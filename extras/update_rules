@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+app_path=`pwd`
+snort_base_path=`pwd`/extras/snort
+export PATH=$PATH:/usr/local/bin
+
+os=`uname -s`
+if [ $os == "FreeBSD" ]
+then
+    sed=gsed
+    make=gmake
+elif [ $os == "Linux" ]
+then
+    sed=sed
+    make=make
+else
+    echo "Unrecognized os: #{os}"
+    exit 1
+fi
+
+# Make sure we use the running ssh-agent
+cd $app_path
+if [ ! -e tmp/ssh.script ]
+then
+	echo "Unable to find ssh-agent script"
+	exit 1	
+else
+	source tmp/ssh.script
+fi
+
+# Alawys update and enable all plaintext rules
+cd $snort_base_path/rules
+rm * &> /dev/null
+cvs -Q update
+touch white_list.rules
+touch black_list.rules
+$sed -i 's/^# alert/alert/' *.rules
+
+# Generate flowbit rules
+grep -h 'flowbits:set,' $snort_base_path/rules/*.rules | grep -v DELETED | sed 's/^# alert/alert/' > $snort_base_path/flowbit.rules
+mv $snort_base_path/flowbit.rules $snort_base_path/rules/flowbit.rules
+
+if [ ! $1 ]
+then
+
+	# Update the configs
+	cd $snort_base_path/etc
+	rm * &> /dev/null
+	cvs -Q update
+	touch local.rules
+
+	# Make sure we fix these few lines
+	$sed -i 's/^dynamicpreprocessor/# dynamicpreprocessor/' snort.*.conf
+	$sed -i 's/^dynamicdetection/# dynamicpreprocessor/' snort.*.conf
+	$sed -i 's/^dynamicengine/# dynamicpreprocessor/' snort.*.conf
+
+	# Enable all rule includes
+	$sed -i 's/^# include $PREPROC_RULE/include $PREPROC_RULE/' snort.*.conf
+	$sed -i 's/^# include $SO_RULE/include $SO_RULE/' snort.*.conf
+	$sed -i 's/^include $PREPROC_RULE_PATH\/sensitive-data\.rules/# include $PREPROC_RULE_PATH\/sensitive-data.rules/' snort.*.conf
+
+	# Make copies for local runs and disable all rules
+	for x in snort.*.conf; do cp $x $x.local; done
+	$sed -i 's/^include $RULE_PATH/# include $RULE_PATH/' snort.*.conf.local
+	$sed -i 's/^include $PREPROC_RULE/# include $PREPROC_RULE/' snort.*.conf.local
+	$sed -i 's/^include $SO_RULE/# include $SO_RULE/' snort.*.conf.local
+
+	for x in snort.*.conf.local; do echo 'include $RULE_FILE' >> $x; done
+	
+	# Make sure to include local rules for local tests
+	$sed -i 's/^# include $RULE_PATH\/local\.rules/include local.rules/' snort.*.conf.local
+	
+	# Make sure we don't kill the poller
+	for x in snort.*.conf*
+	do
+		echo 'event_filter gen_id 0, sig_id 0, type limit, track by_src, count 10, seconds 10' >> $x
+	done
+
+	# Update and enable all preprocessor rules
+	cd $snort_base_path/preprocessor
+	rm * &> /dev/null
+	cvs -Q update
+	$sed -i 's/^# alert/alert/' *.rules
+
+	# Update and enable all so rules
+	cd $snort_base_path/snort-current/src/so_rules
+	rm * &> /dev/null
+	cvs -Q update
+	$make
+	#$sed -i 's/^# alert/alert/' *.rules
+
+        # Enable all flowbit setting rules including file-identify.rules
+        $sed -i 's/^# include $RULE_PATH\/file-identify\.rules/include $RULE_PATH\/flowbit.rules/' $snort_base_path/etc/snort.*.conf.local
+fi

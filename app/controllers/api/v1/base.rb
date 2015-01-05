@@ -4,7 +4,10 @@ module API
     class Base < Grape::API
       mount API::V1::Contacts
       mount API::V1::Products
-      # mount API::V1::Reviews
+      mount API::V1::Bugs
+      mount API::V1::Rules
+      mount API::V1::Exploits
+      mount API::V1::Attachments
 
       add_swagger_documentation(
           api_version: "v1",

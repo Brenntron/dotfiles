@@ -1,11 +1,27 @@
 Rails.application.routes.draw do
 
+
+
+  resources :rules
+
+  root 'pages#index'
+
+  resources :attachments
+  resources :exploits
+  resources :bugs
   resources :reviews
   resources :contacts
   resources :products
 
   mount API::Base => '/api'
   mount GrapeSwaggerRails::Engine => '/documentation'
+
+
+  get 'login' => 'sessions#new', as: 'login'
+  post 'login' => 'sessions#login', as: 'signin'
+  get 'logout' => 'sessions#logout', as: 'logout'
+
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

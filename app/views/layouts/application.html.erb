@@ -8,6 +8,19 @@
 </head>
 <body>
 
+
+<% if notice %>
+    <div id="error_messages" class="fixed_alerts alert alert-info  fade in" data-alert="alert">
+      <%= raw "<p>#{notice}</p>" %>
+    </div>
+<%elsif alert%>
+    <div id="error_messages" class="fixed_alerts alert alert-danger">
+      <%= raw "<p>#{alert}</p>" %>
+    </div>
+<% else %>
+    <div id="error_messages">
+    </div>
+<% end %>
 <%= yield %>
 
 </body>
