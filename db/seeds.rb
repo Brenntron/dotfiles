@@ -6,6 +6,10 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+User.create(cvs_username:"nicherbe",committer:'true')
+User.create(cvs_username:"alwillet",committer:'false')
+User.create(cvs_username:"pamullen",committer:'false')
+
 
 c1 = Contact.create(name: 'Giamia',about: 'Although Giamia came from a humble spark of lightning, he quickly grew to be a great craftsman, providing all the warming instruments needed by those close to him.',avatar: 'images/contacts/giamia.png')
 c2 = Contact.create(name: 'Anostagia',about: 'Knowing there was a need for it, Anostagia drew on her experience and spearheaded the Flint & Flame storefront. In addition to coding the site, she also creates a few products available in the store.',avatar: 'images/contacts/anostagia.png')
@@ -20,3 +24,22 @@ p6 = Product.create(title: 'Matches',price:550,description:'One end is coated wi
 r1 = Review.create(reviewedAt: (DateTime.now - 3.days),text: "Started a fire in no time!",rating: 4, product_id: p3.id)
 r2 = Review.create(reviewedAt: DateTime.now,text: "Not the brightest flame, but warm!",rating: 3, product_id: p6.id)
 r3 = Review.create(reviewedAt: (DateTime.now - 5.days),text: "This is some amazing Flint! It lasts **forever** and works even when damp! I still remember the first day when I was only a little fire sprite and got one of these in my flame stalking for treemas. My eyes lit up the moment I tried it! Here's just a few uses for it:\n\n* Create a fire using just a knife and kindling!\n* Works even after jumping in a lake (although, that's suicide for me)\n* Small enough to fit in a pocket -- if you happen to wear pants\n\n\nYears later I'm still using the _same one_. That's the biggest advantage of this -- it doesn't run out easily like matches. As long as you have something to strike it against, **you can start a fire anywhere** you have something to burn!",rating: 5, product_id: p1.id)
+
+
+
+Reference.create(name:'telus', description:'Telus bug report information', validation: 'nil', bugzilla_format:'((FSC|TSL)\\d{8}-\\d{2})',example:'FSC20111103-05',rule_format:'<reference>',url:'https://portal.telussecuritylabs.com/threat/DATA')
+
+Bug.create(bugzilla_id:'143429',state:'Open',summary:'Just some bug',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+Bug.create(bugzilla_id:'142673',state:'Pending',summary:'This is a pending bug',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some more notes',committer_notes:'these are some more committer notes',reference_id:'1')
+
+
+Attachment.create(bugzilla_attachment_id: '1234',filename:'some attachment',file_size:'25')
+
+
+Rule.create(gid:'1',sid:'12345',rev:'1',message:'This is a message',content:'this is where the content goes',state:'open',average_check: '2.5',average_match:'1.7',tested:'false')
+Rule.create(gid:'1',sid:'54321',rev:'1',message:'This is a new message',content:'content works here',state:'open',average_check: '2.2',average_match:'3.1',tested:'false')
+
+Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
+
+
+

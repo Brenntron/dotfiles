@@ -11,8 +11,14 @@ gem "rack-cors", require: "rack/cors"
 gem 'cancan', '1.6.10'
 
 gem 'pg', '0.17.1'
+gem 'ruby-bugzilla'
 
-
+gem 'diffy', '~> 2.1.4'
+gem 'sfbugzilla', '>= 0.0.9', :git => 'git@code.engine.sourcefire.com:VRT-Web/sfbugzilla.git'
+gem 'net-ssh'
+gem 'daemons'
+gem 'stomp'
+gem 'dalli', '~> 2.6.4'
 
 group :development do
   gem 'pry', '0.9.12.4'

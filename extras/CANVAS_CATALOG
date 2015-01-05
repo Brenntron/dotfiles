@@ -1,0 +1,1073 @@
+./exploits/umpnp_dos/umpnp_dos.py:DOCUMENTATION["CVE Name"] = "CVE-2005-2120"
+./exploits/umpnp_dos/umpnp_dos.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-2120"
+./exploits/CVE_2006_4842/CVE_2006_4842.py:NAME                                = 'CVE-2006-4842: libnspr2'
+./exploits/CVE_2006_4842/CVE_2006_4842.py:DOCUMENTATION['CVE Name']           = 'CVE-2006-4842'
+./exploits/CVE_2006_4842/CVE_2006_4842.py:DOCUMENTATION['CVE URL']            = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-4842'
+./exploits/dokuwiki_exec/dokuwiki_exec.py:DOCUMENTATION["CVE Name"]="CVE-2006-2878"
+./exploits/acrobat_flash/acrobat_flash.py:DOCUMENTATION['CVE Name']='CVE-2009-1862'
+./exploits/acrobat_flash/acrobat_flash.py:DOCUMENTATION['CVE URL']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1862'
+./exploits/nss/nss.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0826"
+./exploits/nss/nss.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0826"
+./exploits/linksnet_include/linksnet_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2707"
+./exploits/linksnet_include/linksnet_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2707"
+./exploits/webmin/webmin.py:DOCUMENTATION["CVE Name"] = "CVE-2005-3912"
+./exploits/webmin/webmin.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-3912"
+./exploits/joomlacompetitions_rfi/joomlacompetitions_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-5790"
+./exploits/joomlacompetitions_rfi/joomlacompetitions_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5790"
+./exploits/segue_include/segue_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5186"
+./exploits/segue_include/segue_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5186"
+./exploits/groupwise_messenger/groupwise_messenger.py:DOCUMENTATION["CVE Name"] = "CVE-2006-0992"
+./exploits/groupwise_messenger/groupwise_messenger.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-0992"
+./exploits/flash_wild2/flash_wild2.py:NAME='Flash 0day CVE-2010-2884'
+./exploits/flash_wild2/flash_wild2.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-2884'
+./exploits/netrisk_include/netrisk_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0144"
+./exploits/netrisk_include/netrisk_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0144"
+./exploits/joomladadamail_rfi/joomladadamail_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-6221"
+./exploits/joomladadamail_rfi/joomladadamail_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6221"
+./exploits/lsgb_exec/lsgb_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2093"
+./exploits/lsgb_exec/lsgb_exec.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CCVE-2007-2093"
+./exploits/msimpersonate/msimpersonate.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0894"
+./exploits/msimpersonate/msimpersonate.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0894"
+./exploits/brightstor_message/brightstor_message.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-5143'
+./exploits/brightstor_message/brightstor_message.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5143'
+./exploits/iisftp_nlst/iisftp_nlst.py:DOCUMENTATION["CVE Name"] = "CVE-2009-3023"
+./exploits/iisftp_nlst/iisftp_nlst.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-3023"
+./exploits/ms07_031/ms07_031.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-2218'
+./exploits/ms07_031/ms07_031.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2218'
+./exploits/aimstats_exec/aimstats_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2167"
+./exploits/aimstats_exec/aimstats_exec.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2167"
+./exploits/anyinventory_include/anyinventory_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4744"
+./exploits/anyinventory_include/anyinventory_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4744"
+./exploits/gomplayer/gomplayer.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5779"
+./exploits/gomplayer/gomplayer.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5779"
+./exploits/ms07_051/ms07_051.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-3040'
+./exploits/ms07_051/ms07_051.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3040'
+./exploits/ms06_066/ms06_066.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-4688'
+./exploits/ms06_066/ms06_066.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-4688'
+./exploits/flip_include/flip_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-0785"
+./exploits/flip_include/flip_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0785"
+./exploits/sun_java_hsbparser/sun_java_hsbparser.py:DOCUMENTATION['CVE Name'] = 'CVE-2009-3867'
+./exploits/ms04_007/ms04_007.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0818"
+./exploits/ms04_007/ms04_007.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0818"
+./exploits/ms03_026/ms03_026.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0352"
+./exploits/ms03_026/ms03_026.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0352"
+./exploits/pluck_lfi/pluck_lfi.py:DOCUMENTATION["CVE Name"]= "CVE-2009-1765"
+./exploits/ms07_067/ms07_067.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-5587'
+./exploits/ms07_067/ms07_067.py:DOCUMENTATION['CVE Url'] = 'http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5587'
+./exploits/ms08_049/ms08_049.py:DOCUMENTATION['CVE Name']='CVE-2008-1457'
+./exploits/ms08_049/ms08_049.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1457'
+./exploits/lamasoft_include/lamasoft_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0423"
+./exploits/lamasoft_include/lamasoft_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0423"
+./exploits/ms07_029/ms07_029.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-1748'
+./exploits/ms07_029/ms07_029.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1748'
+./exploits/phplist_lfi/phplist_lfi.py:DOCUMENTATION["CVE Name"]= "CVE-2008-5887"
+./exploits/phplist_lfi/phplist_lfi.py:DOCUMENTATION["CVE Url"]= "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5887" 
+./exploits/proto_ops_null/proto_ops_null.py:Added support for: CVE-2009-2698 (udp_sendmsg) as a fallback ...
+./exploits/vsploit_exchangepop3/vsploit_exchangepop3.py:DOCUMENTATION["CVE Name"] = "CVE-2006-0537"
+./exploits/vsploit_exchangepop3/vsploit_exchangepop3.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-0537"
+./exploits/piwik/piwik.py:DOCUMENTATION['References']=['http://www.sektioneins.com/en/advisories/advisory-032009-piwik-cookie-unserialize-vulnerability/','http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2009-4137']
+./exploits/piwik/piwik.py:DOCUMENTATION['CVE Name']='CVE-2009-4137'
+./exploits/wordsmith_include/wordsmith_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5102"
+./exploits/wordsmith_include/wordsmith_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5102"
+./exploits/joomlaradiov5_include/joomlaradiov5_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4923"
+./exploits/joomlaradiov5_include/joomlaradiov5_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4923"
+./exploits/sugarcrm_fileupload/sugarcrm_fileupload.py:DOCUMENTATION["CVE Name"] = "CVE-2009-2146"
+./exploits/sugarcrm_fileupload/sugarcrm_fileupload.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-2146"
+./exploits/firefox_35/firefox_35.py:DOCUMENTATION["CVE Name"]     = "CVE-2009-2477"
+./exploits/firefox_35/firefox_35.py:DOCUMENTATION["CVE Url"]      = "http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2009-2477"
+./exploits/joomlagooglebase_rfi/joomlagooglebase_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-6483"
+./exploits/joomlagooglebase_rfi/joomlagooglebase_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6483"
+./exploits/minibill_include/minibill_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3306"
+./exploits/minibill_include/minibill_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3306"
+./exploits/stinky/stinky.py:DOCUMENTATION["CVE Name"] = "CVE-2005-3252"
+./exploits/stinky/stinky.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-3252"
+./exploits/ms_kblayout/ms_kblayout.py:DOCUMENTATION['CVE Name']           = 'CVE-2010-2744'
+./exploits/ms_kblayout/ms_kblayout.py:DOCUMENTATION['CVE URL']            = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-2744'
+./exploits/podcastgen_include/podcastgen_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1124"
+./exploits/podcastgen_include/podcastgen_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1124"
+./exploits/ms08_067/ms08_067.py:DOCUMENTATION['CVE Name']='CVE-2008-4250'
+./exploits/ms08_067/ms08_067.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4250'
+./exploits/ms08_067/ms08_067.py:DOCUMENTATION['CVS URL']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4250'
+./exploits/ms04_011_sslpct/ms04_011_sslpct.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0719"
+./exploits/ms04_011_sslpct/ms04_011_sslpct.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0719"
+./exploits/phpwcms_include/phpwcms_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5185"
+./exploits/phpwcms_include/phpwcms_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5185"
+./exploits/flash_APSB11_18/flash_APSB11_18.py:                             'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-2110',
+./exploits/flash_APSB11_18/flash_APSB11_18.py:                             'http://blogs.technet.com/b/mmpc/archive/2011/07/01/a-technical-analysis-on-the-exploit-for-cve-2011-2110-adobe-flash-player-vulnerability.aspx']
+./exploits/flash_APSB11_18/flash_APSB11_18.py:DOCUMENTATION['CVE Name'] = 'CVE-2011-2110'
+./exploits/flash_APSB11_18/flash_APSB11_18.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-2110'
+./exploits/ms10_026/ms10_026.py:DOCUMENTATION['CVE Name']       = 'CVE-2010-0480'
+./exploits/ms10_026/ms10_026.py:DOCUMENTATION['CVS URL']        = 'http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0480'
+./exploits/oracle8listener_win32/oracle8listener_win32.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0499"
+./exploits/oracle8listener_win32/oracle8listener_win32.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0499"
+./exploits/ms06_025b/ms06_025b.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2371"
+./exploits/ms06_025b/ms06_025b.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2371"
+./exploits/citrix_metaframe/citrix_metaframe.py:DOCUMENTATION['CVE Name']   = "CVE-2008-0356"
+./exploits/citrix_metaframe/citrix_metaframe.py:DOCUMENTATION['CVE Url']    = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0356"
+./exploits/i2omgmt/i2omgmt.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0322"
+./exploits/i2omgmt/i2omgmt.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CCVE-2008-0322"
+./exploits/ossigeno_include/ossigeno_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5234"
+./exploits/ossigeno_include/ossigeno_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5234"
+./exploits/CVE_2010_4452/CVE_2010_4452.py:DOCUMENTATION["CVE Name"]       = "CVE-2010-4452"
+./exploits/jafcms_include/jafcms_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1609"
+./exploits/jafcms_include/jafcms_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1609"
+./exploits/nwspool_b/nwspool_b.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2954"
+./exploits/nwspool_b/nwspool_b.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2954"
+./exploits/DSU/DSU.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2451"
+./exploits/DSU/DSU.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2451"
+./exploits/openssl_keylen/openssl_keylen.py:DOCUMENTATION["CVE Name"]="CVE-2002-0656"
+./exploits/openssl_keylen/openssl_keylen.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-0656"
+./exploits/wmf_setabort/wmf_setabort.py:DOCUMENTATION["CVE Name"] = "CVE-2005-4560"
+./exploits/wmf_setabort/wmf_setabort.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-4560"
+./exploits/mssql_auth/mssql_auth.py:DOCUMENTATION["CVE Name"] = "CVE-2000-1209"
+./exploits/mssql_auth/mssql_auth.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2000-1209"
+./exploits/debian_ssh_key_brute/debian_ssh_key_brute.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0166"
+./exploits/debian_ssh_key_brute/debian_ssh_key_brute.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0166"
+./exploits/ms05_046/ms05_046.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1985"
+./exploits/ms05_046/ms05_046.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1985"
+./exploits/firefox_appendchild/firefox_appendchild.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-3765'
+./exploits/3comtftp/3comtftp.py:DOCUMENTATION["CVE Name"] = "CVE-2006-6183"
+./exploits/3comtftp/3comtftp.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-6183"
+./exploits/CLOUDBURST/CLOUDBURST.py:DOCUMENTATION['CVE Name']='CVE-2009-1244'
+./exploits/CLOUDBURST/CLOUDBURST.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1244'
+./exploits/CLOUDBURST/CLOUDBURST.py:DOCUMENTATION['CVS URL']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1244'
+./exploits/ms01_023/ms01_023.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0241"
+./exploits/ms01_023/ms01_023.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0241"
+./exploits/booby_include/booby_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-2645"
+./exploits/booby_include/booby_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-2645"
+./exploits/ms08_078/ms08_078.py:DOCUMENTATION['CVE Name']='CVE-2008-4844'
+./exploits/ms08_078/ms08_078.py:DOCUMENTATION['CVS URL']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4844'
+./exploits/helplink_include/helplink_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5099"
+./exploits/helplink_include/helplink_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5099"
+./exploits/joomla_eval/joomla_eval.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4187"
+./exploits/joomla_eval/joomla_eval.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4187"
+./exploits/ms06_055/ms06_055.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-4868'
+./exploits/ms06_055/ms06_055.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-4868'
+./exploits/adminbot_include/adminbot_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2986"
+./exploits/adminbot_include/adminbot_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2986"
+./exploits/ms_taskscheduler/ms_taskscheduler.py:DOCUMENTATION['CVE Name']           = 'CVE-2010-2743' # Not officially released but referenced in multiple places
+./exploits/ms_taskscheduler/ms_taskscheduler.py:DOCUMENTATION['CVE URL']            = 'http://cve.mitre.org/cgi-bin/cvename.cg?name=CVE-2010-2743' # ditto
+./exploits/CVE_2007_4513/CVE_2007_4513.py:NAME                                = 'CVE-2007-4513: lquerypv'
+./exploits/CVE_2007_4513/CVE_2007_4513.py:DOCUMENTATION['CVE Name']           = 'CVE-2007-4513'
+./exploits/CVE_2007_4513/CVE_2007_4513.py:DOCUMENTATION['CVE URL']            = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4513'
+./exploits/ripecms_include/ripecms_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3524"
+./exploits/ripecms_include/ripecms_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3524"
+./exploits/vportal_include/vportal_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5842"
+./exploits/vportal_include/vportal_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5842"
+./exploits/ms05_010/ms05_010.py:DOCUMENTATION["CVE Name"] = "CVE-2005-0050"
+./exploits/ms05_010/ms05_010.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0050"
+./exploits/webdesktop_include/webdesktop_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5388"
+./exploits/webdesktop_include/webdesktop_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5388"
+./exploits/ms09_041/ms09_041.py:DOCUMENTATION['CVE Name']='CVE-2009-1544'
+./exploits/ms09_041/ms09_041.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1544'
+./exploits/ms09_041/ms09_041.py:DOCUMENTATION['CVS URL']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1544'
+./exploits/zencart_remote/zencart_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2009-2255"
+./exploits/zencart_remote/zencart_remote.py:DOCUMENTATION["CVE URL"] = "http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2009-2255"
+./exploits/cachefsd_lpd/cachefsd_lpd.py:DOCUMENTATION["CVE Name"] = "CVE-2002-0084"
+./exploits/cachefsd_lpd/cachefsd_lpd.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-0084"
+./exploits/joomlaclickheat_rfi/joomlaclickheat_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-5793"
+./exploits/joomlaclickheat_rfi/joomlaclickheat_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5793"
+./exploits/smb2_negotiate_remote/smb2_negotiate_remote.py:DOCUMENTATION['CVE Name']='CVE-2009-3103'
+./exploits/smb2_negotiate_remote/smb2_negotiate_remote.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-3103'
+./exploits/ms10_060/ms10_060.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-1898'
+./exploits/ms10_060/ms10_060.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-1898'
+./exploits/ms03_049/ms03_049.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0812"
+./exploits/ms03_049/ms03_049.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0812"
+./exploits/ms06_040/ms06_040.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-3439'
+./exploits/ms06_040/ms06_040.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-3439'
+./exploits/ms06_040/ms06_040.py:DOCUMENTATION['CVS URL'] = 'http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-3439'
+./exploits/netbackup_javaui/netbackup_javaui.py:DOCUMENTATION['CVE Name']='CVE-2005-2715'
+./exploits/netbackup_javaui/netbackup_javaui.py:DOCUMENTATION['CVE Url']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-2715'
+./exploits/joomlachronoforms_include/joomlachronoforms_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0567"
+./exploits/joomlachronoforms_include/joomlachronoforms_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0567"
+./exploits/samba_nttrans/samba_nttrans.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0085"
+./exploits/samba_nttrans/samba_nttrans.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0085"
+./exploits/lshttpd_disc/lshttpd_disc.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5654"
+./exploits/lshttpd_disc/lshttpd_disc.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5654"
+./exploits/news2_include/news2_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2708"
+./exploits/news2_include/news2_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2708"
+./exploits/speech/speech.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2222"
+./exploits/speech/speech.py:DOCUMENTATION["CVE URL"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2222"
+./exploits/java_docbase/java_docbase.py:DOCUMENTATION['CVE Name']='CVE-2010-3552'
+./exploits/CVE_2010_3856/CVE_2010_3856.py:DOCUMENTATION['CVE Name'] = "CVE-2010-3856"
+./exploits/CVE_2010_3856/CVE_2010_3856.py:DOCUMENTATION['CVE Url'] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-3856"
+./exploits/pserverd/pserverd.py:1.11.15 (http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0396). 
+./exploits/pserverd/pserverd.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0396"
+./exploits/pserverd/pserverd.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0396"
+./exploits/ms08_063/ms08_063.py:DOCUMENTATION['CVE Name']='CVE-2008-4038'
+./exploits/ms08_063/ms08_063.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4038'
+./exploits/ms10_032/ms10_032.py:DOCUMENTATION['CVE Name']='CVE-2010-0485'
+./exploits/ms10_032/ms10_032.py:DOCUMENTATION['CVE Url']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0485'
+./exploits/izicontents_include/izicontents_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5054"
+./exploits/izicontents_include/izicontents_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5054"
+./exploits/savant/savant.py:DOCUMENTATION["CVE Name"] = "CVE-2002-1120"
+./exploits/savant/savant.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-1120"
+./exploits/warftp_165/warftp_165.py:DOCUMENTATION["CVE Name"] = "CVE-2007-1567"
+./exploits/warftp_165/warftp_165.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1567"
+./exploits/xfs_swapchar2b/xfs_swapchar2b.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4990"
+./exploits/xfs_swapchar2b/xfs_swapchar2b.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4990"
+./exploits/acrobat_js4/acrobat_js4.py:DOCUMENTATION['CVE']='CVE-2009-0927'
+./exploits/acrobat_js4/acrobat_js4.py:DOCUMENTATION["CVE Url"]="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0927"
+./exploits/groupe_include/groupe_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1074"
+./exploits/groupe_include/groupe_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1074"
+./exploits/phpblock_include/phpblock_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1776"
+./exploits/phpblock_include/phpblock_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1776"
+./exploits/ms10_048/ms10_048.py:DOCUMENTATION['CVE Name']           = 'CVE-2010-1897'
+./exploits/ms10_048/ms10_048.py:DOCUMENTATION['CVE URL']            = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-1897'
+./exploits/xoops_cjcontent/xoops_cjcontent.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3220"
+./exploits/xoops_cjcontent/xoops_cjcontent.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3220"
+./exploits/worldmail/worldmail.py:DOCUMENTATION["CVE Name"] = "CVE-2005-4267"
+./exploits/worldmail/worldmail.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-4267"
+./exploits/ms05_039/ms05_039.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1983"
+./exploits/ms05_039/ms05_039.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1983"
+./exploits/phpsitebackup_include/phpsitebackup_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2199"
+./exploits/phpsitebackup_include/phpsitebackup_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2199"
+./exploits/nessusxml/nessusxml.py:        # NESSUSVULNS1 [CVE-2008-0001, CVE-2008-0002, CVE-2008-0003] etc
+./exploits/citrix_pp/citrix_pp.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-0444'
+./exploits/citrix_pp/citrix_pp.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0444'
+./exploits/ms07_065/ms07_065.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-3039'
+./exploits/ms07_065/ms07_065.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3039'
+./exploits/ms07_065/ms07_065.py:DOCUMENTATION['CVE']='CVE-2007-3039'
+./exploits/xitami/xitami.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5067"
+./exploits/xitami/xitami.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5067"
+./exploits/tivoli_storage/tivoli_storage.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4880"
+./exploits/tivoli_storage/tivoli_storage.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4880"
+./exploits/ms08_025/ms08_025.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1084"
+./exploits/ms08_025/ms08_025.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1084"
+./exploits/ms08_025/ms08_025.py:DOCUMENTATION["CVS URL"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1084"
+./exploits/dragoon_include/dragoon_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1773"
+./exploits/dragoon_include/dragoon_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1773"
+./exploits/phpuserbase_include/phpuserbase_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1043"
+./exploits/phpuserbase_include/phpuserbase_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1043"
+./exploits/ms06_024/ms06_024.py:DOCUMENTATION['CVE Name']='CVE-2006-0025'
+./exploits/ms06_024/ms06_024.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-0025'
+./exploits/ms06_024/ms06_024.py:DOCUMENTATION['CVS URL']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-0025'
+./exploits/joompana_include/joompana_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5363"
+./exploits/joompana_include/joompana_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5363"
+./exploits/installshield/installshield.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5660"
+./exploits/installshield/installshield.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5660"
+./exploits/installshield/installshield.py:DOCUMENTATION["CVS URL"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5660"
+./exploits/yppasswdd/yppasswdd.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0779"
+./exploits/yppasswdd/yppasswdd.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0779"
+./exploits/joomlamosdirectory_include/joomlamosdirectory_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0690"
+./exploits/joomlamosdirectory_include/joomlamosdirectory_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0690"
+./exploits/icecast/icecast.py:DOCUMENTATION["CVE Name"] = "CVE-2004-1561"
+./exploits/icecast/icecast.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1561"
+./exploits/ms11_003/ms11_003.py:PROPERTY["CVE"]                = "CVE-2010-3971"
+./exploits/ms11_003/ms11_003.py:http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-3971
+./exploits/wordtube_remote/wordtube_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2481"
+./exploits/wordtube_remote/wordtube_remote.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2481"
+./exploits/lavague_include/lavague_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2607"
+./exploits/lavague_include/lavague_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2607"
+./exploits/dokuwiki_exec2/dokuwiki_exec2.py:DOCUMENTATION["CVE Name"]="CVE-2009-1960"
+./exploits/citect_scada/citect_scada.py:DOCUMENTATION['CVE Name']='CVE-2008-2639'
+./exploits/citect_scada/citect_scada.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-2639'
+./exploits/MercurImapSubscribe/MercurImapSubscribe.py:DOCUMENTATION["CVE Name"] = "CVE-2007-1579"
+./exploits/MercurImapSubscribe/MercurImapSubscribe.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1579"
+./exploits/smartag_word/smartag_word.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2492"
+./exploits/smartag_word/smartag_word.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2492"
+./exploits/ms09_013/ms09_013.py:DOCUMENTATION['CVE Name']='CVE-2009-0086'
+./exploits/ms09_013/ms09_013.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0086'
+./exploits/openads_exec/openads_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0635"
+./exploits/openads_exec/openads_exec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0635"
+./exploits/MEWebMail/MEWebMail.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1348"
+./exploits/MEWebMail/MEWebMail.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1348"
+./exploits/FCKEditor/FCKEditor.py:DOCUMENTATION["CVE Name"]      = "CVE-2009-2265"
+./exploits/FCKEditor/FCKEditor.py:DOCUMENTATION["CVE URL"]       = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-2265"
+./exploits/realserver2/realserver2.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0774"
+./exploits/realserver2/realserver2.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0774"
+./exploits/livealbum_include/livealbum_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5315"
+./exploits/livealbum_include/livealbum_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5315"
+./exploits/eznet/eznet.py:DOCUMENTATION["CVE Name"] = "CVE-2003-1339"
+./exploits/eznet/eznet.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-1339"
+./exploits/cep_include/cep_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2199"
+./exploits/cep_include/cep_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2199"
+./exploits/edirectory_http/edirectory_http.py:DOCUMENTATION["CVE Name"] = "CVE-2006-5478"
+./exploits/edirectory_http/edirectory_http.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5478"
+./exploits/naimas32/naimas32.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0095"
+./exploits/naimas32/naimas32.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0095"
+./exploits/naimas32/naimas32.py:Patched with CVE-2004-0095
+./exploits/phpmyadmin_injection/phpmyadmin_injection.py:DOCUMENTATION["CVE Name"]      = "CVE-2009-1151"
+./exploits/phpmyadmin_injection/phpmyadmin_injection.py:DOCUMENTATION["CVE URL"]       = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1151"
+./exploits/joomlafeedrator_rfi/joomlafeedrator_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-5789"
+./exploits/joomlafeedrator_rfi/joomlafeedrator_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5789"
+./exploits/CF_directory_traversal/CF_directory_traversal.py:DOCUMENTATION["CVE Name"]      = "CVE-2010-2861 - "
+./exploits/CF_directory_traversal/CF_directory_traversal.py:DOCUMENTATION["CVE URL"]       = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-2861"
+./exploits/joomlarss_rfi/joomlarss_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-5053"
+./exploits/joomlarss_rfi/joomlarss_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5053"
+./exploits/safari_file_stealing2/safari_file_stealing2.py:DOCUMENTATION["CVE"]            = "CVE-2009-1699"
+./exploits/safari_file_stealing2/safari_file_stealing2.py:DOCUMENTATION["CVE url"]        = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1699"
+./exploits/tikiwiki_exec/tikiwiki_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5423"
+./exploits/tikiwiki_exec/tikiwiki_exec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5423"
+./exploits/ote_include/ote_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2676"
+./exploits/ote_include/ote_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2676"
+./exploits/dfblog4_exec/dfblog4_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-1525"
+./exploits/dfblog4_exec/dfblog4_exec.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1525"
+./exploits/worksimple_rfi/worksimple_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-5764"
+./exploits/worksimple_rfi/worksimple_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5764"
+./exploits/persism_remote/persism_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2545"
+./exploits/persism_remote/persism_remote.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2545"
+./exploits/mswinstcp/mswinstcp.py:DOCUMENTATION["CVE Name"] = "CVE-2004-1080"
+./exploits/mswinstcp/mswinstcp.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1080"
+./exploits/lms_include/lms_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3325"
+./exploits/lms_include/lms_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3325"
+./exploits/ms06_014/ms06_014.py:DOCUMENTATION["CVE Name"]       = "CVE-2006-0003"
+./exploits/wpsniplets_rfi/wpsniplets_rfi.py:DOCUMENTATION["CVE Name"]= "CVE-2008-1059"
+./exploits/tm_sprotect/tm_sprotect.py:DOCUMENTATION["CVE Name"] = "CVE-2007-1070"
+./exploits/tm_sprotect/tm_sprotect.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1070"
+./exploits/ooo_230/ooo_230.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4575"
+./exploits/ooo_230/ooo_230.py:DOCUMENTATION["CVS URL"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4575"
+./exploits/phpbg_include/phpbg_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4636"
+./exploits/phpbg_include/phpbg_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4636"
+./exploits/cmsd_xdrarray/cmsd_xdrarray.py:DOCUMENTATION["CVE Name"] = "CVE-2002-0391"
+./exploits/cmsd_xdrarray/cmsd_xdrarray.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-0391"
+./exploits/acrobat_jbig/acrobat_jbig.py:DOCUMENTATION['CVE Name']='CVE-2009-0658'
+./exploits/acrobat_jbig/acrobat_jbig.py:DOCUMENTATION['CVE URL']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0658'
+./exploits/mssql_replwritetovarbin/mssql_replwritetovarbin.py:DOCUMENTATION["CVE Name"]     = "CVE-2008-5416"
+./exploits/mssql_replwritetovarbin/mssql_replwritetovarbin.py:DOCUMENTATION["CVE Url"]      = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5416"
+./exploits/netmail_webadmin/netmail_webadmin.py:DOCUMENTATION["CVE Name"] = "CVE-2007-1350"
+./exploits/netmail_webadmin/netmail_webadmin.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1350"
+./exploits/limesurvey_include/limesurvey_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3632"
+./exploits/limesurvey_include/limesurvey_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3632"
+./exploits/gapple_client/gapple_client.py:DOCUMENTATION["CVE Name"] = "CVE-2005-0045"
+./exploits/gapple_client/gapple_client.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0045"
+./exploits/ie_peers_setattribute/ie_peers_setattribute.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-0806'
+./exploits/fp30reg/fp30reg.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0822"
+./exploits/fp30reg/fp30reg.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0822"
+./exploits/PROCFS/PROCFS.py:DOCUMENTATION["CVE Name"] = "CVE-2006-3626"
+./exploits/PROCFS/PROCFS.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-3626"
+./exploits/NetworkManagerUnSecret/NetworkManagerUnSecret.py:DOCUMENTATION["CVE Name"]     = "CVE-2009-0365"
+./exploits/NetworkManagerUnSecret/NetworkManagerUnSecret.py:DOCUMENTATION["CVE Url"]      = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0365"
+./exploits/journalness_exec/journalness_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5056"
+./exploits/journalness_exec/journalness_exec.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5056"
+./exploits/cpcommerce_rfi/cpcommerce_rfi.py:DOCUMENTATION["CVE Name"]= "CVE-2009-1936"
+./exploits/cpcommerce_rfi/cpcommerce_rfi.py:DOCUMENTATION["CVE Url"]= "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1936" 
+./exploits/joomlaflashfun_include/joomlaflashfun_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4955"
+./exploits/joomlaflashfun_include/joomlaflashfun_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4955"
+./exploits/ms09_002/ms09_002.py:DOCUMENTATION["CVE Name"]     = "CVE-2009-0075"
+./exploits/ms09_002/ms09_002.py:DOCUMENTATION["CVE Url"]      = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0075"
+./exploits/wpbackup_include/wpbackup_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5800"
+./exploits/wpbackup_include/wpbackup_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5800"
+./exploits/ms11_054/ms11_054.py:DOCUMENTATION['CVE Name']='CVE-2011-1888'
+./exploits/ms11_054/ms11_054.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-1888'
+./exploits/phpbbplus_include/phpbbplus_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5009"
+./exploits/phpbbplus_include/phpbbplus_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5009"
+./exploits/ipswitch_cal/ipswitch_cal.py:DOCUMENTATION['CVE Name'] = 'CVE-2005-1252'
+./exploits/ipswitch_cal/ipswitch_cal.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1252'
+./exploits/w3who/w3who.py:DOCUMENTATION["CVE Name"] = "CVE-2004-1134"
+./exploits/w3who/w3who.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1134"
+./exploits/frontaccount_include/frontaccount_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4279"
+./exploits/frontaccount_include/frontaccount_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4279"
+./exploits/nwspool_a/nwspool_a.py:DOCUMENTATION["CVE Name"] = "CVE-2006-5854"
+./exploits/nwspool_a/nwspool_a.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5854"
+./exploits/ms09_061_cas/ms09_061_cas.py:DOCUMENTATION['CVE Name'] = 'CVE-2009-0091'
+./exploits/ms09_061_cas/ms09_061_cas.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0091'
+./exploits/ms05_021/ms05_021.py:DOCUMENTATION["CVE Name"] = "CVE-2005-0560"
+./exploits/ms05_021/ms05_021.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0560"
+./exploits/nwspool_c/nwspool_c.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0639"
+./exploits/nwspool_c/nwspool_c.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0639"
+./exploits/phpnews_include/phpnews_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4232"
+./exploits/phpnews_include/phpnews_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4232"
+./exploits/phppm_include/phppm_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5641"
+./exploits/phppm_include/phppm_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5641"
+./exploits/ms06_071/ms06_071.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-5745'
+./exploits/ms06_071/ms06_071.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5745'
+./exploits/mdaemon/mdaemon.py:DOCUMENTATION["CVE Name"] = "CVE-2004-2292"
+./exploits/mdaemon/mdaemon.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-2292"
+./exploits/txxcms_include/txxcms_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4818"
+./exploits/txxcms_include/txxcms_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4818"
+./exploits/foxit_printf/foxit_printf.py:DOCUMENTATION['CVE']='CVE-2008-1104'
+./exploits/foxit_printf/foxit_printf.py:DOCUMENTATION['CVE Name'] = 'CVE-2008-1104'
+./exploits/foxit_printf/foxit_printf.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1104'
+./exploits/wptable_remote/wptable_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2484"
+./exploits/wptable_remote/wptable_remote.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2484"
+./exploits/GDIWrite4/GDIWrite4.py:DOCUMENTATION["CVE Name"] = "CVE-2006-5758"
+./exploits/GDIWrite4/GDIWrite4.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5758"
+./exploits/ms07_019/ms07_019.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-1204'
+./exploits/ms07_019/ms07_019.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1204'
+./exploits/ms05_043/ms05_043.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1984"
+./exploits/ms05_043/ms05_043.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1984"
+./exploits/aixcmsd/aixcmsd.py:DOCUMENTATION["CVE Name"]           = "CVE-2009-3699"
+./exploits/quickteam_rfi/quickteam_rfi.py:DOCUMENTATION["CVE Name"]= "CVE-2009-1551"
+./exploits/mssqlhello/mssqlhello.py:DOCUMENTATION["CVE Name"] = "CVE-2002-1123"
+./exploits/mssqlhello/mssqlhello.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-1123"
+./exploits/mssqlresolvestack/mssqlresolvestack.py:DOCUMENTATION["CVE Name"] = "CVE-2002-1123"
+./exploits/mssqlresolvestack/mssqlresolvestack.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-1123"
+./exploits/goodtech_ssh/goodtech_ssh.py:DOCUMENTATION['CVE Name']="CVE-2008-4726"
+./exploits/mailenable_imap/mailenable_imap.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1015"
+./exploits/mailenable_imap/mailenable_imap.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1015"
+./exploits/udevd/udevd.py:DOCUMENTATION["CVE Name"]       = "CVE-2009-1185"
+./exploits/udevd/udevd.py:DOCUMENTATION["CVE Url"]        = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1185"
+./exploits/udevd/udevd.py:DOCUMENTATION["References"]     = ["http://c-skills.blogspot.com/2009/04/udev-trickery-cve-2009-1185-and-cve.html"]
+./exploits/sphpell_include/sphpell_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3522"
+./exploits/sphpell_include/sphpell_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3522"
+./exploits/mantis113/mantis113.py:DOCUMENTATION["CVE Name"]="CVE-2008-4688"
+./exploits/mantis113/mantis113.py:DOCUMENTATION["CVE Url"]="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4688"
+./exploits/sadmind/sadmind.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0722"
+./exploits/sadmind/sadmind.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0722"
+./exploits/mknoboard_include/mknoboard_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3813"
+./exploits/mknoboard_include/mknoboard_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3813"
+./exploits/roundcube/roundcube.py:DOCUMENTATION["CVE Name"]="CVE-2008-5619"
+./exploits/roundcube/roundcube.py:DOCUMENTATION["CVE Url"]="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5619"
+./exploits/svndate/svndate.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0397"
+./exploits/svndate/svndate.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0397"
+./exploits/dfdcart_include/dfdcart_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5098"
+./exploits/dfdcart_include/dfdcart_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5098"
+./exploits/awservices/awservices.py:DOCUMENTATION["CVE Name"] = "CVE-2004-1812"
+./exploits/awservices/awservices.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1812"
+./exploits/joomla12pic_include/joomla12pic_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4954"
+./exploits/joomla12pic_include/joomla12pic_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4954"
+./exploits/dtspcd/dtspcd.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0803"
+./exploits/dtspcd/dtspcd.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0803"
+./exploits/phphtml_remote/phphtml_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3230"
+./exploits/phphtml_remote/phphtml_remote.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3230"
+./exploits/msxexch50/msxexch50.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0714"
+./exploits/msxexch50/msxexch50.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0714"
+./exploits/blog_pixelmotion/blog_pixelmotion.py:DOCUMENTATION["CVE Name"] = "CVE-2006-5085"
+./exploits/blog_pixelmotion/blog_pixelmotion.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5085"
+./exploits/punbb_langexec/punbb_langexec.py:DOCUMENTATION["CVE Name"] = 'CVE-2006-5735'
+./exploits/punbb_langexec/punbb_langexec.py:DOCUMENTATION["CVE Url"] = 'http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5735'
+./exploits/domino_cram/domino_cram.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-1675'
+./exploits/domino_cram/domino_cram.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1675'
+./exploits/phprealty_include/phprealty_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4834"
+./exploits/phprealty_include/phprealty_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4834"
+./exploits/CVE_2010_1807/CVE_2010_1807.py:DOCUMENTATION["CVE Name"]       = "CVE-2010-1807"
+./exploits/CVE_2010_1807/CVE_2010_1807.py:DOCUMENTATION["CVE Url"]        = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-1807"
+./exploits/CVE_2010_1807/CVE_2010_1807.py:DOCUMENTATION["References"]     = "http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-1807"
+./exploits/ms08_062/ms08_062.py:DOCUMENTATION['CVE Name']='CVE-2008-1446'
+./exploits/ms08_062/ms08_062.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1446'
+./exploits/smartpub_exec/smartpub_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0503"
+./exploits/smartpub_exec/smartpub_exec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0503"
+./exploits/iisftp_globbing/iisftp_globbing.py:DOCUMENTATION["CVE Name"] = "CVE-2009-2521"
+./exploits/iisftp_globbing/iisftp_globbing.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-2521"
+./exploits/towel_include/towel_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5628"
+./exploits/towel_include/towel_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5628"
+./exploits/foxit_Action/foxit_Action.py:DOCUMENTATION["CVE Name"]           = "CVE-2009-0837"
+./exploits/foxit_Action/foxit_Action.py:DOCUMENTATION["CVE Url"]            = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0837"
+./exploits/geeklog2_remote/geeklog2_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2793"
+./exploits/geeklog2_remote/geeklog2_remote.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2793"
+./exploits/borland_ib/borland_ib.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-3566'
+./exploits/borland_ib/borland_ib.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3566'
+./exploits/sunlogin/sunlogin.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0797"
+./exploits/sunlogin/sunlogin.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0797"
+./exploits/chfnescape/chfnescape.py:DOCUMENTATION["CVE Name"] = "CVE-2005-3503"
+./exploits/chfnescape/chfnescape.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-3503"
+./exploits/ms06_057/ms06_057.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-3730'
+./exploits/ms06_057/ms06_057.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-3730'
+./exploits/openview_trace/openview_trace.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-1676'
+./exploits/openview_trace/openview_trace.py:DOCUMENTATION['CVE Url'] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1676"
+./exploits/pindorama_include/pindorama_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5387"
+./exploits/pindorama_include/pindorama_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5387"
+./exploits/zen/zen.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1255"
+./exploits/zen/zen.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1255"
+./exploits/CVE_2011_1485/CVE_2011_1485.py:NAME = 'CVE-2011-1485: pkexec st_uid race'
+./exploits/CVE_2011_1485/CVE_2011_1485.py:DESCRIPTION = 'Elevate MOSDEF Node privileges through CVE-2011-1485'
+./exploits/CVE_2011_1485/CVE_2011_1485.py:DOCUMENTATION['CVE Name']='CVE-2011-1485'
+./exploits/CVE_2011_1485/CVE_2011_1485.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-1485'
+./exploits/ms07_066/ms07_066.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-5350'
+./exploits/ms07_066/ms07_066.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5350'
+./exploits/xoops_tinycontent/xoops_tinycontent.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3237"
+./exploits/xoops_tinycontent/xoops_tinycontent.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3237"
+./exploits/cam/cam.py:DOCUMENTATION["CVE Name"] = "CVE-2004-1812"
+./exploits/cam/cam.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1812"
+./exploits/visualpic_include/visualpic_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1876"
+./exploits/visualpic_include/visualpic_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1876"
+./exploits/trendmicro_setowned/trendmicro_setowned.py:DOCUMENTATION['CVE Name'         ] = 'CVE-2010-3189'
+./exploits/trendmicro_setowned/trendmicro_setowned.py:DOCUMENTATION['CVE Url'          ] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-3189'
+./exploits/vmware_dhcpd/vmware_dhcpd.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-0063'
+./exploits/vmware_dhcpd/vmware_dhcpd.py:DOCUMENTATION['CVE Url'] = 'http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0063'
+./exploits/phplinks_include/phplinks_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0566"
+./exploits/phplinks_include/phplinks_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0566"
+./exploits/ws_ftpd_xcrc/ws_ftpd_xcrc.py:DOCUMENTATION["CVE Name"] = "CVE-2006-5000"
+./exploits/ws_ftpd_xcrc/ws_ftpd_xcrc.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5000"
+./exploits/lookstrike_include/lookstrike_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0803"
+./exploits/lookstrike_include/lookstrike_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0803"
+./exploits/radexecd/radexecd.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1825"
+./exploits/radexecd/radexecd.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1825"
+./exploits/CVE_2007_4003/CVE_2007_4003.py:NAME                                = 'CVE-2007-4003: pioout'
+./exploits/CVE_2007_4003/CVE_2007_4003.py:DOCUMENTATION['CVE Name']           = 'CVE-2007-4003'
+./exploits/CVE_2007_4003/CVE_2007_4003.py:DOCUMENTATION['CVE URL']            = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4003'
+./exploits/loudblog_exec/loudblog_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0139"
+./exploits/loudblog_exec/loudblog_exec.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0139"
+./exploits/iis_doubledecode/iis_doubledecode.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0333"
+./exploits/iis_doubledecode/iis_doubledecode.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0333"
+./exploits/dagger_include/dagger_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3431"
+./exploits/dagger_include/dagger_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3431"
+./exploits/phpprofiles_include/phpprofiles_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1051"
+./exploits/phpprofiles_include/phpprofiles_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1051"
+./exploits/sun_java_hsbparser_linux/sun_java_hsbparser_linux.py:DOCUMENTATION['CVE Name'] = 'CVE-2009-3867'
+./exploits/samba_trans2/samba_trans2.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0201"
+./exploits/samba_trans2/samba_trans2.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0201"
+./exploits/trionic_include/trionic_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5271"
+./exploits/trionic_include/trionic_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5271"
+./exploits/vsploit_mercurimap/vsploit_mercurimap.py:DOCUMENTATION["CVE Name"] = "CVE-2006-1255"
+./exploits/vsploit_mercurimap/vsploit_mercurimap.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-1255"
+./exploits/strawberry_lfi/strawberry_lfi.py:DOCUMENTATION["CVE Name"]= "CVE-2009-1774"
+./exploits/WAnewsletter_remote/WAnewsletter_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2969"
+./exploits/WAnewsletter_remote/WAnewsletter_remote.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2969"
+./exploits/rsync/rsync.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0962"
+./exploits/rsync/rsync.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0962"
+./exploits/CVE_2011_0182/CVE_2011_0182.py:NAME = 'CVE-2011-0182: i386_set_ldt()'
+./exploits/CVE_2011_0182/CVE_2011_0182.py:DESCRIPTION = 'Elevate MOSDEF Node privileges through CVE-2011-0182'
+./exploits/CVE_2011_0182/CVE_2011_0182.py:DOCUMENTATION['CVE Name']='CVE-2011-0182'
+./exploits/CVE_2011_0182/CVE_2011_0182.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-0182'
+./exploits/ms10_025/ms10_025.py:DOCUMENTATION['CVE Name']='CVE-2010-0478'
+./exploits/ms06_070/ms06_070.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-4691'
+./exploits/ms06_070/ms06_070.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-4691'
+./exploits/ms05_017/ms05_017.py:DOCUMENTATION["CVE Name"] = "CVE-2005-0059"
+./exploits/ms05_017/ms05_017.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0059"
+./exploits/gallery1_include/gallery1_include.py:DOCUMENTATION["CVE Name"] = "CVE-2002-1412"
+./exploits/gallery1_include/gallery1_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-1412"
+./exploits/pbd_include/pbd_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4313"
+./exploits/pbd_include/pbd_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4313"
+./exploits/mygallery_remote/mygallery_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2426"
+./exploits/mygallery_remote/mygallery_remote.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2426"
+./exploits/mu/mu.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3744"
+./exploits/mu/mu.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3744"
+./exploits/ie_setuserclip/ie_setuserclip.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-3962'
+./exploits/vsploit_winamp512/vsploit_winamp512.py:DOCUMENTATION["CVE Name"] = "CVE-2006-0476"
+./exploits/vsploit_winamp512/vsploit_winamp512.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-0476"
+./exploits/ms08_001/ms08_001.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-0069'
+./exploits/ms08_001/ms08_001.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0069'
+./exploits/real_import/real_import.py:DOCUMENTATION["CVE Name"]="CVE-2007-5601"
+./exploits/real_import/real_import.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5601"
+./exploits/cutenews_exec/cutenews_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2008-4557"
+./exploits/peopleaggregator_include/peopleaggregator_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5631"
+./exploits/peopleaggregator_include/peopleaggregator_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5631"
+./exploits/utorrent/utorrent.py:DOCUMENTATION["CVE Name"] = "CVE-2007-0927"
+./exploits/utorrent/utorrent.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0927"
+./exploits/iplanet_chunked/iplanet_chunked.py:DOCUMENTATION["CVE Name"] = "CVE-2002-0845"
+./exploits/iplanet_chunked/iplanet_chunked.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-0845"
+./exploits/joomlajuser_include/joomlajuser_include.py:DOCUMENTATION["References"]='http://nvd.nist.gov/nvd.cfm?cvename=CVE-2007-6038'
+./exploits/joomlajuser_include/joomlajuser_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-6038"
+./exploits/joomlajuser_include/joomlajuser_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-6038"
+./exploits/phpauction_include/phpauction_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1416"
+./exploits/phpauction_include/phpauction_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1416"
+./exploits/vsploit_winprox/vsploit_winprox.py:DOCUMENTATION["CVE Name"] = "CVE-2007-0796"
+./exploits/ms10_068/ms10_068.py:DOCUMENTATION['CVE Name']='CVE-2010-0820'
+./exploits/ms10_068/ms10_068.py:DOCUMENTATION['CVE Url']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0820'
+./exploits/ms03_001/ms03_001.py:DOCUMENTATION["CVE Name"]         = "CVE-2003-0003"
+./exploits/ms03_001/ms03_001.py:DOCUMENTATION["CVE Url"]          = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0003"
+./exploits/b1gbb_include/b1gbb_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3401"
+./exploits/b1gbb_include/b1gbb_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3401"
+./exploits/smallaxe_include/smallaxe_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0376"
+./exploits/smallaxe_include/smallaxe_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0376"
+./exploits/ttdb_xdrarray/ttdb_xdrarray.py:DOCUMENTATION["CVE Name"] = "CVE-2002-0391"
+./exploits/ttdb_xdrarray/ttdb_xdrarray.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-0391"
+./exploits/quick_punk/quick_punk.py:DOCUMENTATION['CVE Name'         ] = 'CVE-2010-1818'
+./exploits/quick_punk/quick_punk.py:DOCUMENTATION['CVE Url'          ] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-1818'
+./exploits/ms04_031/ms04_031.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0206"
+./exploits/ms04_031/ms04_031.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0206"
+./exploits/tm_sprotectagent/tm_sprotectagent.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2508"
+./exploits/tm_sprotectagent/tm_sprotectagent.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2508"
+./exploits/phpmybb1210_include/phpmybb1210_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0382"
+./exploits/ms03_007/ms03_007.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0109"
+./exploits/ms03_007/ms03_007.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0109"
+./exploits/openrealty_exec/openrealty_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5056"
+./exploits/openrealty_exec/openrealty_exec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5056"
+./exploits/browsercrm_include/browsercrm_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-2689"
+./exploits/browsercrm_include/browsercrm_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-2689"
+./exploits/ms09_022/ms09_022.py:DOCUMENTATION['CVE Name'] = 'CVE-2009-0228'
+./exploits/ms09_022/ms09_022.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0228'
+./exploits/qt73_rtsp/qt73_rtsp.py:DOCUMENTATION["CVE Name"] = "CVE-2007-6166"
+./exploits/qt73_rtsp/qt73_rtsp.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-6166"
+./exploits/slogin_rfi/slogin_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-5763"
+./exploits/slogin_rfi/slogin_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5763"
+./exploits/CVE_2010_3847/CVE_2010_3847.py:DOCUMENTATION['CVE Name'] = "CVE-2010-3847"
+./exploits/CVE_2010_3847/CVE_2010_3847.py:DOCUMENTATION['CVE Url'] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-3847"
+./exploits/gpsd/gpsd.py:DOCUMENTATION['CVE Name'] = 'CVE-2004-1388'
+./exploits/gpsd/gpsd.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1388'
+./exploits/bigant22/bigant22.py:DOCUMENTATION['CVE Name'] = 'CVE-2008-1914'
+./exploits/bigant22/bigant22.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1914'
+./exploits/acrobat_newplayer/acrobat_newplayer.py:DOCUMENTATION['CVE']='CVE-2009-4324'
+./exploits/acrobat_newplayer/acrobat_newplayer.py:DOCUMENTATION["CVE Url"]="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-4324"
+./exploits/niprint/niprint.py:DOCUMENTATION["CVE Name"] = "CVE-2003-1141"
+./exploits/niprint/niprint.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-1141"
+./exploits/wireshark_dect/wireshark_dect.py:DOCUMENTATION['CVE Name'] = 'CVE-2011-1591'
+./exploits/wireshark_dect/wireshark_dect.py:DOCUMENTATION['CVE Url']  = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-1591'
+./exploits/firefox_utf8/firefox_utf8.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0016"
+./exploits/firefox_utf8/firefox_utf8.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0016"
+./exploits/acrobat_u3d_mesh/acrobat_u3d_mesh.py:DESCRIPTION='Adobe Acrobat Reader Heap Overflow (ClodMeshDeclaration CVE-2009-2994)'
+./exploits/acrobat_u3d_mesh/acrobat_u3d_mesh.py:DOCUMENTATION['CVE Name']='CVE-2009-3953'
+./exploits/acrobat_u3d_mesh/acrobat_u3d_mesh.py:DOCUMENTATION["CVE Url"]="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-2994"
+./exploits/joomlacolorlab_include/joomlacolorlab_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5451"
+./exploits/joomlacolorlab_include/joomlacolorlab_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5451"
+./exploits/samiftp/samiftp.py:DOCUMENTATION["CVE Name"] = "CVE-2006-0441"
+./exploits/samiftp/samiftp.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-0441"
+./exploits/xoops_xtconteudo/xoops_xtconteudo.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3221"
+./exploits/xoops_xtconteudo/xoops_xtconteudo.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3221"
+./exploits/acrobat_libtiff/acrobat_libtiff.py:DOCUMENTATION['CVE Name']='CVE-2010-0188'
+./exploits/acrobat_libtiff/acrobat_libtiff.py:DOCUMENTATION["CVE Url"]="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0188"
+./exploits/safari_file_stealing/safari_file_stealing.py:DOCUMENTATION["CVE Name"]       = "CVE-2008-4216"
+./exploits/safari_file_stealing/safari_file_stealing.py:DOCUMENTATION["CVE Url"]        = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4216"
+./exploits/snmpXdmid/snmpXdmid.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0236"
+./exploits/snmpXdmid/snmpXdmid.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0236"
+./exploits/aurora_flash/aurora_flash.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-0249'
+./exploits/db2_jdbc/db2_jdbc.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2582"
+./exploits/db2_jdbc/db2_jdbc.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2582"
+./exploits/mazensphpchat_remote/mazensphpchat_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2939"
+./exploits/mazensphpchat_remote/mazensphpchat_remote.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2939"
+./exploits/pacercms_exec/pacercms_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5056"
+./exploits/pacercms_exec/pacercms_exec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5056"
+./exploits/ms09_029/ms09_029.py:DOCUMENTATION['CVEName']='CVE-2009-0232'
+./exploits/ms09_029/ms09_029.py:DOCUMENTATION['CVEUrl']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0232'
+./exploits/ie7wmp/ie7wmp.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3896"
+./exploits/ie7wmp/ie7wmp.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3896"
+./exploits/ie7wmp/ie7wmp.py:DOCUMENTATION["CVS URL"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3896"
+./exploits/phpslash_rce/phpslash_rce.py:DOCUMENTATION["CVE Name"]="CVE-2009-0517"
+./exploits/blackice/blackice.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0362"
+./exploits/blackice/blackice.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0362"
+./exploits/ms08_059/ms08_059.py:DOCUMENTATION['CVE Name'] = 'CVE-2008-3466'
+./exploits/ms08_059/ms08_059.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-3466'
+./exploits/sige_include/sige_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5781"
+./exploits/sige_include/sige_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5781"
+./exploits/dot_dot_slash/dot_dot_slash.py:DOCUMENTATION["Example"]="""There is a directory traversal vulnerabilitiy in TikiWiki < 1.9.9 (CVE-2007-6528) in tiki.listmovies.php
+./exploits/ie_help/ie_help.py:DOCUMENTATION["CVE Name"] = "CVE-2010-0483"
+./exploits/ie_help/ie_help.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0483"
+./exploits/ie_help/ie_help.py:DOCUMENTATION["CVS URL"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0483"
+./exploits/wpflash_include/wpflash_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2485"
+./exploits/wpflash_include/wpflash_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2485"
+./exploits/webed_include/webed_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4815"
+./exploits/webed_include/webed_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4815"
+./exploits/ms09_051/ms09_051.py:DOCUMENTATION['CVE Name']       = 'CVE-2009-0555'
+./exploits/ms09_051/ms09_051.py:DOCUMENTATION['CVS URL']        = 'http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0555'
+./exploits/mailenable/mailenable.py:DOCUMENTATION["CVE Name"] = "CVE-2005-2223"
+./exploits/mailenable/mailenable.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-2223"
+./exploits/ms_msdtc/ms_msdtc.py:DOCUMENTATION["CVE Name"] = "CVE-2005-2119"
+./exploits/ms_msdtc/ms_msdtc.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-2119"
+./exploits/scwiki_include/scwiki_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5843"
+./exploits/scwiki_include/scwiki_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5843"
+./exploits/newsoffice_include/newsoffice_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1903"
+./exploits/newsoffice_include/newsoffice_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1903"
+./exploits/ca_lic/ca_lic.py:DOCUMENTATION["CVE Name"] = "CVE-2005-0581"
+./exploits/ca_lic/ca_lic.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0581"
+./exploits/CVE_2010_4344/CVE_2010_4344.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-4344'
+./exploits/CVE_2010_4344/CVE_2010_4344.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-4344'
+./exploits/CVE_2010_4344/CVE_2010_4344.py:NAME = "CVE-2010-4344"
+./exploits/CVE_2011_0997/CVE_2011_0997.py:DOCUMENTATION['CVE Name']      = 'CVE-2011-0997'
+./exploits/CVE_2011_0997/CVE_2011_0997.py:DOCUMENTATION['CVE Url']       = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-0997'
+./exploits/easyfilesharing/easyfilesharing.py:DOCUMENTATION["CVE Name"] = "CVE-2006-3952"
+./exploits/easyfilesharing/easyfilesharing.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-3952"
+./exploits/nginx/nginx.py:DOCUMENTATION['CVE Name'] = 'CVE-2009-2629'
+./exploits/nginx/nginx.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-2629'
+./exploits/acutecp_rfi/acutecp_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2009-1247"
+./exploits/acutecp_rfi/acutecp_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1247"
+./exploits/fuzzylime_include/fuzzylime_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1405"
+./exploits/fuzzylime_include/fuzzylime_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1405"
+./exploits/java_deserialize/java_deserialize.py:DOCUMENTATION["CVE Name"]       = "CVE-2008-5353"
+./exploits/streamline_include/streamline_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5015"
+./exploits/streamline_include/streamline_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5015"
+./exploits/nuclearbb_include/nuclearbb_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4906"
+./exploits/nuclearbb_include/nuclearbb_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4906"
+./exploits/joomlajcs_include/joomlajcs_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5407"
+./exploits/joomlajcs_include/joomlajcs_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5407"
+./exploits/ajaxfb_include/ajaxfb_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4921"
+./exploits/ajaxfb_include/ajaxfb_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4921"
+./exploits/phpffl_include/phpffl_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4934"
+./exploits/phpffl_include/phpffl_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4934"
+./exploits/ms07_004/ms07_004.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-0024'
+./exploits/ms07_004/ms07_004.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0024'
+./exploits/ms06_025/ms06_025.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2371"
+./exploits/ms06_025/ms06_025.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2371"
+./exploits/snortrpc/snortrpc.py:DOCUMENTATION["CVE Name"] = "CVE-2006-5276"
+./exploits/snortrpc/snortrpc.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5276"
+./exploits/windows7netbioscrash/windows7netbioscrash.py:DOCUMENTATION['CVE']            = 'CVE-2009-3676'
+./exploits/asus_samba/asus_samba.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2446"
+./exploits/asus_samba/asus_samba.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2446"
+./exploits/ms_ntvdm/ms_ntvdm.py:DOCUMENTATION['CVE Name']='CVE-2010-0232'
+./exploits/in_lpd/in_lpd.py:DOCUMENTATION["CVE Name"] = "CVE-2001-1583"
+./exploits/in_lpd/in_lpd.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-1583"
+./exploits/grape_include/grape_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1963"
+./exploits/grape_include/grape_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1963"
+./exploits/flash_newfunction/flash_newfunction.py:DOCUMENTATION['CVE Name']='CVE-2010-1297'
+./exploits/flash_newfunction/flash_newfunction.py:DOCUMENTATION['CVE URL']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-1297'
+./exploits/coppermine/coppermine.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0506"
+./exploits/coppermine/coppermine.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0506"
+./exploits/shoutcast_fs/shoutcast_fs.py:DOCUMENTATION['CVE Name'] = 'CVE-2004-1373'
+./exploits/shoutcast_fs/shoutcast_fs.py:DOCUMENTATION['CVE Url'] = 'http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1373'
+./exploits/ms01_033/ms01_033.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0500"
+./exploits/ms01_033/ms01_033.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0500"
+./exploits/joomlaoflq_include/joomlaoflq_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1682"
+./exploits/joomlaoflq_include/joomlaoflq_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1682"
+./exploits/imail_rcptoverflow/imail_rcptoverflow.py:DOCUMENTATION["CVE Name"] = "CVE-2006-4379"
+./exploits/imail_rcptoverflow/imail_rcptoverflow.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-4379"
+./exploits/windows_shell_lnk/windows_shell_lnk.py:DOCUMENTATION["CVE Name"] = "CVE-2010-2568"
+./exploits/windows_shell_lnk/windows_shell_lnk.py:        # Info is here: http://www.sinfocol.org/2010/07/analisis-vulnerabilidad-cve-2010-2568/
+./exploits/awzmb_include/awzmb_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5592"
+./exploits/awzmb_include/awzmb_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5592"
+./exploits/norton_upx/norton_upx.py:DOCUMENTATION["CVE Name"] = "CVE-2005-0249"
+./exploits/norton_upx/norton_upx.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0249"
+./exploits/imail_imap/imail_imap.py:DOCUMENTATION["CVE Name"] = "CVE-2005-1255"
+./exploits/imail_imap/imail_imap.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-1255"
+./exploits/wingate_httpproxy/wingate_httpproxy.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2926"
+./exploits/wingate_httpproxy/wingate_httpproxy.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2926"
+./exploits/shoutpro_exec/shoutpro_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2141"
+./exploits/shoutpro_exec/shoutpro_exec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2141"
+./exploits/phplinkadmin_rfi/phplinkadmin_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2009-1025"
+./exploits/phplinkadmin_rfi/phplinkadmin_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1025"
+./exploits/ms06_074/ms06_074.py:DOCUMENTATION['CVE Name'] = 'CVE-2006-5583'
+./exploits/ms06_074/ms06_074.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5583'
+./exploits/ut2004secure/ut2004secure.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0608"
+./exploits/joomlatreeg_rfi/joomlatreeg_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-6482"
+./exploits/joomlatreeg_rfi/joomlatreeg_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6482"
+./exploits/pnphpbb2_lfi/pnphpbb2_lfi.py:DOCUMENTATION["CVE Name"]= "CVE-2009-0592"
+./exploits/pnphpbb2_lfi/pnphpbb2_lfi.py:DOCUMENTATION["CVE Url"]= "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0592" 
+./exploits/ms04_045/ms04_045.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0567"
+./exploits/ms04_045/ms04_045.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0567"
+./exploits/java_deserialize2/java_deserialize2.py:DOCUMENTATION["CVE Name"]       = "CVE-2010-0094"
+./exploits/java_deserialize2/java_deserialize2.py:DOCUMENTATION["CVE Url"]        = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0094"
+./exploits/java_deserialize2/java_deserialize2.py:DOCUMENTATION["References"]     = "http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-0094"
+./exploits/ms_enableeudc/ms_enableeudc.py:DOCUMENTATION['CVE Name']='CVE-2010-4398'
+./exploits/ani_cursor/ani_cursor.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-0038'
+./exploits/ani_cursor/ani_cursor.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0038'
+./exploits/apachechunk_win32/apachechunk_win32.py:DOCUMENTATION["CVE Name"] = "CVE-2002-0392"
+./exploits/apachechunk_win32/apachechunk_win32.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-0392"
+./exploits/iis5asp/iis5asp.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0241"
+./exploits/iis5asp/iis5asp.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0241"
+./exploits/ms09_032/ms09_032.py:DOCUMENTATION['CVE Name']='CVE-2008-0015'
+./exploits/ms09_032/ms09_032.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0015'
+./exploits/barryvan_include/barryvan_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1126"
+./exploits/barryvan_include/barryvan_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1126"
+./exploits/ms09_059/ms09_059.py:DOCUMENTATION['CVE Name']='CVE-2009-2524'
+./exploits/ms09_059/ms09_059.py:DOCUMENTATION['CVE Url']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-2524'
+./exploits/netmail/netmail.py:DOCUMENTATION["CVE Name"] = "CVE-2006-5478"
+./exploits/netmail/netmail.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5478"
+./exploits/phpmytourney_include/phpmytourney_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4757"
+./exploits/phpmytourney_include/phpmytourney_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4757"
+./exploits/FoxitLaunchit/FoxitLaunchit.py:DOCUMENTATION['CVE Name']='CVE-2009-0836'
+./exploits/FoxitLaunchit/FoxitLaunchit.py:DOCUMENTATION['CVE URL']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0836'
+./exploits/nuboard_include/nuboard_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5841"
+./exploits/nuboard_include/nuboard_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5841"
+./exploits/serweb_include/serweb_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3358"
+./exploits/serweb_include/serweb_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3358"
+./exploits/acrobat_js/acrobat_js.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5659"
+./exploits/acrobat_js/acrobat_js.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5659"
+./exploits/stinky_debug/stinky_debug.py:DOCUMENTATION["CVE Name"] = "CVE-2005-3252"
+./exploits/stinky_debug/stinky_debug.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-3252"
+./exploits/quinsonnas_include/quinsonnas_include.py:DOCUMENTATION["References"]='http://nvd.nist.gov/nvd.cfm?cvename=CVE-2008-1046'
+./exploits/quinsonnas_include/quinsonnas_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1046"
+./exploits/quinsonnas_include/quinsonnas_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1046"
+./exploits/nagios_ping/nagios_ping.py:DOCUMENTATION["CVE Name"] = "CVE-2009-2288"
+./exploits/nagios_ping/nagios_ping.py:DOCUMENTATION['CVEUrl']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-2288'
+./exploits/ms05_040/ms05_040.py:DOCUMENTATION['CVE Name']='CVE-2005-0058'
+./exploits/ms05_040/ms05_040.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0058'
+./exploits/mindmeld_include/mindmeld_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0572"
+./exploits/mindmeld_include/mindmeld_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0572"
+./exploits/vmsplice/vmsplice.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0600"
+./exploits/vmsplice/vmsplice.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0600"
+./exploits/phporacle_include/phporacle_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2340"
+./exploits/phporacle_include/phporacle_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2340"
+./exploits/brightstor_discovery/brightstor_discovery.py:DOCUMENTATION['CVE Name'] = 'CVE-2005-0260'
+./exploits/brightstor_discovery/brightstor_discovery.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-0260'
+./exploits/ypbind/ypbind.py:DOCUMENTATION["CVE Name"] = "CVE-2001-1328"
+./exploits/ypbind/ypbind.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-1328"
+./exploits/cesarftp/cesarftp.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2961"
+./exploits/cesarftp/cesarftp.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2961"
+./exploits/philex_include/philex_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-1697"
+./exploits/philex_include/philex_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-1697"
+./exploits/ms10_061/ms10_061.py:DOCUMENTATION['CVE Name']='CVE-2010-2729'
+./exploits/ms10_061/ms10_061.py:DOCUMENTATION['CVE Url']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-2729'
+./exploits/filecopa/filecopa.py:DOCUMENTATION["CVE Name"] = "CVE-2006-3726"
+./exploits/filecopa/filecopa.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-3726"
+./exploits/smb2_negotiate_local/smb2_negotiate_local.py:DOCUMENTATION['CVE Name']='CVE-2009-3103'
+./exploits/smb2_negotiate_local/smb2_negotiate_local.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-3103'
+./exploits/phpdj_include/phpdj_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5574"
+./exploits/phpdj_include/phpdj_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5574"
+./exploits/offl_include/offl_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4809"
+./exploits/offl_include/offl_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4809"
+./exploits/joomlamp3_include/joomlamp3_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5412"
+./exploits/joomlamp3_include/joomlamp3_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5412"
+./exploits/linksys_apply_cgi/linksys_apply_cgi.py:DOCUMENTATION["CVE Name"] = "CVE-2005-2799"
+./exploits/linksys_apply_cgi/linksys_apply_cgi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2005-2799"
+./exploits/xoops_icontent/xoops_icontent.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3057"
+./exploits/xoops_icontent/xoops_icontent.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3057"
+./exploits/php_limit/php_limit.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0594"
+./exploits/php_limit/php_limit.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0594"
+./exploits/IAWebMail/IAWebMail.py:DOCUMENTATION["CVE Name"] = "CVE-2003-1192"
+./exploits/IAWebMail/IAWebMail.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-1192"
+./exploits/solaris_LD_PRELOAD/solaris_LD_PRELOAD.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0609"
+./exploits/solaris_LD_PRELOAD/solaris_LD_PRELOAD.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0609"
+./exploits/joomlamosmedia_include/joomlamosmedia_include.py:DOCUMENTATION["References"]='http://nvd.nist.gov/nvd.cfm?cvename=CVE-2007-5362'
+./exploits/joomlamosmedia_include/joomlamosmedia_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5362"
+./exploits/joomlamosmedia_include/joomlamosmedia_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5362"
+./exploits/solaris_samba/solaris_samba.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2446"
+./exploits/solaris_samba/solaris_samba.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2446"
+./exploits/sol_printer_conf/sol_printer_conf.py:DOCUMENTATION["CVE Name"] = "CVE-2008-2144"
+./exploits/sol_printer_conf/sol_printer_conf.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-2144"
+./exploits/ie_dumpfiles/ie_dumpfiles.py:DOCUMENTATION["CVE Name"] = "CVE-2010-0255"
+./exploits/ie_dumpfiles/ie_dumpfiles.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0255"
+./exploits/ie_dumpfiles/ie_dumpfiles.py:DOCUMENTATION["CVS URL"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0255"
+./exploits/ie_dumpfiles/ie_dumpfiles.py:DOCUMENTATION["MSRC"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-0255"
+./exploits/rexd/rexd.py:DOCUMENTATION["CVE Name"] = "CVE-1999-0627"
+./exploits/rexd/rexd.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-1999-0627"
+./exploits/ie_comments/ie_comments.py:DOCUMENTATION['CVE Name'] = 'CVE-2010-0244'
+./exploits/sitellite_remote/sitellite_remote.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3228"
+./exploits/sitellite_remote/sitellite_remote.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3228"
+./exploits/mysql_auth_bypass/mysql_auth_bypass.py:DOCUMENTATION["CVE Name"] = "CVE-2004-0627"
+./exploits/mysql_auth_bypass/mysql_auth_bypass.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-0627"
+./exploits/joomlatimesheet_rfi/joomlatimesheet_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2008-6347 "
+./exploits/joomlatimesheet_rfi/joomlatimesheet_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6347"
+./exploits/enetman_include/enetman_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4712"
+./exploits/enetman_include/enetman_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4712"
+./exploits/portallwebphp_include/portallwebphp_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-0645"
+./exploits/portallwebphp_include/portallwebphp_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-0645"
+./exploits/solroot/solroot.py:GUI_VERSIONS[1]     = 'CVE-2006-4842'
+./exploits/solroot/solroot.py:        self.SOLlocals['CVE-2006-4842'] = getModuleExploitClass('CVE_2006_4842', which='CVE_2006_4842')
+./exploits/ms08_034/ms08_034.py:DOCUMENTATION['CVE Name'] = 'CVE-2008-1451'
+./exploits/ms08_034/ms08_034.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1451'
+./exploits/ms08_034/ms08_034.py:DOCUMENTATION['CVS URL']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1451'
+./exploits/java_method_chain/java_method_chain.py:DOCUMENTATION["CVE Name"]       = "CVE-2010-0840"
+./exploits/phpskelsite_rfi/phpskelsite_rfi.py:DOCUMENTATION["CVE Name"] = "CVE-2009-0595"
+./exploits/phpskelsite_rfi/phpskelsite_rfi.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0595"
+./exploits/ms09_001/ms09_001.py:DOCUMENTATION['CVE Name']='CVE-2008-4834'
+./exploits/ms09_001/ms09_001.py:DOCUMENTATION['CVE Url']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4834'
+./exploits/java_deserialize_win32/java_deserialize_win32.py:DOCUMENTATION["CVE Name"]       = "CVE-2008-5353"
+./exploits/brightstor_media/brightstor_media.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-2139'
+./exploits/brightstor_media/brightstor_media.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2139'
+./exploits/localLPC/localLPC.py:DOCUMENTATION["CVE Name"] = "CVE-2006-6696"
+./exploits/localLPC/localLPC.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-6696"
+./exploits/sunboard_include/sunboard_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3370"
+./exploits/sunboard_include/sunboard_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3370"
+./exploits/ms03_022/ms03_022.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0349"
+./exploits/ms03_022/ms03_022.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0349"
+./exploits/iepdf/iepdf.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3896"
+./exploits/iepdf/iepdf.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3896"
+./exploits/iepdf/iepdf.py:DOCUMENTATION["CVS URL"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3896"
+./exploits/iepdf/iepdf.py:DOCUMENTATION["MSRC"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3896"
+./exploits/ms10_059/ms10_059.py:DOCUMENTATION['CVE Name'    ] = "CVE-2010-2554"
+./exploits/ms10_059/ms10_059.py:DOCUMENTATION['CVE Url'     ] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-2554"
+./exploits/wftpd/wftpd.py:DOCUMENTATION["CVE Name"] = "CVE-2006-4318"
+./exploits/wftpd/wftpd.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-4318"
+./exploits/qgs_include/qgs_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1069"
+./exploits/qgs_include/qgs_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1069"
+./exploits/qt_rtsp/qt_rtsp.py:DOCUMENTATION["CVE Name"] = "CVE-2007-0015"
+./exploits/qt_rtsp/qt_rtsp.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0015"
+./exploits/symantec_iao/symantec_iao.py:DOCUMENTATION['CVE Name']='CVE-2009-1430'
+./exploits/symantec_iao/symantec_iao.py:DOCUMENTATION['CVE Url']='http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-1430'
+./exploits/ms08_053/ms08_053.py:DOCUMENTATION["CVE Name"] = "CVE-2008-3008"
+./exploits/ms08_053/ms08_053.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-3008"
+./exploits/troforum_include/troforum_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-2937"
+./exploits/troforum_include/troforum_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2937"
+./exploits/realserver/realserver.py:DOCUMENTATION["CVE Name"] = "CVE-2003-0725"
+./exploits/realserver/realserver.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0725"
+./exploits/powl_include/powl_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3371"
+./exploits/powl_include/powl_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3371"
+./exploits/altn_sg/altn_sg.py:DOCUMENTATION['CVE Name'] = 'CVE-2008-4193'
+./exploits/horde_eval/horde_eval.py:DOCUMENTATION["CVE Name"] = "CVE-2006-1491"
+./exploits/horde_eval/horde_eval.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-1491"
+./exploits/joomlacp_include/joomlacp_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1505"
+./exploits/joomlacp_include/joomlacp_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1505"
+./exploits/sunlogin_pamh/sunlogin_pamh.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0797"
+./exploits/sunlogin_pamh/sunlogin_pamh.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0797"
+./exploits/firefox_definesetter/firefox_definesetter.py:DOCUMENTATION["CVE Name"] = "CVE-2008-2798"
+./exploits/firefox_definesetter/firefox_definesetter.py:DOCUMENTATION["CVS URL"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-2798"
+./exploits/flash_duke/flash_duke.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-0071'
+./exploits/flash_duke/flash_duke.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0071'
+./exploits/ncaster_include/ncaster_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-4320"
+./exploits/ncaster_include/ncaster_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-4320"
+./exploits/CVE_2004_1329/CVE_2004_1329.py:NAME                                = 'CVE-2004-1329: DIAGNOSTICS environment handling'
+./exploits/CVE_2004_1329/CVE_2004_1329.py:DOCUMENTATION['CVE Name']           = 'CVE-2004-1329'
+./exploits/CVE_2004_1329/CVE_2004_1329.py:DOCUMENTATION['CVE URL']            = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2004-1329'
+./exploits/realvnc_noauth/realvnc_noauth.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2369"
+./exploits/realvnc_noauth/realvnc_noauth.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2369"
+./exploits/joomlaslideshow_include/joomlaslideshow_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5065"
+./exploits/joomlaslideshow_include/joomlaslideshow_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5065"
+./exploits/cmsmadesimple_eval/cmsmadesimple_eval.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5056"
+./exploits/cmsmadesimple_eval/cmsmadesimple_eval.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5056"
+./exploits/find_null_vnc/find_null_vnc.py:DOCUMENTATION["CVE Name"] = "CVE-2006-2450"
+./exploits/find_null_vnc/find_null_vnc.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-2450"
+./exploits/brightstor_cmdexec/brightstor_cmdexec.py:DOCUMENTATION['CVE Name'] = 'CVE-2008-4397'
+./exploits/brightstor_cmdexec/brightstor_cmdexec.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-4397'
+./exploits/groupwise_webaccess/groupwise_webaccess.py:DOCUMENTATION['CVE Name'] = 'CVE-2007-2171'
+./exploits/groupwise_webaccess/groupwise_webaccess.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-2171'
+./exploits/winpcap/winpcap.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3681"
+./exploits/winpcap/winpcap.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3681"
+./exploits/ms04_011_lsass/ms04_011_lsass.py:DOCUMENTATION["CVE Name"]         = "CVE-2003-0533"
+./exploits/ms04_011_lsass/ms04_011_lsass.py:DOCUMENTATION["CVE Url"]          = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0533"
+./exploits/gneric_include/gneric_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-0584"
+./exploits/gneric_include/gneric_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0584"
+./exploits/acrobat_ttf_sing/acrobat_ttf_sing.py:DOCUMENTATION['CVE']='CVE-2010-2883'
+./exploits/solaris_telnet/solaris_telnet.py:DOCUMENTATION["CVE Name"] = "CVE-2007-0882"
+./exploits/solaris_telnet/solaris_telnet.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0882"
+./exploits/wuglob/wuglob.py:DOCUMENTATION["CVE Name"] = "CVE-2001-0550"
+./exploits/wuglob/wuglob.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2001-0550"
+./exploits/abyss/abyss.py:DOCUMENTATION["CVE Name"]="CVE-2003-1337"
+./exploits/xoops_horoscope/xoops_horoscope.py:DOCUMENTATION["CVE Name"] = "CVE-2007-3236"
+./exploits/xoops_horoscope/xoops_horoscope.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-3236"
+./exploits/phpbb_highlight/phpbb_highlight.py:DOCUMENTATION["CVE Name"] = "CVE-2005-2086"
+./exploits/phpqladmin_include/phpqladmin_include.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1067"
+./exploits/phpqladmin_include/phpqladmin_include.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1067"
+./exploits/wpsniplets_exec/wpsniplets_exec.py:DOCUMENTATION["CVE Name"] = "CVE-2008-1060"
+./exploits/wpsniplets_exec/wpsniplets_exec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-1060"
+./exploits/lotus_domino_http/lotus_domino_http.py:DOCUMENTATION['CVE Name']     = 'CVE-2008-2240'
+./exploits/lotus_domino_http/lotus_domino_http.py:DOCUMENTATION['CVE Url']      = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-2240'
+./exploits/linux_rds/linux_rds.py:DOCUMENTATION["CVE Name"]       = "CVE-2010-3904"
+./exploits/linux_rds/linux_rds.py:DOCUMENTATION["CVE Url"]        = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-3904"
+./exploits/ie_hcp/ie_hcp.py:DOCUMENTATION["CVE Name"] = "CVE-2010-1885"
+./exploits/ie_hcp/ie_hcp.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-1885"
+./exploits/wuftpd_sexec/wuftpd_sexec.py:DOCUMENTATION["CVE Name"] = "CVE-2000-0573"
+./exploits/wuftpd_sexec/wuftpd_sexec.py:DOCUMENTATION["CVE Url"] = "http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2000-0573"
+./exploits/acrobat_js3/acrobat_js3.py:DOCUMENTATION['CVE Name']='CVE-2008-2992'
+./exploits/acrobat_js3/acrobat_js3.py:DOCUMENTATION['CVE URL']='http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-2992'
+./exploits/adobe_flash_button/adobe_flash_button.py:DOCUMENTATION['CVE Name']='CVE-2010-3654'
+./exploits/joomlaflashup_include/joomlaflashup_include.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5457"
+./exploits/joomlaflashup_include/joomlaflashup_include.py:DOCUMENTATION["CVE Url"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5457"
+./exploits/ssreader/ssreader.py:DOCUMENTATION["CVE Name"] = "CVE-2007-5892"
+./exploits/ssreader/ssreader.py:DOCUMENTATION["CVE URL"] = "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-5892"
+./exploits/ms09_022_loaddll/ms09_022_loaddll.py:DOCUMENTATION['CVE Name'] = 'CVE-2009-0230'
+./exploits/ms09_022_loaddll/ms09_022_loaddll.py:DOCUMENTATION['CVE Url'] = 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0230'
+./Documentation/ReleaseNotes/6.45.txt:and improvements to previous PDF exploit modules. New modules come in the shape of FoxitLaunchit (CVE-2009-0836), 
+./Documentation/ReleaseNotes/6.45.txt:foxit_Action (CVE-2009-0837), adobe_js4 (CVE-2009-0927), adobe_jbig (CVE-2009-0658). All PDF exploits are now able to add 
+./Documentation/ReleaseNotes/6.45.txt:A new Linux clientside is also included this month for the NetworkManager DBUS permission error (CVE-2009-0365). As far as 
+./Documentation/ReleaseNotes/6.45.txt:* Foxit Reader 3.0 Action overflow (CVE-2009-0837)
+./Documentation/ReleaseNotes/6.45.txt:* Stack overflow for Adobe Acrobat <= v8.1.2 and v9.0 (CVE-2009-0927)
+./Documentation/ReleaseNotes/6.45.txt:* FoxitLaunchit - Foxit PDF reader permission bypass - arbitrary command execution (CVE-2009-0836)
+./Documentation/ReleaseNotes/6.45.txt:* Exploit for the NetworkManager secrets disclosure vulnerability (CVE-2009-0365) on Linux
+./Documentation/ReleaseNotes/6.52.txt:acrobat_u3d_mesh - (CVE-2009-2994)
+./Documentation/ReleaseNotes/6.52.txt:java_deserialize_win32 - (CVE-2008-5353) (updated to bypass ISA server for large enterprises)
+./Documentation/ReleaseNotes/6.52.txt:ms09_051 - (CVE-2009-0555)
+./Documentation/ReleaseNotes/6.52.txt:ms09_059 - (CVE-2009-2524)
+./Documentation/ReleaseNotes/6.52.txt:aixcmsd  - (CVE-2009-3699)
+./Documentation/ReleaseNotes/6.44.txt:client side (MS09-002, CVE-2009-0075) is included for use against
+./Documentation/ReleaseNotes/6.44.txt:phplist(CVE-2008-5887), phpSlash(CVE 2009-0517), phpYabs(No CVE, Bugtraq
+./Documentation/ReleaseNotes/6.50.txt:Proto ops null dereference linux kernel local (2.6.x)  (CVE-2009-2692)
+./Documentation/ReleaseNotes/6.50.txt:Windows Server Service Double Free (MS09_041) (CVE-2009-1544)
+./Documentation/ReleaseNotes/6.50.txt:IIS FTP NLST Stack Overflow (CVE-2009-3023)
+./Documentation/ReleaseNotes/6.50.txt:IIS FTP Globbing stack exhaustion DOS (CVE-2009-2521)
+./Documentation/ReleaseNotes/6.50.txt:Acute Control Panel 1.0.0 remote file inclusion (CVE-2009-1247)
+./Documentation/ReleaseNotes/6.50.txt:WorkSimple 1.2.1 remote file inclusion (CVE-2008-5764)
+./Documentation/ReleaseNotes/6.50.txt:PHPSkelSite 1.4 remote file inclusion (CVE-2009-0595)
+./Documentation/ReleaseNotes/6.50.txt:Joomla Tree Flash Gallery 1.0 remote file inclusion (CVE-2008-6482)
+./Documentation/ReleaseNotes/6.56.txt:brightstor_cmdexec - CVE-2008-4397 (automatically runs a MOSDEF callback using
+./Documentation/ReleaseNotes/6.56.txt:ie_dumpfiles - CVE-2010-0255 - downloads files off an IE client, assuming they
+./Documentation/ReleaseNotes/6.40.txt:# October 23, 2008 AIX Local Root Exploitation support (CVE-2007-4513 added)
+./Documentation/ReleaseNotes/6.53.txt:ms09_061_cas (CVE-2009-0091)
+./Documentation/ReleaseNotes/6.53.txt:sun_java_hsbparser_linux (CVE-2009-3867)
+./Documentation/ReleaseNotes/6.53.txt:sun_java_hsbparser (CVE-2009-3867)
+./Documentation/ReleaseNotes/6.53.txt:windows7netbioscrash (CVE-2009-3676)
+./Documentation/ReleaseNotes/6.51.txt:An exploit for the much awaited SMBv2 Vulnerability (CVE-2009-3103) has
+./Documentation/ReleaseNotes/6.51.txt:SMBv2 local execution  (CVE-2009-3103 & MS KB975497)
+./Documentation/ReleaseNotes/6.51.txt:SMBv2 remote execution (CVE-2009-3103 & MS KB975497)
+./Documentation/ReleaseNotes/6.51.txt:Word Press Sniplets 1.1.2 & 1.2.2 remote file include (CVE-2008-1059)
+./Documentation/ReleaseNotes/6.51.txt:Strawberry 1.1.1 local file include (CVE-2009-1774)
+./Documentation/ReleaseNotes/6.51.txt:cpCommerce 1.2.x remote file include (CVE-2009-1936)
+./Documentation/ReleaseNotes/6.51.txt:Qt quickteam 2 remote file inlcude (CVE-2009-1551)
+./Documentation/ReleaseNotes/6.43.txt:5.2/5.3 DIAGNOSTICS environment handling bug (CVE-2004-1329). This
+./Documentation/ReleaseNotes/6.43.txt:(CVE-2008-5416) exploiting the replwritetovarbin stored procedure
+./Documentation/ReleaseNotes/6.43.txt:pool overflow (CVE-2008-4834, MS09-001) which is capable of a DOS
+./Documentation/ReleaseNotes/6.43.txt:* AIX DIAGNOSTICS ENVIRONMENT HANDLING (CVE-2004-1329)
+./Documentation/ReleaseNotes/6.43.txt:(CVE-2008-4834)
+./Documentation/ReleaseNotes/6.43.txt:(CVE-2008-5416)
+./Documentation/ReleaseNotes/6.49.txt:Acrobat + Flash exploit (CVE-2009-1862)
+./Documentation/ReleaseNotes/6.49.txt:Firefox 3.5 Memory Corruption (CVE-2009-2477)
+./Documentation/ReleaseNotes/6.49.txt:(CVE-2009-0232)
+./Documentation/ReleaseNotes/6.49.txt:(CVE-2008-0015)
+./Documentation/ReleaseNotes/6.49.txt:Nagios < 3.1.1 Command Injection (CVE-2009-2288)
+./Documentation/ReleaseNotes/6.49.txt:Zen Cart <= 1.3.8a Remote Code Execution (CVE-2009-2255) 
+./Documentation/ReleaseNotes/6.47.txt:CANVAS modules. Kostya's eagerly awaited CLOUDBURST (CVE-2009-1244) VMWare
+./Documentation/ReleaseNotes/6.47.txt:bug (CVE-2009-1535). There is also a commandline 'davshell' option that allows you to do 
+./Documentation/ReleaseNotes/6.47.txt:There are also 6 more new exploits: joomlagooglebase_rfi (CVE-2008-6483), 
+./Documentation/ReleaseNotes/6.47.txt:joomlarss_rfi (CVE-2008-5053), dokeos_rce (No CVE), phplinkadmin_rfi (CVE-2009-1025),
+./Documentation/ReleaseNotes/6.47.txt:slogin_rfi (CVE-2008-5763) & pluck_lfi (CVE-2009-1765) included for your web hacking
+./Documentation/ReleaseNotes/6.47.txt:CLOUDBURST: VMWare Workstation/Player 6.5.0/6.5.1 guest breakout(CVE-2009-1244)
+./Documentation/ReleaseNotes/6.47.txt:iis_webdav: Microsoft IIS WebDAV Remote Authentication Bypass (CVE-2009-1535)
+./Documentation/ReleaseNotes/6.47.txt:pluck_lfi:  Pluck 4.6.2 Local File Include (CVE-2009-1765)
+./Documentation/ReleaseNotes/6.47.txt:joomlagooglebase_rfi: Joomla com_googlebase Remote File Include (CVE-2008-6483)
+./Documentation/ReleaseNotes/6.47.txt:joomlarss_rfi: Joomla Simple RSS Reader Remote File Include (CVE-2008-5053)
+./Documentation/ReleaseNotes/6.47.txt:phplinkadmin_rfi: PHPLinkAdmin Remote File Include (CVE-2009-1025)
+./Documentation/ReleaseNotes/6.47.txt:slogin_rfi: SLogin Remote File Include (CVE-2008-5763)
+./Documentation/ReleaseNotes/6.48.txt:Remote authenticated arbitrary DLL loading vulnerability (MS09-022) (CVE-2009-0230)
+./Documentation/ReleaseNotes/6.48.txt:Windows Print Spooler exploit (MS09-022) (CVE-2009-0228)
+./Documentation/ReleaseNotes/6.48.txt:Symantec Alert Management System 2 Stack Overflow (CVE-2009-1430)
+./Documentation/ReleaseNotes/6.48.txt:Safari < 4 File Stealing - XSL local file access(DTD) (CVE-2009-1699)
+./Documentation/ReleaseNotes/6.48.txt:Safari < 3.2 File Stealing - local file:/// URI (CVE-2008-4216)
+./Documentation/ReleaseNotes/6.48.txt:SugarCRM Remote Code Execution (CVE-2009-2146)
+./Documentation/ReleaseNotes/6.48.txt:PNphpBB2 1.2i Local File Inclusion (CVE-2009-0592)
+./Documentation/ReleaseNotes/6.48.txt:phpMyAdmin Static Code Injection (CVE-2009-1151)
+./Documentation/ReleaseNotes/6.48.txt:Joomla! Feederator Remote File Include (CVE-2008-5789)
+./Documentation/ReleaseNotes/6.48.txt:Joomla! timesheet component Remote File Inclusion (CVE-2008-6347)
+./Documentation/ReleaseNotes/6.48.txt:Joomla com_clickheat Remote File Include (CVE-2008-5793)
+./Documentation/ReleaseNotes/6.48.txt:Joomla Simple RSS Reader Remote File(CVE-2008-5053)
+./Documentation/ReleaseNotes/6.48.txt:Joomla Dada Mail Manager (CVE-2008-6221)
+./Documentation/ReleaseNotes/6.48.txt:Joomla Competitions (CVE-2008-5790)
+./Documentation/ReleaseNotes/6.48.txt:Fixed bug in PROCFS exploit (CVE-2006-3626)
+./Documentation/ReleaseNotes/6.42.txt:in the Roundcube webmail server (CVE-2008-5619) which has been being
+./Documentation/ReleaseNotes/6.42.txt:* Roundcube remote exploit CVE-2008-5619
+./Documentation/ReleaseNotes/6.42.txt:Roundcube vulnerability (CVE-2008-5619) discussion:
+./Documentation/ReleaseNotes/6.42.txt:Flash bug CVE-2008-5499 walkthrough by Bas:
+./Changelog.txt:brightstor_cmdexec - CVE-2008-4397 (automatically runs a MOSDEF callback using
+./Changelog.txt:ie_dumpfiles - CVE-2010-0255 - downloads files off an IE client, assuming they
+./Changelog.txt:ms09_061_cas (CVE-2009-0091)
+./Changelog.txt:sun_java_hsbparser_linux (CVE-2009-3867)
+./Changelog.txt:sun_java_hsbparser (CVE-2009-3867)
+./Changelog.txt:windows7netbioscrash (CVE-2009-3676)
+./Changelog.txt:acrobat_u3d_mesh - (CVE-2009-2994)
+./Changelog.txt:java_deserialize_win32 - (CVE-2008-5353) (updated to bypass ISA server for
+./Changelog.txt:ms09_051 - (CVE-2009-0555)
+./Changelog.txt:ms09_059 - (CVE-2009-2524)
+./Changelog.txt:aixcmsd  - (CVE-2009-3699)
+./Changelog.txt:SMBv2 local execution  (CVE-2009-3103 & MS KB975497)
+./Changelog.txt:SMBv2 remote execution (CVE-2009-3103 & MS KB975497)
+./Changelog.txt:Word Press Sniplets 1.1.2 & 1.2.2 remote file include (CVE-2008-1059)
+./Changelog.txt:Strawberry 1.1.1 local file include (CVE-2009-1774)
+./Changelog.txt:cpCommerce 1.2.x remote file include (CVE-2009-1936)
+./Changelog.txt:Qt quickteam 2 remote file inlcude (CVE-2009-1551)
+./Changelog.txt:Proto ops null dereference linux kernel local (2.6.x)  (CVE-2009-2692)
+./Changelog.txt:Windows Server Service Double Free (MS09_041) (CVE-2009-1544)
+./Changelog.txt:IIS FTP NLST Stack Overflow (CVE-2009-3023)
+./Changelog.txt:IIS FTP Globbing stack exhaustion DOS (CVE-2009-2521)
+./Changelog.txt:Acute Control Panel 1.0.0 remote file inclusion (CVE-2009-1247)
+./Changelog.txt:WorkSimple 1.2.1 remote file inclusion (CVE-2008-5764)
+./Changelog.txt:PHPSkelSite 1.4 remote file inclusion (CVE-2009-0595)
+./Changelog.txt:Joomla Tree Flash Gallery 1.0 remote file inclusion (CVE-2008-6482)
+./Changelog.txt:Acrobat + Flash exploit (CVE-2009-1862)
+./Changelog.txt:Firefox 3.5 Memory Corruption (CVE-2009-2477)
+./Changelog.txt:(CVE-2009-0232)
+./Changelog.txt:(CVE-2008-0015)
+./Changelog.txt:Nagios < 3.1.1 Command Injection (CVE-2009-2288)
+./Changelog.txt:Zen Cart <= 1.3.8a Remote Code Execution (CVE-2009-2255) 
+./Changelog.txt:Remote authenticated arbitrary DLL loading vulnerability (MS09-022) (CVE-2009-0230)
+./Changelog.txt:Windows Print Spooler exploit (MS09-022) (CVE-2009-0228)
+./Changelog.txt:Symantec Alert Management System 2 Stack Overflow (CVE-2009-1430)
+./Changelog.txt:Safari < 4 File Stealing - XSL local file access(DTD) (CVE-2009-1699)
+./Changelog.txt:Safari < 3.2 File Stealing - local file:/// URI (CVE-2008-4216)
+./Changelog.txt:SugarCRM Remote Code Execution (CVE-2009-2146)
+./Changelog.txt:PNphpBB2 1.2i Local File Inclusion (CVE-2009-0592)
+./Changelog.txt:phpMyAdmin Static Code Injection (CVE-2009-1151)
+./Changelog.txt:Joomla! Feederator Remote File Include (CVE-2008-5789)
+./Changelog.txt:Joomla! timesheet component Remote File Inclusion (CVE-2008-6347)
+./Changelog.txt:Joomla com_clickheat Remote File Include (CVE-2008-5793)
+./Changelog.txt:Joomla Simple RSS Reader Remote File(CVE-2008-5053)
+./Changelog.txt:Joomla Dada Mail Manager (CVE-2008-6221)
+./Changelog.txt:Joomla Competitions (CVE-2008-5790)
+./Changelog.txt:Fixed bug in PROCFS exploit (CVE-2006-3626)
+./Changelog.txt:CLOUDBURST: VMWare Workstation/Player 6.5.0/6.5.1 guest breakout(CVE-2009-1244)
+./Changelog.txt:iis_webdav: Microsoft IIS WebDAV Remote Authentication Bypass (CVE-2009-1535)
+./Changelog.txt:pluck_lfi:  Pluck 4.6.2 Local File Include (CVE-2009-1765)
+./Changelog.txt:joomlagooglebase_rfi: Joomla com_googlebase Remote File Include (CVE-2008-6483)
+./Changelog.txt:joomlarss_rfi: Joomla Simple RSS Reader Remote File Include (CVE-2008-5053)
+./Changelog.txt:phplinkadmin_rfi: PHPLinkAdmin Remote File Include (CVE-2009-1025)
+./Changelog.txt:slogin_rfi: SLogin Remote File Include (CVE-2008-5763)
+./Changelog.txt:* Foxit Reader 3.0 Action overflow (CVE-2009-0837)
+./Changelog.txt:* Stack overflow for Adobe Acrobat <= v8.1.2 and v9.0 (CVE-2009-0927)
+./Changelog.txt:* FoxitLaunchit - Foxit PDF reader permission bypass - arbitrary command execution (CVE-2009-0836)
+./Changelog.txt:* Exploit for the NetworkManager secrets disclosure vulnerability (CVE-2009-0365) on Linux
+./Changelog.txt:* AIX DIAGNOSTICS ENVIRONMENT HANDLING (CVE-2004-1329)
+./Changelog.txt:(CVE-2008-4834)
+./Changelog.txt:(CVE-2008-5416)
+./Changelog.txt:* Roundcube remote exploit CVE-2008-5619
+./Changelog.txt:# October 23, 2008 AIX Local Root Exploitation support (CVE-2007-4513 added)
+./Changelog.txt:# firefox_utf8  (CVE-2008-0016)
+./Changelog.txt:# citect_scada  (CVE-2008-2639)
+./Changelog.txt:# ms08_053      (CVE-2008-3008)
+./Changelog.txt:# June 4, 2008: Exploit for CVE-2008-2144 (Solaris in.lpd)
+./Changelog.txt:# December 17th, 2007: Exploit for CVE-2006-5735 (PunBB)
+./Changelog.txt:# Oct 15th, 2007: DB2_JDBC exploit (cve-2007-5324)
+./Changelog.txt:o CVE-2007-0063 vmware_dhcpd - gets you a shell on the host from a guest
+./Changelog.txt:o CVE-2007-5067 xitami - Overflow in Xitami gets you a remote shell. This is a good exploit for classes.
+./Changelog.txt:o CVE-2005-2715 - netbackup_javaui - VERITAS NetBackup Java User Interface Format String
+./Changelog.txt:o CVE-2007-3040 - MS07-051 - Microsoft Agent Client-Side overflow (Windows 2000 SP4)
+./Changelog.txt:o CVE-2007-3681 Winpcap vulnerability added - gets local SYSTEM on machines
+./Changelog.txt:overflow against Samba Servers on Solaris 8/9/10 (CVE-2007-2446).
+./Changelog.txt:o GDIWrite4: exploit for CVE-2006-5758
+./Resources/nm.py:#Script to upload and execute on a target system to retrieve connection secrets from NetworkManager as per CVE-2009-0365 - Rich

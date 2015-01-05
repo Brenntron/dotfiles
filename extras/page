@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vulnerabilities type="array">
+  <vulnerability>
+    <complete type="integer">100</complete>
+    <created-on type="datetime">2011-11-04T17:20:51-05:00</created-on>
+    <description>Microsoft Windows contains a flaw related to the Win32k TrueType font parsing engine that may allow a context-dependent attacker to execute arbitrary code via malicious font data contained in a Word document.</description>
+    <disclosure-date type="datetime">2011-10-18T15:00:00-05:00</disclosure-date>
+    <disclosure-date-unknown type="boolean">false</disclosure-date-unknown>
+    <disclosure-source-id type="integer" nil="true"></disclosure-source-id>
+    <discovery-date type="datetime">1970-01-01T00:00:00-06:00</discovery-date>
+    <discovery-date-unknown type="boolean">false</discovery-date-unknown>
+    <exploit-publish-date type="datetime">1970-01-01T00:00:00-06:00</exploit-publish-date>
+    <exploit-publish-date-unknown type="boolean">false</exploit-publish-date-unknown>
+    <id type="integer">1165949</id>
+    <keywords>duqu, win.duqu, W32.Duqu, worm, trojan, Win32/Duqu, Cool Exploit Kit</keywords>
+    <manual-notes nil="true"></manual-notes>
+    <osvdb-id type="integer">76843</osvdb-id>
+    <short-description></short-description>
+    <solution>Microsoft has released a patch to address this vulnerability. Additionally, it is possible to temporarily work around the flaw by implementing the following workaround:  Access to T2embed.dll file on the vulnerable machine should be revoked by renaming the file.</solution>
+    <solution-date type="datetime">2011-12-13T00:00:00-06:00</solution-date>
+    <solution-date-unknown type="boolean">false</solution-date-unknown>
+    <t-description></t-description>
+    <third-party-solution-date type="datetime">1970-01-01T00:00:00-06:00</third-party-solution-date>
+    <third-party-solution-date-unknown type="boolean">false</third-party-solution-date-unknown>
+    <title>Microsoft Windows Win32k TrueType Font Handling Privilege Escalation</title>
+    <updated-on type="datetime">2012-12-27T14:18:48-06:00</updated-on>
+    <vendor-ack-date type="datetime">1970-01-01T00:00:00-06:00</vendor-ack-date>
+    <vendor-ack-date-unknown type="boolean">false</vendor-ack-date-unknown>
+    <vendor-informed-date type="datetime">1970-01-01T00:00:00-06:00</vendor-informed-date>
+    <vendor-informed-date-unknown type="boolean">false</vendor-informed-date-unknown>
+    <vulnerability-id type="integer">1165949</vulnerability-id>
+    <ext-references type="array">
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:21:15-05:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944611</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:21:15-05:00</updated-on>
+        <value>http://www.us-cert.gov/control_systems/pdf/ICS-ALERT-11-291-01.pdf</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:21:24-05:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944612</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:21:24-05:00</updated-on>
+        <value>http://www.us-cert.gov/control_systems/pdf/ICS-ALERT-11-291-01A.pdf</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:22:27-05:00</created-on>
+        <ext-reference-type-id type="integer">37</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944613</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:22:27-05:00</updated-on>
+        <value>http://www.csmonitor.com/Innovation/Horizons/2011/1103/Duqu-worm-looms-as-next-big-cyber-threat</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:22:37-05:00</created-on>
+        <ext-reference-type-id type="integer">37</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944614</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:22:37-05:00</updated-on>
+        <value>http://www.pcworld.com/businesscenter/article/243019/duqu_worm_targets_microsoft_zero_day_flaw.html</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:22:42-05:00</created-on>
+        <ext-reference-type-id type="integer">37</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944615</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:22:42-05:00</updated-on>
+        <value>http://www.msnbc.msn.com/id/45136542/ns/technology_and_science-security/</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:22:51-05:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944616</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:22:51-05:00</updated-on>
+        <value>http://www.symantec.com/security_response/writeup.jsp?docid=2011-101814-1119-99</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:23:37-05:00</created-on>
+        <ext-reference-type-id type="integer">37</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944617</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:23:37-05:00</updated-on>
+        <value>http://www.zdnet.com/blog/security/patch-tuesday-fix-for-duqu-zero-day-not-likely-this-month/9760</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:23:39-05:00</created-on>
+        <ext-reference-type-id type="integer">37</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944618</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:23:39-05:00</updated-on>
+        <value>http://www.kaspersky.com/about/news/virus/2011/Duqu_Targeted_Attacks_on_Iranian_and_Sudanese_Objects_Detected</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:24:40-05:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944619</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:24:40-05:00</updated-on>
+        <value>http://www.us-cert.gov/control_systems/pdf/ICS-ALERT-11-291-01D.pdf</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T02:25:21-05:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944620</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T02:25:21-05:00</updated-on>
+        <value>http://www.us-cert.gov/control_systems/pdf/ICS-ALERT-11-291-01B.pdf</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T11:30:20-05:00</created-on>
+        <ext-reference-type-id type="integer">8</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944621</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T11:30:20-05:00</updated-on>
+        <value>http://technet.microsoft.com/en-us/security/advisory/2639658</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T11:30:27-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944622</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T11:30:27-05:00</updated-on>
+        <value>2639658</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T11:30:34-05:00</created-on>
+        <ext-reference-type-id type="integer">3</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944623</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T11:30:34-05:00</updated-on>
+        <value>2011-3402</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-04T21:23:16-05:00</created-on>
+        <ext-reference-type-id type="integer">19</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944624</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-04T21:23:16-05:00</updated-on>
+        <value>46724</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-09T03:21:51-06:00</created-on>
+        <ext-reference-type-id type="integer">2</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944625</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-09T03:21:51-06:00</updated-on>
+        <value>3-20539</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-13T02:16:39-06:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944626</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-13T02:16:39-06:00</updated-on>
+        <value>http://www.us-cert.gov/control_systems/pdf/ICS-ALERT-11-291-01E.pdf</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-11-30T06:00:06-06:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944627</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-11-30T06:00:06-06:00</updated-on>
+        <value>http://www.us-cert.gov/control_systems/pdf/JSAR-11-312-01.pdf</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-12-13T20:39:09-06:00</created-on>
+        <ext-reference-type-id type="integer">8</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944628</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-12-13T20:39:09-06:00</updated-on>
+        <value>http://technet.microsoft.com/en-us/security/bulletin/ms11-087</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-12-13T21:54:08-06:00</created-on>
+        <ext-reference-type-id type="integer">37</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944629</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-12-13T21:54:08-06:00</updated-on>
+        <value>http://www.computerworld.com/s/article/9222530/Update_Microsoft_plans_20_patches_next_week_will_fix_Duqu_and_BEAST_bugs</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-12-14T02:29:07-06:00</created-on>
+        <ext-reference-type-id type="integer">1</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944630</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-12-14T02:29:07-06:00</updated-on>
+        <value>57273</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-12-14T02:29:07-06:00</created-on>
+        <ext-reference-type-id type="integer">5</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944631</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-12-14T02:29:07-06:00</updated-on>
+        <value>50462</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2011-12-14T12:59:11-06:00</created-on>
+        <ext-reference-type-id type="integer">37</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944632</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2011-12-14T12:59:11-06:00</updated-on>
+        <value>http://www.computerworld.com/s/article/9222639/Microsoft_scratches_BEAST_patch_at_last_minute_but_fixes_Duqu_bug</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">19</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944633</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>49119</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">8</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944634</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>http://technet.microsoft.com/en-us/security/bulletin/ms12-034</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944635</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>2681578</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944636</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>2656407</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944637</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>2656409</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944638</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>2656410</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944639</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>2656411</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:47:27-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944640</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:47:27-05:00</updated-on>
+        <value>2656405</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:51:47-05:00</created-on>
+        <ext-reference-type-id type="integer">19</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944641</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:51:47-05:00</updated-on>
+        <value>49120</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:51:47-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944642</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:51:47-05:00</updated-on>
+        <value>2660649</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:51:47-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944643</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:51:47-05:00</updated-on>
+        <value>2659262</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:51:47-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944644</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:51:47-05:00</updated-on>
+        <value>2676562</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:51:47-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944645</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:51:47-05:00</updated-on>
+        <value>2686509</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:51:47-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944646</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:51:47-05:00</updated-on>
+        <value>2658846</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:58:44-05:00</created-on>
+        <ext-reference-type-id type="integer">19</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944647</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:58:44-05:00</updated-on>
+        <value>49122</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:58:44-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944648</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:58:44-05:00</updated-on>
+        <value>2636927</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T22:58:44-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944649</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T22:58:44-05:00</updated-on>
+        <value>2690729</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T23:02:18-05:00</created-on>
+        <ext-reference-type-id type="integer">19</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944650</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T23:02:18-05:00</updated-on>
+        <value>49121</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T23:02:18-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944651</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T23:02:18-05:00</updated-on>
+        <value>2598253</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T23:02:18-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944652</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T23:02:18-05:00</updated-on>
+        <value>2596672</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T23:02:18-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944653</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T23:02:18-05:00</updated-on>
+        <value>2596792</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-05-08T23:02:18-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944654</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-05-08T23:02:18-05:00</updated-on>
+        <value>2589337</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T13:57:32-05:00</created-on>
+        <ext-reference-type-id type="integer">6</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944655</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T13:57:32-05:00</updated-on>
+        <value>MS12-039</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T13:57:32-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944656</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T13:57:32-05:00</updated-on>
+        <value>2707956</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T13:57:32-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944657</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T13:57:32-05:00</updated-on>
+        <value>2708980</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T13:57:32-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944658</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T13:57:32-05:00</updated-on>
+        <value>2693282</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T13:57:32-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944659</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T13:57:32-05:00</updated-on>
+        <value>2696031</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T13:57:32-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944660</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T13:57:32-05:00</updated-on>
+        <value>2693283</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T13:57:32-05:00</created-on>
+        <ext-reference-type-id type="integer">22</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944661</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T13:57:32-05:00</updated-on>
+        <value>2702444</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-06-12T15:28:44-05:00</created-on>
+        <ext-reference-type-id type="integer">19</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944662</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-06-12T15:28:44-05:00</updated-on>
+        <value>48429</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-07-09T17:30:16-05:00</created-on>
+        <ext-reference-type-id type="integer">35</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944663</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-07-09T17:30:16-05:00</updated-on>
+        <value>13998</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-12-08T07:33:02-06:00</created-on>
+        <ext-reference-type-id type="integer">31</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944664</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-12-08T07:33:02-06:00</updated-on>
+        <value>1027039</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+      <ext-reference>
+        <auth-required type="boolean">false</auth-required>
+        <created-on type="datetime">2012-12-27T02:53:54-06:00</created-on>
+        <ext-reference-type-id type="integer">24</ext-reference-type-id>
+        <fourofour type="boolean">false</fourofour>
+        <id type="integer">2944665</id>
+        <indirect type="boolean">false</indirect>
+        <updated-on type="datetime">2012-12-27T02:53:54-06:00</updated-on>
+        <value>http://yomuds.blogspot.com.au/2012/11/cve-2011-3402-and-cool-exploit-kit_28.html</value>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </ext-reference>
+    </ext-references>
+    <cvss-metrics type="array">
+      <cvss-metric>
+        <access-complexity>MEDIUM</access-complexity>
+        <access-vector>NETWORK</access-vector>
+        <authentication>NONE</authentication>
+        <availability-impact>COMPLETE</availability-impact>
+        <calculated-cvss-base-score type="float">9.3</calculated-cvss-base-score>
+        <confidentiality-impact>COMPLETE</confidentiality-impact>
+        <created-at type="datetime">2011-11-07T20:00:07-06:00</created-at>
+        <cve-id>2011-3402</cve-id>
+        <generated-on type="datetime">2011-11-07T13:55:00-06:00</generated-on>
+        <id type="integer">129924</id>
+        <integrity-impact>COMPLETE</integrity-impact>
+        <score type="float">9.3</score>
+        <short-notation>AV:N/AC:M/Au:N/C:C/I:C/A:C</short-notation>
+        <source>http://nvd.nist.gov</source>
+        <updated-at type="datetime">2011-11-07T20:00:07-06:00</updated-at>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </cvss-metric>
+    </cvss-metrics>
+    <classification-items type="array">
+      <classification-item>
+        <classification-id type="integer">42</classification-id>
+        <id type="integer">1330660</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">46</classification-id>
+        <id type="integer">1330661</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">12</classification-id>
+        <id type="integer">1330662</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">18</classification-id>
+        <id type="integer">1330663</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">55</classification-id>
+        <id type="integer">1330664</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">44</classification-id>
+        <id type="integer">1330665</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">53</classification-id>
+        <id type="integer">1330666</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">35</classification-id>
+        <id type="integer">1330667</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+      <classification-item>
+        <classification-id type="integer">34</classification-id>
+        <id type="integer">1330668</id>
+        <vulnerability-id type="integer">1165949</vulnerability-id>
+      </classification-item>
+    </classification-items>
+    <object-correlations type="array">
+      <object-correlation>
+        <id type="integer">35204</id>
+        <object-product-id type="integer">1841</object-product-id>
+        <object-vendor-id type="integer">1152</object-vendor-id>
+        <object-version-id type="integer">21729</object-version-id>
+      </object-correlation>
+      <object-correlation>
+        <id type="integer">758</id>
+        <object-product-id type="integer">1841</object-product-id>
+        <object-vendor-id type="integer">1152</object-vendor-id>
+        <object-version-id type="integer">3521</object-version-id>
+      </object-correlation>
+      <object-correlation>
+        <id type="integer">62455</id>
+        <object-product-id type="integer">1841</object-product-id>
+        <object-vendor-id type="integer">1152</object-vendor-id>
+        <object-version-id type="integer">47261</object-version-id>
+      </object-correlation>
+      <object-correlation>
+        <id type="integer">3032</id>
+        <object-product-id type="integer">1841</object-product-id>
+        <object-vendor-id type="integer">1152</object-vendor-id>
+        <object-version-id type="integer">4450</object-version-id>
+      </object-correlation>
+      <object-correlation>
+        <id type="integer">67129</id>
+        <object-product-id type="integer">1841</object-product-id>
+        <object-vendor-id type="integer">1152</object-vendor-id>
+        <object-version-id type="integer">3514</object-version-id>
+      </object-correlation>
+      <object-correlation>
+        <id type="integer">57568</id>
+        <object-product-id type="integer">1841</object-product-id>
+        <object-vendor-id type="integer">1152</object-vendor-id>
+        <object-version-id type="integer">42701</object-version-id>
+      </object-correlation>
+    </object-correlations>
+  </vulnerability>
+</vulnerabilities>

@@ -25,5 +25,16 @@ module Api
         resource "*", headers: :any, methods: [:get, :post, :put, :delete, :options]
       end
     end
+
+    config.bugzilla_host = 'bugzilla.vrt.sourcefire.com'
+    config.bugzilla_domain = 'cisco.com'
+    config.snort_rule_path = Rails.root.join('extras', 'snort', 'rules')
+    config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'
+    config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
+    config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
+    config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
+    config.osvdb_search_url = "http://www.osvdb.org/search/search?search[refid]=DATA"
+    config.max_attachment_size = 50000000 # 50MB
+    config.job_timeout = 300    # 5 minutes
   end
 end
