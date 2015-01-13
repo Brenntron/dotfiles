@@ -1,4 +1,24 @@
 class SessionsController < ApplicationController
+  def create
+    respond_to do |format|
+      format.json do
+        resource = User.where("email=?", params[:user][:email]).first
+        return invalid_login_attempt unless resource
+
+        if resource.valid_password?(params[:user][:password]) #devise takes care of password checking
+          resource.ensure_authentication_token                #make sure the user has a token generated
+          render :json=> {
+              :success=>true,
+              :user_token=>resource.authentication_token,     #this must be called user_token for the ember app session to persist
+              :user_email=>resource.email                     #this also ust be called user_email for the ember app session to persist
+          }
+          return
+        end
+        invalid_login_attempt
+      end
+    end
+  end
+
   def login
     begin
       raise Exception.new("You must specify a user parameter") if params[:user].nil?
@@ -26,5 +46,11 @@ class SessionsController < ApplicationController
 
   def logout
     redirect_to login_url if reset_session.nil?
+  end
+  private
+
+  def invalid_login_attempt
+    warden.custom_failure!
+    render :json => { :errors => ["Invalid email or password."] },  :success => false, :status => :unauthorized
   end
 end
