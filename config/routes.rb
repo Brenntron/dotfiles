@@ -1,10 +1,11 @@
 Rails.application.routes.draw do
 
 
-
+  devise_for :users, controllers: { sessions: 'sessions' }
   resources :rules
 
   root 'pages#index'
+
 
   resources :attachments
   resources :exploits
@@ -13,13 +14,16 @@ Rails.application.routes.draw do
   resources :contacts
   resources :products
 
+  namespace :api do
+      get :csrf, to: 'csrf#index'
+  end
   mount API::Base => '/api'
   mount GrapeSwaggerRails::Engine => '/documentation'
 
-
-  get 'login' => 'sessions#new', as: 'login'
-  post 'login' => 'sessions#login', as: 'signin'
-  get 'logout' => 'sessions#logout', as: 'logout'
+  #
+  # get 'login' => 'sessions#new', as: 'login'
+  # post 'login' => 'sessions#login', as: 'signin'
+  # get 'logout' => 'sessions#logout', as: 'logout'
 
 
 

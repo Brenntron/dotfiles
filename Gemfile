@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "grape"
+gem "grape", '0.9.0'
 gem "grape-swagger"
 gem "hashie_rails"
 gem "active_model_serializers"
@@ -9,6 +9,7 @@ gem "grape-swagger-rails"
 gem "rack-cors", require: "rack/cors"
 
 gem 'cancan', '1.6.10'
+gem 'devise', '3.2.2'
 
 gem 'pg', '0.17.1'
 gem 'ruby-bugzilla'
