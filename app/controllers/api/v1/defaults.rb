@@ -11,7 +11,23 @@ module API
         format :json
         formatter :json, Grape::Formatter::ActiveModelSerializers
 
+        before do
+          error!("401 Unauthorized", 401) unless authenticated
+        end
+
         helpers do
+          def warden
+            env['warden']
+          end
+
+          def authenticated
+            return true if warden.authenticated?
+            params[:access_token] && @user = User.find_by_authentication_token(params[:access_token])
+          end
+
+          def current_user
+            warden.user || @user
+          end
           def permitted_params
             @permitted_params ||= declared(params, include_missing: false)
           end
