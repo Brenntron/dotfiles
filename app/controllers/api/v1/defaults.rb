@@ -21,8 +21,9 @@ module API
           end
 
           def authenticated
+            access_token = request.headers['Token']
             return true if warden.authenticated?
-            params[:access_token] && @user = User.find_by_authentication_token(params[:access_token])
+            access_token && @user = User.where("authentication_token = ?", access_token)
           end
 
           def current_user
