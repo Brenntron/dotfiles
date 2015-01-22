@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  has_many :bugs
   before_save :ensure_authentication_token
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable

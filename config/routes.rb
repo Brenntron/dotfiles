@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :reviews
   resources :contacts
   resources :products
+  resources :users
 
   namespace :api do
       get :csrf, to: 'csrf#index'
