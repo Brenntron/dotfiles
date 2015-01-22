@@ -20,10 +20,10 @@ gem 'net-ssh'
 gem 'daemons'
 gem 'stomp'
 gem 'dalli', '~> 2.6.4'
+gem 'pry', '0.9.12.4'
+gem 'pry-remote', '0.1.8'
 
 group :development do
-  gem 'pry', '0.9.12.4'
-  gem 'pry-remote', '0.1.8'
   gem 'awesome_print', '1.2.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
@@ -34,7 +34,7 @@ end
 group :test do
   gem 'factory_girl', '4.3.0'
   gem 'factory_girl_rails', '4.3.0'
-  gem 'capybara', '2.2.0'
+  gem 'capybara', '2.4.4'
   gem 'poltergeist', '1.5.1'
   gem 'cucumber-rails', '1.4.2', :require => false
   gem 'database_cleaner', '1.2.0'

@@ -39,10 +39,6 @@ When(/^I click button "(.*?)"$/) do |button|
   click_button(button)
 end
 
-Given(/^I upload "(.*?)" from_button "(.*?)"$/) do |filename, type|
-  attach_file("#{type}", "#{Rails.root}/lib/data/#{filename}")
-end
-
 When(/^I "(.*?)" the url "(.*?)"$/) do |method, url|
   case method
   when "GET"
