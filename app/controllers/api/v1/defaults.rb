@@ -11,6 +11,7 @@ module API
         format :json
         formatter :json, Grape::Formatter::ActiveModelSerializers
 
+
         before do
           error!("401 Unauthorized", 401) unless authenticated
         end
@@ -21,7 +22,7 @@ module API
           end
 
           def authenticated
-            access_token = request.headers['Token']
+            access_token = request.headers['Token']   #we just want to use headers and not url parameters
             return true if warden.authenticated?
             access_token && @user = User.where("authentication_token = ?", access_token)
           end
@@ -35,6 +36,12 @@ module API
 
           def logger
             Rails.logger
+          end
+
+          def bugzilla_session
+            xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+            xmlrpc.token = current_user.first.bugzilla_token
+            xmlrpc
           end
         end
 

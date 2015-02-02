@@ -23,6 +23,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string   :last_sign_in_ip
 
       t.string   :authentication_token
+      t.string   :bugzilla_token
 
       t.timestamps
     end

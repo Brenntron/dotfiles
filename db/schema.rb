@@ -157,6 +157,7 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
     t.string   "authentication_token"
+    t.string   "bugzilla_token"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

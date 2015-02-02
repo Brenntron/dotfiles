@@ -6,7 +6,7 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-User.create(cvs_username:"nicherbe",email:"nicherbe@cisco.com",password: 'password', password_confirmation: 'password',committer:'true')
+
 User.create(cvs_username:"alwillet",email:"alwillet@cisco.com  ",password: 'password', password_confirmation: 'password',committer:'false')
 User.create(cvs_username:"pamullen",email:"pamullen@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
 
@@ -25,34 +25,34 @@ r2 = Review.create(reviewedAt: DateTime.now,text: "Not the brightest flame, but 
 r3 = Review.create(reviewedAt: (DateTime.now - 5.days),text: "This is some amazing Flint! It lasts **forever** and works even when damp! I still remember the first day when I was only a little fire sprite and got one of these in my flame stalking for treemas. My eyes lit up the moment I tried it! Here's just a few uses for it:\n\n* Create a fire using just a knife and kindling!\n* Works even after jumping in a lake (although, that's suicide for me)\n* Small enough to fit in a pocket -- if you happen to wear pants\n\n\nYears later I'm still using the _same one_. That's the biggest advantage of this -- it doesn't run out easily like matches. As long as you have something to strike it against, **you can start a fire anywhere** you have something to burn!",rating: 5, product_id: p1.id)
 
 
+#
+# Reference.create(name:'telus', description:'Telus bug report information', validation: 'nil', bugzilla_format:'((FSC|TSL)\\d{8}-\\d{2})',example:'FSC20111103-05',rule_format:'<reference>',url:'https://portal.telussecuritylabs.com/threat/DATA')
 
-Reference.create(name:'telus', description:'Telus bug report information', validation: 'nil', bugzilla_format:'((FSC|TSL)\\d{8}-\\d{2})',example:'FSC20111103-05',rule_format:'<reference>',url:'https://portal.telussecuritylabs.com/threat/DATA')
-
-Bug.create(bugzilla_id:'116261',state:'Pending',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'103015',state:'Open',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'41545',state:'Open',summary:'[TELUS][VULN][BP] [SPARK][NSS][SID] 13572 25587 26663 FSC20080311-14 CVE-2008-0118 Microsoft Office Drawing Shapes Handling Memory',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'89558',state:'Open',summary:'[SPARK][SID] 13990,19437-19440,27287-27288,30040-30041 New SQL injection rules',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'79157',state:'Open',summary:'[BP] [SID] 17211 [MSF][NSS] CVE-2010-1818 FSC20100831-03 Apple QuickTime QTPlugin.ocx _Marshaled_pUnk Code Execution',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'121323',state:'Open',summary:'Java 0-day 1.7.0_21-b11',user_id:'3',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'112408',state:'Pending',summary:'[SID] 24741-24760 [NSS] [MSF] [BP] [TELUS][VULN] FSC20120110-17 Citrix Provisioning Services streamprocess.exe Multiple Opcodes Inte',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'60939',state:'Pending',summary:'CVE-2006-5112 FSC20060927-14 InterVations NaviCOPA Web Server Buffer Overflow',user_id:'3',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'79563',state:'Open',summary:'[BP] [NSS] [SPARK] [SID] 17255,19183,24379-24380 FSC20100914-09 CVE-2010-2730 Microsoft IIS Request Header Buffer Overflow',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'121624',state:'Closed',summary:'FP] [SID] 26575 [BP] [CCR] CVE-2011-1527 FSC20111019-02 Kerberos DoS via lowercase realm name',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'95771',state:'Open',summary:'[TELUS][VULN][SID] 20539-20540,20735 [BP][SPARK]FSC20111103-05 [MSTUES] MS11-087 CVE-2011-3402 Microsoft TrueType font parsing engine sfac_GetSbitBitmap EoP',user_id:'3',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'49537',state:'Open',summary:'[SID] 15539 [MSTUES] MS09-021 CVE-2009-0560 Excel Rce FSC20090609-21',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'121778',state:'Closed',summary:'[MSTUES] CVE-2013-1298 IE VML dynamic array out of bounds rce',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'122013',state:'Closed',summary:'EXPLOIT-KIT Unknown exploit kit Java jar file download',user_id:'3',committer_id:'3',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-Bug.create(bugzilla_id:'99802',state:'Closed',summary:'[SID] [NSS] [BP] [TELUS][VULN] CVE-2012-0501 FSC20120217-03 Oracle Java zip_util readCEN Denial-of-service',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
-
-
-
-Attachment.create(bugzilla_attachment_id: '1234',filename:'some attachment',file_size:'25')
+# Bug.create(bugzilla_id:'116261',state:'Pending',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'103015',state:'Open',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'41545',state:'Open',summary:'[TELUS][VULN][BP] [SPARK][NSS][SID] 13572 25587 26663 FSC20080311-14 CVE-2008-0118 Microsoft Office Drawing Shapes Handling Memory',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'89558',state:'Open',summary:'[SPARK][SID] 13990,19437-19440,27287-27288,30040-30041 New SQL injection rules',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'79157',state:'Open',summary:'[BP] [SID] 17211 [MSF][NSS] CVE-2010-1818 FSC20100831-03 Apple QuickTime QTPlugin.ocx _Marshaled_pUnk Code Execution',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'121323',state:'Open',summary:'Java 0-day 1.7.0_21-b11',user_id:'3',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'112408',state:'Pending',summary:'[SID] 24741-24760 [NSS] [MSF] [BP] [TELUS][VULN] FSC20120110-17 Citrix Provisioning Services streamprocess.exe Multiple Opcodes Inte',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'60939',state:'Pending',summary:'CVE-2006-5112 FSC20060927-14 InterVations NaviCOPA Web Server Buffer Overflow',user_id:'3',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'79563',state:'Open',summary:'[BP] [NSS] [SPARK] [SID] 17255,19183,24379-24380 FSC20100914-09 CVE-2010-2730 Microsoft IIS Request Header Buffer Overflow',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'121624',state:'Closed',summary:'FP] [SID] 26575 [BP] [CCR] CVE-2011-1527 FSC20111019-02 Kerberos DoS via lowercase realm name',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'95771',state:'Open',summary:'[TELUS][VULN][SID] 20539-20540,20735 [BP][SPARK]FSC20111103-05 [MSTUES] MS11-087 CVE-2011-3402 Microsoft TrueType font parsing engine sfac_GetSbitBitmap EoP',user_id:'3',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'49537',state:'Open',summary:'[SID] 15539 [MSTUES] MS09-021 CVE-2009-0560 Excel Rce FSC20090609-21',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'121778',state:'Closed',summary:'[MSTUES] CVE-2013-1298 IE VML dynamic array out of bounds rce',user_id:'2',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'122013',state:'Closed',summary:'EXPLOIT-KIT Unknown exploit kit Java jar file download',user_id:'3',committer_id:'3',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
+# Bug.create(bugzilla_id:'99802',state:'Closed',summary:'[SID] [NSS] [BP] [TELUS][VULN] CVE-2012-0501 FSC20120217-03 Oracle Java zip_util readCEN Denial-of-service',user_id:'1',committer_id:'1',gid:'1',sid:'nil',rev:'1',notes:'These are some notes',committer_notes:'these are some committer notes')
 
 
-Rule.create(gid:'1',sid:'12345',rev:'1',message:'This is a message',content:'this is where the content goes',state:'open',average_check: '2.5',average_match:'1.7',tested:'false')
-Rule.create(gid:'1',sid:'54321',rev:'1',message:'This is a new message',content:'content works here',state:'open',average_check: '2.2',average_match:'3.1',tested:'false')
-
-Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
-
-
+#
+# Attachment.create(bugzilla_attachment_id: '1234',filename:'some attachment',file_size:'25')
+#
+#
+# Rule.create(gid:'1',sid:'12345',rev:'1',message:'This is a message',content:'this is where the content goes',state:'open',average_check: '2.5',average_match:'1.7',tested:'false')
+# Rule.create(gid:'1',sid:'54321',rev:'1',message:'This is a new message',content:'content works here',state:'open',average_check: '2.2',average_match:'3.1',tested:'false')
+#
+# Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
+#
+#
 

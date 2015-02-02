@@ -1,8 +1,7 @@
-GIT
-  remote: git@code.engine.sourcefire.com:VRT-Web/sfbugzilla.git
-  revision: 200916b1930a5c45c0abe278723199d466f97d50
+PATH
+  remote: ./vendor/gems/sfbugzilla
   specs:
-    sfbugzilla (0.0.9)
+    sfbugzilla (0.0.10)
       highline (>= 1.6.8)
       mime-types (>= 1.18)
       ruby-bugzilla (>= 0.5.3)
@@ -194,7 +193,7 @@ GEM
     mysql2 (0.3.17)
     nenv (0.2.0)
     net-ssh (2.9.2)
-    nokogiri (1.6.6.1)
+    nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     notiffany (0.0.3)
       nenv (~> 0.1)
@@ -347,7 +346,7 @@ DEPENDENCIES
   rb-fsevent (= 0.9.4)
   rspec (= 2.14.1)
   ruby-bugzilla
-  sfbugzilla (>= 0.0.9)!
+  sfbugzilla!
   spring
   sqlite3
   stomp

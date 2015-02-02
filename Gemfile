@@ -15,7 +15,8 @@ gem 'pg', '0.17.1'
 gem 'ruby-bugzilla'
 
 gem 'diffy', '~> 2.1.4'
-gem 'sfbugzilla', '>= 0.0.9', :git => 'git@code.engine.sourcefire.com:VRT-Web/sfbugzilla.git'
+gem 'sfbugzilla', :path => './vendor/gems/sfbugzilla'
+
 gem 'net-ssh'
 gem 'daemons'
 gem 'stomp'
