@@ -23,4 +23,8 @@ class Bug < ActiveRecord::Base
     end
     bug_state
   end
+  def self.get_latest()
+    Bug.order("created_at").last.created_at
+  end
+
 end

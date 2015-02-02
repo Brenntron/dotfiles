@@ -14,7 +14,7 @@ module API
           xmlrpc_token = current_user.first.bugzilla_token        #We need to figure out how to populate the current user properly
           if xmlrpc_token
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-            last_updated = Time.now
+            last_updated = Bug.get_latest()
             new_bugs = xmlrpc.search(creation_time:last_updated)    #then we need to go over all new bugs and import them
 
             new_bugs['bugs'].each do |item|
@@ -35,6 +35,7 @@ module API
         params do
           requires :id, type: String, desc: "ID of the bug"
         end
+
         get ":id", root: "bug" do
           Bug.where(id: permitted_params[:id])
         end
@@ -46,6 +47,7 @@ module API
         put ":id", root: "bug" do
           Bug.where(id: permitted_params[:id])
         end
+
 
       end
     end
