@@ -10,6 +10,19 @@ class Bug < ActiveRecord::Base
 
 
   private
+  def self.import(new_bugs)
+    new_bugs['bugs'].each do |item|
+      Bug.find_or_create_by(bugzilla_id: item['id']) do |new_record|
+        new_record.id        = item['id']
+        new_record.state     = Bug.get_state(item['status'], item['resolution'])
+        new_record.summary   = item['summary']
+        new_record.user      = User.find_or_create_by(email: item['assigned_to'])
+        new_record.committer = User.find_or_create_by(email: item['qa_contact'])
+      end
+    end
+  end
+
+
   def self.get_state(status, resolution)
     bug_state = "OPEN"
     if status != 'RESOLVED'
