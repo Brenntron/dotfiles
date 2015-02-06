@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20141223155820) do
   create_table "bugs", force: true do |t|
     t.integer  "bugzilla_id"
     t.string   "state"
+    t.string   "creator"
     t.string   "summary"
     t.integer  "committer_id"
     t.integer  "gid",             default: 1
@@ -146,6 +147,7 @@ ActiveRecord::Schema.define(version: 20141223155820) do
   create_table "users", force: true do |t|
     t.string   "cvs_username"
     t.boolean  "committer",              default: false
+    t.boolean  "confirmed",              default: false
     t.string   "email",                  default: "",    null: false
     t.string   "encrypted_password",     default: "",    null: false
     t.string   "reset_password_token"

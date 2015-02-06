@@ -3,6 +3,7 @@ class CreateUsers < ActiveRecord::Migration
     create_table :users do |t|
       t.string "cvs_username"
       t.boolean "committer", :default => false
+      t.boolean "confirmed", :default => false
 
       ## Database authenticatable
       t.string :email,              :null => false, :default => ""

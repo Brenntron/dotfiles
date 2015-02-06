@@ -22,7 +22,7 @@ module API
           end
 
           def authenticated
-            access_token = request.headers['Token']   #we just want to use headers and not url parameters
+            access_token = request.headers['Token'] #we just want to use headers and not url parameters
             return true if warden.authenticated?
             access_token && @user = User.where("authentication_token = ?", access_token)
           end
@@ -30,6 +30,7 @@ module API
           def current_user
             warden.user || @user
           end
+
           def permitted_params
             @permitted_params ||= declared(params, include_missing: false)
           end
@@ -40,7 +41,9 @@ module API
 
           def bugzilla_session
             xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-            xmlrpc.token = current_user.first.bugzilla_token
+            if current_user
+              xmlrpc.token = current_user.first.bugzilla_token
+            end
             xmlrpc
           end
         end

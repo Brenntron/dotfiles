@@ -34,7 +34,8 @@ class User < ActiveRecord::Base
         new_record.password       = params[:user][:password]
         new_record.committer      = 'true'
       end
-      user.updated_at = Time.now
+      user.confirmed      = 'true'
+      user.updated_at     = Time.now
       user.bugzilla_token = xmlrpc.token
       raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
 
