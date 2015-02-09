@@ -97,25 +97,80 @@ class Bug < ActiveRecord::Base
     return latest_bug_date.nil? ? Time.now : latest_bug_date.created_at
   end
 
-  def close(xmlrpc, notes=nil)
-    self.bug_state = "FIXED"
-
-    if notes.nil?
-      if self.committer_notes.nil? or self.committer_notes == ''
-        notes = 'Closing bug'
-      else
-        notes = self.committer_notes
-      end
+  def update_bug(xmlrpc, options)
+    unless xmlrpc.nil?
+      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options)#the bugzilla session is where we authenticate
     end
-
-    self.update_status(xmlrpc, 'resolved', 'fixed', notes)
-    self.refresh_summary(xmlrpc)
-    self.bugzilla_summary_sids_replace(xmlrpc, self.summary_sids)
-    self.update_qa_contact(xmlrpc)
-    self.update_summary(xmlrpc, self.summary.gsub(/\s*\[FP\]\s*/, '')) # Remove FP tags
-    self.refresh_summary(xmlrpc)
+    changed_bug
   end
 
+
+  def bug_state(xmlrpc, notes=nil, status, resolution)
+    deps = self.open_dependencies(xmlrpc)
+    if deps.size > 0
+      false
+      add_error("This bug currently has open dependencies: #{deps}")
+    else
+      self.bug_state = resolution
+      if notes.nil?
+        if self.committer_notes.nil? or self.committer_notes == ''
+          notes = 'Closing bug'
+        else
+          notes = self.committer_notes
+        end
+      end
+
+      options = {:ids => [self.bugzilla_id],:status => status, :resolution => resolution,:comment => {:body => notes } }
+      self.update_bugzilla_attributes(xmlrpc, options)
+      self.refresh_summary(xmlrpc)
+      self.bugzilla_summary_sids_replace(xmlrpc, self.summary_sids)
+      options = {:ids => [self.bugzilla_id], :qa_contact => (self.committer.username ) }
+      self.update_bugzilla_attributes(xmlrpc, options)
+      options = {:ids => [self.bugzilla_id], :summary => self.summary.gsub(/\s*\[FP\]\s*/, '')}    # Remove FP tags
+      self.update_bugzilla_attributes(xmlrpc, options)
+      self.refresh_summary(xmlrpc)
+
+      true
+    end
+  end
+
+  def refresh_summary(xmlrpc)
+    unless xmlrpc.nil?
+      bug = Bugzilla::Bug.new(xmlrpc).get(self.bugzilla_id)['bugs'].first
+      raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
+      self.summary = bug['summary']
+    end
+  end
+
+  def update_bugzilla_attributes(xmlrpc, options)
+    unless xmlrpc.nil?
+      Bugzilla::Bug.new(xmlrpc).update(options)
+    end
+  end
+
+  def bugzilla_summary_sids_add(xmlrpc, sids)
+    unless xmlrpc.nil?
+      # Make sure to get the latest summary
+      self.refresh_summary(xmlrpc)
+      # Now extract the existing sids
+      self.bugzilla_summary_sids_replace(xmlrpc, (self.summary_sids + sids).flatten.compact)
+    end
+  end
+
+  def bugzilla_summary_sids_replace(xmlrpc, sids)
+    unless xmlrpc.nil?
+      sids.delete_if { |sid| sid.zero? }
+      unless sids.nil? or sids.empty?
+        self.summary = "[SID] #{sids.to_ranges_compact_string} #{self.summary_without_sids}"
+      end
+      options = {:ids => [self.bugzilla_id],:summary => self.summary }
+      Bugzilla::Bug.new(xmlrpc).update(options)
+    end
+  end
+
+  def summary_without_sids
+    self.summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
+  end
 
   def summary_sids
     sids = []
@@ -136,8 +191,22 @@ class Bug < ActiveRecord::Base
   end
 
 
-  def publish
+  def open_dependencies(xmlrpc)
+    raise Exception.new("Bugzilla xmlrpc session must be specified") if xmlrpc.nil?
 
+    return self.get_dependencies(xmlrpc).reject do |i|
+      bug = Bugzilla::Bug.new(xmlrpc).get(i)['bugs'].first
+      raise Exception.new("Unable to find blocking bug #{i}") if bug.nil?
+      (bug['status'] == 'RESOLVED'
+      ) ? true : false
+    end
+  end
+
+  def get_dependencies(xmlrpc)
+    raise Exception.new("Bugzilla xmlrpc session must be specified") if xmlrpc.nil?
+    bug = Bugzilla::Bug.new(xmlrpc).get(self.bugzilla_id)['bugs'].first
+    raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
+    return bug['depends_on']
   end
 
 end

@@ -24,13 +24,13 @@ module API
           # all the params we need to permit must to go here
         end
         put ":id", root: "bug" do
-          Bug.where(id: permitted_params[:id])
+          bug = Bug.where(id: permitted_params[:id])
           options = {
               :ids      => permitted_params[:id],
               :summary => permitted_params[:summary]
+              #all the options we want to possily include
           }
-          changed_bug = Bugzilla::Bug.new(bugzilla_session).update(options)#the bugzilla session is where we authenticate
-          return changed_bug
+          return bug.update_bug(bugzilla_session, options)
         end
 
         desc "create a bug"
@@ -52,15 +52,6 @@ module API
           }
           new_bug_id = Bugzilla::Bug.new(bugzilla_session).create(options)#the bugzilla session is where we authenticate
           return new_bug_id
-        end
-
-        desc "destroy a bug"
-        params do
-          requires :id, type: String, desc: "id of the bug"
-        end
-        delete "delete", root: "bug" do
-          return "deleting bug with id:" + permitted_params[:id]
-          # Bug.where(id: permitted_params[:id]).destroy
         end
 
         desc "get latest bugs from bugzilla"
@@ -91,32 +82,55 @@ module API
           end
         end
 
-        desc "publish a bug"
-        params do
-          requires :id, type: String, desc: "id of the bug"
-          # all the params we need to permit must to go here
-        end
-        put "publish/:id", root: "bug" do
-          xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
-          if xmlrpc_token
-            bug = Bug.where(id: permitted_params[:id])
-            return bug.publish()
-          else
-            false
-          end
-        end
-
         desc "close a bug"
         params do
           requires :id, type: String, desc: "id of the bug"
-          optional :notes, type: String, desc: "notes about closing a bug"
+          requires :notes, type: String, desc: "notes about closing a bug"
           # all the params we need to permit must to go here
         end
         post "close/:id", root: "bug" do
           xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
           if xmlrpc_token
             bug = Bug.where(id: permitted_params[:id])
-            return bug.close(bugzilla_session, permitted_params[:notes])
+            status = "resolved"
+            resolution = "Fixed"
+            return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
+          else
+            false
+          end
+        end
+
+        desc "wontfix a bug"
+        params do
+          requires :id, type: String, desc: "id of the bug"
+          requires :notes, type: String, desc: "notes about closing a bug"
+          # all the params we need to permit must to go here
+        end
+        post "wontfix/:id", root: "bug" do
+          xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
+          if xmlrpc_token
+            bug = Bug.where(id: permitted_params[:id])
+            status = "resolved"
+            resolution = "WontFix"
+            return bug.bug_state(bugzilla_session, permitted_params[:notes],status, resolution)
+          else
+            false
+          end
+        end
+
+        desc "reopen a bug"
+        params do
+          requires :id, type: String, desc: "id of the bug"
+          requires :notes, type: String, desc: "notes about closing a bug"
+          # all the params we need to permit must to go here
+        end
+        post "reopen/:id", root: "bug" do
+          xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
+          if xmlrpc_token
+            bug = Bug.where(id: permitted_params[:id])
+            status = "reopened"
+            resolution = "reopened"
+            return bug.bug_state(bugzilla_session, permitted_params[:notes],status, resolution)
           else
             false
           end
