@@ -7,4 +7,5 @@ class Bug < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :committer, :class_name => 'User'
+
 end

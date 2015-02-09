@@ -9,12 +9,12 @@ module API
           Rule.all
         end
 
-        desc "Return a rule"
+        desc "Return a rule by sid"
         params do
-          requires :id, type: String, desc: "ID of the rule"
+          requires :sid, type: String, desc: "SID of the rule"
         end
-        get ":id", root: "rule" do
-          Rule.where(id: permitted_params[:id])
+        get ":sid", root: "rule" do
+          Rule.where(sid: permitted_params[:sid])
         end
       end
     end
