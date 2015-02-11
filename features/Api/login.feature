@@ -1,7 +1,7 @@
-Feature: API Json interface
-  In order to blank
+Feature: login API interface
+  In order to use the api
   as a user
-  I will provide
+  I will provide a way to login and authenticate
 
   Scenario: Request is Unauthorized when header does not contain credentials
     Given I goto "/api/v1/bugs"

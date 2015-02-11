@@ -18,10 +18,10 @@ class RulesControllerTest < ActionController::TestCase
 
   test "should create rule" do
     assert_difference('Rule.count') do
-      post :create, rule: {  }
+      post :create, rules: {  }
     end
 
-    assert_redirected_to rule_path(assigns(:rule))
+    assert_redirected_to rule_path(assigns(:rules))
   end
 
   test "should show rule" do
@@ -35,8 +35,8 @@ class RulesControllerTest < ActionController::TestCase
   end
 
   test "should update rule" do
-    patch :update, id: @rule, rule: {  }
-    assert_redirected_to rule_path(assigns(:rule))
+    patch :update, id: @rule, rules: {  }
+    assert_redirected_to rule_path(assigns(:rules))
   end
 
   test "should destroy rule" do

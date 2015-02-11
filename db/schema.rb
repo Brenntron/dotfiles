@@ -36,8 +36,17 @@ ActiveRecord::Schema.define(version: 20141223155820) do
   create_table "bugs", force: true do |t|
     t.integer  "bugzilla_id"
     t.string   "state"
+    t.string   "creator"
     t.string   "summary"
     t.integer  "committer_id"
+    t.string   "product"
+    t.string   "component"
+    t.string   "version"
+    t.string   "description"
+    t.string   "opsys"
+    t.string   "platform"
+    t.string   "priority"
+    t.string   "severity"
     t.integer  "gid",             default: 1
     t.integer  "sid"
     t.integer  "rev",             default: 1
@@ -146,6 +155,7 @@ ActiveRecord::Schema.define(version: 20141223155820) do
   create_table "users", force: true do |t|
     t.string   "cvs_username"
     t.boolean  "committer",              default: false
+    t.boolean  "confirmed",              default: false
     t.string   "email",                  default: "",    null: false
     t.string   "encrypted_password",     default: "",    null: false
     t.string   "reset_password_token"
@@ -157,6 +167,7 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
     t.string   "authentication_token"
+    t.string   "bugzilla_token"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

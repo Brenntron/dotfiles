@@ -7,6 +7,7 @@ gem "active_model_serializers"
 gem "grape-active_model_serializers"
 gem "grape-swagger-rails"
 gem "rack-cors", require: "rack/cors"
+gem 'kaminari', '~>0.16.3'
 
 gem 'cancan', '1.6.10'
 gem 'devise', '3.2.2'
@@ -15,7 +16,8 @@ gem 'pg', '0.17.1'
 gem 'ruby-bugzilla'
 
 gem 'diffy', '~> 2.1.4'
-gem 'sfbugzilla', '>= 0.0.9', :git => 'git@code.engine.sourcefire.com:VRT-Web/sfbugzilla.git'
+gem 'sfbugzilla', :path => './vendor/gems/sfbugzilla'
+
 gem 'net-ssh'
 gem 'daemons'
 gem 'stomp'
