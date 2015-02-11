@@ -35,6 +35,11 @@ module API
             @permitted_params ||= declared(params, include_missing: false)
           end
 
+          params :pagination do
+            optional :page, type: Integer
+            optional :per_page, type: Integer
+          end
+
           def logger
             Rails.logger
           end

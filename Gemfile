@@ -7,6 +7,7 @@ gem "active_model_serializers"
 gem "grape-active_model_serializers"
 gem "grape-swagger-rails"
 gem "rack-cors", require: "rack/cors"
+gem 'kaminari', '~>0.16.3'
 
 gem 'cancan', '1.6.10'
 gem 'devise', '3.2.2'

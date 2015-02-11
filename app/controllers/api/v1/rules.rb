@@ -4,9 +4,16 @@ module API
       include API::V1::Defaults
 
       resource :rules do
+        params do
+          optional :sid, type: String, desc: "SID of the rule"
+        end
         desc "Return all rules"
         get "", root: :rules do
-          Rule.all
+          if permitted_params[:sid]
+            Rule.where(sid: permitted_params[:sid]).first
+          else
+            Rule.all
+          end
         end
 
         desc "Return a rule"

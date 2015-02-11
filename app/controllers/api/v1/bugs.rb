@@ -4,9 +4,17 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+        params do
+          use :pagination
+        end
         desc "Return all bugs"
         get "", root: :bugs do
-          Bug.all
+          if params[:page]
+            bugs = Bug.page(params[:page]).per(params[:per_page])
+            render bugs, { meta: {total_pages: bugs.total_pages} }
+          else
+            Bug.all
+          end
         end
 
         desc "get a bug"
