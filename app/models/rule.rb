@@ -4,33 +4,29 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :attachments
 
 
-  def create(content)
-      begin
-        raise Exception.new("No rules to add") if content.blank?
-        text_rules = content.each_line.to_a.sort.uniq.map {|t| t.chomp}.compact.reject {|e| e.empty?}
-        raise Exception.new("No rules to add") if text_rules.empty?
-
-
-        # Loop through all of the rules
-        text_rules.each do |text_rule|
-          begin
-            unless text_rule =~ / sid:(\d+);/ #if we find the rule then we dont need to create it
-              #otherwise we need to create the rule
-              @record = Rule.update_generate_rule($1)
-              @record.state = "New"
-              @record.rev = 1
-              @record.save
-            end
-          rescue Exception => e
-            raise Exception.new("{rule_error: {content: #{text_rule},error:#{e.to_s}}}")
+  def self.create_a_rule(content)
+    begin
+      raise Exception.new("No rules to add") if content.blank?
+      text_rules = content.each_line.to_a.sort.uniq.map { |t| t.chomp }.compact.reject { |e| e.empty? }
+      raise Exception.new("No rules to add") if text_rules.empty?
+      # Loop through all of the rules
+      text_rules.each do |text_rule|
+        begin
+          if text_rule =~ / sid:(\d+);/ #if this rule has a sid then we can attempt to create it
+            @record = Rule.update_generate_rule($1)
+            @record.state = "New"
+            @record.rev = 1
+            @record.save
           end
+        rescue Exception => e
+          raise Exception.new("{rule_error: {content: #{text_rule},error:#{e.to_s}}}")
         end
-
-      rescue Exception => e
-        raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e.to_s}}}")
       end
-
+    rescue Exception => e
+      raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e.to_s}}}")
     end
+
+  end
 
   def extract_rule
     begin
@@ -59,7 +55,7 @@ class Rule < ActiveRecord::Base
         self.rev = parsed['revision']
         self.content = parsed['optomized']
 
-        if not parsed['references'].nil?
+        unless parsed['references'].nil?
           parsed['references'].each do |type, ref|
             begin
               reference_type = ReferenceType.find_by_name(type)
@@ -99,34 +95,23 @@ class Rule < ActiveRecord::Base
 
   def self.parse_rule(rule)
     begin
-      raise RuleError.new("Rule has no content") if rule.nil?
-
+      raise Exception.new("Rule has no content") if rule.nil?
       # Cache this output as well to speed up any changes
       message = Rails.cache.fetch("rules.content.#{Digest::MD5::hexdigest(rule)}") do
-        Open3.popen3("#{Rails.configuration.rule2yaml_path}") do |i,o,e|
-          i.puts rule
-          i.close
-          # response = o.read.encode(Encoding.find('ASCII'), {:invalid => :replace, :undef => :replace, :replace => '', :universal_newline => true}).gsub(/[\x7f-\xff]/, '')
-          data = YAML.load(response)
-
-          if data.nil? or data == false
-            raise RuleError.new('Unable to load yaml output from rule2yaml')
-          end
-
-          unless data['failed'].nil?
-            raise RuleError.new(data['failed'])
-          end
-
-          # Looks like it parsed it so just return the data
-          data
+        data ={}
+        # parse the rule
+        split_rule = rule.scan(/(\w+:)([^\;]*)/)
+        split_rule.each do |key, value|
+          data[key.gsub(":", "")] = value
         end
+        return data
       end
-
-    rescue Psych::SyntaxError => e
-      raise RuleError.new("Can't parse invalid yaml data: #{rule}")
+      return message
+    rescue Exception => e
+      raise Exception.new("{rule_parse_error: {content: #{rule},error:#{e.to_s}}}")
     end
 
-    return message
+
   end
 
   def self.parse_and_create_rule(rule)
@@ -152,7 +137,7 @@ class Rule < ActiveRecord::Base
 
   def remove_rule
     begin
-      remove_rule_from_bug(Bug.find(active_scaffold_session_storage[:constraints][:bugs]), Rule.find(params[:id]) )
+      remove_rule_from_bug(Bug.find(active_scaffold_session_storage[:constraints][:bugs]), Rule.find(params[:id]))
     rescue Exception => e
       log_error(e)
     end
@@ -176,19 +161,29 @@ class Rule < ActiveRecord::Base
   end
 
   def self.create_or_update_rule(body)
-    rule = Rule.where("sid = ?",(Rule.parse_rule(body)['sid']))
-
-    if rule.nil?
-      rule = Rule.create(:content => body)
-      rule.rule_state = RuleState.Unchanged
-    else
-      rule.content = body
-      rule.rule_state = RuleState.Unchanged
+    begin
+      parsed = Rule.parse_rule(body)
+      rule   = Rule.where("sid = ?", parsed['sid'])
+      if rule.empty?
+        rule = Rule.create(:content => body)
+        rule.gid = 1
+        rule.message = parsed['msg'].gsub("\"","")
+        rule.sid = parsed['sid']
+        rule.rev = parsed['revision']
+        rule.state = "Unchanged"
+      else
+        rule.content = body
+        rule.message = parsed['msg'].gsub("\"","")
+        rule.gid = 1
+        rule.sid = parsed['sid']
+        rule.rev = parsed['revision']
+        rule.state = "Unchanged"
+      end
+      rule.save
+      return rule
+    rescue Exception => e
+      raise Exception.new(e)
     end
-
-    rule.save
-
-    return rule
   end
 
   def self.find_current_rule(sid)
@@ -208,11 +203,13 @@ class Rule < ActiveRecord::Base
 
     raise RuleError.new("Unable to find sid #{sid}")
   end
-  def self.rule_exist?(sid)
-    return Rule.find_current_rule(sid).blank? ? true : false
-  end
+
   def self.update_generate_rule(sid)
-    return Rule.create_or_update_rule(Rule.find_current_rule(sid))
+    begin
+      return Rule.create_or_update_rule(Rule.find_current_rule(sid))
+    rescue Exception => e
+      raise Exception.new(e)
+    end
   end
 
   def self.update_rules(rules)

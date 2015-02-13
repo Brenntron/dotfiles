@@ -31,8 +31,8 @@ module API
         params do
           requires :content, type: String, desc: "The text content of the rule to be created"
         end
-        post "new", root: "rule" do
-          Rule.create(permitted_params[:content])
+        post do
+          Rule.create_a_rule(permitted_params[:content])
         end
 
         #import rule via sid
