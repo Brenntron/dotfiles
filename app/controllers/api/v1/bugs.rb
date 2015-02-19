@@ -61,10 +61,8 @@ module API
               :description => permitted_params[:bug][:description]
           }
           new_bug = Bugzilla::Bug.new(bugzilla_session).create(options)#the bugzilla session is where we authenticate
-          #new_bug = {"id"=>145125}
           new_bug_id = new_bug["id"]
-          puts "------------------------"
-          puts new_bug_id
+
           Bug.create(
               :id => new_bug_id,
               :bugzilla_id => new_bug_id,
