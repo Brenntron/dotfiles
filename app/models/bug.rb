@@ -6,8 +6,16 @@ class Bug < ActiveRecord::Base
 
   has_and_belongs_to_many :references
 
-  belongs_to :user
+  has_and_belongs_to_many :users
   belongs_to :committer, :class_name => 'User'
+
+  enum classification: {
+      unclassified:   0,
+      confidential:   1,
+      secret:         2,
+      top_secret:     3,
+      top_secret_sci: 4
+  }
 
 
   def get_state(status, resolution)

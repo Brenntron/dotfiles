@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141223155820) do
+ActiveRecord::Schema.define(version: 20150216211933) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.string   "platform"
     t.string   "priority"
     t.string   "severity"
+    t.integer  "classification"
     t.integer  "gid",             default: 1
     t.integer  "sid"
     t.integer  "rev",             default: 1
@@ -63,6 +64,14 @@ ActiveRecord::Schema.define(version: 20141223155820) do
   add_index "bugs", ["reference_id"], name: "index_bugs_on_reference_id", using: :btree
   add_index "bugs", ["rule_id"], name: "index_bugs_on_rule_id", using: :btree
   add_index "bugs", ["user_id"], name: "index_bugs_on_user_id", using: :btree
+
+  create_table "bugs_users", id: false, force: true do |t|
+    t.integer "bug_id"
+    t.integer "user_id"
+  end
+
+  add_index "bugs_users", ["bug_id"], name: "index_bugs_users_on_bug_id", using: :btree
+  add_index "bugs_users", ["user_id"], name: "index_bugs_users_on_user_id", using: :btree
 
   create_table "contacts", force: true do |t|
     t.string   "name"
@@ -148,8 +157,10 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.float    "average_match"
     t.float    "average_nonmatch"
     t.boolean  "tested",           default: false
+    t.integer  "bug_id"
   end
 
+  add_index "rules", ["bug_id"], name: "index_rules_on_bug_id", using: :btree
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
 
   create_table "users", force: true do |t|
@@ -166,12 +177,16 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
+    t.string   "role"
+    t.integer  "class_level"
     t.string   "authentication_token"
     t.string   "bugzilla_token"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "bug_id"
   end
 
+  add_index "users", ["bug_id"], name: "index_users_on_bug_id", using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 

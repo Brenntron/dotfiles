@@ -1,12 +1,19 @@
 class User < ActiveRecord::Base
-  has_many :bugs
+  has_and_belongs_to_many :bugs
+
   before_save :ensure_authentication_token
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-
+  enum class_level: {
+      unclassified:   0,
+      confidential:   1,
+      secret:         2,
+      top_secret:     3,
+      top_secret_sci: 4
+  }
 
   def ensure_authentication_token
     if authentication_token.blank?

@@ -4,25 +4,31 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+
         params do
           use :pagination
         end
-        desc "Return all bugs"
         get "", root: :bugs do
-          if params[:page]
-            bugs = Bug.page(params[:page]).per(params[:per_page])
+            bugs = Bug.all.where("classification <= ?",User.class_levels[current_user.class_level]).page(params[:page]).per(params[:per_page])
             render bugs, { meta: {total_pages: bugs.total_pages} }
-          else
-            Bug.all
-          end
+        end
+
+
+        desc "get all bugs"
+        params do
+          use :pagination
+        end
+        get :user_bugs, root: "bug" do
+            bugs = current_user.bugs.page(params[:page]).per(params[:per_page]).where("classification <= ?",User.class_levels[current_user.class_level])
+            render bugs, { meta: {total_pages: bugs.total_pages} }
         end
 
         desc "get a bug"
         params do
           requires :id, type: String, desc: "ID of the bug"
         end
-        get :id, root: "bug" do
-          Bug.where(id: permitted_params[:id])
+        get "allbugs/:id", root: "bug" do
+          Bug.where(id: permitted_params[:id]).where("classification <= ?",User.class_levels[current_user.class_level])
         end
 
         desc "update a bug"
@@ -50,13 +56,13 @@ module API
           requires :description, type: String, desc: "A full text description of the bug"
           # all the params we need to permit must to go here
         end
-        post "new", root: "bug" do
+        post "", root: "bug" do
           options = {
-              :product => permitted_params[:product],
-              :component => permitted_params[:component],
-              :summary => permitted_params[:summary],
-              :version => permitted_params[:version],
-              :description => permitted_params[:description]
+              :product => permitted_params["bug"]["product"],
+              :component => permitted_params["bug"]["component"],
+              :summary => permitted_params["bug"]["summary"],
+              :version => permitted_params["bug"]["version"],
+              :description => permitted_params["bug"]["description"]
           }
           new_bug_id = Bugzilla::Bug.new(bugzilla_session).create(options)#the bugzilla session is where we authenticate
           return new_bug_id
