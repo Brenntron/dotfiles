@@ -13,7 +13,6 @@ module API
             render bugs, { meta: {total_pages: bugs.total_pages} }
         end
 
-
         desc "get all bugs"
         params do
           use :pagination
@@ -160,6 +159,33 @@ module API
             false
           end
         end
+
+        desc "subscribe to a bug"
+        params do
+          requires :id, type: String, desc: "id of the bug"
+        end
+        post "subscribe/:id", root: "bug" do
+          bug = current_user.bugs.where(id: permitted_params[:id])
+          unless bug.nil?
+            current_user.bugs.delete(bug)
+            return true
+          end
+          return false
+        end
+
+        desc "unsubscribe to a bug"
+        params do
+          requires :id, type: String, desc: "id of the bug"
+        end
+        post "unsubscribe/:id", root: "bug" do
+          bug = Bug.where(id: permitted_params[:id]).where("classification <= ?",User.class_levels[current_user.class_level])
+          unless bug.nil?
+            current_user.bugs << bug
+            return true
+          end
+          return false
+        end
+
 
       end
     end
