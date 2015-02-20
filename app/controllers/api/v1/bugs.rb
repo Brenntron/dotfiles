@@ -58,20 +58,18 @@ module API
               :component => permitted_params[:bug][:component],
               :summary => permitted_params[:bug][:summary],
               :version => permitted_params[:bug][:version],
-              :description => permitted_params[:bug][:description]
+              :description => permitted_params[:bug][:description],
           }
-          new_bug = Bugzilla::Bug.new(bugzilla_session).create(options)#the bugzilla session is where we authenticate
-          new_bug_id = new_bug["id"]
 
-          Bug.create(
-              :id => new_bug_id,
-              :bugzilla_id => new_bug_id,
-              :product => permitted_params[:bug][:product],
-              :component => permitted_params[:bug][:component],
-              :summary => permitted_params[:bug][:summary],
-              :version => permitted_params[:bug][:version],
-              :description => permitted_params[:bug][:description]
-          )
+          new_bug = Bugzilla::Bug.new(bugzilla_session).create(options)#the bugzilla session is where we authenticate
+
+          new_bug_id = new_bug["id"]
+          options.delete("Bugzilla_token")
+          options[:id] = new_bug_id
+          options[:bugzilla_id] = new_bug_id
+
+          Bug.create(options)
+
         end
 
         desc "get latest bugs from bugzilla"
