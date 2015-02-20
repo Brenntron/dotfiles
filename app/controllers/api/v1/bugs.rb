@@ -49,23 +49,34 @@ module API
 
         desc "create a bug"
         params do
-          requires :product, type: String, desc: "The name of the product the bug is being filed against."
-          requires :component, type: String, desc: "The name of a component in the product above."
-          requires :summary, type: String, desc: "A brief description of the bug being filed."
-          requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
-          requires :description, type: String, desc: "A full text description of the bug"
-          # all the params we need to permit must to go here
+          requires :bug, type: Hash do
+            requires :product, type: String, desc: "The name of the product the bug is being filed against."
+            requires :component, type: String, desc: "The name of a component in the product above."
+            requires :summary, type: String, desc: "A brief description of the bug being filed."
+            requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
+            requires :description, type: String, desc: "A full text description of the bug"
+            # all the params we need to permit must to go here
+          end
         end
         post "", root: "bug" do
           options = {
-              :product => permitted_params["bug"]["product"],
-              :component => permitted_params["bug"]["component"],
-              :summary => permitted_params["bug"]["summary"],
-              :version => permitted_params["bug"]["version"],
-              :description => permitted_params["bug"]["description"]
+              :product => permitted_params[:bug][:product],
+              :component => permitted_params[:bug][:component],
+              :summary => permitted_params[:bug][:summary],
+              :version => permitted_params[:bug][:version],
+              :description => permitted_params[:bug][:description]
           }
-          new_bug_id = Bugzilla::Bug.new(bugzilla_session).create(options)#the bugzilla session is where we authenticate
-          return new_bug_id
+          new_bug = Bugzilla::Bug.new(bugzilla_session).create(options)#the bugzilla session is where we authenticate
+          new_bug_id = new_bug["id"]
+          Bug.create(
+              :id => new_bug_id,
+              :bugzilla_id => new_bug_id,
+              :product => permitted_params[:bug][:product],
+              :component => permitted_params[:bug][:component],
+              :summary => permitted_params[:bug][:summary],
+              :version => permitted_params[:bug][:version],
+              :description => permitted_params[:bug][:description]
+          )
         end
 
         desc "get latest bugs from bugzilla"
