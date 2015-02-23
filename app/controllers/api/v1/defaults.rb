@@ -48,7 +48,7 @@ module API
           def bugzilla_session
             xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
             if current_user
-              xmlrpc.token = current_user.first.bugzilla_token
+              xmlrpc.token = current_user.bugzilla_token
             end
             xmlrpc
           end

@@ -41,6 +41,7 @@ class User < ActiveRecord::Base
         new_record.password       = params[:user][:password]
         new_record.committer      = 'true'
       end
+      user.class_level = 'unclassified'
       user.confirmed      = 'true'
       user.updated_at     = Time.now
       user.bugzilla_token = xmlrpc.token

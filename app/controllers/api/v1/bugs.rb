@@ -80,7 +80,7 @@ module API
 
         desc "get latest bugs from bugzilla"
         get :import_all, root: "bug" do
-          xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
+          xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
           if xmlrpc_token
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_latest()

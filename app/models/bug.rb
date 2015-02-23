@@ -12,10 +12,10 @@ class Bug < ActiveRecord::Base
   belongs_to :committer, :class_name => 'User'
 
   enum classification: {
-      unclassified:   0,
-      confidential:   1,
-      secret:         2,
-      top_secret:     3,
+      unclassified: 0,
+      confidential: 1,
+      secret: 2,
+      top_secret: 3,
       top_secret_sci: 4
   }
 
@@ -83,20 +83,27 @@ class Bug < ActiveRecord::Base
   def self.import(new_bugs)
     new_bugs['bugs'].each do |item|
       Bug.find_or_create_by(bugzilla_id: item['id']) do |new_record|
-        new_record.id        = item['id']
-        new_record.state     = new_record.get_state(item['status'], item['resolution'])
-        new_record.summary   = item['summary']
-        new_record.creator   = User.where("email=?", item['creator']).first
-        new_record.user      = User.where("email=?", item['assigned_to']).first
-        new_record.committer = User.where("email=?", item['qa_contact']).first
-        unless new_record.creator
-          User.create(cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}",""), email: item['creator'] ,password: 'password', password_confirmation: 'password',committer:'false')
+        new_record.id = item['id']
+        new_record.state = new_record.get_state(item['status'], item['resolution'])
+        new_record.summary = item['summary']
+        new_record.classification = "unclassified"
+        creator = User.where("email=?", item['creator']).first
+        new_user = User.where("email=?", item['assigned_to']).first
+        new_committer = User.where("email=?", item['qa_contact']).first
+        if creator.nil?
+          new_record.creator = User.create(cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['creator'], password: 'password', password_confirmation: 'password', committer: 'false')
+        else
+          new_record.creator = creator
         end
-        unless new_record.user
-          User.create(cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}",""), email: item['assigned_to'] ,password: 'password', password_confirmation: 'password',committer:'false')
+        if new_user.nil?
+          new_record.users << User.create(cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
+        else
+          new_record.users << new_user
         end
-        unless new_record.committer
-          User.create(cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}",""), email: item['qa_contact'] ,password: 'password', password_confirmation: 'password',committer:'false')
+        if new_committer.nil?
+          new_record.committer = User.create(cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
+        else
+          new_record.committer = new_committer
         end
       end
     end
@@ -110,7 +117,7 @@ class Bug < ActiveRecord::Base
 
   def update_bug(xmlrpc, options)
     unless xmlrpc.nil?
-      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options)#the bugzilla session is where we authenticate
+      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options) #the bugzilla session is where we authenticate
     end
     changed_bug
   end
@@ -131,13 +138,13 @@ class Bug < ActiveRecord::Base
         end
       end
 
-      options = {:ids => [self.bugzilla_id],:status => status, :resolution => resolution,:comment => {:body => notes } }
+      options = {:ids => [self.bugzilla_id], :status => status, :resolution => resolution, :comment => {:body => notes}}
       self.update_bugzilla_attributes(xmlrpc, options)
       self.refresh_summary(xmlrpc)
       self.bugzilla_summary_sids_replace(xmlrpc, self.summary_sids)
-      options = {:ids => [self.bugzilla_id], :qa_contact => (self.committer.username ) }
+      options = {:ids => [self.bugzilla_id], :qa_contact => (self.committer.username)}
       self.update_bugzilla_attributes(xmlrpc, options)
-      options = {:ids => [self.bugzilla_id], :summary => self.summary.gsub(/\s*\[FP\]\s*/, '')}    # Remove FP tags
+      options = {:ids => [self.bugzilla_id], :summary => self.summary.gsub(/\s*\[FP\]\s*/, '')} # Remove FP tags
       self.update_bugzilla_attributes(xmlrpc, options)
       self.refresh_summary(xmlrpc)
 
@@ -174,7 +181,7 @@ class Bug < ActiveRecord::Base
       unless sids.nil? or sids.empty?
         self.summary = "[SID] #{sids.to_ranges_compact_string} #{self.summary_without_sids}"
       end
-      options = {:ids => [self.bugzilla_id],:summary => self.summary }
+      options = {:ids => [self.bugzilla_id], :summary => self.summary}
       Bugzilla::Bug.new(xmlrpc).update(options)
     end
   end
@@ -198,7 +205,7 @@ class Bug < ActiveRecord::Base
       end
     end
 
-    return sids.flatten.sort.uniq.delete_if {|a| a <= 0}
+    return sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
   end
 
 
