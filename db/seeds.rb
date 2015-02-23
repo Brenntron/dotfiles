@@ -7,7 +7,6 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 
-User.create(cvs_username:"alwillet",email:"alwillet@cisco.com  ",password: 'password', password_confirmation: 'password',committer:'false')
 User.create(cvs_username:"pamullen",email:"pamullen@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
 
 c1 = Contact.create(name: 'Giamia',about: 'Although Giamia came from a humble spark of lightning, he quickly grew to be a great craftsman, providing all the warming instruments needed by those close to him.',avatar: 'images/contacts/giamia.png')

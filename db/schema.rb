@@ -148,8 +148,10 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.float    "average_match"
     t.float    "average_nonmatch"
     t.boolean  "tested",           default: false
+    t.integer  "bug_id"
   end
 
+  add_index "rules", ["bug_id"], name: "index_rules_on_bug_id", using: :btree
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
 
   create_table "users", force: true do |t|
