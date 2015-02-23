@@ -14,14 +14,12 @@ class CreateBugs < ActiveRecord::Migration
       t.string  :platform
       t.string  :priority
       t.string  :severity
-      t.integer  :classification
+      t.integer :classification
       t.integer :gid, :default => 1
       t.integer :sid
       t.integer :rev, :default => 1
-      t.text    :committer_notes
       t.timestamps
     end
-    add_reference :bugs, :notes, index: true
     add_reference :bugs, :user, index: true
     add_reference :bugs, :reference, index: true
     add_reference :bugs, :rule, index: true
