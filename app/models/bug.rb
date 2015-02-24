@@ -34,10 +34,11 @@ class Bug < ActiveRecord::Base
     bug_state
   end
 
-  private
-
-  def add_attachment(xmlrpc, file)
-    Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
+  def update_bug(xmlrpc, options)
+    unless xmlrpc.nil?
+      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options) #the bugzilla session is where we authenticate
+    end
+    changed_bug
   end
 
   def update_attachments(xmlrpc)
@@ -80,6 +81,13 @@ class Bug < ActiveRecord::Base
   end
 
 
+  private
+
+  def add_attachment(xmlrpc, file)
+    Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
+  end
+
+
   def self.import(new_bugs)
     new_bugs['bugs'].each do |item|
       Bug.find_or_create_by(bugzilla_id: item['id']) do |new_record|
@@ -115,19 +123,12 @@ class Bug < ActiveRecord::Base
     return latest_bug_date.nil? ? Time.now : latest_bug_date.created_at
   end
 
-  def update_bug(xmlrpc, options)
-    unless xmlrpc.nil?
-      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options) #the bugzilla session is where we authenticate
-    end
-    changed_bug
-  end
 
 
   def bug_state(xmlrpc, notes=nil, status, resolution)
     deps = self.open_dependencies(xmlrpc)
     if deps.size > 0
-      false
-      add_error("This bug currently has open dependencies: #{deps}")
+      return {error: "This bug currently has open dependencies: #{deps}"}
     else
       self.bug_state = resolution
       if notes.nil?
@@ -137,6 +138,9 @@ class Bug < ActiveRecord::Base
           notes = self.committer_notes
         end
       end
+
+      committer_note = Note.create(content: notes,type: "committer",author: current_user.email)
+      self.notes << committer_note
 
       options = {:ids => [self.bugzilla_id], :status => status, :resolution => resolution, :comment => {:body => notes}}
       self.update_bugzilla_attributes(xmlrpc, options)
