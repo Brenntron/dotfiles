@@ -27,13 +27,20 @@ module API
 
         desc "get a single bug"
         params do
-          use :pagination
           requires :id, type: String, desc: "ID of the bug"
         end
         get :id, root: "bug" do
           Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
         end
 
+        # params do
+        #   requires :id, type: String, desc: "ID of the bug"
+        # end
+        # route_param :id do
+        #   get do
+        #     Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
+        #   end
+        # end
 
         desc "update a bug"
         params do
@@ -42,15 +49,15 @@ module API
             optional :summary, type: String, desc: "A brief Title of the bug being filed."
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
             optional :creator, type: String, desc: "The person who created the bug"
-            optional :product, String, desc: "The name of the product"
-            optional :component, String, desc: "The name of the component"
-            optional :version, String, desc: "the version of the product"
-            optional :description, String,  desc: "a brief description of the bug"
-            optional :opsys, String, desc: "The operating system that this bug affects"
-            optional :platform, String , desc: "What platform this bug runs on"
-            optional :priority, String , desc: "How soon should this bug get fixed"
-            optional :severity, String, desc: "How terrible is this bug"
-            optional :classification, Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+            optional :product, type: String, desc: "The name of the product"
+            optional :component, type: String, desc: "The name of the component"
+            optional :version, type: String, desc: "the version of the product"
+            optional :description, type: String,  desc: "a brief description of the bug"
+            optional :opsys, type: String, desc: "The operating system that this bug affects"
+            optional :platform, type: String , desc: "What platform this bug runs on"
+            optional :priority, type: String , desc: "How soon should this bug get fixed"
+            optional :severity, type: String, desc: "How terrible is this bug"
+            optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
             # all the params we need to permit must to go here
           end
         end
@@ -102,15 +109,16 @@ module API
             requires :description, type: String, desc: "A full text description of the bug"
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
             optional :creator, type: String, desc: "The person who created the bug"
-            optional :opsys, String, desc: "The operating system that this bug affects"
-            optional :platform, String , desc: "What platform this bug runs on"
-            optional :priority, String , desc: "How soon should this bug get fixed"
-            optional :severity, String, desc: "How terrible is this bug"
-            optional :classification, Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+            optional :opsys, type: String, desc: "The operating system that this bug affects"
+            optional :platform, type: String , desc: "What platform this bug runs on"
+            optional :priority, type: String , desc: "How soon should this bug get fixed"
+            optional :severity, type: String, desc: "How terrible is this bug"
+            optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
             # all the params we need to permit must to go here
           end
         end
         post "", root: "bug" do
+          binding.pry
           options = {
               :product => permitted_params[:bug][:product],
               :component => permitted_params[:bug][:component],

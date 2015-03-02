@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "grape", '0.9.0'
+gem "grape", '0.11.0'
 gem "grape-swagger"
 gem "hashie_rails"
 gem "active_model_serializers"
