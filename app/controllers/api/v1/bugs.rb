@@ -27,18 +27,47 @@ module API
 
         desc "update a bug"
         params do
-          requires :id, type: String, desc: "id of the bug"
-          optional :summary, type: String, desc: "A brief description of the bug being filed."
-          # all the params we need to permit must to go here
+          requires :bug, type: Hash do
+            requires :product, type: String, desc: "The name of the product the bug is being filed against."
+            requires :component, type: String, desc: "The name of a component in the product above."
+            requires :summary, type: String, desc: "A brief description of the bug being filed."
+            requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
+            requires :description, type: String, desc: "A full text description of the bug"
+            optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
+            optional :creator, type: String, desc: "The person who created the bug"
+            optional :opsys, type:String, desc: "The operating system that this bug affects"
+            optional :platform, type:String , desc: "What platform this bug runs on"
+            optional :priority, type:String , desc: "How soon should this bug get fixed"
+            optional :severity, type:String, desc: "How terrible is this bug"
+            optional :classification, type:Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+          end
         end
         put ":id", root: "bug" do
-          bug = Bug.where(id: permitted_params[:id])
           options = {
-              :ids      => permitted_params[:id],
-              :summary => permitted_params[:summary]
-              #all the options we want to possily include
+              :ids      => params[:id],
+              :product => permitted_params[:bug][:product],
+              :component => permitted_params[:bug][:component],
+              :summary => permitted_params[:bug][:summary],
+              :version => permitted_params[:bug][:version],
+              :description => permitted_params[:bug][:description],
+              :state => permitted_params[:bug][:state],
+              :creator => permitted_params[:bug][:creator],
+              :opsys => permitted_params[:bug][:opsys],
+              :platform => permitted_params[:bug][:platform],
+              :priority => permitted_params[:bug][:priority],
+              :severity => permitted_params[:bug][:severity],
+              :classification => permitted_params[:bug][:classification]
+              #all the options we want to possibly include
           }
-          return bug.update_bug(bugzilla_session, options)
+          options.reject! {|k,v| v.nil?}
+          update_params = permitted_params[:bug].reject {|k, v| v.nil?}
+
+          updated_bug = Bugzilla::Bug.new(bugzilla_session).update(options)
+          if updated_bug
+            Bug.update(params[:id], update_params)
+          else
+            puts "changes not saved to bugzilla (#{update_params})"
+          end
         end
 
         desc "create a bug"
