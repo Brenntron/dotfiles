@@ -7,7 +7,10 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 
-User.create(cvs_username:"pamullen",email:"pamullen@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
+
+u1 = User.create(cvs_username:"tuser1",email:"testUser1@cisco.com  ",password: 'password', password_confirmation: 'password',committer:'false')
+u2 = User.create(cvs_username:"tuser2",email:"testUser2@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
+
 
 c1 = Contact.create(name: 'Giamia',about: 'Although Giamia came from a humble spark of lightning, he quickly grew to be a great craftsman, providing all the warming instruments needed by those close to him.',avatar: 'images/contacts/giamia.png')
 c2 = Contact.create(name: 'Anostagia',about: 'Knowing there was a need for it, Anostagia drew on her experience and spearheaded the Flint & Flame storefront. In addition to coding the site, she also creates a few products available in the store.',avatar: 'images/contacts/anostagia.png')
@@ -37,6 +40,20 @@ Rule.create(gid:'1',sid:'30040',rev:'2',message:'SQL 1 = 1 - possible sql inject
 
 
 Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
+
+b1 = Bug.create(bugzilla_id:'116261',state:'Pending',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System', committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
+b2 = Bug.create(bugzilla_id:'103015',state:'Open',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2, classification: 2)
+b3 = Bug.create(bugzilla_id:'103016',state:'Open',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
+
+
+Note.create(content: "This is some content",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b1.id)
+Note.create(content: "We should all have awesome notes",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b2.id)
+Note.create(content: "Test research content is important",note_type: "research",author: "nicherbe@cisco.com", bug_id: b3.id)
+Note.create(content: "More notes to test multiple notes on a bug",note_type: "research",author: "nicherbe@cisco.com", bug_id: b1.id)
+
+n4 = Note.create(content: "More notes to test multiple notes on a bug",note_type: "research",author: "nicherbe@cisco.com")
+b1.notes << n4
+b1.save
 
 
 #
