@@ -1,12 +1,19 @@
 class User < ActiveRecord::Base
   has_many :bugs
+
   before_save :ensure_authentication_token
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-
+  enum class_level: {
+      unclassified:   0,
+      confidential:   1,
+      secret:         2,
+      top_secret:     3,
+      top_secret_sci: 4
+  }
 
   def ensure_authentication_token
     if authentication_token.blank?
@@ -34,6 +41,7 @@ class User < ActiveRecord::Base
         new_record.password       = params[:user][:password]
         new_record.committer      = 'true'
       end
+      user.class_level = 'unclassified'
       user.confirmed      = 'true'
       user.updated_at     = Time.now
       user.bugzilla_token = xmlrpc.token
