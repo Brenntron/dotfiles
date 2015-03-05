@@ -8,8 +8,8 @@
 
 
 
-u1 = User.create(cvs_username:"alwillet",email:"alwillet@cisco.com  ",password: 'password', password_confirmation: 'password',committer:'false')
-u2 = User.create(cvs_username:"pamullen",email:"pamullen@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
+u1 = User.create(cvs_username:"tuser1",email:"testUser1@cisco.com  ",password: 'password', password_confirmation: 'password',committer:'false')
+u2 = User.create(cvs_username:"tuser2",email:"testUser2@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
 
 
 c1 = Contact.create(name: 'Giamia',about: 'Although Giamia came from a humble spark of lightning, he quickly grew to be a great craftsman, providing all the warming instruments needed by those close to him.',avatar: 'images/contacts/giamia.png')
