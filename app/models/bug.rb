@@ -8,7 +8,7 @@ class Bug < ActiveRecord::Base
 
   has_and_belongs_to_many :references
 
-  has_and_belongs_to_many :users
+  belongs_to :user
   belongs_to :committer, :class_name => 'User'
 
   enum classification: {

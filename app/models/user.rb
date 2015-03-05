@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  has_and_belongs_to_many :bugs
+  has_many :bugs
 
   before_save :ensure_authentication_token
   # Include default devise modules. Others available are:
