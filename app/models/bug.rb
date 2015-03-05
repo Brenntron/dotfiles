@@ -104,9 +104,9 @@ class Bug < ActiveRecord::Base
           new_record.creator = creator
         end
         if new_user.nil?
-          new_record.users << User.create(cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
+          new_record.user = User.create(cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
         else
-          new_record.users << new_user
+          new_record.user = new_user
         end
         if new_committer.nil?
           new_record.committer = User.create(cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
