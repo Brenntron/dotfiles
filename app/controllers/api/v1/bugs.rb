@@ -44,58 +44,64 @@ module API
 
         desc "update a bug"
         params do
+          requires :id, type: String, desc: "id of the bug"
           requires :bug, type: Hash do
-            requires :id, type: String, desc: "id of the bug"
             optional :summary, type: String, desc: "A brief Title of the bug being filed."
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
             optional :creator, type: String, desc: "The person who created the bug"
             optional :product, type: String, desc: "The name of the product"
             optional :component, type: String, desc: "The name of the component"
             optional :version, type: String, desc: "the version of the product"
-            optional :description, type: String,  desc: "a brief description of the bug"
+            optional :description, type: String, desc: "a brief description of the bug"
             optional :opsys, type: String, desc: "The operating system that this bug affects"
-            optional :platform, type: String , desc: "What platform this bug runs on"
-            optional :priority, type: String , desc: "How soon should this bug get fixed"
+            optional :platform, type: String, desc: "What platform this bug runs on"
+            optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
             optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
             # all the params we need to permit must to go here
           end
         end
-        post ":id", root: "bug" do
-          bug = Bug.where(id: permitted_params[:bug][:id]).first
-          unless bug.nil?
-            options = {
-                :ids => permitted_params[:bug][:id],
-                :summary => permitted_params[:bug][:summary],
-                :state => permitted_params[:bug][:state],
-                :creator => permitted_params[:bug][:creator],
-                :product => permitted_params[:bug][:product],
-                :component => permitted_params[:bug][:component],
-                :version => permitted_params[:bug][:version],
-                :description => permitted_params[:bug][:description],
-                :opsys => permitted_params[:bug][:opsys],
-                :platform => permitted_params[:bug][:platform],
-                :priority => permitted_params[:bug][:priority],
-                :severity => permitted_params[:bug][:severity],
-                :classification => permitted_params[:bug][:classification]
-                #all the options we want to possily include
-            }
-            updated_bugs = bug.update_bug(bugzilla_session, options)
+        route_param :id do
+          put do
+            binding.pry
+            bug = Bug.where(id: permitted_params[:id]).first
+            binding.pry
+            unless bug.nil?
+              options = {
+                  :ids => permitted_params[:id],
+                  :summary => permitted_params[:bug][:summary],
+                  :state => permitted_params[:bug][:state],
+                  :creator => permitted_params[:bug][:creator],
+                  :product => permitted_params[:bug][:product],
+                  :component => permitted_params[:bug][:component],
+                  :version => permitted_params[:bug][:version],
+                  :description => permitted_params[:bug][:description],
+                  :opsys => permitted_params[:bug][:opsys],
+                  :platform => permitted_params[:bug][:platform],
+                  :priority => permitted_params[:bug][:priority],
+                  :severity => permitted_params[:bug][:severity],
+                  :classification => permitted_params[:bug][:classification]
+                  #all the options we want to possily include
+              }.reject() { |k, v| v.nil? } #remove any nil values in the hash(bugzilla doesnt like them)
+              binding.pry
+              updated_bugs = bug.update_bug(bugzilla_session, options)
 
-            if updated_bugs['bugs'].empty?
-              #nothing came back so the update must have failed
-              return {error: 'bug not updated'}
-            else
-              #update the bug if updated bugs contains anything
-              if bug.update(params[:bug])
-                 render json: true, status: 200
+              if updated_bugs['bugs'].empty?
+                #nothing came back so the update must have failed
+                return {error: 'bug not updated'}
               else
-                render json: bug.errors, status: :unprocessable_entity
+                #update the bug if updated bugs contains anything
+                if bug.update(params[:bug])
+                  render json: true, status: 200
+                else
+                  render json: bug.errors, status: :unprocessable_entity
+                end
               end
+              return true
             end
-            return true
+            return {error: 'bug not found'}
           end
-          return {error: 'bug not found'}
+
         end
 
 
@@ -110,15 +116,14 @@ module API
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
             optional :creator, type: String, desc: "The person who created the bug"
             optional :opsys, type: String, desc: "The operating system that this bug affects"
-            optional :platform, type: String , desc: "What platform this bug runs on"
-            optional :priority, type: String , desc: "How soon should this bug get fixed"
+            optional :platform, type: String, desc: "What platform this bug runs on"
+            optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
             optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
             # all the params we need to permit must to go here
           end
         end
         post "", root: "bug" do
-          binding.pry
           options = {
               :product => permitted_params[:bug][:product],
               :component => permitted_params[:bug][:component],
@@ -132,7 +137,7 @@ module API
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
               :classification => permitted_params[:bug][:classification]
-          }
+          }.reject() { |k, v| v.nil? || v.empty? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
           new_bug = Bugzilla::Bug.new(bugzilla_session).create(options) #the bugzilla session is where we authenticate
           new_bug_id = new_bug["id"]
           Bug.create(
@@ -150,7 +155,6 @@ module API
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
               :classification => permitted_params[:bug][:classification]
-
           )
         end
 
@@ -244,36 +248,41 @@ module API
 
         desc "subscribe to a bug"
         params do
-          requires :bug, type: Hash do
           requires :id, type: String, desc: "id of the bug"
-            end
         end
-        post "subscribe/:id", root: "bug" do
-          bug = Bug.where(id: permitted_params[:bug][:id]).where("classification <= ?", User.class_levels[current_user.class_level])
-          unless bug.nil?
-            if current_user.bugs.exists?(bug)
-              return {error: 'already subscribed to this bug'}
-            else
-              current_user.bugs << bug
+        route_param "subscribe/:id" do
+          post do
+            bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
+            unless bug.nil?
+              binding.pry
+              if current_user.bugs.exists?(bug)
+                return {error: 'already subscribed to this bug'}
+              else
+                bug.user_id = current_user.id
+                bug.save
+                current_user.bugs << bug
+              end
+              return true
             end
-            return true
+            return {error: 'cannot find bug to subscribe'}
           end
-          return {error: 'cannot find bug to subscribe'}
         end
 
         desc "unsubscribe to a bug"
         params do
-          requires :bug, type: Hash do
           requires :id, type: String, desc: "id of the bug"
-            end
         end
-        post "unsubscribe/:id", root: "bug" do
-          bug = current_user.bugs.where(id: permitted_params[:bug][:id])
-          unless bug.nil?
-            current_user.bugs.delete(bug)
-            return true
+        route_param "unsubscribe/:id" do
+          post do
+            bug = current_user.bugs.where(id: permitted_params[:id])
+            unless bug.nil?
+              bug.user_id = nil
+              bug.save
+              current_user.bugs.delete(bug)
+              return true
+            end
+            return false
           end
-          return false
         end
 
 
