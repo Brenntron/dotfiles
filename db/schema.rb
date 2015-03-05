@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141223155820) do
+ActiveRecord::Schema.define(version: 20150216182106) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,11 +47,10 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.string   "platform"
     t.string   "priority"
     t.string   "severity"
-    t.integer  "gid",             default: 1
+    t.integer  "classification"
+    t.integer  "gid",            default: 1
     t.integer  "sid"
-    t.integer  "rev",             default: 1
-    t.text     "notes"
-    t.text     "committer_notes"
+    t.integer  "rev",            default: 1
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
@@ -97,6 +96,17 @@ ActiveRecord::Schema.define(version: 20141223155820) do
 
   add_index "jobs", ["bug_id"], name: "index_jobs_on_bug_id", using: :btree
   add_index "jobs", ["user_id"], name: "index_jobs_on_user_id", using: :btree
+
+  create_table "notes", force: true do |t|
+    t.text     "content"
+    t.string   "note_type"
+    t.string   "author"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "bug_id"
+  end
+
+  add_index "notes", ["bug_id"], name: "index_notes_on_bug_id", using: :btree
 
   create_table "products", force: true do |t|
     t.string   "title"
@@ -168,12 +178,16 @@ ActiveRecord::Schema.define(version: 20141223155820) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
+    t.string   "role"
+    t.integer  "class_level"
     t.string   "authentication_token"
     t.string   "bugzilla_token"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "bug_id"
   end
 
+  add_index "users", ["bug_id"], name: "index_users_on_bug_id", using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
