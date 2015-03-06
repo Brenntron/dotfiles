@@ -53,7 +53,8 @@ class User < ActiveRecord::Base
             :success => true,
             :xmlrpc_token => xmlrpc.token,
             :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
-            :user_email => user.email #this also ust be called user_email for the ember app session to persist
+            :user_email => user.email, #this also ust be called user_email for the ember app session to persist
+            :user_id => user.id
         }
         return resource
       else

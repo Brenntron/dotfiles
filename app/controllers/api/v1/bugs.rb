@@ -63,9 +63,7 @@ module API
         end
         route_param :id do
           put do
-            binding.pry
             bug = Bug.where(id: permitted_params[:id]).first
-            binding.pry
             unless bug.nil?
               options = {
                   :ids => permitted_params[:id],
@@ -83,7 +81,6 @@ module API
                   :classification => permitted_params[:bug][:classification]
                   #all the options we want to possily include
               }.reject() { |k, v| v.nil? } #remove any nil values in the hash(bugzilla doesnt like them)
-              binding.pry
               updated_bug = bug.update_bug(bugzilla_session, options)
 
 
