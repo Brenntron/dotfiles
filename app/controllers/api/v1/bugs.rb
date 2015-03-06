@@ -174,6 +174,13 @@ module API
           end
         end
 
+        desc "remove a bug from the db only"
+        params do
+          requires :id, type: Integer, desc: "Bugzilla id."
+        end
+        delete ":id", root: "bug" do
+          Bug.destroy(permitted_params[:id])
+        end
 
         desc "close a bug"
         params do
