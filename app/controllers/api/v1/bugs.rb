@@ -79,7 +79,6 @@ module API
               :classification => permitted_params[:bug][:classification]
               #all the options we want to possibly include
           }
-          binding.pry
           options.reject! { |k, v| v.nil? }
           update_params = permitted_params[:bug].reject { |k, v| v.nil? }
           updated_bug = Bugzilla::Bug.new(bugzilla_session).update(options)

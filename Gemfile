@@ -13,7 +13,8 @@ gem 'cancan', '1.6.10'
 gem 'devise', '3.2.2'
 
 gem 'pg', '0.17.1'
-gem 'ruby-bugzilla'
+
+gem 'ruby-bugzilla', '~> 0.6.0'
 
 gem 'diffy', '~> 2.1.4'
 gem 'sfbugzilla', :path => './vendor/gems/sfbugzilla'
