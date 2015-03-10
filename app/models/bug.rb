@@ -1,12 +1,12 @@
 class Bug < ActiveRecord::Base
   has_many :attachments, :dependent => :destroy
-  has_many :exploits, :through => :references
   has_many :jobs, :dependent => :destroy
   has_many :notes, :dependent => :destroy
   has_many :rules
 
 
-  has_and_belongs_to_many :references
+  has_many :references
+  has_many :exploits, :through => :references
 
   belongs_to :user
   belongs_to :committer, :class_name => 'User'
@@ -120,7 +120,7 @@ class Bug < ActiveRecord::Base
 
   def self.get_latest()
     latest_bug_date = Bug.order("created_at").last
-    return latest_bug_date.nil? ? Time.now : latest_bug_date.created_at
+    return latest_bug_date.nil? ? Time.now-(1.day) : latest_bug_date.created_at
   end
 
 
