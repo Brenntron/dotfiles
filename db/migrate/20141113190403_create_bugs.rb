@@ -14,7 +14,7 @@ class CreateBugs < ActiveRecord::Migration
       t.string  :platform
       t.string  :priority
       t.string  :severity
-      t.integer :classification
+      t.integer :classification, default: 0
       t.integer :gid, :default => 1
       t.integer :sid
       t.integer :rev, :default => 1

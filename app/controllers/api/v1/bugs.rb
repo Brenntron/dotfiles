@@ -143,7 +143,7 @@ module API
               :platform => permitted_params[:bug][:platform],
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification]
+              :classification => permitted_params[:bug][:classification] || 0 #api won't get bugs with classification of nil
           )
         end
 
