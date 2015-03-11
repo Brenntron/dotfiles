@@ -45,7 +45,7 @@ module API
         desc "update a bug"
         params do
           requires :bug, type: Hash do
-            optional :user_id, type: Integer, desc: "the user thsi bug is assigned to"
+            optional :user_id, type: Integer, desc: "the user this bug is assigned to"
             requires :product, type: String, desc: "The name of the product the bug is being filed against."
             requires :component, type: String, desc: "The name of a component in the product above."
             requires :summary, type: String, desc: "A brief description of the bug being filed."
@@ -87,12 +87,11 @@ module API
             #nothing came back so the update must have failed
             return {error: 'bug not updated'}
           else
-            if Bug.update(params[:id], update_params)
-              render json: Bug.where(id: params[:id]), status: 200
-            else
+            unless Bug.update(params[:id], update_params)
               render json: bug.errors, status: :unprocessable_entity
             end
           end
+
         end
 
         desc "create a bug"
