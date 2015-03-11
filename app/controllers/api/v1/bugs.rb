@@ -88,10 +88,9 @@ module API
             return {error: 'bug not updated'}
           else
             unless Bug.update(params[:id], update_params)
-              render json: bug.errors, status: :unprocessable_entity
+              return {error: 'bug not updated'}
             end
           end
-
         end
 
         desc "create a bug"
@@ -137,7 +136,7 @@ module API
               :summary => permitted_params[:bug][:summary],
               :version => permitted_params[:bug][:version],
               :description => permitted_params[:bug][:description],
-              :state => permitted_params[:bug][:state],
+              :state => permitted_params[:bug][:state] || 'OPEN',
               :creator => permitted_params[:bug][:creator],
               :opsys => permitted_params[:bug][:opsys],
               :platform => permitted_params[:bug][:platform],
