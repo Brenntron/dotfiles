@@ -45,7 +45,7 @@ module API
         desc "update a bug"
         params do
           requires :bug, type: Hash do
-            optional :user_id, type: Integer, desc: "the user thsi bug is assigned to"
+            optional :user_id, type: Integer, desc: "the user this bug is assigned to"
             requires :product, type: String, desc: "The name of the product the bug is being filed against."
             requires :component, type: String, desc: "The name of a component in the product above."
             requires :summary, type: String, desc: "A brief description of the bug being filed."
@@ -87,10 +87,8 @@ module API
             #nothing came back so the update must have failed
             return {error: 'bug not updated'}
           else
-            if Bug.update(params[:id], update_params)
-              render json: Bug.where(id: params[:id]), status: 200
-            else
-              render json: bug.errors, status: :unprocessable_entity
+            unless Bug.update(params[:id], update_params)
+              return {error: 'bug not updated'}
             end
           end
         end
@@ -138,13 +136,13 @@ module API
               :summary => permitted_params[:bug][:summary],
               :version => permitted_params[:bug][:version],
               :description => permitted_params[:bug][:description],
-              :state => permitted_params[:bug][:state],
+              :state => permitted_params[:bug][:state] || 'OPEN',
               :creator => permitted_params[:bug][:creator],
               :opsys => permitted_params[:bug][:opsys],
               :platform => permitted_params[:bug][:platform],
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification]
+              :classification => permitted_params[:bug][:classification] || 0 #api won't get bugs with classification of nil
           )
         end
 
