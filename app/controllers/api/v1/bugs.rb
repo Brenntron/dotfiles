@@ -14,17 +14,6 @@ module API
           render bugs, {meta: {total_pages: bugs.total_pages}}
         end
 
-
-        desc "get all bugs for the current user"
-        params do
-          use :pagination
-        end
-        get ':user_bugs', root: "bug" do
-          bugs = current_user.bugs.page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
-          render bugs, {meta: {total_pages: bugs.total_pages}}
-        end
-
-
         desc "get a single bug"
         params do
           requires :id, type: String, desc: "ID of the bug"
