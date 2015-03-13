@@ -41,9 +41,9 @@ Rule.create(gid:'1',sid:'30040',rev:'2',message:'SQL 1 = 1 - possible sql inject
 
 Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
 
-b1 = Bug.create(bugzilla_id:'116261',state:'Pending',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System', committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
-b2 = Bug.create(bugzilla_id:'103015',state:'Open',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2, classification: 2)
-b3 = Bug.create(bugzilla_id:'103016',state:'Open',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
+b1 = Bug.create(bugzilla_id:'116261',state:'PENDING',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System', committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
+b2 = Bug.create(bugzilla_id:'103015',state:'OPEN',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2, classification: 2)
+b3 = Bug.create(bugzilla_id:'103016',state:'OPEN',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
 
 
 Note.create(content: "This is some content",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b1.id)
