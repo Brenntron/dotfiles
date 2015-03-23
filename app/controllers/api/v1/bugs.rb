@@ -70,16 +70,17 @@ module API
           }
           options.reject! { |k, v| v.nil? }
           update_params = permitted_params[:bug].reject { |k, v| v.nil? }
-          updated_bug = Bugzilla::Bug.new(bugzilla_session).update(options)
+          #updated_bug = Bugzilla::Bug.new(bugzilla_session).update(options)
+          Bug.update(params[:id], update_params)
 
-          if updated_bug['bugs'].empty?
-            #nothing came back so the update must have failed
-            return {error: 'bug not updated'}
-          else
-            unless Bug.update(params[:id], update_params)
-              return {error: 'bug not updated'}
-            end
-          end
+          # if updated_bug['bugs'].empty?
+          #   #nothing came back so the update must have failed
+          #   return {error: 'bug not updated'}
+          # else
+          #   unless Bug.update(params[:id], update_params)
+          #     return {error: 'bug not updated'}
+          #   end
+          # end
         end
 
         desc "create a bug"

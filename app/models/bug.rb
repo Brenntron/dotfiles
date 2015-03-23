@@ -139,7 +139,7 @@ class Bug < ActiveRecord::Base
         end
       end
 
-      committer_note = Note.create(content: notes,type: "committer",author: current_user.email)
+      committer_note = Note.create(text: notes,type: "committer",author: current_user.email)
       self.notes << committer_note
 
       options = {:ids => [self.bugzilla_id], :status => status, :resolution => resolution, :comment => {:body => notes}}

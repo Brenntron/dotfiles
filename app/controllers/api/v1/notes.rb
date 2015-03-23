@@ -12,7 +12,7 @@ module API
         desc "Create a note"
         params do
           requires :note, type: Hash do
-            requires :content, type: String, desc: "The content of the note."
+            requires :text, type: String, desc: "The text of the note."
             requires :author, type: String, desc: "Who wrote the note."
             requires :note_type, type: String, desc: "Is it a Research note or a Committer note?"
             requires :bugzilla_id, type: Integer, desc: "The bug the note pertains to."
@@ -20,7 +20,7 @@ module API
         end
         post "", root: "note" do
           Note.create(
-            :content => permitted_params[:note][:content],
+            :text => permitted_params[:note][:text],
             :author => permitted_params[:note][:author],
             :note_type => permitted_params[:note][:note_type],
             :bug_id => permitted_params[:note][:bugzilla_id]
@@ -42,6 +42,20 @@ module API
         get "by_author/:author", root: "note" do
           Note.where("author =? ", permitted_params[:author])
         end
+
+        desc "edit a note"
+        params do
+          requires :id, type: Integer, desc: "The note's id in the database."
+          requires :note, type: Hash do
+            #requires :id, type: Integer, desc: "The bug to which the note pertains."
+            requires :text, type: String, desc: "The text of the note."
+            #optional :note_type, type: String, desc: "Is it a Research note or a Committer note?"
+          end
+        end
+        put ":id", root: "note" do
+          Note.update(permitted_params[:id], permitted_params[:note])
+        end
+
 
         desc "delete a note"
         params do
