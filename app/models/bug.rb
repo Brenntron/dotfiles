@@ -80,12 +80,12 @@ class Bug < ActiveRecord::Base
     end
   end
 
-
   private
 
   def add_attachment(xmlrpc, file)
     Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
   end
+
 
 
   def self.import(new_bugs)
@@ -113,16 +113,50 @@ class Bug < ActiveRecord::Base
         else
           new_record.committer = new_committer
         end
+        comments = item['comments'][new_record.id]
+        comments.each do |c|
+          if c['text'].downcase.strip.start_with?('commit')
+            note_type = 'committer'
+          elsif c['text'].start_with?('Created attachment')
+            note_type = 'attachment'
+          else
+            note_type = 'research'
+          end
+          note = Note.create(:id=>c['id'],:author=>c['author'],:comment=>c['text'],:bug_id=>c['bug_id'],:note_type=>note_type)
+          new_record.notes << note
+        end
       end
     end
     return true
   end
 
+  def self.get_comments(bug_comments)
+    comments = {}
+    bug_comments['bugs'].each do |comment|
+      bug_id = comment[0]
+      comments_array = []
+      comment[1]['comments'].each do |c|
+        comments_array.push(c)
+      end
+      comments[bug_id.to_i] = comments_array
+    end
+    return comments
+
+    # comments_array = []
+    # binding.pry
+    # bug_id = bug_comments['bugs'].first[0]
+    # bug_comments['bugs'][bug_id]['comments'].each do |c|
+    #   comments_array.push(c)
+    # end
+    # puts comments_array
+    # return comments_array
+  end
+
+
   def self.get_latest()
     latest_bug_date = Bug.order("created_at").last
     return latest_bug_date.nil? ? Time.now-(1.day) : latest_bug_date.created_at
   end
-
 
 
   def bug_state(xmlrpc, notes=nil, status, resolution)

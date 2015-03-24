@@ -46,12 +46,12 @@ b2 = Bug.create(bugzilla_id:'103015',state:'OPEN',summary:'[SID] 22078,25366-253
 b3 = Bug.create(bugzilla_id:'103016',state:'OPEN',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
 
 
-Note.create(text: "This is some content",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b1.id)
-Note.create(text: "We should all have awesome notes",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b2.id)
-Note.create(text: "Test research content is important",note_type: "research",author: "nicherbe@cisco.com", bug_id: b3.id)
-Note.create(text: "More notes to test multiple notes on a bug",note_type: "research",author: "nicherbe@cisco.com", bug_id: b1.id)
+Note.create(comment: "This is some content",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b1.id)
+Note.create(comment: "We should all have awesome notes",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b2.id)
+Note.create(comment: "Test research content is important",note_type: "research",author: "nicherbe@cisco.com", bug_id: b3.id)
+Note.create(comment: "More notes to test multiple notes on a bug",note_type: "research",author: "nicherbe@cisco.com", bug_id: b1.id)
 
-n4 = Note.create(text: "More notes to test multiple notes on a bug",note_type: "research",author: "nicherbe@cisco.com")
+n4 = Note.create(comment: "More notes to test multiple notes on a bug",note_type: "research",author: "nicherbe@cisco.com")
 b1.notes << n4
 b1.save
 

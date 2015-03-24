@@ -12,7 +12,7 @@ module API
         desc "Create a note"
         params do
           requires :note, type: Hash do
-            requires :text, type: String, desc: "The text of the note."
+            requires :comment, type: String, desc: "The text of the note."
             requires :author, type: String, desc: "Who wrote the note."
             requires :note_type, type: String, desc: "Is it a Research note or a Committer note?"
             requires :bugzilla_id, type: Integer, desc: "The id or alias of the bug to append a comment to."
@@ -24,14 +24,14 @@ module API
         post "", root: "note" do
           options = {
             :id => permitted_params[:note][:bugzilla_id],
-            :comment => permitted_params[:note][:text],
+            :comment => permitted_params[:note][:comment],
             :is_private => permitted_params[:note][:is_private],
             :is_markdown => permitted_params[:note][:is_markdown],
             :minor_update => permitted_params[:note][:minor_update]
           }.reject() { |k, v| v.nil? }
           Bugzilla::Bug.new(bugzilla_session).add_comment(options)
           Note.create(
-            :text => permitted_params[:note][:text],
+            :comment => permitted_params[:note][:comment],
             :author => permitted_params[:note][:author],
             :note_type => permitted_params[:note][:note_type],
             :bug_id => permitted_params[:note][:bugzilla_id]
@@ -58,7 +58,7 @@ module API
         params do
           requires :id, type: Integer, desc: "The note's id in the database."
           requires :note, type: Hash do
-            requires :text, type: String, desc: "The text of the note."
+            requires :comment, type: String, desc: "The text of the note."
           end
         end
         put ":id", root: "note" do

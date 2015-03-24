@@ -161,6 +161,8 @@ module API
             xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
             if xmlrpc_token
               new_bug = Bugzilla::Bug.new(bugzilla_session).get(permitted_params[:id])
+              bug_comments = Bugzilla::Bug.new(bugzilla_session).comments(:ids => [permitted_params[:id]])
+              new_bug['bugs'].first['comments'] = Bug.get_comments(bug_comments)
               Bug.import(new_bug).to_s
             else
               false
