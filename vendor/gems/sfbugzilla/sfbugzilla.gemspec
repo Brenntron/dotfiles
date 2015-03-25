@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Christopher McBee"]
   s.email       = 'cmcbee@sourcefire.com'
   s.files       = ["lib/sfbugzilla.rb"]
-  s.add_dependency('ruby-bugzilla', '>= 0.5.3')
+  s.add_dependency('ruby-bugzilla', '>= 0.6.0')
   s.add_dependency('highline', '>= 1.6.8')
   s.add_dependency('mime-types', '>= 1.18')
 end

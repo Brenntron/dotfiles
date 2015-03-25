@@ -45,8 +45,12 @@ b1 = Bug.create(bugzilla_id:'116261',state:'Pending',summary:'[TELUS][VULN][SID]
 b2 = Bug.create(bugzilla_id:'103015',state:'Open',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2, classification: 2)
 b3 = Bug.create(bugzilla_id:'103016',state:'Open',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
 
-a1 = Attachment.create(bugzilla_attachment_id:'137288',direct_upload_url: 'https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=137288',filename:'2006-5112-20250-metasploit-60939-1.pcap',file_size: '25')
+a1 = Attachment.create(bugzilla_attachment_id:'137288',direct_upload_url: 'https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=137288',file_name:'2006-5112-20250-metasploit-60939-1.pcap',size: '2', creator: u2.email, content_type: "text/plain",summary:"just some words")
 b3.attachments << a1
+a2 = Attachment.create(bugzilla_attachment_id:'83950',direct_upload_url: 'https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=83950',file_name:'FSC20120110-17-attack-1a.pcap',size: '17', creator: u1.email, content_type: "text/plain",summary:"just some words")
+b1.attachments << a2
+a3 = Attachment.create(bugzilla_attachment_id:'113473',direct_upload_url: 'https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=113473',file_name:'normal-2011-0098-ms-84851-1.pcap',size: '19', creator: u1.email, content_type: "text/plain",summary:"just some words")
+b3.attachments << a3
 
 Note.create(content: "This is some content",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b1.id)
 Note.create(content: "We should all have awesome notes",note_type: "committer",author: "nicherbe@cisco.com", bug_id: b2.id)
