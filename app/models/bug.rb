@@ -122,7 +122,8 @@ class Bug < ActiveRecord::Base
           else
             note_type = 'research'
           end
-          note = Note.create(:id=>c['id'],:author=>c['author'],:comment=>c['text'],:bug_id=>c['bug_id'],:note_type=>note_type)
+          comment = c['text'].strip
+          note = Note.create(:id=>c['id'],:author=>c['author'],:comment=>comment,:bug_id=>c['bug_id'],:note_type=>note_type)
           new_record.notes << note
         end
       end
@@ -141,15 +142,6 @@ class Bug < ActiveRecord::Base
       comments[bug_id.to_i] = comments_array
     end
     return comments
-
-    # comments_array = []
-    # binding.pry
-    # bug_id = bug_comments['bugs'].first[0]
-    # bug_comments['bugs'][bug_id]['comments'].each do |c|
-    #   comments_array.push(c)
-    # end
-    # puts comments_array
-    # return comments_array
   end
 
 

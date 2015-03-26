@@ -29,8 +29,9 @@ module API
             :is_markdown => permitted_params[:note][:is_markdown],
             :minor_update => permitted_params[:note][:minor_update]
           }.reject() { |k, v| v.nil? }
-          Bugzilla::Bug.new(bugzilla_session).add_comment(options)
+          new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options)
           Note.create(
+            :id => new_note['id'],
             :comment => permitted_params[:note][:comment],
             :author => permitted_params[:note][:author],
             :note_type => permitted_params[:note][:note_type],
