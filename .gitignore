@@ -10,7 +10,7 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
-
+/vendor/cache
 .DS_Store
 /public/assets/*
 /public/system/*

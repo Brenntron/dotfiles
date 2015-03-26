@@ -88,41 +88,64 @@ class Bug < ActiveRecord::Base
   end
 
 
-  def self.import(new_bugs)
-    new_bugs['bugs'].each do |item|
-      Bug.find_or_create_by(bugzilla_id: item['id']) do |new_record|
-        new_record.id = item['id']
-        new_record.state = new_record.get_state(item['status'], item['resolution'])
-        new_record.summary = item['summary']
-        new_record.classification = "unclassified"
-        creator = User.where("email=?", item['creator']).first
-        new_user = User.where("email=?", item['assigned_to']).first
-        new_committer = User.where("email=?", item['qa_contact']).first
-        if creator.nil?
-          new_record.creator = User.create(cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['creator'], password: 'password', password_confirmation: 'password', committer: 'false')
-        else
-          new_record.creator = creator
-        end
-        if new_user.nil?
-          new_record.user = User.create(cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
-        else
-          new_record.user = new_user
-        end
-        if new_committer.nil?
-          new_record.committer = User.create(cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
-        else
-          new_record.committer = new_committer
+  def self.import(xmlrpc, new_bugs)
+    unless new_bugs.empty?
+      new_bugs['bugs'].each do |item|
+        bug_id = item['id']
+        new_attachments = xmlrpc.attachments({:ids=>[bug_id]})
+        Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
+          new_record.id = bug_id
+          new_record.state = new_record.get_state(item['status'], item['resolution'])
+          new_record.summary = item['summary']
+          new_record.classification = "unclassified"
+          creator = User.where("email=?", item['creator']).first
+          new_user = User.where("email=?", item['assigned_to']).first
+          new_committer = User.where("email=?", item['qa_contact']).first
+          if creator.nil?
+            new_record.creator = User.create(cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['creator'], password: 'password', password_confirmation: 'password', committer: 'false')
+          else
+            new_record.creator = creator
+          end
+          if new_user.nil?
+            new_record.user = User.create(cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
+          else
+            new_record.user = new_user
+          end
+          if new_committer.nil?
+            new_record.committer = User.create(cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
+          else
+            new_record.committer = new_committer
+          end
+          unless new_attachments.empty?
+            new_attachments['bugs'][bug_id.to_s].each do |attachment|
+              new_attachment = Attachment.find_or_create_by(id: attachment['id']) do |new_attach_record|
+                new_attach_record.id = attachment['id']
+                new_attach_record.size = attachment['size']
+                new_attach_record.bugzilla_attachment_id = attachment['bug_id']
+                new_attach_record.file_name = attachment['file_name']
+                new_attach_record.summary = attachment['summary']
+                new_attach_record.content_type = attachment['content_type']
+                new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
+                new_attach_record.creator = attachment['attacher']
+                new_attach_record.is_private = attachment['is_private']
+                new_attach_record.is_obsolete = attachment['is_obsolete']
+                new_attach_record.minor_update = false
+                new_attach_record.created_at = attachment['creation_time'].to_time
+              end
+              new_record.attachments << new_attachment
+            end
+          end
         end
       end
     end
     return true
   end
 
-  def self.get_latest()
-    latest_bug_date = Bug.order("created_at").last
+  def self.get_last_import_all()
+    binding.pry
+    latest_bug_date = Event.where(action: "import_all").last
     return latest_bug_date.nil? ? Time.now-(1.day) : latest_bug_date.created_at
   end
-
 
 
   def bug_state(xmlrpc, notes=nil, status, resolution)
@@ -139,7 +162,7 @@ class Bug < ActiveRecord::Base
         end
       end
 
-      committer_note = Note.create(content: notes,type: "committer",author: current_user.email)
+      committer_note = Note.create(content: notes, type: "committer", author: current_user.email)
       self.notes << committer_note
 
       options = {:ids => [self.bugzilla_id], :status => status, :resolution => resolution, :comment => {:body => notes}}
