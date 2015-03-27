@@ -14,24 +14,6 @@ module API
           render bugs, {meta: {total_pages: bugs.total_pages}}
         end
 
-        desc "get a single bug"
-        params do
-          requires :id, type: String, desc: "ID of the bug"
-        end
-        get ':id' do
-          Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
-        end
-
-
-        # params do
-        #   requires :id, type: String, desc: "ID of the bug"
-        # end
-        # route_param :id do
-        #   get do
-        #     Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
-        #   end
-        # end
-
         desc "update a bug"
         params do
           requires :bug, type: Hash do
@@ -109,7 +91,7 @@ module API
           }.reject() { |k, v| v.nil? || v.empty? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
           new_bug = Bugzilla::Bug.new(bugzilla_session).create(options) #the bugzilla session is where we authenticate
           new_bug_id = new_bug["id"]
-          created_bug = Bug.create(
+          Bug.create(
               :id => new_bug_id,
               :bugzilla_id => new_bug_id,
               :product => permitted_params[:bug][:product],
@@ -151,10 +133,6 @@ module API
           get do
             xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
             if xmlrpc_token
-              # new_bug = Bugzilla::Bug.new(bugzilla_session).get(permitted_params[:id])
-              # bug_comments = Bugzilla::Bug.new(bugzilla_session).comments(:ids => [permitted_params[:id]])
-              # new_bug['bugs'].first['comments'] = Bug.get_comments(bug_comments)
-              # Bug.import(new_bug).to_s
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
               Bug.import(xmlrpc,new_bug).to_s
