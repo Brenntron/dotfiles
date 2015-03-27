@@ -11,16 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150216182106) do
+ActiveRecord::Schema.define(version: 20150324170413) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
-    t.string   "filename"
+    t.string   "file_name"
+    t.string   "summary"
+    t.string   "content_type"
     t.string   "direct_upload_url"
-    t.integer  "file_size",              default: 0
+    t.integer  "size",                   default: 0
+    t.integer  "creator"
+    t.boolean  "is_obsolete",            default: false
+    t.boolean  "is_private",             default: false
+    t.boolean  "minor_update",           default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
@@ -67,6 +73,14 @@ ActiveRecord::Schema.define(version: 20150216182106) do
     t.string   "name"
     t.string   "about"
     t.string   "avatar"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "events", force: true do |t|
+    t.string   "user"
+    t.string   "action"
+    t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

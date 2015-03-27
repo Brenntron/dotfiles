@@ -3,10 +3,6 @@ class Attachment < ActiveRecord::Base
   has_and_belongs_to_many :rules
   has_many :exploits
 
-
-
-
-
   def create_attachment
     if params[:file_upload]
       begin

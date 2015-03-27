@@ -11,6 +11,8 @@ module API
       mount API::V1::Attachments
       mount API::V1::Users
       mount API::V1::Notes
+      mount API::V1::Events
+
 
       add_swagger_documentation(
           api_version: "v1",

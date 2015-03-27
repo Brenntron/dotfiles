@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem "grape", '0.11.0'
 gem "grape-swagger"
-gem "hashie_rails"
+gem "hashie-forbidden_attributes"
 gem "active_model_serializers"
 gem "grape-active_model_serializers"
 gem "grape-swagger-rails"
@@ -13,7 +13,7 @@ gem 'cancan', '1.6.10'
 gem 'devise', '3.2.2'
 
 gem 'pg', '0.17.1'
-
+gem 'rmagick', '~> 2.13'
 gem 'ruby-bugzilla', '~> 0.6.0'
 
 gem 'diffy', '~> 2.1.4'
