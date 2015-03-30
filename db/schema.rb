@@ -104,7 +104,7 @@ ActiveRecord::Schema.define(version: 20150324170413) do
   add_index "jobs", ["user_id"], name: "index_jobs_on_user_id", using: :btree
 
   create_table "notes", force: true do |t|
-    t.text     "content"
+    t.text     "comment"
     t.string   "note_type"
     t.string   "author"
     t.datetime "created_at"

@@ -80,19 +80,19 @@ class Bug < ActiveRecord::Base
     end
   end
 
-
   private
 
   def add_attachment(xmlrpc, file)
     Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
   end
 
-
   def self.import(xmlrpc, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
         new_attachments = xmlrpc.attachments({:ids=>[bug_id]})
+        new_comments = xmlrpc.comments(:ids => [bug_id])
+
         Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
           new_record.id = bug_id
           new_record.state = new_record.get_state(item['status'], item['resolution'])
@@ -135,10 +135,31 @@ class Bug < ActiveRecord::Base
               new_record.attachments << new_attachment
             end
           end
+          unless new_comments.empty?
+            new_comments['bugs'].each do |comment|
+              bug_id = comment[0].to_i
+              comment[1]['comments'].each do |c|
+                if c['text'].downcase.strip.start_with?('commit')
+                  note_type = 'committer'
+                elsif c['text'].start_with?('Created attachment')
+                  note_type = 'attachment'
+                else
+                  note_type = 'research'
+                end
+                comment = c['text'].strip
+                note = Note.create(:id=>c['id'],:author=>c['author'],:comment=>comment,:bug_id=>bug_id,:note_type=>note_type)
+                new_record.notes << note
+              end
+            end
+          end
         end
       end
     end
     return true
+  end
+
+  def self.get_latest()
+    latest_bug_date = Bug.order("created_at").last
   end
 
   def self.get_last_import_all()
@@ -162,7 +183,7 @@ class Bug < ActiveRecord::Base
         end
       end
 
-      committer_note = Note.create(content: notes, type: "committer", author: current_user.email)
+      committer_note = Note.create(comment: notes,note_type: "committer",author: current_user.email)
       self.notes << committer_note
 
       options = {:ids => [self.bugzilla_id], :status => status, :resolution => resolution, :comment => {:body => notes}}
@@ -253,5 +274,4 @@ class Bug < ActiveRecord::Base
     raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
     return bug['depends_on']
   end
-
 end
