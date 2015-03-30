@@ -69,14 +69,6 @@ ActiveRecord::Schema.define(version: 20150324170413) do
   add_index "bugs", ["rule_id"], name: "index_bugs_on_rule_id", using: :btree
   add_index "bugs", ["user_id"], name: "index_bugs_on_user_id", using: :btree
 
-  create_table "contacts", force: true do |t|
-    t.string   "name"
-    t.string   "about"
-    t.string   "avatar"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "events", force: true do |t|
     t.string   "user"
     t.string   "action"
@@ -122,17 +114,6 @@ ActiveRecord::Schema.define(version: 20150324170413) do
 
   add_index "notes", ["bug_id"], name: "index_notes_on_bug_id", using: :btree
 
-  create_table "products", force: true do |t|
-    t.string   "title"
-    t.decimal  "price"
-    t.string   "description"
-    t.boolean  "isOnSale"
-    t.string   "image"
-    t.integer  "contact_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "references", force: true do |t|
     t.string   "data"
     t.string   "name"
@@ -149,15 +130,6 @@ ActiveRecord::Schema.define(version: 20150324170413) do
   end
 
   add_index "references", ["rule_id"], name: "index_references_on_rule_id", using: :btree
-
-  create_table "reviews", force: true do |t|
-    t.text     "text"
-    t.datetime "reviewedAt"
-    t.integer  "rating"
-    t.integer  "product_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "rules", force: true do |t|
     t.integer  "gid"
