@@ -2,6 +2,7 @@ module API
   module V1
     class Events < Grape::API
       include API::V1::Defaults
+      include ActionController::Live
 
       resource :events do
 
@@ -28,8 +29,11 @@ module API
                            action: permitted_params[:event][:action],
                            description: permitted_params[:event][:description] || ""
                        })
+          #   push event to clients that are listening for it.
+          redirect_to 'events/send_event'
         end
       end
     end
   end
 end
+

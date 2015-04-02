@@ -110,8 +110,6 @@ class Rule < ActiveRecord::Base
     rescue Exception => e
       raise Exception.new("{rule_parse_error: {content: #{rule},error:#{e.to_s}}}")
     end
-
-
   end
 
   def self.parse_and_create_rule(rule)
@@ -163,7 +161,7 @@ class Rule < ActiveRecord::Base
   def self.create_or_update_rule(body)
     begin
       parsed = Rule.parse_rule(body)
-      rule   = Rule.where("sid = ?", parsed['sid'])
+      rule   = Rule.where("sid = ?", parsed['sid']).first
       if rule.empty?
         rule = Rule.create(:content => body)
         rule.gid = 1

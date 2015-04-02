@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 20150324170413) do
     t.integer  "sid"
     t.integer  "rev"
     t.string   "message"
-    t.text     "content"
+    t.text     "detection"
     t.string   "state"
     t.datetime "created_at"
     t.datetime "updated_at"

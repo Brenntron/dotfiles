@@ -5,7 +5,7 @@ class CreateRules < ActiveRecord::Migration
       t.integer  "sid"
       t.integer  "rev"
       t.string   "message"
-      t.text     "content"
+      t.text     "detection"
       t.string   "state"
       t.timestamps
       t.float    "average_check"
