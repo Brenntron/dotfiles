@@ -5,6 +5,45 @@ module API
 
       resource :bugs do
 
+        desc "get latest bugs from bugzilla"
+        get 'import_all' do
+          xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
+          if xmlrpc_token
+            xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+            last_updated = Bug.get_last_import_all()
+            new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
+            Bug.import(xmlrpc,new_bugs)
+            "true"
+          else
+            "false"
+          end
+        end
+
+        desc "import one bug from bugzilla"
+        params do
+          requires :id, type: Integer, desc: "Bugzilla id."
+        end
+        route_param "import/:id" do
+          get do
+            xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
+            if xmlrpc_token
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+              new_bug = xmlrpc.get(permitted_params[:id])
+              Bug.import(xmlrpc,new_bug).to_s
+            else
+              false
+            end
+          end
+        end
+
+        desc "get a single bug"
+        params do
+          requires :id, type: String, desc: "ID of the bug"
+        end
+        get ':id' do
+          Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
+        end
+
         desc "get all bugs"
         params do
           use :pagination
@@ -107,39 +146,6 @@ module API
               :severity => permitted_params[:bug][:severity],
               :classification => permitted_params[:bug][:classification] || 0 #api won't get bugs with classification of nil
           )
-        end
-
-
-        desc "get latest bugs from bugzilla"
-        get 'import_all' do
-          xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
-          if xmlrpc_token
-            xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-            last_updated = Bug.get_last_import_all()
-            new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.import(xmlrpc,new_bugs)
-            "true"
-          else
-            "false"
-          end
-        end
-
-
-        desc "import one bug from bugzilla"
-        params do
-          requires :id, type: Integer, desc: "Bugzilla id."
-        end
-        route_param "import/:id" do
-          get do
-            xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
-            if xmlrpc_token
-              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-              new_bug = xmlrpc.get(permitted_params[:id])
-              Bug.import(xmlrpc,new_bug).to_s
-            else
-              false
-            end
-          end
         end
 
         desc "remove a bug from the db only"
