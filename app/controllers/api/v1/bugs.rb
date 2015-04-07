@@ -69,6 +69,8 @@ module API
             optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
             optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+            optional :research_notes, type: String, desc: "Current working draft of research notes"
+            optional :committer_notes, type: String, desc: "Current working draft of committer notes"
           end
 
         end
