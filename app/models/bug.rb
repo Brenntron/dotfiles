@@ -98,6 +98,7 @@ class Bug < ActiveRecord::Base
           new_record.state = new_record.get_state(item['status'], item['resolution'])
           new_record.summary = item['summary']
           new_record.classification = "unclassified"
+          new_record.created_at = item['creation_time'].to_time
           creator = User.where("email=?", item['creator']).first
           new_user = User.where("email=?", item['assigned_to']).first
           new_committer = User.where("email=?", item['qa_contact']).first
@@ -135,6 +136,7 @@ class Bug < ActiveRecord::Base
               new_record.attachments << new_attachment
             end
           end
+          new_record.research_notes ||= "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n"
           unless new_comments.empty?
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
@@ -147,7 +149,8 @@ class Bug < ActiveRecord::Base
                   note_type = 'research'
                 end
                 comment = c['text'].strip
-                note = Note.create(:id=>c['id'],:author=>c['author'],:comment=>comment,:bug_id=>bug_id,:note_type=>note_type)
+                creation_time = c['creation_time'].to_time
+                note = Note.create(:id=>c['id'],:author=>c['author'],:comment=>comment,:bug_id=>bug_id,:note_type=>note_type,:created_at=>creation_time)
                 new_record.notes << note
               end
             end

@@ -53,10 +53,12 @@ ActiveRecord::Schema.define(version: 20150401202645) do
     t.string   "platform"
     t.string   "priority"
     t.string   "severity"
-    t.integer  "classification", default: 0
-    t.integer  "gid",            default: 1
+    t.string   "research_notes"
+    t.string   "committer_notes"
+    t.integer  "classification",  default: 0
+    t.integer  "gid",             default: 1
     t.integer  "sid"
-    t.integer  "rev",            default: 1
+    t.integer  "rev",             default: 1
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
