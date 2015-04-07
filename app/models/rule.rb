@@ -25,7 +25,6 @@ class Rule < ActiveRecord::Base
     rescue Exception => e
       raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e.to_s}}}")
     end
-
   end
 
   def extract_rule
@@ -81,9 +80,7 @@ class Rule < ActiveRecord::Base
       elsif gid.nil?
         raise "Neither gid nor sid content is set"
       end
-
       return true
-
     rescue Exception => e
       self.errors.add(:base, e.to_s)
       e.backtrace.each do |l|

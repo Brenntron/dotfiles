@@ -30,7 +30,6 @@ module API
                            description: permitted_params[:event][:description] || ""
                        })
           #   push event to clients that are listening for it.
-          redirect_to 'events/send_event'
         end
       end
     end

@@ -12,7 +12,16 @@ u1 = User.create(cvs_username:"tuser1",email:"testUser1@cisco.com  ",password: '
 u2 = User.create(cvs_username:"tuser2",email:"testUser2@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
 
 
-Reference.create(name:'telus', description:'Telus bug report information', validation: 'nil', bugzilla_format:'((FSC|TSL)\\d{8}-\\d{2})',example:'FSC20111103-05',rule_format:'<reference>',url:'https://portal.telussecuritylabs.com/threat/DATA')
+ref1 = ReferenceType.create(:name => 'cve',:description => 'Common Vulnerabilities and Exposures',:validation => '^(19|20)\d{2}-\d{4}$',:bugzilla_format => 'cve-((19|20)\d{2}-\d{4})',:example => '1999-1234',:rule_format => 'cve,<reference>',:url => 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-DATA')
+ref2 = ReferenceType.create(:name => 'bugtraq',:description => 'Bugtraq - SecurityFocus',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'bugtraq,<reference>',:url => 'http://www.securityfocus.com/bid/DATA')
+ref3 = ReferenceType.create(:name => 'osvdb',:description => 'The Open Source Vulnerability Database',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'osvdb,<reference>',:url => 'http://www.osvdb.org/DATA')
+ref4 = ReferenceType.create(:name => 'msb',:description => 'Microsoft Security Bulletin',:validation => '^MS\d{2}-\d{3}$',:bugzilla_format => '(MS\d{2}-\d{3})',:example => 'MS08-067',:rule_format => 'url,technet.microsoft.com/en-us/security/bulletin/<reference>',:url => 'http://technet.microsoft.com/en-us/security/bulletin/DATA')
+ref5 = ReferenceType.create(:name => 'url',:description => 'Generic URL for vulnerability information',:validation => '^(?!http|ftp).*',:example => 'www.somesite.com/whatever/whocares',:rule_format => 'url,<reference>',:url => 'http://DATA')
+ref6 = ReferenceType.create(:name => 'telus',:description => 'Telus bug report information',:bugzilla_format => '((FSC|TSL)\d{8}-\d{2})',:example => 'FSC20111103-05',:rule_format => '<reference>',:url => 'https://portal.telussecuritylabs.com/threat/DATA')
+ref7 = ReferenceType.create(:name => 'apsb',:description => 'Adobe Product Security Bulletin',:validation => '^APSB\d{2}-\d{2}$',:bugzilla_format => '(APSB\d{2}-\d{2})',:example => 'APSB13-03',:rule_format => 'url,www.adobe.com/support/security/bulletins/<reference>.html',:url => 'url,www.adobe.com/support/security/bulletins/DATA.html')
+
+Reference.create(data:"12345",reference_type: ref2)
+Reference.create(data:"cve,1936-7254",reference_type: ref1)
 
 
 Rule.create(gid:'1',sid:'3679',rev:'12',message:'INDICATOR-OBFUSCATION Multiple Products IFRAME src javascript code execution',detection:'alert tcp $EXTERNAL_NET $HTTP_PORTS -> $HOME_NET any (msg:"INDICATOR-OBFUSCATION Multiple Products IFRAME src javascript code execution"; flow:to_client,established; file_data; content:"IFRAME"; nocase; pcre:"/\x3c\s*IFRAME\s*[^\x3e]*src=\x22javascript\x3a/smi"; metadata:service http; reference:bugtraq,13544; reference:bugtraq,30560; reference:cve,2005-1476; reference:cve,2008-2939; reference:nessus,18243; classtype:attempted-user; sid:3679; rev:12;)', state:'open',average_check: '29.0',average_match:'73.1',average_nonmatch:'24,9',tested:'false')
