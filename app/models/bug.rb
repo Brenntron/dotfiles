@@ -136,6 +136,7 @@ class Bug < ActiveRecord::Base
               new_record.attachments << new_attachment
             end
           end
+          new_record.research_notes ||= "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n"
           unless new_comments.empty?
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
