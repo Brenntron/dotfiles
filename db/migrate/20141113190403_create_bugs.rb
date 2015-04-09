@@ -3,6 +3,8 @@ class CreateBugs < ActiveRecord::Migration
     create_table :bugs do |t|
       t.integer :bugzilla_id
       t.string  :state
+      t.string  :status
+      t.string  :resolution
       t.string  :creator
       t.string  :summary
       t.integer :committer_id

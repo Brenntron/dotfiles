@@ -42,6 +42,8 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   create_table "bugs", force: true do |t|
     t.integer  "bugzilla_id"
     t.string   "state"
+    t.string   "status"
+    t.string   "resolution"
     t.string   "creator"
     t.string   "summary"
     t.integer  "committer_id"

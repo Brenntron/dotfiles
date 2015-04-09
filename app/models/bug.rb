@@ -20,15 +20,17 @@ class Bug < ActiveRecord::Base
   }
 
 
-  def get_state(status, resolution)
-    bug_state = "OPEN"
-    if status != 'RESOLVED'
-      bug_state = "OPEN"
+  def get_state(status, resolution, user)
+    bug_state = 'OPEN'
+    if status == 'REOPENED'
+      bug_state = status
+    elsif status == 'RESOLVED'
+      bug_state = resolution
     else
-      if resolution.blank?
-        bug_state = "OPEN"
+      if user != ('vrt-incoming@sourcefire.com' || nil)
+        bug_state = 'ASSIGNED'
       else
-        bug_state = resolution
+        bug_state = 'NEW'
       end
     end
     bug_state
@@ -95,7 +97,10 @@ class Bug < ActiveRecord::Base
 
         Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
           new_record.id = bug_id
-          new_record.state = new_record.get_state(item['status'], item['resolution'])
+          new_record.status = item['status']
+          new_record.resolution = item['resolution']
+          new_record.resolution = "OPEN" if new_record.resolution.empty?
+          new_record.state = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
           new_record.summary = item['summary']
           new_record.classification = "unclassified"
           new_record.created_at = item['creation_time'].to_time
