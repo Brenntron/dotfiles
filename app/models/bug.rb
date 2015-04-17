@@ -82,6 +82,61 @@ class Bug < ActiveRecord::Base
     end
   end
 
+  def self.update_state(bug, state, editor_email)
+    updated_state = state
+    updated_state = 'NEW' if editor_email == "vrt-incoming@sourcefire.com" && bug.resolution == 'OPEN'
+    updated_state = 'ASSIGNED' unless (editor_email == 'vrt-incoming@sourcefire.com') || (%w(RESOLVED REOPENED).include? bug.status) || state == 'PENDING'
+    updated_state = nil if updated_state == bug.state
+
+    case updated_state
+      when 'NEW'
+        status = updated_state
+        resolution = 'OPEN'
+        comment = {comment:"This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug."}
+      when 'ASSIGNED'
+        status = updated_state
+        resolution = 'OPEN'
+        comment = {comment:"This bug is now ASSIGNED to #{editor_email}."}
+        assigned_at = Time.now
+      when 'PENDING'
+        status = 'RESOLVED'
+        resolution = updated_state
+        comment = {comment:"This bug is now RESOLVED - #{updated_state}."}
+        pending_at = Time.now
+        if bug.state == 'REOPENED'
+          rework_time = ((bug.reopened_at - pending_at)/86400).round.abs
+        else
+          work_time = ((bug.assigned_at - pending_at)/86400).round.abs
+        end
+      when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
+        status = 'RESOLVED'
+        resolution = updated_state
+        comment = {comment:"This bug is now RESOLVED - #{updated_state}."}
+        resolved_at = Time.now
+        review_time = ((bug.pending_at - resolved_at)/86400).round.abs
+      when 'REOPENED'
+        status = updated_state
+        resolution = 'OPEN'
+        comment = {comment:"This bug is now #{updated_state}."}
+        reopened_at = Time.now
+    end
+
+    state_params = {
+        :state => updated_state,
+        :status => status,
+        :resolution => resolution,
+        :comment => comment,
+        :assigned_at => assigned_at,
+        :pending_at => pending_at,
+        :resolved_at => resolved_at,
+        :reopened_at => reopened_at,
+        :work_time => work_time,
+        :rework_time => rework_time,
+        :review_time => review_time
+    }
+
+  end
+
   private
 
   def add_attachment(xmlrpc, file)
@@ -97,13 +152,28 @@ class Bug < ActiveRecord::Base
 
         Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
           new_record.id = bug_id
+          new_record.summary = item['summary']
+          new_record.classification = "unclassified"
+
           new_record.status = item['status']
           new_record.resolution = item['resolution']
           new_record.resolution = "OPEN" if new_record.resolution.empty?
           new_record.state = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
-          new_record.summary = item['summary']
-          new_record.classification = "unclassified"
+
           new_record.created_at = item['creation_time'].to_time
+          last_change_time = item['last_change_time'].to_time
+          if new_record.state == 'NEW'
+          # do nothing
+          elsif new_record.state == 'ASSIGNED'
+            new_record.assigned_at = last_change_time
+          elsif new_record.state == 'PENDING'
+            new_record.pending_at = last_change_time
+          elsif new_record.state == 'REOPENED'
+            new_record.reopened_at = last_change_time
+          else
+            new_record.resolved_at = last_change_time
+          end
+
           creator = User.where("email=?", item['creator']).first
           new_user = User.where("email=?", item['assigned_to']).first
           new_committer = User.where("email=?", item['qa_contact']).first

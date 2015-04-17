@@ -25,9 +25,9 @@ Rule.create(gid:'1',sid:'30040',rev:'2',message:'SQL 1 = 1 - possible sql inject
 
 Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
 
-b1 = Bug.create(bugzilla_id:'116261',state:'PENDING',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System', committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
-b2 = Bug.create(bugzilla_id:'103015',state:'OPEN',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2, classification: 2)
-b3 = Bug.create(bugzilla_id:'103016',state:'OPEN',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
+b1 = Bug.create(bugzilla_id:'116261',state:'PENDING',status:'RESOLVED',resolution:'PENDING',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System', committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
+b2 = Bug.create(bugzilla_id:'103015',state:'ASSIGNED',status:'NEW',resolution:'OPEN',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2, classification: 2)
+b3 = Bug.create(bugzilla_id:'103016',state:'ASSIGNED',status:'NEW',resolution:'OPEN',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
 
 a1 = Attachment.create(bugzilla_attachment_id:'137288',direct_upload_url: 'https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=137288',file_name:'2006-5112-20250-metasploit-60939-1.pcap',size: '2', creator: u2.email, content_type: "text/plain",summary:"just some words")
 b3.attachments << a1

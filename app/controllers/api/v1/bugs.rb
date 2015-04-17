@@ -78,45 +78,96 @@ module API
 
         end
         put ":id", root: "bug" do
+          bug = Bug.find(permitted_params[:id])
+
           if permitted_params[:bug][:editor_id]
             editor = User.find(permitted_params[:bug][:editor_id])
-            state = "ASSIGNED"
-            state = "NEW" if editor.email == "vrt-incoming@sourcefire.com"
-            updated_bug = Bugzilla::Bug.new(bugzilla_session).update({:ids => permitted_params[:id], :assigned_to => editor.email})
-            if updated_bug
-              Bug.update(permitted_params[:id], {user:editor,state: state})
-            end
+            state_params = Bug.update_state(bug, nil, editor.email)
+            options = {
+                :ids => permitted_params[:id],
+                :assigned_to => editor.email,
+                :status => state_params[:status],
+                :resolution => state_params[:resolution],
+                :comment => state_params[:comment]
+            }
+            update_params = {
+                :user => editor,
+                :state => state_params[:state],
+                :status => state_params[:status],
+                :resolution => state_params[:resolution],
+                :assigned_at => state_params[:assigned_at],
+                :pending_at => state_params[:pending_at],
+                :resolved_at => state_params[:resolved_at],
+                :reopened_at => state_params[:reopened_at],
+                :work_time => state_params[:work_time],
+                :rework_time => state_params[:rework_time],
+                :review_time => state_params[:review_time]
+            }
           elsif permitted_params[:bug][:reviewer_id]
             reviewer = User.find(permitted_params[:bug][:reviewer_id])
-            updated_bug = Bugzilla::Bug.new(bugzilla_session).update({:ids => permitted_params[:id], :qa_contact => reviewer.email})
-            if updated_bug
-              Bug.update(permitted_params[:id], committer: reviewer)
-            end
-          else
             options = {
-              :ids => permitted_params[:id],
-              :user_id => permitted_params[:bug][:user_id],
-              :product => permitted_params[:bug][:product],
-              :component => permitted_params[:bug][:component],
-              :summary => permitted_params[:bug][:summary],
-              :version => permitted_params[:bug][:version],
-              :description => permitted_params[:bug][:description],
-              :state => permitted_params[:bug][:state],
-              :creator => permitted_params[:bug][:creator],
-              :opsys => permitted_params[:bug][:opsys],
-              :platform => permitted_params[:bug][:platform],
-              :priority => permitted_params[:bug][:priority],
-              :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification]
-              #all the options we want to possibly include
+                :ids => permitted_params[:id],
+                :qa_contact => reviewer.email
             }
-            options.reject! { |k, v| v.nil? }
-            update_params = permitted_params[:bug].reject { |k, v| v.nil? }
-            updated_bug = Bugzilla::Bug.new(bugzilla_session).update(options)
-            if updated_bug
-              Bug.update(params[:id], update_params)
-            end
+            update_params = {
+                :committer => reviewer
+            }
+          elsif permitted_params[:bug][:state]
+            state_params = Bug.update_state(bug, permitted_params[:bug][:state], nil)
+            options = {
+                :ids => permitted_params[:id],
+                :status => state_params[:status],
+                :resolution => state_params[:resolution],
+                :comment => state_params[:comment]
+            }
+            update_params = {
+                :state => state_params[:state],
+                :status => state_params[:status],
+                :resolution => state_params[:resolution],
+                :assigned_at => state_params[:assigned_at],
+                :pending_at => state_params[:pending_at],
+                :resolved_at => state_params[:resolved_at],
+                :reopened_at => state_params[:reopened_at],
+                :work_time => state_params[:work_time],
+                :rework_time => state_params[:rework_time],
+                :review_time => state_params[:review_time]
+            }
+          else
+            binding.pry
+            options = {
+                :ids => permitted_params[:id],
+                :product => permitted_params[:bug][:product],
+                :component => permitted_params[:bug][:component],
+                :summary => permitted_params[:bug][:summary],
+                :version => permitted_params[:bug][:version],
+                :description => permitted_params[:bug][:description],
+                :creator => permitted_params[:bug][:creator],
+                :opsys => permitted_params[:bug][:opsys],
+                :platform => permitted_params[:bug][:platform],
+                :priority => permitted_params[:bug][:priority],
+                :severity => permitted_params[:bug][:severity],
+                :classification => permitted_params[:bug][:classification]
+            }
+            update_params ={
+                :product => permitted_params[:bug][:product],
+                :component => permitted_params[:bug][:component],
+                :summary => permitted_params[:bug][:summary],
+                :version => permitted_params[:bug][:version],
+                :description => permitted_params[:bug][:description],
+                :opsys => permitted_params[:bug][:opsys],
+                :platform => permitted_params[:bug][:platform],
+                :priority => permitted_params[:bug][:priority],
+                :severity => permitted_params[:bug][:severity],
+                :classification => permitted_params[:bug][:classification]
+            }
           end
+
+
+          options.reject! { |k, v| v.nil? }
+          update_params.reject! { |k, v| v.nil? }
+          Bugzilla::Bug.new(bugzilla_session).update(options)
+          Bug.update(permitted_params[:id], update_params)
+
         end
 
         desc "create a bug"

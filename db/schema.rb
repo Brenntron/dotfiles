@@ -61,6 +61,13 @@ ActiveRecord::Schema.define(version: 20150401202645) do
     t.integer  "gid",             default: 1
     t.integer  "sid"
     t.integer  "rev",             default: 1
+    t.datetime "assigned_at"
+    t.datetime "pending_at"
+    t.datetime "resolved_at"
+    t.datetime "reopened_at"
+    t.integer  "work_time"
+    t.integer  "review_time"
+    t.integer  "rework_time"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
