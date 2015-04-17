@@ -104,16 +104,16 @@ class Bug < ActiveRecord::Base
         comment = {comment:"This bug is now RESOLVED - #{updated_state}."}
         pending_at = Time.now
         if bug.state == 'REOPENED'
-          rework_time = ((bug.reopened_at - pending_at)/86400).round.abs
+          rework_time = ((pending_at - bug.reopened_at)/86400).ceil
         else
-          work_time = ((bug.assigned_at - pending_at)/86400).round.abs
+          work_time = ((pending_at - bug.assigned_at)/86400).ceil
         end
       when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
         status = 'RESOLVED'
         resolution = updated_state
         comment = {comment:"This bug is now RESOLVED - #{updated_state}."}
         resolved_at = Time.now
-        review_time = ((bug.pending_at - resolved_at)/86400).round.abs
+        review_time = ((resolved_at - bug.pending_at)/86400).ceil
       when 'REOPENED'
         status = updated_state
         resolution = 'OPEN'
