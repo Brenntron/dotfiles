@@ -26,8 +26,25 @@ Rule.create(gid:'1',sid:'30040',rev:'2',message:'SQL 1 = 1 - possible sql inject
 Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
 
 b1 = Bug.create(bugzilla_id:'116261',state:'PENDING',status:'RESOLVED',resolution:'PENDING',summary:'[TELUS][VULN][SID] 25849-25852,26392,29504 [BP] CVE-2013-0657 FSC20130121-06 Schneider Electric Interactive Graphical SCADA System', committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
-b2 = Bug.create(bugzilla_id:'103015',state:'ASSIGNED',status:'NEW',resolution:'OPEN',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2, classification: 2)
-b3 = Bug.create(bugzilla_id:'103016',state:'ASSIGNED',status:'NEW',resolution:'OPEN',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id, classification: 0)
+b2 = Bug.create(bugzilla_id:'103015',state:'ASSIGNED',status:'NEW',resolution:'OPEN',summary:'[SID] 22078,25366-25367 [SPARK] [NSS][MSTUES] FSC20120508-11 CVE-2012-0143 Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u2.id, classification: 2)
+b3 = Bug.create(bugzilla_id:'103016',state:'ASSIGNED',status:'NEW',resolution:'OPEN',summary:'Microsoft Excel invalid Window2 BIFF record',committer_id:'1',gid:'1',sid:'nil',rev:'1',user_id: u1.id,classification:0)
+
+#some closed bugs for stats
+Bug.create(bugzilla_id:'000001',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #1',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:5.78,rework_time:2.97,review_time:5.43)
+Bug.create(bugzilla_id:'000002',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #2',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:10.24,rework_time:6.04,review_time:1.3)
+Bug.create(bugzilla_id:'000003',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #3',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:6.45,rework_time:4.72,review_time:0.51)
+Bug.create(bugzilla_id:'000004',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #4',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:10.76,rework_time:nil,review_time:4.44)
+Bug.create(bugzilla_id:'000005',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #5',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:1.82,rework_time:3.86,review_time:4.4)
+Bug.create(bugzilla_id:'000006',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #6',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:12.13,rework_time:2.18,review_time:0.03)
+Bug.create(bugzilla_id:'000007',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #7',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:5.18,rework_time:4.44,review_time:2.7)
+Bug.create(bugzilla_id:'000008',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #8',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:4.3,rework_time:nil,review_time:3.92)
+Bug.create(bugzilla_id:'000009',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #9',gid:'1',sid:'nil',rev:'1',user_id:u1.id,committer_id:u2.id,classification:0,work_time:7.29,rework_time:nil,review_time:0.13)
+
+Bug.create(bugzilla_id:'000010',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #10',gid:'1',sid:'nil',rev:'1',user_id:u2.id,committer_id:u1.id,classification:0,work_time:1.49,rework_time:nil,review_time:4.59)
+Bug.create(bugzilla_id:'000011',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #11',gid:'1',sid:'nil',rev:'1',user_id:u2.id,committer_id:u1.id,classification:0,work_time:2.72,rework_time:8.44,review_time:2.67)
+Bug.create(bugzilla_id:'000012',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #12',gid:'1',sid:'nil',rev:'1',user_id:u2.id,committer_id:u1.id,classification:0,work_time:7.27,rework_time:nil,review_time:4.75)
+Bug.create(bugzilla_id:'000013',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #13',gid:'1',sid:'nil',rev:'1',user_id:u2.id,committer_id:u1.id,classification:0,work_time:9.41,rework_time:nil,review_time:6.47)
+Bug.create(bugzilla_id:'000014',state:'FIXED',status:'RESOLVED',resolution:'FIXED',summary:'Important Bug #14',gid:'1',sid:'nil',rev:'1',user_id:u2.id,committer_id:u1.id,classification:0,work_time:9.44,rework_time:nil,review_time:6.86)
 
 a1 = Attachment.create(bugzilla_attachment_id:'137288',direct_upload_url: 'https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=137288',file_name:'2006-5112-20250-metasploit-60939-1.pcap',size: '2', creator: u2.email, content_type: "text/plain",summary:"just some words")
 b3.attachments << a1
