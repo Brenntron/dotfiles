@@ -2,6 +2,10 @@ Rails.application.routes.draw do
 
   devise_for :users, controllers: { sessions: 'sessions' }
 
+  resources :events do
+    collection {get :send_event}
+  end
+
   root 'pages#index'
 
   namespace :api do

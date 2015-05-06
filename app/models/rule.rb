@@ -24,7 +24,6 @@ class Rule < ActiveRecord::Base
     rescue Exception => e
       raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e.to_s}}}")
     end
-
   end
 
   def extract_rule
@@ -80,9 +79,7 @@ class Rule < ActiveRecord::Base
       elsif gid.nil?
         raise "Neither gid nor sid content is set"
       end
-
       return true
-
     rescue Exception => e
       self.errors.add(:base, e.to_s)
       e.backtrace.each do |l|
@@ -109,8 +106,6 @@ class Rule < ActiveRecord::Base
     rescue Exception => e
       raise Exception.new("{rule_parse_error: {content: #{rule},error:#{e.to_s}}}")
     end
-
-
   end
 
   def self.parse_and_create_rule(rule)
@@ -162,7 +157,7 @@ class Rule < ActiveRecord::Base
   def self.create_or_update_rule(body)
     begin
       parsed = Rule.parse_rule(body)
-      rule   = Rule.where("sid = ?", parsed['sid'])
+      rule   = Rule.where("sid = ?", parsed['sid']).first
       if rule.empty?
         rule = Rule.create(:content => body)
         rule.gid = 1
