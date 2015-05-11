@@ -108,6 +108,15 @@ class Rule < ActiveRecord::Base
     end
   end
 
+  def associate_references(ref)
+    references = ref.split(";")
+    references.each do |reference|
+      ref_message = reference.split(":.:")
+      new_reference = Reference.create(data: ref_message.last, reference_type: ReferenceType.where(name: ref_message.first.downcase).first)
+      self.references << new_reference
+    end
+  end
+
   def self.parse_and_create_rule(rule)
     r = Rule.new(:content => rule)
     return r.extract_rule ? r : nil
@@ -157,17 +166,17 @@ class Rule < ActiveRecord::Base
   def self.create_or_update_rule(body)
     begin
       parsed = Rule.parse_rule(body)
-      rule   = Rule.where("sid = ?", parsed['sid']).first
+      rule = Rule.where("sid = ?", parsed['sid']).first
       if rule.empty?
         rule = Rule.create(:content => body)
         rule.gid = 1
-        rule.message = parsed['msg'].gsub("\"","")
+        rule.message = parsed['msg'].gsub("\"", "")
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']
         rule.state = "Unchanged"
       else
         rule.content = body
-        rule.message = parsed['msg'].gsub("\"","")
+        rule.message = parsed['msg'].gsub("\"", "")
         rule.gid = 1
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']

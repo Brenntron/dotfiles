@@ -35,7 +35,7 @@ module API
             split_string = value.split(/:\d[\d]*:/)
             puts "filename = #{split_string[0]}"
             puts "Rule = #{split_string[1]}"
-           true
+            true
           end
         end
 
@@ -57,7 +57,7 @@ module API
             requires :detection, type: String, desc: "The detection for this rule"
             optional :flow, type: String, desc: "The flow"
             optional :metadata, type: String, desc: "Any meta data that goes with this"
-            optional :classType, type: String, desc: "The type of rule"
+            optional :classification, type: String, desc: "The type of rule"
             optional :references, type: String, desc: "any references this rule has"
             optional :sid, type: Integer, desc: "the sid number"
             optional :gid, type: Integer, desc: "the gid number"
@@ -76,35 +76,26 @@ module API
           options = {
               :connection => permitted_params[:rule][:connection],
               :message => permitted_params[:rule][:message],
-              :summary => permitted_params[:rule][:summary],
-              :version => permitted_params[:rule][:version],
-              :description => permitted_params[:rule][:description],
+              :detection => permitted_params[:rule][:detection],
+              :flow => permitted_params[:rule][:flow],
+              :metadata => permitted_params[:rule][:metadata],
+              :classification => permitted_params[:rule][:classification],
+              :sid => permitted_params[:rule][:sid] || Time.now.to_i,
+              :gid => permitted_params[:rule][:gid] || 1,
+              :rev => permitted_params[:rule][:rev] || 1,
               :state => permitted_params[:rule][:state],
-              :creator => permitted_params[:rule][:creator],
-              :opsys => permitted_params[:rule][:opsys],
-              :platform => permitted_params[:rule][:platform],
-              :priority => permitted_params[:rule][:priority],
-              :severity => permitted_params[:rule][:severity],
-              :classification => permitted_params[:rule][:classification]
-          }.reject() { |k, v| v.nil? || v.empty? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
-          # new_bug = Bugzilla::Bug.new(bugzilla_session).create(options) #the bugzilla session is where we authenticate
-          # new_bug_id = new_bug["id"]
-          Rule.create(
-              # :id => new_bug_id,
-              # :bugzilla_id => new_bug_id,
-              :connection => permitted_params[:rule][:connection],
-              :message => permitted_params[:rule][:message],
-              :summary => permitted_params[:bug][:summary],
-              :version => permitted_params[:bug][:version],
-              :description => permitted_params[:bug][:description],
-              :state => permitted_params[:bug][:state] || 'OPEN',
-              :creator => permitted_params[:bug][:creator],
-              :opsys => permitted_params[:bug][:opsys],
-              :platform => permitted_params[:bug][:platform],
-              :priority => permitted_params[:bug][:priority],
-              :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification] || 0 #api won't get bugs with classification of nil
-          )
+              :tested => permitted_params[:rule][:tested],
+              :average_check => permitted_params[:rule][:average_check],
+              :average_match => permitted_params[:rule][:average_match],
+              :average_nonmatch => permitted_params[:rule][:average_nonmatch],
+              :created_at => permitted_params[:rule][:created_at],
+              :updated_at => permitted_params[:rule][:updated_at]
+          }.reject() { |k, v| v.nil? } #remove any nil values in the hash
+          new_rule = Rule.create(options)
+          unless permitted_params[:rule][:references].empty?
+            new_rule.associate_references(permitted_params[:rule][:references])
+          end
+          new_rule
         end
 
         #import rule via sid
