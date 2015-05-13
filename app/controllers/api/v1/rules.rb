@@ -5,19 +5,6 @@ module API
 
       resource :rules do
 
-        #get all the rules OR get a rule by sid parameter
-        desc "Return all rules"
-        params do
-          optional :sid, type: String, desc: "SID of the rule"
-        end
-        get "", root: :rules do
-          if permitted_params[:sid]
-            Rule.where(sid: permitted_params[:sid]).first
-          else
-            Rule.all
-          end
-        end
-
         desc "import all existing rules"
         get 'import_all' do
           true
@@ -33,19 +20,42 @@ module API
             #grep in the extras/snort folder for the sid number that is supplied
             value = `grep -Hrn "sid:#{permitted_params[:id]}" #{Rails.root}/extras/snort`
             split_string = value.split(/:\d[\d]*:/)
-            puts "filename = #{split_string[0]}"
-            puts "Rule = #{split_string[1]}"
-           true
+            rule = split_string[1]
+            Rule.create(
+                :id => permitted_params[:id],
+                :rule_content => rule.strip,
+                :connection => /(.*?)\(/.match(rule)[1].strip,
+                :message => /msg:(".*?";)/.match(rule)[1].strip,
+                :flow => /flow:(.*?;)/.match(rule)[1].strip,
+                :detection => /flow:.*?;(.*?)metadata:/.match(rule)[1].strip,
+                :metadata => /metadata:(.*?;)/.match(rule)[1].strip,
+                :class_type => /classtype:*(.*?;)/.match(rule)[1].strip,
+                :gid => 1,
+                :sid => permitted_params[:id],
+                :rev => /rev:(\S*?);/.match(rule)[1].strip
+            )
           end
         end
 
-        # get a single rule
+
         desc "Return a rule"
         params do
           requires :id, type: String, desc: "ID of the rule"
         end
         get ":id", root: "rule" do
           Rule.where(id: permitted_params[:id]).first
+        end
+
+        desc "Return all rules"
+        params do
+          optional :sid, type: String, desc: "SID of the rule"
+        end
+        get "", root: :rules do
+          if permitted_params[:sid]
+            Rule.where(sid: permitted_params[:sid]).first
+          else
+            Rule.all
+          end
         end
 
         #create rule using rule text
@@ -67,53 +77,49 @@ module API
             optional :average_match, type: String, desc: "The operating system that this bug affects"
             optional :average_nonmatch, type: String, desc: "What platform this bug runs on"
             optional :tested, type: String, desc: "How soon should this bug get fixed"
-            optional :created_at, type: String, desc: "How terrible is this bug"
-            optional :updated_at, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
             # all the params we need to permit must to go here
           end
         end
         post "", root: "rule" do
           options = {
-              :connection => permitted_params[:rule][:connection],
-              :message => permitted_params[:rule][:message],
-              :summary => permitted_params[:rule][:summary],
-              :version => permitted_params[:rule][:version],
-              :description => permitted_params[:rule][:description],
-              :state => permitted_params[:rule][:state],
-              :creator => permitted_params[:rule][:creator],
-              :opsys => permitted_params[:rule][:opsys],
-              :platform => permitted_params[:rule][:platform],
-              :priority => permitted_params[:rule][:priority],
-              :severity => permitted_params[:rule][:severity],
-              :classification => permitted_params[:rule][:classification]
-          }.reject() { |k, v| v.nil? || v.empty? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
-          # new_bug = Bugzilla::Bug.new(bugzilla_session).create(options) #the bugzilla session is where we authenticate
-          # new_bug_id = new_bug["id"]
+
+          }.reject() { |k, v| v.nil? || v.empty? }
           Rule.create(
-              # :id => new_bug_id,
-              # :bugzilla_id => new_bug_id,
-              :connection => permitted_params[:rule][:connection],
-              :message => permitted_params[:rule][:message],
-              :summary => permitted_params[:bug][:summary],
-              :version => permitted_params[:bug][:version],
-              :description => permitted_params[:bug][:description],
-              :state => permitted_params[:bug][:state] || 'OPEN',
-              :creator => permitted_params[:bug][:creator],
-              :opsys => permitted_params[:bug][:opsys],
-              :platform => permitted_params[:bug][:platform],
-              :priority => permitted_params[:bug][:priority],
-              :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification] || 0 #api won't get bugs with classification of nil
           )
         end
 
-        #import rule via sid
+        desc "Edit a rule"
         params do
-          requires :sid, type: String, desc: "ID of the rule"
+          requires :rule, type: Hash do
+            optional :connection, type: String, desc: "The connection string"
+            optional :message, type: String, desc: "The message describing the rule"
+            optional :detection, type: String, desc: "The detection for this rule"
+            optional :flow, type: String, desc: "The flow"
+            optional :metadata, type: String, desc: "Any meta data that goes with this"
+            optional :classType, type: String, desc: "The type of rule"
+            optional :references, type: String, desc: "any references this rule has"
+            optional :sid, type: Integer, desc: "the sid number"
+            optional :gid, type: Integer, desc: "the gid number"
+            optional :rev, type: Integer, desc: "the version of the rule"
+            optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
+            optional :average_check, type: String, desc: "The person who created the bug"
+            optional :average_match, type: String, desc: "The operating system that this bug affects"
+            optional :average_nonmatch, type: String, desc: "What platform this bug runs on"
+            optional :tested, type: String, desc: "How soon should this bug get fixed"
+          end
         end
-        post "import/:sid", root: "rule" do
-          Rule.import(permitted_params[:sid])
+        put ":id", root: "rule" do
+          update_params = permitted_params[:rule].reject { |k, v| v.nil? }
+          Rule.update(update_params['sid'], update_params)
         end
+
+        # #import rule via sid
+        # params do
+        #   requires :sid, type: String, desc: "ID of the rule"
+        # end
+        # post "import/:sid", root: "rule" do
+        #   Rule.import(permitted_params[:sid])
+        # end
 
         #import multiple rules
         params do
@@ -131,6 +137,16 @@ module API
         post "update", root: "rule" do
           Rule.update(permitted_params[:id])
         end
+
+
+        desc "remove a rule from the db only"
+        params do
+          requires :id, type: Integer, desc: "rule id"
+        end
+        delete ":id", root: "rule" do
+          Rule.destroy(permitted_params[:id])
+        end
+
 
         #delete a rule
         params do

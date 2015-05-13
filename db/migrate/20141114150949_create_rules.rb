@@ -1,6 +1,7 @@
 class CreateRules < ActiveRecord::Migration
   def change
     create_table :rules do |t|
+      t.text     "rule_content"
       t.string   "connection"
       t.string   "message"
       t.string   "flow"
@@ -10,12 +11,12 @@ class CreateRules < ActiveRecord::Migration
       t.integer  "gid"
       t.integer  "sid", :unique => true
       t.integer  "rev"
-      t.timestamps
       t.string   "state"
       t.float    "average_check"
       t.float    "average_match"
       t.float    "average_nonmatch"
       t.boolean  "tested",           :default => false
+      t.timestamps
     end
 
     add_reference :rules, :reference, index: true

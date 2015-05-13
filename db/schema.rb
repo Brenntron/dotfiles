@@ -157,6 +157,7 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   end
 
   create_table "rules", force: true do |t|
+    t.text     "rule_content"
     t.string   "connection"
     t.string   "message"
     t.string   "flow"
@@ -166,13 +167,13 @@ ActiveRecord::Schema.define(version: 20150401202645) do
     t.integer  "gid"
     t.integer  "sid"
     t.integer  "rev"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.string   "state"
     t.float    "average_check"
     t.float    "average_match"
     t.float    "average_nonmatch"
     t.boolean  "tested",           default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "reference_id"
     t.integer  "bug_id"
   end
