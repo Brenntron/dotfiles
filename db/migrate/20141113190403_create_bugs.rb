@@ -3,6 +3,8 @@ class CreateBugs < ActiveRecord::Migration
     create_table :bugs do |t|
       t.integer :bugzilla_id
       t.string  :state
+      t.string  :status
+      t.string  :resolution
       t.string  :creator
       t.string  :summary
       t.integer :committer_id
@@ -20,6 +22,13 @@ class CreateBugs < ActiveRecord::Migration
       t.integer :gid, :default => 1
       t.integer :sid
       t.integer :rev, :default => 1
+      t.datetime :assigned_at
+      t.datetime :pending_at
+      t.datetime :resolved_at
+      t.datetime :reopened_at
+      t.integer :work_time
+      t.integer :review_time
+      t.integer :rework_time
       t.timestamps
     end
     add_reference :bugs, :user, index: true
