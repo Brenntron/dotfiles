@@ -149,6 +149,14 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   add_index "references", ["bug_id"], name: "index_references_on_bug_id", using: :btree
   add_index "references", ["rule_id"], name: "index_references_on_rule_id", using: :btree
 
+  create_table "references_rules", id: false, force: true do |t|
+    t.integer "reference_id"
+    t.integer "rule_id"
+  end
+
+  add_index "references_rules", ["reference_id"], name: "index_references_rules_on_reference_id", using: :btree
+  add_index "references_rules", ["rule_id"], name: "index_references_rules_on_rule_id", using: :btree
+
   create_table "relationships", force: true do |t|
     t.integer  "user_id"
     t.integer  "team_member_id"
@@ -172,6 +180,7 @@ ActiveRecord::Schema.define(version: 20150401202645) do
     t.float    "average_match"
     t.float    "average_nonmatch"
     t.boolean  "tested",           default: false
+    t.boolean  "committed",        default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "reference_id"

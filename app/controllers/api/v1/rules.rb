@@ -32,7 +32,7 @@ module API
                 :class_type => /classtype:*(.*?;)/.match(rule)[1].strip,
                 :gid => 1,
                 :sid => permitted_params[:id],
-                :rev => /rev:(\S*?);/.match(rule)[1].strip
+                :rev => /rev:(\S*?;)/.match(rule)[1].strip
             )
           end
         end
@@ -67,7 +67,7 @@ module API
             requires :detection, type: String, desc: "The detection for this rule"
             optional :flow, type: String, desc: "The flow"
             optional :metadata, type: String, desc: "Any meta data that goes with this"
-            optional :classType, type: String, desc: "The type of rule"
+            optional :classification, type: String, desc: "The type of rule"
             optional :references, type: String, desc: "any references this rule has"
             optional :sid, type: Integer, desc: "the sid number"
             optional :gid, type: Integer, desc: "the gid number"
@@ -82,10 +82,28 @@ module API
         end
         post "", root: "rule" do
           options = {
-
-          }.reject() { |k, v| v.nil? || v.empty? }
-          Rule.create(
-          )
+              :connection => permitted_params[:rule][:connection],
+              :message => permitted_params[:rule][:message],
+              :detection => permitted_params[:rule][:detection],
+              :flow => permitted_params[:rule][:flow],
+              :metadata => permitted_params[:rule][:metadata],
+              :classification => permitted_params[:rule][:classification],
+              :sid => permitted_params[:rule][:sid] || Time.now.to_i,
+              :gid => permitted_params[:rule][:gid] || 1,
+              :rev => permitted_params[:rule][:rev] || 1,
+              :state => permitted_params[:rule][:state],
+              :tested => permitted_params[:rule][:tested],
+              :average_check => permitted_params[:rule][:average_check],
+              :average_match => permitted_params[:rule][:average_match],
+              :average_nonmatch => permitted_params[:rule][:average_nonmatch],
+              :created_at => permitted_params[:rule][:created_at],
+              :updated_at => permitted_params[:rule][:updated_at]
+          }.reject() { |k, v| v.nil? } #remove any nil values in the hash
+          new_rule = Rule.create(options)
+          unless permitted_params[:rule][:references].empty?
+            new_rule.associate_references(permitted_params[:rule][:references])
+          end
+          new_rule
         end
 
         desc "Edit a rule"

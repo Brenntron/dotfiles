@@ -23,7 +23,6 @@ ref7 = ReferenceType.create(:name => 'apsb',:description => 'Adobe Product Secur
 Reference.create(data:"12345",reference_type: ref2)
 Reference.create(data:"cve,1936-7254",reference_type: ref1)
 
-
 r1 = Rule.create(gid:'1',sid:'3679',rev:'12',message:'INDICATOR-OBFUSCATION Multiple Products IFRAME src javascript code execution',rule_content:'alert tcp $EXTERNAL_NET $HTTP_PORTS -> $HOME_NET any (msg:"INDICATOR-OBFUSCATION Multiple Products IFRAME src javascript code execution"; flow:to_client,established; file_data; content:"IFRAME"; nocase; pcre:"/\x3c\s*IFRAME\s*[^\x3e]*src=\x22javascript\x3a/smi"; metadata:service http; reference:bugtraq,13544; reference:bugtraq,30560; reference:cve,2005-1476; reference:cve,2008-2939; reference:nessus,18243; classtype:attempted-user; sid:3679; rev:12;)', state:'open',average_check: '29.0',average_match:'73.1',average_nonmatch:'24,9',tested:'false')
 r2 = Rule.create(gid:'1',sid:'13990',rev:'17',message:'SQL union select - possible sql injection attempt - GET parameter',rule_content:'alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS (msg:"SQL union select - possible sql injection attempt - GET parameter"; flow:to_server,established; content:"union"; fast_pattern; nocase; http_uri; content:"select"; nocase; http_uri; pcre:"/union\s+(all\s+)?select\s+/Ui"; metadata:policy security-ips drop, service http; reference:bugtraq,21227; reference:cve,2006-6268; reference:cve,2007-1021; reference:cve,2007-2824; reference:cve,2011-1667; reference:url,www.securityfocus.com/archive/1/452259; classtype:misc-attack; sid:13990; rev:17;)',state:'open',average_check: '8.3',average_match:'24.9',average_nonmatch:'0.0',tested:'false')
 r3 = Rule.create(gid:'1',sid:'19439',rev:'8',message:'SQL 1 = 1 - possible sql injection attempt',rule_content:'alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS (msg:"SQL 1 = 1 - possible sql injection attempt"; flow:to_server,established; content:"1=1"; fast_pattern:only; http_uri; pcre:"/(and|or)[\s\x2f\x2A]+1=1/Ui"; metadata:policy balanced-ips drop, policy security-ips drop, service http; reference:url,ferruh.mavituna.com/sql-injection-cheatsheet-oku/; classtype:web-application-attack; sid:19439; rev:8;)',state:'open',average_check:'1.4',average_match:'4.7',average_nonmatch:'0.1',tested:'false')
@@ -43,7 +42,6 @@ rules.each do |r|
   r.class_type = /classtype:*(.*?);/.match(rule)[1].strip
   r.save
 end
-
 
 Exploit.create(name:"exploit abc123",description:"this is an exploit that everything has",pcap_validation:"?? dont know....",data:"blah blah blah data goes here. lots of data im not sure how much data but i would imagine lots would need to be here. I could talk all day about data but i wont because there are other things to do.")
 
