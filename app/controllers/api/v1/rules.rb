@@ -32,7 +32,8 @@ module API
                 :class_type => /classtype:*(.*?;)/.match(rule)[1].strip,
                 :gid => 1,
                 :sid => permitted_params[:id],
-                :rev => /rev:(\S*?;)/.match(rule)[1].strip
+                :rev => /rev:(\S*?;)/.match(rule)[1].strip,
+                :committed => true
             )
           end
         end
