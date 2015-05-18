@@ -139,7 +139,8 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   add_index "reference_types", ["reference_id"], name: "index_reference_types_on_reference_id", using: :btree
 
   create_table "references", force: true do |t|
-    t.string   "data"
+    t.string   "reference_data"
+    t.integer  "reference_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "rule_id"
@@ -147,6 +148,7 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   end
 
   add_index "references", ["bug_id"], name: "index_references_on_bug_id", using: :btree
+  add_index "references", ["reference_type_id"], name: "index_references_on_reference_type_id", using: :btree
   add_index "references", ["rule_id"], name: "index_references_on_rule_id", using: :btree
 
   create_table "references_rules", id: false, force: true do |t|

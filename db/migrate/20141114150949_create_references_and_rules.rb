@@ -1,7 +1,8 @@
 class CreateReferencesAndRules < ActiveRecord::Migration
   def change
     create_table :references do |t|
-      t.string :data
+      t.string :reference_data
+      t.belongs_to :reference_type, index: true
       t.timestamps
     end
     add_reference :references, :rule, index: true

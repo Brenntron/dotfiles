@@ -1,3 +1,3 @@
 class ReferenceType < ActiveRecord::Base
-  belongs_to :reference
+  has_many :reference
 end

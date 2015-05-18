@@ -1,6 +1,6 @@
 class Rule < ActiveRecord::Base
-  has_and_belongs_to_many :references
-
+  has_and_belongs_to_many :references, dependent: :destroy
+  #has_many :references
 
   def self.create_a_rule(content)
     begin
