@@ -1,7 +1,6 @@
 class Rule < ActiveRecord::Base
-  has_and_belongs_to_many :bugs
-  has_and_belongs_to_many :references
-
+  #has_and_belongs_to_many :bugs   ## this relationship causes some problems...to be revisited
+  has_and_belongs_to_many :references, dependent: :destroy
 
   def self.create_a_rule(content)
     begin
@@ -24,7 +23,6 @@ class Rule < ActiveRecord::Base
     rescue Exception => e
       raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e.to_s}}}")
     end
-
   end
 
   def extract_rule
@@ -80,9 +78,7 @@ class Rule < ActiveRecord::Base
       elsif gid.nil?
         raise "Neither gid nor sid content is set"
       end
-
       return true
-
     rescue Exception => e
       self.errors.add(:base, e.to_s)
       e.backtrace.each do |l|
@@ -109,13 +105,36 @@ class Rule < ActiveRecord::Base
     rescue Exception => e
       raise Exception.new("{rule_parse_error: {content: #{rule},error:#{e.to_s}}}")
     end
+  end
 
-
+  def associate_references(rule_text)
+    references = []
+    rule_text.split(';').each {|r| references << r.strip.gsub!('reference:', '') if r.include? "reference" }
+    references.each do |r|
+      r = r.split(',')
+      new_reference = Reference.create(reference_type:ReferenceType.where(name:r[0]).first,reference_data:r[1])
+      self.references << new_reference
+    end
   end
 
   def self.parse_and_create_rule(rule)
-    r = Rule.new(:content => rule)
-    return r.extract_rule ? r : nil
+    rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
+    options = {
+        :id           => rule_sid,
+        :sid          => rule_sid,
+        :rule_content => rule,
+        :gid          => 1,
+        :rev          => /rev:(\S*?);/.match(rule)[1].strip || 1,
+        :connection   => /(.*?)\(/.match(rule)[1].strip,
+        :message      => /msg:(".*?")/.match(rule)[1].strip,
+        :detection    => /flow:.*?;(.*?)metadata:/.match(rule)[1].strip,
+        :flow         => /flow:(.*?);/.match(rule)[1].strip,
+        :metadata     => /metadata:(.*?);/.match(rule)[1].strip,
+        :class_type   => /classtype:*(.*?);/.match(rule)[1].strip,
+        :committed    => true,
+        :state        => rule_sid ? 'UNCHANGED' : 'NEW'
+    }.reject() { |k, v| v.nil? }
+    options
   end
 
   def update_rule
@@ -162,17 +181,17 @@ class Rule < ActiveRecord::Base
   def self.create_or_update_rule(body)
     begin
       parsed = Rule.parse_rule(body)
-      rule   = Rule.where("sid = ?", parsed['sid'])
+      rule = Rule.where("sid = ?", parsed['sid']).first
       if rule.empty?
         rule = Rule.create(:content => body)
         rule.gid = 1
-        rule.message = parsed['msg'].gsub("\"","")
+        rule.message = parsed['msg'].gsub("\"", "")
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']
         rule.state = "Unchanged"
       else
         rule.content = body
-        rule.message = parsed['msg'].gsub("\"","")
+        rule.message = parsed['msg'].gsub("\"", "")
         rule.gid = 1
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']

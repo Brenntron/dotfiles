@@ -125,22 +125,39 @@ ActiveRecord::Schema.define(version: 20150401202645) do
 
   add_index "notes", ["bug_id"], name: "index_notes_on_bug_id", using: :btree
 
+  create_table "reference_types", force: true do |t|
+    t.string  "name"
+    t.string  "description"
+    t.string  "validation"
+    t.string  "bugzilla_format"
+    t.string  "example"
+    t.string  "rule_format"
+    t.string  "url"
+    t.integer "reference_id"
+  end
+
+  add_index "reference_types", ["reference_id"], name: "index_reference_types_on_reference_id", using: :btree
+
   create_table "references", force: true do |t|
-    t.string   "data"
-    t.string   "name"
-    t.string   "description"
-    t.string   "validation"
-    t.string   "bugzilla_format"
-    t.string   "example"
-    t.string   "rule_format"
-    t.string   "url"
-    t.integer  "bug_id"
+    t.string   "reference_data"
+    t.integer  "reference_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "rule_id"
+    t.integer  "bug_id"
   end
 
+  add_index "references", ["bug_id"], name: "index_references_on_bug_id", using: :btree
+  add_index "references", ["reference_type_id"], name: "index_references_on_reference_type_id", using: :btree
   add_index "references", ["rule_id"], name: "index_references_on_rule_id", using: :btree
+
+  create_table "references_rules", id: false, force: true do |t|
+    t.integer "reference_id"
+    t.integer "rule_id"
+  end
+
+  add_index "references_rules", ["reference_id"], name: "index_references_rules_on_reference_id", using: :btree
+  add_index "references_rules", ["rule_id"], name: "index_references_rules_on_rule_id", using: :btree
 
   create_table "relationships", force: true do |t|
     t.integer  "user_id"
@@ -150,23 +167,31 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   end
 
   create_table "rules", force: true do |t|
+    t.text     "rule_content"
+    t.string   "connection"
+    t.string   "message"
+    t.string   "flow"
+    t.text     "detection"
+    t.string   "metadata"
+    t.string   "class_type"
     t.integer  "gid"
     t.integer  "sid"
     t.integer  "rev"
-    t.string   "message"
-    t.text     "content"
     t.string   "state"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.float    "average_check"
     t.float    "average_match"
     t.float    "average_nonmatch"
     t.boolean  "tested",           default: false
+    t.boolean  "committed",        default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "reference_id"
     t.integer  "bug_id"
   end
 
   add_index "rules", ["bug_id"], name: "index_rules_on_bug_id", using: :btree
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
+  add_index "rules", ["reference_id"], name: "index_rules_on_reference_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "cvs_username"
