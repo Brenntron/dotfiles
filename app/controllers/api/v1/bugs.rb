@@ -36,6 +36,28 @@ module API
           end
         end
 
+
+        desc "link a rule with this bug"
+        params do
+          requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
+        end
+        post '/rules/:link' do
+          association = Hash.new
+          permitted_params[:link].split('&').each { |data| association[data.split(':')[0]] = data.split(':')[1] }
+          Bug.find(association["bug"]).rules << Rule.find(association["rule"])
+        end
+
+        desc "unlink a rule with this bug"
+        params do
+          requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
+        end
+        delete '/rules/:link' do
+          association = Hash.new
+          permitted_params[:link].split('&').each { |data| association[data.split(':')[0]] = data.split(':')[1] }
+          Bug.find(association["bug"]).rules.destroy(association["rule"])
+        end
+
+
         desc "get a single bug"
         params do
           requires :id, type: String, desc: "ID of the bug"
