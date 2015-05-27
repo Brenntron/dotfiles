@@ -42,9 +42,9 @@ module API
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
         end
         post '/rules/:link' do
-          association = Hash.new
-          permitted_params[:link].split('&').each { |data| association[data.split(':')[0]] = data.split(':')[1] }
-          Bug.find(association["bug"]).rules << Rule.find(association["rule"])
+          rule_id = permitted_params[:link].split(':')[1]
+          Rule.import_rule(rule_id) if Rule.where(id:rule_id).empty?
+          Bug.find(permitted_params[:link].split(':')[0]).rules << Rule.find(rule_id)
         end
 
         desc "unlink a rule with this bug"
@@ -52,11 +52,8 @@ module API
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
         end
         delete '/rules/:link' do
-          association = Hash.new
-          permitted_params[:link].split('&').each { |data| association[data.split(':')[0]] = data.split(':')[1] }
-          Bug.find(association["bug"]).rules.destroy(association["rule"])
+          Bug.find(permitted_params[:link].split(':')[0]).rules.destroy(permitted_params[:link].split(':')[1])
         end
-
 
         desc "get a single bug"
         params do

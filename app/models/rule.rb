@@ -25,6 +25,19 @@ class Rule < ActiveRecord::Base
     end
   end
 
+  def self.import_rule(sid)
+    if sid
+      value = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`
+      split_string = value.split(/:\d[\d]*:/)
+      rule_text = split_string[1].strip!
+      new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
+      new_rule.associate_references(rule_text)
+      new_rule
+    else
+      raise "No rule sid provided"
+    end
+  end
+
   def extract_rule
     begin
       if not self.content.nil?

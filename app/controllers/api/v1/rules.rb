@@ -17,13 +17,7 @@ module API
         end
         route_param "import/:id" do
           get do
-            #grep in the extras/snort folder for the sid number that is supplied
-            value = `grep -Hrn "sid:#{permitted_params[:id]}" #{Rails.root}/extras/snort`
-            split_string = value.split(/:\d[\d]*:/)
-            rule_text = split_string[1].strip!
-            new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
-            new_rule.associate_references(rule_text)
-            new_rule
+            Rule.import_rule(permitted_params[:id])
           end
         end
 
@@ -35,6 +29,7 @@ module API
         get ":id", root: "rule" do
           Rule.where(id: permitted_params[:id]).first
         end
+
 
         desc "Return all rules"
         params do
@@ -52,9 +47,10 @@ module API
         desc "create a rule"
         params do
           requires :rule, type: Hash do
-            requires :connection, type: String, desc: "The connection string"
-            requires :message, type: String, desc: "The message describing the rule"
-            requires :detection, type: String, desc: "The detection for this rule"
+            requires :rule_content, type: String, desc: "Compiled rule content"
+            optional :connection, type: String, desc: "The connection string"
+            optional :message, type: String, desc: "The message describing the rule"
+            optional :detection, type: String, desc: "The detection for this rule"
             optional :flow, type: String, desc: "The flow"
             optional :metadata, type: String, desc: "Any meta data that goes with this"
             optional :class_type, type: String, desc: "The type of rule"
@@ -66,7 +62,6 @@ module API
             optional :average_match, type: String, desc: "The operating system that this bug affects"
             optional :average_nonmatch, type: String, desc: "What platform this bug runs on"
             optional :tested, type: String, desc: "How soon should this bug get fixed"
-            requires :rule_content, type: String, desc: "Compiled rule content"
           end
         end
         post "", root: "rule" do
@@ -95,7 +90,6 @@ module API
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule
         end
-
 
         desc "Edit a rule"
         params do
