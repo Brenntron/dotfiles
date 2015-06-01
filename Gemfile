@@ -30,6 +30,8 @@ gem 'puma'
 
 group :development do
   gem 'awesome_print', '1.2.0'
+  # Use Capistrano for deployment
+  gem 'capistrano', '~> 3.4.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
   gem 'mysql2'
