@@ -7,6 +7,26 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
+set :stage, :production
+
+# Bonus! Colors are pretty!
+def red(str)
+  "\e[31m#{str}\e[0m"
+end
+# Figure out the name of the current local branch
+def current_git_branch
+  branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
+  puts "Deploying branch #{red branch}"
+  branch
+end
+# Set the deploy branch to the current branch
+set :branch, current_git_branch
+
+role :app, "10.7.1.127"
+role :web, "10.7.1.127"
+role :db, "10.7.1.127", :primary => true
+
+server "10.7.1.127", user: "vrtweb", port: "22", roles: %w{web app db}
 
 
 # role-based syntax

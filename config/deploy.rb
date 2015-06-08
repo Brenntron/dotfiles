@@ -4,7 +4,7 @@ lock '3.4.0'
 set :user, "talosweb"
 set :application, 'talos_api'
 set :repo_url, 'git@github.com:talosweb/talos_api.git'
-set :rails_env, "staging"
+set :rails_env, "production"
 set :rbenv_ruby, '2.1.2'
 
 set :pty, true
