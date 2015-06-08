@@ -17,7 +17,7 @@ set :use_sudo, false
 
 
 
-set :linked_files, %w{config/database.yml config/app_config.yml}
+set :linked_files, %w{config/database.yml config/app_config.yml config/.env}
 
 set(:config_files,%w(database.yml app_config.yml))
 

@@ -191,7 +191,6 @@ GEM
     multi_json (1.11.0)
     multi_test (0.1.2)
     multi_xml (0.5.5)
-    mysql2 (0.3.18)
     nenv (0.2.0)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -344,7 +343,6 @@ DEPENDENCIES
   kaminari (~> 0.16.3)
   launchy (= 2.4.2)
   mailcatcher
-  mysql2
   net-ssh
   pg (= 0.17.1)
   poltergeist (= 1.5.1)
@@ -359,6 +357,5 @@ DEPENDENCIES
   ruby-bugzilla (~> 0.6.0)
   sfbugzilla!
   spring
-  sqlite3
   stomp
   uglifier (>= 1.3.0)
