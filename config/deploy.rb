@@ -17,9 +17,9 @@ set :use_sudo, false
 
 
 
-set :linked_files, %w{config/database.yml config/app_config.yml config/.env}
+set :linked_files, %w{config/database.yml config/app_config.yml config/secrets.yml}
 
-set(:config_files,%w(database.yml app_config.yml .env))
+set(:config_files,%w(database.yml app_config.yml config/secrets.yml))
 
 set :keep_releases, 5
 
