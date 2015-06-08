@@ -34,7 +34,6 @@ group :development do
   gem 'capistrano', '~> 3.4.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
-  gem 'mysql2'
   gem 'mailcatcher'
 end
 
@@ -53,8 +52,6 @@ end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.5'
-# Use sqlite3 as the database for Active Record
-gem 'sqlite3'
 # Use SCSS for stylesheets
 # gem 'sass-rails', '~> 4.0.3'
 # Use Uglifier as compressor for JavaScript assets
