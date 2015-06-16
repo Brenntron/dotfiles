@@ -188,6 +188,7 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.float    "average_nonmatch"
     t.boolean  "tested",           default: false
     t.boolean  "committed",        default: false
+    t.string   "documentation"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "reference_id"

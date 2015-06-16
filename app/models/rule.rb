@@ -125,29 +125,32 @@ class Rule < ActiveRecord::Base
     rule_text.split(';').each {|r| references << r.strip.gsub!('reference:', '') if r.include? "reference" }
     references.each do |r|
       r = r.split(',')
-      new_reference = Reference.create(reference_type:ReferenceType.where(name:r[0]).first,reference_data:r[1])
-      self.references << new_reference
+      unless r[1].empty?
+        new_reference = Reference.create(reference_type:ReferenceType.where(name:r[0]).first,reference_data:r[1])
+        self.references << new_reference
+      end
     end
   end
 
-  def self.parse_and_create_rule(rule)
+  def self.parse_and_create_rule(rule, documentation)
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
     options = {
-        :id           => rule_sid,
-        :sid          => rule_sid,
-        :rule_content => rule,
-        :gid          => 1,
-        :rev          => /rev:(\S*?);/.match(rule)[1].strip.to_i || 1,
-        :connection   => /(.*?)\(/.match(rule)[1].strip,
-        :message      => /msg:(".*?")/.match(rule)[1].strip,
-        :detection    => /flow:.*?;(.*?)(metadata|reference):/.match(rule)[1].strip,
-        :flow         => /flow:(.*?);/.match(rule)[1].strip,
-        :metadata     => /metadata:(.*?);/.match(rule) ? /metadata:(.*?);/.match(rule)[1].strip : nil ,
-        :class_type   => /classtype:*(.*?);/.match(rule)[1].strip,
-        :committed    => true,
-        :state        => rule_sid ? 'UNCHANGED' : 'NEW'
+        :id            => rule_sid,
+        :sid           => rule_sid,
+        :rule_content  => rule,
+        :gid           => 1,
+        :rev           => /rev:(\S*?);/.match(rule) ? /rev:(\S*?);/.match(rule)[1].strip.to_i : 1,
+        :connection    => /(.*?)\(/.match(rule)[1].strip,
+        :message       => /msg:"(.*?)"/.match(rule)[1].strip,
+        :detection     => /flow:.*?;(.*?)(metadata|reference):/.match(rule)[1].strip,
+        :flow          => /flow:(.*?);/.match(rule)[1].strip,
+        :metadata      => /metadata:(.*?);/.match(rule) ? /metadata:(.*?);/.match(rule)[1].strip : nil ,
+        :class_type    => /classtype:*(.*?);/.match(rule) ? /classtype:*(.*?);/.match(rule)[1].strip : nil,
+        :committed     => true,
+        :state         => rule_sid ? 'UNCHANGED' : 'NEW',
+        :documentation => documentation || nil
     }.reject() { |k, v| v.nil? }
-    options
+    Rule.create(options)
   end
 
   def update_rule
