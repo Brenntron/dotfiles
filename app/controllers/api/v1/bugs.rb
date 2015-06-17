@@ -43,8 +43,8 @@ module API
         end
         post '/rules/:link' do
           rule_id = permitted_params[:link].split(':')[1]
-          Rule.import_rule(rule_id) if Rule.where(id:rule_id).empty?
-          Bug.find(permitted_params[:link].split(':')[0]).rules << Rule.find(rule_id)
+          rule = Rule.where(id:rule_id).empty? ? Rule.import_rule(rule_id) : Rule.find(rule_id)
+          Bug.find(permitted_params[:link].split(':')[0]).rules << rule
         end
 
         desc "unlink a rule with this bug"

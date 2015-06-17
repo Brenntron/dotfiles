@@ -52,7 +52,8 @@ module API
           end
         end
         post "", root: "rule" do
-          new_rule = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content], permitted_params[:rule][:documentation])
+          new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
+          new_rule.update(documentation: permitted_params[:rule][:documentation])
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule
         end

@@ -132,7 +132,7 @@ class Rule < ActiveRecord::Base
     end
   end
 
-  def self.parse_and_create_rule(rule, documentation)
+  def self.parse_and_create_rule(rule)
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
     options = {
         :id            => rule_sid,
@@ -147,10 +147,8 @@ class Rule < ActiveRecord::Base
         :metadata      => /metadata:(.*?);/.match(rule) ? /metadata:(.*?);/.match(rule)[1].strip : nil ,
         :class_type    => /classtype:*(.*?);/.match(rule) ? /classtype:*(.*?);/.match(rule)[1].strip : nil,
         :committed     => true,
-        :state         => rule_sid ? 'UNCHANGED' : 'NEW',
-        :documentation => documentation || nil
+        :state         => rule_sid ? 'UNCHANGED' : 'NEW'
     }.reject() { |k, v| v.nil? }
-    Rule.create(options)
   end
 
   def update_rule
