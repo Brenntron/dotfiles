@@ -13,7 +13,7 @@ gem 'cancan', '1.6.10'
 gem 'devise', '3.2.2'
 
 gem 'pg', '0.17.1'
-gem 'rmagick', '~> 2.13'
+gem 'rmagick', '2.13.2'
 gem 'ruby-bugzilla', '~> 0.6.0'
 
 gem 'diffy', '~> 2.1.4'
@@ -30,9 +30,10 @@ gem 'puma'
 
 group :development do
   gem 'awesome_print', '1.2.0'
+  # Use Capistrano for deployment
+  gem 'capistrano', '~> 3.4.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
-  gem 'mysql2'
   gem 'mailcatcher'
 end
 
@@ -51,8 +52,6 @@ end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.5'
-# Use sqlite3 as the database for Active Record
-gem 'sqlite3'
 # Use SCSS for stylesheets
 # gem 'sass-rails', '~> 4.0.3'
 # Use Uglifier as compressor for JavaScript assets
