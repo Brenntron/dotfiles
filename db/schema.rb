@@ -32,10 +32,12 @@ ActiveRecord::Schema.define(version: 20150401202645) do
     t.integer  "bug_id"
     t.integer  "rule_id"
     t.integer  "reference_id"
+    t.integer  "job_id"
   end
 
   add_index "attachments", ["bug_id"], name: "index_attachments_on_bug_id", using: :btree
   add_index "attachments", ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id", using: :btree
+  add_index "attachments", ["job_id"], name: "index_attachments_on_job_id", using: :btree
   add_index "attachments", ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
   add_index "attachments", ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
 

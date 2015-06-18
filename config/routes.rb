@@ -1,3 +1,5 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
 
   devise_for :users, controllers: { sessions: 'sessions' }
@@ -11,7 +13,7 @@ Rails.application.routes.draw do
   namespace :api do
       get :csrf, to: 'csrf#index'
   end
-
+  mount Sidekiq::Web, at: '/sidekiq'
   mount API::Base => '/api'
   mount GrapeSwaggerRails::Engine => '/documentation'
 

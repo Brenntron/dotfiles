@@ -27,6 +27,8 @@ gem 'pry', '0.9.12.4'
 gem 'pry-remote', '0.1.8'
 
 gem 'sidekiq'
+gem 'sinatra',require: false
+gem 'slim'
 gem 'puma'
 
 group :development do

@@ -10,6 +10,7 @@ module API
       mount API::V1::Users
       mount API::V1::Notes
       mount API::V1::Events
+      mount API::V1::Jobs
 
 
       add_swagger_documentation(

@@ -241,6 +241,7 @@ class Bug < ActiveRecord::Base
   end
 
   def self.get_last_import_all()
+    #this needs a manifest file to check against should the job fail half way through
     latest_bug_date = Event.where(action: "import_all").last
     return latest_bug_date.nil? ? Time.now-(1.day) : latest_bug_date.created_at
   end

@@ -28,24 +28,42 @@ module API
         desc "create a job"
         params do
           requires :job, type: Hash do
-            requires :bug_id, type: String, desc: "The connection string"
+            requires :bugzilla_id, type: String, desc: "The bug associated with the job"
             requires :job_type, type: String, desc: "is this testing a rule or an attachment"
-            optional :attachments, type: String, desc: "The attachemnts to test. this is a list of bugzilla attachment id's"
-            optional :rules, type: String, desc: "the rule to test"
+            requires :current_user, type: Integer, desc: "the user creating the job"
+            optional :attachment_array, type: String, desc: "The attachments to test. this is a list of bugzilla attachment id's"
+            optional :rule_array, type: String, desc: "the rule ids to test"
           end
         end
         post "", root: "job" do
-          if permitted_params[:job][:bug_id]
+          if permitted_params[:job][:bugzilla_id]
             options = {
-                :attachments       => permitted_params[:job][:attachments],
-                :rules          => permitted_params[:job][:rules]
+                :bug              => Bug.where(id: permitted_params[:job][:bugzilla_id]).first,
+                :job_type         => permitted_params[:job][:job_type],
+                :current_user     => User.where(id: permitted_params[:job][:current_user]).first,
+                :attachment_array => permitted_params[:job][:attachment_array],
+                :rule_array       => permitted_params[:job][:rule_array]
             }.reject() { |k, v| v.nil? }
           else   # (legacy form)
 
           end
-          #do something
+          new_job = Job.create(
+              :bug  => options[:bug],
+              :job_type     => options[:job_type],
+              :user => options[:current_user],
+          )
+          case options[:job_type]
+            when "attachment"
+              options[:attachment_array].split(',').each do |attachment_id|
+                new_job.attachments << Attachment.where(id: attachment_id).first unless nil
+              end
+            when "rule"
+              options[:rule_array].split(',').each do |rule_id|
+                new_job.rules << Rule.where(id: rule_id).first unless nil
+              end
+          end
+          new_job
         end
-
       end
     end
   end
