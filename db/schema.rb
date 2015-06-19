@@ -44,8 +44,6 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   create_table "bugs", force: true do |t|
     t.integer  "bugzilla_id"
     t.string   "state"
-    t.string   "status"
-    t.string   "resolution"
     t.string   "creator"
     t.string   "summary"
     t.integer  "committer_id"
@@ -63,13 +61,6 @@ ActiveRecord::Schema.define(version: 20150401202645) do
     t.integer  "gid",             default: 1
     t.integer  "sid"
     t.integer  "rev",             default: 1
-    t.datetime "assigned_at"
-    t.datetime "pending_at"
-    t.datetime "resolved_at"
-    t.datetime "reopened_at"
-    t.integer  "work_time"
-    t.integer  "review_time"
-    t.integer  "rework_time"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
@@ -141,8 +132,7 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   add_index "reference_types", ["reference_id"], name: "index_reference_types_on_reference_id", using: :btree
 
   create_table "references", force: true do |t|
-    t.string   "reference_data"
-    t.integer  "reference_type_id"
+    t.string   "data"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "rule_id"
@@ -150,7 +140,6 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   end
 
   add_index "references", ["bug_id"], name: "index_references_on_bug_id", using: :btree
-  add_index "references", ["reference_type_id"], name: "index_references_on_reference_type_id", using: :btree
   add_index "references", ["rule_id"], name: "index_references_on_rule_id", using: :btree
 
   create_table "references_rules", id: false, force: true do |t|
@@ -169,24 +158,23 @@ ActiveRecord::Schema.define(version: 20150401202645) do
   end
 
   create_table "rules", force: true do |t|
-    t.text     "rule_content"
     t.string   "connection"
     t.string   "message"
     t.string   "flow"
     t.text     "detection"
     t.string   "metadata"
-    t.string   "class_type"
+    t.string   "classification"
     t.integer  "gid"
     t.integer  "sid"
     t.integer  "rev"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "state"
     t.float    "average_check"
     t.float    "average_match"
     t.float    "average_nonmatch"
     t.boolean  "tested",           default: false
     t.boolean  "committed",        default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.integer  "reference_id"
     t.integer  "bug_id"
   end
