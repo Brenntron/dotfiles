@@ -1,3 +1,7 @@
+require 'open3'
+require 'diffy'
+require 'tempfile'
+
 class Rule < ActiveRecord::Base
   has_and_belongs_to_many :bugs
   has_and_belongs_to_many :references, dependent: :destroy
@@ -27,10 +31,15 @@ class Rule < ActiveRecord::Base
 
   def self.import_rule(sid)
     if sid
-      value = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`
-      split_string = value.split(/:\d[\d]*:/)
-      rule_text = split_string[1].strip!
+      rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1].strip!
+      parsed = Rule.visruleparser(rule_text)
       new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
+      new_rule.update(
+          rule_parsed:parsed[:rule],
+          rule_warnings:parsed[:errors],
+          cvs_rule_parsed:parsed[:rule],
+          cvs_rule_content:rule_text
+      )
       new_rule.associate_references(rule_text)
       new_rule
     else
@@ -149,6 +158,22 @@ class Rule < ActiveRecord::Base
         :committed     => true,
         :state         => rule_sid ? 'UNCHANGED' : 'NEW'
     }.reject() { |k, v| v.nil? }
+  end
+
+  def self.visruleparser(rule_text)
+    return nil if rule_text.nil?
+    parsed = Hash.new
+    temp_rule = Tempfile.new("temp.rules")
+    temp_rule.write(rule_text)
+    temp_rule.rewind
+    Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
+      text = stdout.read
+      parsed[:rule] = text.split(/\%{80}|\*{80}/)[1].strip
+      parsed[:errors] = text.split(/\%{80}|\*{80}/)[2] ? text.split(/\%{80}|\*{80}/)[2].gsub('%', '').strip : ''
+      parsed[:errors] += stderr.read
+    end
+    temp_rule.close
+    parsed
   end
 
   def update_rule

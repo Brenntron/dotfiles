@@ -10,6 +10,10 @@ class CreateReferencesAndRules < ActiveRecord::Migration
 
     create_table :rules do |t|
       t.text     "rule_content"
+      t.text     "rule_parsed"
+      t.text     "rule_warnings"
+      t.text     "cvs_rule_content"
+      t.text     "cvs_rule_parsed"
       t.string   "connection"
       t.string   "message"
       t.string   "flow"

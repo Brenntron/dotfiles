@@ -173,6 +173,10 @@ ActiveRecord::Schema.define(version: 20150520191229) do
 
   create_table "rules", force: true do |t|
     t.text     "rule_content"
+    t.text     "rule_parsed"
+    t.text     "rule_warnings"
+    t.text     "cvs_rule_content"
+    t.text     "cvs_rule_parsed"
     t.string   "connection"
     t.string   "message"
     t.string   "flow"
