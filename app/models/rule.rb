@@ -142,22 +142,23 @@ class Rule < ActiveRecord::Base
   end
 
   def self.parse_and_create_rule(rule)
+    parsed = Rule.visruleparser(rule)[:rule]
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
     options = {
         :id            => rule_sid,
         :sid           => rule_sid,
         :rule_content  => rule,
         :gid           => 1,
-        :rev           => /rev:(\S*?);/.match(rule) ? /rev:(\S*?);/.match(rule)[1].strip.to_i : 1,
-        :connection    => /(.*?)\(/.match(rule)[1].strip,
-        :message       => /msg:"(.*?)"/.match(rule)[1].strip,
-        :detection     => /flow:.*?;(.*?)(metadata|reference):/.match(rule)[1].strip,
-        :flow          => /flow:(.*?);/.match(rule)[1].strip,
-        :metadata      => /metadata:(.*?);/.match(rule) ? /metadata:(.*?);/.match(rule)[1].strip : nil ,
-        :class_type    => /classtype:*(.*?);/.match(rule) ? /classtype:*(.*?);/.match(rule)[1].strip : nil,
+        :rev           => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
+        :connection    => /Connection\s*:\s(.+)/.match(parsed)[1],
+        :message       => /Message\s*:\s(.*)/.match(parsed)[1],
+        :detection     => /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip,
+        :flow          => /Flow\s*:\s(.+)/.match(parsed)[1],
+        :metadata      => /Metadata\s*:\s(.*)/.match(parsed)[1],
+        :class_type    => /Classtype\s*:\s(.*)/.match(parsed)[1],
         :committed     => true,
         :state         => rule_sid ? 'UNCHANGED' : 'NEW'
-    }.reject() { |k, v| v.nil? }
+    }.reject() {|k,v,| v.nil? || v == "<MISSING>" }
   end
 
   def self.visruleparser(rule_text)
@@ -168,8 +169,8 @@ class Rule < ActiveRecord::Base
     temp_rule.rewind
     Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
       text = stdout.read
-      parsed[:rule] = text.split(/\%{80}|\*{80}/)[1].strip
-      parsed[:errors] = text.split(/\%{80}|\*{80}/)[2] ? text.split(/\%{80}|\*{80}/)[2].gsub('%', '').strip : ''
+      parsed[:rule] = text.split(/%{80}|\*{80}/)[1].strip
+      parsed[:errors] = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
       parsed[:errors] += stderr.read
     end
     temp_rule.close
