@@ -42,7 +42,7 @@ snort_build=snort-$build
 snort_pkg=$snort_build.tar.gz
 
 echo "Fetching the snort package from snort.org"
-wget -q http://www.snort.org/dl/snort-current/$snort_pkg -O $snort_pkg
+wget -q https://snort.org/downloads/snort/$snort_pkg -O $snort_pkg
 
 if [ $? -ne 0 ]
 then

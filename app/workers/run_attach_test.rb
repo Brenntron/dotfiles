@@ -3,6 +3,7 @@ class RunAttachTestWorker
   sidekiq_options retry: false
 
   def perform
+
     "success"
   end
 end
