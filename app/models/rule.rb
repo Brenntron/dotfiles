@@ -144,15 +144,17 @@ class Rule < ActiveRecord::Base
   def self.parse_and_create_rule(rule)
     parsed = Rule.visruleparser(rule)[:rule]
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
+    detection = /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip
     options = {
         :id            => rule_sid,
         :sid           => rule_sid,
         :rule_content  => rule,
+        :rule_parsed   => parsed,
         :gid           => 1,
         :rev           => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
         :connection    => /Connection\s*:\s(.+)/.match(parsed)[1],
         :message       => /Message\s*:\s(.*)/.match(parsed)[1],
-        :detection     => /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip,
+        :detection     => detection[-1, 1] == ';' ? detection : detection + ';',
         :flow          => /Flow\s*:\s(.+)/.match(parsed)[1],
         :metadata      => /Metadata\s*:\s(.*)/.match(parsed)[1],
         :class_type    => /Classtype\s*:\s(.*)/.match(parsed)[1],
@@ -165,7 +167,7 @@ class Rule < ActiveRecord::Base
     return nil if rule_text.nil?
     parsed = Hash.new
     temp_rule = Tempfile.new("temp.rules")
-    temp_rule.write(rule_text)
+    temp_rule.write(rule_text.gsub(/\#\s/, ''))
     temp_rule.rewind
     Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
       text = stdout.read
