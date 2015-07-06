@@ -36,6 +36,25 @@ module API
           end
         end
 
+
+        desc "link a rule with this bug"
+        params do
+          requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
+        end
+        post '/rules/:link' do
+          rule_id = permitted_params[:link].split(':')[1]
+          rule = Rule.where(id:rule_id).empty? ? Rule.import_rule(rule_id) : Rule.find(rule_id)
+          Bug.find(permitted_params[:link].split(':')[0]).rules << rule
+        end
+
+        desc "unlink a rule with this bug"
+        params do
+          requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
+        end
+        delete '/rules/:link' do
+          Bug.find(permitted_params[:link].split(':')[0]).rules.destroy(permitted_params[:link].split(':')[1])
+        end
+
         desc "get a single bug"
         params do
           requires :id, type: String, desc: "ID of the bug"
@@ -70,8 +89,8 @@ module API
             optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
             optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
-            optional :research_notes, type: String, desc: "Current working draft of research notes"
-            optional :committer_notes, type: String, desc: "Current working draft of committer notes"
+            optional :new_research_notes, type: String, desc: "Current working draft of research notes"
+            optional :new_committer_notes, type: String, desc: "Current working draft of committer notes"
             optional :editor_id, type: String, desc: "id of the new user to be assigned to the bug"
             optional :reviewer_id, type: String, desc: "id of the new committer to be assigned to the bug"
           end
@@ -132,6 +151,14 @@ module API
                 :rework_time => state_params[:rework_time],
                 :review_time => state_params[:review_time]
             }
+          elsif permitted_params[:bug][:new_research_notes]
+            update_params = {
+                :research_notes => permitted_params[:bug][:new_research_notes]
+            }
+          elsif permitted_params[:bug][:new_committer_notes]
+            update_params = {
+                :committer_notes => permitted_params[:bug][:new_committer_notes]
+            }
           else
             options = {
                 :ids => permitted_params[:id],
@@ -160,11 +187,11 @@ module API
                 :classification => permitted_params[:bug][:classification]
             }
           end
-
-
-          options.reject! { |k, v| v.nil? }
+          # update buzilla (if needed)
+          options.reject! { |k, v| v.nil? } if options
+          Bugzilla::Bug.new(bugzilla_session).update(options) unless options.blank?
+          # update the database
           update_params.reject! { |k, v| v.nil? }
-          Bugzilla::Bug.new(bugzilla_session).update(options)
           Bug.update(permitted_params[:id], update_params)
 
         end
