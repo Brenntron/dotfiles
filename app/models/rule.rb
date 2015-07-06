@@ -1,5 +1,4 @@
 require 'open3'
-require 'diffy'
 require 'tempfile'
 
 class Rule < ActiveRecord::Base
