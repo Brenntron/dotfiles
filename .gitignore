@@ -11,6 +11,7 @@
 /log/*.log
 /tmp
 /vendor/cache
+/vendor/bundle
 .DS_Store
 /public/assets/*
 /public/system/*

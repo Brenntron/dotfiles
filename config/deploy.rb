@@ -8,7 +8,7 @@ set :rails_env, "production"
 set :rbenv_ruby, '2.1.2'
 
 set :pty, true
-set :deploy_to, "/Library/WebServer/Documents/talos_api/"
+set :deploy_to, "public/app"
 set :deploy_via, :copy
 set :scm, :git
 set :password, false

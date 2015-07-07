@@ -22,11 +22,11 @@ end
 # Set the deploy branch to the current branch
 set :branch, current_git_branch
 
-role :app, "10.7.1.127"
-role :web, "10.7.1.127"
-role :db, "10.7.1.127", :primary => true
+role :app, "rulesuitest.vrt.sourcefire.com"
+role :web, "rulesuitest.vrt.sourcefire.com"
+role :db, "rulesuitest.vrt.sourcefire.com", :primary => true
 
-server "10.7.1.127", user: "vrtweb", port: "22", roles: %w{web app db}
+server "rulesuitest.vrt.sourcefire.com", user: "talosweb", port: "22", roles: %w{web app db}
 
 
 # role-based syntax
