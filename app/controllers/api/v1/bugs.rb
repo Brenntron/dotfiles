@@ -12,7 +12,7 @@ module API
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
             new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.import(xmlrpc,new_bugs)
+            Bug.bugzilla_import(xmlrpc,new_bugs)
             "true"
           else
             "false"
@@ -29,7 +29,7 @@ module API
             if xmlrpc_token
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
-              Bug.import(xmlrpc,new_bug).to_s
+              Bug.bugzilla_import(xmlrpc,new_bug).to_s
             else
               false
             end

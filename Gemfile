@@ -27,6 +27,9 @@ gem 'pry-remote', '0.1.8'
 
 gem 'puma'
 
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'
+
 group :development do
   gem 'awesome_print', '1.2.0'
   # Use Capistrano for deployment

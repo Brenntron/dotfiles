@@ -1,4 +1,8 @@
 class Bug < ActiveRecord::Base
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+
+
   has_many :attachments, :dependent => :destroy
   has_many :jobs, :dependent => :destroy
   has_many :notes, :dependent => :destroy
@@ -143,7 +147,7 @@ class Bug < ActiveRecord::Base
     Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
   end
 
-  def self.import(xmlrpc, new_bugs)
+  def self.bugzilla_import(xmlrpc, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
