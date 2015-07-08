@@ -36,7 +36,6 @@ module API
           end
         end
 
-
         desc "link a rule with this bug"
         params do
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
@@ -53,6 +52,16 @@ module API
         end
         delete '/rules/:link' do
           Bug.find(permitted_params[:link].split(':')[0]).rules.destroy(permitted_params[:link].split(':')[1])
+        end
+
+        desc "search for bugs"
+        params do
+          requires :query, type: String, desc: "search query"
+        end
+        post '/search/:query' do
+          hits = []
+          Bug.search(permitted_params[:query]).records.map { |r| hits.push(r.id) if Bug.classifications[r.classification]}
+          hits
         end
 
         desc "get a single bug"

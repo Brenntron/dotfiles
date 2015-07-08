@@ -2,18 +2,26 @@ class Bug < ActiveRecord::Base
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
-
-  has_many :attachments, :dependent => :destroy
-  has_many :jobs, :dependent => :destroy
-  has_many :notes, :dependent => :destroy
   has_and_belongs_to_many :rules
-
+  belongs_to :user
+  belongs_to :committer, :class_name => 'User'
 
   has_many :references
   has_many :exploits, :through => :references
+  has_many :attachments, :dependent => :destroy
+  has_many :jobs, :dependent => :destroy
+  has_many :notes, :dependent => :destroy
 
-  belongs_to :user
-  belongs_to :committer, :class_name => 'User'
+  def as_indexed_json(options={})
+    self.as_json({
+      only: [:bugzilla_id, :summary, :state],
+      include: {
+          user: { only: :cvs_username },
+          committer: { only: :cvs_username },
+          rules: { only: [:sid, :message] }
+      }
+    })
+  end
 
   enum classification: {
       unclassified: 0,
@@ -355,4 +363,9 @@ class Bug < ActiveRecord::Base
     raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
     return bug['depends_on']
   end
+
+  # def self.check_permission(bugs)
+  #   class_allowed = User.class_levels[current_user.class_level]
+  #   bugs.reject {|b| Bug.classifications[b.classification] >= class_allowed }
+  # end
 end
