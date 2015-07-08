@@ -60,7 +60,15 @@ module API
         end
         post '/search/:query' do
           hits = []
-          Bug.search(permitted_params[:query]).records.map { |r| hits.push(r.id) if Bug.classifications[r.classification]}
+          # parse query params
+          id_txt = /id:(\d+\-*\d*)/.match(permitted_params[:query]) ? /id:(\d+\-*\d*)/.match(permitted_params[:query])[1] : ''
+          id_query = /-/.match(id_txt) ? id_txt.split('-') : id_txt
+          summ_query = /&su:(.+)/.match(permitted_params[:query]) ? /&su:(.+)/.match(permitted_params[:query])[1] : ''
+          #search for / filter bugs that fit the query
+          bugs = id_query.blank? ? Bug.all : ( id_query.kind_of?(Array) ? Bug.where(bugzilla_id:id_query[0]..id_query[1]) : Bug.where(bugzilla_id:id_query))
+          bugs = bugs.search(summ_query).records unless summ_query.blank?
+          # return bug ids
+          Bug.check_permission(current_user, bugs).map { |r| hits.push(r.id)}
           hits
         end
 

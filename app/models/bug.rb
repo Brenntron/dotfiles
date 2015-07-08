@@ -364,8 +364,8 @@ class Bug < ActiveRecord::Base
     return bug['depends_on']
   end
 
-  # def self.check_permission(bugs)
-  #   class_allowed = User.class_levels[current_user.class_level]
-  #   bugs.reject {|b| Bug.classifications[b.classification] >= class_allowed }
-  # end
+  def self.check_permission(current_user, bugs)
+    class_allowed = User.class_levels[current_user.class_level]
+    bugs.reject {|b| Bug.classifications[b.classification] > class_allowed }
+  end
 end
