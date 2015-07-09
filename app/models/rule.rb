@@ -1,5 +1,8 @@
+require 'open3'
+require 'tempfile'
+
 class Rule < ActiveRecord::Base
-  #has_and_belongs_to_many :bugs   ## this relationship causes some problems...to be revisited
+  has_and_belongs_to_many :bugs
   has_and_belongs_to_many :references, dependent: :destroy
 
   def self.create_a_rule(content)
@@ -22,6 +25,24 @@ class Rule < ActiveRecord::Base
       end
     rescue Exception => e
       raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e.to_s}}}")
+    end
+  end
+
+  def self.import_rule(sid)
+    if sid
+      rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1].strip!
+      parsed = Rule.visruleparser(rule_text)
+      new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
+      new_rule.update(
+          rule_parsed:parsed[:rule],
+          rule_warnings:parsed[:errors],
+          cvs_rule_parsed:parsed[:rule],
+          cvs_rule_content:rule_text
+      )
+      new_rule.associate_references(rule_text)
+      new_rule
+    else
+      raise "No rule sid provided"
     end
   end
 
@@ -112,29 +133,49 @@ class Rule < ActiveRecord::Base
     rule_text.split(';').each {|r| references << r.strip.gsub!('reference:', '') if r.include? "reference" }
     references.each do |r|
       r = r.split(',')
-      new_reference = Reference.create(reference_type:ReferenceType.where(name:r[0]).first,reference_data:r[1])
-      self.references << new_reference
+      unless r[1].empty?
+        new_reference = Reference.create(reference_type:ReferenceType.where(name:r[0]).first,reference_data:r[1])
+        self.references << new_reference
+      end
     end
   end
 
   def self.parse_and_create_rule(rule)
+    parsed = Rule.visruleparser(rule)[:rule]
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
+    detection = /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip
     options = {
-        :id           => rule_sid,
-        :sid          => rule_sid,
-        :rule_content => rule,
-        :gid          => 1,
-        :rev          => /rev:(\S*?);/.match(rule)[1].strip || 1,
-        :connection   => /(.*?)\(/.match(rule)[1].strip,
-        :message      => /msg:(".*?")/.match(rule)[1].strip,
-        :detection    => /flow:.*?;(.*?)metadata:/.match(rule)[1].strip,
-        :flow         => /flow:(.*?);/.match(rule)[1].strip,
-        :metadata     => /metadata:(.*?);/.match(rule)[1].strip,
-        :class_type   => /classtype:*(.*?);/.match(rule)[1].strip,
-        :committed    => true,
-        :state        => rule_sid ? 'UNCHANGED' : 'NEW'
-    }.reject() { |k, v| v.nil? }
-    options
+        :id            => rule_sid,
+        :sid           => rule_sid,
+        :rule_content  => rule,
+        :rule_parsed   => parsed,
+        :gid           => 1,
+        :rev           => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
+        :connection    => /Connection\s*:\s(.+)/.match(parsed)[1],
+        :message       => /Message\s*:\s(.*)/.match(parsed)[1],
+        :detection     => detection[-1, 1] == ';' ? detection : detection + ';',
+        :flow          => /Flow\s*:\s(.+)/.match(parsed)[1],
+        :metadata      => /Metadata\s*:\s(.*)/.match(parsed)[1],
+        :class_type    => /Classtype\s*:\s(.*)/.match(parsed)[1],
+        :committed     => true,
+        :state         => rule_sid ? 'UNCHANGED' : 'NEW'
+    }.reject() {|k,v,| v.nil? || v == "<MISSING>" }
+  end
+
+  def self.visruleparser(rule_text)
+    return nil if rule_text.nil?
+    parsed = Hash.new
+    temp_rule = Tempfile.new("temp.rules")
+    temp_rule.write(rule_text.gsub(/\#\s/, ''))
+    temp_rule.rewind
+    Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
+      text = stdout.read
+      parsed[:rule] = text.split(/%{80}|\*{80}/)[1].strip
+      parsed[:errors] = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
+      parsed[:errors] += stderr.read
+    end
+    temp_rule.close
+    parsed
   end
 
   def update_rule

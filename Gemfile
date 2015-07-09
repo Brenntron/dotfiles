@@ -16,7 +16,6 @@ gem 'pg', '0.17.1'
 gem 'rmagick', '2.13.2'
 gem 'ruby-bugzilla', '~> 0.6.0'
 
-gem 'diffy', '~> 2.1.4'
 gem 'sfbugzilla', :path => './vendor/gems/sfbugzilla'
 
 gem 'net-ssh'
