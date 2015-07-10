@@ -13,9 +13,6 @@
 
 ActiveRecord::Schema.define(version: 20150520191229) do
 
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
     t.string   "file_name"
@@ -189,11 +186,11 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.integer  "sid"
     t.integer  "rev"
     t.string   "state"
-    t.float    "average_check"
-    t.float    "average_match"
-    t.float    "average_nonmatch"
-    t.boolean  "tested",           default: false
-    t.boolean  "committed",        default: false
+    t.float    "average_check",    limit: 24
+    t.float    "average_match",    limit: 24
+    t.float    "average_nonmatch", limit: 24
+    t.boolean  "tested",                      default: false
+    t.boolean  "committed",                   default: false
     t.string   "documentation"
     t.datetime "created_at"
     t.datetime "updated_at"

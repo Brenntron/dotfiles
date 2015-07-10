@@ -4,29 +4,29 @@
 #   Ensure the SQLite 3 gem is defined in your Gemfile
 #   gem 'sqlite3'
 development:
-  adapter: postgresql
-  encoding: unicode
+  adapter: mysql2
+  encoding: utf8
   database: talos_development
+  username: root
   host: localhost
-  pool: 5
-  password:
+
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test: &test
-  adapter: postgresql
-  encoding: unicode
+  adapter: mysql2
+  encoding: utf8
   database: talos_test
+  username: root
   host: localhost
-  pool: 5
-  password:
 
 production:
-  adapter: postgresql
-  encoding: unicode
+  adapter: mysql2
+  encoding: utf8
   database: talos_production
-  pool: 5
+  username: root
+  host: localhost
 
 cucumber:
   <<: *test
