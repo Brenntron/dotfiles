@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     collection {get :send_event}
   end
 
-  root 'pages#index'
+  root 'bugs#index'
 
   namespace :api do
       get :csrf, to: 'csrf#index'
