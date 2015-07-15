@@ -12,17 +12,6 @@ class Bug < ActiveRecord::Base
   has_many :jobs, :dependent => :destroy
   has_many :notes, :dependent => :destroy
 
-  def as_indexed_json(options={})
-    self.as_json({
-      only: [:bugzilla_id, :summary, :state],
-      include: {
-          user: { only: :cvs_username },
-          committer: { only: :cvs_username },
-          rules: { only: [:sid, :message] }
-      }
-    })
-  end
-
   enum classification: {
       unclassified: 0,
       confidential: 1,
@@ -364,8 +353,49 @@ class Bug < ActiveRecord::Base
     return bug['depends_on']
   end
 
+  def self.search(query_str, filters)
+    if query_str.blank? && filters.empty?
+      Bug.all
+    else
+      filters_array = []
+      filters.each {|k,v| filters_array.push({:term => { k => v}})}
+      query = Jbuilder.encode do |json|
+        json.query do
+          json.filtered do
+            unless query_str.blank?
+              json.query do
+                json.query_string do
+                  json.query query_str
+                end
+              end
+            end
+            if filters
+              json.filter do
+                json.bool do
+                  json.must filters_array
+                end
+              end
+            end
+          end
+        end
+        json.size 100
+      end
+      Bug.__elasticsearch__.search(query).records
+    end
+  end
+
   def self.check_permission(current_user, bugs)
     class_allowed = User.class_levels[current_user.class_level]
     bugs.reject {|b| Bug.classifications[b.classification] > class_allowed }
+  end
+
+  settings index: { number_of_shards: 5 } do
+    mappings dynamic: 'false' do
+      indexes :bugzilla_id, type: :integer
+      indexes :user_id, type: :integer
+      indexes :committer_id, type: :integer
+      indexes :summary, type: :string, analyzer: :keyword
+      indexes :state, type: :string, index: :not_analyzed
+    end
   end
 end

@@ -61,16 +61,24 @@ module API
         post '/search/:query' do
           hits = []
           # parse query params
+
           id_txt = /id:(\d+\-*\d*)/.match(permitted_params[:query]) ? /id:(\d+\-*\d*)/.match(permitted_params[:query])[1] : ''
           id_query = /-/.match(id_txt) ? id_txt.split('-') : id_txt
-          summ_query = /&su:(.+)/.match(permitted_params[:query]) ? /&su:(.+)/.match(permitted_params[:query])[1] : ''
-          #search for / filter bugs that fit the query
-          bugs = id_query.blank? ? Bug.all : ( id_query.kind_of?(Array) ? Bug.where(bugzilla_id:id_query[0]..id_query[1]) : Bug.where(bugzilla_id:id_query))
-          bugs = bugs.search(summ_query).records unless summ_query.blank?
-          # return bug ids
+          query_str = /&su:(.*)/.match(permitted_params[:query])[1]
+
+          filters = {
+              :state   => /&st:(\w*)&/.match(permitted_params[:query]) ? nil : /&st:(\w*)&/.match(permitted_params[:query])[1],
+              :user_id => /&u:(\d*)&/.match(permitted_params[:query]) ? nil : /&u:(\d*)&/.match(permitted_params[:query])[1],
+              :committer_id => /&c:(\d*)&/.match(permitted_params[:query]) ? nil : /&c:(\d*)&/.match(permitted_params[:query])[1]
+          }.reject{|k,v| v.blank?}
+
+
+          bugs = Bug.search(query_str, filters)
           Bug.check_permission(current_user, bugs).map { |r| hits.push(r.id)}
           hits
+
         end
+
 
         desc "get a single bug"
         params do

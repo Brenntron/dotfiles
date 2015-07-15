@@ -29,6 +29,7 @@ gem 'puma'
 
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
+gem 'jbuilder', '~> 2.2.16'
 
 group :development do
   gem 'awesome_print', '1.2.0'
