@@ -353,35 +353,34 @@ class Bug < ActiveRecord::Base
     return bug['depends_on']
   end
 
-  def self.search(query_str, filters)
-    if query_str.blank? && filters.empty?
-      Bug.all
-    else
-      filters_array = []
-      filters.each {|k,v| filters_array.push({:term => { k => v}})}
-      query = Jbuilder.encode do |json|
-        json.query do
-          json.filtered do
-            unless query_str.blank?
-              json.query do
-                json.query_string do
-                  json.query query_str
-                end
+  def self.search(query_str, terms, range)
+    filters = []
+    terms.each {|k,v| filters.push({:term => { k => v}})}
+    filters.push({:range => {:bugzilla_id=>range}})
+
+    query = Jbuilder.encode do |json|
+      json.query do
+        json.filtered do
+          unless query_str.blank?
+            json.query do
+              json.query_string do
+                json.query query_str
               end
             end
-            if filters
-              json.filter do
-                json.bool do
-                  json.must filters_array
-                end
+          end
+          unless filters.empty?
+            json.filter do
+              json.bool do
+                json.must filters
               end
             end
           end
         end
-        json.size 100
       end
-      Bug.__elasticsearch__.search(query).records
+      json.size 100
     end
+
+    Bug.__elasticsearch__.search(query).records
   end
 
   def self.check_permission(current_user, bugs)
