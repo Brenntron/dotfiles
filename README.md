@@ -1,6 +1,6 @@
 talos_api
 =========
-
+http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
 
 SSL self signed localhost for rails start to finish, no red warnings.
 
