@@ -33,9 +33,11 @@ $ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
 
 $ echo "127.0.0.1 localhost.ssl" | sudo tee -a /etc/hosts
 
-## 6) Boot thin
+## 6) Boot thin using foreman
 
-$ thin start -p 3000 --ssl --ssl-verify --ssl-key-file ~/.ssl/server.key --ssl-cert-file ~/.ssl/server.crt
+--the cool way-> bundle exec foreman start -f Procfile.dev
+
+--the old way -> $ thin start -p 3000 --ssl --ssl-verify --ssl-key-file ~/.ssl/server.key --ssl-cert-file ~/.ssl/server.crt
 
 ## 7) Add server.crt as trusted !!SYSTEM!! (not login) cert in the mac osx keychain
  *Open keychain tool, drag .crt file to system, and trust everything.

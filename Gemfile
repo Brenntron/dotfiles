@@ -25,8 +25,11 @@ gem 'dalli', '~> 2.6.4'
 gem 'pry', '0.9.12.4'
 gem 'pry-remote', '0.1.8'
 
+gem 'foreman'
+
 group :development do
   gem 'puma'
+  gem 'thin'
   gem 'awesome_print', '1.2.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
