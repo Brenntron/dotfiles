@@ -30,9 +30,7 @@ group :development do
   gem 'awesome_print', '1.2.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
-  gem 'mailcatcher'
   gem 'spring'
-  gem 'sqlite3'
 end
 
 group :test do
