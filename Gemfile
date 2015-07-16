@@ -32,6 +32,7 @@ group :development do
   gem 'guard-livereload', '2.3.0', require: false
   gem 'mailcatcher'
   gem 'spring'
+  gem 'sqlite3'
 end
 
 group :test do
