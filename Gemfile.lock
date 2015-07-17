@@ -24,6 +24,9 @@ GEM
       erubis (~> 2.7.0)
     active_model_serializers (0.9.3)
       activemodel (>= 3.2)
+    activemessaging (0.13.0)
+      activemessaging
+      activesupport (>= 2.3.11)
     activemodel (4.1.5)
       activesupport (= 4.1.5)
       builder (~> 3.1)
@@ -288,6 +291,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers
+  activemessaging
   awesome_print (= 1.2.0)
   cancan (= 1.6.10)
   capybara (= 2.4.4)

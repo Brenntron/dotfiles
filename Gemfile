@@ -20,6 +20,7 @@ gem 'sfbugzilla', :path => './vendor/gems/sfbugzilla'
 
 gem 'net-ssh'
 gem 'daemons'
+gem 'activemessaging'
 gem 'stomp'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '0.9.12.4'
