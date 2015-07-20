@@ -28,9 +28,6 @@ gem 'pry-remote', '0.1.8'
 
 gem 'foreman'
 
-gem 'execjs'
-gem 'therubyracer', :platforms => :ruby
-
 group :development do
   gem 'puma'
   gem 'thin'
@@ -56,9 +53,7 @@ end
 
 gem 'rails', '4.1.5'
 
-gem 'uglifier', '>= 1.3.0'
-
-gem 'jquery-rails'
+# gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 # gem 'turbolinks'
 
