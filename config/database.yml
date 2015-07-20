@@ -20,8 +20,8 @@ test: &test
 production:
   adapter: mysql2
   encoding: utf8
-  database: talos_production
-  username: root
+  database: talos_rulesui_production
+  username: talosweb
   host: localhost
 
 cucumber:

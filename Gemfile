@@ -28,6 +28,9 @@ gem 'pry-remote', '0.1.8'
 
 gem 'foreman'
 
+gem 'execjs'
+gem 'therubyracer', :platforms => :ruby
+
 group :development do
   gem 'puma'
   gem 'thin'
