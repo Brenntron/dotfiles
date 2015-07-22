@@ -1,15 +1,16 @@
 class Bug < ActiveRecord::Base
-  has_many :attachments, :dependent => :destroy
-  has_many :jobs, :dependent => :destroy
-  has_many :notes, :dependent => :destroy
-  has_and_belongs_to_many :rules
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
 
+  has_and_belongs_to_many :rules
+  belongs_to :user
+  belongs_to :committer, :class_name => 'User'
 
   has_many :references
   has_many :exploits, :through => :references
-
-  belongs_to :user
-  belongs_to :committer, :class_name => 'User'
+  has_many :attachments, :dependent => :destroy
+  has_many :jobs, :dependent => :destroy
+  has_many :notes, :dependent => :destroy
 
   enum classification: {
       unclassified: 0,
@@ -143,7 +144,7 @@ class Bug < ActiveRecord::Base
     Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
   end
 
-  def self.import(xmlrpc, new_bugs)
+  def self.bugzilla_import(xmlrpc, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
@@ -351,5 +352,50 @@ class Bug < ActiveRecord::Base
     bug = Bugzilla::Bug.new(xmlrpc).get(self.bugzilla_id)['bugs'].first
     raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
     return bug['depends_on']
+  end
+
+  def self.search(query_str, terms, range)
+    filters = []
+    terms.each {|k,v| filters.push({:term => { k => v}})}
+    filters.push({:range => {:bugzilla_id=>range}})
+
+    query = Jbuilder.encode do |json|
+      json.query do
+        json.filtered do
+          unless query_str.blank?
+            json.query do
+              json.query_string do
+                json.query query_str
+              end
+            end
+          end
+          unless filters.empty?
+            json.filter do
+              json.bool do
+                json.must filters
+              end
+            end
+          end
+        end
+      end
+      json.size 100
+    end
+
+    Bug.__elasticsearch__.search(query).records
+  end
+
+  def self.check_permission(current_user, bugs)
+    class_allowed = User.class_levels[current_user.class_level]
+    bugs.reject {|b| Bug.classifications[b.classification] > class_allowed }
+  end
+
+  settings index: { number_of_shards: 5 } do
+    mappings dynamic: 'false' do
+      indexes :bugzilla_id, type: :integer
+      indexes :user_id, type: :integer
+      indexes :committer_id, type: :integer
+      indexes :summary, type: :string, analyzer: :keyword
+      indexes :state, type: :string, index: :not_analyzed
+    end
   end
 end
