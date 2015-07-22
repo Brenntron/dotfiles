@@ -12,7 +12,7 @@ module API
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
             new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.import(xmlrpc,new_bugs)
+            Bug.bugzilla_import(xmlrpc,new_bugs)
             "true"
           else
             "false"
@@ -29,13 +29,12 @@ module API
             if xmlrpc_token
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
-              Bug.import(xmlrpc,new_bug).to_s
+              Bug.bugzilla_import(xmlrpc,new_bug).to_s
             else
               false
             end
           end
         end
-
 
         desc "link a rule with this bug"
         params do
@@ -53,6 +52,31 @@ module API
         end
         delete '/rules/:link' do
           Bug.find(permitted_params[:link].split(':')[0]).rules.destroy(permitted_params[:link].split(':')[1])
+        end
+
+        desc "search for bugs"
+        params do
+          requires :query, type: String, desc: "search query"
+        end
+        post '/search/:query' do
+          # parse query params
+          query_str = /&su:(.*)/.match(permitted_params[:query])[1]
+          id_txt = /id:(\d+\-*\d*)/.match(permitted_params[:query]) ? /id:(\d+\-*\d*)/.match(permitted_params[:query])[1] : ''
+          terms = {
+              :bugzilla_id  => /-/.match(id_txt) ? nil : id_txt,
+              :state        => /&st:(\w*)&/.match(permitted_params[:query]) ? /&st:(\w*)&/.match(permitted_params[:query])[1] : nil,
+              :user_id      => /&u:(\d*)&/.match(permitted_params[:query]) ? /&u:(\d*)&/.match(permitted_params[:query])[1] : nil,
+              :committer_id => /&c:(\d*)&/.match(permitted_params[:query]) ? /&c:(\d*)&/.match(permitted_params[:query])[1] : nil
+          }.reject{|k,v| v.blank?}
+          range = {
+              :gte      => /-/.match(id_txt) ? /(\d+)-/.match(id_txt)[1] : nil,
+              :lte   => /-/.match(id_txt) ? /-(\d+)/.match(id_txt)[1] : nil,
+          }.reject{|k,v| v.blank?}
+
+          # search bugs and return the bugs current user is allowed to see
+          hits = []
+          Bug.check_permission(current_user, Bug.search(query_str, terms, range)).map { |r| hits.push(r.id)}
+          hits
         end
 
         desc "get a single bug"
