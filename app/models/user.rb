@@ -49,7 +49,6 @@ class User < ActiveRecord::Base
 
       user.confirmed      = 'true'
       user.updated_at     = Time.now
-      user.bugzilla_token = xmlrpc.token
 
       if user.valid_password?(params[:user][:password]) #devise takes care of password checking but this wont work if the user has an account but no password.
         user.ensure_authentication_token #make sure the user has a token generated

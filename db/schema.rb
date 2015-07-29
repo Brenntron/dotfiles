@@ -220,7 +220,6 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.string   "role"
     t.integer  "class_level"
     t.string   "authentication_token"
-    t.string   "bugzilla_token"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
