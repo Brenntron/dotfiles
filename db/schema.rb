@@ -204,6 +204,7 @@ ActiveRecord::Schema.define(version: 20150520191229) do
 
   create_table "users", force: true do |t|
     t.string   "cvs_username"
+    t.string   "kerberos_login"
     t.boolean  "committer",              default: false
     t.boolean  "confirmed",              default: false
     t.string   "email",                  default: "",    null: false

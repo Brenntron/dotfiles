@@ -7,7 +7,7 @@ module API
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
-          xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
+          xmlrpc_token = request.headers['Xmlrpc-Token'] #We need to figure out how to populate the current user properly
           if xmlrpc_token
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
@@ -25,7 +25,7 @@ module API
         end
         route_param "import/:id" do
           get do
-            xmlrpc_token = current_user.bugzilla_token #We need to figure out how to populate the current user properly
+            xmlrpc_token = request.headers['Xmlrpc-Token']
             if xmlrpc_token
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
@@ -288,7 +288,7 @@ module API
           # all the params we need to permit must to go here
         end
         post "close/:id", root: "bug" do
-          xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
+          xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             bug = Bug.where(id: permitted_params[:id])
             status = "resolved"
@@ -306,7 +306,7 @@ module API
           # all the params we need to permit must to go here
         end
         post "wontfix/:id", root: "bug" do
-          xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
+          xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             bug = Bug.where(id: permitted_params[:id])
             status = "resolved"
@@ -324,7 +324,7 @@ module API
           # all the params we need to permit must to go here
         end
         post "reopen/:id", root: "bug" do
-          xmlrpc_token = current_user.first.bugzilla_token #We need to figure out how to populate the current user properly
+          xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             bug = Bug.where(id: permitted_params[:id])
             status = "reopened"

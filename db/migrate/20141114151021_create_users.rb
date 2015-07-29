@@ -2,6 +2,7 @@ class CreateUsers < ActiveRecord::Migration
   def change
     create_table :users do |t|
       t.string "cvs_username"
+      t.string "kerberos_login"
       t.boolean "committer", :default => false
       t.boolean "confirmed", :default => false
 
@@ -27,7 +28,6 @@ class CreateUsers < ActiveRecord::Migration
       t.integer   :class_level
 
       t.string   :authentication_token
-      t.string   :bugzilla_token
 
       t.timestamps
     end

@@ -49,7 +49,7 @@ module API
           def bugzilla_session
             xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
             if current_user
-              xmlrpc.token = current_user.bugzilla_token
+              xmlrpc.token = request.headers['Xmlrpc-Token']
             end
             xmlrpc
           end
@@ -65,8 +65,8 @@ module API
           if Rails.env.development?
             raise e
           else
-            Raven.capture_exception(e)
-            error_response(message: "Internal server error", status: 500)
+            # Raven.capture_exception(e)
+            error_response(message: "Internal server error: #{e}", status: 500)
           end
         end
 
