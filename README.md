@@ -51,3 +51,12 @@ $ open https://localhost:3000
 **Notes:**
 *1) Https traffic and http traffic can't be served from the same thin process. If you want*
 *both you need to start two instances on different ports.*
+
+
+
+##Deploying this app to production
+run the deploy_api.rb file using:
+ruby deploy_api.rb
+
+this will build the app locally, package it up, and scp it up to the server. 
+
