@@ -9,5 +9,6 @@ class CreateJobs < ActiveRecord::Migration
     end
     add_reference :jobs, :bug, index: true
     add_reference :jobs, :user, index: true
+    
   end
 end

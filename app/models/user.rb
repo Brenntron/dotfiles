@@ -34,7 +34,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.login_user(params)
+  def self.login_user(params,request)
     begin
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), params[:user][:email].gsub("@#{Rails.configuration.bugzilla_domain}",""), params[:user][:password])
@@ -44,14 +44,13 @@ class User < ActiveRecord::Base
         new_record.cvs_username   = params[:user][:email].gsub("@#{Rails.configuration.bugzilla_domain}","")
         new_record.password       = params[:user][:password]
         new_record.committer      = 'true'
+        new_record.class_level    = 'unclassified'
       end
-      user.class_level = 'unclassified'
+
       user.confirmed      = 'true'
       user.updated_at     = Time.now
-      user.bugzilla_token = xmlrpc.token
-      raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
 
-      if user.valid_password?(params[:user][:password]) #devise takes care of password checking
+      if user.valid_password?(params[:user][:password]) #devise takes care of password checking but this wont work if the user has an account but no password.
         user.ensure_authentication_token #make sure the user has a token generated
         resource = {
             :success => true,
@@ -60,6 +59,21 @@ class User < ActiveRecord::Base
             :user_email => user.email, #this also ust be called user_email for the ember app session to persist
             :user_id => user.id
         }
+        raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
+        return resource
+      elsif user.kerberos_login == "generated" #this person has had an account created programatically but they havn't signed in yet.
+        user.class_level    = 'unclassified'
+        user.kerberos_login = request.env['REMOTE_USER']
+        user.ensure_authentication_token #make sure the user has a token generated
+        user.password       = params[:user][:password]
+        resource = {
+            :success => true,
+            :xmlrpc_token => xmlrpc.token,
+            :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
+            :user_email => user.email, #this also ust be called user_email for the ember app session to persist
+            :user_id => user.id
+        }
+        raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
         return resource
       else
         raise Exception.new("Either your Username or Password is incorrect.")

@@ -13,9 +13,6 @@
 
 ActiveRecord::Schema.define(version: 20150520191229) do
 
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
     t.string   "file_name"
@@ -32,10 +29,12 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.integer  "bug_id"
     t.integer  "rule_id"
     t.integer  "reference_id"
+    t.integer  "job_id"
   end
 
   add_index "attachments", ["bug_id"], name: "index_attachments_on_bug_id", using: :btree
   add_index "attachments", ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id", using: :btree
+  add_index "attachments", ["job_id"], name: "index_attachments_on_job_id", using: :btree
   add_index "attachments", ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
   add_index "attachments", ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
 
@@ -187,11 +186,11 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.integer  "sid"
     t.integer  "rev"
     t.string   "state"
-    t.float    "average_check"
-    t.float    "average_match"
-    t.float    "average_nonmatch"
-    t.boolean  "tested",           default: false
-    t.boolean  "committed",        default: false
+    t.float    "average_check",    limit: 24
+    t.float    "average_match",    limit: 24
+    t.float    "average_nonmatch", limit: 24
+    t.boolean  "tested",                      default: false
+    t.boolean  "committed",                   default: false
     t.string   "documentation"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -205,6 +204,7 @@ ActiveRecord::Schema.define(version: 20150520191229) do
 
   create_table "users", force: true do |t|
     t.string   "cvs_username"
+    t.string   "kerberos_login"
     t.boolean  "committer",              default: false
     t.boolean  "confirmed",              default: false
     t.string   "email",                  default: "",    null: false
@@ -220,7 +220,6 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.string   "role"
     t.integer  "class_level"
     t.string   "authentication_token"
-    t.string   "bugzilla_token"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"

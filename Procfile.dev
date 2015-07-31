@@ -1,0 +1,1 @@
+thin_server: thin start --ssl --address localhost

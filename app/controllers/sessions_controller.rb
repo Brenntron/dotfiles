@@ -1,9 +1,10 @@
 class SessionsController < ApplicationController
   def create
+
     respond_to do |format|
       format.json do
         begin
-          resource = User.login_user(params)
+          resource = User.login_user(params,request)
           if resource
             render :json => resource
           end

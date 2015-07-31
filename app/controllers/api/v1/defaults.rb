@@ -22,6 +22,7 @@ module API
           end
 
           def authenticated
+            kerb_auth = request.env['remote_user']
             access_token = request.headers['Token'] #we just want to use headers and not url parameters
             return true if warden.authenticated?
             @user = User.where("authentication_token = ?", access_token).first
@@ -48,7 +49,7 @@ module API
           def bugzilla_session
             xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
             if current_user
-              xmlrpc.token = current_user.bugzilla_token
+              xmlrpc.token = request.headers['Xmlrpc-Token']
             end
             xmlrpc
           end
@@ -64,15 +65,10 @@ module API
           if Rails.env.development?
             raise e
           else
-            Raven.capture_exception(e)
-            error_response(message: "Internal server error", status: 500)
+            error_response(message: "Internal server error: #{e}", status: 500)
           end
         end
 
-        # # HTTP header based authentication
-        # before do
-        #   error!('Unauthorized', 401) unless headers['Authorization'] == "some token"
-        # end
       end
     end
   end

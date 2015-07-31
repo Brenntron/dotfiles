@@ -89,8 +89,6 @@ class Rule < ActiveRecord::Base
               end
             rescue ActiveRecord::RecordNotUnique => e
               # Ignore
-            rescue SQLite3::ConstraintException => e
-              # Ignore
             rescue Exception => e
               raise
             end
