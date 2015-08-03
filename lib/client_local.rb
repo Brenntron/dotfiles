@@ -2,7 +2,6 @@
 
 require 'open3'
 require 'stomp'
-require 'sfbugzilla'
 require 'json'
 require 'tmpdir'
 require 'tempfile'
@@ -12,13 +11,12 @@ puts "test1"
 stomp_options = {
 	:hosts => [
       { :login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 8161, :ssl => true },
-      { :login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 8161, :ssl => false }
+      { :login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false }
   ],
-	:reliable => true
+	:reliable => true,
+  :closed_check => false
 }
 
-# Create the xmlrpc instance for updating later
-xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
 puts "test2"
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
@@ -33,7 +31,6 @@ while message = client.receive
 
   # Release the message early
   client.ack(message.headers['message-id'])
-  binding.pry
   sleep(2)
   puts "back to you."
   client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
