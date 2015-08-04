@@ -1,1 +1,3 @@
+client_local_test: script/client_local run
+poller: script/poller run
 thin_server: thin start --ssl --address localhost

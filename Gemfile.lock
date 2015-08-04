@@ -1,4 +1,10 @@
 PATH
+  remote: ./vendor/gems/rule_test_api
+  specs:
+    rule_test_api (0.1.4)
+      her (>= 0.7.2)
+
+PATH
   remote: ./vendor/gems/sfbugzilla
   specs:
     sfbugzilla (0.0.10)
@@ -166,6 +172,11 @@ GEM
     hashie (3.4.2)
     hashie-forbidden_attributes (0.1.1)
       hashie (>= 3.0)
+    her (0.7.6)
+      activemodel (>= 3.0.0, <= 4.3.0)
+      activesupport (>= 3.0.0, <= 4.3.0)
+      faraday (>= 0.8, < 1.0)
+      multi_json (~> 1.7)
     highline (1.7.2)
     hitimes (1.2.2)
     http_parser.rb (0.6.0)
@@ -336,6 +347,7 @@ DEPENDENCIES
   rmagick (= 2.13.2)
   rspec (= 2.14.1)
   ruby-bugzilla (~> 0.6.0)
+  rule_test_api!
   sfbugzilla!
   spring
   stomp
