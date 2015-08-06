@@ -76,12 +76,14 @@ def self.upload_API(rebuild_gems)
   # and save a copy of the vendor folder for next time.
   directory_exists = `ssh talosweb@rulesuitest.vrt.sourcefire.com "test -d /usr/local/www/rulesuitest/releases/shared/vendor && echo 1 || echo 0"`
   if(directory_exists.to_i == 1 && rebuild_gems == false)
+    puts "copying vendor to vendor"
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "copying vendor to vendor"
             rm -rf /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
             cp -r /usr/local/www/rulesuitest/releases/shared/vendor /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
             ENDSSH`
   else
+    puts "bundle installing gems"
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "bundle installing gems"
             cd rulesuitest/releases/#{timestamp}/
