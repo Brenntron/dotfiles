@@ -1,6 +1,22 @@
 talos_api
 =========
 
+install visruleparser dependancies
+Net::Snort::Parser::Rule
+    svn co https://repo.vrt.sourcefire.com/svn/vrt-systems/trunk/buildtools/common/lib/net-snort-parser
+    cd net-snort-parser
+    perl Makefile.pl && make && make test
+    sudo make install
+
+put a copy of snort rules in the extras directory.
+    download latest snort rule set
+    extract rules to
+        extras/snort/etc
+        extras/snort/preproc_rules
+        extras/snort/rules
+    extract snort so rules to
+        extras/snort/so_rules
+
 
 http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
 
