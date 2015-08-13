@@ -14,8 +14,8 @@ then
 	cvs_user=$USER
 fi
 
-export CVSHOST="scm.sfeng.sourcefire.com"
-export CVSROOT=":ext:$cvs_user@scm.sfeng.sourcefire.com:/usr/cvsroot/"
+export CVSHOST="localhost"
+export CVSROOT=":local:/Users/$cvs_user/Documents/snort_local_cvs"
 export CVS_RSH="/usr/bin/ssh"
 
 # Don't overwrite the directory if it exists

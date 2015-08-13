@@ -168,9 +168,11 @@ class Rule < ActiveRecord::Base
     temp_rule.rewind
     Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
       text = stdout.read
-      parsed[:rule] = text.split(/%{80}|\*{80}/)[1].strip
-      parsed[:errors] = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
-      parsed[:errors] += stderr.read
+      unless text.empty?
+        parsed[:rule] = text.split(/%{80}|\*{80}/)[1].strip
+        parsed[:errors] = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
+        parsed[:errors] += stderr.read
+      end
     end
     temp_rule.close
     parsed
