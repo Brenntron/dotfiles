@@ -3,7 +3,7 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
   subscribes_to :snort_local_rules_test_result
 
   def on_message(message)
-  	result = JSON.parse(message)	
+  	result = JSON.parse(message)
   	attachment = Attachment.find_by_bugzilla_attachment_id(result['id'])
 
     # Is this an alert message or a job completion message?
