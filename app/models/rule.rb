@@ -3,6 +3,7 @@ require 'tempfile'
 
 class Rule < ActiveRecord::Base
   has_and_belongs_to_many :bugs
+  has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
 
   def self.create_a_rule(content)
