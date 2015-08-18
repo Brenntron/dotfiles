@@ -8,6 +8,9 @@ Net::Snort::Parser::Rule
     perl Makefile.pl && make && make test
     sudo make install
 
+set up perl to be able to run visruleparser or make sure visruleparser is using /usr/local/bin/perl not /usr/bin/perl
+
+
 put a copy of snort rules in the extras directory.
     download latest snort rule set
     extract rules to
