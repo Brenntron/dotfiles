@@ -6,7 +6,6 @@ class RuleSerializer < ActiveModel::Serializer
     object.bugs.each { |b| bug_ids << b.id }
     bug_ids
   end
-  # has_many :attachments, embed: :ids, embed_in_root: true
   def attachments # writing a new method because AMS doesn't have has_and_belongs_to_many
     attachment_ids = []
     object.attachments.each { |a| attachment_ids << a.id }
