@@ -33,11 +33,20 @@ test:
     adapter: test
     reliable: false
 
+staging:
+    adapter: stomp
+    login: "guest"
+    passcode: "guest"
+    host: mqtest01.vrt.sourcefire.com
+    port: 61613
+    reliable: true
+    reconnectDelay: 5
+
 production:
     adapter: stomp
     login: ""
     passcode: ""
-    host: mqtest01.vrt.sourcefire.com
-    port: 8161
+    host: mq.vrt.sourcefire.com
+    port: 61613
     reliable: true
     reconnectDelay: 5

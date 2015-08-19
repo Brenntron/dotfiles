@@ -20,10 +20,24 @@ if not File.exists?(local_cache_path)
 	Dir.mkdir(local_cache_path)
 end
 
-stomp_options = {
-	:hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-	:reliable => true,
-}
+stomp_options = {}
+case RAILS.env
+  when "production"
+    stomp_options = {
+        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
+        :reliable => true,  :closed_check => false
+    }
+  when "staging"
+    stomp_options = {
+        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false }],
+        :reliable => true,  :closed_check => false
+    }
+  when "development"
+    stomp_options = {
+        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false }],
+        :reliable => true,  :closed_check => false
+    }
+end
 
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
@@ -175,7 +189,7 @@ while message = client.receive
   puts errors.inspect
   puts job_id
   unless job_id.nil?
-    client.publish "/queue/RulesUI.Snort.Run.All.Result",
+    client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
 			{ 
         :job_id => job_id,
         :alerts => alerts,
