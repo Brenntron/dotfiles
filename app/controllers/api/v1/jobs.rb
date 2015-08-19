@@ -62,9 +62,7 @@ module API
                 new_job.rules << Rule.where(id: rule_id).first unless nil
               end
           end
-
-          RunAttachTestWorker.perform_async()
-
+          Publish.send_work_msg(new_job,options,request)
           new_job
         end
       end
