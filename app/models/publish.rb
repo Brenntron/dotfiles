@@ -10,6 +10,7 @@ class Publish
         :cookie => request.headers['Xmlrpc-Token'],
         :attachments => options[:attachment_array]
     }.to_json
+
   end
 
 

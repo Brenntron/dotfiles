@@ -31,17 +31,22 @@ class Rule < ActiveRecord::Base
 
   def self.import_rule(sid)
     if sid
-      rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1].strip!
-      parsed = Rule.visruleparser(rule_text)
-      new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
-      new_rule.update(
-          rule_parsed:parsed[:rule],
-          rule_warnings:parsed[:errors],
-          cvs_rule_parsed:parsed[:rule],
-          cvs_rule_content:rule_text
-      )
-      new_rule.associate_references(rule_text)
-      new_rule
+      rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1]
+      if rule_text.nil?
+        raise "Rule doesn't exist."
+      else
+        rule_text.strip!
+        parsed = Rule.visruleparser(rule_text)
+        new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
+        new_rule.update(
+            rule_parsed:parsed[:rule],
+            rule_warnings:parsed[:errors],
+            cvs_rule_parsed:parsed[:rule],
+            cvs_rule_content:rule_text
+        )
+        new_rule.associate_references(rule_text)
+        new_rule
+      end
     else
       raise "No rule sid provided"
     end
