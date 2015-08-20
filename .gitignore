@@ -16,7 +16,7 @@
 
 /extras/snort
 
-/extras/ssh/ca.pem
+/extras/ssh/*
 
 .idea/*
 .tags*
