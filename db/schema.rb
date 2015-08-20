@@ -203,6 +203,7 @@ ActiveRecord::Schema.define(version: 20150814161138) do
     t.integer  "attachment_id"
     t.integer  "reference_id"
     t.integer  "bug_id"
+    t.integer  "job_id"
   end
 
   add_index "rules", ["attachment_id"], name: "index_rules_on_attachment_id", using: :btree

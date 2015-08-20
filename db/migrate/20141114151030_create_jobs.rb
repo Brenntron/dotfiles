@@ -5,6 +5,7 @@ class CreateJobs < ActiveRecord::Migration
       t.boolean  "failed",      :default => false
       t.text     "result"
       t.string  "job_type"
+      t.integer "time_elapsed"
       t.timestamps
     end
     add_reference :jobs, :bug, index: true
