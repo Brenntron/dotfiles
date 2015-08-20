@@ -356,21 +356,8 @@ class Bug < ActiveRecord::Base
 
   def self.search(query_str, terms, range)
 
-
-    binding.pry
-
-      bug1 = Bug.where(summary: query_str)
-
-      bug2 = Bug.where(bugzilla_id: range[:gte]...range[:lte])
-
-      bug3 = Bug.where(terms.symbolize_keys!)
-
-    bug_merge = bug1.merge(bug2)
-    bug_relation = bug_merge.merge(bug3)
-
-
-binding.pry
-
+    bugs = Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
+    
     # filters = []
     # terms.each {|k,v| filters.push({:term => { k => v}})}
     # filters.push({:range => {:bugzilla_id=>range}})
@@ -399,7 +386,6 @@ binding.pry
     #
     # Bug.__elasticsearch__.search(query).records
 
-    bugs
   end
 
   def self.check_permission(current_user, bugs)

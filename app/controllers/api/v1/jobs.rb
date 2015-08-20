@@ -30,7 +30,7 @@ module API
           requires :job, type: Hash do
             requires :bugzilla_id, type: String, desc: "The bug associated with the job"
             requires :job_type, type: String, desc: "is this testing a rule or an attachment"
-            requires :current_user, type: Integer, desc: "the user creating the job"
+            requires :created_by, type: Integer, desc: "the user creating the job"
             optional :attachment_array, type: String, desc: "The attachments to test. this is a list of bugzilla attachment id's"
             optional :rule_array, type: String, desc: "the rule ids to test"
           end

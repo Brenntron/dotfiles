@@ -110,10 +110,11 @@ ActiveRecord::Schema.define(version: 20150814161138) do
   add_index "exploits", ["reference_id"], name: "index_exploits_on_reference_id", using: :btree
 
   create_table "jobs", force: true do |t|
-    t.boolean  "completed",  default: false
-    t.boolean  "failed",     default: false
+    t.boolean  "completed",    default: false
+    t.boolean  "failed",       default: false
     t.text     "result"
     t.string   "job_type"
+    t.integer  "time_elapsed"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
@@ -203,7 +204,6 @@ ActiveRecord::Schema.define(version: 20150814161138) do
     t.integer  "attachment_id"
     t.integer  "reference_id"
     t.integer  "bug_id"
-    t.integer  "job_id"
   end
 
   add_index "rules", ["attachment_id"], name: "index_rules_on_attachment_id", using: :btree

@@ -48,8 +48,10 @@ client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
 client.subscribe "/queue/RulesUI.Snort.Run.All.Work", { :ack => :client }
 
+cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
+ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
 # Initialize the API
-RuleTestAPI.init('http://stewie.vrt.sourcefire.com:3389')
+RuleTestAPI.init('https://ruleapitest.vrt.sourcefire.com', ssl_options)
 
 # Find the engine we should be using for these rules
 engine_type = EngineType.where(:name => 'Persistent').first

@@ -49,12 +49,6 @@ client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
 
-# Create our stomp client
-client = Stomp::Connection.new(stomp_options)
-
-# This queue should only have work jobs for All rule runs
-client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
-
 cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
 ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
 # Initialize the API
@@ -174,7 +168,7 @@ while message = client.receive
       pt.alerts.each do |alert|
         puts ({:id => pcaps[pt.pcap.file_hash][:attachment_id], :gid => alert.gid, :sid => alert.sid, :rev => alert.rev, :message => alert.msg}).inspect
 
-        client.publish "/queue/RulesUI.Snort.Run.Local.Result",
+        client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                        {
                            :id => pcaps[pt.pcap.file_hash][:attachment_id],
                            :gid => alert.gid,
@@ -186,7 +180,7 @@ while message = client.receive
     end
 
     # And notify the front end that the job is complete
-    client.publish "/queue/RulesUI.Snort.Run.Local.Result",
+    client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
                        :job_id => request['job_id'],
                        :completed => job.completed,
@@ -197,7 +191,7 @@ while message = client.receive
   rescue JSON::ParserError => e
     puts e.inspect
   rescue EOFError => e
-    client.publish "/queue/RulesUI.Snort.Run.Local.Result",
+    client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
                        :job_id => request['job_id'],
                        :failed => true,
@@ -205,7 +199,7 @@ while message = client.receive
                        :result => "Bugzilla appears to be fucking off: #{e.to_s}"
                    }.to_json
   rescue Exception => e
-    client.publish "/queue/RulesUI.Snort.Run.Local.Result",
+    client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
                        :job_id => request['job_id'],
                        :failed => true,
