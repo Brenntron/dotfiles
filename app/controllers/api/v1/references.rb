@@ -8,8 +8,8 @@ module API
         desc "Create a reference"
         params do
           requires :reference, type: Hash do
-            requires :reference_data, type: String, desc: "The text of the note."
-            requires :type, type: String, desc: "Who wrote the note."
+            requires :reference_data, type: String, desc: "the reference data"
+            requires :type, type: String, desc: "what kind of reference this is"
             optional :bug_id, type: Integer, desc: "The id of a bug to which this reference can be assigned."
             optional :rule_id, type: Integer, desc: "The id of a rule to which this reference can be assigned."
           end
@@ -27,8 +27,8 @@ module API
         desc "Update a reference"
         params do
           requires :reference, type: Hash do
-            requires :reference_data, type: String, desc: "The text of the note."
-            requires :type, type: String, desc: "Who wrote the note."
+            requires :reference_data, type: String, desc: "the reference data"
+            requires :type, type: String, desc: "what kind of reference this is"
             optional :bug_id, type: Integer, desc: "The id of a bug to which this reference can be assigned."
             optional :rule_id, type: Integer, desc: "The id of a rule to which this reference can be assigned."
           end
