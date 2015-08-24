@@ -18,22 +18,30 @@ if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
 
+cert = OpenSSL::X509::Certificate.new()
+ssl_options= {}
 stomp_options = {}
 case Rails.env
   when "production"
     puts "stomp in production"
+    cert = OpenSSL::X509::Certificate.new(File.read("/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"))
+    ssl_options= {ca_file: "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem", client_cert: cert}
     stomp_options = {
-        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
         :reliable => true, :closed_check => false
     }
   when "staging"
     puts "stomp in staging"
+    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
+    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
     stomp_options = {
         :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
         :reliable => true, :closed_check => false
     }
   when "development"
     puts "stomp in development"
+    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
+    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
     stomp_options = {
         :hosts => [{:login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false}],
         :reliable => true, :closed_check => false
@@ -49,8 +57,6 @@ client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
 
-cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
-ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
 # Initialize the API
 RuleTestAPI.init('https://ruleapitest.vrt.sourcefire.com', ssl_options)
 
@@ -70,11 +76,11 @@ engine = Engine.where(
     :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the single All Rules Open Source engine") if engine.nil?
 
-
+puts "listening to queue"
 while message = client.receive
   begin
-    puts "ok lets do some work."
-    puts "+++++++++++++++++++++"
+    puts "starting local rule work"
+    puts "++++++++++++++++++++++++"
     # Start by parsing the request
     request = JSON.parse(message.body)
 

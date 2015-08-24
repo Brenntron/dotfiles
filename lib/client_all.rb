@@ -20,22 +20,33 @@ if not File.exists?(local_cache_path)
 	Dir.mkdir(local_cache_path)
 end
 
+cert = OpenSSL::X509::Certificate.new()
+ssl_options= {}
 stomp_options = {}
-case RAILS.env
+case Rails.env
   when "production"
+    puts "stomp in production"
+    cert = OpenSSL::X509::Certificate.new(File.read("/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"))
+    ssl_options= {ca_file: "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem", client_cert: cert}
     stomp_options = {
-        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-        :reliable => true,  :closed_check => false
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
     }
   when "staging"
+    puts "stomp in staging"
+    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
+    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
     stomp_options = {
-        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-        :reliable => true,  :closed_check => false
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
     }
   when "development"
+    puts "stomp in development"
+    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
+    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
     stomp_options = {
-        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false }],
-        :reliable => true,  :closed_check => false
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
     }
 end
 
@@ -44,12 +55,9 @@ xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
 
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
-
 # This queue should only have work jobs for All rule runs
 client.subscribe "/queue/RulesUI.Snort.Run.All.Work", { :ack => :client }
 
-cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
-ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
 # Initialize the API
 RuleTestAPI.init('https://ruleapitest.vrt.sourcefire.com', ssl_options)
 
@@ -70,6 +78,8 @@ engine = Engine.where(
 raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
 
 while message = client.receive
+  puts "starting all rule work"
+  puts "++++++++++++++++++++++"
   alerts = Array.new
   errors = Array.new
   job_id = nil

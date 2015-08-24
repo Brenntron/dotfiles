@@ -3,6 +3,8 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
    subscribes_to :snort_all_rules_test_result
 
    def on_message(message)
+     puts "============================"
+     puts "Configuring all rule results"
       result = JSON.parse(message)	
 
       unless result['job_id'].nil?

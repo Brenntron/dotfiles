@@ -27,21 +27,24 @@ if not File.exists?(local_cache_path)
 end
 
 stomp_options = {}
-case RAILS.env
+case Rails.env
   when "production"
+    puts "stomp in production"
     stomp_options = {
-        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-        :reliable => true,  :closed_check => false
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
     }
   when "staging"
+    puts "stomp in staging"
     stomp_options = {
-        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-        :reliable => true,  :closed_check => false
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
     }
   when "development"
+    puts "stomp in development"
     stomp_options = {
-        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false }],
-        :reliable => true,  :closed_check => false
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
     }
 end
 

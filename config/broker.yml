@@ -44,9 +44,9 @@ staging:
 
 production:
     adapter: stomp
-    login: ""
-    passcode: ""
-    host: mq.vrt.sourcefire.com
+    login: "guest"
+    passcode: "guest"
+    host: mqtest01.vrt.sourcefire.com
     port: 61613
     reliable: true
     reconnectDelay: 5
