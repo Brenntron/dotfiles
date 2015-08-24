@@ -21,6 +21,7 @@ module Api
     # config.i18n.default_locale = :de
 
     # Enable this to prevent any ssl verification
+    # (we could do this but this is bad... dont do this.)
     # OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE if Rails.env.development?
 
     config.middleware.use Rack::Cors do
