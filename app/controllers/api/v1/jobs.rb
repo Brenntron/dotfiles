@@ -57,12 +57,13 @@ module API
               options[:attachment_array].split(',').each do |attachment_id|
                 new_job.attachments << Attachment.where(id: attachment_id).first unless nil
               end
+              PublishAttachment.send_work_msg(new_job,options,request)
             when "rule"
               options[:rule_array].split(',').each do |rule_id|
                 new_job.rules << Rule.where(id: rule_id).first unless nil
               end
+              PublishRule.send_work_msg(new_job,options,request)
           end
-          Publish.send_work_msg(new_job,options,request)
           new_job
         end
       end

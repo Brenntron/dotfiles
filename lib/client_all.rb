@@ -56,7 +56,7 @@ xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
-client.subscribe "/queue/RulesUI.Snort.Run.All.Work", { :ack => :client }
+client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", { :ack => :client }
 
 # Initialize the API
 RuleTestAPI.init('https://ruleapitest.vrt.sourcefire.com', ssl_options)
@@ -72,11 +72,12 @@ raise Exception.new("Unable to find Open Source snort configuration") if snort_c
 raise Exception.new("Unable to find All Rules configuration") if rule_configuration.nil?
 
 engine = Engine.where(
-  :engine_type_id => engine_type.id, 
-  :snort_configuration_id => snort_configuration.id,
-  :rule_configuration_id => rule_configuration.id).first
+  :engine_type_id => engine_type[:id],
+  :snort_configuration_id => snort_configuration[:id],
+  :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
 
+puts "listening to queue"
 while message = client.receive
   puts "starting all rule work"
   puts "++++++++++++++++++++++"
@@ -161,7 +162,7 @@ while message = client.receive
     end
 
 	  # Create the new job
-    job = Job.create(:engine_id => engine.id, :pcaps => test_pcaps, :completed => false)
+    job = Job.create(:engine_id => engine[:id], :pcaps => test_pcaps, :completed => false)
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
