@@ -53,7 +53,7 @@ def self.build_API(include_snort)
   puts "compile assets"
   Dir.chdir "../production"
   system 'rake assets:precompile'
-  Dir.chdir ".."
+  Dir.chdir "../talos_api"
 
   puts "tar up the contents of the production folder"
   system 'cd ../production/ && tar -zcvf ../rulesuitest.tar.gz . && cd ..'
