@@ -107,6 +107,7 @@ module API
             requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
             requires :description, type: String, desc: "A full text description of the bug"
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
+            optional :state_id, type: String, desc: "The new state of the bug, Open, Closed, ReOpened,etc"
             optional :creator, type: String, desc: "The person who created the bug"
             optional :opsys, type: String, desc: "The operating system that this bug affects"
             optional :platform, type: String, desc: "What platform this bug runs on"
