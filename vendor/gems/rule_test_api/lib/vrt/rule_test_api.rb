@@ -21,14 +21,15 @@ require 'her'
 class RuleTestAPI
 
   # Initialize the RuleTestAPI with the URL to the API service.
-  def self.init(url)
+  def self.init(url, ssl_options)
     
     # Setup her first
-    Her::API.setup url: url do |c|
+    Her::API.setup url: url, ssl: ssl_options do |c|
       c.use Faraday::Request::UrlEncoded
       c.use Her::Middleware::DefaultParseJSON
       c.use Faraday::Adapter::NetHttp
     end
+
     
     # Now we can include all of the subclasses
     require 'vrt/rule_test_api/engine_type'

@@ -16,6 +16,8 @@
 
 /extras/snort
 
+/extras/ssh/*
+
 .idea/*
 .tags*
 gems.tags*
