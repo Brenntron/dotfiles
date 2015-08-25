@@ -29,16 +29,16 @@ $ENV{"PERL_LWP_SSL_VERIFY_HOSTNAME"} = 0;
 
 my $source = {
 	# Source abbreviation	  , Associated subroutine	 , Source full-name				, Source URL			, 		CSV short name 
-	all    => { checked => "N", func => \&searchStart,         sname => "All",                                url => "Runs All Tests",			csv_name => "" },
-	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security",               url => "http://packetstormsecurity.org/", 	csv_name => "other" },
-	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",                     url => "http://securityfocus.com/",		csv_name => "bugtraq" },
-	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",                         url => "http://exploit-db.com/",		csv_name => "expldb" },
-	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",                         url => "http://metasploit.com/",		csv_name => "metasploit" },
-	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",                      url => "http://coresecurity.com/",		csv_name => "core" },
-	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                              url => "http://telussecuritylabs.com/",	csv_name => "telus" },
-	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                              url => "http://osvdb.org/",			csv_name => "other" },
-	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                              url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=", csv_name => "other" },
-	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",                             url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG", csv_name => "canvas" } 
+	all    => { checked => "N", func => \&searchStart,         sname => "All",                  url => "Runs All Tests",			csv_name => "" },
+	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security", url => "http://packetstormsecurity.org/", 	csv_name => "other" },
+	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",       url => "http://securityfocus.com/",		csv_name => "bugtraq" },
+	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",           url => "http://exploit-db.com/",		csv_name => "expldb" },
+	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",           url => "http://metasploit.com/",		csv_name => "metasploit" },
+	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",        url => "http://coresecurity.com/",		csv_name => "core" },
+	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                url => "http://telussecuritylabs.com/",	csv_name => "telus" },
+	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                url => "http://osvdb.org/",			csv_name => "other" },
+	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=", csv_name => "other" },
+	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",               url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG", csv_name => "canvas" }
 };
 
 
@@ -102,8 +102,7 @@ sub searchMITRE
 	setChecked("mitre", "Y");
 
 	my $cve = shift;
-	print "searchMITRE\n$cve";
-    print "\n";
+
 	my $url = $source->{"mitre"}->{"url"} . "CVE-$cve";
 	my $mech = mechInit("mitre");
 
@@ -137,8 +136,7 @@ sub searchPacketstorm
 	setChecked("ps", "Y");
 
 	my $cve = shift;
-print "searchPacketstorm\n$cve";
-print "\n";
+
 	my $mech = mechInit("ps");
 
 	$mech->get("http://packetstormsecurity.com/files/cve/CVE-$cve");
@@ -156,8 +154,7 @@ sub searchSecurityfocus
 	setChecked("sf", "Y");
 
 	my $cve = shift;
-print "searchSecurityfocus\n$cve";
-print "\n";
+
 	my $mech = mechInit("sf");
 
 	$mech->get("http://www.securityfocus.com/bid");
@@ -191,8 +188,7 @@ sub searchExploitdb
 	setChecked("edb", "Y");
 
 	my $cve = shift;
-print "searchExploitdb\n$cve";
-print "\n";
+
 	my $mech = mechInit("edb");
 
 	$mech->get("http://www.exploit-db.com/search/?action=search&filter_cve=$cve");
@@ -207,8 +203,7 @@ sub searchMetasploit
 	setChecked("ms", "Y");
 
 	my $cve = shift;
-print "searchMetasploit\n$cve";
-print "\n";
+
 	my $mech = mechInit("ms");
 	$mech->get("http://www.rapid7.com/db/search?q=cve-$cve&t=m");
 
@@ -225,8 +220,7 @@ sub searchCore
 	setChecked("cs", "Y");
 
 	my $cve = shift;
-print "searchCore\n$cve";
-print "\n";
+
 	my $mech = mechInit("cs");
 
 	$mech->get("http://www.coresecurity.com/products/core-impact/recent-exploits-and-updates?title=&field_exploit_type_tid=All&field_vulnerabilty_id_value=cve-$cve&field_operating_system_tid=All&order=field_released_date&sort=desc");
@@ -244,8 +238,6 @@ sub searchOSVDB
 	setChecked("osvdb", "Y");
 
 	my $cve = shift;
-	print "searchOSVDB\n$cve";
-    print "\n";
 
 	my $mech = mechInit("osvdb");
 
@@ -268,10 +260,10 @@ sub searchTelus
 {
 	setChecked("telus", "Y");
 
-	try {
 	my $cve = shift;
-print "searchTelus\n$cve";
-    print "\n";
+
+	try {
+
 	my $mech = mechInit("telus");
 
 	# Dummy GET to perform login
@@ -316,8 +308,7 @@ sub search1337Day
 	setChecked("1337", "Y");
 
 	my $cve  = shift;
-	print "search1337Day\n$cve";
-        print "\n";
+
 	my $msid = cve2msid($cve);
 
 	my $mech = mechInit("1337");
@@ -356,8 +347,7 @@ sub searchCANVAS
         setChecked("canvas", "Y");
 
         my $cve  = shift;
-        print "searchCANVAS\n$cve";
-                print "\n";
+
         my $msid = cve2msid($cve);
         my $cat  = $source->{canvas}->{catalog};
 

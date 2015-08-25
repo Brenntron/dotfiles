@@ -259,8 +259,10 @@ sub searchTelus
 {
 	setChecked("telus", "Y");
 
+    my $cve = shift;
+
 	try {
-	my $cve = shift;
+
 
 	my $mech = mechInit("telus");
 
