@@ -98,7 +98,7 @@ while message = client.receive
 
 
     # Fetch all of the needed pcaps into the cache directory
-    request['attachments'].split(',').each do |attachment_id|
+    request['attachments'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
 
       # Updated files get new attachment ids so no need to test the actual data

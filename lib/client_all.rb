@@ -162,6 +162,7 @@ while message = client.receive
     end
 
 	  # Create the new job
+
     job = Job.create(:engine_id => engine[:id], :pcaps => test_pcaps, :completed => false)
 
     # Make sure the job was created
