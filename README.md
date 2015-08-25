@@ -9,12 +9,14 @@ in
 
 You will need certain perl modules
 install cpanminus
-sudo cpanm WWW::Mechanize
-sudo cpanm Try::Tiny
+$ curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+install perl modules
+$ sudo cpanm WWW::Mechanize
+$ sudo cpanm Try::Tiny
 
 
 add CANVAS_ROOT to your profile env file
-export CANVAS_ROOT=/Users/<username>/Documents/test_talos_dash/talos_api/extras
+export CANVAS_ROOT=/Users/<username>/<talos_api_directory>/extras
 
 install visruleparser dependancies
 Net::Snort::Parser::Rule
