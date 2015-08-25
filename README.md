@@ -1,6 +1,21 @@
 talos_api
 =========
 
+install the ca.pem found here
+https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
+in
+/System/Library/OpenSSL/certs/
+
+
+You will need certain perl modules
+install cpanminus
+sudo cpanm WWW::Mechanize
+sudo cpanm Try::Tiny
+
+
+add CANVAS_ROOT to your profile env file
+export CANVAS_ROOT=/Users/<username>/Documents/test_talos_dash/talos_api/extras
+
 install visruleparser dependancies
 Net::Snort::Parser::Rule
     svn co https://repo.vrt.sourcefire.com/svn/vrt-systems/trunk/buildtools/common/lib/net-snort-parser
@@ -20,6 +35,11 @@ put a copy of snort rules in the extras directory.
     extract snort so rules to
         extras/snort/so_rules
 
+
+
+dont forget to migrate the database
+
+Below is just to set up a locally signed ssh key not really all that necessary.
 
 http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
 
