@@ -15,10 +15,12 @@ module API
           end
         end
         post "", root: "reference" do
+
           ref = Reference.create(
               :reference_data => permitted_params[:reference][:reference_data],
               :reference_type_id => ReferenceType.find_by_name(permitted_params[:reference][:type]).id
           )
+
           Bug.find(permitted_params[:reference][:bug_id]).references << ref if permitted_params[:reference][:bug_id]
           Rule.find(permitted_params[:reference][:rule_id]).references << ref if permitted_params[:reference][:rule_id]
           ref

@@ -138,7 +138,45 @@ class Bug < ActiveRecord::Base
 
   end
 
+  def parse_summary
+    parsed_summary = {}
+    parsed_summary[:tags] =[]
+    parsed_summary[:sids] = self.summary_sids
+    parsed_summary[:refs] = self.summary_references
+    parsed_summary
+  end
+
+
+  def summary_sids
+    sids = []
+    unless summary.nil?
+      summary.scan(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/).each do |match|
+        match[0].split(/[,\s]/).each do |part|
+          if part =~ /(\d+)-(\d+)/
+            sids << eval("#{$1}..#{$2}").to_a
+          else
+            sids << part.gsub(/\s+/, '').to_i
+          end
+        end
+      end
+    end
+    return sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
+  end
+
+  def summary_references
+    references = []
+    ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
+      self.summary.scan(/#{ref_type.bugzilla_format}/i).each do |match|
+        references << Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+      end
+    end
+
+    return references.uniq
+  end
+
   private
+
+
 
   def add_attachment(xmlrpc, file)
     Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
@@ -316,25 +354,6 @@ class Bug < ActiveRecord::Base
   def summary_without_sids
     self.summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
   end
-
-  def summary_sids
-    sids = []
-
-    unless self.summary.nil?
-      self.summary.scan(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/).each do |match|
-        match[0].split(/[,\s]/).each do |part|
-          if part =~ /(\d+)-(\d+)/
-            sids << eval("#{$1}..#{$2}").to_a
-          else
-            sids << part.gsub(/\s+/, '').to_i
-          end
-        end
-      end
-    end
-
-    return sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
-  end
-
 
   def open_dependencies(xmlrpc)
     raise Exception.new("Bugzilla xmlrpc session must be specified") if xmlrpc.nil?

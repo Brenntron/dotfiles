@@ -45,7 +45,7 @@ module Api
     config.bugzilla_domain = 'cisco.com'
     config.snort_rule_path = Rails.root.join('extras', 'snort', 'rules')
     config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'
-    config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
+    Rails.env.development? ? config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl') : config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
     config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
     Rails.env.development? ? config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl') : config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
     config.osvdb_search_url = "http://www.osvdb.org/search/search?search[refid]=DATA"

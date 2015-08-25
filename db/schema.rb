@@ -97,13 +97,21 @@ ActiveRecord::Schema.define(version: 20150814161138) do
     t.datetime "updated_at"
   end
 
-  create_table "exploits", force: true do |t|
+  create_table "exploit_types", force: true do |t|
     t.string  "name"
     t.string  "description"
     t.string  "pcap_validation"
-    t.string  "data"
-    t.integer "attachment_id"
-    t.integer "reference_id"
+    t.integer "exploit_id"
+  end
+
+  add_index "exploit_types", ["exploit_id"], name: "index_exploit_types_on_exploit_id", using: :btree
+
+  create_table "exploits", force: true do |t|
+    t.string   "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "attachment_id"
+    t.integer  "reference_id"
   end
 
   add_index "exploits", ["attachment_id"], name: "index_exploits_on_attachment_id", using: :btree

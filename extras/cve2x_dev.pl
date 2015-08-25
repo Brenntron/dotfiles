@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 #use warnings;
 use strict;
@@ -66,7 +66,7 @@ sub searchStart($$)
 	my @ignore = split( /,\s?/, $ignore );
 
 	## If we are looking for all, pull in the sources alphabetically.
-	## Otherwise, use type specified with -t
+	## Otherwise, usemeh type specified with -t
 	($type eq lc "all") ? @search = sort @sources : $search[0] = $type;
 
 	for my $sauce (sort @search)
@@ -102,6 +102,8 @@ sub searchMITRE
 	setChecked("mitre", "Y");
 
 	my $cve = shift;
+	print "searchMITRE\n$cve";
+    print "\n";
 	my $url = $source->{"mitre"}->{"url"} . "CVE-$cve";
 	my $mech = mechInit("mitre");
 
@@ -135,7 +137,8 @@ sub searchPacketstorm
 	setChecked("ps", "Y");
 
 	my $cve = shift;
-
+print "searchPacketstorm\n$cve";
+print "\n";
 	my $mech = mechInit("ps");
 
 	$mech->get("http://packetstormsecurity.com/files/cve/CVE-$cve");
@@ -153,7 +156,8 @@ sub searchSecurityfocus
 	setChecked("sf", "Y");
 
 	my $cve = shift;
-
+print "searchSecurityfocus\n$cve";
+print "\n";
 	my $mech = mechInit("sf");
 
 	$mech->get("http://www.securityfocus.com/bid");
@@ -187,7 +191,8 @@ sub searchExploitdb
 	setChecked("edb", "Y");
 
 	my $cve = shift;
-
+print "searchExploitdb\n$cve";
+print "\n";
 	my $mech = mechInit("edb");
 
 	$mech->get("http://www.exploit-db.com/search/?action=search&filter_cve=$cve");
@@ -202,7 +207,8 @@ sub searchMetasploit
 	setChecked("ms", "Y");
 
 	my $cve = shift;
-
+print "searchMetasploit\n$cve";
+print "\n";
 	my $mech = mechInit("ms");
 	$mech->get("http://www.rapid7.com/db/search?q=cve-$cve&t=m");
 
@@ -219,7 +225,8 @@ sub searchCore
 	setChecked("cs", "Y");
 
 	my $cve = shift;
-
+print "searchCore\n$cve";
+print "\n";
 	my $mech = mechInit("cs");
 
 	$mech->get("http://www.coresecurity.com/products/core-impact/recent-exploits-and-updates?title=&field_exploit_type_tid=All&field_vulnerabilty_id_value=cve-$cve&field_operating_system_tid=All&order=field_released_date&sort=desc");
@@ -237,6 +244,8 @@ sub searchOSVDB
 	setChecked("osvdb", "Y");
 
 	my $cve = shift;
+	print "searchOSVDB\n$cve";
+    print "\n";
 
 	my $mech = mechInit("osvdb");
 
@@ -261,7 +270,8 @@ sub searchTelus
 
 	try {
 	my $cve = shift;
-
+print "searchTelus\n$cve";
+    print "\n";
 	my $mech = mechInit("telus");
 
 	# Dummy GET to perform login
@@ -282,7 +292,6 @@ sub searchTelus
 	$mech->get("https://portal.telussecuritylabs.com/search/search_results?kw=$cve");
 
 	# the page above will have a link that matches this regex if the cve is found
-
 	my @results = uniq( $mech->content =~ /<a href="\/(threat\/TSL\d+-\d+)">/msgi );
 
 	for my $part ( @results )	
@@ -307,6 +316,8 @@ sub search1337Day
 	setChecked("1337", "Y");
 
 	my $cve  = shift;
+	print "search1337Day\n$cve";
+        print "\n";
 	my $msid = cve2msid($cve);
 
 	my $mech = mechInit("1337");
@@ -345,6 +356,8 @@ sub searchCANVAS
         setChecked("canvas", "Y");
 
         my $cve  = shift;
+        print "searchCANVAS\n$cve";
+                print "\n";
         my $msid = cve2msid($cve);
         my $cat  = $source->{canvas}->{catalog};
 

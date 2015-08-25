@@ -26,10 +26,34 @@ module API
         route_param "import/:id" do
           get do
             xmlrpc_token = request.headers['Xmlrpc-Token']
+
             if xmlrpc_token
+              begin
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
+              #create the bug from bugzilla
               Bug.bugzilla_import(xmlrpc,new_bug).to_s
+              bug = Bug.where(id:params[:id]).first
+              #parse the bug summary
+              parsed = bug.parse_summary
+              parsed[:sids].each do |sid|
+                bug.rules << Rule.import_rule(sid)
+              end
+              parsed[:tags].each do |tag|
+                bug.tags << Tag.find_or_create(tag)
+              end
+              parsed[:refs].each do |ref|
+                bug.references << ref
+                Exploit.find_exploits(ref.reference_data)
+              end
+              #use the references to find any existing exploits
+
+
+              #save the bug
+              bug.save
+              rescue Exception => e
+                false
+              end
             else
               false
             end

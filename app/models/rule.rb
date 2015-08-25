@@ -31,21 +31,26 @@ class Rule < ActiveRecord::Base
 
   def self.import_rule(sid)
     if sid
-      rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1]
-      if rule_text.nil?
-        raise "Rule doesn't exist."
+      found_rule = Rule.where(id: sid).first
+      if found_rule.nil?
+        rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1]
+        if rule_text.nil?
+          raise "Rule doesn't exist."
+        else
+          rule_text.strip!
+          parsed = Rule.visruleparser(rule_text)
+          new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
+          new_rule.update(
+              rule_parsed: parsed[:rule],
+              rule_warnings: parsed[:errors],
+              cvs_rule_parsed: parsed[:rule],
+              cvs_rule_content: rule_text
+          )
+          new_rule.associate_references(rule_text)
+          return new_rule
+        end
       else
-        rule_text.strip!
-        parsed = Rule.visruleparser(rule_text)
-        new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
-        new_rule.update(
-            rule_parsed:parsed[:rule],
-            rule_warnings:parsed[:errors],
-            cvs_rule_parsed:parsed[:rule],
-            cvs_rule_content:rule_text
-        )
-        new_rule.associate_references(rule_text)
-        new_rule
+        return found_rule
       end
     else
       raise "No rule sid provided"
@@ -134,11 +139,11 @@ class Rule < ActiveRecord::Base
 
   def associate_references(rule_text)
     references = []
-    rule_text.split(';').each {|r| references << r.strip.gsub!('reference:', '') if r.include? "reference" }
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.include? "reference" }
     references.each do |r|
       r = r.split(',')
       unless r[1].empty?
-        new_reference = Reference.create(reference_type:ReferenceType.where(name:r[0]).first,reference_data:r[1])
+        new_reference = Reference.create(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
         self.references << new_reference
       end
     end
@@ -149,21 +154,21 @@ class Rule < ActiveRecord::Base
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
     detection = /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip
     options = {
-        :id            => rule_sid,
-        :sid           => rule_sid,
-        :rule_content  => rule,
-        :rule_parsed   => parsed,
-        :gid           => 1,
-        :rev           => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
-        :connection    => /Connection\s*:\s(.+)/.match(parsed)[1],
-        :message       => /Message\s*:\s(.*)/.match(parsed)[1],
-        :detection     => detection[-1, 1] == ';' ? detection : detection + ';',
-        :flow          => /Flow\s*:\s(.+)/.match(parsed)[1],
-        :metadata      => /Metadata\s*:\s(.*)/.match(parsed)[1],
-        :class_type    => /Classtype\s*:\s(.*)/.match(parsed)[1],
-        :committed     => true,
-        :state         => rule_sid ? 'UNCHANGED' : 'NEW'
-    }.reject() {|k,v,| v.nil? || v == "<MISSING>" }
+        :id => rule_sid,
+        :sid => rule_sid,
+        :rule_content => rule,
+        :rule_parsed => parsed,
+        :gid => 1,
+        :rev => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
+        :connection => /Connection\s*:\s(.+)/.match(parsed)[1],
+        :message => /Message\s*:\s(.*)/.match(parsed)[1],
+        :detection => detection[-1, 1] == ';' ? detection : detection + ';',
+        :flow => /Flow\s*:\s(.+)/.match(parsed)[1],
+        :metadata => /Metadata\s*:\s(.*)/.match(parsed)[1],
+        :class_type => /Classtype\s*:\s(.*)/.match(parsed)[1],
+        :committed => true,
+        :state => rule_sid ? 'UNCHANGED' : 'NEW'
+    }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
   end
 
   def self.visruleparser(rule_text)
