@@ -138,7 +138,45 @@ class Bug < ActiveRecord::Base
 
   end
 
+  def parse_summary
+    parsed_summary = {}
+    parsed_summary[:tags] =[]
+    parsed_summary[:sids] = self.summary_sids
+    parsed_summary[:refs] = self.summary_references
+    parsed_summary
+  end
+
+
+  def summary_sids
+    sids = []
+    unless summary.nil?
+      summary.scan(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/).each do |match|
+        match[0].split(/[,\s]/).each do |part|
+          if part =~ /(\d+)-(\d+)/
+            sids << eval("#{$1}..#{$2}").to_a
+          else
+            sids << part.gsub(/\s+/, '').to_i
+          end
+        end
+      end
+    end
+    return sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
+  end
+
+  def summary_references
+    references = []
+    ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
+      self.summary.scan(/#{ref_type.bugzilla_format}/i).each do |match|
+        references << Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+      end
+    end
+
+    return references.uniq
+  end
+
   private
+
+
 
   def add_attachment(xmlrpc, file)
     Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
@@ -317,25 +355,6 @@ class Bug < ActiveRecord::Base
     self.summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
   end
 
-  def summary_sids
-    sids = []
-
-    unless self.summary.nil?
-      self.summary.scan(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/).each do |match|
-        match[0].split(/[,\s]/).each do |part|
-          if part =~ /(\d+)-(\d+)/
-            sids << eval("#{$1}..#{$2}").to_a
-          else
-            sids << part.gsub(/\s+/, '').to_i
-          end
-        end
-      end
-    end
-
-    return sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
-  end
-
-
   def open_dependencies(xmlrpc)
     raise Exception.new("Bugzilla xmlrpc session must be specified") if xmlrpc.nil?
 
@@ -355,33 +374,7 @@ class Bug < ActiveRecord::Base
   end
 
   def self.search(query_str, terms, range)
-    filters = []
-    terms.each {|k,v| filters.push({:term => { k => v}})}
-    filters.push({:range => {:bugzilla_id=>range}})
-
-    query = Jbuilder.encode do |json|
-      json.query do
-        json.filtered do
-          unless query_str.blank?
-            json.query do
-              json.query_string do
-                json.query query_str
-              end
-            end
-          end
-          unless filters.empty?
-            json.filter do
-              json.bool do
-                json.must filters
-              end
-            end
-          end
-        end
-      end
-      json.size 100
-    end
-
-    Bug.__elasticsearch__.search(query).records
+    bugs = Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
   def self.check_permission(current_user, bugs)

@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 #use warnings;
 use strict;
@@ -29,16 +29,16 @@ $ENV{"PERL_LWP_SSL_VERIFY_HOSTNAME"} = 0;
 
 my $source = {
 	# Source abbreviation	  , Associated subroutine	 , Source full-name				, Source URL			, 		CSV short name 
-	all    => { checked => "N", func => \&searchStart,         sname => "All",                                url => "Runs All Tests",			csv_name => "" },
-	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security",               url => "http://packetstormsecurity.org/", 	csv_name => "other" },
-	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",                     url => "http://securityfocus.com/",		csv_name => "bugtraq" },
-	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",                         url => "http://exploit-db.com/",		csv_name => "expldb" },
-	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",                         url => "http://metasploit.com/",		csv_name => "metasploit" },
-	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",                      url => "http://coresecurity.com/",		csv_name => "core" },
-	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                              url => "http://telussecuritylabs.com/",	csv_name => "telus" },
-	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                              url => "http://osvdb.org/",			csv_name => "other" },
-	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                              url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=", csv_name => "other" },
-	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",                             url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG", csv_name => "canvas" } 
+	all    => { checked => "N", func => \&searchStart,         sname => "All",                  url => "Runs All Tests",			csv_name => "" },
+	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security", url => "http://packetstormsecurity.org/", 	csv_name => "other" },
+	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",       url => "http://securityfocus.com/",		csv_name => "bugtraq" },
+	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",           url => "http://exploit-db.com/",		csv_name => "expldb" },
+	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",           url => "http://metasploit.com/",		csv_name => "metasploit" },
+	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",        url => "http://coresecurity.com/",		csv_name => "core" },
+	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                url => "http://telussecuritylabs.com/",	csv_name => "telus" },
+	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                url => "http://osvdb.org/",			csv_name => "other" },
+	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=", csv_name => "other" },
+	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",               url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG", csv_name => "canvas" }
 };
 
 
@@ -66,7 +66,7 @@ sub searchStart($$)
 	my @ignore = split( /,\s?/, $ignore );
 
 	## If we are looking for all, pull in the sources alphabetically.
-	## Otherwise, use type specified with -t
+	## Otherwise, usemeh type specified with -t
 	($type eq lc "all") ? @search = sort @sources : $search[0] = $type;
 
 	for my $sauce (sort @search)
@@ -102,6 +102,7 @@ sub searchMITRE
 	setChecked("mitre", "Y");
 
 	my $cve = shift;
+
 	my $url = $source->{"mitre"}->{"url"} . "CVE-$cve";
 	my $mech = mechInit("mitre");
 
@@ -259,10 +260,9 @@ sub searchTelus
 {
 	setChecked("telus", "Y");
 
-    my $cve = shift;
+	my $cve = shift;
 
 	try {
-
 
 	my $mech = mechInit("telus");
 
@@ -284,7 +284,6 @@ sub searchTelus
 	$mech->get("https://portal.telussecuritylabs.com/search/search_results?kw=$cve");
 
 	# the page above will have a link that matches this regex if the cve is found
-
 	my @results = uniq( $mech->content =~ /<a href="\/(threat\/TSL\d+-\d+)">/msgi );
 
 	for my $part ( @results )	
@@ -309,6 +308,7 @@ sub search1337Day
 	setChecked("1337", "Y");
 
 	my $cve  = shift;
+
 	my $msid = cve2msid($cve);
 
 	my $mech = mechInit("1337");
@@ -347,6 +347,7 @@ sub searchCANVAS
         setChecked("canvas", "Y");
 
         my $cve  = shift;
+
         my $msid = cve2msid($cve);
         my $cat  = $source->{canvas}->{catalog};
 

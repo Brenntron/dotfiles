@@ -8,17 +8,31 @@ Dir.chdir ENV['APP_ROOT']
 
 # Limit the amount of memory used by a single client (300MB)
 Process.setrlimit(:AS, 300 * 1024 * 1024)
+stomp_options ={}
+case RAILS.env
+  when "production"
+    stomp_options = {
+        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
+        :reliable => true,
+    }
+  when "staging"
+    stomp_options = {
+        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false }],
+        :reliable => true,
+    }
+  when "development"
+    stomp_options = {
+        :hosts => [{ :login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false }],
+        :reliable => true,
+    }
+end
 
-stomp_options = {
-	:hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-	:reliable => true,
-}
 
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 
 # This queue should only have work jobs for local rule runs
-client.subscribe "/queue/RulesUI.Snort.Commit.Reload", { :ack => :client }
+client.subscribe "/queue/RulesUI.Snort.Commit.Test.Reload", { :ack => :client }
 
 while message = client.receive
 	begin

@@ -3,6 +3,8 @@ class SnortCommitResultProcessor < ApplicationProcessor
   subscribes_to :snort_commit_test_result
 
   def on_message(message)
+    puts "=========================="
+    puts "Configuring commit results"
     begin
     	response = JSON.parse(message)	
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)  

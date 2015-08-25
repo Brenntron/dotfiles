@@ -19,6 +19,11 @@ module Api
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
+
+    # Enable this to prevent any ssl verification
+    # (we could do this but this is bad... dont do this.)
+    # OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE if Rails.env.development?
+
     config.middleware.use Rack::Cors do
       allow do
         origins '*'
@@ -40,9 +45,9 @@ module Api
     config.bugzilla_domain = 'cisco.com'
     config.snort_rule_path = Rails.root.join('extras', 'snort', 'rules')
     config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'
-    config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
+    Rails.env.development? ? config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl') : config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
     config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
-    config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
+    Rails.env.development? ? config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl') : config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
     config.osvdb_search_url = "http://www.osvdb.org/search/search?search[refid]=DATA"
     config.max_attachment_size = 50000000 # 50MB
     config.job_timeout = 300    # 5 minutes

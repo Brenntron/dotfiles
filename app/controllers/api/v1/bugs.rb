@@ -26,10 +26,34 @@ module API
         route_param "import/:id" do
           get do
             xmlrpc_token = request.headers['Xmlrpc-Token']
+
             if xmlrpc_token
+              begin
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
+              #create the bug from bugzilla
               Bug.bugzilla_import(xmlrpc,new_bug).to_s
+              bug = Bug.where(id:params[:id]).first
+              #parse the bug summary
+              parsed = bug.parse_summary
+              parsed[:sids].each do |sid|
+                bug.rules << Rule.import_rule(sid)
+              end
+              parsed[:tags].each do |tag|
+                bug.tags << Tag.find_or_create(tag)
+              end
+              parsed[:refs].each do |ref|
+                bug.references << ref
+                Exploit.find_exploits(ref.reference_data)
+              end
+              #use the references to find any existing exploits
+
+
+              #save the bug
+              bug.save
+              rescue Exception => e
+                false
+              end
             else
               false
             end
@@ -56,26 +80,27 @@ module API
 
         desc "search for bugs"
         params do
-          requires :query, type: String, desc: "search query"
+          optional :summary, type: String, desc: "summary query"
+          optional :id_range, type: String, desc: "bugzilla id range may be one value or a range between values"
+          optional :state, type: String, desc: "The state of the bug"
+          optional :user_id, type: String, desc: "This is a particular user"
+          optional :committer, type: String, desc: "searching for a commiter"
         end
-        post '/search/:query' do
-          # parse query params
-          query_str = /&su:(.*)/.match(permitted_params[:query])[1]
-          id_txt = /id:(\d+\-*\d*)/.match(permitted_params[:query]) ? /id:(\d+\-*\d*)/.match(permitted_params[:query])[1] : ''
+        post '/search/' do
           terms = {
-              :bugzilla_id  => /-/.match(id_txt) ? nil : id_txt,
-              :state        => /&st:(\w*)&/.match(permitted_params[:query]) ? /&st:(\w*)&/.match(permitted_params[:query])[1] : nil,
-              :user_id      => /&u:(\d*)&/.match(permitted_params[:query]) ? /&u:(\d*)&/.match(permitted_params[:query])[1] : nil,
-              :committer_id => /&c:(\d*)&/.match(permitted_params[:query]) ? /&c:(\d*)&/.match(permitted_params[:query])[1] : nil
+              :bugzilla_id  => /-/.match(permitted_params[:id_range]) ? nil : permitted_params[:id_range],
+              :state        => permitted_params[:state] ? permitted_params[:state] : nil,
+              :user_id      => permitted_params[:user_id] ? permitted_params[:user_id] : nil,
+              :committer_id => permitted_params[:committer] ? permitted_params[:committer] : nil
           }.reject{|k,v| v.blank?}
           range = {
-              :gte      => /-/.match(id_txt) ? /(\d+)-/.match(id_txt)[1] : nil,
-              :lte   => /-/.match(id_txt) ? /-(\d+)/.match(id_txt)[1] : nil,
+              :gte      => /-/.match(permitted_params[:id_range]) ? /(\d+)-/.match(permitted_params[:id_range])[1] : nil,
+              :lte   => /-/.match(permitted_params[:id_range]) ? /-(\d+)/.match(permitted_params[:id_range])[1] : nil,
           }.reject{|k,v| v.blank?}
 
           # search bugs and return the bugs current user is allowed to see
           hits = []
-          Bug.check_permission(current_user, Bug.search(query_str, terms, range)).map { |r| hits.push(r.id)}
+          Bug.check_permission(current_user, Bug.search(permitted_params[:summary], terms, range)).map { |r| hits.push(r.id)}
           hits
         end
 
