@@ -3,5 +3,5 @@ class Reference < ActiveRecord::Base
   has_and_belongs_to_many :rules
   belongs_to :reference_type
   belongs_to :bug
-  belongs_to :exploit
+  has_and_belongs_to_many :exploits
 end
