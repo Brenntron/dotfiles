@@ -43,8 +43,8 @@ module API
                 bug.tags << Tag.find_or_create(tag)
               end
               parsed[:refs].each do |ref|
+                Exploit.find_exploits(ref)
                 bug.references << ref
-                Exploit.find_exploits(ref.reference_data)
               end
               #use the references to find any existing exploits
 

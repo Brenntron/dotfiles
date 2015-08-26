@@ -5,4 +5,6 @@ class BugSerializer < ActiveModel::Serializer
   has_many :rules, embed: :ids, embed_in_root: true
   has_many :references, embed: :ids, embed_in_root: true
   has_many :jobs, embed: :ids, embed_in_root: true
+  has_many :exploits, embed: :ids, embed_in_root: true
+
 end
