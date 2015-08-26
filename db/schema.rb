@@ -108,6 +108,7 @@ ActiveRecord::Schema.define(version: 20150814161138) do
 
   create_table "exploits", force: true do |t|
     t.string   "data"
+    t.integer  "exploit_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "attachment_id"
@@ -115,6 +116,7 @@ ActiveRecord::Schema.define(version: 20150814161138) do
   end
 
   add_index "exploits", ["attachment_id"], name: "index_exploits_on_attachment_id", using: :btree
+  add_index "exploits", ["exploit_type_id"], name: "index_exploits_on_exploit_type_id", using: :btree
   add_index "exploits", ["reference_id"], name: "index_exploits_on_reference_id", using: :btree
 
   create_table "jobs", force: true do |t|

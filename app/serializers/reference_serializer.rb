@@ -1,5 +1,5 @@
 class ReferenceSerializer < ActiveModel::Serializer
-  attributes :id, :reference_data, :created_at, :updated_at , :type, :url
+  attributes :id, :reference_data, :created_at, :updated_at , :type
 
   def type
     object.reference_type.name if object.reference_type
