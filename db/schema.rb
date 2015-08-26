@@ -161,15 +161,15 @@ ActiveRecord::Schema.define(version: 20150814161138) do
   create_table "references", force: true do |t|
     t.string   "reference_data"
     t.integer  "reference_type_id"
+    t.integer  "bug_id"
+    t.integer  "exploit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "rule_id"
-    t.integer  "bug_id"
   end
 
   add_index "references", ["bug_id"], name: "index_references_on_bug_id", using: :btree
+  add_index "references", ["exploit_id"], name: "index_references_on_exploit_id", using: :btree
   add_index "references", ["reference_type_id"], name: "index_references_on_reference_type_id", using: :btree
-  add_index "references", ["rule_id"], name: "index_references_on_rule_id", using: :btree
 
   create_table "references_rules", id: false, force: true do |t|
     t.integer "reference_id"
