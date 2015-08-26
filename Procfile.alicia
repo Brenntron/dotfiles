@@ -1,0 +1,2 @@
+poller: script/poller run
+thin_server: thin start --ssl --address localhost
