@@ -164,7 +164,7 @@ class Rule < ActiveRecord::Base
         :message => /Message\s*:\s(.*)/.match(parsed)[1],
         :detection => detection[-1, 1] == ';' ? detection : detection + ';',
         :flow => /Flow\s*:\s(.+)/.match(parsed)[1],
-        :metadata => /Metadata\s*:\s(.*)/.match(parsed)[1],
+        :metadata => /metadata\s*:(.+?)\;/.match(rule)[1].strip,
         :class_type => /Classtype\s*:\s(.*)/.match(parsed)[1],
         :committed => true,
         :state => rule_sid ? 'UNCHANGED' : 'NEW'

@@ -48,12 +48,12 @@ module API
         params do
           requires :rule, type: Hash do
             requires :rule_content, type: String, desc: "Compiled rule content"
-            #requires :documentation, type: String, desc: "A brief description to be used in the documentation."
+            optional :bug_id, type: Integer, desc: "Id of the bug associated with this rule"
           end
         end
         post "", root: "rule" do
           new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
-          #new_rule.update(documentation: permitted_params[:rule][:documentation])
+          new_rule.bugs << Bug.find(permitted_params[:rule][:bug_id]) if permitted_params[:rule][:bug_id]
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule
         end
