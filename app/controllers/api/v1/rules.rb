@@ -63,12 +63,15 @@ module API
           requires :id, type: Integer, desc: "The database id of the rule you want to update."
           requires :rule, type: Hash do
             optional :rule_content, type: String, desc: "Compiled rule content"
+            optional :revert, type: Boolean, desc: "Revert rule to CVS copy?"
           end
         end
         put ":id", root: "rule" do
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
-          update_params[:state] = "UPDATED"
-          update_params[:committed] = false
+          unless permitted_params[:rule][:revert]
+            update_params[:state] = "UPDATED"
+            update_params[:committed] = false
+          end
           Rule.update(permitted_params[:id], update_params)
         end
 

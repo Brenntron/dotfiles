@@ -37,7 +37,7 @@ class Rule < ActiveRecord::Base
         if rule_text.nil?
           raise "Rule doesn't exist."
         else
-          rule_text.strip!
+          rule_text.strip!.gsub!(/(?=\A).+(?=alert)/, '')
           parsed = Rule.visruleparser(rule_text)
           new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
           new_rule.update(
@@ -153,7 +153,7 @@ class Rule < ActiveRecord::Base
     parsed = Rule.visruleparser(rule)[:rule]
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
     detection = /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip
-    options = {
+    return {
         :id => rule_sid,
         :sid => rule_sid,
         :rule_content => rule,
@@ -164,7 +164,7 @@ class Rule < ActiveRecord::Base
         :message => /Message\s*:\s(.*)/.match(parsed)[1],
         :detection => detection[-1, 1] == ';' ? detection : detection + ';',
         :flow => /Flow\s*:\s(.+)/.match(parsed)[1],
-        :metadata => /metadata\s*:(.+?)\;/.match(rule)[1].strip,
+        :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
         :class_type => /Classtype\s*:\s(.*)/.match(parsed)[1],
         :committed => true,
         :state => rule_sid ? 'UNCHANGED' : 'NEW'
