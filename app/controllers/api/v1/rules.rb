@@ -53,7 +53,7 @@ module API
         end
         post "", root: "rule" do
           new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
-          new_rule.bugs << Bug.where(permitted_params[:rule][:bug_id]) if permitted_params[:rule][:bug_id]
+          new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule
         end

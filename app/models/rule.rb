@@ -8,9 +8,9 @@ class Rule < ActiveRecord::Base
 
   def self.create_a_rule(content)
     begin
-      raise Exception.new("No rules to add") if content.blank?
+      raise Exception.new('No rules to add') if content.blank?
       text_rules = content.each_line.to_a.sort.uniq.map { |t| t.chomp }.compact.reject { |e| e.empty? }
-      raise Exception.new("No rules to add") if text_rules.empty?
+      raise Exception.new('No rules to add') if text_rules.empty?
       # Loop through all of the rules
       text_rules.each do |text_rule|
         begin
@@ -139,13 +139,37 @@ class Rule < ActiveRecord::Base
 
   def associate_references(rule_text)
     references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.include? "reference" }
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/)}
     references.each do |r|
       r = r.split(',')
       unless r[1].empty?
         new_reference = Reference.create(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
         self.references << new_reference
       end
+    end
+  end
+
+  def update_references(rule_text)
+    current_references = []
+    self.references.each {|r| current_references << ReferenceType.where(id:r.reference_type_id).first.name + ',' + r.reference_data == references.last}
+    references = []
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/)}
+    references.each do |r|
+      # skip this reference if it already exists
+      if current_references.include? r
+        current_references.delete(r)
+      # otherwise create it
+      else
+        ref_type = r.split(',')[0]
+        ref_data = r.split(',')[1]
+        self.references << Reference.create(reference_type: ReferenceType.where(name:ref_type).first, reference_data:ref_data) unless ref_data.strip.empty?
+      end
+    end
+    # delete the reference if it is no longer part of the record
+    current_references.each do |r|
+      ref_type = r.split(',')[0]
+      ref_data = r.split(',')[1]
+      self.references.where(reference_type: ReferenceType.where(name:ref_type).first,reference_data:ref_data).each { |ref| ref.destroy! }
     end
   end
 
@@ -158,7 +182,7 @@ class Rule < ActiveRecord::Base
         :sid => rule_sid,
         :rule_content => rule,
         :rule_parsed => parsed,
-        :gid => 1,
+        :gid => rule_sid ? 1 : nil,
         :rev => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
         :connection => /Connection\s*:\s(.+)/.match(parsed)[1],
         :message => /Message\s*:\s(.*)/.match(parsed)[1],
