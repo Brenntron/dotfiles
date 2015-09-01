@@ -29,28 +29,28 @@ module API
 
             if xmlrpc_token
               begin
-              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-              new_bug = xmlrpc.get(permitted_params[:id])
-              #create the bug from bugzilla
-              Bug.bugzilla_import(xmlrpc,new_bug).to_s
-              bug = Bug.where(id:params[:id]).first
-              #parse the bug summary
-              parsed = bug.parse_summary
-              parsed[:sids].each do |sid|
-                bug.rules << Rule.import_rule(sid)
-              end
-              parsed[:tags].each do |tag|
-                bug.tags << Tag.find_or_create(tag)
-              end
-              parsed[:refs].each do |ref|
-                Exploit.find_exploits(ref)
-                bug.references << ref
-              end
-              #use the references to find any existing exploits
+                xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+                new_bug = xmlrpc.get(permitted_params[:id])
+                #create the bug from bugzilla
+                Bug.bugzilla_import(xmlrpc,new_bug).to_s
+                bug = Bug.where(id:params[:id]).first
+                #parse the bug summary
+                parsed = bug.parse_summary
+                parsed[:sids].each do |sid|
+                  bug.rules << Rule.import_rule(sid)
+                end
+                parsed[:tags].each do |tag|
+                  bug.tags << Tag.find_or_create(tag)
+                end
+                parsed[:refs].each do |ref|
+                  Exploit.find_exploits(ref)
+                  bug.references << ref
+                end
+                #use the references to find any existing exploits
 
 
-              #save the bug
-              bug.save
+                #save the bug
+                bug.save
               rescue Exception => e
                 false
               end
@@ -66,8 +66,8 @@ module API
         end
         post '/rules/:link' do
           rule_id = permitted_params[:link].split(':')[1]
-          rule = Rule.where(id:rule_id).empty? ? Rule.import_rule(rule_id) : Rule.find(rule_id)
-          Bug.find(permitted_params[:link].split(':')[0]).rules << rule
+          rule = Rule.where(id:rule_id).empty? ? Rule.import_rule(rule_id) : Rule.where(id:rule_id).first
+          Bug.where(id:permitted_params[:link].split(':')[0]).first.rules << rule
         end
 
         desc "unlink a rule with this bug"
@@ -75,7 +75,7 @@ module API
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
         end
         delete '/rules/:link' do
-          Bug.find(permitted_params[:link].split(':')[0]).rules.destroy(permitted_params[:link].split(':')[1])
+          Bug.where(id:permitted_params[:link].split(':')[0]).first.rules.destroy(permitted_params[:link].split(':')[1]).first
         end
 
         desc "search for bugs"
