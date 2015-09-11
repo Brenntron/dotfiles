@@ -52,10 +52,15 @@ module API
           end
         end
         post "", root: "rule" do
-          new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
-          new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
-          new_rule.associate_references(permitted_params[:rule][:rule_content])
-          new_rule
+          begin
+            new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
+            new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
+            new_rule.associate_references(permitted_params[:rule][:rule_content])
+            new_rule
+          rescue
+            render json: { errors: errors }, status: 422
+          end
+
         end
 
         desc "Edit a rule"
@@ -72,7 +77,10 @@ module API
             update_params[:state] = "UPDATED"
             update_params[:committed] = false
           end
-          Rule.update(permitted_params[:id], update_params)
+          rule = Rule.where(id:permitted_params[:id]).first
+          rule.update_references(permitted_params[:rule][:rule_content])
+          rule.update(update_params)
+          rule
         end
 
 

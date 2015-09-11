@@ -151,7 +151,7 @@ class Rule < ActiveRecord::Base
 
   def update_references(rule_text)
     current_references = []
-    self.references.each {|r| current_references << ReferenceType.where(id:r.reference_type_id).first.name + ',' + r.reference_data == references.last}
+    self.references.each {|r| current_references << ReferenceType.where(id:r.reference_type_id).first.name + ',' + r.reference_data}
     references = []
     rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/)}
     references.each do |r|
@@ -175,6 +175,7 @@ class Rule < ActiveRecord::Base
 
   def self.parse_and_create_rule(rule)
     parsed = Rule.visruleparser(rule)[:rule]
+    raise RuleError.new("Visruleparser detected some errors: #{parsed}") if parsed.match(/FAILED/) # need to save failures, warnings here
     rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
     detection = /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip
     return {
