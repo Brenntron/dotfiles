@@ -174,26 +174,38 @@ class Rule < ActiveRecord::Base
   end
 
   def self.parse_and_create_rule(rule)
-    parsed = Rule.visruleparser(rule)[:rule]
-    raise RuleError.new("Visruleparser detected some errors: #{parsed}") if parsed.match(/FAILED/) # need to save failures, warnings here
-    rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
-    detection = /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip
-    return {
-        :id => rule_sid,
-        :sid => rule_sid,
-        :rule_content => rule,
-        :rule_parsed => parsed,
-        :gid => rule_sid ? 1 : nil,
-        :rev => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
-        :connection => /Connection\s*:\s(.+)/.match(parsed)[1],
-        :message => /Message\s*:\s(.*)/.match(parsed)[1],
-        :detection => detection[-1, 1] == ';' ? detection : detection + ';',
-        :flow => /Flow\s*:\s(.+)/.match(parsed)[1],
-        :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
-        :class_type => /Classtype\s*:\s(.*)/.match(parsed)[1],
-        :committed => true,
-        :state => rule_sid ? 'UNCHANGED' : 'NEW'
-    }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+    parsed = Rule.visruleparser(rule)
+    if parsed[:rule].match(/FAILED/)
+      rule_params = {
+          :message => rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
+          :rule_content => rule,
+          :rule_parsed => parsed[:rule],
+          :rule_failures => parsed[:rule],
+          :committed => false,
+          :state => 'FAILED'
+      }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+    else
+      rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
+      detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip
+      rule_params = {
+          :id => rule_sid,
+          :sid => rule_sid,
+          :rule_content => rule,
+          :rule_parsed => parsed[:rule],
+          :gid => rule_sid ? 1 : nil,
+          :rev => /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
+          :connection => /Connection\s*:\s(.+)/.match(parsed[:rule])[1],
+          :message => /Message\s*:\s(.*)/.match(parsed[:rule])[1],
+          :detection => detection[-1, 1] == ';' ? detection : detection + ';',
+          :flow => /Flow\s*:\s(.+)/.match(parsed[:rule])[1],
+          :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
+          :class_type => /Classtype\s*:\s(.*)/.match(parsed[:rule])[1],
+          :committed => true,
+          :state => rule_sid ? 'UNCHANGED' : 'NEW'
+      }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+      rule_params[:rule_failures] = nil
+    end
+    rule_params
   end
 
   def self.visruleparser(rule_text)

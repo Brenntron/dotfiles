@@ -49,18 +49,16 @@ module API
           requires :rule, type: Hash do
             requires :rule_content, type: String, desc: "Compiled rule content"
             optional :bug_id, type: Integer, desc: "Id of the bug associated with this rule"
+            optional :detection, type: String, desc: "Detection for the new rule"
+            optional :class_type, type: String, desc: "Classification of the new rule"
           end
         end
         post "", root: "rule" do
-          begin
-            new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
-            new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
-            new_rule.associate_references(permitted_params[:rule][:rule_content])
-            new_rule
-          rescue
-            render json: { errors: errors }, status: 422
-          end
-
+          new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
+          new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
+          new_rule.associate_references(permitted_params[:rule][:rule_content])
+          new_rule.update(detection:permitted_params[:rule][:detection].strip!, class_type:permitted_params[:rule][:class_type]) if new_rule.state == 'FAILED'
+          new_rule
         end
 
         desc "Edit a rule"
@@ -73,11 +71,13 @@ module API
         end
         put ":id", root: "rule" do
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
-          unless permitted_params[:rule][:revert]
-            update_params[:state] = "UPDATED"
-            update_params[:committed] = false
-          end
           rule = Rule.where(id:permitted_params[:id]).first
+          unless permitted_params[:rule][:revert]
+            unless rule.sid.nil? | (update_params[:state] == 'FAILED')
+              update_params[:state] = "UPDATED"
+              update_params[:committed] = false
+            end
+          end
           rule.update_references(permitted_params[:rule][:rule_content])
           rule.update(update_params)
           rule
