@@ -8,9 +8,9 @@ class Rule < ActiveRecord::Base
 
   def self.create_a_rule(content)
     begin
-      raise Exception.new("No rules to add") if content.blank?
+      raise Exception.new('No rules to add') if content.blank?
       text_rules = content.each_line.to_a.sort.uniq.map { |t| t.chomp }.compact.reject { |e| e.empty? }
-      raise Exception.new("No rules to add") if text_rules.empty?
+      raise Exception.new('No rules to add') if text_rules.empty?
       # Loop through all of the rules
       text_rules.each do |text_rule|
         begin
@@ -37,7 +37,7 @@ class Rule < ActiveRecord::Base
         if rule_text.nil?
           raise "Rule doesn't exist."
         else
-          rule_text.strip!
+          rule_text.strip!.gsub!(/(?=\A).+(?=alert)/, '')
           parsed = Rule.visruleparser(rule_text)
           new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
           new_rule.update(
@@ -139,7 +139,7 @@ class Rule < ActiveRecord::Base
 
   def associate_references(rule_text)
     references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.include? "reference" }
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/)}
     references.each do |r|
       r = r.split(',')
       unless r[1].empty?
@@ -149,26 +149,63 @@ class Rule < ActiveRecord::Base
     end
   end
 
+  def update_references(rule_text)
+    current_references = []
+    self.references.each {|r| current_references << ReferenceType.where(id:r.reference_type_id).first.name + ',' + r.reference_data}
+    references = []
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/)}
+    references.each do |r|
+      # skip this reference if it already exists
+      if current_references.include? r
+        current_references.delete(r)
+      # otherwise create it
+      else
+        ref_type = r.split(',')[0]
+        ref_data = r.split(',')[1]
+        self.references << Reference.create(reference_type: ReferenceType.where(name:ref_type).first, reference_data:ref_data) unless ref_data.strip.empty?
+      end
+    end
+    # delete the reference if it is no longer part of the record
+    current_references.each do |r|
+      ref_type = r.split(',')[0]
+      ref_data = r.split(',')[1]
+      self.references.where(reference_type: ReferenceType.where(name:ref_type).first,reference_data:ref_data).each { |ref| ref.destroy! }
+    end
+  end
+
   def self.parse_and_create_rule(rule)
-    parsed = Rule.visruleparser(rule)[:rule]
-    rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
-    detection = /Detection\s*:\n(.*)Metadata/m.match(parsed)[1].gsub(/\t|#\n/, '').strip
-    options = {
-        :id => rule_sid,
-        :sid => rule_sid,
-        :rule_content => rule,
-        :rule_parsed => parsed,
-        :gid => 1,
-        :rev => /Rev\s*:\s(.+)/.match(parsed) ? /Rev\s*:\s(.+)/.match(parsed)[1] : 1,
-        :connection => /Connection\s*:\s(.+)/.match(parsed)[1],
-        :message => /Message\s*:\s(.*)/.match(parsed)[1],
-        :detection => detection[-1, 1] == ';' ? detection : detection + ';',
-        :flow => /Flow\s*:\s(.+)/.match(parsed)[1],
-        :metadata => /metadata\s*:(.+?)\;/.match(rule)[1].strip,
-        :class_type => /Classtype\s*:\s(.*)/.match(parsed)[1],
-        :committed => true,
-        :state => rule_sid ? 'UNCHANGED' : 'NEW'
-    }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+    parsed = Rule.visruleparser(rule)
+    if parsed[:rule].match(/FAILED/)
+      rule_params = {
+          :message => rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
+          :rule_content => rule,
+          :rule_parsed => parsed[:rule],
+          :rule_failures => parsed[:rule],
+          :committed => false,
+          :state => 'FAILED'
+      }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+    else
+      rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
+      detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip
+      rule_params = {
+          :id => rule_sid,
+          :sid => rule_sid,
+          :rule_content => rule,
+          :rule_parsed => parsed[:rule],
+          :gid => rule_sid ? 1 : nil,
+          :rev => /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
+          :connection => /Connection\s*:\s(.+)/.match(parsed[:rule])[1],
+          :message => /Message\s*:\s(.*)/.match(parsed[:rule])[1],
+          :detection => detection[-1, 1] == ';' ? detection : detection + ';',
+          :flow => /Flow\s*:\s(.+)/.match(parsed[:rule])[1],
+          :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
+          :class_type => /Classtype\s*:\s(.*)/.match(parsed[:rule])[1],
+          :committed => true,
+          :state => rule_sid ? 'UNCHANGED' : 'NEW'
+      }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+      rule_params[:rule_failures] = nil
+    end
+    rule_params
   end
 
   def self.visruleparser(rule_text)
