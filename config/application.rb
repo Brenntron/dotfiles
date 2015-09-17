@@ -41,7 +41,8 @@ module Api
       end
     end
 
-    config.bugzilla_host = 'bugzilla.vrt.sourcefire.com'
+    # Rails.env.development? ? config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com' : config.bugzilla_host = 'bugzilla.vrt.sourcefire.com' This line should go in production mode
+    Rails.env.development? ? config.bugzilla_host = 'bugzillatest02.vrt.sourcefire.com' : config.bugzilla_host = 'bugzillatest02.vrt.sourcefire.com'
     config.bugzilla_domain = 'cisco.com'
     config.snort_rule_path = Rails.root.join('extras', 'snort', 'rules')
     config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'
