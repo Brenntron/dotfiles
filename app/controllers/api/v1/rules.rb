@@ -72,7 +72,9 @@ module API
         put ":id", root: "rule" do
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
           rule = Rule.where(id:permitted_params[:id]).first
-          unless permitted_params[:rule][:revert]
+          if permitted_params[:rule][:revert]
+            update_params[:cvs_rule_parsed] = update_params[:rule_parsed]
+          else
             unless rule.sid.nil? | (update_params[:state] == 'FAILED')
               update_params[:state] = "UPDATED"
               update_params[:committed] = false
