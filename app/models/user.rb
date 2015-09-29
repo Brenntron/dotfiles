@@ -36,6 +36,8 @@ class User < ActiveRecord::Base
 
   def self.login_user(params,request)
     begin
+       #we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
+
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), params[:user][:email].gsub("@#{Rails.configuration.bugzilla_domain}",""), params[:user][:password])
 
@@ -57,7 +59,8 @@ class User < ActiveRecord::Base
             :xmlrpc_token => xmlrpc.token,
             :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
             :user_email => user.email, #this also ust be called user_email for the ember app session to persist
-            :user_id => user.id
+            :user_id => user.id,
+            :kerberos_login => request.env['REMOTE_USER']
         }
         raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
         return resource
@@ -71,7 +74,8 @@ class User < ActiveRecord::Base
             :xmlrpc_token => xmlrpc.token,
             :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
             :user_email => user.email, #this also ust be called user_email for the ember app session to persist
-            :user_id => user.id
+            :user_id => user.id,
+            :kerberos_login => user.kerberos_login
         }
         raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
         return resource
