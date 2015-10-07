@@ -1,5 +1,5 @@
 // This is a server that keeps an eye on activeMQ
-// This server can connect to a websocket to publish the changes out
+// This server can connect to a websocket to publish the changes from activeMQ
 
 var WebSocketServer = require('ws').Server;
 var ws = new WebSocketServer({port: 7001});
@@ -20,12 +20,10 @@ client.connect(headers, function() {
   console.log("Connected to ActiveMQ with Stomp");
   client.subscribe("/queue/RulesUI.Snort.Run.Local.Test.Work", function(message) {
     var data = JSON.parse(message.body);
-    publishToWebsocket(data.message);
+    publishToWebsocket(data["record"]);
   });
 });
 
-
 function publishToWebsocket(msg){
-  console.log(msg);
   socket.emit('amq', msg);
 }

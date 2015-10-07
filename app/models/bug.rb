@@ -20,6 +20,17 @@ class Bug < ActiveRecord::Base
       top_secret_sci: 4
   }
 
+  after_create {|bug| bug.record 'create' }
+  after_update {|bug| bug.record 'update' }
+  after_destroy {|bug| bug.record 'destroy' }
+
+  def record action
+    record = { resource: 'bug',
+               action: action,
+               id: self.id,
+               obj: self }
+    PublishWebsocket.push_changes(record)
+  end
 
   def get_state(status, resolution, user)
     bug_state = 'OPEN'

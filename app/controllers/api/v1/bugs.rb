@@ -6,8 +6,12 @@ module API
       resource :bugs do
         desc "test the websocket"
         get 'websocket' do
-          message = "Just a test at #{Time.now}"
-          PublishWebsocket.send_test_msg(message, request)
+          bug = Bug.first
+          record = { resource: 'bug',
+                     action: 'testing',
+                     id: bug.id,
+                     obj: bug }
+          PublishWebsocket.push_changes(record)
         end
 
         desc "get latest bugs from bugzilla"
