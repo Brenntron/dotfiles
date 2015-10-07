@@ -36,6 +36,8 @@ class User < ActiveRecord::Base
 
   def self.login_user(params, request)
     begin
+       #we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
+
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
       kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
@@ -55,7 +57,6 @@ class User < ActiveRecord::Base
 
       if user.email == "" #this person has had an account created programatically but they havn't signed in yet.
         # we need to look up the user in LDAP and get their email
-
       end
 
       user.ensure_authentication_token #make sure the user has a token generated

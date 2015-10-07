@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150520191229) do
+ActiveRecord::Schema.define(version: 20150826050243) do
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
@@ -37,6 +37,11 @@ ActiveRecord::Schema.define(version: 20150520191229) do
   add_index "attachments", ["job_id"], name: "index_attachments_on_job_id", using: :btree
   add_index "attachments", ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
   add_index "attachments", ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
+
+  create_table "attachments_rules", id: false, force: true do |t|
+    t.integer "attachment_id"
+    t.integer "rule_id"
+  end
 
   create_table "bugs", force: true do |t|
     t.integer  "bugzilla_id"
@@ -92,23 +97,39 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.datetime "updated_at"
   end
 
-  create_table "exploits", force: true do |t|
+  create_table "exploit_types", force: true do |t|
     t.string  "name"
     t.string  "description"
     t.string  "pcap_validation"
-    t.string  "data"
-    t.integer "attachment_id"
-    t.integer "reference_id"
+    t.integer "exploit_id"
+  end
+
+  add_index "exploit_types", ["exploit_id"], name: "index_exploit_types_on_exploit_id", using: :btree
+
+  create_table "exploits", force: true do |t|
+    t.string   "data"
+    t.integer  "exploit_type_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "attachment_id"
+    t.integer  "reference_id"
   end
 
   add_index "exploits", ["attachment_id"], name: "index_exploits_on_attachment_id", using: :btree
+  add_index "exploits", ["exploit_type_id"], name: "index_exploits_on_exploit_type_id", using: :btree
   add_index "exploits", ["reference_id"], name: "index_exploits_on_reference_id", using: :btree
 
+  create_table "exploits_references", force: true do |t|
+    t.integer "exploit_id"
+    t.integer "reference_id"
+  end
+
   create_table "jobs", force: true do |t|
-    t.boolean  "completed",  default: false
-    t.boolean  "failed",     default: false
+    t.boolean  "completed",    default: false
+    t.boolean  "failed",       default: false
     t.text     "result"
     t.string   "job_type"
+    t.integer  "time_elapsed"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
@@ -145,15 +166,15 @@ ActiveRecord::Schema.define(version: 20150520191229) do
   create_table "references", force: true do |t|
     t.string   "reference_data"
     t.integer  "reference_type_id"
+    t.integer  "bug_id"
+    t.integer  "exploit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "rule_id"
-    t.integer  "bug_id"
   end
 
   add_index "references", ["bug_id"], name: "index_references_on_bug_id", using: :btree
+  add_index "references", ["exploit_id"], name: "index_references_on_exploit_id", using: :btree
   add_index "references", ["reference_type_id"], name: "index_references_on_reference_type_id", using: :btree
-  add_index "references", ["rule_id"], name: "index_references_on_rule_id", using: :btree
 
   create_table "references_rules", id: false, force: true do |t|
     t.integer "reference_id"
@@ -174,6 +195,7 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.text     "rule_content"
     t.text     "rule_parsed"
     t.text     "rule_warnings"
+    t.text     "rule_failures"
     t.text     "cvs_rule_content"
     t.text     "cvs_rule_parsed"
     t.string   "connection"
@@ -194,12 +216,16 @@ ActiveRecord::Schema.define(version: 20150520191229) do
     t.string   "documentation"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "job_id"
+    t.integer  "attachment_id"
     t.integer  "reference_id"
     t.integer  "bug_id"
   end
 
+  add_index "rules", ["attachment_id"], name: "index_rules_on_attachment_id", using: :btree
   add_index "rules", ["bug_id"], name: "index_rules_on_bug_id", using: :btree
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
+  add_index "rules", ["job_id"], name: "index_rules_on_job_id", using: :btree
   add_index "rules", ["reference_id"], name: "index_rules_on_reference_id", using: :btree
 
   create_table "users", force: true do |t|

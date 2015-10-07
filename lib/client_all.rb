@@ -20,22 +20,46 @@ if not File.exists?(local_cache_path)
 	Dir.mkdir(local_cache_path)
 end
 
-stomp_options = {
-	:hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-	:reliable => true,
-}
+cert = OpenSSL::X509::Certificate.new()
+ssl_options= {}
+stomp_options = {}
+case Rails.env
+  when "production"
+    puts "stomp in production"
+    cert = OpenSSL::X509::Certificate.new(File.read("/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"))
+    ssl_options= {ca_file: "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem", client_cert: cert}
+    stomp_options = {
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
+    }
+  when "staging"
+    puts "stomp in staging"
+    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
+    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
+    stomp_options = {
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
+    }
+  when "development"
+    puts "stomp in development"
+    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
+    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
+    stomp_options = {
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
+    }
+end
 
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
 
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
-
 # This queue should only have work jobs for All rule runs
-client.subscribe "/queue/RulesUI.Snort.Run.All.Work", { :ack => :client }
+client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", { :ack => :client }
 
 # Initialize the API
-RuleTestAPI.init('http://stewie.vrt.sourcefire.com:3389')
+RuleTestAPI.init('https://ruleapitest.vrt.sourcefire.com', ssl_options)
 
 # Find the engine we should be using for these rules
 engine_type = EngineType.where(:name => 'Persistent').first
@@ -48,12 +72,15 @@ raise Exception.new("Unable to find Open Source snort configuration") if snort_c
 raise Exception.new("Unable to find All Rules configuration") if rule_configuration.nil?
 
 engine = Engine.where(
-  :engine_type_id => engine_type.id, 
-  :snort_configuration_id => snort_configuration.id,
-  :rule_configuration_id => rule_configuration.id).first
+  :engine_type_id => engine_type[:id],
+  :snort_configuration_id => snort_configuration[:id],
+  :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
 
+puts "listening to queue"
 while message = client.receive
+  puts "starting all rule work"
+  puts "++++++++++++++++++++++"
   alerts = Array.new
   errors = Array.new
   job_id = nil
@@ -135,7 +162,8 @@ while message = client.receive
     end
 
 	  # Create the new job
-    job = Job.create(:engine_id => engine.id, :pcaps => test_pcaps, :completed => false)
+
+    job = Job.create(:engine_id => engine[:id], :pcaps => test_pcaps, :completed => false)
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
@@ -175,7 +203,7 @@ while message = client.receive
   puts errors.inspect
   puts job_id
   unless job_id.nil?
-    client.publish "/queue/RulesUI.Snort.Run.All.Result",
+    client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
 			{ 
         :job_id => job_id,
         :alerts => alerts,

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 #use warnings;
 use strict;
@@ -93,7 +93,6 @@ sub searchStart($$)
 		$source->{$sauce}->{"func"}->($cve);
 
 	} ## end for (sort @search)
-
 	print "-" x 45, "\n" unless $write;
 } ## end sub searchStart($$)
 
@@ -260,8 +259,10 @@ sub searchTelus
 {
 	setChecked("telus", "Y");
 
+    my $cve = shift;
+
 	try {
-	my $cve = shift;
+
 
 	my $mech = mechInit("telus");
 

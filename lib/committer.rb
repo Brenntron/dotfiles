@@ -26,10 +26,27 @@ if not File.exists?(local_cache_path)
 	Dir.mkdir(local_cache_path)
 end
 
-stomp_options = {
-	:hosts => [{ :login => "guest", :passcode => "guest", :host => 'mq.vrt.sourcefire.com', :port => 61613, :ssl => false }],
-	:reliable => true,
-}
+stomp_options = {}
+case Rails.env
+  when "production"
+    puts "stomp in production"
+    stomp_options = {
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
+    }
+  when "staging"
+    puts "stomp in staging"
+    stomp_options = {
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
+    }
+  when "development"
+    puts "stomp in development"
+    stomp_options = {
+        :hosts => [{:login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false}],
+        :reliable => true, :closed_check => false
+    }
+end
 
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
@@ -192,21 +209,21 @@ while message = client.receive
 			end
 
 			# And notify the front end that the job is complete
-			client.publish "/queue/RulesUI.Snort.Commit.Result",
+			client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
 				{ :job_id => request['job_id'], :completed => true, :failed => false, :result => result, :rules => rules, :cookie => request['cookie'] }.to_json
 
 		end
 
 	rescue SocketError, Errno::EHOSTUNREACH, Net::SSH::Disconnect => e
-		client.publish "/queue/RulesUI.Snort.Commit.Result",
+		client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
 			{ :job_id => request['job_id'], :completed => true, :failed => true, :result => "Network failure: #{e.to_s}@#{cvs_host}"}.to_json
 	
 	rescue Net::SSH::AuthenticationFailed => e
-		client.publish "/queue/RulesUI.Snort.Commit.Result",
+		client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
 			{ :job_id => request['job_id'], :completed => true, :failed => true, :result => "Authentication failed for #{e.to_s}@#{cvs_host}"}.to_json
 
 	rescue CommitError => e
-		client.publish "/queue/RulesUI.Snort.Commit.Result",
+		client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
 			{ :job_id => request['job_id'], :completed => true, :failed => true, :result => e.to_s}.to_json
 	end
 

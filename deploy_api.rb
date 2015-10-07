@@ -13,7 +13,7 @@ def self.current_git_branch
 end
 
 
-def self.build_API
+def self.build_API(include_snort)
   puts "delete production folder"
   production_folder = "production"
   if File.directory?("../#{production_folder}")
@@ -26,15 +26,37 @@ def self.build_API
   system "git clone git@github.com:talosweb/talos_api.git -b #{current_git_branch} --single-branch ../production"
 
 
-  puts "build the gems into vendor/bundle"
+  if File.directory?("vendor/bundle")
+    puts "Vendor bundle folder exists. Copying bundle to production."
+    `cp -r vendor/bundle ../production/vendor`
+    if File.directory?("vendor/cache")
+    `cp -r vendor/cache ../production/vendor`
+    else
+      Dir.chdir "../production"
+      system 'bundle package'
+      Dir.chdir ".."
+    end
+  else
+    puts "Vendor bundle folder does NOT exist. Building gems."
+    puts "build the gems into vendor/bundle"
+    Dir.chdir "../production"
+    system 'bundle install --deployment'
+    system 'bundle package'
+    system 'bundle install --standalone'
+    Dir.chdir ".."
+  end
+
+  if(include_snort)
+    `cp -r extras/snort ../production/extras`
+  end
+
+  puts "compile assets"
   Dir.chdir "../production"
-  system 'bundle install --deployment'
-  system 'bundle package'
-  system 'bundle install --standalone'
-  Dir.chdir ".."
+  system 'rake assets:precompile'
+  Dir.chdir "../talos_api"
 
   puts "tar up the contents of the production folder"
-  system 'cd production/ && tar -zcvf ../rulesuitest.tar.gz . && cd ..'
+  system 'cd ../production/ && tar -zcvf ../rulesuitest.tar.gz . && cd ..'
 end
 
 def self.upload_API(rebuild_gems)
@@ -45,7 +67,7 @@ def self.upload_API(rebuild_gems)
             ENDSSH`
 
   puts "scp the tarball to talosweb@rulesuitest.vrt.sourcefire.com:rulesuitest/public/app folder"
-  system "scp rulesuitest.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp}"
+  system "scp ../rulesuitest.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp}"
 
   puts "unload the zip file into timestamp folder"
   `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
@@ -59,10 +81,13 @@ def self.upload_API(rebuild_gems)
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
+            rm /usr/local/www/rulesuitest/releases/#{timestamp}/extras/ssh/ca.pem
             ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
             ln -s /usr/local/www/rulesuitest/releases/shared/database.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
             ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
+            ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem /usr/local/www/rulesuitest/releases/#{timestamp}/extras/ssh/ca.pem
             ENDSSH`
+
 
   puts "simlink the timestamped folder to the app directory"
   `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
@@ -76,17 +101,22 @@ def self.upload_API(rebuild_gems)
   # and save a copy of the vendor folder for next time.
   directory_exists = `ssh talosweb@rulesuitest.vrt.sourcefire.com "test -d /usr/local/www/rulesuitest/releases/shared/vendor && echo 1 || echo 0"`
   if(directory_exists.to_i == 1 && rebuild_gems == false)
+    puts "copying vendor to vendor"
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "copying vendor to vendor"
             rm -rf /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
             cp -r /usr/local/www/rulesuitest/releases/shared/vendor /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
+            cd rulesuitest/releases/#{timestamp}/
+            bundle install --deployment
             ENDSSH`
   else
+    puts "bundle installing gems"
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "bundle installing gems"
             cd rulesuitest/releases/#{timestamp}/
             bundle install --deployment
-            cp -r /usr/local/www/rulesuitest/releases/#{timestamp}/vendor /usr/local/www/rulesuitest/releases/shared/vendor
+            rm -rf vendor
+            cp -r /usr/local/www/rulesuitest/releases/#{timestamp}/vendor /usr/local/www/rulesuitest/releases/shared/
             ENDSSH`
   end
 
@@ -100,6 +130,7 @@ end
 process_api = true
 send_upload = true
 rebuild_gems = false
+include_snort = true
 
 ARGV.each do|a|
   case a
@@ -109,13 +140,16 @@ ARGV.each do|a|
       send_upload = false
     when "--rebuild-gems"
       rebuild_gems = true
-    when "-h" || "-help"
+    when "--no_snort"
+      include_snort = false
+    when "-h" || "--help"
       puts "This script deploys all the content in the API directory and the UI directory up to the server"
       puts "============"
       puts "Valid flags are"
       puts "--no-api           use this flag to prevent the API from being built and sent to the server"
       puts "--no-upload        apps will be built but they will be prevented from being sent to the server"
       puts "--rebuild-gems     gems are stored in the shared folder on the server. Use this flag to rebuild them."
+      puts "--no_snort         Snort rules will not be packaged with the production tarball"
       process_api = false
       send_upload = false
       break
@@ -128,7 +162,7 @@ ARGV.each do|a|
 end
 
 if process_api
-  build_API()
+  build_API(include_snort)
   if send_upload
     upload_API(rebuild_gems)
   end
