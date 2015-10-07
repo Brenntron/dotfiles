@@ -4,6 +4,11 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+        desc "test the websocket"
+        get 'websocket' do
+          message = "Just a test at #{Time.now}"
+          PublishWebsocket.send_test_msg(message, request)
+        end
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
