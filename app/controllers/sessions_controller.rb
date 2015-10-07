@@ -1,6 +1,5 @@
 class SessionsController < ApplicationController
   def create
-
     respond_to do |format|
       format.json do
         begin

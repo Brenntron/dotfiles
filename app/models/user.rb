@@ -12,12 +12,12 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
 
   enum class_level: {
-      unclassified:   0,
-      confidential:   1,
-      secret:         2,
-      top_secret:     3,
-      top_secret_sci: 4
-  }
+           unclassified: 0,
+           confidential: 1,
+           secret: 2,
+           top_secret: 3,
+           top_secret_sci: 4
+       }
 
   def ensure_authentication_token
     if authentication_token.blank?
@@ -34,51 +34,44 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.login_user(params,request)
+  def self.login_user(params, request)
     begin
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-      xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), params[:user][:email].gsub("@#{Rails.configuration.bugzilla_domain}",""), params[:user][:password])
+      xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
+      kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
 
-      user = User.where("email=?", params[:user][:email]).first_or_create do |new_record|
-        new_record.email          = params[:user][:email]
-        new_record.cvs_username   = params[:user][:email].gsub("@#{Rails.configuration.bugzilla_domain}","")
-        new_record.password       = params[:user][:password]
-        new_record.committer      = 'true'
-        new_record.class_level    = 'unclassified'
+      raise Exception.new("You are not logged into Kerberos. Please try again.") if kerberos_login.nil?
+
+      user = User.where("kerberos_login=?", kerberos_login).first_or_create do |new_record|
+        new_record.email = ""
+        new_record.kerberos_login = kerberos_login
+        new_record.cvs_username = ""
+        new_record.committer = 'true'
+        new_record.class_level = 'unclassified'
       end
 
-      user.confirmed      = 'true'
-      user.updated_at     = Time.now
+      user.confirmed = 'true'
+      user.updated_at = Time.now
 
-      if user.valid_password?(params[:user][:password]) #devise takes care of password checking but this wont work if the user has an account but no password.
-        user.ensure_authentication_token #make sure the user has a token generated
-        resource = {
-            :success => true,
-            :xmlrpc_token => xmlrpc.token,
-            :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
-            :user_email => user.email, #this also ust be called user_email for the ember app session to persist
-            :user_id => user.id
-        }
-        raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
-        return resource
-      elsif user.kerberos_login == "generated" #this person has had an account created programatically but they havn't signed in yet.
-        user.class_level    = 'unclassified'
-        user.kerberos_login = request.env['REMOTE_USER']
-        user.ensure_authentication_token #make sure the user has a token generated
-        user.password       = params[:user][:password]
-        resource = {
-            :success => true,
-            :xmlrpc_token => xmlrpc.token,
-            :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
-            :user_email => user.email, #this also ust be called user_email for the ember app session to persist
-            :user_id => user.id
-        }
-        raise Exception.new("Error signing in. Please use full email as your login.") unless user.save
-        return resource
-      else
-        raise Exception.new("Either your Username or Password is incorrect.")
+      if user.email == "" #this person has had an account created programatically but they havn't signed in yet.
+        # we need to look up the user in LDAP and get their email
+
       end
-      raise Exception.new("Please use your full email to log in.")
+
+      user.ensure_authentication_token #make sure the user has a token generated
+      resource = {
+          :success => true,
+          :xmlrpc_token => xmlrpc.token,
+          :kerberos_login => user.kerberos_login,
+          :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
+          :user_email => user.email, #this also ust be called user_email for the ember app session to persist
+          :user_id => user.id
+      }
+
+      raise Exception.new("Error signing in. Please contact the administrator.") unless user.save
+
+      return resource
+
     end
   end
 end
