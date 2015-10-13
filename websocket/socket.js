@@ -17,7 +17,7 @@ pem.createCertificate({days:1, selfSigned:true}, function(err, keys) {
     sendMessage('hi');
 
     socket.on('amq', function(msg){
-      console.log('AMQ : ' + msg);
+      console.log('AMQ data received.');
       io.emit('incoming', msg);
     });
     socket.on('join', function(msg){
@@ -25,7 +25,7 @@ pem.createCertificate({days:1, selfSigned:true}, function(err, keys) {
     });
 
     function sendMessage(msg){
-      socket.emit('incoming', msg);
+      socket.emit('join', msg);
     }
   });
 });

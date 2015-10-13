@@ -8,7 +8,7 @@ module API
         get 'websocket' do
           bug = Bug.first
           record = { resource: 'bug',
-                     action: 'testing',
+                     action: 'update',
                      id: bug.id,
                      obj: bug }
           PublishWebsocket.push_changes(record)
