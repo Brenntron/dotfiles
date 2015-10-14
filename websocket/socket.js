@@ -14,7 +14,7 @@ pem.createCertificate({days:1, selfSigned:true}, function(err, keys) {
   var io = require('socket.io')(app);
   io.on('connection', function(socket){
     console.log('a user connected');
-    sendMessage('hi');
+    sendMessage('Connection established.');
 
     socket.on('amq', function(msg){
       console.log('AMQ data received.');

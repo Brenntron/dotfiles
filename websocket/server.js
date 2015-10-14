@@ -7,15 +7,18 @@ var Stomp = require('stompjs');
 var client = Stomp.overTCP('localhost', 61613);
 var app = require('express')();
 var http = require('http').Server(app);
-var socket = require('socket.io-client')('https://localhost:7000');
-socket.on('connect', function(){
-  console.log('amq server connected to websocket');
-});
-
 var headers = {
   login: 'guest',
   passcode: 'guest'
 };
+
+var socket = require('socket.io-client')('https://localhost:7000');
+socket.on('connect', function(){
+  console.log('amq server connected to websocket');
+});
+function publishToWebsocket(msg){
+  socket.emit('amq', msg);
+}
 client.connect(headers, function() {
   console.log("Connected to ActiveMQ with Stomp");
   client.subscribe("/queue/RulesUI.Snort.Run.Local.Test.Work", function(message) {
@@ -23,7 +26,3 @@ client.connect(headers, function() {
     publishToWebsocket(JSON.parse(data["record"]));
   });
 });
-
-function publishToWebsocket(msg){
-  socket.emit('amq', msg);
-}
