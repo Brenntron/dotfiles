@@ -37,13 +37,11 @@ class User < ActiveRecord::Base
   def self.login_user(params, request)
     begin
        #we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
-
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
       kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
 
       raise Exception.new("You are not logged into Kerberos. Please try again.") if kerberos_login.nil?
-
       user = User.where("kerberos_login=?", kerberos_login).first_or_create do |new_record|
         new_record.email = ""
         new_record.kerberos_login = kerberos_login
@@ -70,7 +68,6 @@ class User < ActiveRecord::Base
       }
 
       raise Exception.new("Error signing in. Please contact the administrator.") unless user.save
-
       return resource
 
     end

@@ -32,6 +32,7 @@ gem 'foreman'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 gem 'jbuilder', '~> 2.2.16'
+gem 'dotenv-rails', :groups => [:development, :test]
 
 group :development do
   gem 'puma'

@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     collection {get :send_event}
   end
 
-  get "sessions/create.:format" => "sessions#create", :constraints => { :format => /json/}
+  post "sessions/create.:format" => "sessions#create", :constraints => { :format => /json/}
   root 'pages#index'
 
   mount API::Base => '/api'

@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
     if !params[:api_key].blank?
       # user   = User.where(kerberos_login: request.env['REMOTE_USER']).first_or_create(kerberos_login: request.env['REMOTE_USER'])
       user   = User.where(kerberos_login: "nherbert@VRT.SOURCEFIRE.COM").first_or_create(kerberos_login: "nherbert@VRT.SOURCEFIRE.COM")
-      if user &&  params[:api_key] = Rails.configuration.ember_app[:api_key]
+      if user &&  params[:api_key] == Rails.configuration.ember_app[:api_key]
         sign_in user, store: false
       end
     end
