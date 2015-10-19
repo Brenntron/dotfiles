@@ -78,10 +78,12 @@ def self.upload_API(rebuild_gems)
 
   puts "copy the app config and the database yaml files to the timestamp folder"
   `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
+            rm /usr/local/www/rulesuitest/releases/#{timestamp}/.env
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/extras/ssh/ca.pem
+            ln -s /usr/local/www/rulesuitest/releases/shared/.env /usr/local/www/rulesuitest/releases/#{timestamp}/.env
             ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
             ln -s /usr/local/www/rulesuitest/releases/shared/database.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
             ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
