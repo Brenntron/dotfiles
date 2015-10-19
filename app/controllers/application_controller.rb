@@ -8,8 +8,8 @@ class ApplicationController < ActionController::Base
 
   def authenticate_from_token!
     if !params[:api_key].blank?
-      # user   = User.where(kerberos_login: request.env['REMOTE_USER']).first_or_create(kerberos_login: request.env['REMOTE_USER'])
-      user   = User.where(kerberos_login: "nherbert@VRT.SOURCEFIRE.COM").first_or_create(kerberos_login: "nherbert@VRT.SOURCEFIRE.COM")
+      kerb_login = request.env['REMOTE_USER'] ||  Rails.configuration.ember_app[:remote_user]
+      user   = User.where(kerberos_login: kerb_login).first_or_create(kerberos_login: kerb_login)
       if user &&  params[:api_key] == Rails.configuration.ember_app[:api_key]
         sign_in user, store: false
       end
