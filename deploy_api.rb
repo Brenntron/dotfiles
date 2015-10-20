@@ -52,7 +52,7 @@ def self.build_API(include_snort)
 
   puts "compile assets"
   Dir.chdir "../production"
-  system 'rake assets:precompile'
+  system 'bundle exec rake assets:precompile'
   Dir.chdir "../talos_api"
 
   puts "tar up the contents of the production folder"
