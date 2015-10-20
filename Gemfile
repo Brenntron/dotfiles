@@ -28,9 +28,9 @@ gem 'pry', '0.9.12.4'
 gem 'pry-remote', '0.1.8'
 
 gem 'foreman'
-#
-# gem 'elasticsearch-model'
-# gem 'elasticsearch-rails'
+
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'
 gem 'jbuilder', '~> 2.2.16'
 gem 'dotenv-rails'
 

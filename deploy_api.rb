@@ -117,8 +117,8 @@ def self.upload_API(rebuild_gems)
             echo "bundle installing gems"
             cd rulesuitest/releases/#{timestamp}/
             bundle install --deployment --without development test
-            rm -rf vendor
-            cp -r /usr/local/www/rulesuitest/releases/#{timestamp}/vendor /usr/local/www/rulesuitest/releases/shared/
+            rm -rf ../shared/vendor
+            cp -r vendor /usr/local/www/rulesuitest/releases/shared/
             ENDSSH`
   end
 
