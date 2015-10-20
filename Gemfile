@@ -32,10 +32,9 @@ gem 'foreman'
 # gem 'elasticsearch-model'
 # gem 'elasticsearch-rails'
 gem 'jbuilder', '~> 2.2.16'
-gem 'dotenv-rails', :groups => [:development, :test]
+gem 'dotenv-rails'
 
 group :development do
-  gem 'puma'
   gem 'thin', '~> 1.6.3'
   gem 'awesome_print', '1.2.0'
   gem 'guard','2.11.1'

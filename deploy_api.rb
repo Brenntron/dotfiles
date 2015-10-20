@@ -40,9 +40,9 @@ def self.build_API(include_snort)
     puts "Vendor bundle folder does NOT exist. Building gems."
     puts "build the gems into vendor/bundle"
     Dir.chdir "../production"
-    system 'bundle install --deployment'
+    system 'bundle install --deployment --without development test'
     system 'bundle package'
-    system 'bundle install --standalone'
+    system 'bundle install --standalone --without development test'
     Dir.chdir ".."
   end
 
@@ -109,14 +109,14 @@ def self.upload_API(rebuild_gems)
             rm -rf /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
             cp -r /usr/local/www/rulesuitest/releases/shared/vendor /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
             cd rulesuitest/releases/#{timestamp}/
-            bundle install --deployment
+            bundle install --deployment --without development test
             ENDSSH`
   else
     puts "bundle installing gems"
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "bundle installing gems"
             cd rulesuitest/releases/#{timestamp}/
-            bundle install --deployment
+            bundle install --deployment --without development test
             rm -rf vendor
             cp -r /usr/local/www/rulesuitest/releases/#{timestamp}/vendor /usr/local/www/rulesuitest/releases/shared/
             ENDSSH`
