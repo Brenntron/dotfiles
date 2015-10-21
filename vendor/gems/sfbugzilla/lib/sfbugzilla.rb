@@ -25,6 +25,7 @@ class Bugzilla::XMLRPC
       use_ssl = (port == 443) ? true : false
       @xmlrpc = XMLRPC::Client.new(host, path, port, nil, nil, nil, nil, use_ssl, 60)
       @xmlrpc.fix_ssl
+      # @xmlrpc.http_header_extra = {'accept-encoding' => 'identity'}
 
    end
 

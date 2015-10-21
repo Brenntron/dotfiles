@@ -11,6 +11,7 @@ gem 'kaminari', '~>0.16.3'
 
 gem 'cancan', '1.6.10'
 gem 'devise', '3.2.2'
+gem 'net-ldap', '~> 0.11'
 
 gem 'mysql2', '~> 0.3.20'
 gem 'rmagick', '2.13.2'
