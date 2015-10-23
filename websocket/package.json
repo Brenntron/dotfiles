@@ -11,6 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "socket.io": "^1.3.7",
-    "ws": "^0.8.0"
+    "socket.io-client": "^1.3.7",
+    "stompjs": "2.3.3",
+    "ws": "^0.8.0",
+    "express": "4.13.3",
+    "pem": "1.8.1"
   }
 }
