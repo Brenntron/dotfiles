@@ -7,6 +7,7 @@ ActiveMessaging::Gateway.define do |s|
   s.destination :snort_all_rules_test_work, '/queue/RulesUI.Snort.Run.All.Test.Work'
   s.destination :snort_all_rules_test_result, '/queue/RulesUI.Snort.Run.All.Test.Result'
   s.destination :snort_local_rules_test_work, '/queue/RulesUI.Snort.Run.Local.Test.Work'
+  s.destination :snort_local_rules_test_messages, '/queue/RulesUI.Snort.Run.Local.Test.Messages'
   s.destination :snort_local_rules_test_result, '/queue/RulesUI.Snort.Run.Local.Test.Result'
   s.destination :snort_commit_test_work, '/queue/RulesUI.Snort.Commit.Test.Work'
   s.destination :snort_commit_test_result, '/queue/RulesUI.Snort.Commit.Test.Result'

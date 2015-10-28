@@ -19,6 +19,18 @@ class User < ActiveRecord::Base
       top_secret_sci: 4
   }
 
+  after_create {|user| user.record 'create' }
+  after_update {|user| user.record 'update' }
+  after_destroy {|user| user.record 'destroy' }
+
+  def record action
+    record = { resource: 'user',
+               action: action,
+               id: self.id,
+               obj: self }
+    PublishWebsocket.push_changes(record)
+  end
+
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token

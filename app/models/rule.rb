@@ -6,6 +6,18 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
 
+  after_create {|rule| rule.record 'create' }
+  after_update {|rule| rule.record 'update' }
+  after_destroy {|rule| rule.record 'destroy' }
+
+  def record action
+    record = { resource: 'rule',
+               action: action,
+               id: self.id,
+               obj: self }
+    PublishWebsocket.push_changes(record)
+  end
+
   def self.create_a_rule(content)
     begin
       raise Exception.new('No rules to add') if content.blank?

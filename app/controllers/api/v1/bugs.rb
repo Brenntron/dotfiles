@@ -4,6 +4,15 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+        desc "test the websocket"
+        get 'websocket' do
+          bug = Bug.first
+          record = { resource: 'bug',
+                     action: 'update',
+                     id: bug.id,
+                     obj: bug }
+          PublishWebsocket.push_changes(record)
+        end
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
