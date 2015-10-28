@@ -11,8 +11,9 @@ gem 'kaminari', '~>0.16.3'
 
 gem 'cancan', '1.6.10'
 gem 'devise', '3.2.2'
+gem 'net-ldap', '~> 0.11'
 
-gem 'mysql2'
+gem 'mysql2', '~> 0.3.20'
 gem 'rmagick', '2.13.2'
 gem 'ruby-bugzilla', '~> 0.6.0'
 
@@ -32,14 +33,13 @@ gem 'foreman'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 gem 'jbuilder', '~> 2.2.16'
+gem 'dotenv-rails'
 
 group :development do
-  gem 'puma'
-  gem 'thin'
+  gem 'thin', '~> 1.6.3'
   gem 'awesome_print', '1.2.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
-  gem 'spring'
 end
 
 group :test do

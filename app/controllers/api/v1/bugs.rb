@@ -16,7 +16,7 @@ module API
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
-          xmlrpc_token = request.headers['Xmlrpc-Token'] #We need to figure out how to populate the current user properly
+          xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
