@@ -20,6 +20,20 @@ class Bug < ActiveRecord::Base
       top_secret_sci: 4
   }
 
+  after_create {|bug| bug.record 'create' }
+  after_update {|bug| bug.record 'update' }
+  after_destroy {|bug| bug.record 'destroy' }
+
+  def record action
+    obj = JSON.parse(BugSerializer.new(self).to_json)
+    obj["bug"] = obj["bug"].except('notes', 'attachments', 'jobs', 'exploits')
+    obj["bug"]["user"] = obj["bug"]["user_id"]
+    record = { resource: 'bug',
+               action: action,
+               id: self.id,
+               obj: obj.except("notes","attachments","rules","references","jobs","exploits")}
+    PublishWebsocket.push_changes(record)
+  end
 
   def get_state(status, resolution, user)
     bug_state = 'OPEN'

@@ -40,9 +40,9 @@ def self.build_API(include_snort)
     puts "Vendor bundle folder does NOT exist. Building gems."
     puts "build the gems into vendor/bundle"
     Dir.chdir "../production"
-    system 'bundle install --deployment'
+    system 'bundle install --deployment --without development test'
     system 'bundle package'
-    system 'bundle install --standalone'
+    system 'bundle install --standalone --without development test'
     Dir.chdir ".."
   end
 
@@ -52,7 +52,7 @@ def self.build_API(include_snort)
 
   puts "compile assets"
   Dir.chdir "../production"
-  system 'rake assets:precompile'
+  system 'bundle exec rake assets:precompile'
   Dir.chdir "../talos_api"
 
   puts "tar up the contents of the production folder"
@@ -78,10 +78,12 @@ def self.upload_API(rebuild_gems)
 
   puts "copy the app config and the database yaml files to the timestamp folder"
   `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
+            rm /usr/local/www/rulesuitest/releases/#{timestamp}/.env
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
             rm /usr/local/www/rulesuitest/releases/#{timestamp}/extras/ssh/ca.pem
+            ln -s /usr/local/www/rulesuitest/releases/shared/.env /usr/local/www/rulesuitest/releases/#{timestamp}/.env
             ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
             ln -s /usr/local/www/rulesuitest/releases/shared/database.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
             ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
@@ -107,16 +109,16 @@ def self.upload_API(rebuild_gems)
             rm -rf /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
             cp -r /usr/local/www/rulesuitest/releases/shared/vendor /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
             cd rulesuitest/releases/#{timestamp}/
-            bundle install --deployment
+            bundle install --deployment --without development test
             ENDSSH`
   else
     puts "bundle installing gems"
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "bundle installing gems"
             cd rulesuitest/releases/#{timestamp}/
-            bundle install --deployment
-            rm -rf vendor
-            cp -r /usr/local/www/rulesuitest/releases/#{timestamp}/vendor /usr/local/www/rulesuitest/releases/shared/
+            bundle install --deployment --without development test
+            rm -rf ../shared/vendor
+            cp -r vendor /usr/local/www/rulesuitest/releases/shared/
             ENDSSH`
   end
 

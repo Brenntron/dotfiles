@@ -4,6 +4,8 @@ class SessionsController < ApplicationController
     respond_to do |format|
       format.json do
         begin
+          raise Exception.new("Unauthorized Access.") if params[:api_key].blank? || params[:api_key] != Rails.configuration.ember_app[:api_key]
+
           resource = User.login_user(params,request)
           if resource
             render :json => resource

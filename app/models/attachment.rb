@@ -3,6 +3,18 @@ class Attachment < ActiveRecord::Base
   has_and_belongs_to_many :rules
   has_many :exploits
 
+  after_create {|attachment| attachment.record 'create' }
+  after_update {|attachment| attachment.record 'update' }
+  after_destroy {|attachment| attachment.record 'destroy' }
+
+  def record action
+    record = { resource: 'attachment',
+               action: action,
+               id: self.id,
+               obj: self }
+    PublishWebsocket.push_changes(record)
+  end
+
   def create_attachment
     if params[:file_upload]
       begin

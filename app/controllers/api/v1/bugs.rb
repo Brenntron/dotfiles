@@ -4,10 +4,19 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+        desc "test the websocket"
+        get 'websocket' do
+          bug = Bug.first
+          record = { resource: 'bug',
+                     action: 'update',
+                     id: bug.id,
+                     obj: bug }
+          PublishWebsocket.push_changes(record)
+        end
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
-          xmlrpc_token = request.headers['Xmlrpc-Token'] #We need to figure out how to populate the current user properly
+          xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()

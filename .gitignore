@@ -23,4 +23,4 @@
 gems.tags*
 
 dump.rdb
-.env
+/websocket/node_modules
