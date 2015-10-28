@@ -7,13 +7,13 @@ var fs = require('fs');
 
 pem.createCertificate({days:1, selfSigned:true}, function(err, keys) {
   var app = https.createServer({key: keys.serviceKey, cert: keys.certificate}, function (req, res) {
-    console.log('server created...');
+    console.log('Server created...');
     res.end('Websocket server running');
   }).listen(7000);
 
   var io = require('socket.io')(app);
   io.on('connection', function(socket){
-    console.log('a user connected');
+    console.log('A user connected.');
     sendMessage('Connection established.');
 
     socket.on('amq', function(msg){

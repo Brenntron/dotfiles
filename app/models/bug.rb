@@ -25,10 +25,13 @@ class Bug < ActiveRecord::Base
   after_destroy {|bug| bug.record 'destroy' }
 
   def record action
+    obj = JSON.parse(BugSerializer.new(self).to_json)
+    obj["bug"] = obj["bug"].except('notes', 'attachments', 'jobs', 'exploits')
+    obj["bug"]["user"] = obj["bug"]["user_id"]
     record = { resource: 'bug',
                action: action,
                id: self.id,
-               obj: self }
+               obj: obj.except("notes","attachments","rules","references","jobs","exploits")}
     PublishWebsocket.push_changes(record)
   end
 
