@@ -5,6 +5,7 @@ require 'digest'
 def red(str)
   "\e[31m#{str}\e[0m"
 end
+
 # Figure out the name of the current local branch
 def self.current_git_branch
   branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
@@ -25,28 +26,31 @@ def self.build_API(include_snort)
   puts "clone the git repo to the production folder"
   system "git clone git@github.com:talosweb/talos_api.git -b #{current_git_branch} --single-branch ../production"
 
-
-  if File.directory?("vendor/bundle")
-    puts "Vendor bundle folder exists. Copying bundle to production."
-    `cp -r vendor/bundle ../production/vendor`
-    if File.directory?("vendor/cache")
-    `cp -r vendor/cache ../production/vendor`
+  if File.directory?("../production")
+    if File.directory?("vendor/bundle")
+      puts "Vendor bundle folder exists. Copying bundle to production."
+      `cp -r vendor/bundle ../production/vendor`
+      if File.directory?("vendor/cache")
+        `cp -r vendor/cache ../production/vendor`
+      else
+        Dir.chdir "../production"
+        system 'bundle package'
+        Dir.chdir ".."
+      end
     else
+      puts "Vendor bundle folder does NOT exist. Building gems."
+      puts "build the gems into vendor/bundle"
       Dir.chdir "../production"
+      system 'bundle install --deployment'
       system 'bundle package'
+      system 'bundle install --standalone'
       Dir.chdir ".."
     end
   else
-    puts "Vendor bundle folder does NOT exist. Building gems."
-    puts "build the gems into vendor/bundle"
-    Dir.chdir "../production"
-    system 'bundle install --deployment --without development test'
-    system 'bundle package'
-    system 'bundle install --standalone --without development test'
-    Dir.chdir ".."
+    raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
   end
 
-  if(include_snort)
+  if (include_snort)
     `cp -r extras/snort ../production/extras`
   end
 
@@ -102,7 +106,7 @@ def self.upload_API(rebuild_gems)
   # if vendor folder exists copy that over to this vendor folder other wise build the gems
   # and save a copy of the vendor folder for next time.
   directory_exists = `ssh talosweb@rulesuitest.vrt.sourcefire.com "test -d /usr/local/www/rulesuitest/releases/shared/vendor && echo 1 || echo 0"`
-  if(directory_exists.to_i == 1 && rebuild_gems == false)
+  if (directory_exists.to_i == 1 && rebuild_gems == false)
     puts "copying vendor to vendor"
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "copying vendor to vendor"
@@ -116,9 +120,9 @@ def self.upload_API(rebuild_gems)
     `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
             echo "bundle installing gems"
             cd rulesuitest/releases/#{timestamp}/
-            bundle install --deployment --without development test
-            rm -rf ../shared/vendor
-            cp -r vendor /usr/local/www/rulesuitest/releases/shared/
+            bundle install --deployment
+            rm -rf /usr/local/www/rulesuitest/releases/shared/vendor
+            cp -r /usr/local/www/rulesuitest/releases/#{timestamp}/vendor /usr/local/www/rulesuitest/releases/shared/
             ENDSSH`
   end
 
@@ -129,12 +133,13 @@ def self.upload_API(rebuild_gems)
             touch tmp/restart.txt
             ENDSSH`
 end
+
 process_api = true
 send_upload = true
 rebuild_gems = false
 include_snort = true
 
-ARGV.each do|a|
+ARGV.each do |a|
   case a
     when "--no-api"
       process_api = false
@@ -164,9 +169,13 @@ ARGV.each do|a|
 end
 
 if process_api
-  build_API(include_snort)
-  if send_upload
-    upload_API(rebuild_gems)
+  begin
+    build_API(include_snort)
+    if send_upload
+      upload_API(rebuild_gems)
+    end
+  rescue Exception => e
+    puts e.message
   end
 end
 
