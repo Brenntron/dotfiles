@@ -19,7 +19,7 @@ function publishToWebsocket(msg){
   socket.emit('amq', msg);
 }
 client.connect(headers, function() {
-  console.log("Connected to ActiveMQ with Stomp.");
+  console.log("Connected to ActiveMQ with Stomp");
   client.subscribe("/queue/RulesUI.Snort.Run.Local.Test.Work", function(message) {
     var data = JSON.parse(message.body);
     publishToWebsocket(JSON.parse(data["record"]));

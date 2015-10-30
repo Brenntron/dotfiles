@@ -1,4 +1,3 @@
-
 Rails.application.routes.draw do
 
   devise_for :users, controllers: { sessions: 'sessions' }
@@ -7,6 +6,7 @@ Rails.application.routes.draw do
     collection {get :send_event}
   end
 
+  post "sessions/create.:format" => "sessions#create", :constraints => { :format => /json/}
   root 'pages#index'
 
   mount API::Base => '/api'
