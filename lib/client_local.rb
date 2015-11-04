@@ -21,9 +21,11 @@ end
 cert = OpenSSL::X509::Certificate.new()
 ssl_options= {}
 stomp_options = {}
+bugzilla_host= ""
 case Rails.env
   when "production"
     puts "stomp in production"
+    bugzilla_host= "bugzillatest02.vrt.sourcefire.com"
     cert = OpenSSL::X509::Certificate.new(File.read("/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"))
     ssl_options= {ca_file: "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem", client_cert: cert}
     stomp_options = {
@@ -32,6 +34,7 @@ case Rails.env
     }
   when "staging"
     puts "stomp in staging"
+    bugzilla_host= "bugzillatest02.vrt.sourcefire.com"
     cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
     ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
     stomp_options = {
@@ -39,6 +42,7 @@ case Rails.env
         :reliable => true, :closed_check => false
     }
   when "development"
+    bugzilla_host = "bugzillatest02.vrt.sourcefire.com"
     puts "stomp in development"
     cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
     ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
@@ -49,13 +53,14 @@ case Rails.env
 end
 
 
+
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
 
 
 # Create the xmlrpc instance for updating later
-xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
+xmlrpc = Bugzilla::XMLRPC.new(bugzilla_host)
 
 # Initialize the API
 RuleTestAPI.init('https://ruleapitest.vrt.sourcefire.com', ssl_options)

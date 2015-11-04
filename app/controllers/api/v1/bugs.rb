@@ -139,7 +139,7 @@ module API
             requires :component, type: String, desc: "The name of a component in the product above."
             requires :summary, type: String, desc: "A brief description of the bug being filed."
             requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
-            requires :description, type: String, desc: "A full text description of the bug"
+            optional :description, type: String, desc: "A full text description of the bug"
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
             optional :state_id, type: String, desc: "The new state of the bug, Open, Closed, ReOpened,etc"
             optional :creator, type: String, desc: "The person who created the bug"
@@ -157,10 +157,10 @@ module API
         end
         put ":id", root: "bug" do
           bug = Bug.find(permitted_params[:id])
-
           if permitted_params[:bug][:editor_id]
+            state = nil
             editor = User.find(permitted_params[:bug][:editor_id])
-            state_params = Bug.update_state(bug, nil, editor.email)
+            state_params = Bug.update_state(bug, state, editor.email)
             options = {
                 :ids => permitted_params[:id],
                 :assigned_to => editor.email,
@@ -218,34 +218,30 @@ module API
             update_params = {
                 :committer_notes => permitted_params[:bug][:new_committer_notes]
             }
-          else
-            options = {
-                :ids => permitted_params[:id],
-                :product => permitted_params[:bug][:product],
-                :component => permitted_params[:bug][:component],
-                :summary => permitted_params[:bug][:summary],
-                :version => permitted_params[:bug][:version],
-                :description => permitted_params[:bug][:description],
-                :creator => permitted_params[:bug][:creator],
-                :opsys => permitted_params[:bug][:opsys],
-                :platform => permitted_params[:bug][:platform],
-                :priority => permitted_params[:bug][:priority],
-                :severity => permitted_params[:bug][:severity],
-                :classification => permitted_params[:bug][:classification]
-            }
-            update_params ={
-                :product => permitted_params[:bug][:product],
-                :component => permitted_params[:bug][:component],
-                :summary => permitted_params[:bug][:summary],
-                :version => permitted_params[:bug][:version],
-                :description => permitted_params[:bug][:description],
-                :opsys => permitted_params[:bug][:opsys],
-                :platform => permitted_params[:bug][:platform],
-                :priority => permitted_params[:bug][:priority],
-                :severity => permitted_params[:bug][:severity],
-                :classification => permitted_params[:bug][:classification]
-            }
           end
+
+          options[:ids] = permitted_params[:id]
+          options[:product] = permitted_params[:bug][:product]
+          options[:component] = permitted_params[:bug][:component]
+          options[:summary] = permitted_params[:bug][:summary]
+          options[:version] = permitted_params[:bug][:version]
+          options[:creator] = permitted_params[:bug][:creator]
+          options[:opsys] = permitted_params[:bug][:opsys]
+          options[:platform] = permitted_params[:bug][:platform]
+          options[:priority] = permitted_params[:bug][:priority]
+          options[:severity] = permitted_params[:bug][:severity]
+          options[:classification] = permitted_params[:bug][:classification]
+
+          update_params[:product] = permitted_params[:bug][:product]
+          update_params[:component] = permitted_params[:bug][:component]
+          update_params[:summary] = permitted_params[:bug][:summary]
+          update_params[:version] = permitted_params[:bug][:version]
+          update_params[:opsys] = permitted_params[:bug][:opsys]
+          update_params[:platform] = permitted_params[:bug][:platform]
+          update_params[:priority] = permitted_params[:bug][:priority]
+          update_params[:severity] = permitted_params[:bug][:severity]
+          update_params[:classification] = permitted_params[:bug][:classification]
+
           # update buzilla (if needed)
           options.reject! { |k, v| v.nil? } if options
           Bugzilla::Bug.new(bugzilla_session).update(options) unless options.blank?
