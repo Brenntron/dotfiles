@@ -39,12 +39,13 @@ def self.build_API(include_snort)
       end
     else
       puts "Vendor bundle folder does NOT exist. Building gems."
-      puts "build the gems into vendor/bundle"
-      Dir.chdir "../production"
+      puts "build the gems into talos_api/vendor/bundle"
       system 'bundle install --deployment'
       system 'bundle package'
       system 'bundle install --standalone'
-      Dir.chdir ".."
+      puts "copying gems from talos_api/vendor/bundle to production"
+      `cp -r vendor/bundle ../production/vendor`
+      `cp -r vendor/cache ../production/vendor`
     end
   else
     raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
