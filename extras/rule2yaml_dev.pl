@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 use strict;
 use Net::Snort::Parser::Rule;
 use YAML;

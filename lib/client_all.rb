@@ -17,50 +17,34 @@ local_cache_path = File.expand_path('tmp/pcaps')
 
 # Make sure our pcaps cache exists
 if not File.exists?(local_cache_path)
-	Dir.mkdir(local_cache_path)
+  Dir.mkdir(local_cache_path)
 end
 
 cert = OpenSSL::X509::Certificate.new()
 ssl_options= {}
 stomp_options = {}
-case Rails.env
-  when "production"
-    puts "stomp in production"
-    cert = OpenSSL::X509::Certificate.new(File.read("/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"))
-    ssl_options= {ca_file: "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem", client_cert: cert}
-    stomp_options = {
-        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
-        :reliable => true, :closed_check => false
-    }
-  when "staging"
-    puts "stomp in staging"
-    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
-    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
-    stomp_options = {
-        :hosts => [{:login => "guest", :passcode => "guest", :host => 'mqtest01.vrt.sourcefire.com', :port => 61613, :ssl => false}],
-        :reliable => true, :closed_check => false
-    }
-  when "development"
-    puts "stomp in development"
-    cert = OpenSSL::X509::Certificate.new(File.read("/System/Library/OpenSSL/certs/ca.pem"))
-    ssl_options= {ca_file: "/System/Library/OpenSSL/certs/ca.pem", client_cert: cert}
-    stomp_options = {
-        :hosts => [{:login => "guest", :passcode => "guest", :host => 'localhost', :port => 61613, :ssl => false}],
-        :reliable => true, :closed_check => false
-    }
-end
+cert = OpenSSL::X509::Certificate.new(File.read(Rails.configuration.cert_file))
+ssl_options= {ca_file: Rails.configuration.cert_file, client_cert: cert}
+stomp_options = {
+    :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
+    :reliable => true, :closed_check => false
+}
 
 # Create the xmlrpc instance for updating later
-xmlrpc = Bugzilla::XMLRPC.new('bugzilla.vrt.sourcefire.com')
+xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
-client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", { :ack => :client }
+client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", {:ack => :client}
 
 # Initialize the API
-RuleTestAPI.init('https://ruleapitest.vrt.sourcefire.com', ssl_options)
-
+tries ||= 3
+begin
+  RuleTestAPI.init(Rails.configuration.ruletest_server, ssl_options)
+rescue Exception => e
+  retry unless (tries -= 1).zero?
+end
 # Find the engine we should be using for these rules
 engine_type = EngineType.where(:name => 'Persistent').first
 snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
@@ -72,9 +56,9 @@ raise Exception.new("Unable to find Open Source snort configuration") if snort_c
 raise Exception.new("Unable to find All Rules configuration") if rule_configuration.nil?
 
 engine = Engine.where(
-  :engine_type_id => engine_type[:id],
-  :snort_configuration_id => snort_configuration[:id],
-  :rule_configuration_id => rule_configuration[:id]).first
+    :engine_type_id => engine_type[:id],
+    :snort_configuration_id => snort_configuration[:id],
+    :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
 
 puts "listening to queue"
@@ -85,13 +69,13 @@ while message = client.receive
   errors = Array.new
   job_id = nil
 
-	begin
+  begin
 
-		# Start by parsing the request
-		request = JSON.parse(message.body)
+    # Start by parsing the request
+    request = JSON.parse(message.body)
 
-		# Release the message early
-		client.ack(message.headers['message-id'])
+    # Release the message early
+    client.ack(message.headers['message-id'])
 
     # Use this for hashing the pcaps
     sha256 = Digest::SHA256.new
@@ -100,17 +84,17 @@ while message = client.receive
     pcaps = Hash.new
 
     # Save the job_id
-    job_id = request['job_id'] 
+    job_id = request['job_id']
 
     # Fetch all of the needed pcaps into the cache directory
     request['attachments'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
-			
+
       # Updated files get new attachment ids so no need to test the actual data
       if not File.exists?(pcap_path)
         attempts = 0
 
-        begin 
+        begin
           xmlrpc.token = request['cookie']
           bug = Bugzilla::Bug.new(xmlrpc)
           res = bug.attachments(:attachment_ids => attachment_id, :include_fields => ['data'])
@@ -150,26 +134,26 @@ while message = client.receive
       if pcap.error?
         errors << pcap.error
       else
-        pcaps[sha] = { :pcap_id => pcap.id, :attachment_id => attachment_id }
+        pcaps[sha] = {:pcap_id => pcap.id, :attachment_id => attachment_id}
       end
     end
 
-    test_pcaps = pcaps.map {|k,v| v[:pcap_id]} 
+    test_pcaps = pcaps.map { |k, v| v[:pcap_id] }
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size == 1
       test_pcaps << nil
     end
 
-	  # Create the new job
+    # Create the new job
 
     job = Job.create(:engine_id => engine[:id], :pcaps => test_pcaps, :completed => false)
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
-		
+
     # Wait for the job to finish
-    until(job.completed == "1")
+    until (job.completed == "1")
       sleep 1
       job = Job.find(job.id)
     end
@@ -177,37 +161,37 @@ while message = client.receive
     # Send back alerts
     job.pcap_tests.each do |pt|
       pt.alerts.each do |alert|
-        alerts << 
-          { 
-            :id => pcaps[pt.pcap.file_hash][:attachment_id], 
-            :gid => alert.gid, 
-            :sid => alert.sid, 
-            :rev => alert.rev, 
-            :message => alert.msg 
-          }
+        alerts <<
+            {
+                :id => pcaps[pt.pcap.file_hash][:attachment_id],
+                :gid => alert.gid,
+                :sid => alert.sid,
+                :rev => alert.rev,
+                :message => alert.msg
+            }
       end
     end
 
-	rescue JSON::ParserError => e
+  rescue JSON::ParserError => e
     print "Failed to parse json message:"
     puts e.to_s
     puts e.backtrace.join("\n\t")
-	rescue EOFError => e
-	  errors << "Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}"
+  rescue EOFError => e
+    errors << "Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}"
   rescue Exception => e
-		errors << "An unknown error occurred: #{$!}\n#{e.backtrace.join("\n\t")}"
-	end
-  
+    errors << "An unknown error occurred: #{$!}\n#{e.backtrace.join("\n\t")}"
+  end
+
   # Finally, send the results back
   puts alerts.inspect
   puts errors.inspect
   puts job_id
   unless job_id.nil?
     client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
-			{ 
-        :job_id => job_id,
-        :alerts => alerts,
-        :errors => errors,
-			}.to_json
+                   {
+                       :job_id => job_id,
+                       :alerts => alerts,
+                       :errors => errors,
+                   }.to_json
   end
 end
