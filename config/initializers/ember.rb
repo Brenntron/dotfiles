@@ -4,3 +4,4 @@ Rails.configuration.ember_app = {
     :bugzilla_key => ENV['Bugzilla_secret'],
     :remote_user => ENV['remote_user']
 }
+
