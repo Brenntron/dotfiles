@@ -38,7 +38,7 @@ client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
 # Initialize the API
 tries ||= 3
 begin
-  RuleTestAPI.init(ruletest_server, ssl_options)
+  RuleTestAPI.init(Rails.configuration.ruletest_server, ssl_options)
 rescue Exception => e
   retry unless (tries -= 1).zero?
 end
