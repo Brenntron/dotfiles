@@ -53,6 +53,10 @@ class User < ActiveRecord::Base
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
       kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
 
+      Rails.logger.info("++++++++++++++++++++++++")
+      Rails.logger.info(request.env)
+      Rails.logger.info("++++++++++++++++++++++++")
+
       raise Exception.new("You are not logged into Kerberos. Please try again.") if kerberos_login.nil?
       user = User.where("kerberos_login=?", kerberos_login).first_or_create do |new_record|
         new_record.email = ""
