@@ -230,7 +230,9 @@ ActiveRecord::Schema.define(version: 20150826050243) do
 
   create_table "users", force: true do |t|
     t.string   "cvs_username"
+    t.string   "cec_username"
     t.string   "kerberos_login"
+    t.string   "display_name"
     t.boolean  "committer",              default: false
     t.boolean  "confirmed",              default: false
     t.string   "email",                  default: "",    null: false

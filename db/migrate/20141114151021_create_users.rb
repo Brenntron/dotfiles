@@ -2,7 +2,9 @@ class CreateUsers < ActiveRecord::Migration
   def change
     create_table :users do |t|
       t.string "cvs_username"
+      t.string "cec_username"
       t.string "kerberos_login"
+      t.string "display_name"
       t.boolean "committer", :default => false
       t.boolean "confirmed", :default => false
 

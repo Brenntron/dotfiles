@@ -52,14 +52,17 @@ class User < ActiveRecord::Base
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
       kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
-
       raise Exception.new("You are not logged into Kerberos. Please try again.") if kerberos_login.nil?
       user = User.where("kerberos_login=?", kerberos_login).first_or_create do |new_record|
-        new_record.email = ""
         new_record.kerberos_login = kerberos_login
-        new_record.cvs_username = ""
-        new_record.committer = 'true'
-        new_record.class_level = 'unclassified'
+        new_record.email          = request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
+        new_record.cvs_username   = request.env['AUTHENTICATE_SAMACCOUNTNAME'] || Rails.configuration.backend_auth[:authenticate_cvs_username]
+        new_record.cec_username   = request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
+        new_record.display_name   = request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
+        new_record.committer      = 'true'
+        new_record.class_level    = 'unclassified'
+        new_record.password       = 'password'
+        new_record.password_confirmation= 'password'
       end
 
       user.confirmed = 'true'
@@ -78,7 +81,6 @@ class User < ActiveRecord::Base
           :user_email => user.email, #this also ust be called user_email for the ember app session to persist
           :user_id => user.id
       }
-
       raise Exception.new("Error signing in. Please contact the administrator.") unless user.save
       return resource
 
