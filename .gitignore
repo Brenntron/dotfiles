@@ -22,6 +22,7 @@
 .idea/*
 .tags*
 gems.tags*
+.env
 
 dump.rdb
 /websocket/node_modules

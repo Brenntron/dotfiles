@@ -37,6 +37,7 @@ module Api
                  :max_age => 0
       end
     end
+
     case Rails.env
       when "development"
         config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
