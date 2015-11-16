@@ -2,23 +2,23 @@ class SessionsController < ApplicationController
   def create
 
     if !params[:api_key].blank?
-    respond_to do |format|
-      format.json do
-        begin
-          raise Exception.new("Unauthorized Access.") if params[:api_key].blank? || params[:api_key] != Rails.configuration.ember_app[:api_key]
+      respond_to do |format|
+        format.json do
+          begin
+            raise Exception.new("Unauthorized Access.") if params[:api_key].blank? || params[:api_key] != Rails.configuration.ember_app[:api_key]
 
-          resource = User.login_user(params,request)
-          if resource
-            render :json => resource
+            resource = User.login_user(params, request)
+            if resource
+              render :json => resource
+            end
+          rescue XMLRPC::FaultException => e
+            return invalid_login_attempt(e)
+          rescue Exception => e
+            return invalid_login_attempt(e)
           end
-        rescue XMLRPC::FaultException => e
-          return invalid_login_attempt(e)
-        rescue Exception => e
-          return invalid_login_attempt(e)
         end
       end
     end
-      end
   end
 
   def logout
