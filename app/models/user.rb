@@ -52,7 +52,6 @@ class User < ActiveRecord::Base
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
       kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
-
       raise Exception.new("You are not logged into Kerberos. Please try again.") if kerberos_login.nil?
       user = User.where("kerberos_login=?", kerberos_login).first_or_create do |new_record|
         new_record.email = ""
@@ -68,7 +67,6 @@ class User < ActiveRecord::Base
       if user.email == "" #this person has had an account created programatically but they havn't signed in yet.
         # we need to look up the user in LDAP and get their email
       end
-
       user.ensure_authentication_token #make sure the user has a token generated
       resource = {
           :success => true,
@@ -78,7 +76,6 @@ class User < ActiveRecord::Base
           :user_email => user.email, #this also ust be called user_email for the ember app session to persist
           :user_id => user.id
       }
-
       raise Exception.new("Error signing in. Please contact the administrator.") unless user.save
       return resource
 

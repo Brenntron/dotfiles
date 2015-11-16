@@ -1,6 +1,7 @@
 class SessionsController < ApplicationController
   def create
 
+    if !params[:api_key].blank?
     respond_to do |format|
       format.json do
         begin
@@ -17,6 +18,7 @@ class SessionsController < ApplicationController
         end
       end
     end
+      end
   end
 
   def logout
