@@ -19,9 +19,9 @@ class User < ActiveRecord::Base
            top_secret_sci: 4
        }
 
-  after_create {|user| user.record 'create' }
-  after_update {|user| user.record 'update' }
-  after_destroy {|user| user.record 'destroy' }
+  after_create {|user| user.record 'create' if Rails.configuration.websockets_enabled == "true"}
+  after_update {|user| user.record 'update' if Rails.configuration.websockets_enabled == "true"}
+  after_destroy {|user| user.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
 
   def record action
     record = { resource: 'user',
