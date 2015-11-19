@@ -64,6 +64,7 @@ module Api
         config.amq_host = "mq.vrt.sourcefire.com"
         config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
     end
+    config.websockets_enabled = "false"
     config.bugzilla_domain = 'cisco.com'
     config.snort_rule_path = Rails.root.join('extras', 'snort', 'rules')
     config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'

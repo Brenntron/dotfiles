@@ -1,9 +1,9 @@
 class Note < ActiveRecord::Base
   belongs_to :bug
 
-  after_create {|note| note.record 'create' }
-  after_update {|note| note.record 'update' }
-  after_destroy {|note| note.record 'destroy' }
+  after_create {|note| note.record 'create' if Rails.configuration.websockets_enabled == "true"}
+  after_update {|note| note.record 'update' if Rails.configuration.websockets_enabled == "true"}
+  after_destroy {|note| note.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
 
   def record action
     record = { resource: 'note',

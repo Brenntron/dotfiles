@@ -20,9 +20,9 @@ class Bug < ActiveRecord::Base
       top_secret_sci: 4
   }
 
-  after_create {|bug| bug.record 'create' }
-  after_update {|bug| bug.record 'update' }
-  after_destroy {|bug| bug.record 'destroy' }
+  after_create {|bug| bug.record 'create' if Rails.configuration.websockets_enabled == "true"}
+  after_update {|bug| bug.record 'update' if Rails.configuration.websockets_enabled == "true"}
+  after_destroy {|bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
 
   def record action
     obj = JSON.parse(BugSerializer.new(self).to_json)
