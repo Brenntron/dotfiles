@@ -3,9 +3,9 @@ class Attachment < ActiveRecord::Base
   has_and_belongs_to_many :rules
   has_many :exploits
 
-  after_create {|attachment| attachment.record 'create' }
-  after_update {|attachment| attachment.record 'update' }
-  after_destroy {|attachment| attachment.record 'destroy' }
+  after_create {|attachment| attachment.record 'create' if Rails.configuration.websockets_enabled == "true"}
+  after_update {|attachment| attachment.record 'update' if Rails.configuration.websockets_enabled == "true"}
+  after_destroy {|attachment| attachment.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
 
   def record action
     record = { resource: 'attachment',
