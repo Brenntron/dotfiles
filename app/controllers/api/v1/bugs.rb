@@ -156,7 +156,9 @@ module API
 
         end
         put ":id", root: "bug" do
-          bug = Bug.find(permitted_params[:id])
+          bug     = Bug.find(permitted_params[:id])
+          options = {}
+          update_params = {}
           if permitted_params[:bug][:editor_id]
             state = nil
             editor = User.find(permitted_params[:bug][:editor_id])
@@ -219,7 +221,6 @@ module API
                 :committer_notes => permitted_params[:bug][:new_committer_notes]
             }
           end
-
           options[:ids] = permitted_params[:id]
           options[:product] = permitted_params[:bug][:product]
           options[:component] = permitted_params[:bug][:component]
@@ -244,9 +245,11 @@ module API
 
           # update buzilla (if needed)
           options.reject! { |k, v| v.nil? } if options
+          binding.pry
           Bugzilla::Bug.new(bugzilla_session).update(options) unless options.blank?
           # update the database
           update_params.reject! { |k, v| v.nil? }
+          binding.pry
           Bug.update(permitted_params[:id], update_params)
 
         end
