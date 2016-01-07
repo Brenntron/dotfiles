@@ -156,7 +156,9 @@ module API
 
         end
         put ":id", root: "bug" do
-          bug = Bug.find(permitted_params[:id])
+          bug     = Bug.find(permitted_params[:id])
+          options = {}
+          update_params = {}
           if permitted_params[:bug][:editor_id]
             state = nil
             editor = User.find(permitted_params[:bug][:editor_id])
@@ -219,7 +221,6 @@ module API
                 :committer_notes => permitted_params[:bug][:new_committer_notes]
             }
           end
-
           options[:ids] = permitted_params[:id]
           options[:product] = permitted_params[:bug][:product]
           options[:component] = permitted_params[:bug][:component]

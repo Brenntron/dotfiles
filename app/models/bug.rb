@@ -231,17 +231,17 @@ class Bug < ActiveRecord::Base
           new_user = User.where("email=?", item['assigned_to']).first
           new_committer = User.where("email=?", item['qa_contact']).first
           if creator.nil?
-            new_record.creator = User.create(kerberos_login: "generated", cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['creator'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.creator = User.create(kerberos_login: "generated", cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['creator'], password: 'password', password_confirmation: 'password', committer: 'false')
           else
             new_record.creator = creator
           end
           if new_user.nil?
-            new_record.user = User.create(kerberos_login: "generated",cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.user = User.create(kerberos_login: "generated",cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
           else
             new_record.user = new_user
           end
           if new_committer.nil?
-            new_record.committer = User.create(kerberos_login: "generated",cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.committer = User.create(kerberos_login: "generated",cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
           else
             new_record.committer = new_committer
           end

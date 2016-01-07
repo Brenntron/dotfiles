@@ -6,15 +6,15 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
 
-  after_create {|rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true"}
-  after_update {|rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true"}
-  after_destroy {|rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
+  after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
+  after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
+  after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
   def record action
-    record = { resource: 'rule',
-               action: action,
-               id: self.id,
-               obj: self }
+    record = {resource: 'rule',
+              action: action,
+              id: self.id,
+              obj: self}
     PublishWebsocket.push_changes(record)
   end
 
@@ -49,7 +49,9 @@ class Rule < ActiveRecord::Base
         if rule_text.nil?
           raise "Rule doesn't exist."
         else
-          rule_text.strip!.gsub!(/(?=\A).+(?=alert)/, '')
+          # remove anything before the first alert
+          # rule_text.strip!.gsub!(/(?=^).+?(?=alert)/, '')
+          rule_text.strip!
           parsed = Rule.visruleparser(rule_text)
           new_rule = Rule.create(Rule.parse_and_create_rule(rule_text))
           new_rule.update(
@@ -151,7 +153,7 @@ class Rule < ActiveRecord::Base
 
   def associate_references(rule_text)
     references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/)}
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
     references.each do |r|
       r = r.split(',')
       unless r[1].empty?
@@ -163,30 +165,31 @@ class Rule < ActiveRecord::Base
 
   def update_references(rule_text)
     current_references = []
-    self.references.each {|r| current_references << ReferenceType.where(id:r.reference_type_id).first.name + ',' + r.reference_data}
+    self.references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
     references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/)}
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
     references.each do |r|
       # skip this reference if it already exists
       if current_references.include? r
         current_references.delete(r)
-      # otherwise create it
+        # otherwise create it
       else
         ref_type = r.split(',')[0]
         ref_data = r.split(',')[1]
-        self.references << Reference.create(reference_type: ReferenceType.where(name:ref_type).first, reference_data:ref_data) unless ref_data.strip.empty?
+        self.references << Reference.create(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data) unless ref_data.strip.empty?
       end
     end
     # delete the reference if it is no longer part of the record
     current_references.each do |r|
       ref_type = r.split(',')[0]
       ref_data = r.split(',')[1]
-      self.references.where(reference_type: ReferenceType.where(name:ref_type).first,reference_data:ref_data).each { |ref| ref.destroy! }
+      self.references.where(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data).each { |ref| ref.destroy! }
     end
   end
 
   def self.parse_and_create_rule(rule)
     parsed = Rule.visruleparser(rule)
+
     if parsed[:rule].match(/FAILED/)
       rule_params = {
           :message => rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
@@ -198,7 +201,8 @@ class Rule < ActiveRecord::Base
       }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
     else
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
-      detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip
+      detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule]) ? /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip : nil
+      message = /Message\s*:\s(.*)/.match(parsed[:rule]) ? /Message\s*:\s(.*)/.match(parsed[:rule])[1] : "<MISSING>"
       rule_params = {
           :id => rule_sid,
           :sid => rule_sid,
@@ -206,15 +210,16 @@ class Rule < ActiveRecord::Base
           :rule_parsed => parsed[:rule],
           :gid => rule_sid ? 1 : nil,
           :rev => /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
-          :connection => /Connection\s*:\s(.+)/.match(parsed[:rule])[1],
-          :message => /Message\s*:\s(.*)/.match(parsed[:rule])[1],
-          :detection => detection[-1, 1] == ';' ? detection : detection + ';',
-          :flow => /Flow\s*:\s(.+)/.match(parsed[:rule])[1],
-          :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
-          :class_type => /Classtype\s*:\s(.*)/.match(parsed[:rule])[1],
+          :connection => /Connection\s*:\s(.+)/.match(parsed[:rule]) ? /Connection\s*:\s(.+)/.match(parsed[:rule])[1] : "<MISSING>",
+          :message => message,
+          :detection => detection.nil? ? "<MISSING>" : detection[-1, 1] == ';' ? detection : detection + ';',
+          :flow => /Flow\s*:\s(.+)/.match(parsed[:rule]) ? /Flow\s*:\s(.+)/.match(parsed[:rule])[1] : "<MISSING>",
+          :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : "<MISSING>",
+          :class_type => /Classtype\s*:\s(.*)/.match(parsed[:rule]) ? /Classtype\s*:\s(.*)/.match(parsed[:rule])[1] : "<MISSING>",
           :committed => true,
           :state => rule_sid ? 'UNCHANGED' : 'NEW'
-      }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+      }
+      rule_params.reject() { |k, v,| v.nil? || v == "<MISSING>" }
       rule_params[:rule_failures] = nil
     end
     rule_params
