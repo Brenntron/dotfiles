@@ -245,11 +245,9 @@ module API
 
           # update buzilla (if needed)
           options.reject! { |k, v| v.nil? } if options
-          binding.pry
           Bugzilla::Bug.new(bugzilla_session).update(options) unless options.blank?
           # update the database
           update_params.reject! { |k, v| v.nil? }
-          binding.pry
           Bug.update(permitted_params[:id], update_params)
 
         end

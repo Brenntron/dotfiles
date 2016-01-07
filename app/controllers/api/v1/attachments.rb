@@ -53,7 +53,7 @@ module API
                 :file_name => options[:file_name],
                 :summary => options[:summary],
                 :content_type => options[:type],
-                :direct_upload_url => "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attachment_id.to_s,
+                :direct_upload_url => "https://"+ Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
                 :creator => current_user.email,
                 :is_private => options[:is_private],
                 :is_obsolete => false,

@@ -68,10 +68,6 @@ class User < ActiveRecord::Base
       user.confirmed = 'true'
       user.updated_at = Time.now
 
-      if user.email == "" #this person has had an account created programatically but they havn't signed in yet.
-        # we need to look up the user in LDAP and get their email
-      end
-
       user.ensure_authentication_token #make sure the user has a token generated
       resource = {
           :success => true,

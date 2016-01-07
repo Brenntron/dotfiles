@@ -7,10 +7,6 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 
-
-# u1 = User.create(kerberos_login: "generated",cvs_username:"tuser1",email:"testUser1@cisco.com  ",password: 'password', password_confirmation: 'password',committer:'false')
-# u2 = User.create(kerberos_login: "generated",cvs_username:"tuser2",email:"testUser2@cisco.com",password: 'password', password_confirmation: 'password',committer:'false')
-
 ReferenceType.create(:name => 'cve',:description => 'Common Vulnerabilities and Exposures',:validation => '^(19|20)\d{2}-\d{4}$',:bugzilla_format => 'cve-((19|20)\d{2}-\d{4})',:example => '1999-1234',:rule_format => 'cve,<reference>',:url => 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-DATA')
 ReferenceType.create(:name => 'bugtraq',:description => 'Bugtraq - SecurityFocus',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'bugtraq,<reference>',:url => 'http://www.securityfocus.com/bid/DATA')
 ReferenceType.create(:name => 'osvdb',:description => 'The Open Source Vulnerability Database',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'osvdb,<reference>',:url => 'http://www.osvdb.org/DATA')
