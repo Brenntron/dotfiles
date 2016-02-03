@@ -85,42 +85,43 @@ def self.run_server_config(timestamp, rebuild_gems)
    `ssh rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/rulesuitest/releases/#{timestamp}/deploy_api.rb --no-api --run-config #{rebuild_gems}`
 end
 
-def self.production_config()
+def self.production_config(rebuild_gems)
   puts "copy the app config and the database yaml files to the timestamp folder"
-  # system "rm #{Dir.pwd}/.env"
-  # system "rm #{Dir.pwd}/config/database.yml"
-  # system "rm #{Dir.pwd}/config/app_config.yml"
-  # system "rm #{Dir.pwd}/config/secrets.yml"
-  # system "rm #{Dir.pwd}/extras/ssh/ca.pem"
-  # system "ln -s /usr/local/www/rulesuitest/releases/shared/.env #{Dir.pwd}/.env"
-  # system "ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml #{Dir.pwd}/config/secrets.yml"
-  # system "ln -s /usr/local/www/rulesuitest/releases/shared/database.yml #{Dir.pwd}/config/database.yml"
-  # system "ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml #{Dir.pwd}/config/app_config.yml"
-  # system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
+  system "rm #{Dir.pwd}/.env"
+  system "rm #{Dir.pwd}/config/database.yml"
+  system "rm #{Dir.pwd}/config/app_config.yml"
+  system "rm #{Dir.pwd}/config/secrets.yml"
+  system "rm #{Dir.pwd}/extras/ssh/ca.pem"
+  system "ln -s /usr/local/www/rulesuitest/releases/shared/.env #{Dir.pwd}/.env"
+  system "ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml #{Dir.pwd}/config/secrets.yml"
+  system "ln -s /usr/local/www/rulesuitest/releases/shared/database.yml #{Dir.pwd}/config/database.yml"
+  system "ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml #{Dir.pwd}/config/app_config.yml"
+  system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
 
   puts "simlink the timestamped folder to the app directory"
-  # system "rm /usr/local/www/rulesuitest/public/app"
-  # system "ln -s #{Dir.pwd} /usr/local/www/rulesuitest/public/app"
+  system "rm /usr/local/www/rulesuitest/public/app"
+  system "ln -s #{Dir.pwd} /usr/local/www/rulesuitest/public/app"
 
   puts "build the gems locally if folder exists"
-  # if vendor folder exists copy that over to this vendor folder other wise build the gems
-  # and save a copy of the vendor folder for next time.
-  if File.directory?("/usr/local/www/rulesuitest/releases/shared/vendor") && rebuild_gems == false
-    puts "dont rebuild gems and copy shared/vendor to app/vendor"
-    # system "rm -rf #{Dir.pwd}/vendor"
-    # system "cp -r /usr/local/www/rulesuitest/releases/shared/vendor #{Dir.pwd}/vendor"
-    # system "bundle install --deployment --without development test"
-  else
+  # if vendor folder doesnt exist or we ask to rebuild the gems then build the gems and create a copy for later
+  if !File.directory?("/usr/local/www/rulesuitest/releases/shared/vendor") || rebuild_gems
     puts "rebuilding gems and over writing the ones in shared vendor"
-    # system "bundle install --deployment"
-    # system "rm -rf /usr/local/www/rulesuitest/releases/shared/vendor"
-    # system "cp -r #{Dir.pwd}/vendor /usr/local/www/rulesuitest/releases/shared/"
+    system "bundle install --deployment"
+    system "rm -rf /usr/local/www/rulesuitest/releases/shared/vendor"
+    system "cp -r #{Dir.pwd}/vendor /usr/local/www/rulesuitest/releases/shared/"
+  else
+    puts "dont rebuild gems and copy shared/vendor to app/vendor"
+    system "rm -rf #{Dir.pwd}/vendor"
+    system "cp -r /usr/local/www/rulesuitest/releases/shared/vendor #{Dir.pwd}/vendor"
+    system "bundle install --deployment --without development test"
   end
 
   puts "Restarting server tmp/restart.txt"
-  # system "mkdir #{Dir.pwd}/tmp"
-  # system "touch tmp/restart.txt"
+  system "mkdir #{Dir.pwd}/tmp"
+  system "touch tmp/restart.txt"
 
+  puts "removing rulesuitest.tar.gz"
+  system "rm #{Dir.pwd}/rulesuitest.tar.gz"
 end
 
 process_api = true
@@ -185,7 +186,7 @@ if process_api
 end
 if run_config
   begin
-      production_config
+      production_config(rebuild_gems)
   rescue Exception => e
     puts e.message
   end
