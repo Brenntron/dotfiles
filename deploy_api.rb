@@ -87,7 +87,7 @@ end
 
 def self.production_config(timestamp, rebuild_gems)
   Dir.chdir "/usr/local/www/rulesuitest/releases/#{timestamp}"
-  system "echo 'copy the app config and the database yaml files to the timestamp folder'"
+  `echo 'copy the app config and the database yaml files to the timestamp folder'`
   system "rm #{Dir.pwd}/.env"
   system "rm #{Dir.pwd}/config/database.yml"
   system "rm #{Dir.pwd}/config/app_config.yml"
@@ -99,29 +99,29 @@ def self.production_config(timestamp, rebuild_gems)
   system "ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml #{Dir.pwd}/config/app_config.yml"
   system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
 
-  system "echo 'simlink the timestamped folder to the app directory'"
+  `echo 'simlink the timestamped folder to the app directory'`
   system "rm /usr/local/www/rulesuitest/public/app"
   system "ln -s #{Dir.pwd} /usr/local/www/rulesuitest/public/app"
 
-  system "echo 'build the gems locally if folder exists'"
+  `echo 'build the gems locally if folder exists'`
   # if vendor folder doesnt exist or we ask to rebuild the gems then build the gems and create a copy for later
   if !File.directory?("/usr/local/www/rulesuitest/releases/shared/vendor") || rebuild_gems
-    system "echo 'rebuilding gems and over writing the ones in shared vendor'"
+    `echo 'rebuilding gems and over writing the ones in shared vendor'`
     system "bundle install --deployment"
     system "rm -rf /usr/local/www/rulesuitest/releases/shared/vendor"
     system "cp -r #{Dir.pwd}/vendor /usr/local/www/rulesuitest/releases/shared/"
   else
-    system "echo 'dont rebuild gems and copy shared/vendor to app/vendor'"
+    `echo 'dont rebuild gems and copy shared/vendor to app/vendor'`
     system "rm -rf #{Dir.pwd}/vendor"
     system "cp -r /usr/local/www/rulesuitest/releases/shared/vendor #{Dir.pwd}/vendor"
     system "bundle install --deployment --without development test"
   end
 
-  system "echo 'Restarting server tmp/restart.txt'"
+  `echo 'Restarting server tmp/restart.txt'`
   system "mkdir #{Dir.pwd}/tmp"
   system "touch tmp/restart.txt"
 
-  system "echo 'removing rulesuitest.tar.gz'"
+  `echo 'removing rulesuitest.tar.gz'`
   system "rm #{Dir.pwd}/rulesuitest.tar.gz"
 end
 
