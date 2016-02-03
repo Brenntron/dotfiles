@@ -28,9 +28,11 @@ stomp_options = {
     :reliable => true, :closed_check => false
 }
 
+puts "talk to bugzilla"
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 
+puts "create stomp client"
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}

@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+
 require 'open3'
 require 'stomp'
 require 'sfbugzilla'

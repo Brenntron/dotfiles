@@ -64,84 +64,79 @@ def self.build_API(include_snort)
   system 'cd ../production/ && tar -zcvf ../rulesuitest.tar.gz . && cd ..'
 end
 
-def self.upload_API(rebuild_gems)
-  puts "create a new folder on the server with a new timestamp"
-  timestamp = Time.now.to_i
-  `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
-            mkdir rulesuitest/releases/#{timestamp}
-            ENDSSH`
+def self.upload_API
+  begin
+    puts "create a new folder on the server with a new timestamp"
+    timestamp = Time.now.to_i
+    system "ssh rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/rulesuitest/releases/#{timestamp}"
+    if File.exists?("../rulesuitest.tar.gz")
+      puts "scp the tarball to talosweb@rulesuitest.vrt.sourcefire.com:rulesuitest/public/app folder"
+      system "scp ../rulesuitest.tar.gz rulesuitest.vrt.sourcefire.com:/usr/local/www/rulesuitest/releases/#{timestamp}/"
+      puts "unload the zip file into timestamp folder"
+      system "ssh rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/rulesuitest/releases/#{timestamp}/ -zxvf /usr/local/www/rulesuitest/releases/#{timestamp}/rulesuitest.tar.gz"
+    else
+      raise("Please build the project first")
+    end
+  end
+  timestamp
+end
 
-  puts "scp the tarball to talosweb@rulesuitest.vrt.sourcefire.com:rulesuitest/public/app folder"
-  system "scp ../rulesuitest.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp}"
+def self.run_server_config(timestamp, rebuild_gems)
+   `ssh rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/rulesuitest/releases/#{timestamp}/deploy_api.rb --no-api --run-config #{rebuild_gems}`
+end
 
-  puts "unload the zip file into timestamp folder"
-  `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
-            cd rulesuitest/releases/#{timestamp}/
-            tar -zxvf rulesuitest.tar.gz
-            rm rulesuitest.tar.gz
-            ENDSSH`
-
+def self.production_config()
   puts "copy the app config and the database yaml files to the timestamp folder"
-  `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
-            rm /usr/local/www/rulesuitest/releases/#{timestamp}/.env
-            rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
-            rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
-            rm /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
-            rm /usr/local/www/rulesuitest/releases/#{timestamp}/extras/ssh/ca.pem
-            ln -s /usr/local/www/rulesuitest/releases/shared/.env /usr/local/www/rulesuitest/releases/#{timestamp}/.env
-            ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/secrets.yml
-            ln -s /usr/local/www/rulesuitest/releases/shared/database.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/database.yml
-            ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml /usr/local/www/rulesuitest/releases/#{timestamp}/config/app_config.yml
-            ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem /usr/local/www/rulesuitest/releases/#{timestamp}/extras/ssh/ca.pem
-            ENDSSH`
-
+  # system "rm #{Dir.pwd}/.env"
+  # system "rm #{Dir.pwd}/config/database.yml"
+  # system "rm #{Dir.pwd}/config/app_config.yml"
+  # system "rm #{Dir.pwd}/config/secrets.yml"
+  # system "rm #{Dir.pwd}/extras/ssh/ca.pem"
+  # system "ln -s /usr/local/www/rulesuitest/releases/shared/.env #{Dir.pwd}/.env"
+  # system "ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml #{Dir.pwd}/config/secrets.yml"
+  # system "ln -s /usr/local/www/rulesuitest/releases/shared/database.yml #{Dir.pwd}/config/database.yml"
+  # system "ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml #{Dir.pwd}/config/app_config.yml"
+  # system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
 
   puts "simlink the timestamped folder to the app directory"
-  `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
-            rm /usr/local/www/rulesuitest/public/app
-            ln -s /usr/local/www/rulesuitest/releases/#{timestamp} /usr/local/www/rulesuitest/public/app
-            ENDSSH`
-
+  # system "rm /usr/local/www/rulesuitest/public/app"
+  # system "ln -s #{Dir.pwd} /usr/local/www/rulesuitest/public/app"
 
   puts "build the gems locally if folder exists"
   # if vendor folder exists copy that over to this vendor folder other wise build the gems
   # and save a copy of the vendor folder for next time.
-  directory_exists = `ssh talosweb@rulesuitest.vrt.sourcefire.com "test -d /usr/local/www/rulesuitest/releases/shared/vendor && echo 1 || echo 0"`
-  if (directory_exists.to_i == 1 && rebuild_gems == false)
-    puts "copying vendor to vendor"
-    `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
-            echo "copying vendor to vendor"
-            rm -rf /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
-            cp -r /usr/local/www/rulesuitest/releases/shared/vendor /usr/local/www/rulesuitest/releases/#{timestamp}/vendor
-            cd rulesuitest/releases/#{timestamp}/
-            bundle install --deployment --without development test
-            ENDSSH`
+  if File.directory?("/usr/local/www/rulesuitest/releases/shared/vendor") && rebuild_gems == false
+    puts "dont rebuild gems and copy shared/vendor to app/vendor"
+    # system "rm -rf #{Dir.pwd}/vendor"
+    # system "cp -r /usr/local/www/rulesuitest/releases/shared/vendor #{Dir.pwd}/vendor"
+    # system "bundle install --deployment --without development test"
   else
-    puts "bundle installing gems"
-    `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
-            echo "bundle installing gems"
-            cd rulesuitest/releases/#{timestamp}/
-            bundle install --deployment
-            rm -rf /usr/local/www/rulesuitest/releases/shared/vendor
-            cp -r /usr/local/www/rulesuitest/releases/#{timestamp}/vendor /usr/local/www/rulesuitest/releases/shared/
-            ENDSSH`
+    puts "rebuilding gems and over writing the ones in shared vendor"
+    # system "bundle install --deployment"
+    # system "rm -rf /usr/local/www/rulesuitest/releases/shared/vendor"
+    # system "cp -r #{Dir.pwd}/vendor /usr/local/www/rulesuitest/releases/shared/"
   end
 
-  puts "add tmp/restart.txt"
-  `ssh talosweb@rulesuitest.vrt.sourcefire.com << ENDSSH
-            cd rulesuitest/releases/#{timestamp}/
-            mkdir tmp
-            touch tmp/restart.txt
-            ENDSSH`
+  puts "Restarting server tmp/restart.txt"
+  # system "mkdir #{Dir.pwd}/tmp"
+  # system "touch tmp/restart.txt"
+
 end
 
 process_api = true
+build_api = true
 send_upload = true
 rebuild_gems = false
 include_snort = true
+run_config = false
 
 ARGV.each do |a|
   case a
+    when "--run-config"
+      run_config = true
+      process_api = false
+    when "--no-build"
+      build_api = false
     when "--no-api"
       process_api = false
     when "--no-upload"
@@ -169,11 +164,27 @@ ARGV.each do |a|
   end
 end
 
+
 if process_api
   begin
-    build_API(include_snort)
+    if build_api
+      build_API(include_snort)
+    end
     if send_upload
-      upload_API(rebuild_gems)
+      timestamp = upload_API
+      run_server_config(timestamp, rebuild_gems)
+    end
+
+  rescue Exception => e
+    puts e.message
+  end
+end
+if run_config
+  begin
+    if rebuild_gems
+      production_config("--rebuild-gems")
+    else
+      production_config("")
     end
   rescue Exception => e
     puts e.message
