@@ -82,11 +82,12 @@ def self.upload_API
 end
 
 def self.run_server_config(timestamp, rebuild_gems)
-   `ssh rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/rulesuitest/releases/#{timestamp}/deploy_api.rb --no-api --run-config #{rebuild_gems}`
+   `ssh rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/rulesuitest/releases/#{timestamp}/deploy_api.rb --no-api #{rebuild_gems} --run-config #{timestamp}`
 end
 
-def self.production_config(rebuild_gems)
-  puts "copy the app config and the database yaml files to the timestamp folder"
+def self.production_config(timestamp, rebuild_gems)
+  Dir.chdir "/usr/local/www/rulesuitest/releases/#{timestamp}"
+  system "echo 'copy the app config and the database yaml files to the timestamp folder'"
   system "rm #{Dir.pwd}/.env"
   system "rm #{Dir.pwd}/config/database.yml"
   system "rm #{Dir.pwd}/config/app_config.yml"
@@ -98,29 +99,29 @@ def self.production_config(rebuild_gems)
   system "ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml #{Dir.pwd}/config/app_config.yml"
   system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
 
-  puts "simlink the timestamped folder to the app directory"
+  system "echo 'simlink the timestamped folder to the app directory'"
   system "rm /usr/local/www/rulesuitest/public/app"
   system "ln -s #{Dir.pwd} /usr/local/www/rulesuitest/public/app"
 
-  puts "build the gems locally if folder exists"
+  system "echo 'build the gems locally if folder exists'"
   # if vendor folder doesnt exist or we ask to rebuild the gems then build the gems and create a copy for later
   if !File.directory?("/usr/local/www/rulesuitest/releases/shared/vendor") || rebuild_gems
-    puts "rebuilding gems and over writing the ones in shared vendor"
+    system "echo 'rebuilding gems and over writing the ones in shared vendor'"
     system "bundle install --deployment"
     system "rm -rf /usr/local/www/rulesuitest/releases/shared/vendor"
     system "cp -r #{Dir.pwd}/vendor /usr/local/www/rulesuitest/releases/shared/"
   else
-    puts "dont rebuild gems and copy shared/vendor to app/vendor"
+    system "echo 'dont rebuild gems and copy shared/vendor to app/vendor'"
     system "rm -rf #{Dir.pwd}/vendor"
     system "cp -r /usr/local/www/rulesuitest/releases/shared/vendor #{Dir.pwd}/vendor"
     system "bundle install --deployment --without development test"
   end
 
-  puts "Restarting server tmp/restart.txt"
+  system "echo 'Restarting server tmp/restart.txt'"
   system "mkdir #{Dir.pwd}/tmp"
   system "touch tmp/restart.txt"
 
-  puts "removing rulesuitest.tar.gz"
+  system "echo 'removing rulesuitest.tar.gz'"
   system "rm #{Dir.pwd}/rulesuitest.tar.gz"
 end
 
@@ -130,12 +131,21 @@ send_upload = true
 rebuild_gems = false
 include_snort = true
 run_config = false
+timestamp = 0
 
 ARGV.each do |a|
   case a
     when "--run-config"
-      run_config = true
-      process_api = false
+      timestamp = ARGV[ARGV.index(a)+1].to_i
+      if timestamp.is_a? Numeric
+        run_config = true
+        process_api = false
+      else
+        puts "One of your flags '#{a}' requires a timestamp."
+        run_config = false
+        process_api = false
+        break
+      end
     when "--no-build"
       build_api = false
     when "--no-api"
@@ -186,7 +196,7 @@ if process_api
 end
 if run_config
   begin
-      production_config(rebuild_gems)
+      production_config(timestamp,rebuild_gems)
   rescue Exception => e
     puts e.message
   end
