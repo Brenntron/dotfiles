@@ -172,7 +172,11 @@ if process_api
     end
     if send_upload
       timestamp = upload_API
-      run_server_config(timestamp, rebuild_gems)
+      if rebuild_gems
+        run_server_config(timestamp, "--rebuild-gems")
+      else
+        run_server_config(timestamp, "")
+      end
     end
 
   rescue Exception => e
@@ -181,11 +185,7 @@ if process_api
 end
 if run_config
   begin
-    if rebuild_gems
-      production_config("--rebuild-gems")
-    else
-      production_config("")
-    end
+      production_config
   rescue Exception => e
     puts e.message
   end
