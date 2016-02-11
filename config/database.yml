@@ -21,14 +21,14 @@ production:
   adapter: mysql2
   encoding: utf8
   database: talos_rulesui_production
-  username: talosweb
+  username: root
   host: localhost
 
 staging:
   adapter: mysql2
   encoding: utf8
   database: talos_rulesui_staging
-  username: talosweb
+  username: root
   host: localhost
 
 cucumber:

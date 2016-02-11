@@ -44,7 +44,6 @@ module API
                 Bug.bugzilla_import(xmlrpc,new_bug).to_s
                 bug = Bug.where(id:params[:id]).first
                 #parse the bug summary
-                binding.pry
                 parsed = bug.parse_summary
                 parsed[:sids].each do |sid|
                   bug.rules << Rule.import_rule(sid)

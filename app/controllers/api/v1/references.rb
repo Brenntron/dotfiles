@@ -36,7 +36,7 @@ module API
           end
         end
         put ":id", root: "reference" do
-          binding.pry
+          puts "updating reference"
         end
 
         desc "Delete a reference"

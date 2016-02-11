@@ -39,6 +39,23 @@ put a copy of snort rules in the extras directory.
 
 
 
+
+
+
+On the server we need to do this
+regenerating the keytab
+
+sudo msktutil -u -s HTTP
+sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
+sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p rulesuitest\$
+sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p host/rulesuitest.vrt.sourcefire.com
+
+Production also needs to have mysql set up
+
+
+
+
+
 dont forget to migrate the database
 
 Below is just to set up a locally signed ssh key not really all that necessary.

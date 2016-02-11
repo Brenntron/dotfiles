@@ -164,7 +164,6 @@ class Bug < ActiveRecord::Base
   def summary_tags
     tags = []
     tag_list = Tag.all.map{|a| a.name}.join("|")
-    binding.pry
     unless summary.nil?
       unless tag_list.empty?
         summary.scan(tag_list).each do |match|
