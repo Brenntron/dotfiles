@@ -1,3 +1,7 @@
-client_local_test: rails runner script/client_local run
-poller: script/poller run
-thin_server: thin start --ssl --address localhost
+client_local_test: rails runner script/client_local start
+client_all_test: rails runner script/client_all start
+committer: rails runner script/committer
+rule_upater: rails runner script/rules_updater
+job_cleaner: rails runner script/job_cleaner
+poller: rails runner script/poller start
+

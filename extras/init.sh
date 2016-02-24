@@ -3,9 +3,9 @@
 # Set the number of each you want run
 declare -A processes
 
-processes["poller"]=5
-processes["client_local"]=10
-processes["client_all"]=10
+processes["poller"]=2
+processes["client_local"]=1
+processes["client_all"]=1
 processes["rules_updater"]=1	# Only run 1
 processes["committer"]=1		# Only run 1	
 processes["job_cleaner"]=1		# Only run 1
@@ -33,7 +33,8 @@ for process in ${!processes[@]}
 do
 	for x in $(seq 1 ${processes[$process]})
 	do
-		./script/$process $1
+	    echo "$1ing: $process"
+		bundle exec rails runner script/$process $1
 
 		if [ $1 == "start" ]
 		then

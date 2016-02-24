@@ -36,6 +36,7 @@ module API
           end
         end
         post "", root: "job" do
+
           if permitted_params[:job][:bugzilla_id]
             options = {
                 :bug              => Bug.where(id: permitted_params[:job][:bugzilla_id]).first,
@@ -44,14 +45,17 @@ module API
                 :attachment_array => permitted_params[:job][:attachment_array],
                 :rule_array       => permitted_params[:job][:rule_array]
             }.reject() { |k, v| v.nil? }
+
           else   # (legacy form)
 
           end
+
           new_job = Job.create(
               :bug  => options[:bug],
               :job_type     => options[:job_type],
               :user => options[:current_user],
           )
+
           case options[:job_type]
             when "attachment"
               options[:attachment_array].split(',').each do |attachment_id|

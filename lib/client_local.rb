@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 
+######################
+#=============
+#client_local
+#=============
+# This file processes each selected rule against the local copy of the snort rules
+######################
+
 require 'open3'
 require 'stomp'
 require 'sfbugzilla'

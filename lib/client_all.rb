@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 
+######################
+#=============
+#client_all
+#=============
+# This file tests each attachment against the snort rules. It returns a number of alerts for each rule it has a problem with.
+######################
 
 require 'open3'
 require 'stomp'
