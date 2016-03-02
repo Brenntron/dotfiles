@@ -19,7 +19,7 @@ options = {
   :mode       => :load,
   :backtrace  => true,
   :monitor    => true,
-  :log_output => true,
+  :log_output => true
 }
 
 Daemons.run(script_file,options)

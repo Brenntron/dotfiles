@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
+require 'daemons'
+
+require 'rails/all'
+
 ENV['APP_ROOT'] ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
 APP_ROOT = ENV['APP_ROOT']
 script_file = File.join(APP_ROOT, 'lib', 'poller.rb')
 tmp_dir = File.join(APP_ROOT, 'tmp')
-
-require 'rubygems'
-require 'daemons'
-
 
 options = {
   :app_name   => "poller",
