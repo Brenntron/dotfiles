@@ -10,6 +10,8 @@ APP_ROOT = ENV['APP_ROOT']
 script_file = File.join(APP_ROOT, 'lib', 'poller.rb')
 tmp_dir = File.join(APP_ROOT, 'tmp')
 
+
+
 options = {
   :app_name   => "poller",
   :dir_mode   => :normal,

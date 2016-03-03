@@ -17,7 +17,7 @@ require 'vrt/rule_test_api'
 require 'base64'
 
 # Make sure we run from the application root
-Dir.chdir ENV['APP_ROOT']
+Dir.chdir Rails.root
 
 # General options
 local_cache_path = File.expand_path('tmp/pcaps')
@@ -45,28 +45,28 @@ client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
 client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", {:ack => :client}
 
-# Initialize the API
-tries ||= 3
-begin
-  RuleTestAPI.init(Rails.configuration.ruletest_server, ssl_options)
-rescue Exception => e
-  retry unless (tries -= 1).zero?
-end
-# Find the engine we should be using for these rules
-engine_type = EngineType.where(:name => 'Persistent').first
-snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
-rule_configuration = RuleConfiguration.where(:name => 'All Rules').first
-
-# Make sure everything was found
-raise Exception.new("Unable to find Persistent engine type") if engine_type.nil?
-raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
-raise Exception.new("Unable to find All Rules configuration") if rule_configuration.nil?
-
-engine = Engine.where(
-    :engine_type_id => engine_type[:id],
-    :snort_configuration_id => snort_configuration[:id],
-    :rule_configuration_id => rule_configuration[:id]).first
-raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
+# # Initialize the API
+# tries ||= 3
+# begin
+#   RuleTestAPI.init(Rails.configuration.ruletest_server, ssl_options)
+# rescue Exception => e
+#   retry unless (tries -= 1).zero?
+# end
+# # Find the engine we should be using for these rules
+# engine_type = EngineType.where(:name => 'Persistent').first
+# snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
+# rule_configuration = RuleConfiguration.where(:name => 'All Rules').first
+#
+# # Make sure everything was found
+# raise Exception.new("Unable to find Persistent engine type") if engine_type.nil?
+# raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
+# raise Exception.new("Unable to find All Rules configuration") if rule_configuration.nil?
+#
+# engine = Engine.where(
+#     :engine_type_id => engine_type[:id],
+#     :snort_configuration_id => snort_configuration[:id],
+#     :rule_configuration_id => rule_configuration[:id]).first
+# raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
 
 puts "listening to queue"
 while message = client.receive
