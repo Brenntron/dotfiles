@@ -52,25 +52,25 @@ begin
 rescue Exception => e
   retry unless (tries -= 1).zero?
 end
-#
-# puts "finding engine..."
-# # Find the engine we should be using for these rules
-# engine_type = EngineType.where(:name => 'Single').first
-# snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
-# rule_configuration = RuleConfiguration.where(:name => 'Local Rules Only').first
-#
-# puts "confirming..."
-# # Make sure everything was found
-# raise Exception.new("Unable to find Single engine type") if engine_type.nil?
-# raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
-# raise Exception.new("Unable to find Local Rules Only configuration") if rule_configuration.nil?
-#
-# puts "setting engine..."
-# engine = Engine.where(
-#     :engine_type_id => engine_type[:id],
-#     :snort_configuration_id => snort_configuration[:id],
-#     :rule_configuration_id => rule_configuration[:id]).first
-# raise Exception.new("Unable to find the single All Rules Open Source engine") if engine.nil?
+
+puts "finding engine..."
+# Find the engine we should be using for these rules
+engine_type = EngineType.where(:name => 'Single').first
+snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
+rule_configuration = RuleConfiguration.where(:name => 'Local Rules Only').first
+
+puts "confirming..."
+# Make sure everything was found
+raise Exception.new("Unable to find Single engine type") if engine_type.nil?
+raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
+raise Exception.new("Unable to find Local Rules Only configuration") if rule_configuration.nil?
+
+puts "setting engine..."
+engine = Engine.where(
+    :engine_type_id => engine_type[:id],
+    :snort_configuration_id => snort_configuration[:id],
+    :rule_configuration_id => rule_configuration[:id]).first
+raise Exception.new("Unable to find the single All Rules Open Source engine") if engine.nil?
 
 puts "listening to queue"
 while message = client.receive

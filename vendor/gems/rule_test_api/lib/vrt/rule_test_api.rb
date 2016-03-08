@@ -1,4 +1,3 @@
-require 'her'
 
 # Main class for accessing the RuleTestAPI Service. 
 #
@@ -17,7 +16,6 @@ require 'her'
 #   snort_config = SnortConfiguration.find_by_name('Open Source')
 #
 # See examples/run_pcap.rb for more examples of how to use this library.
-
 class RuleTestAPI
 
   # Initialize the RuleTestAPI with the URL to the API service.
