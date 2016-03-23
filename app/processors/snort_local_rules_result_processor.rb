@@ -11,7 +11,7 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
 
     # Is this an alert message or a job completion message?
     if result['completed'] and result['job_id']
-    	job = Job.find(result['job_id'])
+    	job = LocalJob.find(result['job_id'])
       job.result = result['result']
     	job.completed = true
       job.failed = result['failed']

@@ -12,7 +12,7 @@ class SnortCommitResultProcessor < ApplicationProcessor
       new_sids = []
 
       # Start by updating the job
-    	job = Job.find(response['job_id'])
+    	job = LocalJob.find(response['job_id'])
     	job.completed = response['completed']
     	job.failed = response['failed']
     	job.result = response['result']

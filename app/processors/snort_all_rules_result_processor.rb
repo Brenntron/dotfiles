@@ -11,7 +11,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
          begin
             # Make sure to close the job
-            job = Job.find(result['job_id'])
+            job = LocalJob.find(result['job_id'])
             job.result ||= ""
             return if job.nil?
 

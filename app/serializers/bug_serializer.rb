@@ -4,7 +4,7 @@ class BugSerializer < ActiveModel::Serializer
   has_many :attachments, embed: :ids, embed_in_root: true
   has_many :rules, embed: :ids, embed_in_root: true
   has_many :references, embed: :ids, embed_in_root: true
-  has_many :jobs, embed: :ids, embed_in_root: true
+  has_many :local_jobs, embed: :ids, embed_in_root: true
   has_many :exploits, embed: :ids, embed_in_root: true
   def editor_id
     object.user_id

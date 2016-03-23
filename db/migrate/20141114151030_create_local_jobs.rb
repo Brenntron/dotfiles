@@ -1,6 +1,6 @@
-class CreateJobs < ActiveRecord::Migration
+class CreateLocalJobs < ActiveRecord::Migration
   def change
-    create_table :jobs do |t|
+    create_table :local_jobs do |t|
       t.boolean  "completed",   :default => false
       t.boolean  "failed",      :default => false
       t.text     "result"
@@ -8,8 +8,8 @@ class CreateJobs < ActiveRecord::Migration
       t.integer "time_elapsed"
       t.timestamps
     end
-    add_reference :jobs, :bug, index: true
-    add_reference :jobs, :user, index: true
+    add_reference :local_jobs, :bug, index: true
+    add_reference :local_jobs, :user, index: true
     
   end
 end

@@ -124,7 +124,7 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.integer "reference_id"
   end
 
-  create_table "jobs", force: true do |t|
+  create_table "local_jobs", force: true do |t|
     t.boolean  "completed",    default: false
     t.boolean  "failed",       default: false
     t.text     "result"
@@ -136,8 +136,8 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.integer  "user_id"
   end
 
-  add_index "jobs", ["bug_id"], name: "index_jobs_on_bug_id", using: :btree
-  add_index "jobs", ["user_id"], name: "index_jobs_on_user_id", using: :btree
+  add_index "local_jobs", ["bug_id"], name: "index_local_jobs_on_bug_id", using: :btree
+  add_index "local_jobs", ["user_id"], name: "index_local_jobs_on_user_id", using: :btree
 
   create_table "notes", force: true do |t|
     t.text     "comment"
