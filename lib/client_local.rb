@@ -44,6 +44,7 @@ puts "create stomp client"
 client = Stomp::Connection.new(stomp_options)
 client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
 
+unless Rails.env == "development"
 puts "init API"
 # Initialize the API
 tries ||= 3
@@ -71,7 +72,7 @@ engine = Engine.where(
     :snort_configuration_id => snort_configuration[:id],
     :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the single All Rules Open Source engine") if engine.nil?
-
+end
 puts "listening to queue"
 while message = client.receive
   begin

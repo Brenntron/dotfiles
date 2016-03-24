@@ -3,7 +3,7 @@
 # Set the number of each you want run
 declare -A processes
 
-processes["poller"]=2
+processes["poller"]=1
 processes["client_local"]=1
 processes["client_all"]=1
 processes["rules_updater"]=1	# Only run 1

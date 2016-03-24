@@ -55,7 +55,7 @@ module API
               :job_type     => options[:job_type],
               :user => options[:current_user],
           )
-
+          
           case options[:job_type]
             when "attachment"
               options[:attachment_array].split(',').each do |attachment_id|

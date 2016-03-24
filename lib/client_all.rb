@@ -44,7 +44,7 @@ xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
 client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", {:ack => :client}
-
+unless Rails.env == "development"
 # Initialize the API
 tries ||= 3
 begin
@@ -67,7 +67,7 @@ engine = Engine.where(
     :snort_configuration_id => snort_configuration[:id],
     :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
-
+end
 puts "listening to queue"
 while message = client.receive
   puts "starting all rule work"
