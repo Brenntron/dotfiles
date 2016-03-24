@@ -17,7 +17,7 @@ class CreateAttachments < ActiveRecord::Migration
     add_reference :attachments, :bug, index: true
     add_reference :attachments, :rule, index: true
     add_reference :attachments, :reference, index: true
-    add_reference :attachments, :job, index: true
+    add_reference :attachments, :local_job, index: true
     add_index "attachments", ["bugzilla_attachment_id"], :name => "index_attachments_on_bugzilla_attachment_id"
   end
 end

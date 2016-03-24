@@ -38,7 +38,8 @@ put a copy of snort rules in the extras directory.
         extras/snort/so_rules
 
 
-
+Make sure active MQ is running
+./activemq console
 
 
 

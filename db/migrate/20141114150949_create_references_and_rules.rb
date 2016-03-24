@@ -36,7 +36,7 @@ class CreateReferencesAndRules < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_reference :rules, :job, index: true
+    add_reference :rules, :local_job, index: true
     add_reference :rules, :attachment, index: true
     add_reference :rules, :reference, index: true
     add_reference :rules, :bug, index: true

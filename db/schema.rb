@@ -29,12 +29,12 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.integer  "bug_id"
     t.integer  "rule_id"
     t.integer  "reference_id"
-    t.integer  "job_id"
+    t.integer  "local_job_id"
   end
 
   add_index "attachments", ["bug_id"], name: "index_attachments_on_bug_id", using: :btree
   add_index "attachments", ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id", using: :btree
-  add_index "attachments", ["job_id"], name: "index_attachments_on_job_id", using: :btree
+  add_index "attachments", ["local_job_id"], name: "index_attachments_on_local_job_id", using: :btree
   add_index "attachments", ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
   add_index "attachments", ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
 
@@ -216,7 +216,7 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.string   "documentation"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "job_id"
+    t.integer  "local_job_id"
     t.integer  "attachment_id"
     t.integer  "reference_id"
     t.integer  "bug_id"
@@ -225,7 +225,7 @@ ActiveRecord::Schema.define(version: 20160108224914) do
   add_index "rules", ["attachment_id"], name: "index_rules_on_attachment_id", using: :btree
   add_index "rules", ["bug_id"], name: "index_rules_on_bug_id", using: :btree
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
-  add_index "rules", ["job_id"], name: "index_rules_on_job_id", using: :btree
+  add_index "rules", ["local_job_id"], name: "index_rules_on_local_job_id", using: :btree
   add_index "rules", ["reference_id"], name: "index_rules_on_reference_id", using: :btree
 
   create_table "tags", force: true do |t|
