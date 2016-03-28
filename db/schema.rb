@@ -29,14 +29,14 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.integer  "bug_id"
     t.integer  "rule_id"
     t.integer  "reference_id"
-    t.integer  "local_job_id"
+    t.integer  "task_id"
   end
 
   add_index "attachments", ["bug_id"], name: "index_attachments_on_bug_id", using: :btree
   add_index "attachments", ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id", using: :btree
-  add_index "attachments", ["local_job_id"], name: "index_attachments_on_local_job_id", using: :btree
   add_index "attachments", ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
   add_index "attachments", ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
+  add_index "attachments", ["task_id"], name: "index_attachments_on_task_id", using: :btree
 
   create_table "attachments_rules", id: false, force: true do |t|
     t.integer "attachment_id"
@@ -124,21 +124,6 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.integer "reference_id"
   end
 
-  create_table "local_jobs", force: true do |t|
-    t.boolean  "completed",    default: false
-    t.boolean  "failed",       default: false
-    t.text     "result"
-    t.string   "job_type"
-    t.integer  "time_elapsed"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "bug_id"
-    t.integer  "user_id"
-  end
-
-  add_index "local_jobs", ["bug_id"], name: "index_local_jobs_on_bug_id", using: :btree
-  add_index "local_jobs", ["user_id"], name: "index_local_jobs_on_user_id", using: :btree
-
   create_table "notes", force: true do |t|
     t.text     "comment"
     t.string   "note_type"
@@ -216,7 +201,7 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.string   "documentation"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "local_job_id"
+    t.integer  "task_id"
     t.integer  "attachment_id"
     t.integer  "reference_id"
     t.integer  "bug_id"
@@ -225,14 +210,29 @@ ActiveRecord::Schema.define(version: 20160108224914) do
   add_index "rules", ["attachment_id"], name: "index_rules_on_attachment_id", using: :btree
   add_index "rules", ["bug_id"], name: "index_rules_on_bug_id", using: :btree
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
-  add_index "rules", ["local_job_id"], name: "index_rules_on_local_job_id", using: :btree
   add_index "rules", ["reference_id"], name: "index_rules_on_reference_id", using: :btree
+  add_index "rules", ["task_id"], name: "index_rules_on_task_id", using: :btree
 
   create_table "tags", force: true do |t|
     t.string   "name",       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "tasks", force: true do |t|
+    t.boolean  "completed",    default: false
+    t.boolean  "failed",       default: false
+    t.text     "result"
+    t.string   "task_type"
+    t.integer  "time_elapsed"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "bug_id"
+    t.integer  "user_id"
+  end
+
+  add_index "tasks", ["bug_id"], name: "index_tasks_on_bug_id", using: :btree
+  add_index "tasks", ["user_id"], name: "index_tasks_on_user_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "cvs_username"

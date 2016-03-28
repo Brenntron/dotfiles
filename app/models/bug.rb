@@ -9,7 +9,7 @@ class Bug < ActiveRecord::Base
   has_many :references
   has_many :exploits, :through => :references
   has_many :attachments, :dependent => :destroy
-  has_many :local_jobs, :dependent => :destroy
+  has_many :tasks, :dependent => :destroy
   has_many :notes, :dependent => :destroy
 
   enum classification: {
@@ -26,12 +26,12 @@ class Bug < ActiveRecord::Base
 
   def record action
     obj = JSON.parse(BugSerializer.new(self).to_json)
-    obj["bug"] = obj["bug"].except('notes', 'attachments', 'local_jobs', 'exploits')
+    obj["bug"] = obj["bug"].except('notes', 'attachments', 'tasks', 'exploits')
     obj["bug"]["user"] = obj["bug"]["user_id"]
     record = {resource: 'bug',
               action: action,
               id: self.id,
-              obj: obj.except("notes", "attachments", "rules", "references", "local_jobs", "exploits")}
+              obj: obj.except("notes", "attachments", "rules", "references", "tasks", "exploits")}
     PublishWebsocket.push_changes(record)
   end
 

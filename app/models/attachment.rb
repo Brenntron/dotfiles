@@ -35,7 +35,7 @@ class Attachment < ActiveRecord::Base
         bug.update_attachments(Bugzilla::Bug.new(bugzilla_session))
 
         # Now test all the attachments
-        redirect_to :controller => 'jobs', :action => 'wait', :id => test_all(bug, filter_attachments(bug.attachments)).id
+        redirect_to :controller => 'tasks', :action => 'wait', :id => test_all(bug, filter_attachments(bug.attachments)).id
 
       rescue Exception => e
         log_error(e)
@@ -49,7 +49,7 @@ class Attachment < ActiveRecord::Base
       bug = Bug.find(active_scaffold_session_storage[:constraints][:bug])
       bug.update_attachments(Bugzilla::Bug.new(bugzilla_session))
       if bug.attachments.size > 0
-        redirect_to :controller => 'jobs', :action => 'wait', :id => test_all(bug, filter_attachments(bug.attachments)).id
+        redirect_to :controller => 'tasks', :action => 'wait', :id => test_all(bug, filter_attachments(bug.attachments)).id
       else
         redirect_to :controller => 'bugs', :action => 'open', :id => bug.id
       end

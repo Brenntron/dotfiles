@@ -1,15 +1,15 @@
-class CreateLocalJobs < ActiveRecord::Migration
+class CreateTasks < ActiveRecord::Migration
   def change
-    create_table :local_jobs do |t|
+    create_table :tasks do |t|
       t.boolean  "completed",   :default => false
       t.boolean  "failed",      :default => false
       t.text     "result"
-      t.string  "job_type"
+      t.string  "task_type"
       t.integer "time_elapsed"
       t.timestamps
     end
-    add_reference :local_jobs, :bug, index: true
-    add_reference :local_jobs, :user, index: true
+    add_reference :tasks, :bug, index: true
+    add_reference :tasks, :user, index: true
     
   end
 end
