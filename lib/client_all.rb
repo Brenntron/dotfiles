@@ -74,7 +74,7 @@ while message = client.receive
   puts "++++++++++++++++++++++"
   alerts = Array.new
   errors = Array.new
-  job_id = nil
+  task_id = nil
 
   begin
 
@@ -90,8 +90,8 @@ while message = client.receive
     # Store the pcaps for testing
     pcaps = Hash.new
 
-    # Save the job_id
-    job_id = request['job_id']
+    # Save the task_id
+    task_id = request['task_id']
 
     # Fetch all of the needed pcaps into the cache directory
     request['attachments'].each do |attachment_id|
@@ -192,11 +192,11 @@ while message = client.receive
   # Finally, send the results back
   puts alerts.inspect
   puts errors.inspect
-  puts job_id
-  unless job_id.nil?
+  puts task_id
+  unless task_id.nil?
     client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
                    {
-                       :job_id => job_id,
+                       :task_id => task_id,
                        :alerts => alerts,
                        :errors => errors,
                    }.to_json

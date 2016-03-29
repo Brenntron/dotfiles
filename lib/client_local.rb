@@ -185,7 +185,7 @@ while message = client.receive
     # And notify the front end that the job is complete
     client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
-                       :job_id => request['job_id'],
+                       :task_id => request['task_id'],
                        :completed => job.completed,
                        :result => job.information,
                        :failed => job.failed,
@@ -196,7 +196,7 @@ while message = client.receive
   rescue EOFError => e
     client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
-                       :job_id => request['job_id'],
+                       :task_id => request['task_id'],
                        :failed => true,
                        :completed => true,
                        :result => "Bugzilla appears to be fucking off: #{e.to_s}"
@@ -204,7 +204,7 @@ while message = client.receive
   rescue Exception => e
     client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
-                       :job_id => request['job_id'],
+                       :task_id => request['task_id'],
                        :failed => true,
                        :completed => true,
                        :result => "#{$!}\n#{e.backtrace.join("\n\t")}",

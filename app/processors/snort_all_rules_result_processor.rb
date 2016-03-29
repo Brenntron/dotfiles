@@ -7,7 +7,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
      puts "Configuring all rule results"
       result = JSON.parse(message)	
 
-      unless result['job_id'].nil?
+      unless result['task_id'].nil?
 
          begin
             # Make sure to close the job
