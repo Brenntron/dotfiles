@@ -41,7 +41,7 @@ module API
             options = {
                 :bug              => Bug.where(id: permitted_params[:task][:bugzilla_id]).first,
                 :task_type         => permitted_params[:task][:task_type],
-                :current_user     => User.where(id: permitted_params[:task][:current_user]).first,
+                :current_user     => User.where(id: permitted_params[:task][:created_by]).first,
                 :attachment_array => permitted_params[:task][:attachment_array],
                 :rule_array       => permitted_params[:task][:rule_array]
             }.reject() { |k, v| v.nil? }
