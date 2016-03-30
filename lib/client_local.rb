@@ -143,7 +143,7 @@ while message = client.receive
       if pcap.error?
         raise Exception.new(pcap.error)
       else
-        pcaps[sha] = {:pcap_id => pcap.id, :attachment_id => attachment_id}
+        pcaps[sha] = {:pcap_id => pcap.attributes[:id], :attachment_id => attachment_id}
       end
     end
 
