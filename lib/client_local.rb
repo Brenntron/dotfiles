@@ -151,11 +151,12 @@ while message = client.receive
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size == 1
-      test_pcaps << nil
+      test_pcaps << ""
     end
 
     # Create the new job
-    job = Job.create(:engine_id => engine.id, :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
+    # job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
+job = `curl -X POST --insecure --data "pcaps=9458&pcaps=&engine_id=2&completed=false&local_rules='24397\n24397'" https://ruleapitest.vrt.sourcefire.com/jobs`
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
@@ -163,7 +164,7 @@ while message = client.receive
     # Wait for the job to finish
     until (job.completed == "1")
       sleep 1
-      job = Job.find(job.id)
+      job = Job.find(job.attributes[:id])
     end
 
     # Send back alerts
