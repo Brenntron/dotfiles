@@ -7,10 +7,10 @@ class Pcap
   has_many :pcap_tests
 
   # Internal record ID.
-  attr_reader :id
+  # attr_reader :id
 
   # sha256 of the PCAP file data.
-  attr_accessor :file_hash
+  # attr_accessor :file_hash
 
   # Search for an existing PCAP in the API or create it if it's not found.
   #

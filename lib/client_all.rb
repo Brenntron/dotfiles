@@ -22,6 +22,10 @@ Dir.chdir Rails.root
 # General options
 local_cache_path = File.expand_path('tmp/pcaps')
 
+if Rails.env =="development"
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
+
 # Make sure our pcaps cache exists
 if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
@@ -44,7 +48,7 @@ xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
 client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", {:ack => :client}
-unless Rails.env == "development"
+
 # Initialize the API
 tries ||= 3
 begin
@@ -67,7 +71,7 @@ engine = Engine.where(
     :snort_configuration_id => snort_configuration[:id],
     :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
-end
+
 puts "listening to queue"
 while message = client.receive
   puts "starting all rule work"
@@ -153,16 +157,19 @@ while message = client.receive
     end
 
     # Create the new job
-
-    job = Job.create(:engine_id => engine[:id], :pcaps => test_pcaps, :completed => false)
+binding.pry
+    job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false)
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
 
-    # Wait for the job to finish
-    until (job.completed == "1")
-      sleep 1
-      job = Job.find(job.id)
+
+    unless Rails.env == "development"
+      # Wait for the job to finish
+      until (job.completed == "1")
+        sleep 1
+        job = Job.find(job.attributes[:id])
+      end
     end
 
     # Send back alerts

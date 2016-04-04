@@ -20,6 +20,11 @@ require 'pry'
 # General options
 local_cache_path = File.expand_path('tmp/pcaps')
 
+if Rails.env =="development"
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
+
+
 # Make sure our pcaps cache exists
 if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
@@ -44,7 +49,7 @@ puts "create stomp client"
 client = Stomp::Connection.new(stomp_options)
 client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
 
-unless Rails.env == "development"
+
 puts "init API"
 # Initialize the API
 tries ||= 3
@@ -72,7 +77,7 @@ engine = Engine.where(
     :snort_configuration_id => snort_configuration[:id],
     :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the single All Rules Open Source engine") if engine.nil?
-end
+
 puts "listening to queue"
 while message = client.receive
   begin
@@ -83,7 +88,6 @@ while message = client.receive
 
     puts request
 
-
     # Release the message early
     client.ack(message.headers['message-id'])
 
@@ -92,7 +96,6 @@ while message = client.receive
 
     # Store the pcaps for testing
     pcaps = Hash.new
-
 
     # Fetch all of the needed pcaps into the cache directory
     request['attachments'].each do |attachment_id|
@@ -130,7 +133,7 @@ while message = client.receive
 
       # Start by hashing the pcap data
       sha = Digest.hexencode(sha256.digest(pcap_data))
-
+binding.pry
       # See if the PCAP exists on the server
       pcap = Pcap.where(:file_hash => sha).first
 
@@ -153,18 +156,19 @@ while message = client.receive
     if test_pcaps.size == 1
       test_pcaps << ""
     end
-
+binding.pry
     # Create the new job
-    # job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
-job = `curl -X POST --insecure --data "pcaps=9458&pcaps=&engine_id=2&completed=false&local_rules='24397\n24397'" https://ruleapitest.vrt.sourcefire.com/jobs`
+    job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
 
-    # Wait for the job to finish
-    until (job.completed == "1")
-      sleep 1
-      job = Job.find(job.attributes[:id])
+    unless Rails.env == "development"
+      # Wait for the job to finish
+      until (job.completed == "1")
+        sleep 1
+        job = Job.find(job.attributes[:id])
+      end
     end
 
     # Send back alerts
