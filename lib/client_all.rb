@@ -31,6 +31,8 @@ if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
 
+max_wait_for_job = 10 #seconds
+
 cert = OpenSSL::X509::Certificate.new()
 ssl_options= {}
 stomp_options = {}
@@ -153,11 +155,10 @@ while message = client.receive
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size == 1
-      test_pcaps << nil
+      test_pcaps << ""
     end
 
     # Create the new job
-binding.pry
     job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false)
 
     # Make sure the job was created
@@ -166,10 +167,16 @@ binding.pry
 
     unless Rails.env == "development"
       # Wait for the job to finish
+      puts "waiting for job to finish..."
+      sleep_counter = 0
       until (job.completed == "1")
+        sleep_counter += 1
         sleep 1
         job = Job.find(job.attributes[:id])
+
+        raise Exception.new("Job Timed Out") if sleep_counter == max_wait_for_job
       end
+      puts "...done"
     end
 
     # Send back alerts
@@ -185,6 +192,7 @@ binding.pry
             }
       end
     end
+
 
   rescue JSON::ParserError => e
     print "Failed to parse json message:"

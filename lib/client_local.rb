@@ -133,7 +133,6 @@ while message = client.receive
 
       # Start by hashing the pcap data
       sha = Digest.hexencode(sha256.digest(pcap_data))
-binding.pry
       # See if the PCAP exists on the server
       pcap = Pcap.where(:file_hash => sha).first
 
@@ -156,7 +155,6 @@ binding.pry
     if test_pcaps.size == 1
       test_pcaps << ""
     end
-binding.pry
     # Create the new job
     job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
 
