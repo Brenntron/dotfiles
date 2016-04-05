@@ -87,7 +87,7 @@ end
 
 def self.production_config(timestamp, rebuild_gems)
   Dir.chdir "/usr/local/www/rulesuitest/releases/#{timestamp}"
-  `echo 'copy the app config and the database yaml files to the timestamp folder'`
+  `echo 'copy the app config and the database yaml files to the #{timestamp} folder'`
   system "rm #{Dir.pwd}/.env"
   system "rm #{Dir.pwd}/config/database.yml"
   system "rm #{Dir.pwd}/config/app_config.yml"
@@ -167,6 +167,8 @@ ARGV.each do |a|
       process_api = false
       send_upload = false
       break
+    when timestamp
+      puts "processing time stamp"
     else
       puts "One of your flags '#{a}' is not valid. Try again. use -h or --help"
       process_api = false
