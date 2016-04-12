@@ -48,7 +48,7 @@ module Api
         config.amq_host = "localhost"
         config.cert_file = "/System/Library/OpenSSL/certs/ca.pem"
       when "staging"
-        config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
+        config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')

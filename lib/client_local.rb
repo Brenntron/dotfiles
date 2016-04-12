@@ -17,6 +17,7 @@ require 'vrt/rule_test_api'
 require 'base64'
 require 'pry'
 
+
 # General options
 local_cache_path = File.expand_path('tmp/pcaps')
 
