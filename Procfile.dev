@@ -1,4 +1,4 @@
-
+server: thin start --ssl --address localhost
 client_local: bundle exec rails runner lib/client_local.rb
 client_all: bundle exec rails runner lib/client_all.rb
 poller: bundle exec rails runner lib/poller.rb
