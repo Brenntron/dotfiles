@@ -30,7 +30,6 @@ end
 if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
-
 cert = OpenSSL::X509::Certificate.new()
 ssl_options= {}
 stomp_options = {}
@@ -40,7 +39,6 @@ stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
 }
-
 puts "talk to bugzilla"
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)

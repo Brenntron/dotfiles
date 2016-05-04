@@ -31,7 +31,7 @@ if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
 
-max_wait_for_job = 10 #seconds
+max_wait_for_job = 60 #seconds
 
 cert = OpenSSL::X509::Certificate.new()
 ssl_options= {}
