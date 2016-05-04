@@ -10,8 +10,8 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
   	attachment = Attachment.find_by_bugzilla_attachment_id(result['id'])
 
     # Is this an alert message or a job completion message?
-    if result['completed'] and result['job_id']
-    	job = Job.find(result['job_id'])
+    if result['completed'] and result['task_id']
+    	job = Task.find(result['task_id'])
       job.result = result['result']
     	job.completed = true
       job.failed = result['failed']

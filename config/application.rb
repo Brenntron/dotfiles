@@ -40,7 +40,7 @@ module Api
 
     case Rails.env
       when "development"
-        config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
+        config.ruletest_server = "https://localhost:3000/api_test"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')

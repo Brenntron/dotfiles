@@ -19,6 +19,7 @@ gem 'ruby-bugzilla', '~> 0.6.0'
 
 gem 'sfbugzilla', :path => './vendor/gems/sfbugzilla'
 gem 'rule_test_api', :path => './vendor/gems/rule_test_api'
+gem 'her'
 
 gem 'net-ssh'
 gem 'daemons'

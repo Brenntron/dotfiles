@@ -5,11 +5,11 @@ class SnortConfiguration
   has_many :engines
 
   # Internal record ID.
-  attr_reader :id
+  # attr_reader :id
 
   # The snort configuration data.
-  attr_accessor :config_data
+  # attr_accessor :config_data
 
   # The name of the snort configuration. 
-  attr_accessor :name
+  # attr_accessor :name
 end

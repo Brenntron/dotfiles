@@ -9,7 +9,7 @@ class Bug < ActiveRecord::Base
   has_many :references
   has_many :exploits, :through => :references
   has_many :attachments, :dependent => :destroy
-  has_many :jobs, :dependent => :destroy
+  has_many :tasks, :dependent => :destroy
   has_many :notes, :dependent => :destroy
 
   enum classification: {
@@ -20,18 +20,18 @@ class Bug < ActiveRecord::Base
       top_secret_sci: 4
   }
 
-  after_create {|bug| bug.record 'create' if Rails.configuration.websockets_enabled == "true"}
-  after_update {|bug| bug.record 'update' if Rails.configuration.websockets_enabled == "true"}
-  after_destroy {|bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
+  after_create { |bug| bug.record 'create' if Rails.configuration.websockets_enabled == "true" }
+  after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == "true" }
+  after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
   def record action
     obj = JSON.parse(BugSerializer.new(self).to_json)
-    obj["bug"] = obj["bug"].except('notes', 'attachments', 'jobs', 'exploits')
+    obj["bug"] = obj["bug"].except('notes', 'attachments', 'tasks', 'exploits')
     obj["bug"]["user"] = obj["bug"]["user_id"]
-    record = { resource: 'bug',
-               action: action,
-               id: self.id,
-               obj: obj.except("notes","attachments","rules","references","jobs","exploits")}
+    record = {resource: 'bug',
+              action: action,
+              id: self.id,
+              obj: obj.except("notes", "attachments", "rules", "references", "tasks", "exploits")}
     PublishWebsocket.push_changes(record)
   end
 
@@ -107,16 +107,16 @@ class Bug < ActiveRecord::Base
       when 'NEW'
         status = updated_state
         resolution = 'OPEN'
-        comment = {comment:"This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug."}
+        comment = {comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug."}
       when 'ASSIGNED'
         status = updated_state
         resolution = 'OPEN'
-        comment = {comment:"This bug is now ASSIGNED to #{editor_email}."}
+        comment = {comment: "This bug is now ASSIGNED to #{editor_email}."}
         assigned_at = Time.now
       when 'PENDING'
         status = 'RESOLVED'
         resolution = updated_state
-        comment = {comment:"This bug is now RESOLVED - #{updated_state}."}
+        comment = {comment: "This bug is now RESOLVED - #{updated_state}."}
         pending_at = Time.now
         if bug.state == 'REOPENED'
           rework_time = ((pending_at - bug.reopened_at)/86400).ceil
@@ -126,13 +126,13 @@ class Bug < ActiveRecord::Base
       when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
         status = 'RESOLVED'
         resolution = updated_state
-        comment = {comment:"This bug is now RESOLVED - #{updated_state}."}
+        comment = {comment: "This bug is now RESOLVED - #{updated_state}."}
         resolved_at = Time.now
         review_time = ((resolved_at - bug.pending_at)/86400).ceil
       when 'REOPENED'
         status = updated_state
         resolution = 'OPEN'
-        comment = {comment:"This bug is now #{updated_state}."}
+        comment = {comment: "This bug is now #{updated_state}."}
         reopened_at = Time.now
     end
 
@@ -153,13 +153,26 @@ class Bug < ActiveRecord::Base
   end
 
   def parse_summary
+
     parsed_summary = {}
-    parsed_summary[:tags] =[]
+    parsed_summary[:tags] = self.summary_tags
     parsed_summary[:sids] = self.summary_sids
     parsed_summary[:refs] = self.summary_references
     parsed_summary
   end
 
+  def summary_tags
+    tags = []
+    tag_list = Tag.all.map{|a| a.name}.join("|")
+    unless summary.nil?
+      unless tag_list.empty?
+        summary.scan(tag_list).each do |match|
+          tags << match
+        end
+      end
+    end
+    return tags.uniq
+  end
 
   def summary_sids
     sids = []
@@ -191,7 +204,6 @@ class Bug < ActiveRecord::Base
   private
 
 
-
   def add_attachment(xmlrpc, file)
     Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
   end
@@ -200,7 +212,7 @@ class Bug < ActiveRecord::Base
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
-        new_attachments = xmlrpc.attachments({:ids=>[bug_id]})
+        new_attachments = xmlrpc.attachments({:ids => [bug_id]})
         new_comments = xmlrpc.comments(:ids => [bug_id])
 
         Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
@@ -216,7 +228,7 @@ class Bug < ActiveRecord::Base
           new_record.created_at = item['creation_time'].to_time
           last_change_time = item['last_change_time'].to_time
           if new_record.state == 'NEW'
-          # do nothing
+            # do nothing
           elsif new_record.state == 'ASSIGNED'
             new_record.assigned_at = last_change_time
           elsif new_record.state == 'PENDING'
@@ -236,12 +248,12 @@ class Bug < ActiveRecord::Base
             new_record.creator = creator
           end
           if new_user.nil?
-            new_record.user = User.create(kerberos_login: "generated",cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.user = User.create(kerberos_login: "generated", cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
           else
             new_record.user = new_user
           end
           if new_committer.nil?
-            new_record.committer = User.create(kerberos_login: "generated",cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.committer = User.create(kerberos_login: "generated", cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
           else
             new_record.committer = new_committer
           end
@@ -278,7 +290,7 @@ class Bug < ActiveRecord::Base
                 end
                 comment = c['text'].strip
                 creation_time = c['creation_time'].to_time
-                note = Note.create(:id=>c['id'],:author=>c['author'],:comment=>comment,:bug_id=>bug_id,:note_type=>note_type,:created_at=>creation_time)
+                note = Note.create(:id => c['id'], :author => c['author'], :comment => comment, :bug_id => bug_id, :note_type => note_type, :created_at => creation_time)
                 new_record.notes << note
               end
             end
@@ -314,7 +326,7 @@ class Bug < ActiveRecord::Base
         end
       end
 
-      committer_note = Note.create(comment: notes,note_type: "committer",author: current_user.email)
+      committer_note = Note.create(comment: notes, note_type: "committer", author: current_user.email)
       self.notes << committer_note
 
       options = {:ids => [self.bugzilla_id], :status => status, :resolution => resolution, :comment => {:body => notes}}
@@ -393,10 +405,10 @@ class Bug < ActiveRecord::Base
 
   def self.check_permission(current_user, bugs)
     class_allowed = User.class_levels[current_user.class_level]
-    bugs.reject {|b| Bug.classifications[b.classification] > class_allowed }
+    bugs.reject { |b| Bug.classifications[b.classification] > class_allowed }
   end
 
-  settings index: { number_of_shards: 5 } do
+  settings index: {number_of_shards: 5} do
     mappings dynamic: 'false' do
       indexes :bugzilla_id, type: :integer
       indexes :user_id, type: :integer

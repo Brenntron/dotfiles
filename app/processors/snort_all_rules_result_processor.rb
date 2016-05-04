@@ -7,11 +7,11 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
      puts "Configuring all rule results"
       result = JSON.parse(message)	
 
-      unless result['job_id'].nil?
+      unless result['task_id'].nil?
 
          begin
             # Make sure to close the job
-            job = Job.find(result['job_id'])
+            job = Task.find(result['task_id'])
             job.result ||= ""
             return if job.nil?
 

@@ -5,12 +5,12 @@ class RuleConfiguration
   has_many :engines
 
   # Internal record ID.
-  attr_reader :id
+  # attr_reader :id
 
   # The rule configuration data.
-  attr_accessor :config_data
+  # attr_accessor :config_data
 
   # The name of the rule configuration. 
-  attr_accessor :name
+  # attr_accessor :name
   
 end

@@ -73,8 +73,8 @@ while message = client.receive
 		if request['rules'].nil? or request['rules'].empty?
 			raise CommitError.new("no bugs sent to commit")
 		end
-		if request['job_id'].nil?
-			raise CommitError.new("no job_id sent in this request")
+		if request['task_id'].nil?
+			raise CommitError.new("no task_id sent in this request")
 		end
 		if request['bug_id'].nil?
 			raise CommitError.new("no bug_id sent in this request")
@@ -210,21 +210,21 @@ while message = client.receive
 
 			# And notify the front end that the job is complete
 			client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
-				{ :job_id => request['job_id'], :completed => true, :failed => false, :result => result, :rules => rules, :cookie => request['cookie'] }.to_json
+				{ :task_id => request['task_id'], :completed => true, :failed => false, :result => result, :rules => rules, :cookie => request['cookie'] }.to_json
 
 		end
 
 	rescue SocketError, Errno::EHOSTUNREACH, Net::SSH::Disconnect => e
 		client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
-			{ :job_id => request['job_id'], :completed => true, :failed => true, :result => "Network failure: #{e.to_s}@#{cvs_host}"}.to_json
+			{ :task_id => request['task_id'], :completed => true, :failed => true, :result => "Network failure: #{e.to_s}@#{cvs_host}"}.to_json
 	
 	rescue Net::SSH::AuthenticationFailed => e
 		client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
-			{ :job_id => request['job_id'], :completed => true, :failed => true, :result => "Authentication failed for #{e.to_s}@#{cvs_host}"}.to_json
+			{ :task_id => request['task_id'], :completed => true, :failed => true, :result => "Authentication failed for #{e.to_s}@#{cvs_host}"}.to_json
 
 	rescue CommitError => e
 		client.publish "/queue/RulesUI.Snort.Commit.Test.Result",
-			{ :job_id => request['job_id'], :completed => true, :failed => true, :result => e.to_s}.to_json
+			{ :task_id => request['task_id'], :completed => true, :failed => true, :result => e.to_s}.to_json
 	end
 
 	# Finally let the server release this message

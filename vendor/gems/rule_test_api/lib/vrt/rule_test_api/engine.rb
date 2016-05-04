@@ -8,19 +8,19 @@ class Engine
   belongs_to :engine_type
 
   # Internal record ID
-  attr_reader :id
+  # attr_reader :id
 
   # RuleConfiguration ID - The defined rule configuration to use with this engine.
-  attr_accessor :rule_configuration_id
+  # attr_accessor :rule_configuration_id
 
   # SnortConfiguration ID - The defined snort configuration to use with this engine.
-  attr_accessor :snort_configuration_id
+  # attr_accessor :snort_configuration_id
 
   # EngineType ID - (Persistent, Single, etc) Determines how this engine will be started.
-  attr_accessor :engine_type_id
+  # attr_accessor :engine_type_id
 
   # Defines how many of these instances will started by each running engine_manager.
-  attr_accessor :instances
+  # attr_accessor :instances
 
 
 end

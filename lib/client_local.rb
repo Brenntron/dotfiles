@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 
+######################
+#=============
+#client_local
+#=============
+# This file processes each selected rule against the local copy of the snort rules
+######################
+
 require 'open3'
 require 'stomp'
 require 'sfbugzilla'
@@ -10,14 +17,19 @@ require 'vrt/rule_test_api'
 require 'base64'
 require 'pry'
 
+
 # General options
 local_cache_path = File.expand_path('tmp/pcaps')
+
+if Rails.env =="development"
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
+
 
 # Make sure our pcaps cache exists
 if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
-
 cert = OpenSSL::X509::Certificate.new()
 ssl_options= {}
 stomp_options = {}
@@ -27,14 +39,17 @@ stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
 }
-
+puts "talk to bugzilla"
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 
+puts "create stomp client"
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
 
+
+puts "init API"
 # Initialize the API
 tries ||= 3
 begin
@@ -43,16 +58,19 @@ rescue Exception => e
   retry unless (tries -= 1).zero?
 end
 
+puts "finding engine..."
 # Find the engine we should be using for these rules
 engine_type = EngineType.where(:name => 'Single').first
 snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
 rule_configuration = RuleConfiguration.where(:name => 'Local Rules Only').first
 
+puts "confirming..."
 # Make sure everything was found
 raise Exception.new("Unable to find Single engine type") if engine_type.nil?
 raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
 raise Exception.new("Unable to find Local Rules Only configuration") if rule_configuration.nil?
 
+puts "setting engine..."
 engine = Engine.where(
     :engine_type_id => engine_type[:id],
     :snort_configuration_id => snort_configuration[:id],
@@ -69,7 +87,6 @@ while message = client.receive
 
     puts request
 
-
     # Release the message early
     client.ack(message.headers['message-id'])
 
@@ -78,7 +95,6 @@ while message = client.receive
 
     # Store the pcaps for testing
     pcaps = Hash.new
-
 
     # Fetch all of the needed pcaps into the cache directory
     request['attachments'].each do |attachment_id|
@@ -116,7 +132,6 @@ while message = client.receive
 
       # Start by hashing the pcap data
       sha = Digest.hexencode(sha256.digest(pcap_data))
-
       # See if the PCAP exists on the server
       pcap = Pcap.where(:file_hash => sha).first
 
@@ -129,7 +144,7 @@ while message = client.receive
       if pcap.error?
         raise Exception.new(pcap.error)
       else
-        pcaps[sha] = {:pcap_id => pcap.id, :attachment_id => attachment_id}
+        pcaps[sha] = {:pcap_id => pcap.attributes[:id], :attachment_id => attachment_id}
       end
     end
 
@@ -137,19 +152,20 @@ while message = client.receive
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size == 1
-      test_pcaps << nil
+      test_pcaps << ""
     end
-
     # Create the new job
-    job = Job.create(:engine_id => engine.id, :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
+    job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
 
-    # Wait for the job to finish
-    until (job.completed == "1")
-      sleep 1
-      job = Job.find(job.id)
+    unless Rails.env == "development"
+      # Wait for the job to finish
+      until (job.completed == "1")
+        sleep 1
+        job = Job.find(job.attributes[:id])
+      end
     end
 
     # Send back alerts
@@ -171,7 +187,7 @@ while message = client.receive
     # And notify the front end that the job is complete
     client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
-                       :job_id => request['job_id'],
+                       :task_id => request['task_id'],
                        :completed => job.completed,
                        :result => job.information,
                        :failed => job.failed,
@@ -182,7 +198,7 @@ while message = client.receive
   rescue EOFError => e
     client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
-                       :job_id => request['job_id'],
+                       :task_id => request['task_id'],
                        :failed => true,
                        :completed => true,
                        :result => "Bugzilla appears to be fucking off: #{e.to_s}"
@@ -190,7 +206,7 @@ while message = client.receive
   rescue Exception => e
     client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
-                       :job_id => request['job_id'],
+                       :task_id => request['task_id'],
                        :failed => true,
                        :completed => true,
                        :result => "#{$!}\n#{e.backtrace.join("\n\t")}",

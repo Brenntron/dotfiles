@@ -6,7 +6,7 @@ module API
       resource :notes do
         desc "Return all notes"
         get "", root: :notes do
-          Note.all
+          Note.all.sort_by &:created_at
         end
 
         desc "Create a note"

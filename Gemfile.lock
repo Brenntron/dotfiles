@@ -336,6 +336,7 @@ DEPENDENCIES
   guard-cucumber (= 1.5.3)
   guard-livereload (= 2.3.0)
   hashie-forbidden_attributes
+  her
   jbuilder (~> 2.2.16)
   kaminari (~> 0.16.3)
   launchy (= 2.4.2)

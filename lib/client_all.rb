@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 
+######################
+#=============
+#client_all
+#=============
+# This file tests each attachment against the snort rules. It returns a number of alerts for each rule it has a problem with.
+######################
+
 require 'open3'
 require 'stomp'
 require 'sfbugzilla'
@@ -10,15 +17,21 @@ require 'vrt/rule_test_api'
 require 'base64'
 
 # Make sure we run from the application root
-Dir.chdir ENV['APP_ROOT']
+Dir.chdir Rails.root
 
 # General options
 local_cache_path = File.expand_path('tmp/pcaps')
+
+if Rails.env =="development"
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
 
 # Make sure our pcaps cache exists
 if not File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
+
+max_wait_for_job = 60 #seconds
 
 cert = OpenSSL::X509::Certificate.new()
 ssl_options= {}
@@ -67,7 +80,7 @@ while message = client.receive
   puts "++++++++++++++++++++++"
   alerts = Array.new
   errors = Array.new
-  job_id = nil
+  task_id = nil
 
   begin
 
@@ -83,8 +96,8 @@ while message = client.receive
     # Store the pcaps for testing
     pcaps = Hash.new
 
-    # Save the job_id
-    job_id = request['job_id']
+    # Save the task_id
+    task_id = request['task_id']
 
     # Fetch all of the needed pcaps into the cache directory
     request['attachments'].each do |attachment_id|
@@ -142,20 +155,28 @@ while message = client.receive
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size == 1
-      test_pcaps << nil
+      test_pcaps << ""
     end
 
     # Create the new job
-
-    job = Job.create(:engine_id => engine[:id], :pcaps => test_pcaps, :completed => false)
+    job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false)
 
     # Make sure the job was created
     raise Exception.new("Failed to create job: #{job.error}") if job.error?
 
-    # Wait for the job to finish
-    until (job.completed == "1")
-      sleep 1
-      job = Job.find(job.id)
+
+    unless Rails.env == "development"
+      # Wait for the job to finish
+      puts "waiting for job to finish..."
+      sleep_counter = 0
+      until (job.completed == "1")
+        sleep_counter += 1
+        sleep 1
+        job = Job.find(job.attributes[:id])
+
+        raise Exception.new("Job Timed Out") if sleep_counter == max_wait_for_job
+      end
+      puts "...done"
     end
 
     # Send back alerts
@@ -172,6 +193,7 @@ while message = client.receive
       end
     end
 
+
   rescue JSON::ParserError => e
     print "Failed to parse json message:"
     puts e.to_s
@@ -185,11 +207,11 @@ while message = client.receive
   # Finally, send the results back
   puts alerts.inspect
   puts errors.inspect
-  puts job_id
-  unless job_id.nil?
+  puts task_id
+  unless task_id.nil?
     client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
                    {
-                       :job_id => job_id,
+                       :task_id => task_id,
                        :alerts => alerts,
                        :errors => errors,
                    }.to_json
