@@ -1,25 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Backend</title>
-  <%= csrf_meta_tags %>
-</head>
-<body>
+  <head>
+    <title>Backend</title>
+    <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+    <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
 
+    <div class="sidebar">
+      <div class="sidebar-header center">
+        <h1 class="logo"><%= link_to 'RulesUI', '#'  %></h1>
+        <div class="sidebar-footer">
+          <p>&copy; 2015 Cisco Systems, Inc</p>
+        </div>
+      </div>
+      <nav class="navbar nav-stacked rules-ui-nav">
+        <ul class="nav nav-stacked">
+          <li><%= link_to 'BUG LIST', '#' %></li>
+          <li><%= link_to 'RULES', '#' %></li>
+          <li><%= link_to 'USERS', '#' %></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="overall" id="main-content">
+      <div class="container-fluid">
+        <div class="row">
+          <a class="sidebar-toggle">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <p class="login-area">
+            <% if current_user %>
+                <span class="login-label"> <strong><%= current_user[:display_name] %></strong> </span>
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+git remote
+    <%= yield %>
 
-<% if notice %>
-    <div id="error_messages" class="fixed_alerts alert alert-info  fade in" data-alert="alert">
-      <%= raw "<p>#{notice}</p>" %>
-    </div>
-<%elsif alert%>
-    <div id="error_messages" class="fixed_alerts alert alert-danger">
-      <%= raw "<p>#{alert}</p>" %>
-    </div>
-<% else %>
-    <div id="error_messages">
-    </div>
-<% end %>
-<%= yield %>
-
-</body>
+  </body>
 </html>
+

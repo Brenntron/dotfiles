@@ -15,8 +15,7 @@ Rails.application.routes.draw do
     resources :rule_configurations, :defaults => { :format => 'json' }
   end
 
-
-  post "sessions/create.:format" => "sessions#create", :constraints => { :format => /json/}
+  post "sessions/create" => "sessions#create"
   root 'pages#index'
 
   mount API::Base => '/api'

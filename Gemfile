@@ -23,7 +23,7 @@ gem 'her'
 
 gem 'net-ssh'
 gem 'daemons'
-gem 'activemessaging'
+gem "activemessaging", :git => "https://github.com/digital-york/activemessaging.git"
 gem 'stomp'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '0.9.12.4'
@@ -56,11 +56,16 @@ group :test do
   gem 'rspec', '2.14.1'
 end
 
+gem 'uglifier', '>= 1.3.0'
+gem 'jquery-rails'
+gem 'jquery-ui-rails'
+gem 'coffee-rails'
+gem 'less-rails'
+gem 'bootstrap-sass'
+gem 'therubyracer'
+gem 'turbolinks'
 
 gem 'rails', '4.1.5'
 
-# gem 'jquery-rails'
-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
-# gem 'turbolinks'
 
 

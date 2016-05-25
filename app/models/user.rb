@@ -67,7 +67,6 @@ class User < ActiveRecord::Base
 
       user.confirmed = 'true'
       user.updated_at = Time.now
-
       user.ensure_authentication_token #make sure the user has a token generated
       resource = {
           :success => true,
@@ -75,7 +74,10 @@ class User < ActiveRecord::Base
           :kerberos_login => user.kerberos_login,
           :user_token => user.authentication_token, #this must be called user_token for the ember app session to persist
           :user_email => user.email, #this also ust be called user_email for the ember app session to persist
-          :user_id => user.id
+          :user_id => user.id,
+          currentUser: {
+              display_name: user.display_name
+          }
       }
       raise Exception.new("Error signing in. Please contact the administrator.") unless user.save
       return resource
