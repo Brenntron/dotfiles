@@ -79,6 +79,7 @@ class User < ActiveRecord::Base
               display_name: user.display_name
           }
       }
+
       raise Exception.new("Error signing in. Please contact the administrator.") unless user.save
       return resource
 

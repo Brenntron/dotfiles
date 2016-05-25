@@ -1,20 +1,20 @@
 <div class="jumbotron">
-    <div class="col-sm-offset-2">
-        <p class="tagline">
-            Please wait while we sign you in.
-        </p>
-    </div>
+  <div class="col-sm-offset-2">
+    <p class="tagline">
+      Please wait while we sign you in.
+    </p>
+  </div>
 </div>
 
 <script>
-    function signIn(){
-        $.ajax({
-            url: "/sessions/create",
-            method: 'POST',
-            data: {'api_key': 'h93hq@hwo9%@ah!jsh'}
-        }).done(function(response) {
-            window.location.replace("/");
-        });
-    };
-    window.onload = signIn;
+  function signIn(){
+    $.ajax({
+      url: "/sessions/create",
+      method: 'POST',
+      data: {'api_key': 'h93hq@hwo9%@ah!jsh'}
+    }).done(function(response) {
+      window.location.replace("/");
+    });
+  };
+  window.onload = signIn;
 </script>

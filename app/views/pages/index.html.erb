@@ -1,10 +1,14 @@
 <% if current_user %>
+
     <div class="jumbotron">
       <h1>Rules UI</h1>
       <p class="tagline">
         Part of the Talos dashboard!
       </p>
     </div>
+
 <% else %>
+
     <%= render 'login' %>
+
 <% end %>
