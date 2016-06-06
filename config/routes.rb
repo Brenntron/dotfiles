@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   post "sessions/create" => "sessions#create"
   root 'pages#index'
+  resources 'rules'
 
   mount API::Base => '/api'
   mount GrapeSwaggerRails::Engine => '/documentation'

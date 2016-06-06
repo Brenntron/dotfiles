@@ -56,6 +56,7 @@ group :test do
   gem 'rspec', '2.14.1'
 end
 
+gem 'httparty'
 gem 'uglifier', '>= 1.3.0'
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
