@@ -1,0 +1,35 @@
+<div class="modal fade" id="change_summary_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">
+          Change Summary
+        </h4>
+      </div>
+
+      <!-- Modal Body -->
+
+      <form class="form-horizontal" role="form">
+        <div class="modal-body">
+          <input type="hidden" name="id" value=<%= @bug.id %>>
+          <input class="form-control" name="summary" value="<%= @bug.summary %>">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            <button type="submit" id='change_summary' class="btn btn-primary" data-dismiss="modal">
+              Save changes
+            </button>
+          </div>
+        </div>
+      </form>
+
+
+    </div>
+  </div>
+</div>

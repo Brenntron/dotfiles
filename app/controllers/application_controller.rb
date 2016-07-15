@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   #protect_from_forgery with: :null_session, :if => Proc.new { |c| c.request.accept == 'application/json' }
   helper_method :current_user
+  helper_method :xml_token
 
   private
 
@@ -15,6 +16,10 @@ class ApplicationController < ActionController::Base
 
   def current_user
     @current_user ||= User.find(session[:user]) if session[:user]
+  end
+
+  def xml_token
+    @xml_token ||= session[:token] if session[:token]
   end
 
 

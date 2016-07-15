@@ -1,0 +1,54 @@
+<div class="row top-space">
+  <div class="col-sm-12">
+    <h4 class="blue">Summary <span class="tiny text-muted">&nbsp; <a data-toggle="modal" data-target="#change_summary_modal">edit</a>&nbsp; </span></h4>
+  </div>
+
+  <div class="col-sm-12 bug_summary">
+    <h4 id="current_bug_summary"><%= @bug.summary %></h4>
+  </div>
+
+</div>
+<div class="row top-space">
+  <div class="col-xs-12">
+    <h4 class="blue"> References
+      <span class="pull-right h6">
+        <a data-toggle="modal" data-target="#referenceWindow"><i class="glyphicon glyphicon-plus"></i> Add Reference</a>
+      </span>
+    </h4>
+  </div>
+  <div class="col-xs-12 code">
+    <% if @bug.references.any? %>
+      <% @bug.references.each do |ref| %>
+        <div class="col-xs-12">
+          <code><a {{bind-attr href=url}} target="_blank"><%= ref.reference_data %></a></code>
+        </div>
+      <% end %>
+    <% else %>
+      <p>< MISSING ></p>
+    <% end %>
+  </div>
+</div>
+
+
+<div class="row top-space">
+  <div class="col-xs-12">
+    <h4 class="blue"> Exploits</h4>
+  </div>
+  <div class="col-xs-12 code">
+    <% if @bug.references.any? %>
+      <% @bug.references.each do |ref| %>
+        <% if ref.exploits %>
+          <% ref.exploits.each do |exploit|  %>
+            <div class="col-xs-12">
+              <p><%= exploit.exploit_type_id %><a {{bind-attr href=exploit_data}} target="_blank"><%= exploit.data %></a></p>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+    <p>----------------</p>
+  </div>
+</div>
+
+
+

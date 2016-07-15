@@ -64,7 +64,6 @@ class User < ActiveRecord::Base
         new_record.password       = 'password'
         new_record.password_confirmation= 'password'
       end
-
       user.confirmed = 'true'
       user.updated_at = Time.now
       user.ensure_authentication_token #make sure the user has a token generated

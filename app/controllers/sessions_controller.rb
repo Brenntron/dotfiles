@@ -7,8 +7,9 @@ class SessionsController < ApplicationController
           begin
             raise Exception.new("Unauthorized Access.") if params[:api_key].blank? || params[:api_key] != Rails.configuration.ember_app[:api_key]
             resource = User.login_user(params, request)
-            if resource[:user_id]
+            if resource[:user_id] && resource[:xmlrpc_token]
               session[:user] = resource[:user_id]
+              session[:token] = resource[:xmlrpc_token]
             end
           rescue XMLRPC::FaultException => e
             return invalid_login_attempt(e)

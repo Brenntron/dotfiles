@@ -3,21 +3,22 @@
   <head>
     <title>Backend</title>
     <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
-    <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+    <%= javascript_include_tag "application", "data-turbolinks-track" => false %>
+    <%= render 'layouts/javascript_tags' %>
     <%= csrf_meta_tags %>
   </head>
   <body>
 
     <div class="sidebar">
       <div class="sidebar-header center">
-        <h1 class="logo"><%= link_to 'RulesUI', '#'  %></h1>
+        <h1 class="logo"><%= link_to 'RulesUI', root_url  %></h1>
         <div class="sidebar-footer">
           <p>&copy; 2015 Cisco Systems, Inc</p>
         </div>
       </div>
       <nav class="navbar nav-stacked rules-ui-nav">
         <ul class="nav nav-stacked">
-          <li><%= link_to 'BUG LIST', '#' %></li>
+          <li><%= link_to 'BUG LIST', bugs_path %></li>
           <li><%= link_to 'RULES', rules_path %></li>
           <li><%= link_to 'USERS', '#' %></li>
         </ul>
@@ -34,6 +35,9 @@
           <p class="login-area">
             <% if current_user %>
                 <span class="login-label"> <strong><%= current_user[:display_name] %></strong> </span>
+            <% end %>
+            <% if controller_name == 'bugs' %>
+              <%= render 'layouts/bugs_layout'%>
             <% end %>
           </p>
         </div>

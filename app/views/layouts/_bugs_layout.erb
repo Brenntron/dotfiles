@@ -1,0 +1,97 @@
+<div class="container-fluid bugs-page">
+  <div class="col-xs-3 col-sm-2 col-md-2 col-lg-2 item-ids-column">
+    <div class="sidebar-search">
+      <div class="input-group input-group-sm">
+        <input type="text" class="form-control" placeholder="BugID">
+      </div><!-- /input-group -->
+    </div>
+    <table class="right table index-table">
+      <thead>
+      <tr><td><strong>Bugs</strong></td></tr>
+      </thead>
+      <tbody>
+      <% @bugs.each do |bug| %>
+          <tr class="highlight">
+            <td><%= bug.bugzilla_id %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <div class="col-pagination">
+    </div>
+  </div>
+  <div class="col-xs-9 col-sm-10 col-md-10 col-lg-10 item-details-column">
+    <div class="row header">
+      <div class="col-xs-12 actions-bar">
+        <button id="search-bugs-btn" class="btn btn-link float-left icon-link" data-toggle="modal" data-target="#searchWindow"><i class="glyphicon glyphicon-search"></i><span class="sr-only">search</span></button>
+        <div class="btn-group float-left">
+          <button type="button" class="btn btn-link icon-link dropdown-toggle float-left" data-toggle="dropdown" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/bugs?q=my-bugs">my bugs</a></li>
+            <li><a href="/bugs?q=team-bugs"}}>team bugs</a></li>
+            <li class="divider"></li>
+            <li><a href="/bugs?q=open-bugs">open bugs</a></li>
+            <li><a href="/bugs?q=pending-bugs"}>pending bugs</a></li>
+            <li><a href="/bugs?q=fixed-bugs">fixed bugs</a></li>
+            <li class="divider"></li>
+            <li><a href="/bugs?q=all-bugs">all bugs</a></li>
+          </ul>
+        </div>
+        <input id="import_bug" type="text" name="bug_name">
+        <button type="button" id="button_import">Import</button>
+      </div>
+      <div class="import_button col-xs-12 hidden-md hidden-lg" style="display:none">
+      </div>
+    </div>
+    <%= yield %>
+  </div>
+</div>
+<div id="blanket" style="display:none;"></div>
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="xml_token" value="<%= xml_token %>">
+
+<%= render 'shared/bug_search_modal' %>
+
+
+<% if action_name == 'show' %>
+    <%= render 'shared/summary_modal' %>
+    <%= render 'shared/reference_modal' %>
+<% end %>
+
+<script>
+  $('#button_import').click(function() {
+    var headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
+    var id = $('#import_bug').val();
+    $.ajax({
+      url: "/api/v1/bugs/import/" + id,
+      method: 'GET',
+      data: {'api_key': 'h93hq@hwo9%@ah!jsh'},
+      headers: headers
+    }).done(function(response) {
+      window.location.replace("/bugs");
+    });
+  });
+
+  $(document).on("click", "a[data-remote=true]", function(e){
+    e.preventDefault();
+    $.getScript($(this).attr('href'))
+  });
+
+  $(".reset").click(function(e) {
+    e.preventDefault();
+    $(this).closest('form').find("input").val("");
+    $(this).closest('form').find("select").val("");
+  });
+
+  $("input[name='bug_range']").on("click", function(){
+    if($('input[name="bug_range"]').prop('checked')) {
+      $(".bugzilla_max").show();
+    } else {
+      $(".bugzilla_max").hide();
+    }
+
+  });
+
+</script>

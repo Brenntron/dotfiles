@@ -1,0 +1,155 @@
+<div class="row top-space">
+  <div class="col-xs-6">
+    <h4 class="blue">Attachments</h4>
+  </div>
+  <div class="col-xs-6 right">
+    <p>
+      <a>
+      <span id="showAddAttachsToggle"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs">new attachment</strong></span>
+      <span id="hideAddAttachsToggle" class="text-muted" style="display:none"><i class="glyphicon glyphicon-remove"></i><strong class="hidden-xs">cancel</strong></span>
+      </a>&nbsp;&nbsp;
+      <button class="select-sm btn btn-default right">
+      <strong class="hidden-xs">test attachments &nbsp;&nbsp;</strong>
+      <i class="glyphicon glyphicon-flag"></i>
+      </button>
+    </p>
+  </div>
+  <div class="col-xs-12">
+    <div class="attach_button" style="display:none">
+      <form role="form" id="attachment_form">
+      <div class="row">
+        <div class="col-sm-12 form-group">
+          <label for="title">Summary (what is this attachment)</label>
+          {{input classNames="form-control create-input" id="new-attach-title" name="title" value=title required="true"}}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12 form-group">
+          <label for="file_name">file</label>
+          <input id="fileItem" type="file" required="true">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12 form-group">
+          <button class="btn btn-warning btn-sm" value="submit">create attachment</button>
+        </div>
+      </div>
+      </form>
+      <hr>
+    </div>
+  </div>
+</div>
+<div class="row top-bar">
+  <div class="col-xs-12">
+    <button class="select-sm btn btn-link">
+      <strong class="hidden-xs" id="attachments-current">Current (<%= @attachments.count %>)&nbsp;&nbsp;</strong>
+      <i class="glyphicon glyphicon-eye-open"></i>
+    </button>
+    <button class="select-sm btn btn-link">
+      <strong class="hidden-xs" id="attachments-obsolete">Obsolete (<%= @obsolete_attachments.count %>) &nbsp;&nbsp;</strong>
+      <i class="glyphicon glyphicon-eye-close"></i>
+    </button>
+
+    <% if @attachments.any? %>
+    <table class="table table-condensed small table-hover" id="current-attachments">
+      <thead>
+      <tr>
+        <td class="narrow-column"><input type="checkbox" class="attachcheckbox"></td>
+        <td class="narrow-column"></td>
+        <td>Filename</td>
+        <td>Alerts</td>
+      </tr>
+      </thead>
+      <tbody>
+        <% @attachments.each do |attachment| %>
+        <tr>
+          <td><input type="checkbox" name=<%= attachment.id %> class="attachcheckbox"> </td>
+          <td class="center narrow-column"><a class="blue">
+            <i class="glyphicon glyphicon-download"></i></a></td>
+          <td><code><a><%= attachment.file_name %></a></code></td>
+          <td class="center narrow-column">
+            <h5>
+              <a><%= attachment.rules.count %></a>
+            </h5>
+          </td>
+        </tr>
+        <% if attachment.rules %>
+          <tr style="display: none;">
+            <td></td><td colspan=2>
+            <table class="table-condensed small">
+              <% attachment.rules.each do |rule| %>
+                <tr>
+                  <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
+                  <td><strong><%= rule.message %></strong></td>
+                </tr>
+              <% end %>
+            </table>
+          </td>
+          </tr>
+        <% end %>
+        <% end %>
+      </tbody>
+    </table>
+    <% else %>
+      <p class="small text-muted top-space center"><em>No attached files.</em></p>
+    <% end %>
+    <% if @obsolete_attachments %>
+      <table class="table table-condensed small table-hover" id="obsolete-attachments" style="display: none;">
+        <thead>
+        <tr>
+          <td class="narrow-column"></td>
+          <td>Filename</td>
+          <td>Alerts</td>
+        </tr>
+        </thead>
+        <tbody>
+        <% @obsolete_attachments.each do |attachment| %>
+        <tr>
+          <td class="center narrow-column"><a class="blue"><i class="glyphicon glyphicon-download"></i></a></td>
+          <td><code><a><%= attachment.file_name %></a></code></td>
+          <td class="center narrow-column">
+            <h5 class="ember-tooltip bottom" style="display: none;">
+              1
+              <div class="tip">
+                <table class="table-condensed small">
+                  <tr>
+                    <td class="blue">120:9:1</td>
+                    <td><strong>(http_inspect) JAVASCRIPT OBFUSCATION LEVELS EXCEEDS 1</strong></td>
+                  </tr>
+                  <tr>
+                    <td class="blue">1:29519:1</td>
+                    <td><strong>INDICATOR-OBFUSCATION Javascript obfuscation using split reverse
+                      join</strong></td>
+                  </tr>
+                  <tr>
+                    <td class="blue">1:32246:3</td>
+                    <td><strong>BROWSER-PLUGINS Samsung iPOLiS device manager clsid access attempt</strong>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </h5>
+        </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="small text-muted top-space center"><em>No obsolete attached files.</em></p>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+    $('#attachments-current').click(function(){
+      $('#current-attachments').show();
+      $('#obsolete-attachments').hide();
+    });
+    $('#attachments-obsolete').click(function(){
+      $('#current-attachments').hide();
+      $('#obsolete-attachments').show();
+    });
+  });
+</script>

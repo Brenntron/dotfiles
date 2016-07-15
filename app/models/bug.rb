@@ -12,6 +12,9 @@ class Bug < ActiveRecord::Base
   has_many :tasks, :dependent => :destroy
   has_many :notes, :dependent => :destroy
 
+  accepts_nested_attributes_for :references
+  accepts_nested_attributes_for :rules
+
   enum classification: {
       unclassified: 0,
       confidential: 1,

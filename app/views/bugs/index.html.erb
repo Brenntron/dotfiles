@@ -1,0 +1,36 @@
+<table class="table index-table">
+  <thead>
+  <tr>
+    <td class="indent"><strong>Summary</strong></td>
+    <td><strong>&nbsp;&nbsp;&nbsp;State</strong></td>
+    <td><strong>User</strong></td>
+    <td><strong>Committer</strong></td>
+    <td></td>
+  </tr>
+  </thead>
+  <tbody>
+  <% @bugs.each do |bug| %>
+      <tr>
+        <td><%= bug.summary %></td>
+        <td>&nbsp;&nbsp;&nbsp;
+          <%= bug.state %></td>
+        <td class="bug-user">
+          <% if bug.user %>
+              <%= bug.user.cvs_username %>
+          <% else %>
+              -
+          <% end %>
+          <br/><span class="small text-muted bug-actions">take</span>
+        </td>
+        <td class="bug-user">
+          <% if bug.committer %>
+              <%= bug.committer.cvs_username %>
+          <% else %>
+              -
+          <% end %>
+        </td>
+        <td><div class="delete-btn"></div></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,273 @@
+$(document).ready(function(){
+
+        var legacy_rule_form = '<hr/>'+
+            '<div class="rule_form_id">' +
+            '<div class="col-xs-12">'+
+            '<h4>New Rule</h4>'+
+            '</div>'+
+            '<div>'+
+            '<div class="col-xs-4 top-space">'+
+            '<form role="form" class="form-inline pull-right prepopulate-form">'+
+            '<div class="form-group">'+
+            '<label class="sr-only">Duplicate: </label>'+
+            '<input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>'+
+            '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
+            '</div>'+
+            '</form>'+
+
+            '<button class="pull-right btn btn-default btn-sm">Revert</button>'+
+
+            '</div>'+
+
+  '<div class="form-group">'+
+  '<div class="col-xs-12">'+
+  '<label>Rule content</label>'+
+  '<textarea class="form-control code select-sm" placeholder="Enter rule content" name="bug[rules][][content]" rows="13" required></textarea>'+
+  '</div>'+
+  '</div>'+
+  '</div></div>';
+
+        var standard_rule_form = '<hr/>'+
+            '<div class="rule_form_id">' +
+            '<div class="col-xs-12">'+
+            '<h4>New Rule</h4>'+
+        '</div>'+
+        '<div>'+
+        '<div class="col-xs-8">'+
+        '</div>'+
+        '<div class="col-xs-4 top-space">'+
+            '<form role="form" class="form-inline pull-right prepopulate-form">'+
+            '<div class="form-group">'+
+            '<label class="sr-only">Duplicate: </label>'+
+        '<input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>'+
+        '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
+            '</div>'+
+            '</form>'+
+
+            '<button class="pull-right btn btn-default btn-sm">Revert</button>'+
+
+            '</div>'+
+
+        //'<form action="/rules" method="post" role="form" class="form rule-form">'+
+            '<div class="form-group rule-form">'+
+            '<div class="col-xs-12">'+
+            '<h5>Message</h5>'+
+            '<div class="entry-type-switch">'+
+            '</div>'+
+            '<div class="col-xs-10">'+
+            '<input class="form-control create-input select-sm code" name="bug[rules][][message]" placeholder="enter a message" required="true">'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-12">'+
+            '<h5>Connection</h5>'+
+            '</div>'+
+            '<div class="form-group">'+
+            '<div class="col-xs-12">'+
+            '<div class="entry-type-switch">'+
+            '<div class="radio">'+
+            '<label>'+
+            '<input type="radio" class="connection" name="connectionForm" checked value="true">'+
+            '<span class="sr-only">Select connection options</span>'+
+        '</label>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-10 col-sm-11">'+
+            '<label for="connectionText" class="control-label sr-only">Connection</label>'+
+            '<div class="form-inline code">'+
+            '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
+            '"<% ["alert"].each do |type| %>'+
+        '<option><%= type %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
+            '"<% ["tcp","udp","ip","icmp"].each do |type| %>'+
+        '<option><%= type %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
+            '"<% ["$HOME_NET", "$EXTERNAL_NET", "$DNS_SERVERS", "$SMTP_SERVERS", "$HTTP_SERVERS", "$SQL_SERVERS", "$TELNET_SERVERS", "$SSH_SERVERS", "$FTP_SERVERS","$SIP_SERVERS", "$AIM_SERVERS","$HTTP_PORTS","$SHELLCODE_PORTS","$ORACLE_PORTS", "$SSH_PORTS", "$FTP_PORTS", "$SIP_PORTS", "$FILE_DATA_PORTS"].each do |dstsrc| %>'+
+            '<option value=<%= dstsrc %>><%= dstsrc %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '<input class="form-control select-sm src-prt" name="bug[rules][][connection][]" value="any">'+
+            '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
+            '"<% ["->","<->"].each do |direction| %>'+
+            '<option><%= direction %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
+            '"<% ["$HOME_NET", "$EXTERNAL_NET", "$DNS_SERVERS", "$SMTP_SERVERS", "$HTTP_SERVERS", "$SQL_SERVERS","$TELNET_SERVERS", "$SSH_SERVERS", "$FTP_SERVERS","$SIP_SERVERS", "$AIM_SERVERS","$HTTP_PORTS","$SHELLCODE_PORTS","$ORACLE_PORTS", "$SSH_PORTS", "$FTP_PORTS", "$SIP_PORTS", "$FILE_DATA_PORTS"].each do |dstsrc| %>'+
+            '<option><%= dstsrc %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '<input class="form-control select-sm dst-prt" name="bug[rules][][connection][]" value="any">'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-12">'+
+            '<div class="entry-type-switch">'+
+            '<div class="radio">'+
+            '<label>'+
+            '<input type="radio" class="connection" id="scratch_connection" name="connectionForm" value="false">'+
+            '<span class="sr-only">Write Connection from scratch</span>'+
+        '</label>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-10">'+
+            '<input type="text" class="form-control create-input select-sm code" id="scratch_connection_text" name="bug[rules][][connection][]" placeholder="write connection from scratch" disabled>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '<div class="form-group">'+
+            '<div class="col-xs-12">'+
+            '<h5>Flow</h5>'+
+            '<div class="entry-type-switch">'+
+            '<div class="radio">'+
+            '<label>'+
+            '<input type="radio" name="flowForm" class="flow" checked>'+
+        '<span class="sr-only">Select flow options</span>'+
+        '</label>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-10 form-inline">'+
+            '<select class="form-control select-sm code" name="bug[rules][][flow][]" id="new-rule-flow">'+
+            '"<% ["to_server", "to_client"].each do |flow| %>'+
+        '<option value=<%= flow %>><%= flow %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '<div class="checkbox left-space">'+
+            '<label>'+
+            '<input type="checkbox" name="bug[rules][][flow][]" id="new-rule-flow-established" value="established" checked>established?'+
+        '</label>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-12">'+
+            '<div class="entry-type-switch">'+
+            '<div class="radio">'+
+            '<label>'+
+            '<input type="radio" name="flowForm" class="flow" id="scratch_flow" value="false">'+
+            '<span class="sr-only">Write flow from scratch</span>'+
+        '</label>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-10">'+
+            '<input class="form-control create-input select-sm code" name="bug[rules][][flow][]" id="scratch_flow_text" placeholder="write flow from scratch" disabled>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '<div class="form-group">'+
+            '<div class="col-xs-12">'+
+            '<h5>Detection</h5>'+
+            '<div class="entry-type-switch">'+
+            '</div>'+
+            '<div class="col-xs-10">'+
+            '<textarea class="form-control create-input select-sm code" rows=10 name="bug[rules][][detection]" placeholder="enter detection" required="true"></textarea>'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '<div class="form-group">'+
+            '<div class="col-xs-12">'+
+            '<h5>Metadata</h5>'+
+            '</div>'+
+            '<div class="col-xs-12">'+
+            '<div class="entry-type-switch">'+
+            '<div class="radio">'+
+            '<label>'+
+            '<input type="radio" name="metadataForm" class="metadata" checked>'+
+        '<span class="sr-only">Select metadata options</span>'+
+        '</label>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-10 form-inline">'+
+            '<label for="metadata-policy">Policy:&nbsp;&nbsp;</label>'+
+        '<select class="form-control select-sm code" name="bug[rules][][metadata][]" id="new-rule-metadata-policy">'+
+            '<option value=""> -- </option>'+
+            '"<% ["security-ips drop", "balanced-ips drop", "security-ips drop","connectivity-ips", "balanced-ips drop", "security-ips drop", "max-detect-ips drop"].each do |policy| %>'+
+        '<option value=<%= policy %>><%= policy %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-12">'+
+            '<div class="entry-type-switch"></div>'+
+            '<div class="col-xs-2 col-sm-1">'+
+            '<label for="metadata-services">Service:</label>'+
+        '</div>'+
+        '<div class="col-xs-8 col-sm-9">'+
+            '<% ["dns", "ftp-data","http", "imap", "netbios-ssn", "pop3", "smtp"].each do |service| %>'+
+        '<input type="checkbox" name="bug[rules][][metadata][]" value=<%= service %>>&nbsp;<%= service %>&nbsp;&nbsp;'+
+        '<% end %>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-12">'+
+            '<div class="entry-type-switch"></div>'+
+            '<div class="form-inline col-xs-10">'+
+            '<div class="form-group">'+
+            '<label for="metadata-flag">Impact Flag:&nbsp;&nbsp;</label>'+
+        '<select class="form-control select-sm code" name="bug[rules][][metadata][]" id="new-rule-metadata-flag">'+
+            '<option value=""> -- </option>'+
+            '<option value="red">red</option>'+
+            '</select>'+
+            '</div>'+
+            '<div class="form-group">'+
+            '<label for="metadata-ruleset">Ruleset:&nbsp;&nbsp;</label>'+
+        '<select class="form-control select-sm code" name="bug[rules][][metadata][]" id="new-rule-metadata-ruleset">'+
+            '<option value=""> -- </option>'+
+            '<option value="community">community</option>'+
+            '</select>'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-12 top-space">'+
+            '<div class="entry-type-switch">'+
+            '<div class="radio">'+
+            '<label>'+
+            '<input type="radio" name="metadataForm" class="metadata" id="scratch_metadata" value="false">'+
+            '<span class="sr-only">Write metadata from scratch</span>'+
+        '</label>'+
+        '</div>'+
+        '</div>'+
+        '<div class="col-xs-10">'+
+            '<input class="form-control create-input select-sm code" name="bug[rules][][metadata][]" id="scratch_metadata_text" placeholder="write metadata from scratch" disabled>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '<div class="form-group">'+
+            '<div class="col-xs-12">'+
+            '<h5>ClassType</h5>'+
+            '<div class="entry-type-switch">'+
+            '</div>'+
+            '<div class="col-xs-10">'+
+            '<select class="form-control select-sm code" name="bug[rules][][class_type]" id="new-rule-classtype-form" required>'+
+        '"<% ["", "attempted-admin", "attempted-recon","attempted-user","policy-violation","shellcode-detect","trojan-activity","web-application-attack","misc-activity","bad-unknown"].each do |clas| %>'+
+        '<option value=<%= clas %>><%= clas %></option>'+
+            '<% end %>"'+
+            '</select>'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '<div class="form-group">'+
+            '<div class="col-xs-12 references_add">'+
+            '<h5>References &nbsp;&nbsp;<a class="top-space add_reference_btn h6 blue"><i class="glyphicon glyphicon-plus"></i> add reference</a></h5>'+
+        '</div>'+
+        '</div>'+
+        //'<div class="form-group right">'+
+        //    '<div class="col-xs-12 center top-space">'+
+        //    '<button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>'+
+        //'</div>'+
+        //'</div>'+
+        //'<input type="hidden" name="bug[rules][][bug_id]" value="103015">'+
+            //'</form>'+
+            '</div>'+
+            '</div>';
+
+    $('.create').on("click", '#add_rule_btn', function(e){
+        e.preventDefault();
+      console.log("hhh");
+        $('.rule_form').append(standard_rule_form);
+      $('#legacy_form').append(legacy_rule_form);
+    });
+
+});

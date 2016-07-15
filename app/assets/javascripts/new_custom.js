@@ -1,0 +1,74 @@
+$(document).ready(function() {
+
+    $('.active').show();
+    $('.hidden').hide();
+    $('.rules').click(function () {
+        console.log($(this).attr("id"));
+        var tab = $(this).attr("id");
+        $('.row.active').addClass('hidden').removeClass('active');
+        $('.' + tab).addClass('active').removeClass('hidden');
+        $('.active').show();
+        $('.hidden').hide();
+    });
+
+    $('#change_summary').click(function () {
+        var headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
+        var id = $('input[name="id"]').val();
+        var summary = $('input[name="summary"]').val();
+        $.ajax({
+            url: "/bugs/" + id,
+            method: 'PUT',
+            data: {'bug': {'summary': summary}},
+            headers: headers
+        }).done(function (response) {
+            $('.bug_summary').html(response.bug.summary);
+        });
+    });
+
+    $('document').on('click', '#add_reference', function () {
+        var headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
+        var id = $('input[name="id"]').val();
+        var reference = $('#reference-bugs-type').val();
+        var content = $('input[name="content"]').val();
+        $.ajax({
+            url: "/bugs/" + id + "/references",
+            method: 'POST',
+            data: {reference: {'reference_data': content, 'reference_type_id': reference}},
+            headers: headers
+        }).done(function (response) {
+            console.log(response);
+            alert('success');
+        });
+    });
+
+
+    $(document).on('click', '.connection', function () {
+        if ($('#scratch_connection').prop("checked")) {
+            $('#scratch_connection_text').prop('disabled', false);
+        } else {
+            $('#scratch_connection_text').prop('disabled', true);
+        }
+        ;
+    });
+    $('.flow').click(function () {
+        if ($('#scratch_flow').prop("checked")) {
+            $('#scratch_flow_text').prop('disabled', false);
+        } else {
+            $('#scratch_flow_text').prop('disabled', true);
+        }
+        ;
+    });
+    $('.metadata').click(function () {
+        if ($('#scratch_metadata').prop("checked")) {
+            $('#scratch_metadata_text').prop('disabled', false);
+        } else {
+            $('#scratch_metadata_text').prop('disabled', true);
+        }
+        ;
+    });
+
+    $(document).on('click', '.legacy_btn, .standard_btn', function (e) {
+        e.preventDefault();
+        $('.legacy_form, .legacy_btn, .rule_form, .standard_btn').toggle();
+    });
+});
