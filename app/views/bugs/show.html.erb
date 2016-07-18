@@ -31,7 +31,7 @@
         </div>
         <div class="col-xs-4 col-sm-3">
           <h6>committer</h6>
-          <h4 class="bug-user top-space" id="current_bug_reviewer"><%= @bug.committer.cvs_username %>
+          <h4 class="bug-user top-space" id="current_bug_reviewer"><%= @bug.committer.cvs_username if @bug.committer %>
           </h4>
           <form id="change_reviewer_form" style="display:none;" class="form-inline top-space">
             <div class="form-group row">

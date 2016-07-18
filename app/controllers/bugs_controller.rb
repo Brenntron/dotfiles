@@ -25,6 +25,19 @@ class BugsController < ApplicationController
     end
   end
 
+  def new
+    @users = User.all
+    @states = Bug.uniq.pluck(:state)
+    @bug = current_user.bugs.build
+  end
+
+  def create
+    @bug = current_user.bugs.build(bug_params)
+    if @bug.save
+      redirect_to @bug
+    end
+  end
+
   def show
     @bug = Bug.find(params[:id])
     @rules = @bug.rules
@@ -33,6 +46,8 @@ class BugsController < ApplicationController
     @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
     @tasks = @bug.tasks
     @notes = @bug.notes
+    @users = User.all
+    @states = Bug.uniq.pluck(:state)
   end
 
   def update
@@ -70,7 +85,7 @@ class BugsController < ApplicationController
   private
 
   def bug_params
-    params.require(:bug).permit(:summary, rules_attributes: [:connection, :flow, :message, :reference, :metadata, :detection, :class_type, :reference])
+    params.require(:bug).permit(:summary, :version, :description, :user_id, rules_attributes: [:connection, :flow, :message, :reference, :metadata, :detection, :class_type, :reference])
   end
 
   def bugs_with_search(param)

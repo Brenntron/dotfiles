@@ -14,32 +14,34 @@
       </button>
     </p>
   </div>
+
   <div class="col-xs-12">
     <div class="attach_button" style="display:none">
-      <form role="form" id="attachment_form">
-      <div class="row">
-        <div class="col-sm-12 form-group">
-          <label for="title">Summary (what is this attachment)</label>
-          {{input classNames="form-control create-input" id="new-attach-title" name="title" value=title required="true"}}
+      <form action='#' method='post' role="form" id="attachment_form" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-sm-12 form-group">
+            <label for="attachment[summary]">Summary (what is this attachment)</label>
+            <input class="form-control create-input" id="new-attach-title" name="summary" required="true">
+          </div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="col-sm-12 form-group">
-          <label for="file_name">file</label>
-          <input id="fileItem" type="file" required="true">
+        <div class="row">
+          <div class="col-sm-12 form-group">
+            <label for="file_name">file</label>
+            <input name="file_name" type="file">
+          </div>
         </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12 form-group">
-          <button class="btn btn-warning btn-sm" value="submit">create attachment</button>
+        <input type="hidden" name="bug_id" value="<%= @bug.id %>" >
+        <div class="row">
+          <div class="col-sm-12 form-group">
+            <button class="btn btn-warning btn-sm" value="submit">Create Attachment</button>
+          </div>
         </div>
-      </div>
       </form>
       <hr>
     </div>
   </div>
+
 </div>
 <div class="row top-bar">
   <div class="col-xs-12">

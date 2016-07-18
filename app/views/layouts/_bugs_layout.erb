@@ -10,10 +10,12 @@
       <tr><td><strong>Bugs</strong></td></tr>
       </thead>
       <tbody>
-      <% @bugs.each do |bug| %>
-          <tr class="highlight">
-            <td><%= bug.bugzilla_id %></td>
-          </tr>
+      <% if @bugs %>
+        <% @bugs.each do |bug| %>
+            <tr class="highlight">
+              <td><%= link_to bug.id, bug %></td>
+            </tr>
+        <% end %>
       <% end %>
       </tbody>
     </table>
@@ -23,6 +25,9 @@
   <div class="col-xs-9 col-sm-10 col-md-10 col-lg-10 item-details-column">
     <div class="row header">
       <div class="col-xs-12 actions-bar">
+        <%= link_to new_bug_path, class: "btn btn-link float-left icon-link" do %>
+          <i class="glyphicon glyphicon-plus"></i>
+        <% end %>
         <button id="search-bugs-btn" class="btn btn-link float-left icon-link" data-toggle="modal" data-target="#searchWindow"><i class="glyphicon glyphicon-search"></i><span class="sr-only">search</span></button>
         <div class="btn-group float-left">
           <button type="button" class="btn btn-link icon-link dropdown-toggle float-left" data-toggle="dropdown" aria-expanded="false">
