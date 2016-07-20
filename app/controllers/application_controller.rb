@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
 
   def bugzilla_session()
     xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-    xmlrpc.token = request.headers['Xmlrpc-Token']
+    xmlrpc.token = request.headers['Xmlrpc-Token'] ? request.headers['Xmlrpc-Token'] : xml_token
     return xmlrpc
   end
 

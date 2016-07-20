@@ -32,7 +32,27 @@ class BugsController < ApplicationController
   end
 
   def create
-    @bug = current_user.bugs.build(bug_params)
+    options = bug_params
+    options[:creator] = current_user.id
+    new_bug = Bugzilla::Bug.new(bugzilla_session).create(options) #the bugzilla session is where we authenticate
+    new_bug_id = new_bug["id"]
+    @bug = Bug.new(
+        :id => new_bug_id,
+        :bugzilla_id => new_bug_id,
+        :product => params[:bug][:product],
+        :component => params[:bug][:component],
+        :summary => params[:bug][:summary],
+        :version => params[:bug][:version],
+        :description => params[:bug][:description],
+        :state => params[:bug][:state] || 'OPEN',
+        :creator => current_user.id,
+        :user_id => current_user.id,
+        :opsys => params[:bug][:opsys],
+        :platform => params[:bug][:platform],
+        :priority => params[:bug][:priority],
+        :severity => params[:bug][:severity],
+        :classification => params[:bug][:classification] || 0
+    )
     if @bug.save
       redirect_to @bug
     end
@@ -85,7 +105,9 @@ class BugsController < ApplicationController
   private
 
   def bug_params
-    params.require(:bug).permit(:summary, :version, :description, :user_id, rules_attributes: [:connection, :flow, :message, :reference, :metadata, :detection, :class_type, :reference])
+    params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification,
+                                :summary, :version, :description, :user_id, rules_attributes: [:connection, :flow, :message, :reference,
+                                                                                               :metadata, :detection, :class_type, :reference])
   end
 
   def bugs_with_search(param)

@@ -2,7 +2,7 @@
   <div class='col-lg-10 col-sm-11'>
     <div class="row">
       <div class="col-xs-12">
-        <h2 class="subtitle">Create A New Bug <button class="btn btn-sm btn-default" {{action 'cancelCreate'}}>cancel</button></h2>
+        <h2 class="subtitle">Create A New Bug <button class="btn btn-sm btn-default">cancel</button></h2>
         <p>Use this form to open a new Snort Rules bug on bugzilla.</p>
       </div>
     </div>
@@ -28,6 +28,8 @@
             <%= f.text_area :description, class: "form-control", required: true %>
           </div>
         </div>
+        <%= f.hidden_field :product, value: 'Research' %>
+        <%= f.hidden_field :component, value: 'Snort Rules' %>
         <div class="row">
           <div class="col-sm-12 form-group">
             <button class="btn btn-success" value="submit">Create Bug</button>

@@ -19,7 +19,7 @@
         </div>
         <div class="col-xs-4 col-sm-3">
           <h6>editor</h6>
-          <h4 class="top-space" id="current_bug_editor"><%= @bug.user.cvs_username %>
+          <h4 class="top-space" id="current_bug_editor"><%= @bug.user.cvs_username if @bug.user %>
           </h4>
           <form id="change_editor_form" style="display:none;" class="form-inline top-space">
             <div class="form-group row">
