@@ -72,11 +72,7 @@ class BugsController < ApplicationController
 
   def update
     @bug = Bug.find(params[:id])
-    xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-    if current_user
-      xmlrpc.token = request.headers['Xmlrpc-Token']
-    end
-    Bugzilla::Bug.new(xmlrpc).update({ids: params[:id], summary: params[:bug][:summary]})
+    Bugzilla::Bug.new(bugzilla_session).update(get_params_hash(params))
     if @bug.update(bug_params)
       render json: @bug
     else
@@ -122,6 +118,15 @@ class BugsController < ApplicationController
       end
       Bug.where(query)
     end
+  end
+
+  def get_params_hash(params)
+    para_hash = {}
+    params[:bug].each do |k,v|
+      para_hash[k] = v
+    end
+    para_hash[:ids] = params[:id]
+    para_hash
   end
 
 end

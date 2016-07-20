@@ -6,17 +6,13 @@
           <h3><a target="_blank"><%= @bug.id %></a><span class="tiny"><a target="_blank"><i class="glyphicon glyphicon-link"></i></a></span></h3>
           <span class="visible-xs"><h6>summary</h6></span>
         </div>
+
         <div class="col-xs-4 col-sm-3 state">
           <h6>state</h6>
-          <h5 class="top-space" id="current_bug_state"><%= @bug.state %> &nbsp;<a class="tiny text-muted"><em>change</em></a></h5>
-          <form id="change_state_form" style="display:none;" class="form-inline top-space">
-            <div class="form-group row">
-              <div class="col-xs-12 col-lg-10">
-                <button class="btn btn-xs btn-default" value="submit" type="submit">done</button>
-              </div>
-            </div>
-          </form>
+          <h5 class="top-space" id="current_bug_state"><%= @bug.state %> &nbsp;<a class="tiny text-muted" id="change_current_bug_state"><em>change</em></a></h5>
+          <%= render 'shared/change_state_form' %>
         </div>
+
         <div class="col-xs-4 col-sm-3">
           <h6>editor</h6>
           <h4 class="top-space" id="current_bug_editor"><%= @bug.user.cvs_username if @bug.user %>
@@ -29,6 +25,7 @@
             </div>
           </form>
         </div>
+
         <div class="col-xs-4 col-sm-3">
           <h6>committer</h6>
           <h4 class="bug-user top-space" id="current_bug_reviewer"><%= @bug.committer.cvs_username if @bug.committer %>
