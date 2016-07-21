@@ -38,6 +38,7 @@ class Bug < ActiveRecord::Base
     PublishWebsocket.push_changes(record)
   end
 
+
   def get_state(status, resolution, user)
     bug_state = 'OPEN'
     if status == 'REOPENED'

@@ -74,7 +74,7 @@ class BugsController < ApplicationController
     @bug = Bug.find(params[:id])
     Bugzilla::Bug.new(bugzilla_session).update(get_params_hash(params))
     if @bug.update(bug_params)
-      render json: {bug: @bug, user: (@bug.user ? @bug.user.cvs_username : nil), committer: (@bug.committer ? @bug.committer.cvs_username : nil)}
+      render json: @bug
     else
       render json: @bug.errors, status: 422
     end

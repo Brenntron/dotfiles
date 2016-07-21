@@ -1,5 +1,5 @@
 $ ->
-  $(document).on 'click', '#change_current_bug_state', ->
+  $(document).on 'click', '.change_current_bug_state', ->
     $('#current_bug_state, #change_state_form').toggle()
 
   $(document).on 'click', '.change_current_bug_editor', ->
@@ -19,7 +19,7 @@ $ ->
         id: id
         bug: 'state': state
       ).done (response) ->
-        $('#current_bug_state').html(response.bug.state).append('&nbsp;<a class="tiny text-muted change_current_bug_state"><em>change</em></a>')
+        $('#current_bug_state').html(response.bug.state).append(' &nbsp;<a class="tiny text-muted change_current_bug_state"><em>change</em></a>')
         $('#current_bug_state, #change_state_form').toggle()
         return
 
@@ -34,7 +34,7 @@ $ ->
         id: id
         bug: 'user_id': editor
     ).done (response) ->
-      $('#current_bug_editor').html(response.user).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
+      $('#current_bug_editor').html(response.bug.user_name).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
       $('#current_bug_editor, #change_editor_form').toggle()
       return
 
@@ -49,6 +49,6 @@ $ ->
         id: id
         bug: 'committer_id': committer
     ).done (response) ->
-      $('#current_bug_committer').html(response.committer).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
+      $('#current_bug_committer').html(response.bug.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
       $('#current_bug_committer, #change_committer_form').toggle()
       return
