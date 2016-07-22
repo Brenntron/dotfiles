@@ -1,29 +1,32 @@
 <div class="row">
   <div class="col-xs-6">
+    <div class="alert_comment"></div>
     <h4 class="top-space blue">History</h4>
   </div>
   <div class="col-xs-6 right">
     <p class="top-space">
-      <a {{action 'reorder'}}>
+      <a>
       <i class="glyphicon glyphicon-sort"></i>&nbsp;
       <span id="notesChronToggle" style="display:none;">oldest -> newest</span>
       <span id="notesTLDRToggle">newest -> oldest</span>
       </a>
       <span class="text-muted">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-      <a {{action 'toggleAddForm'}}>
+      <a class="toggle_comment_form">
       <span id="showAddNotesToggle"><i class="glyphicon glyphicon-plus"></i> comment</span>
-      <span id="hideAddNotesToggle" class="text-muted hidden"><i class="glyphicon glyphicon-remove"></i> cancel</span>
+      <span id="hideAddNotesToggle" class="text-muted" style="display: none;"><i class="glyphicon glyphicon-remove"></i> cancel</span>
       </a>
     </p>
   </div>
 </div>
 <div class="row">
   <div class="col-xs-12">
-    <form role="form" {{action "createNote" on="submit"}} id="addResearchNoteForm" class="hidden">
-    <h5>post a comment... &nbsp;&nbsp; {{#if saving}} <span class="small text-muted"><em>saving to bugzilla</em> <i class="glyphicon glyphicon-refresh spin text-muted"></i></span>{{/if}} <span class="small text-muted">{{historyStatus}}</span></h5>
+    <form role="form" id="addResearchNoteForm" style="display: none;">
+    <h5>post a comment... &nbsp;&nbsp;</h5>
     <div class="form-group">
-      {{textarea classNames="form-control" name="comment" id="noteCommentField" value=comment}}
+      <textarea class="form-control" name="comment" id="noteCommentField"></textarea>
     </div>
+    <input type="hidden" name="comment_type" value="research">
+    <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
     <div class="form-group">
       <button value="submit" class="btn btn-warning btn-sm">save</button>
     </div>

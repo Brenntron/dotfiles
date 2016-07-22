@@ -54,3 +54,11 @@ div.field, div.actions {
   font-size: 12px;
   list-style: square;
 }
+
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}

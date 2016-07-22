@@ -2,6 +2,7 @@
   <div class="panel-group minimal-panel-group col-xs-12"  role="tablist" aria-multiselectable="true">
     <div class="panel panel-default">
       <div class="panel-heading" role="tab" id="research_notes_heading">
+        <div class="alert_notes"></div>
         <h4 class="panel-title">
           <a class="collapsed" data-toggle="collapse"  href="#research_notes_collapse" aria-expanded="false" aria-controls="collapseTwo">
             <span class="blue">Research notes</span>
@@ -9,20 +10,28 @@
           &nbsp;&nbsp;
         </h4>
       </div>
+      <% note = get_notes_saved 'research', current_user.email %>
       <div id="research_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingTwo">
         <div class="panel-body row">
-          <form {{action "saveEdits" 'research' on="submit"}}>
-          <div class="form-group col-xs-12 col-md-10">
-            <textarea classNames="form-control disabled code select-sm" name="research_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= @bug.research_notes %></textarea>
-          </div>
-          <div class="form-group col-xs-12 col-md-2 right">
-            <button id="researchNotesEditBtn" class="btn btn-default btn-sm" {{action 'editMode' 'research'}}>edit</button>
-            <button id="researchNotesCancelBtn" class="btn btn-default btn-sm" {{action 'cancelEdits' 'research'}} style="display:none;">cancel</button>
-            <div class="top-space"></div>
-            <button id="researchNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
-            <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" {{action 'publish' 'research'}}>publish to bugzilla</button>
-          </div>
-          </form>
+            <form id="notes_form">
+              <div class="form-group col-xs-12 col-md-10">
+                <% if note %>
+                  <textarea class="form-control disabled code select-sm" name="research_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= note.comment %></textarea>
+                  <input type="hidden" name="note_id" value="<%= note.id %>">
+                <% else %>
+                  <textarea class="form-control disabled code select-sm" name="research_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= @bug.research_notes %></textarea>
+                <% end %>
+              </div>
+              <input type="hidden" name="note_type" value="research">
+              <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
+              <div class="form-group col-xs-12 col-md-2 right">
+                <button id="researchNotesEditBtn" class="btn btn-default btn-sm" >edit</button>
+                <button id="researchNotesCancelBtn" class="btn btn-default btn-sm"  style="display:none;">cancel</button>
+                <div class="top-space"></div>
+                <button id="researchNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
+                <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" <%= note ? '' : 'disabled' %>>publish to bugzilla</button>
+              </div>
+            </form>
         </div>
       </div>
     </div>
@@ -35,18 +44,26 @@
           &nbsp;&nbsp;
         </h4>
       </div>
+      <% committer_note = get_notes_saved 'committer', current_user.email %>
       <div id="comm_notes_collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
         <div class="panel-body row">
-          <form {{action "saveEdits" 'committer' on="submit"}}>
+          <form id="committer_notes_form">
             <div class="form-group col-xs-12 col-md-10 col-lg-11">
-              <textarea classNames="form-control disabled code select-sm" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly></textarea>
+              <% if committer_note %>
+                <textarea class="form-control disabled code select-sm" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= committer_note.comment %></textarea>
+                <input type="hidden" name="committer_note_id" value="<%= committer_note.id %>">
+              <% else %>
+                <textarea class="form-control disabled code select-sm" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly></textarea>
+              <% end %>
             </div>
+            <input type="hidden" name="committer_type" value="committer">
+            <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
             <div class="form-group col-xs-12 col-md-2 col-lg-1 right">
-              <button id="committerNotesEditBtn" class="btn btn-default btn-sm" {{action 'editMode' 'committer'}}>edit</button>
-              <button id="committerNotesCancelBtn" class="btn btn-default btn-sm" {{action 'cancelEdits' 'committer'}} style="display:none;">cancel</button>
+              <button id="committerNotesEditBtn" class="btn btn-default btn-sm">edit</button>
+              <button id="committerNotesCancelBtn" class="btn btn-default btn-sm" style="display:none;">cancel</button>
               <div class="top-space"></div>
               <button id="committerNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
-              <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" {{action 'publish' 'committer'}}>publish</button>
+              <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" <%= committer_note ? '' : 'disabled' %>>publish</button>
             </div>
           </form>
         </div>
@@ -54,5 +71,3 @@
     </div>
   </div>
 </div>
-
-

@@ -27,6 +27,9 @@ Rails.application.routes.draw do
     resources 'references'
   end
 
+  post '/notes' => 'notes#create'
+  put '/notes/publish_to_bugzilla' => 'notes#publish_to_bugzilla'
+
 
   mount API::Base => '/api'
   mount GrapeSwaggerRails::Engine => '/documentation'

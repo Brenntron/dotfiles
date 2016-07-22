@@ -14,7 +14,7 @@
       </button>
     </p>
   </div>
-
+  <div class="alert_attachments"></div>
   <div class="col-xs-12">
     <div class="attach_button" style="display:none">
       <form action='#' method='post' role="form" id="attachment_form" enctype="multipart/form-data">
@@ -58,7 +58,7 @@
     <table class="table table-condensed small table-hover" id="current-attachments">
       <thead>
       <tr>
-        <td class="narrow-column"><input type="checkbox" class="attachcheckbox"></td>
+        <td class="narrow-column"><input type="checkbox" class="selectallcheckbox"></td>
         <td class="narrow-column"></td>
         <td>Filename</td>
         <td>Alerts</td>
@@ -67,8 +67,8 @@
       <tbody>
         <% @attachments.each do |attachment| %>
         <tr>
-          <td><input type="checkbox" name=<%= attachment.id %> class="attachcheckbox"> </td>
-          <td class="center narrow-column"><a class="blue">
+          <td><input type="checkbox" name=<%= attachment.id %> class="attach_check_box"> </td>
+          <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
             <i class="glyphicon glyphicon-download"></i></a></td>
           <td><code><a><%= attachment.file_name %></a></code></td>
           <td class="center narrow-column">
@@ -142,16 +142,3 @@
     <% end %>
   </div>
 </div>
-
-<script>
-  $(document).ready(function(){
-    $('#attachments-current').click(function(){
-      $('#current-attachments').show();
-      $('#obsolete-attachments').hide();
-    });
-    $('#attachments-obsolete').click(function(){
-      $('#current-attachments').hide();
-      $('#obsolete-attachments').show();
-    });
-  });
-</script>

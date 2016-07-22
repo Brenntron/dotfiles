@@ -25,41 +25,7 @@
         $(this).parents('.form-inline').remove();
       });
 
-      $(document).on('click', '#showAddAttachsToggle, #hideAddAttachsToggle', function(e) {
-        e.preventDefault();
-        $('#hideAddAttachsToggle, #showAddAttachsToggle,.attach_button').toggle();
-      });
 
-      $('#attachment_form').submit(function(e){
-        e.preventDefault();
-        var headers = {'Xmlrpc-Token': $('input[name="xml_token"]').val()};
-        var m_data = new FormData();
-        m_data.append( 'bug_id', $('input[name=bug_id]').val());
-        m_data.append( 'attachment[summary]', $('input[name=summary]').val());
-        m_data.append( 'attachment[file_data]', $('input[name="file_name"]')[0].files[0]);
-        $.ajax({
-          url: "/attachments",
-          data: m_data,
-          headers: headers,
-          processData: false,
-          contentType: false,
-          type: 'POST',
-          dataType:'json'
-        }).done(function (response) {
-          var attachment = response.attachment;
-          $('#current-attachments').append('<tr>'+
-          '<td><input type="checkbox" name='+attachment.id+' class="attachcheckbox"> </td>'+
-          '<td class="center narrow-column"><a class="blue">'+
-          '<i class="glyphicon glyphicon-download"></i></a></td>'+
-          '<td><code><a>'+attachment.file_name+'</a></code></td>'+
-          '<td class="center narrow-column">'+
-          '<h5>'+
-          '<a>0</a>'+
-          '</h5>'+
-          '</td>'+
-          '</tr>');
-        });
-      });
     });
 
   </script>
