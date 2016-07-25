@@ -3,7 +3,7 @@
       <div class="row subheading">
         <div class="col-xs-12 col-sm-3">
           <h6>bugzilla id</h6>
-          <h3><a target="_blank"><%= @bug.id %></a><span class="tiny"><a target="_blank"><i class="glyphicon glyphicon-link"></i></a></span></h3>
+          <h3><a href="<%= get_bug_url %>" target="_blank"><%= @bug.id %></a><span class="tiny"><a href="<%= get_bug_url %>" target="_blank"><i class="glyphicon glyphicon-link"></i></a></span></h3>
           <span class="visible-xs"><h6>summary</h6></span>
         </div>
 

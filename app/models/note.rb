@@ -1,5 +1,6 @@
 class Note < ActiveRecord::Base
   belongs_to :bug
+  validates :comment, presence: true
 
   after_create {|note| note.record 'create' if Rails.configuration.websockets_enabled == "true"}
   after_update {|note| note.record 'update' if Rails.configuration.websockets_enabled == "true"}

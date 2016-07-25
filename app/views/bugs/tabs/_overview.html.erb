@@ -18,10 +18,61 @@
   </div>
   <div class="col-xs-12 code">
     <% if @bug.references.any? %>
-      <% @bug.references.each do |ref| %>
-        <div class="col-xs-12">
-          <code><a {{bind-attr href=url}} target="_blank"><%= ref.reference_data %></a></code>
-        </div>
+      <% if @bug.references.cves.any? %>
+        <p>cve:</p>
+        <% @bug.references.cves.each do |ref| %>
+          <div class="col-xs-12">
+            <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
+          </div>
+        <% end %>
+      <% end %>
+      <% if @bug.references.url.any? %>
+        <p>url:</p>
+        <% @bug.references.url.each do |ref| %>
+            <div class="col-xs-12">
+              <code><a href="<%= get_ref_url(ref, "url") %>" target="_blank"><%= ref.reference_data %></a></code>
+            </div>
+        <% end %>
+      <% end %>
+      <% if @bug.references.url.any? %>
+        <p>bugtraq:</p>
+        <% @bug.references.bugtraqs.each do |ref| %>
+          <div class="col-xs-12">
+            <code><a href="<%= get_ref_url(ref, "bugtraq") %>" target="_blank"><%= ref.reference_data %></a></code>
+          </div>
+        <% end %>
+      <% end %>
+      <% if @bug.references.telus.any? %>
+        <p>telus:</p>
+        <% @bug.references.telus.each do |ref| %>
+          <div class="col-xs-12">
+            <code><a href="<%= get_ref_url(ref, "telus") %>" target="_blank"><%= ref.reference_data %></a></code>
+          </div>
+        <% end %>
+      <% end %>
+      <% if @bug.references.apsb.any? %>
+        <p>apsb:</p>
+        <% @bug.references.apsb.each do |ref| %>
+          <div class="col-xs-12">
+            <code><a href="<%= get_ref_url(ref, "apsb") %>" target="_blank"><%= ref.reference_data %></a></code>
+          </div>
+        <% end %>
+      <% end %>
+      <% if @bug.references.msb.any? %>
+        <p>msb:</p>
+        <% @bug.references.msb.each do |ref| %>
+          <div class="col-xs-12">
+            <code><a href="<%= get_ref_url(ref, "msb") %>" target="_blank"><%= ref.reference_data %></a></code>
+          </div>
+        <% end %>
+      <% end %>
+      <% if @bug.references.osvdb.any? %>
+        <p>osvdb:</p>
+        <% @bug.references.osvdb.each do |ref| %>
+          <div class="col-xs-12">
+            <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
+          </div>
+        <% end %>
       <% end %>
     <% else %>
       <p>< MISSING ></p>
