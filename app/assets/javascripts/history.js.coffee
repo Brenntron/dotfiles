@@ -2,6 +2,29 @@ $ ->
   $(document).on 'click', '.toggle_comment_form', ->
     $('#showAddNotesToggle, #hideAddNotesToggle, #addResearchNoteForm').toggle()
 
+  $(document).on 'click', '.sort_history', ->
+    $('#notesChronToggle, #notesTLDRToggle').toggle()
+    order = $('#list_history')
+    order.children().each (index, div) ->
+      order.prepend div
+    if order.hasClass('reverse')
+      order.removeClass('reverse')
+    else
+      order.addClass('reverse')
+
+
+  $(document).on 'click', '.show-note-toggle', ->
+    $(this).addClass('hidden')
+    $(this).siblings('.hide-note-toggle').removeClass('hidden').show()
+    $(this).closest('.research-note').children('.col-xs-12').first().hide()
+
+  $(document).on 'click', '.hide-note-toggle', ->
+    $(this).addClass('hidden')
+    $(this).siblings('.show-note-toggle').removeClass('hidden').show()
+    $(this).closest('.research-note').children('.col-xs-12').first().show()
+
+
+
   $(document).on 'submit', '#addResearchNoteForm', (e) ->
     e.preventDefault()
     data = new FormData()

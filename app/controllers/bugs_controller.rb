@@ -65,7 +65,7 @@ class BugsController < ApplicationController
     @attachments = @bug.attachments.where(is_obsolete: false)
     @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
     @tasks = @bug.tasks
-    @notes = @bug.notes
+    @notes = @bug.notes.order(created_at: :desc)
     @users = User.all
     @states = Bug.uniq.pluck(:state)
   end

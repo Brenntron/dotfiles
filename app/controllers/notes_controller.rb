@@ -38,7 +38,7 @@ class NotesController < ApplicationController
       end
       @bug = Bug.find params[:note][:bugzilla_id]
       if @note.update(:id => new_note['id'],:comment => params[:note][:comment], :notes_bugzilla_id => new_note['id'])
-        render json: {notes: @bug.research_notes}
+        render json: {bug: @bug.as_json, note: @note.as_json}
       else
         render json: "Published to bugzilla but not updated in local db", status: 422
       end

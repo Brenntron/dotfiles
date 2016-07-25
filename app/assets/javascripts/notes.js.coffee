@@ -92,10 +92,33 @@ $ ->
       type: 'PUT'
       dataType: 'json'
       success: (response) ->
+        bug = response.bug.bug
+        note = response.note.note
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
-        $('textarea[name="research_notes"]').val(response.notes)
+        $('textarea[name="research_notes"]').val(bug.research_notes)
         $('#researchNotesPublishBtn').attr('disabled', true)
         $('#notes_form input[name="note_id"]').remove()
+        div = '<div class="row top-space research-note">'+
+          '<div class="col-xs-6">'+
+          '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+
+          '</div>'+
+          '<div class="col-xs-6 right">'+
+          '<a>'+
+          '<span class="show-note-toggle text-muted">[-]</span>'+
+          '<span class="hide-note-toggle hidden text-muted">[+]</span>'+
+          '</a>'+
+          '</div>'+
+          '<div class="col-xs-12">'+
+          '<pre class="comment">'+note["comment"]+'</pre>'+
+          '</div>'+
+          '<div class="col-xs-12">'+
+          '<p class="line"></p>'+
+          '</div>'+
+          '</div>'
+        if $('#list_history').hasClass('reverse')
+          $('#list_history').append(div)
+        else
+          $('#list_history').prepend(div)
       error: (response) ->
         $('.alert_notes').addClass('error').show().html(response.responseText)
       complete: ->
@@ -120,10 +143,32 @@ $ ->
       type: 'PUT'
       dataType: 'json'
       success: (response) ->
+        note = response.note.note
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
         $('textarea[name="committer_notes"]').val('')
         $('#committerNotesPublishBtn').attr('disabled', true)
         $('#committer_notes_form input[name="committer_note_id"]').remove()
+        div = '<div class="row top-space research-note">'+
+          '<div class="col-xs-6">'+
+          '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+
+          '</div>'+
+          '<div class="col-xs-6 right">'+
+          '<a>'+
+          '<span class="show-note-toggle text-muted">[-]</span>'+
+          '<span class="hide-note-toggle hidden text-muted">[+]</span>'+
+          '</a>'+
+          '</div>'+
+          '<div class="col-xs-12">'+
+          '<pre class="comment">'+note["comment"]+'</pre>'+
+          '</div>'+
+          '<div class="col-xs-12">'+
+          '<p class="line"></p>'+
+          '</div>'+
+          '</div>'
+        if $('#list_history').hasClass('reverse')
+          $('#list_history').append(div)
+        else
+          $('#list_history').prepend(div)
       error: (response) ->
         $('.alert_notes').addClass('error').show().html(response.responseText)
       complete: ->

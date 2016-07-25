@@ -5,7 +5,7 @@
   </div>
   <div class="col-xs-6 right">
     <p class="top-space">
-      <a>
+      <a class="sort_history">
       <i class="glyphicon glyphicon-sort"></i>&nbsp;
       <span id="notesChronToggle" style="display:none;">oldest -> newest</span>
       <span id="notesTLDRToggle">newest -> oldest</span>
@@ -34,22 +34,24 @@
     </form>
   </div>
 </div>
-<% @notes.each do |note| %>
-  <div class="row top-space research-note">
-    <div class="col-xs-6">
-      <p class="small text-muted">written by <strong><%= note.author %></strong> <%= note.created_at %></p>
+<div id="list_history">
+  <% @notes.each do |note| %>
+    <div class="row top-space research-note">
+      <div class="col-xs-6">
+        <p class="small text-muted">written by <strong><%= get_username(note.author) %></strong> <%= distance_of_time_in_words(Time.now, note.created_at) %> ago</p>
+      </div>
+      <div class="col-xs-6 right">
+        <a>
+        <span class="show-note-toggle text-muted">[-]</span>
+        <span class="hide-note-toggle hidden text-muted">[+]</span>
+        </a>
+      </div>
+      <div class="col-xs-12">
+        <pre class="comment"><%= note.comment %></pre>
+      </div>
+      <div class="col-xs-12">
+        <p class="line"></p>
+      </div>
     </div>
-    <div class="col-xs-6 right">
-      <a {{action 'toggleNote' id}}>
-      <span class="show-note-toggle text-muted">[-]</span>
-      <span class="hide-note-toggle hidden text-muted">[+]</span>
-      </a>
-    </div>
-    <div class="col-xs-12">
-      <pre class="comment"><%= note.comment %></pre>
-    </div>
-    <div class="col-xs-12">
-      <p class="line"></p>
-    </div>
-  </div>
-<% end %>
+  <% end %>
+</div>
