@@ -21,6 +21,16 @@ class RulesController < ApplicationController
     render json: new_rule
   end
 
+  def destroy
+    if params[:ids]
+      params[:ids].each do |id|
+        rule = Rule.find_by id: id
+        rule.destroy if rule
+      end
+    end
+    render json: {success: 'Rule has been deleted'}, status: 200
+  end
+
 
   private
 

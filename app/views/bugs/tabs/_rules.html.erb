@@ -18,10 +18,10 @@
 
 <div class="row overview active">
   <div class="col-xs-12">
-    <table class="table table-condensed table-hover">
+    <table class="table table-condensed table-hover rules_table">
       <thead class="small">
       <tr>
-        <td><input type="checkbox"class="rulecheckbox"></td>
+        <td><input type="checkbox" class="rules_check_box"></td>
         <td>State</td>
         <td>Version</td>
         <td>Message</td>
@@ -34,7 +34,7 @@
         <tbody>
         <% @rules.each do |rule| %>
           <tr id=<%= rule.id %>>
-            <td><input type="checkbox"class="rulecheckbox"></td>
+            <td><input type="checkbox" class="rule_check_box" value="<%= rule.id %>"></td>
             <td><%= rule.state %></td>
             <td>
               <a class="blue" href="#">
@@ -93,14 +93,4 @@
     <%= render '/bugs/tabs/rules/edit' %>
   </div>
 </div>
-<div class="row remove hidden">
-  <div class="col-xs-12">
-    <div class="col-xs-12"><hr/></div>
-    <%= render '/bugs/tabs/rules/edit' %>
-  </div>
-</div>
 <div class="row spacer"></div>
-
-<script>
-
-</script>

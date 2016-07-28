@@ -10,7 +10,7 @@ $ ->
 
   $(document).on 'click', '#showAddAttachsToggle, #hideAddAttachsToggle', (e) ->
     e.preventDefault()
-    $('#hideAddAttachsToggle, #showAddAttachsToggle,.attach_button').toggle()
+    $('#hideAddAttachsToggle, #showAddAttachsToggle, .attach_button').toggle()
 
   $(document).on 'click','.selectallcheckbox', ->
     $(".attach_check_box").prop("checked", $(".selectallcheckbox").prop("checked"))

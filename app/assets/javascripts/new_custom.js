@@ -2,11 +2,17 @@ $(document).ready(function() {
 
     $('.active').show();
     $('.hidden').hide();
+
+    $(function () {
+        $('#myTab a:first').tab('show');
+    });
+
     $('.rules').click(function () {
-        console.log($(this).attr("id"));
         var tab = $(this).attr("id");
-        $('.row.active').addClass('hidden').removeClass('active');
-        $('.' + tab).addClass('active').removeClass('hidden');
+        if(tab!="remove" && tab!="test") {
+            $('.row.active').addClass('hidden').removeClass('active');
+            $('.' + tab).addClass('active').removeClass('hidden');
+        }
         $('.active').show();
         $('.hidden').hide();
     });

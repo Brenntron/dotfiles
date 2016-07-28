@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
+  delete '/rules' => 'rules#destroy'
   resources 'rules'
   resources 'bugs' do
     resources 'references'
