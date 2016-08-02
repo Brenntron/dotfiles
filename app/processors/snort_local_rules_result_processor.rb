@@ -1,4 +1,4 @@
-class SnortLocalRulesResultProcessor < ApplicationProcessor
+ class SnortLocalRulesResultProcessor < ApplicationProcessor
 
   subscribes_to :snort_local_rules_test_result
 

@@ -34,4 +34,38 @@ $ ->
         console.log('Error')
     }
 
-
+  $(document).on 'click', '#test',  ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    bug_id = $('input[name="bug_id"]').val()
+    user_id = $('input[name="current_user_id"]').val()
+    selected = []
+    $('input:checkbox.rule_check_box').each ->
+      if @checked
+        selected.push($(this).val())
+    data = {api_key: 'h93hq@hwo9%@ah!jsh', task: {bugzilla_id: bug_id, rule_array: selected.join(), task_type: "rule", created_by: user_id}}
+    $.ajax {
+      url: "/api/v1/tasks"
+      method: 'POST'
+      data: data
+      headers: headers
+      success: (response) ->
+        task = response.task
+        d = new Date()
+        month = d.getMonth()+1
+        day = d.getDate()
+        date = month + '/' + day + '/' + d.getFullYear()
+        string = '<tr id='+task.id+'><td class="center"><input type="checkbox"></td>'+
+          '<td class="center"><input type="checkbox"></td>'+
+          '<td>'+task.task_type+'</td><td></td><td></td>'+
+          '<td>'+task.result+'</td>'+
+            '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
+        $('#jobs-tab table tbody').append(string)
+        $('.alert_rules').addClass('success').show().html('Task has been created to test the rule')
+      error: (response) ->
+        $('.alert_rules').addClass('error').show().html('Task has not been created')
+      complete: ->
+        setTimeout (->
+          $('.alert_rules').hide 'blind', {}, 500
+          return
+        ), 5000
+    }

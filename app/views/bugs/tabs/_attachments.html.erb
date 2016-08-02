@@ -9,7 +9,7 @@
       <span id="hideAddAttachsToggle" class="text-muted" style="display:none"><i class="glyphicon glyphicon-remove"></i><strong class="hidden-xs">cancel</strong></span>
       </a>&nbsp;&nbsp;
       <button class="select-sm btn btn-default right">
-      <strong class="hidden-xs">test attachments &nbsp;&nbsp;</strong>
+      <strong class="hidden-xs" id="test_attachments">test attachments &nbsp;&nbsp;</strong>
       <i class="glyphicon glyphicon-flag"></i>
       </button>
     </p>
@@ -67,7 +67,7 @@
       <tbody>
         <% @attachments.each do |attachment| %>
         <tr>
-          <td><input type="checkbox" name=<%= attachment.id %> class="attach_check_box"> </td>
+          <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box"> </td>
           <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
             <i class="glyphicon glyphicon-download"></i></a></td>
           <td><code><a><%= attachment.file_name %></a></code></td>

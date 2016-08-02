@@ -20,33 +20,37 @@
         <% if @tasks.any? %>
           <% @tasks.each do |task| %>
             <tr>
-              <td class="center"><input type="checkbox"></td>
-              <% if task.failed %>
-                <td class="center failed-bg"><input type="checkbox"></td>
+              <% if task.completed %>
+                <td class="center"><input type="checkbox" checked></td>
               <% else %>
-                <td class="center"><input type="checkbox" ></td>
+                  <td class="center"><input type="checkbox"></td>
               <% end %>
-              <td><% task.task_type %></td>
+              <% if task.failed %>
+                <td class="center failed-bg"><input type="checkbox" checked></td>
+              <% else %>
+                <td class="center"><input type="checkbox"></td>
+              <% end %>
+              <td><%= task.task_type %></td>
               <td></td>
               <td></td>
-              <td class="no-overflow"><a><% task.result %></a></td>
-              <td><% task.user_id.username %></td>
-              <td><% task.created_at %></td>
+              <td class="no-overflow"><a><%= task.result %></a></td>
+              <td><%= User.find(task.user_id).cvs_username %></td>
+              <td><%= task.created_at.strftime("%m/%d/%y") %></td>
             </tr>
             <tr style="display:none;">
               <td colspan="7" class="code">
                 <strong>Rules:</strong>
                 <% task.rules.each do |rule| %>
-                  <% rule.id %>, 
+                  <%= rule.id %>,
                 <% end %>
                 <br/>
                 <strong>Attachments:</strong>
                 <% task.attachments.each do |attach| %>
-                  <% attach.file_name %>,
+                  <%= attach.file_name %>,
                 <% end %>
                 <br/>
                 <strong>Result:</strong><br/>
-                <% task.result %>
+                <%= task.result %>
               </td>
             </tr>
           <% end %>

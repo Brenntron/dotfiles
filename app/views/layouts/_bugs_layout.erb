@@ -55,6 +55,7 @@
 </div>
 <div id="blanket" style="display:none;"></div>
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="current_user_id" value="<%= current_user.id %>">
 <input type="hidden" name="xml_token" value="<%= xml_token %>">
 
 <%= render 'shared/bug_search_modal' %>
@@ -63,6 +64,7 @@
 <% if action_name == 'show' %>
     <%= render 'shared/summary_modal' %>
     <%= render 'shared/reference_modal' %>
+    <input type="hidden" name="bug_id" value="<%= @bug.id %>">
 <% end %>
 
 <script>
