@@ -1,9 +1,6 @@
 <div class="rule_form_id">
-<div class="col-xs-12">
-  <h4>New Rule</h4>
-</div>
-<div>
   <div class="col-xs-8">
+    <h4>New Rule</h4>
   </div>
   <div class="col-xs-4 top-space">
     <form role="form" class="form-inline pull-right prepopulate-form">
@@ -13,12 +10,10 @@
         <button class="btn btn-default select-sm" value="submit">duplicate</button>
       </div>
     </form>
-
     <button class="pull-right btn btn-default btn-sm">Revert</button>
-
   </div>
 
-  <form action="/bugs/<%=@bug.id%>/create_rules" role="form">
+  <form action="/bugs/<%=@bug.id%>/create_rules" method="post" role="form" class="legacy_form">
     <div id="legacy_form" >
       <div class="form-group">
         <div class="col-xs-12">
@@ -34,7 +29,7 @@
     </div>
   </form>
 
-  <form action="/bugs/<%=@bug.id%>/create_rules" method="post" role="form" id="standard_form" style="display: none;">
+  <form action="/bugs/<%=@bug.id%>/create_rules" method="post" role="form" class="standard_form">
     <div class="rule_form">
     <div class="form-group">
       <div class="col-xs-12">
@@ -252,5 +247,4 @@
       </div>
     </div>
   </form>
-</div>
 </div>

@@ -73,8 +73,4 @@ $(document).ready(function() {
         ;
     });
 
-    $(document).on('click', '.legacy_btn, .standard_btn', function (e) {
-        e.preventDefault();
-        $('.legacy_form, .legacy_btn, .rule_form, .standard_btn').toggle();
-    });
 });

@@ -1,4 +1,6 @@
 $ ->
+  $('.standard_form').hide()
+
   $(document).on 'click','.rules_check_box', ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))
 
@@ -16,8 +18,24 @@ $ ->
     $.each selected, (i, v) ->
       $('.rule_'+v).removeClass('hidden').addClass('active')
 
+  $('#linkRuleForm').submit (e) ->
+    e.preventDefault()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    rule_id = $('#linkRuleForm input[name="sid"]').val()
+    bug_id = $('input[name="bug_id"]').val()
+    query = bug_id+":"+rule_id
+    $.ajax {
+      url: "/api/v1/bugs/rules/"+query
+      method: 'POST'
+      headers: headers
+      data: {'api_key': 'h93hq@hwo9%@ah!jsh'}
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        alert('Please provide proper rule sid')
+    }
+
   $(document).on 'click', '#remove',  ->
-    alert('Selected rules will be removed. Are you sure?')
     selected = []
     $('input:checkbox.rule_check_box').each ->
       if @checked
@@ -69,3 +87,8 @@ $ ->
           return
         ), 5000
     }
+
+  $(document).on 'click', '#legacy_btn, #standard_btn', (e) ->
+    e.preventDefault()
+    $('.legacy_form, #legacy_btn, .standard_form, #standard_btn').toggle()
+
