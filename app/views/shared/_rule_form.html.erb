@@ -1,4 +1,5 @@
 <div class="rule_form_id">
+  <div class="new_rule_form">
   <div class="col-xs-8">
     <h4>New Rule</h4>
   </div>
@@ -10,21 +11,19 @@
         <button class="btn btn-default select-sm" value="submit">duplicate</button>
       </div>
     </form>
-    <button class="pull-right btn btn-default btn-sm">Revert</button>
   </div>
 
-  <form action="/bugs/<%=@bug.id%>/create_rules" method="post" role="form" class="legacy_form">
-    <div id="legacy_form" >
-      <div class="form-group">
-        <div class="col-xs-12">
-          <label>Rule content</label>
-          <textarea class="form-control code select-sm" placeholder="Enter rule content" name="bug[rules][][content]" rows="13" required></textarea>
-        </div>
+  <form role="form" class="legacy_form">
+    <div class="form-group">
+      <div class="col-xs-12">
+        <label>Rule content</label>
+        <textarea class="form-control code select-sm" placeholder="Enter rule content" name="rule[rule_content]" rows="13" required></textarea>
       </div>
     </div>
-    <div class="form-group right">
+    <div class="form-group center">
       <div class="col-xs-12">
         <button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>
+        &nbsp;&nbsp;<a class="btn btn-danger remove-rule">Discard</a>
       </div>
     </div>
   </form>
@@ -247,4 +246,5 @@
       </div>
     </div>
   </form>
+  </div>
 </div>

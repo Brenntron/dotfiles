@@ -73,4 +73,29 @@ $(document).ready(function() {
         ;
     });
 
+    var reference_form = '<div class="form-inline" style="padding:0 20px 10px 50px;">'+
+        '<div class="form-group">'+
+        '<select name="bug[rules][][reference][][reference_type_id]" class="form-control select-sm code">'+
+        '<option class="text-muted" value="" selected> - </option>'+
+        '"<% @ref_types.each do |ref| %> <option value=<%= ref.id %>><%= ref.name %></option><% end %>"'+
+        '</select>'+
+        '</div>'+
+        '<div class="form-group">'+
+        '<input class="form-control select-sm code" placeholder="reference data" name="bug[rules][][reference][][reference_data]" required="true">'+
+        '</div>'+
+        '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>'+
+        '</div>';
+
+    $(document).on('click', '.add_reference_btn', function() {
+        var reference = $(this).parents('.references_add');
+        $(reference_form).appendTo(reference);
+        return false;
+    });
+
+    $(document).on('click', '.remove-ref', function(e) {
+        e.preventDefault();
+        $(this).parents('.form-inline').remove();
+    });
+
+
 });

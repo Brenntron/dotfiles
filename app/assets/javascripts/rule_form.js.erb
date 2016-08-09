@@ -1,31 +1,34 @@
 $(document).ready(function(){
 
-        var legacy_rule_form = '<hr/>'+
-            '<div class="rule_form_id">' +
-            '<div class="col-xs-12">'+
-            '<h4>New Rule</h4>'+
-            '</div>'+
-            '<div>'+
-            '<div class="col-xs-4 top-space">'+
-            '<form role="form" class="form-inline pull-right prepopulate-form">'+
-            '<div class="form-group">'+
-            '<label class="sr-only">Duplicate: </label>'+
-            '<input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>'+
-            '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
-            '</div>'+
-            '</form>'+
-
-            '<button class="pull-right btn btn-default btn-sm">Revert</button>'+
-
-            '</div>'+
-
-  '<div class="form-group">'+
-  '<div class="col-xs-12">'+
-  '<label>Rule content</label>'+
-  '<textarea class="form-control code select-sm" placeholder="Enter rule content" name="bug[rules][][content]" rows="13" required></textarea>'+
-  '</div>'+
-  '</div>'+
-  '</div></div>';
+        var legacy_rule_form = '<div class="new_rule_form"><div class="col-xs-12"><hr></div>'+
+              '<div class="col-xs-8">'+
+                '<h4>New Rule</h4>'+
+              '</div>'+
+                '<div class="col-xs-4 top-space">'+
+                  '<form role="form" class="form-inline pull-right prepopulate-form">'+
+                    '<div class="form-group">'+
+                      '<label class="sr-only">Duplicate: </label>'+
+                      '<input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>'+
+                      '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
+                    '</div>'+
+                  '</form>'+
+                '</div>'+
+                '<form role="form" class="legacy_form">'+
+                  '<div id="legacy_form" >'+
+                    '<div class="form-group">'+
+                      '<div class="col-xs-12">'+
+                        '<label>Rule content</label>'+
+                        '<textarea class="form-control code select-sm" placeholder="Enter rule content" name="rule[rule_content]" rows="13" required></textarea>'+
+                      '</div>'+
+                    '</div>'+
+                  '</div>'+
+                  '<div class="form-group center">'+
+                    '<div class="col-xs-12">'+
+                      '<button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>'+
+                      '&nbsp;&nbsp;<a class="btn btn-danger remove-rule">Discard</a>'+
+                    '</div>'+
+                  '</div>'+
+                '</form></div>';
 
         var standard_rule_form = '<hr/>'+
             '<div class="rule_form_id">' +
@@ -43,8 +46,6 @@ $(document).ready(function(){
         '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
             '</div>'+
             '</form>'+
-
-            '<button class="pull-right btn btn-default btn-sm">Revert</button>'+
 
             '</div>'+
 
@@ -264,10 +265,13 @@ $(document).ready(function(){
             '</div>';
 
     $('.create').on("click", '#add_rule_btn', function(e){
-        e.preventDefault();
-      console.log("hhh");
-        $('.rule_form').append(standard_rule_form);
-      $('#legacy_form').append(legacy_rule_form);
+      e.preventDefault();
+      $('.rule_form_id').append(legacy_rule_form);
+    });
+
+    $('.create').on("click", '.remove-rule', function(e){
+      e.preventDefault();
+      $(this).parents('.new_rule_form').remove();
     });
 
 });

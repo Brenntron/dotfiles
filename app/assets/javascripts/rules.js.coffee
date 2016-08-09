@@ -92,3 +92,46 @@ $ ->
     e.preventDefault()
     $('.legacy_form, #legacy_btn, .standard_form, #standard_btn').toggle()
 
+  $('.create').on 'click', '#save_all_rules', ->
+    if $('#standard_btn').is(":visible")
+      $('.legacy_form').each ->
+        _this = $(this)
+        console.log('hello')
+    else
+      console.log('submit std rules')
+
+  $('.create').on "click", '.save-rule-btn', (e) ->
+    e.preventDefault();
+    form = $(this).parents('.legacy_form');
+    rule_content = form.find('textarea[name="rule[rule_content]"]').val();
+    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
+    data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax {
+      url: "/api/v1/rules"
+      method: 'POST'
+      data: data
+      headers: headers
+      success: (response) ->
+        $('.alert_rules').addClass('success').show().html('New rule has been created')
+        rule = response.rule
+        if rule.sid==null
+          version = 'new_rule'
+        else
+          version = rule.gid+':'+rule.sid+':'+rule.rev
+        string = '<tr id='+rule.id+'>'+
+          '<td><input type="checkbox" class="rule_check_box" value='+rule.id+'></td>'+
+          '<td>'+rule.state+'</td>'+
+          '<td>'+version+'</td>'+
+          '<td><code>'+rule.message+'</code></td>'+
+          '<td class="center">-</td><td class="center">-</td><td class="center">-</td></tr>'
+        $('.rules_table tbody').append(string)
+        form.parents('.new_rule_form').remove()
+      error: (response) ->
+        $('.alert_rules').addClass('error').show().html('New rule has not been created')
+      complete: ->
+        setTimeout (->
+          $('.alert_rules').hide 'blind', {}, 500
+          return
+        ), 5000
+    }
