@@ -81,11 +81,6 @@
     });
   });
 
-  $(document).on("click", "a[data-remote=true]", function(e){
-    e.preventDefault();
-    $.getScript($(this).attr('href'))
-  });
-
   $(".reset").click(function(e) {
     e.preventDefault();
     $(this).closest('form').find("input").val("");

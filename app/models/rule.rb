@@ -195,7 +195,6 @@ class Rule < ActiveRecord::Base
 
   def self.parse_and_create_rule(rule)
     parsed = Rule.visruleparser(rule)
-
     if parsed[:rule].match(/FAILED/)
       rule_params = {
           :message => rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,

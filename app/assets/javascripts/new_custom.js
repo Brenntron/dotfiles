@@ -48,29 +48,33 @@ $(document).ready(function() {
     });
 
 
-    $(document).on('click', '.connection', function () {
-        if ($('#scratch_connection').prop("checked")) {
-            $('#scratch_connection_text').prop('disabled', false);
+    $(document).on('click', '.connection, .scratch_connection', function () {
+        var form = $(this).parents('.standard_form');
+        if (form.find('.connection').prop("checked"))
+        {
+            form.find('.scratch_connection_text').prop('disabled', true);
         } else {
-            $('#scratch_connection_text').prop('disabled', true);
-        }
-        ;
+            form.find('.scratch_connection_text').prop('disabled', false);
+        };
     });
-    $('.flow').click(function () {
-        if ($('#scratch_flow').prop("checked")) {
-            $('#scratch_flow_text').prop('disabled', false);
+
+    $(document).on('click', '.flow, .scratch_flow', function () {
+        var form = $(this).parents('.standard_form');
+        if (form.find('.flow').prop("checked"))
+        {
+            form.find('.scratch_flow_text').prop('disabled', true);
         } else {
-            $('#scratch_flow_text').prop('disabled', true);
-        }
-        ;
+            form.find('.scratch_flow_text').prop('disabled', false);
+        };
     });
-    $('.metadata').click(function () {
-        if ($('#scratch_metadata').prop("checked")) {
-            $('#scratch_metadata_text').prop('disabled', false);
+    $(document).on('click', '.metadata, .scratch_metadata', function () {
+        var form = $(this).parents('.standard_form');
+        if (form.find('.metadata').prop("checked"))
+        {
+            form.find('.scratch_metadata_text').prop('disabled', true);
         } else {
-            $('#scratch_metadata_text').prop('disabled', true);
-        }
-        ;
+            form.find('.scratch_metadata_text').prop('disabled', false);
+        };
     });
 
     var reference_form = '<div class="form-inline" style="padding:0 20px 10px 50px;">'+

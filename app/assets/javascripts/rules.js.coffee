@@ -92,14 +92,6 @@ $ ->
     e.preventDefault()
     $('.legacy_form, #legacy_btn, .standard_form, #standard_btn').toggle()
 
-  $('.create').on 'click', '#save_all_rules', ->
-    if $('#standard_btn').is(":visible")
-      $('.legacy_form').each ->
-        _this = $(this)
-        console.log('hello')
-    else
-      console.log('submit std rules')
-
   $('.create').on "click", '.save-rule-btn', (e) ->
     e.preventDefault();
     form = $(this).parents('.legacy_form');
@@ -132,6 +124,73 @@ $ ->
       complete: ->
         setTimeout (->
           $('.alert_rules').hide 'blind', {}, 500
+          return
+        ), 5000
+    }
+
+  $('.create').on 'click', '#save_all_rules', ->
+    if $('#standard_btn').is(":visible")
+      $('.legacy_form').each ->
+        _this = $(this)
+        rule_content = $(this).find('textarea[name="rule[rule_content]"]').val()
+        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
+        data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
+        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+        $.ajax {
+          url: "/api/v1/rules"
+          method: 'POST'
+          data: data
+          headers: headers
+          success: (response) ->
+            $('.alert_rules').addClass('success').show().append('<p>New rule has been created</p>')
+            rule = response.rule
+            if rule.sid==null
+              version = 'new_rule'
+            else
+              version = rule.gid+':'+rule.sid+':'+rule.rev
+            string = '<tr id='+rule.id+'>'+
+              '<td><input type="checkbox" class="rule_check_box" value='+rule.id+'></td>'+
+              '<td>'+rule.state+'</td>'+
+              '<td>'+version+'</td>'+
+              '<td><code>'+rule.message+'</code></td>'+
+              '<td class="center">-</td><td class="center">-</td><td class="center">-</td></tr>'
+            $('.rules_table tbody').append(string)
+            _this.parents('.new_rule_form').remove()
+          error: (response) ->
+            $('.alert_rules').addClass('error').show().html('New rule has not been created')
+          complete: ->
+            setTimeout (->
+              $('.alert_rules').hide 'blind', {}, 500
+              return
+            ), 5000
+        }
+    else
+      console.log('submit std rules')
+
+  $('.edit').on "click", '.update-rule-btn', (e) ->
+    e.preventDefault();
+    form = $(this).parents('.legacy_form')
+    rule_content = form.find('textarea[name="rule[rule_content]"]').val()
+    id = form.find('input[name="rule_id"]').val()
+    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
+    data = {api_key: 'h93hq@hwo9%@ah!jsh', id: id, rule: rule}
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax {
+      url: "/api/v1/rules/"+id
+      method: 'PUT'
+      data: data
+      headers: headers
+      success: (response) ->
+        $('.alert_rules').addClass('success').show().html('Rule has been updated')
+        form.hide()
+        $('.rule_'+id).append('<div class="col-xs-12 alert_edit">Rule has been updated</div>')
+      error: (response) ->
+        $('.alert_rules').addClass('error').show().html('Rule has not been updated')
+      complete: ->
+        setTimeout (->
+          $('.alert_rules').hide 'blind', {}, 500
+          $('.alert_edit').remove()
+          form.show()
           return
         ), 5000
     }

@@ -1,19 +1,20 @@
 $(document).ready(function(){
 
-        var legacy_rule_form = '<div class="new_rule_form"><div class="col-xs-12"><hr></div>'+
-              '<div class="col-xs-8">'+
-                '<h4>New Rule</h4>'+
-              '</div>'+
-                '<div class="col-xs-4 top-space">'+
-                  '<form role="form" class="form-inline pull-right prepopulate-form">'+
-                    '<div class="form-group">'+
-                      '<label class="sr-only">Duplicate: </label>'+
-                      '<input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>'+
-                      '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
-                    '</div>'+
-                  '</form>'+
-                '</div>'+
-                '<form role="form" class="legacy_form">'+
+        var new_rule = '<div class="new_rule_form"><div class="col-xs-12"><hr></div>'+
+                        '<div class="col-xs-8">'+
+                        '<h4>New Rule</h4>'+
+                        '</div>'+
+                        '<div class="col-xs-4 top-space">'+
+                        '<form role="form" class="form-inline pull-right prepopulate-form">'+
+                        '<div class="form-group">'+
+                        '<label class="sr-only">Duplicate: </label>'+
+                        '<input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>'+
+                        '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
+                        '</div>'+
+                        '</form>'+
+                        '</div>';
+
+        var legacy_rule_form = '<form role="form" class="legacy_form">'+
                   '<div id="legacy_form" >'+
                     '<div class="form-group">'+
                       '<div class="col-xs-12">'+
@@ -28,28 +29,9 @@ $(document).ready(function(){
                       '&nbsp;&nbsp;<a class="btn btn-danger remove-rule">Discard</a>'+
                     '</div>'+
                   '</div>'+
-                '</form></div>';
+                '</form>';
 
-        var standard_rule_form = '<hr/>'+
-            '<div class="rule_form_id">' +
-            '<div class="col-xs-12">'+
-            '<h4>New Rule</h4>'+
-        '</div>'+
-        '<div>'+
-        '<div class="col-xs-8">'+
-        '</div>'+
-        '<div class="col-xs-4 top-space">'+
-            '<form role="form" class="form-inline pull-right prepopulate-form">'+
-            '<div class="form-group">'+
-            '<label class="sr-only">Duplicate: </label>'+
-        '<input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>'+
-        '<button class="btn btn-default select-sm" value="submit">duplicate</button>'+
-            '</div>'+
-            '</form>'+
-
-            '</div>'+
-
-        //'<form action="/rules" method="post" role="form" class="form rule-form">'+
+        var standard_rule_form = '<form role="form" class="standard_form">'+
             '<div class="form-group rule-form">'+
             '<div class="col-xs-12">'+
             '<h5>Message</h5>'+
@@ -70,20 +52,20 @@ $(document).ready(function(){
             '<label>'+
             '<input type="radio" class="connection" name="connectionForm" checked value="true">'+
             '<span class="sr-only">Select connection options</span>'+
-        '</label>'+
-        '</div>'+
-        '</div>'+
-        '<div class="col-xs-10 col-sm-11">'+
+            '</label>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-10 col-sm-11">'+
             '<label for="connectionText" class="control-label sr-only">Connection</label>'+
             '<div class="form-inline code">'+
             '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
             '"<% ["alert"].each do |type| %>'+
-        '<option><%= type %></option>'+
-            '<% end %>"'+
-            '</select>'+
-            '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
-            '"<% ["tcp","udp","ip","icmp"].each do |type| %>'+
-        '<option><%= type %></option>'+
+            '<option><%= type %></option>'+
+                '<% end %>"'+
+                '</select>'+
+                '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
+                '"<% ["tcp","udp","ip","icmp"].each do |type| %>'+
+            '<option><%= type %></option>'+
             '<% end %>"'+
             '</select>'+
             '<select class="form-control select-sm" name="bug[rules][][connection][]">'+
@@ -110,51 +92,51 @@ $(document).ready(function(){
             '<div class="entry-type-switch">'+
             '<div class="radio">'+
             '<label>'+
-            '<input type="radio" class="connection" id="scratch_connection" name="connectionForm" value="false">'+
+            '<input type="radio" class="scratch_connection" name="connectionForm" value="false">'+
             '<span class="sr-only">Write Connection from scratch</span>'+
-        '</label>'+
-        '</div>'+
-        '</div>'+
-        '<div class="col-xs-10">'+
-            '<input type="text" class="form-control create-input select-sm code" id="scratch_connection_text" name="bug[rules][][connection][]" placeholder="write connection from scratch" disabled>'+
-        '</div>'+
-        '</div>'+
-        '</div>'+
-        '<div class="form-group">'+
+            '</label>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-10">'+
+            '<input type="text" class="form-control create-input select-sm code scratch_connection_text" name="bug[rules][][connection][]" placeholder="write connection from scratch" disabled>'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '<div class="form-group">'+
             '<div class="col-xs-12">'+
             '<h5>Flow</h5>'+
             '<div class="entry-type-switch">'+
             '<div class="radio">'+
             '<label>'+
             '<input type="radio" name="flowForm" class="flow" checked>'+
-        '<span class="sr-only">Select flow options</span>'+
-        '</label>'+
-        '</div>'+
-        '</div>'+
-        '<div class="col-xs-10 form-inline">'+
+            '<span class="sr-only">Select flow options</span>'+
+            '</label>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-10 form-inline">'+
             '<select class="form-control select-sm code" name="bug[rules][][flow][]" id="new-rule-flow">'+
             '"<% ["to_server", "to_client"].each do |flow| %>'+
-        '<option value=<%= flow %>><%= flow %></option>'+
+            '<option value=<%= flow %>><%= flow %></option>'+
             '<% end %>"'+
             '</select>'+
             '<div class="checkbox left-space">'+
             '<label>'+
             '<input type="checkbox" name="bug[rules][][flow][]" id="new-rule-flow-established" value="established" checked>established?'+
-        '</label>'+
-        '</div>'+
-        '</div>'+
-        '</div>'+
-        '<div class="col-xs-12">'+
+            '</label>'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '<div class="col-xs-12">'+
             '<div class="entry-type-switch">'+
             '<div class="radio">'+
             '<label>'+
-            '<input type="radio" name="flowForm" class="flow" id="scratch_flow" value="false">'+
+            '<input type="radio" name="flowForm" class="scratch_flow" value="false">'+
             '<span class="sr-only">Write flow from scratch</span>'+
         '</label>'+
         '</div>'+
         '</div>'+
         '<div class="col-xs-10">'+
-            '<input class="form-control create-input select-sm code" name="bug[rules][][flow][]" id="scratch_flow_text" placeholder="write flow from scratch" disabled>'+
+            '<input class="form-control create-input select-sm code scratch_flow_text" name="bug[rules][][flow][]" placeholder="write flow from scratch" disabled>'+
         '</div>'+
         '</div>'+
         '</div>'+
@@ -225,13 +207,13 @@ $(document).ready(function(){
             '<div class="entry-type-switch">'+
             '<div class="radio">'+
             '<label>'+
-            '<input type="radio" name="metadataForm" class="metadata" id="scratch_metadata" value="false">'+
+            '<input type="radio" name="metadataForm" class="scratch_metadata" value="false">'+
             '<span class="sr-only">Write metadata from scratch</span>'+
         '</label>'+
         '</div>'+
         '</div>'+
         '<div class="col-xs-10">'+
-            '<input class="form-control create-input select-sm code" name="bug[rules][][metadata][]" id="scratch_metadata_text" placeholder="write metadata from scratch" disabled>'+
+            '<input class="form-control create-input select-sm code scratch_metadata_text" name="bug[rules][][metadata][]" placeholder="write metadata from scratch" disabled>'+
         '</div>'+
         '</div>'+
         '</div>'+
@@ -254,19 +236,25 @@ $(document).ready(function(){
             '<h5>References &nbsp;&nbsp;<a class="top-space add_reference_btn h6 blue"><i class="glyphicon glyphicon-plus"></i> add reference</a></h5>'+
         '</div>'+
         '</div>'+
-        //'<div class="form-group right">'+
-        //    '<div class="col-xs-12 center top-space">'+
-        //    '<button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>'+
-        //'</div>'+
-        //'</div>'+
-        //'<input type="hidden" name="bug[rules][][bug_id]" value="103015">'+
-            //'</form>'+
+        '<div class="form-group right">'+
+            '<div class="col-xs-12 center top-space">'+
+            '<button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>'+
+            '&nbsp;&nbsp;<a class="btn btn-danger remove-rule">Discard</a>'+
+        '</div>'+
+        '</div>'+
+        '<input type="hidden" name="bug[rules][][bug_id]" value="103015">'+
+            '</form>'+
             '</div>'+
-            '</div>';
+            '</div></div>';
 
     $('.create').on("click", '#add_rule_btn', function(e){
       e.preventDefault();
-      $('.rule_form_id').append(legacy_rule_form);
+      $('.rule_form_id').append(new_rule + legacy_rule_form + standard_rule_form);
+      if($('#standard_btn').is(":visible")){
+        $('.standard_form').hide()
+      }else{
+        $('.legacy_form').hide()
+      }
     });
 
     $('.create').on("click", '.remove-rule', function(e){
