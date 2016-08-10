@@ -22,5 +22,4 @@ class ApplicationController < ActionController::Base
     @xml_token ||= session[:token] if session[:token]
   end
 
-
 end

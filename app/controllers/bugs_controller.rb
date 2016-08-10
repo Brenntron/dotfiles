@@ -1,5 +1,7 @@
 class BugsController < ApplicationController
 
+  before_filter :query_bugs
+
   def index
     @users = User.all
     @states = Bug.uniq.pluck(:state)
@@ -80,30 +82,34 @@ class BugsController < ApplicationController
     end
   end
 
-  def create_rules
-    @bug = Bug.find(params[:id])
-    params[:bug][:rules].each do |rule|
-      new_rule = Rule.new
-      new_rule['message'] = rule['message']
-      new_rule['detection'] = rule['detection']
-      new_rule['class_type'] = rule['class_type']
-      [:connection, :flow, :metadata].each do |data|
-        new_rule[data] = rule[data].join(" ") if rule[data].is_a? Array
-      end
-      if new_rule.save
-        @bug.rules << new_rule
-        new_rule.create_references(rule[:reference]) if rule[:reference]
-      end
-    end
-    redirect_to bug_path(@bug)
-  end
-
   private
 
   def bug_params
     params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification,
                                 :summary, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
                                                                                                :metadata, :detection, :class_type, :reference])
+  end
+
+  def query_bugs
+    session[:query] = params[:q] if params[:q]
+    if session[:query]
+      case session[:query]
+        when "my-bugs"
+          @bugs = current_user.bugs
+        when "team-bugs"
+          @bugs = current_user.bugs
+        when "open-bugs"
+          @bugs = current_user.bugs
+        when "pending-bugs"
+          @bugs = current_user.bugs
+        when "fixed-bugs"
+          @bugs = Bug.where(state: "FIXED")
+        else
+          @bugs = Bug.all
+      end
+    else
+      @bugs = current_user.bugs
+    end
   end
 
   def bugs_with_search(param)

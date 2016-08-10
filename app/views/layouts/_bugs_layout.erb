@@ -12,7 +12,7 @@
       <tbody>
       <% if @bugs %>
         <% @bugs.each do |bug| %>
-            <tr class="highlight">
+            <tr class="highlight" id="show_<%= bug.id %>">
               <td><%= link_to bug.id, bug %></td>
             </tr>
         <% end %>

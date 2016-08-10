@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Backend</title>
+    <title>Rules UI</title>
     <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
     <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+    <%= render 'layouts/bugs_show' if controller_name == "bugs" && action_name == "show" %>
     <%= csrf_meta_tags %>
   </head>
   <body>
