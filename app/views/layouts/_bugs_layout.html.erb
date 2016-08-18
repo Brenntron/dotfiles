@@ -12,9 +12,9 @@
       <tbody>
       <% if @bugs %>
         <% @bugs.each do |bug| %>
-            <tr class="highlight" id="show_<%= bug.id %>">
-              <td><%= link_to bug.id, bug %></td>
-            </tr>
+          <tr class="highlight <%= 'active' if bug.id.to_s == params[:id] %>" id="show_<%= bug.id %>">
+            <td><%= link_to bug.id, bug %></td>
+          </tr>
         <% end %>
       <% end %>
       </tbody>
@@ -35,10 +35,10 @@
           </button>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/bugs?q=my-bugs">my bugs</a></li>
-            <li><a href="/bugs?q=team-bugs"}}>team bugs</a></li>
+            <li><a href="/bugs?q=team-bugs">team bugs</a></li>
             <li class="divider"></li>
             <li><a href="/bugs?q=open-bugs">open bugs</a></li>
-            <li><a href="/bugs?q=pending-bugs"}>pending bugs</a></li>
+            <li><a href="/bugs?q=pending-bugs">pending bugs</a></li>
             <li><a href="/bugs?q=fixed-bugs">fixed bugs</a></li>
             <li class="divider"></li>
             <li><a href="/bugs?q=all-bugs">all bugs</a></li>
@@ -66,34 +66,3 @@
     <%= render 'shared/reference_modal' %>
     <input type="hidden" name="bug_id" value="<%= @bug.id %>">
 <% end %>
-
-<script>
-  $('#button_import').click(function() {
-    var headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
-    var id = $('#import_bug').val();
-    $.ajax({
-      url: "/api/v1/bugs/import/" + id,
-      method: 'GET',
-      data: {'api_key': 'h93hq@hwo9%@ah!jsh'},
-      headers: headers
-    }).done(function(response) {
-      window.location.replace("/bugs");
-    });
-  });
-
-  $(".reset").click(function(e) {
-    e.preventDefault();
-    $(this).closest('form').find("input").val("");
-    $(this).closest('form').find("select").val("");
-  });
-
-  $("input[name='bug_range']").on("click", function(){
-    if($('input[name="bug_range"]').prop('checked')) {
-      $(".bugzilla_max").show();
-    } else {
-      $(".bugzilla_max").hide();
-    }
-
-  });
-
-</script>

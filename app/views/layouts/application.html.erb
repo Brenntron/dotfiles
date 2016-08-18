@@ -4,7 +4,6 @@
     <title>Rules UI</title>
     <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
     <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
-    <%= render 'layouts/bugs_show' if controller_name == "bugs" && action_name == "show" %>
     <%= csrf_meta_tags %>
   </head>
   <body>
@@ -19,8 +18,7 @@
       <nav class="navbar nav-stacked rules-ui-nav">
         <ul class="nav nav-stacked">
           <li><%= link_to 'BUG LIST', bugs_path %></li>
-          <li><%= link_to 'RULES', rules_path %></li>
-          <li><%= link_to 'USERS', '#' %></li>
+          <li><%= link_to 'USERS', users_path %></li>
         </ul>
       </nav>
     </div>
@@ -34,16 +32,18 @@
           </a>
           <p class="login-area">
             <% if current_user %>
-                <span class="login-label"> <strong><%= current_user[:display_name] %></strong> </span>
+              <span class="login-label"> <strong><%= current_user[:display_name] %></strong> </span>
             <% end %>
             <% if controller_name == 'bugs' %>
               <%= render 'layouts/bugs_layout'%>
+            <% elsif controller_name == "users" %>
+              <%= render 'layouts/users_layout'%>
             <% end %>
           </p>
         </div>
       </div>
     </div>
-    <% if controller_name != 'bugs' %>
+    <% if controller_name != 'bugs' && controller_name != "users" %>
       <%= yield %>
     <% end %>
 

@@ -1,35 +1,13 @@
 class BugsController < ApplicationController
 
+  before_filter :require_login
   before_filter :query_bugs
+  before_filter :get_states_and_users, only: [:index, :show, :new]
 
   def index
-    @users = User.all
-    @states = Bug.uniq.pluck(:state)
-    if params[:q]
-      case params[:q]
-        when "my-bugs"
-          @bugs = current_user.bugs
-        when "team-bugs"
-          @bugs = current_user.bugs
-        when "open-bugs"
-          @bugs = current_user.bugs
-        when "pending-bugs"
-          @bugs = current_user.bugs
-        when "fixed-bugs"
-          @bugs = Bug.where(state: "FIXED")
-        else
-          @bugs = Bug.all
-      end
-    elsif params[:bug]
-      @bugs = bugs_with_search(params[:bug])
-    else
-      @bugs = current_user.bugs
-    end
   end
 
   def new
-    @users = User.all
-    @states = Bug.uniq.pluck(:state)
     @bug = current_user.bugs.build
   end
 
@@ -68,8 +46,6 @@ class BugsController < ApplicationController
     @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
     @tasks = @bug.tasks
     @notes = @bug.notes.order(created_at: :desc)
-    @users = User.all
-    @states = Bug.uniq.pluck(:state)
   end
 
   def update
@@ -99,9 +75,9 @@ class BugsController < ApplicationController
         when "team-bugs"
           @bugs = current_user.bugs
         when "open-bugs"
-          @bugs = current_user.bugs
+          @bugs = Bug.where(state: "OPEN")
         when "pending-bugs"
-          @bugs = current_user.bugs
+          @bugs = Bug.where(state: "PENDING")
         when "fixed-bugs"
           @bugs = Bug.where(state: "FIXED")
         else
@@ -133,6 +109,15 @@ class BugsController < ApplicationController
     end
     para_hash[:ids] = params[:id]
     para_hash
+  end
+
+  def get_states_and_users
+    @states = Bug.uniq.pluck(:state)
+    @users = User.all
+  end
+
+  def require_login
+    redirect_to root_url if !current_user
   end
 
 end

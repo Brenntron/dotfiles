@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   root 'pages#index'
   delete '/rules' => 'rules#destroy'
   resources 'rules'
+  resources 'users'
   resources 'bugs' do
     resources 'references'
   end
