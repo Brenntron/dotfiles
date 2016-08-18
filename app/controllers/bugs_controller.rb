@@ -67,7 +67,12 @@ class BugsController < ApplicationController
   end
 
   def query_bugs
-    session[:query] = params[:q] if params[:q]
+    if params[:q]
+      session[:query] = params[:q]
+    elsif params[:bug].is_a? Hash
+      session[:query] = "advance-search"
+      session[:search] = params[:bug]
+    end
     if session[:query]
       case session[:query]
         when "my-bugs"
@@ -80,25 +85,13 @@ class BugsController < ApplicationController
           @bugs = Bug.where(state: "PENDING")
         when "fixed-bugs"
           @bugs = Bug.where(state: "FIXED")
+        when "advance-search"
+          @bugs = Bug.bugs_with_search(session[:search])
         else
           @bugs = Bug.all
       end
     else
       @bugs = current_user.bugs
-    end
-  end
-
-  def bugs_with_search(param)
-    if param[:bugzilla_max] == ''
-      param.delete_if { |k,v| v == "" }
-      count = 0
-      query = ''
-      param.each do |k,v|
-        count = count+1
-        query = query + k + "='" + v + "'"
-        query = query + " && " if count != param.count
-      end
-      Bug.where(query)
     end
   end
 

@@ -7,7 +7,9 @@
     <%= csrf_meta_tags %>
   </head>
   <body>
-
+    <% if controller_name == 'bugs' %>
+      <%= render 'shared/bug_search_modal' %>
+    <% end %>
     <div class="sidebar">
       <div class="sidebar-header center">
         <h1 class="logo"><%= link_to 'RulesUI', root_url  %></h1>
@@ -46,6 +48,7 @@
     <% if controller_name != 'bugs' && controller_name != "users" %>
       <%= yield %>
     <% end %>
+
 
   </body>
 </html>

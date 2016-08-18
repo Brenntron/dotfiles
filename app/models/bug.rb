@@ -62,6 +62,20 @@ class Bug < ActiveRecord::Base
     changed_bug
   end
 
+  def self.bugs_with_search(params)
+    if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
+      params.delete_if { |k,v| v == "" }
+      count = 0
+      query = ''
+      params.each do |k,v|
+        count = count+1
+        query = query + k + "='" + v + "'"
+        query = query + " && " if count != params.count
+      end
+      Bug.where(query)
+    end
+  end
+
   def update_attachments(xmlrpc)
     fields = ['file_name', 'id', 'last_change_time', 'is_obsolete', 'size']
 

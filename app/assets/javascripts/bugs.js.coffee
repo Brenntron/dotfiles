@@ -8,6 +8,17 @@ $ ->
   $(document).on 'click', '.change_current_bug_committer', ->
     $('#current_bug_committer, #change_committer_form').toggle()
 
+  $(".reset").click (e) ->
+    e.preventDefault();
+    $(this).closest('form').find("input").val("")
+    $(this).closest('form').find("select").val("")
+
+  $("input[name='bug[bug_range]']").click () ->
+    if($('input[name="bug[bug_range]"]').prop('checked'))
+      $(".bugzilla_max").show()
+    else
+      $(".bugzilla_max").hide()
+
   $("#change_state_form").submit (e)->
     e.preventDefault()
     id = $('input[name="id"]').val()

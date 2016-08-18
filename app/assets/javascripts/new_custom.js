@@ -16,20 +16,6 @@ $(document).ready(function() {
         });
     });
 
-    $(".reset").click(function(e) {
-        e.preventDefault();
-        $(this).closest('form').find("input").val("");
-        $(this).closest('form').find("select").val("");
-    });
-
-    $("input[name='bug_range']").on("click", function(){
-        if($('input[name="bug_range"]').prop('checked')) {
-            $(".bugzilla_max").show();
-        } else {
-            $(".bugzilla_max").hide();
-        }
-
-    });
 
     $(function () {
         $('#myTab a:first').tab('show');
