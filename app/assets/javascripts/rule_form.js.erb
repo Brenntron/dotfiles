@@ -249,12 +249,7 @@ $(document).ready(function(){
 
     $('.create').on("click", '#add_rule_btn', function(e){
       e.preventDefault();
-      $('.rule_form_id').append(new_rule + legacy_rule_form + standard_rule_form);
-      if($('#standard_btn').is(":visible")){
-        $('.standard_form').hide()
-      }else{
-        $('.legacy_form').hide()
-      }
+      $('.rule_form_id').append(new_rule + legacy_rule_form);
     });
 
     $('.create').on("click", '.remove-rule', function(e){
