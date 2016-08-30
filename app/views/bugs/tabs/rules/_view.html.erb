@@ -16,7 +16,7 @@
           <div class="alert alert-danger small"><%= rule.rule_failures %></div>
           <pre><%= rule.rule_content %></pre>
         <% else %>
-          <p class="code"><%= simple_format rule.cvs_rule_parsed.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') if rule.cvs_rule_parsed %></p>
+          <p class="code"><%= simple_format rule.rule_parsed.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') if rule.rule_parsed %></p>
         <% end %>
         <% if rule.rule_warnings.present? %>
           <div class="alert alert-warning small"><%= simple_format rule.rule_warnings.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') if rule.rule_warnings %></div>

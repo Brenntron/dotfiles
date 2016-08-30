@@ -1,5 +1,11 @@
 $ ->
 
+  $('.standard_form').hide()
+
+  $(document).on 'click', '#legacy_btn, #standard_btn', (e) ->
+    e.preventDefault()
+    $('.legacy_form, #legacy_btn, .standard_form, #standard_btn').toggle()
+
   $(document).on 'click','.rules_check_box', ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))
 
@@ -50,10 +56,10 @@ $ ->
           $.each selected, (index, value) ->
             $('.rules_table tr#'+value).remove()
             $('.alert_rules').removeClass('error')
-            $('.alert_rules').addClass('success').append('Rule '+value+' has been deleted')
+            $('.alert_rules').addClass('success').append('Rule '+value+' has been deleted\n')
             $('.rule_'+value).remove()
         error: (response) ->
-          $('.alert_rules').addClass('error').append('Rule '+value+' has not been deleted')
+          $('.alert_rules').addClass('error').append('Rule '+value+' has not been deleted\n')
         complete: ->
           setTimeout (->
             $('.alert_rules').hide 'blind', {}, 500
@@ -97,81 +103,107 @@ $ ->
         ), 5000
     }
 
-  $('.create').on "click", '.save-rule-btn', (e) ->
-    e.preventDefault();
-    form = $(this).parents('.legacy_form');
-    rule_content = form.find('textarea[name="rule[rule_content]"]').val();
-    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
-    data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax {
-      url: "/api/v1/rules"
-      method: 'POST'
-      data: data
-      headers: headers
-      success: (response) ->
-        $('.alert_rules').addClass('success').show().html('New rule has been created')
-        rule = response.rule
-        if rule.sid==null
-          version = 'new_rule'
-        else
-          version = rule.gid+':'+rule.sid+':'+rule.rev
-        string = '<tr id='+rule.id+'>'+
-          '<td><input type="checkbox" class="rule_check_box" value='+rule.id+'></td>'+
-          '<td>'+rule.state+'</td>'+
-          '<td>'+version+'</td>'+
-          '<td><code>'+rule.message+'</code></td>'+
-          '<td class="center">-</td><td class="center">-</td><td class="center">-</td></tr>'
-        $('.rules_table tbody').append(string)
-        form.parents('.new_rule_form').remove()
-      error: (response) ->
-        $('.alert_rules').addClass('error').show().html('New rule has not been created')
-      complete: ->
-        setTimeout (->
-          $('.alert_rules').hide 'blind', {}, 500
-          return
-        ), 5000
-    }
+  $('.scratch_connection, .connection').click ->
+    if $('.scratch_connection').is(":checked")
+      $('.connectionForm').prop('disabled', true)
+    else
+      $('.connectionForm').prop('disabled', false)
 
-  $('.create').on 'click', '#save_all_rules', ->
-    $('.create .legacy_form').each ->
-      _this = $(this)
-      rule_content = $(this).find('textarea[name="rule[rule_content]"]').val()
+  $('.scratch_flow, .flow').click ->
+    if $('.scratch_flow').is(":checked")
+      $('.flow_form').prop('disabled', true)
+    else
+      $('.flow_form').prop('disabled', false)
+
+  $('.scratch_metadata, .metadata').click ->
+    if $('.scratch_metadata').is(":checked")
+      $('.metadata_form').prop('disabled', true)
+    else
+      $('.metadata_form').prop('disabled', false)
+
+  $('.create').on "click", '.save-rule-btn', (e) ->
+    e.preventDefault()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    if $('.legacy_form').is(":visible")
+      form = $(this).parents('.legacy_form');
+      rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
+      contents_arr = rule_contents.split('\n')
+      contents_arr.forEach (rule_content) ->
+        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
+        data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
+        $.ajax {
+          url: "/api/v1/rules"
+          method: 'POST'
+          data: data
+          headers: headers
+          success: (response) ->
+            $('.alert_rules').removeClass('error')
+            $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
+          error: (response) ->
+            $('.alert_rules').removeClass('success')
+            $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
+          complete: ->
+            $(document).ajaxStop ->
+              location.reload true
+        }
+    else if $('.standard_form').is(":visible")
+      form = $(this).parents('.standard_form')
+      msg = form.find('input[name="rule[message]"]').val()
+      msg = '(msg:"' + msg + '";'
+      connection = ""
+      form.find('input[name="rule[connection][]"], select[name="rule[connection][]"]').each ->
+        if $(this).is(":enabled")
+          connection = connection + $(this).val() + " "
+      flow = "flow:"
+      form.find('input[name="rule[flow][]"], select[name="rule[flow][]"]').each ->
+        if $(this).is(":enabled")
+          flow = flow + $(this).val() + ","
+      flow = flow.replace(/,([^,]*)$/,'$1') + ";"
+      detection = form.find('textarea[name="rule[detection]"]').val()
+      metadata = "metadata:"
+      form.find('input[name="rule[metadata][]"], select[name="rule[metadata][]"]').each ->
+        if $(this).is(":enabled")
+          if ($(this).is('input') && $(this).is(':checked')) || $(this).is('input[type="text"]')
+            metadata = metadata + " " + $(this).val() + ","
+          else if $(this).is('select')
+            metadata = metadata + " " + $(this).val() + ","
+      metadata = metadata.replace(/,([^,]*)$/,'$1') + ";"
+      class_type = "classtype:" + form.find('select[name="rule[class_type]"]').val()
+      ref_types = []
+      ref_values = []
+      references = ""
+      form.find('input[name="rule[reference][][reference_data]"]').each ->
+        ref_values.push($(this).val())
+      form.find('select[name="rule[reference][][reference_type_id]"]').each ->
+        ref_types.push($(this).val())
+      i = 0
+      ref_types.forEach (item) ->
+        references = references + "reference:" + item + "," + ref_values[i] + "; "
+        i = i + 1
+      rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
       rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
       data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
-      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       $.ajax {
         url: "/api/v1/rules"
         method: 'POST'
         data: data
         headers: headers
         success: (response) ->
-          $('.alert_rules').addClass('success').show().append('<p>New rule has been created</p>')
-          rule = response.rule
-          if rule.sid==null
-            version = 'new_rule'
-          else
-            version = rule.gid+':'+rule.sid+':'+rule.rev
-          string = '<tr id='+rule.id+'>'+
-            '<td><input type="checkbox" class="rule_check_box" value='+rule.id+'></td>'+
-            '<td>'+rule.state+'</td>'+
-            '<td>'+version+'</td>'+
-            '<td><code>'+rule.message+'</code></td>'+
-            '<td class="center">-</td><td class="center">-</td><td class="center">-</td></tr>'
-          $('.rules_table tbody').append(string)
-          _this.parents('.new_rule_form').remove()
+          $('.alert_rules').removeClass('error')
+          $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
         error: (response) ->
           $('.alert_rules').removeClass('success')
-          $('.alert_rules').addClass('error').show().html('New rule has not been created')
+          $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
         complete: ->
-          setTimeout (->
-            $('.alert_rules').hide 'blind', {}, 500
-            return
-          ), 5000
+          $(document).ajaxStop ->
+            location.reload true
       }
 
+
+
+
   $('.edit').on "click", '.update-rule-btn', (e) ->
-    e.preventDefault();
+    e.preventDefault()
     form = $(this).parents('.legacy_form')
     rule_content = form.find('textarea[name="rule[rule_content]"]').val()
     id = form.find('input[name="rule_id"]').val()
