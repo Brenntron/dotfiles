@@ -21,7 +21,7 @@ $ ->
     data.append( 'note[bugzilla_id]', $('input[name="bugzilla_id"]').val())
     data.append( 'note[comment]', $('textarea[name="research_notes"]').val())
     data.append( 'note[note_type]', $('input[name="note_type"]').val())
-    if $('input[name="note_id"]').val()
+    if $('#researchNotesEditBtn').html()=='edit' && $('input[name="note_id"]').val()
       data.append( 'note[id]', $('input[name="note_id"]').val())
     $.ajax {
       url: "/notes"
@@ -35,8 +35,8 @@ $ ->
         $('.alert_notes').addClass('success').show().html('Notes saved')
         $('#researchNotesCancelBtn, #researchNotesSaveBtn, #researchNotesPublishBtn, #researchNotesEditBtn').toggle()
         $('textarea[name="research_notes"]').attr("readonly", true)
-        if !$('input[name="note_id"]').val()
-          $('#notes_form').append('<input type="hidden" name="note_id" value='+response.note.id+'>')
+        $('#researchNotesEditBtn').html('edit')
+        $('input[name="research_note_id"]').val(response.note.id)
         $('#researchNotesPublishBtn').attr('disabled', false)
       error: (response) ->
         $('.alert_notes').removeClass('success')
@@ -54,7 +54,7 @@ $ ->
     data.append( 'note[bugzilla_id]', $('input[name="bugzilla_id"]').val())
     data.append( 'note[comment]', $('textarea[name="committer_notes"]').val())
     data.append( 'note[note_type]', $('input[name="committer_type"]').val())
-    if $('input[name="committer_note_id"]').val()
+    if $('#committerNotesEditBtn').html()=='edit'  && $('input[name="committer_note_id"]').val()
       data.append( 'note[id]', $('input[name="committer_note_id"]').val())
     $.ajax {
       url: "/notes"
@@ -67,9 +67,9 @@ $ ->
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes saved')
         $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
+        $('#committerNotesEditBtn').html('edit')
         $('textarea[name="committer_notes"]').attr("readonly", true)
-        if !$('input[name="committer_note_id"]').val()
-          $('#committer_notes_form').append('<input type="hidden" name="committer_note_id" value='+response.note.id+'>')
+        $('input[name="committer_note_id"]').val(response.note.id)
         $('#committerNotesPublishBtn').attr('disabled', false)
       error: (response) ->
         $('.alert_notes').removeClass('success')
@@ -100,9 +100,8 @@ $ ->
         note = response.note.note
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
-        $('textarea[name="research_notes"]').val(bug.research_notes)
         $('#researchNotesPublishBtn').attr('disabled', true)
-        $('#notes_form input[name="note_id"]').remove()
+        $('#researchNotesEditBtn').html('new')
         div = '<div class="row top-space research-note">'+
           '<div class="col-xs-6">'+
           '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+
@@ -152,9 +151,8 @@ $ ->
         note = response.note.note
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
-        $('textarea[name="committer_notes"]').val('')
         $('#committerNotesPublishBtn').attr('disabled', true)
-        $('#committer_notes_form input[name="committer_note_id"]').remove()
+        $('#committerNotesEditBtn').html('new')
         div = '<div class="row top-space research-note">'+
           '<div class="col-xs-6">'+
           '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+
