@@ -4,8 +4,10 @@ module NotesHelper
     "https://#{Rails.application.config.bugzilla_host}/show_bug.cgi?id=#{@bug.id}"
   end
 
-  def get_notes_saved type, author
-    @bug.notes.where("note_type=? and author=? and notes_bugzilla_id is ?", type, author, nil).last if @bug.notes != []
+  def get_last_notes type, author
+    last_bug = @bug.notes.where("note_type=? and author=?", type, author).last if @bug.notes != []
+    last_bug = @bug.notes.where("note_type=?", type).last if last_bug.notes_bugzilla_id
+    last_bug
   end
 
   def get_username(email)
