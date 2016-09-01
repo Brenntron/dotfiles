@@ -112,7 +112,7 @@ $ ->
       $('.connectionForm').prop('disabled', false)
       form.find('.scratch_connection_text').prop('disabled', true)
 
-  $('.scratch_flow, .flow').click ->
+  $(document).on 'change', '.scratch_flow, .flow', ->
     form = $(this).parents('.standard_form')
     if $('.scratch_flow').is(":checked")
       $('.flow_form').prop('disabled', true)
@@ -121,7 +121,7 @@ $ ->
       $('.flow_form').prop('disabled', false)
       form.find('.scratch_flow_text').prop('disabled', true)
 
-  $('.scratch_metadata, .metadata').click ->
+  $(document).on 'change', '.scratch_metadata, .metadata', ->
     form = $(this).parents('.standard_form')
     if $('.scratch_metadata').is(":checked")
       $('.metadata_form').prop('disabled', true)
