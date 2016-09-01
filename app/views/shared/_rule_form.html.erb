@@ -4,10 +4,10 @@
       <h4>New Rule</h4>
     </div>
     <div class="col-xs-4 top-space">
-      <form role="form" class="form-inline pull-right prepopulate-form">
+      <form role="form" class="form-inline pull-right prepopulate-form" id="duplicate_rule">
         <div class="form-group">
           <label class="sr-only">Duplicate: </label>
-          <input class="form-control select-sm input-extra-narrow" placeholder="rule SID" required>
+          <input class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID" required>
           <button class="btn btn-default select-sm" value="submit">duplicate</button>
         </div>
       </form>
@@ -274,4 +274,44 @@
     e.preventDefault();
     $(this).parents('.form-inline').remove();
   });
+
+  $('#duplicate_rule').on("submit", function(e) {
+    var data, form, headers, id;
+    e.preventDefault();
+    form = $(this).serializeArray();
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
+    data = {api_key: 'h93hq@hwo9%@ah!jsh'};
+    id = form[0].value;
+    return $.ajax({
+      url: "/api/v1/rules/" + id,
+      method: 'GET',
+      data: data,
+      headers: headers,
+      success: function(response) {
+        if(response == null){
+          alert('No rule id exists');
+        }else{
+          var reference, references, rule, standard_form;
+          rule = response.rule;
+          references = response.references;
+          $('.legacy_form').find('textarea[name="rule[rule_content]"]').val(rule.rule_content);
+          standard_form = $('.standard_form');
+          standard_form.find('input[name="rule[message]"]').val(rule.message);
+          standard_form.find('.scratch_connection').prop('checked', true);
+          standard_form.find('.scratch_connection_text').val(rule.connection);
+          standard_form.find('textarea[name="rule[detection]"]').val(rule.detection);
+          standard_form.find('.scratch_flow_text').val(rule.flow);
+          standard_form.find('.scratch_metadata_text').val(rule.metadata);
+          standard_form.find('select[name="rule[class_type]"]').val(rule.class_type);
+          reference = standard_form.find('.references_add');
+          $.each(references, function(i, v) {
+            var ref_form = $(reference_form).appendTo(reference);
+            ref_form.find('input[name="rule[reference][][reference_data]"]').val(v.reference_data);
+            ref_form.find('select[name="rule[reference][][reference_type_id]"]').val(v.type);
+          });
+        }
+      }
+    });
+  });
+
 </script>

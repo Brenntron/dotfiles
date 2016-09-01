@@ -21,7 +21,7 @@
               <input type="hidden" name="note_type" value="research">
               <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
               <div class="form-group col-xs-12 col-md-2 right">
-                <button id="researchNotesEditBtn" class="btn btn-default btn-sm" ><%= note.notes_bugzilla_id ? 'new' : 'edit' %></button>
+                <button id="researchNotesEditBtn" class="btn btn-default btn-sm">edit</button>
                 <button id="researchNotesCancelBtn" class="btn btn-default btn-sm"  style="display:none;">cancel</button>
                 <div class="top-space"></div>
                 <button id="researchNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
@@ -51,7 +51,7 @@
             <input type="hidden" name="committer_type" value="committer">
             <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
             <div class="form-group col-xs-12 col-md-2 col-lg-1 right">
-              <button id="committerNotesEditBtn" class="btn btn-default btn-sm"><%= committer_note.notes_bugzilla_id ? 'new' : 'edit' %></button>
+              <button id="committerNotesEditBtn" class="btn btn-default btn-sm">edit</button>
               <button id="committerNotesCancelBtn" class="btn btn-default btn-sm" style="display:none;">cancel</button>
               <div class="top-space"></div>
               <button id="committerNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>

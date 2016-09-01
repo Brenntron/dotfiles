@@ -103,23 +103,32 @@ $ ->
         ), 5000
     }
 
-  $('.scratch_connection, .connection').click ->
+  $(document).on 'change', '.scratch_connection, .connection', ->
+    form = $(this).parents('.standard_form');
     if $('.scratch_connection').is(":checked")
       $('.connectionForm').prop('disabled', true)
+      form.find('.scratch_connection_text').prop('disabled', false)
     else
       $('.connectionForm').prop('disabled', false)
+      form.find('.scratch_connection_text').prop('disabled', true)
 
   $('.scratch_flow, .flow').click ->
+    form = $(this).parents('.standard_form')
     if $('.scratch_flow').is(":checked")
       $('.flow_form').prop('disabled', true)
+      form.find('.scratch_flow_text').prop('disabled', false)
     else
       $('.flow_form').prop('disabled', false)
+      form.find('.scratch_flow_text').prop('disabled', true)
 
   $('.scratch_metadata, .metadata').click ->
+    form = $(this).parents('.standard_form')
     if $('.scratch_metadata').is(":checked")
       $('.metadata_form').prop('disabled', true)
+      form.find('.scratch_metadata_text').prop('disabled', false)
     else
       $('.metadata_form').prop('disabled', false)
+      form.find('.scratch_metadata_text').prop('disabled', true)
 
   $('.create').on "click", '.save-rule-btn', (e) ->
     e.preventDefault()
@@ -199,9 +208,6 @@ $ ->
             location.reload true
       }
 
-
-
-
   $('.edit').on "click", '.update-rule-btn', (e) ->
     e.preventDefault()
     form = $(this).parents('.legacy_form')
@@ -229,3 +235,4 @@ $ ->
           return
         ), 5000
     }
+
