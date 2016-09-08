@@ -183,7 +183,7 @@ $ ->
       references = ""
       form.find('input[name="rule[reference][][reference_data]"]').each ->
         ref_values.push($(this).val())
-      form.find('select[name="rule[reference][][reference_type_id]"]').each ->
+      form.find('select[name="rule[reference][][reference_type_id]"], input[name="rule[reference][][reference_type_id]"]').each ->
         ref_types.push($(this).val())
       i = 0
       ref_types.forEach (item) ->

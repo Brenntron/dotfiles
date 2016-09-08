@@ -46,7 +46,11 @@
 <div class="row top-bar">
   <div class="col-xs-12">
     <button class="select-sm btn btn-link">
-      <strong class="hidden-xs" id="attachments-current">Current (<%= @attachments.count %>)&nbsp;&nbsp;</strong>
+      <strong class="hidden-xs" id="attachments-pcap">Pcap (<%= @pcap_attachments.count %>)&nbsp;&nbsp;</strong>
+      <i class="glyphicon glyphicon-eye-open"></i>
+    </button>
+    <button class="select-sm btn btn-link">
+      <strong class="hidden-xs" id="attachments-other">Other (<%= @other_attachments.count %>)&nbsp;&nbsp;</strong>
       <i class="glyphicon glyphicon-eye-open"></i>
     </button>
     <button class="select-sm btn btn-link">
@@ -54,8 +58,8 @@
       <i class="glyphicon glyphicon-eye-close"></i>
     </button>
 
-    <% if @attachments.any? %>
-    <table class="table table-condensed small table-hover" id="current-attachments">
+    <% if @pcap_attachments.any? %>
+    <table class="table table-condensed small table-hover" id="pcap-attachments">
       <thead>
       <tr>
         <td class="narrow-column"><input type="checkbox" class="selectallcheckbox"></td>
@@ -65,7 +69,7 @@
       </tr>
       </thead>
       <tbody>
-        <% @attachments.each do |attachment| %>
+        <% @pcap_attachments.each do |attachment| %>
         <tr>
           <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box"> </td>
           <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
@@ -97,8 +101,51 @@
     <% else %>
       <p class="small text-muted top-space center"><em>No attached files.</em></p>
     <% end %>
+    <% if @other_attachments.any? %>
+        <table class="table table-condensed small table-hover hidden" id="other-attachments">
+          <thead>
+          <tr>
+            <td class="narrow-column"><input type="checkbox" class="selectallcheckbox"></td>
+            <td class="narrow-column"></td>
+            <td>Filename</td>
+            <td>Alerts</td>
+          </tr>
+          </thead>
+          <tbody>
+          <% @other_attachments.each do |attachment| %>
+              <tr>
+                <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box"> </td>
+                <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
+                  <i class="glyphicon glyphicon-download"></i></a></td>
+                <td><code><a><%= attachment.file_name %></a></code></td>
+                <td class="center narrow-column">
+                  <h5>
+                    <a><%= attachment.rules.count %></a>
+                  </h5>
+                </td>
+              </tr>
+              <% if attachment.rules %>
+                  <tr style="display: none;">
+                    <td></td><td colspan=2>
+                    <table class="table-condensed small">
+                      <% attachment.rules.each do |rule| %>
+                          <tr>
+                            <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
+                            <td><strong><%= rule.message %></strong></td>
+                          </tr>
+                      <% end %>
+                    </table>
+                  </td>
+                  </tr>
+              <% end %>
+          <% end %>
+          </tbody>
+        </table>
+    <% else %>
+        <p class="small text-muted top-space center"><em>No attached files.</em></p>
+    <% end %>
     <% if @obsolete_attachments %>
-      <table class="table table-condensed small table-hover" id="obsolete-attachments" style="display: none;">
+      <table class="table table-condensed small table-hover hidden" id="obsolete-attachments">
         <thead>
         <tr>
           <td class="narrow-column"></td>

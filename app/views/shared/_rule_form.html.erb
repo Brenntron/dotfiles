@@ -67,7 +67,7 @@
               <% end %>
             </select>
             <select class="form-control select-sm connectionForm" name="rule[connection][]">
-              <% ['$HOME_NET', '$EXTERNAL_NET', '$DNS_SERVERS', '$SMTP_SERVERS', '$HTTP_SERVERS', '$SQL_SERVERS',
+              <% ['$EXTERNAL_NET', '$HOME_NET', '$DNS_SERVERS', '$SMTP_SERVERS', '$HTTP_SERVERS', '$SQL_SERVERS',
                   '$TELNET_SERVERS', '$SSH_SERVERS', '$FTP_SERVERS','$SIP_SERVERS', '$AIM_SERVERS','$HTTP_PORTS','$SHELLCODE_PORTS',
                   '$ORACLE_PORTS', '$SSH_PORTS', '$FTP_PORTS', '$SIP_PORTS', '$FILE_DATA_PORTS'].each do |dstsrc| %>
                   <option value=<%= dstsrc %>><%= dstsrc %></option>
@@ -80,9 +80,9 @@
               <% end %>
             </select>
             <select class="form-control select-sm connectionForm" name="rule[connection][]">
-              <% ['$HOME_NET', '$EXTERNAL_NET', '$DNS_SERVERS', '$SMTP_SERVERS', '$HTTP_SERVERS', '$SQL_SERVERS',
+              <% ['$FILE_DATA_PORTS', '$HOME_NET', '$EXTERNAL_NET', '$DNS_SERVERS', '$SMTP_SERVERS', '$HTTP_SERVERS', '$SQL_SERVERS',
                   '$TELNET_SERVERS', '$SSH_SERVERS', '$FTP_SERVERS','$SIP_SERVERS', '$AIM_SERVERS','$HTTP_PORTS','$SHELLCODE_PORTS',
-                  '$ORACLE_PORTS', '$SSH_PORTS', '$FTP_PORTS', '$SIP_PORTS', '$FILE_DATA_PORTS'].each do |dstsrc| %>
+                  '$ORACLE_PORTS', '$SSH_PORTS', '$FTP_PORTS', '$SIP_PORTS'].each do |dstsrc| %>
                   <option value="<%= dstsrc %>"><%= dstsrc %></option>
               <% end %>
             </select>
@@ -117,7 +117,7 @@
         </div>
         <div class="col-xs-10 form-inline">
           <select class="form-control select-sm code flow_form" name="rule[flow][]" id="new-rule-flow">
-            <% ['to_server', 'to_client'].each do |flow| %>
+            <% ['to_client', 'to_server'].each do |flow| %>
                 <option value=<%= flow %>><%= flow %></option>
             <% end %>
           </select>
@@ -169,10 +169,16 @@
         <div class="col-xs-10 form-inline">
           <label for="metadata-policy">Policy:&nbsp;&nbsp;</label>
           <select class="form-control select-sm code metadata_form" name="rule[metadata][]" id="new-rule-metadata-policy">
-            <option value=""> -- </option>
-            <% ['security-ips drop', 'balanced-ips drop, security-ips drop','connectivity-ips, balanced-ips drop, security-ips drop', 'max-detect-ips drop'].each do |policy| %>
-                <option value="<%= policy %>"><%= policy %></option>
+            <% ['security-ips', 'balanced-ips, security-ips','connectivity-ips, balanced-ips, security-ips'].each do |policy| %>
+                <option value="<%= policy %>" <%= "selected" if policy == 'balanced-ips, security-ips' %>><%= policy %></option>
             <% end %>
+          </select>
+          &nbsp;
+          <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="max-detect">&nbsp;max-detect
+          &nbsp;
+          <select class="form-control select-sm code metadata_form" name="rule[metadata][]">
+            <option value="drop" selected>drop</option>
+            <option value="alert">alert</option>
           </select>
         </div>
       </div>
@@ -183,7 +189,7 @@
         </div>
         <div class="col-xs-8 col-sm-9">
           <% ['dns', 'ftp-data','http', 'imap', 'netbios-ssn', 'pop3', 'smtp'].each do |service| %>
-              <input type="checkbox" name="rule[metadata][]" class="metadata_form" value=<%= service %>>&nbsp;<%= service %>&nbsp;&nbsp;
+              <input type="checkbox" name="rule[metadata][]" class="metadata_form" value=<%= service %> <%= "checked" if service == 'ftp-data' || service == 'http' || service == 'imap' || service == 'pop3' %>>&nbsp;<%= service %>&nbsp;&nbsp;
           <% end %>
         </div>
       </div>
@@ -227,7 +233,7 @@
         </div>
         <div class="col-xs-10">
           <select class="form-control select-sm code" name="rule[class_type]" id="new-rule-classtype-form" required>
-            <% ['', 'attempted-admin', 'attempted-recon','attempted-user','policy-violation','shellcode-detect','trojan-activity','web-application-attack','misc-activity','bad-unknown'].each do |clas| %>
+            <% ['attempted-user', 'attempted-admin', 'attempted-recon','policy-violation','shellcode-detect','trojan-activity','web-application-attack','misc-activity','bad-unknown'].each do |clas| %>
                 <option value="<%= clas %>"><%= clas %></option>
             <% end %>
           </select>
@@ -236,7 +242,19 @@
     </div>
     <div class="form-group">
       <div class="col-xs-12 references_add">
-        <h5>References &nbsp;&nbsp;<a class="top-space add_reference_btn h6 blue"><i class="glyphicon glyphicon-plus"></i> add reference</a></h5>
+        <h5>References</h5>
+        <div class="entry-type-switch">
+        </div>
+        <div class="col-xs-10">
+          <select class="form-control select-sm code" name="references" id="new-rule-ref-form">
+            <option>--</option>
+            <% @bug.references.each do |ref| %>
+                <option value="<%= ref.reference_type.name+ ":" +ref.reference_data %>"><%= ref.reference_type.name+ ": " +ref.reference_data %></option>
+            <% end %>
+            <option value="custom_ref">new reference</option>
+          </select>
+        </div>
+        <div class="col-xs-1"></div>
       </div>
     </div>
     </div>
@@ -251,23 +269,40 @@
 </div>
 
 <script>
-  var reference_form = '<div class="form-inline" style="padding:0 20px 10px 50px;">'+
-      '<div class="form-group">'+
-      '<select name="rule[reference][][reference_type_id]" class="form-control select-sm code">'+
-      '<option class="text-muted" value="" selected> - </option>'+
-      '"<% @ref_types.each do |ref| %> <option value="<%= ref.name %>"><%= ref.name %></option><% end %>"'+
-      '</select>'+
-      '</div>'+
-      '<div class="form-group">'+
-      '<input class="form-control select-sm code" placeholder="reference data" name="rule[reference][][reference_data]" required="true">'+
-      '</div>'+
-      '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>'+
-      '</div>';
 
-  $(document).on('click', '.add_reference_btn', function() {
+  $(document).on('change', '#new-rule-ref-form', function() {
+    arr = $('#new-rule-ref-form').val().split(/:/);
+    arr = $('#new-rule-ref-form').val().split(/:/);
+    if(arr[0] != "custom_ref"){
+      var reference_form = '<div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">'+
+          '<div class="form-group">'+
+          '<input type="text" name="rule[reference][][reference_type_id]" class="form-control select-sm code" size="8" value="'+arr[0]+'">'+
+          '</div>&nbsp;&nbsp;'+
+          '<div class="form-group">'+
+          '<input class="form-control select-sm code" name="rule[reference][][reference_data]" value="'+arr[1]+'">'+
+          '</div>'+
+          '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>'+
+          '</div></div>';
+    }else{
+      var reference_form = '<div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">'+
+          '<div class="form-group">'+
+          '<select type="text" name="rule[reference][][reference_type_id]" class="form-control select-sm code">'+
+          '<option class="text-muted" value="" selected> - </option>'+
+          '"<% @ref_types.each do |ref| %> <option value="<%= ref.name %>"><%= ref.name %></option><% end %>"'+
+          '</select>'+
+          '</div>'+
+          '<div class="form-group">'+
+          '<input class="form-control select-sm code" placeholder="reference data" name="rule[reference][][reference_data]" required="true">'+
+          '</div>'+
+          '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>'+
+          '</div></div>';
+    }
     var reference = $(this).parents('.references_add');
+    if(arr[0] != "--"){
     $(reference_form).appendTo(reference);
-    return false;
+    $("#new-rule-ref-form").val("--");
+  }
+
   });
 
   $(document).on('click', '.remove-ref', function(e) {
