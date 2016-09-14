@@ -62,34 +62,4 @@ $(document).ready(function() {
     });
 
 
-    $(document).on('click', '.connection, .scratch_connection', function () {
-        var form = $(this).parents('.standard_form');
-        if (form.find('.connection').prop("checked"))
-        {
-            form.find('.scratch_connection_text').prop('disabled', true);
-        } else {
-            form.find('.scratch_connection_text').prop('disabled', false);
-        };
-    });
-
-    $(document).on('click', '.flow, .scratch_flow', function () {
-        var form = $(this).parents('.standard_form');
-        if (form.find('.flow').prop("checked"))
-        {
-            form.find('.scratch_flow_text').prop('disabled', true);
-        } else {
-            form.find('.scratch_flow_text').prop('disabled', false);
-        };
-    });
-    $(document).on('click', '.metadata, .scratch_metadata', function () {
-        var form = $(this).parents('.standard_form');
-        if (form.find('.metadata').prop("checked"))
-        {
-            form.find('.scratch_metadata_text').prop('disabled', true);
-        } else {
-            form.find('.scratch_metadata_text').prop('disabled', false);
-        };
-    });
-
-
 });

@@ -103,23 +103,32 @@ $ ->
         ), 5000
     }
 
-  $('.scratch_connection, .connection').click ->
+  $(document).on 'change', '.scratch_connection, .connection', ->
+    form = $(this).parents('.standard_form');
     if $('.scratch_connection').is(":checked")
       $('.connectionForm').prop('disabled', true)
+      form.find('.scratch_connection_text').prop('disabled', false)
     else
       $('.connectionForm').prop('disabled', false)
+      form.find('.scratch_connection_text').prop('disabled', true)
 
-  $('.scratch_flow, .flow').click ->
+  $(document).on 'change', '.scratch_flow, .flow', ->
+    form = $(this).parents('.standard_form')
     if $('.scratch_flow').is(":checked")
       $('.flow_form').prop('disabled', true)
+      form.find('.scratch_flow_text').prop('disabled', false)
     else
       $('.flow_form').prop('disabled', false)
+      form.find('.scratch_flow_text').prop('disabled', true)
 
-  $('.scratch_metadata, .metadata').click ->
+  $(document).on 'change', '.scratch_metadata, .metadata', ->
+    form = $(this).parents('.standard_form')
     if $('.scratch_metadata').is(":checked")
       $('.metadata_form').prop('disabled', true)
+      form.find('.scratch_metadata_text').prop('disabled', false)
     else
       $('.metadata_form').prop('disabled', false)
+      form.find('.scratch_metadata_text').prop('disabled', true)
 
   $('.create').on "click", '.save-rule-btn', (e) ->
     e.preventDefault()
@@ -174,7 +183,7 @@ $ ->
       references = ""
       form.find('input[name="rule[reference][][reference_data]"]').each ->
         ref_values.push($(this).val())
-      form.find('select[name="rule[reference][][reference_type_id]"]').each ->
+      form.find('select[name="rule[reference][][reference_type_id]"], input[name="rule[reference][][reference_type_id]"]').each ->
         ref_types.push($(this).val())
       i = 0
       ref_types.forEach (item) ->
@@ -199,12 +208,9 @@ $ ->
             location.reload true
       }
 
-
-
-
   $('.edit').on "click", '.update-rule-btn', (e) ->
     e.preventDefault()
-    form = $(this).parents('.legacy_form')
+    form = $(this).parents('.edit_legacy_form')
     rule_content = form.find('textarea[name="rule[rule_content]"]').val()
     id = form.find('input[name="rule_id"]').val()
     rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}

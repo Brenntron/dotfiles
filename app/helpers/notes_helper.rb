@@ -5,9 +5,9 @@ module NotesHelper
   end
 
   def get_last_notes type, author
-    last_bug = @bug.notes.where("note_type=? and author=?", type, author).last if @bug.notes != []
-    last_bug = @bug.notes.where("note_type=?", type).last if last_bug.notes_bugzilla_id
-    last_bug
+    last_note = @bug.notes.where("note_type=? and author=?", type, author).last unless @bug.notes.empty?
+    last_note = @bug.notes.where("note_type=?", type).last if last_note && last_note.notes_bugzilla_id
+    last_note
   end
 
   def get_username(email)

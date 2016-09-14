@@ -101,7 +101,6 @@ $ ->
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
         $('#researchNotesPublishBtn').attr('disabled', true)
-        $('#researchNotesEditBtn').html('new')
         div = '<div class="row top-space research-note">'+
           '<div class="col-xs-6">'+
           '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+
@@ -152,7 +151,6 @@ $ ->
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
         $('#committerNotesPublishBtn').attr('disabled', true)
-        $('#committerNotesEditBtn').html('new')
         div = '<div class="row top-space research-note">'+
           '<div class="col-xs-6">'+
           '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+

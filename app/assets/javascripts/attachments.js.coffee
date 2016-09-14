@@ -1,12 +1,19 @@
 $ ->
 
-  $(document).on 'click', '#attachments-current', ->
-    $('#current-attachments').show()
-    $('#obsolete-attachments').hide()
+  $(document).on 'click', '#attachments-pcap', ->
+    $('#other-attachments').addClass('hidden')
+    $('#pcap-attachments').removeClass('hidden').show()
+    $('#obsolete-attachments').addClass('hidden')
+
+  $(document).on 'click', '#attachments-other', ->
+    $('#pcap-attachments').addClass('hidden')
+    $('#other-attachments').removeClass('hidden').show()
+    $('#obsolete-attachments').addClass('hidden')
 
   $(document).on 'click', '#attachments-obsolete', ->
-    $('#current-attachments').hide()
-    $('#obsolete-attachments').show()
+    $('#pcap-attachments').addClass('hidden')
+    $('#obsolete-attachments').removeClass('hidden').show()
+    $('#other-attachments').addClass('hidden')
 
   $(document).on 'click', '#showAddAttachsToggle, #hideAddAttachsToggle', (e) ->
     e.preventDefault()

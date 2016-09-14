@@ -42,7 +42,15 @@ class BugsController < ApplicationController
     @bug = Bug.find(params[:id])
     @rules = @bug.rules
     @ref_types = ReferenceType.all
-    @attachments = @bug.attachments.where(is_obsolete: false)
+    @pcap_attachments = []
+    @other_attachments = []
+    @bug.attachments.where(is_obsolete: false).map do |att|
+      if att.file_name.include? '.pcap'
+        @pcap_attachments << att
+      else
+        @other_attachments << att
+      end
+    end
     @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
     @tasks = @bug.tasks
     @notes = @bug.notes.order(created_at: :desc)
