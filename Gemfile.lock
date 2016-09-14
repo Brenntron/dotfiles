@@ -111,6 +111,7 @@ GEM
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
+    diffy (3.1.0)
     dotenv (2.0.2)
     dotenv-rails (2.0.2)
       dotenv (= 2.0.2)
@@ -369,6 +370,7 @@ DEPENDENCIES
   dalli (~> 2.6.4)
   database_cleaner (= 1.2.0)
   devise (= 3.2.2)
+  diffy
   dotenv-rails
   elasticsearch-model
   elasticsearch-rails

@@ -210,7 +210,7 @@ $ ->
 
   $('.edit').on "click", '.update-rule-btn', (e) ->
     e.preventDefault()
-    form = $(this).parents('.legacy_form')
+    form = $(this).parents('.edit_legacy_form')
     rule_content = form.find('textarea[name="rule[rule_content]"]').val()
     id = form.find('input[name="rule_id"]').val()
     rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
@@ -235,4 +235,3 @@ $ ->
           return
         ), 5000
     }
-

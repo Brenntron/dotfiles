@@ -35,6 +35,7 @@ gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 gem 'jbuilder', '~> 2.2.16'
 gem 'dotenv-rails'
+gem 'diffy'
 
 group :development do
   gem 'thin', '~> 1.6.3'

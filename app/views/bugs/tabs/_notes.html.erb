@@ -25,7 +25,11 @@
                 <button id="researchNotesCancelBtn" class="btn btn-default btn-sm"  style="display:none;">cancel</button>
                 <div class="top-space"></div>
                 <button id="researchNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
-                <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" <%= note.notes_bugzilla_id ? 'disabled' : '' %>>publish</button>
+                <% if note %>
+                  <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" <%= note.notes_bugzilla_id ? 'disabled' : ''  %>>publish</button>
+                <% else %>
+                  <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" disabled>publish</button>
+                <% end %>
               </div>
             </form>
         </div>
@@ -55,7 +59,11 @@
               <button id="committerNotesCancelBtn" class="btn btn-default btn-sm" style="display:none;">cancel</button>
               <div class="top-space"></div>
               <button id="committerNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
-              <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" <%= committer_note.notes_bugzilla_id ? 'disabled' : '' %>>publish</button>
+              <% if committer_note %>
+                <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" <%= committer_note.notes_bugzilla_id ? 'disabled' : ''  %>>publish</button>
+              <% else %>
+                <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" disabled>publish</button>
+              <% end %>
             </div>
           </form>
         </div>

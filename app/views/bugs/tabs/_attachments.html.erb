@@ -105,39 +105,19 @@
         <table class="table table-condensed small table-hover hidden" id="other-attachments">
           <thead>
           <tr>
-            <td class="narrow-column"><input type="checkbox" class="selectallcheckbox"></td>
             <td class="narrow-column"></td>
             <td>Filename</td>
-            <td>Alerts</td>
           </tr>
           </thead>
           <tbody>
           <% @other_attachments.each do |attachment| %>
               <tr>
-                <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box"> </td>
                 <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
                   <i class="glyphicon glyphicon-download"></i></a></td>
                 <td><code><a><%= attachment.file_name %></a></code></td>
                 <td class="center narrow-column">
-                  <h5>
-                    <a><%= attachment.rules.count %></a>
-                  </h5>
                 </td>
               </tr>
-              <% if attachment.rules %>
-                  <tr style="display: none;">
-                    <td></td><td colspan=2>
-                    <table class="table-condensed small">
-                      <% attachment.rules.each do |rule| %>
-                          <tr>
-                            <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
-                            <td><strong><%= rule.message %></strong></td>
-                          </tr>
-                      <% end %>
-                    </table>
-                  </td>
-                  </tr>
-              <% end %>
           <% end %>
           </tbody>
         </table>
