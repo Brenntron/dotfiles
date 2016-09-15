@@ -1,0 +1,13 @@
+<form id="change_editor_form" style="display:none;" class="form-inline top-space">
+  <div class="form-group row">
+    <div class="col-xs-12 col-lg-10">
+      <select class="form-control input-sm" id="bug_editor">
+        <option value="" disabled selected>select user</option>
+        <% @users.each do |user| %>
+          <option value='<%= user.id %>'><%= user.cvs_username %></option>
+        <% end %>
+      </select>
+      <button class="btn btn-xs btn-default" value="submit" type="submit">done</button>
+    </div>
+  </div>
+</form>

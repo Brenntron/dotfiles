@@ -6,9 +6,9 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
 
-  after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
-  after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
-  after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
+  #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
+  #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
+  #after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
   def record action
     record = {resource: 'rule',
@@ -16,6 +16,12 @@ class Rule < ActiveRecord::Base
               id: self.id,
               obj: self}
     PublishWebsocket.push_changes(record)
+  end
+
+  def create_references(references)
+    references.each do |reference|
+      self.references << Reference.create(reference.permit(:reference_type_id, :reference_data))
+    end
   end
 
   def self.create_a_rule(content)
@@ -189,7 +195,6 @@ class Rule < ActiveRecord::Base
 
   def self.parse_and_create_rule(rule)
     parsed = Rule.visruleparser(rule)
-
     if parsed[:rule].match(/FAILED/)
       rule_params = {
           :message => rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,

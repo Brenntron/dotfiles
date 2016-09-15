@@ -1,0 +1,33 @@
+<div class="row top-space">
+  <div class="col-xs-1">
+    <span class="small blue"><button class="btn btn-link"><i class="glyphicon glyphicon-arrow-left"></i> back</button></span>
+  </div>
+  <div class="col-xs-11">
+    <%  @rules.each do |rule| %>
+      <div class="col-xs-12 col-md-11 hidden rule_<%= rule.id %>">
+        <h4 class="blue">
+          <% if rule.sid %>
+            <%= "#{rule.gid}:#{rule.sid}:#{rule.rev}" %>
+          <% else %>
+            New rule
+          <% end %>
+        </h4>
+        <form role="form" class="edit_legacy_form">
+          <input type="hidden" name="rule_id" value="<%= rule.id %>">
+          <div class="form-group">
+            <div class="col-xs-12">
+              <label>Rule content</label>
+              <textarea class="form-control code select-sm" name="rule[rule_content]" rows="13" required="true"><%= rule.rule_content %></textarea>
+            </div>
+          </div>
+          <div class="form-group right">
+            <div class="col-xs-12">
+              <button class="btn btn-warning update-rule-btn" type="submit">Save Changes</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-xs-11"><hr></div>
+    <% end %>
+  </div>
+</div>

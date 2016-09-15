@@ -1,0 +1,26 @@
+<table class="table index-table">
+  <thead>
+  <tr>
+    <td><strong>Open</strong></td>
+    <td><strong>Pending</strong></td>
+    <td><strong>Closed</strong></td>
+    <td><strong>All</strong></td>
+    <td><strong>Committer</strong></td>
+  </tr>
+  </thead>
+  <tbody>
+  <% @users.each do |user| %>
+    <tr>
+      <td><%= user.bugs.length %></td>
+      <td><%= user.bugs.length %></td>
+      <td><%= user.bugs.length %></td>
+      <td><%= user.bugs.length %></td>
+      <td>
+        <% if user.committer %>
+          <i class="glyphicon glyphicon-ok"></i>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

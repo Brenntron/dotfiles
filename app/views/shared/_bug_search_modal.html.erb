@@ -1,0 +1,76 @@
+<div id="searchWindow" style="display: none;">
+
+  <button type="button" class="close" data-dismiss="modal">
+    <span aria-hidden="true">&times;</span>
+    <span class="sr-only">Close</span>
+  </button>
+  <h4 class="modal-title" style="text-align: center;">
+    Search
+  </h4>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form class="form-horizontal" action="/bugs" id="search-bugs-form">
+      <div class="form-group form-inline col-xs-12 col-sm-11">
+        <label for="bugzilla" class="col-sm-2 control-label" >Bugzilla Id</label>
+        <div class="col-xs-3">
+          <input class="form-control" type="number" name="bug[bugzilla_id]">
+        </div>
+        <div class="col-xs-4 bugzilla_max" style="display: none;">
+          <label>TO &nbsp;&nbsp;</label>
+          <input class="form-control" type="number" name="bug[bugzilla_max]">
+        </div>
+        <div class="col-xs-3">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="bug[bug_range]"> range?
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-xs-12 col-sm-11">
+        <label for="summary" class="col-sm-2 control-label" >Summary</label>
+        <div class="col-sm-10">
+          <input class="form-control" type="text" name="bug[summary]">
+        </div>
+      </div>
+      <div class="form-group col-xs-12 col-sm-11">
+        <label for="user" class="col-sm-2 control-label" >User</label>
+        <div class="col-sm-10">
+          <select  class="form-control" name="bug[user_id]">
+            <option value=""> -- </option>
+            <% @users.each do |user| %>
+                <option value=<%= user.id %>><%= user.cvs_username %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group col-xs-12 col-sm-11">
+        <label for="committer" class="col-sm-2 control-label" >Committer</label>
+        <div class="col-sm-10">
+          <select  class="form-control" name="bug[committer_id]">
+            <option value=""> -- </option>
+            <% @users.each do |user| %>
+                <option value=<%= user.id %>><%= user.cvs_username %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group col-xs-12 col-sm-11">
+        <label for="state" class="col-sm-2 control-label" >Bug State</label>
+        <div class="col-sm-10">
+          <select  class="form-control" name='bug[state]'>
+            <option value= ""> -- </option>
+            <% @states.each do |state| %>
+                <option><%= state %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group col-xs-12 center">
+        <button class="btn btn-default" value="submit">submit</button>
+        <button class="btn btn-default reset">reset</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+
+    <div class='row item-info'>
+      <div class="row subheading">
+        <div class="col-xs-12 col-sm-3">
+          <h6>bugzilla id</h6>
+          <h3><a href="<%= get_bug_url %>" target="_blank"><%= @bug.id %></a><span class="tiny"><a href="<%= get_bug_url %>" target="_blank"><i class="glyphicon glyphicon-link"></i></a></span></h3>
+          <span class="visible-xs"><h6>summary</h6></span>
+        </div>
+
+        <div class="col-xs-4 col-sm-3 state">
+          <h6>state</h6>
+          <h5 class="top-space" id="current_bug_state"><%= @bug.state %> &nbsp;<a class="tiny text-muted change_current_bug_state"><em>change</em></a></h5>
+          <%= render 'shared/change_state_form' %>
+        </div>
+
+        <div class="col-xs-4 col-sm-3">
+          <h6>editor</h6>
+          <h4 class="top-space" id="current_bug_editor">
+            <% if @bug.user %>
+              <%= @bug.user.cvs_username %>&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>
+            <% else %>
+              <a class="tiny text-muted change_current_bug_editor"><em>assign</em></a>
+            <% end %>
+          </h4>
+          <%= render 'shared/change_editor_bug_form' %>
+        </div>
+
+        <div class="col-xs-4 col-sm-3">
+          <h6>committer</h6>
+          <h4 class="bug-user top-space" id="current_bug_committer">
+            <% if @bug.committer %>
+              <%= @bug.committer.cvs_username %>&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>
+            <% else %>
+              <a class="tiny text-muted change_current_bug_committer"><em>assign</em></a>
+            <% end %>
+          </h4>
+          <%= render 'shared/change_committer_bug_form' %>
+        </div>
+        <div class="col-sm-12 hidden-xs bug_summary">
+          <h6><%= @bug.summary %></h6>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+        </div>
+      </div>
+    </div>
+    <div class="spacer">
+      <%= render 'tabs' %>
+    </div>
+
+<div id="blanket" style="display:none;"></div>
+<div id="searchWindow" style="display:none;">
+  <div class="col-xs-1 col-xs-offset-11">
+  </div>
+  <div class="row center">
+    <h3>Search</h3>
+  </div>
+  <div class="row">
+  </div>
+</div>
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="xml_token" value="<%= xml_token %>">

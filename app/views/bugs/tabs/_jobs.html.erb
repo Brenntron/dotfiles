@@ -1,0 +1,65 @@
+<div class="row top-space">
+  <div class="col-sm-12">
+    <h4 class="blue">&nbsp; Task Logs</h4>
+  </div>
+  <div class="col-sm-12">
+    <table class="table table-condensed table-striped small">
+      <thead>
+      <tr>
+        <td class="narrow-column">Completed</td>
+        <td class="narrow-column">Failed</td>
+        <td>Type</td>
+        <td class="narrow-column">Time</td>
+        <td class="narrow-column">Committed</td>
+        <td>Result</td>
+        <td>User</td>
+        <td class="narrow-column">CreatedAt</td>
+      </tr>
+      </thead>
+      <tbody>
+        <% if @tasks.any? %>
+          <% @tasks.each do |task| %>
+            <tr>
+              <% if task.completed %>
+                <td class="center"><input type="checkbox" checked></td>
+              <% else %>
+                  <td class="center"><input type="checkbox"></td>
+              <% end %>
+              <% if task.failed %>
+                <td class="center failed-bg"><input type="checkbox" checked></td>
+              <% else %>
+                <td class="center"><input type="checkbox"></td>
+              <% end %>
+              <td><%= task.task_type %></td>
+              <td></td>
+              <td></td>
+              <td class="no-overflow"><a><%= task.result %></a></td>
+              <td><%= User.find(task.user_id).cvs_username %></td>
+              <td><%= task.created_at.strftime("%m/%d/%y") %></td>
+            </tr>
+            <tr style="display:none;">
+              <td colspan="7" class="code">
+                <strong>Rules:</strong>
+                <% task.rules.each do |rule| %>
+                  <%= rule.id %>,
+                <% end %>
+                <br/>
+                <strong>Attachments:</strong>
+                <% task.attachments.each do |attach| %>
+                  <%= attach.file_name %>,
+                <% end %>
+                <br/>
+                <strong>Result:</strong><br/>
+                <%= task.result %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="7" class="center text-muted"><em>No tasks for this bug.</em></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

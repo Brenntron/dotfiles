@@ -20,7 +20,6 @@ module Api
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-
     config.middleware.use Rack::Cors do
       allow do
         origins '*'
@@ -72,4 +71,6 @@ module Api
     config.max_attachment_size = 50000000 # 50MB
     config.job_timeout = 300    # 5 minutes
   end
+
+
 end

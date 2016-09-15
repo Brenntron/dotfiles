@@ -1,0 +1,73 @@
+<div class="row top-space">
+  <div class="panel-group minimal-panel-group col-xs-12"  role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="research_notes_heading">
+        <div class="alert_notes"></div>
+        <h4 class="panel-title">
+          <a class="collapsed" data-toggle="collapse"  href="#research_notes_collapse" aria-expanded="false" aria-controls="collapseTwo">
+            <span class="blue">Research notes</span>
+          </a> <span class="caret"></span>
+          &nbsp;&nbsp;
+        </h4>
+      </div>
+      <% note = get_last_notes 'research', current_user.email %>
+      <div id="research_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingTwo">
+        <div class="panel-body row">
+            <form id="notes_form">
+              <div class="form-group col-xs-12 col-md-10">
+                <textarea class="form-control disabled code select-sm" name="research_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= note ? note.comment : "" %></textarea>
+                <input type="hidden" name="note_id" value="<%= note ? note.id : nil %>">
+              </div>
+              <input type="hidden" name="note_type" value="research">
+              <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
+              <div class="form-group col-xs-12 col-md-2 right">
+                <button id="researchNotesEditBtn" class="btn btn-default btn-sm">edit</button>
+                <button id="researchNotesCancelBtn" class="btn btn-default btn-sm"  style="display:none;">cancel</button>
+                <div class="top-space"></div>
+                <button id="researchNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
+                <% if note %>
+                  <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" <%= note.notes_bugzilla_id ? 'disabled' : ''  %>>publish</button>
+                <% else %>
+                  <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" disabled>publish</button>
+                <% end %>
+              </div>
+            </form>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="committer_notes_heading">
+        <h4 class="panel-title">
+          <a class="collapsed" data-toggle="collapse"  href="#comm_notes_collapse" aria-expanded="false" aria-controls="collapseThree">
+            <span class="blue">Committer notes</span>
+          </a> <span class="caret"></span>
+          &nbsp;&nbsp;
+        </h4>
+      </div>
+      <% committer_note = get_last_notes 'committer', current_user.email %>
+      <div id="comm_notes_collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+        <div class="panel-body row">
+          <form id="committer_notes_form">
+            <div class="form-group col-xs-12 col-md-10 col-lg-11">
+              <textarea class="form-control disabled code select-sm" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= committer_note ? committer_note.comment : "" %></textarea>
+              <input type="hidden" name="committer_note_id" value="<%= committer_note ? committer_note.id : nil %>">
+            </div>
+            <input type="hidden" name="committer_type" value="committer">
+            <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
+            <div class="form-group col-xs-12 col-md-2 col-lg-1 right">
+              <button id="committerNotesEditBtn" class="btn btn-default btn-sm">edit</button>
+              <button id="committerNotesCancelBtn" class="btn btn-default btn-sm" style="display:none;">cancel</button>
+              <div class="top-space"></div>
+              <button id="committerNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
+              <% if committer_note %>
+                <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" <%= committer_note.notes_bugzilla_id ? 'disabled' : ''  %>>publish</button>
+              <% else %>
+                <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" disabled>publish</button>
+              <% end %>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

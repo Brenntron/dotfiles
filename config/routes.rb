@@ -15,9 +15,23 @@ Rails.application.routes.draw do
     resources :rule_configurations, :defaults => { :format => 'json' }
   end
 
-
-  post "sessions/create.:format" => "sessions#create", :constraints => { :format => /json/}
+  get 'rules/add_form' => 'rules#add_form', format: 'js'
+  post "bugs/:id/create_rules" => "bugs#create_rules"
+  get 'bugs/new' => 'bugs#new'
+  post 'bugs' => 'bugs#create'
+  post "sessions/create" => "sessions#create"
+  post "/attachments" => "attachments#create"
   root 'pages#index'
+  delete '/rules' => 'rules#destroy'
+  resources 'rules'
+  resources 'users'
+  resources 'bugs' do
+    resources 'references'
+  end
+
+  post '/notes' => 'notes#create'
+  put '/notes/publish_to_bugzilla' => 'notes#publish_to_bugzilla'
+
 
   mount API::Base => '/api'
   mount GrapeSwaggerRails::Engine => '/documentation'

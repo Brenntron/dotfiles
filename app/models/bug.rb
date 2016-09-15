@@ -12,6 +12,9 @@ class Bug < ActiveRecord::Base
   has_many :tasks, :dependent => :destroy
   has_many :notes, :dependent => :destroy
 
+  accepts_nested_attributes_for :references
+  accepts_nested_attributes_for :rules
+
   enum classification: {
       unclassified: 0,
       confidential: 1,
@@ -20,9 +23,9 @@ class Bug < ActiveRecord::Base
       top_secret_sci: 4
   }
 
-  after_create { |bug| bug.record 'create' if Rails.configuration.websockets_enabled == "true" }
-  after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == "true" }
-  after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
+  #after_create { |bug| bug.record 'create' if Rails.configuration.websockets_enabled == "true" }
+  #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == "true" }
+  #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
   def record action
     obj = JSON.parse(BugSerializer.new(self).to_json)
@@ -34,6 +37,7 @@ class Bug < ActiveRecord::Base
               obj: obj.except("notes", "attachments", "rules", "references", "tasks", "exploits")}
     PublishWebsocket.push_changes(record)
   end
+
 
   def get_state(status, resolution, user)
     bug_state = 'OPEN'
@@ -56,6 +60,20 @@ class Bug < ActiveRecord::Base
       changed_bug = Bugzilla::Bug.new(xmlrpc).update(options) #the bugzilla session is where we authenticate
     end
     changed_bug
+  end
+
+  def self.bugs_with_search(params)
+    if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
+      params.delete_if { |k,v| v == "" }
+      count = 0
+      query = ''
+      params.each do |k,v|
+        count = count+1
+        query = query + k + "='" + v + "'"
+        query = query + " && " if count != params.count
+      end
+      Bug.where(query)
+    end
   end
 
   def update_attachments(xmlrpc)

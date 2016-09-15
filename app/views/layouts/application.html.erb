@@ -1,25 +1,54 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Backend</title>
-  <%= csrf_meta_tags %>
-</head>
-<body>
-
-
-<% if notice %>
-    <div id="error_messages" class="fixed_alerts alert alert-info  fade in" data-alert="alert">
-      <%= raw "<p>#{notice}</p>" %>
+  <head>
+    <title>Rules UI</title>
+    <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+    <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
+  <% if controller_name == 'bugs' %>
+    <%= render 'shared/bug_search_modal' %>
+  <% end %>
+    <div class="sidebar">
+      <div class="sidebar-header center">
+        <h1 class="logo"><%= link_to 'RulesUI', root_url  %></h1>
+        <div class="sidebar-footer">
+          <p>&copy; 2015 Cisco Systems, Inc</p>
+        </div>
+      </div>
+      <nav class="navbar nav-stacked rules-ui-nav">
+        <ul class="nav nav-stacked">
+          <li><%= link_to 'BUG LIST', bugs_path %></li>
+          <li><%= link_to 'USERS', users_path %></li>
+        </ul>
+      </nav>
     </div>
-<%elsif alert%>
-    <div id="error_messages" class="fixed_alerts alert alert-danger">
-      <%= raw "<p>#{alert}</p>" %>
+    <div class="overall" id="main-content">
+      <div class="container-fluid">
+        <div class="row">
+          <a class="sidebar-toggle">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <p class="login-area">
+            <% if current_user %>
+              <span class="login-label"> <strong><%= current_user[:display_name] %></strong> </span>
+            <% end %>
+            <% if controller_name == 'bugs' %>
+              <%= render 'layouts/bugs_layout'%>
+            <% elsif controller_name == "users" %>
+              <%= render 'layouts/users_layout'%>
+            <% end %>
+          </p>
+        </div>
+      </div>
     </div>
-<% else %>
-    <div id="error_messages">
-    </div>
-<% end %>
-<%= yield %>
+    <% if controller_name != 'bugs' && controller_name != "users" %>
+      <%= yield %>
+    <% end %>
 
-</body>
+  </body>
 </html>
+

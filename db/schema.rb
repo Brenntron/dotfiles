@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160108224914) do
+ActiveRecord::Schema.define(version: 20160722172425) do
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
@@ -131,6 +131,7 @@ ActiveRecord::Schema.define(version: 20160108224914) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
+    t.integer  "notes_bugzilla_id"
   end
 
   add_index "notes", ["bug_id"], name: "index_notes_on_bug_id", using: :btree

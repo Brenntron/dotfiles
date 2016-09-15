@@ -1,0 +1,36 @@
+<div id="referenceWindow" style="display:none;">
+  <div class="row center">
+    <a data-dismiss="modal" class="text-muted small">close</a>
+    <h4>Add a reference</h4>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group col-xs-12 col-sm-11">
+        <label for="state" class="col-sm-2 control-label">Reference Type</label>
+
+        <div class="col-sm-10">
+          <select class="form-control" id='reference-bugs-type'>
+            <option value=""> --</option>
+            <% @ref_types.each do |type| %>
+                <option value=<%= type.id %>><%= type.name %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group col-xs-12 col-sm-11">
+        <label for="summary" class="col-sm-2 control-label">Content</label>
+
+        <div class="col-sm-10">
+          <input class="form-control" type="text" name="content">
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="row center top-space">
+    <div class="col-xs-10 col-xs-offset-1">
+      <button class="btn btn-default"  id="add_reference">Add Reference</button>
+    </div>
+  </div>
+
+</div>

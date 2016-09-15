@@ -1,0 +1,30 @@
+<div class="bug-tabs" style="padding-left: 25px;">
+  <ul class="nav nav-tabs" id="myTab">
+    <li class="active"><a data-target="#overview" data-toggle="tab">Overview</a></li>
+    <li><a data-target="#rules-tab" data-toggle="tab">Rules</a></li>
+    <li><a data-target="#attachments-tab" data-toggle="tab">Attachments</a></li>
+    <li><a data-target="#notes-tab" data-toggle="tab">Notes</a></li>
+    <li><a data-target="#history-tab" data-toggle="tab">History</a></li>
+    <li><a data-target="#jobs-tab" data-toggle="tab">Jobs</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="overview">
+      <%= render 'bugs/tabs/overview' %>
+    </div>
+    <div class="tab-pane" id="rules-tab">
+      <%= render 'bugs/tabs/rules' %>
+    </div>
+    <div class="tab-pane" id="attachments-tab">
+      <%= render 'bugs/tabs/attachments' %>
+    </div>
+    <div class="tab-pane" id="notes-tab">
+      <%= render 'bugs/tabs/notes' %>
+    </div>
+    <div class="tab-pane" id="history-tab">
+      <%= render 'bugs/tabs/history' %>
+    </div>
+    <div class="tab-pane" id="jobs-tab">
+      <%= render 'bugs/tabs/jobs' %>
+    </div>
+  </div>
+</div>
