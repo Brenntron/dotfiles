@@ -68,12 +68,12 @@
           <td><code><a><%= attachment.file_name %></a></code></td>
           <td class="center narrow-column">
             <h5>
-              <a><%= attachment.rules.count %></a>
+              <a class="attachment_alert <%= attachment.id %>"><%= attachment.rules.count %></a>
             </h5>
           </td>
         </tr>
-        <% if attachment.rules %>
-          <tr style="display: none;">
+        <% if attachment.rules.any? %>
+          <tr style="display: none;" id="attachment_<%= attachment.id %>">
             <td></td><td colspan=2>
             <table class="table-condensed small">
               <% attachment.rules.each do |rule| %>

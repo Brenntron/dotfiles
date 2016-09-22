@@ -22,6 +22,10 @@ $ ->
   $(document).on 'click','.selectallcheckbox', ->
     $(".attach_check_box").prop("checked", $(".selectallcheckbox").prop("checked"))
 
+  $(document).on 'click','.attachment_alert', ->
+    id = $(this).attr('class')
+    id = id.slice(id.indexOf(' ')+1, id.length)
+    $('#attachment_'+id).toggle()
 
 
   $(document).on 'submit', '#attachment_form', (e) ->
