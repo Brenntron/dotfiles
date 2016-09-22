@@ -8,6 +8,22 @@ $ ->
   $(document).on 'click', '.change_current_bug_committer', ->
     $('#current_bug_committer, #change_committer_form').toggle()
 
+  $('.delete_bug').on 'click', ->
+    id = $(this).parents('tr').attr('id')
+    id = id.slice(id.indexOf("_")+1, id.length)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    if window.confirm("Are you sure?")
+      $.ajax {
+        url: '/api/v1/bugs/'+id
+        method: 'delete'
+        headers: headers
+        data: {api_key: 'h93hq@hwo9%@ah!jsh'}
+        success: (response) ->
+          window.location.reload()
+        error: (response) ->
+          alert 'Could not delete the bug'
+      }
+
   $(".reset").click (e) ->
     e.preventDefault();
     $(this).closest('form').find("input").val("")
