@@ -37,7 +37,7 @@
             <td><input type="checkbox" class="rule_check_box" value="<%= rule.id %>"></td>
             <td><%= rule.state %></td>
             <td>
-              <a class="blue" href="#">
+              <a class="blue show_rule" href="#">
                 <% if rule.sid %>
                   <strong><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></strong>
                 <% else %>
@@ -91,3 +91,19 @@
   </div>
 </div>
 <div class="row spacer"></div>
+
+<script>
+  $('.show_rule').on('click', function(e){
+    e.preventDefault();
+    var id = $(this).parents('tr').attr('id');
+    $('.overview').removeClass('active').addClass('hidden');
+    $('.view').removeClass('hidden').addClass('active').show();
+    $.each($('.rules_table tr'), function() {
+      var id = $(this).attr('id');
+      if(!isNaN(id)){
+        $('.rule_'+id).removeClass('active').addClass('hidden').hide();
+      }
+    });
+    $('.rule_'+id).removeClass('hidden').addClass('active').show();
+  });
+</script>

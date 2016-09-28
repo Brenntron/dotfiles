@@ -45,18 +45,9 @@
 </div>
 <div class="row top-bar">
   <div class="col-xs-12">
-    <button class="select-sm btn btn-link">
-      <strong class="hidden-xs" id="attachments-pcap">Pcap (<%= @pcap_attachments.count %>)&nbsp;&nbsp;</strong>
-      <i class="glyphicon glyphicon-eye-open"></i>
-    </button>
-    <button class="select-sm btn btn-link">
-      <strong class="hidden-xs" id="attachments-other">Other (<%= @other_attachments.count %>)&nbsp;&nbsp;</strong>
-      <i class="glyphicon glyphicon-eye-open"></i>
-    </button>
-    <button class="select-sm btn btn-link">
-      <strong class="hidden-xs" id="attachments-obsolete">Obsolete (<%= @obsolete_attachments.count %>) &nbsp;&nbsp;</strong>
-      <i class="glyphicon glyphicon-eye-close"></i>
-    </button>
+    <button class="select-sm btn btn-link" id="attachments-pcap" style="text-decoration: none;"><strong>Pcap (<%= @pcap_attachments.count %>)&nbsp;&nbsp;</strong></button>
+    <button class="select-sm btn btn-link" id="attachments-other" style="text-decoration: none;"><strong>Other (<%= @other_attachments.count %>)&nbsp;&nbsp;</strong></button>
+    <button class="select-sm btn btn-link" id="attachments-obsolete" style="text-decoration: none;"><strong>Obsolete (<%= @obsolete_attachments.count %>) &nbsp;&nbsp;</strong></button>
 
     <% if @pcap_attachments.any? %>
     <table class="table table-condensed small table-hover" id="pcap-attachments">
@@ -77,12 +68,12 @@
           <td><code><a><%= attachment.file_name %></a></code></td>
           <td class="center narrow-column">
             <h5>
-              <a><%= attachment.rules.count %></a>
+              <a class="attachment_alert <%= attachment.id %>"><%= attachment.rules.count %></a>
             </h5>
           </td>
         </tr>
-        <% if attachment.rules %>
-          <tr style="display: none;">
+        <% if attachment.rules.any? %>
+          <tr style="display: none;" id="attachment_<%= attachment.id %>">
             <td></td><td colspan=2>
             <table class="table-condensed small">
               <% attachment.rules.each do |rule| %>

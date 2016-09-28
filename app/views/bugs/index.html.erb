@@ -10,7 +10,7 @@
   </thead>
   <tbody>
   <% @bugs.each do |bug| %>
-      <tr>
+      <tr id="bug_<%= bug.id %>">
         <td><%= bug.summary %></td>
         <td>&nbsp;&nbsp;&nbsp;
           <%= bug.state %></td>
@@ -29,7 +29,7 @@
               -
           <% end %>
         </td>
-        <td><div class="delete-btn"></div></td>
+        <td><div class="delete-btn delete_bug"></div></td>
       </tr>
   <% end %>
   </tbody>
