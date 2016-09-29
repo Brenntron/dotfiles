@@ -24,6 +24,9 @@ $ ->
           alert 'Could not delete the bug'
       }
 
+  $('.back_btn').click ->
+    window.location.replace('/bugs')
+
   $(".reset").click (e) ->
     e.preventDefault();
     $(this).closest('form').find("input").val("")
