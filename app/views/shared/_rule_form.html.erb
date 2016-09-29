@@ -262,19 +262,21 @@
     </div>
     <div class="form-group">
       <div class="col-xs-12 references_add">
-        <h5>References</h5>
-        <div class="entry-type-switch">
-        </div>
-        <div class="col-xs-10">
-          <select class="form-control select-sm code" name="references" id="new-rule-ref-form">
-            <option>--</option>
-            <% @bug.references.each do |ref| %>
-                <option value="<%= ref.reference_type.name+ ":" +ref.reference_data %>"><%= ref.reference_type.name+ ": " +ref.reference_data %></option>
-            <% end %>
-            <option value="custom_ref">new reference</option>
-          </select>
-        </div>
-        <div class="col-xs-1"></div>
+        <h5>References&nbsp;&nbsp;<a class="top-space add-reference-btn blue"><i class="glyphicon glyphicon-plus"></i> add reference</a></h5>
+        <% if @bug.references.any? %>
+          <% @bug.references.each do |ref| %>
+            <div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">
+              <div class="form-group">
+                <input class="form-control select-sm code" name="rule[reference][][reference_type_id]" size=8 value="<%= ref.reference_type.name %>">
+              </div>
+              <div class="form-group">
+                <input class="form-control select-sm code" name="rule[reference][][reference_data]" value="<%= ref.reference_data %>">
+              </div>
+              <div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
       </div>
     </div>
     </div>
@@ -290,20 +292,7 @@
 
 <script>
 
-  $(document).on('change', '#new-rule-ref-form', function() {
-    arr = $('#new-rule-ref-form').val().split(/:/);
-    arr = $('#new-rule-ref-form').val().split(/:/);
-    if(arr[0] != "custom_ref"){
-      var reference_form = '<div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">'+
-          '<div class="form-group">'+
-          '<input type="text" name="rule[reference][][reference_type_id]" class="form-control select-sm code" size="8" value="'+arr[0]+'">'+
-          '</div>&nbsp;&nbsp;'+
-          '<div class="form-group">'+
-          '<input class="form-control select-sm code" name="rule[reference][][reference_data]" value="'+arr[1]+'">'+
-          '</div>'+
-          '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>'+
-          '</div></div>';
-    }else{
+  $(document).on('click', '.add-reference-btn', function() {
       var reference_form = '<div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">'+
           '<div class="form-group">'+
           '<select type="text" name="rule[reference][][reference_type_id]" class="form-control select-sm code">'+
@@ -316,13 +305,8 @@
           '</div>'+
           '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>'+
           '</div></div>';
-    }
     var reference = $(this).parents('.references_add');
-    if(arr[0] != "--"){
     $(reference_form).appendTo(reference);
-    $("#new-rule-ref-form").val("--");
-  }
-
   });
 
   $(document).on('click', '.remove-ref', function(e) {
