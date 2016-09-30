@@ -183,7 +183,7 @@ sub searchExploitdb
 	do {
 		$mech->get("https://www.exploit-db.com/search/?action=search&cve=$cve");
 		$numtries--;
-	} while(!($mech->success()) && ($numtries != 0) && (print ">>> Trying Exploit-DB again.\n"));
+	} while(!($mech->success()) && ($numtries != 0) && (print STDERR ">>> Trying Exploit-DB again.\n"));
 
 	my @results = $mech->content =~ /(https?:\/\/www.exploit-db.com\/exploits\/\d+)/smig;
 
@@ -206,7 +206,7 @@ sub searchMetasploit
 
 sub searchCore
 {
-	print ">>> Core Security link has changed.  Check disabled!\n";
+	print STDERR ">>> Core Security link has changed.  Check disabled!\n";
         setChecked("cs", "DISABLED");
         return;
 
@@ -227,7 +227,7 @@ sub searchCore
 sub searchOSVDB
 {
 
-        print ">>> Need to add CloudFlare bybass.  Check disabled!\n";
+        print STDERR ">>> Need to add CloudFlare bybass.  Check disabled!\n";
         setChecked("osvdb", "DISABLED");
         return;
 
@@ -255,7 +255,7 @@ sub searchOSVDB
 sub searchTelus
 {
 
-        print ">>> Contract negotiations FTL.  Check disabled!\n";
+        print STDERR ">>> Contract negotiations FTL.  Check disabled!\n";
         setChecked("telus", "DISABLED");
         return;
 

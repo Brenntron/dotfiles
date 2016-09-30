@@ -87,15 +87,7 @@
   </div>
   <div class="col-xs-12 code">
     <% if @bug.references.any? %>
-      <% @bug.references.each do |ref| %>
-        <% if ref.exploits %>
-          <% ref.exploits.each do |exploit|  %>
-            <div class="col-xs-12">
-              <p><%= exploit.exploit_type_id %><a {{bind-attr href=exploit_data}} target="_blank"><%= exploit.data %></a></p>
-            </div>
-          <% end %>
-        <% end %>
-      <% end %>
+      <p><%=exploit_link(@bug.references)%></p>
     <% end %>
     <p>----------------</p>
   </div>

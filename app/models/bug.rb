@@ -195,7 +195,7 @@ class Bug < ActiveRecord::Base
   def summary_sids
     sids = []
     unless summary.nil?
-      summary.scan(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/).each do |match|
+      summary.scan(/\[SID\]\s*([\d,\-]+)\b(?:\s)?/).each do |match|
         match[0].split(/[,\s]/).each do |part|
           if part =~ /(\d+)-(\d+)/
             sids << eval("#{$1}..#{$2}").to_a
