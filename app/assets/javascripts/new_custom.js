@@ -12,13 +12,8 @@ $(document).ready(function() {
             data: {'api_key': 'h93hq@hwo9%@ah!jsh'},
             headers: headers
         }).done(function(response) {
-            window.location.replace("/bugs");
+            window.location.replace("/bugs/"+id);
         });
-    });
-
-
-    $(function () {
-        $('#myTab a:first').tab('show');
     });
 
     $('.rules').click(function () {
