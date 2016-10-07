@@ -1,11 +1,11 @@
 module OverviewHelper
 
-  def exploit_link(references)
+  def find_exploit_link(references)
     types = ExploitType.all.select(:id,:name)
     exploits=Hash.new {|h,k| h[k] = [] }
     references.each do |ref|
       ref.exploits.each do |exploit|
-        exploits[types[exploit.exploit_type_id-1].name] << exploit.data
+        exploits[types[exploit.exploit_type_id-1].name] << [exploit.id, exploit.data, exploit.attachment]
       end
     end
     render "bugs/tabs/exploits", exploits: exploits

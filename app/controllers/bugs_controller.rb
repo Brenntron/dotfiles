@@ -52,7 +52,6 @@ class BugsController < ApplicationController
         @other_attachments << att
       end
     end
-    @exploits
     @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
     @tasks = @bug.tasks
     @notes = @bug.notes.order(created_at: :desc)

@@ -1,0 +1,8 @@
+.exploit_attach_success{
+    color:LimeGreen !important;
+    background:none !important;
+}
+.exploit_attach_missing{
+    color:red !important;
+    background:none !important;
+}
