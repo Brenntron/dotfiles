@@ -45,8 +45,10 @@ module API
                 bug = Bug.where(id:params[:id]).first
                 #parse the bug summary
                 parsed = bug.parse_summary
+                bug_rules = bug.rules.map {|r| r.id}
                 parsed[:sids].each do |sid|
-                  bug.rules << Rule.import_rule(sid)
+                  rule = Rule.import_rule(sid)
+                  bug.rules << rule unless bug_rules.include? rule.id
                 end
                 parsed[:tags].each do |tag|
                   bug.tags << Tag.find_or_create(tag)

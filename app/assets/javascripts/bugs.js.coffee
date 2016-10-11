@@ -1,4 +1,7 @@
 $ ->
+
+  $('#bug_tab a:first').tab('show')
+
   $(document).on 'click', '.change_current_bug_state', ->
     $('#current_bug_state, #change_state_form').toggle()
 
@@ -23,6 +26,9 @@ $ ->
         error: (response) ->
           alert 'Could not delete the bug'
       }
+
+  $('.back_btn').click ->
+    window.location.replace('/bugs')
 
   $(".reset").click (e) ->
     e.preventDefault();
