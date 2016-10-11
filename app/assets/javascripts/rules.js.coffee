@@ -2,6 +2,8 @@ $ ->
 
   $('.standard_form').hide()
 
+  $('.diff').find('br').remove()
+
   $(document).on 'click', '#legacy_btn, #standard_btn', (e) ->
     e.preventDefault()
     $('.legacy_form, #legacy_btn, .standard_form, #standard_btn').toggle()

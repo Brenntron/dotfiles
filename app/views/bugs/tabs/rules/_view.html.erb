@@ -17,7 +17,7 @@
           <pre><%= rule.rule_content %></pre>
         <% else %>
           <% if rule.rule_parsed && Diffy::Diff.new(rule.cvs_rule_parsed, rule.rule_parsed).to_s != "" %>
-            <p class="code"><%= simple_format Diffy::Diff.new(rule.cvs_rule_parsed, rule.rule_parsed).to_s.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') %></p>
+            <p class="code"><%= simple_format Diffy::Diff.new(rule.cvs_rule_parsed, rule.rule_parsed).to_s(:html).gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') %></p>
           <% elsif rule.rule_parsed %>
             <p class="code"><%= simple_format rule.rule_parsed.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') %></p>
           <% end %>

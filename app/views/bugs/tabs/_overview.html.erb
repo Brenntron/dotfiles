@@ -45,38 +45,7 @@
                 </div>
             <% end %>
         <% end %>
-        <% if @bug.references.telus.any? %>
-            <p>telus:</p>
-            <% @bug.references.telus.each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "telus") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
-        <% if @bug.references.apsb.any? %>
-            <p>apsb:</p>
-            <% @bug.references.apsb.each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "apsb") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
-        <% if @bug.references.msb.any? %>
-            <p>msb:</p>
-            <% @bug.references.msb.each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "msb") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
-        <% if @bug.references.osvdb.any? %>
-            <p>osvdb:</p>
-            <% @bug.references.osvdb.each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
+      <% end %>
     <% else %>
         <p>< MISSING ></p>
     <% end %>
