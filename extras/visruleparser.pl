@@ -23,13 +23,17 @@
 # Author: McLovin
 #
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../vrt/lib","$FindBin::Bin/../lib";
 use Net::Snort::Parser::Rule;
 use Net::Snort::Parser::File;
 use Data::Dumper;
 
 print "Parser version: " . $Net::Snort::Parser::Rule::VERSION . "\n";
+print "Visruleparser version: 2016.09.10\n";
 
 my $dumprulestruct = 0;  # for debug output, dump the rule structure for the first rule and exit
+my $speedtruffs = 0; # set to 1 to allow stream_reassemble rule option
 
 my $file = "";
 my $csv = 0;
@@ -62,6 +66,8 @@ if($file eq "") {
 my @VALID_VARS = qw( HOME_NET EXTERNAL_NET DNS_SERVERS SMTP_SERVERS HTTP_SERVERS SQL_SERVERS
                      TELNET_SERVERS SSH_SERVERS FTP_SERVERS SIP_SERVERS AIM_SERVERS HTTP_PORTS
                      SHELLCODE_PORTS ORACLE_PORTS SSH_PORTS FTP_PORTS SIP_PORTS FILE_DATA_PORTS );
+
+my $indent = length("References: "); # longest section header
 
 my $version = 9999;
 my $warning=0;
@@ -146,24 +152,29 @@ sub process_line {
    }
 
    # Verify variables in connection information
-   my ($src_net, $src_port, $dst_net, $dst_port) = $line =~ /^\s*#?\s*alert\s+[^\s]+\s+([^\s]+)\s+([^\s]+)\s*->\s*([^\s]+)\s+([^\s]+)/;
+   my ($src_net, $src_port, $dst_net, $dst_port) = $line =~ /^\s*#?\s*alert\s+[^\s]+\s+([^\s]+)\s+([^\s]+)\s*(?:<-|<>|->)\s*([^\s]+)\s+([^\s]+)/;
    #print "$src_net, $src_port, $dst_net, $dst_port\n";
    foreach my $connvar ($src_net, $src_port, $dst_net, $dst_port) {
-      if($connvar =~ /^\$/) {
-         $connvar =~ s/^\$//;
-         if(!grep(/^$connvar$/, @VALID_VARS)) {
-            $failure++;
-            push(@failed, "INVALID VARIABLE - $connvar");
-         }
-      } else {
-         # If not a variable, at least look somewhat like something valid
-         # This could be more robust.  It seems snort rule parser library
-         # doesn't validate this format so it seems this issue is deeper
-         # than just "library doesn't validate variable names because it
-         # has no way of knowing what's valid and what isn't." 
-         if(!($connvar =~ /^any$/) && !($connvar =~ /^[\d,\[\]\.!:]+$/)) {
-            $failure++;
-            push(@failed, "INVALID CONNECTION INFO - $connvar");
+      # If we have a ports list, split it into pieces.  This is to fix "ports list with variables" issue
+      $connvar =~ s/^\[?(.*)\]$/$1/; # Strip leading and trailing square brackets if present
+      my @mtoks = split(/,/, $connvar); # Marty tokens!
+      foreach my $mtok (@mtoks) {
+         if($mtok =~ /^\$/) {
+            $mtok =~ s/^\$//;
+            if(!grep(/^$mtok$/, @VALID_VARS)) {
+               $failure++;
+               push(@failed, "INVALID VARIABLE - $mtok");
+            }
+         } else {
+            # If not a variable, at least look somewhat like something valid
+            # This could be more robust.  It seems snort rule parser library
+            # doesn't validate this format so it seems this issue is deeper
+            # than just "library doesn't validate variable names because it
+            # has no way of knowing what's valid and what isn't." 
+            if(!($mtok =~ /^any$/) && !($mtok =~ /^[\d,\[\]\.!:\/]+$/)) {
+               $failure++;
+               push(@failed, "INVALID CONNECTION INFO - $mtok");
+            }
          }
       }
    }   
@@ -258,8 +269,8 @@ sub process_line {
       push(@warnings, "Should the rule message have the word \"attempt\"?") unless ($r->{name} =~ /^(BOTNET-CNC|BLACKLIST|MALWARE-BACKDOOR|MALWARE-CNC|MALWARE-OTHER|MALWARE-TOOLS) /);
    }
 
-   # Category list generated 18-JUN-2013
-   my @rulecategories = qw(APP-DETECT ATTACK-RESPONSES BACKDOOR BAD-TRAFFIC BLACKLIST BOTNET-CNC BROWSER-CHROME BROWSER-FIREFOX BROWSER-IE BROWSER-OTHER BROWSER-PLUGINS BROWSER-WEBKIT CHAT CONTENT-REPLACE DDOS DELETED DNS DOS EXPERIMENTAL EXPLOIT-KIT EXPLOIT FILE-EXECUTABLE FILE-FLASH FILE-IDENTIFY FILE-IMAGE FILE-JAVA FILE-MULTIMEDIA FILE-OFFICE FILE-OTHER FILE-PDF FINGER FTP ICMP-INFO ICMP IMAP INDICATOR-COMPROMISE INDICATOR-OBFUSCATION INDICATOR-SCAN INDICATOR-SHELLCODE INFO LOCAL MALWARE-BACKDOOR MALWARE-CNC MALWARE-OTHER MALWARE-TOOLS MISC MULTIMEDIA MYSQL NETBIOS NNTP ORACLE OS-LINUX OS-MOBILE OS-OTHER OS-SOLARIS OS-WINDOWS OTHER-IDS P2P PHISHING-SPAM POLICY-MULTIMEDIA POLICY-OTHER POLICY POLICY-SOCIAL POLICY-SPAM POP2 POP3 PROTOCOL-DNS PROTOCOL-FINGER PROTOCOL-FTP PROTOCOL-ICMP PROTOCOL-IMAP PROTOCOL-NNTP PROTOCOL-POP PROTOCOL-RPC PROTOCOL-SCADA PROTOCOL-SERVICES PROTOCOL-SNMP PROTOCOL-TELNET PROTOCOL-TFTP PROTOCOL-VOIP PUA-ADWARE PUA-OTHER PUA-P2P PUA-TOOLBARS RPC RSERVICES SCADA SCAN SERVER-APACHE SERVER-IIS SERVER-MAIL SERVER-MSSQL SERVER-MYSQL SERVER-ORACLE SERVER-OTHER SERVER-SAMBA SERVER-WEBAPP SHELLCODE SMTP SNMP SPECIFIC-THREATS SPYWARE-PUT SQL TELNET TFTP VIRUS VOIP WEB-ACTIVEX WEB-ATTACKS WEB-CGI WEB-CLIENT WEB-COLDFUSION WEB-FRONTPAGE WEB-IIS WEB-MISC WEB-PHP X11);
+   # Category list generated 01-JUL-2015
+   my @rulecategories = qw(APP-DETECT ATTACK-RESPONSES BACKDOOR BAD-TRAFFIC BLACKLIST BOTNET-CNC BROWSER-CHROME BROWSER-FIREFOX BROWSER-IE BROWSER-OTHER BROWSER-PLUGINS BROWSER-WEBKIT CHAT CONTENT-REPLACE DDOS DELETED DNS DOS EXPERIMENTAL EXPLOIT-KIT EXPLOIT FILE-EXECUTABLE FILE-FLASH FILE-IDENTIFY FILE-IMAGE FILE-JAVA FILE-MULTIMEDIA FILE-OFFICE FILE-OTHER FILE-PDF FINGER FTP ICMP-INFO ICMP IMAP INDICATOR-COMPROMISE INDICATOR-OBFUSCATION INDICATOR-SCAN INDICATOR-SHELLCODE INFO LOCAL MALWARE-BACKDOOR MALWARE-CNC MALWARE-OTHER MALWARE-TOOLS MISC MULTIMEDIA MYSQL NETBIOS NNTP ORACLE OS-LINUX OS-MOBILE OS-OTHER OS-SOLARIS OS-WINDOWS OTHER-IDS P2P PHISHING-SPAM POLICY-MULTIMEDIA POLICY-OTHER POLICY POLICY-SOCIAL POLICY-SPAM POP2 POP3 PROTOCOL-DNS PROTOCOL-FINGER PROTOCOL-FTP PROTOCOL-ICMP PROTOCOL-IMAP PROTOCOL-NNTP PROTOCOL-OTHER PROTOCOL-POP PROTOCOL-RPC PROTOCOL-SCADA PROTOCOL-SERVICES PROTOCOL-SNMP PROTOCOL-TELNET PROTOCOL-TFTP PROTOCOL-VOIP PUA-ADWARE PUA-OTHER PUA-P2P PUA-TOOLBARS RPC RSERVICES SCADA SCAN SERVER-APACHE SERVER-IIS SERVER-MAIL SERVER-MSSQL SERVER-MYSQL SERVER-ORACLE SERVER-OTHER SERVER-SAMBA SERVER-WEBAPP SHELLCODE SMTP SNMP SPECIFIC-THREATS SPYWARE-PUT SQL TELNET TFTP VIRUS VOIP WEB-ACTIVEX WEB-ATTACKS WEB-CGI WEB-CLIENT WEB-COLDFUSION WEB-FRONTPAGE WEB-IIS WEB-MISC WEB-PHP X11);
 
    # Extra VOIP stuff that is handled in textrules-commit.pl
    push(@rulecategories, qw(VOIP-SIP-TCP VOIP-SIP-UDP VOIP-SKINNY-TCP VOIP-SDP-TCP VOIP-SDP-UDP));
@@ -317,14 +328,12 @@ sub process_line {
    print "Flow      : $flow\n";
 
    # Detection: awful I know
-   print "Detection :\n"; # Newline will be within $detection below
+   print "Detection :";
+   print " (disabled)" if($line =~ /^\s*#/);
+   print "\n";
+
    my $detection = $line;
-   # $detection =~ /msg:\"(.*?)\";(.*)/;
-   # $detection = $2;
-   # $detection =~ /(.*?)(reference:|metadata:).*?;/;
-   # $detection = $1;
-   # a little more robust than previous...
-   $detection =~ s/alert(.*?)\((.*)\)/$2/;
+   $detection =~ s/\s*#?\s*alert(.*?)\((.*)\)/$2/;
 
    foreach my $strippershoes (qw(reference metadata msg flow classtype sid rev)) {
       $detection =~ s/(^|[\s;])$strippershoes:(.*?);//g;
@@ -335,33 +344,76 @@ sub process_line {
 
    # split detection into separate rule option lines.  Current as of snort 2.9.3.5
    foreach my $ruleoption (qw(content rawbytes uricontent urilen isdataat pcre file_data base64_decode base64_data byte_test byte_jump byte_extract ftpbounce asn1 cvs dce_iface dce_opnum dce_stub_data ssl_version ssl_state fragoffset ttl tos id ipopts fragbits dsize flags flowbits seq ack window itype icode icmp_id icmp_seq rpc ip_proto sameip stream_reassemble stream_size logto session resp react tag activates activated_by count replace detection_filter sip_header sip_body threshold uri_data raw_uri_data header_data raw_header_data method_data cookie_data raw_cookie_data stat_code_data stat_msg_data http_encode pkt_data sip_stat_code gtp_type gtp_info)) {
+
       $detection =~ s/[\s;]$ruleoption([:;])/\n\t$ruleoption$1/g;
    }
 
-   print "\t$detection\n";
+   # Now let's try to add some clever indentation cleverly
+   my (@detectionarray) = split(/\n\t/, $detection);
+   for (@detectionarray) {
+
+      if(/^content\s*:.*[\s;](distance|within)\s*:\s*[-0-9a-z_]+\s*;/i || # relative content matches
+         /[:,]\s*relative\s*[,;]/                                || # "relative" is literally a rule option option
+         /^pcre\s*:.*\/[ismxAEGUIPHDMCKSYBO]*R[ismxAEGRUIPHDMCKSYBO]*"\s*;/                                   ){ # relative pcre
+         s/^/   /;
+      }
+
+   }
+
+   # Print out the detection content
+   print " "x$indent . join("\n" . " "x$indent, @detectionarray) . "\n";
 
    # Find some common mistakes
+
+   # No content match (meaning no fast_pattern)
+   # Some options actually have hidden "content matches," like dce_iface
+   if(!($detection =~ /([\s;]|^)(content|dce_iface)\s*:/)) {
+      push(@failed, "No content match, so no fast_pattern entry - rule will enter on every packet!");
+   }
+
    # pcre: using a pipe in a character class
-   if($detection =~ /pcre\s*:\s*"[^"]*\[[^\]]*\|/) {
+   if($detection =~ /pcre\s*:\s*"[^"]*[^\\]\[[^\]]*\|/) {
      push(@warnings, "Pipe found in character class - are you sure you want this?  [a|b] is not correct; [ab] is.");
    }
 
    # pcre: missing backslash for hex chars
    # "exec" in the pcre gives us a false positive, so strip that out
-   my ($pcre) = $detection =~ m/pcre\s*:([^;]*);/;
+   my ($pcre) = $detection =~ m/pcre\s*:\s*"\s*(\/.*?)"\s*;/;
+
    if(defined $pcre) {
-      $pcre =~ s/exec//gi;
+      $pcre =~ s/(exec|exact|fixed)//gi;
       if($pcre =~ /[^\\]x[0-9a-f]{2}/i) {
          push(@warnings, "Missing backslash for hex char in pcre? /x[0-9a-f]{2}/ detected");
       }
       if($pcre =~ /\\[0-9a-f]{2}/i) {
          push(@warnings, "Missing 'x' for hex char in pcre? /\\\\[0-9a-f]{2}/ detected");
       }
+      if($pcre =~ /\|\s*([0-9a-f][0-9a-f]\s*){1,}\|/i) {
+         push(@warnings, "Suspected \"hex characters in pipes\" notation (like snort content match) found in pcre");
+      }
+
+      # Verify the flags (which also detects unescaped slashes)
+      my ($pcreflags) = ($pcre =~ /[^\\]\/(.*)/);
+
+      if(defined $pcreflags && $pcreflags ne "") {
+         # Fail if invalid characters in flag or too many flags
+         my $validpcreflags = "ismxAEGRUIPHDMCKSYBO";
+         my $invalidpcreflags = "[^$validpcreflags]"; 
+         my $toomanypcreflags = "[$validpcreflags]{6}";
+         if($pcreflags =~ /$invalidpcreflags/ || $pcreflags =~ /$toomanypcreflags/) {
+            push(@failed, "Invalid pcreflag (or unescaped slash in regex) $pcreflags");
+         }
+      }
+
    }
 
    # Here's a nice place to put errors for using rule options that shouldn't be used
    if(get_option($r, 'threshold')){
       push(@failed, 'Threshold is deprecated -- replace with detection_filter');
+   }
+
+   if(get_option($r, 'stream_reassemble')){
+      push(@failed, 'Listen, Geockass -- do not use stream_reassemble!!') unless($speedtruffs);
    }
 
    # Metadata:
@@ -370,27 +422,29 @@ sub process_line {
 #print Dumper($r->{metadata});
    print "Metadata  :";
    if( $r->{metadata} ){
-      if( $r->{metadata}{policy} ){
-         print "\n\tPolicy: " . join(', ', keys %{$r->{metadata}{policy}}) . "\n";
-         if( join(', ', keys %{$r->{metadata}{policy}}) =~ m/balanced-ips/) {
+      if( $r->{metadata}{policy} && keys $r->{metadata}{policy} ){
+#print "POLICY: >>" . Dumper($r->{metadata}{policy}) . "<<\n";
+         print "\n" . " "x$indent . "Policy: " . join(', ', keys %{$r->{metadata}{policy}}) . "\n";
+         # ZDNOTE I'd like to sort these in a specific order, but no time atm so at least it'll be consistent
+         if( join(', ', sort {$a cmp $b} keys %{$r->{metadata}{policy}}) =~ m/balanced-ips/) {
             $balancedpolicy = 1;
          }
       } else {
 #         push(@warnings, "METADATA Policy");
-         print "\n\tPolicy: <MISSING>\n";
+         print "\n" . " "x$indent . "Policy: <MISSING>\n";
       }   
       if( $r->{metadata}{service}){
-         print "\tService: " . join(', ', keys %{$r->{metadata}{service}}) . "\n";
+         print " "x$indent . "Service: " . join(', ', sort {$a cmp $b} keys %{$r->{metadata}{service}}) . "\n";
          $servicemetadata = 1;
       } else {
 #         push(@warnings, "METADATA Service");
-         print "\tService: <MISSING>\n";
+         print " "x$indent . "Service: <MISSING>\n";
       }
       if($r->{metadata}{impact_flag}) {
-         print "\tImpact Flag: " . join(', ', keys %{$r->{metadata}{impact_flag}}) . "\n";
+         print " "x$indent . "Impact Flag: " . join(', ', keys %{$r->{metadata}{impact_flag}}) . "\n";
       }
       if($r->{metadata}{ruleset}) {
-         print "\tRuleset: " . join(', ', keys %{$r->{metadata}{ruleset}}) . "\n";
+         print " "x$indent . "Ruleset: " . join(', ', keys %{$r->{metadata}{ruleset}}) . "\n";
       }
    } else {
 #      push(@warnings, "METADATA");
@@ -406,20 +460,26 @@ sub process_line {
    } else {
       if( $r->{references}{cve} ){
          #print "\tCVE:\n\t\t" . join("\n\t\t", keys %{$r->{references}{cve}}) . "\n";
-         print "\n\tCVE:     " . join(", ", keys %{$r->{references}{cve}}) . "\n";
+         print "\n" . " "x$indent . "CVE:     " . join("\n" . " "x$indent . " "x9, keys %{$r->{references}{cve}}) . "\n";
+
+         foreach my $cve (keys %{$r->{references}{cve}}) {
+            if(!($cve =~ /^(19[89][0-9]|20[0-9][0-9])-(0[0-9]{3}|[1-9][0-9]{3,})$/)) {
+               push(@failed, "Reference: Invalid CVE reference ($cve)");
+            }
+         }
       } else {
          push(@warnings, 'No CVE reference');
-         print "\n\tCVE:     <MISSING>\n";
+         print "\n" . " "x$indent . "CVE:     <MISSING>\n";
       }
       if( $r->{references}{bugtraq} ){
          #print "\tBUGTRAQ:\n\t\t" . join("\n\t\t", keys %{$r->{references}{bugtraq}}) . "\n";
-         print "\tBUGTRAQ: " . join(", ", keys %{$r->{references}{bugtraq}}) . "\n";
-      } else {
-         print "\tBUGTRAQ: <MISSING>\n";
+         print " "x$indent . "BUGTRAQ: " . join(", ", keys %{$r->{references}{bugtraq}}) . "\n";
+#      } else { # Don't really care if bugtraq is missing, tbh
+#         print " "x$indent . "BUGTRAQ: <MISSING>\n";
       }      
       if( $r->{references}{url} ){
          #print "\tURL:\n\t\t" . join("\n\t\t", keys %{$r->{references}{url}}) . "\n";
-         print "\tURL:     " . join(", ", keys %{$r->{references}{url}}) . "\n";
+         print " "x$indent . "URL:     " . join("\n" . " "x$indent . " "x9, keys %{$r->{references}{url}}) . "\n";
          foreach my $key (keys %{$r->{references}{url}}) {
             if($key =~ /microsoft\.com.*ms..-.{1,3}/i) { # Looks vaguely like an MS Bulletin reference
                if(#!($key =~ /www\.microsoft\.com\/technet\/security\/bulletin\/(MS|ms)[0-9]{2}-[0-9]{3}.mspx($|\s)/) && # Old form no longer supported
@@ -438,7 +498,7 @@ sub process_line {
             }
          }
       } else {
-         print "\tURL:     <MISSING>\n";
+         print " "x$indent . "URL:     <MISSING>\n";
       }
    }
    
@@ -487,13 +547,19 @@ sub process_line {
 
    if( @failed || @warnings || @improvements ){
       print "\n" . "%"x80 . "\n";
+
+      my $line_info = $line_num;
+      if(defined($r->{sid})) {
+         $line_info .= ", sid:" . $r->{sid};
+      }
+
       if(@failed){
          $failure++;
          print "% FAILURE - Rule failed due to the following missing requirements\n";
          print "%\t" . join("\n%\t", @failed) . "\n";
          print "%"x80 . "\n";
          foreach my $alert (@failed) {
-            push(@consolidatedalerts, "FAIL ($line_num): $alert\n");
+            push(@consolidatedalerts, "FAIL ($line_info): $alert\n");
             push(@csvoutput, "error,$line_num,$alert");
          }
       }
@@ -503,7 +569,7 @@ sub process_line {
          print "%\t" . join("\n%\t", @warnings) . "\n";
          print "%"x80 . "\n";
          foreach my $alert (@warnings) {
-            push(@consolidatedalerts, "WARN ($line_num): $alert\n");
+            push(@consolidatedalerts, "WARN ($line_info): $alert\n");
             push(@csvoutput, "warning,$line_num,$alert");
          }
       }
@@ -512,7 +578,7 @@ sub process_line {
          print "%\t" . join("\n%\t", @improvements) . "\n";
          print "%"x80 . "\n";
          foreach my $alert (@improvements) {
-            push(@consolidatedalerts, "IMPR ($line_num): $alert\n");
+            push(@consolidatedalerts, "IMPR ($line_info): $alert\n");
             push(@csvoutput, "suggestion,$line_num,$alert");
          }
 #      print "\n\n$updated_rule\n";

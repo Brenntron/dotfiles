@@ -5,6 +5,7 @@ class BugsController < ApplicationController
   before_filter :get_states_and_users, only: [:index, :show, :new]
 
   def index
+
   end
 
   def new

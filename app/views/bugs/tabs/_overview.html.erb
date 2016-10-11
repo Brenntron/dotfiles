@@ -1,6 +1,8 @@
 <div class="row top-space">
   <div class="col-sm-12">
-    <h4 class="blue">Summary <span class="tiny text-muted">&nbsp; <a data-toggle="modal" data-target="#change_summary_modal">edit</a>&nbsp; </span></h4>
+    <h4 class="blue">Summary
+      <span class="tiny text-muted">&nbsp; <a data-toggle="modal" data-target="#change_summary_modal">edit</a>&nbsp; </span>
+    </h4>
   </div>
 
   <div class="col-sm-12 bug_summary">
@@ -8,6 +10,7 @@
   </div>
 
 </div>
+<hr>
 <div class="row top-space">
   <div class="col-xs-12">
     <h4 class="blue"> References
@@ -18,56 +21,52 @@
   </div>
   <div class="col-xs-12 code">
     <% if @bug.references.any? %>
-      <% if @bug.references.cves.any? %>
-        <p>cve:</p>
-        <% @bug.references.cves.each do |ref| %>
-          <div class="col-xs-12">
-            <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
-          </div>
+        <% if @bug.references.cves.any? %>
+            <p>cve:</p>
+            <% @bug.references.cves.each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
         <% end %>
-      <% end %>
-      <% if @bug.references.url.any? %>
-        <p>url:</p>
-        <% @bug.references.url.each do |ref| %>
-            <div class="col-xs-12">
-              <code><a href="<%= get_ref_url(ref, "url") %>" target="_blank"><%= ref.reference_data %></a></code>
-            </div>
+        <% if @bug.references.url.any? %>
+            <p>url:</p>
+            <% @bug.references.url.each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "url") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
         <% end %>
-      <% end %>
-      <% if @bug.references.url.any? %>
-        <p>bugtraq:</p>
-        <% @bug.references.bugtraqs.each do |ref| %>
-          <div class="col-xs-12">
-            <code><a href="<%= get_ref_url(ref, "bugtraq") %>" target="_blank"><%= ref.reference_data %></a></code>
-          </div>
+        <% if @bug.references.url.any? %>
+            <p>bugtraq:</p>
+            <% @bug.references.bugtraqs.each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "bugtraq") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
         <% end %>
       <% end %>
     <% else %>
-      <p>< MISSING ></p>
+        <p>< MISSING ></p>
     <% end %>
   </div>
 </div>
 
-
+<hr>
 <div class="row top-space">
   <div class="col-xs-12">
     <h4 class="blue"> Exploits</h4>
   </div>
+  <div class="col-xs-12">
+    <div class="exploit_notices red"></div>
+  </div>
   <div class="col-xs-12 code">
     <% if @bug.references.any? %>
-      <% @bug.references.each do |ref| %>
-        <% if ref.exploits %>
-          <% ref.exploits.each do |exploit|  %>
-            <div class="col-xs-12">
-              <p><%= exploit.exploit_type_id %><a {{bind-attr href=exploit_data}} target="_blank"><%= exploit.data %></a></p>
-            </div>
-          <% end %>
-        <% end %>
-      <% end %>
+        <p><%= find_exploit_link(@bug.references) %></p>
     <% end %>
-    <p>----------------</p>
   </div>
 </div>
+
 
 
 

@@ -63,6 +63,7 @@ module API
                 #save the bug
                 bug.save
               rescue Exception => e
+                Rails.logger.info e
                 false
               end
             else

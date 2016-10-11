@@ -64,10 +64,10 @@ class Bug < ActiveRecord::Base
 
   def self.bugs_with_search(params)
     if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
-      params.delete_if { |k,v| v == "" }
+      params.delete_if { |k, v| v == "" }
       count = 0
       query = ''
-      params.each do |k,v|
+      params.each do |k, v|
         count = count+1
         query = query + k + "='" + v + "'"
         query = query + " && " if count != params.count
@@ -181,7 +181,7 @@ class Bug < ActiveRecord::Base
 
   def summary_tags
     tags = []
-    tag_list = Tag.all.map{|a| a.name}.join("|")
+    tag_list = Tag.all.map { |a| a.name }.join("|")
     unless summary.nil?
       unless tag_list.empty?
         summary.scan(tag_list).each do |match|
@@ -195,7 +195,7 @@ class Bug < ActiveRecord::Base
   def summary_sids
     sids = []
     unless summary.nil?
-      summary.scan(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/).each do |match|
+      summary.scan(/\[SID\]\s*([\d,\-]+)\b(?:\s)?/).each do |match|
         match[0].split(/[,\s]/).each do |part|
           if part =~ /(\d+)-(\d+)/
             sids << eval("#{$1}..#{$2}").to_a

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160108224914) do
+ActiveRecord::Schema.define(version: 20160915163005) do
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
@@ -37,6 +37,11 @@ ActiveRecord::Schema.define(version: 20160108224914) do
   add_index "attachments", ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
   add_index "attachments", ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
   add_index "attachments", ["task_id"], name: "index_attachments_on_task_id", using: :btree
+
+  create_table "attachments_exploits", force: true do |t|
+    t.integer "attachment_id"
+    t.integer "exploit_id"
+  end
 
   create_table "attachments_rules", id: false, force: true do |t|
     t.integer "attachment_id"

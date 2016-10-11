@@ -1,5 +1,14 @@
+.exploit_attach_success{
+    color:LimeGreen !important;
+    background:none !important;
+}
+.exploit_attach_missing{
+    color:red !important;
+    background:none !important;
+}
 .back_btn {
     background-color: #80a9ba;
     cursor: pointer;
     padding: 10px;
 }
+
