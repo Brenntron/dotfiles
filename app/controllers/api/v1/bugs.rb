@@ -63,7 +63,6 @@ module API
                 #save the bug
                 bug.save
               rescue Exception => e
-                binding.pry
                 Rails.logger.info e
                 false
               end
