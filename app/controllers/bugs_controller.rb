@@ -5,7 +5,10 @@ class BugsController < ApplicationController
   before_filter :get_states_and_users, only: [:index, :show, :new]
 
   def index
-
+    if params[:bug].present?
+      @bug_searchID = params[:bug][:searchID]
+      @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:searchID]}%")
+    end
   end
 
   def new
@@ -70,7 +73,7 @@ class BugsController < ApplicationController
   private
 
   def bug_params
-    params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification,
+    params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification, :searchID,
                                 :summary, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
                                                                                                :metadata, :detection, :class_type, :reference])
   end
