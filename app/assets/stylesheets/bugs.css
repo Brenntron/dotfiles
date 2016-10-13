@@ -11,4 +11,7 @@
     cursor: pointer;
     padding: 10px;
 }
-
+.searchID{
+    width:100%;
+    margin-botom: 10px;
+}
