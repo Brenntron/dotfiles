@@ -38,7 +38,9 @@
         <% @rules.each do |rule| %>
           <tr id=<%= rule.id %>>
             <td><input type="checkbox" class="rule_check_box" value="<%= rule.id %>"></td>
-            <td><%= rule.state %></td>
+
+            <td class="rule_state_<%=rule_state_color(rule.state)%>"><%= rule.state %></td>
+
             <td>
               <a class="blue show_rule" href="#">
                 <% if rule.sid %>
