@@ -6,6 +6,7 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
 
+
   #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
   #after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
@@ -349,4 +350,19 @@ class Rule < ActiveRecord::Base
     end
   end
 
+  def sort_rules_by_state
+    case(self.state)
+      when "FAILED"
+        val = 0
+      when "NEW"
+        val = 1
+      when "UPDATED"
+        val = 2
+      when "UNCHANGED"
+        val = 3
+      else
+        val = 3
+    end
+    return val
+  end
 end

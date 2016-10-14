@@ -44,7 +44,7 @@ class BugsController < ApplicationController
 
   def show
     @bug = Bug.find(params[:id])
-    @rules = @bug.rules
+    @rules = @bug.rules.sort {|a,b| a.sort_rules_by_state <=> b.sort_rules_by_state}
     @ref_types = ReferenceType.all
     @pcap_attachments = []
     @other_attachments = []
@@ -77,6 +77,8 @@ class BugsController < ApplicationController
                                 :summary, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
                                                                                                :metadata, :detection, :class_type, :reference])
   end
+
+
 
   def query_bugs
     if params[:q]
