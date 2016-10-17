@@ -1,5 +1,8 @@
 $ ->
 
+  $('.edit-summary').on 'click', ->
+    $('.edit-summary-field').toggle()
+
   $('#bug_tab a:first').tab('show')
 
   $('#import_bug').keypress (e) ->
