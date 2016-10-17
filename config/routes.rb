@@ -17,6 +17,8 @@ Rails.application.routes.draw do
 
   get 'rules/add_form' => 'rules#add_form', format: 'js'
   post "bugs/:id/create_rules" => "bugs#create_rules"
+  post 'bugs/:id/add_tag' => 'bugs#add_tag'
+  patch  'bugs/:id/remove_tag' => 'bugs#remove_tag'
   get 'bugs/new' => 'bugs#new'
   post 'bugs' => 'bugs#create'
   post "sessions/create" => "sessions#create"
@@ -28,6 +30,8 @@ Rails.application.routes.draw do
   resources 'bugs' do
     resources 'references'
   end
+
+
 
   post '/notes' => 'notes#create'
   put '/notes/publish_to_bugzilla' => 'notes#publish_to_bugzilla'

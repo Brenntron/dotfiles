@@ -51,7 +51,7 @@ module API
                   bug.rules << rule unless bug_rules.include? rule.id
                 end
                 parsed[:tags].each do |tag|
-                  bug.tags << Tag.find_or_create(tag)
+                  bug.tags << tag
                 end
                 parsed[:refs].each do |ref|
                   Exploit.find_exploits(ref)

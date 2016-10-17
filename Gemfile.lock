@@ -310,6 +310,7 @@ GEM
       gruff (~> 0)
       highline
     sass (3.4.22)
+    selectize-rails (0.12.3)
     shellany (0.0.1)
     slop (3.6.0)
     sprockets (3.4.0)
@@ -406,6 +407,7 @@ DEPENDENCIES
   rspec (= 2.14.1)
   ruby-bugzilla (~> 0.6.0)
   rule_test_api!
+  selectize-rails
   sfbugzilla!
   stomp
   therubyracer

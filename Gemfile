@@ -37,6 +37,8 @@ gem 'jbuilder', '~> 2.2.16'
 gem 'dotenv-rails'
 gem 'diffy'
 
+gem 'selectize-rails'
+
 group :development do
   gem 'thin', '~> 1.6.3'
   gem 'awesome_print', '1.2.0'
