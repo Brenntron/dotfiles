@@ -64,7 +64,7 @@ class BugsController < ApplicationController
     @bug = Bug.find(params[:id])
     Bugzilla::Bug.new(bugzilla_session).update(get_params_hash(params))
     if @bug.update(bug_params)
-      render json: @bug
+      redirect_to @bug
     else
       render json: @bug.errors, status: 422
     end
