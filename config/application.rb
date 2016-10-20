@@ -62,6 +62,14 @@ module Api
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
         config.amq_host = "mq.vrt.sourcefire.com"
         config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
+      when "test"
+        config.ruletest_server = "https://localhost:3000/api_test"
+        config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
+        config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
+        config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
+        config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')
+        config.amq_host = "localhost"
+        config.cert_file = "/System/Library/OpenSSL/certs/ca.pem"
     end
     config.websockets_enabled = "false"
     config.bugzilla_domain = 'cisco.com'

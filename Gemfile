@@ -50,7 +50,7 @@ group :test do
   gem 'factory_girl', '4.3.0'
   gem 'factory_girl_rails', '4.3.0'
   gem 'capybara', '2.4.4'
-  gem 'poltergeist', '1.5.1'
+  gem 'poltergeist', '1.11.0'
   gem 'cucumber-rails', '1.4.2', :require => false
   gem 'database_cleaner', '1.2.0'
   gem 'launchy', '2.4.2'
