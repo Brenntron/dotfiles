@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(version: 20160915163005) do
     t.string   "user"
     t.string   "action"
     t.string   "description"
+    t.integer  "progress"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

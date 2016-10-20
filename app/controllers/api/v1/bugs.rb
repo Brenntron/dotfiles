@@ -38,18 +38,23 @@ module API
 
             if xmlrpc_token
               begin
+                progress_bar = Event.create(user:current_user.display_name,action:"import_bug:#{params[:id]}",description:"#{request.headers["Token"]}",progress:1)
                 xmlrpc = Bugzilla::Bug.new(bugzilla_session)
                 new_bug = xmlrpc.get(permitted_params[:id])
+                progress_bar.progress = 10
                 #create the bug from bugzilla
                 Bug.bugzilla_import(xmlrpc,new_bug).to_s
                 bug = Bug.where(id:params[:id]).first
                 #parse the bug summary
+                progress_bar.save
                 parsed = bug.parse_summary
                 bug_rules = bug.rules.map {|r| r.id}
                 parsed[:sids].each do |sid|
                   rule = Rule.import_rule(sid)
                   bug.rules << rule unless bug_rules.include? rule.id
                 end
+                progress_bar.progress = 50
+                progress_bar.save
                 parsed[:tags].each do |tag|
                   bug.tags << Tag.find_or_create(tag)
                 end
@@ -59,9 +64,13 @@ module API
                 end
                 #use the references to find any existing exploits
 
-
+                progress_bar.progress = 90
+                progress_bar.save
                 #save the bug
                 bug.save
+
+                progress_bar.progress = 100
+                progress_bar.save
               rescue Exception => e
                 Rails.logger.info e
                 false

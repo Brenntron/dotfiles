@@ -4,6 +4,7 @@ class CreateEvents < ActiveRecord::Migration
       t.string   :user
       t.string   :action
       t.string   :description
+      t.integer  :progress
       t.timestamps
     end
   end

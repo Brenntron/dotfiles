@@ -34,7 +34,7 @@
           </a>
           <p class="login-area">
             <% if current_user %>
-              <span class="login-label"> <strong><%= current_user[:display_name] %></strong> </span>
+              <span class="login-label"> <strong class="current_user"><%= current_user[:display_name] %></strong> </span>
             <% end %>
             <% if controller_name == 'bugs' %>
               <%= render 'layouts/bugs_layout'%>
