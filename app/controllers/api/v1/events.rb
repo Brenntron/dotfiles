@@ -15,6 +15,17 @@ module API
           render events, {meta: {total_pages: events.total_pages}}
         end
 
+        desc "get update progress"
+        params do
+          requires :description, type: String, desc: "the description"
+          requires :user, type:String, desc: "the user whos event this belongs to"
+          requires :id,type: String, desc: "the id of the thing we are monitoring"
+          optional :action, type: String, desc: "The action"
+        end
+        get "update-progress" do
+          Event.where(description:params["description"],user:params["user"],action:"import_bug:#{params["id"]}").last.progress
+        end
+
         desc "create an event"
         params do
           requires :event, type: Hash do
