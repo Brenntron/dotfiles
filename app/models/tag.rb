@@ -1,6 +1,8 @@
 class Tag < ActiveRecord::Base
   has_and_belongs_to_many :bugs
 
+  validates :name, presence: true, uniqueness: true
+
   after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
   after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }

@@ -12,6 +12,8 @@
  *
  *= require jquery-ui
  *= require bugs
+ *= require selectize
+ *= require selectize.default
  *= require_tree .
  *= require_self
  */

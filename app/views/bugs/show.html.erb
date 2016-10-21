@@ -36,8 +36,14 @@
         </div>
         <div class="col-xs-4 col-sm-1 back_btn"><i class="glyphicon glyphicon-arrow-left"></i> Back</div>
         <div class="col-sm-12 hidden-xs bug_summary">
-          <h6><%= @bug.summary %></h6>
+          <h5><span class="edit-summary-field"><%= @bug.summary %></span><span>
+          <%= form_tag("/bugs/#{@bug.id}", method: :put) do -%>
+              <%= text_field_tag 'bug[summary]', "#{@bug.summary}", class:"edit-summary-field", style:"display:none"%>
+          <% end -%></span>
+            <span class="tiny text-muted">&nbsp; <a class="edit-summary">edit</a>&nbsp; </span>
+          </h5>
         </div>
+
 
       </div>
       <div class="row">

@@ -3,6 +3,7 @@ class Bug < ActiveRecord::Base
   include Elasticsearch::Model::Callbacks
 
   has_and_belongs_to_many :rules
+  has_and_belongs_to_many :tags, dependent: :destroy
   belongs_to :user
   belongs_to :committer, :class_name => 'User'
 
@@ -64,13 +65,13 @@ class Bug < ActiveRecord::Base
 
   def self.bugs_with_search(params)
     if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
-      params.delete_if { |k, v| v == "" }
+      query_params =params.reject{ |k, v| (v == "" || v.is_a?(Array) || k=='tag_name') }
       count = 0
       query = ''
-      params.each do |k, v|
+      query_params.each do |k, v|
         count = count+1
-        query = query + k + "='" + v + "'"
-        query = query + " && " if count != params.count
+        query = query + k + "='" + v.gsub("'", "\\'") + "'"
+        query = query + " && " if count != query_params.count
       end
       Bug.where(query)
     end
@@ -180,16 +181,13 @@ class Bug < ActiveRecord::Base
   end
 
   def summary_tags
-    tags = []
-    tag_list = Tag.all.map { |a| a.name }.join("|")
-    unless summary.nil?
-      unless tag_list.empty?
-        summary.scan(tag_list).each do |match|
-          tags << match
-        end
-      end
+    summary_tags = summary.scan(/\[.*?\]/).map{|s| s.delete "[]"}.reject!{|tag| tag == "SID"}
+    if summary_tags
+      create_tags_from_summary(summary_tags)
+      summary_tags.map{|tag| Tag.find_by_name(tag)}
+    else
+      []
     end
-    return tags.uniq
   end
 
   def summary_sids
@@ -219,7 +217,35 @@ class Bug < ActiveRecord::Base
     return references.uniq
   end
 
+  def tag_array
+    #array of tags for comparison
+    tags.map{|t| "[#{t.name}]"}
+  end
+
+  def summary_tag_array
+    #array of tags in summary for comparison
+    summary_without_sids.scan(/\[.*?\]/)
+  end
+
+  def compose_summary
+    if tag_array.try(:sort) != summary_tag_array.try(:sort)
+
+      #extract summary_tag_string and replace with tag_string
+      summary_string = "#{self.summary}"
+      summary_tag_array.each{|st| summary_string.slice! st } if !summary_tag_array.nil?
+      tag_array.reverse.each{|ta| summary_string.prepend(ta) }
+
+      self.update(summary: summary_string)
+    end
+  end
+
   private
+
+  def create_tags_from_summary(summary_tags)
+    summary_tags.each do |tag|
+      Tag.create(name: tag)
+    end
+  end
 
 
   def add_attachment(xmlrpc, file)

@@ -18,6 +18,15 @@
         </div>
         <div class="row">
           <div class="col-sm-12 form-group">
+            <div class="sandbox">
+              <label for="select-to-selectized">Tags</label>
+              <select id="select-to-new"  name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 form-group">
             <label for="summary">Summary</label>
             <%= f.text_field :summary, class: "form-control create-input", required: true %>
           </div>
@@ -30,6 +39,7 @@
         </div>
         <%= f.hidden_field :product, value: 'Research' %>
         <%= f.hidden_field :component, value: 'Snort Rules' %>
+        <!--<select id="bug_tag_ids" multiple="multiple" name="bug[tag_names][]"></select>-->
         <div class="row">
           <div class="col-sm-12 form-group">
             <button class="btn btn-success" value="submit">Create Bug</button>
@@ -40,4 +50,5 @@
       </div>
     </div>
   </div>
+  <input id="tag_list" class="hidden" value="<%=@tags%>"></input>
 </div>

@@ -35,3 +35,7 @@ div.progress{
     display:none;
 }
 
+.edit-summary-field{
+    width:100%;
+    margin-botom: 10px;
+}
