@@ -1,4 +1,22 @@
 <div class="row top-space">
+  <div class="col-sm-12">
+    <h4 class="blue">Tags</h4>
+  </div>
+
+  <div class="col-sm-12 bug_summary">
+    <div class="sandbox">
+      <div id="alert_message" role="alert"></div>
+      <select id="select-to-edit" bug_id="<%=@bug.id%>" name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">
+        <% @bug.tags.each do |tag|%>
+          <option value="<%=tag.name%>" selected="selected"></option>
+        <%end%>
+      </select>
+    </div>
+  </div>
+
+</div>
+<hr>
+<div class="row top-space">
   <div class="col-xs-12">
     <h4 class="blue"> References
       <span class="pull-right h6">
@@ -36,6 +54,7 @@
         <p>< MISSING ></p>
     <% end %>
   </div>
+  <input id="tag_list" class="hidden" value="<%=@tags%>"></input>
 </div>
 <hr>
 <div class="row top-space">

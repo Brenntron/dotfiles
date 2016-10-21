@@ -92,5 +92,71 @@ $ ->
     ).done (response) ->
       $('#current_bug_committer').html(response.bug.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
       $('#current_bug_committer, #change_committer_form').toggle()
+      return
+
+
+  createSelectOptions = ->
+    tags = $('#tag_list')[0]
+    if tags
+      tag_list= tags.value
+      array = tag_list.split(',')
+      options = []
+      for x in array
+        options.push {name: x}
+      return options
+
+  $('#select-to-new').selectize {
+    persist: false,
+    create: (input) ->
+      {name: input}
+    maxItmes: null
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: createSelectOptions()
+
+  }
+
+  $('#select-to-edit').selectize {
+    create: (input) ->
+      {name: input}
+    persist: false
+    maxItmes: null
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: createSelectOptions()
+    onItemAdd: (item) ->
+      bug_id = $('#select-to-edit').attr('bug_id')
+      $.ajax(
+        url: bug_id + '/add_tag'
+        method: 'POST'
+        data: {bug: {id: bug_id, tag_name: item}}
+        success: (response) ->
+          notice_html = "<p>#{item} has been added.</p>"
+          $("#alert_message").addClass('alert alert-info alert-dismissable').append(notice_html)
+          window.location.reload()
+        error: (response) ->
+          notice_html = "<p>Something went wrong.</p>"
+          $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      ,this)
+
+    onItemRemove: (item) ->
+      bug_id = $('#select-to-edit').attr('bug_id')
+      $.ajax(
+        url: bug_id + '/remove_tag'
+        method: 'PATCH'
+        data: {bug: {id: bug_id, tag_name: item}}
+        success: (response) ->
+          notice_html = "<p>#{item} has been removed.</p>"
+          $("#alert_message").addClass('alert alert-info alert-dismissable').append(notice_html)
+          window.location.reload()
+        error: (response) ->
+          notice_html = "<p>Something went wrong.</p>"
+          $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      ,this)
+
+
+  }
 
 
