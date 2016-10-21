@@ -11,4 +11,22 @@
     cursor: pointer;
     padding: 10px;
 }
+.searchID{
+    width:100%;
+    margin-botom: 10px;
+}
+.rule_state_blue{
+    color:blue;
+}
+.rule_state_green{
+    color:green;
+}
+.rule_state_red{
+    color:white;
+    background-color:red;
+}
 
+.edit-summary-field{
+    width:100%;
+    margin-botom: 10px;
+}

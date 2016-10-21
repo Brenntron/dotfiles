@@ -6,7 +6,10 @@ class BugsController < ApplicationController
   after_action  :sync_summary, only: [:create, :add_tag, :remove_tag]
 
   def index
-
+    if params[:bug].present?
+      @bug_searchID = params[:bug][:searchID]
+      @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:searchID]}%")
+    end
   end
 
   def new
@@ -46,7 +49,7 @@ class BugsController < ApplicationController
 
   def show
     @bug = Bug.find(params[:id])
-    @rules = @bug.rules
+    @rules = @bug.rules.sort {|a,b| a.sort_rules_by_state <=> b.sort_rules_by_state}
     @ref_types = ReferenceType.all
     @pcap_attachments = []
     @other_attachments = []
@@ -67,7 +70,7 @@ class BugsController < ApplicationController
     @bug = Bug.find(params[:id])
     Bugzilla::Bug.new(bugzilla_session).update(get_params_hash(params))
     if @bug.update(bug_params)
-      render json: @bug
+      redirect_to @bug
     else
       render json: @bug.errors, status: 422
     end
@@ -94,7 +97,7 @@ class BugsController < ApplicationController
   private
 
   def bug_params
-    params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification,
+    params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification, :searchID,
                                 :summary, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
                                                                                                :metadata, :detection, :class_type, :reference], tag_ids: [])
   end
@@ -102,6 +105,8 @@ class BugsController < ApplicationController
   def sync_summary
     @bug.compose_summary
   end
+
+
 
   def query_bugs
     if params[:q]

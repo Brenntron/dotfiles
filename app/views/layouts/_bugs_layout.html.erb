@@ -2,7 +2,11 @@
   <div class="col-xs-3 col-sm-2 col-md-2 col-lg-2 item-ids-column">
     <div class="sidebar-search">
       <div class="input-group input-group-sm">
-        <input type="text" class="form-control" placeholder="BugID">
+
+        <%= form_tag('/bugs', method: :get) do -%>
+            <%= text_field_tag 'bug[searchID]', "#{@bug_searchID}",class:"searchID", placeholder:"BugID"%>
+        <% end -%>
+
       </div><!-- /input-group -->
     </div>
     <table class="right table index-table">
@@ -60,7 +64,6 @@
 
 
 <% if action_name == 'show' %>
-    <%= render 'shared/summary_modal' %>
     <%= render 'shared/reference_modal' %>
     <input type="hidden" name="bug_id" value="<%= @bug.id %>">
 <% end %>
