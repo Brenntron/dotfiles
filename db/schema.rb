@@ -90,8 +90,8 @@ ActiveRecord::Schema.define(version: 20161011182823) do
   add_index "bugs", ["user_id"], name: "index_bugs_on_user_id", using: :btree
 
   create_table "bugs_rules", id: false, force: true do |t|
-    t.integer "bug_id"
-    t.integer "rule_id"
+    t.integer "bug_id",  default: 0, null: false
+    t.integer "rule_id", default: 0, null: false
   end
 
   create_table "bugs_tags", id: false, force: true do |t|
@@ -143,10 +143,10 @@ ActiveRecord::Schema.define(version: 20161011182823) do
     t.text     "comment"
     t.string   "note_type"
     t.string   "author"
+    t.integer  "notes_bugzilla_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
-    t.integer  "notes_bugzilla_id"
   end
 
   add_index "notes", ["bug_id"], name: "index_notes_on_bug_id", using: :btree
