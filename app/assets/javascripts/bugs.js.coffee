@@ -1,6 +1,7 @@
 $ ->
   $('#button_import').on 'click', ->
     ### update the progress bar width ###
+    $('.progress_group').show()
     $('.progress-bar').css('width', '10%')
     ### and display the numeric value ###
     $('.progress-bar').html('10%')
