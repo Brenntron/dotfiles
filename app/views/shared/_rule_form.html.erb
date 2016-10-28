@@ -319,7 +319,6 @@
     e.preventDefault();
     form = $(this).serializeArray();
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
-    data = {api_key: 'h93hq@hwo9%@ah!jsh'};
     id = form[0].value;
     return $.ajax({
       url: "/api/v1/rules/" + id,

@@ -11,7 +11,6 @@ $ ->
     $.ajax(
       url: '/api/v1/bugs/import/' + bid
       method: 'GET'
-      data: 'api_key': 'h93hq@hwo9%@ah!jsh'
       headers: headers).done (response) ->
       window.location.replace '/bugs/' + bid
     ### update the progress bar width ###

@@ -13,7 +13,7 @@ $ ->
           headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
           bug_id = $('input[name="bug_id"]').val()
           user_id = $('input[name="current_user_id"]').val()
-          data = {api_key: 'h93hq@hwo9%@ah!jsh', task: {bugzilla_id: bug_id, rule_array: selected.join(), task_type: "rule", created_by: user_id}}
+          data = {task: {bugzilla_id: bug_id, rule_array: selected.join(), task_type: "rule", created_by: user_id}}
           $.ajax {
             url: "/api/v1/tasks"
             method: 'POST'
@@ -147,7 +147,7 @@ $ ->
       contents_arr = rule_contents.split('\n')
       contents_arr.forEach (rule_content) ->
         rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
-        data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
+        data = { rule: rule}
         $.ajax {
           url: "/api/v1/rules"
           method: 'POST'
@@ -222,7 +222,7 @@ $ ->
     rule_content = form.find('textarea[name="rule[rule_content]"]').val()
     id = form.find('input[name="rule_id"]').val()
     rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
-    data = {api_key: 'h93hq@hwo9%@ah!jsh', id: id, rule: rule}
+    data = {id: id, rule: rule}
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax {
       url: "/api/v1/rules/"+id
