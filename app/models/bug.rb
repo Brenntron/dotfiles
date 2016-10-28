@@ -171,6 +171,15 @@ class Bug < ActiveRecord::Base
 
   end
 
+  def can_set_pending?
+    self.exploits.each do |expl|
+      if expl.attachment.nil?
+        return false
+      end
+    end
+      true
+  end
+
   def parse_summary
 
     parsed_summary = {}

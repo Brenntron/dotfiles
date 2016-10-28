@@ -1,5 +1,19 @@
 $ ->
+  $('.active').show();
+  $('.hidden').hide();
+
+
   $('#button_import').on 'click', ->
+    bid = $('#import_bug').val()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $('input[name="bug_name"]').val()
+    current_user = $(".current_user").html()
+    $.ajax(
+      url: '/api/v1/bugs/import/' + bid
+      method: 'GET'
+      data: 'api_key': 'h93hq@hwo9%@ah!jsh'
+      headers: headers).done (response) ->
+      window.location.replace '/bugs/' + bid
     ### update the progress bar width ###
     $('.progress_group').show()
     $('.progress-bar').css('width', '10%')
@@ -7,9 +21,7 @@ $ ->
     $('.progress-bar').html('10%')
     progresspump = setInterval( ( ->
       ### query the completion percentage from the server ###
-      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-      id = $('input[name="bug_name"]').val()
-      current_user = $(".current_user").html()
+
       $.ajax {
         url: '/api/v1/events/update-progress'
         method: 'get'
@@ -86,10 +98,10 @@ $ ->
 
   $("#change_state_form").submit (e)->
     e.preventDefault()
-    id = $('input[name="id"]').val()
+    id = $('input[name="bug_id"]').val()
     state = $('#bug_state option:selected').text()
     $.ajax(
-      url: "/bugs/" + id
+      url: '/api/v1/bugs/'+id
       method: 'PUT'
       data:
         id: id
@@ -104,8 +116,8 @@ $ ->
     id = $('input[name="id"]').val()
     editor = $('#bug_editor option:selected').val()
     $.ajax(
-      url: "/bugs/" + id
-      method: 'PUT'
+      url: '/api/v1/bugs/'+id
+      method: 'POST'
       data:
         id: id
         bug: 'user_id': editor
@@ -119,8 +131,8 @@ $ ->
     id = $('input[name="id"]').val()
     committer = $('#bug_committer option:selected').val()
     $.ajax(
-      url: "/bugs/" + id
-      method: 'PUT'
+      url: '/api/v1/bugs/'+id
+      method: 'POST'
       data:
         id: id
         bug: 'committer_id': committer
