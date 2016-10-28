@@ -22,6 +22,21 @@ ExploitType.create(:name => 'other',:description => 'Other publicly available ex
 ExploitType.create(:name => 'telus',:description => 'Other publicly available exploit module.',:pcap_validation => '^((FSC|TSL)\d{8}-\d{2})-.*?attack-*?\.pcap$')
 ExploitType.create(:name => 'expldb',:description => 'Other publicly available exploit module.',:pcap_validation => '^((19|20)\d{2}-\d{4}$|none)-(\d+|none)-((ms\d{2}-\d{3}-)?)-expldb-\d+-\d+\.pcap')
 
+rule_categories = ['APP-DETECT', 'BLACKLIST', 'BROWSER-CHROME', 'BROWSER-FIREFOX', 'BROWSER-IE', 'BROWSER-OTHER',
+                   'BROWSER-PLUGINS', 'BROWSER-WEBKIT', 'CONTENT-REPLACE', 'EXPLOIT-KIT', 'FILE-EXECUTABLE', 'FILE-FLASH',
+                   'FILE-IDENTIFY', 'FILE-IMAGE', 'FILE-JAVA', 'FILE-MULTIMEDIA', 'FILE-OFFICE', 'FILE-OTHER', 'FILE-PDF',
+                   'INDICATOR-COMPROMISE', 'INDICATOR-OBFUSCATION', 'INDICATOR-SCAN', 'INDICATOR-SHELLCODE', 'MALWARE-BACKDOOR',
+                   'MALWARE-CNC', 'MALWARE-OTHER', 'MALWARE-TOOLS', 'NETBIOS', 'OS-LINUX', 'OS-MOBILE', 'OS-OTHER', 'OS-SOLARIS',
+                   'OS-WINDOWS', 'POLICY-MULTIMEDIA', 'POLICY-OTHER', 'POLICY-SOCIAL', 'POLICY-SPAM', 'PROTOCOL-DNS',
+                   'PROTOCOL-FINGER', 'PROTOCOL-FTP', 'PROTOCOL-ICMP', 'PROTOCOL-IMAP', 'PROTOCOL-NNTP', 'PROTOCOL-OTHER',
+                   'PROTOCOL-POP', 'PROTOCOL-RPC', 'PROTOCOL-SCADA', 'PROTOCOL-SERVICES', 'PROTOCOL-SNMP', 'PROTOCOL-TELNET',
+                   'PROTOCOL-TFTP', 'PROTOCOL-VOIP', 'PUA-ADWARE', 'PUA-OTHER', 'PUA-P2P', 'PUA-TOOLBARS', 'SERVER-APACHE',
+                   'SERVER-IIS', 'SERVER-MAIL', 'SERVER-MSSQL', 'SERVER-MYSQL', 'SERVER-ORACLE', 'SERVER-OTHER', 'SERVER-SAMBA', 'SERVER-WEBAPP']
+
+rule_categories.each do |rc|
+  RuleCategory.create(category: rc)
+end
+
 
 # Reference.create(reference_data:"12345",reference_type: ref2)
 # Reference.create(reference_data:"cve,1936-7254",reference_type: ref1)

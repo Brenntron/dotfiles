@@ -205,10 +205,37 @@ class Rule < ActiveRecord::Base
           :committed => false,
           :state => 'FAILED'
       }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+
+    elsif parsed[:rule].match(/msg/)
+      rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
+      message = rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : "<MISSING>"
+
+      rule_params = {
+          :id => rule_sid,
+          :sid => rule_sid,
+          :rule_content => rule,
+          :rule_parsed => parsed[:rule],
+          :gid => rule_sid ? 1 : nil,
+          :rev => /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
+          :connection => rule.match(/connection:\s*(.+?)\(/) ? rule.match(/connection:\s*(.+?)\(/)[1] : "<MISSING>",
+          :message => message,
+          :detection => rule.match(/detection:\s*(.+?);/) ? rule.match(/detection:\s*(.+?);/)[1] : "<MISSING>",
+          :flow => rule.match(/flow:\s*(.+?);/) ? rule.match(/flow:\s*(.+?);/)[1] : "<MISSING>",
+          :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : "<MISSING>",
+          :class_type => /classtype\s*:(.*)\)/.match(parsed[:rule]) ? /classtype\s*:(.*)\)/.match(parsed[:rule])[1] : "<MISSING>",
+          :committed => true,
+          :state => rule_sid ? 'UNCHANGED' : 'NEW'
+      }
+      rule_params.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+      rule_params[:rule_failures] = nil
+
+
     else
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
       detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule]) ? /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip : nil
       message = /Message\s*:\s(.*)/.match(parsed[:rule]) ? /Message\s*:\s(.*)/.match(parsed[:rule])[1] : "<MISSING>"
+      rule_category = RuleCategory.find_by_category(message.split(" ")[0])
+
       rule_params = {
           :id => rule_sid,
           :sid => rule_sid,
@@ -223,7 +250,8 @@ class Rule < ActiveRecord::Base
           :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : "<MISSING>",
           :class_type => /Classtype\s*:\s(.*)/.match(parsed[:rule]) ? /Classtype\s*:\s(.*)/.match(parsed[:rule])[1] : "<MISSING>",
           :committed => true,
-          :state => rule_sid ? 'UNCHANGED' : 'NEW'
+          :state => rule_sid ? 'UNCHANGED' : 'NEW',
+          :rule_category_id => rule_category.id
       }
       rule_params.reject() { |k, v,| v.nil? || v == "<MISSING>" }
       rule_params[:rule_failures] = nil
