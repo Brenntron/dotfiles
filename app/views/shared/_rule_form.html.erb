@@ -36,7 +36,7 @@
         <div class="entry-type-switch">
         </div>
         <div class="col-xs-10"><div class="form-inline">
-          <%=select_tag :rule_category_id, options_for_select(RuleCategory.all.map{|rc| [rc.category, rc.id]}), prompt: 'select a cateogory', class: "form-control create-input select-sm code"%>
+          <%=select_tag :rule_category_id, options_for_select(@categories.map{|rc| [rc.category, rc.id]}), prompt: 'select a cateogory', class: "form-control create-input select-sm code"%>
           <input class="form-control create-input select-sm code" name="rule[message]" placeholder="enter a message" required="true" style="width:75%;">
         </div>
         </div>

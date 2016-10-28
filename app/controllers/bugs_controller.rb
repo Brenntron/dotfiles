@@ -64,6 +64,7 @@ class BugsController < ApplicationController
     @tasks = @bug.tasks
     @notes = @bug.notes.order(created_at: :desc)
     @tags = Tag.all.map{|tag| tag.name}.join(',')
+    @categories = RuleCategory.all.sort_by{ |x| [-x.rules.count , x.category]}
   end
 
   def update

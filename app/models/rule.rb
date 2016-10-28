@@ -6,6 +6,8 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
 
+  belongs_to :rule_category
+
 
   #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
