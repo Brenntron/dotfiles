@@ -1,11 +1,9 @@
 class SessionsController < ApplicationController
 
   def create
-    if !params[:api_key].blank?
       respond_to do |format|
         format.json do
           begin
-            raise Exception.new("Unauthorized Access.") if params[:api_key].blank? || params[:api_key] != Rails.configuration.ember_app[:api_key]
             resource = User.login_user(params, request)
             if resource[:user_id] && resource[:xmlrpc_token]
               session[:user] = resource[:user_id]
@@ -18,7 +16,6 @@ class SessionsController < ApplicationController
           end
         end
       end
-    end
     render json: {  }
   end
 
