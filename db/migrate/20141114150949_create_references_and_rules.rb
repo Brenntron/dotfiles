@@ -37,9 +37,7 @@ class CreateReferencesAndRules < ActiveRecord::Migration
     end
 
     add_reference :rules, :task, index: true
-    add_reference :rules, :attachment, index: true
-    add_reference :rules, :reference, index: true
-    add_reference :rules, :bug, index: true
+    add_reference :rules, :rule_category, index: true
     add_index "rules", ["gid", "sid"], :name => "index_rules_on_gid_and_sid", :unique => true
 
     create_table :references_rules, id: false do |t|
