@@ -2,7 +2,6 @@ $ ->
   $('.active').show();
   $('.hidden').hide();
 
-
   $('#button_import').on 'click', ->
     bid = $('#import_bug').val()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -97,11 +96,13 @@ $ ->
 
   $("#change_state_form").submit (e)->
     e.preventDefault()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     id = $('input[name="bug_id"]').val()
     state = $('#bug_state option:selected').text()
     $.ajax(
       url: '/api/v1/bugs/'+id
       method: 'PUT'
+      headers: headers
       data:
         id: id
         bug: 'state': state
