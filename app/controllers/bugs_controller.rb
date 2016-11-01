@@ -6,7 +6,6 @@ class BugsController < ApplicationController
   after_action :sync_summary, only: [:create, :add_tag, :remove_tag]
 
   def index
-    @bugs = Bug.all
     if params[:bug].present?
       @bug_searchID = params[:bug][:searchID]
       if @bug_searchID
@@ -117,6 +116,8 @@ class BugsController < ApplicationController
     elsif params[:bug].is_a? Hash
       session[:query] = "advance-search"
       session[:search] = params[:bug]
+    else
+      session[:query] = ""
     end
     if session[:query]
       case session[:query]
