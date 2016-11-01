@@ -25,6 +25,15 @@
     color:white;
     background-color:red;
 }
+div.progress{
+    background-color: #80a9ba;
+    width:100%;
+    margin-bottom: 0px;
+    margin-right:100px;
+}
+.progress_group{
+    display:none;
+}
 
 .edit-summary-field{
     width:100%;

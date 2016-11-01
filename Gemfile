@@ -41,6 +41,7 @@ gem 'selectize-rails'
 
 group :development do
   gem 'thin', '~> 1.6.3'
+  gem 'puma'
   gem 'awesome_print', '1.2.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
@@ -69,7 +70,7 @@ gem 'bootstrap-sass'
 gem 'therubyracer'
 gem 'turbolinks'
 
-gem 'rails', '4.1.5'
+gem 'rails', "4.1.5"
 
 
 

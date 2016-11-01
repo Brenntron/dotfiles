@@ -1,4 +1,39 @@
 $ ->
+  $('#button_import').on 'click', ->
+    ### update the progress bar width ###
+    $('.progress_group').show()
+    $('.progress-bar').css('width', '10%')
+    ### and display the numeric value ###
+    $('.progress-bar').html('10%')
+    progresspump = setInterval( ( ->
+      ### query the completion percentage from the server ###
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      id = $('input[name="bug_name"]').val()
+      current_user = $(".current_user").html()
+      $.ajax {
+        url: '/api/v1/events/update-progress'
+        method: 'get'
+        headers: headers
+        data:
+          description: $('input[name="token"]').val()
+          user: current_user
+          id: id
+        success: (response) ->
+          ### update the progress bar width ###
+          $('.progress-bar').css('width', response + '%')
+          ### and display the numeric value ###
+          $('.progress-bar').html(response + '%')
+          ### test to see if the job has completed ###
+          if response > 99.999
+            clearInterval(progresspump)
+            $('#progress').html 'Done'
+            console.log(response)
+        error: (response) ->
+          console.log(response)
+          clearInterval(progresspump)
+          $('.progress-bar').html 'Done'
+      }
+    ), 1000)
 
   $('.edit-summary').on 'click', ->
     $('.edit-summary-field').toggle()

@@ -12,4 +12,5 @@ class EventsController < ApplicationController
   ensure
     response.stream.close
   end
+
 end
