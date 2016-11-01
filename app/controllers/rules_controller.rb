@@ -35,7 +35,7 @@ class RulesController < ApplicationController
   private
 
   def rules_params
-    params.require(:rule).permit(:message, :connection, :flow, :detection, :metadata, :class_type)
+    params.require(:rule).permit(:message, :connection, :flow, :detection, :metadata, :class_type, :rule_category_id)
   end
 
 end

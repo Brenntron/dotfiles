@@ -160,17 +160,19 @@ $ ->
     else if $('.standard_form').is(":visible")
       form = $(this).parents('.standard_form')
       msg = form.find('input[name="rule[message]"]').val()
-      msg = '(msg:"' + msg + '";'
+      category = $('#rule_category_id option:selected').text()
+      msg = '(msg:"'+ category +  " " + msg + '";'
       connection = ""
       form.find('input[name="rule[connection][]"], select[name="rule[connection][]"]').each ->
         if $(this).is(":enabled")
           connection = connection + $(this).val() + " "
+      connection = "connection:" + connection
       flow = "flow:"
       form.find('input[name="rule[flow][]"], select[name="rule[flow][]"]').each ->
         if $(this).is(":enabled")
           flow = flow + $(this).val() + ","
       flow = flow.replace(/,([^,]*)$/,'$1') + ";"
-      detection = form.find('textarea[name="rule[detection]"]').val()
+      detection = "detection:" + form.find('textarea[name="rule[detection]"]').val()
       metadata = "metadata:"
       form.find('input[name="rule[metadata][]"], select[name="rule[metadata][]"]').each ->
         if $(this).is(":enabled")
@@ -192,7 +194,7 @@ $ ->
         references = references + "reference:" + item + "," + ref_values[i] + "; "
         i = i + 1
       rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
-      rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
+      rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val() }
       data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
       $.ajax {
         url: "/api/v1/rules"

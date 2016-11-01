@@ -51,6 +51,7 @@ module API
             optional :bug_id, type: Integer, desc: "Id of the bug associated with this rule"
             optional :detection, type: String, desc: "Detection for the new rule"
             optional :class_type, type: String, desc: "Classification of the new rule"
+            optional :rule_category_id, type: Integer, desc: "Rule Category"
           end
         end
         post "", root: "rule" do
@@ -58,6 +59,7 @@ module API
           new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule.update(detection:permitted_params[:rule][:detection].strip!, class_type:permitted_params[:rule][:class_type]) if new_rule.state == 'FAILED'
+          new_rule.update(rule_category_id: permitted_params[:rule][:rule_category_id])
           new_rule
         end
 

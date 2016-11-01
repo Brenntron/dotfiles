@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161011182823) do
+ActiveRecord::Schema.define(version: 20161028164433) do
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
@@ -107,7 +107,6 @@ ActiveRecord::Schema.define(version: 20161011182823) do
     t.string   "user"
     t.string   "action"
     t.string   "description"
-    t.integer  "progress"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -192,6 +191,12 @@ ActiveRecord::Schema.define(version: 20161011182823) do
     t.datetime "updated_at"
   end
 
+  create_table "rule_categories", force: true do |t|
+    t.string   "category"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "rules", force: true do |t|
     t.text     "rule_content"
     t.text     "rule_parsed"
@@ -218,15 +223,10 @@ ActiveRecord::Schema.define(version: 20161011182823) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "task_id"
-    t.integer  "attachment_id"
-    t.integer  "reference_id"
-    t.integer  "bug_id"
+    t.integer  "rule_category_id"
   end
 
-  add_index "rules", ["attachment_id"], name: "index_rules_on_attachment_id", using: :btree
-  add_index "rules", ["bug_id"], name: "index_rules_on_bug_id", using: :btree
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
-  add_index "rules", ["reference_id"], name: "index_rules_on_reference_id", using: :btree
   add_index "rules", ["task_id"], name: "index_rules_on_task_id", using: :btree
 
   create_table "tags", force: true do |t|
