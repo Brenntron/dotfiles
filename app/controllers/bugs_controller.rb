@@ -3,18 +3,20 @@ class BugsController < ApplicationController
   before_filter :require_login
   before_filter :query_bugs
   before_filter :get_states_and_users, only: [:index, :show, :new]
-  after_action  :sync_summary, only: [:create, :add_tag, :remove_tag]
+  after_action :sync_summary, only: [:create, :add_tag, :remove_tag]
 
   def index
     if params[:bug].present?
       @bug_searchID = params[:bug][:searchID]
-      @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:searchID]}%")
+      if @bug_searchID
+        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:searchID]}%")
+      end
     end
   end
 
   def new
     @bug = current_user.bugs.build
-    @tags = Tag.all.map{|tag| tag.name}.join(',')
+    @tags = Tag.all.map { |tag| tag.name }.join(',')
   end
 
   def create
@@ -42,14 +44,14 @@ class BugsController < ApplicationController
     )
 
     if @bug.save
-      @tags.each{|tag| @bug.tags << Tag.find_or_create_by(name: tag.upcase)}
+      @tags.each { |tag| @bug.tags << Tag.find_or_create_by(name: tag.upcase) }
       redirect_to @bug
     end
   end
 
   def show
     @bug = Bug.find(params[:id])
-    @rules = @bug.rules.sort {|a,b| a.sort_rules_by_state <=> b.sort_rules_by_state}
+    @rules = @bug.rules.sort { |a, b| a.sort_rules_by_state <=> b.sort_rules_by_state }
     @ref_types = ReferenceType.all
     @pcap_attachments = []
     @other_attachments = []
@@ -63,7 +65,8 @@ class BugsController < ApplicationController
     @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
     @tasks = @bug.tasks
     @notes = @bug.notes.order(created_at: :desc)
-    @tags = Tag.all.map{|tag| tag.name}.join(',')
+    @tags = Tag.all.map { |tag| tag.name }.join(',')
+    @categories = RuleCategory.all.sort_by { |x| [-x.rules.count, x.category] }
   end
 
   def update
@@ -81,7 +84,7 @@ class BugsController < ApplicationController
     @tag = Tag.find_or_create_by(name: params[:bug][:tag_name].upcase)
     @bug.tags << @tag
     respond_to do |format|
-      format.json {head :no_content}
+      format.json { head :no_content }
     end
   end
 
@@ -90,7 +93,7 @@ class BugsController < ApplicationController
     @tag = Tag.find_by(name: params[:bug][:tag_name])
     @bug.tags.destroy(@tag)
     respond_to do |format|
-      format.json {head :no_content}
+      format.json { head :no_content }
     end
   end
 
@@ -99,13 +102,12 @@ class BugsController < ApplicationController
   def bug_params
     params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification, :searchID,
                                 :summary, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
-                                                                                               :metadata, :detection, :class_type, :reference], tag_ids: [])
+                                                                                                              :metadata, :detection, :class_type, :reference], tag_ids: [])
   end
 
   def sync_summary
     @bug.compose_summary
   end
-
 
 
   def query_bugs
@@ -114,6 +116,8 @@ class BugsController < ApplicationController
     elsif params[:bug].is_a? Hash
       session[:query] = "advance-search"
       session[:search] = params[:bug]
+    else
+      session[:query] = ""
     end
     if session[:query]
       case session[:query]
@@ -139,7 +143,7 @@ class BugsController < ApplicationController
 
   def get_params_hash(params)
     para_hash = {}
-    params[:bug].each do |k,v|
+    params[:bug].each do |k, v|
       para_hash[k] = v
     end
     para_hash[:ids] = params[:id]
