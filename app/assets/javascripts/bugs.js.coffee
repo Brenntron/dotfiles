@@ -113,14 +113,16 @@ $ ->
 
   $("#change_editor_form").submit (e)->
     e.preventDefault()
-    id = $('input[name="id"]').val()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $('input[name="bug_id"]').val()
     editor = $('#bug_editor option:selected').val()
     $.ajax(
       url: '/api/v1/bugs/'+id
-      method: 'POST'
+      method: 'PUT'
+      headers: headers
       data:
         id: id
-        bug: 'user_id': editor
+        bug: 'editor_id': editor
     ).done (response) ->
       $('#current_bug_editor').html(response.bug.user_name).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
       $('#current_bug_editor, #change_editor_form').toggle()
@@ -128,14 +130,16 @@ $ ->
 
   $("#change_committer_form").submit (e)->
     e.preventDefault()
-    id = $('input[name="id"]').val()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $('input[name="bug_id"]').val()
     committer = $('#bug_committer option:selected').val()
     $.ajax(
       url: '/api/v1/bugs/'+id
-      method: 'POST'
+      method: 'PUT'
+      headers: headers
       data:
         id: id
-        bug: 'committer_id': committer
+        bug: 'reviewer_id': committer
     ).done (response) ->
       $('#current_bug_committer').html(response.bug.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
       $('#current_bug_committer, #change_committer_form').toggle()
