@@ -236,7 +236,7 @@ class Rule < ActiveRecord::Base
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
       detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule]) ? /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip : nil
       message = /Message\s*:\s(.*)/.match(parsed[:rule]) ? /Message\s*:\s(.*)/.match(parsed[:rule])[1] : "<MISSING>"
-      rule_category = RuleCategory.find_by_category(message.split(" ")[0])
+      rule_category = RuleCategory.find_or_create_by(category: message.split(" ")[0])
 
       rule_params = {
           :id => rule_sid,
