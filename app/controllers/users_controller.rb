@@ -3,11 +3,11 @@ class UsersController < ApplicationController
   before_filter :require_login
 
   def index
-    @users = User.all
+    @users = current_user.team_members
   end
 
   def show
-    @users = User.all
+    @users = current_user.team_members
     @user = User.find(params[:id])
   end
 

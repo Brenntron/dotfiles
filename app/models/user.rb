@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   has_many :team_members, :through => :team_member_relationships
   has_many :manager_relationships, :class_name => "Relationship", :foreign_key => "team_member_id"
   has_many :managers, :through => :manager_relationships, :source => :user
+  has_many :relationships
 
   before_save :ensure_authentication_token
   # Include default devise modules. Others available are:

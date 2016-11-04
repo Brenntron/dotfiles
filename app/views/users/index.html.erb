@@ -9,6 +9,17 @@
   </tr>
   </thead>
   <tbody>
+  <tr>
+    <td><%= current_user.bugs.open.count %></td>
+    <td><%= current_user.bugs.pending.count %></td>
+    <td><%= current_user.bugs.pending.count %></td>
+    <td><%= current_user.bugs.count %></td>
+    <td>
+      <% if current_user.committer %>
+          <i class="glyphicon glyphicon-ok"></i>
+      <% end %>
+    </td>
+  </tr>
   <% @users.each do |user| %>
     <tr>
       <td><%= user.bugs.open.count %></td>

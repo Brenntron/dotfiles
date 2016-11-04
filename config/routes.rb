@@ -15,22 +15,26 @@ Rails.application.routes.draw do
     resources :rule_configurations, :defaults => { :format => 'json' }
   end
 
+  # some of these named routes need to be rethought to conform to rails conventions
   get 'rules/add_form' => 'rules#add_form', format: 'js'
-  post "bugs/:id/create_rules" => "bugs#create_rules"
-  post 'bugs/:id/add_tag' => 'bugs#add_tag'
-  patch  'bugs/:id/remove_tag' => 'bugs#remove_tag'
-  get 'bugs/new' => 'bugs#new'
-  post 'bugs' => 'bugs#create'
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
   delete '/rules' => 'rules#destroy'
-  resources 'rules'
-  resources 'users'
-  resources 'bugs' do
-    resources 'references'
-  end
 
+
+  resources :rules
+  resources :users do
+    resources :relationships
+  end
+  resources :bugs do
+    member do
+      post  :create_rules
+      post  :add_tag
+      patch :remove_tag
+    end
+    resources :references
+  end
 
 
   post '/notes' => 'notes#create'
