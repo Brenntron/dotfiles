@@ -16,6 +16,10 @@ class Bug < ActiveRecord::Base
   accepts_nested_attributes_for :references
   accepts_nested_attributes_for :rules
 
+  scope :open, -> {where(state: "OPEN")}
+  scope :pending, -> {where(state: "PENDING")}
+  scope :closed, -> {where(state: "CLOSED")}
+
   enum classification: {
       unclassified: 0,
       confidential: 1,

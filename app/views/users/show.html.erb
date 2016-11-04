@@ -46,58 +46,60 @@
         </div>
       </div>
       <div class='col-sm-11'>
-        <ul class="nav nav-tabs">
-          <li role="presentation" class="user-tab active" id="open-tab"><a>open (<%= @user.bugs.length %>)</a></li>
-          <li role="presentation" class="user-tab" id="pending-tab"><a>pending (<%= @user.bugs.length %>)</a></li>
-          <li role="presentation" class="user-tab" id="closed-tab"><a>closed (<%= @user.bugs.length %>)</a></li>
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="user-tab active" id="open-tab"><a href="#open" aria-controls="open" role="tab" data-toggle="tab">open (<%= @user.bugs.open.count %>)</a></li>
+          <li role="presentation" class="user-tab" id="pending-tab"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">pending (<%= @user.bugs.pending.count %>)</a></li>
+          <li role="presentation" class="user-tab" id="closed-tab"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">closed (<%= @user.bugs.closed.count %>)</a></li>
         </ul>
-        <div class="tabs-content" id="open">
-          <% if @user.bugs %>
-            <% @user.bugs.each do |bug| %>
-              <div class="col-xs-2 col-md-1 center">
-                <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
-              </div>
-              <div class="col-xs-10 col-md-11">
-                <p><%= bug.summary %></p>
-              </div>
-            <% end %>
-          <% else %>
-            <div class="col-xs-12">
-              <p class="text-muted"><em>No open bugs at this time.</em></p>
-            </div>
-          <% end %>
-        </div>
-        <div class="tabs-content hidden" id="pending">
-          <% if @user.bugs %>
-            <% @user.bugs.each do |bug| %>
-              <div class="col-xs-2 col-md-1 center">
-                <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
-              </div>
-              <div class="col-xs-10 col-md-11">
-                <p><%= bug.summary %></p>
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="open">
+            <% if @user.bugs.open.any? %>
+              <% @user.bugs.open.each do |bug| %>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
+                </div>
+                <div class="col-xs-10 col-md-11">
+                  <p><%= bug.summary %></p>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="col-xs-12">
+                <p class="text-muted"><em>No open bugs at this time.</em></p>
               </div>
             <% end %>
-          <% else %>
-            <div class="col-xs-12">
-              <p class="text-muted"><em>No pending bugs at this time.</em></p>
-            </div>
-          <% end %>
-        </div>
-        <div class="tabs-content hidden" id="closed">
-          <% if @user.bugs %>
-            <% @user.bugs.each do |bug| %>
-              <div class="col-xs-2 col-md-1 center">
-                <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
-              </div>
-              <div class="col-xs-10 col-md-11">
-                <p><%= bug.summary %></p>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="pending">
+            <% if @user.bugs.pending.any? %>
+              <% @user.bugs.pending.each do |bug| %>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
+                </div>
+                <div class="col-xs-10 col-md-11">
+                  <p><%= bug.summary %></p>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="col-xs-12">
+                <p class="text-muted"><em>No pending bugs at this time.</em></p>
               </div>
             <% end %>
-          <% else %>
-            <div class="col-xs-12">
-              <p class="text-muted"><em>No closed bugs at this time.</em></p>
-            </div>
-          <% end %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="closed">
+            <% if @user.bugs.closed.any? %>
+              <% @user.bugs.closed.each do |bug| %>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
+                </div>
+                <div class="col-xs-10 col-md-11">
+                  <p><%= bug.summary %></p>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="col-xs-12">
+                <p class="text-muted"><em>No closed bugs at this time.</em></p>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>

@@ -11,10 +11,10 @@
   <tbody>
   <% @users.each do |user| %>
     <tr>
-      <td><%= user.bugs.length %></td>
-      <td><%= user.bugs.length %></td>
-      <td><%= user.bugs.length %></td>
-      <td><%= user.bugs.length %></td>
+      <td><%= user.bugs.open.count %></td>
+      <td><%= user.bugs.pending.count %></td>
+      <td><%= user.bugs.closed.count %></td>
+      <td><%= user.bugs.count %></td>
       <td>
         <% if user.committer %>
           <i class="glyphicon glyphicon-ok"></i>
