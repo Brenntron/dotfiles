@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   has_many :managers, :through => :manager_relationships, :source => :user
   has_many :relationships
 
+
   before_save :ensure_authentication_token
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -36,6 +37,16 @@ class User < ActiveRecord::Base
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
     end
+  end
+
+  def co_workers
+    co = []
+    managers.each do |m|
+      m.team_members.each do |tm|
+        co << tm
+      end
+    end
+    co.reject{ |u| u == self }
   end
 
   private

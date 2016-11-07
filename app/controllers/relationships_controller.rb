@@ -26,6 +26,15 @@ class RelationshipsController < ApplicationController
     redirect_to user_relationships_path(@user)
   end
 
+  def member_status
+    new_member = params[:new_member]
+    member_status = Relationship.where(team_member_id: new_member)
+    status = member_status.empty? ? true : false
+    respond_to do |format|
+      format.json { head :no_content, new_member: status }
+    end
+  end
+
   private
 
   def require_login

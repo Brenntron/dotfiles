@@ -8,10 +8,17 @@
         <tr class="highlight <%= 'active' if current_user.id.to_s == params[:id] %>" id="show_<%= current_user.id %>">
           <td><%= link_to current_user.cvs_username, user_path(current_user) %></td>
         </tr>
-        <% @users.each do |user| %>
-          <tr class="highlight <%= 'active' if user.id.to_s == params[:id] %>" id="show_<%= user.id %>">
-            <td><%= link_to user.cvs_username, user_path(user) %></td>
-          </tr>
+        <tr><td><strong>team</strong></td></tr>
+        <% current_user.team_members.each do |user| %>
+            <tr class="highlight <%= 'active' if user.id.to_s == params[:id] %>" id="show_<%= user.id %>">
+              <td><%= link_to user.cvs_username, user_path(user) %></td>
+            </tr>
+        <% end %>
+        <tr><td><strong>co-workers</strong></td></tr>
+        <% current_user.co_workers.each do |user| %>
+            <tr class="highlight <%= 'active' if user.id.to_s == params[:id] %>" id="show_<%= user.id %>">
+              <td><%= link_to user.cvs_username, user_path(user) %></td>
+            </tr>
         <% end %>
       </tbody>
     </table>

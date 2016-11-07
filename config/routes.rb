@@ -25,7 +25,11 @@ Rails.application.routes.draw do
 
   resources :rules
   resources :users do
-    resources :relationships
+    resources :relationships do
+      collection do
+        get :member_status
+      end
+    end
   end
   resources :bugs do
     member do

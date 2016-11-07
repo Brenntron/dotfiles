@@ -9,35 +9,49 @@
     </div>
     <div class='row top-space'>
       <div class="col-xs-11">
-        <div class="col-xs-12">
-          <h4>Team</h4>
-        </div>
-        <div class="col-xs-6 col-sm-4">
-          <h6 class="text-muted">managers</h6>
-          <% if @user.managers.any? %>
-            <ul class="compact-list">
-              <% @user.managers.each do |manager| %>
-                <li><%= link_to manager.cvs_username, user_path(manager) %></li>
-              <% end %>
-            </ul>
-          <% else %>
-            <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> answers to no one!</em></p>
-          <% end %>
-        </div>
-        <div class="col-xs-6 col-sm-4">
-          <h6 class="text-muted">team</h6>
-          <% if @user.team_members.any? %>
-            <ul class="compact-list">
-              <% @user.team_members.each do |member| %>
-              <li><%= link_to member.cvs_username, user_path(member) %></li>
-              <% end %>
-            </ul>
-          <% else %>
-            <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> is a lone wolf!</em></p>
-          <% end %>
+        <% if @user == current_user %>
+          <div class="col-xs-12">
+            <h4>Team</h4>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <h6 class="text-muted">managers</h6>
+            <% if @user.managers.any? %>
+              <ul class="compact-list">
+                <% @user.managers.each do |manager| %>
+                  <li><%= link_to manager.cvs_username, user_path(manager) %></li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> answers to no one!</em></p>
+            <% end %>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <h6 class="text-muted">team</h6>
+            <% if @user.team_members.any? %>
+              <ul class="compact-list">
+                <% @user.team_members.each do |member| %>
+                <li><%= link_to member.cvs_username, user_path(member) %></li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> is a lone wolf!</em></p>
+            <% end %>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <h6 class="text-muted">co-workers</h6>
+            <% if @user.co_workers.any? %>
+                <ul class="compact-list">
+                  <% @user.co_workers.each do |co| %>
+                      <li><%= link_to co.cvs_username, user_path(co) %></li>
+                  <% end %>
+                </ul>
+            <% else %>
+                <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> works alone!</em></p>
+            <% end %>
+          </div>
+        <%end%>
         </div>
       </div>
-    </div>
     <div class="row">
       <div class="col-xs-11"><hr/></div>
       <div class='col-xs-12'>

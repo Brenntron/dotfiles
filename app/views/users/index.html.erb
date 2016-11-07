@@ -1,37 +1,52 @@
 <table class="table index-table">
   <thead>
-  <tr>
-    <td><strong>Open</strong></td>
-    <td><strong>Pending</strong></td>
-    <td><strong>Closed</strong></td>
-    <td><strong>All</strong></td>
-    <td><strong>Committer</strong></td>
-  </tr>
+    <tr>
+      <td><strong>Open</strong></td>
+      <td><strong>Pending</strong></td>
+      <td><strong>Closed</strong></td>
+      <td><strong>All</strong></td>
+      <td><strong>Committer</strong></td>
+    </tr>
   </thead>
   <tbody>
-  <tr>
-    <td><%= current_user.bugs.open.count %></td>
-    <td><%= current_user.bugs.pending.count %></td>
-    <td><%= current_user.bugs.pending.count %></td>
-    <td><%= current_user.bugs.count %></td>
-    <td>
-      <% if current_user.committer %>
-          <i class="glyphicon glyphicon-ok"></i>
-      <% end %>
-    </td>
-  </tr>
-  <% @users.each do |user| %>
     <tr>
-      <td><%= user.bugs.open.count %></td>
-      <td><%= user.bugs.pending.count %></td>
-      <td><%= user.bugs.closed.count %></td>
-      <td><%= user.bugs.count %></td>
+      <td><%= current_user.bugs.open.count %></td>
+      <td><%= current_user.bugs.pending.count %></td>
+      <td><%= current_user.bugs.pending.count %></td>
+      <td><%= current_user.bugs.count %></td>
       <td>
-        <% if user.committer %>
-          <i class="glyphicon glyphicon-ok"></i>
+        <% if current_user.committer %>
+            <i class="glyphicon glyphicon-ok"></i>
         <% end %>
       </td>
     </tr>
-  <% end %>
+    <tr></tr>
+    <% current_user.team_members.each do |user| %>
+      <tr>
+        <td><%= user.bugs.open.count %></td>
+        <td><%= user.bugs.pending.count %></td>
+        <td><%= user.bugs.closed.count %></td>
+        <td><%= user.bugs.count %></td>
+        <td>
+          <% if user.committer %>
+            <i class="glyphicon glyphicon-ok"></i>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    <tr></tr>
+    <% current_user.co_workers.each do |user| %>
+        <tr>
+          <td><%= user.bugs.open.count %></td>
+          <td><%= user.bugs.pending.count %></td>
+          <td><%= user.bugs.closed.count %></td>
+          <td><%= user.bugs.count %></td>
+          <td>
+            <% if user.committer %>
+                <i class="glyphicon glyphicon-ok"></i>
+            <% end %>
+          </td>
+        </tr>
+    <% end %>
   </tbody>
 </table>
