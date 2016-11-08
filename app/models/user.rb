@@ -49,6 +49,11 @@ class User < ActiveRecord::Base
     co.reject{ |u| u == self }
   end
 
+  def authorized_user_list
+    users = co_workers + team_members + [self]
+    [].tap{ |arry| arry << users.map{ |u| u.id }}.flatten
+  end
+
   private
 
   def generate_authentication_token

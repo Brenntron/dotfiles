@@ -13,16 +13,22 @@ class RelationshipsController < ApplicationController
 
   def create
     @user = User.find(params[:user_id])
-    Relationship.create(relationship_params)
+    r = Relationship.create(relationship_params)
+    if r.save
+      flash[:notice] = "#{r.team_member.cvs_username} is now on your team!"
+    else
+      flash[:error] = 'Something went wrong.'
+    end
     redirect_to user_relationships_path(@user)
   end
 
   def destroy
     @user = User.find(params[:user_id])
     @relationship = Relationship.find(params[:id])
+    @team_member = @relationship.team_member.cvs_username
     @relationship.destroy
 
-    flash[:notice] = 'Team member has been removed'
+    flash[:alert] = "#{@team_member} has been removed from your team."
     redirect_to user_relationships_path(@user)
   end
 

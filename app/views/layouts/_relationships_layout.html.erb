@@ -23,6 +23,7 @@
           <!-- committer specific links-->
       <% end %>
     </div>
+    <%= render partial: "shared/flash_messages", flash: flash %>
     <%= yield %>
   </div>
 </div>
