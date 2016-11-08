@@ -6,3 +6,9 @@
 .table-borderless tfoot tr td {
     border: none;
 }
+
+.back_btn_user {
+    background-color: #D29864;
+    cursor: pointer;
+    padding: 10px;
+}

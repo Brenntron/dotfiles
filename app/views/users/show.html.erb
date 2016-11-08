@@ -1,4 +1,10 @@
 <div class='row item-info'>
+  <div class="row subheading">
+    <div class="col-xs-4 col-sm-1 back_btn_user pull-right">
+      <i class="glyphicon glyphicon-arrow-left"></i>
+      <%=link_to ' Back', users_path%>
+    </div>
+  </div>
   <div class='col-lg-11 col-md-11'>
     <div class="row">
       <div class="col-xs-12 col-sm-4">
@@ -137,8 +143,5 @@
     <div class="footer-spacer"></div>
 
   </div>
-  <%= link_to users_path, class: "col-xs-1 back-btn center" do %>
-    <div class="back-triangle"><p class="sr-only">back</p></div>
-  <% end %>
 </div>
 <div class="spacer"></div>
