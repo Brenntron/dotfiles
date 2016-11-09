@@ -77,7 +77,7 @@ module API
           if permitted_params[:rule][:revert]
             update_params[:cvs_rule_parsed] = update_params[:rule_parsed]
           else
-            unless rule.sid.nil? | (update_params[:state] == 'FAILED')
+            unless rule.sid.nil? || (update_params[:state] == 'FAILED')
               update_params[:state] = "UPDATED"
               update_params[:committed] = false
             end
@@ -86,7 +86,6 @@ module API
           rule.update(update_params)
           rule
         end
-
 
         #import multiple rules
         params do

@@ -1,19 +1,30 @@
+
 <form id="change_state_form" style="display:none;" class="form-inline top-space">
   <div class="form-group row">
     <div class="col-xs-12 col-lg-10">
       <select class="form-control input-sm" id="bug_state" name="state">
         <option value="" disabled>NEW</option>
-        <% ['ASSIGNED','PENDING','DUPLICATE', 'REOPENED'].each do |state| %>
-            <option value="<%= state %>"><%= state %></option>
+        <% if @bug.can_set_pending? %>
+            <% ['ASSIGNED', 'PENDING', 'DUPLICATE', 'REOPENED'].each do |state| %>
+                <option value="<%= state %>"><%= state %></option>
+            <% end %>
+        <% else %>
+            <% ['ASSIGNED', 'DUPLICATE', 'REOPENED'].each do |state| %>
+                <option value="<%= state %>"><%= state %></option>
+            <% end %>
         <% end %>
+
         <% if current_user.committer %>
             <% ['FIXED', 'WONTFIX', 'LATER', 'INVALID'].each do |state| %>
                 <option value="<%= state %>"><%= state %></option>
             <% end %>
         <% end %>
       </select>
+      <% unless @bug.can_set_pending? %>
+          <br><span class="tiny text-muted ">Cant set to pending. please assign attachments to exploits.</span><br>
+      <% end %>
       <input type="hidden" name="bug_id" value="<%= @bug.id %>">
-      <button class="btn btn-xs btn-default" value="submit" type="submit">done</button>
+      <button class="btn btn-xs btn-default" value="submit" type="submit" id="submit_change">Submit State</button>
     </div>
   </div>
 </form>

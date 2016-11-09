@@ -23,7 +23,7 @@
     <div class="form-group center">
       <div class="col-xs-12">
         <button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>
-        &nbsp;&nbsp;<a class="btn btn-danger remove-rule">Discard</a>
+        <button class="btn btn-danger rules" id="overview">Discard</button>
       </div>
     </div>
   </form>
@@ -286,7 +286,7 @@
     <div class="form-group right">
       <div class="col-xs-12 center top-space">
         <button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>
-        &nbsp;&nbsp;<a class="btn btn-danger remove-rule">Discard</a>
+        <button class="btn btn-danger rules" id="overview">Discard</button>
       </div>
     </div>
   </form>
@@ -322,7 +322,6 @@
     e.preventDefault();
     form = $(this).serializeArray();
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
-    data = {api_key: 'h93hq@hwo9%@ah!jsh'};
     id = form[0].value;
     return $.ajax({
       url: "/api/v1/rules/" + id,

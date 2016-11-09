@@ -10,7 +10,7 @@ end
 
 Given(/^a user exists and is logged in$/) do
   @user = FactoryGirl.create(:user, confirmed: true)
-  visit root_path(api_key: "h93hq@hwo9%@ah!jsh")
+  visit root_path()
 end
 
 Given(/^a manager exists and is logged in$/) do
@@ -23,5 +23,5 @@ Given(/^a user exists$/) do
 end
 
 Then(/^I visit the root url$/) do
-  visit root_path(api_key: "h93hq@hwo9%@ah!jsh")
+  visit root_path()
 end

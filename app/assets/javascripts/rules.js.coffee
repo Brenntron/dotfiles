@@ -1,12 +1,84 @@
 $ ->
-
-  $('.standard_form').hide()
+  $('.rule-toolbar').click ->
+    tab = $(this).attr('id')
+    isSelected = false
+    selected = []
+    $('input:checkbox.rule_check_box').each ->
+      if @checked
+        isSelected = true
+        selected.push($(this).val())
+    if isSelected or tab in ['overview','create']
+      switch(tab)
+        when 'test'
+          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+          bug_id = $('input[name="bug_id"]').val()
+          user_id = $('input[name="current_user_id"]').val()
+          data = {task: {bugzilla_id: bug_id, rule_array: selected.join(), task_type: "rule", created_by: user_id}}
+          $.ajax {
+            url: "/api/v1/tasks"
+            method: 'POST'
+            data: data
+            headers: headers
+            success: (response) ->
+              task = response.task
+              d = new Date()
+              month = d.getMonth()+1
+              day = d.getDate()
+              date = month + '/' + day + '/' + d.getFullYear()
+              string = '<tr id='+task.id+'><td class="center"><input type="checkbox"></td>'+
+                '<td class="center"><input type="checkbox"></td>'+
+                '<td>'+task.task_type+'</td><td></td><td></td>'+
+                '<td>'+task.result+'</td>'+
+                '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
+              $('#jobs-tab table tbody').append(string)
+              $('.alert_rules').addClass('success').show().html('Task has been created to test the rule')
+            error: (response) ->
+              $('.alert_rules').addClass('error').show().html('Task has not been created')
+            complete: ->
+              setTimeout (->
+                $('.alert_rules').hide 'blind', {}, 500
+                return
+              ), 5000
+          }
+        when 'remove'
+          if window.confirm("Are you sure?")
+            $.ajax {
+              url: "/rules"
+              data: { ids: selected }
+              type: 'DELETE'
+              dataType: 'json'
+              success: (response) ->
+                $.each selected, (index, value) ->
+                  $('.rules_table tr#'+value).remove()
+                  $('.alert_rules').removeClass('error')
+                  $('.alert_rules').addClass('success').append('Rule '+value+' has been deleted\n')
+                  $('.rule_'+value).remove()
+              error: (response) ->
+                $('.alert_rules').addClass('error').append('Rule '+value+' has not been deleted\n')
+              complete: ->
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+            }
+        else
+          $('.row.active').addClass('hidden').removeClass 'active'
+          $('.' + tab).addClass('active').removeClass 'hidden'
+          $('.active').show()
+          $('.hidden').hide()
+          $('.standard_form').hide()
+    else
+      alert("please select something")
 
   $('.diff').find('br').remove()
 
-  $(document).on 'click', '#legacy_btn, #standard_btn', (e) ->
-    e.preventDefault()
-    $('.legacy_form, #legacy_btn, .standard_form, #standard_btn').toggle()
+  $(document).on 'click', '#legacy_btn', (e) ->
+    $('.standard_form, #standard_btn').hide()
+    $('.legacy_form, #legacy_btn').show()
+
+  $(document).on 'click', '#standard_btn', (e) ->
+    $('.legacy_form, #legacy_btn').hide()
+    $('.standard_form, #standard_btn').show()
 
   $(document).on 'click','.rules_check_box', ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))
@@ -41,68 +113,6 @@ $ ->
       error: (response) ->
         $('alert_rules').removeClass('.success')
         $('alert_rules').addClass('error').append('Please provide correct rule sid')
-    }
-
-  $(document).on 'click', '#remove',  ->
-    selected = []
-    if window.confirm("Are you sure?")
-      $('input:checkbox.rule_check_box').each ->
-        if @checked
-         selected.push($(this).val())
-      $.ajax {
-        url: "/rules"
-        data: { ids: selected }
-        type: 'DELETE'
-        dataType: 'json'
-        success: (response) ->
-          $.each selected, (index, value) ->
-            $('.rules_table tr#'+value).remove()
-            $('.alert_rules').removeClass('error')
-            $('.alert_rules').addClass('success').append('Rule '+value+' has been deleted\n')
-            $('.rule_'+value).remove()
-        error: (response) ->
-          $('.alert_rules').addClass('error').append('Rule '+value+' has not been deleted\n')
-        complete: ->
-          setTimeout (->
-            $('.alert_rules').hide 'blind', {}, 500
-            return
-          ), 5000
-      }
-
-  $(document).on 'click', '#test',  ->
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    bug_id = $('input[name="bug_id"]').val()
-    user_id = $('input[name="current_user_id"]').val()
-    selected = []
-    $('input:checkbox.rule_check_box').each ->
-      if @checked
-        selected.push($(this).val())
-    data = {api_key: 'h93hq@hwo9%@ah!jsh', task: {bugzilla_id: bug_id, rule_array: selected.join(), task_type: "rule", created_by: user_id}}
-    $.ajax {
-      url: "/api/v1/tasks"
-      method: 'POST'
-      data: data
-      headers: headers
-      success: (response) ->
-        task = response.task
-        d = new Date()
-        month = d.getMonth()+1
-        day = d.getDate()
-        date = month + '/' + day + '/' + d.getFullYear()
-        string = '<tr id='+task.id+'><td class="center"><input type="checkbox"></td>'+
-          '<td class="center"><input type="checkbox"></td>'+
-          '<td>'+task.task_type+'</td><td></td><td></td>'+
-          '<td>'+task.result+'</td>'+
-            '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
-        $('#jobs-tab table tbody').append(string)
-        $('.alert_rules').addClass('success').show().html('Task has been created to test the rule')
-      error: (response) ->
-        $('.alert_rules').addClass('error').show().html('Task has not been created')
-      complete: ->
-        setTimeout (->
-          $('.alert_rules').hide 'blind', {}, 500
-          return
-        ), 5000
     }
 
   $(document).on 'change', '.scratch_connection, .connection', ->
@@ -141,7 +151,7 @@ $ ->
       contents_arr = rule_contents.split('\n')
       contents_arr.forEach (rule_content) ->
         rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
-        data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
+        data = { rule: rule}
         $.ajax {
           url: "/api/v1/rules"
           method: 'POST'
@@ -197,7 +207,7 @@ $ ->
           i = i + 1
         rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
         rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val() }
-        data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
+        data = {rule: rule}
         $.ajax {
           url: "/api/v1/rules"
           method: 'POST'
@@ -225,7 +235,7 @@ $ ->
     rule_content = form.find('textarea[name="rule[rule_content]"]').val()
     id = form.find('input[name="rule_id"]').val()
     rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
-    data = {api_key: 'h93hq@hwo9%@ah!jsh', id: id, rule: rule}
+    data = {id: id, rule: rule}
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax {
       url: "/api/v1/rules/"+id
@@ -245,4 +255,6 @@ $ ->
           form.show()
           return
         ), 5000
+        $(document).ajaxStop ->
+          location.reload true
     }
