@@ -14,3 +14,7 @@ del {
 .diff ul{
     list-style: none;
 }
+
+.onError {
+    border-color: red;
+}
