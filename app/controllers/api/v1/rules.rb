@@ -72,7 +72,6 @@ module API
           end
         end
         put ":id", root: "rule" do
-          binding.pry
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
           rule = Rule.where(id:permitted_params[:id]).first
           if permitted_params[:rule][:revert]
@@ -87,7 +86,6 @@ module API
           rule.update(update_params)
           rule
         end
-
 
         #import multiple rules
         params do

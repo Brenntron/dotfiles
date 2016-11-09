@@ -149,7 +149,7 @@ Feature: Bug
 #    And I goto "/bugs/222222"
 #    And I click "change_state"
 #    And I select "PENDING" from "state"
-##    And I do some debugging
+#    And I do some debugging
 #    When I click "submit_change"
 ##    And I change the "state" of bug number "222222" to "PENDING"
 #    And I wait for "3" seconds
@@ -176,7 +176,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     And I click ".rules-tab"
     And I click button "create"
-    And  I fill in "rule[rule_content]" with "1: connection:alert tcp $EXTERNAL_NET  ->  $HOME_NET any (msg:"select a category ";flow:to_client,established;detection:;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, , ;reference:cve,2006-5745; reference:cve,2568-5014; classtype:attempted-user)"
+    And  I fill in "rule[rule_content]" with "1: connection:alert tcp $EXTERNAL_NET  ->  $HOME_NET any (msg:"select a category ";flow:to_client,established;detection:;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, , ;reference:cve,2006-5745; reference:cve,2568-5014; classtype:attempted-user; sid:12345; rev:3)"
     When I click button "Create Rule"
     Then I click ".rules-tab"
     And I should see "new_rule"
@@ -207,7 +207,6 @@ Feature: Bug
     And I goto "/bugs/222222"
     And I click ".rules-tab"
 
-@now
   @javascript
   Scenario: a user can edit a rule attached to a bug
     Given a user exists and is logged in
@@ -220,10 +219,11 @@ Feature: Bug
     And I click ".rules-tab"
     And I toggle checkbox ".rule_1"
     And I click button "edit"
-    And  I fill in "rule[rule_content]" with "connection:drop ip $DNS_SERVERS $ORACLE_PORTS -> $SMTP_SERVERS $HOME_NET any (msg:'BROWSER-IE You deserve this if you use Firefox';flow:to_client,established;detection:So many detections;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, red, community;reference:bugtraq,122344; classtype:attempted-user)"
+    And  I fill in "rule[rule_content]" with "connection:drop ip $DNS_SERVERS $ORACLE_PORTS -> $SMTP_SERVERS $HOME_NET any (msg:'BROWSER-IE You deserve this if you use Firefox';flow:to_client,established;detection:So many detections;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, red, community;reference:bugtraq,122344; classtype:attempted-user; sid:12345; rev:3)"
+    And I do some debugging
     When I click button "Save Changes"
     Then I click ".rules-tab"
-    And I do some debugging
+
 
   @javascript
   Scenario: a user can test a rule

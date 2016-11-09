@@ -207,7 +207,7 @@ $ ->
           i = i + 1
         rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
         rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val() }
-        data = {api_key: 'h93hq@hwo9%@ah!jsh', rule: rule}
+        data = {rule: rule}
         $.ajax {
           url: "/api/v1/rules"
           method: 'POST'
