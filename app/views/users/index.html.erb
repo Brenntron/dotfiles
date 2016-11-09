@@ -20,19 +20,21 @@
         <% end %>
       </td>
     </tr>
-    <tr></tr>
-    <% current_user.team_members.each do |user| %>
-      <tr>
-        <td><%= user.bugs.open.count %></td>
-        <td><%= user.bugs.pending.count %></td>
-        <td><%= user.bugs.closed.count %></td>
-        <td><%= user.bugs.count %></td>
-        <td>
-          <% if user.committer %>
-            <i class="glyphicon glyphicon-ok"></i>
-          <% end %>
-        </td>
-      </tr>
+    <% if current_user.manager? %>
+      <tr></tr>
+      <% current_user.team_members.each do |user| %>
+        <tr>
+          <td><%= user.bugs.open.count %></td>
+          <td><%= user.bugs.pending.count %></td>
+          <td><%= user.bugs.closed.count %></td>
+          <td><%= user.bugs.count %></td>
+          <td>
+            <% if user.committer %>
+              <i class="glyphicon glyphicon-ok"></i>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
     <% end %>
     <tr></tr>
     <% current_user.co_workers.each do |user| %>

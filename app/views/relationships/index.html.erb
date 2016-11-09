@@ -33,9 +33,10 @@
           <br>
           <%=form_for :relationship, url: user_relationships_path(@user), method: :post do |f|%>
             <div class="form-group"><div class="form-inline">
-              <%= f.select :team_member_id, options_for_select(@users.map{|u| ["#{u.display_name} (#{u.cvs_username})", u.id]}), {prompt: "Choose Team Member"}, class: "form-control", required: "true", onchange: "populateAlert();"%>
+              <%= f.select :team_member_id, options_for_select(@users.map{|u| ["#{u.display_name} (#{u.cvs_username})", u.id]}), {prompt: "Choose Team Member"}, class: "form-control", required: "true"%>
               <%= f.hidden_field :user_id, value: @user.id %>
               <%= f.submit 'Add', class: 'btn btn-primary' %>
+              <p class="help-block text-nowrap">Any member of a team can view other members of the team(s) they belong to.</p>
             </div>
             </div>
           <%end%>
@@ -45,18 +46,19 @@
   </div>
 </div>
 
-<script>
-  function populateAlert(){
-    var newTeamMember = $('#relationship_team_member_id option:selected')
-    $.ajax({
-      url: "relationships/member_status",
-      method: 'GET',
-      data: {'new_member': newTeamMember.val()},
-      success: function(res, status, xhr) {
-        if(xhr.getResponseHeader("New-Member") == 'false') {
-          alert(newTeamMember.text() + ' is already on a team. However,' +  newTeamMember.text() + ' CAN be added to your team too.');
-        }
-      }
-    });
-  };
-</script>
+<div id="new_member_modal" class="modal" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header user">
+        <h4 class="modal-title">
+          Information Alert
+        </h4>
+      </div>
+      <div class="modal-body center-block">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>

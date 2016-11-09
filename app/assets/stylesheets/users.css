@@ -12,3 +12,7 @@
     cursor: pointer;
     padding: 10px;
 }
+
+.modal-header.user {
+    background-color: #D29864;
+}

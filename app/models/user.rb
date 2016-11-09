@@ -54,6 +54,10 @@ class User < ActiveRecord::Base
     [].tap{ |arry| arry << users.map{ |u| u.id }}.flatten
   end
 
+  def manager?
+    self.role == 'manager'
+  end
+
   private
 
   def generate_authentication_token

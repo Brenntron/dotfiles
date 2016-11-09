@@ -13,6 +13,11 @@ Given(/^a user exists and is logged in$/) do
   visit root_path(api_key: "h93hq@hwo9%@ah!jsh")
 end
 
+Given(/^a manager exists and is logged in$/) do
+  @user = FactoryGirl.create(:user, confirmed: true, role: 'manager')
+  visit root_path(api_key: "h93hq@hwo9%@ah!jsh")
+end
+
 Given(/^a user exists$/) do
   @user = FactoryGirl.create(:user, confirmed: true)
 end
