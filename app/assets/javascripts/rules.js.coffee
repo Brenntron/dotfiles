@@ -72,9 +72,13 @@ $ ->
 
   $('.diff').find('br').remove()
 
-  $(document).on 'click', '#legacy_btn, #standard_btn', (e) ->
-    e.preventDefault()
-    $('.legacy_form, #legacy_btn, .standard_form, #standard_btn').toggle()
+  $(document).on 'click', '#legacy_btn', (e) ->
+    $('.standard_form, #standard_btn').hide()
+    $('.legacy_form, #legacy_btn').show()
+
+  $(document).on 'click', '#standard_btn', (e) ->
+    $('.legacy_form, #legacy_btn').hide()
+    $('.standard_form, #standard_btn').show()
 
   $(document).on 'click','.rules_check_box', ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))

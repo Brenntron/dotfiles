@@ -7,7 +7,14 @@ Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
 end
 
 When(/^I click "(.*?)"$/) do |target|
-  click_on(target)
+    begin
+      click_on(target)
+    rescue Capybara::ElementNotFound => e
+      page.find("#{target}").click
+    end
+end
+When(/^I toggle checkbox "(.*?)"$/) do |target|
+  page.find(target).click
 end
 
 When(/^I check "(.*?)"$/) do |target|
@@ -107,11 +114,31 @@ Given(/^I wait for "(.*?)" seconds$/) do |seconds|
   sleep seconds.to_i
 end
 
+When /^I wait for the ajax request to finish$/ do
+  start_time = Time.now
+  page.evaluate_script('jQuery.isReady&&jQuery.active==0').class.should_not eql(String) until page.evaluate_script('jQuery.isReady&&jQuery.active==0') or (start_time + 5.seconds) < Time.now do
+    sleep 1
+  end
+end
+
 When(/^I select "(.*?)" from "(.*?)"$/) do |option, select|
   if option == "next year"
     option = (Time.now + 1.year).strftime("%Y")
   end
   select(option, :from => select)
+end
+When(/^I can not select "(.*?)" from "(.*?)"$/) do |option, select|
+  this_is_true = false
+  begin
+    select(option, :from => select)
+  rescue Capybara::ElementNotFound => e
+    if e.message.match(/Unable to find option/)
+      this_is_true = true
+    else
+      raise "content found but this is the incorrect message"
+    end
+  end
+  raise "content found when it should not have been found" unless this_is_true == true
 end
 
 Then(/^I should see "(.*?)"$/) do |content|
@@ -164,6 +191,9 @@ end
 
 Then(/^show me the page$/) do
   save_and_open_page
+end
+Then(/^take a photo/)do
+  save_and_open_screenshot
 end
 
 Then(/^take a screenshot$/) do 

@@ -31,7 +31,12 @@
               -
           <% end %>
         </td>
-        <td><div class="delete-btn delete_bug"></div></td>
+
+        <td>
+          <%=link_to  "#" , class: "delete_bug", id: "delete_bug"+bug.id.to_s do %>
+              <i class="glyphicon glyphicon-remove" title="Delete"></i>
+          <% end %>
+        </td>
       </tr>
   <% end %>
   </tbody>

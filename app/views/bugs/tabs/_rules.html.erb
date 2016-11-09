@@ -11,9 +11,12 @@
     <button class="select-sm btn btn-default rule-toolbar" id="test"><strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
     <span class="text-muted small hidden-xs"><i id="bug-rules-loader" class="glyphicon glyphicon-refresh spin" style="display:none;"></i><i id="bug-rules-error" class="glyphicon glyphicon-alert" style="display:none;"></i> &nbsp;&nbsp;</span>
     <form class="form-inline pull-right" id="linkRuleForm">
-      <div class="form-group">
+      <div class="input-group">
         <input name="sid" class="form-control select-sm input-extra-narrow" placeholder="import rule" />
-      </div>
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button">Import</button>
+      </span>
+      </div><!-- /input-group -->
     </form>
   </div>
 </div>
@@ -37,7 +40,7 @@
         <tbody>
         <% @rules.each do |rule| %>
           <tr id=<%= rule.id %>>
-            <td><input type="checkbox" class="rule_check_box" value="<%= rule.id %>"></td>
+            <td><input type="checkbox" class="rule_check_box rule_<%= rule.id %>" value="<%= rule.id %>"></td>
 
             <td class="rule_state_<%=rule_state_color(rule.state)%>"><%= rule.state %></td>
 

@@ -3,12 +3,13 @@
       <div class="row subheading">
         <div class="col-xs-12 col-sm-3">
           <h6>bugzilla id</h6>
-          <h3><%= @bug.id %><span class="tiny"><a href="<%= get_bug_url %>" target="_blank"><i class="glyphicon glyphicon-link"></i></a></span></h3>
+          <h3><%= @bug.id %><span class="tiny"><a href="<%= get_bug_url %>" id="bugzilla_<%= @bug.id %>" target="_blank"><i class="glyphicon glyphicon-link"></i></a></span></h3>
         </div>
 
         <div class="col-xs-4 col-sm-3 state">
           <h6>state</h6>
-          <h5 class="top-space" id="current_bug_state"><%= @bug.state %> &nbsp;<a class="tiny text-muted change_current_bug_state"><em>change</em></a></h5>
+          <h5 class="top-space" id="current_bug_state"><%= @bug.state %> &nbsp;<button class="tiny text-muted change_current_bug_state" id="change_state"><em>change</em></button></h5>
+
           <%= render 'shared/change_state_form' %>
         </div>
 
@@ -34,7 +35,7 @@
           </h4>
           <%= render 'shared/change_committer_bug_form' %>
         </div>
-        <div class="col-xs-4 col-sm-1 back_btn"><i class="glyphicon glyphicon-arrow-left"></i> Back</div>
+        <button class="select-sm btn btn-info back_btn" id="back_btn" style="margin-top:4px;"><i class="glyphicon glyphicon-arrow-left"></i> <strong class="hidden-xs">back</strong></button>
         <div class="col-sm-12 hidden-xs bug_summary">
           <h5><span class="edit-summary-field"><%= @bug.summary %></span><span>
           <%= form_tag("/bugs/#{@bug.id}", method: :put) do -%>
