@@ -3,6 +3,7 @@ class RulesController < ApplicationController
   def create
     @bug = Bug.find(params[:rule][:bug_id])
     @rule = Rule.new(rules_params)
+
     [:connection, :flow, :metadata].each do |data|
       @rule[data] = params[:rule][data].join(" ") if params[:rule][data].is_a? Array
     end

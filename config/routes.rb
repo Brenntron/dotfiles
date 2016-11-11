@@ -25,7 +25,7 @@ Rails.application.routes.draw do
   post "/attachments" => "attachments#create"
   root 'pages#index'
   delete '/rules' => 'rules#destroy'
-  resources 'rules'
+  resources :rules, param: :sid
   resources 'users'
   resources 'bugs' do
     resources 'references'
