@@ -17,24 +17,24 @@
   <div class="alert_attachments"></div>
   <div class="col-xs-12">
     <div class="attach_button" style="display:none">
-      <form action='#' method='post' role="form" id="attachment_form" enctype="multipart/form-data">
+      <form action='/api/v1/attachments' method='post' role="form" id="attachment_form" enctype="multipart/form-data">
         <div class="row">
           <div class="col-sm-12 form-group">
             <label for="attachment[summary]">Summary (what is this attachment)</label>
-            <input class="form-control create-input" id="new-attach-title" name="summary" required="true">
+            <input class="form-control create-input" id="new-attach-title" name="attachment[summary]" required="true">
           </div>
         </div>
 
         <div class="row">
           <div class="col-sm-12 form-group">
-            <label for="file_name">file</label>
-            <input name="file_name" type="file">
+            <label for="file_data">file</label>
+            <input name="attachment[file_data]" id="file_data" type="file" required="true">
           </div>
         </div>
-        <input type="hidden" name="bug_id" value="<%= @bug.id %>" >
+        <input type="hidden" name="attachment[bugzilla_attachment_id]" id="bug_id" value="<%= @bug.id %>" >
         <div class="row">
           <div class="col-sm-12 form-group">
-            <button class="btn btn-warning btn-sm" value="submit">Create Attachment</button>
+            <button class="btn btn-warning btn-sm add_attachment" value="submit">Create Attachment</button>
           </div>
         </div>
       </form>
@@ -62,7 +62,7 @@
       <tbody>
         <% @pcap_attachments.each do |attachment| %>
         <tr>
-          <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box"> </td>
+          <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box attach_<%= attachment.id %>"> </td>
           <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
             <i class="glyphicon glyphicon-download"></i></a></td>
           <td><code><a><%= attachment.file_name %></a></code></td>

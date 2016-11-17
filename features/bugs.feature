@@ -219,33 +219,73 @@ Feature: Bug
     And I goto "/bugs/222222"
     And I click ".rules-tab"
     And I toggle checkbox ".rule_1"
-    Then I should see "deserve this"
+    Then I should see "ActiveX clsid access attempt"
     And I click button "edit"
     And  I fill in "rule[rule_content]" with "connection:drop ip $DNS_SERVERS $ORACLE_PORTS -> $SMTP_SERVERS $HOME_NET any (msg:'BROWSER-IE You are the worst if you use IE';flow:to_client,established;detection:So many detections;metadata: balanced-ips, drop, ftp-data, http, imap, pop3, red, community;reference:bugtraq,122344; classtype:attempted-user; sid:12345; rev:3)"
     When I click button "Save Changes"
     And I click ".rules-tab"
-    Then I should not see "deserve this"
+    Then I should not see "ActiveX clsid access attempt"
     And I should see "are the worst"
 
   @javascript
   Scenario: a user can test a rule
     Given a user exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
-    And the following rules exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And I goto "/bugs/222222"
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And a rule exists and belongs to bug "145359"
+    And I wait for "3" seconds
+    When I goto "/bugs/145359"
+    And I click ".jobs-tab"
+    Then I should not see "rule"
     And I click ".rules-tab"
+    And I toggle checkbox ".rule_1"
+    Then I should see "ActiveX clsid access attempt"
+    When I click button "test"
+    Then test should be created and I should see "Task has been created to test the rule"
+    And I click ".jobs-tab"
+    Then I should see "rule"
 
-
+@now
   @javascript
   Scenario: a user can test add an attachment
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And I wait for "3" seconds
+    When I goto "/bugs/145359"
+    And I click ".attachments-tab"
+    Then I should not see "Newpcap.pcap"
+    And I click "#showAddAttachsToggle"
+    And I fill in "new-attach-title" with "new.pcap"
+    And I upload "Newpcap.pcap" from_button "file_data"
+    When I click "Create Attachment"
+    And I wait for "1" seconds
+    And I click ".attachments-tab"
+    Then I should see "Newpcap.pcap"
+    Then I clean up attachments
+
+
 
   @javascript
   Scenario: a user can test an attachment
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And an attachment exists and belongs to bug "145359"
+    And I wait for "3" seconds
+    When I goto "/bugs/145359"
+    And I click ".jobs-tab"
+    Then I should not see "attachment"
+    And I click ".attachments-tab"
+    And I toggle checkbox ".attach_1"
+    Then I should see "new.pcap"
+    When I click button "test attachments"
+    Then test should be created and I should see "Task has been created to test the attachment"
+    And I click ".jobs-tab"
+    Then I should see "attachment"
 
   @javascript
   Scenario: a user can edit research notes

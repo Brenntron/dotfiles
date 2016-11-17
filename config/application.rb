@@ -45,7 +45,7 @@ module Api
         config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')
         config.amq_host = "localhost"
-        config.cert_file = "/System/Library/OpenSSL/certs/ca.pem"
+        config.cert_file = "extras/ssh/ca.pem"
       when "staging"
         config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'

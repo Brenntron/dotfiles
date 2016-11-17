@@ -36,7 +36,6 @@ module API
           end
         end
         post "", root: "task" do
-
           if permitted_params[:task][:bugzilla_id]
             options = {
                 :bug              => Bug.where(id: permitted_params[:task][:bugzilla_id]).first,
@@ -45,17 +44,13 @@ module API
                 :attachment_array => permitted_params[:task][:attachment_array],
                 :rule_array       => permitted_params[:task][:rule_array]
             }.reject() { |k, v| v.nil? }
-
           else   # (legacy form)
-
           end
-
           new_task = Task.create(
               :bug  => options[:bug],
               :task_type     => options[:task_type],
               :user => options[:current_user],
           )
-          
           case options[:task_type]
             when "attachment"
               options[:attachment_array].split(',').each do |attachment_id|
