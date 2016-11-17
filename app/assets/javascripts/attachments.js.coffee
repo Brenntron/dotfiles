@@ -85,46 +85,6 @@ $ ->
         $(document).ajaxStop ->
           location.reload()
 
-
-#  $('#attachment_form').submit (e) ->
-#    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#    data = new FormData()
-#    data.append( 'bug_id', $('input[name=bug_id]').val())
-#    data.append( 'attachment[summary]', $('input[name=summary]').val())
-#    data.append( 'attachment[file_data]', $('input[name="file_name"]')[0].files[0])
-#    debugger
-#    $.ajax {
-#      url: "/attachments"
-#      method: 'POST'
-#      data: data
-#      headers: headers
-#      success: (response) ->
-#        debugger
-#        attachment = response.attachment
-#        $('.success_attachments').html('successfully attached')
-#        $('#current-attachments').append('<tr>'+
-#            '<td><input type="checkbox" name='+attachment.id+' class="attachcheckbox"> </td>'+
-#            '<td class="center narrow-column"><a class="blue" href='+attachment.direct_upload_url+'>'+
-#            '<i class="glyphicon glyphicon-download"></i></a></td>'+
-#            '<td><code><a>'+attachment.file_name+'</a></code></td>'+
-#            '<td class="center narrow-column">'+
-#            '<h5>'+
-#            '<a>0</a>'+
-#            '</h5>'+
-#            '</td>'+
-#            '</tr>')
-#        $('#hideAddAttachsToggle, #showAddAttachsToggle, .attach_button').toggle()
-#        $('.alert_attachments').addClass('success').show().html(attachment.file_name+' successfully attached')
-#      error: (response) ->
-#        debugger
-#        $('.alert_attachments').addClass('error').show().html(response.responseText)
-#      complete: ->
-#        setTimeout (->
-#            $('.alert_attachments').hide 'blind', {}, 5000
-#            return
-#          ), 5000
-#    }
-
   $(document).on 'click', '#test_attachments',  ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     bug_id = $('input[name="bug_id"]').val()

@@ -32,10 +32,10 @@ $ ->
                 '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
               $('#jobs-tab table tbody').append(string)
               debugger;
-              $('.alert_rules').addClass('success').show().html('Task has been created to test the rule ' + response.rules.length)
+              $('.alert_rules').addClass('success').show().html('Task has been created to test the rule ')
             error: (response) ->
               debugger;
-              $('.alert_rules').addClass('error').show().html('Task has not been created '+ response.rules.length)
+              $('.alert_rules').addClass('error').show().html('Task has not been created ')
             complete: ->
               setTimeout (->
                 $('.alert_rules').hide 'blind', {}, 5000

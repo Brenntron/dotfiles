@@ -1,7 +1,6 @@
 class AttachmentsController < ApplicationController
 
   def create
-    binding.pry
     begin
       file_content = params[:attachment][:file_data].tempfile.read
       options = {
