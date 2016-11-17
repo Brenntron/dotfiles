@@ -1,9 +1,8 @@
 <div class='row item-info'>
   <div class="row subheading">
-    <div class="col-xs-4 col-sm-1 back_btn_user pull-right">
-      <i class="glyphicon glyphicon-arrow-left"></i>
-      <%=link_to ' Back', users_path%>
-    </div>
+    <button class="btn back_btn_user pull-right">
+      <i class="glyphicon glyphicon-arrow-left"></i> Back
+    </button>
   </div>
   <div class='col-lg-11 col-md-11'>
     <div class="row">
@@ -128,15 +127,22 @@
       <div class='col-xs-12'>
         <div class='col-xs-11'>
           <h4>Metrics</h4>
+          <div id="msg"></div>
         </div>
       </div>
-      <div class="col-lg-4 col-md-6">
+      <div class="col-lg-5 col-md-6">
+        <div class="user-metrics" id='<%=@user.id%>'></div>
+        <p>Bug status changes last <%=current_user.metrics_timeframe%> days <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change</em></a></p>
+        <%= render 'shared/change_metrics_timeframe_form' %>
+        <canvas id="statusChart"></canvas>
       </div>
-      <div class="col-lg-4 col-md-6">
-        <p class="small">
-        </p>
-      </div>
-      <div class="col-lg-4 col-md-6">
+      <div class="col-lg-5 col-md-6">
+        <p>Work Time Averages</p>
+        <canvas id="timeChart"></canvas>
+        <br>
+        <div class="col-xs-12">
+          <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
+        </div>
       </div>
 
     </div>
@@ -145,3 +151,6 @@
   </div>
 </div>
 <div class="spacer"></div>
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="xml_token" value="<%= xml_token %>">
+<input type="hidden" name="current_user" value="<%= current_user.id%>">

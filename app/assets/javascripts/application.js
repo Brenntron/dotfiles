@@ -15,6 +15,8 @@
 //= require jquery-ui
 //= require bootstrap-sprockets
 //= require selectize
+//= require Chart.bundle
+//= require chartkick
 //= require_tree .
 
 

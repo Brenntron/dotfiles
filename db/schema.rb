@@ -90,8 +90,8 @@ ActiveRecord::Schema.define(version: 20161021150451) do
   add_index "bugs", ["user_id"], name: "index_bugs_on_user_id", using: :btree
 
   create_table "bugs_rules", id: false, force: true do |t|
-    t.integer "bug_id",  default: 0, null: false
-    t.integer "rule_id", default: 0, null: false
+    t.integer "bug_id",  null: false
+    t.integer "rule_id", null: false
   end
 
   create_table "bugs_tags", id: false, force: true do |t|
@@ -272,6 +272,7 @@ ActiveRecord::Schema.define(version: 20161021150451) do
     t.string   "role"
     t.integer  "class_level"
     t.string   "authentication_token"
+    t.integer  "metrics_timeframe",      default: 7
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"

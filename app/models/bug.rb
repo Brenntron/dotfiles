@@ -184,6 +184,13 @@ class Bug < ActiveRecord::Base
       true
   end
 
+  def allow_state_change?
+    if !self.user.present? || !self.committer.present?
+      return false
+    end
+    true
+  end
+
   def parse_summary
 
     parsed_summary = {}
@@ -249,6 +256,14 @@ class Bug < ActiveRecord::Base
       tag_array.reverse.each{|ta| summary_string.prepend(ta) }
 
       self.update(summary: summary_string)
+    end
+  end
+
+  def resolution_time
+    if resolved_at.present?
+      ((resolved_at - created_at)/86400).ceil
+    else
+      0
     end
   end
 

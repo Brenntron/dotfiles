@@ -27,9 +27,10 @@ class CreateUsers < ActiveRecord::Migration
       t.string   :last_sign_in_ip
 
       t.string   :role
-      t.integer   :class_level
+      t.integer  :class_level
 
       t.string   :authentication_token
+      t.integer  :metrics_timeframe, :default => 7
 
       t.timestamps
     end

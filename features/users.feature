@@ -107,6 +107,26 @@ Feature: User Accounts
     Then I click "Add"
     And  I should see "t_bear is now on your team!"
 
-    # go to relationships page and add and delete users
-      # get proper js alerts if someone is on another team
-    # see new team member in index after add
+  @javascript
+  Scenario: A manager user can go to a users show page and update their metrics timeframe preference.
+    Given a manager exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
+
+    And the following relationships exist:
+      | user_id | team_member_id |
+      | 1       | 3              |
+      | 1       | 4              |
+
+    Then I wait for "3" seconds
+    And  I goto "/users"
+    And  I goto "/users/3"
+    And  I should see "Bug status changes last 7 days"
+    Then I click "change"
+    And  I select "30" from "user_metrics_timeframe"
+    Then I click "done"
+    And  I wait for "2" seconds
+    Then I should see "Bug status changes last 30 days"

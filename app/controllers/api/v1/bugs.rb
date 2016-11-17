@@ -200,8 +200,8 @@ module API
             update_params = {
                 :committer => reviewer
             }
-          elsif permitted_params[:bug][:state_id]
-            state_params = Bug.update_state(bug, permitted_params[:bug][:state_id], nil)
+          elsif permitted_params[:bug][:state]
+            state_params = Bug.update_state(bug, permitted_params[:bug][:state], nil)
             options = {
                 :ids => permitted_params[:id],
                 :status => state_params[:status],

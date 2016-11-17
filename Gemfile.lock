@@ -75,6 +75,9 @@ GEM
       xpath (~> 2.0)
     celluloid (0.16.0)
       timers (~> 4.0.0)
+    chart-js-rails (0.1.0)
+      railties (> 3.1)
+    chartkick (2.1.1)
     cliver (0.3.2)
     coderay (1.1.0)
     coercible (1.0.0)
@@ -365,6 +368,8 @@ DEPENDENCIES
   bootstrap-sass
   cancan (= 1.6.10)
   capybara (= 2.4.4)
+  chart-js-rails
+  chartkick
   coffee-rails
   cucumber-rails (= 1.4.2)
   daemons

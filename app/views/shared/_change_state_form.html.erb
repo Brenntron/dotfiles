@@ -5,19 +5,30 @@
       <select class="form-control input-sm" id="bug_state" name="state">
         <option value="" disabled>NEW</option>
         <% if @bug.can_set_pending? %>
-            <% ['ASSIGNED', 'PENDING', 'DUPLICATE', 'REOPENED'].each do |state| %>
-                <option value="<%= state %>"><%= state %></option>
+          <% ['ASSIGNED', 'PENDING', 'DUPLICATE', 'REOPENED'].each do |state| %>
+            <% if state == @bug.state %>
+              <option value="<%= state %>" selected="selected"><%= state %></option>
+            <% else %>
+              <option value="<%= state %>"><%= state %></option>
             <% end %>
+          <% end %>
         <% else %>
-            <% ['ASSIGNED', 'DUPLICATE', 'REOPENED'].each do |state| %>
+          <% ['ASSIGNED', 'DUPLICATE', 'REOPENED'].each do |state| %>
+            <% if state == @bug.state %>
+                <option value="<%= state %>" selected="selected"><%= state %></option>
+            <% else %>
                 <option value="<%= state %>"><%= state %></option>
-            <% end %>
+            <% end %> end %>
+          <% end %>
         <% end %>
-
         <% if current_user.committer %>
-            <% ['FIXED', 'WONTFIX', 'LATER', 'INVALID'].each do |state| %>
+          <% ['FIXED', 'WONTFIX', 'LATER', 'INVALID'].each do |state| %>
+            <% if state == @bug.state %>
+                <option value="<%= state %>" selected="selected"><%= state %></option>
+            <% else %>
                 <option value="<%= state %>"><%= state %></option>
             <% end %>
+          <% end %>
         <% end %>
       </select>
       <% unless @bug.can_set_pending? %>

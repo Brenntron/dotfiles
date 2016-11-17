@@ -12,6 +12,37 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
+  def status_metrics
+    @user = User.find(params[:user_id])
+    pending = {}
+    reopened = {}
+    timeframe = current_user.metrics_timeframe
+    (timeframe.days.ago.to_date..Date.today).each do |day|
+      pending[day.strftime("%b %d, %Y")] = @user.bugs.where('DATE(pending_at) = ?', day).count
+      reopened[day.strftime("%b %d, %Y")] = @user.bugs.where('DATE(reopened_at) = ?', day).count
+    end
+    respond_to do |format|
+      format.json {
+        render :json => [pending, reopened]
+      }
+    end
+  end
+
+  def time_metrics
+    @user = User.find(params[:user_id])
+    @work_time_ave = @user.bugs.average(:work_time).try(:round)
+    @rework_time_ave = @user.bugs.average(:rework_time).try(:round)
+    @review_time_ave = @user.bugs.average(:review_time).try(:round)
+    @resolution_times = @user.bugs.where('resolved_at is NOT ?', nil).map{|x| x.resolution_time}
+    @resolution_time_ave = @resolution_times.empty? ? 0 : (@resolution_times.sum / @resolution_times.size).round()
+
+    respond_to do |format|
+      format.json {
+        render :json => [@work_time_ave, @rework_time_ave, @review_time_ave, @resolution_time_ave]
+      }
+    end
+  end
+
   private
 
   def require_login
@@ -23,5 +54,9 @@ class UsersController < ApplicationController
       flash[:error] = 'You are not authorized to view that user.'
       redirect_to users_path
     end
+  end
+
+  def user_params
+    params.require(:user).permit(:display_name, :committer, :confirmed, :email, :role, :class_level, :metrics_timeframe)
   end
 end

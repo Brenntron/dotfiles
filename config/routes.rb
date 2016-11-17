@@ -25,6 +25,8 @@ Rails.application.routes.draw do
 
   resources :rules
   resources :users do
+    get :status_metrics, defaults: { format: :json }
+    get :time_metrics, defaults: { format: :json }
     resources :relationships do
       collection do
         get :member_status
