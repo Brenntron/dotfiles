@@ -127,6 +127,7 @@ Feature: Bug
     Then I should see "Cant set to pending."
     And I can not select "PENDING" from "state"
 
+
   @javascript
   Scenario: a user can return to the index from viewing a bug
     Given a user exists and is logged in
@@ -176,7 +177,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     And I click ".rules-tab"
     And I click button "create"
-    And  I fill in "rule[rule_content]" with "1: connection:alert tcp $EXTERNAL_NET  ->  $HOME_NET any (msg:"select a category ";flow:to_client,established;detection:;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, , ;reference:cve,2006-5745; reference:cve,2568-5014; classtype:attempted-user; sid:12345; rev:3)"
+    And  I fill in "rule[rule_content]" with "1: connection:alert tcp $EXTERNAL_NET  ->  $HOME_NET any (msg:"select a category ";flow:to_client,established;detection:;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, , ;reference:cve,2006-5745; reference:cve,2568-5014; classtype:attempted-user)"
     When I click button "Create Rule"
     Then I click ".rules-tab"
     And I should see "new_rule"
@@ -218,69 +219,145 @@ Feature: Bug
     And I goto "/bugs/222222"
     And I click ".rules-tab"
     And I toggle checkbox ".rule_1"
+    Then I should see "ActiveX clsid access attempt"
     And I click button "edit"
-    And  I fill in "rule[rule_content]" with "connection:drop ip $DNS_SERVERS $ORACLE_PORTS -> $SMTP_SERVERS $HOME_NET any (msg:'BROWSER-IE You deserve this if you use Firefox';flow:to_client,established;detection:So many detections;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, red, community;reference:bugtraq,122344; classtype:attempted-user; sid:12345; rev:3)"
-    And I do some debugging
+    And  I fill in "rule[rule_content]" with "connection:drop ip $DNS_SERVERS $ORACLE_PORTS -> $SMTP_SERVERS $HOME_NET any (msg:'BROWSER-IE You are the worst if you use IE';flow:to_client,established;detection:So many detections;metadata: balanced-ips, drop, ftp-data, http, imap, pop3, red, community;reference:bugtraq,122344; classtype:attempted-user; sid:12345; rev:3)"
     When I click button "Save Changes"
-    Then I click ".rules-tab"
-
+    And I click ".rules-tab"
+    Then I should not see "ActiveX clsid access attempt"
+    And I should see "are the worst"
 
   @javascript
   Scenario: a user can test a rule
     Given a user exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
-    And the following rules exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And I goto "/bugs/222222"
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And a rule exists and belongs to bug "145359"
+    And I wait for "3" seconds
+    When I goto "/bugs/145359"
+    And I click ".jobs-tab"
+    Then I should not see "rule"
     And I click ".rules-tab"
+    And I toggle checkbox ".rule_1"
+    Then I should see "ActiveX clsid access attempt"
+    When I click button "test"
+    Then test should be created and I should see "Task has been created to test the rule"
+    And I click ".jobs-tab"
+    Then I should see "rule"
 
-
+@now
   @javascript
   Scenario: a user can test add an attachment
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And I wait for "3" seconds
+    When I goto "/bugs/145359"
+    And I click ".attachments-tab"
+    Then I should not see "Newpcap.pcap"
+    And I click "#showAddAttachsToggle"
+    And I fill in "new-attach-title" with "new.pcap"
+    And I upload "Newpcap.pcap" from_button "file_data"
+    When I click "Create Attachment"
+    And I wait for "1" seconds
+    And I click ".attachments-tab"
+    Then I should see "Newpcap.pcap"
+    Then I clean up attachments
+
+
 
   @javascript
   Scenario: a user can test an attachment
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And an attachment exists and belongs to bug "145359"
+    And I wait for "3" seconds
+    When I goto "/bugs/145359"
+    And I click ".jobs-tab"
+    Then I should not see "attachment"
+    And I click ".attachments-tab"
+    And I toggle checkbox ".attach_1"
+    Then I should see "new.pcap"
+    When I click button "test attachments"
+    Then test should be created and I should see "Task has been created to test the attachment"
+    And I click ".jobs-tab"
+    Then I should see "attachment"
 
   @javascript
   Scenario: a user can edit research notes
     Given a user exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
     Then I wait for "3" seconds
-    And I goto "/bugs/222222"
-    And I click ".attachments-tab"
+    And I goto "/bugs/145359"
+    And I click ".notes-tab"
+    And I click "edit"
+    And  I fill in "research_notes" with "This is a research note"
+    And I click "save"
+    Then I should see "Notes saved"
+    When I click "publish"
+    And I wait for "5" seconds
+    Then I should see "Notes published to bugzilla"
 
   @javascript
   Scenario: a user can edit committer notes.
-    Given a user exists and is logged in
+    Given a user with commit permission exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And I goto "/bugs/222222"
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    Then I wait for "2" seconds
+    And I goto "/bugs/145359"
     And I click ".notes-tab"
+    And I click "Committer notes"
+    And I click "#committerNotesEditBtn"
+    And  I fill in "committer_notes" with "This is a research note"
+    And I click "save"
+    Then I should see "Notes saved"
+    When I click "#committerNotesPublishBtn"
+    And I wait for "3" seconds
+    Then I should see "Notes published to bugzilla"
 
   @javascript
   Scenario: a user can add a comment
     Given a user exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
     Then I wait for "3" seconds
-    And I goto "/bugs/222222"
-    And I click ".notes-tab"
+    And I goto "/bugs/145359"
+    And I click ".history-tab"
+    And I click "#showAddNotesToggle"
+    And  I fill in "noteCommentField" with "I love testing"
+    And I click "save"
+    And I wait for "3" seconds
+    Then I should see "Comment saved and published to bugzilla"
+    When I goto "/bugs/145359"
+    And I click ".history-tab"
+    Then I should see "I love testing"
 
   @javascript
   Scenario: a user can sort history from oldest to newest messages.
     Given a user exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And the following notes exist:
+      | id |   comment     |  note_type |        author       | bug_id  |
+      | 1  |i like comments| "research" | "nicherbe@cisco.com"| 145359  |
+      | 2  |pork sandwiches| "research" | "nicherbe@cisco.com"| 145359  |
+
     Then I wait for "3" seconds
-    And I goto "/bugs/222222"
+    And I goto "/bugs/145359"
     And I click ".history-tab"
+    Then note number "1" should say "i like comments"
+    And note number "2" should say "pork sandwiches"
+    When I click "#notesTLDRToggle"
+    Then note number "1" should say "pork sandwiches"
+    And note number "2" should say "i like comments"
+
+

@@ -24,7 +24,7 @@ class CreateReferencesAndRules < ActiveRecord::Migration
       t.string   "metadata"
       t.string   "class_type"
       t.integer  "gid"
-      t.integer  "sid",              unique: true
+      t.integer  "sid"
       t.integer  "rev"
       t.string   "state"
       t.float    "average_check"

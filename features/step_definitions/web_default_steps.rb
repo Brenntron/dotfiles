@@ -28,6 +28,10 @@ When(/^I choose "(.*?)"$/) do |target|
   choose(target)
 end
 
+Given(/^I upload "(.*?)" from_button "(.*?)"$/) do |filename, type|
+  attach_file("#{type}", "#{Rails.root}/lib/data/#{filename}")
+end
+
 When(/^I click link "(.*?)"$/) do |link| #id or link name
   click_link(link)
 end
@@ -195,6 +199,7 @@ end
 Then(/^take a photo/)do
   save_and_open_screenshot
 end
+
 
 Then(/^take a screenshot$/) do 
   page.save_screenshot('/tmp/screenshot.png', :full => true)

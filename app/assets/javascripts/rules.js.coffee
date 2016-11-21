@@ -31,12 +31,14 @@ $ ->
                 '<td>'+task.result+'</td>'+
                 '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
               $('#jobs-tab table tbody').append(string)
-              $('.alert_rules').addClass('success').show().html('Task has been created to test the rule')
+              debugger;
+              $('.alert_rules').addClass('success').show().html('Task has been created to test the rule ')
             error: (response) ->
-              $('.alert_rules').addClass('error').show().html('Task has not been created')
+              debugger;
+              $('.alert_rules').addClass('error').show().html('Task has not been created ')
             complete: ->
               setTimeout (->
-                $('.alert_rules').hide 'blind', {}, 500
+                $('.alert_rules').hide 'blind', {}, 5000
                 return
               ), 5000
           }

@@ -127,9 +127,9 @@ $ ->
         $('.alert_notes').addClass('error').show().html(response.responseText)
       complete: ->
         setTimeout (->
-          $('.alert_notes').hide 'blind', {}, 500
+          $('.alert_notes').hide 'blind', {}, 5000
           return
-        ), 5000
+        ), 8000
     }
 
   $(document).on 'click', '#committerNotesPublishBtn', (e) ->
@@ -177,7 +177,7 @@ $ ->
         $('.alert_notes').addClass('error').show().html(response.responseText)
       complete: ->
         setTimeout (->
-          $('.alert_notes').hide 'blind', {}, 500
+          $('.alert_notes').hide 'blind', {}, 5000
           return
-        ), 5000
+        ), 8000
     }

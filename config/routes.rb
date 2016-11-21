@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   delete '/rules' => 'rules#destroy'
 
 
-  resources :rules
+  resources :rules, param: :sid
   resources :users do
     get :status_metrics, defaults: { format: :json }
     get :time_metrics, defaults: { format: :json }

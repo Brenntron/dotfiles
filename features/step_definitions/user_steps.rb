@@ -8,6 +8,11 @@ Given(/^the following users exist$/) do |users|
   end
 end
 
+Given(/^a user with commit permission exists and is logged in$/) do
+  @user = FactoryGirl.create(:user, confirmed: true, committer: true)
+  visit root_path()
+end
+
 Given(/^a user exists and is logged in$/) do
   @user = FactoryGirl.create(:user, confirmed: true)
   visit root_path()

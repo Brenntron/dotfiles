@@ -46,7 +46,7 @@ $ ->
         $('.alert_comment').addClass('error').show().html(response.responseText)
       complete: ->
         setTimeout (->
-          $('.alert_comment').hide 'blind', {}, 500
+          $('.alert_comment').hide 'blind', {}, 8000
           return
-        ), 5000
+        ), 8000
     }

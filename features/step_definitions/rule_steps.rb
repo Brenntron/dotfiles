@@ -23,3 +23,6 @@ Then(/^"(.*?)" should be listed first$/) do |value|
 end
 
 
+Then(/^test should be created and I should see "(.*?)"$/) do |content|
+  raise "Content not found. Make sure AMQ and background jobs are running." unless page.has_content?(content)
+end
