@@ -34,6 +34,8 @@ class BugsController < ApplicationController
         :version => params[:bug][:version],
         :description => params[:bug][:description],
         :state => params[:bug][:state] || 'OPEN',
+        :status => params[:bug][:status] || 'NEW',
+        :resolution => params[:bug][:resolution] || 'OPEN',
         :creator => current_user.id,
         :user_id => current_user.id,
         :opsys => params[:bug][:opsys],

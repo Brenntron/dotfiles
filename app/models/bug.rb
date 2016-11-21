@@ -16,9 +16,9 @@ class Bug < ActiveRecord::Base
   accepts_nested_attributes_for :references
   accepts_nested_attributes_for :rules
 
-  scope :open, -> {where(state: "OPEN")}
+  scope :open, -> {where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED'])}
+  scope :closed, -> {where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE'])}
   scope :pending, -> {where(state: "PENDING")}
-  scope :closed, -> {where(state: "CLOSED")}
 
   enum classification: {
       unclassified: 0,
@@ -175,6 +175,14 @@ class Bug < ActiveRecord::Base
 
   end
 
+  def priority_sort
+    if self.priority.nil?
+      self.priority = 'Unspecified'
+    else
+      self.priority
+    end
+  end
+
   def can_set_pending?
     self.exploits.each do |expl|
       if expl.attachment.nil?
@@ -201,7 +209,7 @@ class Bug < ActiveRecord::Base
   end
 
   def summary_tags
-    summary_tags = summary.scan(/\[.*?\]/).map{|s| s.delete "[]"}.reject!{|tag| tag == "SID"}
+    summary_tags = summary_tag_array.map{|s| s.delete "[]"}
     if summary_tags
       create_tags_from_summary(summary_tags)
       summary_tags.map{|tag| Tag.find_by_name(tag)}
@@ -296,6 +304,7 @@ class Bug < ActiveRecord::Base
           new_record.resolution = item['resolution']
           new_record.resolution = "OPEN" if new_record.resolution.empty?
           new_record.state = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
+          new_record.priority = item['priority']
 
           new_record.created_at = item['creation_time'].to_time
           last_change_time = item['last_change_time'].to_time

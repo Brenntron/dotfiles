@@ -62,6 +62,9 @@ $ ->
   $(document).on 'click', '.change_current_bug_editor', ->
     $('#current_bug_editor, #change_editor_form').toggle()
 
+  $(document).on 'click', '.change_current_bug_priority', ->
+    $('#current_bug_priority, #change_priority_form').toggle()
+
   $(document).on 'click', '.change_current_bug_committer', ->
     $('#current_bug_committer, #change_committer_form').toggle()
 
@@ -132,6 +135,7 @@ $ ->
     ).done (response) ->
       $('#current_bug_editor').html(response.bug.user_name).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
       $('#current_bug_editor, #change_editor_form').toggle()
+      location.reload()
 
 
   $("#change_committer_form").submit (e)->
@@ -150,6 +154,25 @@ $ ->
     ).done (response) ->
       $('#current_bug_committer').html(response.bug.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
       $('#current_bug_committer, #change_committer_form').toggle()
+      location.reload()
+      return
+
+  $("#change_priority_form").submit (e)->
+    e.preventDefault()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $('input[name="bug_id"]').val()
+    priority = $('#bug_priority option:selected').val()
+    $.ajax(
+      url: '/api/v1/bugs/' + id
+      method: 'PUT'
+      headers: headers
+      data:
+        id: id
+        bug:
+          'priority': priority
+    ).done (response) ->
+      $('#current_bug_priority, #change_priority_form').toggle()
+      location.reload()
       return
 
 

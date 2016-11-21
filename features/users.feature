@@ -130,3 +130,29 @@ Feature: User Accounts
     Then I click "done"
     And  I wait for "2" seconds
     Then I should see "Bug status changes last 30 days"
+
+
+
+  @javascript
+  Scenario: Bugs should be separated into the proper open, closed and pending tabs
+    Given a manager exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
+
+    And the following relationships exist:
+      | user_id | team_member_id |
+      | 1       | 3              |
+
+    And the following bugs exist:
+      | id      | bugzilla_id | state     | user_id | summary             | product | component   | version | description       |
+      |222222   | 222222      | OPEN      | 3       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
+      |333333   | 333333      | PENDING   | 3       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+
+    Then I wait for "3" seconds
+    And  I goto "/users/3"
+    And  I should see "[BP][NSS] fixed bug"
+    And  I should not see "[TELUS] broken bug"
+    Then I click "pending (1)"
+    And  I should see "[TELUS] broken bug"
+    And  I should not see "[BP][NSS] fixed bug"

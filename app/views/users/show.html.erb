@@ -73,11 +73,14 @@
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="open">
             <% if @user.bugs.open.any? %>
-              <% @user.bugs.open.each do |bug| %>
+              <% @user.bugs.open.sort_by{ |b| b.priority_sort }.each do |bug| %>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%=bug.priority%></strong></p>
+                </div>
                 <div class="col-xs-2 col-md-1 center">
                   <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
                 </div>
-                <div class="col-xs-10 col-md-11">
+                <div class="col-xs-8 col-md-10">
                   <p><%= bug.summary %></p>
                 </div>
               <% end %>
