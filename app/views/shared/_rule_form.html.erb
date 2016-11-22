@@ -7,7 +7,7 @@
       <form role="form" class="form-inline pull-right prepopulate-form" id="duplicate_rule">
         <div class="form-group">
           <label class="sr-only">Duplicate: </label>
-          <input class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID" required>
+          <input class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID">
           <button class="btn btn-default select-sm" value="submit">duplicate</button>
         </div>
       </form>
@@ -36,8 +36,9 @@
         <div class="entry-type-switch">
         </div>
         <div class="col-xs-10"><div class="form-inline">
-          <%=select_tag :rule_category_id, options_for_select(@categories.map{|rc| [rc.category, rc.id]}), prompt: 'select a cateogory', class: "form-control create-input select-sm code"%>
-          <input class="form-control create-input select-sm code" name="rule[message]" placeholder="enter a message" required="true" style="width:75%;">
+          <%=select_tag :rule_category_id, options_for_select(@categories.map{|rc| [rc.category, rc.id]}), prompt: 'select a category', class: "form-control create-input select-sm code", required: "true"%>
+          <label for="message"></label>
+          <input class="form-control create-input select-sm code" name="rule[message]" id="message" type="text" placeholder="enter a message" style="width:75%;" required="required" />
         </div>
         </div>
       </div>
