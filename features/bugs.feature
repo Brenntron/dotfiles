@@ -97,7 +97,6 @@ Feature: Bug
 #    And  I goto "/bugs"
 #    Then I should see "[SID] 2330 This is a fake bug"
 #    And I should see "145359"  <- this is broken
-
   @javascript
   Scenario: a user can not set the state of a bug to pending when exploits are missing attachments
     Given a user exists and is logged in
@@ -118,8 +117,8 @@ Feature: Bug
       | id | data                                                                                        | exploit_type_id |
       | 1  | exploits/ms06_071/ms06_071.py - http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5745 | 1               |
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     And reference with id "1" has exploit with id "1"
     Then I wait for "2" seconds
     And I goto "/bugs/222222"
@@ -246,7 +245,6 @@ Feature: Bug
     And I click ".jobs-tab"
     Then I should see "rule"
 
-@now
   @javascript
   Scenario: a user can test add an attachment
     Given a user exists and is logged in
