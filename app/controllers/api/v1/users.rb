@@ -17,6 +17,15 @@ module API
           User.where(id: permitted_params[:id])
         end
 
+        desc "Update a user"
+        params do
+          requires :id, type: String, desc: "ID of the user"
+          optional :metrics_timeframe, type: Integer, desc: "the user's preferred time frame to view metrics'"
+        end
+        put ":id", root: "user" do
+          current_user.update_attributes(metrics_timeframe: permitted_params[:metrics_timeframe])
+        end
+
         desc "Add a new team member"
         params do
           requires :id, type: String, desc: "ID of the user"

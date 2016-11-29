@@ -4,7 +4,7 @@ class AttachmentsController < ApplicationController
     begin
       file_content = params[:attachment][:file_data].tempfile.read
       options = {
-          :ids => params[:bug_id],
+          :ids => params[:attachment][:bug_id],
           :data => XMLRPC::Base64.new(file_content),
           :file_name => params[:attachment][:file_data].original_filename,
           :summary => params[:attachment][:summary],

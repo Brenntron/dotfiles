@@ -9,7 +9,6 @@ $(document).ready(function() {
         $.ajax({
             url: "/api/v1/bugs/import/" + id,
             method: 'GET',
-            data: {'api_key': 'h93hq@hwo9%@ah!jsh'},
             headers: headers
         }).done(function(response) {
             window.location.replace("/bugs/"+id);

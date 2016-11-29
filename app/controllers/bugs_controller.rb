@@ -3,7 +3,7 @@ class BugsController < ApplicationController
   before_filter :require_login
   before_filter :query_bugs
   before_filter :get_states_and_users, only: [:index, :show, :new]
-  after_action :sync_summary, only: [:create, :add_tag, :remove_tag]
+  after_action  :sync_summary, only: [:create, :add_tag, :remove_tag]
 
   def index
     if params[:bug].present?
@@ -34,6 +34,8 @@ class BugsController < ApplicationController
         :version => params[:bug][:version],
         :description => params[:bug][:description],
         :state => params[:bug][:state] || 'OPEN',
+        :status => params[:bug][:status] || 'NEW',
+        :resolution => params[:bug][:resolution] || 'OPEN',
         :creator => current_user.id,
         :user_id => current_user.id,
         :opsys => params[:bug][:opsys],

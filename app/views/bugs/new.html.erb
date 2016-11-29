@@ -18,6 +18,12 @@
         </div>
         <div class="row">
           <div class="col-sm-12 form-group">
+            <label for="version">Priority</label>
+            <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control" %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 form-group">
             <div class="sandbox">
               <label for="select-to-selectized">Tags</label>
               <select id="select-to-new"  name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">

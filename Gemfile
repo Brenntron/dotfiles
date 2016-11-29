@@ -38,6 +38,8 @@ gem 'dotenv-rails'
 gem 'diffy'
 
 gem 'selectize-rails'
+gem 'chart-js-rails'
+gem 'chartkick'
 
 group :development do
   gem 'thin', '~> 1.6.3'

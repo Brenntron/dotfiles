@@ -40,12 +40,14 @@
               <%= render 'layouts/bugs_layout'%>
             <% elsif controller_name == "users" %>
               <%= render 'layouts/users_layout'%>
+            <% elsif controller_name == "relationships" %>
+              <%= render 'layouts/relationships_layout' %>
             <% end %>
           </p>
         </div>
       </div>
     </div>
-    <% if controller_name != 'bugs' && controller_name != "users" %>
+    <% if controller_name != 'bugs' && controller_name != "users" && controller_name != "relationships" %>
       <%= yield %>
     <% end %>
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161028164433) do
+ActiveRecord::Schema.define(version: 20161021150451) do
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
@@ -107,6 +107,7 @@ ActiveRecord::Schema.define(version: 20161028164433) do
     t.string   "user"
     t.string   "action"
     t.string   "description"
+    t.integer  "progress"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -227,6 +228,7 @@ ActiveRecord::Schema.define(version: 20161028164433) do
   end
 
   add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
+  add_index "rules", ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
   add_index "rules", ["task_id"], name: "index_rules_on_task_id", using: :btree
 
   create_table "tags", force: true do |t|
@@ -270,6 +272,7 @@ ActiveRecord::Schema.define(version: 20161028164433) do
     t.string   "role"
     t.integer  "class_level"
     t.string   "authentication_token"
+    t.integer  "metrics_timeframe",      default: 7
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"

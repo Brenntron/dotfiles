@@ -143,10 +143,10 @@ module API
           requires :id, type: Integer, desc: "The id of the bug to be updated."
           requires :bug, type: Hash do
             optional :user_id, type: Integer, desc: "the user this bug is assigned to"
-            requires :product, type: String, desc: "The name of the product the bug is being filed against."
-            requires :component, type: String, desc: "The name of a component in the product above."
-            requires :summary, type: String, desc: "A brief description of the bug being filed."
-            requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
+            optional :product, type: String, desc: "The name of the product the bug is being filed against."
+            optional :component, type: String, desc: "The name of a component in the product above."
+            optional :summary, type: String, desc: "A brief description of the bug being filed."
+            optional :version, type: String, desc: "A version of the product above; the version the bug was found in."
             optional :description, type: String, desc: "A full text description of the bug"
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
             optional :state_id, type: String, desc: "The new state of the bug, Open, Closed, ReOpened,etc"
@@ -200,8 +200,8 @@ module API
             update_params = {
                 :committer => reviewer
             }
-          elsif permitted_params[:bug][:state_id]
-            state_params = Bug.update_state(bug, permitted_params[:bug][:state_id], nil)
+          elsif permitted_params[:bug][:state]
+            state_params = Bug.update_state(bug, permitted_params[:bug][:state], nil)
             options = {
                 :ids => permitted_params[:id],
                 :status => state_params[:status],
@@ -234,6 +234,7 @@ module API
           options[:component] = permitted_params[:bug][:component]
           options[:summary] = permitted_params[:bug][:summary]
           options[:version] = permitted_params[:bug][:version]
+          options[:state] = permitted_params[:bug][:state]
           options[:creator] = permitted_params[:bug][:creator]
           options[:opsys] = permitted_params[:bug][:opsys]
           options[:platform] = permitted_params[:bug][:platform]
@@ -245,6 +246,7 @@ module API
           update_params[:component] = permitted_params[:bug][:component]
           update_params[:summary] = permitted_params[:bug][:summary]
           update_params[:version] = permitted_params[:bug][:version]
+          update_params[:state] = permitted_params[:bug][:state]
           update_params[:opsys] = permitted_params[:bug][:opsys]
           update_params[:platform] = permitted_params[:bug][:platform]
           update_params[:priority] = permitted_params[:bug][:priority]

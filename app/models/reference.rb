@@ -13,7 +13,7 @@ class Reference < ActiveRecord::Base
   scope :bugtraqs, -> {where( "reference_type_id=?", ReferenceType.find_by_name('bugtraq').id )}
   scope :telus, -> {where( "reference_type_id=?", ReferenceType.find_by_name('telus').id )}
   scope :apsb, -> {where( "reference_type_id=?", ReferenceType.find_by_name('apsb').id )}
-  scope :url, -> {where( "reference_type_id=?", ReferenceType.find_by_name('url').id )}
+  scope :urls, -> {where( "reference_type_id=?", ReferenceType.find_by_name('url').id )}
   scope :msb, -> {where( "reference_type_id=?", ReferenceType.find_by_name('msb').id )}
   scope :osvdb, -> {where( "reference_type_id=?", ReferenceType.find_by_name('osvdb').id )}
 

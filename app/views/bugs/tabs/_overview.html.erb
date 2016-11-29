@@ -34,15 +34,15 @@
                 </div>
             <% end %>
         <% end %>
-        <% if @bug.references.url.any? %>
+        <% if @bug.references.urls.any? %>
             <p>url:</p>
-            <% @bug.references.url.each do |ref| %>
+            <% @bug.references.urls.each do |ref| %>
                 <div class="col-xs-12">
                   <code><a href="<%= get_ref_url(ref, "url") %>" target="_blank"><%= ref.reference_data %></a></code>
                 </div>
             <% end %>
         <% end %>
-        <% if @bug.references.url.any? %>
+        <% if @bug.references.bugtraqs.any? %>
             <p>bugtraq:</p>
             <% @bug.references.bugtraqs.each do |ref| %>
                 <div class="col-xs-12">

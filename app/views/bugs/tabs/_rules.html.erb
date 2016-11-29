@@ -3,17 +3,20 @@
 </style>
 <div class="row top-bar">
   <div class="col-xs-12">
-    <button class="select-sm btn btn-default rules" id="overview"><i class="glyphicon glyphicon-list"></i><strong class="hidden-xs">&nbsp;&nbsp; list all</strong></button>
-    <button class="select-sm btn btn-default rules" id="view"><strong class="hidden-xs">view &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-eye-open"></i></button>
-    <button class="select-sm btn btn-default rules" id="edit"><strong class="hidden-xs">edit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-pencil"></i></button>
-    <button class="select-sm btn btn-default rules" id="create"><strong class="hidden-xs">create &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-plus"></i></button>
-    <button class="select-sm btn btn-default rules" id="remove"><strong class="hidden-xs">remove &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-minus"></i></button>
-    <button class="select-sm btn btn-default rules" id="test"><strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="overview"><i class="glyphicon glyphicon-list"></i><strong class="hidden-xs">&nbsp;&nbsp; list all</strong></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="view"><strong class="hidden-xs">view &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-eye-open"></i></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="edit"><strong class="hidden-xs">edit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-pencil"></i></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="create"><strong class="hidden-xs">create &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-plus"></i></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="remove"><strong class="hidden-xs">remove &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-minus"></i></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="test"><strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
     <span class="text-muted small hidden-xs"><i id="bug-rules-loader" class="glyphicon glyphicon-refresh spin" style="display:none;"></i><i id="bug-rules-error" class="glyphicon glyphicon-alert" style="display:none;"></i> &nbsp;&nbsp;</span>
     <form class="form-inline pull-right" id="linkRuleForm">
-      <div class="form-group">
+      <div class="input-group">
         <input name="sid" class="form-control select-sm input-extra-narrow" placeholder="import rule" />
-      </div>
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button">Import</button>
+      </span>
+      </div><!-- /input-group -->
     </form>
   </div>
 </div>
@@ -37,7 +40,7 @@
         <tbody>
         <% @rules.each do |rule| %>
           <tr id=<%= rule.id %>>
-            <td><input type="checkbox" class="rule_check_box" value="<%= rule.id %>"></td>
+            <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>" value="<%= rule.id %>"></td>
 
             <td class="rule_state_<%=rule_state_color(rule.state)%>"><%= rule.state %></td>
 
@@ -61,11 +64,10 @@
     </table>
   </div>
 </div>
-
 <div class="row create hidden">
   <div class="row top-space center">
     <div class="col-xs-2">
-      <a><i class="glyphicon glyphicon-arrow-left"></i> back</a>
+      <button class="select-sm btn btn-default rules" id="overview"><i class="glyphicon glyphicon-arrow-left"></i><strong class="hidden-xs">&nbsp;&nbsp; back</strong></button>
     </div>
     <div class="col-xs-8 col-sm-7 center">
       <h4>

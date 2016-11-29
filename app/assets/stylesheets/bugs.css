@@ -6,10 +6,10 @@
     color:red !important;
     background:none !important;
 }
-.back_btn {
+button.back_btn {
     background-color: #80a9ba;
+    border-color: #80a9ba;
     cursor: pointer;
-    padding: 10px;
 }
 .searchID{
     width:100%;

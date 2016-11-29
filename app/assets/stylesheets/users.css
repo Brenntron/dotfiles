@@ -1,0 +1,20 @@
+.table-borderless tbody tr td,
+.table-borderless tbody tr th,
+.table-borderless thead tr th,
+.table-borderless thead tr td,
+.table-borderless tfoot tr th,
+.table-borderless tfoot tr td {
+    border: none;
+}
+
+.back_btn_user {
+    background-color: #D29864;
+    cursor: pointer;
+    padding: 10px;
+    margin-top:4px;
+    padding:4px 8px 6px 8px;
+}
+
+.modal-header.user {
+    background-color: #D29864;
+}

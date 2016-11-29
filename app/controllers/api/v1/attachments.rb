@@ -30,7 +30,7 @@ module API
             optional :minor_update, type: Boolean, desc: "if true emails wont be sent to users who dont want minor updates"
           end
         end
-        post "", root: "attachment" do
+        post "", root: :attachments do
           file_content = permitted_params[:attachment][:file_data][:tempfile].read
           options = {
               :ids => permitted_params[:attachment][:bugzilla_attachment_id],
@@ -47,7 +47,7 @@ module API
           new_attachment_id = new_attachment["ids"][0]
           if new_attachment_id
             new_attach = Attachment.create(
-                # :id => new_attachment_id,
+                :id => new_attachment_id,
                 :size => permitted_params[:attachment][:file_data][:tempfile].size,
                 :bugzilla_attachment_id => options[:ids],
                 :file_name => options[:file_name],

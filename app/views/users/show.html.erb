@@ -1,4 +1,9 @@
 <div class='row item-info'>
+  <div class="row subheading">
+    <button class="btn back_btn_user pull-right">
+      <i class="glyphicon glyphicon-arrow-left"></i> Back
+    </button>
+  </div>
   <div class='col-lg-11 col-md-11'>
     <div class="row">
       <div class="col-xs-12 col-sm-4">
@@ -9,35 +14,49 @@
     </div>
     <div class='row top-space'>
       <div class="col-xs-11">
-        <div class="col-xs-12">
-          <h4>Team</h4>
-        </div>
-        <div class="col-xs-6 col-sm-4">
-          <h6 class="text-muted">managers</h6>
-          <% if @user.managers.any? %>
-            <ul class="compact-list">
-              <% @user.managers.each do |manager| %>
-                <li><%= link_to manager.cvs_username, user_path(manager) %></li>
-              <% end %>
-            </ul>
-          <% else %>
-            <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> answers to no one!</em></p>
-          <% end %>
-        </div>
-        <div class="col-xs-6 col-sm-4">
-          <h6 class="text-muted">team</h6>
-          <% if @user.team_members.any? %>
-            <ul class="compact-list">
-              <% @user.team_members.each do |member| %>
-              <li><%= link_to member.cvs_username, user_path(member) %></li>
-              <% end %>
-            </ul>
-          <% else %>
-            <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> is a lone wolf!</em></p>
-          <% end %>
+        <% if @user == current_user %>
+          <div class="col-xs-12">
+            <h4>Team</h4>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <h6 class="text-muted">managers</h6>
+            <% if @user.managers.any? %>
+              <ul class="compact-list">
+                <% @user.managers.each do |manager| %>
+                  <li><%= link_to manager.cvs_username, user_path(manager) %></li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> answers to no one!</em></p>
+            <% end %>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <h6 class="text-muted">team</h6>
+            <% if @user.team_members.any? %>
+              <ul class="compact-list">
+                <% @user.team_members.each do |member| %>
+                <li><%= link_to member.cvs_username, user_path(member) %></li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> is a lone wolf!</em></p>
+            <% end %>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <h6 class="text-muted">co-workers</h6>
+            <% if @user.co_workers.any? %>
+                <ul class="compact-list">
+                  <% @user.co_workers.each do |co| %>
+                      <li><%= link_to co.cvs_username, user_path(co) %></li>
+                  <% end %>
+                </ul>
+            <% else %>
+                <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> works alone!</em></p>
+            <% end %>
+          </div>
+        <%end%>
         </div>
       </div>
-    </div>
     <div class="row">
       <div class="col-xs-11"><hr/></div>
       <div class='col-xs-12'>
@@ -46,58 +65,63 @@
         </div>
       </div>
       <div class='col-sm-11'>
-        <ul class="nav nav-tabs">
-          <li role="presentation" class="user-tab active" id="open-tab"><a>open (<%= @user.bugs.length %>)</a></li>
-          <li role="presentation" class="user-tab" id="pending-tab"><a>pending (<%= @user.bugs.length %>)</a></li>
-          <li role="presentation" class="user-tab" id="closed-tab"><a>closed (<%= @user.bugs.length %>)</a></li>
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="user-tab active" id="open-tab"><a href="#open" aria-controls="open" role="tab" data-toggle="tab">open (<%= @user.bugs.open.count %>)</a></li>
+          <li role="presentation" class="user-tab" id="pending-tab"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">pending (<%= @user.bugs.pending.count %>)</a></li>
+          <li role="presentation" class="user-tab" id="closed-tab"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">closed (<%= @user.bugs.closed.count %>)</a></li>
         </ul>
-        <div class="tabs-content" id="open">
-          <% if @user.bugs %>
-            <% @user.bugs.each do |bug| %>
-              <div class="col-xs-2 col-md-1 center">
-                <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
-              </div>
-              <div class="col-xs-10 col-md-11">
-                <p><%= bug.summary %></p>
-              </div>
-            <% end %>
-          <% else %>
-            <div class="col-xs-12">
-              <p class="text-muted"><em>No open bugs at this time.</em></p>
-            </div>
-          <% end %>
-        </div>
-        <div class="tabs-content hidden" id="pending">
-          <% if @user.bugs %>
-            <% @user.bugs.each do |bug| %>
-              <div class="col-xs-2 col-md-1 center">
-                <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
-              </div>
-              <div class="col-xs-10 col-md-11">
-                <p><%= bug.summary %></p>
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="open">
+            <% if @user.bugs.open.any? %>
+              <% @user.bugs.open.sort_by{ |b| b.priority_sort }.each do |bug| %>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%=bug.priority%></strong></p>
+                </div>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
+                </div>
+                <div class="col-xs-8 col-md-10">
+                  <p><%= bug.summary %></p>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="col-xs-12">
+                <p class="text-muted"><em>No open bugs at this time.</em></p>
               </div>
             <% end %>
-          <% else %>
-            <div class="col-xs-12">
-              <p class="text-muted"><em>No pending bugs at this time.</em></p>
-            </div>
-          <% end %>
-        </div>
-        <div class="tabs-content hidden" id="closed">
-          <% if @user.bugs %>
-            <% @user.bugs.each do |bug| %>
-              <div class="col-xs-2 col-md-1 center">
-                <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
-              </div>
-              <div class="col-xs-10 col-md-11">
-                <p><%= bug.summary %></p>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="pending">
+            <% if @user.bugs.pending.any? %>
+              <% @user.bugs.pending.each do |bug| %>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
+                </div>
+                <div class="col-xs-10 col-md-11">
+                  <p><%= bug.summary %></p>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="col-xs-12">
+                <p class="text-muted"><em>No pending bugs at this time.</em></p>
               </div>
             <% end %>
-          <% else %>
-            <div class="col-xs-12">
-              <p class="text-muted"><em>No closed bugs at this time.</em></p>
-            </div>
-          <% end %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="closed">
+            <% if @user.bugs.closed.any? %>
+              <% @user.bugs.closed.each do |bug| %>
+                <div class="col-xs-2 col-md-1 center">
+                  <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
+                </div>
+                <div class="col-xs-10 col-md-11">
+                  <p><%= bug.summary %></p>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="col-xs-12">
+                <p class="text-muted"><em>No closed bugs at this time.</em></p>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
@@ -106,23 +130,30 @@
       <div class='col-xs-12'>
         <div class='col-xs-11'>
           <h4>Metrics</h4>
+          <div id="msg"></div>
         </div>
       </div>
-      <div class="col-lg-4 col-md-6">
+      <div class="col-lg-5 col-md-6">
+        <div class="user-metrics" id='<%=@user.id%>'></div>
+        <p>Bug status changes last <%=current_user.metrics_timeframe%> days <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change</em></a></p>
+        <%= render 'shared/change_metrics_timeframe_form' %>
+        <canvas id="statusChart"></canvas>
       </div>
-      <div class="col-lg-4 col-md-6">
-        <p class="small">
-        </p>
-      </div>
-      <div class="col-lg-4 col-md-6">
+      <div class="col-lg-5 col-md-6">
+        <p>Work Time Averages</p>
+        <canvas id="timeChart"></canvas>
+        <br>
+        <div class="col-xs-12">
+          <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
+        </div>
       </div>
 
     </div>
     <div class="footer-spacer"></div>
 
   </div>
-  <%= link_to users_path, class: "col-xs-1 back-btn center" do %>
-    <div class="back-triangle"><p class="sr-only">back</p></div>
-  <% end %>
 </div>
 <div class="spacer"></div>
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="xml_token" value="<%= xml_token %>">
+<input type="hidden" name="current_user" value="<%= current_user.id%>">
