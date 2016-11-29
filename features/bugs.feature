@@ -97,6 +97,7 @@ Feature: Bug
 #    And  I goto "/bugs"
 #    Then I should see "[SID] 2330 This is a fake bug"
 #    And I should see "145359"  <- this is broken
+
   @javascript
   Scenario: a user can not set the state of a bug to pending when exploits are missing attachments
     Given a user exists and is logged in
@@ -206,6 +207,8 @@ Feature: Bug
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
     And I click ".rules-tab"
+
+
 
   @javascript
   Scenario: a user can edit a rule attached to a bug
@@ -348,7 +351,6 @@ Feature: Bug
       | id |   comment     |  note_type |        author       | bug_id  |
       | 1  |i like comments| "research" | "nicherbe@cisco.com"| 145359  |
       | 2  |pork sandwiches| "research" | "nicherbe@cisco.com"| 145359  |
-
     Then I wait for "3" seconds
     And I goto "/bugs/145359"
     And I click ".history-tab"
