@@ -1,15 +1,7 @@
 <form id="change_priority_form" style="display:none;" class="form-inline top-space">
   <div class="form-group row">
     <div class="col-xs-12 col-lg-10">
-      <select class="form-control input-sm" id="bug_priority">
-        <option value="" disabled selected>select priority</option>
-        <option value='Unspecified'>Unspecified</option>
-        <option value='P1'>P1</option>
-        <option value='P2'>P2</option>
-        <option value='P3'>P3</option>
-        <option value='P4'>P4</option>
-        <option value='P5'>P5</option>
-      </select>
+      <%=select_tag :priority, options_for_select(['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], selected: @bug.priority), id: 'bug_priority', class: 'form-control input-sm'%>
       <button class="btn btn-xs btn-default" value="submit" type="submit">done</button>
     </div>
   </div>

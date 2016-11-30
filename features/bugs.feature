@@ -37,7 +37,6 @@ Feature: Bug
       | BP    |
     Then I wait for "3" seconds
     And  I goto "/bugs/new"
-    And  I select "2.5.2" from "bug_version"
     And  I fill in "bug_summary" with "New Bug Summary"
     And  I fill in "bug_description" with "This is my description."
     And  I fill in selectized with "TELUS"
@@ -165,6 +164,36 @@ Feature: Bug
 
   @javascript
   Scenario: a user can change the committer of a bug
+
+  @javascript
+  Scenario: a user can change the priority of a bug
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click "priority"
+    And I select "P2" from "priority"
+    Then I click button "done"
+    And I wait for "3" seconds
+# uncomment when connectivity to bugzilla test fixed
+#    And I should see "P2"
+
+  @javascript
+  Scenario: a user can change the component of a bug
+    Given a user exists and is logged in
+    And the following bugs exist:
+       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
+       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click "component"
+    And I select "Malware" from "component"
+    Then I click button "done"
+    And I wait for "3" seconds
+# uncomment when connectivity to bugzilla test fixed
+#    Then I should see "Malware"
 
 
   @javascript

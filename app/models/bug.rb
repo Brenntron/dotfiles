@@ -296,18 +296,21 @@ class Bug < ActiveRecord::Base
         new_comments = xmlrpc.comments(:ids => [bug_id])
 
         Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
-          new_record.id = bug_id
-          new_record.summary = item['summary']
+          new_record.id             = bug_id
+          new_record.summary        = item['summary']
           new_record.classification = "unclassified"
 
-          new_record.status = item['status']
+          new_record.status     = item['status']
           new_record.resolution = item['resolution']
           new_record.resolution = "OPEN" if new_record.resolution.empty?
-          new_record.state = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
-          new_record.priority = item['priority']
+
+          new_record.state     = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
+          new_record.priority  = item['priority']
+          new_record.component = item['component']
+          new_record.product   = item['product']
 
           new_record.created_at = item['creation_time'].to_time
-          last_change_time = item['last_change_time'].to_time
+          last_change_time      = item['last_change_time'].to_time
           if new_record.state == 'NEW'
             # do nothing
           elsif new_record.state == 'ASSIGNED'
