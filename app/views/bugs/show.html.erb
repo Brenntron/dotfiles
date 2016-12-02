@@ -20,9 +20,16 @@
         <div class="col-xs-3 col-sm-2">
           <h6>priority</h6>
           <h4 class="top-space" id="current_bug_priority">
-            <%= @bug.priority %>&nbsp;<a class="tiny text-muted change_current_bug_priority"><em>change</em></a>
+            <%= @bug.priority %>&nbsp;<a href="#" id="priority" class="tiny text-muted change_current_bug_priority"><em>change</em></a>
           </h4>
           <%= render 'shared/change_priority_bug_form' %>
+        </div>
+        <div class="col-xs-3 col-sm-2">
+          <h6>component</h6>
+          <h4 class="top-space" id="current_bug_component">
+            <%= @bug.component %>&nbsp;<a href="#" id="component" class="tiny text-muted change_current_bug_component"><em>change</em></a>
+          </h4>
+          <%= render 'shared/change_component_bug_form' %>
         </div>
         <div class="col-xs-3 col-sm-2">
           <h6>editor</h6>
@@ -35,7 +42,7 @@
           </h4>
           <%= render 'shared/change_editor_bug_form' %>
         </div>
-        <div class="col-xs-3 col-sm-2">
+        <div class="col-xs-3 col-sm-1">
           <h6>committer</h6>
           <h4 class="bug-user top-space" id="current_bug_committer">
             <% if @bug.committer %>
@@ -46,7 +53,7 @@
           </h4>
           <%= render 'shared/change_committer_bug_form' %>
         </div>
-        <div class="col-xs-3 col-sm-2">
+        <div class="col-xs-3 col-sm-1">
           <button class="select-sm btn btn-info back_btn pull-right" id="back_btn" style="margin-top:4px;"><i class="glyphicon glyphicon-arrow-left"></i> <strong class="hidden-xs">back</strong></button>
         </div>
         <div class="col-sm-12 hidden-xs bug_summary">

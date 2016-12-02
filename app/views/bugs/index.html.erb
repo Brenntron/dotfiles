@@ -1,9 +1,10 @@
 <table class="table index-table">
   <thead>
   <tr>
-    <td class="indent"><strong>Summary</strong></td>
+    <td class="indent" data-defaultsign="nospan"><strong>Summary</strong></td>
     <td><strong>Tags</strong></td>
     <td><strong>&nbsp;&nbsp;&nbsp;State</strong></td>
+    <td><strong>Priority</strong></td>
     <td><strong>User</strong></td>
     <td><strong>Committer</strong></td>
     <td></td>
@@ -14,8 +15,9 @@
       <tr id="bug_<%= bug.id %>">
         <td><%= bug.summary %></td>
         <td><%= bug.tags.map{|t| "[#{t.name}]"}.join(' ') %></td>
-        <td>&nbsp;&nbsp;&nbsp;
-          <%= bug.state %></td>
+        <td>&nbsp;&nbsp;&nbsp;<%= bug.state %></td>
+        <td><%= bug.priority %></td>
+
         <td class="bug-user">
           <% if bug.user %>
               <%= bug.user.cvs_username %>

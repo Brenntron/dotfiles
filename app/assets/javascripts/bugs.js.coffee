@@ -68,6 +68,9 @@ $ ->
   $(document).on 'click', '.change_current_bug_committer', ->
     $('#current_bug_committer, #change_committer_form').toggle()
 
+  $(document).on 'click', '.change_current_bug_component', ->
+    $('#current_bug_component, #change_component_form').toggle()
+
   $('.delete_bug').on 'click', ->
     id = $(this).parents('tr').attr('id')
     id = id.slice(id.indexOf("_") + 1, id.length)
@@ -172,6 +175,24 @@ $ ->
           'priority': priority
     ).done (response) ->
       $('#current_bug_priority, #change_priority_form').toggle()
+      location.reload()
+      return
+
+  $("#change_component_form").submit (e)->
+    e.preventDefault()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $('input[name="bug_id"]').val()
+    component = $('#bug_component option:selected').val()
+    $.ajax(
+      url: '/api/v1/bugs/' + id
+      method: 'PUT'
+      headers: headers
+      data:
+        id: id
+        bug:
+          'component': component
+    ).done (response) ->
+      $('#current_bug_component, #change_component_form').toggle()
       location.reload()
       return
 

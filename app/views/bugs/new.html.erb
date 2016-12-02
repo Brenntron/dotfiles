@@ -12,14 +12,14 @@
         <%= form_for @bug do |f| %>
         <div class="row">
           <div class="col-sm-12 form-group">
-            <label for="version">Snort Version</label>
-            <%= f.select :version, ['No Version Specified', '2.5.2', '2.6.0', '2.7.0', '3.0.0', '3.0.0-139', '3.0.0-146(RC3)'], {}, class: "form-control" %>
+            <label for="priority">Priority</label>
+            <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control" %>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12 form-group">
-            <label for="version">Priority</label>
-            <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control" %>
+            <label for="component">Component</label>
+            <%= f.select :component, ['Snort Rules', 'SO Rules', 'Malware'], {}, class: "form-control" %>
           </div>
         </div>
         <div class="row">
@@ -44,7 +44,7 @@
           </div>
         </div>
         <%= f.hidden_field :product, value: 'Research' %>
-        <%= f.hidden_field :component, value: 'Snort Rules' %>
+        <%= f.hidden_field :version, value: 'No Version Specified' %>
         <!--<select id="bug_tag_ids" multiple="multiple" name="bug[tag_names][]"></select>-->
         <div class="row">
           <div class="col-sm-12 form-group">
