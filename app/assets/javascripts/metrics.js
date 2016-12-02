@@ -1,4 +1,4 @@
-
+// Individual user metrics
 $(document).ready(function() {
     if ($('.user-metrics').length > 0) {
         var user_id = $('.user-metrics')[0].id;
@@ -9,7 +9,6 @@ $(document).ready(function() {
             dataType: 'json',
             success: function (data) {
                 status_draw(data);
-                debugger
             },
             error: function (result) {
                 $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the status metrics.</div>");
@@ -20,7 +19,6 @@ $(document).ready(function() {
 
 function status_draw(data) {
     var ctx = document.getElementById("statusChart");
-    debugger;
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -184,7 +182,7 @@ function time_draw(data) {
             }
         }
     });
-};
+}
 
 function create_array(data) {
     array = [];
@@ -192,6 +190,292 @@ function create_array(data) {
         array.push(value);
     });
     return array;
+}
+
+//managers view metrics
+$(document).ready(function() {
+    if ($('.user-metrics-manager').length > 0) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: 'pending_team_metrics',
+            dataType: 'json',
+            success: function (data) {
+                status_team_draw(data,'pending','line');
+            },
+            error: function (result) {
+                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
+            }
+        });
+    }
+});
+
+$(document).ready(function() {
+    if ($('.user-metrics-manager').length > 0) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: 'resolved_team_metrics',
+            dataType: 'json',
+            success: function (data) {
+                status_team_draw(data,'resolved','line');
+            },
+            error: function (result) {
+                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
+            }
+        });
+    }
+});
+
+$(document).ready(function() {
+    if ($('.user-metrics-manager').length > 0) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: 'time_team_metrics',
+            dataType: 'json',
+            success: function (data) {
+                team_time_draw(data);
+            },
+            error: function (result) {
+                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
+            }
+        });
+    }
+});
+
+$(document).ready(function() {
+    if ($('.user-metrics-manager').length > 0) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: 'component_team_metrics',
+            dataType: 'json',
+            success: function (data) {
+                team_component_draw(data);
+            },
+            error: function (result) {
+                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
+            }
+        });
+    };
+});
+
+
+function status_team_draw(data, status, type) {
+    var ctx = document.getElementById(status + "Chart");
+    var myChart = new Chart(ctx, {
+        type: type,
+        data: {
+            labels: create_label_hash(data),
+            datasets: create_data_hash(data)
+        },
+        options: {
+            legend: {
+                display: true
+            },
+            tooltips: {
+                y: "String",
+                titleSpacing: 3
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 2
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Bug Count'
+                    },
+                    gridLines: {
+                        display:false
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display:false
+                    }
+                }]
+            }
+        }
+    });
+}
+
+function team_time_draw(data) {
+    var ctx = document.getElementById("worktimeChart");
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
+            datasets: create_time_data_hash(data)
+        },
+        options: {
+            legend: {
+                display: true
+            },
+            tooltips: {
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 10
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Average Number of Days *'
+                    },
+                    gridLines: {
+                        display:false
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display:false
+                    }
+                }]
+            }
+        }
+    });
+}
+
+function team_component_draw(data) {
+    var ctx = document.getElementById("componenttimeChart");
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
+            datasets: create_component_data_hash(data)
+        },
+        options: {
+            legend: {
+                display: true
+            },
+            tooltips: {
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 5
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Average Number of Days *'
+                    },
+                    gridLines: {
+                        display:false
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display:false
+                    }
+                }]
+            }
+        }
+    });
+}
+
+// helper functions
+function create_data_hash(data) {
+    var hash = [];
+    colorCount = 0;
+    for (var i = 0; i < Object.keys(data.users).length; i++) {
+        color = generate_color();
+        hash[i] = {
+            label: Object.keys(data.users[i]),
+            data: create_array(create_array(data.users[i])[0]),
+            lineTension: 0.1,
+            borderCapStyle: 'butt',
+            backgroundColor: color[colorCount][0],
+            borderColor: color[colorCount][1],
+            borderJoinStyle: 'miter',
+            borderWidth: 2,
+            pointBorderColor: color[colorCount][1],
+            pointBackgroundColor: color[colorCount][0],
+            pointBorderWidth: 1,
+            pointHoverRadius: 3,
+            pointHoverBackgroundColor: color[colorCount][0],
+            pointHoverBorderColor: color[colorCount][1],
+            pointHoverBorderWidth: 1,
+            pointRadius: 1,
+            pointHitRadius: 10
+        };
+        if(colorCount == color.length - 1) {
+            colorCount = 0;
+        }
+        else{
+            colorCount += 1
+        }
+    }
+    return hash;
+}
+
+function create_time_data_hash(data) {
+    var hash = [];
+    colorCount = 0;
+    for (var i = 0; i < data.users[0].length; i++) {
+        color = generate_color();
+        hash[i] = {
+            label: Object.keys(data.users[0][i]),
+            data: create_array(data.users[0][i])[0],
+            backgroundColor: color[colorCount][0],
+            borderColor: color[colorCount][1],
+            borderWidth: 1
+        };
+        if(colorCount == color.length - 1) {
+            colorCount = 0;
+        }
+        else{
+            colorCount += 1
+        }
+    }
+    return hash;
+}
+
+function create_component_data_hash(data) {
+    var hash = [];
+    colorCount = 0;
+    for (var i = 0; i < data.users.length; i++) {
+        color = generate_color();
+        hash[i] = {
+            label: Object.keys(data.users[i]),
+            data: create_array(data.users[i])[0],
+            backgroundColor: color[colorCount][0],
+            borderColor: color[colorCount][1],
+            borderWidth: 1
+        };
+        if(colorCount == color.length - 1) {
+            colorCount = 0;
+        }
+        else{
+            colorCount += 1
+        }
+    }
+    return hash;
+}
+
+function create_label_hash(data) {
+    var array = [];
+    var label = Object.keys(data.users[0]);
+    array.push(Object.keys(data.users[0][label]));
+    return array[0];
+}
+
+function generate_color() {
+    return color_array = [
+        ['rgba(255, 99, 132, 0.2)', 'rgba(255,99,132,1)'],
+        ['rgba(54, 162, 235, 0.2)', 'rgba(54, 162, 235, 1)'],
+        ['rgba(255, 206, 86, 0.2)','rgba(255, 206, 86, 1)' ],
+        ['rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)'],
+        ['rgba(153, 102, 255, 0.2)', 'rgba(153, 102, 255, 1)'],
+        ['rgba(255, 159, 64, 0.2)', 'rgba(255, 159, 64, 1)'],
+        ['rgba(179, 181, 198, 0.2)','rgba(179,181,198,1)' ]
+
+    ];
+
 }
 
 

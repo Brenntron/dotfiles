@@ -58,6 +58,43 @@ class User < ActiveRecord::Base
     self.role == 'manager'
   end
 
+  def team_metrics(bug_status)
+    result = []
+    team_members.each do |tm|
+      bug_count = {}
+      (metrics_timeframe.days.ago.to_date..Date.today).each do |day|
+        bug_count[day.strftime("%b %d, %Y")] = tm.bugs.where("DATE(#{bug_status}_at) = ?", day).count
+      end
+      result << {"#{tm.cvs_username}" => bug_count}
+    end
+    result
+  end
+
+  def team_work_times
+    team_members.map{ |tm| {"#{tm.cvs_username}" => [tm.bugs.average(:work_time).try(:round) || 0,
+                                                     tm.bugs.average(:rework_time).try(:round) || 0,
+                                                     tm.bugs.average(:review_time).try(:round) || 0,
+                                                     tm.average_resolution_times]}}
+  end
+
+
+  def average_resolution_times
+    resolution_times = bugs.where('resolved_at is NOT ?', nil).map{|x| x.resolution_time}
+    resolution_times.empty? ? 0 : (resolution_times.sum / resolution_times.size).round()
+  end
+
+  def team_by_component(component)
+    result = {}
+    bugs = team_members.map{ |tm| tm.bugs.by_component(component)}.flatten
+
+    result[:work_time] = bugs.map{ |x| x.work_time}.compact
+    result[:rework_time] = bugs.map{ |x| x.rework_time}.compact
+    result[:review_time] = bugs.map{ |x| x.review_time}.compact
+    result[:resolution_time] = bugs.map{|x| x.resolution_time if x.resolution_time}.compact
+
+    {"#{component}" => result.map{|k,v| ((v.inject{ |sum, el| sum + el }.to_f / v.size).try(:round) unless v.empty?) || 0}}
+  end
+
   private
 
   def generate_authentication_token
