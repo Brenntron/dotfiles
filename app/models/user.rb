@@ -87,9 +87,9 @@ class User < ActiveRecord::Base
     result = {}
     bugs = team_members.map{ |tm| tm.bugs.by_component(component)}.flatten
 
-    result[:work_time] = bugs.map{ |x| x.work_time}.compact
-    result[:rework_time] = bugs.map{ |x| x.rework_time}.compact
-    result[:review_time] = bugs.map{ |x| x.review_time}.compact
+    result[:work_time]       = bugs.map{ |x| x.work_time}.compact
+    result[:rework_time]     = bugs.map{ |x| x.rework_time}.compact
+    result[:review_time]     = bugs.map{ |x| x.review_time}.compact
     result[:resolution_time] = bugs.map{|x| x.resolution_time if x.resolution_time}.compact
 
     {"#{component}" => result.map{|k,v| ((v.inject{ |sum, el| sum + el }.to_f / v.size).try(:round) unless v.empty?) || 0}}

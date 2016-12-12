@@ -194,72 +194,39 @@ function create_array(data) {
 
 //managers view metrics
 $(document).ready(function() {
+    get_chart_data('pending_team_metrics');
+    get_chart_data('resolved_team_metrics');
+    get_chart_data('time_team_metrics');
+    get_chart_data('component_team_metrics');
+    });
+
+function get_chart_data(url) {
     if ($('.user-metrics-manager').length > 0) {
         $.ajax({
             type: "GET",
             contentType: "application/json; charset=utf-8",
-            url: 'pending_team_metrics',
+            url: url,
             dataType: 'json',
             success: function (data) {
-                status_team_draw(data,'pending','line');
+                if (url == 'pending_team_metrics') {
+                    status_team_draw(data,'pending','line');
+                }
+                else if (url == 'resolved_team_metrics') {
+                    status_team_draw(data,'resolved','line');
+                }
+                else if (url == 'time_team_metrics') {
+                    team_work_time_draw(data, "worktimeChart")
+                }
+                else if (url == 'component_team_metrics') {
+                    team_work_time_draw(data, "componenttimeChart")
+                }
             },
             error: function (result) {
                 $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
             }
         });
     }
-});
-
-$(document).ready(function() {
-    if ($('.user-metrics-manager').length > 0) {
-        $.ajax({
-            type: "GET",
-            contentType: "application/json; charset=utf-8",
-            url: 'resolved_team_metrics',
-            dataType: 'json',
-            success: function (data) {
-                status_team_draw(data,'resolved','line');
-            },
-            error: function (result) {
-                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
-            }
-        });
-    }
-});
-
-$(document).ready(function() {
-    if ($('.user-metrics-manager').length > 0) {
-        $.ajax({
-            type: "GET",
-            contentType: "application/json; charset=utf-8",
-            url: 'time_team_metrics',
-            dataType: 'json',
-            success: function (data) {
-                team_time_draw(data);
-            },
-            error: function (result) {
-                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
-            }
-        });
-    }
-});
-
-$(document).ready(function() {
-    if ($('.user-metrics-manager').length > 0) {
-        $.ajax({
-            type: "GET",
-            contentType: "application/json; charset=utf-8",
-            url: 'component_team_metrics',
-            dataType: 'json',
-            success: function (data) {
-                team_component_draw(data);
-            },
-            error: function (result) {
-                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
-            }
-        });
-    };
-});
+}
 
 
 function status_team_draw(data, status, type) {
@@ -302,13 +269,13 @@ function status_team_draw(data, status, type) {
     });
 }
 
-function team_time_draw(data) {
-    var ctx = document.getElementById("worktimeChart");
+function team_work_time_draw(data, id) {
+    var ctx = document.getElementById(id);
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
-            datasets: create_time_data_hash(data)
+            datasets: create_work_time_data_hash(data)
         },
         options: {
             legend: {
@@ -321,44 +288,6 @@ function team_time_draw(data) {
                     ticks: {
                         beginAtZero: true,
                         stepSize: 10
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Average Number of Days *'
-                    },
-                    gridLines: {
-                        display:false
-                    }
-                }],
-                xAxes: [{
-                    gridLines: {
-                        display:false
-                    }
-                }]
-            }
-        }
-    });
-}
-
-function team_component_draw(data) {
-    var ctx = document.getElementById("componenttimeChart");
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
-            datasets: create_component_data_hash(data)
-        },
-        options: {
-            legend: {
-                display: true
-            },
-            tooltips: {
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                        stepSize: 5
                     },
                     scaleLabel: {
                         display: true,
@@ -413,29 +342,8 @@ function create_data_hash(data) {
     return hash;
 }
 
-function create_time_data_hash(data) {
-    var hash = [];
-    colorCount = 0;
-    for (var i = 0; i < data.users[0].length; i++) {
-        color = generate_color();
-        hash[i] = {
-            label: Object.keys(data.users[0][i]),
-            data: create_array(data.users[0][i])[0],
-            backgroundColor: color[colorCount][0],
-            borderColor: color[colorCount][1],
-            borderWidth: 1
-        };
-        if(colorCount == color.length - 1) {
-            colorCount = 0;
-        }
-        else{
-            colorCount += 1
-        }
-    }
-    return hash;
-}
 
-function create_component_data_hash(data) {
+function create_work_time_data_hash(data) {
     var hash = [];
     colorCount = 0;
     for (var i = 0; i < data.users.length; i++) {

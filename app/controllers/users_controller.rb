@@ -63,7 +63,7 @@ class UsersController < ApplicationController
   def time_team_metrics
     respond_to do |format|
       format.json {
-        render :json => [current_user.team_work_times]
+        render :json => current_user.team_work_times
       }
     end
   end
