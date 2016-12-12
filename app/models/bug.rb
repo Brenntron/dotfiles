@@ -19,6 +19,7 @@ class Bug < ActiveRecord::Base
   scope :open, -> {where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED'])}
   scope :closed, -> {where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE'])}
   scope :pending, -> {where(state: "PENDING")}
+  scope :by_component, -> (component) { where('component = ?', component)}
 
   enum classification: {
       unclassified: 0,

@@ -33,12 +33,47 @@ class UsersController < ApplicationController
     @work_time_ave = @user.bugs.average(:work_time).try(:round)
     @rework_time_ave = @user.bugs.average(:rework_time).try(:round)
     @review_time_ave = @user.bugs.average(:review_time).try(:round)
-    @resolution_times = @user.bugs.where('resolved_at is NOT ?', nil).map{|x| x.resolution_time}
-    @resolution_time_ave = @resolution_times.empty? ? 0 : (@resolution_times.sum / @resolution_times.size).round()
 
     respond_to do |format|
       format.json {
-        render :json => [@work_time_ave, @rework_time_ave, @review_time_ave, @resolution_time_ave]
+        render :json => [@work_time_ave,
+                         @rework_time_ave,
+                         @review_time_ave,
+                         @user.average_resolution_times]
+      }
+    end
+  end
+
+  def pending_team_metrics
+    respond_to do |format|
+      format.json {
+        render :json => current_user.team_metrics('pending')
+      }
+    end
+  end
+
+  def resolved_team_metrics
+    respond_to do |format|
+      format.json {
+        render :json => current_user.team_metrics('resolved')
+      }
+    end
+  end
+
+  def time_team_metrics
+    respond_to do |format|
+      format.json {
+        render :json => current_user.team_work_times
+      }
+    end
+  end
+
+  def component_team_metrics
+    respond_to do |format|
+      format.json {
+        render :json => [current_user.team_by_component('Snort Rules'),
+                         current_user.team_by_component('SO Rules'),
+                         current_user.team_by_component('Malware')]
       }
     end
   end
