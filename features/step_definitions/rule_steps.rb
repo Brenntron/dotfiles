@@ -26,3 +26,7 @@ end
 Then(/^test should be created and I should see "(.*?)"$/) do |content|
   raise "Content not found. Make sure AMQ and background jobs are running." unless page.has_content?(content)
 end
+
+Then(/^I toggle "(.*?)"$/) do |content|
+  page.find(:xpath, "//div[@class='#{content}']").click()
+end

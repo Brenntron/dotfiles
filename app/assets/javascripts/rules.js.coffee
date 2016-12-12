@@ -1,4 +1,5 @@
 $ ->
+
   $('.rule-toolbar').click ->
     tab = $(this).attr('id')
     isSelected = false
@@ -260,3 +261,24 @@ $ ->
         $(document).ajaxStop ->
           location.reload true
     }
+
+
+
+  $(document).on "change", '.metadata_form', (e) ->
+    id = $(this)[0].id
+    $(".bootstrap-switch-id-drop-alert-" + id).toggle();
+
+  $(document).on 'switchChange.bootstrapSwitch', '.bootstrap-switch', (e) ->
+    policy = $(this)[0].children[0].children[3].id.substring(11)
+    checkbox = $('#' + policy)[0]
+    current_val = $(this)[0].children[0].children[3].checked
+    if current_val == true
+      #update to drop
+      new_val = checkbox.value.split(' ').slice(0,2).join(' ') +  ' drop'
+    else
+      #update to alert
+      new_val = checkbox.value.split(' ').slice(0,2).join(' ') +  ' alert'
+
+    checkbox.value = new_val
+
+  $("[name='alert-drop']").bootstrapSwitch();
