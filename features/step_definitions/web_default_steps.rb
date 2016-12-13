@@ -181,6 +181,14 @@ Then(/^"(.*?)" should be visible$/) do |target| #target is #id or .class
   page.find(target).visible?
 end
 
+Then(/^I should see div element with class "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//div[contains(@class, '#{element}')]")
+end
+
+Then(/^I should not see div element with class "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//div[contains(@class, '#{element}')]")
+end
+
 Then(/^I should be on "(.*?)"$/) do |path|
   raise "current_path is not \"#{path}\":  current_path = #{current_path} " unless current_path == path
 end

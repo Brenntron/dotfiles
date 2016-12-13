@@ -7,6 +7,13 @@ Given(/^a rule exists and belongs to bug "(.*?)"/)  do |bug_id|
   Bug.find(bug_id).rules << rule
 end
 
+Given(/^"(.*?)" rules exist and belong to bug "(.*?)"/)  do |number, bug_id|
+  number.to_i.times do
+    rule = FactoryGirl.create(:rule)
+    Bug.find(bug_id).rules << rule
+  end
+end
+
 Given(/^the following rules exist:$/) do |rules|
   rules.hashes.each do |rule|
     FactoryGirl.create(:rule, rule)
