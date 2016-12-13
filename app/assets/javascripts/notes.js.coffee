@@ -1,19 +1,4 @@
 $ ->
-  $(document).on 'click', '#researchNotesEditBtn, #researchNotesCancelBtn', (e) ->
-    e.preventDefault()
-    $('#researchNotesCancelBtn, #researchNotesSaveBtn, #researchNotesPublishBtn, #researchNotesEditBtn').toggle()
-    if $('textarea[name="research_notes"]').attr("readonly")
-      $('textarea[name="research_notes"]').attr("readonly", false)
-    else
-      $('textarea[name="research_notes"]').attr("readonly", true)
-
-  $(document).on 'click', '#committerNotesEditBtn, #committerNotesCancelBtn', (e) ->
-    e.preventDefault()
-    $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
-    if $('textarea[name="committer_notes"]').attr("readonly")
-      $('textarea[name="committer_notes"]').attr("readonly", false)
-    else
-      $('textarea[name="committer_notes"]').attr("readonly", true)
 
   $(document).on 'click', '#researchNotesSaveBtn', (e) ->
     e.preventDefault()
@@ -181,3 +166,31 @@ $ ->
           return
         ), 8000
     }
+  $(document).on 'click', '#researchNotesEditBtn', (e) ->
+    e.preventDefault()
+    $('#researchNotesEditArea').focus()
+
+  $(document).on 'click', '#researchNotesCancelBtn', (e) ->
+    e.preventDefault()
+    $('#researchNotesCancelBtn, #researchNotesSaveBtn, #researchNotesPublishBtn, #researchNotesEditBtn').toggle()
+    $('textarea[name="research_notes"]').attr("readonly", true)
+
+  $(document).on 'click', '#committerNotesEditBtn', (e) ->
+    e.preventDefault()
+    $('#committerNotesEditArea').focus()
+
+  $(document).on 'click', '#committerNotesCancelBtn', (e) ->
+    e.preventDefault()
+    $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
+    $('textarea[name="committer_notes"]').attr("readonly", false)
+
+  $(document).on 'focusin',  '#researchNotesEditArea', (e) ->
+    if $('textarea[name="research_notes"]').attr("readonly")
+      $('#researchNotesCancelBtn, #researchNotesSaveBtn, #researchNotesPublishBtn, #researchNotesEditBtn').toggle()
+      $('textarea[name="research_notes"]').attr("readonly", false)
+
+  $(document).on 'focusin',  '#committerNotesEditArea', (e) ->
+    if $('textarea[name="committer_notes"]').attr("readonly")
+      $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
+      $('textarea[name="committer_notes"]').attr("readonly", false)
+
