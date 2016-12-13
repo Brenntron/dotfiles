@@ -1,22 +1,67 @@
-// Individual user metrics
 $(document).ready(function() {
+    get_user_chart_data('status_metrics');
+    get_user_chart_data('time_metrics');
+    get_manager_chart_data('pending_team_metrics');
+    get_manager_chart_data('resolved_team_metrics');
+    get_manager_chart_data('time_team_metrics');
+    get_manager_chart_data('component_team_metrics');
+});
+
+//users metrics
+function get_user_chart_data(url) {
     if ($('.user-metrics').length > 0) {
         var user_id = $('.user-metrics')[0].id;
         $.ajax({
             type: "GET",
             contentType: "application/json; charset=utf-8",
-            url: user_id + '/status_metrics',
+            url: user_id + '/' + url,
             dataType: 'json',
             success: function (data) {
-                status_draw(data);
+                if (url == 'status_metrics') {
+                    status_draw(data);
+                }
+                else if (url == 'time_metrics') {
+                    time_draw(data);
+                }
             },
             error: function (result) {
-                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the status metrics.</div>");
+                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the metrics.</div>");
             }
         });
-    };
-});
+    }
 
+}
+
+//managers metrics
+function get_manager_chart_data(url) {
+    if ($('.user-metrics-manager').length > 0) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: url,
+            dataType: 'json',
+            success: function (data) {
+                if (url == 'pending_team_metrics') {
+                    status_team_draw(data,'pending','line');
+                }
+                else if (url == 'resolved_team_metrics') {
+                    status_team_draw(data,'resolved','line');
+                }
+                else if (url == 'time_team_metrics') {
+                    team_work_time_draw(data, "worktimeChart")
+                }
+                else if (url == 'component_team_metrics') {
+                    team_work_time_draw(data, "componenttimeChart")
+                }
+            },
+            error: function (result) {
+                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
+            }
+        });
+    }
+}
+
+//users view charts
 function status_draw(data) {
     var ctx = document.getElementById("statusChart");
     var myChart = new Chart(ctx, {
@@ -93,24 +138,6 @@ function status_draw(data) {
     });
 };
 
-$(document).ready(function() {
-    if ($('.user-metrics').length > 0) {
-        var user_id = $('.user-metrics')[0].id;
-        $.ajax({
-            type: "GET",
-            contentType: "application/json; charset=utf-8",
-            url: user_id + '/time_metrics',
-            dataType: 'json',
-            success: function (data) {
-                time_draw(data);
-            },
-            error: function (result) {
-                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
-            }
-        });
-    };
-});
-
 function time_draw(data) {
     var ctx = document.getElementById("timeChart");
     var myChart = new Chart(ctx, {
@@ -184,51 +211,7 @@ function time_draw(data) {
     });
 }
 
-function create_array(data) {
-    array = [];
-    $.each( data, function( key, value ) {
-        array.push(value);
-    });
-    return array;
-}
-
-//managers view metrics
-$(document).ready(function() {
-    get_chart_data('pending_team_metrics');
-    get_chart_data('resolved_team_metrics');
-    get_chart_data('time_team_metrics');
-    get_chart_data('component_team_metrics');
-    });
-
-function get_chart_data(url) {
-    if ($('.user-metrics-manager').length > 0) {
-        $.ajax({
-            type: "GET",
-            contentType: "application/json; charset=utf-8",
-            url: url,
-            dataType: 'json',
-            success: function (data) {
-                if (url == 'pending_team_metrics') {
-                    status_team_draw(data,'pending','line');
-                }
-                else if (url == 'resolved_team_metrics') {
-                    status_team_draw(data,'resolved','line');
-                }
-                else if (url == 'time_team_metrics') {
-                    team_work_time_draw(data, "worktimeChart")
-                }
-                else if (url == 'component_team_metrics') {
-                    team_work_time_draw(data, "componenttimeChart")
-                }
-            },
-            error: function (result) {
-                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the work time metrics.</div>");
-            }
-        });
-    }
-}
-
-
+//managers view charts
 function status_team_draw(data, status, type) {
     var ctx = document.getElementById(status + "Chart");
     var myChart = new Chart(ctx, {
@@ -308,6 +291,15 @@ function team_work_time_draw(data, id) {
 }
 
 // helper functions
+
+function create_array(data) {
+    array = [];
+    $.each( data, function( key, value ) {
+        array.push(value);
+    });
+    return array;
+}
+
 function create_data_hash(data) {
     var hash = [];
     colorCount = 0;

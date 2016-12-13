@@ -191,18 +191,10 @@
         </div>
         <div class="col-xs-10 form-inline">
           <label for="metadata-policy">Policy:&nbsp;&nbsp;</label>
-          <select class="form-control select-sm code metadata_form" name="rule[metadata][]" id="new-rule-metadata-policy">
-            <% ['security-ips', 'balanced-ips, security-ips','connectivity-ips, balanced-ips, security-ips'].each do |policy| %>
-                <option value="<%= policy %>" <%= "selected" if policy == 'balanced-ips, security-ips' %>><%= policy %></option>
-            <% end %>
-          </select>
-          &nbsp;
-          <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="max-detect">&nbsp;max-detect
-          &nbsp;
-          <select class="form-control select-sm code metadata_form" name="rule[metadata][]">
-            <option value="drop" selected>drop</option>
-            <option value="alert">alert</option>
-          </select>
+          <% ['security-ips', 'balanced-ips', 'connectivity-ips', 'max-detect-ips'].each do |policy| %>
+              <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="policy <%= policy %> drop" id=<%= policy %>> <%= policy %>
+              <input type="checkbox" name="alert-drop" class="drop_alert" checked data-size='mini' data-on-color="default" data-on-text="drop" data-off-text="alert" id="drop-alert-<%=policy%>">
+          <%end%>
         </div>
       </div>
       <div class="col-xs-12">
@@ -212,7 +204,7 @@
         </div>
         <div class="col-xs-8 col-sm-9">
           <% ['dns', 'ftp-data','http', 'imap', 'netbios-ssn', 'pop3', 'smtp'].each do |service| %>
-              <input type="checkbox" name="rule[metadata][]" class="metadata_form" value=<%= service %> <%= "checked" if service == 'ftp-data' || service == 'http' || service == 'imap' || service == 'pop3' %>>&nbsp;<%= service %>&nbsp;&nbsp;
+              <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="service <%= service %>" <%= "checked" if service == 'ftp-data' || service == 'http' || service == 'imap' || service == 'pop3' %>>&nbsp;<%= service %>&nbsp;&nbsp;
           <% end %>
         </div>
       </div>
@@ -294,6 +286,10 @@
 </div>
 
 <script>
+
+  $(document).ready(function() {
+    $(".bootstrap-switch").hide();
+  });
 
   $(document).on('click', '.add-reference-btn', function() {
       var reference_form = '<div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">'+
