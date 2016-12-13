@@ -4,10 +4,13 @@ $ ->
     tab = $(this).attr('id')
     isSelected = false
     selected = []
+    allboxes = []
     $('input:checkbox.rule_check_box').each ->
+      allboxes.push($(this).val())
       if @checked
         isSelected = true
         selected.push($(this).val())
+    allboxes = $.unique(allboxes)
     if isSelected or tab in ['overview','create']
       switch(tab)
         when 'test'
@@ -32,10 +35,8 @@ $ ->
                 '<td>'+task.result+'</td>'+
                 '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
               $('#jobs-tab table tbody').append(string)
-              debugger;
               $('.alert_rules').addClass('success').show().html('Task has been created to test the rule ')
             error: (response) ->
-              debugger;
               $('.alert_rules').addClass('error').show().html('Task has not been created ')
             complete: ->
               setTimeout (->
@@ -65,6 +66,10 @@ $ ->
                 ), 5000
             }
         else
+          $.each allboxes, (i, v) ->
+            $('.rule_'+v).removeClass('active').addClass('hidden')
+          $.each selected, (i, v) ->
+            $('.rule_'+v).removeClass('hidden').addClass('active')
           $('.row.active').addClass('hidden').removeClass 'active'
           $('.' + tab).addClass('active').removeClass 'hidden'
           $('.active').show()
@@ -86,19 +91,10 @@ $ ->
   $(document).on 'click','.rules_check_box', ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))
 
-  $(document).on 'click','.rules_check_box, .rule_check_box', ->
-    selected = []
-    allboxes = []
+  $(document).on 'click','#overview', ->
     $('input:checkbox.rule_check_box').each ->
-      allboxes.push($(this).val())
-      if @checked
-        _val = $(this).val()
-        selected.push(_val)
-    allboxes = $.unique(allboxes)
-    $.each allboxes, (i, v) ->
-      $('.rule_'+v).removeClass('active').addClass('hidden')
-    $.each selected, (i, v) ->
-      $('.rule_'+v).removeClass('hidden').addClass('active')
+      $(this).removeClass('hidden')
+      $(this).show()
 
   $('#linkRuleForm').submit (e) ->
     e.preventDefault()
