@@ -15,7 +15,7 @@
         <div class="panel-body row">
             <form id="notes_form">
               <div class="form-group col-xs-12 col-md-10">
-                <textarea class="form-control disabled code select-sm" name="research_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= note ? note.comment : "" %></textarea>
+                <textarea id="researchNotesEditArea" class="form-control disabled code select-sm" name="research_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= note ? note.comment : "" %></textarea>
                 <input type="hidden" name="note_id" value="<%= note ? note.id : nil %>">
               </div>
               <input type="hidden" name="note_type" value="research">
@@ -49,7 +49,7 @@
         <div class="panel-body row">
           <form id="committer_notes_form">
             <div class="form-group col-xs-12 col-md-10 col-lg-11">
-              <textarea class="form-control disabled code select-sm" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= committer_note ? committer_note.comment : "" %></textarea>
+              <textarea <% if current_user.committer %>id="committerNotesEditArea"<%end%>class="form-control disabled code select-sm" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= committer_note ? committer_note.comment : "" %></textarea>
               <input type="hidden" name="committer_note_id" value="<%= committer_note ? committer_note.id : nil %>">
             </div>
             <input type="hidden" name="committer_type" value="committer">

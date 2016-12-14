@@ -333,6 +333,10 @@ Feature: Bug
     When I click "publish"
     And I wait for "5" seconds
     Then I should see "Notes published to bugzilla"
+    And I click "edit"
+    And  I fill in "research_notes" with "This is a research note too"
+    And I click "save"
+    Then I should see "Notes saved"
 
   @javascript
   Scenario: a user can edit committer notes.
@@ -351,6 +355,11 @@ Feature: Bug
     When I click "#committerNotesPublishBtn"
     And I wait for "3" seconds
     Then I should see "Notes published to bugzilla"
+    And I click "#committerNotesEditBtn"
+    And  I fill in "committer_notes" with "This is a research note too"
+    And I click "save"
+    Then I should see "Notes saved"
+
 
   @javascript
   Scenario: a user can add a comment
