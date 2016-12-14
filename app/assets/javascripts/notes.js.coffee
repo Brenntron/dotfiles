@@ -83,6 +83,7 @@ $ ->
       success: (response) ->
         bug = response.bug.bug
         note = response.note.note
+        $('input[name="note_id"]').val(note.id)
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
         $('#researchNotesPublishBtn').attr('disabled', true)
@@ -133,6 +134,7 @@ $ ->
       dataType: 'json'
       success: (response) ->
         note = response.note.note
+        $('input[name="committer_note_id"]').val(note.id)
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
         $('#committerNotesPublishBtn').attr('disabled', true)
@@ -182,7 +184,7 @@ $ ->
   $(document).on 'click', '#committerNotesCancelBtn', (e) ->
     e.preventDefault()
     $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
-    $('textarea[name="committer_notes"]').attr("readonly", false)
+    $('textarea[name="committer_notes"]').attr("readonly", true)
 
   $(document).on 'focusin',  '#researchNotesEditArea', (e) ->
     if $('textarea[name="research_notes"]').attr("readonly")
