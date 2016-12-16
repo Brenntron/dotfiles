@@ -93,7 +93,7 @@ Then(/^Element with class "(.*?)" should have content "(.*?)"$/) do |class_name,
   find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
 end
 
-Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |content,id_name|
+Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
   find(:xpath, "//div[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end
 
@@ -191,6 +191,10 @@ end
 
 Then(/^I should not see div element with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//div[contains(@class, '#{element}')]")
+end
+
+Then(/^the textarea with id "(.*?)" should contain "(.*?)"$/) do |id, content|
+  page.find(:xpath, "//textarea[@id='#{id}']").text.should == content
 end
 
 Then(/^I should be on "(.*?)"$/) do |path|
