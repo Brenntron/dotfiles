@@ -17,6 +17,7 @@
 //= require selectize
 //= require Chart.bundle
 //= require chartkick
+//= require bootstrap-multiselect
 //= require_tree .
 
 

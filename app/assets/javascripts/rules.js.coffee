@@ -278,3 +278,9 @@ $ ->
     checkbox.value = new_val
 
   $("[name='alert-drop']").bootstrapSwitch();
+
+  $('.multiselect').multiselect(
+     buttonClass: 'btn btn-default btn-xs',
+     enableFiltering: true,
+     nonSelectedText: 'other'
+  );
