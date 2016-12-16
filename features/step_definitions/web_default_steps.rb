@@ -46,6 +46,10 @@ When(/^I click the link "(.*?)" in row "(.*?)" of the table with class "(.*?)"$/
   page.find(:xpath, "//*[contains(@class, '#{table_class}')]//tr[#{row_number}]").click_link(target)
 end
 
+Then(/^I hide the element with class "(.*?)"$/) do |element|
+  page.execute_script("$('.#{element}').hide()")
+end
+
 When(/^I click button "(.*?)"$/) do |button|
   click_button(button)
 end

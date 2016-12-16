@@ -8,6 +8,16 @@ class Rule < ActiveRecord::Base
 
   belongs_to :rule_category
 
+  TOP_SERVICES = ['http', 'imap', 'pop3', 'ftp-data', 'smtp',
+                  'dns', 'netbios-ssn', 'ssl', 'ftp', 'sunrpc']
+
+  OTHER_SERVICES = ['dcerpc', 'mysql', 'telnet', 'snmp', 'irc',
+                    'openvpn', 'sip', 'ntp', 'kerberos', 'ldap',
+                    'rtsp', 'netbios-ns', 'java_rmi', 'dhcp', 'ircd',
+                    'ssdp', 'netbios-dgm', 'vnc-server', 'ssh', 'printer',
+                    'drda', 'rtmp', 'syslog', 'nntp', 'tftp',
+                    'rdp', 'teamview', 'wins', 'netware', 'postgresql',
+                    'ident', 'ldp', 'rtp', 'igmp', 'gopher']
 
   #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
