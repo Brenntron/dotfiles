@@ -71,6 +71,7 @@ gem 'less-rails'
 gem 'bootstrap-sass'
 gem 'therubyracer'
 gem 'turbolinks'
+gem 'paper_trail', '6.0.2'
 
 gem 'rails', "4.1.5"
 
