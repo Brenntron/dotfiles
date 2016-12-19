@@ -135,7 +135,7 @@
       </div>
       <div class="col-lg-5 col-md-6">
         <div class="user-metrics" id='<%=@user.id%>'></div>
-        <p>Bug status changes last <%=current_user.metrics_timeframe%> days <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change</em></a></p>
+        <p>Bug status changes last <%=current_user.chart_timeframe_preference%> days <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change</em></a></p>
         <%= render 'shared/change_metrics_timeframe_form' %>
         <canvas id="statusChart"></canvas>
       </div>

@@ -54,11 +54,11 @@
       </div>
       <div class="col-lg-5 col-md-6">
         <div class="user-metrics-manager" id='<%=current_user.id%>'></div>
-        <p>Bug status set to <i>Pending</i> last <%=current_user.metrics_timeframe%> days</p>
+        <p>Bug status set to <i>Pending</i> last <%=current_user.chart_timeframe_preference%> days</p>
         <canvas id="pendingChart"></canvas>
       </div>
       <div class="col-lg-5 col-md-6">
-        <p>Bug status set to <i>Resolved</i> last <%=current_user.metrics_timeframe%> days</p>
+        <p>Bug status set to <i>Resolved</i> last <%=current_user.chart_timeframe_preference%> days</p>
         <canvas id="resolvedChart"></canvas>
       </div>
     </div>

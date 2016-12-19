@@ -62,7 +62,7 @@ class User < ActiveRecord::Base
     result = []
     team_members.each do |tm|
       bug_count = {}
-      (metrics_timeframe.days.ago.to_date..Date.today).each do |day|
+      (chart_timeframe_preference.days.ago.to_date..Date.today).each do |day|
         bug_count[day.strftime("%b %d, %Y")] = tm.bugs.where("DATE(#{bug_status}_at) = ?", day).count
       end
       result << {"#{tm.cvs_username}" => bug_count}
@@ -93,6 +93,10 @@ class User < ActiveRecord::Base
     result[:resolution_time] = bugs.map{|x| x.resolution_time if x.resolution_time}.compact
 
     {"#{component}" => result.map{|k,v| ((v.inject{ |sum, el| sum + el }.to_f / v.size).try(:round) unless v.empty?) || 0}}
+  end
+
+  def chart_timeframe_preference
+    metrics_timeframe ?  metrics_timeframe : 7
   end
 
   private
