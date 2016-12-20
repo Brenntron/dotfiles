@@ -46,6 +46,10 @@ When(/^I click the link "(.*?)" in row "(.*?)" of the table with class "(.*?)"$/
   page.find(:xpath, "//*[contains(@class, '#{table_class}')]//tr[#{row_number}]").click_link(target)
 end
 
+Then(/^I hide the element with class "(.*?)"$/) do |element|
+  page.execute_script("$('.#{element}').hide()")
+end
+
 When(/^I click button "(.*?)"$/) do |button|
   click_button(button)
 end
@@ -89,7 +93,7 @@ Then(/^Element with class "(.*?)" should have content "(.*?)"$/) do |class_name,
   find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
 end
 
-Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |content,id_name|
+Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
   find(:xpath, "//div[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end
 
@@ -187,6 +191,10 @@ end
 
 Then(/^I should not see div element with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//div[contains(@class, '#{element}')]")
+end
+
+Then(/^the textarea with id "(.*?)" should contain "(.*?)"$/) do |id, content|
+  page.find(:xpath, "//textarea[@id='#{id}']").text.should == content
 end
 
 Then(/^I should be on "(.*?)"$/) do |path|

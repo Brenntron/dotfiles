@@ -116,6 +116,39 @@ Feature: Rules
     Then  the "max-detect-ips" field should be "policy max-detect-ips drop"
     Then the "security-ips" field should be "policy security-ips alert"
 
+  @javascript
+  Scenario: When a new rule is created, the service options should populate correctly
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
+    And the following rule categories exist:
+      |category       | id |
+      |BLACKLIST      |  1 |
+      |FILE-EXECUTABLE|  2 |
+      |OS-LINUX       |  3 |
+    Then I wait for "3" seconds
+    And  I goto "/bugs/222222"
+    Then I click the "Rules" tab
+    Then I click button "create"
+    Then I click "use standard form"
+    And  I click "other"
+    Then I click "mysql"
+    Then I click "kerberos"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "Test Message the third"
+    And  I fill in "rule[detection]" with "Detection test3"
+    # dropdown needs to be obscured to find Create Rule button
+    Then I hide the element with class "other-dropdown"
+    Then I click "Create Rule"
+    Then I wait for "1" seconds
+    Then I click the "Rules" tab
+    Then I click button "list all"
+    And  I click "new_rule"
+    Then I should see "service mysql"
+    Then I should see "service kerberos"
+    And  I should not see "telnet"
+
 
   @javascript
   Scenario: One or more rules can be selected on a bug to view or edit
