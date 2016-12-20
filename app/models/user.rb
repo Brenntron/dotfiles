@@ -25,6 +25,8 @@ class User < ActiveRecord::Base
   after_update {|user| user.record 'update' if Rails.configuration.websockets_enabled == "true"}
   after_destroy {|user| user.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
 
+  DEFAULT_METRICS_TIMEFRAME = 7
+
   def record action
     record = { resource: 'user',
                action: action,
@@ -96,7 +98,7 @@ class User < ActiveRecord::Base
   end
 
   def chart_timeframe_preference
-    metrics_timeframe ?  metrics_timeframe : 7
+    metrics_timeframe ?  metrics_timeframe : DEFAULT_METRICS_TIMEFRAME
   end
 
   private
