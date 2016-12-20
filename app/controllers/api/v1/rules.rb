@@ -55,6 +55,7 @@ module API
           end
         end
         post "", root: "rule" do
+          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
           new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
           new_rule.associate_references(permitted_params[:rule][:rule_content])
@@ -72,6 +73,7 @@ module API
           end
         end
         put ":id", root: "rule" do
+          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
           rule = Rule.where(id:permitted_params[:id]).first
           if permitted_params[:rule][:revert]
@@ -102,6 +104,7 @@ module API
           requires :id, type: Integer, desc: "the id for the rule to be updated"
         end
         post "update", root: "rule" do
+          ::PaperTrail.whodunnit = current_user.cvs_username
           Rule.update(permitted_params[:id])
         end
 
