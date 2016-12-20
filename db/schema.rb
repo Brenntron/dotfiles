@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161219011636) do
+ActiveRecord::Schema.define(version: 20161219011635) do
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
@@ -288,8 +288,8 @@ ActiveRecord::Schema.define(version: 20161219011636) do
     t.string   "event",                             null: false
     t.string   "whodunnit"
     t.text     "object",         limit: 2147483647
-    t.datetime "created_at"
     t.text     "object_changes", limit: 2147483647
+    t.datetime "created_at"
   end
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
