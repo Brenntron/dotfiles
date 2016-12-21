@@ -32,7 +32,6 @@ class CreateReferencesAndRules < ActiveRecord::Migration
       t.float    "average_nonmatch"
       t.boolean  "tested",           default: false
       t.boolean  "committed",        default: false
-      t.string   "documentation"
       t.timestamps
     end
 

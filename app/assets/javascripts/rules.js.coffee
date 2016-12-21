@@ -204,8 +204,13 @@ $ ->
         ref_types.forEach (item) ->
           references = references + "reference:" + item + "," + ref_values[i] + "; "
           i = i + 1
+
+        rule_doc = {}
+        $('.rule_doc').find('textarea[type=text]').each ->
+          rule_doc[$(this)[0].id] = $(this)[0].value
+
         rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
-        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val() }
+        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val(), rule_doc: rule_doc }
         data = {rule: rule}
         $.ajax {
           url: "/api/v1/rules"

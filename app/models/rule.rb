@@ -5,6 +5,7 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :bugs
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
+  has_one :rule_doc, dependent: :destroy
 
   belongs_to :rule_category
 

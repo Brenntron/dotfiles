@@ -47,11 +47,24 @@ module API
         desc "create a rule"
         params do
           requires :rule, type: Hash do
-            requires :rule_content, type: String, desc: "Compiled rule content"
-            optional :bug_id, type: Integer, desc: "Id of the bug associated with this rule"
-            optional :detection, type: String, desc: "Detection for the new rule"
-            optional :class_type, type: String, desc: "Classification of the new rule"
+            requires :rule_content,     type: String,  desc: "Compiled rule content"
+            optional :bug_id,           type: Integer, desc: "Id of the bug associated with this rule"
+            optional :detection,        type: String,  desc: "Detection for the new rule"
+            optional :class_type,       type: String,  desc: "Classification of the new rule"
             optional :rule_category_id, type: Integer, desc: "Rule Category"
+
+            requires :rule_doc, type: Hash do
+              requires :summary,           type: String, desc: "Rule Doc Summary"
+              optional :impact,            type: String, desc: "Rule Doc Impact"
+              optional :details,           type: String, desc: "Rule Doc Detailed Information"
+              optional :affected_sys,      type: String, desc: "Rule Doc Affected Systems"
+              optional :attack_scenarios,  type: String, desc: "Rule Doc Attack Scenarios"
+              optional :ease_of_attack,    type: String, desc: "Rule Doc Ease of Attack"
+              optional :false_positives,   type: String, desc: "Rule Doc False Positives"
+              optional :false_negatives,   type: String, desc: "Rule Doc False Negatives"
+              optional :corrective_action, type: String, desc: "Rule Doc Corrective Action"
+              optional :contributors,      type: String, desc: "Rule Doc Contributors"
+            end
           end
         end
         post "", root: "rule" do
@@ -60,6 +73,7 @@ module API
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule.update(detection:permitted_params[:rule][:detection].strip!, class_type:permitted_params[:rule][:class_type]) if new_rule.state == 'FAILED'
           new_rule.update(rule_category_id: permitted_params[:rule][:rule_category_id])
+          new_rule.create_rule_doc(permitted_params[:rule][:rule_doc])
           new_rule
         end
 
