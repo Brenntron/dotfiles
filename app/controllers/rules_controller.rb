@@ -32,6 +32,15 @@ class RulesController < ApplicationController
     render json: {success: 'Rule has been deleted'}, status: 200
   end
 
+  def get_impact
+    classification = params[:classification]
+    respond_to do |format|
+      format.js {
+        render :js => RulesHelper::CLASSIFICATION[classification]
+      }
+    end
+  end
+
 
   private
 

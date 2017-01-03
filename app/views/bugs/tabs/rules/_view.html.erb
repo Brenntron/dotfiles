@@ -25,6 +25,23 @@
         <% if rule.rule_warnings.present? %>
           <div class="alert alert-warning small"><%= simple_format rule.rule_warnings.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') if rule.rule_warnings %></div>
         <% end %>
+        <h4 class="blue">Documentation</h4>
+        <div class="alert alert-info small">
+          <% if rule.rule_doc.present? %>
+              <p class="code">Summary:              <%=rule.rule_doc.summary%></p>
+              <p class="code">Impact:               <%=rule.rule_doc.impact%></p>
+              <p class="code">Detailed Information: <%=rule.rule_doc.details%></p>
+              <p class="code">Affected Systems:     <%=rule.rule_doc.affected_sys%></p>
+              <p class="code">Attack Scenarios:     <%=rule.rule_doc.attack_scenarios%></p>
+              <p class="code">Ease of Attack:       <%=rule.rule_doc.ease_of_attack%></p>
+              <p class="code">False Positives:      <%=rule.rule_doc.false_positives%></p>
+              <p class="code">False Negatives:      <%=rule.rule_doc.false_negatives%></p>
+              <p class="code">Corrective Action:    <%=rule.rule_doc.corrective_action%></p>
+              <p class="code">Contributors:         <%=rule.rule_doc.contributors%></p>
+          <%else%>
+              Documentation not available
+          <%end%>
+        </div>
         <hr/>
       </div>
     <% end %>

@@ -83,6 +83,19 @@ module API
           requires :rule, type: Hash do
             optional :rule_content, type: String, desc: "Compiled rule content"
             optional :revert, type: Boolean, desc: "Revert rule to CVS copy?"
+
+            requires :rule_doc, type: Hash do
+              requires :summary,           type: String, desc: "Rule Doc Summary"
+              optional :impact,            type: String, desc: "Rule Doc Impact"
+              optional :details,           type: String, desc: "Rule Doc Detailed Information"
+              optional :affected_sys,      type: String, desc: "Rule Doc Affected Systems"
+              optional :attack_scenarios,  type: String, desc: "Rule Doc Attack Scenarios"
+              optional :ease_of_attack,    type: String, desc: "Rule Doc Ease of Attack"
+              optional :false_positives,   type: String, desc: "Rule Doc False Positives"
+              optional :false_negatives,   type: String, desc: "Rule Doc False Negatives"
+              optional :corrective_action, type: String, desc: "Rule Doc Corrective Action"
+              optional :contributors,      type: String, desc: "Rule Doc Contributors"
+            end
           end
         end
         put ":id", root: "rule" do
@@ -97,6 +110,7 @@ module API
             end
           end
           rule.update_references(permitted_params[:rule][:rule_content])
+          rule.rule_doc.present? ? rule.rule_doc.update(permitted_params[:rule][:rule_doc]) : rule.create_rule_doc(permitted_params[:rule][:rule_doc])
           rule.update(update_params)
           rule
         end

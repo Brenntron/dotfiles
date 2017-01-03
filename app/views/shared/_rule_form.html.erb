@@ -203,10 +203,10 @@
           <label for="metadata-services">Service:</label>
         </div>
         <div class="col-xs-8 col-sm-9 other-dropdown">
-          <% Rule::TOP_SERVICES.each do |service| %>
+          <% RulesHelper::TOP_SERVICES.each do |service| %>
               <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="service <%= service %>" <%= "checked" if service == 'ftp-data' || service == 'http' || service == 'imap' || service == 'pop3' %>>&nbsp;<%= service %>&nbsp;&nbsp;
           <% end %>
-          <%=select_tag 'rule[metadata][]', options_for_select(Rule::OTHER_SERVICES.map{|os| [ os, " service #{os}"]}), class: "multiselect metadata_form service-other-dropdown form-control input-sm", multiple: "true"%>
+          <%=select_tag 'rule[metadata][]', options_for_select(RulesHelper::OTHER_SERVICES.map{|os| [ os, " service #{os}"]}), class: "multiselect metadata_form service-other-dropdown form-control input-sm", multiple: "true"%>
         </div>
       </div>
       <div class="col-xs-12">
@@ -248,11 +248,7 @@
         <div class="entry-type-switch">
         </div>
         <div class="col-xs-10">
-          <select class="form-control select-sm code" name="rule[class_type]" id="new-rule-classtype-form" required>
-            <% ['attempted-user', 'attempted-admin', 'attempted-recon','policy-violation','shellcode-detect','trojan-activity','web-application-attack','misc-activity','bad-unknown'].each do |clas| %>
-                <option value="<%= clas %>"><%= clas %></option>
-            <% end %>
-          </select>
+          <%=select_tag "rule[class_type]", options_for_select(RulesHelper::CLASSIFICATION.keys), prompt: 'select classification', id: "new-rule-classtype-form", class: "form-control select-sm code", required: "true"%>
         </div>
       </div>
     </div>
@@ -283,13 +279,13 @@
             <div class="form-group">
               <label for="rule_doc_summary">Summary</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][summary]" type="text" id="summary"
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][summary]" type="text" id="summary"
                         placeholder="This event is generated when..." required="true"></textarea>
             </div>
             <div class="form-group">
               <label for="rule_doc_impact">Impact</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][impact]" id="impact" type="text"></textarea>
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][impact]" id="impact" type="text"></textarea>
             </div>
             </div>
           </div>
@@ -299,13 +295,13 @@
             <div class="form-group">
               <label for="rule_doc_details">Detailed Information</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][details]" type="text" id="details"
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][details]" type="text" id="details"
                         placeholder="Information regarding the underlying vulnerability, what the rule actually looks for and affected/non-affected systems etc..."></textarea>
             </div>
             <div class="form-group">
               <label for="rule_doc_affected_sys">Affected Systems</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][affected_sys]" id="affected_sys" type="text"></textarea>
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][affected_sys]" id="affected_sys" type="text"></textarea>
             </div>
             </div>
           </div>
@@ -315,13 +311,13 @@
             <div class="form-group">
               <label for="rule_doc_attack_scenarios">Attack Scenarios</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][attack_scenarios]" type="text" id="attack_scenarios"
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][attack_scenarios]" type="text" id="attack_scenarios"
                         placeholder="Possible examples of attacks or script usage etc..." ></textarea>
             </div>
             <div class="form-group">
               <label for="rule_doc_ease_of_attack">Ease of Attack</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][ease_of_attack]" id="ease_of_attack" type="text"
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][ease_of_attack]" id="ease_of_attack" type="text"
                         placeholder="Simple, Medium, Hard, Difficult etc...&#10;Publicly Available?"></textarea>
             </div>
             </div>
@@ -332,12 +328,12 @@
             <div class="form-group">
               <label for="rule_doc_false_positives">False Positives</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][false_positives]" id="false_positives" type="text">None Known</textarea>
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][false_positives]" id="false_positives" type="text">None Known</textarea>
             </div>
             <div class="form-group">
               <label for="rule_doc_false_negatives">False Negatives</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][false_negatives]" id="false_negatives" type="text">None Known</textarea>
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][false_negatives]" id="false_negatives" type="text">None Known</textarea>
             </div>
             </div>
           </div>
@@ -347,13 +343,13 @@
             <div class="form-group">
               <label for="rule_doc_corrective_action">Corrective Action</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][corrective_action]" id="corrective_action" type="text"
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][corrective_action]" id="corrective_action" type="text"
                         placeholder="Information regarding patches, upgrades, other info about firewall rules or system hardening techniques etc. Whatever might be appropriate to mitigate the risk of further compromise."></textarea>
             </div>
             <div class="form-group">
               <label for="rule_doc_contributors">Contributors</label>
               <br>
-              <textarea class="form-control create-input select-sm code" rows=5 cols=78 name="rule[rule_doc][][contributors]" id="contributors" type="text"
+              <textarea class="form-control create-input select-sm code" rows=4 cols=78 name="rule[rule_doc][][contributors]" id="contributors" type="text"
                         placeholder="Original Rule writer (if not Talos, for instance Community Submission)&#10;Cisco's Talos Intelligence Group"></textarea>
             </div>
             </div>

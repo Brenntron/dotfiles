@@ -238,7 +238,12 @@ $ ->
     form = $(this).parents('.edit_legacy_form')
     rule_content = form.find('textarea[name="rule[rule_content]"]').val()
     id = form.find('input[name="rule_id"]').val()
-    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
+
+    edit_rule_doc = {}
+    form.find('textarea[type=text]').each ->
+      edit_rule_doc[$(this)[0].id] = $(this)[0].value
+
+    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: edit_rule_doc}
     data = {id: id, rule: rule}
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax {
@@ -289,3 +294,16 @@ $ ->
      enableFiltering: true,
      nonSelectedText: 'other'
   );
+
+  $(document).on "change", '#new-rule-classtype-form', (e) ->
+    classification = $('#new-rule-classtype-form option:selected').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax {
+      url: '/rules/get_impact/'
+      method: 'GET'
+      data: {classification: classification}
+      headers: headers
+      complete: (e) ->
+        $('#impact')[0].value = e.responseText
+
+    }
