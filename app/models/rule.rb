@@ -147,7 +147,8 @@ class Rule < ActiveRecord::Base
   def rule_classification
     split = rule_content.split(';')
     classification_index = split.index{|s| s.include?("classtype")}
-    RulesHelper::CLASSIFICATION[split[classification_index].split(':')[1]]
+    impact = split[classification_index].split(':')[1].scan(/[a-z-]/).join
+    RulesHelper::CLASSIFICATION[impact]
   end
 
   def self.parse_rule(rule)

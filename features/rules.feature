@@ -25,6 +25,8 @@ Feature: Rules
     And  I select "FILE-EXECUTABLE" from "rule_category_id"
     And  I fill in "rule[message]" with "Test Message"
     And  I fill in "rule[detection]" with "Detection test"
+    And  I select "unknown" from "rule[class_type]"
+    And  I fill in "summary" with "This is the rule doc summary"
     Then I click "Create Rule"
     And  I wait for "3" seconds
     Then I click the "Rules" tab
@@ -56,6 +58,8 @@ Feature: Rules
     And  I select "BLACKLIST" from "rule_category_id"
     And  I fill in "rule[message]" with "Test Message"
     And  I fill in "rule[detection]" with "Detection test2"
+    And  I select "unknown" from "rule[class_type]"
+    And  I fill in "summary" with "This is the rule doc summary"
     Then I click "Create Rule"
     And  I wait for "3" seconds
     Then I click the "Rules" tab
@@ -90,6 +94,8 @@ Feature: Rules
     Then I should see "Please fill in required fields."
     And  I fill in "rule[message]" with "Test Message the third"
     And  I fill in "rule[detection]" with "Detection test3"
+    And  I select "unknown" from "rule[class_type]"
+    And  I fill in "summary" with "This is the rule doc summary"
     Then I click "Create Rule"
     Then I wait for "1" seconds
     Then I click the "Rules" tab
@@ -138,6 +144,8 @@ Feature: Rules
     And  I select "BLACKLIST" from "rule_category_id"
     And  I fill in "rule[message]" with "Test Message the third"
     And  I fill in "rule[detection]" with "Detection test3"
+    And  I select "unknown" from "rule[class_type]"
+    And  I fill in "summary" with "This is the rule doc summary"
     # dropdown needs to be obscured to find Create Rule button
     Then I hide the element with class "other-dropdown"
     Then I click "Create Rule"

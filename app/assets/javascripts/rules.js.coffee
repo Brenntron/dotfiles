@@ -145,27 +145,37 @@ $ ->
     e.preventDefault()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     if $('.legacy_form').is(":visible")
-      form = $(this).parents('.legacy_form');
-      rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
-      contents_arr = rule_contents.split('\n')
-      contents_arr.forEach (rule_content) ->
-        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
-        data = { rule: rule}
-        $.ajax {
-          url: "/api/v1/rules"
-          method: 'POST'
-          data: data
-          headers: headers
-          success: (response) ->
-            $('.alert_rules').removeClass('error')
-            $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
-          error: (response) ->
-            $('.alert_rules').removeClass('success')
-            $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
-          complete: ->
-            $(document).ajaxStop ->
-              location.reload true
-        }
+      if $('.legacy_form')[0].checkValidity()
+        form = $(this).parents('.legacy_form');
+
+        legacy_rule_doc = {}
+        form.find('textarea[type=text]').each ->
+          legacy_rule_doc[$(this)[0].id] = $(this)[0].value
+
+        rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
+        contents_arr = rule_contents.split('\n')
+        contents_arr.forEach (rule_content) ->
+          rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: legacy_rule_doc}
+          data = { rule: rule}
+          $.ajax {
+            url: "/api/v1/rules"
+            method: 'POST'
+            data: data
+            headers: headers
+            success: (response) ->
+              $('.alert_rules').removeClass('error')
+              $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
+            error: (response) ->
+              $('.alert_rules').removeClass('success')
+              $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
+            complete: ->
+              $(document).ajaxStop ->
+                location.reload true
+          }
+      else
+        $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
+        $('.legacy_form').find(":invalid").each (e) ->
+          $(this).addClass('onError')
     else if $('.standard_form').is(":visible")
       form = $(this).parents('.standard_form')
       if $('.standard_form')[0].checkValidity()
@@ -304,6 +314,6 @@ $ ->
       data: {classification: classification}
       headers: headers
       complete: (e) ->
-        $('#impact')[0].value = e.responseText
+        $('.impact-standard')[0].value = e.responseText
 
     }

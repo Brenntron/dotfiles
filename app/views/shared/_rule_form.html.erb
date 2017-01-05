@@ -20,6 +20,17 @@
         <textarea class="form-control code select-sm" placeholder="Enter rule content" name="rule[rule_content]" rows="13" required></textarea>
       </div>
     </div>
+    <div class="form-group">
+      <div class="col-xs-12 rule_doc">
+        <h4>Documentation&nbsp;&nbsp;</h4>
+        <p class="help-block">
+          When creating multiple rules simultaneously, documentation entered below will be applied to each rule.<br>
+          Docs can be customized after rules are created via the Edit section.
+        </p>
+        <div class="entry-type-switch"></div>
+        <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: Rule.new, form_type: 'legacy' } %>
+      </div>
+    </div>
     <div class="form-group center">
       <div class="col-xs-12">
         <button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>
@@ -275,7 +286,7 @@
       <div class="col-xs-12 rule_doc">
         <h5>Documentation&nbsp;&nbsp;</h5>
         <div class="entry-type-switch"></div>
-          <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: Rule.new } %>
+          <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: Rule.new, form_type: 'standard' } %>
       </div>
     </div>
     </div>
