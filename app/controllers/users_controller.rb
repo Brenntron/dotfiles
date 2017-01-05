@@ -16,7 +16,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:user_id])
     pending = {}
     reopened = {}
-    timeframe = current_user.metrics_timeframe
+    timeframe = current_user.chart_timeframe_preference
     (timeframe.days.ago.to_date..Date.today).each do |day|
       pending[day.strftime("%b %d, %Y")] = @user.bugs.where('DATE(pending_at) = ?', day).count
       reopened[day.strftime("%b %d, %Y")] = @user.bugs.where('DATE(reopened_at) = ?', day).count

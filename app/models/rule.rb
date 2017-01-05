@@ -2,6 +2,8 @@ require 'open3'
 require 'tempfile'
 
 class Rule < ActiveRecord::Base
+  has_paper_trail
+
   has_and_belongs_to_many :bugs
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
