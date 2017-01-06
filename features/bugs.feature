@@ -213,6 +213,45 @@ Feature: Bug
     And I should see "new_rule"
     And I should see "select a category"
 
+  @javascript
+  Scenario: a user can add a new rule to a bug only if all required fields are filled out
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    And I click ".rules-tab"
+    And I click button "create"
+    And  I fill in "rule[rule_content]" with "1: connection:alert tcp $EXTERNAL_NET  ->  $HOME_NET any (msg:"select a category ";flow:to_client,established;detection:;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, , ;reference:cve,2006-5745; reference:cve,2568-5014; classtype:attempted-user)"
+    Then I click button "Create Rule"
+    Then I wait for "2" seconds
+    Then I should see "Please fill in required fields."
+    Then I fill in "summary" with "This is the summary"
+    Then I click button "Create Rule"
+    Then I click ".rules-tab"
+    And I should see "new_rule"
+    And I should see "select a category"
+
+  @javascript
+  Scenario: a user can add a new rule and the rule doc impact will populate after save
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    And I click ".rules-tab"
+    And I click button "create"
+    And I fill in "rule[rule_content]" with "1: connection:alert tcp $EXTERNAL_NET  ->  $HOME_NET any (msg:'select a category ';flow:to_client,established;detection:;metadata: balanced-ips, security-ips, drop, ftp-data, http, imap, pop3, , ;reference:cve,2006-5745; reference:cve,2568-5014; classtype:attempted-user)"
+    And I fill in "summary" with "this is the summary"
+    Then I click button "Create Rule"
+    Then I click ".rules-tab"
+    Then I click "new_rule"
+    And I should see "select a category"
+    And I should see "this is the summary"
+    And I should see "Attempted User Privilege Gain"
+
 
   @javascript
   Scenario: a user can import an existing rule to a bug
