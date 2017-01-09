@@ -14,7 +14,6 @@ FactoryGirl.define do
     average_nonmatch nil
     tested false
     committed true
-    documentation nil
     task_id nil
     rule_category_id 7
   end

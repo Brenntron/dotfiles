@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161219011635) do
+ActiveRecord::Schema.define(version: 20161220161215) do
 
   create_table "attachments", force: true do |t|
     t.integer  "bugzilla_attachment_id"
@@ -90,8 +90,8 @@ ActiveRecord::Schema.define(version: 20161219011635) do
   add_index "bugs", ["user_id"], name: "index_bugs_on_user_id", using: :btree
 
   create_table "bugs_rules", id: false, force: true do |t|
-    t.integer "bug_id",  null: false
-    t.integer "rule_id", null: false
+    t.integer "bug_id",  default: 0, null: false
+    t.integer "rule_id", default: 0, null: false
   end
 
   create_table "bugs_tags", id: false, force: true do |t|
@@ -198,6 +198,22 @@ ActiveRecord::Schema.define(version: 20161219011635) do
     t.datetime "updated_at"
   end
 
+  create_table "rule_docs", force: true do |t|
+    t.integer  "rule_id"
+    t.text     "summary"
+    t.text     "impact"
+    t.text     "details"
+    t.text     "affected_sys"
+    t.text     "attack_scenarios"
+    t.text     "ease_of_attack"
+    t.text     "false_positives"
+    t.text     "false_negatives"
+    t.text     "corrective_action"
+    t.text     "contributors"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "rules", force: true do |t|
     t.text     "rule_content"
     t.text     "rule_parsed"
@@ -220,7 +236,6 @@ ActiveRecord::Schema.define(version: 20161219011635) do
     t.float    "average_nonmatch", limit: 24
     t.boolean  "tested",                      default: false
     t.boolean  "committed",                   default: false
-    t.string   "documentation"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "task_id"
@@ -272,7 +287,7 @@ ActiveRecord::Schema.define(version: 20161219011635) do
     t.string   "role"
     t.integer  "class_level"
     t.string   "authentication_token"
-    t.integer  "metrics_timeframe"
+    t.integer  "metrics_timeframe",      default: 7
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"

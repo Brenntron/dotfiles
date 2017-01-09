@@ -20,6 +20,8 @@
               <textarea class="form-control code select-sm" name="rule[rule_content]" rows="13" required="true"><%= rule.rule_content %></textarea>
             </div>
           </div>
+          <h4 class="blue">Documentation</h4>
+          <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: rule} %>
           <div class="form-group right">
             <div class="col-xs-12">
               <button class="btn btn-warning update-rule-btn" type="submit">Save Changes</button>

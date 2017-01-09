@@ -20,6 +20,17 @@
         <textarea class="form-control code select-sm" placeholder="Enter rule content" name="rule[rule_content]" rows="13" required></textarea>
       </div>
     </div>
+    <div class="form-group">
+      <div class="col-xs-12 rule_doc">
+        <h4>Documentation&nbsp;&nbsp;</h4>
+        <p class="help-block">
+          When creating multiple rules simultaneously, documentation entered below will be applied to each rule.<br>
+          Docs can be customized after rules are created via the Edit section.
+        </p>
+        <div class="entry-type-switch"></div>
+        <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: Rule.new, form_type: 'legacy' } %>
+      </div>
+    </div>
     <div class="form-group center">
       <div class="col-xs-12">
         <button class="btn btn-warning save-rule-btn" type="submit" value="submit">Create Rule</button>
@@ -203,10 +214,10 @@
           <label for="metadata-services">Service:</label>
         </div>
         <div class="col-xs-8 col-sm-9 other-dropdown">
-          <% Rule::TOP_SERVICES.each do |service| %>
+          <% RulesHelper::TOP_SERVICES.each do |service| %>
               <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="service <%= service %>" <%= "checked" if service == 'ftp-data' || service == 'http' || service == 'imap' || service == 'pop3' %>>&nbsp;<%= service %>&nbsp;&nbsp;
           <% end %>
-          <%=select_tag 'rule[metadata][]', options_for_select(Rule::OTHER_SERVICES.map{|os| [ os, " service #{os}"]}), class: "multiselect metadata_form service-other-dropdown form-control input-sm", multiple: "true"%>
+          <%=select_tag 'rule[metadata][]', options_for_select(RulesHelper::OTHER_SERVICES.map{|os| [ os, " service #{os}"]}), class: "multiselect metadata_form service-other-dropdown form-control input-sm", multiple: "true"%>
         </div>
       </div>
       <div class="col-xs-12">
@@ -248,11 +259,7 @@
         <div class="entry-type-switch">
         </div>
         <div class="col-xs-10">
-          <select class="form-control select-sm code" name="rule[class_type]" id="new-rule-classtype-form" required>
-            <% ['attempted-user', 'attempted-admin', 'attempted-recon','policy-violation','shellcode-detect','trojan-activity','web-application-attack','misc-activity','bad-unknown'].each do |clas| %>
-                <option value="<%= clas %>"><%= clas %></option>
-            <% end %>
-          </select>
+          <%=select_tag "rule[class_type]", options_for_select(RulesHelper::CLASSIFICATION.keys), prompt: 'select classification', id: "new-rule-classtype-form", class: "form-control select-sm code", required: "true"%>
         </div>
       </div>
     </div>
@@ -273,6 +280,13 @@
             </div>
           <% end %>
         <% end %>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-xs-12 rule_doc">
+        <h5>Documentation&nbsp;&nbsp;</h5>
+        <div class="entry-type-switch"></div>
+          <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: Rule.new, form_type: 'standard' } %>
       </div>
     </div>
     </div>

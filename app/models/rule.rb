@@ -7,19 +7,9 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :bugs
   has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
+  has_one :rule_doc, dependent: :destroy
 
   belongs_to :rule_category
-
-  TOP_SERVICES = ['http', 'imap', 'pop3', 'ftp-data', 'smtp',
-                  'dns', 'netbios-ssn', 'ssl', 'ftp', 'sunrpc']
-
-  OTHER_SERVICES = ['dcerpc', 'mysql', 'telnet', 'snmp', 'irc',
-                    'openvpn', 'sip', 'ntp', 'kerberos', 'ldap',
-                    'rtsp', 'netbios-ns', 'java_rmi', 'dhcp', 'ircd',
-                    'ssdp', 'netbios-dgm', 'vnc-server', 'ssh', 'printer',
-                    'drda', 'rtmp', 'syslog', 'nntp', 'tftp',
-                    'rdp', 'teamview', 'wins', 'netware', 'postgresql',
-                    'ident', 'ldp', 'rtp', 'igmp', 'gopher']
 
   #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
@@ -154,6 +144,13 @@ class Rule < ActiveRecord::Base
       end
       return false
     end
+  end
+
+  def rule_classification
+    split = rule_content.split(';')
+    classification_index = split.index{|s| s.include?("classtype")}
+    impact = split[classification_index].split(':')[1].scan(/[a-z-]/).join
+    RulesHelper::CLASSIFICATION[impact]
   end
 
   def self.parse_rule(rule)

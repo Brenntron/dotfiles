@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   # some of these named routes need to be rethought to conform to rails conventions
   get 'rules/add_form' => 'rules#add_form', format: 'js'
+  get 'rules/get_impact' => 'rules#get_impact', format: 'js'
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
@@ -24,6 +25,7 @@ Rails.application.routes.draw do
 
 
   resources :rules, param: :sid
+
   resources :users do
     get :status_metrics, defaults: { format: :json }
     get :time_metrics, defaults: { format: :json }

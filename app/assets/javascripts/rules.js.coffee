@@ -81,12 +81,12 @@ $ ->
   $('.diff').find('br').remove()
 
   $(document).on 'click', '#legacy_btn', (e) ->
-    $('.standard_form, #standard_btn').hide()
-    $('.legacy_form, #legacy_btn').show()
+    $('.standard_form, #legacy_btn').hide()
+    $('.legacy_form, #standard_btn' ).show()
 
   $(document).on 'click', '#standard_btn', (e) ->
-    $('.legacy_form, #legacy_btn').hide()
-    $('.standard_form, #standard_btn').show()
+    $('.legacy_form, #standard_btn' ).hide()
+    $('.standard_form, #legacy_btn').show()
 
   $(document).on 'click','.rules_check_box', ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))
@@ -145,27 +145,37 @@ $ ->
     e.preventDefault()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     if $('.legacy_form').is(":visible")
-      form = $(this).parents('.legacy_form');
-      rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
-      contents_arr = rule_contents.split('\n')
-      contents_arr.forEach (rule_content) ->
-        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
-        data = { rule: rule}
-        $.ajax {
-          url: "/api/v1/rules"
-          method: 'POST'
-          data: data
-          headers: headers
-          success: (response) ->
-            $('.alert_rules').removeClass('error')
-            $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
-          error: (response) ->
-            $('.alert_rules').removeClass('success')
-            $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
-          complete: ->
-            $(document).ajaxStop ->
-              location.reload true
-        }
+      if $('.legacy_form')[0].checkValidity()
+        form = $(this).parents('.legacy_form');
+
+        legacy_rule_doc = {}
+        form.find('textarea[type=text]').each ->
+          legacy_rule_doc[$(this)[0].id] = $(this)[0].value
+
+        rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
+        contents_arr = rule_contents.split('\n')
+        contents_arr.forEach (rule_content) ->
+          rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: legacy_rule_doc}
+          data = { rule: rule}
+          $.ajax {
+            url: "/api/v1/rules"
+            method: 'POST'
+            data: data
+            headers: headers
+            success: (response) ->
+              $('.alert_rules').removeClass('error')
+              $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
+            error: (response) ->
+              $('.alert_rules').removeClass('success')
+              $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
+            complete: ->
+              $(document).ajaxStop ->
+                location.reload true
+          }
+      else
+        $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
+        $('.legacy_form').find(":invalid").each (e) ->
+          $(this).addClass('onError')
     else if $('.standard_form').is(":visible")
       form = $(this).parents('.standard_form')
       if $('.standard_form')[0].checkValidity()
@@ -204,8 +214,13 @@ $ ->
         ref_types.forEach (item) ->
           references = references + "reference:" + item + "," + ref_values[i] + "; "
           i = i + 1
+
+        rule_doc = {}
+        $('.rule_doc').find('textarea[type=text]').each ->
+          rule_doc[$(this)[0].id] = $(this)[0].value
+
         rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
-        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val() }
+        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val(), rule_doc: rule_doc }
         data = {rule: rule}
         $.ajax {
           url: "/api/v1/rules"
@@ -233,7 +248,12 @@ $ ->
     form = $(this).parents('.edit_legacy_form')
     rule_content = form.find('textarea[name="rule[rule_content]"]').val()
     id = form.find('input[name="rule_id"]').val()
-    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val()}
+
+    edit_rule_doc = {}
+    form.find('textarea[type=text]').each ->
+      edit_rule_doc[$(this)[0].id] = $(this)[0].value
+
+    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: edit_rule_doc}
     data = {id: id, rule: rule}
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax {
@@ -284,3 +304,16 @@ $ ->
      enableFiltering: true,
      nonSelectedText: 'other'
   );
+
+  $(document).on "change", '#new-rule-classtype-form', (e) ->
+    classification = $('#new-rule-classtype-form option:selected').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax {
+      url: '/rules/get_impact/'
+      method: 'GET'
+      data: {classification: classification}
+      headers: headers
+      complete: (e) ->
+        $('.impact-standard')[0].value = e.responseText
+
+    }
