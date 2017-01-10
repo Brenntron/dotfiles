@@ -1,29 +1,29 @@
 source 'https://rubygems.org'
 
-gem "grape", '0.11.0'
-gem "grape-swagger"
-gem "hashie-forbidden_attributes"
-gem "active_model_serializers"
-gem "grape-active_model_serializers"
-gem "grape-swagger-rails"
-gem "rack-cors", require: "rack/cors"
-gem 'kaminari', '~>0.16.3'
+gem 'grape', '0.11.0'
+gem 'grape-swagger'
+gem 'hashie-forbidden_attributes'
+gem 'active_model_serializers'
+gem 'grape-active_model_serializers'
+gem 'grape-swagger-rails'
+gem 'rack-cors', require: 'rack/cors'
+gem 'kaminari', '~> 0.16.3'
 
 gem 'cancan', '1.6.10'
-gem 'devise', '3.2.2'
+gem 'devise', '4.2.0'
 gem 'net-ldap', '~> 0.11'
 
 gem 'mysql2', '~> 0.3.20'
 gem 'rmagick', '2.13.2'
 gem 'ruby-bugzilla', '~> 0.6.0'
 
-gem 'sfbugzilla', :path => './vendor/gems/sfbugzilla'
-gem 'rule_test_api', :path => './vendor/gems/rule_test_api'
+gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
+gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her'
 
 gem 'net-ssh'
 gem 'daemons'
-gem "activemessaging", :git => "https://github.com/digital-york/activemessaging.git"
+gem 'activemessaging', git: 'https://github.com/digital-york/activemessaging.git'
 gem 'stomp'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '0.9.12.4'
@@ -48,6 +48,7 @@ group :development do
   gem 'awesome_print', '1.2.0'
   gem 'guard','2.11.1'
   gem 'guard-livereload', '2.3.0', require: false
+  gem 'web-console', '~> 2.0'
 end
 
 group :test do
@@ -74,7 +75,7 @@ gem 'therubyracer'
 gem 'turbolinks'
 gem 'paper_trail', '6.0.2'
 
-gem 'rails', "4.1.5"
+gem 'rails', "4.2.7.1"
 
 
 
