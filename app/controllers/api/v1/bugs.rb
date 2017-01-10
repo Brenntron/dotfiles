@@ -170,26 +170,26 @@ module API
           if permitted_params[:bug][:editor_id]
             state = nil
             editor = User.find(permitted_params[:bug][:editor_id])
-            state_params = Bug.update_state(bug, state, editor.email)
+            updated_bug_state = Bug.get_new_bug_state(bug, state, editor.email)
             options = {
                 :ids => permitted_params[:id],
                 :assigned_to => editor.email,
-                :status => state_params[:status],
-                :resolution => state_params[:resolution],
-                :comment => state_params[:comment]
+                :status => updated_bug_state[:status],
+                :resolution => updated_bug_state[:resolution],
+                :comment => updated_bug_state[:comment]
             }
             update_params = {
                 :user => editor,
-                :state => state_params[:state],
-                :status => state_params[:status],
-                :resolution => state_params[:resolution],
-                :assigned_at => state_params[:assigned_at],
-                :pending_at => state_params[:pending_at],
-                :resolved_at => state_params[:resolved_at],
-                :reopened_at => state_params[:reopened_at],
-                :work_time => state_params[:work_time],
-                :rework_time => state_params[:rework_time],
-                :review_time => state_params[:review_time]
+                :state => updated_bug_state[:state],
+                :status => updated_bug_state[:status],
+                :resolution => updated_bug_state[:resolution],
+                :assigned_at => updated_bug_state[:assigned_at],
+                :pending_at => updated_bug_state[:pending_at],
+                :resolved_at => updated_bug_state[:resolved_at],
+                :reopened_at => updated_bug_state[:reopened_at],
+                :work_time => updated_bug_state[:work_time],
+                :rework_time => updated_bug_state[:rework_time],
+                :review_time => updated_bug_state[:review_time]
             }
           elsif permitted_params[:bug][:reviewer_id]
             reviewer = User.find(permitted_params[:bug][:reviewer_id])
@@ -201,24 +201,24 @@ module API
                 :committer => reviewer
             }
           elsif permitted_params[:bug][:state]
-            state_params = Bug.update_state(bug, permitted_params[:bug][:state], nil)
+            updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], nil)
             options = {
                 :ids => permitted_params[:id],
-                :status => state_params[:status],
-                :resolution => state_params[:resolution],
-                :comment => state_params[:comment]
+                :status => updated_bug_state[:status],
+                :resolution => updated_bug_state[:resolution],
+                :comment => updated_bug_state[:comment]
             }
             update_params = {
-                :state => state_params[:state],
-                :status => state_params[:status],
-                :resolution => state_params[:resolution],
-                :assigned_at => state_params[:assigned_at],
-                :pending_at => state_params[:pending_at],
-                :resolved_at => state_params[:resolved_at],
-                :reopened_at => state_params[:reopened_at],
-                :work_time => state_params[:work_time],
-                :rework_time => state_params[:rework_time],
-                :review_time => state_params[:review_time]
+                :state => updated_bug_state[:state],
+                :status => updated_bug_state[:status],
+                :resolution => updated_bug_state[:resolution],
+                :assigned_at => updated_bug_state[:assigned_at],
+                :pending_at => updated_bug_state[:pending_at],
+                :resolved_at => updated_bug_state[:resolved_at],
+                :reopened_at => updated_bug_state[:reopened_at],
+                :work_time => updated_bug_state[:work_time],
+                :rework_time => updated_bug_state[:rework_time],
+                :review_time => updated_bug_state[:review_time]
             }
           elsif permitted_params[:bug][:new_research_notes]
             update_params = {

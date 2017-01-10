@@ -121,58 +121,47 @@ class Bug < ActiveRecord::Base
     end
   end
 
-  def self.update_state(bug, state, editor_email)
+  def self.get_new_bug_state(bug, state, editor_email)
     updated_state = state
     updated_state = 'NEW' if editor_email == 'vrt-incoming@sourcefire.com' && bug.resolution == 'OPEN'
     updated_state = 'ASSIGNED' unless (editor_email == 'vrt-incoming@sourcefire.com') || (%w(RESOLVED REOPENED).include? bug.status) || state == 'PENDING'
     updated_state = nil if updated_state == bug.state
+    state_params = {}
 
     case updated_state
     when 'NEW'
-      status = updated_state
-      resolution = 'OPEN'
-      comment = { comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug." }
+      state_params['status'] = updated_state
+      state_params['resolution'] = 'OPEN'
+      state_params['comment'] = { comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug." }
     when 'ASSIGNED'
-      status = updated_state
-      resolution = 'OPEN'
-      comment = { comment: "This bug is now ASSIGNED to #{editor_email}." }
-      assigned_at = Time.now
+      state_params['status'] = updated_state
+      state_params['resolution'] = 'OPEN'
+      state_params['comment'] = { comment: "This bug is now ASSIGNED to #{editor_email}." }
+      state_params['assigned_at'] = Time.now
     when 'PENDING'
-      status = 'RESOLVED'
-      resolution = updated_state
-      comment = { comment: "This bug is now RESOLVED - #{updated_state}." }
-      pending_at = Time.now
+      state_params['status'] = 'RESOLVED'
+      state_params['resolution'] = updated_state
+      state_params['comment'] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params['pending_at'] = Time.now
       if bug.state == 'REOPENED'
-        rework_time = ((pending_at - bug.reopened_at) / 86_400).ceil
+        state_params['rework_time'] = ((pending_at - bug.reopened_at) / 86_400).ceil
       else
-        work_time = ((pending_at - bug.assigned_at) / 86_400).ceil
+        state_params['work_time'] = ((pending_at - bug.assigned_at) / 86_400).ceil
       end
     when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
-      status = 'RESOLVED'
-      resolution = updated_state
-      comment = { comment: "This bug is now RESOLVED - #{updated_state}." }
-      resolved_at = Time.now
-      review_time = ((resolved_at - bug.pending_at) / 86_400).ceil
+      state_params['status'] = 'RESOLVED'
+      state_params['resolution'] = updated_state
+      state_params['comment'] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params['resolved_at'] = Time.now
+      state_params['review_time'] = ((resolved_at - bug.pending_at) / 86_400).ceil
     when 'REOPENED'
-      status = updated_state
-      resolution = 'OPEN'
-      comment = { comment: "This bug is now #{updated_state}." }
-      reopened_at = Time.now
+      state_params['status'] = updated_state
+      state_params['resolution'] = 'OPEN'
+      state_params['comment'] = { comment: "This bug is now #{updated_state}." }
+      state_params['reopened_at'] = Time.now
     end
-    # do we need these state_params?
-    state_params = {
-                      state: updated_state,
-                      status: status,
-                      resolution: resolution,
-                      comment: comment,
-                      assigned_at: assigned_at,
-                      pending_at: pending_at,
-                      resolved_at: resolved_at,
-                      reopened_at: reopened_at,
-                      work_time: work_time,
-                      rework_time: rework_time,
-                      review_time: review_time
-    }
+    #return state params hash
+    state_params
   end
 
   def priority_sort
