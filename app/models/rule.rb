@@ -10,16 +10,16 @@ class Rule < ActiveRecord::Base
   has_one :rule_doc, dependent: :destroy
 
   belongs_to :rule_category
-
+  
   #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
   #after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
-  def record action
-    record = {resource: 'rule',
+  def record(action)
+    record = { resource: 'rule',
               action: action,
               id: self.id,
-              obj: self}
+              obj: self }
     PublishWebsocket.push_changes(record)
   end
 
@@ -37,18 +37,18 @@ class Rule < ActiveRecord::Base
       # Loop through all of the rules
       text_rules.each do |text_rule|
         begin
-          if text_rule =~ / sid:(\d+);/ #if this rule has a sid then we can attempt to create it
+          if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
             @record = Rule.update_generate_rule($1)
-            @record.state = "New"
+            @record.state = 'New'
             @record.rev = 1
             @record.save
           end
         rescue Exception => e
-          raise Exception.new("{rule_error: {content: #{text_rule},error:#{e.to_s}}}")
+          raise Exception.new("{rule_error: {content: #{text_rule},error:#{e}}}")
         end
       end
     rescue Exception => e
-      raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e.to_s}}}")
+      raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e}}}")
     end
   end
 
@@ -67,9 +67,9 @@ class Rule < ActiveRecord::Base
           parsed = Rule.visruleparser(rule_text)
           rule_sid = /sid:\s*(\d+)\s*;/.match(rule_text) ? /sid:\s*(\d+)\s*;/.match(rule_text)[1].to_i : nil
           rule_hash = Rule.parse_and_create_rule(rule_text)
-          rule_hash['id']=nil
+          rule_hash['id'] = nil
           rule_hash['sid'] = rule_sid
-          rule_hash['rule_parsed']= parsed[:rule]
+          rule_hash['rule_parsed'] = parsed[:rule]
           rule_hash['rule_warnings'] = parsed[:errors]
           rule_hash['cvs_rule_parsed'] = parsed[:rule]
           rule_hash['cvs_rule_content'] = rule_text
@@ -81,29 +81,28 @@ class Rule < ActiveRecord::Base
         return found_rule
       end
     else
-      raise "No rule sid provided"
+      raise 'No rule sid provided'
     end
   end
 
   def extract_rule
     begin
-      if not self.content.nil?
+      if !content.nil?
 
         # Make sure we don't have multiple rules in one
-        if self.content =~ /[\r\n]/
-          raise "Only create one rule at a time"
+        if content =~ /[\r\n]/
+          raise 'Only create one rule at a time'
         end
 
         # First make sure we can parse it
-        parsed = Rule.parse_rule(self.content)
-
+        parsed = Rule.parse_rule(content)
 
         if parsed.nil?
-          raise "Failed to parse rule"
+          raise 'Failed to parse rule'
         end
 
-        if not parsed['sid'].nil? and not self.sid.nil?
-          raise "Mismatched sid in updated rule. Expected #{self.sid} not #{parsed['sid']}" if parsed['sid'] != self.sid
+        if !parsed['sid'].nil? && !sid.nil?
+          raise "Mismatched sid in updated rule. Expected #{sid} not #{parsed['sid']}" if parsed['sid'] != sid
         end
 
         self.message = parsed['name']
@@ -120,9 +119,9 @@ class Rule < ActiveRecord::Base
               unless reference_type.nil?
                 reference = Reference.find_or_create_by_reference_type_id_and_data(reference_type.id, ref.keys.first)
 
-                if not self.references.empty?
-                  if not self.references.includes?(reference)
-                    self.references << reference
+                if !references.empty?
+                  if !references.includes?(reference)
+                    references << reference
                   end
                 end
               end
@@ -134,13 +133,13 @@ class Rule < ActiveRecord::Base
           end
         end
       elsif gid.nil?
-        raise "Neither gid nor sid content is set"
+        raise 'Neither gid nor sid content is set'
       end
       return true
     rescue Exception => e
-      self.errors.add(:base, e.to_s)
+      errors.add(:base, e.to_s)
       e.backtrace.each do |l|
-        self.errors.add(:base, l)
+        errors.add(:base, l)
       end
       return false
     end
@@ -155,20 +154,20 @@ class Rule < ActiveRecord::Base
 
   def self.parse_rule(rule)
     begin
-      raise Exception.new("Rule has no content") if rule.nil?
+      raise Exception.new('Rule has no content') if rule.nil?
       # Cache this output as well to speed up any changes
       message = Rails.cache.fetch("rules.content.#{Digest::MD5::hexdigest(rule)}") do
-        data ={}
+        data = {}
         # parse the rule
         split_rule = rule.scan(/(\w+:)([^\;]*)/)
         split_rule.each do |key, value|
-          data[key.gsub(":", "")] = value
+          data[key.gsub(':', '')] = value
         end
         return data
       end
       return message
     rescue Exception => e
-      raise Exception.new("{rule_parse_error: {content: #{rule},error:#{e.to_s}}}")
+      raise Exception.new("{rule_parse_error: {content: #{rule},error:#{e}}}")
     end
   end
 
@@ -186,7 +185,7 @@ class Rule < ActiveRecord::Base
 
   def update_references(rule_text)
     current_references = []
-    self.references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
+    references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
     references = []
     rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
     references.each do |r|
@@ -212,62 +211,62 @@ class Rule < ActiveRecord::Base
     parsed = Rule.visruleparser(rule)
     if parsed[:rule].match(/FAILED/)
       rule_params = {
-          :message => rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
-          :rule_content => rule,
-          :rule_parsed => parsed[:rule],
-          :rule_failures => parsed[:rule],
-          :committed => false,
-          :state => 'FAILED'
-      }.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+          message: rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
+          rule_content: rule,
+          rule_parsed: parsed[:rule],
+          rule_failures: parsed[:rule],
+          committed: false,
+          state: 'FAILED'
+      }.reject { |k, v,| v.nil? || v == '<MISSING>' }
 
     elsif parsed[:rule].match(/msg/)
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
-      message = rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : "<MISSING>"
+      message = rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : '<MISSING>'
 
       rule_params = {
 
-          :sid => rule_sid,
-          :rule_content => rule,
-          :rule_parsed => parsed[:rule],
-          :gid => rule_sid ? 1 : nil,
-          :rev => /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
-          :connection => rule.match(/connection:\s*(.+?)\(/) ? rule.match(/connection:\s*(.+?)\(/)[1] : "<MISSING>",
-          :message => message,
-          :detection => rule.match(/detection:\s*(.+?);/) ? rule.match(/detection:\s*(.+?);/)[1] : "<MISSING>",
-          :flow => rule.match(/flow:\s*(.+?);/) ? rule.match(/flow:\s*(.+?);/)[1] : "<MISSING>",
-          :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : "<MISSING>",
-          :class_type => /classtype\s*:(.*)\)/.match(parsed[:rule]) ? /classtype\s*:(.*)\)/.match(parsed[:rule])[1] : "<MISSING>",
-          :committed => true,
-          :state => rule_sid ? 'UNCHANGED' : 'NEW'
+          sid: rule_sid,
+          rule_content: rule,
+          rule_parsed: parsed[:rule],
+          gid: rule_sid ? 1 : nil,
+          rev: /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
+          connection: rule.match(/connection:\s*(.+?)\(/) ? rule.match(/connection:\s*(.+?)\(/)[1] : '<MISSING>',
+          message: message,
+          detection: rule.match(/detection:\s*(.+?);/) ? rule.match(/detection:\s*(.+?);/)[1] : '<MISSING>',
+          flow: rule.match(/flow:\s*(.+?);/) ? rule.match(/flow:\s*(.+?);/)[1] : '<MISSING>',
+          metadata: /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : '<MISSING>',
+          class_type: /classtype\s*:(.*)\)/.match(parsed[:rule]) ? /classtype\s*:(.*)\)/.match(parsed[:rule])[1] : '<MISSING>',
+          committed: true,
+          state: rule_sid ? 'UNCHANGED' : 'NEW'
       }
-      rule_params.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+      rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
 
 
     else
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
       detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule]) ? /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip : nil
-      message = /Message\s*:\s(.*)/.match(parsed[:rule]) ? /Message\s*:\s(.*)/.match(parsed[:rule])[1] : "<MISSING>"
-      rule_category = RuleCategory.find_or_create_by(category: message.split(" ")[0])
+      message = /Message\s*:\s(.*)/.match(parsed[:rule]) ? /Message\s*:\s(.*)/.match(parsed[:rule])[1] : '<MISSING>'
+      rule_category = RuleCategory.find_or_create_by(category: message.split(' ')[0])
 
       rule_params = {
 
-          :sid => rule_sid,
-          :rule_content => rule,
-          :rule_parsed => parsed[:rule],
-          :gid => rule_sid ? 1 : nil,
-          :rev => /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
-          :connection => /Connection\s*:\s(.+)/.match(parsed[:rule]) ? /Connection\s*:\s(.+)/.match(parsed[:rule])[1] : "<MISSING>",
-          :message => message,
-          :detection => detection.nil? ? "<MISSING>" : detection[-1, 1] == ';' ? detection : detection + ';',
-          :flow => /Flow\s*:\s(.+)/.match(parsed[:rule]) ? /Flow\s*:\s(.+)/.match(parsed[:rule])[1] : "<MISSING>",
-          :metadata => /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : "<MISSING>",
-          :class_type => /Classtype\s*:\s(.*)/.match(parsed[:rule]) ? /Classtype\s*:\s(.*)/.match(parsed[:rule])[1] : "<MISSING>",
-          :committed => true,
-          :state => rule_sid ? 'UNCHANGED' : 'NEW',
-          :rule_category_id => rule_category.id
+          sid: rule_sid,
+          rule_content: rule,
+          rule_parsed: parsed[:rule],
+          gid: rule_sid ? 1 : nil,
+          rev: /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
+          connection: /Connection\s*:\s(.+)/.match(parsed[:rule]) ? /Connection\s*:\s(.+)/.match(parsed[:rule])[1] : '<MISSING>',
+          message: message,
+          detection: detection.nil? ? "<MISSING>" : detection[-1, 1] == ';' ? detection : detection + ';',
+          flow: /Flow\s*:\s(.+)/.match(parsed[:rule]) ? /Flow\s*:\s(.+)/.match(parsed[:rule])[1] : '<MISSING>',
+          metadata: /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : '<MISSING>',
+          class_type: /Classtype\s*:\s(.*)/.match(parsed[:rule]) ? /Classtype\s*:\s(.*)/.match(parsed[:rule])[1] : '<MISSING>',
+          committed: true,
+          state: rule_sid ? 'UNCHANGED' : 'NEW',
+          rule_category_id: rule_category.id
       }
-      rule_params.reject() { |k, v,| v.nil? || v == "<MISSING>" }
+      rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
     end
     rule_params
@@ -275,8 +274,8 @@ class Rule < ActiveRecord::Base
 
   def self.visruleparser(rule_text)
     return nil if rule_text.nil?
-    parsed = Hash.new
-    temp_rule = Tempfile.new("temp.rules")
+    parsed = {}
+    temp_rule = Tempfile.new('temp.rules')
     temp_rule.write(rule_text.gsub(/\#\s/, ''))
     temp_rule.rewind
     Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
@@ -296,12 +295,12 @@ class Rule < ActiveRecord::Base
       rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
       rule.rule_state = RuleState.Unchanged
       rule.attachments.clear
-      rule.save(:validate => false)
+      rule.save(validate: false)
 
     rescue Exception => e
       log_error(e)
     rescue RuleError => e
-      add_error("#{rule.sid}: #{e.to_s}")
+      add_error("#{rule.sid}: #{e}")
     end
 
     redirect_to request.referer
@@ -329,27 +328,27 @@ class Rule < ActiveRecord::Base
     bug.rules.delete(rule)
 
     # Remove this rule if it is no longer needed
-    rule.destroy if rule.bugs.empty? and rule.attachments.empty?
+    rule.destroy if rule.bugs.empty? && rule.attachments.empty?
   end
 
   def self.create_or_update_rule(body)
     begin
       parsed = Rule.parse_rule(body)
-      rule = Rule.where("sid = ?", parsed['sid']).first
+      rule = Rule.where('sid = ?', parsed['sid']).first
       if rule.empty?
-        rule = Rule.create(:content => body)
+        rule = Rule.create(content: body)
         rule.gid = 1
         rule.message = parsed['msg'].gsub("\"", "")
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']
-        rule.state = "Unchanged"
+        rule.state = 'Unchanged'
       else
         rule.content = body
         rule.message = parsed['msg'].gsub("\"", "")
         rule.gid = 1
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']
-        rule.state = "Unchanged"
+        rule.state = 'Unchanged'
       end
       rule.save
       return rule
@@ -360,9 +359,8 @@ class Rule < ActiveRecord::Base
 
   def self.find_current_rule(sid)
     Dir.entries(Rails.configuration.snort_rule_path).each do |f|
-
       # Don't include .stub.rules hidden rule files
-      if f =~ /^[^\.]/ and f =~ /\.rules$/
+      if f =~ /^[^\.]/ && f =~ /\.rules$/
         File.read("#{Rails.configuration.snort_rule_path}/#{f}").each_line do |line|
           line = line.chomp.gsub(/^# /, '')
 
@@ -393,18 +391,18 @@ class Rule < ActiveRecord::Base
   end
 
   def sort_rules_by_state
-    case(self.state)
-      when "FAILED"
-        val = 0
-      when "NEW"
-        val = 1
-      when "UPDATED"
-        val = 2
-      when "UNCHANGED"
-        val = 3
-      else
-        val = 3
+    case (state)
+    when 'FAILED'
+      val = 0
+    when 'NEW'
+      val = 1
+    when 'UPDATED'
+      val = 2
+    when 'UNCHANGED'
+      val = 3
+    else
+      val = 3
     end
-    return val
+    val
   end
 end
