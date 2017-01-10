@@ -5,45 +5,44 @@ class Bug < ActiveRecord::Base
   has_and_belongs_to_many :rules
   has_and_belongs_to_many :tags, dependent: :destroy
   belongs_to :user
-  belongs_to :committer, :class_name => 'User'
+  belongs_to :committer, class_name: 'User'
 
-  has_many :references, :dependent => :destroy
-  has_many :exploits, :through => :references
-  has_many :attachments, :dependent => :destroy
-  has_many :tasks, :dependent => :destroy
-  has_many :notes, :dependent => :destroy
+  has_many :references, dependent: :destroy
+  has_many :exploits, through: :references
+  has_many :attachments, dependent: :destroy
+  has_many :tasks, dependent: :destroy
+  has_many :notes, dependent: :destroy
 
   accepts_nested_attributes_for :references
   accepts_nested_attributes_for :rules
 
-  scope :open, -> {where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED'])}
-  scope :closed, -> {where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE'])}
-  scope :pending, -> {where(state: "PENDING")}
-  scope :by_component, -> (component) { where('component = ?', component)}
+  scope :open, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
+  scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
+  scope :pending, -> { where(state: "PENDING") }
+  scope :by_component, ->(component) { where('component = ?', component) }
 
   enum classification: {
-      unclassified: 0,
-      confidential: 1,
-      secret: 2,
-      top_secret: 3,
-      top_secret_sci: 4
-  }
+                          unclassified: 0,
+                          confidential: 1,
+                          secret: 2,
+                          top_secret: 3,
+                          top_secret_sci: 4
+                        }
 
-  #after_create { |bug| bug.record 'create' if Rails.configuration.websockets_enabled == "true" }
-  #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == "true" }
-  #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
+  #after_create { |bug| bug.record 'create' if Rails.configuration.websockets_enabled == 'true' }
+  #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == 'true' }
+  #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
-  def record action
+  def record(action)
     obj = JSON.parse(BugSerializer.new(self).to_json)
-    obj["bug"] = obj["bug"].except('notes', 'attachments', 'tasks', 'exploits')
-    obj["bug"]["user"] = obj["bug"]["user_id"]
-    record = {resource: 'bug',
-              action: action,
-              id: self.id,
-              obj: obj.except("notes", "attachments", "rules", "references", "tasks", "exploits")}
+    obj['bug'] = obj['bug'].except('notes', 'attachments', 'tasks', 'exploits')
+    obj['bug']['user'] = obj['bug']['user_id']
+    record = { resource: 'bug',
+               action: action,
+               id: self.id,
+               obj: obj.except('notes', 'attachments', 'rules', 'references', 'tasks', 'exploits') }
     PublishWebsocket.push_changes(record)
   end
-
 
   def get_state(status, resolution, user)
     bug_state = 'OPEN'
@@ -63,20 +62,21 @@ class Bug < ActiveRecord::Base
 
   def update_bug(xmlrpc, options)
     unless xmlrpc.nil?
-      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options) #the bugzilla session is where we authenticate
+      # the bugzilla session is where we authenticate
+      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options)
     end
     changed_bug
   end
 
   def self.bugs_with_search(params)
     if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
-      query_params =params.reject{ |k, v| (v == "" || v.is_a?(Array) || k=='tag_name') }
+      query_params = params.reject { |k, v| (v == '' || v.is_a?(Array) || k =='tag_name') }
       count = 0
       query = ''
       query_params.each do |k, v|
-        count = count+1
+        count = count + 1
         query = query + k + "='" + v.gsub("'", "\\'") + "'"
-        query = query + " && " if count != query_params.count
+        query = query + ' && ' if count != query_params.count
       end
       Bug.where(query)
     end
@@ -86,15 +86,14 @@ class Bug < ActiveRecord::Base
     fields = ['file_name', 'id', 'last_change_time', 'is_obsolete', 'size']
 
     # Now fetch the bug attachments and create them if needed
-    xmlrpc.attachments(:ids => [self.bugzilla_id], :include_fields => fields)['bugs'][self.bugzilla_id.to_s].each do |attachment|
-
+    xmlrpc.attachments(ids: [bugzilla_id], include_fields: fields)['bugs'][bugzilla_id.to_s].each do |attachment|
       next if attachment['file_name'] !~ /\.pcap$/
       attach = Attachment.find_by_bugzilla_attachment_id(attachment['id'])
 
       # We need to remove any obsoleted attachments
       if attachment['is_obsolete'] == 1
-        if attach and attach.bug == self
-          self.attachments.delete(attach)
+        if attach && attach.bug == self
+          attachments.delete(attach)
         end
       else
         if attach
@@ -109,10 +108,11 @@ class Bug < ActiveRecord::Base
           end
         else
           begin
-            self.attachments << Attachment.create(
-                :filename => attachment['file_name'],
-                :bugzilla_attachment_id => attachment['id'],
-                :file_size => attachment['size'])
+            attachments << Attachment.create(
+              filename: attachment['file_name'],
+              bugzilla_attachment_id: attachment['id'],
+              file_size: attachment['size']
+            )
           rescue ActiveRecord::RecordNotUnique => e
             # Ignore duplicate attempts
           end
@@ -121,99 +121,86 @@ class Bug < ActiveRecord::Base
     end
   end
 
-  def self.update_state(bug, state, editor_email)
+  def self.get_new_bug_state(bug, state, editor_email)
     updated_state = state
-    updated_state = 'NEW' if editor_email == "vrt-incoming@sourcefire.com" && bug.resolution == 'OPEN'
+    updated_state = 'NEW' if editor_email == 'vrt-incoming@sourcefire.com' && bug.resolution == 'OPEN'
     updated_state = 'ASSIGNED' unless (editor_email == 'vrt-incoming@sourcefire.com') || (%w(RESOLVED REOPENED).include? bug.status) || state == 'PENDING'
     updated_state = nil if updated_state == bug.state
+    state_params = {}
 
     case updated_state
-      when 'NEW'
-        status = updated_state
-        resolution = 'OPEN'
-        comment = {comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug."}
-      when 'ASSIGNED'
-        status = updated_state
-        resolution = 'OPEN'
-        comment = {comment: "This bug is now ASSIGNED to #{editor_email}."}
-        assigned_at = Time.now
-      when 'PENDING'
-        status = 'RESOLVED'
-        resolution = updated_state
-        comment = {comment: "This bug is now RESOLVED - #{updated_state}."}
-        pending_at = Time.now
-        if bug.state == 'REOPENED'
-          rework_time = ((pending_at - bug.reopened_at)/86400).ceil
-        else
-          work_time = ((pending_at - bug.assigned_at)/86400).ceil
-        end
-      when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
-        status = 'RESOLVED'
-        resolution = updated_state
-        comment = {comment: "This bug is now RESOLVED - #{updated_state}."}
-        resolved_at = Time.now
-        review_time = ((resolved_at - bug.pending_at)/86400).ceil
-      when 'REOPENED'
-        status = updated_state
-        resolution = 'OPEN'
-        comment = {comment: "This bug is now #{updated_state}."}
-        reopened_at = Time.now
+    when 'NEW'
+      state_params['status'] = updated_state
+      state_params['resolution'] = 'OPEN'
+      state_params['comment'] = { comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug." }
+    when 'ASSIGNED'
+      state_params['status'] = updated_state
+      state_params['resolution'] = 'OPEN'
+      state_params['comment'] = { comment: "This bug is now ASSIGNED to #{editor_email}." }
+      state_params['assigned_at'] = Time.now
+    when 'PENDING'
+      state_params['status'] = 'RESOLVED'
+      state_params['resolution'] = updated_state
+      state_params['comment'] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params['pending_at'] = Time.now
+      if bug.state == 'REOPENED'
+        state_params['rework_time'] = ((pending_at - bug.reopened_at) / 86_400).ceil
+      else
+        state_params['work_time'] = ((pending_at - bug.assigned_at) / 86_400).ceil
+      end
+    when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
+      state_params['status'] = 'RESOLVED'
+      state_params['resolution'] = updated_state
+      state_params['comment'] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params['resolved_at'] = Time.now
+      state_params['review_time'] = ((resolved_at - bug.pending_at) / 86_400).ceil
+    when 'REOPENED'
+      state_params['status'] = updated_state
+      state_params['resolution'] = 'OPEN'
+      state_params['comment'] = { comment: "This bug is now #{updated_state}." }
+      state_params['reopened_at'] = Time.now
     end
-
-    state_params = {
-        :state => updated_state,
-        :status => status,
-        :resolution => resolution,
-        :comment => comment,
-        :assigned_at => assigned_at,
-        :pending_at => pending_at,
-        :resolved_at => resolved_at,
-        :reopened_at => reopened_at,
-        :work_time => work_time,
-        :rework_time => rework_time,
-        :review_time => review_time
-    }
-
+    #return state params hash
+    state_params
   end
 
   def priority_sort
-    if self.priority.nil?
-      self.priority = 'Unspecified'
+    if priority.nil?
+      priority = 'Unspecified'
     else
-      self.priority
+      priority
     end
   end
 
   def can_set_pending?
-    self.exploits.each do |expl|
+    exploits.each do |expl|
       if expl.attachment.nil?
         return false
       end
     end
-      true
+    true
   end
 
   def allow_state_change?
-    if !self.user.present? || !self.committer.present?
+    if !user.present? || !committer.present?
       return false
     end
     true
   end
 
   def parse_summary
-
     parsed_summary = {}
-    parsed_summary[:tags] = self.summary_tags
-    parsed_summary[:sids] = self.summary_sids
-    parsed_summary[:refs] = self.summary_references
+    parsed_summary[:tags] = summary_tags
+    parsed_summary[:sids] = summary_sids
+    parsed_summary[:refs] = summary_references
     parsed_summary
   end
 
   def summary_tags
-    summary_tags = summary_tag_array.map{|s| s.delete "[]"}
+    summary_tags = summary_tag_array.map { |s| s.delete '[]' }
     if summary_tags
       create_tags_from_summary(summary_tags)
-      summary_tags.map{|tag| Tag.find_by_name(tag)}
+      summary_tags.map { |tag| Tag.find_by_name(tag) }
     else
       []
     end
@@ -232,27 +219,26 @@ class Bug < ActiveRecord::Base
         end
       end
     end
-    return sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
+    sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
   end
 
   def summary_references
     references = []
     ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
-      self.summary.scan(/#{ref_type.bugzilla_format}/i).each do |match|
+      summary.scan(/#{ref_type.bugzilla_format}/i).each do |match|
         references << Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
       end
     end
-
-    return references.uniq
+    references.uniq
   end
 
   def tag_array
-    #array of tags for comparison
-    tags.map{|t| "[#{t.name}]"}
+    # array of tags for comparison
+    tags.map { |t| "[#{t.name}]" }
   end
 
   def summary_tag_array
-    #array of tags in summary for comparison
+    # array of tags in summary for comparison
     summary_without_sids.scan(/\[.*?\]/)
   end
 
@@ -260,8 +246,8 @@ class Bug < ActiveRecord::Base
     if tag_array.try(:sort) != summary_tag_array.try(:sort)
 
       #extract summary_tag_string and replace with tag_string
-      summary_string = "#{self.summary}"
-      summary_tag_array.each{|st| summary_string.slice! st } if !summary_tag_array.nil?
+      summary_string = "#{summary}"
+      summary_tag_array.each{|st| summary_string.slice! st } unless summary_tag_array.nil?
       tag_array.reverse.each{|ta| summary_string.prepend(ta) }
 
       self.update(summary: summary_string)
@@ -270,7 +256,7 @@ class Bug < ActiveRecord::Base
 
   def resolution_time
     if resolved_at.present?
-      ((resolved_at - created_at)/86400).ceil
+      ((resolved_at - created_at) / 86_400).ceil
     else
       0
     end
@@ -284,26 +270,25 @@ class Bug < ActiveRecord::Base
     end
   end
 
-
   def add_attachment(xmlrpc, file)
-    Bugzilla::Bug.new(xmlrpc).attach_file(self.bugzilla_id, file)
+    Bugzilla::Bug.new(xmlrpc).attach_file(bugzilla_id, file)
   end
 
   def self.bugzilla_import(xmlrpc, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
-        new_attachments = xmlrpc.attachments({:ids => [bug_id]})
-        new_comments = xmlrpc.comments(:ids => [bug_id])
+        new_attachments = xmlrpc.attachments(ids: [bug_id])
+        new_comments = xmlrpc.comments(ids: [bug_id])
 
         Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
           new_record.id             = bug_id
           new_record.summary        = item['summary']
-          new_record.classification = "unclassified"
+          new_record.classification = 'unclassified'
 
           new_record.status     = item['status']
           new_record.resolution = item['resolution']
-          new_record.resolution = "OPEN" if new_record.resolution.empty?
+          new_record.resolution = 'OPEN' if new_record.resolution.empty?
 
           new_record.state     = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
           new_record.priority  = item['priority']
@@ -324,21 +309,36 @@ class Bug < ActiveRecord::Base
             new_record.resolved_at = last_change_time
           end
 
-          creator = User.where("email=?", item['creator']).first
-          new_user = User.where("email=?", item['assigned_to']).first
-          new_committer = User.where("email=?", item['qa_contact']).first
+          creator = User.where('email=?', item['creator']).first
+          new_user = User.where('email=?', item['assigned_to']).first
+          new_committer = User.where('email=?', item['qa_contact']).first
           if creator.nil?
-            new_record.creator = User.create(kerberos_login: "generated", cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['creator'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.creator = User.create(kerberos_login: 'generated',
+                                             cvs_username: item['creator'].gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@sourcefire.com', ''),
+                                             email: item['creator'],
+                                             password: 'password',
+                                             password_confirmation: 'password',
+                                             committer: 'false')
           else
             new_record.creator = creator
           end
           if new_user.nil?
-            new_record.user = User.create(kerberos_login: "generated", cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['assigned_to'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.user = User.create(kerberos_login: 'generated',
+                                          cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@sourcefire.com', ''),
+                                          email: item['assigned_to'],
+                                          password: 'password',
+                                          password_confirmation: 'password',
+                                          committer: 'false')
           else
             new_record.user = new_user
           end
           if new_committer.nil?
-            new_record.committer = User.create(kerberos_login: "generated", cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", "").gsub("@sourcefire.com", ""), email: item['qa_contact'], password: 'password', password_confirmation: 'password', committer: 'false')
+            new_record.committer = User.create(kerberos_login: 'generated',
+                                               cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@sourcefire.com', ''),
+                                               email: item['qa_contact'],
+                                               password: 'password',
+                                               password_confirmation: 'password',
+                                               committer: 'false')
           else
             new_record.committer = new_committer
           end
@@ -375,7 +375,12 @@ class Bug < ActiveRecord::Base
                 end
                 comment = c['text'].strip
                 creation_time = c['creation_time'].to_time
-                note = Note.create(:id => c['id'], :author => c['author'], :comment => comment, :bug_id => bug_id, :note_type => note_type, :created_at => creation_time)
+                note = Note.create(id: c['id'],
+                                   author: c['author'],
+                                   comment: comment,
+                                   bug_id: bug_id,
+                                   note_type: note_type,
+                                   created_at: creation_time)
                 new_record.notes << note
               end
             end
@@ -383,46 +388,52 @@ class Bug < ActiveRecord::Base
         end
       end
     end
-    return true
+    true
   end
 
   def self.get_latest()
-    latest_bug_date = Bug.order("created_at").last
+    Bug.order('created_at').last
   end
 
   def self.get_last_import_all()
-    #this needs a manifest file to check against should the job fail half way through
-    latest_bug_date = Event.where(action: "import_all").last
-    return latest_bug_date.nil? ? Time.now-(1.day) : latest_bug_date.created_at
+    # this needs a manifest file to check against should the job fail half way through
+    latest_bug_date = Event.where(action: 'import_all').last
+    latest_bug_date.nil? ? Time.now - 1.day : latest_bug_date.created_at
   end
 
-
   def bug_state(xmlrpc, notes=nil, status, resolution)
-    deps = self.open_dependencies(xmlrpc)
+    deps = open_dependencies(xmlrpc)
     if deps.size > 0
-      return {error: "This bug currently has open dependencies: #{deps}"}
+      return { error: "This bug currently has open dependencies: #{deps}" }
     else
       self.bug_state = resolution
       if notes.nil?
-        if self.committer_notes.nil? or self.committer_notes == ''
+        if committer_notes.nil? || committer_notes == ''
           notes = 'Closing bug'
         else
-          notes = self.committer_notes
+          notes = committer_notes
         end
       end
 
-      committer_note = Note.create(comment: notes, note_type: "committer", author: current_user.email)
+      committer_note = Note.create(comment: notes,
+                                   note_type: 'committer',
+                                   author: current_user.email)
       self.notes << committer_note
 
-      options = {:ids => [self.bugzilla_id], :status => status, :resolution => resolution, :comment => {:body => notes}}
-      self.update_bugzilla_attributes(xmlrpc, options)
-      self.refresh_summary(xmlrpc)
-      self.bugzilla_summary_sids_replace(xmlrpc, self.summary_sids)
-      options = {:ids => [self.bugzilla_id], :qa_contact => (self.committer.username)}
-      self.update_bugzilla_attributes(xmlrpc, options)
-      options = {:ids => [self.bugzilla_id], :summary => self.summary.gsub(/\s*\[FP\]\s*/, '')} # Remove FP tags
-      self.update_bugzilla_attributes(xmlrpc, options)
-      self.refresh_summary(xmlrpc)
+      options = { ids: [bugzilla_id],
+                  status: status,
+                  resolution: resolution,
+                  comment: { body: notes } }
+      update_bugzilla_attributes(xmlrpc, options)
+      refresh_summary(xmlrpc)
+      bugzilla_summary_sids_replace(xmlrpc, summary_sids)
+      options =  { ids: [bugzilla_id],
+                   qa_contact: committer.username }
+      update_bugzilla_attributes(xmlrpc, options)
+      options = { ids: [bugzilla_id],
+                  summary: summary.gsub(/\s*\[FP\]\s*/, '') } # Remove FP tags
+      update_bugzilla_attributes(xmlrpc, options)
+      refresh_summary(xmlrpc)
 
       true
     end
@@ -430,7 +441,7 @@ class Bug < ActiveRecord::Base
 
   def refresh_summary(xmlrpc)
     unless xmlrpc.nil?
-      bug = Bugzilla::Bug.new(xmlrpc).get(self.bugzilla_id)['bugs'].first
+      bug = Bugzilla::Bug.new(xmlrpc).get(bugzilla_id)['bugs'].first
       raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
       self.summary = bug['summary']
     end
@@ -445,25 +456,26 @@ class Bug < ActiveRecord::Base
   def bugzilla_summary_sids_add(xmlrpc, sids)
     unless xmlrpc.nil?
       # Make sure to get the latest summary
-      self.refresh_summary(xmlrpc)
+      refresh_summary(xmlrpc)
       # Now extract the existing sids
-      self.bugzilla_summary_sids_replace(xmlrpc, (self.summary_sids + sids).flatten.compact)
+      bugzilla_summary_sids_replace(xmlrpc, (summary_sids + sids).flatten.compact)
     end
   end
 
   def bugzilla_summary_sids_replace(xmlrpc, sids)
     unless xmlrpc.nil?
       sids.delete_if { |sid| sid.zero? }
-      unless sids.nil? or sids.empty?
-        self.summary = "[SID] #{sids.to_ranges_compact_string} #{self.summary_without_sids}"
+      unless sids.nil? || sids.empty?
+        self.summary = "[SID] #{sids.to_ranges_compact_string} #{summary_without_sids}"
       end
-      options = {:ids => [self.bugzilla_id], :summary => self.summary}
+      options = { ids: [bugzilla_id],
+                  summary: summary }
       Bugzilla::Bug.new(xmlrpc).update(options)
     end
   end
 
   def summary_without_sids
-    self.summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
+    summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
   end
 
   def open_dependencies(xmlrpc)
@@ -478,14 +490,14 @@ class Bug < ActiveRecord::Base
   end
 
   def get_dependencies(xmlrpc)
-    raise Exception.new("Bugzilla xmlrpc session must be specified") if xmlrpc.nil?
-    bug = Bugzilla::Bug.new(xmlrpc).get(self.bugzilla_id)['bugs'].first
+    raise Exception.new('Bugzilla xmlrpc session must be specified') if xmlrpc.nil?
+    bug = Bugzilla::Bug.new(xmlrpc).get(bugzilla_id)['bugs'].first
     raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
-    return bug['depends_on']
+    bug['depends_on']
   end
 
   def self.search(query_str, terms, range)
-    bugs = Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
+    Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
   def self.check_permission(current_user, bugs)
@@ -493,7 +505,7 @@ class Bug < ActiveRecord::Base
     bugs.reject { |b| Bug.classifications[b.classification] > class_allowed }
   end
 
-  settings index: {number_of_shards: 5} do
+  settings index: { number_of_shards: 5 } do
     mappings dynamic: 'false' do
       indexes :bugzilla_id, type: :integer
       indexes :user_id, type: :integer
