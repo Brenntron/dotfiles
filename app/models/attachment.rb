@@ -3,11 +3,11 @@ class Attachment < ActiveRecord::Base
   has_and_belongs_to_many :rules
   has_many :exploits
 
-  after_create {|attachment| attachment.record 'create' if Rails.configuration.websockets_enabled == "true"}
-  after_update {|attachment| attachment.record 'update' if Rails.configuration.websockets_enabled == "true"}
-  after_destroy {|attachment| attachment.record 'destroy' if Rails.configuration.websockets_enabled == "true"}
+  after_create { |attachment| attachment.record 'create' if Rails.configuration.websockets_enabled == 'true' }
+  after_update { |attachment| attachment.record 'update' if Rails.configuration.websockets_enabled == 'true' }
+  after_destroy { |attachment| attachment.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
-  def record action
+  def record(action)
     record = { resource: 'attachment',
                action: action,
                id: self.id,
@@ -22,7 +22,7 @@ class Attachment < ActiveRecord::Base
         attach = params[:file_upload][:attachment]
 
         # Move it back to the original name before attaching it
-        file = File.join("tmp", attach.original_filename)
+        file = File.join('tmp', attach.original_filename)
         FileUtils.mv attach.tempfile, file
 
         # Attach using the xmlrpc interface
@@ -35,11 +35,11 @@ class Attachment < ActiveRecord::Base
         bug.update_attachments(Bugzilla::Bug.new(bugzilla_session))
 
         # Now test all the attachments
-        redirect_to :controller => 'tasks', :action => 'wait', :id => test_all(bug, filter_attachments(bug.attachments)).id
+        redirect_to controller: 'tasks', action: 'wait', id: test_all(bug, filter_attachments(bug.attachments)).id
 
       rescue Exception => e
         log_error(e)
-        redirect_to :controller => 'bugs', :action => 'open', :id => bug.id
+        redirect_to controller: 'bugs', action: 'open', id: bug.id
       end
     end
   end
@@ -48,10 +48,10 @@ class Attachment < ActiveRecord::Base
     begin
       bug = Bug.find(active_scaffold_session_storage[:constraints][:bug])
       bug.update_attachments(Bugzilla::Bug.new(bugzilla_session))
-      if bug.attachments.size > 0
-        redirect_to :controller => 'tasks', :action => 'wait', :id => test_all(bug, filter_attachments(bug.attachments)).id
+      if !bug.attachments.empty?
+        redirect_to controller: 'tasks', action: 'wait', id: test_all(bug, filter_attachments(bug.attachments)).id
       else
-        redirect_to :controller => 'bugs', :action => 'open', :id => bug.id
+        redirect_to controller: 'bugs', action: 'open', id: bug.id
       end
     rescue Exception => e
       log_error(e)
@@ -67,10 +67,6 @@ class Attachment < ActiveRecord::Base
         # Ignore
       end
     end
-
     bug.save
-
   end
-
-
 end

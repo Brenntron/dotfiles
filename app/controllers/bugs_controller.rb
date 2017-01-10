@@ -126,7 +126,11 @@ class BugsController < ApplicationController
         when "my-bugs"
           @bugs = current_user.bugs
         when "team-bugs"
-          @bugs = current_user.bugs
+          if current_user.manager?
+            @bugs = current_user.team_members.map{ |cw| cw.bugs }[0]
+          else
+            @bugs = current_user.co_workers.map{ |cw| cw.bugs }[0]
+          end
         when "open-bugs"
           @bugs = Bug.where(state: "OPEN")
         when "pending-bugs"
