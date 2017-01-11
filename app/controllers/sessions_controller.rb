@@ -9,6 +9,8 @@ class SessionsController < ApplicationController
               session[:user] = resource[:user_id]
               session[:token] = resource[:xmlrpc_token]
             end
+          rescue StandardError => e
+            return system_not_ready(e)
           rescue XMLRPC::FaultException => e
             return invalid_login_attempt(e)
           rescue Exception => e
@@ -28,5 +30,8 @@ class SessionsController < ApplicationController
   def invalid_login_attempt(error_message)
     warden.custom_failure!
     render :json => {:errors => ["#{error_message}"]}, :success => false, :status => :unauthorized
+  end
+  def system_not_ready(error_message)
+    render :json => {:errors => ["#{error_message}"]}, :success => false, :status => 500
   end
 end
