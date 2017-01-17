@@ -1,4 +1,4 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 require 'rails/all'
 
@@ -78,6 +78,8 @@ module Api
     config.osvdb_search_url = "http://www.osvdb.org/search/search?search[refid]=DATA"
     config.max_attachment_size = 50000000 # 50MB
     config.job_timeout = 300    # 5 minutes
-    config.active_record.raise_in_transactional_callbacks = true
+    ActiveSupport.halt_callback_chains_on_return_false = false
+    config.action_controller.per_form_csrf_tokens = true
+    config.ssl_options = { hsts: { subdomains: true } }
   end
 end

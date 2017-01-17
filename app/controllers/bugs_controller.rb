@@ -1,8 +1,8 @@
 class BugsController < ApplicationController
 
-  before_filter :require_login
-  before_filter :query_bugs
-  before_filter :get_states_and_users, only: [:index, :show, :new]
+  before_action :require_login
+  before_action :query_bugs
+  before_action :get_states_and_users, only: [:index, :show, :new]
   after_action  :sync_summary, only: [:create, :add_tag, :remove_tag]
 
   def index
@@ -22,7 +22,7 @@ class BugsController < ApplicationController
   def create
     options = bug_params
     options[:creator] = current_user.id
-    new_bug = Bugzilla::Bug.new(bugzilla_session).create(options) #the bugzilla session is where we authenticate
+    new_bug = Bugzilla::Bug.new(bugzilla_session).create(options.to_h) #the bugzilla session is where we authenticate
     new_bug_id = new_bug["id"]
     @tags=params[:bug][:tag_names]
     @bug = Bug.new(
@@ -52,28 +52,33 @@ class BugsController < ApplicationController
   end
 
   def show
-    @bug = Bug.find(params[:id])
-    @rules = @bug.rules.sort { |a, b| a.sort_rules_by_state <=> b.sort_rules_by_state }
-    @ref_types = ReferenceType.all
-    @pcap_attachments = []
-    @other_attachments = []
-    @bug.attachments.where(is_obsolete: false).map do |att|
-      if att.file_name.include? '.pcap'
-        @pcap_attachments << att
-      else
-        @other_attachments << att
+    @bug = Bug.where(id: params[:id]).first()
+    if @bug
+      @rules = @bug.rules.sort { |a, b| a.sort_rules_by_state <=> b.sort_rules_by_state }
+      @ref_types = ReferenceType.all
+      @pcap_attachments = []
+      @other_attachments = []
+      @bug.attachments.where(is_obsolete: false).map do |att|
+        if att.file_name.include? '.pcap'
+          @pcap_attachments << att
+        else
+          @other_attachments << att
+        end
       end
+      @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
+      @tasks = @bug.tasks
+      @notes = @bug.notes.order(created_at: :desc)
+      @tags = Tag.all.map { |tag| tag.name }.join(',')
+      @categories = RuleCategory.all.sort_by { |x| [-x.rules.count, x.category] }
+    else
+      redirect_to '/bugs'
+      flash[:error] = "Could not find bug #{params[:id]}"
     end
-    @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
-    @tasks = @bug.tasks
-    @notes = @bug.notes.order(created_at: :desc)
-    @tags = Tag.all.map { |tag| tag.name }.join(',')
-    @categories = RuleCategory.all.sort_by { |x| [-x.rules.count, x.category] }
   end
 
   def update
     @bug = Bug.find(params[:id])
-    Bugzilla::Bug.new(bugzilla_session).update(get_params_hash(params))
+    Bugzilla::Bug.new(bugzilla_session).update(get_params_hash(params).to_h)
     if @bug.update(bug_params)
       redirect_to @bug
     else
@@ -157,7 +162,7 @@ class BugsController < ApplicationController
   end
 
   def get_states_and_users
-    @states = Bug.uniq.pluck(:state)
+    @states = Bug.distinct.pluck(:state)
     @users = User.all
   end
 

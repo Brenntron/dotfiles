@@ -21,7 +21,7 @@ $ ->
         $('#researchNotesCancelBtn, #researchNotesSaveBtn, #researchNotesPublishBtn, #researchNotesEditBtn').toggle()
         $('textarea[name="research_notes"]').attr("readonly", true)
         $('#researchNotesEditBtn').html('edit')
-        $('input[name="research_note_id"]').val(response.note.id)
+        $('input[name="research_note_id"]').val(response.id)
         $('#researchNotesPublishBtn').attr('disabled', false)
       error: (response) ->
         $('.alert_notes').removeClass('success')
@@ -54,7 +54,7 @@ $ ->
         $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
         $('#committerNotesEditBtn').html('edit')
         $('textarea[name="committer_notes"]').attr("readonly", true)
-        $('input[name="committer_note_id"]').val(response.note.id)
+        $('input[name="committer_note_id"]').val(response.id)
         $('#committerNotesPublishBtn').attr('disabled', false)
       error: (response) ->
         $('.alert_notes').removeClass('success')
@@ -81,8 +81,8 @@ $ ->
       type: 'PUT'
       dataType: 'json'
       success: (response) ->
-        bug = response.bug.bug
-        note = response.note.note
+        bug = response.bug
+        note = response.note
         $('input[name="note_id"]').val(note.id)
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
@@ -133,7 +133,7 @@ $ ->
       type: 'PUT'
       dataType: 'json'
       success: (response) ->
-        note = response.note.note
+        note = response.note
         $('input[name="committer_note_id"]').val(note.id)
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')

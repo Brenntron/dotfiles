@@ -1,6 +1,6 @@
 class RelationshipsController < ApplicationController
 
-  before_filter :require_login
+  before_action :require_login
   before_action :manager_only_access
 
   def index

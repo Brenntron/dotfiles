@@ -3,6 +3,7 @@ module API
     class Events < Grape::API
       include API::V1::Defaults
       include ActionController::Live
+      extend ActiveSupport::Concern
 
       resource :events do
 

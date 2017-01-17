@@ -1,4 +1,5 @@
-class Event < ActiveRecord::Base
+class Event < ApplicationRecord
+
   after_create { |event| event.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |event| event.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   after_destroy { |event| event.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }

@@ -1,7 +1,7 @@
 require 'open3'
 require 'tempfile'
 
-class Rule < ActiveRecord::Base
+class Rule < ApplicationRecord
   has_paper_trail
 
   has_and_belongs_to_many :bugs
@@ -9,7 +9,7 @@ class Rule < ActiveRecord::Base
   has_and_belongs_to_many :references, dependent: :destroy
   has_one :rule_doc, dependent: :destroy
 
-  belongs_to :rule_category
+  belongs_to :rule_category, optional: true
   
   #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
@@ -54,7 +54,7 @@ class Rule < ActiveRecord::Base
 
   def self.import_rule(sid)
     if sid
-      found_rule = Rule.where(id: sid).first
+      found_rule = Rule.where(sid: sid).first
       if found_rule.nil?
         rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1]
         if rule_text.nil?
@@ -383,7 +383,7 @@ class Rule < ActiveRecord::Base
   end
 
   def self.update_rules(rules)
-    ActiveRecord::Base.transaction do
+    ApplicationRecord.transaction do
       rules.each do |rule|
         rule.save
       end

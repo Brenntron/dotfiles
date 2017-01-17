@@ -1,6 +1,6 @@
-class Task < ActiveRecord::Base
-  belongs_to :bug
-  belongs_to :user
+class Task < ApplicationRecord
+  belongs_to :bug, optional: true
+  belongs_to :user, optional: true
   has_many :rules
   has_many :attachments
 

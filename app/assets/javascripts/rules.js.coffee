@@ -24,7 +24,7 @@ $ ->
             data: data
             headers: headers
             success: (response) ->
-              task = response.task
+              task = response
               d = new Date()
               month = d.getMonth()+1
               day = d.getDate()

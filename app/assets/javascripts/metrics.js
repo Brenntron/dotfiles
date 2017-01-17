@@ -67,7 +67,7 @@ function status_draw(data) {
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: Object.keys(data.users[0]),
+            labels: Object.keys(data[0]),
             datasets: [{
                 label: "Pending",
                 lineTension: 0.1,
@@ -85,7 +85,7 @@ function status_draw(data) {
                 pointHoverBorderWidth: 1,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: create_array(data.users[0])
+                data: create_array(data[0])
             }, {
                 label: "Reopened",
                 lineTension: 0.1,
@@ -103,7 +103,7 @@ function status_draw(data) {
                 pointHoverBorderWidth: 1,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: create_array(data.users[1])
+                data: create_array(data[1])
             }]
         },
         options: {
@@ -145,7 +145,7 @@ function time_draw(data) {
         data: {
             labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
             datasets: [{
-                data: data.users,
+                data: data,
                 backgroundColor: [
                     'rgba(255, 206, 86, 0.2)',
                     'rgba(75, 192, 192, 0.2)',
@@ -303,11 +303,11 @@ function create_array(data) {
 function create_data_hash(data) {
     var hash = [];
     colorCount = 0;
-    for (var i = 0; i < Object.keys(data.users).length; i++) {
+    for (var i = 0; i < Object.keys(data).length; i++) {
         color = generate_color();
         hash[i] = {
-            label: Object.keys(data.users[i]),
-            data: create_array(create_array(data.users[i])[0]),
+            label: Object.keys(data[i]),
+            data: create_array(create_array(data[i])[0]),
             lineTension: 0.1,
             borderCapStyle: 'butt',
             backgroundColor: color[colorCount][0],
@@ -338,11 +338,11 @@ function create_data_hash(data) {
 function create_work_time_data_hash(data) {
     var hash = [];
     colorCount = 0;
-    for (var i = 0; i < data.users.length; i++) {
+    for (var i = 0; i < data.length; i++) {
         color = generate_color();
         hash[i] = {
-            label: Object.keys(data.users[i]),
-            data: create_array(data.users[i])[0],
+            label: Object.keys(data[i]),
+            data: create_array(data[i])[0],
             backgroundColor: color[colorCount][0],
             borderColor: color[colorCount][1],
             borderWidth: 1
@@ -359,8 +359,8 @@ function create_work_time_data_hash(data) {
 
 function create_label_hash(data) {
     var array = [];
-    var label = Object.keys(data.users[0]);
-    array.push(Object.keys(data.users[0][label]));
+    var label = Object.keys(data[0]);
+    array.push(Object.keys(data[0][label]));
     return array[0];
 }
 

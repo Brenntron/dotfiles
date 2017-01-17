@@ -1,11 +1,11 @@
-class Bug < ActiveRecord::Base
+class Bug < ApplicationRecord
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
   has_and_belongs_to_many :rules
   has_and_belongs_to_many :tags, dependent: :destroy
-  belongs_to :user
-  belongs_to :committer, class_name: 'User'
+  belongs_to :user, optional: true
+  belongs_to :committer, class_name: 'User', optional: true
 
   has_many :references, dependent: :destroy
   has_many :exploits, through: :references
@@ -63,7 +63,7 @@ class Bug < ActiveRecord::Base
   def update_bug(xmlrpc, options)
     unless xmlrpc.nil?
       # the bugzilla session is where we authenticate
-      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options)
+      changed_bug = Bugzilla::Bug.new(xmlrpc).update(options.to_h)
     end
     changed_bug
   end
@@ -449,7 +449,7 @@ class Bug < ActiveRecord::Base
 
   def update_bugzilla_attributes(xmlrpc, options)
     unless xmlrpc.nil?
-      Bugzilla::Bug.new(xmlrpc).update(options)
+      Bugzilla::Bug.new(xmlrpc).update(options.to_h)
     end
   end
 
@@ -470,7 +470,7 @@ class Bug < ActiveRecord::Base
       end
       options = { ids: [bugzilla_id],
                   summary: summary }
-      Bugzilla::Bug.new(xmlrpc).update(options)
+      Bugzilla::Bug.new(xmlrpc).update(options.to_h)
     end
   end
 
@@ -504,6 +504,7 @@ class Bug < ActiveRecord::Base
     class_allowed = User.class_levels[current_user.class_level]
     bugs.reject { |b| Bug.classifications[b.classification] > class_allowed }
   end
+  Bug.import force: true
 
   settings index: { number_of_shards: 5 } do
     mappings dynamic: 'false' do
