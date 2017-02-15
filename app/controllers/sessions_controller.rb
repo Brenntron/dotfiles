@@ -32,6 +32,6 @@ class SessionsController < ApplicationController
     render :json => {:errors => ["#{error_message}"]}, :success => false, :status => :unauthorized
   end
   def system_not_ready(error_message)
-    render :json => {:errors => ["#{error_message}"]}, :success => false, :status => 500
+    render json:  {errors: ["#{error_message}"]}, success: false, status: 533
   end
 end

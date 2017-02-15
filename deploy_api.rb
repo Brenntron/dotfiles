@@ -139,6 +139,7 @@ ARGV.each do |a|
   case a
     when "--run-config"
       timestamp = ARGV[ARGV.index(a)+1].to_i
+      puts "timestamp is: #{timestamp}"
       if timestamp.is_a? Numeric
         run_config = true
         process_api = false
