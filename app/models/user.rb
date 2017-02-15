@@ -1,4 +1,4 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_many :bugs
   has_many :team_member_relationships, class_name: 'Relationship'
   has_many :team_members, through: :team_member_relationships

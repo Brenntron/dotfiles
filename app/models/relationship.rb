@@ -1,5 +1,5 @@
-class Relationship < ActiveRecord::Base
-  belongs_to :user
+class Relationship < ApplicationRecord
+  belongs_to :user, optional: true
   belongs_to :team_member,
-             class_name: 'User'
+             class_name: 'User', optional: true
 end

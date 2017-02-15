@@ -1,3 +1,3 @@
-class ReferenceType < ActiveRecord::Base
+class ReferenceType < ApplicationRecord
   has_many :references
 end

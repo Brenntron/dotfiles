@@ -1,5 +1,6 @@
 class EventsController < ApplicationController
   include ActionController::Live
+  extend ActiveSupport::Concern
 
   def send_event
     data = 'something'

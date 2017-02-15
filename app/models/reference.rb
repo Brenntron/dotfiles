@@ -1,8 +1,8 @@
-class Reference < ActiveRecord::Base
+class Reference < ApplicationRecord
   has_many :bugs
   has_and_belongs_to_many :rules
-  belongs_to :reference_type
-  belongs_to :bug
+  belongs_to :reference_type, optional: true
+  belongs_to :bug, optional: true
   has_and_belongs_to_many :exploits
 
   after_create { |reference| reference.record 'create' if Rails.configuration.websockets_enabled == 'true' }

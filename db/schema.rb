@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -13,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 20161220161215) do
 
-  create_table "attachments", force: true do |t|
+  create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_attachment_id"
     t.string   "file_name"
     t.string   "summary"
@@ -30,25 +29,24 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.integer  "rule_id"
     t.integer  "reference_id"
     t.integer  "task_id"
+    t.index ["bug_id"], name: "index_attachments_on_bug_id", using: :btree
+    t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id", using: :btree
+    t.index ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
+    t.index ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
+    t.index ["task_id"], name: "index_attachments_on_task_id", using: :btree
   end
 
-  add_index "attachments", ["bug_id"], name: "index_attachments_on_bug_id", using: :btree
-  add_index "attachments", ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id", using: :btree
-  add_index "attachments", ["reference_id"], name: "index_attachments_on_reference_id", using: :btree
-  add_index "attachments", ["rule_id"], name: "index_attachments_on_rule_id", using: :btree
-  add_index "attachments", ["task_id"], name: "index_attachments_on_task_id", using: :btree
-
-  create_table "attachments_exploits", force: true do |t|
+  create_table "attachments_exploits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "attachment_id"
     t.integer "exploit_id"
   end
 
-  create_table "attachments_rules", id: false, force: true do |t|
+  create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "attachment_id"
     t.integer "rule_id"
   end
 
-  create_table "bugs", force: true do |t|
+  create_table "bugs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_id"
     t.string   "state"
     t.string   "status"
@@ -83,27 +81,25 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.integer  "reference_id"
     t.integer  "rule_id"
     t.integer  "attachment_id"
+    t.index ["reference_id"], name: "index_bugs_on_reference_id", using: :btree
+    t.index ["rule_id"], name: "index_bugs_on_rule_id", using: :btree
+    t.index ["user_id"], name: "index_bugs_on_user_id", using: :btree
   end
 
-  add_index "bugs", ["reference_id"], name: "index_bugs_on_reference_id", using: :btree
-  add_index "bugs", ["rule_id"], name: "index_bugs_on_rule_id", using: :btree
-  add_index "bugs", ["user_id"], name: "index_bugs_on_user_id", using: :btree
-
-  create_table "bugs_rules", id: false, force: true do |t|
-    t.integer "bug_id",  default: 0, null: false
-    t.integer "rule_id", default: 0, null: false
+  create_table "bugs_rules", primary_key: ["bug_id", "rule_id"], force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "bug_id",  null: false
+    t.integer "rule_id", null: false
   end
 
-  create_table "bugs_tags", id: false, force: true do |t|
+  create_table "bugs_tags", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bug_id", null: false
     t.integer "tag_id", null: false
+    t.index ["bug_id", "tag_id"], name: "index_bugs_tags_on_bug_id_and_tag_id", unique: true, using: :btree
+    t.index ["bug_id"], name: "index_bugs_tags_on_bug_id", using: :btree
+    t.index ["tag_id"], name: "index_bugs_tags_on_tag_id", using: :btree
   end
 
-  add_index "bugs_tags", ["bug_id", "tag_id"], name: "index_bugs_tags_on_bug_id_and_tag_id", unique: true, using: :btree
-  add_index "bugs_tags", ["bug_id"], name: "index_bugs_tags_on_bug_id", using: :btree
-  add_index "bugs_tags", ["tag_id"], name: "index_bugs_tags_on_tag_id", using: :btree
-
-  create_table "events", force: true do |t|
+  create_table "events", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "user"
     t.string   "action"
     t.string   "description"
@@ -112,46 +108,43 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.datetime "updated_at"
   end
 
-  create_table "exploit_types", force: true do |t|
+  create_table "exploit_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string  "name"
     t.string  "description"
     t.string  "pcap_validation"
     t.integer "exploit_id"
+    t.index ["exploit_id"], name: "index_exploit_types_on_exploit_id", using: :btree
   end
 
-  add_index "exploit_types", ["exploit_id"], name: "index_exploit_types_on_exploit_id", using: :btree
-
-  create_table "exploits", force: true do |t|
+  create_table "exploits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "data"
     t.integer  "exploit_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "attachment_id"
     t.integer  "reference_id"
+    t.index ["attachment_id"], name: "index_exploits_on_attachment_id", using: :btree
+    t.index ["exploit_type_id"], name: "index_exploits_on_exploit_type_id", using: :btree
+    t.index ["reference_id"], name: "index_exploits_on_reference_id", using: :btree
   end
 
-  add_index "exploits", ["attachment_id"], name: "index_exploits_on_attachment_id", using: :btree
-  add_index "exploits", ["exploit_type_id"], name: "index_exploits_on_exploit_type_id", using: :btree
-  add_index "exploits", ["reference_id"], name: "index_exploits_on_reference_id", using: :btree
-
-  create_table "exploits_references", force: true do |t|
+  create_table "exploits_references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "exploit_id"
     t.integer "reference_id"
   end
 
-  create_table "notes", force: true do |t|
-    t.text     "comment"
+  create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.text     "comment",           limit: 65535
     t.string   "note_type"
     t.string   "author"
     t.integer  "notes_bugzilla_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
+    t.index ["bug_id"], name: "index_notes_on_bug_id", using: :btree
   end
 
-  add_index "notes", ["bug_id"], name: "index_notes_on_bug_id", using: :btree
-
-  create_table "reference_types", force: true do |t|
+  create_table "reference_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string  "name"
     t.string  "description"
     t.string  "validation"
@@ -160,71 +153,69 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.string  "rule_format"
     t.string  "url"
     t.integer "reference_id"
+    t.index ["reference_id"], name: "index_reference_types_on_reference_id", using: :btree
   end
 
-  add_index "reference_types", ["reference_id"], name: "index_reference_types_on_reference_id", using: :btree
-
-  create_table "references", force: true do |t|
+  create_table "references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "reference_data"
     t.integer  "reference_type_id"
     t.integer  "bug_id"
     t.integer  "exploit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["bug_id"], name: "index_references_on_bug_id", using: :btree
+    t.index ["exploit_id"], name: "index_references_on_exploit_id", using: :btree
+    t.index ["reference_type_id"], name: "index_references_on_reference_type_id", using: :btree
   end
 
-  add_index "references", ["bug_id"], name: "index_references_on_bug_id", using: :btree
-  add_index "references", ["exploit_id"], name: "index_references_on_exploit_id", using: :btree
-  add_index "references", ["reference_type_id"], name: "index_references_on_reference_type_id", using: :btree
-
-  create_table "references_rules", id: false, force: true do |t|
+  create_table "references_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "reference_id"
     t.integer "rule_id"
+    t.index ["reference_id"], name: "index_references_rules_on_reference_id", using: :btree
+    t.index ["rule_id"], name: "index_references_rules_on_rule_id", using: :btree
   end
 
-  add_index "references_rules", ["reference_id"], name: "index_references_rules_on_reference_id", using: :btree
-  add_index "references_rules", ["rule_id"], name: "index_references_rules_on_rule_id", using: :btree
-
-  create_table "relationships", force: true do |t|
+  create_table "relationships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "user_id"
     t.integer  "team_member_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "rule_categories", force: true do |t|
+  create_table "rule_categories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "category"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "rule_docs", force: true do |t|
+  create_table "rule_docs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "rule_id"
-    t.text     "summary"
-    t.text     "impact"
-    t.text     "details"
-    t.text     "affected_sys"
-    t.text     "attack_scenarios"
-    t.text     "ease_of_attack"
-    t.text     "false_positives"
-    t.text     "false_negatives"
-    t.text     "corrective_action"
-    t.text     "contributors"
+    t.text     "summary",           limit: 65535
+    t.text     "impact",            limit: 65535
+    t.text     "details",           limit: 65535
+    t.text     "affected_sys",      limit: 65535
+    t.text     "attack_scenarios",  limit: 65535
+    t.text     "ease_of_attack",    limit: 65535
+    t.text     "false_positives",   limit: 65535
+    t.text     "false_negatives",   limit: 65535
+    t.text     "corrective_action", limit: 65535
+    t.text     "contributors",      limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["rule_id"], name: "index_rule_docs_on_rule_id", using: :btree
   end
 
-  create_table "rules", force: true do |t|
-    t.text     "rule_content"
-    t.text     "rule_parsed"
-    t.text     "rule_warnings"
-    t.text     "rule_failures"
-    t.text     "cvs_rule_content"
-    t.text     "cvs_rule_parsed"
+  create_table "rules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.text     "rule_content",     limit: 65535
+    t.text     "rule_parsed",      limit: 65535
+    t.text     "rule_warnings",    limit: 65535
+    t.text     "rule_failures",    limit: 65535
+    t.text     "cvs_rule_content", limit: 65535
+    t.text     "cvs_rule_parsed",  limit: 65535
     t.string   "connection"
     t.string   "message"
     t.string   "flow"
-    t.text     "detection"
+    t.text     "detection",        limit: 65535
     t.string   "metadata"
     t.string   "class_type"
     t.integer  "gid"
@@ -234,40 +225,38 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.float    "average_check",    limit: 24
     t.float    "average_match",    limit: 24
     t.float    "average_nonmatch", limit: 24
-    t.boolean  "tested",                      default: false
-    t.boolean  "committed",                   default: false
+    t.boolean  "tested",                         default: false
+    t.boolean  "committed",                      default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "task_id"
     t.integer  "rule_category_id"
+    t.index ["gid", "sid", "rev"], name: "index_rules_gid_and_sid_and_rev", unique: true, using: :btree
+    t.index ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
+    t.index ["task_id"], name: "index_rules_on_task_id", using: :btree
   end
 
-  add_index "rules", ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
-  add_index "rules", ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
-  add_index "rules", ["task_id"], name: "index_rules_on_task_id", using: :btree
-
-  create_table "tags", force: true do |t|
+  create_table "tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name",       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "tasks", force: true do |t|
-    t.boolean  "completed",    default: false
-    t.boolean  "failed",       default: false
-    t.text     "result"
+  create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.boolean  "completed",                  default: false
+    t.boolean  "failed",                     default: false
+    t.text     "result",       limit: 65535
     t.string   "task_type"
     t.integer  "time_elapsed"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
     t.integer  "user_id"
+    t.index ["bug_id"], name: "index_tasks_on_bug_id", using: :btree
+    t.index ["user_id"], name: "index_tasks_on_user_id", using: :btree
   end
 
-  add_index "tasks", ["bug_id"], name: "index_tasks_on_bug_id", using: :btree
-  add_index "tasks", ["user_id"], name: "index_tasks_on_user_id", using: :btree
-
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "cvs_username"
     t.string   "cec_username"
     t.string   "kerberos_login"
@@ -290,21 +279,19 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.integer  "metrics_timeframe",      default: 7
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
-
-  create_table "versions", force: true do |t|
+  create_table "versions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.string   "item_type",      limit: 191,        null: false
     t.integer  "item_id",                           null: false
     t.string   "event",                             null: false
     t.string   "whodunnit"
-    t.text     "object",         limit: 2147483647
-    t.text     "object_changes", limit: 2147483647
+    t.text     "object",         limit: 4294967295
+    t.text     "object_changes", limit: 4294967295
     t.datetime "created_at"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   end
-
-  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
 end

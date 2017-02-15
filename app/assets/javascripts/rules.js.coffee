@@ -24,7 +24,7 @@ $ ->
             data: data
             headers: headers
             success: (response) ->
-              task = response.task
+              task = response
               d = new Date()
               month = d.getMonth()+1
               day = d.getDate()
@@ -110,8 +110,8 @@ $ ->
       success: (response) ->
         window.location.reload()
       error: (response) ->
-        $('alert_rules').removeClass('.success')
-        $('alert_rules').addClass('error').append('Please provide correct rule sid')
+        $('.alert_rules').removeClass('.success')
+        $('.alert_rules').addClass('error').append('Please provide correct rule sid')
     }
 
   $(document).on 'change', '.scratch_connection, .connection', ->

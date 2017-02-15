@@ -255,7 +255,7 @@ module API
 
           # update buzilla (if needed)
           options.reject! { |k, v| v.nil? } if options
-          Bugzilla::Bug.new(bugzilla_session).update(options) unless options.blank?
+          Bugzilla::Bug.new(bugzilla_session).update(options.to_h) unless options.blank?
           # update the database
           update_params.reject! { |k, v| v.nil? }
           Bug.update(permitted_params[:id], update_params)
@@ -295,7 +295,7 @@ module API
               :severity => permitted_params[:bug][:severity],
               :classification => permitted_params[:bug][:classification]
           }.reject() { |k, v| v.nil? || v.empty? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
-          new_bug = Bugzilla::Bug.new(bugzilla_session).create(options) #the bugzilla session is where we authenticate
+          new_bug = Bugzilla::Bug.new(bugzilla_session).create(options.to_h) #the bugzilla session is where we authenticate
           new_bug_id = new_bug["id"]
           Bug.create(
               :id => new_bug_id,
@@ -389,7 +389,7 @@ module API
                 return {error: 'already subscribed to this bug'}
               else
                 options = {:ids => permitted_params[:id], :assigned_to => current_user.email}
-                Bugzilla::Bug.new(bugzilla_session).update(options)
+                Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                 current_user.bugs << bug
                 Bug.update(permitted_params[:id], state:"ASSIGNED")
               end
@@ -411,7 +411,7 @@ module API
           unless bug.nil?
             begin
               options = {:ids => permitted_params[:id], :reset_assigned_to => true}
-              Bugzilla::Bug.new(bugzilla_session).update(options)
+              Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
               current_user.bugs.delete(bug)
               Bug.update(permitted_params[:id], state:"NEW")
               return true

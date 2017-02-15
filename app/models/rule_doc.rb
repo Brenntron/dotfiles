@@ -1,4 +1,4 @@
-class RuleDoc < ActiveRecord::Base
+class RuleDoc < ApplicationRecord
   belongs_to :rule
 
   validates :summary, presence: true
