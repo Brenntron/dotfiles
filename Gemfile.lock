@@ -1,18 +1,11 @@
-GIT
-  remote: https://github.com/digital-york/activemessaging.git
-  revision: 433e88352be3ef0365b84cdf35a67d492c2819b3
-  specs:
-    activemessaging (0.13.0)
-      activesupport (>= 2.3.11)
-
 PATH
-  remote: ./vendor/gems/rule_test_api
+  remote: vendor/gems/rule_test_api
   specs:
     rule_test_api (0.1.4)
       her (>= 0.7.2)
 
 PATH
-  remote: ./vendor/gems/sfbugzilla
+  remote: vendor/gems/sfbugzilla
   specs:
     sfbugzilla (0.0.10)
       highline (>= 1.6.8)
@@ -53,6 +46,9 @@ GEM
     activejob (5.0.1)
       activesupport (= 5.0.1)
       globalid (>= 0.3.6)
+    activemessaging (0.13.1)
+      activesupport
+      rake
     activemodel (5.0.1)
       activesupport (= 5.0.1)
     activerecord (5.0.1)
@@ -413,7 +409,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers
-  activemessaging!
+  activemessaging
   awesome_print (= 1.2.0)
   bootstrap-multiselect-rails
   bootstrap-sass
@@ -476,4 +472,4 @@ DEPENDENCIES
   web-console (~> 3.4.0)
 
 BUNDLED WITH
-   1.13.7
+   1.14.4
