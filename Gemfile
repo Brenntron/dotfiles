@@ -31,8 +31,6 @@ gem 'pry-remote', '0.1.8'
 
 gem 'foreman'
 
-gem 'elasticsearch-model'
-gem 'elasticsearch-rails'
 gem 'jbuilder', '~> 2.6.1'
 gem 'dotenv-rails'
 gem 'diffy'
