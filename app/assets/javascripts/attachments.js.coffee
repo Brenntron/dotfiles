@@ -63,7 +63,7 @@ $ ->
       processData: false
       success:(response) ->
         success = true
-        attachment = response.attachments
+        attachment = response
         $('.success_attachments').html('successfully attached')
         $('#current-attachments').append('<tr>'+
             '<td><input type="checkbox" name='+attachment.id+' class="attachcheckbox"> </td>'+
@@ -100,7 +100,7 @@ $ ->
       data: data
       headers: headers
       success: (response) ->
-        task = response.task
+        task = response
         d = new Date()
         month = d.getMonth()+1
         day = d.getDate()

@@ -30,7 +30,7 @@ class NotesController < ApplicationController
           :is_markdown => params[:note][:is_markdown],
           :minor_update => params[:note][:minor_update]
       }.reject() { |k, v| v.nil? }
-      new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options)
+      new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options.to_h)
       if params[:note][:id].blank?
         note = Note.create(id: new_note['id'])
       else

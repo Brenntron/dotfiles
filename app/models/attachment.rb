@@ -1,5 +1,5 @@
-class Attachment < ActiveRecord::Base
-  belongs_to :bug
+class Attachment < ApplicationRecord
+  belongs_to :bug, optional: true
   has_and_belongs_to_many :rules
   has_many :exploits
 

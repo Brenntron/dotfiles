@@ -78,6 +78,7 @@ Feature: Bug
     And I wait for "1" seconds
     When I click "delete_bug222222"
     And I wait for "1" seconds
+    And I goto "/bugs"
     Then I should not see "[BP][NSS] fixed bug"
 
 
