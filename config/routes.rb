@@ -39,7 +39,7 @@ Rails.application.routes.draw do
       end
     end
   end
-  resources :user_searches #, only: [:new, :create]
+  resources :user_searches, only: [:new, :create]
   resources :bugs do
     member do
       post  :create_rules

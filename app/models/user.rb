@@ -26,6 +26,12 @@ class User < ApplicationRecord
 
   DEFAULT_METRICS_TIMEFRAME = 7
 
+  def self.search(conditions)
+    # all
+    name = conditions["name"]
+    where("cvs_username like '%#{name}%'")
+  end
+
   def record(action)
     record = { resource: 'user',
                action: action,

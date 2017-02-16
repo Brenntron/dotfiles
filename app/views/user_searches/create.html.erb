@@ -1,15 +1,14 @@
 <table class="table index-table">
   <thead>
   <tr>
-    <th>Name</th>
+    <th>CVS Username</th>
   </tr>
   </thead>
   <tbody>
-  <tr>
-    <td>carlzipp</td>
-  </tr>
-  <tr>
-    <td>davecarr</td>
-  </tr>
+  <% @users.each do |user| %>
+    <tr>
+      <td><%= user.cvs_username%></td>
+    </tr>
+  <% end %>
   </tbody>
 </table>
