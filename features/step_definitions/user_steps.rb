@@ -35,13 +35,17 @@ Then(/^I see a (\w*) new form$/) do |resources_name|
   find(:xpath, "//form[@action='/#{resources_name}'][@method='post']")
 end
 
+Then(/^I see a user_searches form$/) do
+  find(:xpath, "//form[@action='/user_searches'][@method='get']")
+end
+
 When(/^I create a user search for name "(.*)"$/) do |name|
   # page.driver.submit :get, "/user_searches", :name => name
   visit "/user_searches"
 end
 
 Then(/^I see a user_searches result for name "(.*)"$/) do |name|
-  find(:xpath, "//td[contains(text(), '#{name}')]")
+  find(:xpath, "//td[text()='#{name}']")
 end
 
 Then(/^I do not see a user_searches result for name "(.*)"$/) do |name|

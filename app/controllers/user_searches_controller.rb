@@ -5,7 +5,7 @@ class UserSearchesController < ApplicationController
   def new
   end
 
-  def create
+  def index
     @users = User.search(params[:user_search])
   end
 

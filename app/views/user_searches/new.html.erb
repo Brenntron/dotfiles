@@ -10,7 +10,7 @@
       <div class="col-xs-12">
         <div class="spacer"></div>
 
-        <%= form_for :user_search, url: user_searches_path do |form| %>
+        <%= form_for :user_search, url: user_searches_path, method: :get do |form| %>
           <div class="row">
             <div class="col-sm-12 form-group">
               <%= form.label :name %>

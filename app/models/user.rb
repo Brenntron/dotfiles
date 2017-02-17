@@ -29,7 +29,12 @@ class User < ApplicationRecord
   def self.search(conditions)
     # all
     name = conditions["name"]
-    where("cvs_username like '%#{name}%'")
+    where("display_name like :name_pattern" +
+              " or email like :name_pattern" +
+              " or cvs_username like :name_pattern" +
+              " or cec_username like :name_pattern" +
+              " or kerberos_login like :name_pattern",
+          name_pattern: "%#{name}%")
   end
 
   def record(action)
