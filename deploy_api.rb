@@ -24,7 +24,7 @@ def self.build_API(include_snort)
 
 
   puts "clone the git repo to the production folder"
-  system "git clone git@github.com:talosweb/talos_api.git -b #{current_git_branch} --single-branch ../production"
+  system "git clone https://git.vrt.sourcefire.com/talosweb/talos_api.git -b #{current_git_branch} --single-branch ../production"
 
   if File.directory?("../production")
     if File.directory?("vendor/bundle")
@@ -68,7 +68,6 @@ def self.upload_API
   begin
     puts "create a new folder on the server with a new timestamp"
     timestamp = Time.now.to_i
-    system "ssh rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/rulesuitest/releases/#{timestamp}"
     if File.exists?("../rulesuitest.tar.gz")
       system "ssh rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/rulesuitest/releases/#{timestamp}"
       puts "scp the tarball to rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp} folder"
@@ -101,8 +100,10 @@ def self.production_config(timestamp, rebuild_gems)
   system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
 
   `echo 'simlink the timestamped folder to the app directory'`
-  system "rm /usr/local/www/rulesuitest/public/app"
-  system "ln -s #{Dir.pwd} /usr/local/www/rulesuitest/public/app"
+  #i would have liked to simlink this folder to the app directory but i cant edit where apache is looking for the webapp
+  # system "rm /usr/local/www/rulesuitest/public/app"
+  #so we are gonna have to copy it instead
+  system "rsync -r #{Dir.pwd}/* /usr/local/www/rulesuitest"
 
   `echo 'build the gems locally if folder exists'`
   # if vendor folder doesnt exist or we ask to rebuild the gems then build the gems and create a copy for later
@@ -138,6 +139,7 @@ ARGV.each do |a|
   case a
     when "--run-config"
       timestamp = ARGV[ARGV.index(a)+1].to_i
+      puts "timestamp is: #{timestamp}"
       if timestamp.is_a? Numeric
         run_config = true
         process_api = false
