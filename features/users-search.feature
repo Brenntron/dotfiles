@@ -8,14 +8,14 @@ Feature: UserSearch
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
-      | email                | display_name        |
-      | carlzipp@cisco.com   | Carl Zipp           |
-      | davecarr@cisco.com   | David Carr          |
-      | pbugatti@cisco.com   | Porsche Bugatti     |
-      | bentford@cisco.com   | Bentley Ford        |
+      | email            | display_name        |
+      | email1@cisco.com | Carl Zipp           |
+      | email2@cisco.com | David Carr          |
+      | email3@cisco.com | Porsche Bugatti     |
+      | email4@cisco.com | Bentley Ford        |
     When I goto "/user_searches/new"
     Then I see a user_searches form
-    Given I fill in "Name" with "Car"
+    Given I fill in "Name" with "CAR"
     When I click button "Search"
     Then I see a user_searches result for name "Carl Zipp"
     And I see a user_searches result for name "David Carr"
@@ -27,14 +27,14 @@ Feature: UserSearch
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
-      | email                | cvs_username |
-      | carlzipp@cisco.com   | carlzipp     |
-      | davecarr@cisco.com   | davecarr     |
-      | pbugatti@cisco.com   | porsche      |
-      | bentford@cisco.com   | bentley      |
+      | email            | cvs_username |
+      | email1@cisco.com | carlzipp     |
+      | email2@cisco.com | davecarr     |
+      | email3@cisco.com | porsche      |
+      | email4@cisco.com | bentley      |
     When I goto "/user_searches/new"
     Then I see a user_searches form
-    Given I fill in "Name" with "car"
+    Given I fill in "Name" with "CAR"
     When I click button "Search"
     Then I see a user_searches result for name "carlzipp"
     And I see a user_searches result for name "davecarr"
@@ -46,14 +46,14 @@ Feature: UserSearch
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
-      | email                | cec_username |
-      | carlzipp@cisco.com   | carlzipp     |
-      | davecarr@cisco.com   | davecarr     |
-      | pbugatti@cisco.com   | porsche      |
-      | bentford@cisco.com   | bentley      |
+      | email            | cec_username |
+      | email1@cisco.com | carlzipp     |
+      | email2@cisco.com | davecarr     |
+      | email3@cisco.com | porsche      |
+      | email4@cisco.com | bentley      |
     When I goto "/user_searches/new"
     Then I see a user_searches form
-    Given I fill in "Name" with "car"
+    Given I fill in "Name" with "CAR"
     When I click button "Search"
     Then I see a user_searches result for name "carlzipp"
     And I see a user_searches result for name "davecarr"
@@ -65,14 +65,14 @@ Feature: UserSearch
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
-      | email                | kerberos_login |
-      | carlzipp@cisco.com   | carlzipp       |
-      | davecarr@cisco.com   | davecarr       |
-      | pbugatti@cisco.com   | porsche        |
-      | bentford@cisco.com   | bentley        |
+      | email            | kerberos_login |
+      | email1@cisco.com | carlzipp       |
+      | email2@cisco.com | davecarr       |
+      | email3@cisco.com | porsche        |
+      | email4@cisco.com | bentley        |
     When I goto "/user_searches/new"
     Then I see a user_searches form
-    Given I fill in "Name" with "car"
+    Given I fill in "Name" with "CAR"
     When I click button "Search"
     Then I see a user_searches result for name "carlzipp"
     And I see a user_searches result for name "davecarr"
@@ -84,14 +84,14 @@ Feature: UserSearch
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
-      | email                |
-      | carlzipp@cisco.com   |
-      | davecarr@cisco.com   |
-      | pbugatti@cisco.com   |
-      | bentford@cisco.com   |
+      | email              |
+      | carlzipp@cisco.com |
+      | davecarr@cisco.com |
+      | porsche@cisco.com  |
+      | bentley@cisco.com  |
     When I goto "/user_searches/new"
     Then I see a user_searches form
-    Given I fill in "Name" with "car"
+    Given I fill in "Name" with "CAR"
     When I click button "Search"
     Then I see a user_searches result for name "carlzipp@cisco.com"
     And I see a user_searches result for name "davecarr@cisco.com"
