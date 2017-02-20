@@ -1,6 +1,4 @@
 class Bug < ApplicationRecord
-  include Elasticsearch::Model
-  include Elasticsearch::Model::Callbacks
 
   has_and_belongs_to_many :rules
   has_and_belongs_to_many :tags, dependent: :destroy
