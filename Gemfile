@@ -23,7 +23,7 @@ gem 'her'
 
 gem 'net-ssh'
 gem 'daemons'
-gem 'activemessaging', git: 'https://github.com/digital-york/activemessaging.git'
+gem 'activemessaging'
 gem 'stomp'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '0.9.12.4'
@@ -31,8 +31,6 @@ gem 'pry-remote', '0.1.8'
 
 gem 'foreman'
 
-gem 'elasticsearch-model'
-gem 'elasticsearch-rails'
 gem 'jbuilder', '~> 2.6.1'
 gem 'dotenv-rails'
 gem 'diffy'
