@@ -1,6 +1,4 @@
 class Bug < ApplicationRecord
-  include Elasticsearch::Model
-  include Elasticsearch::Model::Callbacks
 
   has_and_belongs_to_many :rules
   has_and_belongs_to_many :tags, dependent: :destroy
@@ -503,16 +501,5 @@ class Bug < ApplicationRecord
   def self.check_permission(current_user, bugs)
     class_allowed = User.class_levels[current_user.class_level]
     bugs.reject { |b| Bug.classifications[b.classification] > class_allowed }
-  end
-  Bug.import force: true
-
-  settings index: { number_of_shards: 5 } do
-    mappings dynamic: 'false' do
-      indexes :bugzilla_id, type: :integer
-      indexes :user_id, type: :integer
-      indexes :committer_id, type: :integer
-      indexes :summary, type: :string, analyzer: :keyword
-      indexes :state, type: :string, index: :not_analyzed
-    end
   end
 end
