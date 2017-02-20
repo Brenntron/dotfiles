@@ -42,7 +42,6 @@ Rails.application.routes.draw do
       end
     end
   end
-  resources :user_searches, only: [:new, :index]
   resources :bugs do
     member do
       post  :create_rules
