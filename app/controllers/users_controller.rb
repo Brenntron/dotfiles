@@ -12,6 +12,10 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
+  def results
+    @users = User.search(params.require(:user).require(:search).permit(:name))
+  end
+
   def status_metrics
     @user = User.find(params[:user_id])
     pending = {}

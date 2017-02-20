@@ -31,6 +31,12 @@ Then(/^I visit the root url$/) do
   visit root_path()
 end
 
+Then(/^I should see a user search form$/) do
+  find(:xpath, "//form[@action='/users/results'][@method='get']") &&
+      find(:xpath, "//form[@action='/users/results']/input[@name='user[search][name]']") &&
+      find(:xpath, "//form[@action='/users/results']/input[@type='submit'][@value='Search']")
+end
+
 Then(/^I see a (\w*) new form$/) do |resources_name|
   find(:xpath, "//form[@action='/#{resources_name}'][@method='post']")
 end

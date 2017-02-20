@@ -1,0 +1,22 @@
+<table class="table index-table">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>email</th>
+    <th>CVS Username</th>
+    <th>CEC Username</th>
+    <th>Kerberos login</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @users.each do |user| %>
+    <tr>
+      <td><%= user.display_name %></td>
+      <td><%= user.email %></td>
+      <td><%= user.cvs_username %></td>
+      <td><%= user.cec_username %></td>
+      <td><%= user.kerberos_login %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

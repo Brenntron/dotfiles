@@ -27,6 +27,9 @@ Rails.application.routes.draw do
   resources :rules, param: :sid
 
   resources :users do
+    collection do
+      get :results
+    end
     get :status_metrics, defaults: { format: :json }
     get :time_metrics, defaults: { format: :json }
     get :pending_team_metrics, defaults: {format: :json}

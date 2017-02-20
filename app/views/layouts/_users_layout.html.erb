@@ -32,6 +32,15 @@
     <div class="row header">
       <!-- action links -->
       <div class="col-xs-12 actions-bar">
+
+        <%= form_for :user, url: results_users_path, method: :get do |form| %>
+          <%= form.fields_for :search do |search_fields| %>
+            <%= search_fields.label :name %>
+            <%= search_fields.text_field :name %>
+          <% end %>
+          <%= form.submit 'Search' %>
+        <% end %>
+
         <% if current_user.manager? %>
           <%= link_to user_relationships_path(current_user) do %>
             <button class="btn btn-link icon-link custom-icon"><%= image_tag "tree-diagram-icon.png" %></button>
