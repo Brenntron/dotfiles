@@ -125,7 +125,7 @@ class User < ApplicationRecord
       # we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
-      if Rails.env != "development"
+      if Rails.env == "staging" || Rails.env == "production"
           raise StandardError.new('The server does not have the following variables set: <br> AUTHENTICATE_MAIL, AUTHENTICATE_SAMACCOUNTNAME, AUTHENTICATE_CISCOCECUSERNAME, AUTHENTICATE_DISPLAYNAME. <br> Please contact Ops about this.') unless request.env['AUTHENTICATE_MAIL']&&request.env['AUTHENTICATE_SAMACCOUNTNAME']&&request.env['AUTHENTICATE_CISCOCECUSERNAME']&&request.env['AUTHENTICATE_DISPLAYNAME']
       end
       kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
