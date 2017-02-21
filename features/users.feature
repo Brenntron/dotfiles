@@ -160,7 +160,7 @@ Feature: User Accounts
 
 
   @javascript
-  Scenario: A user can search
+  Scenario: A user can search using email
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -179,7 +179,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "bentley@cisco.com"
 
   @javascript
-  Scenario: A user can search
+  Scenario: A user can search using a users display name
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -197,7 +197,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "Bentley Ford"
 
   @javascript
-  Scenario: A user can search
+  Scenario: A user can search using CVS user name
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -215,7 +215,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "bentley"
 
   @javascript
-  Scenario: A user can search
+  Scenario: A user can search using CEC username
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -233,7 +233,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "bentley"
 
   @javascript
-  Scenario: A user can search
+  Scenario: A user can search using Kerberos Login
     Given a user exists and is logged in
     And I wait for "3" seconds
     And the following users exist
