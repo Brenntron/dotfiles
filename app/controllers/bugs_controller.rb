@@ -137,11 +137,11 @@ class BugsController < ApplicationController
             @bugs = current_user.co_workers.map{ |cw| cw.bugs }[0]
           end
         when "open-bugs"
-          @bugs = Bug.where(state: "OPEN")
+          @bugs = Bug.open
         when "pending-bugs"
-          @bugs = Bug.where(state: "PENDING")
+          @bugs = Bug.pending
         when "fixed-bugs"
-          @bugs = Bug.where(state: "FIXED")
+          @bugs = Bug.closed
         when "advance-search"
           @bugs = Bug.bugs_with_search(session[:search])
         else
