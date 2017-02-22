@@ -7,12 +7,12 @@ class UsersController < ApplicationController
   end
 
   def show
+    @user = User.where(id: params[:id]).first
     if !current_user.authorized_user_list.include?(params[:id].to_i)
       flash[:error] = 'You are not authorized to view that user.'
       redirect_to users_path
     else
       @users = current_user.team_members
-      @user = User.find(params[:id])
     end
   end
 
