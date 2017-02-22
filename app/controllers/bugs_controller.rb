@@ -46,7 +46,7 @@ class BugsController < ApplicationController
     )
 
     if @bug.save
-      @tags.each { |tag| @bug.tags << Tag.find_or_create_by(name: tag.upcase) }
+      @tags.each { |tag| @bug.tags << Tag.find_or_create_by(name: tag.upcase) } if @tags
       redirect_to @bug
     end
   end
