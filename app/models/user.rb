@@ -27,6 +27,17 @@ class User < ApplicationRecord
 
   DEFAULT_METRICS_TIMEFRAME = 7
 
+  def self.search(conditions)
+    # all
+    name = conditions["name"]
+    where("display_name like :name_pattern" +
+              " or email like :name_pattern" +
+              " or cvs_username like :name_pattern" +
+              " or cec_username like :name_pattern" +
+              " or kerberos_login like :name_pattern",
+          name_pattern: "%#{name}%")
+  end
+
   def record(action)
     record = { resource: 'user',
                action: action,

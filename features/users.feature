@@ -37,6 +37,7 @@ Feature: User Accounts
     And  I goto "/users"
     And  I should see "h_clinton"
     And  I should not see "d_drumph"
+    And  I should see a user search form
     Then I click "h_clinton"
     And  I should see "[BP][NSS] fixed bug"
     And  I should not see "[TELUS] broken bug"
@@ -156,3 +157,96 @@ Feature: User Accounts
     Then I click "pending (1)"
     And  I should see "[TELUS] broken bug"
     And  I should not see "[BP][NSS] fixed bug"
+
+
+  @javascript
+  Scenario: A user can search using email
+    Given a user exists and is logged in
+    And I wait for "3" seconds
+    And the following users exist
+      | email              |
+      | carlzipp@cisco.com |
+      | davecarr@cisco.com |
+      | porsche@cisco.com  |
+      | bentley@cisco.com  |
+    When I goto "/users"
+    Then I should see a user search form
+    Given I fill in "Name" with "CAR"
+    When I click button "Search"
+    Then I see a user_searches result for name "carlzipp@cisco.com"
+    And I see a user_searches result for name "davecarr@cisco.com"
+    And I do not see a user_searches result for name "porsche@cisco.com"
+    And I do not see a user_searches result for name "bentley@cisco.com"
+
+  @javascript
+  Scenario: A user can search using a users display name
+    Given a user exists and is logged in
+    And I wait for "3" seconds
+    And the following users exist
+      | email            | display_name        |
+      | email1@cisco.com | Carl Zipp           |
+      | email2@cisco.com | David Carr          |
+      | email3@cisco.com | Porsche Bugatti     |
+      | email4@cisco.com | Bentley Ford        |
+    Given I goto "/users"
+    Given I fill in "Name" with "CAR"
+    When I click button "Search"
+    Then I see a user_searches result for name "Carl Zipp"
+    And I see a user_searches result for name "David Carr"
+    And I do not see a user_searches result for name "Porsche Bugatti"
+    And I do not see a user_searches result for name "Bentley Ford"
+
+  @javascript
+  Scenario: A user can search using CVS user name
+    Given a user exists and is logged in
+    And I wait for "3" seconds
+    And the following users exist
+      | email            | cvs_username |
+      | email1@cisco.com | carlzipp     |
+      | email2@cisco.com | davecarr     |
+      | email3@cisco.com | porsche      |
+      | email4@cisco.com | bentley      |
+    Given I goto "/users"
+    Given I fill in "Name" with "CAR"
+    When I click button "Search"
+    Then I see a user_searches result for name "carlzipp"
+    And I see a user_searches result for name "davecarr"
+    And I do not see a user_searches result for name "porsche"
+    And I do not see a user_searches result for name "bentley"
+
+  @javascript
+  Scenario: A user can search using CEC username
+    Given a user exists and is logged in
+    And I wait for "3" seconds
+    And the following users exist
+      | email            | cec_username |
+      | email1@cisco.com | carlzipp     |
+      | email2@cisco.com | davecarr     |
+      | email3@cisco.com | porsche      |
+      | email4@cisco.com | bentley      |
+    Given I goto "/users"
+    Given I fill in "Name" with "CAR"
+    When I click button "Search"
+    Then I see a user_searches result for name "carlzipp"
+    And I see a user_searches result for name "davecarr"
+    And I do not see a user_searches result for name "porsche"
+    And I do not see a user_searches result for name "bentley"
+
+  @javascript
+  Scenario: A user can search using Kerberos Login
+    Given a user exists and is logged in
+    And I wait for "3" seconds
+    And the following users exist
+      | email            | kerberos_login |
+      | email1@cisco.com | carlzipp       |
+      | email2@cisco.com | davecarr       |
+      | email3@cisco.com | porsche        |
+      | email4@cisco.com | bentley        |
+    Given I goto "/users"
+    Given I fill in "Name" with "CAR"
+    When I click button "Search"
+    Then I see a user_searches result for name "carlzipp"
+    And I see a user_searches result for name "davecarr"
+    And I do not see a user_searches result for name "porsche"
+    And I do not see a user_searches result for name "bentley"
+
