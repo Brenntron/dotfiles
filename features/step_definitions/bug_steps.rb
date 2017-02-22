@@ -41,3 +41,18 @@ Given(/^the bug "(.*?)" has tag "(.*?)"$/) do |bug_id, tag |
   @tag = Tag.find_or_create_by(name: tag)
   @bug.tags << @tag
 end
+
+When(/^I send a GET request to "(.*)"$/) do |url|
+  get(url)
+end
+
+When(/^I make an API request to bug "(.*)"$/) do |id|
+  get("/api/v1/bugs/${id}.json")
+end
+
+Then(/^response should have bug_id$/) do
+  $stdout.puts "\n\n*** last response = #{last_response.body}\n\n\n"
+
+  target = JSON.parse(last_response.body)
+  target[0]["id"].should eq(121778)
+end

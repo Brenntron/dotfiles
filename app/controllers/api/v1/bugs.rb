@@ -192,7 +192,8 @@ module API
           requires :id, type: String, desc: "ID of the bug"
         end
         get ':id' do
-          Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
+          # Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
+          Bug.where(id: permitted_params[:id])
         end
 
         desc "get all bugs"
