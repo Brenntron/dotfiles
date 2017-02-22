@@ -63,9 +63,9 @@
         <% @pcap_attachments.each do |attachment| %>
         <tr>
           <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box attach_<%= attachment.id %>"> </td>
-          <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
+          <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>" target="_blank">
             <i class="glyphicon glyphicon-download"></i></a></td>
-          <td><code><a><%= attachment.file_name %></a></code></td>
+          <td><code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code></td>
           <td class="center narrow-column">
             <h5>
               <a class="attachment_alert <%= attachment.id %>"><%= attachment.rules.count %></a>
