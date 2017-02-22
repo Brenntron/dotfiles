@@ -10,15 +10,13 @@ class UsersController < ApplicationController
     @user = User.where(id: params[:id]).first
     case
       when @user.nil?
-        redirect_to users_path
         flash[:error] = "Could not find user '#{params[:id]}'"
+        redirect_to users_path
+      when !current_user.authorized_user_list.include?(@user.id)
+        flash[:error] = 'You are not authorized to view that user.'
+        redirect_to users_path
       else
-        if !current_user.authorized_user_list.include?(params[:id].to_i)
-          flash[:error] = 'You are not authorized to view that user.'
-          redirect_to users_path
-        else
-          @users = current_user.team_members
-        end
+        @users = current_user.team_members
     end
   end
 
