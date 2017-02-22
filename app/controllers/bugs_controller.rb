@@ -120,7 +120,7 @@ class BugsController < ApplicationController
   def query_bugs
     if params[:q]
       session[:query] = params[:q]
-    elsif params[:bug].is_a? Hash
+    elsif params[:bug].present?
       session[:query] = "advance-search"
       session[:search] = params[:bug]
     else
