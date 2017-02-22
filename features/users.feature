@@ -13,6 +13,18 @@ Feature: User Accounts
 
 
   @javascript
+  Scenario: A regular user should see a not found flash message
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+    Given I wait for "3" seconds
+    When I goto "/users/1001"
+    Then I should see could not find user "1001" flash massage
+    When I goto "/users/malformed"
+    Then I should see could not find user "malformed" flash massage
+
+  @javascript
   Scenario: A non-manager user can go to the users index page and see only their co-workers.
             Assigned bugs should be on users show page.
             A non-manager cannot get to the relationships section.

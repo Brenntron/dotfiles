@@ -67,6 +67,10 @@ class User < ApplicationRecord
     [].tap { |arry| arry << users.map(&:id) }.flatten
   end
 
+  def authorized_to_see?(user_id)
+    authorized_user_list.include?(user_id)
+  end
+
   def manager?
     role == 'manager'
   end
