@@ -58,3 +58,8 @@ Then(/^I do not see a user_searches result for name "(.*)"$/) do |name|
   page.should have_no_selector(:xpath, "//td[contains(text(), '#{name}')]")
 end
 
+Then(/^I should see could not find user "(.*)" flash massage$/) do |user_id|
+  find(:xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' alert ')][contains(text(), \"Could not find user '#{user_id}'\")]")
+end
+
+
