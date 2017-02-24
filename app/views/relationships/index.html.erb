@@ -17,11 +17,32 @@
       <div class="col-xs-11">
         <div class="col-xs-6 col-sm-4">
           <% if @user.team_members.any? %>
-              <table class="table table-hover table-sm table-borderless">
+              <table class="table table-hover table-borderless">
                 <tbody>
                   <% @user.team_member_relationships.each do |member| %>
                     <tr>
-                      <th><%= link_to member.team_member.cvs_username, user_path(member.team_member) %></th>
+                      <th>
+                        <%= link_to member.team_member.cvs_username, user_path(member.team_member) %>
+                      </th>
+                      <th class="text-muted small">
+                        <%= member.team_member.roles.map(&:role).join(', ') %>
+                      </th>
+                      <th>
+                        <a type="button" class="glyphicon glyphicon-pencil" data-target='<%= "#roleModal_#{member.team_member.id}" %>' data-toggle="modal"></a>
+                        <div class="modal fade" id= '<%= "roleModal_#{member.team_member.id}" %>' tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidde="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">Update Role(s) for <%=member.team_member.cvs_username%></h4>
+                              </div>
+                              <div class="modal-body">
+                                <%=render 'shared/role_form', user: member.team_member %>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </th>
                       <th><%= link_to '<i class="glyphicon glyphicon-remove-circle"></i>'.html_safe, user_relationship_path(id: member.id), method: :delete, data: {confirm: "Remove #{member.team_member.display_name} from your team?"}%></th>
                     </tr>
                   <%end%>
@@ -43,55 +64,57 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-xs-11"><hr/></div>
-      <div class='col-xs-12'>
-        <div class='col-xs-11'>
-          <h4>Metrics <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change timeframe</em></a></h4>
-          <%= render 'shared/change_metrics_timeframe_form' %>
-          <div id="msg"></div>
+    <% if @user.team_members.any? %>
+      <div class="row">
+        <div class="col-xs-11"><hr/></div>
+        <div class='col-xs-12'>
+          <div class='col-xs-11'>
+            <h4>Metrics <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change timeframe</em></a></h4>
+            <%= render 'shared/change_metrics_timeframe_form' %>
+            <div id="msg"></div>
+          </div>
+        </div>
+        <div class="col-lg-5 col-md-6">
+          <div class="user-metrics-manager" id='<%=current_user.id%>'></div>
+          <p>Bug status set to <i>Pending</i> last <%=current_user.chart_timeframe_preference%> days</p>
+          <canvas id="pendingChart"></canvas>
+        </div>
+        <div class="col-lg-5 col-md-6">
+          <p>Bug status set to <i>Resolved</i> last <%=current_user.chart_timeframe_preference%> days</p>
+          <canvas id="resolvedChart"></canvas>
         </div>
       </div>
-      <div class="col-lg-5 col-md-6">
-        <div class="user-metrics-manager" id='<%=current_user.id%>'></div>
-        <p>Bug status set to <i>Pending</i> last <%=current_user.chart_timeframe_preference%> days</p>
-        <canvas id="pendingChart"></canvas>
+      <div class="row">
+        <div class="col-xs-11"><hr/></div>
+        <div class='col-xs-12'>
+          <div class='col-xs-11'>
+            <div id="msg"></div>
+          </div>
+        </div>
+        <div class="col-lg-5 col-md-6">
+          <p>Average Work Time by Team Memeber</p>
+          <canvas id="worktimeChart"></canvas>
+          <br>
+          <div class="col-xs-12">
+            <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
+          </div>
+        </div>
+        <div class="col-lg-5 col-md-6">
+          <p>Average Work Time by Component</p>
+          <canvas id="componenttimeChart"></canvas>
+          <br>
+          <div class="col-xs-12">
+            <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
+          </div>
+        </div>
       </div>
-      <div class="col-lg-5 col-md-6">
-        <p>Bug status set to <i>Resolved</i> last <%=current_user.chart_timeframe_preference%> days</p>
-        <canvas id="resolvedChart"></canvas>
-      </div>
+      <div class="footer-spacer"></div>
+      <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+      <input type="hidden" name="xml_token" value="<%= xml_token %>">
+      <input type="hidden" name="current_user" value="<%= current_user.id%>">
     </div>
-    <div class="row">
-      <div class="col-xs-11"><hr/></div>
-      <div class='col-xs-12'>
-        <div class='col-xs-11'>
-          <div id="msg"></div>
-        </div>
-      </div>
-      <div class="col-lg-5 col-md-6">
-        <p>Average Work Time by Team Memeber</p>
-        <canvas id="worktimeChart"></canvas>
-        <br>
-        <div class="col-xs-12">
-          <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
-        </div>
-      </div>
-      <div class="col-lg-5 col-md-6">
-        <p>Average Work Time by Component</p>
-        <canvas id="componenttimeChart"></canvas>
-        <br>
-        <div class="col-xs-12">
-          <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
-        </div>
-      </div>
-    </div>
-    <div class="footer-spacer"></div>
-    <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
-    <input type="hidden" name="xml_token" value="<%= xml_token %>">
-    <input type="hidden" name="current_user" value="<%= current_user.id%>">
+    <% end %>
   </div>
-</div>
 
 <div id="new_member_modal" class="modal" role="dialog">
   <div class="modal-dialog modal-sm">
@@ -101,7 +124,7 @@
           Information Alert
         </h4>
       </div>
-      <div class="modal-body center-block">
+      <div class="modal-body center-block info-alert">
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
@@ -109,3 +132,4 @@
     </div>
   </div>
 </div>
+

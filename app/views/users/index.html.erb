@@ -20,7 +20,7 @@
         <% end %>
       </td>
     </tr>
-    <% if current_user.manager? %>
+    <% if current_user.has_role?('manager') %>
       <tr></tr>
       <% current_user.team_members.each do |user| %>
         <tr>

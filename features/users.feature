@@ -16,7 +16,7 @@ Feature: User Accounts
   Scenario: A non-manager user can go to the users index page and see only their co-workers.
             Assigned bugs should be on users show page.
             A non-manager cannot get to the relationships section.
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following users exist
       | id | email                | cvs_username | display_name        |
       | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
@@ -46,6 +46,67 @@ Feature: User Accounts
     And  I should see "[TELUS] broken bug"
     And  I goto "/users/1/relationships"
     And  I should see "You must be a manager to access that page."
+
+  @javascript
+  Scenario: A non-manager non-admin user cannot edit the role for any user.
+    Given a user with role "analyst" exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
+
+    And the following relationships exist:
+      | user_id | team_member_id |
+      | 2       | 3              |
+      | 2       | 1              |
+
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |222222   | 222222      | OPEN   | 3       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+
+    Then I wait for "3" seconds
+    And  I goto "/users"
+    Then I click "h_clinton"
+    And  I should not see "glyphicon-pencil"
+
+  @javascript
+  Scenario: A non-manager admin user can edit the role for any user.
+    Given a user with role "admin" exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
+
+    And the following relationships exist:
+      | user_id | team_member_id |
+      | 2       | 3              |
+      | 2       | 1              |
+
+    And the following roles exist:
+      | role           |
+      | analyst        |
+      | committer      |
+
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |222222   | 222222      | OPEN   | 3       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+
+    Then I wait for "3" seconds
+    And  I goto "/users"
+    Then I click "h_clinton"
+    Then I click the link with data-target "#roleModal_3"
+    And I wait for "1" seconds
+    And I should see "Update Role(s) for h_clinton"
+    And I check "analyst"
+    Then I click "Save changes"
+    And I should see "h_clinton updated successfully"
+    And I should see "analyst"
+    And I should not see "committer"
+
 
   @javascript
   Scenario: A manager user can go to the users index page and see only their co-workers and team members.
@@ -106,6 +167,51 @@ Feature: User Accounts
     Then I click "Ok"
     Then I click "Add"
     And  I should see "t_bear is now on your team!"
+
+  @javascript
+  Scenario: A manager can edit roles of team members on relationships page.
+    Given a manager exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username  | display_name        |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |
+
+    And the following relationships exist:
+      | user_id | team_member_id |
+      | 2       | 3              |
+      | 2       | 6              |
+      | 1       | 3              |
+      | 1       | 4              |
+
+    And the following roles exist:
+      | role           |
+      | analyst        |
+      | committer      |
+
+    Then I wait for "3" seconds
+    And  I goto "/users/1/relationships"
+    And  I should see "h_clinton"
+    And  "Hillary Clinton (h_clinton)" should not be in the dropdown list
+    Then I click the link with data-target "#roleModal_3"
+    Then I wait for "1" seconds
+    Then I should see "Update Role(s) for h_clinton"
+    Then I check "analyst"
+    Then I click "Save changes"
+    Then I should see "h_clinton updated successfully."
+    And I should see "analyst"
+    And I should not see "committer"
+    And I click the link with data-target "#roleModal_4"
+    Then I wait for "1" seconds
+    Then I should see "Update Role(s) for d_drumph"
+    Then I check "analyst"
+    Then I check "committer"
+    Then I click "Save changes"
+    Then I should see "d_drumph updated successfully."
+    Then I should see "analyst, committer"
+
 
   @javascript
   Scenario: A manager user can go to a users show page and update their metrics timeframe preference.

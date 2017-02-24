@@ -26,7 +26,6 @@ class CreateUsers < ActiveRecord::Migration
       t.string   :current_sign_in_ip
       t.string   :last_sign_in_ip
 
-      t.string   :role
       t.integer  :class_level
 
       t.string   :authentication_token

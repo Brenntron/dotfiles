@@ -4,7 +4,8 @@ class User < ApplicationRecord
   has_many :team_members, through: :team_member_relationships
   has_many :manager_relationships, class_name: 'Relationship', foreign_key: 'team_member_id'
   has_many :managers, through: :manager_relationships, source: :user
-  has_many :relationships
+  has_many :relationships, dependent: :destroy
+  has_and_belongs_to_many :roles, dependent: :destroy
 
 
   before_save :ensure_authentication_token
@@ -35,6 +36,10 @@ class User < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
+  def has_role?(role)
+    roles.where(role: role).any?
+  end
+
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
@@ -54,10 +59,6 @@ class User < ApplicationRecord
   def authorized_user_list
     users = co_workers + team_members + [self]
     [].tap { |arry| arry << users.map(&:id) }.flatten
-  end
-
-  def manager?
-    role == 'manager'
   end
 
   def team_metrics(bug_status)

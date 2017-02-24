@@ -3,9 +3,9 @@ class Tag < ApplicationRecord
 
   validates :name, presence: true, uniqueness: true
 
-  after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == 'true' }
-  after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == 'true' }
-  after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
+  after_create { |tag| tag.record 'create' if Rails.configuration.websockets_enabled == 'true' }
+  after_update { |tag| tag.record 'update' if Rails.configuration.websockets_enabled == 'true' }
+  after_destroy { |tag| tag.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
   def record(action)
     record = { resource: 'tag',

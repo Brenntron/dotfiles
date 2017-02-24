@@ -209,6 +209,10 @@ Then(/^response header "(.*?)" should be "(.*?)"$/) do |header_key,header_value|
   raise "response header #{header_key} = #{page.response_headers[header_key]}. Expected #{header_value}" if page.response_headers[header_key] != header_value
 end
 
+Then(/^I click the link with data-target "(.*?)"$/) do |target|
+  find("a[data-target='#{target}']").click
+end
+
 Then(/^show me the page$/) do
   save_and_open_page
 end

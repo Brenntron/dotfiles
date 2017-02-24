@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  load_and_authorize_resource
 
   before_action :require_login
   before_action :authenticate_access, only: [:show]
@@ -10,6 +11,18 @@ class UsersController < ApplicationController
   def show
     @users = current_user.team_members
     @user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
+    @user.update(user_params)
+    redirect_back(fallback_location: :back)
+    if @user.save
+      flash[:notice] = "#{@user.cvs_username} updated successfully."
+    else
+      flash[:alert] = "Unable to update #{@user.cvs_username}."
+    end
+
   end
 
   def status_metrics
@@ -92,6 +105,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:display_name, :committer, :confirmed, :email, :role, :class_level, :metrics_timeframe)
+    params.require(:user).permit(:display_name, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
   end
 end

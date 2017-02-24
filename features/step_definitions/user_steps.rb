@@ -13,13 +13,17 @@ Given(/^a user with commit permission exists and is logged in$/) do
   visit root_path()
 end
 
-Given(/^a user exists and is logged in$/) do
+Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   @user = FactoryGirl.create(:user, confirmed: true)
+  @role = Role.create(role: role)
+  @user.roles << @role
   visit root_path()
 end
 
 Given(/^a manager exists and is logged in$/) do
-  @user = FactoryGirl.create(:user, confirmed: true, role: 'manager')
+  @user = FactoryGirl.create(:user, confirmed: true)
+  @role = Role.create(role: 'manager')
+  @user.roles << @role
   visit root_path(api_key: "h93hq@hwo9%@ah!jsh")
 end
 
