@@ -18,10 +18,6 @@
 
 /extras/snort
 /extras/snort_repo
-/extras/etc/
-/extras/preproc_rules/
-/extras/rules/
-/extras/so_rules/
 
 /extras/ssh/*
 
