@@ -38,7 +38,7 @@ Then(/^I toggle "(.*?)"$/) do |content|
   page.find(:xpath, "//div[@class='#{content}']").click()
 end
 
-When(/^code calls load_rule_from_grep/) do
+Given(/^rule conent$/) do
   @sid = 25358
   @rev = 4
   @connection = "alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS"
@@ -49,13 +49,17 @@ When(/^code calls load_rule_from_grep/) do
   @metadata = "ruleset community, service http"
   @classtype = "web-application-attack"
   @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@classtype}; sid:#{@sid}; rev:#{@rev};)"
+end
 
+Given(/grep output for rule content/) do
   @rule_grep_line = "extras/snort/rules/app-detect.rules:33:#{@rule_content}"
+end
 
+When(/^code calls load_rule_from_grep on rule content/) do
   Rule.load_rule_from_grep(@rule_grep_line)
 end
 
-Then(/^a corresponding rule record will exist$/) do
+Then(/^a rule record for rule conent will exist$/) do
   rule_resultset = Rule.where(sid: @sid)
   rule_resultset.should exist
   rule = rule_resultset.first
