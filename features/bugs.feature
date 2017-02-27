@@ -6,7 +6,7 @@ Feature: Bug
 
   @javascript
   Scenario: A user can view and filter bugs
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
       | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
@@ -29,7 +29,7 @@ Feature: Bug
 # ==== Creating a Bug with Tags ===
   @javascript
   Scenario: A new bug can be created with tags
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following tags exist:
       | name  |
       | TELUS |
@@ -49,7 +49,7 @@ Feature: Bug
   # ==== Editing Tags ===
   @javascript
   Scenario: The summary text should update with tag edits
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -68,7 +68,7 @@ Feature: Bug
   # ==== Deleteing Bugs ===
   @javascript
   Scenario: A bug can be deleted
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -100,7 +100,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can not set the state of a bug to pending when exploits are missing attachments
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following exploit types exist:
       | id | name   | description                              |
       | 1  | core   | Core Impact exploit module.              |
@@ -130,7 +130,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can return to the index from viewing a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -168,7 +168,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can change the priority of a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -183,7 +183,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can change the component of a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
        | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
        | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -199,7 +199,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a new rule to a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -216,7 +216,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a new rule to a bug only if all required fields are filled out
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -236,7 +236,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a new rule and the rule doc impact will populate after save
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -269,7 +269,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can remove a rule from a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -282,7 +282,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can edit a rule attached to a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -301,7 +301,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can test a rule
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -320,7 +320,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can test add an attachment
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -341,7 +341,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can test an attachment
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -360,7 +360,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can edit research notes
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -405,7 +405,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a comment
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -423,7 +423,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can sort history from oldest to newest messages.
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |

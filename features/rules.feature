@@ -6,7 +6,7 @@ Feature: Rules
  # ==== Appending the rule category to the Rule message ===
   @javascript
   Scenario: A new rule can be created with a rule category
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -35,7 +35,7 @@ Feature: Rules
 
   @javascript
   Scenario: Rule category drop down should sort by frequency of use
-  Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -74,7 +74,7 @@ Feature: Rules
 
   @javascript
   Scenario: A new rule is only created when required fields are filled in
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -108,7 +108,7 @@ Feature: Rules
 
   @javascript
   Scenario: When a new rule is created, the policy options and toggle should populate checkbox values
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -127,7 +127,7 @@ Feature: Rules
 
   @javascript
   Scenario: When a new rule is created, the service options should populate correctly
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -162,7 +162,7 @@ Feature: Rules
 
   @javascript
   Scenario: When a new rule is created, the rule doc impact should populate based on class type selection
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -193,7 +193,7 @@ Feature: Rules
 
   @javascript
   Scenario: One or more rules can be selected on a bug to view or edit
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |

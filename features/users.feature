@@ -14,7 +14,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A regular user should see a not found flash message
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
@@ -279,7 +279,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using email
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email              |
@@ -298,7 +298,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using a users display name
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | display_name        |
@@ -316,7 +316,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using CVS user name
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | cvs_username |
@@ -334,7 +334,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using CEC username
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | cec_username |
@@ -352,7 +352,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using Kerberos Login
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | kerberos_login |

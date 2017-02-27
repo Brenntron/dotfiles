@@ -74,7 +74,7 @@ class Bug < ApplicationRecord
       query_params.each do |k, v|
         count = count + 1
         query = query + k + "='" + v.gsub("'", "\\'") + "'"
-        query = query + ' && ' if count != query_params.count
+        query = query + ' && ' if count != query_params.to_h.size
       end
       Bug.where(query)
     end

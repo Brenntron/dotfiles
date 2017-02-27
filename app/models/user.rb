@@ -68,8 +68,12 @@ class User < ApplicationRecord
   end
 
   def authorized_user_list
-    users = co_workers + team_members + [self]
-    [].tap { |arry| arry << users.map(&:id) }.flatten
+    if has_role?('admin')
+      User.all.map(&:id)
+    else
+      users = co_workers + team_members + [self]
+      [].tap { |arry| arry << users.map(&:id) }.flatten
+    end
   end
 
   def authorized_to_see?(user_id)
