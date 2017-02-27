@@ -1,6 +1,8 @@
 talos_api
 =========
 
+# Environment Installation
+
 install the ca.pem found here
 https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
 in
@@ -120,22 +122,60 @@ $ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
 
 $ echo "127.0.0.1 localhost.ssl" | sudo tee -a /etc/hosts
 
-## 6) Boot thin using foreman
 
---the cool way-> bundle exec foreman start -f Procfile.dev
+# Running the Server
 
---the old way -> $ thin start -p 3000 --ssl --ssl-verify --ssl-key-file ~/.ssl/server.key --ssl-cert-file ~/.ssl/server.crt
+## Run the web server
 
-## 7) Add server.crt as trusted !!SYSTEM!! (not login) cert in the mac osx keychain
+*   To use with guard
+
+        $bundle exec foreman start -f Procfile.dev
+    
+*   To just run with rails
+
+        $bundle exec rails s
+    
+* If you *want* to use thin
+
+        $thin start -p 3000
+        $thin start -p 3000 --ssl --ssl-verify --ssl-key-file ~/.ssl/server.key --ssl-cert-file ~/.ssl/server.crt
+
+
+## Add server.crt as trusted !!SYSTEM!! (not login) cert in the mac osx keychain
  *Open keychain tool, drag .crt file to system, and trust everything.
 
 
-## 8) View test page
+## View test page
 $ open https://localhost:3000
 
 **Notes:**
 *1) Https traffic and http traffic can't be served from the same thin process. If you want*
 *both you need to start two instances on different ports.*
+
+
+
+# Tests
+
+### Guard
+
+---
+
+run all tests
+
+    $ bundle exec guard
+
+run all test with @now tag
+
+    $ bundle exec guard -g now
+
+### Cucumber
+
+---
+
+run individual feature files
+
+    $ bundle exec cucumber features/users.feature --require features
+
 
 
 

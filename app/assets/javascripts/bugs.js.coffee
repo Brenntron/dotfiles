@@ -136,7 +136,7 @@ $ ->
         bug:
           'editor_id': editor
     ).done (response) ->
-      $('#current_bug_editor').html(response.bug.user_name).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
+      $('#current_bug_editor').html(response.user_name).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
       $('#current_bug_editor, #change_editor_form').toggle()
       location.reload()
 
@@ -155,7 +155,7 @@ $ ->
         bug:
           'reviewer_id': committer
     ).done (response) ->
-      $('#current_bug_committer').html(response.bug.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
+      $('#current_bug_committer').html(response.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
       $('#current_bug_committer, #change_committer_form').toggle()
       location.reload()
       return

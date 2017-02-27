@@ -40,6 +40,8 @@
               <%= render 'layouts/bugs_layout'%>
             <% elsif controller_name == "users" %>
               <%= render 'layouts/users_layout'%>
+            <% elsif controller_name == "user_searches" %>
+              <%= render 'layouts/users_layout'%>
             <% elsif controller_name == "relationships" %>
               <%= render 'layouts/relationships_layout' %>
             <% end %>
@@ -47,7 +49,7 @@
         </div>
       </div>
     </div>
-    <% if controller_name != 'bugs' && controller_name != "users" && controller_name != "relationships" %>
+    <% unless %w{bugs users user_searches relationships}.include?(controller_name) %>
       <%= yield %>
     <% end %>
 

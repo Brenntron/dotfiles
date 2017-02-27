@@ -28,6 +28,17 @@ class User < ApplicationRecord
 
   DEFAULT_METRICS_TIMEFRAME = 7
 
+  def self.search(conditions)
+    # all
+    name = conditions["name"]
+    where("display_name like :name_pattern" +
+              " or email like :name_pattern" +
+              " or cvs_username like :name_pattern" +
+              " or cec_username like :name_pattern" +
+              " or kerberos_login like :name_pattern",
+          name_pattern: "%#{name}%")
+  end
+
   def record(action)
     record = { resource: 'user',
                action: action,
@@ -59,6 +70,10 @@ class User < ApplicationRecord
   def authorized_user_list
     users = co_workers + team_members + [self]
     [].tap { |arry| arry << users.map(&:id) }.flatten
+  end
+
+  def authorized_to_see?(user_id)
+    authorized_user_list.include?(user_id)
   end
 
   def team_metrics(bug_status)
