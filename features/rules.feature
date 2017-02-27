@@ -258,11 +258,27 @@ Feature: Rules
 #    And I should not see "This is the summary"
 
 
-  Scenario: load rule from grep output model test
+  Scenario: load new rule from grep string model test
     Given rule conent
     And grep output for rule content
     When code calls load_rule_from_grep on rule content
     Then a rule record for rule conent will exist
+
+  Scenario: load existing rule from string model test
+    Given rule conent
+    And grep output for rule content
+    And record exists for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will be unchanged
+
+  Scenario: load updated rule from grep string model test
+    Given rule conent
+    And grep output for rule content
+    And record with earlier rev exists for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will be updated
 
 
 

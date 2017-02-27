@@ -47,15 +47,29 @@ Given(/^rule conent$/) do
   @detection = @detection_parsed.gsub("\n", ' ')
   @flow = "to_server,established"
   @metadata = "ruleset community, service http"
-  @classtype = "web-application-attack"
-  @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@classtype}; sid:#{@sid}; rev:#{@rev};)"
+  @class_type = "web-application-attack"
+  @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@class_type}; sid:#{@sid}; rev:#{@rev};)"
 end
 
-Given(/grep output for rule content/) do
+Given(/^grep output for rule content$/) do
   @rule_grep_line = "extras/snort/rules/app-detect.rules:33:#{@rule_content}"
 end
 
-When(/^code calls load_rule_from_grep on rule content/) do
+Given(/^record exists for rule content$/) do
+  rule = Rule.create!(sid: @sid, rev: @rev, rule_content: @rule_content,
+                      connection: @connection, message: @messages, detection: @detection_parsed,
+                      flow: @flow, metadata: @metadata, class_type: @class_type)
+  @rule_updated_at = rule.updated_at
+end
+
+Given(/^record with earlier rev exists for rule content$/) do
+  rule = Rule.create!(sid: @sid, rev: (@rev - 1), rule_content: @rule_content,
+                      connection: @connection, message: @messages, detection: @detection_parsed,
+                      flow: @flow, metadata: @metadata, class_type: @class_type)
+  @rule_updated_at = rule.updated_at
+end
+
+When(/^code calls load_rule_from_grep on rule content$/) do
   Rule.load_rule_from_grep(@rule_grep_line)
 end
 
@@ -72,6 +86,26 @@ Then(/^a rule record for rule conent will exist$/) do
   rule.detection.should eq(@detection_parsed)
   rule.flow.should eq(@flow)
   rule.metadata.should eq(@metadata)
-  rule.class_type.should eq(@classtype)
+  rule.class_type.should eq(@class_type)
+end
+
+Then(/^rule record will be unchanged$/) do
+  rule_resultset = Rule.where(sid: @sid)
+  rule_resultset.should exist
+  rule = rule_resultset.first
+
+  rule.sid.should eq(@sid)
+  rule.rev.should eq(@rev)
+  rule.updated_at.should eq(@rule_updated_at)
+end
+
+Then(/^rule record will be updated$/) do
+  rule_resultset = Rule.where(sid: @sid)
+  rule_resultset.should exist
+  rule = rule_resultset.first
+
+  rule.sid.should eq(@sid)
+  rule.rev.should eq(@rev)
+  rule.updated_at.should_not eq(@rule_updated_at)
 end
 
