@@ -37,3 +37,37 @@ end
 Then(/^I toggle "(.*?)"$/) do |content|
   page.find(:xpath, "//div[@class='#{content}']").click()
 end
+
+When(/^code calls load_rule_from_grep/) do
+  @sid = 25358
+  @rev = 4
+  @connection = "alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS"
+  @message = "APP-DETECT Acunetix web vulnerability scan attempt"
+  @detection_parsed = "flowbits:set,acunetix-scan;\ncontent:\"Acunetix-\"; fast_pattern:only; http_header;"
+  @detection = @detection_parsed.gsub("\n", ' ')
+  @flow = "to_server,established"
+  @metadata = "ruleset community, service http"
+  @classtype = "web-application-attack"
+  @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@classtype}; sid:#{@sid}; rev:#{@rev};)"
+
+  @rule_grep_line = "extras/snort/rules/app-detect.rules:33:#{@rule_content}"
+
+  Rule.load_rule_from_grep(@rule_grep_line)
+end
+
+Then(/^a corresponding rule record will exist$/) do
+  rule_resultset = Rule.where(sid: @sid)
+  rule_resultset.should exist
+  rule = rule_resultset.first
+
+  rule.rule_content.should eq(@rule_content)
+  rule.sid.should eq(@sid)
+  rule.rev.should eq(@rev)
+  rule.connection.should eq(@connection)
+  rule.message.should eq(@message)
+  rule.detection.should eq(@detection_parsed)
+  rule.flow.should eq(@flow)
+  rule.metadata.should eq(@metadata)
+  rule.class_type.should eq(@classtype)
+end
+

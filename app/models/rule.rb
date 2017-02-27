@@ -207,8 +207,11 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.parse_and_create_rule(rule)
-    parsed = Rule.visruleparser(rule)
+  # Takes the hash and adds some data from the rules text
+  # @param [String, #read] rule the line of rule text.
+  # @param [Hash, #read] parsed A hash, which must have :rule set by visruleparser.
+  # @return [Hash] the original hash, now with additional data.
+  def self.parse_from_visrule(rule, parsed)
     if parsed[:rule].match(/FAILED/)
       rule_params = {
           message: rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
@@ -272,8 +275,11 @@ class Rule < ApplicationRecord
     rule_params
   end
 
+  # Runs the visruleparser perl script to parse a line of rule text.
+  # @param [String, #read] rule_text the line of rule text
+  # @return [Hash] hash with :rule and :errors text populated.
   def self.visruleparser(rule_text)
-    return nil if rule_text.nil?
+    return nil if rule_text.empty?
     parsed = {}
     temp_rule = Tempfile.new('temp.rules')
     temp_rule.write(rule_text.gsub(/\#\s/, ''))
@@ -288,6 +294,58 @@ class Rule < ApplicationRecord
     end
     temp_rule.close
     parsed
+  end
+
+  # Takes the hash and adds some data from the rules text
+  # @param [String, #read] rule the line of rule text.
+  # @return [Hash] a hash, with data from parsing rule text.
+  def self.parse_and_create_rule(rule)
+    parsed = visruleparser(rule)
+    parse_from_visrule(rule, parsed)
+  end
+
+  # Takes a rule and populates all the attributes to create a Rule record object.
+  # @param [String, #read] rule_content the line of rule text.
+  # @return [Hash] a hash, with all the attributes to create a Rule record object
+  def self.full_parse(rule_content)
+    raise "Rule text missing." if rule_content.nil?
+
+    rule_content.strip!
+
+    parsed = Rule.visruleparser(rule_content)
+    rule_hash = Rule.parse_from_visrule(rule_content, parsed)
+    rule_hash['rule_parsed'] = parsed[:rule]
+    rule_hash['rule_warnings'] = parsed[:errors]
+    rule_hash['cvs_rule_parsed'] = parsed[:rule]
+    rule_hash['cvs_rule_content'] = rule_content
+    rule_hash
+  end
+
+  # Take a line from a rule file and saves to database unless rev is unchanged
+  # @param [String, #read] rule_content the line of text from a rule file.
+  def self.load_rule_from_content(rule_content)
+    rule_attrs = full_parse(rule_content)
+    return nil unless rule_attrs
+    raise 'No rule sid provided' unless rule_attrs[:sid]
+
+    rule = where(sid: rule_attrs[:sid]).first
+    if rule
+      unless rule.rev == rule_attrs[:rev].to_i
+        rule.update(rule_attrs)
+      end
+    else
+      rule = create!(rule_attrs)
+      rule.associate_references(rule_content)
+    end
+
+    rule
+  end
+
+  # Take a line from grep output of a rule file and saves to database unless rev is unchanged
+  # @param [String, #read] `rule_grep_line` the line of text from a rule file.
+  def self.load_rule_from_grep(rule_grep_line)
+    filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
+    load_rule_from_content(rule_content) unless rule_content.empty?
   end
 
   def update_rule

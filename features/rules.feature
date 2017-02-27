@@ -258,10 +258,9 @@ Feature: Rules
 #    And I should not see "This is the summary"
 
 
-
-
-
-
+  Scenario: load rule from string model test
+    When code calls load_rule_from_grep
+#    Then a corresponding rule record will exist
 
 
 
