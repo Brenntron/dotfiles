@@ -281,21 +281,42 @@ Feature: Rules
     When code calls load_rule_from_grep on rule content
     Then a rule record for rule conent will exist
 
-  Scenario: load existing rule from string model test
-    Given rule content
+  Scenario: synch existing rule with same rev in db model test
+    Given rule content for following rule:
+      | gid | sid | rev | state     |
+      |  1  | 101 |  4  | UNCHANGED |
     And grep output for rule content
-    And record exists for rule content
     And I wait for "3" seconds
     When code calls load_rule_from_grep on rule content
     Then rule record will be unchanged
 
-  Scenario: load updated rule from grep string model test
-    Given rule content
+  Scenario: synch updated rule with earlier rev in db model test
+    Given rule content for following rule:
+      | id | gid | sid | rev | state     |
+      |  7 |  1  | 101 |  4  | UNCHANGED |
+    And rule content rev set to "5"
     And grep output for rule content
-    And record with earlier rev exists for rule content
     And I wait for "3" seconds
     When code calls load_rule_from_grep on rule content
     Then rule record will be updated
 
+  Scenario: do not synch updated rule with earlier rev in db model test
+    Given rule content for following rule:
+      | id | gid | sid | rev | state     |
+      |  7 |  1  | 101 |  4  | UPDATED   |
+    And rule content rev set to "5"
+    And grep output for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will marked out of date
 
+  Scenario: do not synch updated rule with earlier rev in db model test
+    Given rule content for following rule:
+      | id | gid | sid | rev | state     |
+      |  7 |  1  | 101 |  4  | FAILED    |
+    And rule content rev set to "5"
+    And grep output for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will marked out of date
 

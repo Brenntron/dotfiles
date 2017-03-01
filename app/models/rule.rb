@@ -15,6 +15,11 @@ class Rule < ApplicationRecord
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
   #after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
+  PUBLISH_STATUS_SYNCHED        = 'SYNCHED'         #unchanged from VC and up to date with VC
+  PUBLISH_STATUS_NEW            = 'NEW'             #new rule unknowned to VC
+  PUBLISH_STATUS_CURRENT_EDIT   = 'CURRENT_EDIT'    #draft of rule edited in UI, but optimistic it can be checked in
+  PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft of rule, but VC rev has changed and cannot be checked in
+
   def record(action)
     record = { resource: 'rule',
               action: action,
@@ -40,6 +45,7 @@ class Rule < ApplicationRecord
           if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
             @record = Rule.update_generate_rule($1)
             @record.state = 'New'
+            @record.publish_status = PUBLISH_STATUS_NEW
             @record.rev = 1
             @record.save
           end
@@ -199,7 +205,7 @@ class Rule < ApplicationRecord
           rule_parsed: parsed[:rule],
           rule_failures: parsed[:rule],
           committed: false,
-          state: 'FAILED'
+          state: 'FAILED',
       }.reject { |k, v,| v.nil? || v == '<MISSING>' }
 
     elsif parsed[:rule].match(/msg/)
@@ -220,7 +226,7 @@ class Rule < ApplicationRecord
           metadata: /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : '<MISSING>',
           class_type: /classtype\s*:(.*)\)/.match(parsed[:rule]) ? /classtype\s*:(.*)\)/.match(parsed[:rule])[1] : '<MISSING>',
           committed: true,
-          state: rule_sid ? 'UNCHANGED' : 'NEW'
+          state: rule_sid ? 'UNCHANGED' : 'NEW',
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
@@ -292,8 +298,8 @@ class Rule < ApplicationRecord
 
     rule_content.strip!
 
-    parsed = Rule.visruleparser(rule_content)
-    rule_hash = Rule.parse_from_visrule(rule_content, parsed)
+    parsed = visruleparser(rule_content)
+    rule_hash = parse_from_visrule(rule_content, parsed)
     rule_hash['rule_parsed'] = parsed[:rule]
     rule_hash['rule_warnings'] = parsed[:errors]
     rule_hash['cvs_rule_parsed'] = parsed[:rule]
@@ -310,10 +316,16 @@ class Rule < ApplicationRecord
 
     rule = where(sid: rule_attrs[:sid]).first
     if rule
-      unless rule.rev == rule_attrs[:rev].to_i
-        rule.update(rule_attrs)
+      if rule.draft?
+        rule.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
+      else
+        unless rule.rev == rule_attrs[:rev].to_i
+          rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
+          rule.update(rule_attrs)
+        end
       end
     else
+      rule_attrs[:publish_status] = PUBLISH_STATUS_NEW
       rule = create!(rule_attrs)
       rule.associate_references(rule_content)
     end
@@ -388,6 +400,7 @@ class Rule < ApplicationRecord
         rule.rev = parsed['revision']
         rule.state = 'Unchanged'
       end
+      rule.publish_status = PUBLISH_STATUS_SYNCHED
       rule.save
       return rule
     rescue Exception => e
@@ -442,5 +455,41 @@ class Rule < ApplicationRecord
       val = 3
     end
     val
+  end
+
+  # Tests if rule is the current version in VC
+  # @return [boolean] true iff rule is latest version synced with VC
+  def synched?
+    %w[UNCHANGED].include?(state)
+  end
+
+  # Tests if rule is a user edited version
+  # @return [boolean] true iff rule is a user edited version
+  def draft?
+    %w[NEW UPDATED FAILED].include?(state)
+  end
+
+  # Tests if edited rule is new
+  # @return [boolean] true iff rule is a new edited rule
+  def new_rule?
+    draft? && sid.nil?
+  end
+
+  # Tests if edited rule is an edited update to an existing rule
+  # @return [boolean] true iff rule is a updated edited rule
+  def edited_rule?
+    draft? && sid.present?
+  end
+
+  # Tests if edited rule is in progress while VC updated the rule externally
+  # @return [boolean] true iff rule is a updated edited rule but VC has not changed
+  def current_edit?
+    edited_rule? && (PUBLISH_STATUS_CURRENT_EDIT == publish_status)
+  end
+
+  # Tests if edited rule is in progress while VC updated the rule externally
+  # @return [boolean] true iff rule is a updated edited rule and VC has updated the rule
+  def stale_edit?
+    edited_rule? && (PUBLISH_STATUS_STALE_EDIT == publish_status)
   end
 end

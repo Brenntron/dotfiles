@@ -5,10 +5,11 @@ FactoryGirl.define do
     connection "alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any"
     message "BROWSER-PLUGINS Microsoft Internet Explorer MSXML .definition ActiveX clsid access attempt"
     flow "to_client,established"
-    detection "\"file_data;\ncontent:\"Msxml2.FreeThreadedDOMDocument.6.0\"; fast_pattern:only;\ncontent:\".definition(\"; nocase;\npcre:\"/(var|set)\\s+\\w+\\s*=\\s*(new\\s+ActiveXObject|CreateObject)\\s*\\((?P<q1>(\\x22|\\x27|))Msxml2\\.FreeThreadedDOMDocument\\.6\\.0(?P=q1)\\)/smi\";"
+    detection "flowbits:set,acunetix-scan;\ncontent:\"Acunetix-\"; fast_pattern:only; http_header;"
     metadata "policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3"
     class_type "attempted-user"
     state "UNCHANGED"
+    publish_status "SYNCHED"
     average_check nil
     average_match nil
     average_nonmatch nil
