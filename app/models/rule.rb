@@ -56,27 +56,7 @@ class Rule < ApplicationRecord
     if sid
       found_rule = Rule.where(sid: sid).first
       if found_rule.nil?
-        rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1]
-        if rule_text.nil?
-          raise "Rule doesn't exist."
-        else
-          # remove anything before the first alert
-          # rule_text.strip!.gsub!(/(?=^).+?(?=alert)/, '')
-          rule_text.strip!
-
-          parsed = Rule.visruleparser(rule_text)
-          rule_sid = /sid:\s*(\d+)\s*;/.match(rule_text) ? /sid:\s*(\d+)\s*;/.match(rule_text)[1].to_i : nil
-          rule_hash = Rule.parse_and_create_rule(rule_text)
-          rule_hash['id'] = nil
-          rule_hash['sid'] = rule_sid
-          rule_hash['rule_parsed'] = parsed[:rule]
-          rule_hash['rule_warnings'] = parsed[:errors]
-          rule_hash['cvs_rule_parsed'] = parsed[:rule]
-          rule_hash['cvs_rule_content'] = rule_text
-          new_rule = Rule.create(rule_hash)
-          new_rule.associate_references(rule_text)
-          return new_rule
-        end
+        raise "Rule doesn't exist."
       else
         return found_rule
       end
