@@ -315,19 +315,16 @@ class Rule < ApplicationRecord
     raise 'No rule sid provided' unless rule_attrs[:sid]
 
     rule = where(sid: rule_attrs[:sid]).first
-    if rule
-      if rule.draft?
+    case
+      when rule.nil?
+        rule_attrs[:publish_status] = PUBLISH_STATUS_NEW
+        rule = create!(rule_attrs)
+        rule.associate_references(rule_content)
+      when rule.draft?
         rule.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
-      else
-        unless rule.rev == rule_attrs[:rev].to_i
-          rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
-          rule.update(rule_attrs)
-        end
-      end
-    else
-      rule_attrs[:publish_status] = PUBLISH_STATUS_NEW
-      rule = create!(rule_attrs)
-      rule.associate_references(rule_content)
+      when rule.rev != rule_attrs[:rev].to_i
+        rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
+        rule.update(rule_attrs)
     end
 
     rule
