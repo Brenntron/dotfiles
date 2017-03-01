@@ -20,6 +20,13 @@ Given(/^the following rules exist:$/) do |rules|
   end
 end
 
+Given(/^the following rules exist belonging to bug "(.*?)":$/) do |bug_id, rules|
+  bug = Bug.find(bug_id)
+  rules.hashes.each do |rule|
+    bug.rules << FactoryGirl.create(:rule, rule)
+  end
+end
+
 Then(/^I click the "(.*?)" tab$/) do |value|
   tab = "#{value}".downcase
   find(:xpath, "//ul[@id='bug_tab']/li/a[@data-target='##{tab}-tab']").click()
@@ -107,5 +114,10 @@ Then(/^rule record will be updated$/) do
   rule.sid.should eq(@sid)
   rule.rev.should eq(@rev)
   rule.updated_at.should_not eq(@rule_updated_at)
+end
+
+Then(/^I should see rule "(.*)" state "(.*)" version "(.*)"$/) do |rule_id, state, version|
+  page.find(:xpath, "//tr[@id='#{rule_id}']/td[text()='#{state}']")
+  page.find(:xpath, "//tr[@id='#{rule_id}']/td/a/strong[text()='#{version}']")
 end
 
