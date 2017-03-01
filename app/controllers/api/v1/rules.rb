@@ -108,7 +108,7 @@ module API
           else
             unless rule.sid.nil? || (update_params[:state] == 'FAILED')
               update_params[:state] = "UPDATED"
-              update_params[:publish_status] = Rule.PUBLISH_STATUS_CURRENT_EDIT
+              update_params[:publish_status] = Rule.PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
               update_params[:committed] = false
             end
           end
