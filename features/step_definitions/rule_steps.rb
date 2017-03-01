@@ -45,7 +45,7 @@ Then(/^I toggle "(.*?)"$/) do |content|
   page.find(:xpath, "//div[@class='#{content}']").click()
 end
 
-Given(/^rule conent$/) do
+Given(/^rule content$/) do
   @sid = 25358
   @rev = 4
   @connection = "alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS"
