@@ -348,6 +348,32 @@ class Rule < ApplicationRecord
     load_rule_from_content(rule_content) unless rule_content.empty?
   end
 
+  def patch(filename)
+    tmp = Tempfile.new(['tmprule', '.rules'])
+    File.open(filename, 'rt') do |input_stream|
+      IO.copy_stream(input_stream, tmp)
+    end
+
+    sid_regex = Regexp.new("sid:\\s*#{self.sid}\\s*;")
+    gid_regex = Regexp.new("gid:\\s*#{self.gid}\\s*;")
+
+    tmp.rewind
+    File.open(filename, 'wt') do |rulefile|
+      written = false
+      tmp.each_line do |line|
+        if gid_regex.match(line) && sid_regex.match(line)
+          rulefile << self.rule_content
+          written = true
+        else
+          rulefile << line
+        end
+      end
+
+      rulefile << self.rule_content unless written
+    end
+    tmp.close!
+  end
+
   def update_rule
     begin
       rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
