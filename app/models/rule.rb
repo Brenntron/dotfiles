@@ -193,6 +193,26 @@ class Rule < ApplicationRecord
     end
   end
 
+  def self.hash_visrule(ruleline)
+    ruleline.split("\n").inject({}) do |attrs, line|
+      if /^\s*(?<key>\w*)\s*:(?<value>.*)$/ =~ line
+        value = value[1..-1] if ' ' == value[0]
+        attrs[key.downcase.to_sym] = value
+      end
+
+      attrs
+    end
+  end
+
+  def self.gid_from_visrule(rule_content, parsed_attrs)
+    return parsed_attrs[:gid] if parsed_attrs[:gid]
+
+    gid_match = nil
+    /gid:\s*(?<gid_match>\d+)\s*;/ =~ rule_content
+
+    gid_match ? gid_match.to_i : 1
+  end
+
   # Takes the hash and adds some data from the rules text
   # @param [String, #read] rule the line of rule text.
   # @param [Hash, #read] parsed A hash, which must have :rule set by visruleparser.
@@ -209,6 +229,7 @@ class Rule < ApplicationRecord
       }.reject { |k, v,| v.nil? || v == '<MISSING>' }
 
     elsif parsed[:rule].match(/msg/)
+      parsed_attrs = hash_visrule(parsed[:rule])
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
       message = rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : '<MISSING>'
 
@@ -217,7 +238,7 @@ class Rule < ApplicationRecord
           sid: rule_sid,
           rule_content: rule,
           rule_parsed: parsed[:rule],
-          gid: rule_sid ? 1 : nil,
+          gid: gid_from_visrule(rule, parsed_attrs),
           rev: /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
           connection: rule.match(/connection:\s*(.+?)\(/) ? rule.match(/connection:\s*(.+?)\(/)[1] : '<MISSING>',
           message: message,
@@ -233,6 +254,7 @@ class Rule < ApplicationRecord
 
 
     else
+      parsed_attrs = hash_visrule(parsed[:rule])
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
       detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule]) ? /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip : nil
       message = /Message\s*:\s(.*)/.match(parsed[:rule]) ? /Message\s*:\s(.*)/.match(parsed[:rule])[1] : '<MISSING>'
@@ -243,7 +265,7 @@ class Rule < ApplicationRecord
           sid: rule_sid,
           rule_content: rule,
           rule_parsed: parsed[:rule],
-          gid: rule_sid ? 1 : nil,
+          gid: gid_from_visrule(rule, parsed_attrs),
           rev: /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
           connection: /Connection\s*:\s(.+)/.match(parsed[:rule]) ? /Connection\s*:\s(.+)/.match(parsed[:rule])[1] : '<MISSING>',
           message: message,
@@ -258,6 +280,7 @@ class Rule < ApplicationRecord
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
     end
+
     rule_params
   end
 
@@ -299,26 +322,29 @@ class Rule < ApplicationRecord
     rule_content.strip!
 
     parsed = visruleparser(rule_content)
-    rule_hash = parse_from_visrule(rule_content, parsed)
-    rule_hash['rule_parsed'] = parsed[:rule]
-    rule_hash['rule_warnings'] = parsed[:errors]
-    rule_hash['cvs_rule_parsed'] = parsed[:rule]
-    rule_hash['cvs_rule_content'] = rule_content
-    rule_hash
+    rule_attrs = parse_from_visrule(rule_content, parsed)
+    rule_attrs['rule_parsed'] = parsed[:rule]
+    rule_attrs['rule_warnings'] = parsed[:errors]
+    rule_attrs['cvs_rule_parsed'] = parsed[:rule]
+    rule_attrs['cvs_rule_content'] = rule_content
+    rule_attrs
   end
 
   # Take a line from a rule file and saves to database unless rev is unchanged
   # @param [String, #read] rule_content the line of text from a rule file.
+  # @return [Rule] the rule loaded or nil if failed
+  # @raise [RuntimeError] could not process
   def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
     rule_attrs = full_parse(rule_content)
     return nil unless rule_attrs
     return nil if 'FAILED' == rule_attrs[:state]
+    raise 'No rule gid provided' unless rule_attrs[:gid]
     raise 'No rule sid provided' unless rule_attrs[:sid]
 
     rule_attrs[:filename] = filename
     rule_attrs[:linenumber] = linenumber
 
-    rule = where(sid: rule_attrs[:sid]).first
+    rule = where(gid: rule_attrs[:gid]).where(sid: rule_attrs[:sid]).first
     case
       when rule.nil?
         rule_attrs[:publish_status] = PUBLISH_STATUS_NEW
@@ -336,6 +362,8 @@ class Rule < ApplicationRecord
 
   # Take a line from grep output of a rule file and saves to database unless rev is unchanged
   # @param [String, #read] `rule_grep_line` the line of text from a rule file.
+  # @return [Rule] the rule loaded or nil if failed
+  # @raise [RuntimeError] could not process
   def self.load_rule_from_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
     rule_content.strip!

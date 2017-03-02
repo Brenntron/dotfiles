@@ -14,7 +14,7 @@ begin
         $stderr.puts line.chomp
       end
     rescue
-      $stderr.puts "\n!!! cannot parse = #{line}"
+      $stderr.puts "cannot parse :#{line}"
       raise
     end
   end
