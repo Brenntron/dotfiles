@@ -361,15 +361,15 @@ class Rule < ApplicationRecord
     File.open(filename, 'wt') do |rulefile|
       written = false
       tmp.each_line do |line|
-        if gid_regex.match(line) && sid_regex.match(line)
-          rulefile << self.rule_content
+        if gid && sid && gid_regex.match(line) && sid_regex.match(line)
+          rulefile.puts(self.rule_content)
           written = true
         else
-          rulefile << line
+          rulefile.puts(line)
         end
       end
 
-      rulefile << self.rule_content unless written
+      rulefile.puts(self.rule_content) unless written
     end
     tmp.close!
   end
