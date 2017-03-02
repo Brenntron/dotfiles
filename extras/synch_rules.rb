@@ -1,5 +1,5 @@
 #!/usr/bin/env rails runner
-# USAGE: rails runnersynch_rules.rb
+# USAGE: rails runner synch_rules.rb
 # parses rules from stdin and loads into synched_rules table.
 
 begin

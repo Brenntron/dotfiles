@@ -332,6 +332,8 @@ class Rule < ApplicationRecord
 
   # Take a line from a rule file and saves to database unless rev is unchanged
   # @param [String, #read] rule_content the line of text from a rule file.
+  # @param [String, #read] filename the path or name of the file.
+  # @param [Fixnum, #read] linenumber the line number from the input rules file.
   # @return [Rule] the rule loaded or nil if failed
   # @raise [RuntimeError] could not process
   def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
@@ -361,13 +363,18 @@ class Rule < ApplicationRecord
   end
 
   # Take a line from grep output of a rule file and saves to database unless rev is unchanged
-  # @param [String, #read] `rule_grep_line` the line of text from a rule file.
-  # @return [Rule] the rule loaded or nil if failed
+  # @param [String, #read] rule_grep_line the line of text from a rule file.
+  # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
   def self.load_rule_from_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
+
     rule_content.strip!
-    load_rule_from_content(rule_content, filename, line_number[1..-2].to_i) unless rule_content.empty?
+    if rule_content.empty?
+      ''
+    else
+      load_rule_from_content(rule_content, filename, line_number[1..-2].to_i)
+    end
   end
 
   def update_rule
