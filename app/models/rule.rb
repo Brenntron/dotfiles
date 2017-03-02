@@ -309,13 +309,14 @@ class Rule < ApplicationRecord
 
   # Take a line from a rule file and saves to database unless rev is unchanged
   # @param [String, #read] rule_content the line of text from a rule file.
-  def self.load_rule_from_content(rule_content, filename = '')
+  def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
     rule_attrs = full_parse(rule_content)
     return nil unless rule_attrs
     return nil if 'FAILED' == rule_attrs[:state]
     raise 'No rule sid provided' unless rule_attrs[:sid]
 
     rule_attrs[:filename] = filename
+    rule_attrs[:linenumber] = linenumber
 
     rule = where(sid: rule_attrs[:sid]).first
     case
@@ -338,7 +339,7 @@ class Rule < ApplicationRecord
   def self.load_rule_from_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
     rule_content.strip!
-    load_rule_from_content(rule_content, filename) unless rule_content.empty?
+    load_rule_from_content(rule_content, filename, line_number[1..-2].to_i) unless rule_content.empty?
   end
 
   def update_rule
