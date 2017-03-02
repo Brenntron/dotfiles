@@ -14,6 +14,8 @@ class Bug < ApplicationRecord
   accepts_nested_attributes_for :references
   accepts_nested_attributes_for :rules
 
+  validates :committer_id, uniqueness: { scope: :user_id }, allow_blank: true
+
   scope :open, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }

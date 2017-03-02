@@ -25,6 +25,8 @@ class User < ApplicationRecord
 
   DEFAULT_METRICS_TIMEFRAME = 7
 
+  scope :with_role, ->(role) { joins(:roles).where('roles.role = ?', role) }
+
   def self.search(conditions)
     # all
     name = conditions["name"]

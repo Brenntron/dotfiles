@@ -76,13 +76,6 @@ Then(/^I should see could not find user "(.*)" flash massage$/) do |user_id|
   find(:xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' alert ')][contains(text(), \"Could not find user '#{user_id}'\")]")
 end
 
-And(/^"(.*?)" should be in the dropdown list$/) do |value|
-  find_field('child_id').all('option').collect(&:text).include?(value).should == true
-end
-
-And(/^"(.*?)" should not be in the dropdown list$/) do |value|
-  find_field('child_id').all('option').collect(&:text).include?(value).should == false
-end
 
 When(/^select "(.*?)" from "(.*?)" within "(.*?)"$/) do |option, select, context|
   within(context) do

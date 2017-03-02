@@ -35,9 +35,9 @@
           <h6>editor</h6>
           <h4 class="top-space" id="current_bug_editor">
             <% if @bug.user %>
-              <%= @bug.user.cvs_username %>&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>
+              <%= @bug.user.cvs_username %>&nbsp;<a href="#" id="editor" class="tiny text-muted change_current_bug_editor"><em>change</em></a>
             <% else %>
-              <a class="tiny text-muted change_current_bug_editor"><em>assign</em></a>
+              <a href="#" id="editor" class="tiny text-muted change_current_bug_editor"><em>assign</em></a>
             <% end %>
           </h4>
           <%= render 'shared/change_editor_bug_form' %>
@@ -46,9 +46,9 @@
           <h6>committer</h6>
           <h4 class="bug-user top-space" id="current_bug_committer">
             <% if @bug.committer %>
-              <%= @bug.committer.cvs_username %>&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>
+              <%= @bug.committer.cvs_username %>&nbsp;<a href="#" id="committer" class="tiny text-muted change_current_bug_committer"><em>change</em></a>
             <% else %>
-              <a class="tiny text-muted change_current_bug_committer"><em>assign</em></a>
+              <a href="#" id="committer" class="tiny text-muted change_current_bug_committer"><em>assign</em></a>
             <% end %>
           </h4>
           <%= render 'shared/change_committer_bug_form' %>

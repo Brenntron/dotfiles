@@ -162,9 +162,76 @@ Feature: Bug
 
   @javascript
   Scenario: a user can change the editor of a bug
+            the committer of the bug should not be availabe for the editor dropdown
+    Given a user with role "analyst" exists and is logged in
+
+    And the following users exist
+      | id | email                | cvs_username  | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+
+    And the following roles exist:
+      | role           |
+      | committer      |
+      | manager        |
+
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |  6           |
+
+    And a user with id "2" has a role of "manager"
+    And a user with id "6" has a role of "committer"
+
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click "editor"
+    And "rainbow_b" should be in the "bug_editor" dropdown list
+    And "t_bear" should not be in the "bug_editor" dropdown list
+    And I select "rainbow_b" from "bug_editor"
+    Then I click button "done"
+    And I wait for "3" seconds
+# uncomment when connectivity to bugzilla test fixed
+# And I should see "rainbow_b"
 
   @javascript
   Scenario: a user can change the committer of a bug
+            only a user with role committer should be available in the dropdown
+            user assigned as editor cannot be in the committer dropdown
+    Given a user with role "analyst" exists and is logged in
+
+    And the following users exist
+      | id | email                | cvs_username  | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+
+    And the following roles exist:
+      | role           |
+      | committer      |
+      | manager        |
+
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | user_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |  4      |
+
+    And a user with id "4" has a role of "committer"
+    And a user with id "6" has a role of "committer"
+
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click "committer"
+    And "t_bear" should be in the "bug_committer" dropdown list
+    And "d_drumph" should not be in the "bug_committer" dropdown list
+    And I select "t_bear" from "bug_committer"
+    Then I click button "done"
+    And I wait for "3" seconds
+# uncomment when connectivity to bugzilla test fixed
+# And I should see "t_bear"
 
   @javascript
   Scenario: a user can change the priority of a bug

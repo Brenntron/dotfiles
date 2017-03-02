@@ -149,8 +149,7 @@ Feature: User Accounts
     Then I wait for "3" seconds
     And  I goto "/users/1/relationships"
     And  I should see "h_clinton"
-    And  "Hillary Clinton (h_clinton)" should not be in the dropdown list
-    And  "-- Hillary Clinton (h_clinton)" should be in the dropdown list
+    And  "-- Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
     And  I select "Donald Trump (d_drumph)" from "child_id"
     Then I click "Add"
     Then I should see "d_drumph successfully added"
@@ -179,7 +178,7 @@ Feature: User Accounts
     Then I wait for "3" seconds
     And  I goto "/users/1/relationships"
     And  I should see "h_clinton"
-    And  "Hillary Clinton (h_clinton)" should not be in the dropdown list
+    And  "Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
     Then I click the link with data-target "#roleModal_3"
     Then I wait for "1" seconds
     Then I should see "Update Role(s) for h_clinton"

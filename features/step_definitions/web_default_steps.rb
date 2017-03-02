@@ -213,6 +213,14 @@ Then(/^I click the link with data-target "(.*?)"$/) do |target|
   find("a[data-target='#{target}']").click
 end
 
+And(/^"(.*?)" should be in the "(.*?)" dropdown list$/) do |value, field|
+  find_field(field).all('option').collect(&:text).include?(value).should == true
+end
+
+And(/^"(.*?)" should not be in the "(.*?)" dropdown list$/) do |value, field|
+  find_field(field).all('option').collect(&:text).include?(value).should == false
+end
+
 Then(/^show me the page$/) do
   save_and_open_page
 end
