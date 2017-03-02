@@ -36,6 +36,8 @@ Rails.application.routes.draw do
     get :resolved_team_metrics, defaults: {format: :json}
     get :time_team_metrics, defaults: {format: :json}
     get :component_team_metrics, defaults: {format: :json}
+    patch :add_to_team
+    patch :remove_from_team
     resources :relationships do
       collection do
         get :member_status

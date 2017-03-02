@@ -31,6 +31,13 @@ class CreateUsers < ActiveRecord::Migration
       t.string   :authentication_token
       t.integer  :metrics_timeframe, :default => 7
 
+      t.integer :parent_id, :null => true, :index => true
+      t.integer :lft, :null => false, :index => true
+      t.integer :rgt, :null => false, :index => true
+
+      # optional fields
+      t.integer :depth, :null => false, :default => 0
+
       t.timestamps
     end
     add_index :users, :email,                :unique => true

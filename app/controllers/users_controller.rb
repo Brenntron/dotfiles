@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   before_action :require_login
 
   def index
-    @users = current_user.team_members
+    @users = current_user.children
   end
 
   def show
@@ -16,7 +16,7 @@ class UsersController < ApplicationController
         flash[:error] = 'You are not authorized to view that user.'
         redirect_to users_path
       else
-        @users = current_user.team_members
+        @users = current_user.children
     end
   end
 
@@ -33,7 +33,29 @@ class UsersController < ApplicationController
     else
       flash[:alert] = "Unable to update #{@user.cvs_username}."
     end
+  end
 
+  def add_to_team
+    @user = User.find(params[:user_id])
+    @child = User.find(params[:child_id])
+    @child.move_to_child_of(@user)
+    redirect_back(fallback_location: :back)
+    if @child.save
+      flash[:notice] = "#{@child.cvs_username} successfully added to #{@user.cvs_username}'s team."
+    else
+      flash[:alert] = "Unable to add #{@child.cvs_username} to #{@user.cvs_username}'s team."
+    end
+  end
+
+  def remove_from_team
+    @child = User.find(params[:user_id])
+    @child.update(parent_id: nil)
+    redirect_back(fallback_location: :back)
+    if @child.save
+      flash[:notice] = "#{@child.cvs_username} successfully removed from team."
+    else
+      flash[:alert] = "Unable to remove #{@child.cvs_username} from team."
+    end
   end
 
   def status_metrics
@@ -109,6 +131,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:display_name, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
+    params.require(:user).permit(:parent_id, :display_name, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
   end
 end

@@ -5,38 +5,15 @@ class RelationshipsController < ApplicationController
 
   def index
     @user = current_user
-    team = @user.team_members.map{|t| t.id} << @user.id
-    @users = User.all.reject{|u| team.include?(u.id)}
+    @users = @user.available_users
   end
 
   def show
   end
 
-  def create
-    @user = User.find(params[:user_id])
-    r = Relationship.create(relationship_params)
-    if r.save
-      flash[:notice] = "#{r.team_member.cvs_username} is now on your team!"
-    else
-      flash[:error] = 'Something went wrong.'
-    end
-    redirect_to user_relationships_path(@user)
-  end
-
-  def destroy
-    @user = User.find(params[:user_id])
-    @relationship = Relationship.find(params[:id])
-    @team_member = @relationship.team_member.cvs_username
-    @relationship.destroy
-
-    flash[:alert] = "#{@team_member} has been removed from your team."
-    redirect_to user_relationships_path(@user)
-  end
-
   def member_status
-    new_member = params[:new_member]
-    member_status = Relationship.where(team_member_id: new_member)
-    status = member_status.empty? ? true : false
+    new_member = User.find(params[:new_member])
+    status = new_member.parent_id.nil? ? true : false
     respond_to do |format|
       format.json { head :no_content, new_member: status }
     end

@@ -20,6 +20,16 @@ Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   visit root_path()
 end
 
+Given(/^a user with id "(.*?)" has a parent with id "(.*?)"$/) do |user_id, parent_id|
+  @user = User.find(user_id)
+  @user.update(parent_id: parent_id)
+end
+
+Given(/^a user with id "(.*?)" has a role of "(.*?)"$/) do |user_id, role|
+  @user = User.find(user_id)
+  @user.roles << Role.where(role: role).first
+end
+
 Given(/^a manager exists and is logged in$/) do
   @user = FactoryGirl.create(:user, confirmed: true)
   @role = Role.create(role: 'manager')
@@ -64,6 +74,26 @@ end
 
 Then(/^I should see could not find user "(.*)" flash massage$/) do |user_id|
   find(:xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' alert ')][contains(text(), \"Could not find user '#{user_id}'\")]")
+end
+
+And(/^"(.*?)" should be in the dropdown list$/) do |value|
+  find_field('child_id').all('option').collect(&:text).include?(value).should == true
+end
+
+And(/^"(.*?)" should not be in the dropdown list$/) do |value|
+  find_field('child_id').all('option').collect(&:text).include?(value).should == false
+end
+
+When(/^select "(.*?)" from "(.*?)" within "(.*?)"$/) do |option, select, context|
+  within(context) do
+    select(option, :from => select)
+  end
+end
+
+When(/^click button "(.*?)" within "(.*?)"$/) do |button, context|
+  within(context) do
+    click_button(button)
+  end
 end
 
 

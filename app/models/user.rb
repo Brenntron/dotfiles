@@ -1,10 +1,7 @@
 class User < ApplicationRecord
+  acts_as_nested_set
+
   has_many :bugs
-  has_many :team_member_relationships, class_name: 'Relationship'
-  has_many :team_members, through: :team_member_relationships
-  has_many :manager_relationships, class_name: 'Relationship', foreign_key: 'team_member_id'
-  has_many :managers, through: :manager_relationships, source: :user
-  has_many :relationships, dependent: :destroy
   has_and_belongs_to_many :roles, dependent: :destroy
 
 
@@ -51,27 +48,21 @@ class User < ApplicationRecord
     roles.where(role: role).any?
   end
 
+  def available_users
+    User.all.reject{|u| self_and_ancestors.include?(u) || children.include?(u)}
+  end
+
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
     end
   end
 
-  def co_workers
-    co = []
-    managers.each do |m|
-      m.team_members.each do |tm|
-        co << tm
-      end
-    end
-    co.reject { |u| u == self }
-  end
-
   def authorized_user_list
     if has_role?('admin')
       User.all.map(&:id)
     else
-      users = co_workers + team_members + [self]
+      users = siblings + self_and_descendants
       [].tap { |arry| arry << users.map(&:id) }.flatten
     end
   end
@@ -82,7 +73,7 @@ class User < ApplicationRecord
 
   def team_metrics(bug_status)
     result = []
-    team_members.each do |tm|
+    descendants.each do |tm|
       bug_count = {}
       (chart_timeframe_preference.days.ago.to_date..Date.today).each do |day|
         bug_count[day.strftime('%b %d, %Y')] = tm.bugs.where("DATE(#{bug_status}_at) = ?", day).count
@@ -93,7 +84,7 @@ class User < ApplicationRecord
   end
 
   def team_work_times
-    team_members.map { |tm| { "#{tm.cvs_username}" => [tm.bugs.average(:work_time).try(:round) || 0,
+    descendants.map { |tm| { "#{tm.cvs_username}" => [tm.bugs.average(:work_time).try(:round) || 0,
                                                      tm.bugs.average(:rework_time).try(:round) || 0,
                                                      tm.bugs.average(:review_time).try(:round) || 0,
                                                      tm.average_resolution_times] } }
@@ -106,7 +97,7 @@ class User < ApplicationRecord
 
   def team_by_component(component)
     result = {}
-    bugs = team_members.map { |tm| tm.bugs.by_component(component) }.flatten
+    bugs = descendants.map { |tm| tm.bugs.by_component(component) }.flatten
 
     result[:work_time]       = bugs.map(&:work_time).compact
     result[:rework_time]     = bugs.map(&:rework_time).compact

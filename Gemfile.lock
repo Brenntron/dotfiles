@@ -65,6 +65,8 @@ GEM
     arel (7.1.4)
     autoprefixer-rails (6.6.1)
       execjs
+    awesome_nested_set (3.1.1)
+      activerecord (>= 4.0.0, < 5.1)
     awesome_print (1.2.0)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -397,6 +399,7 @@ PLATFORMS
 DEPENDENCIES
   active_model_serializers
   activemessaging
+  awesome_nested_set
   awesome_print (= 1.2.0)
   bootstrap-multiselect-rails
   bootstrap-sass

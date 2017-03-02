@@ -9,5 +9,6 @@ FactoryGirl.define do
     cvs_username ENV['authenticate_cvs_username']
     kerberos_login ENV['remote_user']
     cec_username ENV['authenticate_cec_username']
+    parent_id nil
   end
 end

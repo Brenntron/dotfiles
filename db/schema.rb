@@ -175,13 +175,6 @@ ActiveRecord::Schema.define(version: 20170221205627) do
     t.index ["rule_id"], name: "index_references_rules_on_rule_id", using: :btree
   end
 
-  create_table "relationships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "user_id"
-    t.integer  "team_member_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "role"
   end
@@ -285,14 +278,20 @@ ActiveRecord::Schema.define(version: 20170221205627) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.string   "role"
     t.integer  "class_level"
     t.string   "authentication_token"
     t.integer  "metrics_timeframe",      default: 7
+    t.integer  "parent_id"
+    t.integer  "lft",                                    null: false
+    t.integer  "rgt",                                    null: false
+    t.integer  "depth",                  default: 0,     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["lft"], name: "index_users_on_lft", using: :btree
+    t.index ["parent_id"], name: "index_users_on_parent_id", using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+    t.index ["rgt"], name: "index_users_on_rgt", using: :btree
   end
 
   create_table "versions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|

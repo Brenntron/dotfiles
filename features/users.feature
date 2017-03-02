@@ -30,15 +30,12 @@ Feature: User Accounts
             A non-manager cannot get to the relationships section.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
-      | id | email                | cvs_username | display_name        |
-      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
-      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
-      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
+      | id | email                      | cvs_username | display_name        | parent_id |
+      | 2  | rainbows@email.com         | rainbow_b    | Rainbow Brite       |           |
+      | 3  | hclinton@email.com         | h_clinton    | Hillary Clinton     |  2        |
+      | 4  | dtrump@email.com           | d_drumph     | Donald Trump        |           |
 
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 2       | 3              |
-      | 2       | 1              |
+    And a user with id "1" has a parent with id "2"
 
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
@@ -69,11 +66,6 @@ Feature: User Accounts
       | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
       | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
 
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 2       | 3              |
-      | 2       | 1              |
-
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 3       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -92,11 +84,6 @@ Feature: User Accounts
       | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
       | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
       | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
-
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 2       | 3              |
-      | 2       | 1              |
 
     And the following roles exist:
       | role           |
@@ -126,17 +113,13 @@ Feature: User Accounts
             A manager can access the relationships page.
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username | display_name        |
-      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
-      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
-      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        | 1         |
+      | 5  | master@email.com     | master       | Master User         |           |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |  5        |
 
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 2       | 3              |
-      | 2       | 1              |
-      | 1       | 3              |
-      | 1       | 4              |
+    And a user with id "1" has a parent with id "5"
 
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
@@ -147,7 +130,7 @@ Feature: User Accounts
     And  I goto "/users"
     And  I should see "h_clinton"
     And  I should see "d_drumph"
-    And  I should not see "rainbow_b"
+    And  I should see "rainbow_b"
     Then I goto "/users/1/relationships"
     And  I should see "d_drumph"
 
@@ -155,49 +138,38 @@ Feature: User Accounts
   Scenario: A manager can add and remove team members on the relationships page.
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username  | display_name        |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |
-      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |
-      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |
+      | id | email                | cvs_username  | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |  1        |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |  2        |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |           |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |  5        |
 
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 2       | 3              |
-      | 2       | 6              |
-      | 1       | 3              |
 
     Then I wait for "3" seconds
     And  I goto "/users/1/relationships"
     And  I should see "h_clinton"
     And  "Hillary Clinton (h_clinton)" should not be in the dropdown list
-    And  I select "Donald Trump (d_drumph)" from "relationship_team_member_id"
+    And  "-- Hillary Clinton (h_clinton)" should be in the dropdown list
+    And  I select "Donald Trump (d_drumph)" from "child_id"
     Then I click "Add"
-    Then I should see "d_drumph is now on your team!"
-    And  I select "Teddy Bear (t_bear)" from "relationship_team_member_id"
-    Then I should see "Teddy Bear (t_bear) is on a team already. Users can be members of multiple teams."
+    Then I should see "d_drumph successfully added"
+    And  I select "- Teddy Bear (t_bear)" from "child_id"
+    Then I should see "- Teddy Bear (t_bear) is on a team already. Are you sure you want to move - Teddy Bear (t_bear) to another team?"
     Then I click "Ok"
     Then I click "Add"
-    And  I should see "t_bear is now on your team!"
+    And  I should see "t_bear successfully added"
 
   @javascript
   Scenario: A manager can edit roles of team members on relationships page.
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username  | display_name        |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |
-      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |
-      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |
-
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 2       | 3              |
-      | 2       | 6              |
-      | 1       | 3              |
-      | 1       | 4              |
+      | id | email                | cvs_username  | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
 
     And the following roles exist:
       | role           |
@@ -225,20 +197,42 @@ Feature: User Accounts
     Then I should see "d_drumph updated successfully."
     Then I should see "analyst, committer"
 
+  @javascript
+  Scenario: A manager can edit members subordinate manager teams on relationships page.
+    Given a manager exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username  | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+
+    And the following roles exist:
+      | role           |
+      | analyst        |
+      | committer      |
+
+    And a user with id "2" has a role of "manager"
+
+    Then I wait for "3" seconds
+    And  I goto "/users/1/relationships"
+    Then I click the link with data-target "#teamModal_2"
+    Then I wait for "1" seconds
+    Then I should see "Add to rainbow_b's team"
+    Then select "Gary Johnson (g_johnson)" from "child_id" within ".modal-body"
+    Then click button "Add" within ".modal-body"
+    Then I should see "g_johnson successfully added"
+
 
   @javascript
   Scenario: A manager user can go to a users show page and update their metrics timeframe preference.
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username | display_name        |
-      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
-      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
-      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
-
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 1       | 3              |
-      | 1       | 4              |
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        | 1         |
 
     Then I wait for "3" seconds
     And  I goto "/users"
@@ -256,12 +250,9 @@ Feature: User Accounts
   Scenario: Bugs should be separated into the proper open, closed and pending tabs
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username | display_name        |
-      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
 
-    And the following relationships exist:
-      | user_id | team_member_id |
-      | 1       | 3              |
 
     And the following bugs exist:
       | id      | bugzilla_id | state     | user_id | summary             | product | component   | version | description       |

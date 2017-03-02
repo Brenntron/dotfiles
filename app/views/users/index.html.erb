@@ -22,7 +22,7 @@
     </tr>
     <% if current_user.has_role?('manager') %>
       <tr></tr>
-      <% current_user.team_members.each do |user| %>
+      <% current_user.children.each do |user| %>
         <tr>
           <td><%= user.bugs.open.count %></td>
           <td><%= user.bugs.pending.count %></td>
@@ -37,7 +37,7 @@
       <% end %>
     <% end %>
     <tr></tr>
-    <% current_user.co_workers.each do |user| %>
+    <% current_user.siblings.each do |user| %>
         <tr>
           <td><%= user.bugs.open.count %></td>
           <td><%= user.bugs.pending.count %></td>

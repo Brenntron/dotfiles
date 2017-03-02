@@ -39,6 +39,7 @@ gem 'selectize-rails'
 gem 'chart-js-rails'
 gem 'chartkick'
 gem 'bootstrap-multiselect-rails'
+gem 'awesome_nested_set'
 
 group :development do
   gem 'thin', '~> 1.7.0'
