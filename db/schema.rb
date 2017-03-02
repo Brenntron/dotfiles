@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170302133740) do
+ActiveRecord::Schema.define(version: 20170302175702) do
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_attachment_id"
@@ -233,6 +233,7 @@ ActiveRecord::Schema.define(version: 20170302133740) do
     t.integer  "task_id"
     t.integer  "rule_category_id"
     t.string   "filename"
+    t.integer  "linenumber"
     t.index ["gid", "sid", "rev"], name: "index_rules_gid_and_sid_and_rev", unique: true, using: :btree
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
     t.index ["task_id"], name: "index_rules_on_task_id", using: :btree
