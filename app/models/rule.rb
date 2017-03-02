@@ -312,6 +312,7 @@ class Rule < ApplicationRecord
   def self.load_rule_from_content(rule_content)
     rule_attrs = full_parse(rule_content)
     return nil unless rule_attrs
+    return nil if 'FAILED' == rule_attrs[:state]
     raise 'No rule sid provided' unless rule_attrs[:sid]
 
     rule = where(sid: rule_attrs[:sid]).first
