@@ -1,4 +1,5 @@
 class RulesController < ApplicationController
+  load_and_authorize_resource :except => [:get_impact]
 
   def create
     @bug = Bug.find(params[:rule][:bug_id])

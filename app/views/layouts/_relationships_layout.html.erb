@@ -19,7 +19,7 @@
             <button class="btn btn-link icon-link custom-icon"><i class="glyphicon glyphicon-user"></i> Home</button>
         <% end %>
       </div>
-      <% if current_user.committer %>
+      <% if current_user.has_role?('committer') %>
           <!-- committer specific links-->
       <% end %>
     </div>

@@ -15,7 +15,7 @@
       <td><%= current_user.bugs.pending.count %></td>
       <td><%= current_user.bugs.count %></td>
       <td>
-        <% if current_user.committer %>
+        <% if current_user.has_role?('committer') %>
             <i class="glyphicon glyphicon-ok"></i>
         <% end %>
       </td>

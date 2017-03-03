@@ -358,3 +358,83 @@ Feature: User Accounts
     And I do not see a user_searches result for name "porsche"
     And I do not see a user_searches result for name "bentley"
 
+  @javascript
+  Scenario: An analyst should be able to do everything
+            related to a bug except for commit a rule
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+    Given I wait for "3" seconds
+    And I goto "/bugs/333333"
+    When I click ".rules-tab"
+    Then I should see content "edit" within ".top-bar"
+    And I should see content "create" within ".top-bar"
+    And I should see content "remove" within ".top-bar"
+    And I should not see content "commit" within ".top-bar"
+    When I click ".attachments-tab"
+    Then I should see "new attachment"
+    When I click ".notes-tab"
+    Then I should see content "edit" within "#notes_form"
+    And I should see content "publish" within "#notes_form"
+
+  @javascript
+  Scenario: A committer should be able to do everything related to a bug
+    Given a user with role "committer" exists and is logged in
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+    Given I wait for "3" seconds
+    And I goto "/bugs/333333"
+    When I click ".rules-tab"
+    Then I should see content "edit" within ".top-bar"
+    And I should see content "create" within ".top-bar"
+    And I should see content "remove" within ".top-bar"
+    And I should see content "commit" within ".top-bar"
+    When I click ".attachments-tab"
+    Then I should see "new attachment"
+    When I click ".notes-tab"
+    Then I should see content "edit" within "#notes_form"
+    And I should see content "publish" within "#notes_form"
+
+  @javascript
+  Scenario: A manager should be able to do everything related to a bug except commit
+    Given a user with role "manager" exists and is logged in
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+    Given I wait for "3" seconds
+    And I goto "/bugs/333333"
+    When I click ".rules-tab"
+    Then I should see content "edit" within ".top-bar"
+    And I should see content "create" within ".top-bar"
+    And I should see content "remove" within ".top-bar"
+    And I should not see content "commit" within ".top-bar"
+    When I click ".attachments-tab"
+    Then I should see "new attachment"
+    When I click ".notes-tab"
+    Then I should see content "edit" within "#notes_form"
+    And I should see content "publish" within "#notes_form"
+
+  @javascript @allow-rescue
+  Scenario: A build coordinator should be able to view everything related to a bug but not alter it
+            A build coordinator cannot create new bugs
+    Given a user with role "build coordinator" exists and is logged in
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+    Given I wait for "3" seconds
+    And  I goto "/bugs/new"
+    Then I should see "You are not authorized to new bug."
+    And I goto "/bugs/333333"
+    When I click ".rules-tab"
+    Then I should not see content "edit" within ".top-bar"
+    And I should not see content "create" within ".top-bar"
+    And I should not see content "remove" within ".top-bar"
+    And I should not see content "commit" within ".top-bar"
+    When I click ".attachments-tab"
+    Then I should not see "new attachment"
+    When I click ".notes-tab"
+    Then I should not see content "edit" within "#notes_form"
+    And I should not see content "publish" within "#notes_form"
+

@@ -439,6 +439,7 @@ Feature: Bug
     And  I fill in "research_notes" with "This is a research note"
     And I click "save"
     Then I should see "Notes saved"
+    Then I wait for "2" seconds
     When I click "publish"
     And I wait for "5" seconds
     Then I should see "Notes published to bugzilla"
@@ -457,6 +458,7 @@ Feature: Bug
     And I goto "/bugs/145359"
     And I click ".notes-tab"
     And I click "Committer notes"
+    Then I wait for "1" seconds
     And I click "#committerNotesEditBtn"
     And  I fill in "committer_notes" with "This is a research note"
     And I click "save"

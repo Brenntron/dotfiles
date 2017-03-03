@@ -281,6 +281,7 @@ module API
           end
         end
         post "", root: "bug" do
+          authorize! :create, Bug
           options = {
               :product => permitted_params[:bug][:product],
               :component => permitted_params[:bug][:component],
@@ -320,6 +321,7 @@ module API
           requires :id, type: Integer, desc: "Bugzilla id."
         end
         delete ":id", root: "bug" do
+          authorize! :destroy, Bug
           Bug.destroy(permitted_params[:id])
         end
 

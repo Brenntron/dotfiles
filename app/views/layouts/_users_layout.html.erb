@@ -46,7 +46,7 @@
           <% end %>
         <%end%>
       </div>
-      <% if current_user.committer %>
+      <% if current_user.has_role?('committer') %>
       <!-- committer specific links-->
       <% end %>
     </div>

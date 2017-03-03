@@ -1,4 +1,5 @@
 class ReferencesController < ApplicationController
+  load_and_authorize_resource
 
   def create
     @bug = Bug.find(params[:bug_id])

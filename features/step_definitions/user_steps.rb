@@ -9,7 +9,9 @@ Given(/^the following users exist$/) do |users|
 end
 
 Given(/^a user with commit permission exists and is logged in$/) do
-  @user = FactoryGirl.create(:user, confirmed: true, committer: true)
+  @user = FactoryGirl.create(:user, confirmed: true)
+  @role = Role.create(role: 'committer')
+  @user.roles << @role
   visit root_path()
 end
 

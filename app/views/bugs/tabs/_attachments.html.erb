@@ -4,10 +4,12 @@
   </div>
   <div class="col-xs-6 right">
     <p>
-      <a>
-      <span id="showAddAttachsToggle"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs">new attachment</strong></span>
-      <span id="hideAddAttachsToggle" class="text-muted" style="display:none"><i class="glyphicon glyphicon-remove"></i><strong class="hidden-xs">cancel</strong></span>
-      </a>&nbsp;&nbsp;
+      <% if can? :create, Attachment %>
+        <a>
+        <span id="showAddAttachsToggle"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs">new attachment</strong></span>
+        <span id="hideAddAttachsToggle" class="text-muted" style="display:none"><i class="glyphicon glyphicon-remove"></i><strong class="hidden-xs">cancel</strong></span>
+        </a>&nbsp;&nbsp;
+      <% end %>
       <button class="select-sm btn btn-default right">
       <strong class="hidden-xs" id="test_attachments">test attachments &nbsp;&nbsp;</strong>
       <i class="glyphicon glyphicon-flag"></i>

@@ -31,6 +31,7 @@ module API
           end
         end
         post "", root: :attachments do
+          authorize! :create, Attachment
           file_content = permitted_params[:attachment][:file_data][:tempfile].read
           options = {
               :ids => permitted_params[:attachment][:bugzilla_attachment_id],
