@@ -61,15 +61,17 @@ Feature: User Accounts
   Scenario: A non-manager non-admin user cannot edit the role for any user.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
-      | id | email                | cvs_username | display_name        |
-      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
-      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
-      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |           |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |     2     |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |           |
 
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 3       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
       |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+
+    And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
     And  I goto "/users"
@@ -80,10 +82,10 @@ Feature: User Accounts
   Scenario: A non-manager admin user can edit the role for any user.
     Given a user with role "admin" exists and is logged in
     And the following users exist
-      | id | email                | cvs_username | display_name        |
-      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |
-      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |
-      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |           |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |     2     |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |           |
 
     And the following roles exist:
       | role           |
@@ -94,6 +96,8 @@ Feature: User Accounts
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 3       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
       |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+
+    And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
     And  I goto "/users"
