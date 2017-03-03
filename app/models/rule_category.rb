@@ -4,7 +4,7 @@ class RuleCategory < ApplicationRecord
   validates :category, uniqueness: true
 
   def filename(gid = 1)
-    Rule.joins(:rule_category).select('rules.id, rules.gid, rules.filename, rule_categories.category').each do |rule|
+    # Rule.joins(:rule_category).select('rules.id, rules.gid, rules.filename, rule_categories.category').each do |rule|
     #   unless /^extras\/snort\/(?<dir>\w+)\/(?<basename>[-a-z]+)\.rules$/ =~ rule.filename
     #     puts "!!!1 rule #{rule.id} filename not in directory: '#{rule.filename}'"
     #   end

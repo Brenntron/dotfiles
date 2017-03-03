@@ -405,7 +405,10 @@ class Rule < ApplicationRecord
     true
   end
 
-  def publish
+  def checkin
+    filename = self.filename || self.rule_category.filename(self.gid)
+
+    patch(filename)
   end
 
   def update_rule
