@@ -47,7 +47,7 @@
           </div>
           <div class="col-xs-6 col-sm-4">
             <h6 class="text-muted">co-workers</h6>
-            <% if @user.siblings.any? %>
+            <% if @user.siblings.any?  && @user.child? %>
                 <ul class="compact-list">
                   <% @user.siblings.each do |co| %>
                       <li><%= link_to co.cvs_username, user_path(co) %></li>

@@ -37,18 +37,20 @@
       <% end %>
     <% end %>
     <tr></tr>
-    <% current_user.siblings.each do |user| %>
-        <tr>
-          <td><%= user.bugs.open.count %></td>
-          <td><%= user.bugs.pending.count %></td>
-          <td><%= user.bugs.closed.count %></td>
-          <td><%= user.bugs.count %></td>
-          <td>
-            <% if user.committer %>
-                <i class="glyphicon glyphicon-ok"></i>
-            <% end %>
-          </td>
-        </tr>
+    <% if current_user.child? %>
+      <% current_user.siblings.each do |user| %>
+          <tr>
+            <td><%= user.bugs.open.count %></td>
+            <td><%= user.bugs.pending.count %></td>
+            <td><%= user.bugs.closed.count %></td>
+            <td><%= user.bugs.count %></td>
+            <td>
+              <% if user.committer %>
+                  <i class="glyphicon glyphicon-ok"></i>
+              <% end %>
+            </td>
+          </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>
