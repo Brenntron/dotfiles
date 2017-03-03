@@ -405,6 +405,11 @@ class Rule < ApplicationRecord
     true
   end
 
+  # Check rule_content into CVS and update rule record.
+  #
+  # Write rule_content to file by calling patch.
+  # Call CVS checkin.
+  # Since CVS has a rewrite rule for checkins, update rule record from file.
   def checkin
     filename = self.filename || self.rule_category.filename(self.gid)
 
