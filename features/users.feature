@@ -438,3 +438,45 @@ Feature: User Accounts
     Then I should not see content "edit" within "#notes_form"
     And I should not see content "publish" within "#notes_form"
 
+  @javascript
+  Scenario: An analyst should see a list of their bugs first time in bugs index
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
+      | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
+      | 222222      | OPEN  | 2       | No Tags in this one                         | Research | Snort Rules | 2.6.0   | test description2 |
+      | 222222      | FIXED | 2       | [BP][NSS] fixed bug                         | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    And  I should see "[[TELUS][VULN][BP] [SID] 22078 test summary"
+    And  I should not see "[BP][NSS] fixed bug"
+
+  @javascript
+  Scenario: A committer should see a list of pending bugs first time in bugs index
+    Given a user with role "committer" exists and is logged in
+    And the following bugs exist:
+      | bugzilla_id | state   | user_id | summary                                                 | product  | component   | version | description       |
+      | 111111      | OPEN    | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
+      | 222222      | OPEN    | 2       | No Tags in this one                                     | Research | Snort Rules | 2.6.0   | test description2 |
+      | 222222      | FIXED   | 2       | [BP][NSS] fixed bug                                     | Research | Snort Rules | 2.6.0   | test description3 |
+      | 333333      | PENDING | 2       | Pending bug I should see                                | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    And  I should see "Pending bug I should see"
+    And  I should not see "[BP][NSS] fixed bug"
+
+  @javascript
+  Scenario: A build coordinator should see a list of fixed bugs first time in bugs index
+    Given a user with role "build coordinator" exists and is logged in
+    And the following bugs exist:
+      | bugzilla_id | state   | user_id | summary                                                 | product  | component   | version | description       |
+      | 111111      | OPEN    | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
+      | 222222      | OPEN    | 2       | No Tags in this one                                     | Research | Snort Rules | 2.6.0   | test description2 |
+      | 222222      | FIXED   | 2       | [BP][NSS] fixed bug                                     | Research | Snort Rules | 2.6.0   | test description3 |
+      | 333333      | PENDING | 2       | Pending bug I should see                                | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    And  I should see "[BP][NSS] fixed bug"
+    And  I should not see "Pending bug I should see"
+    And  I should not see "[[TELUS][VULN][BP] [SID] 22078 test summary"
+

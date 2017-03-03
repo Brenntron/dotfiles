@@ -146,10 +146,10 @@ class BugsController < ApplicationController
         when "advance-search"
           @bugs = Bug.bugs_with_search(session[:search])
         else
-          @bugs = Bug.all
+          @bugs = current_user.default_bug_list
       end
     else
-      @bugs = current_user.bugs
+      @bugs = current_user.default_bug_list
     end
   end
 
