@@ -236,7 +236,7 @@ ActiveRecord::Schema.define(version: 20170221205627) do
     t.datetime "updated_at"
     t.integer  "task_id"
     t.integer  "rule_category_id"
-    t.index ["gid", "sid", "rev"], name: "index_rules_gid_and_sid_and_rev", unique: true, using: :btree
+    t.index ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
     t.index ["task_id"], name: "index_rules_on_task_id", using: :btree
   end
