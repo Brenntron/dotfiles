@@ -1,6 +1,29 @@
 require 'open3'
 require 'tempfile'
 
+# Records for rules both synched with CVS and drafts of rules from the UI.
+#
+# When a rule has not been edited by our users, it will be updated with changed from CVS.
+# When a user saves a draft of an edit to a rule, that draft is stored instead and CVS synching is suppressed.
+# A new rule originating in our UI will be saved here, but obvious will have no synching until committed to CVS.
+#
+#                           |sid|  state  |publish_status|
+# All Rules
+# * synched with CVS
+#   * valid                 |int|UNCHANGED|    SYNCHED   | valid rule up to date with CVS
+#   * failed visruleparse   .............................. rules which fail visruleparse are not loaded
+# * draft
+#   * new
+#     * valid               |nil|   NEW   |      NEW     | new rule created from UI or web services
+#     * failed parse        |nil|  FAILED |      NEW     | new rule which failed visruleparse
+#   * edit
+#     * current edit
+#       * valid             |int| UPDATED | CURRENT_EDIT | CVS rule edited in UI or web service
+#       * failed parse      |int|  FAILED | CURRENT_EDIT | edited rule which failed visruleparse
+#     * out of date
+#       * valid             |int| UPDATED |  STALE_EDIT  | edited rule, but CVS has since been updated and cannot save
+#       * failed parse      |int|  FAILED |  STALE_EDIT  | stale edit which failed visruleparse
+#
 class Rule < ApplicationRecord
   has_paper_trail
 
