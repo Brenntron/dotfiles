@@ -348,6 +348,10 @@ class Rule < ApplicationRecord
     load_rule_from_content(rule_content) unless rule_content.empty?
   end
 
+  # Replace rule in given file with rule_content.
+  # Scans file for rule with same gid and sid and replaces that line with rule_content.
+  # Appends rule_content to end of file if gid and sid are not found
+  # @param [String, #read] path to the file.
   def patch(filename)
     tmp = Tempfile.new(['tmprule', '.rules'])
     File.open(filename, 'rt') do |input_stream|
@@ -356,12 +360,14 @@ class Rule < ApplicationRecord
 
     sid_regex = Regexp.new("sid:\\s*#{self.sid}\\s*;")
     gid_regex = Regexp.new("gid:\\s*#{self.gid}\\s*;")
+    anygid_regex = /gid:\s*\d+\s*;/
 
     tmp.rewind
     File.open(filename, 'wt') do |rulefile|
       written = false
       tmp.each_line do |line|
-        if gid && sid && gid_regex.match(line) && sid_regex.match(line)
+        gid_matched = (gid_regex =~ line) || !(anygid_regex =~ line)
+        if self.gid && self.sid && gid_matched && (sid_regex =~ line)
           rulefile.puts(self.rule_content)
           written = true
         else
@@ -372,6 +378,11 @@ class Rule < ApplicationRecord
       rulefile.puts(self.rule_content) unless written
     end
     tmp.close!
+
+    true
+  end
+
+  def publish
   end
 
   def update_rule
