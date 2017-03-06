@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170221205627) do
+ActiveRecord::Schema.define(version: 20170302175702) do
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_attachment_id"
@@ -87,8 +87,8 @@ ActiveRecord::Schema.define(version: 20170221205627) do
   end
 
   create_table "bugs_rules", primary_key: ["bug_id", "rule_id"], force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "bug_id",  null: false
-    t.integer "rule_id", null: false
+    t.integer "bug_id",  default: 0, null: false
+    t.integer "rule_id", default: 0, null: false
   end
 
   create_table "bugs_tags", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -227,6 +227,7 @@ ActiveRecord::Schema.define(version: 20170221205627) do
     t.integer  "sid"
     t.integer  "rev"
     t.string   "state"
+    t.string   "publish_status",                 default: "SYNCHED", null: false
     t.float    "average_check",    limit: 24
     t.float    "average_match",    limit: 24
     t.float    "average_nonmatch", limit: 24
@@ -236,7 +237,9 @@ ActiveRecord::Schema.define(version: 20170221205627) do
     t.datetime "updated_at"
     t.integer  "task_id"
     t.integer  "rule_category_id"
-    t.index ["gid", "sid", "rev"], name: "index_rules_gid_and_sid_and_rev", unique: true, using: :btree
+    t.string   "filename"
+    t.integer  "linenumber"
+    t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true, using: :btree
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
     t.index ["task_id"], name: "index_rules_on_task_id", using: :btree
   end

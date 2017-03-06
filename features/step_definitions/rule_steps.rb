@@ -20,6 +20,13 @@ Given(/^the following rules exist:$/) do |rules|
   end
 end
 
+Given(/^the following rules exist belonging to bug "(.*?)":$/) do |bug_id, rules|
+  bug = Bug.find(bug_id)
+  rules.hashes.each do |rule|
+    bug.rules << FactoryGirl.create(:rule, rule)
+  end
+end
+
 Then(/^I click the "(.*?)" tab$/) do |value|
   tab = "#{value}".downcase
   find(:xpath, "//ul[@id='bug_tab']/li/a[@data-target='##{tab}-tab']").click()
@@ -37,3 +44,122 @@ end
 Then(/^I toggle "(.*?)"$/) do |content|
   page.find(:xpath, "//div[@class='#{content}']").click()
 end
+
+Given(/^rule content$/) do
+  @gid = 1
+  @sid = 25358
+  @rev = 4
+  @connection = "alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS"
+  @message = "APP-DETECT Acunetix web vulnerability scan attempt"
+  @detection_parsed = "flowbits:set,acunetix-scan;\ncontent:\"Acunetix-\"; fast_pattern:only; http_header;"
+  @detection = @detection_parsed.gsub("\n", ' ')
+  @flow = "to_server,established"
+  @metadata = "ruleset community, service http"
+  @class_type = "web-application-attack"
+  @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@class_type}; sid:#{@sid}; rev:#{@rev};)"
+end
+
+Given(/^rule content for following rule:$/) do |rules|
+  @rule = FactoryGirl.create(:rule, rules.hashes[0])
+  @rule_updated_at = @rule.updated_at
+  @gid = @rule.gid
+  @sid = @rule.sid
+  @rev = @rule.rev
+  @connection = @rule.connection
+  @message = @rule.message
+  @detection_parsed = @rule.detection
+  @detection = @detection_parsed.gsub("\n", ' ')
+  @flow = @rule.flow
+  @metadata = @rule.metadata
+  @class_type = @rule.class_type
+  @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@class_type}; sid:#{@sid}; rev:#{@rev};)"
+end
+
+Given(/^grep output for rule content$/) do
+  @rule_grep_line = "extras/snort/rules/app-detect.rules:33:#{@rule_content}"
+end
+
+# Given(/^record exists for rule content$/) do
+#   rule = Rule.create!(sid: @sid, rev: @rev, rule_content: @rule_content,
+#                       connection: @connection, message: @messages, detection: @detection_parsed,
+#                       flow: @flow, metadata: @metadata, class_type: @class_type)
+#   @rule_updated_at = rule.updated_at
+# end
+
+# Given(/^record with earlier rev exists for rule content$/) do
+#   rule = Rule.create!(sid: @sid, rev: (@rev - 1), rule_content: @rule_content,
+#                       connection: @connection, message: @messages, detection: @detection_parsed,
+#                       flow: @flow, metadata: @metadata, class_type: @class_type)
+#   @rule_updated_at = rule.updated_at
+# end
+
+Given(/^record "(.*)" updated to:$/) do |rule_id, rules|
+  rule = Rule.find(rule_id)
+  rule.update!(rules.hashes[0])
+end
+
+Given(/^rule content rev set to "(.*)"$/) do |rev|
+  @rev = rev.to_i
+  @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@class_type}; sid:#{@sid}; rev:#{@rev};)"
+end
+
+When(/^code calls load_rule_from_grep on rule content$/) do
+  puts "*** @rule_grep_line = #{@rule_grep_line}"
+  Rule.load_rule_from_grep(@rule_grep_line)
+end
+
+Then(/^a rule record for rule conent will exist$/) do
+  rule_resultset = Rule.where(sid: @sid)
+  rule_resultset.should exist
+  rule = rule_resultset.first
+
+  rule.rule_content.should eq(@rule_content)
+  rule.sid.should eq(@sid)
+  rule.rev.should eq(@rev)
+  rule.connection.should eq(@connection)
+  rule.message.should eq(@message)
+  rule.detection.should eq(@detection_parsed)
+  rule.flow.should eq(@flow)
+  rule.metadata.should eq(@metadata)
+  rule.class_type.should eq(@class_type)
+end
+
+Then(/^rule record will be unchanged$/) do
+  rule_resultset = Rule.where(sid: @sid)
+  rule_resultset.should exist
+  rule = rule_resultset.first
+
+  rule.gid.should eq(@gid)
+  rule.sid.should eq(@sid)
+  rule.updated_at.should eq(@rule_updated_at)
+end
+
+Then(/^rule record will be updated$/) do
+  rule_resultset = Rule.where(gid: @gid, sid: @sid)
+  rule_resultset.should exist
+  rule = rule_resultset.first
+  puts "*** rule = #{rule.inspect}"
+
+  rule.gid.should eq(@gid)
+  rule.sid.should eq(@sid)
+  rule.rev.should eq(@rev)
+  rule.updated_at.should_not eq(@rule_updated_at)
+end
+
+Then(/^rule record will marked out of date/) do
+  rule_resultset = Rule.where(sid: @sid)
+  rule_resultset.should exist
+  rule = rule_resultset.first
+
+  rule.gid.should eq(@gid)
+  rule.sid.should eq(@sid)
+  rule.rev.should_not eq(@rev)
+  rule.current_edit?.should eq(false)
+  rule.stale_edit?.should eq(true)
+end
+
+Then(/^I should see rule "(.*)" state "(.*)" version "(.*)"$/) do |rule_id, state, version|
+  page.find(:xpath, "//tr[@id='#{rule_id}']/td[text()='#{state}']")
+  page.find(:xpath, "//tr[@id='#{rule_id}']/td/a/strong[text()='#{version}']")
+end
+

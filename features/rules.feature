@@ -3,6 +3,23 @@ Feature: Rules
   as a user
   I will provides ways to interact with rules
 
+  @javascript
+  Scenario: An existing unchanged rule synced with VC can be viewed
+    Given a user exists and is logged in
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id |
+      |222222   | 222222      | OPEN   | 1       |
+    And the following rule categories exist:
+      |category       | id |
+      |BLACKLIST      |  1 |
+    And the following rules exist belonging to bug "222222":
+      | id | state     | message                 | rule_category_id |gid|sid|rev|
+      | 99 | UNCHANGED | BLACKLIST message       | 1                | 1 |101| 3 |
+    And I wait for "3" seconds
+    When I goto "/bugs/222222"
+    And I click the "Rules" tab
+    Then I should see rule "99" state "UNCHANGED" version "1:101:3"
+
  # ==== Appending the rule category to the Rule message ===
   @javascript
   Scenario: A new rule can be created with a rule category
@@ -258,10 +275,48 @@ Feature: Rules
 #    And I should not see "This is the summary"
 
 
+  Scenario: load new rule from grep string model test
+    Given rule content
+    And grep output for rule content
+    When code calls load_rule_from_grep on rule content
+    Then a rule record for rule conent will exist
 
+  Scenario: synch existing rule with same rev in db model test
+    Given rule content for following rule:
+      | gid | sid | rev | state     |
+      |  1  | 101 |  4  | UNCHANGED |
+    And grep output for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will be unchanged
 
+  Scenario: synch updated rule with earlier rev in db model test
+    Given rule content for following rule:
+      | id | gid | sid | rev | state     |
+      |  7 |  1  | 101 |  4  | UNCHANGED |
+    And rule content rev set to "5"
+    And grep output for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will be updated
 
+  Scenario: do not synch updated rule with earlier rev in db model test
+    Given rule content for following rule:
+      | id | gid | sid | rev | state     |
+      |  7 |  1  | 101 |  4  | UPDATED   |
+    And rule content rev set to "5"
+    And grep output for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will marked out of date
 
-
-
+  Scenario: do not synch updated rule with earlier rev in db model test
+    Given rule content for following rule:
+      | id | gid | sid | rev | state     |
+      |  7 |  1  | 101 |  4  | FAILED    |
+    And rule content rev set to "5"
+    And grep output for rule content
+    And I wait for "3" seconds
+    When code calls load_rule_from_grep on rule content
+    Then rule record will marked out of date
 

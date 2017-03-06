@@ -83,7 +83,7 @@ module API
         end
         post '/rules/:link' do
           rule_id = permitted_params[:link].split(':')[1]
-          rule = Rule.where(id:rule_id).empty? ? Rule.import_rule(rule_id) : Rule.where(id:rule_id).first
+          rule = Rule.where(sid:rule_id).empty? ? Rule.import_rule(rule_id) : Rule.where(sid:rule_id).first
           Bug.where(id:permitted_params[:link].split(':')[0]).first.rules << rule
         end
 
@@ -321,8 +321,12 @@ module API
           requires :id, type: Integer, desc: "Bugzilla id."
         end
         delete ":id", root: "bug" do
-          authorize! :destroy, Bug
-          Bug.destroy(permitted_params[:id])
+          begin
+            authorize! :destroy, Bug
+            Bug.destroy(permitted_params[:id])
+          rescue CanCan::AccessDenied => e
+            error!({error: "Access denied.",message: e.message}, 200)
+          end
         end
 
         desc "close a bug"
