@@ -16,6 +16,7 @@ class RulesController < ApplicationController
 
   def update
     new_rule = Rule.create(Rule.parse_and_create_rule(params[:rule][:rule_content]))
+    new_rule.update(publish_status: Rule::PUBLISH_STATUS_NEW) unless new_rule.sid
     new_rule.bugs << Bug.where(id: params[:rule][:bug_id]).first if params[:rule][:bug_id]
     new_rule.associate_references(params[:rule][:rule_content])
     new_rule.update(detection: params[:rule][:detection].strip!, class_type: params[:rule][:class_type]) if new_rule.state == 'FAILED'

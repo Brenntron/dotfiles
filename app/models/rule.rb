@@ -15,6 +15,11 @@ class Rule < ApplicationRecord
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
   #after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
+  PUBLISH_STATUS_SYNCHED        = 'SYNCHED'         #unchanged from VC and up to date with VC
+  PUBLISH_STATUS_NEW            = 'NEW'             #new rule unknowned to VC
+  PUBLISH_STATUS_CURRENT_EDIT   = 'CURRENT_EDIT'    #draft of rule edited in UI, but optimistic it can be checked in
+  PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft of rule, but VC rev has changed and cannot be checked in
+
   def record(action)
     record = { resource: 'rule',
               action: action,
@@ -40,6 +45,7 @@ class Rule < ApplicationRecord
           if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
             @record = Rule.update_generate_rule($1)
             @record.state = 'New'
+            @record.publish_status = PUBLISH_STATUS_NEW
             @record.rev = 1
             @record.save
           end
@@ -56,27 +62,7 @@ class Rule < ApplicationRecord
     if sid
       found_rule = Rule.where(sid: sid).first
       if found_rule.nil?
-        rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1]
-        if rule_text.nil?
-          raise "Rule doesn't exist."
-        else
-          # remove anything before the first alert
-          # rule_text.strip!.gsub!(/(?=^).+?(?=alert)/, '')
-          rule_text.strip!
-
-          parsed = Rule.visruleparser(rule_text)
-          rule_sid = /sid:\s*(\d+)\s*;/.match(rule_text) ? /sid:\s*(\d+)\s*;/.match(rule_text)[1].to_i : nil
-          rule_hash = Rule.parse_and_create_rule(rule_text)
-          rule_hash['id'] = nil
-          rule_hash['sid'] = rule_sid
-          rule_hash['rule_parsed'] = parsed[:rule]
-          rule_hash['rule_warnings'] = parsed[:errors]
-          rule_hash['cvs_rule_parsed'] = parsed[:rule]
-          rule_hash['cvs_rule_content'] = rule_text
-          new_rule = Rule.create(rule_hash)
-          new_rule.associate_references(rule_text)
-          return new_rule
-        end
+        raise "Rule doesn't exist."
       else
         return found_rule
       end
@@ -207,8 +193,31 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.parse_and_create_rule(rule)
-    parsed = Rule.visruleparser(rule)
+  def self.hash_visrule(ruleline)
+    ruleline.split("\n").inject({}) do |attrs, line|
+      if /^\s*(?<key>\w*)\s*:(?<value>.*)$/ =~ line
+        value = value[1..-1] if ' ' == value[0]
+        attrs[key.downcase.to_sym] = value
+      end
+
+      attrs
+    end
+  end
+
+  def self.gid_from_visrule(rule_content, parsed_attrs)
+    return parsed_attrs[:gid] if parsed_attrs[:gid]
+
+    gid_match = nil
+    /gid:\s*(?<gid_match>\d+)\s*;/ =~ rule_content
+
+    gid_match ? gid_match.to_i : 1
+  end
+
+  # Takes the hash and adds some data from the rules text
+  # @param [String, #read] rule the line of rule text.
+  # @param [Hash, #read] parsed A hash, which must have :rule set by visruleparser.
+  # @return [Hash] the original hash, now with additional data.
+  def self.parse_from_visrule(rule, parsed)
     if parsed[:rule].match(/FAILED/)
       rule_params = {
           message: rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
@@ -216,10 +225,11 @@ class Rule < ApplicationRecord
           rule_parsed: parsed[:rule],
           rule_failures: parsed[:rule],
           committed: false,
-          state: 'FAILED'
+          state: 'FAILED',
       }.reject { |k, v,| v.nil? || v == '<MISSING>' }
 
     elsif parsed[:rule].match(/msg/)
+      parsed_attrs = hash_visrule(parsed[:rule])
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
       message = rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : '<MISSING>'
 
@@ -228,7 +238,7 @@ class Rule < ApplicationRecord
           sid: rule_sid,
           rule_content: rule,
           rule_parsed: parsed[:rule],
-          gid: rule_sid ? 1 : nil,
+          gid: gid_from_visrule(rule, parsed_attrs),
           rev: /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
           connection: rule.match(/connection:\s*(.+?)\(/) ? rule.match(/connection:\s*(.+?)\(/)[1] : '<MISSING>',
           message: message,
@@ -237,13 +247,14 @@ class Rule < ApplicationRecord
           metadata: /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : '<MISSING>',
           class_type: /classtype\s*:(.*)\)/.match(parsed[:rule]) ? /classtype\s*:(.*)\)/.match(parsed[:rule])[1] : '<MISSING>',
           committed: true,
-          state: rule_sid ? 'UNCHANGED' : 'NEW'
+          state: rule_sid ? 'UNCHANGED' : 'NEW',
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
 
 
     else
+      parsed_attrs = hash_visrule(parsed[:rule])
       rule_sid = /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule)[1].to_i : nil
       detection = /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule]) ? /Detection\s*:\n(.*)Metadata/m.match(parsed[:rule])[1].gsub(/\t|#\n/, '').strip : nil
       message = /Message\s*:\s(.*)/.match(parsed[:rule]) ? /Message\s*:\s(.*)/.match(parsed[:rule])[1] : '<MISSING>'
@@ -254,7 +265,7 @@ class Rule < ApplicationRecord
           sid: rule_sid,
           rule_content: rule,
           rule_parsed: parsed[:rule],
-          gid: rule_sid ? 1 : nil,
+          gid: gid_from_visrule(rule, parsed_attrs),
           rev: /Rev\s*:\s(.+)/.match(parsed[:rule]) ? /Rev\s*:\s(.+)/.match(parsed[:rule])[1] : 1,
           connection: /Connection\s*:\s(.+)/.match(parsed[:rule]) ? /Connection\s*:\s(.+)/.match(parsed[:rule])[1] : '<MISSING>',
           message: message,
@@ -269,11 +280,15 @@ class Rule < ApplicationRecord
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
     end
+
     rule_params
   end
 
+  # Runs the visruleparser perl script to parse a line of rule text.
+  # @param [String, #read] rule_text the line of rule text
+  # @return [Hash] hash with :rule and :errors text populated.
   def self.visruleparser(rule_text)
-    return nil if rule_text.nil?
+    return nil if rule_text.empty?
     parsed = {}
     temp_rule = Tempfile.new('temp.rules')
     temp_rule.write(rule_text.gsub(/\#\s/, ''))
@@ -288,6 +303,78 @@ class Rule < ApplicationRecord
     end
     temp_rule.close
     parsed
+  end
+
+  # Takes the hash and adds some data from the rules text
+  # @param [String, #read] rule the line of rule text.
+  # @return [Hash] a hash, with data from parsing rule text.
+  def self.parse_and_create_rule(rule)
+    parsed = visruleparser(rule)
+    parse_from_visrule(rule, parsed)
+  end
+
+  # Takes a rule and populates all the attributes to create a Rule record object.
+  # @param [String, #read] rule_content the line of rule text.
+  # @return [Hash] a hash, with all the attributes to create a Rule record object
+  def self.full_parse(rule_content)
+    raise "Rule text missing." if rule_content.nil?
+
+    rule_content.strip!
+
+    parsed = visruleparser(rule_content)
+    rule_attrs = parse_from_visrule(rule_content, parsed)
+    rule_attrs['rule_parsed'] = parsed[:rule]
+    rule_attrs['rule_warnings'] = parsed[:errors]
+    rule_attrs['cvs_rule_parsed'] = parsed[:rule]
+    rule_attrs['cvs_rule_content'] = rule_content
+    rule_attrs
+  end
+
+  # Take a line from a rule file and saves to database unless rev is unchanged
+  # @param [String, #read] rule_content the line of text from a rule file.
+  # @param [String, #read] filename the path or name of the file.
+  # @param [Fixnum, #read] linenumber the line number from the input rules file.
+  # @return [Rule] the rule loaded or nil if failed
+  # @raise [RuntimeError] could not process
+  def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
+    rule_attrs = full_parse(rule_content)
+    return nil unless rule_attrs
+    return nil if 'FAILED' == rule_attrs[:state]
+    raise 'No rule gid provided' unless rule_attrs[:gid]
+    raise 'No rule sid provided' unless rule_attrs[:sid]
+
+    rule_attrs[:filename] = filename
+    rule_attrs[:linenumber] = linenumber
+
+    rule = where(gid: rule_attrs[:gid]).where(sid: rule_attrs[:sid]).first
+    case
+      when rule.nil?
+        rule_attrs[:publish_status] = PUBLISH_STATUS_NEW
+        rule = create!(rule_attrs)
+        rule.associate_references(rule_content)
+      when rule.draft?
+        rule.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
+      when rule.rev != rule_attrs[:rev].to_i
+        rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
+        rule.update(rule_attrs)
+    end
+
+    rule
+  end
+
+  # Take a line from grep output of a rule file and saves to database unless rev is unchanged
+  # @param [String, #read] rule_grep_line the line of text from a rule file.
+  # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
+  # @raise [RuntimeError] could not process
+  def self.load_rule_from_grep(rule_grep_line)
+    filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
+
+    rule_content.strip!
+    if rule_content.empty?
+      ''
+    else
+      load_rule_from_content(rule_content, filename, line_number[1..-2].to_i)
+    end
   end
 
   def update_rule
@@ -350,6 +437,7 @@ class Rule < ApplicationRecord
         rule.rev = parsed['revision']
         rule.state = 'Unchanged'
       end
+      rule.publish_status = PUBLISH_STATUS_SYNCHED
       rule.save
       return rule
     rescue Exception => e
@@ -404,5 +492,41 @@ class Rule < ApplicationRecord
       val = 3
     end
     val
+  end
+
+  # Tests if rule is the current version in VC
+  # @return [boolean] true iff rule is latest version synced with VC
+  def synched?
+    %w[UNCHANGED].include?(state)
+  end
+
+  # Tests if rule is a user edited version
+  # @return [boolean] true iff rule is a user edited version
+  def draft?
+    %w[NEW UPDATED FAILED].include?(state)
+  end
+
+  # Tests if edited rule is new
+  # @return [boolean] true iff rule is a new edited rule
+  def new_rule?
+    draft? && sid.nil?
+  end
+
+  # Tests if edited rule is an edited update to an existing rule
+  # @return [boolean] true iff rule is a updated edited rule
+  def edited_rule?
+    draft? && sid.present?
+  end
+
+  # Tests if edited rule is in progress while VC updated the rule externally
+  # @return [boolean] true iff rule is a updated edited rule but VC has not changed
+  def current_edit?
+    edited_rule? && (PUBLISH_STATUS_CURRENT_EDIT == publish_status)
+  end
+
+  # Tests if edited rule is in progress while VC updated the rule externally
+  # @return [boolean] true iff rule is a updated edited rule and VC has updated the rule
+  def stale_edit?
+    edited_rule? && (PUBLISH_STATUS_STALE_EDIT == publish_status)
   end
 end
