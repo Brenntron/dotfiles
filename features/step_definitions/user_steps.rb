@@ -79,16 +79,6 @@ Then(/^I should see could not find user "(.*)" flash massage$/) do |user_id|
 end
 
 
-When(/^select "(.*?)" from "(.*?)" within "(.*?)"$/) do |option, select, context|
-  within(context) do
-    select(option, :from => select)
-  end
-end
 
-When(/^click button "(.*?)" within "(.*?)"$/) do |button, context|
-  within(context) do
-    click_button(button)
-  end
-end
 
 

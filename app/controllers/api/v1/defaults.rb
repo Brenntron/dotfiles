@@ -69,6 +69,18 @@ module API
           end
         end
 
+        rescue_from CanCan::AccessDenied do |e|
+          error_response(message: e.message, status: 403)
+        end
+
+        rescue_from XMLRPC::FaultException do |e|
+          error_response(message: e.message, status: 500)
+        end
+
+        rescue_from Grape::Exceptions::ValidationErrors do |e|
+          error_response(message: e.message, status: 406)
+        end
+
       end
     end
   end

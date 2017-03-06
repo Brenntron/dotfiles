@@ -145,11 +145,13 @@ class BugsController < ApplicationController
           @bugs = Bug.closed
         when "advance-search"
           @bugs = Bug.bugs_with_search(session[:search])
-        else
+        when "all-bugs"
           @bugs = Bug.all
+        else
+          @bugs = current_user.default_bug_list
       end
     else
-      @bugs = current_user.bugs
+      @bugs = current_user.default_bug_list
     end
   end
 

@@ -60,6 +60,19 @@ class User < ApplicationRecord
     end
   end
 
+  def default_bug_list
+    case
+      when has_role?('committer')
+        Bug.pending
+      when has_role?('analyst')
+        bugs.open + bugs.pending
+      when has_role?('build coordinator')
+        Bug.where(state: 'FIXED').order(:resolved_at)
+      else
+        bugs
+    end
+  end
+
   def authorized_user_list
     if has_role?('admin')
       User.all.map(&:id)
@@ -160,4 +173,14 @@ class User < ApplicationRecord
       return resource
     end
   end
+
+
+  def role_options_for
+    if self.has_role?('admin')
+      Role.all
+    else
+      Role.exclude_admin
+    end
+  end
+
 end
