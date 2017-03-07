@@ -44,6 +44,27 @@ $ ->
                 return
               ), 5000
           }
+        when 'revert'
+          if window.confirm("Are you sure?")
+            $.ajax {
+              url: "/api/v1/rules/revert"
+              data: { ids: selected }
+              type: 'PUT'
+              dataType: 'json'
+              success: (response) ->
+                $.each selected, (index, value) ->
+                  $('.rules_table tr#'+value).remove()
+                  $('.alert_rules').removeClass('error')
+                  $('.alert_rules').addClass('success').append('Rule '+value+' has been deleted\n')
+                  $('.rule_'+value).remove()
+              error: (response) ->
+                $('.alert_rules').addClass('error').append('Rule '+value+' has not been deleted\n')
+              complete: ->
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+            }
         when 'remove'
           if window.confirm("Are you sure?")
             $.ajax {
