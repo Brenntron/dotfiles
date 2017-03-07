@@ -46,19 +46,18 @@ $ ->
           }
         when 'revert'
           if window.confirm("Are you sure?")
+            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
             $.ajax {
               url: "/api/v1/rules/revert"
-              data: { ids: selected }
+              headers: headers
+              data:
+                id: 9
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
-                $.each selected, (index, value) ->
-                  $('.rules_table tr#'+value).remove()
-                  $('.alert_rules').removeClass('error')
-                  $('.alert_rules').addClass('success').append('Rule '+value+' has been deleted\n')
-                  $('.rule_'+value).remove()
+                alert("success")
               error: (response) ->
-                $('.alert_rules').addClass('error').append('Rule '+value+' has not been deleted\n')
+                alert("error")
               complete: ->
                 setTimeout (->
                   $('.alert_rules').hide 'blind', {}, 500

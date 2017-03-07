@@ -111,6 +111,10 @@
 </div>
 <div class="row spacer"></div>
 
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="xml_token" value="<%= xml_token %>">
+<input type="hidden" name="current_user" value="<%= current_user.id%>">
+
 <script>
   $('.show_rule').on('click', function(e){
     e.preventDefault();
@@ -126,3 +130,4 @@
     $('.rule_'+id).removeClass('hidden').addClass('active').show();
   });
 </script>
+

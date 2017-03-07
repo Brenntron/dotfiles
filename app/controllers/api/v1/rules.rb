@@ -79,6 +79,19 @@ module API
           new_rule
         end
 
+
+        #revert a rule
+        params do
+          requires :id, type: Integer, desc: "the id for the rule to be reverted"
+        end
+        put "revert", root: "rule" do
+          binding.pry
+          raise 'raspberry'
+          # authorize! :update, Rule
+          # Rule.remove_rule(permitted_params[:id])
+        end
+
+
         desc "Edit a rule"
         params do
           requires :id, type: Integer, desc: "The database id of the rule you want to update."
@@ -110,7 +123,7 @@ module API
           else
             unless rule.sid.nil? || (update_params[:state] == 'FAILED')
               update_params[:state] = "UPDATED"
-              update_params[:publish_status] = Rule.PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
+              update_params[:publish_status] = Rule::PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
               update_params[:committed] = false
             end
           end
@@ -160,7 +173,6 @@ module API
           authorize! :destroy, Rule
           Rule.remove_rule(permitted_params[:id])
         end
-
       end
     end
   end
