@@ -1,17 +1,16 @@
 $ ->
-  $('#relationship_team_member_id').on 'change', ->
-    newTeamMember = $('#relationship_team_member_id option:selected')
+  $('#child_id').on 'change', ->
+    newTeamMember = $('#child_id option:selected')
     $.ajax
       url: 'relationships/member_status'
       method: 'GET'
       data: 'new_member': newTeamMember.val()
       success: (res, status, xhr) ->
         if xhr.getResponseHeader('New-Member') == 'false'
-          $('.modal-body').eq(0).html( "<p> #{newTeamMember.text()} is on a team already. Users can be members of multiple teams. </p>" )
+          $('.info-alert').eq(0).html( "<p> #{newTeamMember.text()} is on a team already. Are you sure you want to move #{newTeamMember.text()} to another team? </p>" )
           $('#new_member_modal').appendTo('body').modal 'show'
         return
     return
-
 
   $('.back_btn_user').click ->
     window.location.replace('/users')

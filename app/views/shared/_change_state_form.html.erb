@@ -21,7 +21,7 @@
             <% end %> end %>
           <% end %>
         <% end %>
-        <% if current_user.committer %>
+        <% if current_user.has_role?('committer') %>
           <% ['FIXED', 'WONTFIX', 'LATER', 'INVALID'].each do |state| %>
             <% if state == @bug.state %>
                 <option value="<%= state %>" selected="selected"><%= state %></option>

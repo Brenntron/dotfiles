@@ -1,13 +1,8 @@
 <form id="change_committer_form" style="display:none;" class="form-inline top-space">
   <div class="form-group row">
     <div class="col-xs-12 col-lg-10">
-      <select class="form-control input-sm" id="bug_committer">
-        <option value="" disabled selected>select user</option>
-        <% @users.each do |user| %>
-          <option value='<%= user.id %>'><%= user.cvs_username %></option>
-        <% end %>
-      </select>
-      <button class="btn btn-xs btn-default" value="submit" type="submit">done</button>
+      <%=select_tag :committer_id, options_for_select(Bug.allowed_committers(@bug).pluck(:cvs_username,:id), selected: @bug.committer_id), id: 'bug_committer', class: 'form-control input-sm'%>
+      <button class="btn btn-xs btn-default" value="submit" type="submit">change</button>
     </div>
   </div>
 </form>

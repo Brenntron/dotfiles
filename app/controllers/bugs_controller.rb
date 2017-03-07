@@ -1,4 +1,5 @@
 class BugsController < ApplicationController
+  load_and_authorize_resource except: [:add_tag, :remove_tag]
 
   before_action :require_login
   before_action :query_bugs
@@ -131,10 +132,10 @@ class BugsController < ApplicationController
         when "my-bugs"
           @bugs = current_user.bugs
         when "team-bugs"
-          if current_user.manager?
-            @bugs = current_user.team_members.map{ |cw| cw.bugs }[0]
+          if current_user.has_role?('manager')
+            @bugs = current_user.children.map{ |cw| cw.bugs }[0]
           else
-            @bugs = current_user.co_workers.map{ |cw| cw.bugs }[0]
+            @bugs = current_user.siblings.map{ |cw| cw.bugs }[0]
           end
         when "open-bugs"
           @bugs = Bug.open
@@ -144,11 +145,13 @@ class BugsController < ApplicationController
           @bugs = Bug.closed
         when "advance-search"
           @bugs = Bug.bugs_with_search(session[:search])
-        else
+        when "all-bugs"
           @bugs = Bug.all
+        else
+          @bugs = current_user.default_bug_list
       end
     else
-      @bugs = current_user.bugs
+      @bugs = current_user.default_bug_list
     end
   end
 

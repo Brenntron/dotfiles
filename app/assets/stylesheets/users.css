@@ -18,3 +18,7 @@
 .modal-header.user {
     background-color: #D29864;
 }
+
+.modal-backdrop, .modal-backdrop.in{
+    display: none;
+}

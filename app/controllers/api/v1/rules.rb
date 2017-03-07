@@ -68,6 +68,7 @@ module API
           end
         end
         post "", root: "rule" do
+          authorize! :create, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
           new_rule.bugs << Bug.where(id:permitted_params[:rule][:bug_id]).first if permitted_params[:rule][:bug_id]
@@ -100,6 +101,7 @@ module API
           end
         end
         put ":id", root: "rule" do
+          authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
           rule = Rule.where(id:permitted_params[:id]).first
@@ -124,6 +126,7 @@ module API
           requires :id, desc: "IDs of the rules you wish to import"
         end
         post "import_multiple/:sids", root: "rule" do
+          authorize! :create, Rule
           Rule.import_multiple(params[:sids])
         end
 
@@ -133,6 +136,7 @@ module API
           requires :id, type: Integer, desc: "the id for the rule to be updated"
         end
         post "update", root: "rule" do
+          authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.cvs_username
           Rule.update(permitted_params[:id])
         end
@@ -143,6 +147,7 @@ module API
           requires :id, type: Integer, desc: "rule id"
         end
         delete ":id", root: "rule" do
+          authorize! :destroy, Rule
           Rule.destroy(permitted_params[:id])
         end
 
@@ -152,6 +157,7 @@ module API
           requires :id, type: Integer, desc: "the id for the rule to be deleted"
         end
         delete "delete", root: "rule" do
+          authorize! :destroy, Rule
           Rule.remove_rule(permitted_params[:id])
         end
 

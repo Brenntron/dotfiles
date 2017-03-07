@@ -1,16 +1,12 @@
 class NotesController < ApplicationController
+  load_and_authorize_resource
   
   def create
     if params[:note][:id]
       @note = Note.where("id=?", params[:note][:id]).first
       @note.comment = params[:note][:comment]
     else
-      @note = Note.new(
-          :comment => params[:note][:comment],
-          :author => current_user.email,
-          :note_type => params[:note][:note_type],
-          :bug_id => params[:note][:bugzilla_id]
-      )
+      @note = Note.new(note_params.merge(author: current_user.email, bug_id: params[:note][:bugzilla_id]))
     end
     if @note.save
       render json: @note
@@ -49,5 +45,12 @@ class NotesController < ApplicationController
 
   end
 
+end
+
+
+private
+
+def note_params
+  params.require(:note).permit(:comment, :author, :flow, :note_type, :bug_id, :notes_bugzilla_id, :id)
 end
 

@@ -22,6 +22,7 @@ module API
           end
         end
         post "", root: "note" do
+          authorize! :create, Note
           options = {
             :id => permitted_params[:note][:bugzilla_id],
             :comment => permitted_params[:note][:comment],
@@ -63,6 +64,7 @@ module API
           end
         end
         put ":id", root: "note" do
+          authorize! :update, Note
           Note.update(permitted_params[:id], permitted_params[:note])
         end
 
@@ -72,6 +74,7 @@ module API
           requires :id, type: Integer, desc: "Bugzilla id."
         end
         delete ":id", root: "note" do
+          authorize! :destroy, Note
           Note.destroy(permitted_params[:id])
         end
 

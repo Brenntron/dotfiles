@@ -23,6 +23,7 @@ $ ->
         $('#researchNotesEditBtn').html('edit')
         $('input[name="research_note_id"]').val(response.id)
         $('#researchNotesPublishBtn').attr('disabled', false)
+        window.location.reload()
       error: (response) ->
         $('.alert_notes').removeClass('success')
         $('.alert_notes').addClass('error').show().html(response.responseText)

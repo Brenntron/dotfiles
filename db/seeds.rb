@@ -37,6 +37,11 @@ rule_categories.each do |rc|
   RuleCategory.create(category: rc)
 end
 
+roles = ['admin', 'analyst', 'build coordinator', 'committer', 'manager']
+
+roles.each do |role|
+  Role.create(role: role)
+end
 
 # Reference.create(reference_data:"12345",reference_type: ref2)
 # Reference.create(reference_data:"cve,1936-7254",reference_type: ref1)

@@ -1,15 +1,20 @@
 <div class='row item-info'>
   <div class="row subheading">
     <button class="btn back_btn_user pull-right">
-      <i class="glyphicon glyphicon-arrow-left"></i> Back
+      <i class="glyphicon glyphicon-th-list"></i> <strong class="hidden-xs">user list</strong>
     </button>
   </div>
   <div class='col-lg-11 col-md-11'>
     <div class="row">
       <div class="col-xs-12 col-sm-4">
         <h2 class="subtitle"><%= @user.cvs_username %>&nbsp;&nbsp;
-          <span class="email-link"><a href="mailto:<%= @user.email %>"><i class="glyphicon glyphicon-envelope"></i></a></span>
+          <span class="email-link">
+            <% if @user.ancestors.include?(current_user) || current_user.has_role?('admin') %>
+              <a type="button" class="glyphicon glyphicon-pencil" data-target='<%= "#roleModal_#{@user.id}" %>' data-toggle="modal"></a>
+            <% end %>
+            <a href="mailto:<%= @user.email %>"><i class="glyphicon glyphicon-envelope"></i></a></span>
         </h2>
+        <p class="text-muted"><em><strong><%=@user.roles.map(&:role).join(', ')%></strong></em></p>
       </div>
     </div>
     <div class='row top-space'>
@@ -20,11 +25,9 @@
           </div>
           <div class="col-xs-6 col-sm-4">
             <h6 class="text-muted">managers</h6>
-            <% if @user.managers.any? %>
+            <% if @user.parent.present? %>
               <ul class="compact-list">
-                <% @user.managers.each do |manager| %>
-                  <li><%= link_to manager.cvs_username, user_path(manager) %></li>
-                <% end %>
+                <li><%= link_to @user.parent.cvs_username, user_path(@user.parent) %></li>
               </ul>
             <% else %>
               <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> answers to no one!</em></p>
@@ -32,9 +35,9 @@
           </div>
           <div class="col-xs-6 col-sm-4">
             <h6 class="text-muted">team</h6>
-            <% if @user.team_members.any? %>
+            <% if @user.children.any? %>
               <ul class="compact-list">
-                <% @user.team_members.each do |member| %>
+                <% @user.children.each do |member| %>
                 <li><%= link_to member.cvs_username, user_path(member) %></li>
                 <% end %>
               </ul>
@@ -44,9 +47,9 @@
           </div>
           <div class="col-xs-6 col-sm-4">
             <h6 class="text-muted">co-workers</h6>
-            <% if @user.co_workers.any? %>
+            <% if @user.siblings.any?  && @user.child? %>
                 <ul class="compact-list">
-                  <% @user.co_workers.each do |co| %>
+                  <% @user.siblings.each do |co| %>
                       <li><%= link_to co.cvs_username, user_path(co) %></li>
                   <% end %>
                 </ul>
@@ -157,3 +160,18 @@
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
 <input type="hidden" name="xml_token" value="<%= xml_token %>">
 <input type="hidden" name="current_user" value="<%= current_user.id%>">
+
+
+<div class="modal fade" id= '<%= "roleModal_#{@user.id}" %>' tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidde="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Update Role(s) for <%=@user.cvs_username%></h4>
+      </div>
+      <div class="modal-body">
+        <%=render 'shared/role_form', user: @user %>
+      </div>
+    </div>
+  </div>
+</div>

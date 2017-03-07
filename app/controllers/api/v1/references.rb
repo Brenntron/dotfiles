@@ -15,7 +15,7 @@ module API
           end
         end
         post "", root: "reference" do
-
+          authorize! :create, Reference
           ref = Reference.create(
               :reference_data => permitted_params[:reference][:reference_data],
               :reference_type_id => ReferenceType.find_by_name(permitted_params[:reference][:type]).id
@@ -36,6 +36,7 @@ module API
           end
         end
         put ":id", root: "reference" do
+          authorize! :update, Reference
           puts "updating reference"
         end
 
@@ -44,6 +45,7 @@ module API
           requires :id, type: Integer, desc: "The ID of the reference to be deleted."
         end
         delete ":id", root: "reference" do
+          authorize! :destroy, Reference
           Reference.find(permitted_params[:id]).destroy
         end
 

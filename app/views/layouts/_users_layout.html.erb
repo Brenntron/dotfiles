@@ -8,19 +8,21 @@
         <tr class="highlight <%= 'active' if current_user.id.to_s == params[:id] %>" id="show_<%= current_user.id %>">
           <td><%= link_to current_user.cvs_username, user_path(current_user) %></td>
         </tr>
-        <% if current_user.manager? %>
+        <% if current_user.has_role?('manager') %>
           <tr><td><strong>team</strong></td></tr>
-          <% current_user.team_members.each do |user| %>
+          <% current_user.children.each do |user| %>
               <tr class="highlight <%= 'active' if user.id.to_s == params[:id] %>" id="show_<%= user.id %>">
                 <td><%= link_to user.cvs_username, user_path(user) %></td>
               </tr>
           <% end %>
         <% end %>
-        <tr><td><strong>co-workers</strong></td></tr>
-        <% current_user.co_workers.each do |user| %>
-            <tr class="highlight <%= 'active' if user.id.to_s == params[:id] %>" id="show_<%= user.id %>">
-              <td><%= link_to user.cvs_username, user_path(user) %></td>
-            </tr>
+        <% if current_user.child? %>
+          <tr><td><strong>co-workers</strong></td></tr>
+          <% current_user.siblings.each do |user| %>
+              <tr class="highlight <%= 'active' if user.id.to_s == params[:id] %>" id="show_<%= user.id %>">
+                <td><%= link_to user.cvs_username, user_path(user) %></td>
+              </tr>
+          <% end %>
         <% end %>
       </tbody>
     </table>
@@ -32,7 +34,6 @@
     <div class="row header">
       <!-- action links -->
       <div class="col-xs-12 actions-bar">
-
         <%= form_for :user, url: results_users_path, method: :get do |form| %>
           <%= form.fields_for :search do |search_fields| %>
             <%= search_fields.label :name %>
@@ -41,13 +42,13 @@
           <%= form.submit 'Search' %>
         <% end %>
 
-        <% if current_user.manager? %>
+          <% if current_user.has_role?('manager') %>
           <%= link_to user_relationships_path(current_user) do %>
             <button class="btn btn-link icon-link custom-icon"><%= image_tag "tree-diagram-icon.png" %></button>
           <% end %>
         <%end%>
       </div>
-      <% if current_user.committer %>
+      <% if current_user.has_role?('committer') %>
       <!-- committer specific links-->
       <% end %>
     </div>

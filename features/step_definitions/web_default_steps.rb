@@ -129,6 +129,18 @@ When /^I wait for the ajax request to finish$/ do
   end
 end
 
+When(/^select "(.*?)" from "(.*?)" within "(.*?)"$/) do |option, select, context|
+  within(context) do
+    select(option, :from => select)
+  end
+end
+
+When(/^click button "(.*?)" within "(.*?)"$/) do |button, context|
+  within(context) do
+    click_button(button)
+  end
+end
+
 When(/^I select "(.*?)" from "(.*?)"$/) do |option, select|
   if option == "next year"
     option = (Time.now + 1.year).strftime("%Y")
@@ -207,6 +219,18 @@ end
 
 Then(/^response header "(.*?)" should be "(.*?)"$/) do |header_key,header_value|
   raise "response header #{header_key} = #{page.response_headers[header_key]}. Expected #{header_value}" if page.response_headers[header_key] != header_value
+end
+
+Then(/^I click the link with data-target "(.*?)"$/) do |target|
+  find("a[data-target='#{target}']").click
+end
+
+And(/^"(.*?)" should be in the "(.*?)" dropdown list$/) do |value, field|
+  find_field(field).all('option').collect(&:text).include?(value).should == true
+end
+
+And(/^"(.*?)" should not be in the "(.*?)" dropdown list$/) do |value, field|
+  find_field(field).all('option').collect(&:text).include?(value).should == false
 end
 
 Then(/^show me the page$/) do

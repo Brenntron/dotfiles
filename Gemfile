@@ -9,7 +9,8 @@ gem 'grape-swagger-rails'
 gem 'rack-cors', require: 'rack/cors'
 gem 'kaminari', '~> 0.16.3'
 
-gem 'cancan', '1.6.10'
+gem 'cancancan', '1.16.0'
+gem 'grape-cancan'
 gem 'devise', '4.2.0'
 gem 'net-ldap', '~> 0.11'
 
@@ -39,6 +40,7 @@ gem 'selectize-rails'
 gem 'chart-js-rails'
 gem 'chartkick'
 gem 'bootstrap-multiselect-rails'
+gem 'awesome_nested_set'
 
 group :development do
   gem 'thin', '~> 1.7.0'

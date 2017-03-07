@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161220161215) do
+ActiveRecord::Schema.define(version: 20170302175702) do
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_attachment_id"
@@ -87,8 +87,8 @@ ActiveRecord::Schema.define(version: 20161220161215) do
   end
 
   create_table "bugs_rules", primary_key: ["bug_id", "rule_id"], force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "bug_id",  null: false
-    t.integer "rule_id", null: false
+    t.integer "bug_id",  default: 0, null: false
+    t.integer "rule_id", default: 0, null: false
   end
 
   create_table "bugs_tags", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -175,11 +175,16 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.index ["rule_id"], name: "index_references_rules_on_rule_id", using: :btree
   end
 
-  create_table "relationships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "user_id"
-    t.integer  "team_member_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "role"
+  end
+
+  create_table "roles_users", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "user_id", null: false
+    t.integer "role_id", null: false
+    t.index ["role_id"], name: "index_roles_users_on_role_id", using: :btree
+    t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id", unique: true, using: :btree
+    t.index ["user_id"], name: "index_roles_users_on_user_id", using: :btree
   end
 
   create_table "rule_categories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -222,6 +227,7 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.integer  "sid"
     t.integer  "rev"
     t.string   "state"
+    t.string   "publish_status",                 default: "SYNCHED", null: false
     t.float    "average_check",    limit: 24
     t.float    "average_match",    limit: 24
     t.float    "average_nonmatch", limit: 24
@@ -231,7 +237,9 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.datetime "updated_at"
     t.integer  "task_id"
     t.integer  "rule_category_id"
-    t.index ["gid", "sid"], name: "index_rules_on_gid_and_sid", unique: true, using: :btree
+    t.string   "filename"
+    t.integer  "linenumber"
+    t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true, using: :btree
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
     t.index ["task_id"], name: "index_rules_on_task_id", using: :btree
   end
@@ -273,14 +281,20 @@ ActiveRecord::Schema.define(version: 20161220161215) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.string   "role"
     t.integer  "class_level"
     t.string   "authentication_token"
     t.integer  "metrics_timeframe",      default: 7
+    t.integer  "parent_id"
+    t.integer  "lft",                                    null: false
+    t.integer  "rgt",                                    null: false
+    t.integer  "depth",                  default: 0,     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["lft"], name: "index_users_on_lft", using: :btree
+    t.index ["parent_id"], name: "index_users_on_parent_id", using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+    t.index ["rgt"], name: "index_users_on_rgt", using: :btree
   end
 
   create_table "versions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|

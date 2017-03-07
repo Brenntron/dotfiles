@@ -15,14 +15,14 @@
       <td><%= current_user.bugs.pending.count %></td>
       <td><%= current_user.bugs.count %></td>
       <td>
-        <% if current_user.committer %>
+        <% if current_user.has_role?('committer') %>
             <i class="glyphicon glyphicon-ok"></i>
         <% end %>
       </td>
     </tr>
-    <% if current_user.manager? %>
+    <% if current_user.has_role?('manager') %>
       <tr></tr>
-      <% current_user.team_members.each do |user| %>
+      <% current_user.children.each do |user| %>
         <tr>
           <td><%= user.bugs.open.count %></td>
           <td><%= user.bugs.pending.count %></td>
@@ -37,18 +37,20 @@
       <% end %>
     <% end %>
     <tr></tr>
-    <% current_user.co_workers.each do |user| %>
-        <tr>
-          <td><%= user.bugs.open.count %></td>
-          <td><%= user.bugs.pending.count %></td>
-          <td><%= user.bugs.closed.count %></td>
-          <td><%= user.bugs.count %></td>
-          <td>
-            <% if user.committer %>
-                <i class="glyphicon glyphicon-ok"></i>
-            <% end %>
-          </td>
-        </tr>
+    <% if current_user.child? %>
+      <% current_user.siblings.each do |user| %>
+          <tr>
+            <td><%= user.bugs.open.count %></td>
+            <td><%= user.bugs.pending.count %></td>
+            <td><%= user.bugs.closed.count %></td>
+            <td><%= user.bugs.count %></td>
+            <td>
+              <% if user.committer %>
+                  <i class="glyphicon glyphicon-ok"></i>
+              <% end %>
+            </td>
+          </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>

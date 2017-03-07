@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   before_action :require_login
 
   def index
-    @users = current_user.team_members
+    @users = current_user.children
   end
 
   def show
@@ -16,12 +16,46 @@ class UsersController < ApplicationController
         flash[:error] = 'You are not authorized to view that user.'
         redirect_to users_path
       else
-        @users = current_user.team_members
+        @users = current_user.children
     end
   end
 
   def results
     @users = User.search(params.require(:user).require(:search).permit(:name))
+  end
+
+  def update
+    @user = User.find(params[:id])
+    @user.update(user_params)
+    redirect_back(fallback_location: :back)
+    if @user.save
+      flash[:notice] = "#{@user.cvs_username} updated successfully."
+    else
+      flash[:alert] = "Unable to update #{@user.cvs_username}."
+    end
+  end
+
+  def add_to_team
+    @user = User.find(params[:user_id])
+    @child = User.find(params[:child_id])
+    @child.move_to_child_of(@user)
+    redirect_back(fallback_location: :back)
+    if @child.save
+      flash[:notice] = "#{@child.cvs_username} successfully added to #{@user.cvs_username}'s team."
+    else
+      flash[:alert] = "Unable to add #{@child.cvs_username} to #{@user.cvs_username}'s team."
+    end
+  end
+
+  def remove_from_team
+    @child = User.find(params[:user_id])
+    @child.update(parent_id: nil)
+    redirect_back(fallback_location: :back)
+    if @child.save
+      flash[:notice] = "#{@child.cvs_username} successfully removed from team."
+    else
+      flash[:alert] = "Unable to remove #{@child.cvs_username} from team."
+    end
   end
 
   def status_metrics
@@ -97,6 +131,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:display_name, :committer, :confirmed, :email, :role, :class_level, :metrics_timeframe)
+    params.require(:user).permit(:parent_id, :display_name, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
   end
 end

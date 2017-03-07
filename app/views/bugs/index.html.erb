@@ -12,7 +12,7 @@
   </thead>
   <tbody>
   <% @bugs.each do |bug| %>
-      <tr id="bug_<%= bug.id %>">
+      <tr id="bug_<%= bug.id %>" class="<%=set_bug_color(bug) %>">
         <td><%= bug.summary %></td>
         <td><%= bug.tags.map{|t| "[#{t.name}]"}.join(' ') %></td>
         <td>&nbsp;&nbsp;&nbsp;<%= bug.state %></td>

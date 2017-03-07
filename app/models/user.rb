@@ -1,10 +1,8 @@
 class User < ApplicationRecord
+  acts_as_nested_set
+
   has_many :bugs
-  has_many :team_member_relationships, class_name: 'Relationship'
-  has_many :team_members, through: :team_member_relationships
-  has_many :manager_relationships, class_name: 'Relationship', foreign_key: 'team_member_id'
-  has_many :managers, through: :manager_relationships, source: :user
-  has_many :relationships
+  has_and_belongs_to_many :roles, dependent: :destroy
 
 
   before_save :ensure_authentication_token
@@ -27,6 +25,8 @@ class User < ApplicationRecord
 
   DEFAULT_METRICS_TIMEFRAME = 7
 
+  scope :with_role, ->(role) { joins(:roles).where('roles.role = ?', role) }
+
   def self.search(conditions)
     # all
     name = conditions["name"]
@@ -46,38 +46,49 @@ class User < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
+  def has_role?(role)
+    roles.where(role: role).any?
+  end
+
+  def available_users
+    User.all.reject{|u| self_and_ancestors.include?(u) || children.include?(u)}
+  end
+
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
     end
   end
 
-  def co_workers
-    co = []
-    managers.each do |m|
-      m.team_members.each do |tm|
-        co << tm
-      end
+  def default_bug_list
+    case
+      when has_role?('committer')
+        Bug.pending
+      when has_role?('analyst')
+        bugs.open + bugs.pending
+      when has_role?('build coordinator')
+        Bug.where(state: 'FIXED').order(:resolved_at)
+      else
+        bugs
     end
-    co.reject { |u| u == self }
   end
 
   def authorized_user_list
-    users = co_workers + team_members + [self]
-    [].tap { |arry| arry << users.map(&:id) }.flatten
+    if has_role?('admin')
+      User.all.map(&:id)
+    else
+      users = siblings + self_and_descendants
+      [].tap { |arry| arry << users.map(&:id) }.flatten
+    end
   end
 
   def authorized_to_see?(user_id)
     authorized_user_list.include?(user_id)
   end
 
-  def manager?
-    role == 'manager'
-  end
-
   def team_metrics(bug_status)
     result = []
-    team_members.each do |tm|
+    descendants.each do |tm|
       bug_count = {}
       (chart_timeframe_preference.days.ago.to_date..Date.today).each do |day|
         bug_count[day.strftime('%b %d, %Y')] = tm.bugs.where("DATE(#{bug_status}_at) = ?", day).count
@@ -88,7 +99,7 @@ class User < ApplicationRecord
   end
 
   def team_work_times
-    team_members.map { |tm| { "#{tm.cvs_username}" => [tm.bugs.average(:work_time).try(:round) || 0,
+    descendants.map { |tm| { "#{tm.cvs_username}" => [tm.bugs.average(:work_time).try(:round) || 0,
                                                      tm.bugs.average(:rework_time).try(:round) || 0,
                                                      tm.bugs.average(:review_time).try(:round) || 0,
                                                      tm.average_resolution_times] } }
@@ -101,7 +112,7 @@ class User < ApplicationRecord
 
   def team_by_component(component)
     result = {}
-    bugs = team_members.map { |tm| tm.bugs.by_component(component) }.flatten
+    bugs = descendants.map { |tm| tm.bugs.by_component(component) }.flatten
 
     result[:work_time]       = bugs.map(&:work_time).compact
     result[:rework_time]     = bugs.map(&:rework_time).compact
@@ -140,7 +151,7 @@ class User < ApplicationRecord
         new_record.cvs_username   = request.env['AUTHENTICATE_SAMACCOUNTNAME'] || Rails.configuration.backend_auth[:authenticate_cvs_username]
         new_record.cec_username   = request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
         new_record.display_name   = request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
-        new_record.committer      = 'true'
+        new_record.committer      = 'false'
         new_record.class_level    = 'unclassified'
         new_record.password       = 'password'
         new_record.password_confirmation = 'password'

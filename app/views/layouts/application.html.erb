@@ -32,9 +32,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <p class="login-area">
+
             <% if current_user %>
-              <span class="login-label"> <strong class="current_user"><%= current_user[:display_name] %></strong> </span>
+              <a href="/users/<%= current_user[:id] %>">
+              <p class="login-area">
+             <span class="login-label"> <strong class="current_user"><%= current_user[:display_name] %></strong> </span>
+              </p>
+              </a>
             <% end %>
             <% if controller_name == 'bugs' %>
               <%= render 'layouts/bugs_layout'%>
@@ -45,7 +49,7 @@
             <% elsif controller_name == "relationships" %>
               <%= render 'layouts/relationships_layout' %>
             <% end %>
-          </p>
+
         </div>
       </div>
     </div>

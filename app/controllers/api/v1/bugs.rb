@@ -281,6 +281,7 @@ module API
           end
         end
         post "", root: "bug" do
+          authorize! :create, Bug
           options = {
               :product => permitted_params[:bug][:product],
               :component => permitted_params[:bug][:component],
@@ -320,7 +321,12 @@ module API
           requires :id, type: Integer, desc: "Bugzilla id."
         end
         delete ":id", root: "bug" do
-          Bug.destroy(permitted_params[:id])
+          begin
+            authorize! :destroy, Bug
+            Bug.destroy(permitted_params[:id])
+          rescue CanCan::AccessDenied => e
+            error!({error: "Access denied.",message: e.message}, 200)
+          end
         end
 
         desc "close a bug"

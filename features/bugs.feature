@@ -6,7 +6,7 @@ Feature: Bug
 
   @javascript
   Scenario: A user can view and filter bugs
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
       | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
@@ -29,7 +29,7 @@ Feature: Bug
 # ==== Creating a Bug with Tags ===
   @javascript
   Scenario: A new bug can be created with tags
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following tags exist:
       | name  |
       | TELUS |
@@ -49,7 +49,7 @@ Feature: Bug
   # ==== Editing Tags ===
   @javascript
   Scenario: The summary text should update with tag edits
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -68,7 +68,7 @@ Feature: Bug
   # ==== Deleteing Bugs ===
   @javascript
   Scenario: A bug can be deleted
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -100,7 +100,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can not set the state of a bug to pending when exploits are missing attachments
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following exploit types exist:
       | id | name   | description                              |
       | 1  | core   | Core Impact exploit module.              |
@@ -130,7 +130,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can return to the index from viewing a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -162,13 +162,80 @@ Feature: Bug
 
   @javascript
   Scenario: a user can change the editor of a bug
+            the committer of the bug should not be availabe for the editor dropdown
+    Given a user with role "analyst" exists and is logged in
+
+    And the following users exist
+      | id | email                | cvs_username  | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+
+    And the following roles exist:
+      | role           |
+      | committer      |
+      | manager        |
+
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |  6           |
+
+    And a user with id "2" has a role of "manager"
+    And a user with id "6" has a role of "committer"
+
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click "editor"
+    And "rainbow_b" should be in the "bug_editor" dropdown list
+    And "t_bear" should not be in the "bug_editor" dropdown list
+    And I select "rainbow_b" from "bug_editor"
+    Then I click button "done"
+    And I wait for "3" seconds
+# uncomment when connectivity to bugzilla test fixed
+# And I should see "rainbow_b"
 
   @javascript
   Scenario: a user can change the committer of a bug
+            only a user with role committer should be available in the dropdown
+            user assigned as editor cannot be in the committer dropdown
+    Given a user with role "analyst" exists and is logged in
+
+    And the following users exist
+      | id | email                | cvs_username  | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+
+    And the following roles exist:
+      | role           |
+      | committer      |
+      | manager        |
+
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | user_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |  4      |
+
+    And a user with id "4" has a role of "committer"
+    And a user with id "6" has a role of "committer"
+
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click "committer"
+    And "t_bear" should be in the "bug_committer" dropdown list
+    And "d_drumph" should not be in the "bug_committer" dropdown list
+    And I select "t_bear" from "bug_committer"
+    Then I click button "done"
+    And I wait for "3" seconds
+# uncomment when connectivity to bugzilla test fixed
+# And I should see "t_bear"
 
   @javascript
   Scenario: a user can change the priority of a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -183,7 +250,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can change the component of a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
        | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
        | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -199,7 +266,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a new rule to a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -216,7 +283,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a new rule to a bug only if all required fields are filled out
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -236,7 +303,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a new rule and the rule doc impact will populate after save
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -269,7 +336,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can remove a rule from a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -282,7 +349,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can edit a rule attached to a bug
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
@@ -301,7 +368,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can test a rule
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -320,7 +387,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can test add an attachment
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -341,7 +408,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can test an attachment
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -360,7 +427,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can edit research notes
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -372,6 +439,7 @@ Feature: Bug
     And  I fill in "research_notes" with "This is a research note"
     And I click "save"
     Then I should see "Notes saved"
+    Then I wait for "2" seconds
     When I click "publish"
     And I wait for "5" seconds
     Then I should see "Notes published to bugzilla"
@@ -390,6 +458,7 @@ Feature: Bug
     And I goto "/bugs/145359"
     And I click ".notes-tab"
     And I click "Committer notes"
+    Then I wait for "1" seconds
     And I click "#committerNotesEditBtn"
     And  I fill in "committer_notes" with "This is a research note"
     And I click "save"
@@ -405,7 +474,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can add a comment
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
@@ -423,7 +492,7 @@ Feature: Bug
 
   @javascript
   Scenario: a user can sort history from oldest to newest messages.
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
