@@ -19,6 +19,9 @@ class Bug < ApplicationRecord
   scope :pending, -> { where(state: "PENDING") }
   scope :by_component, ->(component) { where('component = ?', component) }
 
+  scope :allowed_editors, ->(bug) {User.all.reject { |u| u.id == bug.committer_id }}
+  scope :allowed_committers, ->(bug) {User.all.reject { |u| u.id == bug.committer_id }}
+
   enum classification: {
                           unclassified: 0,
                           confidential: 1,
@@ -306,7 +309,6 @@ class Bug < ApplicationRecord
           else
             new_record.resolved_at = last_change_time
           end
-
           creator = User.where('email=?', item['creator']).first
           new_user = User.where('email=?', item['assigned_to']).first
           new_committer = User.where('email=?', item['qa_contact']).first
@@ -321,22 +323,29 @@ class Bug < ApplicationRecord
             new_record.creator = creator
           end
           if new_user.nil?
-            new_record.user = User.create(kerberos_login: 'generated',
+             new_generated_user = User.new(kerberos_login: 'generated',
                                           cvs_username: item['assigned_to'].gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@sourcefire.com', ''),
                                           email: item['assigned_to'],
                                           password: 'password',
                                           password_confirmation: 'password',
                                           committer: 'false')
+            new_generated_user.roles = Role.where(role:"analyst")
+            new_generated_user.save
+            new_record.user = new_generated_user
           else
             new_record.user = new_user
           end
           if new_committer.nil?
-            new_record.committer = User.create(kerberos_login: 'generated',
+            new_generated_committer = User.new(kerberos_login: 'generated',
                                                cvs_username: item['qa_contact'].gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@sourcefire.com', ''),
                                                email: item['qa_contact'],
                                                password: 'password',
                                                password_confirmation: 'password',
-                                               committer: 'false')
+                                               committer: 'true')
+
+            new_generated_committer.roles = Role.where(role:"committer")
+            new_generated_committer.save
+            new_record.committer = new_generated_committer
           else
             new_record.committer = new_committer
           end

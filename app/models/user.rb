@@ -151,7 +151,7 @@ class User < ApplicationRecord
         new_record.cvs_username   = request.env['AUTHENTICATE_SAMACCOUNTNAME'] || Rails.configuration.backend_auth[:authenticate_cvs_username]
         new_record.cec_username   = request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
         new_record.display_name   = request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
-        new_record.committer      = 'true'
+        new_record.committer      = 'false'
         new_record.class_level    = 'unclassified'
         new_record.password       = 'password'
         new_record.password_confirmation = 'password'
@@ -173,14 +173,4 @@ class User < ApplicationRecord
       return resource
     end
   end
-
-
-  def role_options_for
-    if self.has_role?('admin')
-      Role.all
-    else
-      Role.exclude_admin
-    end
-  end
-
 end

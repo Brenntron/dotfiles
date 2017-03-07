@@ -137,7 +137,7 @@ $ ->
         bug:
           'editor_id': editor
       success: (response) ->
-        $('#current_bug_editor').html(response.user_name).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
+        $('#current_bug_editor').html(response.user_name).append('<button class="tiny text-muted change_current_bug_editor" id="editor"><em>change</em></button>')
         $('#current_bug_editor, #change_editor_form').toggle()
         location.reload()
       error: (response) ->
@@ -159,7 +159,7 @@ $ ->
         bug:
           'reviewer_id': committer
       success: (response) ->
-        $('#current_bug_committer').html(response.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
+        $('#current_bug_committer').html(response.committer_name).append('<button class="tiny text-muted change_current_bug_committer" id="committer"><em>change</em></button>')
         $('#current_bug_committer, #change_committer_form').toggle()
         location.reload()
       error: (response) ->
