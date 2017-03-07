@@ -191,7 +191,7 @@ Feature: Bug
     And "rainbow_b" should be in the "bug_editor" dropdown list
     And "t_bear" should not be in the "bug_editor" dropdown list
     And I select "rainbow_b" from "bug_editor"
-    Then I click button "done"
+    Then I click button "change editor"
     And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "rainbow_b"
@@ -228,7 +228,7 @@ Feature: Bug
     And "t_bear" should be in the "bug_committer" dropdown list
     And "d_drumph" should not be in the "bug_committer" dropdown list
     And I select "t_bear" from "bug_committer"
-    Then I click button "done"
+    Then I click button "change committer"
     And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "t_bear"
@@ -258,7 +258,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click "component"
     And I select "Malware" from "component"
-    Then I click button "done"
+    Then I click button "change component"
     And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 #    Then I should see "Malware"
