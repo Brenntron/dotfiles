@@ -68,10 +68,10 @@ class Rule < ApplicationRecord
 
   def self.grep_line_from_file(sid, gid)
     rule_grep_output = `grep -Hrn "sid:\s*#{sid}\s*;" #{Rails.root}/extras/snort`
-    gid_regexp = gid_regexp(gid)
+    thisgid_regexp = gid_regexp(gid)
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
-        when gid_regexp =~ grep_line
+        when thisgid_regexp =~ grep_line
           true
         when anygid_regexp =~ grep_line
           false
