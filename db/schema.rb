@@ -87,8 +87,8 @@ ActiveRecord::Schema.define(version: 20170302175702) do
   end
 
   create_table "bugs_rules", primary_key: ["bug_id", "rule_id"], force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "bug_id",  default: 0, null: false
-    t.integer "rule_id", default: 0, null: false
+    t.integer "bug_id",  null: false
+    t.integer "rule_id", null: false
   end
 
   create_table "bugs_tags", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
