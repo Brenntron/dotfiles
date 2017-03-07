@@ -85,10 +85,11 @@ module API
           requires :id, type: Integer, desc: "the id for the rule to be reverted"
         end
         put "revert", root: "rule" do
-          binding.pry
-          raise 'raspberry'
-          # authorize! :update, Rule
-          # Rule.remove_rule(permitted_params[:id])
+          authorize! :update, Rule
+          rule = Rule.where(id:permitted_params[:id]).first
+          # Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename)
+          rule.import
+          rule
         end
 
 
