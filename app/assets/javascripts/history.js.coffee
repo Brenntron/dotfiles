@@ -26,6 +26,7 @@ $ ->
 
 
   $(document).on 'submit', '#addResearchNoteForm', (e) ->
+    $('#submit_comment')[0].disabled = true
     e.preventDefault()
     data = new FormData()
     data.append( 'note[bugzilla_id]', $('input[name="bugzilla_id"]').val())
