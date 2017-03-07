@@ -3,8 +3,6 @@ class CreateReferencesAndRules < ActiveRecord::Migration
     create_table :references do |t|
       t.string :reference_data
       t.belongs_to :reference_type, index: true
-      t.belongs_to :bug, index: true
-      t.belongs_to :exploit, index:true
       t.timestamps
     end
     # add_reference :references, :rule, index: true

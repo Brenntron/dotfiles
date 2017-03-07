@@ -112,8 +112,8 @@ Feature: Bug
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
     And the following references exist:
-      | id | reference_data | reference_type_id | bug_id |
-      | 1  | 2006-5745      | 1                 | 222222 |
+      | id | reference_data | reference_type_id |
+      | 1  | 2006-5745      | 1                 |
     And the following exploits exist:
       | id | data                                                                                        | exploit_type_id |
       | 1  | exploits/ms06_071/ms06_071.py - http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2006-5745 | 1               |
@@ -121,6 +121,7 @@ Feature: Bug
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     And reference with id "1" has exploit with id "1"
+    And bug with id "222222" has reference with id "1"
     Then I wait for "2" seconds
     And I goto "/bugs/222222"
     And I click "change_state"
@@ -270,6 +271,11 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
     And I click ".rules-tab"
@@ -287,6 +293,11 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
     And I click ".rules-tab"
@@ -307,6 +318,11 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
     And I click ".rules-tab"

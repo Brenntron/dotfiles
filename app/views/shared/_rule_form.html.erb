@@ -275,6 +275,9 @@
               <div class="form-group">
                 <input class="form-control select-sm code" name="rule[reference][][reference_data]" value="<%= ref.reference_data %>">
               </div>
+              <div class="form-group">
+                <input class="form-control select-sm code hidden" name="rule[reference][][bug_id]" value="<%= @bug.id %>">
+              </div>
               <div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>
               </div>
             </div>
