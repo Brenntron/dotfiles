@@ -3,5 +3,5 @@
 # loads all rule files under extras into analyst console.
 
 
-./extras/synch_rules.sh `find extras/snort | grep "\.rules$"` 2>/dev/null
+find extras/snort | grep "\.rules$" | xargs ./extras/synch_rules.sh 2>/dev/null
 
