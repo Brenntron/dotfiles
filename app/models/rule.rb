@@ -341,7 +341,6 @@ class Rule < ApplicationRecord
     return nil unless rule_attrs
     return nil if 'FAILED' == rule_attrs[:state]
     raise 'No rule gid provided' unless rule_attrs[:gid]
-    raise 'No rule sid provided' unless rule_attrs[:sid]
 
     rule_attrs[:filename] = filename
     rule_attrs[:linenumber] = linenumber
