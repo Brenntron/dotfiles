@@ -58,55 +58,57 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.import_rule(sid, gid = 1)
-    if sid
-      found_rule = Rule.where(sid: sid).first
-      if found_rule.nil?
-        rule_grep_output = `grep -Hrn "sid:\s*#{sid}\s*;" #{Rails.root}/extras/snort`
-        gid_regexp = Regexp.new("gid:\\s*#{gid}\\s*;")
-        anygid_regexp = Regexp.new("gid:\\s*\\d+\\s*;")
-        rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
-          case
-            when gid_regexp =~ grep_line
-              true
-            when anygid_regexp =~ grep_line
-              false
-            when 1 == gid
-              true
-            else
-              false
-          end
-        end
-        raise "Rule doesn't exist." if 0 == rule_grep_lines.length
-        raise "Duplicate rules found for sid #{sid}." unless 1 == rule_grep_lines.length
+  def self.gid_regexp(gid)
+    Regexp.new("gid:\\s*#{gid}\\s*;")
+  end
 
-        filename, line_number, rule_text = rule_grep_lines[0].partition(/:\d+:/)
-        if rule_text.nil?
-          raise "Rule doesn't exist."
+  def self.anygid_regexp
+    @anygid_regexp ||= Regexp.new("gid:\\s*\\d+\\s*;")
+  end
+
+  def self.grep_line_from_file(sid, gid)
+    rule_grep_output = `grep -Hrn "sid:\s*#{sid}\s*;" #{Rails.root}/extras/snort`
+    gid_regexp = gid_regexp(gid)
+    rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
+      case
+        when gid_regexp =~ grep_line
+          true
+        when anygid_regexp =~ grep_line
+          false
+        when 1 == gid
+          true
         else
-          # remove anything before the first alert
-          # rule_text.strip!.gsub!(/(?=^).+?(?=alert)/, '')
-          rule_text.strip!
-
-          parsed = Rule.visruleparser(rule_text)
-          rule_sid = /sid:\s*(\d+)\s*;/.match(rule_text) ? /sid:\s*(\d+)\s*;/.match(rule_text)[1].to_i : nil
-          rule_hash = Rule.parse_and_create_rule(rule_text)
-          rule_hash['id'] = nil
-          rule_hash['sid'] = rule_sid
-          rule_hash['rule_parsed'] = parsed[:rule]
-          rule_hash['rule_warnings'] = parsed[:errors]
-          rule_hash['cvs_rule_parsed'] = parsed[:rule]
-          rule_hash['cvs_rule_content'] = rule_text
-          new_rule = Rule.create(rule_hash)
-          new_rule.associate_references(rule_text)
-          return new_rule
-        end
-      else
-        return found_rule
+          false
       end
-    else
-      raise 'No rule sid provided'
     end
+    raise "Rule doesn't exist." if 0 == rule_grep_lines.length
+    raise "Duplicate rules found for sid #{sid}." unless 1 == rule_grep_lines.length
+
+    rule_grep_lines[0]
+  end
+
+  def self.import_rule(sid, gid = 1)
+    raise 'No rule sid provided' unless sid
+
+    found_rule = Rule.where(sid: sid).first
+    return found_rule if found_rule
+
+    filename, line_number, rule_content = grep_line_from_file(sid, gid).partition(/:\d+:/)
+    # remove anything before the first alert
+    # rule_content.strip!.gsub!(/(?=^).+?(?=alert)/, '')
+    rule_content.strip!
+
+    parsed = Rule.visruleparser(rule_content)
+    rule_hash = Rule.parse_from_visrule(rule_content, parsed)
+    rule_hash['sid'] = sid
+    rule_hash['rule_parsed'] = parsed[:rule]
+    rule_hash['rule_warnings'] = parsed[:errors]
+    rule_hash['cvs_rule_parsed'] = parsed[:rule]
+    rule_hash['cvs_rule_content'] = rule_content
+    new_rule = Rule.create(rule_hash)
+    new_rule.associate_references(rule_content)
+
+    new_rule
   end
 
   def extract_rule
