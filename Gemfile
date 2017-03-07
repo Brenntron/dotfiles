@@ -24,7 +24,7 @@ gem 'her'
 
 gem 'net-ssh'
 gem 'daemons'
-gem 'activemessaging'
+gem 'activemessaging', git: 'https://github.com/digital-york/activemessaging.git'
 gem 'stomp'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '0.9.12.4'
