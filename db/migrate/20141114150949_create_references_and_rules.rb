@@ -15,7 +15,7 @@ class CreateReferencesAndRules < ActiveRecord::Migration
       t.text     "rule_failures"
       t.text     "cvs_rule_content"
       t.text     "cvs_rule_parsed"
-      t.string   "connection"
+      t.text     "connection"
       t.string   "message"
       t.string   "flow"
       t.text     "detection"

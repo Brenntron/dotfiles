@@ -221,7 +221,7 @@ ActiveRecord::Schema.define(version: 20170306163554) do
     t.text     "rule_failures",    limit: 65535
     t.text     "cvs_rule_content", limit: 65535
     t.text     "cvs_rule_parsed",  limit: 65535
-    t.string   "connection"
+    t.text     "connection",       limit: 65535
     t.string   "message"
     t.string   "flow"
     t.text     "detection",        limit: 65535
