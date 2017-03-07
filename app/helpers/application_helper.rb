@@ -14,6 +14,7 @@ module ApplicationHelper
     end
   end
 
+
   def role_options_for(user)
     if user.has_role?('admin')
       Role.all

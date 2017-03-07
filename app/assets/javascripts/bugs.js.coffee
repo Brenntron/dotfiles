@@ -75,12 +75,13 @@ $ ->
     id = $(this).parents('tr').attr('id')
     id = id.slice(id.indexOf("_") + 1, id.length)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    if window.confirm("Are you sure?")
+    if window.confirm("Are you sure you want to remove this bug from Analyst Console?")
       $.ajax {
         url: '/api/v1/bugs/' + id
         method: 'delete'
         headers: headers
         success: (response) ->
+          alert(response.error + " \n" + response.message)
           window.location.reload()
         error: (response) ->
           alert 'Could not delete the bug'
@@ -136,7 +137,7 @@ $ ->
         bug:
           'editor_id': editor
       success: (response) ->
-        $('#current_bug_editor').html(response.user_name).append('&nbsp;<a class="tiny text-muted change_current_bug_editor"><em>change</em></a>')
+        $('#current_bug_editor').html(response.user_name).append('<button class="tiny text-muted change_current_bug_editor" id="editor"><em>change</em></button>')
         $('#current_bug_editor, #change_editor_form').toggle()
         location.reload()
       error: (response) ->
@@ -158,7 +159,7 @@ $ ->
         bug:
           'reviewer_id': committer
       success: (response) ->
-        $('#current_bug_committer').html(response.committer_name).append('&nbsp;<a class="tiny text-muted change_current_bug_committer"><em>change</em></a>')
+        $('#current_bug_committer').html(response.committer_name).append('<button class="tiny text-muted change_current_bug_committer" id="committer"><em>change</em></button>')
         $('#current_bug_committer, #change_committer_form').toggle()
         location.reload()
       error: (response) ->

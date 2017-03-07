@@ -129,6 +129,18 @@ When /^I wait for the ajax request to finish$/ do
   end
 end
 
+When(/^select "(.*?)" from "(.*?)" within "(.*?)"$/) do |option, select, context|
+  within(context) do
+    select(option, :from => select)
+  end
+end
+
+When(/^click button "(.*?)" within "(.*?)"$/) do |button, context|
+  within(context) do
+    click_button(button)
+  end
+end
+
 When(/^I select "(.*?)" from "(.*?)"$/) do |option, select|
   if option == "next year"
     option = (Time.now + 1.year).strftime("%Y")

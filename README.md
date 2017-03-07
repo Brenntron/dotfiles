@@ -9,89 +9,95 @@ in
 /System/Library/OpenSSL/certs/
 
 
-You will need certain perl modules
-install cpanminus
+1.  You will need certain perl modules
 
-    $ curl -L https://cpanmin.us | perl - --sudo App::cpanminus
-    install perl modules
-    $ sudo cpanm WWW::Mechanize
-    $ sudo cpanm Try::Tiny
-
-
-add CANVAS_ROOT to your profile env file
-
-    export CANVAS_ROOT=/Users/<username>/<talos_api_directory>/extras
-
-install visruleparser dependancies
-Net::Snort::Parser::Rule
-
-    $ svn co https://repo.vrt.sourcefire.com/svn/vrt-systems/trunk/buildtools/common/lib/net-snort-parser
-    $ cd net-snort-parser
-    $ perl Makefile.pl && make && make test
-    $ sudo make install
-
-set up perl to be able to run visruleparser or make sure visruleparser is using /usr/local/bin/perl not /usr/bin/perl
+    install cpanminus
+    
+        $ curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+        install perl modules
+        $ sudo cpanm WWW::Mechanize
+        $ sudo cpanm Try::Tiny
 
 
-put a copy of snort rules in the extras directory.
+2.  add CANVAS_ROOT to your profile env file
 
-*   download latest snort rule set
-*   extract rules to
+        export CANVAS_ROOT=/Users/<username>/<talos_api_directory>/extras
+    
+3.  install visruleparser dependancies
 
-        extras/snort/etc
-        extras/snort/preproc_rules
-        extras/snort/rules
+    Net::Snort::Parser::Rule
+    
+        $ svn co https://repo.vrt.sourcefire.com/svn/vrt-systems/trunk/buildtools/common/lib/net-snort-parser
+        $ cd net-snort-parser
+        $ perl Makefile.pl && make && make test
+        $ sudo make install
 
-*   extract snort so rules to
+    set up perl to be able to run visruleparser or make sure visruleparser is using /usr/local/bin/perl not /usr/bin/perl
 
-        extras/snort/so_rules
+4.  put a copy of snort rules in the extras directory.
+    
+    *   download latest snort rule set from [snort.org](http://snort.org)
+    *   extract rules to
+    
+            extras/snort/etc
+            extras/snort/preproc_rules
+            extras/snort/rules
+    
+    *   extract snort so rules to
+    
+            extras/snort/so_rules
+    
+    run synch script to load rules.
 
-
-Make sure active MQ is running
-
-    $ brew install activemq
-    $ activemq start
-    $ activemq console
+        $ ./extras/resynch.sh
+    
+5.  Make sure active MQ is running
+    
+        $ brew install activemq
+        $ activemq start
+        $ activemq console
   
 
 
 
-On the server we need to do this
-regenerating the keytab
+6.  On the server we need to do this
+    
+    regenerating the keytab
+    
+        $ sudo msktutil -u -s HTTP
+        $ sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
+        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p rulesuitest\$
+        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p host/rulesuitest.vrt.sourcefire.com
+    
+    
+        $ bundle exec rails runner lib/poller.rb
+        $ bundle exec rails runner lib/client_local.rb
 
-    $ sudo msktutil -u -s HTTP
-    $ sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
-    $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p rulesuitest\$
-    $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p host/rulesuitest.vrt.sourcefire.com
-
-
-    $ bundle exec rails runner lib/poller.rb
-    $ bundle exec rails runner lib/client_local.rb
-
-Production also needs to have mysql set up
-
-
-
-
-When bundling:
-
-* if you have problems with eventmachine, you might need to do this:
-
-        $ gem install eventmachine --version=1.0.8 -- --with-cppflags=-I/usr/local/opt/openssl/include
-
-* if you have problems with rmagick, you might need to do this as a solution for Sierra:
-
-        $ brew install imagemagick@6
-        $ brew link --force imagemagick@6
+7. Production also needs to have mysql set up
 
 
-dont forget to migrate the database
 
-Below is just to set up a locally signed ssh key not really all that necessary.
 
-    http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
+8.  When bundling:
 
-SSL self signed localhost for rails start to finish, no red warnings.
+    * if you have problems with eventmachine, you might need to do this:
+    
+            $ gem install eventmachine --version=1.0.8 -- --with-cppflags=-I/usr/local/opt/openssl/include
+    
+    * if you have problems with rmagick, you might need to do this as a solution for Sierra:
+    
+            $ brew install imagemagick@6
+            $ brew link --force imagemagick@6
+
+
+9.  dont forget to migrate the database
+
+10. Below is just to set up a locally signed ssh key not really all that necessary.
+
+        http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
+    
+    SSL self signed localhost for rails start to finish, no red warnings.
+
 
 ## 1) Create your private key (any password will do, we remove it below)
 
@@ -179,7 +185,7 @@ run individual feature files
 
 
 
-##Deploying this app to production
+# Deploying this app to production
 run the deploy_api.rb file using:
 ruby deploy_api.rb
 

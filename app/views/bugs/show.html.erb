@@ -19,38 +19,38 @@
         </div>
         <div class="col-xs-3 col-sm-2">
           <h6>priority</h6>
-          <h4 class="top-space" id="current_bug_priority">
-            <%= @bug.priority %>&nbsp;<a href="#" id="priority" class="tiny text-muted change_current_bug_priority"><em>change</em></a>
-          </h4>
+          <h5 class="top-space" id="current_bug_priority"><%= @bug.priority %> &nbsp;<button class="tiny text-muted change_current_bug_priority" id="priority"><em>change</em></button></h5>
+
           <%= render 'shared/change_priority_bug_form' %>
         </div>
         <div class="col-xs-3 col-sm-2">
           <h6>component</h6>
-          <h4 class="top-space" id="current_bug_component">
-            <%= @bug.component %>&nbsp;<a href="#" id="component" class="tiny text-muted change_current_bug_component"><em>change</em></a>
-          </h4>
+          <h5 class="top-space" id="current_bug_component"><%= @bug.component %> &nbsp;<button class="tiny text-muted change_current_bug_component" id="component"><em>change</em></button></h5>
+
           <%= render 'shared/change_component_bug_form' %>
         </div>
         <div class="col-xs-3 col-sm-2">
           <h6>editor</h6>
-          <h4 class="top-space" id="current_bug_editor">
+
+          <h5 class="top-space" id="current_bug_editor">
             <% if @bug.user %>
-              <%= @bug.user.cvs_username %>&nbsp;<a href="#" id="editor" class="tiny text-muted change_current_bug_editor"><em>change</em></a>
+                <%= @bug.user.cvs_username %> &nbsp;<button class="tiny text-muted change_current_bug_editor" id="editor"><em>change</em></button>
             <% else %>
-              <a href="#" id="editor" class="tiny text-muted change_current_bug_editor"><em>assign</em></a>
+                <button class="tiny text-muted change_current_bug_editor" id="editor"><em>change</em></button>
             <% end %>
-          </h4>
+          </h5>
+
           <%= render 'shared/change_editor_bug_form' %>
         </div>
         <div class="col-xs-3 col-sm-1">
           <h6>committer</h6>
-          <h4 class="bug-user top-space" id="current_bug_committer">
+          <h5 class="bug-user top-space" id="current_bug_committer">
             <% if @bug.committer %>
-              <%= @bug.committer.cvs_username %>&nbsp;<a href="#" id="committer" class="tiny text-muted change_current_bug_committer"><em>change</em></a>
+                <%= @bug.committer.cvs_username %> &nbsp;<button class="tiny text-muted change_current_bug_committer" id="committer"><em>change</em></button>
             <% else %>
-              <a href="#" id="committer" class="tiny text-muted change_current_bug_committer"><em>assign</em></a>
+                <button class="tiny text-muted change_current_bug_committer" id="committer"><em>change</em></button>
             <% end %>
-          </h4>
+          </h5>
           <%= render 'shared/change_committer_bug_form' %>
         </div>
         <div class="col-xs-3 col-sm-1">

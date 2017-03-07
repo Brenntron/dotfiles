@@ -25,6 +25,7 @@ class CreateReferencesAndRules < ActiveRecord::Migration
       t.integer  "sid"
       t.integer  "rev"
       t.string   "state"
+      t.string   "publish_status", null: false, default: "SYNCHED"
       t.float    "average_check"
       t.float    "average_match"
       t.float    "average_nonmatch"
