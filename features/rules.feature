@@ -5,7 +5,7 @@ Feature: Rules
 
   @javascript
   Scenario: An existing unchanged rule synced with VC can be viewed
-    Given a user exists and is logged in
+    Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id |
       |222222   | 222222      | OPEN   | 1       |
