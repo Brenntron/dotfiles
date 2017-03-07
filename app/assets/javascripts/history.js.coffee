@@ -42,12 +42,12 @@ $ ->
         $('.alert_comment').addClass('success').show().html('Comment saved and published to bugzilla')
         $('textarea[name="comment"]').val('')
         $('#showAddNotesToggle, #hideAddNotesToggle, #addResearchNoteForm').toggle()
-        window.location.reload()
       error: (response) ->
         $('.alert_comment').addClass('error').show().html(response.responseText)
       complete: ->
         setTimeout (->
-          $('.alert_comment').hide 'blind', {}, 8000
+          $('.alert_comment').hide 'blind', {}, 1000
+          window.location.reload()
           return
-        ), 8000
+        ), 1000
     }
