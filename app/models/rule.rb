@@ -58,11 +58,29 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.import_rule(sid)
+  def self.import_rule(sid, gid = 1)
     if sid
       found_rule = Rule.where(sid: sid).first
       if found_rule.nil?
-        rule_text = `grep -Hrn "sid:#{sid}" #{Rails.root}/extras/snort`.split(/:\d[\d]*:/)[1]
+        rule_grep_output = `grep -Hrn "sid:\s*#{sid}\s*;" #{Rails.root}/extras/snort`
+        gid_regexp = Regexp.new("gid:\\s*#{gid}\\s*;")
+        anygid_regexp = Regexp.new("gid:\\s*\\d+\\s*;")
+        rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
+          case
+            when gid_regexp =~ grep_line
+              true
+            when anygid_regexp =~ grep_line
+              false
+            when 1 == gid
+              true
+            else
+              false
+          end
+        end
+        raise "Rule doesn't exist." if 0 == rule_grep_lines.length
+        raise "Duplicate rules found for sid #{sid}." unless 1 == rule_grep_lines.length
+
+        filename, line_number, rule_text = rule_grep_lines[0].partition(/:\d+:/)
         if rule_text.nil?
           raise "Rule doesn't exist."
         else
