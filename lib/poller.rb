@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Limit the amount of memory used by a single client (300MB)
-Process.setrlimit(:AS, 300 * 1024 * 1024)
+Process.setrlimit(:AS, 1024 * 1024 * 1024)
 
 # Make sure stdout and stderr write out without delay for using with daemon like scripts
 STDOUT.sync = true; STDOUT.flush

@@ -2,7 +2,7 @@
   <div class="form-group row">
     <div class="col-xs-12 col-lg-10">
       <%=select_tag :priority, options_for_select(['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], selected: @bug.priority), id: 'bug_priority', class: 'form-control input-sm'%>
-      <button class="btn btn-xs btn-default" value="submit" type="submit">change</button>
+      <button class="btn btn-xs btn-default" value="submit" type="submit">change priority</button>
     </div>
   </div>
 </form>
