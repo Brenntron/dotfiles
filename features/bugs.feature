@@ -369,6 +369,11 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
     And a rule exists and belongs to bug "222222"
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
