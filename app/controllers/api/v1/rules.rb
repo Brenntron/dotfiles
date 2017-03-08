@@ -87,7 +87,6 @@ module API
         put "revert", root: "rule" do
           authorize! :update, Rule
           rule = Rule.where(id:permitted_params[:id]).first
-          # Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename)
           rule.import
           rule
         end
