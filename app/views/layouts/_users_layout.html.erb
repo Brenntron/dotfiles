@@ -33,20 +33,23 @@
   <div class="col-xs-9 col-sm-9 col-md-10 col-lg-10 item-details-column">
     <div class="row header">
       <!-- action links -->
-      <div class="col-xs-12 actions-bar">
-        <%= form_for :user, url: results_users_path, method: :get do |form| %>
-          <%= form.fields_for :search do |search_fields| %>
-            <%= search_fields.label :name %>
-            <%= search_fields.text_field :name %>
-          <% end %>
-          <%= form.submit 'Search' %>
-        <% end %>
-
-          <% if current_user.has_role?('manager') %>
+      <div class="col-xs-4 actions-bar">
+        <% if current_user.has_role?('manager') %>
           <%= link_to user_relationships_path(current_user) do %>
-            <button class="btn btn-link icon-link custom-icon"><%= image_tag "tree-diagram-icon.png" %></button>
+              <button class="btn btn-link icon-link custom-icon"><%= image_tag "tree-diagram-icon.png" %></button>
           <% end %>
         <%end%>
+      </div>
+      <div class="col-xs-8 actions-bar form-inline">
+        <p>
+          <%= form_for :user, url: results_users_path, method: :get do |form| %>
+            <%= form.fields_for :search do |search_fields| %>
+              <%= search_fields.text_field :name, class: 'form-control input-sm', placeholder: 'search users' %>
+            <% end %>
+            <%= form.submit 'search', class: 'btn btn-default btn-xs' %>
+          <% end %>
+        </p>
+        <br>
       </div>
       <% if current_user.has_role?('committer') %>
       <!-- committer specific links-->
