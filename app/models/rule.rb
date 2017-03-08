@@ -90,7 +90,7 @@ class Rule < ApplicationRecord
   def self.import_rule(sid, gid = 1)
     raise 'No rule sid provided' unless sid
 
-    found_rule = Rule.where(sid: sid).first
+    found_rule = Rule.where(gid: gid).where(sid: sid).first
     return found_rule if found_rule
 
     filename, line_number, rule_content = grep_line_from_file(sid, gid).partition(/:\d+:/)
