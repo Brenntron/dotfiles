@@ -206,7 +206,7 @@ class Rule < ApplicationRecord
       else
         ref_type = r.split(',')[0]
         ref_data = r.split(',')[1]
-        self.references << Reference.create(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data) unless ref_data.strip.empty?
+        self.references << Reference.find_or_create_by(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data) unless ref_data.strip.empty?
       end
     end
     # delete the reference if it is no longer part of the record

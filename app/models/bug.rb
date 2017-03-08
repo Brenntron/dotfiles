@@ -275,6 +275,30 @@ class Bug < ApplicationRecord
     end
   end
 
+  def update_references(rule_text)
+    current_references = []
+    references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
+    references = []
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
+    references.each do |r|
+      # skip this reference if it already exists
+      if current_references.include? r
+        current_references.delete(r)
+        # otherwise create it
+      else
+        ref_type = r.split(',')[0]
+        ref_data = r.split(',')[1]
+        self.references << Reference.find_or_create_by(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data) unless ref_data.strip.empty?
+      end
+    end
+    # delete the reference if it is no longer part of the record
+    current_references.each do |r|
+      ref_type = r.split(',')[0]
+      ref_data = r.split(',')[1]
+      self.references.where(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data).each { |ref| ref.destroy! }
+    end
+  end
+
   private
 
   def create_tags_from_summary(summary_tags)

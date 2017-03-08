@@ -109,6 +109,7 @@ module API
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
           rule = Rule.where(id:permitted_params[:id]).first
+          bugs = rule.bugs
           if permitted_params[:rule][:revert]
             update_params[:cvs_rule_parsed] = update_params[:rule_parsed]
           else
@@ -117,6 +118,9 @@ module API
               update_params[:publish_status] = Rule.PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
               update_params[:committed] = false
             end
+          end
+          bugs.each do |bug|
+            bug.update_references(permitted_params[:rule][:rule_content])
           end
           rule.update_references(permitted_params[:rule][:rule_content])
           rule.rule_doc.present? ? rule.rule_doc.update(permitted_params[:rule][:rule_doc]) : rule.create_rule_doc(permitted_params[:rule][:rule_doc])
