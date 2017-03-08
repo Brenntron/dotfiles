@@ -55,14 +55,16 @@ $ ->
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
-                alert("success")
+                $('.alert_rules').addClass('success').show().html('Rules has been reverted')
               error: (response) ->
-                alert("error")
+                $('.alert_rules').addClass('error').show().html('Rules have not been reverted')
               complete: ->
                 setTimeout (->
                   $('.alert_rules').hide 'blind', {}, 500
                   return
                 ), 5000
+                $(document).ajaxStop ->
+                  location.reload true
             }
         when 'remove'
           if window.confirm("Are you sure?")
