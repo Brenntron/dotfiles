@@ -82,13 +82,15 @@ module API
 
         #revert a rule
         params do
-          requires :id, type: Integer, desc: "the id for the rule to be reverted"
+          requires :ids, type: Array[String]
         end
         put "revert", root: "rule" do
           authorize! :update, Rule
-          rule = Rule.where(id:permitted_params[:id]).first
-          rule.import
-          rule
+          permitted_params[:ids].each do |id|
+            rule = Rule.where(id: id).first
+            rule.import
+          end
+          true
         end
 
 

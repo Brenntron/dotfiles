@@ -51,7 +51,7 @@ $ ->
               url: "/api/v1/rules/revert"
               headers: headers
               data:
-                id: 9
+                ids: selected
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
