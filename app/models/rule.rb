@@ -1,6 +1,29 @@
 require 'open3'
 require 'tempfile'
 
+# Records for rules both synched with CVS and drafts of rules from the UI.
+#
+# When a rule has not been edited by our users, it will be updated with changed from CVS.
+# When a user saves a draft of an edit to a rule, that draft is stored instead and CVS synching is suppressed.
+# A new rule originating in our UI will be saved here, but obvious will have no synching until committed to CVS.
+#
+#                           |sid|  state  |publish_status|
+# All Rules
+# * synched with CVS
+#   * valid                 |int|UNCHANGED|    SYNCHED   | valid rule up to date with CVS
+#   * failed visruleparse   .............................. rules which fail visruleparse are not loaded
+# * draft
+#   * new
+#     * valid               |nil|   NEW   |      NEW     | new rule created from UI or web services
+#     * failed parse        |nil|  FAILED |      NEW     | new rule which failed visruleparse
+#   * edit
+#     * current edit
+#       * valid             |int| UPDATED | CURRENT_EDIT | CVS rule edited in UI or web service
+#       * failed parse      |int|  FAILED | CURRENT_EDIT | edited rule which failed visruleparse
+#     * out of date
+#       * valid             |int| UPDATED |  STALE_EDIT  | edited rule, but CVS has since been updated and cannot save
+#       * failed parse      |int|  FAILED |  STALE_EDIT  | stale edit which failed visruleparse
+#
 class Rule < ApplicationRecord
   has_paper_trail
 
@@ -381,7 +404,6 @@ class Rule < ApplicationRecord
     return nil unless rule_attrs
     return nil if 'FAILED' == rule_attrs[:state]
     raise 'No rule gid provided' unless rule_attrs[:gid]
-    raise 'No rule sid provided' unless rule_attrs[:sid]
 
     rule_attrs[:filename] = filename
     rule_attrs[:linenumber] = linenumber
@@ -415,6 +437,51 @@ class Rule < ApplicationRecord
     else
       load_rule_from_content(rule_content, filename, line_number[1..-2].to_i)
     end
+  end
+
+  # Replace rule in given file with rule_content.
+  # Scans file for rule with same gid and sid and replaces that line with rule_content.
+  # Appends rule_content to end of file if gid and sid are not found
+  # @param [String, #read] path to the file.
+  def patch(filename)
+    tmp = Tempfile.new(['tmprule', '.rules'])
+    File.open(filename, 'rt') do |input_stream|
+      IO.copy_stream(input_stream, tmp)
+    end
+
+    sid_regex = Regexp.new("sid:\\s*#{self.sid}\\s*;")
+    gid_regex = Regexp.new("gid:\\s*#{self.gid}\\s*;")
+    anygid_regex = /gid:\s*\d+\s*;/
+
+    tmp.rewind
+    File.open(filename, 'wt') do |rulefile|
+      written = false
+      tmp.each_line do |line|
+        gid_matched = (gid_regex =~ line) || !(anygid_regex =~ line)
+        if self.gid && self.sid && gid_matched && (sid_regex =~ line)
+          rulefile.puts(self.rule_content)
+          written = true
+        else
+          rulefile.puts(line)
+        end
+      end
+
+      rulefile.puts(self.rule_content) unless written
+    end
+    tmp.close!
+
+    true
+  end
+
+  # Check rule_content into CVS and update rule record.
+  #
+  # Write rule_content to file by calling patch.
+  # Call CVS checkin.
+  # Since CVS has a rewrite rule for checkins, update rule record from file.
+  def checkin
+    filename = self.filename || self.rule_category.filename(self.gid)
+
+    patch(filename)
   end
 
   def update_rule
