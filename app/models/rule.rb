@@ -43,6 +43,8 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_CURRENT_EDIT   = 'CURRENT_EDIT'    #draft of rule edited in UI, but optimistic it can be checked in
   PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft of rule, but VC rev has changed and cannot be checked in
 
+  scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid) }
+
   def record(action)
     record = { resource: 'rule',
               action: action,
