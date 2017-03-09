@@ -38,9 +38,9 @@
                 </div>
             <% end %>
         <% end %>
-        <% if @bug.references.bugtraqs.distinct.any? %>
+        <% if @bug.references.bugtraqs.any? %>
             <p>bugtraq:</p>
-            <% @bug.references.bugtraqs.each do |ref| %>
+            <% @bug.references.bugtraqs.distinct.each do |ref| %>
                 <div class="col-xs-12">
                   <code><a href="<%= get_ref_url(ref, "bugtraq") %>" target="_blank"><%= ref.reference_data %></a></code>
                 </div>
