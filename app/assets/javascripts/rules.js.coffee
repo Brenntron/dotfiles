@@ -44,6 +44,28 @@ $ ->
                 return
               ), 5000
           }
+        when 'revert'
+          if window.confirm("Are you sure?")
+            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+            $.ajax {
+              url: "/api/v1/rules/revert"
+              headers: headers
+              data:
+                ids: selected
+              type: 'PUT'
+              dataType: 'json'
+              success: (response) ->
+                $('.alert_rules').addClass('success').show().html('Rules has been reverted')
+              error: (response) ->
+                $('.alert_rules').addClass('error').show().html('Rules have not been reverted')
+              complete: ->
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+                $(document).ajaxStop ->
+                  location.reload true
+            }
         when 'remove'
           if window.confirm("Are you sure?")
             $.ajax {

@@ -43,6 +43,8 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_CURRENT_EDIT   = 'CURRENT_EDIT'    #draft of rule edited in UI, but optimistic it can be checked in
   PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft of rule, but VC rev has changed and cannot be checked in
 
+  scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid) }
+
   def record(action)
     record = { resource: 'rule',
               action: action,
@@ -89,8 +91,9 @@ class Rule < ApplicationRecord
     @anygid_regexp ||= Regexp.new("gid:\\s*\\d+\\s*;")
   end
 
-  def self.grep_line_from_file(sid, gid)
-    rule_grep_output = `grep -Hrn "sid:\s*#{sid}\s*;" #{Rails.root}/extras/snort`
+  def self.grep_line_from_file(sid, gid, filepath = nil)
+    filepath ||= "#{Rails.root}/extras/snort"
+    rule_grep_output = `grep -Hrn "sid:\\s*#{sid}\\s*;" #{filepath}`
     thisgid_regexp = gid_regexp(gid)
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
@@ -110,6 +113,33 @@ class Rule < ApplicationRecord
     rule_grep_lines[0]
   end
 
+  def self.hash_from_rule_content(rule_content, sid)
+    # remove anything before the first alert
+    # rule_content.strip!.gsub!(/(?=^).+?(?=alert)/, '')
+    rule_content.strip!
+
+    parsed = Rule.visruleparser(rule_content)
+    rule_attrs = Rule.parse_from_visrule(rule_content, parsed)
+    rule_attrs['sid'] = sid
+    rule_attrs['rule_parsed'] = parsed[:rule]
+    rule_attrs['rule_warnings'] = parsed[:errors]
+    rule_attrs['cvs_rule_parsed'] = parsed[:rule]
+    rule_attrs['cvs_rule_content'] = rule_content
+
+    rule_attrs
+  end
+
+  def import
+    grep_filename, line_number, rule_content = Rule.grep_line_from_file(sid, gid, filename).partition(/:\d+:/)
+
+    rule_attrs = Rule.hash_from_rule_content(rule_content, self.sid)
+    rule_attrs[:state] = 'UNCHANGED'
+    rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
+    update!(rule_attrs)
+
+    self
+  end
+
   def self.import_rule(sid, gid = 1)
     raise 'No rule sid provided' unless sid
 
@@ -117,18 +147,7 @@ class Rule < ApplicationRecord
     return found_rule if found_rule
 
     filename, line_number, rule_content = grep_line_from_file(sid, gid).partition(/:\d+:/)
-    # remove anything before the first alert
-    # rule_content.strip!.gsub!(/(?=^).+?(?=alert)/, '')
-    rule_content.strip!
-
-    parsed = Rule.visruleparser(rule_content)
-    rule_hash = Rule.parse_from_visrule(rule_content, parsed)
-    rule_hash['sid'] = sid
-    rule_hash['rule_parsed'] = parsed[:rule]
-    rule_hash['rule_warnings'] = parsed[:errors]
-    rule_hash['cvs_rule_parsed'] = parsed[:rule]
-    rule_hash['cvs_rule_content'] = rule_content
-    new_rule = Rule.create(rule_hash)
+    new_rule = Rule.create(hash_from_rule_content(rule_content, sid))
     new_rule.associate_references(rule_content)
 
     new_rule
