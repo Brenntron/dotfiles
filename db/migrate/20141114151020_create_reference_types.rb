@@ -9,6 +9,5 @@ class CreateReferenceTypes < ActiveRecord::Migration
       t.string :rule_format
       t.string :url
     end
-    add_reference :reference_types, :reference, index: true
   end
 end
