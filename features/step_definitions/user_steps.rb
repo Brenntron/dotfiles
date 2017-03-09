@@ -50,7 +50,7 @@ end
 Then(/^I should see a user search form$/) do
   find(:xpath, "//form[@action='/users/results'][@method='get']") &&
       find(:xpath, "//form[@action='/users/results']/input[@name='user[search][name]']") &&
-      find(:xpath, "//form[@action='/users/results']/input[@type='submit'][@value='Search']")
+      find(:xpath, "//form[@action='/users/results']/input[@type='submit'][@value='search']")
 end
 
 Then(/^I see a (\w*) new form$/) do |resources_name|

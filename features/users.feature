@@ -283,8 +283,8 @@ Feature: User Accounts
       | bentley@cisco.com  |
     When I goto "/users"
     Then I should see a user search form
-    Given I fill in "Name" with "CAR"
-    When I click button "Search"
+    Given I fill in "user_search_name" with "CAR"
+    When I click button "search"
     Then I see a user_searches result for name "carlzipp@cisco.com"
     And I see a user_searches result for name "davecarr@cisco.com"
     And I do not see a user_searches result for name "porsche@cisco.com"
@@ -301,8 +301,8 @@ Feature: User Accounts
       | email3@cisco.com | Porsche Bugatti     |
       | email4@cisco.com | Bentley Ford        |
     Given I goto "/users"
-    Given I fill in "Name" with "CAR"
-    When I click button "Search"
+    Given I fill in "user_search_name" with "CAR"
+    When I click button "search"
     Then I see a user_searches result for name "Carl Zipp"
     And I see a user_searches result for name "David Carr"
     And I do not see a user_searches result for name "Porsche Bugatti"
@@ -319,8 +319,8 @@ Feature: User Accounts
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
     Given I goto "/users"
-    Given I fill in "Name" with "CAR"
-    When I click button "Search"
+    Given I fill in "user_search_name" with "CAR"
+    When I click button "search"
     Then I see a user_searches result for name "carlzipp"
     And I see a user_searches result for name "davecarr"
     And I do not see a user_searches result for name "porsche"
@@ -337,8 +337,8 @@ Feature: User Accounts
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
     Given I goto "/users"
-    Given I fill in "Name" with "CAR"
-    When I click button "Search"
+    Given I fill in "user_search_name" with "CAR"
+    When I click button "search"
     Then I see a user_searches result for name "carlzipp"
     And I see a user_searches result for name "davecarr"
     And I do not see a user_searches result for name "porsche"
@@ -355,8 +355,8 @@ Feature: User Accounts
       | email3@cisco.com | porsche        |
       | email4@cisco.com | bentley        |
     Given I goto "/users"
-    Given I fill in "Name" with "CAR"
-    When I click button "Search"
+    Given I fill in "user_search_name" with "CAR"
+    When I click button "search"
     Then I see a user_searches result for name "carlzipp"
     And I see a user_searches result for name "davecarr"
     And I do not see a user_searches result for name "porsche"
