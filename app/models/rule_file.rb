@@ -188,6 +188,15 @@ class RuleFile
 
       rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 
+      rules.each do |rule|
+        if rule.rule_doc
+          rule.rule_doc.commit_doc(username)
+          rule.update(publish_status: Rule::PUBLISH_STATUS_SYNCHED,
+                      edit_status: Rule::EDIT_STATUS_SYNCHED,
+                      state: 'UNCHANGED')
+        end
+      end
+
       rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
 
       if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
