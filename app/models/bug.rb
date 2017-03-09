@@ -2,10 +2,10 @@ class Bug < ApplicationRecord
 
   has_and_belongs_to_many :rules
   has_and_belongs_to_many :tags, dependent: :destroy
+  has_and_belongs_to_many :references, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
 
-  has_many :references, dependent: :destroy
   has_many :exploits, through: :references
   has_many :attachments, dependent: :destroy
   has_many :tasks, dependent: :destroy
@@ -19,8 +19,8 @@ class Bug < ApplicationRecord
   scope :pending, -> { where(state: "PENDING") }
   scope :by_component, ->(component) { where('component = ?', component) }
 
-  scope :allowed_editors, ->(bug) {User.all.reject { |u| u.id == bug.committer_id }}
-  scope :allowed_committers, ->(bug) {User.all.reject { |u| u.id == bug.committer_id }}
+  scope :allowed_editors, ->(bug) { User.all.reject { |u| u.id == bug.committer_id } }
+  scope :allowed_committers, ->(bug) { User.all.reject { |u| u.id == bug.user_id } }
 
   enum classification: {
                           unclassified: 0,
@@ -260,6 +260,18 @@ class Bug < ApplicationRecord
       ((resolved_at - created_at) / 86_400).ceil
     else
       0
+    end
+  end
+
+  def associate_references(rule_text)
+    references = []
+    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
+    references.each do |r|
+      r = r.split(',')
+      unless r[1].empty?
+        new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
+        self.references << new_reference unless self.references.include?(new_reference)
+      end
     end
   end
 

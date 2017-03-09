@@ -28,7 +28,10 @@ class NotesController < ApplicationController
       }.reject() { |k, v| v.nil? }
       new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options.to_h)
       if params[:note][:id].blank?
-        note = Note.create(id: new_note['id'])
+        note = Note.create(id: new_note['id'],
+                           comment: options[:comment],
+                           author: options[:author],
+                           note_type: options[:note_type])
       else
         note = Note.where("id=?",params[:note][:id]).first
       end

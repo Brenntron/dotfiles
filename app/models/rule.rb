@@ -55,7 +55,8 @@ class Rule < ApplicationRecord
 
   def create_references(references)
     references.each do |reference|
-      self.references << Reference.create(reference.permit(:reference_type_id, :reference_data))
+      ref = Reference.find_or_create_by(reference_data: reference.permit(:reference_type_id, :reference_data))
+      self.references << ref unless self.references.include?(ref)
     end
   end
 
@@ -245,8 +246,8 @@ class Rule < ApplicationRecord
     references.each do |r|
       r = r.split(',')
       unless r[1].empty?
-        new_reference = Reference.create(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
-        self.references << new_reference
+        new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
+        self.references << new_reference unless self.references.include?(new_reference)
       end
     end
   end

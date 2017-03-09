@@ -133,9 +133,9 @@ class BugsController < ApplicationController
           @bugs = current_user.bugs
         when "team-bugs"
           if current_user.has_role?('manager')
-            @bugs = current_user.children.map{ |cw| cw.bugs }[0]
+            @bugs = current_user.children.map{ |cw| cw.bugs }[0] || []
           else
-            @bugs = current_user.siblings.map{ |cw| cw.bugs }[0]
+            @bugs = current_user.siblings.map{ |cw| cw.bugs }[0] || []
           end
         when "open-bugs"
           @bugs = Bug.open
