@@ -82,6 +82,21 @@ module API
           new_rule
         end
 
+
+        #revert a rule
+        params do
+          requires :ids, type: Array[String]
+        end
+        put "revert", root: "rule" do
+          authorize! :update, Rule
+          permitted_params[:ids].each do |id|
+            rule = Rule.where(id: id).first
+            rule.import
+          end
+          true
+        end
+
+
         desc "Edit a rule"
         params do
           requires :id, type: Integer, desc: "The database id of the rule you want to update."
@@ -163,7 +178,6 @@ module API
           authorize! :destroy, Rule
           Rule.remove_rule(permitted_params[:id])
         end
-
       end
     end
   end

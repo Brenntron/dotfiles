@@ -26,6 +26,7 @@ $ ->
 
 
   $(document).on 'submit', '#addResearchNoteForm', (e) ->
+    $('#submit_comment')[0].disabled = true
     e.preventDefault()
     data = new FormData()
     data.append( 'note[bugzilla_id]', $('input[name="bugzilla_id"]').val())
@@ -46,7 +47,8 @@ $ ->
         $('.alert_comment').addClass('error').show().html(response.responseText)
       complete: ->
         setTimeout (->
-          $('.alert_comment').hide 'blind', {}, 8000
+          $('.alert_comment').hide 'blind', {}, 1000
+          window.location.reload()
           return
-        ), 8000
+        ), 1000
     }

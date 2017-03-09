@@ -7,6 +7,9 @@
     <button class="select-sm btn btn-default rule-toolbar" id="view"><strong class="hidden-xs">view &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-eye-open"></i></button>
     <% if can? :update, Rule %>
       <button class="select-sm btn btn-default rule-toolbar" id="edit"><strong class="hidden-xs">edit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-pencil"></i></button>
+      <button class="select-sm btn btn-default rule-toolbar" id="revert">
+        <strong class="hidden-xs">revert</strong> <i class="glyphicon glyphicon-repeat"></i>
+      </button>
     <% end %>
     <% if can? :create, Rule %>
       <button class="select-sm btn btn-default rule-toolbar" id="create"><strong class="hidden-xs">create &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-plus"></i></button>
@@ -48,7 +51,7 @@
       <% if @rules.any? %>
         <tbody>
         <% @rules.each do |rule| %>
-          <tr id=<%= rule.id %>>
+          <tr id=<%= rule.id %> data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>" value="<%= rule.id %>"></td>
 
             <td class="rule_state_<%=rule_state_color(rule.state)%>"><%= rule.state %></td>
@@ -108,6 +111,10 @@
 </div>
 <div class="row spacer"></div>
 
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="xml_token" value="<%= xml_token %>">
+<input type="hidden" name="current_user" value="<%= current_user.id%>">
+
 <script>
   $('.show_rule').on('click', function(e){
     e.preventDefault();
@@ -123,3 +130,4 @@
     $('.rule_'+id).removeClass('hidden').addClass('active').show();
   });
 </script>
+

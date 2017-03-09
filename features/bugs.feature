@@ -508,10 +508,9 @@ Feature: Bug
     And I click "#showAddNotesToggle"
     And  I fill in "noteCommentField" with "I love testing"
     And I click "save"
-    And I wait for "3" seconds
+    And I wait for "2" seconds
     Then I should see "Comment saved and published to bugzilla"
-    When I goto "/bugs/145359"
-    And I click ".history-tab"
+    And I wait for "1" seconds
     Then I should see "I love testing"
 
   @javascript
