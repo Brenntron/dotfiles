@@ -102,10 +102,11 @@ $ ->
       $(".bugzilla_max").hide()
 
   $("#change_state_form").submit (e)->
+    e.preventDefault()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     id = $('input[name="bug_id"]').val()
     state = $('#bug_state option:selected').text()
-    $.ajax {
+    $.ajax(
       url: '/api/v1/bugs/' + id
       method: 'PUT'
       headers: headers
@@ -114,13 +115,12 @@ $ ->
         bug:
           'state': state
       success: (response) ->
-
-        $('#current_bug_state').html(response.bug.state)
+        $('#current_bug_state').html(response.state)
         $('#current_bug_state, #change_state_form').toggle()
         location.reload()
       error: (response) ->
-        alert 'Could not update the bug state'
-    }
+        alert(response.responseText)
+      , this)
 
 
   $("#change_editor_form").submit (e)->
