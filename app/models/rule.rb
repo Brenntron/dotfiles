@@ -246,7 +246,8 @@ class Rule < ApplicationRecord
     references.each do |r|
       r = r.split(',')
       unless r[1].empty?
-        new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
+        ref_type = ReferenceType.find_or_create_by(name: r[0].strip)
+        new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: r[1].strip)
         self.references << new_reference unless self.references.include?(new_reference)
       end
     end
@@ -265,14 +266,18 @@ class Rule < ApplicationRecord
       else
         ref_type = r.split(',')[0]
         ref_data = r.split(',')[1]
-        self.references << Reference.create(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data) unless ref_data.strip.empty?
+        unless ref_data.strip.empty?
+          new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data)
+          self.references << new_reference unless self.references.include?(new_reference)
+        end
       end
     end
     # delete the reference if it is no longer part of the record
     current_references.each do |r|
       ref_type = r.split(',')[0]
       ref_data = r.split(',')[1]
-      self.references.where(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data).each { |ref| ref.destroy! }
+      ref = Reference.where(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data)
+      self.references.destroy(ref)
     end
   end
 

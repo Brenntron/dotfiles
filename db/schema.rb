@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170306163554) do
+ActiveRecord::Schema.define(version: 20170302175702) do
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_attachment_id"
@@ -86,17 +86,9 @@ ActiveRecord::Schema.define(version: 20170306163554) do
     t.index ["user_id"], name: "index_bugs_on_user_id", using: :btree
   end
 
-  create_table "bugs_references", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "reference_id", null: false
-    t.integer "bug_id",       null: false
-    t.index ["bug_id", "reference_id"], name: "index_bugs_references_on_bug_id_and_reference_id", unique: true, using: :btree
-    t.index ["bug_id"], name: "index_bugs_references_on_bug_id", using: :btree
-    t.index ["reference_id"], name: "index_bugs_references_on_reference_id", using: :btree
-  end
-
   create_table "bugs_rules", primary_key: ["bug_id", "rule_id"], force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "bug_id",  null: false
-    t.integer "rule_id", null: false
+    t.integer "bug_id",  default: 0, null: false
+    t.integer "rule_id", default: 0, null: false
   end
 
   create_table "bugs_tags", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

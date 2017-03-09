@@ -2,10 +2,10 @@ class Bug < ApplicationRecord
 
   has_and_belongs_to_many :rules
   has_and_belongs_to_many :tags, dependent: :destroy
-  has_and_belongs_to_many :references, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
 
+  has_many :references, through: :rules
   has_many :exploits, through: :references
   has_many :attachments, dependent: :destroy
   has_many :tasks, dependent: :destroy
@@ -131,35 +131,35 @@ class Bug < ApplicationRecord
 
     case updated_state
     when 'NEW'
-      state_params['status'] = updated_state
-      state_params['resolution'] = 'OPEN'
-      state_params['comment'] = { comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug." }
+      state_params[:status] = updated_state
+      state_params[:resolution] = 'OPEN'
+      state_params[:comment] = { comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug." }
     when 'ASSIGNED'
-      state_params['status'] = updated_state
-      state_params['resolution'] = 'OPEN'
-      state_params['comment'] = { comment: "This bug is now ASSIGNED to #{editor_email}." }
-      state_params['assigned_at'] = Time.now
+      state_params[:status] = updated_state
+      state_params[:resolution] = 'OPEN'
+      state_params[:comment] = { comment: "This bug is now ASSIGNED to #{editor_email}." }
+      state_params[:assigned_at] = Time.now
     when 'PENDING'
-      state_params['status'] = 'RESOLVED'
-      state_params['resolution'] = updated_state
-      state_params['comment'] = { comment: "This bug is now RESOLVED - #{updated_state}." }
-      state_params['pending_at'] = Time.now
+      state_params[:status] = 'RESOLVED'
+      state_params[:resolution] = updated_state
+      state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params[:pending_at] = Time.now
       if bug.state == 'REOPENED'
-        state_params['rework_time'] = ((pending_at - bug.reopened_at) / 86_400).ceil
+        state_params[:rework_time] = ((state_params[:pending_at] - bug.reopened_at) / 86_400).ceil
       else
-        state_params['work_time'] = ((pending_at - bug.assigned_at) / 86_400).ceil
+        state_params[:work_time] = ((state_params[:pending_at] - bug.assigned_at) / 86_400).ceil
       end
     when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
-      state_params['status'] = 'RESOLVED'
-      state_params['resolution'] = updated_state
-      state_params['comment'] = { comment: "This bug is now RESOLVED - #{updated_state}." }
-      state_params['resolved_at'] = Time.now
-      state_params['review_time'] = ((resolved_at - bug.pending_at) / 86_400).ceil
+      state_params[:status] = 'RESOLVED'
+      state_params[:resolution] = updated_state
+      state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params[:resolved_at] = Time.now
+      state_params[:review_time] = ((state_params[:resolved_at] - bug.pending_at) / 86_400).ceil
     when 'REOPENED'
-      state_params['status'] = updated_state
-      state_params['resolution'] = 'OPEN'
-      state_params['comment'] = { comment: "This bug is now #{updated_state}." }
-      state_params['reopened_at'] = Time.now
+      state_params[:status] = updated_state
+      state_params[:resolution] = 'OPEN'
+      state_params[:comment] = { comment: "This bug is now #{updated_state}." }
+      state_params[:reopened_at] = Time.now
     end
     #return state params hash
     state_params
@@ -260,18 +260,6 @@ class Bug < ApplicationRecord
       ((resolved_at - created_at) / 86_400).ceil
     else
       0
-    end
-  end
-
-  def associate_references(rule_text)
-    references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
-    references.each do |r|
-      r = r.split(',')
-      unless r[1].empty?
-        new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
-        self.references << new_reference unless self.references.include?(new_reference)
-      end
     end
   end
 

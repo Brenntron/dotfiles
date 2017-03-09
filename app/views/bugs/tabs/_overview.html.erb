@@ -24,7 +24,7 @@
     <% if @bug.references.any? %>
         <% if @bug.references.cves.any? %>
             <p>cve:</p>
-            <% @bug.references.cves.each do |ref| %>
+            <% @bug.references.cves.distinct.each do |ref| %>
                 <div class="col-xs-12">
                   <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
                 </div>
@@ -32,7 +32,7 @@
         <% end %>
         <% if @bug.references.urls.any? %>
             <p>url:</p>
-            <% @bug.references.urls.each do |ref| %>
+            <% @bug.references.urls.distinct.each do |ref| %>
                 <div class="col-xs-12">
                   <code><a href="<%= get_ref_url(ref, "url") %>" target="_blank"><%= ref.reference_data %></a></code>
                 </div>
@@ -40,7 +40,7 @@
         <% end %>
         <% if @bug.references.bugtraqs.any? %>
             <p>bugtraq:</p>
-            <% @bug.references.bugtraqs.each do |ref| %>
+            <% @bug.references.bugtraqs.distinct.each do |ref| %>
                 <div class="col-xs-12">
                   <code><a href="<%= get_ref_url(ref, "bugtraq") %>" target="_blank"><%= ref.reference_data %></a></code>
                 </div>

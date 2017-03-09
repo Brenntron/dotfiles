@@ -71,11 +71,10 @@ module API
           authorize! :create, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
-          if permitted_params[:rule][:bug_id]
-            bug = Bug.where(id:permitted_params[:rule][:bug_id]).first
-            new_rule.bugs << bug
-            bug.associate_references(permitted_params[:rule][:rule_content])
-          end
+
+          bug = Bug.where(id:permitted_params[:rule][:bug_id]).first
+          new_rule.bugs << bug if permitted_params[:rule][:bug_id]
+
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule.update(detection:permitted_params[:rule][:detection].strip!, class_type:permitted_params[:rule][:class_type]) if new_rule.state == 'FAILED'
           new_rule.update(rule_category_id: permitted_params[:rule][:rule_category_id], publish_status: Rule::PUBLISH_STATUS_NEW)

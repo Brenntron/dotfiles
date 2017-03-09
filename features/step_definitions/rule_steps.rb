@@ -103,6 +103,11 @@ Given(/^rule content rev set to "(.*)"$/) do |rev|
   @rule_content = "#{@connection} (msg:\"#{@message}\"; flow:#{@flow}; #{@detection} metadata:#{@metadata}; reference:url,www.acunetix.com; classtype:#{@class_type}; sid:#{@sid}; rev:#{@rev};)"
 end
 
+Given(/^rule with id "(.*)" has a reference with id "(.*)"$/) do |rule_id, ref_id|
+  @rule = Rule.find(rule_id)
+  @rule.references << Reference.find(ref_id)
+end
+
 When(/^code calls load_rule_from_grep on rule content$/) do
   puts "*** @rule_grep_line = #{@rule_grep_line}"
   Rule.load_rule_from_grep(@rule_grep_line)
