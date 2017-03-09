@@ -2,10 +2,10 @@ class Bug < ApplicationRecord
 
   has_and_belongs_to_many :rules
   has_and_belongs_to_many :tags, dependent: :destroy
-  has_and_belongs_to_many :references, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
 
+  has_many :references, through: :rules
   has_many :exploits, through: :references
   has_many :attachments, dependent: :destroy
   has_many :tasks, dependent: :destroy
@@ -260,46 +260,6 @@ class Bug < ApplicationRecord
       ((resolved_at - created_at) / 86_400).ceil
     else
       0
-    end
-  end
-
-  def associate_references(rule_text)
-    references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
-    references.each do |r|
-      r = r.split(',')
-      unless r[1].empty?
-        new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
-        self.references << new_reference unless self.references.include?(new_reference)
-      end
-    end
-  end
-
-  def update_references(rule_text)
-    current_references = []
-    references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
-    references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
-    references.each do |r|
-      # skip this reference if it already exists
-      if current_references.include? r
-        current_references.delete(r)
-        # otherwise create it
-      else
-        ref_type = r.split(',')[0]
-        ref_data = r.split(',')[1]
-        unless ref_data.strip.empty?
-          new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data)
-          self.references << new_reference unless self.references.include?(new_reference)
-        end
-      end
-    end
-    # delete the reference if it is no longer part of the record
-    current_references.each do |r|
-      ref_type = r.split(',')[0]
-      ref_data = r.split(',')[1]
-      ref = Reference.where(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data)
-      self.references.destroy(ref)
     end
   end
 

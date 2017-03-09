@@ -21,7 +21,3 @@ And(/^I change the "(.*?)" of bug number "(.*?)" to "(.*?)"$/) do |method, id, s
   # binding.pry
   # page.driver.put, "/api/v1/bugs/#{id}", { :params => {method: status} }
 end
-
-And(/^bug with id "(.*?)" has reference with id "(.*?)"$/) do |bug_id, ref_id|
-  Bug.where(id: bug_id).first.references << Reference.where(id: ref_id).first
-end
