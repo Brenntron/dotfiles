@@ -4,7 +4,7 @@ class Reference < ApplicationRecord
   has_and_belongs_to_many :exploits
   has_many :bugs, through: :rules
 
-  validates :reference_data, uniqueness: :true
+  validates :reference_data, uniqueness: { scope: :reference_type_id }
 
   after_create { |reference| reference.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |reference| reference.record 'update' if Rails.configuration.websockets_enabled == 'true' }

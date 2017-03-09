@@ -227,7 +227,8 @@ class Rule < ApplicationRecord
     references.each do |r|
       r = r.split(',')
       unless r[1].empty?
-        new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: r[0]).first, reference_data: r[1])
+        ref_type = ReferenceType.find_or_create_by(name: r[0].strip)
+        new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: r[1].strip)
         self.references << new_reference unless self.references.include?(new_reference)
       end
     end
