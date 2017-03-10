@@ -3,23 +3,6 @@ Feature: Rules
   as a user
   I will provides ways to interact with rules
 
-  @javascript
-  Scenario: An existing unchanged rule synced with VC can be viewed
-    Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id |
-      |222222   | 222222      | OPEN   | 1       |
-    And the following rule categories exist:
-      |category       | id |
-      |BLACKLIST      |  1 |
-    And the following rules exist belonging to bug "222222":
-      | id | state     | message                 | rule_category_id |gid|sid|rev|
-      | 99 | UNCHANGED | BLACKLIST message       | 1                | 1 |101| 3 |
-    And I wait for "3" seconds
-    When I goto "/bugs/222222"
-    And I click the "Rules" tab
-    Then I should see rule "99" state "UNCHANGED" version "1:101:3"
-
  # ==== Appending the rule category to the Rule message ===
   @javascript
   Scenario: A new rule can be created with a rule category
@@ -208,6 +191,31 @@ Feature: Rules
     Then I should see "Unknown Traffic"
 
 
+  # ==== Existing rule ===
+
+  @javascript
+  Scenario: Viewing an exisiting rule
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    Given the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    When the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    When I goto "/bugs/2222"
+    And I click the "Rules" tab
+    And I click button "list all"
+    Then I should see rule "11" state "UNCHANGED" version "1:22211:3"
+    And I should see "BLACKLIST message"
+
+
+  # ==== Editing a rule ===
+
   @javascript
   Scenario: One or more rules can be selected on a bug to view or edit
     Given a user with role "analyst" exists and is logged in
@@ -239,6 +247,35 @@ Feature: Rules
     And  I should not see div element with class "rule_1"
     And  I should see div element with class "rule_2"
     And  I should see div element with class "rule_3"
+
+  @javascript
+  Scenario: A rule can be edited
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    And  I uncheck "rule_11"
+    And  I click "edit"
+    Then I should not see div element with class "rule_11"
+    When I click the "Rules" tab
+    And  I check "rule_11"
+    And  I click "edit"
+    Then I should see div element with class "rule_11"
+    When I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    And  I click button "Save Changes"
+    And  I wait for "8" seconds
+    And I should see "short msg"
 
 
     # ==== Editing rule docs ===
