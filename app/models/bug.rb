@@ -318,9 +318,9 @@ class Bug < ApplicationRecord
                                              email: item['creator'],
                                              password: 'password',
                                              password_confirmation: 'password',
-                                             committer: 'false')
+                                             committer: 'false').id
           else
-            new_record.creator = creator
+            new_record.creator = creator.id
           end
           if new_user.nil?
              new_generated_user = User.new(kerberos_login: 'generated',

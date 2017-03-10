@@ -145,15 +145,13 @@ ActiveRecord::Schema.define(version: 20170302175702) do
   end
 
   create_table "reference_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string  "name"
-    t.string  "description"
-    t.string  "validation"
-    t.string  "bugzilla_format"
-    t.string  "example"
-    t.string  "rule_format"
-    t.string  "url"
-    t.integer "reference_id"
-    t.index ["reference_id"], name: "index_reference_types_on_reference_id", using: :btree
+    t.string "name"
+    t.string "description"
+    t.string "validation"
+    t.string "bugzilla_format"
+    t.string "example"
+    t.string "rule_format"
+    t.string "url"
   end
 
   create_table "references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

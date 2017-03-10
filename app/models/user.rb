@@ -69,7 +69,7 @@ class User < ApplicationRecord
       when has_role?('build coordinator')
         Bug.where(state: 'FIXED').order(:resolved_at)
       else
-        bugs
+        Bug.all
     end
   end
 
