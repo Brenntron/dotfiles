@@ -58,6 +58,8 @@ mp.roles << Role.where(role: 'admin')
 
 pm = User.create(kerberos_login:"pmullen",cvs_username:"pmullen",cec_username:"pamullen",display_name:"Patrick Mullen",committer:true,email:"pmullen@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 pm.roles << Role.where(role: 'committer')
+#add as child to chris marshall
+pm.move_to_child_of(cm)
 
 am = User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:true,email:"amcdonnell@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 am.roles << Role.where(role: 'committer')
