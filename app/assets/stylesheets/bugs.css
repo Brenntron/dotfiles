@@ -45,3 +45,13 @@ div.progress{
     margin-left: -15px;
     font-size:18px;
 }
+
+#bug-rules-table .rule-test-alert {
+    display: none;
+}
+#bug-rules-table .alerted {
+    background-color: lightgreen;
+}
+#bug-rules-table .failed_alert {
+    background-color: red;
+}
