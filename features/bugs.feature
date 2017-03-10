@@ -267,6 +267,21 @@ Feature: Bug
 # uncomment when connectivity to bugzilla test fixed
 #    Then I should see "Malware"
 
+  @javascript
+  Scenario: a user can change the summary of a bug
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click "summary"
+    And I fill in "bug_summary" with "new summary"
+#    Then I click button "change summary"
+#    And I wait for "2" seconds
+# uncomment when connectivity to bugzilla test fixed
+# Then I should see "new summary"
+
 
   @javascript
   Scenario: a user can add a new rule to a bug

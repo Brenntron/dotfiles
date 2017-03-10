@@ -39,3 +39,9 @@ div.progress{
     width:100%;
     margin-botom: 10px;
 }
+
+.cancel-button{
+    margin-top:6px;
+    margin-left: -15px;
+    font-size:18px;
+}

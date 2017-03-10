@@ -48,6 +48,11 @@ $ ->
 
   $('.edit-summary').on 'click', ->
     $('.edit-summary-field').toggle()
+    $('.edit-summary').toggle()
+
+  $('.cancel-button').on 'click', ->
+    $('.edit-summary-field').toggle()
+    $('.edit-summary').toggle()
 
   $('#bug_tab a:first').tab('show')
 
