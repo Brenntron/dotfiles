@@ -33,7 +33,7 @@
               <td><%= task.task_type %></td>
               <td></td>
               <td></td>
-              <td class="no-overflow"><a><%= task.result %></a></td>
+              <td><pre><%= task.result %></pre></td>
               <td><%= User.find(task.user_id).cvs_username %></td>
               <td><%= task.created_at.strftime("%m/%d/%y") %></td>
             </tr>
