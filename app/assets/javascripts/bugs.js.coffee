@@ -86,7 +86,8 @@ $ ->
         method: 'delete'
         headers: headers
         success: (response) ->
-          alert(response.error + " \n" + response.message)
+          if(typeof response != 'undefined')
+            alert(response.error + " \n" + response.message)
           window.location.reload()
         error: (response) ->
           alert 'Could not delete the bug'

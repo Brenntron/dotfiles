@@ -1,5 +1,5 @@
 class BugsController < ApplicationController
-  load_and_authorize_resource except: [:add_tag, :remove_tag]
+  load_and_authorize_resource except: [:add_tag, :remove_tag, :show]
 
   before_action :require_login
   before_action :query_bugs
