@@ -19,28 +19,9 @@
 
       # Nothing to do on a failed job
       return if job.failed
-      
-      begin
 
-        # Parse performance results (Please lord forgive me)
-        stats = Hash.new
-        job.result.each_line.to_a.map {|l| l.split(/\s+/)}.delete_if {|a| a[1] !~ /\d+/}.map { |a| [a[2], a[3], a[4], a[9], a[10], a[11] ] }.each do |a|
-          stats[a[0].to_i] = [a[3].to_f, a[4].to_f, a[5].to_f]
-        end
-
-        # Update each rule in the 
-        job.bug.rules.find(:all, :conditions => ['gid = ?', 1]).each do |rule|
-          unless stats[rule.temp_sid].nil?
-            rule.average_check = stats[rule.temp_sid][0]
-            rule.average_match = stats[rule.temp_sid][1]
-            rule.average_nonmatch = stats[rule.temp_sid][2]
-            rule.save
-          end
-        end
-
-      rescue Exception => e
-        # We don't care if this fails
-      end
+      # Parse performance results (as Donald Knuth would approve)
+      job.update_rule_stats
 
     else
       if result['sid'].to_i > 1000000
