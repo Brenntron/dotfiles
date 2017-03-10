@@ -56,11 +56,20 @@ nv.roles << Role.where(role: 'admin')
 mp = User.create(kerberos_login:"marlpier",cvs_username:"marlpier",cec_username:"marlpier",display_name:"Marlin Pierce",committer:true,email:"marlpier@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 mp.roles << Role.where(role: 'admin')
 
-User.create(kerberos_login:"pmullen",cvs_username:"pmullen",cec_username:"pamullen",display_name:"Patrick Mullen",committer:true,email:"pmullen@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:true,email:"amcdonnell@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-User.create(kerberos_login:"drandolph",cvs_username:"drandolph",cec_username:"nrandolp",display_name:"Nick Randolph",committer:true,email:"drandolph@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-User.create(kerberos_login:"tmontier",cvs_username:"tmontier",cec_username:"tmontier",display_name:"Tyler Montier",committer:true,email:"tmontier@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-User.create(kerberos_login:"cmarczewski",cvs_username:"cmarczewski",cec_username:"cmarczew",display_name:"Chris Marczewski",committer:true,email:"cmarczewski@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+pm = User.create(kerberos_login:"pmullen",cvs_username:"pmullen",cec_username:"pamullen",display_name:"Patrick Mullen",committer:true,email:"pmullen@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+pm.roles << Role.where(role: 'committer')
+
+am = User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:true,email:"amcdonnell@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+am.roles << Role.where(role: 'committer')
+
+nr = User.create(kerberos_login:"drandolph",cvs_username:"drandolph",cec_username:"nrandolp",display_name:"Nick Randolph",committer:true,email:"drandolph@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+nr.roles << Role.where(role: 'committer')
+
+tm = User.create(kerberos_login:"tmontier",cvs_username:"tmontier",cec_username:"tmontier",display_name:"Tyler Montier",committer:true,email:"tmontier@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+tm.roles << Role.where(role: 'committer')
+
+cz = User.create(kerberos_login:"cmarczewski",cvs_username:"cmarczewski",cec_username:"cmarczew",display_name:"Chris Marczewski",committer:true,email:"cmarczewski@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+cz.roles << Role.where(role: 'committer')
 
 # Reference.create(reference_data:"12345",reference_type: ref2)
 # Reference.create(reference_data:"cve,1936-7254",reference_type: ref1)
