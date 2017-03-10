@@ -272,4 +272,8 @@ $ ->
 
   }
 
+  $(".rulealert-toggle").on 'click', ->
+    which = $(this).data('rulealert');
+    $('.'+which).toggle();
+
 
