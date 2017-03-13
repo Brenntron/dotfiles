@@ -128,7 +128,7 @@ while message = client.receive
       pcap_path = "#{local_cache_path}/#{attachment_id}"
 
       # Updated files get new attachment ids so no need to test the actual data
-      if not File.exists?(pcap_path)
+      unless File.exists?(pcap_path)
         attempts = 0
 
         # Retry if we get a bugzilla EOF error
@@ -157,6 +157,9 @@ while message = client.receive
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
 
+      # NOt sure if the code below returns a proper pcap
+      #
+
       # Start by hashing the pcap data
       sha = Digest.hexencode(sha256.digest(pcap_data))
       # See if the PCAP exists on the server
@@ -164,9 +167,10 @@ while message = client.receive
 
       # Should we upload the pcap
       if pcap.nil?
+        # TODO this part is broken for some reason this does not create a valid pcap for
+        # ruletestapi
         pcap = Pcap.create(:pcap => Base64.encode64(pcap_data))
       end
-
       # Make sure that worked
       if pcap.error?
         raise Exception.new(pcap.error)
