@@ -113,9 +113,9 @@ module API
 
         desc "link a rule to this bug"
         params do
-          requires :bug_id, type: String, desc: "ID of the bug"
-          requires :gid, type: String, desc: "gid of the rule"
-          requires :sid, type: String, desc: "sid of the rule"
+          requires :bug_id, type: Integer, desc: "ID of the bug"
+          requires :gid, type: Integer, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
         end
         post ':bug_id/rules/:gid~:sid/link' do
           bug = Bug.where(id: permitted_params[:bug_id]).first
