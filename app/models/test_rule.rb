@@ -1,6 +1,6 @@
 require 'activemessaging/processor'
 include ActiveMessaging::MessageSender
-class PublishRule
+class TestRule
   publishes_to :snort_local_rules_test_work
 
   def self.send_work_msg(content, options, request)

@@ -168,6 +168,7 @@ module API
           options = {}
           update_params = {}
           if permitted_params[:bug][:editor_id]
+
             state = nil
             editor = User.find(permitted_params[:bug][:editor_id])
             updated_bug_state = Bug.get_new_bug_state(bug, state, editor.email)

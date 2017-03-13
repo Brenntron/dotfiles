@@ -56,12 +56,14 @@ module API
               options[:attachment_array].split(',').each do |attachment_id|
                 new_task.attachments << Attachment.where(id: attachment_id).first unless nil
               end
-              PublishAttachment.send_work_msg(new_task,options,request)
+              TestAttachment.send_work_msg(new_task, options, request)
             when "rule"
               options[:rule_array].split(',').each do |rule_id|
                 new_task.rules << Rule.where(id: rule_id).first unless nil
               end
-              PublishRule.send_work_msg(new_task,options,request)
+              TestRule.send_work_msg(new_task,options,request)
+            when "commmit"
+              SendCommit.send_work_msg(new_task,options,request)
           end
           new_task
         end
