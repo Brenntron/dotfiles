@@ -14,6 +14,10 @@ Given(/^"(.*?)" rules exist and belong to bug "(.*?)"/)  do |number, bug_id|
   end
 end
 
+Given(/^bug with id "(.*)" has rule with id "(.*)"$/) do |bug_id, rule_id|
+  Bug.find(bug_id).rules << Rule.find(rule_id)
+end
+
 Given(/^the following rules exist:$/) do |rules|
   rules.hashes.each do |rule|
     FactoryGirl.create(:rule, rule)
@@ -165,6 +169,6 @@ end
 
 Then(/^I should see rule "(.*)" state "(.*)" version "(.*)"$/) do |rule_id, state, version|
   page.find(:xpath, "//tr[@id='#{rule_id}']/td[text()='#{state}']")
-  page.find(:xpath, "//tr[@id='#{rule_id}']/td/a/strong[text()='#{version}']")
+  page.find(:xpath, "//tr[@id='#{rule_id}']//*[text()='#{version}']")
 end
 
