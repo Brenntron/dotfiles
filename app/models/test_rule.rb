@@ -5,7 +5,10 @@ class TestRule
 
   def self.send_work_msg(content, options, request)
     # be sure to collect all the attachments too but only the ones that are pcaps
-    all_attachments = options[:bug].attachments.map { |b| /^\S+.pcap$/.match(b.file_name) ? b.id : next}.reject { |v| v.nil? }
+    all_attachments = options[:bug].attachments.inject([]) do | memo, attachment |
+      memo << id if /^[-\w]+.pcap$/.match(attachment.file_name)
+      memo
+    end
     # TODO: collect rule content to insert in the local_rules. Dont use numbers.
     rules_content = []
     content.rules.each do |rule|

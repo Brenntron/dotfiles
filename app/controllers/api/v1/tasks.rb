@@ -54,7 +54,10 @@ module API
           case options[:task_type]
             when "attachment"
               options[:attachment_array].split(',').each do |attachment_id|
-                new_task.attachments << Attachment.where(id: attachment_id).first unless nil
+                attachment = Attachment.where(id: attachment_id).first
+                if /^[-\w]+.pcap$/.match(attachment.file_name)
+                  new_task.attachments << attachment
+                end
               end
               TestAttachment.send_work_msg(new_task, options, request)
             when "rule"
