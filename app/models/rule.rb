@@ -336,6 +336,7 @@ class Rule < ApplicationRecord
           class_type: /classtype\s*:(.*)\)/.match(parsed[:rule]) ? /classtype\s*:(.*)\)/.match(parsed[:rule])[1] : '<MISSING>',
           committed: true,
           state: rule_sid ? 'UNCHANGED' : 'NEW',
+          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_NEW,
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
@@ -363,6 +364,7 @@ class Rule < ApplicationRecord
           class_type: /Classtype\s*:\s(.*)/.match(parsed[:rule]) ? /Classtype\s*:\s(.*)/.match(parsed[:rule])[1] : '<MISSING>',
           committed: true,
           state: rule_sid ? 'UNCHANGED' : 'NEW',
+          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_NEW,
           rule_category_id: rule_category.id
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }

@@ -275,6 +275,37 @@ Feature: Rules
     When I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
+    Then I should see rule "11" state "UPDATED" version "1:22211:3"
+    And I should see "short msg"
+
+  @javascript
+  Scenario: Valid current edited rule should have CSS class
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    And  I uncheck "rule_11"
+    And  I click "edit"
+    Then I should not see div element with class "rule_11"
+    When I click the "Rules" tab
+    And  I check "rule_11"
+    And  I click "edit"
+    Then I should see div element with class "rule_11"
+    When I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    And  I click button "Save Changes"
+    And  I wait for "8" seconds
+    Then I should see rule "11" state "FAILED" version "1:22211:3"
     And I should see "short msg"
 
 
