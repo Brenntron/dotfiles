@@ -30,6 +30,14 @@ Feature: Rules
     And  I click button "list all"
     Then I should see "Test message"
     And  I should see a rule with state "NEW" version "new_rule"
+    And I should see "Test message"
+    When I check "rule[id]"
+    And  I click "edit"
+    And  I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    And  I click button "Save Changes"
+    And  I wait for "8" seconds
+    Then I should see a rule with state "FAILED" version "new_rule"
+    And I should see "short msg"
 
   @javascript
   Scenario: Rule category drop down should sort by frequency of use
