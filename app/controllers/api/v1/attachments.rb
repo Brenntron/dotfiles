@@ -60,7 +60,24 @@ module API
                 :is_obsolete => false,
                 :minor_update => options[:minor_update]
             )
-            Bug.where(id: options[:ids]).first.attachments << new_attach
+            bug = Bug.where(id: options[:ids]).first
+            bug.attachments << new_attach
+            options = {
+                :bug              => bug,
+                :task_type         => "attachment",
+                :attachment_array => bug.attachments.map{|a| a.id},
+
+            }
+            new_task = Task.create(
+              :bug  => options[:bug],
+              :task_type     => options[:task_type],
+              :user => User.where(cvs_username: current_user.cvs_username).first
+          )
+          begin
+              new_task.test_attachments(options, request.headers['Xmlrpc-Token'])
+          rescue
+            #handle timeouts accordingly
+          end
           else
             return false
           end

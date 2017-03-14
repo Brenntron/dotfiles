@@ -144,10 +144,10 @@ class User < ApplicationRecord
       raise Exception.new('You are not logged into Kerberos. Please try again.') if kerberos_login.nil?
       user = User.where('kerberos_login=?', kerberos_login).first_or_create do |new_record|
         new_record.kerberos_login = kerberos_login
-        new_record.email          = request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
-        new_record.cvs_username   = request.env['AUTHENTICATE_SAMACCOUNTNAME'] || Rails.configuration.backend_auth[:authenticate_cvs_username]
-        new_record.cec_username   = request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
-        new_record.display_name   = request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
+        new_record.email          = request.env['AUTHORIZE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
+        new_record.cvs_username   = request.env['AUTHORIZE_SAMACCOUNTNAME'] || Rails.configuration.backend_auth[:authenticate_cvs_username]
+        new_record.cec_username   = request.env['AUTHORIZE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
+        new_record.display_name   = request.env['AUTHORIZE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
         new_record.committer      = 'false'
         new_record.class_level    = 'unclassified'
         new_record.password       = 'password'

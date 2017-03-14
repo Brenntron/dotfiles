@@ -41,7 +41,7 @@ module API
                 :bug              => Bug.where(id: permitted_params[:task][:bugzilla_id]).first,
                 :task_type         => permitted_params[:task][:task_type],
                 :current_user     => User.where(id: permitted_params[:task][:created_by]).first,
-                :attachment_array => permitted_params[:task][:attachment_array],
+                :attachment_array => permitted_params[:task][:attachment_array].split(',').map { |s| s.to_i },
                 :rule_array       => permitted_params[:task][:rule_array]
             }.reject() { |k, v| v.nil? }
           else   # (legacy form)
@@ -53,15 +53,9 @@ module API
           )
           case options[:task_type]
             when "attachment"
-              options[:attachment_array].split(',').each do |attachment_id|
-                new_task.attachments << Attachment.where(id: attachment_id).first unless nil
-              end
-              PublishAttachment.send_work_msg(new_task,options,request)
+              new_task.test_attachments(options, request.headers['Xmlrpc-Token'])
             when "rule"
-              options[:rule_array].split(',').each do |rule_id|
-                new_task.rules << Rule.where(id: rule_id).first unless nil
-              end
-              PublishRule.send_work_msg(new_task,options,request)
+              new_task.test_rules(options, request.headers['Xmlrpc-Token'])
           end
           new_task
         end
