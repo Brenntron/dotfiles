@@ -4,34 +4,32 @@ Feature: Rules
   I will provides ways to interact with rules
 
  # ==== Appending the rule category to the Rule message ===
+
   @javascript
-  Scenario: A new rule can be created with a rule category
+  Scenario: A new rule can be created and displayed
     Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   2222228   | OPEN   |    1    |
     And the following rule categories exist:
-      |category       |
-      |BLACKLIST      |
-      |FILE-EXECUTABLE|
-      |OS-LINUX       |
-    Then I wait for "3" seconds
-    And  I goto "/bugs/222222"
-    And  I should see "222222"
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
-    And  I should see "New Rule"
-    And  I select "FILE-EXECUTABLE" from "rule_category_id"
-    And  I fill in "rule[message]" with "Test Message"
+      | category  | id |
+      | BLACKLIST |  1 |
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "Test message"
     And  I fill in "rule[detection]" with "Detection test"
     And  I select "unknown" from "rule[class_type]"
-    And  I fill in "summary" with "This is the rule doc summary"
-    Then I click "Create Rule"
-    And  I wait for "3" seconds
-    Then I click the "Rules" tab
-    Then I click button "list all"
-    And  I should see "FILE-EXECUTABLE Test Message"
+    And  I fill in "summary" with "rule doc summary"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    When I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "Test message"
+    And  I should see a rule with state "NEW" version "new_rule"
 
   @javascript
   Scenario: Rule category drop down should sort by frequency of use
@@ -387,4 +385,8 @@ Feature: Rules
     And I wait for "3" seconds
     When code calls load_rule_from_grep on rule content
     Then rule record will marked out of date
+
+
+
+
 
