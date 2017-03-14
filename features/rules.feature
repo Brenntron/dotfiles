@@ -31,13 +31,21 @@ Feature: Rules
     Then I should see "Test message"
     And  I should see a rule with state "NEW" version "new_rule"
     And I should see "Test message"
+#    And rule "11" is a new rule
+    And I should see a rule row with class "draft" and version "new_rule"
+    And I should see a rule row with class "new-rule" and version "new_rule"
+    And I should see a rule row with class "parsed" and version "new_rule"
     When I check "rule[id]"
     And  I click "edit"
     And  I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see a rule with state "FAILED" version "new_rule"
+#    And rule "11" is a new rule
     And I should see "short msg"
+    And I should see a rule row with class "draft" and version "new_rule"
+    And I should see a rule row with class "new-rule" and version "new_rule"
+    And I should see a rule row with class "failed" and version "new_rule"
 
   @javascript
   Scenario: Rule category drop down should sort by frequency of use
@@ -212,12 +220,14 @@ Feature: Rules
     When the following rules exist:
       | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
       | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+    Then rule "11" is synched
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And I click the "Rules" tab
     And I click button "list all"
     Then I should see rule "11" state "UNCHANGED" version "1:22211:3"
     And I should see "BLACKLIST message"
+    And I should see a rule row with class "synched" and id "11"
 
 
   # ==== Editing a rule ===
@@ -282,7 +292,12 @@ Feature: Rules
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "UPDATED" version "1:22211:3"
+    And rule "11" is a current edit
     And I should see "short msg"
+    And I should see a rule row with class "draft" and id "11"
+    And I should see a rule row with class "edited-rule" and id "11"
+    And I should see a rule row with class "current-edit" and id "11"
+    And I should see a rule row with class "parsed" and id "11"
 
   @javascript
   Scenario: Valid current edited rule should have CSS class
@@ -312,7 +327,12 @@ Feature: Rules
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "FAILED" version "1:22211:3"
+    And rule "11" is a current edit
     And I should see "short msg"
+    And I should see a rule row with class "draft" and id "11"
+    And I should see a rule row with class "edited-rule" and id "11"
+    And I should see a rule row with class "current-edit" and id "11"
+    And I should see a rule row with class "failed" and id "11"
 
 
   # ==== Synching a rule from VC ===
@@ -331,13 +351,18 @@ Feature: Rules
       | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
       | 11 |  1  | 22211 |  3  |  UPDATED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
+    When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "list all"
     Then I should see "BLACKLIST message"
+    And I should see a rule row with class "draft" and id "11"
+    And I should see a rule row with class "edited-rule" and id "11"
+    And I should see a rule row with class "stale-edit" and id "11"
+    And I should see a rule row with class "parsed" and id "11"
 
   @javascript
-  Scenario: VC updated for a failed parsing edited rule *new
+  Scenario: VC updated for a failed parsing edited rule
     Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
     Given the following bugs exist:
@@ -350,10 +375,15 @@ Feature: Rules
       | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
       | 11 |  1  | 22211 |  3  |   FAILED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
+    When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "list all"
     Then I should see "BLACKLIST message"
+    And I should see a rule row with class "draft" and id "11"
+    And I should see a rule row with class "edited-rule" and id "11"
+    And I should see a rule row with class "stale-edit" and id "11"
+    And I should see a rule row with class "failed" and id "11"
 
 
   # ==== Editing rule docs ===
@@ -435,8 +465,4 @@ Feature: Rules
     And I wait for "3" seconds
     When code calls load_rule_from_grep on rule content
     Then rule record will marked out of date
-
-
-
-
 

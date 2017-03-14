@@ -187,6 +187,10 @@ Then(/^I should see a rule row with class "(.*)" and id "(.*)"$/) do |css_class,
   page.find(:xpath, "//table[@id='bug-rules-table']//tr[@id='#{rule_id}']")[:class].split(' ').should include(css_class)
 end
 
+Then(/^I should see a rule row with class "(.*)" and version "(.*)"$/) do |css_class, version|
+  page.find(:xpath, "//table[@id='bug-rules-table']//tr[.//*[normalize-space(text())='#{version}']]")[:class].split(' ').should include(css_class)
+end
+
 Then(/^rule "(.*)" is synched$/) do |rule_id|
   rule = Rule.find(rule_id)
   rule.synched?.should == true
@@ -200,4 +204,9 @@ Then(/^rule "(.*)" is a current edit/) do |rule_id|
   rule.new_rule?.should == false
   rule.edited_rule?.should == true
   rule.current_edit?.should == true
+end
+
+Given(/^rule sid "(.*)" rev "(.*)" is synched$/) do |sid, rev|
+  rule_content = "alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:\"short msg\"; flow:established; content:\"E_|00 03 05|\"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:#{sid}; rev:#{rev};)"
+  Rule.load_rule_from_content(rule_content)
 end
