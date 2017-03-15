@@ -5,9 +5,10 @@ FactoryGirl.define do
     current_sign_in_ip "127.0.0.1"
     authentication_token "12345"
     parent_id nil
+    cec_username nil
     cvs_username { cec_username }
     kerberos_login { cec_username }
-    email { "#{cec_username}@cisco.com" }
+    email { cec_username ? "#{cec_username}@cisco.com" : nil }
 
     factory :current_user do
       display_name ENV['authenticate_display_name']
@@ -18,11 +19,13 @@ FactoryGirl.define do
     end
 
     factory :fake_user do
-      sequence :first_name do |nn|
-        %w[James Ronald George William Barack Hillary][nn - 1] || Faker::Name.first_name
-      end
-      sequence :last_name do |nn|
-        %w[Washington Adams Jefferson Madison Monroe Adams][nn - 1] || Faker::Name.last_name
+      transient do
+        sequence :first_name do |nn|
+          %w[James Ronald George William Barack Hillary][nn - 1] || Faker::Name.first_name
+        end
+        sequence :last_name do |nn|
+          %w[Washington Adams Jefferson Madison Monroe Adams][nn - 1] || Faker::Name.last_name
+        end
       end
       display_name { "#{first_name} #{last_name}" }
       cec_username { "#{first_name[0..3]}#{last_name[0..3]}".downcase }
