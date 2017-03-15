@@ -148,7 +148,7 @@ $ ->
         location.reload()
       error: (response) ->
         location.reload()
-#        alert(response.responseText)
+        alert(response.responseText)
     , this)
 
 
@@ -171,7 +171,7 @@ $ ->
         location.reload()
       error: (response) ->
         location.reload()
-#        alert(response.responseText)
+        alert(response.responseText)
     , this)
 
   $("#change_priority_form").submit (e)->

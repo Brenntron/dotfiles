@@ -47,38 +47,38 @@ roles.each do |role|
   Role.create(role: role)
 end
 
-cm = User.create(kerberos_login:"cmarshall",cvs_username:"cmarshall",cec_username:"marshal1",display_name:"Chris Marshall",committer:true,email:"marshal1@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+cm = User.create(kerberos_login:"cmarshall",cvs_username:"cmarshall",cec_username:"marshal1",display_name:"Chris Marshall",committer:true,email:"cmarshall@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 cm.roles << Role.where(role: 'manager')
 cm.roles << Role.where(role: 'committer')
 
-nh = User.create(kerberos_login:"nherbert",cvs_username:"nherbert",cec_username:"nicherbe",display_name:"Nick Herbert",committer:true,email:"nicherbe@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+nh = User.create(kerberos_login:"nherbert",cvs_username:"nherbert",cec_username:"nicherbe",display_name:"Nick Herbert",committer:true,email:"nherbert@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 nh.roles << Role.where(role: 'admin')
 
-nv = User.create(kerberos_login:"nverbeck",cvs_username:"nverbeck",cec_username:"nverbeck",display_name:"Nicolette Verbeck",committer:true,email:"nverbeck@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+nv = User.create(kerberos_login:"nverbeck",cvs_username:"nverbeck",cec_username:"nverbeck",display_name:"Nicolette Verbeck",committer:true,email:"nverbeck@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 nv.roles << Role.where(role: 'admin')
 nv.move_to_child_of(nh)
 
-mp = User.create(kerberos_login:"marlpier",cvs_username:"marlpier",cec_username:"marlpier",display_name:"Marlin Pierce",committer:true,email:"marlpier@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+mp = User.create(kerberos_login:"marlpier",cvs_username:"marlpier",cec_username:"marlpier",display_name:"Marlin Pierce",committer:true,email:"marlpier@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 mp.roles << Role.where(role: 'admin')
 mp.move_to_child_of(nh)
 
-pm = User.create(kerberos_login:"pmullen",cvs_username:"pmullen",cec_username:"pamullen",display_name:"Patrick Mullen",committer:true,email:"pamullen@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+pm = User.create(kerberos_login:"pmullen",cvs_username:"pmullen",cec_username:"pamullen",display_name:"Patrick Mullen",committer:true,email:"pmullen@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 pm.roles << Role.where(role: 'manager')
 pm.roles << Role.where(role: 'committer')
 #add as child to chris marshall
 pm.move_to_child_of(cm)
 
-am = User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:false,email:"almcdonn@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+am = User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:false,email:"amcdonnell@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 am.roles << Role.where(role: 'analyst')
 am.move_to_child_of(pm)
 
-nr = User.create(kerberos_login:"drandolph",cvs_username:"drandolph",cec_username:"nrandolp",display_name:"Nick Randolph",committer:false,email:"nrandolp@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+nr = User.create(kerberos_login:"drandolph",cvs_username:"drandolph",cec_username:"nrandolp",display_name:"Nick Randolph",committer:false,email:"drandolph@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 nr.roles << Role.where(role: 'analyst')
 
-tm = User.create(kerberos_login:"tmontier",cvs_username:"tmontier",cec_username:"tmontier",display_name:"Tyler Montier",committer:true,email:"tmontier@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+tm = User.create(kerberos_login:"tmontier",cvs_username:"tmontier",cec_username:"tmontier",display_name:"Tyler Montier",committer:true,email:"tmontier@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 tm.roles << Role.where(role: 'committer')
 
-cz = User.create(kerberos_login:"cmarczewski",cvs_username:"cmarczewski",cec_username:"cmarczew",display_name:"Chris Marczewski",committer:true,email:"cmarczew@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+cz = User.create(kerberos_login:"cmarczewski",cvs_username:"cmarczewski",cec_username:"cmarczew",display_name:"Chris Marczewski",committer:true,email:"cmarczewski@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 cz.roles << Role.where(role: 'committer')
 
 # Reference.create(reference_data:"12345",reference_type: ref2)
