@@ -7,10 +7,11 @@ PATH
 PATH
   remote: vendor/gems/sfbugzilla
   specs:
-    sfbugzilla (0.0.10)
-      highline (>= 1.6.8)
-      mime-types (>= 1.18)
-      ruby-bugzilla (>= 0.6.0)
+    sfbugzilla (0.1.6)
+      highline
+      mime-types
+      ruby-bugzilla (> 0.6.3)
+      term-ansicolor
 
 GEM
   remote: https://rubygems.org/
@@ -360,6 +361,8 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     stomp (1.4.3)
+    term-ansicolor (1.4.0)
+      tins (~> 1.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -370,6 +373,7 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.5)
     tilt (2.0.5)
+    tins (1.13.2)
     tool (0.2.3)
     turbolinks (5.0.1)
       turbolinks-source (~> 5)
