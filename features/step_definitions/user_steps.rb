@@ -39,7 +39,7 @@ Given(/^a manager exists and is logged in$/) do
   visit root_path(api_key: "h93hq@hwo9%@ah!jsh")
 end
 
-Given(/^a user exists$/) do
+Given(/^current user exists$/) do
   @user = FactoryGirl.create(:current_user, confirmed: true)
 end
 

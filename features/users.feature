@@ -5,7 +5,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user with proper credentials should get logged in
-    Given a user exists
+    Given current user exists
     And I visit the root url
     And I should see "Please wait while we sign you in"
     Then I wait for "3" seconds
