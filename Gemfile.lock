@@ -152,6 +152,8 @@ GEM
     factory_girl_rails (4.8.0)
       factory_girl (~> 4.8.0)
       railties (>= 3.0.0)
+    faker (1.7.3)
+      i18n (~> 0.5)
     faraday (0.10.1)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.14)
@@ -420,6 +422,7 @@ DEPENDENCIES
   dotenv-rails
   factory_girl (= 4.8.0)
   factory_girl_rails (= 4.8.0)
+  faker (~> 1.7.3)
   foreman
   grape (= 0.19.0)
   grape-active_model_serializers
