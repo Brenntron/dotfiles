@@ -72,12 +72,12 @@ module API
               :bug  => options[:bug],
               :task_type     => options[:task_type],
               :user => User.where(cvs_username: current_user.cvs_username).first
-          )
-          begin
-              new_task.test_attachments(options, request.headers['Xmlrpc-Token'])
-          rescue
-            #handle timeouts accordingly
-          end
+            )
+            begin
+                new_task.test_attachments(options, request.headers['Xmlrpc-Token'])
+            rescue
+              #handle timeouts accordingly
+            end
           else
             return false
           end
