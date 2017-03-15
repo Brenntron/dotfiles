@@ -50,10 +50,10 @@ div.progress{
     display: none;
 }
 #bug-rules-table .alerted {
-    background-color: lightgreen;
+    background-color: #a1f9c0;
 }
-#bug-rules-table .failed_alert {
-    background-color: red;
+#bug-rules-table .no_alert{
+    background-color: #ff8080;
 }
 
 .glyphicon-refresh-animate {

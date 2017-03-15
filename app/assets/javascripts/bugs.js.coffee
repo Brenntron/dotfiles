@@ -160,6 +160,7 @@ $ ->
         $('#current_bug_editor, #change_editor_form').toggle()
         location.reload()
       error: (response) ->
+        location.reload()
         alert(response.responseText)
     , this)
 
@@ -182,6 +183,7 @@ $ ->
         $('#current_bug_committer, #change_committer_form').toggle()
         location.reload()
       error: (response) ->
+        location.reload()
         alert(response.responseText)
     , this)
 
@@ -198,10 +200,13 @@ $ ->
         id: id
         bug:
           'priority': priority
-    ).done (response) ->
-      $('#current_bug_priority, #change_priority_form').toggle()
-      location.reload()
-      return
+      success: (response) ->
+        $('#current_bug_priority, #change_priority_form').toggle()
+        $('#bug_priority option:selected').val()
+        window.location.reload()
+      error:(response) ->
+        window.location.reload()
+    , this)
 
   $("#change_component_form").submit (e)->
     e.preventDefault()
@@ -216,10 +221,13 @@ $ ->
         id: id
         bug:
           'component': component
-    ).done (response) ->
-      $('#current_bug_component, #change_component_form').toggle()
-      location.reload()
-      return
+      success: (response) ->
+        $('#current_bug_component, #change_component_form').toggle()
+        $('#bug_component option:selected').val()
+        window.location.reload()
+      error:(response) ->
+        window.location.reload()
+    , this)
 
 
   createSelectOptions = ->

@@ -100,16 +100,6 @@ module API
           end
         end
 
-        desc "link a rule with this bug"
-        params do
-          requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
-        end
-        post '/rules/:link' do
-          rule_id = permitted_params[:link].split(':')[1]
-          rule = Rule.where(sid:rule_id).empty? ? Rule.import_rule(rule_id) : Rule.where(sid:rule_id).first
-          Bug.where(id:permitted_params[:link].split(':')[0]).first.rules << rule
-        end
-
         desc "unlink a rule with this bug"
         params do
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
@@ -142,6 +132,20 @@ module API
           hits = []
           Bug.check_permission(current_user, Bug.search(permitted_params[:summary], terms, range)).map { |r| hits.push(r.id)}
           hits
+        end
+
+        desc "link a rule to this bug"
+        params do
+          requires :bug_id, type: Integer, desc: "ID of the bug"
+          requires :gid, type: Integer, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+        end
+        post ':bug_id/rules/:gid~:sid/link' do
+          bug = Bug.where(id: permitted_params[:bug_id]).first
+          rule = Rule.import_rule(permitted_params[:sid], permitted_params[:gid])
+          if bug && rule
+            bug.rules << rule
+          end
         end
 
         desc "get a single bug"
@@ -191,6 +195,7 @@ module API
           options = {}
           update_params = {}
           if permitted_params[:bug][:editor_id]
+
             state = nil
             editor = User.find(permitted_params[:bug][:editor_id])
             updated_bug_state = Bug.get_new_bug_state(bug, state, editor.email)

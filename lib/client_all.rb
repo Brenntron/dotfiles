@@ -4,7 +4,44 @@
 #=============
 #client_all
 #=============
-# This file tests each attachment against the snort rules. It returns a number of alerts for each rule it has a problem with.
+# This file tests each attachment(a pcap) against all the snort rules. It returns a number of alerts for each rule it has a problem with.
+# this is an example of the result:
+# ==========================================================
+#
+# Job Information:
+#
+# ==========================================================
+#
+# Submitted at: 2017-03-09 16:52:02
+#
+# Completed at: 2017-03-09 16:52:13
+#
+# Failed: 0
+#
+# ==========================================================
+#
+#
+# ==========================================================
+#
+# Alerts:
+#
+# ==========================================================
+# 2015-0329-72514-apsb-144878-1.pcap
+#     1:33469:1 FILE-FLASH Adobe Flash Player arbitrary code execution attempt
+#     1:38027:2 POLICY-OTHER Adobe Flash file containing ExternalInterface function download detected
+#     1:33471:2 FILE-FLASH Adobe Flash Player arbitrary code execution attempt
+# 2015-0329-72514-apsb-144878-2.pcap
+#     1:38027:2 POLICY-OTHER Adobe Flash file containing ExternalInterface function download detected
+#     1:33471:2 FILE-FLASH Adobe Flash Player arbitrary code execution attempt
+# FP-2015-0339-73088-apsb-145641-3.pcap
+#     No alerts.
+# cve_2015_0329_adobe_flash_pcre_regex_compilation_extended_unicode_comment_code_execution.pcap
+#     No alerts.
+# decompressed-bp.swf-smtp.pcap
+#     No alerts.
+# 2015-0329.swf-http.pcap
+#     1:38027:2 POLICY-OTHER Adobe Flash file containing ExternalInterface function download detected
+# ==========================================================
 ######################
 
 require 'open3'

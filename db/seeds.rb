@@ -10,10 +10,14 @@
 ReferenceType.create(:name => 'cve',:description => 'Common Vulnerabilities and Exposures',:validation => '^(19|20)\d{2}-\d{4}$',:bugzilla_format => 'cve-((19|20)\d{2}-\d{4})',:example => '1999-1234',:rule_format => 'cve,<reference>',:url => 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-DATA')
 ReferenceType.create(:name => 'bugtraq',:description => 'Bugtraq - SecurityFocus',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'bugtraq,<reference>',:url => 'http://www.securityfocus.com/bid/DATA')
 ReferenceType.create(:name => 'url',:description => 'Generic URL for vulnerability information',:validation => '^(?!http|ftp).*',:example => 'www.somesite.com/whatever/whocares',:rule_format => 'url,<reference>',:url => 'http://DATA')
-#ReferenceType.create(:name => 'osvdb',:description => 'The Open Source Vulnerability Database',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'osvdb,<reference>',:url => 'http://www.osvdb.org/DATA')
-#ReferenceType.create(:name => 'msb',:description => 'Microsoft Security Bulletin',:validation => '^MS\d{2}-\d{3}$',:bugzilla_format => '(MS\d{2}-\d{3})',:example => 'MS08-067',:rule_format => 'url,technet.microsoft.com/en-us/security/bulletin/<reference>',:url => 'http://technet.microsoft.com/en-us/security/bulletin/DATA')
-#ReferenceType.create(:name => 'telus',:description => 'Telus bug report information',:bugzilla_format => '((FSC|TSL)\d{8}-\d{2})',:example => 'FSC20111103-05',:rule_format => '<reference>',:url => 'https://portal.telussecuritylabs.com/threat/DATA')
-#ReferenceType.create(:name => 'apsb',:description => 'Adobe Product Security Bulletin',:validation => '^APSB\d{2}-\d{2}$',:bugzilla_format => '(APSB\d{2}-\d{2})',:example => 'APSB13-03',:rule_format => 'url,www.adobe.com/support/security/bulletins/<reference>.html',:url => 'url,www.adobe.com/support/security/bulletins/DATA.html')
+ReferenceType.create(:name => 'nessus', :url => 'http://cgi.nessus.org/plugins/dump.php3?id=')
+ReferenceType.create(:name => 'arachnids', :url => 'http://www.whitehats.com/info/IDS')
+ReferenceType.create(:name => 'mcafee', :url => 'http://vil.nai.com/vil/content/v_')
+# These don't appear to be used currently, but it doesn't hurt to have a few extra db rows in case
+ReferenceType.create(:name => 'osvdb',:description => 'The Open Source Vulnerability Database',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'osvdb,<reference>',:url => 'http://www.osvdb.org/DATA')
+ReferenceType.create(:name => 'msb',:description => 'Microsoft Security Bulletin',:validation => '^MS\d{2}-\d{3}$',:bugzilla_format => '(MS\d{2}-\d{3})',:example => 'MS08-067',:rule_format => 'url,technet.microsoft.com/en-us/security/bulletin/<reference>',:url => 'http://technet.microsoft.com/en-us/security/bulletin/DATA')
+ReferenceType.create(:name => 'telus',:description => 'Telus bug report information',:bugzilla_format => '((FSC|TSL)\d{8}-\d{2})',:example => 'FSC20111103-05',:rule_format => '<reference>',:url => 'https://portal.telussecuritylabs.com/threat/DATA')
+ReferenceType.create(:name => 'apsb',:description => 'Adobe Product Security Bulletin',:validation => '^APSB\d{2}-\d{2}$',:bugzilla_format => '(APSB\d{2}-\d{2})',:example => 'APSB13-03',:rule_format => 'url,www.adobe.com/support/security/bulletins/<reference>.html',:url => 'url,www.adobe.com/support/security/bulletins/DATA.html')
 
 ExploitType.create(:name => 'core',:description => 'Core Impact exploit module.',:pcap_validation => '^((19|20)\d{2}-\d{4}$|none)-(\d+|none)-((ms\d{2}-\d{3}-)?)-core-\d+-\d+\.pcap')
 ExploitType.create(:name => 'metasploit',:description => 'Metasploit exploit module.',:pcap_validation => '^((19|20)\d{2}-\d{4}$|none)-(\d+|none)-((ms\d{2}-\d{3}-)?)-metasploit-\d+-\d+\.pcap')
@@ -52,20 +56,24 @@ nh.roles << Role.where(role: 'admin')
 
 nv = User.create(kerberos_login:"nverbeck",cvs_username:"nverbeck",cec_username:"nverbeck",display_name:"Nicolette Verbeck",committer:true,email:"nverbeck@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 nv.roles << Role.where(role: 'admin')
+nv.move_to_child_of(nh)
 
 mp = User.create(kerberos_login:"marlpier",cvs_username:"marlpier",cec_username:"marlpier",display_name:"Marlin Pierce",committer:true,email:"marlpier@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 mp.roles << Role.where(role: 'admin')
+mp.move_to_child_of(nh)
 
 pm = User.create(kerberos_login:"pmullen",cvs_username:"pmullen",cec_username:"pamullen",display_name:"Patrick Mullen",committer:true,email:"pmullen@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+pm.roles << Role.where(role: 'manager')
 pm.roles << Role.where(role: 'committer')
 #add as child to chris marshall
 pm.move_to_child_of(cm)
 
-am = User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:true,email:"amcdonnell@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-am.roles << Role.where(role: 'committer')
+am = User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:false,email:"amcdonnell@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+am.roles << Role.where(role: 'analyst')
+am.move_to_child_of(pm)
 
-nr = User.create(kerberos_login:"drandolph",cvs_username:"drandolph",cec_username:"nrandolp",display_name:"Nick Randolph",committer:true,email:"drandolph@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-nr.roles << Role.where(role: 'committer')
+nr = User.create(kerberos_login:"drandolph",cvs_username:"drandolph",cec_username:"nrandolp",display_name:"Nick Randolph",committer:false,email:"drandolph@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+nr.roles << Role.where(role: 'analyst')
 
 tm = User.create(kerberos_login:"tmontier",cvs_username:"tmontier",cec_username:"tmontier",display_name:"Tyler Montier",committer:true,email:"tmontier@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 tm.roles << Role.where(role: 'committer')

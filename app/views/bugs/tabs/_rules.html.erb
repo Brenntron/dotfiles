@@ -3,28 +3,42 @@
 </style>
 <div class="row top-bar">
   <div class="col-xs-12">
-    <button class="select-sm btn btn-default rule-toolbar" id="overview"><i class="glyphicon glyphicon-list"></i><strong class="hidden-xs">&nbsp;&nbsp; list all</strong></button>
-    <button class="select-sm btn btn-default rule-toolbar" id="view"><strong class="hidden-xs">view &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-eye-open"></i></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="overview">
+      <i class="glyphicon glyphicon-list"></i><strong class="hidden-xs">&nbsp;&nbsp; list all</strong></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="view">
+      <strong class="hidden-xs">view &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-eye-open"></i></button>
     <% if can? :update, Rule %>
-      <button class="select-sm btn btn-default rule-toolbar" id="edit"><strong class="hidden-xs">edit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-pencil"></i></button>
-      <button class="select-sm btn btn-default rule-toolbar" id="revert">
-        <strong class="hidden-xs">revert</strong> <i class="glyphicon glyphicon-repeat"></i>
-      </button>
+        <button class="select-sm btn btn-default rule-toolbar" id="edit">
+          <strong class="hidden-xs">edit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-pencil"></i></button>
+        <button class="select-sm btn btn-default rule-toolbar" id="revert">
+          <strong class="hidden-xs">revert</strong> <i class="glyphicon glyphicon-repeat"></i>
+        </button>
     <% end %>
     <% if can? :create, Rule %>
-      <button class="select-sm btn btn-default rule-toolbar" id="create"><strong class="hidden-xs">create &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-plus"></i></button>
+        <button class="select-sm btn btn-default rule-toolbar" id="create">
+          <strong class="hidden-xs">create &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-plus"></i></button>
     <% end %>
     <% if can? :destroy, Rule %>
-      <button class="select-sm btn btn-default rule-toolbar" id="remove"><strong class="hidden-xs">remove &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-minus"></i></button>
+        <button class="select-sm btn btn-default rule-toolbar" id="remove">
+          <strong class="hidden-xs">remove &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-minus"></i></button>
     <% end %>
-    <button class="select-sm btn btn-default rule-toolbar" id="test"><strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
+    <button class="select-sm btn btn-default rule-toolbar" id="test">
+      <strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
     <% if can? :publish, Rule %>
-      <button class="select-sm btn btn-default rule-toolbar" id="commit"><strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i></button>
+        <button class="select-sm btn btn-default rule-toolbar" id="commit">
+          <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i></button>
     <% end %>
     <span class="text-muted small hidden-xs"><i id="bug-rules-loader" class="glyphicon glyphicon-refresh spin" style="display:none;"></i><i id="bug-rules-error" class="glyphicon glyphicon-alert" style="display:none;"></i> &nbsp;&nbsp;</span>
     <form class="form-inline pull-right" id="linkRuleForm">
       <div class="input-group">
-        <input name="sid" class="form-control select-sm input-extra-narrow" placeholder="import rule" />
+        <span class="input-label">gid:</span>
+        <span class="input-group-btn">
+          <input name="gid" class="form-control select-xs input-extra-narrow " value="1" disabled/>
+        </span>
+        <span class="input-label">sid:</span>
+        <span class="input-group-btn">
+          <input name="sid" class="form-control select-sm input-extra-narrow" placeholder="import rule" />
+        </span>
       <span class="input-group-btn">
         <button class="btn btn-default" type="submit" data-disable-with="Importing rule...">Import</button>
       </span>
@@ -53,36 +67,45 @@
       <% if @rules.any? %>
         <tbody>
         <% @rules.each do |rule| %>
-          <tr id=<%= rule.id %> data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
+          <tr id="<%= rule.id %>" data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>" value="<%= rule.id %>"></td>
+                <td class="rule_state_<%= rule_state_color(rule.state) %>"><%= rule.state %></td>
 
-            <td class="rule_state_<%=rule_state_color(rule.state)%>"><%= rule.state %></td>
-
-            <td>
-              <a class="blue show_rule" href="#">
-                <% if rule.sid %>
-                  <strong><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></strong>
-                <% else %>
-                  new_rule
-                <% end %>
-              </a>
-            </td>
-            <td><code><%= rule.message %></code></td>
-            <td class="center"><a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= 0 %></a></td>
-            <td class="center"><%= rule.average_check ? rule.average_check : '-' %></td>
-            <td class="center"><%= rule.average_match ? rule.average_match : '-' %></td>
-            <td class="center"><%= rule.average_nonmatch ? rule.average_nonmatch : '-' %></td>
-            <td></td>
-          </tr>
-          <% @bug.attachments.each do |attachment| %>
-            <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
-              <td colspan="8"><%= attachment.file_name %>
-              </td>
-              <td class="<%= cycle('alerted', 'failed_alert') %>">Alerted</td>
-            </tr>
+                <td>
+                  <a class="blue show_rule" href="#">
+                    <% if rule.sid %>
+                        <strong><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></strong>
+                    <% else %>
+                        new_rule
+                    <% end %>
+                  </a>
+                </td>
+                <td><code><%= rule.message %></code></td>
+                <td class="center">
+                  <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= rule.attachments.count %></a>
+                </td>
+                <td class="center"><%= rule.average_check ? rule.average_check : '-' %></td>
+                <td class="center"><%= rule.average_match ? rule.average_match : '-' %></td>
+                <td class="center"><%= rule.average_nonmatch ? rule.average_nonmatch : '-' %></td>
+                <td></td>
+              </tr>
+              <% @bug.attachments.each do |attachment| %>
+                  <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
+                    <td colspan="8"><%= attachment.file_name %>
+                    </td>
+                    <% if rule.attachments.empty? %>
+                        <td class="no_alert">No Alert</td>
+                    <% else %>
+                        <% if rule.attachments.any? {|a| a.file_name == attachment.file_name }%>
+                            <td class="alerted">Alerted</td>
+                        <% else %>
+                            <td class="no_alert">No Alert</td>
+                        <% end %>
+                    <% end %>
+                  </tr>
+              <% end %>
           <% end %>
-        <% end %>
-        </tbody>
+          </tbody>
       <% end %>
     </table>
   </div>
@@ -90,7 +113,8 @@
 <div class="row create hidden">
   <div class="row top-space center">
     <div class="col-xs-2">
-      <button class="select-sm btn btn-default rules" id="overview"><i class="glyphicon glyphicon-arrow-left"></i><strong class="hidden-xs">&nbsp;&nbsp; back</strong></button>
+      <button class="select-sm btn btn-default rules" id="overview">
+        <i class="glyphicon glyphicon-arrow-left"></i><strong class="hidden-xs">&nbsp;&nbsp; back</strong></button>
     </div>
     <div class="col-xs-8 col-sm-7 center">
       <h4>
@@ -101,22 +125,28 @@
     </div>
   </div>
   <div class="col-xs-12">
-    <div class="col-xs-12"><hr/></div>
-      <div class="col-xs-12">
-        <%= render 'shared/rule_form' %>
-      </div>
+    <div class="col-xs-12">
+      <hr/>
+    </div>
+    <div class="col-xs-12">
+      <%= render 'shared/rule_form' %>
+    </div>
     <div class="row top-space"></div>
   </div>
 </div>
 <div class="row view hidden">
   <div class="col-xs-12">
-    <div class="col-xs-12"><hr/></div>
+    <div class="col-xs-12">
+      <hr/>
+    </div>
     <%= render '/bugs/tabs/rules/view' %>
   </div>
 </div>
 <div class="row edit hidden">
   <div class="col-xs-12">
-    <div class="col-xs-12"><hr/></div>
+    <div class="col-xs-12">
+      <hr/>
+    </div>
     <%= render '/bugs/tabs/rules/edit' %>
   </div>
 </div>
@@ -124,21 +154,21 @@
 
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
 <input type="hidden" name="xml_token" value="<%= xml_token %>">
-<input type="hidden" name="current_user" value="<%= current_user.id%>">
+<input type="hidden" name="current_user" value="<%= current_user.id %>">
 
 <script>
-  $('.show_rule').on('click', function(e){
+  $('.show_rule').on('click', function (e) {
     e.preventDefault();
     var id = $(this).parents('tr').attr('id');
     $('.overview').removeClass('active').addClass('hidden');
     $('.view').removeClass('hidden').addClass('active').show();
-    $.each($('.rules_table tr'), function() {
+    $.each($('.rules_table tr'), function () {
       var id = $(this).attr('id');
-      if(!isNaN(id)){
-        $('.rule_'+id).removeClass('active').addClass('hidden').hide();
+      if (!isNaN(id)) {
+        $('.rule_' + id).removeClass('active').addClass('hidden').hide();
       }
     });
-    $('.rule_'+id).removeClass('hidden').addClass('active').show();
+    $('.rule_' + id).removeClass('hidden').addClass('active').show();
   });
 </script>
 

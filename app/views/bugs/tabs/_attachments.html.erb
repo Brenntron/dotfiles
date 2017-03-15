@@ -37,7 +37,8 @@
             <input name="attachment[file_data]" id="file_data" type="file" required="true">
           </div>
         </div>
-        <input type="hidden" name="attachment[bugzilla_attachment_id]" id="bug_id" value="<%= @bug.id %>" >
+        <input type="hidden" name="attachment[bugzilla_attachment_id]" id="bug_id" value="<%= @bug.id %>">
+
         <div class="row">
           <div class="col-sm-12 form-group">
             <button class="btn btn-warning btn-sm add_attachment" value="submit">Create Attachment</button>
@@ -51,52 +52,61 @@
 </div>
 <div class="row top-bar">
   <div class="col-xs-12">
-    <button class="select-sm btn btn-link" id="attachments-pcap" style="text-decoration: none;"><strong>Pcap (<%= @pcap_attachments.count %>)&nbsp;&nbsp;</strong></button>
-    <button class="select-sm btn btn-link" id="attachments-other" style="text-decoration: none;"><strong>Other (<%= @other_attachments.count %>)&nbsp;&nbsp;</strong></button>
-    <button class="select-sm btn btn-link" id="attachments-obsolete" style="text-decoration: none;"><strong>Obsolete (<%= @obsolete_attachments.count %>) &nbsp;&nbsp;</strong></button>
+    <button class="select-sm btn btn-link" id="attachments-pcap" style="text-decoration: none;">
+      <strong>Pcap (<%= @pcap_attachments.count %>)&nbsp;&nbsp;</strong></button>
+    <button class="select-sm btn btn-link" id="attachments-other" style="text-decoration: none;">
+      <strong>Other (<%= @other_attachments.count %>)&nbsp;&nbsp;</strong></button>
+    <button class="select-sm btn btn-link" id="attachments-obsolete" style="text-decoration: none;">
+      <strong>Obsolete (<%= @obsolete_attachments.count %>) &nbsp;&nbsp;</strong></button>
 
     <% if @pcap_attachments.any? %>
-    <table class="table table-condensed small table-hover" id="pcap-attachments">
-      <thead>
-      <tr>
-        <td class="narrow-column"><input type="checkbox" class="selectallcheckbox"></td>
-        <td class="narrow-column"></td>
-        <td>Filename</td>
-        <td>Alerts</td>
-      </tr>
-      </thead>
-      <tbody>
-        <% @pcap_attachments.each do |attachment| %>
-        <tr>
-          <td><input type="checkbox" value=<%= attachment.id %> class="attach_check_box attach_<%= attachment.id %>"> </td>
-          <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>" target="_blank">
-            <i class="glyphicon glyphicon-download"></i></a></td>
-          <td><code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code></td>
-          <td class="center narrow-column">
-            <h5>
-              <a class="attachment_alert <%= attachment.id %>"><%= attachment.rules.count %></a>
-            </h5>
-          </td>
-        </tr>
-        <% if attachment.rules.any? %>
-          <tr style="display: none;" id="attachment_<%= attachment.id %>">
-            <td></td><td colspan=2>
-            <table class="table-condensed small">
-              <% attachment.rules.each do |rule| %>
-                <tr>
-                  <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
-                  <td><strong><%= rule.message %></strong></td>
-                </tr>
-              <% end %>
-            </table>
-          </td>
+        <table class="table table-condensed small table-hover" id="pcap-attachments">
+          <thead>
+          <tr>
+            <td class="narrow-column"><input type="checkbox" class="selectallcheckbox"></td>
+            <td class="narrow-column"></td>
+            <td>Filename</td>
+            <td>Alerts</td>
           </tr>
-        <% end %>
-        <% end %>
-      </tbody>
-    </table>
+          </thead>
+          <tbody>
+          <% @pcap_attachments.each do |attachment| %>
+              <tr>
+                <td>
+                  <input type="checkbox" value=<%= attachment.id %> class="attach_check_box attach_<%= attachment.id %>">
+                </td>
+                <td class="center narrow-column">
+                  <a class="blue" href="<%= attachment.direct_upload_url %>" target="_blank">
+                    <i class="glyphicon glyphicon-download"></i></a></td>
+                <td>
+                  <code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code>
+                </td>
+                <td class="center narrow-column">
+                  <h5>
+                    <a class="attachment_alert <%= attachment.id %>"><%= attachment.rules.count %></a>
+                  </h5>
+                </td>
+              </tr>
+              <% if attachment.rules.any? %>
+                  <tr style="display: none;" id="attachment_<%= attachment.id %>">
+                    <td></td>
+                    <td colspan=2>
+                      <table class="table-condensed small">
+                        <% attachment.rules.each do |rule| %>
+                            <tr>
+                              <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
+                              <td><strong><%= rule.message %></strong></td>
+                            </tr>
+                        <% end %>
+                      </table>
+                    </td>
+                  </tr>
+              <% end %>
+          <% end %>
+          </tbody>
+        </table>
     <% else %>
-      <p class="small text-muted top-space center"><em>No attached files.</em></p>
+        <p class="small text-muted top-space center"><em>No attached files.</em></p>
     <% end %>
     <% if @other_attachments.any? %>
         <table class="table table-condensed small table-hover hidden" id="other-attachments">
@@ -122,47 +132,47 @@
         <p class="small text-muted top-space center"><em>No attached files.</em></p>
     <% end %>
     <% if @obsolete_attachments %>
-      <table class="table table-condensed small table-hover hidden" id="obsolete-attachments">
-        <thead>
-        <tr>
-          <td class="narrow-column"></td>
-          <td>Filename</td>
-          <td>Alerts</td>
-        </tr>
-        </thead>
-        <tbody>
-        <% @obsolete_attachments.each do |attachment| %>
-        <tr>
-          <td class="center narrow-column"><a class="blue"><i class="glyphicon glyphicon-download"></i></a></td>
-          <td><code><a><%= attachment.file_name %></a></code></td>
-          <td class="center narrow-column">
-            <h5 class="ember-tooltip bottom" style="display: none;">
-              1
-              <div class="tip">
-                <table class="table-condensed small">
-                  <tr>
-                    <td class="blue">120:9:1</td>
-                    <td><strong>(http_inspect) JAVASCRIPT OBFUSCATION LEVELS EXCEEDS 1</strong></td>
-                  </tr>
-                  <tr>
-                    <td class="blue">1:29519:1</td>
-                    <td><strong>INDICATOR-OBFUSCATION Javascript obfuscation using split reverse
-                      join</strong></td>
-                  </tr>
-                  <tr>
-                    <td class="blue">1:32246:3</td>
-                    <td><strong>BROWSER-PLUGINS Samsung iPOLiS device manager clsid access attempt</strong>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </h5>
-        </tr>
-        <% end %>
-        </tbody>
-      </table>
+        <table class="table table-condensed small table-hover hidden" id="obsolete-attachments">
+          <thead>
+          <tr>
+            <td class="narrow-column"></td>
+            <td>Filename</td>
+            <td>Alerts</td>
+          </tr>
+          </thead>
+          <tbody>
+          <% @obsolete_attachments.each do |attachment| %>
+              <tr>
+                <td class="center narrow-column"><a class="blue"><i class="glyphicon glyphicon-download"></i></a></td>
+                <td><code><a><%= attachment.file_name %></a></code></td>
+                <td class="center narrow-column">
+                  <h5 class="ember-tooltip bottom" style="display: none;">
+                    1
+                    <div class="tip">
+                      <table class="table-condensed small">
+                        <tr>
+                          <td class="blue">120:9:1</td>
+                          <td><strong>(http_inspect) JAVASCRIPT OBFUSCATION LEVELS EXCEEDS 1</strong></td>
+                        </tr>
+                        <tr>
+                          <td class="blue">1:29519:1</td>
+                          <td><strong>INDICATOR-OBFUSCATION Javascript obfuscation using split reverse
+                            join</strong></td>
+                        </tr>
+                        <tr>
+                          <td class="blue">1:32246:3</td>
+                          <td><strong>BROWSER-PLUGINS Samsung iPOLiS device manager clsid access attempt</strong>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </h5>
+              </tr>
+          <% end %>
+          </tbody>
+        </table>
     <% else %>
-      <p class="small text-muted top-space center"><em>No obsolete attached files.</em></p>
+        <p class="small text-muted top-space center"><em>No obsolete attached files.</em></p>
     <% end %>
   </div>
 </div>

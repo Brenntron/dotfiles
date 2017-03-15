@@ -87,6 +87,8 @@ $ ->
                   return
                 ), 5000
             }
+        when 'commit'
+          alert('Task Created. Rules sent to be committed')
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')
@@ -121,11 +123,12 @@ $ ->
   $('#linkRuleForm').submit (e) ->
     e.preventDefault()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    gid_id = $('#linkRuleForm input[name="gid"]').val()
     rule_id = $('#linkRuleForm input[name="sid"]').val()
     bug_id = $('input[name="bug_id"]').val()
     query = bug_id+":"+rule_id
     $.ajax {
-      url: "/api/v1/bugs/rules/"+query
+      url: "/api/v1/bugs/#{bug_id}/rules/#{gid_id}~#{rule_id}/link"
       method: 'POST'
       headers: headers
       data: {'api_key': 'h93hq@hwo9%@ah!jsh'}
@@ -264,6 +267,8 @@ $ ->
         $('.standard_form').find(":invalid").each (e) ->
           $(this).addClass('onError')
 
+  $('.commit').on "click",(e) ->
+    alert("clicked commit")
 
   $('.edit').on "click", '.update-rule-btn', (e) ->
     e.preventDefault()
