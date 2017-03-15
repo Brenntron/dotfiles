@@ -11,7 +11,7 @@ Feature: Rules
     And I wait for "3" seconds
     Given the following bugs exist:
       |  id  | bugzilla_id | state  | user_id |
-      | 2222 |   2222228   | OPEN   |    1    |
+      | 2222 |   222222    | OPEN   |    1    |
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
@@ -315,7 +315,49 @@ Feature: Rules
     And I should see "short msg"
 
 
-    # ==== Editing rule docs ===
+  # ==== Synching a rule from VC ===
+
+  @javascript
+  Scenario: VC updated for a valid edited rule
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |  UPDATED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    And  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "BLACKLIST message"
+
+  @javascript
+  Scenario: VC updated for a failed parsing edited rule *new
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |   FAILED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    And  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "BLACKLIST message"
+
+
+  # ==== Editing rule docs ===
+
 # TODO: Fix test: textarea value is not being set correctly within test
 #  @javascript @now
 #  Scenario: a user can edit rule docs for a new rule
