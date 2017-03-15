@@ -3,7 +3,9 @@
       <div class="row subheading">
         <div class="col-xs-12 col-sm-2">
           <h6>bugzilla id</h6>
-          <h3><%= @bug.id %><span class="tiny"><a href="<%= get_bug_url %>" id="bugzilla_<%= @bug.id %>" target="_blank"><i class="glyphicon glyphicon-link"></i></a></span></h3>
+            <h3><a class="top-space bugzilla_id" href="<%= get_bug_url %>" id="bugzilla_<%= @bug.id %>" target="_blank"><%=@bug.id%></a>
+              <button class="tiny text-muted resynch_bug" id="resynch_bug"><i class="glyphicon glyphicon-refresh"></i><em> resynch</em></button></h3>
+              <button class="select-sm btn btn-default hidden" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> synching</button>
         </div>
 
         <div class="col-xs-3 col-sm-2 state">

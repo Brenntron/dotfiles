@@ -483,7 +483,7 @@ Feature: Bug
     And I click ".attachments-tab"
     And I toggle checkbox ".attach_1"
     Then I should see "new.pcap"
-    When I click button "test attachments"
+    When I click button "test"
     Then test should be created and I should see "Task has been created to test the attachment"
     And I click ".jobs-tab"
     Then I should see "attachment"

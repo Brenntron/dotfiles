@@ -44,6 +44,19 @@ $ ->
     ).done (response) ->
       window.location.replace '/bugs/' + bid
 
+  $('#resynch_bug').on 'click', ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    alert('Resynch Bug with Bugzilla?')
+    $('.resynch_bug').hide()
+    $('#loading_image').removeClass('hidden').show()
+    $.ajax(
+      url: '/api/v1/bugs/import/' + bid
+      method: 'GET'
+      headers: headers
+    ).done (response) ->
+      window.location.replace '/bugs/' + bid
+
 
 
   $('.edit-summary').on 'click', ->

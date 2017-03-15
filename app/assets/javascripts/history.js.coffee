@@ -52,3 +52,21 @@ $ ->
           return
         ), 1000
     }
+
+  $('.synch_history').on 'click', ->
+    id = $('input[name="bugzilla_id"]').val()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $(this).attr('disabled', 'disabled')
+
+    $.ajax(
+      url: '/api/v1/bugs/synch_bug/history/' + id
+      method: 'GET'
+      headers: headers
+      success: (response) ->
+        $('.alert_comment').addClass('success').show().html('History Synched.')
+        $('#synch_history, #synch_history_synching').toggle()
+        window.location.reload()
+      error: (response) ->
+        $('.alert_comment').addClass('error').show().html('There was a problem synching the history.')
+        $(this).attr('disabled', false)
+    , this)

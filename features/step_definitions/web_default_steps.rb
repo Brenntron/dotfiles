@@ -205,6 +205,14 @@ Then(/^"(.*?)" should be visible$/) do |target| #target is #id or .class
   page.find(target).visible?
 end
 
+Then(/^I should see button with class "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//button[contains(@class, '#{element}')]")
+end
+
+Then(/^I should not see button with class "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
+end
+
 Then(/^I should see div element with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//div[contains(@class, '#{element}')]")
 end

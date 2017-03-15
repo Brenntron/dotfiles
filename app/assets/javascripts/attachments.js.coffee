@@ -35,6 +35,23 @@ $ ->
         max: e.total
     return
 
+  $('.synch').on 'click', ->
+    id = $('input[name="bugzilla_id"]').val()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $(this).attr('disabled', 'disabled')
+
+    $.ajax(
+      url: '/api/v1/bugs/synch_bug/attachments/' + id
+      method: 'GET'
+      headers: headers
+      success: (response) ->
+        $('.alert_attachments').addClass('success').show().html('Attachments Synched.')
+        window.location.reload()
+      error: (response) ->
+        $('.alert_attachments').addClass('error').show().html('There was a problem synching attachments.')
+        $(this).attr('disabled', false)
+    , this)
+
 
   $('.add_attachment').on 'click', (e) ->
     success = false
@@ -85,7 +102,8 @@ $ ->
         $(document).ajaxStop ->
           location.reload()
 
-  $(document).on 'click', '#test_attachments',  ->
+  $(document).on 'click', '.test_attachments',  ->
+    $(this).attr('disabled', 'disabled')
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     bug_id = $('input[name="bug_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
@@ -114,6 +132,7 @@ $ ->
         $('.alert_attachments').addClass('success').show().html('Task has been created to test the attachment')
       error: (response) ->
         $('.alert_attachments').addClass('error').show().html('Task has not been created')
+        $(this).attr('disabled', false)
       complete: ->
         setTimeout (->
           $('.alert_rules').hide 'blind', {}, 5000
