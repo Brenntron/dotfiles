@@ -442,6 +442,7 @@ DEPENDENCIES
   kaminari (~> 0.16.3)
   launchy (= 2.4.2)
   less-rails (~> 2.7.0)
+  libv8 (~> 3.16, >= 3.16.14.17)
   mysql2 (~> 0.3.20)
   net-ldap (~> 0.11)
   net-ssh
