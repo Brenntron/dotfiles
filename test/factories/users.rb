@@ -5,6 +5,10 @@ FactoryGirl.define do
     current_sign_in_ip "127.0.0.1"
     authentication_token "12345"
     parent_id nil
+    sequence :cvs_username do |nn|
+      "user#{nn}"
+    end
+    email { "#{cvs_username}@cisco.com" }
 
     factory :current_user do
       display_name ENV['authenticate_display_name']
@@ -27,7 +31,6 @@ FactoryGirl.define do
       cec_username { "#{first_name[0..3]}#{last_name[0..3]}".downcase }
       cvs_username { cec_username }
       kerberos_login { cec_username }
-      email { cec_username ? "#{cec_username}@cisco.com" : nil }
     end
   end
 end

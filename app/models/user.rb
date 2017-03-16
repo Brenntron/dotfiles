@@ -4,6 +4,8 @@ class User < ApplicationRecord
   has_many :bugs
   has_and_belongs_to_many :roles, dependent: :destroy
 
+  validates :cvs_username, presence: true, uniqueness: true
+
 
   before_save :ensure_authentication_token
   # Include default devise modules. Others available are:
