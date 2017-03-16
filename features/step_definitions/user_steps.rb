@@ -80,4 +80,15 @@ Then(/^I should see could not find user "(.*)" flash massage$/) do |user_id|
   find(:xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' alert ')][contains(text(), \"Could not find user '#{user_id}'\")]")
 end
 
+Then(/^current user not in database$/) do
+  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user = User.where(cvs_username: user_attrs[:cvs_username]).first
+  user.should be_nil
+end
+
+Then(/^current user should be in database$/) do
+  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user = User.where(cvs_username: user_attrs[:cvs_username]).first
+  user.should_not be_nil
+end
 
