@@ -175,3 +175,15 @@ Then(/^I should see rule "(.*)" state "(.*)" version "(.*)"$/) do |rule_id, stat
   page.find(:xpath, "//tr[@id='#{rule_id}']//*[normalize-space(text())='#{version}']")
 end
 
+Then(/^I should see the bug rules table$/) do
+  page.find(:xpath, "//table[@id='bug-rules-table']")
+end
+
+Then(/^I should see a rule row with id "(.*)"$/) do |rule_id|
+  page.find(:xpath, "//table[@id='bug-rules-table']//tr[@id='#{rule_id}']")
+end
+
+Then(/^I should see a rule row with class "(.*)" and id "(.*)"$/) do |css_class, rule_id|
+  page.find(:xpath, "//table[@id='bug-rules-table']//tr[@id='#{rule_id}']")[:class].split(' ').should include(css_class)
+end
+
