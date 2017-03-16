@@ -21,7 +21,7 @@ module API
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
             new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.bugzilla_import(xmlrpc,new_bugs)
+            Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bugs)
             "true"
           else
             "false"
@@ -66,7 +66,7 @@ module API
                 new_bug = xmlrpc.get(permitted_params[:id])
                 progress_bar.update_attribute("progress", 10)
                 #create the bug from bugzilla
-                Bug.bugzilla_import(xmlrpc,new_bug).to_s
+                Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug).to_s
                 bug = Bug.where(id:params[:id]).first
                 #parse the bug summary
                 parsed = bug.parse_summary

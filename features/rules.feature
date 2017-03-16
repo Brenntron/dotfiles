@@ -4,34 +4,40 @@ Feature: Rules
   I will provides ways to interact with rules
 
  # ==== Appending the rule category to the Rule message ===
+
   @javascript
-  Scenario: A new rule can be created with a rule category
+  Scenario: A new rule can be created and displayed
     Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
     And the following rule categories exist:
-      |category       |
-      |BLACKLIST      |
-      |FILE-EXECUTABLE|
-      |OS-LINUX       |
-    Then I wait for "3" seconds
-    And  I goto "/bugs/222222"
-    And  I should see "222222"
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
-    And  I should see "New Rule"
-    And  I select "FILE-EXECUTABLE" from "rule_category_id"
-    And  I fill in "rule[message]" with "Test Message"
+      | category  | id |
+      | BLACKLIST |  1 |
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "Test message"
     And  I fill in "rule[detection]" with "Detection test"
     And  I select "unknown" from "rule[class_type]"
-    And  I fill in "summary" with "This is the rule doc summary"
-    Then I click "Create Rule"
-    And  I wait for "3" seconds
-    Then I click the "Rules" tab
-    Then I click button "list all"
-    And  I should see "FILE-EXECUTABLE Test Message"
+    And  I fill in "summary" with "rule doc summary"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    When I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "Test message"
+    And  I should see a rule with state "NEW" version "new_rule"
+    And I should see "Test message"
+    When I check "rule[id]"
+    And  I click "edit"
+    And  I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    And  I click button "Save Changes"
+    And  I wait for "8" seconds
+    Then I should see a rule with state "FAILED" version "new_rule"
+    And I should see "short msg"
 
   @javascript
   Scenario: Rule category drop down should sort by frequency of use
@@ -275,10 +281,83 @@ Feature: Rules
     When I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
+    Then I should see rule "11" state "UPDATED" version "1:22211:3"
+    And I should see "short msg"
+
+  @javascript
+  Scenario: Valid current edited rule should have CSS class
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    And  I uncheck "rule_11"
+    And  I click "edit"
+    Then I should not see div element with class "rule_11"
+    When I click the "Rules" tab
+    And  I check "rule_11"
+    And  I click "edit"
+    Then I should see div element with class "rule_11"
+    When I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    And  I click button "Save Changes"
+    And  I wait for "8" seconds
+    Then I should see rule "11" state "FAILED" version "1:22211:3"
     And I should see "short msg"
 
 
-    # ==== Editing rule docs ===
+  # ==== Synching a rule from VC ===
+
+  @javascript
+  Scenario: VC updated for a valid edited rule
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |  UPDATED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    And  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "BLACKLIST message"
+
+  @javascript
+  Scenario: VC updated for a failed parsing edited rule *new
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |   FAILED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
+    And bug with id "2222" has rule with id "11"
+    And  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "BLACKLIST message"
+
+
+  # ==== Editing rule docs ===
+
 # TODO: Fix test: textarea value is not being set correctly within test
 #  @javascript @now
 #  Scenario: a user can edit rule docs for a new rule
@@ -356,4 +435,8 @@ Feature: Rules
     And I wait for "3" seconds
     When code calls load_rule_from_grep on rule content
     Then rule record will marked out of date
+
+
+
+
 
