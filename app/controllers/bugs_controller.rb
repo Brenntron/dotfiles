@@ -125,7 +125,7 @@ class BugsController < ApplicationController
       session[:query] = "advance-search"
       session[:search] = params[:bug]
     else
-      session[:query] = ""
+      session[:query] = session[:query] || ''
     end
     if session[:query]
       case session[:query]
