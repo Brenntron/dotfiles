@@ -275,15 +275,6 @@ class Bug < ApplicationRecord
     Bugzilla::Bug.new(xmlrpc).attach_file(bugzilla_id, file)
   end
 
-  def self.new_bug_user(email)
-    User.new(kerberos_login: 'generated',
-             cvs_username: email.gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@sourcefire.com', ''),
-             email: email,
-             password: 'password',
-             password_confirmation: 'password',
-             committer: 'false')
-  end
-
   def self.bugzilla_import(xmlrpc, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
@@ -322,14 +313,14 @@ class Bug < ApplicationRecord
           new_user = User.where('email=?', item['assigned_to']).first
           new_committer = User.where('email=?', item['qa_contact']).first
           if creator.nil?
-            new_creator = new_bug_user(item['creator'])
+            new_creator = User.new_by_email(item['creator'])
             new_creator.save
             new_record.creator = new_creator.id
           else
             new_record.creator = creator.id
           end
           if new_user.nil?
-            new_generated_user = new_bug_user(item['assigned_to'])
+            new_generated_user = User.new_by_email(item['assigned_to'])
             new_generated_user.roles = Role.where(role:"analyst")
             new_generated_user.save
             new_record.user = new_generated_user
@@ -337,7 +328,7 @@ class Bug < ApplicationRecord
             new_record.user = new_user
           end
           if new_committer.nil?
-            new_generated_committer = new_bug_user(item['qa_contact'])
+            new_generated_committer = User.new_by_email(item['qa_contact'])
 
             new_generated_committer.roles = Role.where(role:"committer")
             new_generated_committer.save

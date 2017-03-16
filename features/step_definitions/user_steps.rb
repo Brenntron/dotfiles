@@ -92,3 +92,16 @@ Then(/^current user should be in database$/) do
   user.should_not be_nil
 end
 
+Given(/^current user is a bug user$/) do
+  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user = User.new_by_email(user_attrs[:email])
+  user.save
+end
+
+Then(/^current user should have kerberos login$/) do
+  user_attrs = FactoryGirl.attributes_for(:current_user)
+  User.where(cvs_username: user_attrs[:cvs_username]).count.should == 1
+  user = User.where(cvs_username: user_attrs[:cvs_username]).first
+  user.kerberos_login.should == user_attrs[:kerberos_login]
+end
+

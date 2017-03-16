@@ -135,24 +135,71 @@ class User < ApplicationRecord
     end
   end
 
+  def self.new_by_email(email)
+    new(#kerberos_login: 'generated',
+        cvs_username: email.gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@sourcefire.com', ''),
+        email: email,
+        password: 'password',
+        password_confirmation: 'password',
+        committer: 'false')
+  end
+
+  # A user model from the db and or the http request.
+  #
+  # If there is no user in the database, a new User model is returned.
+  # If the user is in the database, the NULL fields are set from the request.
+  #
+  # Our key for the user name is cvs_username.
+  # This must be the name part of an email address used by bugzilla.
+  # It must also be the remove user value sent from the web request.
+  # This value is also stored as the kerberos_login field,
+  # so the name part of a user's email address must match their kerberos login,
+  # or our system will break.
+  #
+  # returns [User] the user model instance, but may be unsaved
+  def self.from_request(params, request)
+    remote_user =
+        case
+          when params[:kerberos_login]
+            params[:kerberos_login]
+          when request.env['REMOTE_USER']
+            request.env['REMOTE_USER']
+          when Rails.configuration.ember_app[:remote_user]
+            Rails.configuration.ember_app[:remote_user]
+          else
+            nil
+        end
+    raise Exception.new('You are not logged into Kerberos. Please try again.') unless remote_user
+
+    user = User.where(cvs_username: remote_user).first
+    if user
+      user.kerberos_login ||= remote_user
+      user.email          ||= request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
+      user.cec_username   ||= request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
+      user.display_name   ||= request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
+      user
+    else
+      user_attrs = {
+          cvs_username:   remote_user,
+          kerberos_login: remote_user,
+          email:          request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email],
+          cec_username:   request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username],
+          display_name:   request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name],
+          committer:      'false',
+          class_level:    'unclassified',
+          password:       'password',
+          password_confirmation: 'password'
+      }
+      User.new(user_attrs)
+    end
+  end
+
   def self.login_user(params, request)
     begin
       # we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
-      kerberos_login = params[:kerberos_login] || request.env['REMOTE_USER'] || Rails.configuration.ember_app[:remote_user]
-      raise Exception.new('You are not logged into Kerberos. Please try again.') if kerberos_login.nil?
-      user = User.where('kerberos_login=?', kerberos_login).first_or_create do |new_record|
-        new_record.kerberos_login = kerberos_login
-        new_record.email          = request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
-        new_record.cvs_username   = request.env['AUTHENTICATE_SAMACCOUNTNAME'] || Rails.configuration.backend_auth[:authenticate_cvs_username]
-        new_record.cec_username   = request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
-        new_record.display_name   = request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
-        new_record.committer      = 'false'
-        new_record.class_level    = 'unclassified'
-        new_record.password       = 'password'
-        new_record.password_confirmation = 'password'
-      end
+      user = from_request(params, request)
       user.confirmed = 'true'
       user.updated_at = Time.now
       user.ensure_authentication_token # make sure the user has a token generated

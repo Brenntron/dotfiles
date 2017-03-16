@@ -3,6 +3,8 @@ Feature: User Accounts
   As a user
   I want to provide user authentication
 
+  ### Scenarios login ###
+
   @javascript
   Scenario: A user with proper credentials should get logged in
     Given current user exists
@@ -11,6 +13,28 @@ Feature: User Accounts
     Then I wait for "3" seconds
     And I should not see "Please wait while we sign you in"
 
+  @javascript
+  Scenario: A user logging in not in the database should be added to the database
+    Given current user not in database
+    When I visit the root url
+    Then I should see "Please wait while we sign you in"
+    When I wait for "3" seconds
+    Then I should not see "Please wait while we sign you in"
+    And  current user should be in database
+
+  @javascript
+  Scenario: A user logging in, in the database for a bug, should have the kerberos login updated
+    Given current user is a bug user
+    Then current user should be in database
+    When I visit the root url
+    Then I should see "Please wait while we sign you in"
+    When I wait for "3" seconds
+    Then I should not see "Please wait while we sign you in"
+    And  current user should be in database
+    And  current user should have kerberos login
+
+
+  ### Scenarios User management ###
 
   @javascript
   Scenario: A regular user should see a not found flash message
@@ -271,6 +295,8 @@ Feature: User Accounts
     And  I should not see "[BP][NSS] fixed bug"
 
 
+  ### Scenarios User search
+
   @javascript
   Scenario: A user can search using email
     Given a user with role "analyst" exists and is logged in
@@ -361,6 +387,9 @@ Feature: User Accounts
     And I see a user_searches result for name "davecarr"
     And I do not see a user_searches result for name "porsche"
     And I do not see a user_searches result for name "bentley"
+
+
+  ### Scenarios User Role access ###
 
   @javascript
   Scenario: An analyst should be able to do everything
