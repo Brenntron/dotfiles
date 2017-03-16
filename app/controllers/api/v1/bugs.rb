@@ -28,6 +28,29 @@ module API
           end
         end
 
+        desc "synch bug element"
+        params do
+          requires :id, type: Integer, desc: "Bugzilla id."
+          requires :element, type: String, desc: "element of bug wanting to sync, options are attachments or history"
+        end
+        get "/synch_bug/:element/:id" do
+          xmlrpc_token = request.headers['Xmlrpc-Token']
+          if xmlrpc_token
+            begin
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+              new_bug = xmlrpc.get(permitted_params[:id])
+              if permitted_params[:element] == 'attachments'
+                Bug.synch_attachments(xmlrpc,new_bug).to_s
+              else
+                # history
+                Bug.synch_history(xmlrpc,new_bug).to_s
+              end
+            end
+          else
+            false
+          end
+        end
+
         desc "import one bug from bugzilla"
         params do
           requires :id, type: Integer, desc: "Bugzilla id."

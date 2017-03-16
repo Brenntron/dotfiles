@@ -275,6 +275,69 @@ class Bug < ApplicationRecord
     Bugzilla::Bug.new(xmlrpc).attach_file(bugzilla_id, file)
   end
 
+  def self.synch_history(xmlrpc, new_bugs)
+    unless new_bugs.empty?
+      new_bugs['bugs'].each do |item|
+        bug_id = item['id']
+        new_comments = xmlrpc.comments(ids: [bug_id])
+        bug = Bug.find(bug_id)
+        unless new_comments.empty?
+          new_comments['bugs'].each do |comment|
+            bug_id = comment[0].to_i
+            comment[1]['comments'].each do |c|
+              next if Note.where(id: c['id']).first.present? #we already have this one
+              if c['text'].downcase.strip.start_with?('commit')
+                note_type = 'committer'
+              elsif c['text'].start_with?('Created attachment')
+                note_type = 'attachment'
+              else
+                note_type = 'research'
+              end
+              comment = c['text'].strip
+              creation_time = c['creation_time'].to_time
+              note = Note.create(id: c['id'],
+                                 author: c['author'],
+                                 comment: comment,
+                                 bug_id: bug_id,
+                                 note_type: note_type,
+                                 created_at: creation_time)
+              bug.notes << note
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def self.synch_attachments(xmlrpc, new_bugs)
+    unless new_bugs.empty?
+      new_bugs['bugs'].each do |item|
+        bug_id = item['id']
+        new_attachments = xmlrpc.attachments(ids: [bug_id])
+        bug = Bug.find(bug_id)
+        unless new_attachments.empty?
+          new_attachments['bugs'][bug_id.to_s].each do |attachment|
+            new_attachment = Attachment.find_or_create_by(id: attachment['id']) do |new_attach_record|
+              new_attach_record.id = attachment['id']
+              new_attach_record.size = attachment['size']
+              new_attach_record.bugzilla_attachment_id = attachment['bug_id']
+              new_attach_record.file_name = attachment['file_name']
+              new_attach_record.summary = attachment['summary']
+              new_attach_record.content_type = attachment['content_type']
+              new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
+              new_attach_record.creator = attachment['attacher']
+              new_attach_record.is_private = attachment['is_private']
+              new_attach_record.is_obsolete = attachment['is_obsolete']
+              new_attach_record.minor_update = false
+              new_attach_record.created_at = attachment['creation_time'].to_time
+            end
+            bug.attachments << new_attachment unless bug.attachments.include?(new_attachment)
+          end
+        end
+      end
+    end
+  end
+
   def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
