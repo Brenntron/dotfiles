@@ -275,7 +275,7 @@ class Bug < ApplicationRecord
     Bugzilla::Bug.new(xmlrpc).attach_file(bugzilla_id, file)
   end
 
-  def self.bugzilla_import(xmlrpc, new_bugs)
+  def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
@@ -368,6 +368,23 @@ class Bug < ApplicationRecord
               new_record.attachments << new_attachment
             end
           end
+          #we need to test these new attachments
+          options = {
+              :bug              => Bug.where(id: bug_id).first,
+              :task_type         => "attachment",
+              :attachment_array => new_record.attachments.map{|a| a.id},
+          }
+          new_task = Task.create(
+              :bug  => options[:bug],
+              :task_type     => options[:task_type],
+              :user => current_user
+          )
+          begin
+            new_task.test_attachments(options, xmlrpc_token)
+          rescue
+            #handle timeouts accordingly
+          end
+
           new_record.research_notes ||= "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n"
           unless new_comments.empty?
             new_comments['bugs'].each do |comment|

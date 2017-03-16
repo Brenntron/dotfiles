@@ -47,6 +47,8 @@ def self.build_API(include_snort)
       `cp -r vendor/bundle ../production/vendor`
       `cp -r vendor/cache ../production/vendor`
     end
+    puts "copying libv8 to cache folder this is needed on the server"
+    `cp vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem vendor/cache`
   else
     raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
   end
@@ -59,6 +61,8 @@ def self.build_API(include_snort)
   Dir.chdir "../production"
   system 'bundle exec rake assets:precompile'
   Dir.chdir "../Analyst-Console"
+
+
 
   puts "tar up the contents of the production folder"
   system 'cd ../production/ && tar -zcvf ../rulesuitest.tar.gz . && cd ..'
@@ -100,10 +104,12 @@ def self.production_config(timestamp, rebuild_gems)
   system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
 
   `echo 'simlink the timestamped folder to the app directory'`
-  #i would have liked to simlink this folder to the app directory but i cant edit where apache is looking for the webapp
+  system "rm /usr/local/www/rulesuitest/public/current"
+  system "ln -s /usr/local/www/rulesuitest/releases/#{timestamp} /usr/local/www/rulesuitest/public/current"
   # system "rm /usr/local/www/rulesuitest/public/app"
   #so we are gonna have to copy it instead
-  system "rsync -r #{Dir.pwd}/* /usr/local/www/rulesuitest"
+  # system "rsync -r #{Dir.pwd}/* /usr/local/www/rulesuitest"
+
 
   `echo 'build the gems locally if folder exists'`
   # if vendor folder doesnt exist or we ask to rebuild the gems then build the gems and create a copy for later
