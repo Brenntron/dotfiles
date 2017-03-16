@@ -77,7 +77,7 @@ Then(/^I do not see a user_searches result for name "(.*)"$/) do |name|
 end
 
 Then(/^I should see could not find user "(.*)" flash massage$/) do |user_id|
-  find(:xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' alert ')][contains(text(), \"Could not find user '#{user_id}'\")]")
+  find(:xpath, "//div[contains(@class, 'alert')][text()[contains(., \"Could not find user '#{user_id}'\")]]")
 end
 
 Then(/^current user not in database$/) do

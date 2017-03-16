@@ -44,6 +44,19 @@ $ ->
     ).done (response) ->
       window.location.replace '/bugs/' + bid
 
+  $('#resynch_bug').on 'click', ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    alert('Resynch Bug with Bugzilla?')
+    $('.resynch_bug').hide()
+    $('#loading_image').removeClass('hidden').show()
+    $.ajax(
+      url: '/api/v1/bugs/import/' + bid
+      method: 'GET'
+      headers: headers
+    ).done (response) ->
+      window.location.replace '/bugs/' + bid
+
 
 
   $('.edit-summary').on 'click', ->
@@ -147,6 +160,7 @@ $ ->
         $('#current_bug_editor, #change_editor_form').toggle()
         location.reload()
       error: (response) ->
+        location.reload()
         alert(response.responseText)
     , this)
 
@@ -169,6 +183,7 @@ $ ->
         $('#current_bug_committer, #change_committer_form').toggle()
         location.reload()
       error: (response) ->
+        location.reload()
         alert(response.responseText)
     , this)
 
@@ -185,10 +200,13 @@ $ ->
         id: id
         bug:
           'priority': priority
-    ).done (response) ->
-      $('#current_bug_priority, #change_priority_form').toggle()
-      location.reload()
-      return
+      success: (response) ->
+        $('#current_bug_priority, #change_priority_form').toggle()
+        $('#bug_priority option:selected').val()
+        window.location.reload()
+      error:(response) ->
+        window.location.reload()
+    , this)
 
   $("#change_component_form").submit (e)->
     e.preventDefault()
@@ -203,10 +221,13 @@ $ ->
         id: id
         bug:
           'component': component
-    ).done (response) ->
-      $('#current_bug_component, #change_component_form').toggle()
-      location.reload()
-      return
+      success: (response) ->
+        $('#current_bug_component, #change_component_form').toggle()
+        $('#bug_component option:selected').val()
+        window.location.reload()
+      error:(response) ->
+        window.location.reload()
+    , this)
 
 
   createSelectOptions = ->

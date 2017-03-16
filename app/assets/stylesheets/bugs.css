@@ -50,8 +50,23 @@ div.progress{
     display: none;
 }
 #bug-rules-table .alerted {
-    background-color: lightgreen;
+    background-color: #a1f9c0;
 }
-#bug-rules-table .failed_alert {
-    background-color: red;
+#bug-rules-table .no_alert{
+    background-color: #ff8080;
+}
+
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
 }

@@ -8,9 +8,9 @@ class BugsController < ApplicationController
 
   def index
     if params[:bug].present?
-      @bug_searchID = params[:bug][:searchID]
+      @bug_searchID = params[:bug][:id]
       if @bug_searchID
-        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:searchID]}%")
+        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%")
       end
     end
   end
@@ -67,7 +67,7 @@ class BugsController < ApplicationController
         end
       end
       @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
-      @tasks = @bug.tasks
+      @tasks = @bug.tasks.order(created_at: :desc)
       @notes = @bug.notes.order(created_at: :desc)
       @tags = Tag.all.map { |tag| tag.name }.join(',')
       @categories = RuleCategory.all.sort_by { |x| [-x.rules.count, x.category] }
@@ -125,7 +125,7 @@ class BugsController < ApplicationController
       session[:query] = "advance-search"
       session[:search] = params[:bug]
     else
-      session[:query] = ""
+      session[:query] = session[:query] || ''
     end
     if session[:query]
       case session[:query]

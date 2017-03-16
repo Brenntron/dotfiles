@@ -131,6 +131,30 @@ Feature: Bug
     Then I should see "Cant set to pending."
     And I can not select "PENDING" from "state"
 
+  @javascript
+  Scenario: a user can not set the state of a bug to fixed, wontfix, later or invalid if they aren't a committer
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+    Then I wait for "2" seconds
+    And I goto "/bugs/222222"
+    And I click "change_state"
+    And the "FIXED" option from "state" is disabled
+    And the "REOPENED" option from "state" is not disabled
+
+  @javascript
+  Scenario: a user can set the state of a bug to fixed, wontfix, later or invalid if they are a committer
+    Given a user with role "committer" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+    Then I wait for "2" seconds
+    And I goto "/bugs/222222"
+    And I click "change_state"
+    And the "FIXED" option from "state" is not disabled
+    And the "REOPENED" option from "state" is not disabled
+
 
   @javascript
   Scenario: a user can return to the index from viewing a bug
@@ -459,7 +483,7 @@ Feature: Bug
     And I click ".attachments-tab"
     And I toggle checkbox ".attach_1"
     Then I should see "new.pcap"
-    When I click button "test attachments"
+    When I click button "test"
     Then test should be created and I should see "Task has been created to test the attachment"
     And I click ".jobs-tab"
     Then I should see "attachment"

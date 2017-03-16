@@ -4,7 +4,34 @@
 #=============
 #client_local
 #=============
-# This file processes each selected rule against the local copy of the snort rules
+# This file processes each selected rule against each attachment in the bug
+# output should look like this:
+#
+#
+# Reading network traffic from "/tmp/t7nB8WvvhV/2c9b25483e99099e9585096dde1373a1e186a5549f5d93ef606ca5d4a9f541e3" with snaplen = 1514
+# Reading network traffic from "/tmp/t7nB8WvvhV/319df6e776de5cdfb18ef48f6b51eec379739b02101ab5eccb18cabd48aca358" with snaplen = 1514
+# Reading network traffic from "/tmp/t7nB8WvvhV/5328cea7c0214754a1f95f42768341fb0c69f96298e9b5150bbc517a3762e4b1" with snaplen = 1514
+# 06/18-17:21:12.629509  [**] [1:23993:5] SERVER-OTHER Dhcpcd packet size buffer overflow attempt [**] [Classification: Attempted Administrator Privilege Gain] [Priority: 1] {UDP} 10.1.12.51 -> 10.3.12.52
+#
+# some hex here
+#
+#     =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+#
+#
+# Reading network traffic from "/tmp/t7nB8WvvhV/a194548bcb936b066074d72ae927d3540438d03cd18c062922ac8e738c79e4b0" with snaplen = 1514
+# 06/28-09:22:34.693357  [**] [1:23993:5] SERVER-OTHER Dhcpcd packet size buffer overflow attempt [**] [Classification: Attempted Administrator Privilege Gain] [Priority: 1] {UDP} 192.168.5.1 -> 192.168.5.200
+#
+# some hex here
+#
+#     =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+#
+#
+# Rule Profile Statistics (worst 10 rules)
+# ==========================================================
+#     Num      SID GID Rev     Checks   Matches    Alerts           Microsecs  Avg/Check  Avg/Match Avg/Nonmatch   Disabled
+#     ===      === === ===     ======   =======    ======           =========  =========  ========= ============   ========
+#     1    23993   1   5          6         2         1                  23        4.0        9.7          1.1          0
+#
 ######################
 
 require 'open3'
@@ -101,7 +128,7 @@ while message = client.receive
       pcap_path = "#{local_cache_path}/#{attachment_id}"
 
       # Updated files get new attachment ids so no need to test the actual data
-      if not File.exists?(pcap_path)
+      unless File.exists?(pcap_path)
         attempts = 0
 
         # Retry if we get a bugzilla EOF error
@@ -130,6 +157,9 @@ while message = client.receive
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
 
+      # NOt sure if the code below returns a proper pcap
+      #
+
       # Start by hashing the pcap data
       sha = Digest.hexencode(sha256.digest(pcap_data))
       # See if the PCAP exists on the server
@@ -137,9 +167,10 @@ while message = client.receive
 
       # Should we upload the pcap
       if pcap.nil?
+        # TODO this part is broken for some reason this does not create a valid pcap for
+        # ruletestapi
         pcap = Pcap.create(:pcap => Base64.encode64(pcap_data))
       end
-
       # Make sure that worked
       if pcap.error?
         raise Exception.new(pcap.error)

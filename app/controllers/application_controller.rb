@@ -15,7 +15,8 @@ class ApplicationController < ActionController::Base
 
 
   def current_user
-    @current_user ||= User.find(session[:user]) if session[:user]
+    @current_user ||= User.where(id: session[:user]).first if session[:user]
+    @current_user
   end
 
   def xml_token

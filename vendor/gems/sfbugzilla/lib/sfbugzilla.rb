@@ -25,7 +25,6 @@ class Bugzilla::XMLRPC
       use_ssl = (port == 443) ? true : false
       @xmlrpc = XMLRPC::Client.new(host, path, port, nil, nil, nil, nil, use_ssl, 60)
       @xmlrpc.fix_ssl
-      # @xmlrpc.http_header_extra = {'accept-encoding' => 'identity'}
 
    end
 
@@ -62,11 +61,6 @@ class Bugzilla::Bug
       requires_version(cmd, 3.4)
       raise ArgumentError, "Invalid parameters" unless args[0].kind_of?(Hash)
       @iface.call(cmd, args[0])
-   end
-   def _update_attachment(cmd,*args)
-     requires_version(cmd, 5.0)
-     raise ArgumentError, "Invalid parameters" unless args[0].kind_of?(Hash)
-     @iface.call(cmd, args[0])
    end
 
    def _add_attachment(cmd, *args)

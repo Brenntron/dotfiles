@@ -141,6 +141,14 @@ When(/^click button "(.*?)" within "(.*?)"$/) do |button, context|
   end
 end
 
+When(/^the "(.*?)" option from "(.*?)" is disabled$/) do |option, select|
+  select(option, :from => select).disabled? == true
+end
+
+When(/^the "(.*?)" option from "(.*?)" is not disabled$/) do |option, select|
+  select(option, :from => select).disabled? == false
+end
+
 When(/^I select "(.*?)" from "(.*?)"$/) do |option, select|
   if option == "next year"
     option = (Time.now + 1.year).strftime("%Y")
@@ -195,6 +203,14 @@ end
 
 Then(/^"(.*?)" should be visible$/) do |target| #target is #id or .class
   page.find(target).visible?
+end
+
+Then(/^I should see button with class "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//button[contains(@class, '#{element}')]")
+end
+
+Then(/^I should not see button with class "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
 
 Then(/^I should see div element with class "(.*?)"$/) do |element|

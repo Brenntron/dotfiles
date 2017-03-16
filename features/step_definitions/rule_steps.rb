@@ -165,8 +165,13 @@ Then(/^rule record will marked out of date/) do
   rule.stale_edit?.should eq(true)
 end
 
+Then(/^I should see a rule with state "(.*)" version "(.*)"$/) do |state, version|
+  page.find(:xpath, "//td[text()='#{state}']")
+  page.find(:xpath, "//td//*[normalize-space(text())='#{version}']")
+end
+
 Then(/^I should see rule "(.*)" state "(.*)" version "(.*)"$/) do |rule_id, state, version|
   page.find(:xpath, "//tr[@id='#{rule_id}']/td[text()='#{state}']")
-  page.find(:xpath, "//tr[@id='#{rule_id}']//*[text()='#{version}']")
+  page.find(:xpath, "//tr[@id='#{rule_id}']//*[normalize-space(text())='#{version}']")
 end
 

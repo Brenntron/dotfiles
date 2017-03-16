@@ -21,10 +21,33 @@ module API
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
             new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.bugzilla_import(xmlrpc,new_bugs)
+            Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bugs)
             "true"
           else
             "false"
+          end
+        end
+
+        desc "synch bug element"
+        params do
+          requires :id, type: Integer, desc: "Bugzilla id."
+          requires :element, type: String, desc: "element of bug wanting to sync, options are attachments or history"
+        end
+        get "/synch_bug/:element/:id" do
+          xmlrpc_token = request.headers['Xmlrpc-Token']
+          if xmlrpc_token
+            begin
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+              new_bug = xmlrpc.get(permitted_params[:id])
+              if permitted_params[:element] == 'attachments'
+                Bug.synch_attachments(xmlrpc,new_bug).to_s
+              else
+                # history
+                Bug.synch_history(xmlrpc,new_bug).to_s
+              end
+            end
+          else
+            false
           end
         end
 
@@ -43,7 +66,7 @@ module API
                 new_bug = xmlrpc.get(permitted_params[:id])
                 progress_bar.update_attribute("progress", 10)
                 #create the bug from bugzilla
-                Bug.bugzilla_import(xmlrpc,new_bug).to_s
+                Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug).to_s
                 bug = Bug.where(id:params[:id]).first
                 #parse the bug summary
                 parsed = bug.parse_summary
@@ -172,6 +195,7 @@ module API
           options = {}
           update_params = {}
           if permitted_params[:bug][:editor_id]
+
             state = nil
             editor = User.find(permitted_params[:bug][:editor_id])
             updated_bug_state = Bug.get_new_bug_state(bug, state, editor.email)

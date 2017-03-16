@@ -18,6 +18,7 @@ gem 'mysql2', '~> 0.3.20'
 gem 'rmagick', '2.13.2'
 gem 'ruby-bugzilla', '~> 0.6.0'
 
+gem 'libv8', '~> 3.16', '>= 3.16.14.17'
 gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her'

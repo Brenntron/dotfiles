@@ -4,7 +4,7 @@
       <div class="input-group input-group-sm">
 
         <%= form_tag('/bugs', method: :get) do -%>
-            <%= text_field_tag 'bug[searchID]', "#{@bug_searchID}", class: "searchID", placeholder: "BugID" %>
+            <%= text_field_tag 'bug[id]', "#{@bug_searchID}", class: "searchID", placeholder: "BugID" %>
         <% end -%>
 
       </div><!-- /input-group -->
@@ -12,7 +12,7 @@
     <table class="right table index-table">
       <thead>
       <tr>
-        <td><strong>Bugs</strong></td>
+        <td class="indent" data-defaultsign="nospan"><strong>Bugs</strong></td>
       </tr>
       </thead>
       <tbody>

@@ -16,6 +16,7 @@ class Task < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
+
   # Parsed output of results from testing rules
   def stats
     result.split("\n").inject({}) do |stats, line|
@@ -30,6 +31,7 @@ class Task < ApplicationRecord
     end
   end
 
+
   # Set stats fields on rule records
   def update_rule_stats
     stats.each_pair do |sid, attrs|
@@ -40,5 +42,19 @@ class Task < ApplicationRecord
     end
 
     true
+  end
+
+  def test_attachments(options, xmlrpc_token)
+    options[:attachment_array].split(',').each do |attachment_id|
+      self.attachments << Attachment.where(id: attachment_id).first unless nil
+    end
+    PublishAttachment.send_work_msg(self, options, xmlrpc_token)
+  end
+
+  def test_rules(options, xmlrpc_token)
+    options[:rule_array].split(',').each do |rule_id|
+      self.rules << Rule.where(id: rule_id).first unless nil
+    end
+    PublishRule.send_work_msg(self, options, xmlrpc_token)
   end
 end
