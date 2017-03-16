@@ -53,10 +53,20 @@ module API
           )
           case options[:task_type]
             when "attachment"
-              options[:attachment_array] = options[:attachment_array].split(',').map { |s| s.to_i }
-              new_task.test_attachments(options, request.headers['Xmlrpc-Token'])
+              options[:attachment_array].split(',').each do |attachment_id|
+                attachment = Attachment.where(id: attachment_id).first
+                if /^[-\w]+.pcap$/.match(attachment.file_name)
+                  new_task.attachments << attachment
+                end
+              end
+              TestAttachment.send_work_msg(new_task, options, request)
             when "rule"
-              new_task.test_rules(options, request.headers['Xmlrpc-Token'])
+              options[:rule_array].split(',').each do |rule_id|
+                new_task.rules << Rule.where(id: rule_id).first unless nil
+              end
+              TestRule.send_work_msg(new_task,options,request)
+            when "commmit"
+              SendCommit.send_work_msg(new_task,options,request)
           end
           new_task
         end

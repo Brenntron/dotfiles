@@ -16,6 +16,7 @@ class Task < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
+
   # Parsed output of results from testing rules
   def stats
     result.split("\n").inject({}) do |stats, line|
@@ -29,6 +30,7 @@ class Task < ApplicationRecord
       stats
     end
   end
+
 
   # Set stats fields on rule records
   def update_rule_stats

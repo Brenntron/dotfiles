@@ -141,6 +141,14 @@ When(/^click button "(.*?)" within "(.*?)"$/) do |button, context|
   end
 end
 
+When(/^the "(.*?)" option from "(.*?)" is disabled$/) do |option, select|
+  select(option, :from => select).disabled? == true
+end
+
+When(/^the "(.*?)" option from "(.*?)" is not disabled$/) do |option, select|
+  select(option, :from => select).disabled? == false
+end
+
 When(/^I select "(.*?)" from "(.*?)"$/) do |option, select|
   if option == "next year"
     option = (Time.now + 1.year).strftime("%Y")

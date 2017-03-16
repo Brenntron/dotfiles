@@ -87,6 +87,8 @@ $ ->
                   return
                 ), 5000
             }
+        when 'commit'
+          alert('Task Created. Rules sent to be committed')
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')
@@ -265,6 +267,8 @@ $ ->
         $('.standard_form').find(":invalid").each (e) ->
           $(this).addClass('onError')
 
+  $('.commit').on "click",(e) ->
+    alert("clicked commit")
 
   $('.edit').on "click", '.update-rule-btn', (e) ->
     e.preventDefault()

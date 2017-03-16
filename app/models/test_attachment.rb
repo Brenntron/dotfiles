@@ -1,6 +1,6 @@
 require 'activemessaging/processor'
 include ActiveMessaging::MessageSender
-class PublishAttachment
+class TestAttachment
   publishes_to :snort_all_rules_test_work
 
   def self.send_work_msg(content, options, xmlrpc_token)
