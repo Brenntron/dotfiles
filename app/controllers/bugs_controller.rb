@@ -8,9 +8,9 @@ class BugsController < ApplicationController
 
   def index
     if params[:bug].present?
-      @bug_searchID = params[:bug][:searchID]
+      @bug_searchID = params[:bug][:id]
       if @bug_searchID
-        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:searchID]}%")
+        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%")
       end
     end
   end
