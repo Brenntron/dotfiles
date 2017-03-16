@@ -187,3 +187,17 @@ Then(/^I should see a rule row with class "(.*)" and id "(.*)"$/) do |css_class,
   page.find(:xpath, "//table[@id='bug-rules-table']//tr[@id='#{rule_id}']")[:class].split(' ').should include(css_class)
 end
 
+Then(/^rule "(.*)" is synched$/) do |rule_id|
+  rule = Rule.find(rule_id)
+  rule.synched?.should == true
+  rule.draft?.should == false
+end
+
+Then(/^rule "(.*)" is a current edit/) do |rule_id|
+  rule = Rule.find(rule_id)
+  rule.synched?.should == false
+  rule.draft?.should == true
+  rule.new_rule?.should == false
+  rule.edited_rule?.should == true
+  rule.current_edit?.should == true
+end
