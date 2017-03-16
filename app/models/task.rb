@@ -50,6 +50,7 @@ class Task < ApplicationRecord
     end
     PublishAttachment.send_work_msg(self, options, xmlrpc_token)
   end
+
   def test_rules(options, xmlrpc_token)
     options[:rule_array].split(',').each do |rule_id|
       self.rules << Rule.where(id: rule_id).first unless nil
