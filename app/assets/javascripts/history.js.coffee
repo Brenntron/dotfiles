@@ -57,7 +57,10 @@ $ ->
     id = $('input[name="bugzilla_id"]').val()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $(this).attr('disabled', 'disabled')
-
+    $("#synch_history").addClass 'hidden'
+    $("#syncing_history").removeClass 'hidden'
+    $("#syncing_history").show()
+    
     $.ajax(
       url: '/api/v1/bugs/synch_bug/history/' + id
       method: 'GET'
