@@ -384,7 +384,7 @@ class Bug < ApplicationRecord
           end
           if new_user.nil?
             new_generated_user = User.new_by_email(item['assigned_to'])
-            new_generated_user.roles = Role.where(role:"analyst")
+            new_generated_user.roles << Role.where(role:"analyst")
             new_generated_user.save
             new_record.user = new_generated_user
           else
@@ -393,7 +393,7 @@ class Bug < ApplicationRecord
           if new_committer.nil?
             new_generated_committer = User.new_by_email(item['qa_contact'])
 
-            new_generated_committer.roles = Role.where(role:"committer")
+            new_generated_committer.roles << Role.where(role:"committer")
             new_generated_committer.save
             new_record.committer = new_generated_committer
           else

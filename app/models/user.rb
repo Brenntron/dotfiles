@@ -173,7 +173,17 @@ class User < ApplicationRecord
         end
     raise Exception.new('You are not logged into Kerberos. Please try again.') unless remote_user
 
-    user = User.where(cvs_username: remote_user).first
+    user_email =
+      case
+        when request.env['AUTHENTICATE_MAIL']
+          request.env['AUTHENTICATE_MAIL']
+        when Rails.configuration.backend_auth[:authenticate_email]
+          Rails.configuration.backend_auth[:authenticate_email]
+        else
+          nil
+      end
+
+    user = User.where('cvs_username = ? OR email = ?', remote_user, user_email).first
     if user
       user.kerberos_login ||= remote_user
       user.email          ||= request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
