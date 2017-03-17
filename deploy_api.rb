@@ -75,7 +75,7 @@ def self.upload_API
     if File.exists?("../rulesuitest.tar.gz")
       system "ssh talosweb@rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/rulesuitest/releases/#{timestamp}"
       puts "scp the tarball to rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp} folder"
-      system "scp ../rulesuitest.tar.gz rulesuitest.vrt.sourcefire.com:/usr/local/www/rulesuitest/releases/#{timestamp}/"
+      system "scp ../rulesuitest.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:/usr/local/www/rulesuitest/releases/#{timestamp}/"
       puts "unload the zip file into timestamp folder"
       system "ssh talosweb@rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/rulesuitest/releases/#{timestamp}/ -zxvf /usr/local/www/rulesuitest/releases/#{timestamp}/rulesuitest.tar.gz"
     else
@@ -86,7 +86,7 @@ def self.upload_API
 end
 
 def self.run_server_config(timestamp, rebuild_gems)
-   `ssh rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/rulesuitest/releases/#{timestamp}/deploy_api.rb --no-api #{rebuild_gems} --run-config #{timestamp}`
+   `ssh talosweb@rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/rulesuitest/releases/#{timestamp}/deploy_api.rb --no-api #{rebuild_gems} --run-config #{timestamp}`
 end
 
 def self.production_config(timestamp, rebuild_gems)
