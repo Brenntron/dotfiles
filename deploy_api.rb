@@ -73,11 +73,11 @@ def self.upload_API
     puts "create a new folder on the server with a new timestamp"
     timestamp = Time.now.to_i
     if File.exists?("../rulesuitest.tar.gz")
-      system "ssh rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/rulesuitest/releases/#{timestamp}"
+      system "ssh talosweb@rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/rulesuitest/releases/#{timestamp}"
       puts "scp the tarball to rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp} folder"
       system "scp ../rulesuitest.tar.gz rulesuitest.vrt.sourcefire.com:/usr/local/www/rulesuitest/releases/#{timestamp}/"
       puts "unload the zip file into timestamp folder"
-      system "ssh rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/rulesuitest/releases/#{timestamp}/ -zxvf /usr/local/www/rulesuitest/releases/#{timestamp}/rulesuitest.tar.gz"
+      system "ssh talosweb@rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/rulesuitest/releases/#{timestamp}/ -zxvf /usr/local/www/rulesuitest/releases/#{timestamp}/rulesuitest.tar.gz"
     else
       raise("Please build the project first")
     end
