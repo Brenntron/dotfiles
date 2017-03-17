@@ -137,8 +137,8 @@ class User < ApplicationRecord
     end
   end
 
-  def self.new_by_email(email)
-    new(#kerberos_login: 'generated',
+  def self.create_by_email(email)
+    create(#kerberos_login: 'generated',
         cvs_username: email.gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@cisco.com', ''),
         email: email,
         password: 'password',
