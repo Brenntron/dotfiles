@@ -63,6 +63,7 @@ group :test do
   gem 'rb-fsevent', '0.9.8'
   gem 'guard-cucumber', '2.1.2'
   gem 'rspec', '3.4.0'
+  gem 'faker', '~> 1.7.3'
 end
 
 gem 'httparty'

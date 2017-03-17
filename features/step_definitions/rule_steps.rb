@@ -113,7 +113,6 @@ Given(/^rule with id "(.*)" has a reference with id "(.*)"$/) do |rule_id, ref_i
 end
 
 When(/^code calls load_rule_from_grep on rule content$/) do
-  puts "*** @rule_grep_line = #{@rule_grep_line}"
   Rule.load_rule_from_grep(@rule_grep_line)
 end
 
@@ -147,7 +146,6 @@ Then(/^rule record will be updated$/) do
   rule_resultset = Rule.where(gid: @gid, sid: @sid)
   rule_resultset.should exist
   rule = rule_resultset.first
-  puts "*** rule = #{rule.inspect}"
 
   rule.gid.should eq(@gid)
   rule.sid.should eq(@sid)

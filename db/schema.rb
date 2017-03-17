@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170302175702) do
+ActiveRecord::Schema.define(version: 20170316173851) do
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_attachment_id"
@@ -259,7 +259,7 @@ ActiveRecord::Schema.define(version: 20170302175702) do
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "cvs_username"
+    t.string   "cvs_username",                           null: false
     t.string   "cec_username"
     t.string   "kerberos_login"
     t.string   "display_name"
@@ -284,6 +284,7 @@ ActiveRecord::Schema.define(version: 20170302175702) do
     t.integer  "depth",                  default: 0,     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["cvs_username"], name: "index_users_on_cvs_username", unique: true, using: :btree
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["lft"], name: "index_users_on_lft", using: :btree
     t.index ["parent_id"], name: "index_users_on_parent_id", using: :btree
