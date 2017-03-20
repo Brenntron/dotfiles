@@ -94,7 +94,7 @@ end
 
 Given(/^current user is a bug user$/) do
   user_attrs = FactoryGirl.attributes_for(:current_user)
-  user = User.new_by_email(user_attrs[:email])
+  user = User.create_by_email(user_attrs[:email])
   user.save
 end
 

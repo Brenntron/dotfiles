@@ -175,8 +175,8 @@ class User < ApplicationRecord
 
     user_email =
       case
-        when request.env['AUTHENTICATE_MAIL']
-          request.env['AUTHENTICATE_MAIL']
+        when request.env['AUTHORIZE_MAIL']
+          request.env['AUTHORIZE_MAIL']
         when Rails.configuration.backend_auth[:authenticate_email]
           Rails.configuration.backend_auth[:authenticate_email]
         else
@@ -186,17 +186,17 @@ class User < ApplicationRecord
     user = User.where('cvs_username = ? OR email = ?', remote_user, user_email).first
     if user
       user.kerberos_login ||= remote_user
-      user.email          ||= request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
-      user.cec_username   ||= request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
-      user.display_name   ||= request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
+      user.email          ||= request.env['AUTHORIZE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email]
+      user.cec_username   ||= request.env['AUTHORIZE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username]
+      user.display_name   ||= request.env['AUTHORIZE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name]
       user
     else
       user_attrs = {
           cvs_username:   remote_user,
           kerberos_login: remote_user,
-          email:          request.env['AUTHENTICATE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email],
-          cec_username:   request.env['AUTHENTICATE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username],
-          display_name:   request.env['AUTHENTICATE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name],
+          email:          request.env['AUTHORIZE_MAIL'] || Rails.configuration.backend_auth[:authenticate_email],
+          cec_username:   request.env['AUTHORIZE_CISCOCECUSERNAME'] || Rails.configuration.backend_auth[:authenticate_cec_username],
+          display_name:   request.env['AUTHORIZE_DISPLAYNAME'] || Rails.configuration.backend_auth[:authenticate_display_name],
           committer:      'false',
           class_level:    'unclassified',
           password:       'password',
