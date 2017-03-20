@@ -267,7 +267,7 @@
       <div class="col-xs-12 references_add">
         <h5>References&nbsp;&nbsp;<a class="top-space add-reference-btn blue"><i class="glyphicon glyphicon-plus"></i> add reference</a></h5>
         <% if @bug.references.any? %>
-          <% @bug.references.each do |ref| %>
+          <% @bug.references.distinct.each do |ref| %>
             <div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">
               <div class="form-group">
                 <input class="form-control select-sm code" name="rule[reference][][reference_type_id]" size=8 value="<%= ref.reference_type.name %>">
