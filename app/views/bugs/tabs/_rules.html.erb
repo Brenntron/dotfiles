@@ -67,10 +67,11 @@
       <% if @rules.any? %>
         <tbody>
         <% @rules.each do |rule| %>
-          <tr id="<%= rule.id %>" data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
+          <tr id="<%= rule.id %>" class="rule_row <%= rule.css_class %>"
+              data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>"
                        name="rule[id]" value="<%= rule.id %>"></td>
-                <td class="rule_state_<%= rule_state_color(rule.state) %>"><%= rule.state %></td>
+                <td class="rule_state_col rule_state_<%=rule_state_color(rule.state)%>"><%= rule.state %></td>
                 <td>
                   <a class="blue show_rule" href="#">
                     <% if rule.sid %>

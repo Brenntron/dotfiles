@@ -663,4 +663,41 @@ class Rule < ApplicationRecord
   def stale_edit?
     edited_rule? && (PUBLISH_STATUS_STALE_EDIT == publish_status)
   end
+
+  # Tests if rule content parsed correctly
+  # @return [boolean] true iff rule succeeding parsing by visruleparser
+  def parsed?
+    draft? && ('FAILED' != state)
+  end
+
+  # Tests if rule content failed to parse correctly
+  # @return [boolean] true iff rule failed parsing by visruleparser
+  def failed?
+    draft? && ('FAILED' == state)
+  end
+
+  # The CSS class identifiers to identify the type of rule this is.
+  #
+  # Used for stylesheet styling.
+  # synched      | rule is up to date with VC
+  # edited-rule  | rule has been changed by a user and has not been committed to VC
+  # current-edit | edited-rule and can be commited to VC
+  # stale-edit   | edited-rule but VC has been updated externally and we cannot commit the change
+  # new-rule     | rule is newly created by a user and not commited to VC
+  # draft        | new-rule or edited-rule
+  # parsed       | draft parsed correctly in
+  # failed       | new-rule or edited-rule
+  # @returns [String] the CSS class name(s), space delimited if multiple
+  def css_class
+    [].tap do |css_classes|
+      css_classes << 'synched' if synched?
+      css_classes << 'draft' if draft?
+      css_classes << 'new-rule' if new_rule?
+      css_classes << 'edited-rule' if edited_rule?
+      css_classes << 'current-edit' if current_edit?
+      css_classes << 'stale-edit' if stale_edit?
+      css_classes << 'parsed' if parsed?
+      css_classes << 'failed' if failed?
+    end.join(' ')
+  end
 end
