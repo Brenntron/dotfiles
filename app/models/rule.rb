@@ -7,6 +7,15 @@ require 'tempfile'
 # When a user saves a draft of an edit to a rule, that draft is stored instead and CVS synching is suppressed.
 # A new rule originating in our UI will be saved here, but obvious will have no synching until committed to CVS.
 #
+# Database Fields:
+# state (String) the display text for the state of the rule (see below)
+# edit_status [String] if the rule is new, an update, or a rule synched with version control (see below)
+# publish_status (String) status in saving an edit to version control (see below)
+# parsed (Boolean) if the rule content succeeded parsing (see below)
+# on (Boolean) if the rule is uncommented in the rule file
+# filename [String] the (relative or absolute) filename where the rule came from or is stored
+# linenumber [Integer] the line in the rule file where the rule was read from
+#
 #                           |sid|  state  |edit_status|publish_status|parsed|
 # All Rules
 # * synched with CVS
@@ -690,19 +699,6 @@ class Rule < ApplicationRecord
   def publishing?
     PUBLISH_STATUS_PUBLISHING == publish_status
   end
-
-  # # Tests if rule content parsed correctly
-  # # @return [boolean] true iff rule succeeding parsing by visruleparser
-  # def parsed?
-  #   draft? && ('FAILED' != state)
-  # end
-
-  # # Tests if rule content failed to parse correctly
-  # # @return [boolean] true iff rule failed parsing by visruleparser
-  # def failed?
-  #   !parsed?
-  #   # draft? && ('FAILED' == state)
-  # end
 
   # The CSS class identifiers to identify the type of rule this is.
   #
