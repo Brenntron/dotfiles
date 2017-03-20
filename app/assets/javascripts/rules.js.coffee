@@ -17,7 +17,7 @@ $ ->
           headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
           bug_id = $('input[name="bug_id"]').val()
           user_id = $('input[name="current_user_id"]').val()
-          data = {task: {bugzilla_id: bug_id, rule_array: selected.join(), task_type: "rule", created_by: user_id}}
+          data = {task: {bugzilla_id: bug_id, rule_array: selected, task_type: "rule", created_by: user_id}}
           $.ajax {
             url: "/api/v1/tasks"
             method: 'POST'
