@@ -60,14 +60,14 @@ module API
                   new_task.attachments << attachment
                 end
               end
-              TestAttachment.send_work_msg(new_task, options, request.headers['Cookie'])
+              TestAttachment.send_work_msg(new_task, options, request.headers['Xmlrpc-Token'])
             when "rule"
               options[:rule_array].each do |rule_id|
                 new_task.rules << Rule.where(id: rule_id).first unless nil
               end
-              TestRule.send_work_msg(new_task,options,request.headers['Cookie'])
+              TestRule.send_work_msg(new_task,options,request.headers['Xmlrpc-Token'])
             when "commmit"
-              SendCommit.send_work_msg(new_task,options,request.headers['Cookie'])
+              SendCommit.send_work_msg(new_task,options,request.headers['Xmlrpc-Token'])
           end
           new_task
         end

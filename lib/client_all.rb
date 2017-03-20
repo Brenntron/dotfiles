@@ -79,15 +79,17 @@ stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
 }
-
+puts "xmlrpc to bugzilla"
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 
+puts "create stomp client and subscribe to amq"
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
 client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", {:ack => :client}
 
+puts "init api"
 # Initialize the API
 tries ||= 3
 begin
@@ -95,16 +97,19 @@ begin
 rescue Exception => e
   retry unless (tries -= 1).zero?
 end
+puts "finding engines"
 # Find the engine we should be using for these rules
 engine_type = EngineType.where(:name => 'Persistent').first
 snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
 rule_configuration = RuleConfiguration.where(:name => 'All Rules').first
 
+puts "confirming config"
 # Make sure everything was found
 raise Exception.new("Unable to find Persistent engine type") if engine_type.nil?
 raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
 raise Exception.new("Unable to find All Rules configuration") if rule_configuration.nil?
 
+puts "setup engine"
 engine = Engine.where(
     :engine_type_id => engine_type[:id],
     :snort_configuration_id => snort_configuration[:id],
