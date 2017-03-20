@@ -11,8 +11,8 @@ FactoryGirl.define do
     state               "UNCHANGED"
     publish_status      Rule::PUBLISH_STATUS_SYNCHED
     edit_status         Rule::EDIT_STATUS_SYNCHED
-    parse_status        true
-    on_status           true
+    parsed              true
+    on                  true
     average_check       nil
     average_match       nil
     average_nonmatch    nil

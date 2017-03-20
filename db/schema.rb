@@ -248,8 +248,8 @@ ActiveRecord::Schema.define(version: 20170320162300) do
     t.string   "filename"
     t.integer  "linenumber"
     t.string   "edit_status",                                    null: false
-    t.boolean  "parse_status",                   default: true,  null: false
-    t.boolean  "on_status",                      default: true,  null: false
+    t.boolean  "parsed",                         default: true,  null: false
+    t.boolean  "on",                             default: true,  null: false
     t.string   "publish_status",                                 null: false
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true, using: :btree
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id", using: :btree
