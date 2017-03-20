@@ -218,8 +218,8 @@ Feature: Rules
       | category  | id |
       | BLACKLIST |  1 |
     When the following rules exist:
-      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
     Then rule "11" is synched
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
@@ -275,8 +275,8 @@ Feature: Rules
       | category  | id |
       | BLACKLIST |  1 |
     And the following rules exist:
-      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |    SYNCHED     | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -310,8 +310,8 @@ Feature: Rules
       | category  | id |
       | BLACKLIST |  1 |
     And the following rules exist:
-      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |     SYNCHED    | BLACKLIST message |        1         |
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -348,8 +348,8 @@ Feature: Rules
       | category  | id |
       | BLACKLIST |  1 |
     And the following rules exist:
-      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |  UPDATED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
@@ -372,8 +372,8 @@ Feature: Rules
       | category  | id |
       | BLACKLIST |  1 |
     And the following rules exist:
-      | id | gid |  sid  | rev |   state   | publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |   FAILED  |  CURRENT_EDIT  | BLACKLIST message |        1         |
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |parsed|     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |   FAILED  |   EDIT    |  CURRENT_EDIT  |false | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
@@ -448,8 +448,8 @@ Feature: Rules
 
   Scenario: do not synch updated rule with earlier rev in db model test
     Given rule content for following rule:
-      | id | gid | sid | rev | state     |
-      |  7 |  1  | 101 |  4  | UPDATED   |
+      | id | gid | sid | rev | state   |edit_status|publish_status|
+      |  7 |  1  | 101 |  4  | UPDATED |   EDIT    | CURRENT_EDIT |
     And rule content rev set to "5"
     And grep output for rule content
     And I wait for "3" seconds
@@ -458,8 +458,8 @@ Feature: Rules
 
   Scenario: do not synch updated rule with earlier rev in db model test
     Given rule content for following rule:
-      | id | gid | sid | rev | state     |
-      |  7 |  1  | 101 |  4  | FAILED    |
+      | id | gid | sid | rev | state  |edit_status|publish_status|parsed|
+      |  7 |  1  | 101 |  4  | FAILED |   EDIT    | CURRENT_EDIT |false |
     And rule content rev set to "5"
     And grep output for rule content
     And I wait for "3" seconds

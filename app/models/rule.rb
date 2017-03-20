@@ -7,22 +7,22 @@ require 'tempfile'
 # When a user saves a draft of an edit to a rule, that draft is stored instead and CVS synching is suppressed.
 # A new rule originating in our UI will be saved here, but obvious will have no synching until committed to CVS.
 #
-#                           |sid|  state  |edit_status|publish_status|parse_status|
+#                           |sid|  state  |edit_status|publish_status|parsed|
 # All Rules
 # * synched with CVS
-#   * valid                 |int|UNCHANGED|  SYNCHED  |    SYNCHED   |    true    | valid rule up to date with CVS
+#   * valid                 |int|UNCHANGED|  SYNCHED  |    SYNCHED   | true | valid rule up to date with CVS
 #   * failed visruleparse   .............................. rules which fail visruleparse are not loaded
 # * draft
 #   * new
-#     * valid               |nil|   NEW   |    NEW    | CURRENT_EDIT |    true    | new rule created from UI or web services
-#     * failed parse        |nil|  FAILED |    NEW    | CURRENT_EDIT |    false   | new rule which failed visruleparse
+#     * valid               |nil|   NEW   |    NEW    | CURRENT_EDIT | true | new rule created from UI or web services
+#     * failed parse        |nil|  FAILED |    NEW    | CURRENT_EDIT |false | new rule which failed visruleparse
 #   * edit
 #     * current edit
-#       * valid             |int| UPDATED |   EDIT    | CURRENT_EDIT |    true    | CVS rule edited in UI or web service
-#       * failed parse      |int|  FAILED |   EDIT    | CURRENT_EDIT |    false   | edited rule which failed visruleparse
+#       * valid             |int| UPDATED |   EDIT    | CURRENT_EDIT | true | CVS rule edited in UI or web service
+#       * failed parse      |int|  FAILED |   EDIT    | CURRENT_EDIT |false | edited rule which failed visruleparse
 #     * out of date
-#       * valid             |int| UPDATED |   EDIT    |  STALE_EDIT  |    true    | edited rule, but CVS has since been updated and cannot save
-#       * failed parse      |int|  FAILED |   EDIT    |  STALE_EDIT  |    false   | stale edit which failed visruleparse
+#       * valid             |int| UPDATED |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
+#       * failed parse      |int|  FAILED |   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
 #
 class Rule < ApplicationRecord
   has_paper_trail
@@ -320,6 +320,7 @@ class Rule < ApplicationRecord
           rule_failures: parsed[:rule],
           committed: false,
           state: 'FAILED',
+          parsed: false,
       }.reject { |k, v,| v.nil? || v == '<MISSING>' }
 
     elsif parsed[:rule].match(/msg/)
@@ -344,6 +345,7 @@ class Rule < ApplicationRecord
           state: rule_sid ? 'UNCHANGED' : 'NEW',
           edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
           publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
+          parsed: true,
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
@@ -373,7 +375,8 @@ class Rule < ApplicationRecord
           state: rule_sid ? 'UNCHANGED' : 'NEW',
           edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
           publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
-          rule_category_id: rule_category.id
+          rule_category_id: rule_category.id,
+          parsed: true,
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
@@ -449,8 +452,8 @@ class Rule < ApplicationRecord
       when rule.nil?
         rule_attrs[:edit_status]    = EDIT_STATUS_NEW
         rule_attrs[:publish_status] = PUBLISH_STATUS_CURRENT_EDIT
-        rule_attrs[:parse_status]   = true
-        rule_attrs[:on_status]      = /^\s*#/ !~ rule_content
+        rule_attrs[:parsed]         = true
+        rule_attrs[:on]             = /^\s*#/ !~ rule_content
         rule = create!(rule_attrs)
         rule.associate_references(rule_content)
       when rule.draft?
@@ -645,54 +648,61 @@ class Rule < ApplicationRecord
   # Tests if rule is the current version in VC
   # @return [boolean] true iff rule is latest version synced with VC
   def synched?
-    (PUBLISH_STATUS_SYNCHED == publish_status)
+    EDIT_STATUS_SYNCHED == edit_status
     # %w[UNCHANGED].include?(state)
-  end
-
-  # Tests if rule is a user edited version
-  # @return [boolean] true iff rule is a user edited version
-  def draft?
-    (PUBLISH_STATUS_SYNCHED != publish_status)
-    # %w[NEW UPDATED FAILED].include?(state)
   end
 
   # Tests if edited rule is new
   # @return [boolean] true iff rule is a new edited rule
   def new_rule?
-    draft? && (PUBLISH_STATUS_NEW == publish_status)
+    EDIT_STATUS_NEW == edit_status
     # draft? && sid.nil?
   end
 
   # Tests if edited rule is an edited update to an existing rule
   # @return [boolean] true iff rule is a updated edited rule
   def edited_rule?
-    draft? && (PUBLISH_STATUS_NEW != publish_status)
+    EDIT_STATUS_EDIT == edit_status
     # draft? && sid.present?
+  end
+
+  # Tests if rule is a user edited version
+  # @return [boolean] true iff rule is a user edited version
+  def draft?
+    new_rule? || edited_rule?
+    # %w[NEW UPDATED FAILED].include?(state)
   end
 
   # Tests if edited rule is in progress while VC updated the rule externally
   # @return [boolean] true iff rule is a updated edited rule but VC has not changed
   def current_edit?
-    edited_rule? && (PUBLISH_STATUS_CURRENT_EDIT == publish_status)
+    PUBLISH_STATUS_CURRENT_EDIT == publish_status
   end
 
   # Tests if edited rule is in progress while VC updated the rule externally
   # @return [boolean] true iff rule is a updated edited rule and VC has updated the rule
   def stale_edit?
-    edited_rule? && (PUBLISH_STATUS_STALE_EDIT == publish_status)
+    PUBLISH_STATUS_STALE_EDIT == publish_status
   end
 
-  # Tests if rule content parsed correctly
-  # @return [boolean] true iff rule succeeding parsing by visruleparser
-  def parsed?
-    draft? && ('FAILED' != state)
+  # Tests if edited rule is in progress while VC updated the rule externally
+  # @return [boolean] true iff rule is a updated edited rule and VC has updated the rule
+  def publishing?
+    PUBLISH_STATUS_PUBLISHING == publish_status
   end
 
-  # Tests if rule content failed to parse correctly
-  # @return [boolean] true iff rule failed parsing by visruleparser
-  def failed?
-    draft? && ('FAILED' == state)
-  end
+  # # Tests if rule content parsed correctly
+  # # @return [boolean] true iff rule succeeding parsing by visruleparser
+  # def parsed?
+  #   draft? && ('FAILED' != state)
+  # end
+
+  # # Tests if rule content failed to parse correctly
+  # # @return [boolean] true iff rule failed parsing by visruleparser
+  # def failed?
+  #   !parsed?
+  #   # draft? && ('FAILED' == state)
+  # end
 
   # The CSS class identifiers to identify the type of rule this is.
   #
@@ -715,7 +725,7 @@ class Rule < ApplicationRecord
       css_classes << 'current-edit' if current_edit?
       css_classes << 'stale-edit' if stale_edit?
       css_classes << 'parsed' if parsed?
-      css_classes << 'failed' if failed?
+      css_classes << 'failed' unless parsed?
     end.join(' ')
   end
 end
