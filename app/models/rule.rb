@@ -7,22 +7,22 @@ require 'tempfile'
 # When a user saves a draft of an edit to a rule, that draft is stored instead and CVS synching is suppressed.
 # A new rule originating in our UI will be saved here, but obvious will have no synching until committed to CVS.
 #
-#                           |sid|  state  |publish_status|
+#                           |sid|  state  |edit_status|publish_status|parse_status|
 # All Rules
 # * synched with CVS
-#   * valid                 |int|UNCHANGED|    SYNCHED   | valid rule up to date with CVS
+#   * valid                 |int|UNCHANGED|  SYNCHED  |    SYNCHED   |    true    | valid rule up to date with CVS
 #   * failed visruleparse   .............................. rules which fail visruleparse are not loaded
 # * draft
 #   * new
-#     * valid               |nil|   NEW   |      NEW     | new rule created from UI or web services
-#     * failed parse        |nil|  FAILED |      NEW     | new rule which failed visruleparse
+#     * valid               |nil|   NEW   |    NEW    | CURRENT_EDIT |    true    | new rule created from UI or web services
+#     * failed parse        |nil|  FAILED |    NEW    | CURRENT_EDIT |    false   | new rule which failed visruleparse
 #   * edit
 #     * current edit
-#       * valid             |int| UPDATED | CURRENT_EDIT | CVS rule edited in UI or web service
-#       * failed parse      |int|  FAILED | CURRENT_EDIT | edited rule which failed visruleparse
+#       * valid             |int| UPDATED |   EDIT    | CURRENT_EDIT |    true    | CVS rule edited in UI or web service
+#       * failed parse      |int|  FAILED |   EDIT    | CURRENT_EDIT |    false   | edited rule which failed visruleparse
 #     * out of date
-#       * valid             |int| UPDATED |  STALE_EDIT  | edited rule, but CVS has since been updated and cannot save
-#       * failed parse      |int|  FAILED |  STALE_EDIT  | stale edit which failed visruleparse
+#       * valid             |int| UPDATED |   EDIT    |  STALE_EDIT  |    true    | edited rule, but CVS has since been updated and cannot save
+#       * failed parse      |int|  FAILED |   EDIT    |  STALE_EDIT  |    false   | stale edit which failed visruleparse
 #
 class Rule < ApplicationRecord
   has_paper_trail
@@ -38,10 +38,14 @@ class Rule < ApplicationRecord
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
   #after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
 
+  EDIT_STATUS_SYNCHED           = 'SYNCHED'         #unchanged from VC and up to date with VC
+  EDIT_STATUS_NEW               = 'NEW'             #new rule unknowned to VC
+  EDIT_STATUS_EDIT              = 'EDIT'            #draft of rule edited in UI
+
   PUBLISH_STATUS_SYNCHED        = 'SYNCHED'         #unchanged from VC and up to date with VC
-  PUBLISH_STATUS_NEW            = 'NEW'             #new rule unknowned to VC
   PUBLISH_STATUS_CURRENT_EDIT   = 'CURRENT_EDIT'    #draft of rule edited in UI, but optimistic it can be checked in
-  PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft of rule, but VC rev has changed and cannot be checked in
+  PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft but VC rev has changed and cannot be checked in
+  PUBLISH_STATUS_PUBLISHING     = 'PUBLISHING'      #draft in process of being written to VC
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid) }
 
@@ -71,7 +75,8 @@ class Rule < ApplicationRecord
           if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
             @record = Rule.update_generate_rule($1)
             @record.state = 'New'
-            @record.publish_status = PUBLISH_STATUS_NEW
+            @record.edit_status = EDIT_STATUS_NEW
+            @record.publish_status = PUBLISH_STATUS_CURRENT_EDIT
             @record.rev = 1
             @record.save
           end
@@ -135,6 +140,7 @@ class Rule < ApplicationRecord
 
     rule_attrs = Rule.hash_from_rule_content(rule_content, self.sid)
     rule_attrs[:state] = 'UNCHANGED'
+    rule_attrs[:edit_status] = EDIT_STATUS_SYNCHED
     rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
     update!(rule_attrs)
 
@@ -336,7 +342,8 @@ class Rule < ApplicationRecord
           class_type: /classtype\s*:(.*)\)/.match(parsed[:rule]) ? /classtype\s*:(.*)\)/.match(parsed[:rule])[1] : '<MISSING>',
           committed: true,
           state: rule_sid ? 'UNCHANGED' : 'NEW',
-          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_NEW,
+          edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
+          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
@@ -364,7 +371,8 @@ class Rule < ApplicationRecord
           class_type: /Classtype\s*:\s(.*)/.match(parsed[:rule]) ? /Classtype\s*:\s(.*)/.match(parsed[:rule])[1] : '<MISSING>',
           committed: true,
           state: rule_sid ? 'UNCHANGED' : 'NEW',
-          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_NEW,
+          edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
+          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
           rule_category_id: rule_category.id
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
@@ -437,13 +445,18 @@ class Rule < ApplicationRecord
 
     rule = where(gid: rule_attrs[:gid]).where(sid: rule_attrs[:sid]).first
     case
+      #can new rule ever happen?
       when rule.nil?
-        rule_attrs[:publish_status] = PUBLISH_STATUS_NEW
+        rule_attrs[:edit_status]    = EDIT_STATUS_NEW
+        rule_attrs[:publish_status] = PUBLISH_STATUS_CURRENT_EDIT
+        rule_attrs[:parse_status]   = true
+        rule_attrs[:on_status]      = /^\s*#/ !~ rule_content
         rule = create!(rule_attrs)
         rule.associate_references(rule_content)
       when rule.draft?
         rule.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       when rule.rev != rule_attrs[:rev].to_i
+        rule_attrs[:edit_status] = EDIT_STATUS_SYNCHED
         rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
         rule.update(rule_attrs)
     end
@@ -571,6 +584,7 @@ class Rule < ApplicationRecord
         rule.rev = parsed['revision']
         rule.state = 'Unchanged'
       end
+      rule.edit_status = EDIT_STATUS_SYNCHED
       rule.publish_status = PUBLISH_STATUS_SYNCHED
       rule.save
       return rule
