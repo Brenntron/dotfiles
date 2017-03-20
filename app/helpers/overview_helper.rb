@@ -14,18 +14,5 @@ module OverviewHelper
     exploit_split = data.split(/(?i)\b((?:https?:(?:\/{1,3}|[a-z0-9%])|[a-z0-9.\-]+[.](?:com|net|org|edu|gov)\/)(?:[^\s()<>{}\[\]]+|\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\))+(?:\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])|(?:(?<!@)[a-z0-9]+(?:[.\-][a-z0-9]+)*[.](?:com|net|org|edu|gov)\b\/?(?!@)))/)
     render "bugs/tabs/links", data:exploit_split
   end
-  def rule_state_color(state)
-    case(state)
-      when "FAILED"
-        color = 'red'
-      when "NEW"
-        color = 'green'
-      when "UPDATED"
-        color = 'blue'
-      else
-        color = "black"
-    end
-    return color
-  end
 
 end
