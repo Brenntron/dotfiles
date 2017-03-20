@@ -15,15 +15,21 @@ button.back_btn {
     width:100%;
     margin-botom: 10px;
 }
-.rule_state_blue{
+/*.rule_state_blue{*/
+table#bug-rules-table tr.parsed.edited-rule td.rule_state_col {
     color:blue;
 }
-.rule_state_green{
+/*.rule_state_green{*/
+table#bug-rules-table tr.parsed.new-rule td.rule_state_col {
     color:green;
 }
-.rule_state_red{
+/*.rule_state_red{*/
+table#bug-rules-table tr.failed td.rule_state_col {
     color:white;
     background-color:red;
+}
+table#bug-rules-table tr.parsed.stale-edit td.rule_state_col {
+    background-color: #e8e8e8;
 }
 div.progress{
     background-color: #80a9ba;

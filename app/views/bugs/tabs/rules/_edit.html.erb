@@ -4,7 +4,7 @@
   </div>
   <div class="col-xs-11">
     <%  @rules.each do |rule| %>
-      <div class="col-xs-12 col-md-11 hidden rule_<%= rule.id %>">
+      <div id="rule_detail_edit_<%= rule.id %>" class="col-xs-12 col-md-11 hidden rule_<%= rule.id %> <%= rule.css_class %>">
         <h4 class="blue">
           <% if rule.sid %>
             <%= "#{rule.gid}:#{rule.sid}:#{rule.rev}" %>

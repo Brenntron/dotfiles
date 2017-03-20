@@ -77,7 +77,7 @@ module API
 
           new_rule.associate_references(permitted_params[:rule][:rule_content])
           new_rule.update(detection:permitted_params[:rule][:detection].strip!, class_type:permitted_params[:rule][:class_type]) if new_rule.state == 'FAILED'
-          new_rule.update(rule_category_id: permitted_params[:rule][:rule_category_id], publish_status: Rule::PUBLISH_STATUS_NEW)
+          new_rule.update(rule_category_id: permitted_params[:rule][:rule_category_id], edit_status: Rule::EDIT_STATUS_NEW, publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
           new_rule.create_rule_doc(permitted_params[:rule][:rule_doc])
           new_rule
         end
@@ -123,15 +123,17 @@ module API
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
           rule = Rule.where(id:permitted_params[:id]).first
-          if permitted_params[:rule][:revert]
-            update_params[:cvs_rule_parsed] = update_params[:rule_parsed]
-          else
-            unless rule.sid.nil? || (update_params[:state] == 'FAILED')
+          if rule.sid
+            if 'FAILED' == update_params[:state]
+              update_params[:parsed] = false
+            else
+              update_params[:parsed] = true
               update_params[:state] = "UPDATED"
               update_params[:committed] = false
             end
+            update_params[:edit_status] = Rule::EDIT_STATUS_EDIT unless rule.stale_edit?
+            update_params[:publish_status] = Rule::PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
           end
-          update_params[:publish_status] = Rule::PUBLISH_STATUS_CURRENT_EDIT unless rule.sid.nil? || rule.stale_edit?
           rule.update_references(permitted_params[:rule][:rule_content])
           rule.rule_doc.present? ? rule.rule_doc.update(permitted_params[:rule][:rule_doc]) : rule.create_rule_doc(permitted_params[:rule][:rule_doc])
           rule.update(update_params)
