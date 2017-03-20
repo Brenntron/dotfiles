@@ -83,6 +83,32 @@ Feature: Rules
 
 
 
+  ### Scenarios New Rule ###
+  # Scenario: New Rule: standard form required fields
+  # Scenario: New Rule: standard form service options
+  # Scenario: New Rule: standard form rule state and css classes
+  # Scenario: New Rule: legacy form rule state and css classes
+  # Scenario: New Rule: standard form the rule doc impact should populate based on class type selection
+  # Scenario: New Rule: legacy form the rule doc impact should populate based on class type selection
+  ### Scenarios Existing Rule ###
+  # Scenario: Existing Rule: Viewing existing synched rule
+  # Scenario: Existing Rule: Viewing existing parsed new rule
+  # Scenario: Existing Rule: Viewing existing failed new rule
+  # Scenario: Existing Rule: Viewing existing parsed edited rule
+  # Scenario: Existing Rule: Viewing existing failed edited rule
+  # Scenario: Existing Rule: Viewing existing parsed stale edit rule
+  # Scenario: Existing Rule: Viewing existing failed stale edit rule
+  # Scenario: Existing Rule: One or more rules can be selected on a bug to view or edit
+  ### Scenarios Editing Rule ###
+  # Scenario: Edit Rule: A rule can be edited
+  # Scenario: a user can edit rule docs for a new rule
+  ### Scenarios Synching a rule from VC ###
+  # Scenario: Synch Rule: create a rule from synching
+  # Scenario: Synch Rule: update an existing synched rule
+  # Scenario: Synch Rule: do not update a with same rev
+  # Scenario: Synch Rule: VC updated for a parsed edited rule
+  # Scenario: Synch Rule: VC updated for a failed edited rule
+
 
   # ==== Creating a rule ===
 
