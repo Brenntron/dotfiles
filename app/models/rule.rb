@@ -645,25 +645,29 @@ class Rule < ApplicationRecord
   # Tests if rule is the current version in VC
   # @return [boolean] true iff rule is latest version synced with VC
   def synched?
-    %w[UNCHANGED].include?(state)
+    (PUBLISH_STATUS_SYNCHED == publish_status)
+    # %w[UNCHANGED].include?(state)
   end
 
   # Tests if rule is a user edited version
   # @return [boolean] true iff rule is a user edited version
   def draft?
-    %w[NEW UPDATED FAILED].include?(state)
+    (PUBLISH_STATUS_SYNCHED != publish_status)
+    # %w[NEW UPDATED FAILED].include?(state)
   end
 
   # Tests if edited rule is new
   # @return [boolean] true iff rule is a new edited rule
   def new_rule?
-    draft? && sid.nil?
+    draft? && (PUBLISH_STATUS_NEW == publish_status)
+    # draft? && sid.nil?
   end
 
   # Tests if edited rule is an edited update to an existing rule
   # @return [boolean] true iff rule is a updated edited rule
   def edited_rule?
-    draft? && sid.present?
+    draft? && (PUBLISH_STATUS_NEW != publish_status)
+    # draft? && sid.present?
   end
 
   # Tests if edited rule is in progress while VC updated the rule externally
