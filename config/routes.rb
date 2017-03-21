@@ -55,6 +55,7 @@ Rails.application.routes.draw do
 
   namespace :rule_sync do
     resources :rule_files, only: [:create]
+    resources :diags, only: [:index]
   end
 
 

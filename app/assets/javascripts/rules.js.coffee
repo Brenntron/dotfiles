@@ -101,9 +101,9 @@ $ ->
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
-                $('.alert_rules').addClass('success').show().html('Rules has been reverted')
+                $('.alert_rules').addClass('success').show().html('Rules has been committed')
               error: (response) ->
-                $('.alert_rules').addClass('error').show().html('Rules have not been reverted')
+                $('.alert_rules').addClass('error').show().html('Rules have not been committed')
               complete: ->
                 setTimeout (->
                   $('.alert_rules').hide 'blind', {}, 500

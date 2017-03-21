@@ -132,7 +132,7 @@ module API
         end
 
 
-        #revert a rule
+        #revert rules
         params do
           requires :rule_ids, type: Array[String]
         end
@@ -142,13 +142,13 @@ module API
         end
 
 
-        #commit a rule
+        #commit rules
         params do
           requires :rule_ids, type: Array[String]
         end
         put "commit", root: "rule" do
-          authorize! :update, Rule
-          Rule.commit_action(permitted_params[:rule_ids])
+          rules = Rule.where(id: permitted_params[:rule_ids]).to_a.select { |rule| can?(:publish, rule) }
+          Rule.checkin_rules(rules)
           true
         end
 

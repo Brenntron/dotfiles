@@ -24,10 +24,12 @@ require 'tempfile'
 #   * new
 #     * valid               |nil|   NEW   |    NEW    | CURRENT_EDIT | true | new rule created from UI or web services
 #     * failed parse        |nil|  FAILED |    NEW    | CURRENT_EDIT |false | new rule which failed visruleparse
+#     * committing          |nil|   NEW   |    NEW    |  PUBLISHING  | true | the rule is in the process of being commited.
 #   * edit
 #     * current edit
 #       * valid             |int| UPDATED |   EDIT    | CURRENT_EDIT | true | CVS rule edited in UI or web service
 #       * failed parse      |int|  FAILED |   EDIT    | CURRENT_EDIT |false | edited rule which failed visruleparse
+#       * committing        |int| UPDATED |   EDIT    |  PUBLISHING  | true | the rule is in the process of being commited.
 #     * out of date
 #       * valid             |int| UPDATED |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
 #       * failed parse      |int|  FAILED |   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
@@ -77,7 +79,7 @@ class Rule < ApplicationRecord
     end
   end
 
-  # the rule content uncommented (if a # it is omitted)
+    # the rule content uncommented (if a # it is omitted)
   # @return [String] the rule content uncommented
   def on_rule_content(rule_content_given = nil)
     local_rule_content = rule_content_given || self.rule_content
@@ -103,11 +105,8 @@ class Rule < ApplicationRecord
     end
   end
 
-  def latest_test_report(bug, report_timestamp = nil)
-    timestamp = report_timestamp || bug.test_report_timestamp
-    if timestamp
-      test_reports.joins(:task).where(tasks: {bug: bug, stats_updated_at: timestamp}).first
-    end
+  class << self
+    attr_reader :publish_lock_pid
   end
 
   def record(action)
@@ -309,16 +308,45 @@ class Rule < ApplicationRecord
     end
   end
 
-  # def self.hash_visrule(ruleline)
-  #   ruleline.split("\n").inject({}) do |attrs, line|
-  #     if /^\s*(?<key>\w*)\s*:(?<value>.*)$/ =~ line
-  #       value = value[1..-1] if ' ' == value[0]
-  #       attrs[key.downcase.to_sym] = value
-  #     end
-  #
-  #     attrs
-  #   end
-  # end
+  def self.publish_mutex
+    @publish_mutex ||= Mutex.new
+  end
+
+  def self.publish_lock
+    publish_mutex.synchronize do
+      if @publish_lock_pid
+        nil
+      else
+        @publish_lock_pid = Process.pid
+        true
+      end
+    end
+  end
+
+  def self.publish_unlock
+    publish_mutex.synchronize do
+      @publish_lock_pid = nil
+    end
+  end
+
+  #unlock on startup when class file is loaded.
+  publish_unlock
+
+  def self.publish_locked?
+    publish_mutex.synchronize do
+      !@publish_lock_pid
+    end
+  end
+
+  def self.hash_visrule(ruleline)
+    ruleline.split("\n").inject({}) do |attrs, line|
+      if /^\s*(?<key>\w*)\s*:\s?(?<value>.*)$/ =~ line
+        attrs[key.downcase.to_sym] = value
+      end
+
+      attrs
+    end
+  end
 
   def self.gid_from_visrule(rule_content, parsed_attrs)
     return parsed_attrs[:gid] if parsed_attrs[:gid]
@@ -504,7 +532,7 @@ class Rule < ApplicationRecord
 
   # @return [Pathname] relative path name of the version control working directory
   def self.working_root
-    @svn_pathname ||= Pathname.new('working')
+    @svn_pathname ||= Pathname.new('workspace')
   end
 
   # @param [Pathname, String] input file name, absolute or relative
@@ -515,6 +543,8 @@ class Rule < ApplicationRecord
     relative_path
   end
 
+  # A filename which will not be nil
+  # The filename field may be nil.  If so determine the path from rule_category
   # @return [Pathname] check this and related records for pathname
   def definite_pathname
     @definite_pathname ||= Pathname.new(self.filename || self.rule_category.filename(self.gid))
@@ -568,9 +598,10 @@ class Rule < ApplicationRecord
     true
   end
 
-  def self.checkout(rule_ids)
-    rules = Rule.where(id: rule_ids).select(:gid, :filename, :rule_category_id).group(:gid, :filename, :rule_category_id)
-    rules.inject([]) do |working_pathnames, rule|
+  def self.checkout(rules)
+    rule_files = Rule.where(id: rules).select(:gid, :filename, :rule_category_id)
+                     .group(:gid, :filename, :rule_category_id)
+    rule_files.inject([]) do |working_pathnames, rule|
       FileUtils.mkpath(rule.working_pathname.dirname)
 
       # TODO replace copy with svn checkout
@@ -583,15 +614,29 @@ class Rule < ApplicationRecord
 
   # Checks in a set of given rules.
   # param [Array[Integer]] Integer array of Rule model ids.
-  def self.checkin_rules(rule_ids)
-    checkout(rule_ids)
+  def self.checkin_rules(rules)
+    rules.reject! { |rule| rule.synched? || rule.stale_edit? }
 
-    Rule.where(id: rule_ids).each do |rule|
-      rule.patch_file(rule.working_pathname)
+    if rules.any? && publish_lock
+      #set all the rules we will update to publishing.
+      where(id: rules).update_all(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
+
+      checkout(rules)
+
+      rules.each do |rule|
+        rule.patch_file(rule.working_pathname)
+      end
+
+      # TODO call svn commit
+      puts `cd #{working_root};ls *`
+
+      #any rules not set to synch by svn hook should go back to current.
+      where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
+          .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
 
-    # TODO call svn commit
-    puts `cd #{working_root};ls *`
+  ensure
+    publish_unlock
   end
 
   def update_rule
