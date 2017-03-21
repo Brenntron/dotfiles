@@ -156,16 +156,16 @@ while message = client.receive
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
 
           # Try to fetch and write this pcap
-          IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
+          bytes_written = IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
 
         rescue Exception => e
           # Try 5 times to let Bugzilla stop sucking before bailing
-          if attempts < 20
+          if attempts < 5
             attempts += 1
             sleep 1
             retry
           else
-            errors << "#{pcap_path} ++ #{file.exists?(pcap_path)} ++ Unable to fetch attachment #{attachment_id} from Bugzilla: #{e.to_s}"
+            errors << "#{pcap_path} ++ #{file.exists?(pcap_path)} ++ Unable to fetch attachment #{attachment_id} from Bugzilla: #{e.to_s}, bytes written: #{bytes_written} "
             next
           end
         end

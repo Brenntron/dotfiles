@@ -54,7 +54,7 @@ end
 
 
 # Make sure our pcaps cache exists
-if not File.exists?(local_cache_path)
+unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
 cert = OpenSSL::X509::Certificate.new()
@@ -139,17 +139,17 @@ while message = client.receive
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
 
           # Finally, we should actually have data
-          IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
+          bytes_written = IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
 
         rescue Exception => e
 
           # Try 5 times to let Bugzilla stop sucking before bailing
-          if attempts < 20
+          if attempts < 5
             attempts += 1
             sleep 1
             retry
           else
-            raise Exception.new("Failed to read pcap from Bugzilla after 5 attempts. Exception was: #{e.to_s}")
+            raise Exception.new("Failed to read pcap from Bugzilla after 5 attempts. Exception was: #{e.to_s}, bytes written: #{bytes_written}")
           end
         end
       end
