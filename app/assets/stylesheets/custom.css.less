@@ -149,7 +149,7 @@ a { color:#777;}
 
 /* ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ */
 .item-ids-column {
-    min-height:717px; margin-left:0; margin-right:0; padding-left:0; padding-right:0; color:@off-black;
+    height: 100%; min-height:2000px; margin-left:0; margin-right:0; padding-left:0; padding-right:0; color:@off-black;
     position:absolute; width:170px; z-index:20;
 .index-table {
     width: 100%;
@@ -170,7 +170,7 @@ td {vertical-align: top; padding-right:30px;}
 }
 }
 .item-details-column {
-    min-height:717px; margin-left:0; margin-right:0; padding-right:0; background-color: @paper;
+    min-height:2000px; margin-left:0; margin-right:0; padding-right:0; background-color: @paper;
     position:absolute; padding-left:170px; z-index:10; width:100%;
 .table.index-table {
     width: 100%;  border-bottom: 1px solid @light-gray;
@@ -206,7 +206,7 @@ td {
 .bugs-page {
     background-color:@paper; padding:0;
 .item-ids-column {
-    background-color:@bugs-primary;
+    background-color:@bugs-primary; height: 100%; min-height:2000px;
 .index-table {
     border-bottom: 1px solid darken(@bugs-primary, 10%);
 tbody {
@@ -285,7 +285,7 @@ a {
 .users-page {
     color:@charcoal; background-color:@paper; padding:0;
 .item-ids-column {
-    background-color:@users-primary; height: 100%; min-height:717px; padding:0;
+    background-color:@users-primary; min-height:2000px; height:100%; padding:0;
 .col-pagination {background:@users-primary;}
 .pagination {
 li a {
