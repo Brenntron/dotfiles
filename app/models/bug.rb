@@ -11,6 +11,9 @@ class Bug < ApplicationRecord
   has_many :tasks, dependent: :destroy
   has_many :notes, dependent: :destroy
 
+  has_many :alerts, through: :attachments
+  has_many :local_alerts, through: :attachments
+
   accepts_nested_attributes_for :references
   accepts_nested_attributes_for :rules
 
