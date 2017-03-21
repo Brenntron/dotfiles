@@ -104,7 +104,7 @@ engine = Engine.where(
     :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the single All Rules Open Source engine") if engine.nil?
 
-puts "listening to queue"
+puts "listening to LOCAL queue"
 while message = client.receive
   begin
     puts "starting local rule work"
@@ -149,7 +149,7 @@ while message = client.receive
             sleep 1
             retry
           else
-            raise Exception.new("Failed to read pcap from Bugzilla after 5 attempts")
+            raise Exception.new("Failed to read pcap from Bugzilla after 5 attempts. Exception was: #{e.to_s}")
           end
         end
       end

@@ -64,7 +64,7 @@ if Rails.env =="development"
 end
 
 # Make sure our pcaps cache exists
-if not File.exists?(local_cache_path)
+unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
 
@@ -116,7 +116,7 @@ engine = Engine.where(
     :rule_configuration_id => rule_configuration[:id]).first
 raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
 
-puts "listening to queue"
+puts "listening to ALL queue"
 while message = client.receive
   puts "starting all rule work"
   puts "++++++++++++++++++++++"
@@ -165,7 +165,7 @@ while message = client.receive
             sleep 1
             retry
           else
-            errors << "Unable to fetch attachment #{attachment_id} from Bugzilla: #{e.to_s}"
+            errors << "#{pcap_path} ++ #{file.exists?(pcap_path)} ++ Unable to fetch attachment #{attachment_id} from Bugzilla: #{e.to_s}"
             next
           end
         end
