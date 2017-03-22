@@ -56,12 +56,14 @@ module API
             when "attachment"
               options[:attachment_array].each do |attachment_id|
                 attachment = Attachment.where(id: attachment_id).first
+                Alert.reset_pcap(attachment)
                 if /^[-\w]+.pcap$/.match(attachment.file_name)
                   new_task.attachments << attachment
                 end
               end
               TestAttachment.send_work_msg(new_task, options, request.headers['Cookie'])
             when "rule"
+              Alert.reset_local(options[:bug])
               options[:rule_array].each do |rule_id|
                 new_task.rules << Rule.where(id: rule_id).first unless nil
               end

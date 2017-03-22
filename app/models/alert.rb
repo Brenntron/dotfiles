@@ -8,4 +8,12 @@ class Alert < ApplicationRecord
   scope :pcap_alerts, -> { where(test_group: Alert::TEST_GROUP_PCAP) }
   scope :local_alerts, -> { where(test_group: Alert::TEST_GROUP_LOCAL) }
   scope :by_rule, ->(rule) { where(rule: rule) }
+
+  def self.reset_pcap(attachment)
+    Alert.pcap_alerts.where(attachment: attachment).delete_all
+  end
+
+  def self.reset_local(bug)
+    Alert.local_alerts.joins(:attachment).where(attachments: { bug: bug }).delete_all
+  end
 end
