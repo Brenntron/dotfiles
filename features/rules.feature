@@ -84,7 +84,36 @@ Feature: Rules
 
 
   ### Scenarios New Rule ###
-  # Scenario: New Rule: standard form required fields
+
+  @javascript
+  Scenario: New Rule: standard form required fields
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following bugs:
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    And I wait for "3" seconds
+    When  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I click "Create Rule"
+    And  I wait for "2" seconds
+    Then I should see "Please fill in required fields."
+    When I fill in "rule[message]" with "Test Message the third"
+    And  I fill in "rule[detection]" with "Detection test3"
+    And  I select "unknown" from "rule[class_type]"
+    And  I click "Create Rule"
+    And  I wait for "2" seconds
+    Then I should see "Please fill in required fields."
+    When I fill in "summary" with "This is the rule doc summary"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "BLACKLIST Test Message the third"
+
   # Scenario: New Rule: standard form service options
   # Scenario: New Rule: standard form rule state and css classes
   # Scenario: New Rule: legacy form rule state and css classes
@@ -111,40 +140,6 @@ Feature: Rules
 
 
   # ==== Creating a rule ===
-
-  @javascript
-  Scenario: A new rule is only created when required fields are filled in
-    Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
-    And the following rule categories exist:
-      |category       | id |
-      |BLACKLIST      |  1 |
-      |FILE-EXECUTABLE|  2 |
-      |OS-LINUX       |  3 |
-    Then I wait for "3" seconds
-    And  I goto "/bugs/222222"
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
-    And  I select "BLACKLIST" from "rule_category_id"
-    Then I click "Create Rule"
-    Then I wait for "2" seconds
-    Then I should see "Please fill in required fields."
-    And  I fill in "rule[message]" with "Test Message the third"
-    And  I fill in "rule[detection]" with "Detection test3"
-    And  I select "unknown" from "rule[class_type]"
-    Then I click "Create Rule"
-    Then I wait for "2" seconds
-    Then I should see "Please fill in required fields."
-    And  I fill in "summary" with "This is the rule doc summary"
-    Then I click "Create Rule"
-    Then I wait for "1" seconds
-    Then I click the "Rules" tab
-    Then I click button "list all"
-    Then I should see "BLACKLIST Test Message the third"
-
 
   @javascript
   Scenario: When a new rule is created, the policy options and toggle should populate checkbox values
