@@ -24,6 +24,11 @@
 @rules-primary:#CF7160;
 @search-primary:#8DEFDC;
 
+html,body {
+  margin:0;
+  padding:0;
+  height:100%; /* needed for container min-height */
+}
 
 /* ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ */
 
@@ -149,7 +154,7 @@ a { color:#777;}
 
 /* ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ @ ~ */
 .item-ids-column {
-    height: 100%; min-height:2000px; margin-left:0; margin-right:0; padding-left:0; padding-right:0; color:@off-black;
+    height:auto !important; min-height: 100%; margin-left:0; margin-right:0; padding-left:0; padding-right:0; color:@off-black;
     position:absolute; width:170px; z-index:20;
 .index-table {
     width: 100%;
@@ -206,7 +211,7 @@ td {
 .bugs-page {
     background-color:@paper; padding:0;
 .item-ids-column {
-    background-color:@bugs-primary; height: 100%; min-height:2000px;
+    background-color:@bugs-primary; height:auto !important; min-height: 100%;
 .index-table {
     border-bottom: 1px solid darken(@bugs-primary, 10%);
 tbody {
@@ -285,7 +290,7 @@ a {
 .users-page {
     color:@charcoal; background-color:@paper; padding:0;
 .item-ids-column {
-    background-color:@users-primary; min-height:2000px; height:100%; padding:0;
+    background-color:@users-primary; height:auto !important; min-height: 100%; padding:0;
 .col-pagination {background:@users-primary;}
 .pagination {
 li a {
