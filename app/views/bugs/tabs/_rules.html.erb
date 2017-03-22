@@ -97,7 +97,7 @@
                     <% if @bug.local_alerts.by_rule(rule).empty? %>
                         <td class="no_alert">No Alert</td>
                     <% else %>
-                        <% if rule.attachments.any? {|a| a.file_name == attachment.file_name }%>
+                        <% if @bug.local_alerts.by_rule(rule).any? {|alert| alert.attachment.file_name == attachment.file_name }%>
                             <td class="alerted">Alerted</td>
                         <% else %>
                             <td class="no_alert">No Alert</td>
