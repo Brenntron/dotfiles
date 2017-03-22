@@ -48,13 +48,13 @@ class Task < ApplicationRecord
     options[:attachment_array].split(',').each do |attachment_id|
       self.attachments << Attachment.where(id: attachment_id).first unless nil
     end
-    PublishAttachment.send_work_msg(self, options, xmlrpc_token)
+    TestAttachment.send_work_msg(self, xmlrpc_token, options[:attachment_array])
   end
 
   def test_rules(options, xmlrpc_token)
     options[:rule_array].split(',').each do |rule_id|
       self.rules << Rule.where(id: rule_id).first unless nil
     end
-    PublishRule.send_work_msg(self, options, xmlrpc_token)
+    TestRule.send_work_msg(self, xmlrpc_token, self.bug)
   end
 end
