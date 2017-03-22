@@ -37,7 +37,6 @@ class Rule < ApplicationRecord
   has_paper_trail
 
   has_and_belongs_to_many :bugs
-  has_and_belongs_to_many :attachments
   has_and_belongs_to_many :references, dependent: :destroy
   has_one :rule_doc, dependent: :destroy
 

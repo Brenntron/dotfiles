@@ -83,7 +83,7 @@
                 </td>
                 <td><code><%= rule.message %></code></td>
                 <td class="center">
-                  <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= rule.attachments.count %></a>
+                  <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
                 </td>
                 <td class="center"><%= rule.average_check ? rule.average_check : '-' %></td>
                 <td class="center"><%= rule.average_match ? rule.average_match : '-' %></td>
@@ -94,7 +94,7 @@
                   <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
                     <td colspan="8"><%= attachment.file_name %>
                     </td>
-                    <% if rule.attachments.empty? %>
+                    <% if @bug.local_alerts.by_rule(rule).empty? %>
                         <td class="no_alert">No Alert</td>
                     <% else %>
                         <% if rule.attachments.any? {|a| a.file_name == attachment.file_name }%>
