@@ -72,6 +72,7 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
       unless rule.nil?
         begin
           rule.attachments << attachment
+          attachment.local_alerts.create(rule: rule)
         rescue ActiveRecord::RecordNotUnique => e
           # Ignore
         end
