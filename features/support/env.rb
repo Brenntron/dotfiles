@@ -7,6 +7,7 @@
 require 'cucumber/rails'
 require 'capybara/poltergeist'
 require 'paper_trail/frameworks/cucumber'
+require 'will_paginate/array'
 
 Capybara.javascript_driver = :poltergeist
 # Capybara defaults to CSS3 selectors rather than XPath.
