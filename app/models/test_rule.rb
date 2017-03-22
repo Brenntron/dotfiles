@@ -37,7 +37,7 @@ class TestRule
     @rules.each do |rule_id|
       @new_task.rules << Rule.where(id: rule_id).first unless nil
     end
-    TestRule.send_work_msg(@new_task, @xmlrpc_token, bug)
+    TestRule.send_work_msg(@new_task, @xmlrpc_token, @bug)
   end
 end
 
