@@ -92,6 +92,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
               if rule.valid?
                 rule.attachments << attachment
                 rule.save(:validate => false)
+                attachment.pcap_alerts.create(rule: rule)
               else
                 if rule.message.nil?
                   job.failed = true
@@ -101,6 +102,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                 else
                   rule.attachments << attachment
                   rule.save(:validate => false)
+                  attachment.pcap_alerts.create(rule: rule)
                 end
               end
 

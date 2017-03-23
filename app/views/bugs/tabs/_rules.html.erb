@@ -67,10 +67,11 @@
       <% if @rules.any? %>
         <tbody>
         <% @rules.each do |rule| %>
-          <tr id="<%= rule.id %>" data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
+          <tr id="<%= rule.id %>" class="rule_row <%= rule.css_class %>"
+              data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>"
                        name="rule[id]" value="<%= rule.id %>"></td>
-                <td class="rule_state_<%= rule_state_color(rule.state) %>"><%= rule.state %></td>
+                <td class="rule_state_col"><%= rule.state %></td>
                 <td>
                   <a class="blue show_rule" href="#">
                     <% if rule.sid %>
@@ -82,7 +83,7 @@
                 </td>
                 <td><code><%= rule.message %></code></td>
                 <td class="center">
-                  <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= rule.attachments.count %></a>
+                  <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
                 </td>
                 <td class="center"><%= rule.average_check ? rule.average_check : '-' %></td>
                 <td class="center"><%= rule.average_match ? rule.average_match : '-' %></td>
@@ -91,15 +92,15 @@
               </tr>
               <% @bug.attachments.each do |attachment| %>
                   <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
-                    <td colspan="8"><%= attachment.file_name %>
+                    <td colspan="6"><%= attachment.file_name %>
                     </td>
-                    <% if rule.attachments.empty? %>
-                        <td class="no_alert">No Alert</td>
+                    <% if @bug.local_alerts.by_rule(rule).empty? %>
+                        <td colspan="2" class="no_alert">No Alert</td>
                     <% else %>
-                        <% if rule.attachments.any? {|a| a.file_name == attachment.file_name }%>
-                            <td class="alerted">Alerted</td>
+                        <% if @bug.local_alerts.by_rule(rule).any? {|alert| alert.attachment.file_name == attachment.file_name }%>
+                            <td colspan="2" class="alerted">Alerted</td>
                         <% else %>
-                            <td class="no_alert">No Alert</td>
+                            <td colspan="2" class="no_alert">No Alert</td>
                         <% end %>
                     <% end %>
                   </tr>

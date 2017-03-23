@@ -175,3 +175,38 @@ Then(/^I should see rule "(.*)" state "(.*)" version "(.*)"$/) do |rule_id, stat
   page.find(:xpath, "//tr[@id='#{rule_id}']//*[normalize-space(text())='#{version}']")
 end
 
+Then(/^I should see the bug rules table$/) do
+  page.find(:xpath, "//table[@id='bug-rules-table']")
+end
+
+Then(/^I should see a rule row with id "(.*)"$/) do |rule_id|
+  page.find(:xpath, "//table[@id='bug-rules-table']//tr[@id='#{rule_id}']")
+end
+
+Then(/^I should see a rule row with class "(.*)" and id "(.*)"$/) do |css_class, rule_id|
+  page.find(:xpath, "//table[@id='bug-rules-table']//tr[@id='#{rule_id}']")[:class].split(' ').should include(css_class)
+end
+
+Then(/^I should see a rule row with class "(.*)" and version "(.*)"$/) do |css_class, version|
+  page.find(:xpath, "//table[@id='bug-rules-table']//tr[.//*[normalize-space(text())='#{version}']]")[:class].split(' ').should include(css_class)
+end
+
+Then(/^rule "(.*)" is synched$/) do |rule_id|
+  rule = Rule.find(rule_id)
+  rule.synched?.should == true
+  rule.draft?.should == false
+end
+
+Then(/^rule "(.*)" is a current edit/) do |rule_id|
+  rule = Rule.find(rule_id)
+  rule.synched?.should == false
+  rule.draft?.should == true
+  rule.new_rule?.should == false
+  rule.edited_rule?.should == true
+  rule.current_edit?.should == true
+end
+
+Given(/^rule sid "(.*)" rev "(.*)" is synched$/) do |sid, rev|
+  rule_content = "alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:\"short msg\"; flow:established; content:\"E_|00 03 05|\"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:#{sid}; rev:#{rev};)"
+  Rule.load_rule_from_content(rule_content)
+end

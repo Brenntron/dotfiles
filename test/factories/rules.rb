@@ -8,15 +8,18 @@ FactoryGirl.define do
     detection "flowbits:set,acunetix-scan;\ncontent:\"Acunetix-\"; fast_pattern:only; http_header;"
     metadata "policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3"
     class_type "attempted-user"
-    state "UNCHANGED"
-    publish_status "SYNCHED"
-    average_check nil
-    average_match nil
-    average_nonmatch nil
-    tested false
-    committed true
-    task_id nil
-    rule_category_id 7
+    state               "UNCHANGED"
+    publish_status      Rule::PUBLISH_STATUS_SYNCHED
+    edit_status         Rule::EDIT_STATUS_SYNCHED
+    parsed              true
+    on                  true
+    average_check       nil
+    average_match       nil
+    average_nonmatch    nil
+    tested              false
+    committed           true
+    task_id             nil
+    rule_category_id    7
   end
 end
 
