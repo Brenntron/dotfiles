@@ -92,15 +92,15 @@
               </tr>
               <% @bug.attachments.each do |attachment| %>
                   <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
-                    <td colspan="8"><%= attachment.file_name %>
+                    <td colspan="6"><%= attachment.file_name %>
                     </td>
                     <% if @bug.local_alerts.by_rule(rule).empty? %>
-                        <td class="no_alert">No Alert</td>
+                        <td colspan="2" class="no_alert">No Alert</td>
                     <% else %>
                         <% if @bug.local_alerts.by_rule(rule).any? {|alert| alert.attachment.file_name == attachment.file_name }%>
-                            <td class="alerted">Alerted</td>
+                            <td colspan="2" class="alerted">Alerted</td>
                         <% else %>
-                            <td class="no_alert">No Alert</td>
+                            <td colspan="2" class="no_alert">No Alert</td>
                         <% end %>
                     <% end %>
                   </tr>
