@@ -4,7 +4,6 @@ class Attachment < ApplicationRecord
   has_many :alerts, dependent: :destroy
   has_many :pcap_alerts, -> { pcap_alerts }, class_name: Alert
   has_many :local_alerts, -> { local_alerts }, class_name: Alert
-  has_many :rules, through: :pcap_alerts
   has_many :exploits
 
   after_create { |attachment| attachment.record 'create' if Rails.configuration.websockets_enabled == 'true' }
