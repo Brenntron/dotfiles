@@ -54,18 +54,9 @@ module API
           )
           case options[:task_type]
             when "attachment"
-              options[:attachment_array].each do |attachment_id|
-                attachment = Attachment.where(id: attachment_id).first
-                if /^[-\w]+.pcap$/.match(attachment.file_name)
-                  new_task.attachments << attachment
-                end
-              end
-              TestAttachment.send_work_msg(new_task, options, request.headers['Xmlrpc-Token'])
+              TestAttachment.new(new_task, request.headers['Xmlrpc-Token'], options[:attachment_array]).send_work_msg
             when "rule"
-              options[:rule_array].each do |rule_id|
-                new_task.rules << Rule.where(id: rule_id).first unless nil
-              end
-              TestRule.send_work_msg(new_task,options,request.headers['Xmlrpc-Token'])
+              TestRule.new(new_task, request.headers['Xmlrpc-Token'], options[:bug], options[:rule_array]).send_work_msg
             when "commmit"
               SendCommit.send_work_msg(new_task,options,request.headers['Xmlrpc-Token'])
           end
