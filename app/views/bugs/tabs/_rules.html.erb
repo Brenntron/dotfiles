@@ -90,19 +90,17 @@
                 <td class="center"><%= rule.average_nonmatch ? rule.average_nonmatch : '-' %></td>
                 <td></td>
               </tr>
-              <% @bug.attachments.each do |attachment| %>
+                <% @bug.attachment_local_alerts(rule).each do |attachment| %>
                   <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
                     <td colspan="6"><%= attachment.file_name %>
                     </td>
-                    <% if @bug.local_alerts.by_rule(rule).empty? %>
+                    <td>
+                      <% if attachment.rule_id.nil? %>
                         <td colspan="2" class="no_alert">No Alert</td>
-                    <% else %>
-                        <% if @bug.local_alerts.by_rule(rule).any? {|alert| alert.attachment.file_name == attachment.file_name }%>
-                            <td colspan="2" class="alerted">Alerted</td>
-                        <% else %>
-                            <td colspan="2" class="no_alert">No Alert</td>
-                        <% end %>
-                    <% end %>
+                      <% else %>
+                        <td colspan="2" class="alerted">Alerted</td>
+                      <% end %>
+                    </td>
                   </tr>
               <% end %>
           <% end %>
