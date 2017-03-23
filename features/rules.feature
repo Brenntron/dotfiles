@@ -114,6 +114,28 @@ Feature: Rules
     And  I click button "list all"
     Then I should see "BLACKLIST Test Message the third"
 
+  @javascript
+  Scenario: New Rule: the policy options and toggle should populate checkbox values
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following bugs:
+      |  id  |
+      | 2222 |
+    Then I wait for "3" seconds
+    And  I goto "/bugs/2222"
+    Then I click the "Rules" tab
+    Then I click button "create"
+    Then I click "use standard form"
+    And  I check "security-ips"
+    Then the "security-ips" field should be "policy security-ips drop"
+    Then I toggle "bootstrap-switch-container"
+    Then the "security-ips" field should be "policy security-ips alert"
+    Then I check "max-detect-ips"
+    Then  the "max-detect-ips" field should be "policy max-detect-ips drop"
+    Then the "security-ips" field should be "policy security-ips alert"
+
+
+
+
   # Scenario: New Rule: standard form service options
   # Scenario: New Rule: standard form rule state and css classes
   # Scenario: New Rule: legacy form rule state and css classes
@@ -140,25 +162,6 @@ Feature: Rules
 
 
   # ==== Creating a rule ===
-
-  @javascript
-  Scenario: When a new rule is created, the policy options and toggle should populate checkbox values
-    Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And  I goto "/bugs/222222"
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
-    And  I check "security-ips"
-    Then the "security-ips" field should be "policy security-ips drop"
-    Then I toggle "bootstrap-switch-container"
-    Then the "security-ips" field should be "policy security-ips alert"
-    Then I check "max-detect-ips"
-    Then  the "max-detect-ips" field should be "policy max-detect-ips drop"
-    Then the "security-ips" field should be "policy security-ips alert"
 
   @javascript
   Scenario: When a new rule is created, the service options should populate correctly
