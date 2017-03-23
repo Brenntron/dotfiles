@@ -23,9 +23,9 @@ class TestAttachment
       attachment = Attachment.where(id: attachment_id).first
       Alert.reset_pcap(attachment)
       if /^[-\w]+.pcap$/.match(attachment.file_name)
-        new_task.attachments << attachment
+        @new_task.attachments << attachment
       end
     end
-    TestAttachment.send_work_msg(new_task, request.headers['Cookie'], @attachments)
+    TestAttachment.send_work_msg(@new_task, @xmlrpc_token, @attachments)
   end
 end
