@@ -71,6 +71,8 @@ class BugsController < ApplicationController
       @notes = @bug.notes.order(created_at: :desc)
       @tags = Tag.all.map { |tag| tag.name }.join(',')
       @categories = RuleCategory.all.sort_by { |x| [-x.rules.count, x.category] }
+      flash.now[:alert] = "Looks like this bug (#{@bug.id}) may be out of synch with bugzilla.
+                       Please 'resynch' using the button below." if @bug.bugzilla_synch_needed?
     else
       redirect_to '/bugs'
       flash[:error] = "Could not find bug #{params[:id]}"

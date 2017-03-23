@@ -255,6 +255,10 @@ class Bug < ApplicationRecord
     end
   end
 
+  def bugzilla_synch_needed?
+    tags.empty? && !summary_tag_array.empty?
+  end
+
   def resolution_time
     if resolved_at.present?
       ((resolved_at - created_at) / 86_400).ceil
@@ -267,7 +271,7 @@ class Bug < ApplicationRecord
 
   def create_tags_from_summary(summary_tags)
     summary_tags.each do |tag|
-      Tag.create(name: tag)
+      Tag.find_or_create_by(name: tag)
     end
   end
 
@@ -457,6 +461,70 @@ class Bug < ApplicationRecord
                 new_record.notes << note
               end
             end
+          end
+        end
+      end
+    end
+    true
+  end
+
+  def self.bugzilla_light_import(current_user, xmlrpc, xmlrpc_token, new_bugs)
+    unless new_bugs.empty?
+      new_bugs['bugs'].each do |item|
+        bug_id = item['id']
+
+        Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
+          new_record.id             = bug_id
+          new_record.summary        = item['summary']
+          new_record.classification = 'unclassified'
+
+          new_record.status     = item['status']
+          new_record.resolution = item['resolution']
+          new_record.resolution = 'OPEN' if new_record.resolution.empty?
+
+          new_record.state     = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
+          new_record.priority  = item['priority']
+          new_record.component = item['component']
+          new_record.product   = item['product']
+
+          new_record.created_at = item['creation_time'].to_time
+          last_change_time      = item['last_change_time'].to_time
+          if new_record.state == 'NEW'
+            # do nothing
+          elsif new_record.state == 'ASSIGNED'
+            new_record.assigned_at = last_change_time
+          elsif new_record.state == 'PENDING'
+            new_record.pending_at = last_change_time
+          elsif new_record.state == 'REOPENED'
+            new_record.reopened_at = last_change_time
+          else
+            new_record.resolved_at = last_change_time
+          end
+          creator = User.where('email=?', item['creator']).first
+          new_user = User.where('email=?', item['assigned_to']).first
+          new_committer = User.where('email=?', item['qa_contact']).first
+          if creator.nil?
+            User.create_by_email(item['creator'])
+            new_creator = User.where(email: item['creator']).first
+            new_record.creator = new_creator.id
+          else
+            new_record.creator = creator.id
+          end
+          if new_user.nil?
+            User.create_by_email(item['assigned_to'])
+            new_generated_user = User.where(email: item['assigned_to']).first
+            new_generated_user.roles << Role.where(role:"analyst")
+            new_record.user = new_generated_user
+          else
+            new_record.user = new_user
+          end
+          if new_committer.nil?
+            User.create_by_email(item['qa_contact'])
+            new_generated_committer = User.where(email: item['qa_contact']).first
+            new_generated_committer.roles << Role.where(role:"committer")
+            new_record.committer = new_generated_committer
+          else
+            new_record.committer = new_committer
           end
         end
       end

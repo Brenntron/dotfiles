@@ -213,6 +213,14 @@ Then(/^I should not see button with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
 
+Then(/^I should see link with class "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//a[contains(@class, '#{element}')]")
+end
+
+Then(/^I should not see link with class "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//a[contains(@class, '#{element}')]")
+end
+
 Then(/^I should see div element with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//div[contains(@class, '#{element}')]")
 end

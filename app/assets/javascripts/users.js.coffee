@@ -12,6 +12,25 @@ $ ->
         return
     return
 
+  $('#user-bugs').click ->
+    user_id = $(this).attr('value')
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    alert('This will import ALL of your bugs from Bugzilla. All bugs imported with ' +
+        'this method will need to be "resynched", as needed, in order to pull in attachments, rules and history.')
+    $('#user-bugs').hide()
+    $('#importing_image').removeClass('hidden').show()
+    $.ajax(
+      url: '/api/v1/bugs/by_user/' + user_id
+      headers: headers
+      method: 'GET'
+      success: ->
+        window.location.reload
+      error: ->
+        alert('error')
+    ).done (response) ->
+      window.location.reload()
+    return
+
   $('.back_btn_user').click ->
     window.location.replace('/users')
 
