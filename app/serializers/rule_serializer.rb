@@ -1,5 +1,5 @@
 class RuleSerializer < ActiveModel::Serializer
-  attributes :id, :gid, :sid, :rev, :rule_content, :cvs_rule_content, :rule_parsed, :cvs_rule_parsed, :rule_warnings, :rule_failures, :connection, :message, :flow, :detection, :metadata, :class_type, :average_check,:average_match,:average_nonmatch, :state, :tested, :committed, :created_at, :updated_at, :bugs, :attachments
+  attributes :id, :gid, :sid, :rev, :rule_content, :cvs_rule_content, :rule_parsed, :cvs_rule_parsed, :rule_warnings, :rule_failures, :connection, :message, :flow, :detection, :metadata, :class_type, :average_check,:average_match,:average_nonmatch, :state, :tested, :committed, :created_at, :updated_at, :bugs
   has_many :references, embed: :ids, embed_in_root: true
   def bugs # writing a new method because AMS doesn't have has_and_belongs_to_many
     bug_ids = []
