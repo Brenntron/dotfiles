@@ -26,7 +26,7 @@ $ ->
       success: ->
         window.location.reload
       error: ->
-        alert('error')
+        alert('Something went wrong while importing your bugs.')
     ).done (response) ->
       window.location.reload()
     return

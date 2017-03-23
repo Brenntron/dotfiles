@@ -26,7 +26,7 @@ module API
             begin
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bugs = xmlrpc.search(assigned_to: user_email, component: ['Malware', 'SO Rules', 'Snort Rules'])
-              puts new_bugs['bugs'].count
+
               #create the bugs from bugzilla
               Bug.bugzilla_light_import(current_user, xmlrpc,xmlrpc_token,new_bugs).to_s if new_bugs['bugs'].count > 0
             rescue Exception => e
