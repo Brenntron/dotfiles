@@ -102,7 +102,6 @@ module API
           requires :id, type: Integer, desc: "The database id of the rule you want to update."
           requires :rule, type: Hash do
             optional :rule_content, type: String, desc: "Compiled rule content"
-            optional :revert, type: Boolean, desc: "Revert rule to CVS copy?"
 
             requires :rule_doc, type: Hash do
               requires :summary,           type: String, desc: "Rule Doc Summary"
