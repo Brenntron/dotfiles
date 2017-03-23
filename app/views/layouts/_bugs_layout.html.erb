@@ -17,11 +17,11 @@
       </thead>
       <tbody>
       <% if @bugs %>
-          <% @bugs.each do |bug| %>
-              <tr class="highlight <%= 'active' if bug.id.to_s == params[:id] %>" id="show_<%= bug.id %>">
-                <td><%= link_to bug.id, bug %></td>
-              </tr>
-          <% end %>
+        <% @bugs.each do |bug| %>
+          <tr class="highlight <%= 'active' if bug.id.to_s == params[:id] %>" id="show_<%= bug.id %>">
+            <td><%= link_to bug.id, bug %></td>
+          </tr>
+        <% end %>
       <% end %>
       </tbody>
     </table>

@@ -7,11 +7,13 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user with proper credentials should get logged in
+            and redirected to their user page
     Given current user exists
     And I visit the root url
     And I should see "Please wait while we sign you in"
     Then I wait for "3" seconds
     And I should not see "Please wait while we sign you in"
+    And I should see "/users/1" in the current url
 
   @javascript
   Scenario: A user logging in not in the database should be added to the database

@@ -43,6 +43,8 @@ gem 'chartkick'
 gem 'bootstrap-multiselect-rails'
 gem 'awesome_nested_set'
 
+gem 'will_paginate', '~> 3.1.0'
+
 group :development do
   gem 'thin', '~> 1.7.0'
   gem 'puma'

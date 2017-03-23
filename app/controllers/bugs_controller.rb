@@ -121,6 +121,7 @@ class BugsController < ApplicationController
   def query_bugs
     if params[:q]
       session[:query] = params[:q]
+      session[:page] = "1"
     elsif params[:bug].present?
       session[:query] = "advance-search"
       session[:search] = params[:bug]
@@ -153,6 +154,8 @@ class BugsController < ApplicationController
     else
       @bugs = current_user.default_bug_list
     end
+    session[:page] = params[:page] || session[:page]
+    @bugs = @bugs.paginate(:page => session[:page], :per_page => 32)
   end
 
   def get_params_hash(params)
