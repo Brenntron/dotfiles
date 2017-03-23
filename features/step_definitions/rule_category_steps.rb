@@ -1,5 +1,5 @@
-Given (/^a "(.*?)" rule category exists$/) do |role|
-  @rule = FactoryGirl.create(:rule_category)
+Given (/^a "(.*?)" rule category exists$/) do |category|
+  @rule = FactoryGirl.create(:rule_category, category: category)
 end
 
 Given(/^the following rule categories exist:$/) do |categories|

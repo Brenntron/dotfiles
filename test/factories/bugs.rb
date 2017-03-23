@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory :bug do
-    bugzilla_id '111111'
+    sequence :bugzilla_id do |nn|
+      111000 + nn
+    end
     state 'OPEN'
     summary 'Summary for testing'
     product 'Research'

@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170320162300) do
+ActiveRecord::Schema.define(version: 20170321201155) do
+
+  create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.string   "test_group",                  null: false
+    t.integer  "rule_id",                     null: false
+    t.integer  "attachment_id",               null: false
+    t.float    "average_check",    limit: 24
+    t.float    "average_match",    limit: 24
+    t.float    "average_nonmatch", limit: 24
+    t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id", using: :btree
+  end
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "bugzilla_attachment_id"
