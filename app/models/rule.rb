@@ -393,7 +393,7 @@ class Rule < ApplicationRecord
     rule_params
   end
 
-  def set_from_visrule(parser)
+  def assign_from_visrule(parser)
     rule_content = parser.rule_content
 
     if parser.parsed_lines.match(/FAILED/)
@@ -409,12 +409,10 @@ class Rule < ApplicationRecord
 
     elsif parser.parsed_lines.match(/msg/)
       parsed_attrs = Rule.hash_visrule(parser.parsed_lines)
-      rule_sid = /sid:\s*(\d+)\s*;/.match(rule_content) ? /sid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : nil
       message = rule_content.match(/msg:\w*(.+?);/) ? rule_content.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : '<MISSING>'
 
       rule_params = {
 
-          sid: rule_sid,
           rule_content: rule_content,
           rule_parsed: parser.parsed_lines,
           gid: Rule.gid_from_visrule(rule_content, parsed_attrs),
@@ -426,25 +424,19 @@ class Rule < ApplicationRecord
           metadata: /metadata\s*:(.+?)\;/.match(rule_content) ? /metadata\s*:(.+?)\;/.match(rule_content)[1].strip : '<MISSING>',
           class_type: /classtype\s*:(.*)\)/.match(parser.parsed_lines) ? /classtype\s*:(.*)\)/.match(parser.parsed_lines)[1] : '<MISSING>',
           committed: true,
-          state: rule_sid ? 'UNCHANGED' : 'NEW',
-          edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
-          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
           parsed: true,
       }
       rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
       rule_params[:rule_failures] = nil
 
-
     else
       parsed_attrs = Rule.hash_visrule(parser.parsed_lines)
-      rule_sid = /sid:\s*(\d+)\s*;/.match(rule_content) ? /sid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : nil
       detection = /Detection\s*:\n(.*)Metadata/m.match(parser.parsed_lines) ? /Detection\s*:\n(.*)Metadata/m.match(parser.parsed_lines)[1].gsub(/\t|#\n/, '').strip : nil
       message = /Message\s*:\s(.*)/.match(parser.parsed_lines) ? /Message\s*:\s(.*)/.match(parser.parsed_lines)[1] : '<MISSING>'
       rule_category = RuleCategory.find_or_create_by(category: message.split(' ')[0])
 
       rule_params = {
 
-          sid: rule_sid,
           rule_content: rule_content,
           rule_parsed: parser.parsed_lines,
           gid: Rule.gid_from_visrule(rule_content, parsed_attrs),
@@ -456,9 +448,6 @@ class Rule < ApplicationRecord
           metadata: /metadata\s*:(.+?)\;/.match(rule_content) ? /metadata\s*:(.+?)\;/.match(rule_content)[1].strip : '<MISSING>',
           class_type: /Classtype\s*:\s(.*)/.match(parser.parsed_lines) ? /Classtype\s*:\s(.*)/.match(parser.parsed_lines)[1] : '<MISSING>',
           committed: true,
-          state: rule_sid ? 'UNCHANGED' : 'NEW',
-          edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
-          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
           rule_category_id: rule_category.id,
           parsed: true,
       }
@@ -469,6 +458,17 @@ class Rule < ApplicationRecord
     assign_attributes(rule_params)
 
 
+    if self.parsed?
+      if self.sid
+        self.state                      = 'UNCHANGED'
+        self.edit_status                = EDIT_STATUS_SYNCHED
+        self.publish_status             = PUBLISH_STATUS_SYNCHED
+      else
+        self.state                      = 'NEW'
+        self.edit_status                = EDIT_STATUS_NEW
+        self.publish_status             = PUBLISH_STATUS_CURRENT_EDIT
+      end
+    end
     self.on                 = /^\s*#/ !~ rule_content
 
     self.rule_parsed        = parser.parsed_lines
@@ -500,7 +500,7 @@ class Rule < ApplicationRecord
 
     rule = parser.sid && Rule.by_sid(parser.sid, parser.gid).first
     rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
-    rule.set_from_visrule(parser)
+    rule.assign_from_visrule(parser)
 
     rule
   end
