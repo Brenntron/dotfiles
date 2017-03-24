@@ -495,23 +495,6 @@ class Rule < ApplicationRecord
     parse_from_visrule(rule, parsed)
   end
 
-  # Takes a rule and populates all the attributes to create a Rule record object.
-  # @param [String, #read] rule_content the line of rule text.
-  # @return [Hash] a hash, with all the attributes to create a Rule record object
-  def self.full_parse(rule_content)
-    raise "Rule text missing." if rule_content.nil?
-
-    rule_content.strip!
-
-    parsed = visruleparser(rule_content)
-    rule_attrs = parse_from_visrule(rule_content, parsed)
-    rule_attrs['rule_parsed'] = parsed[:rule]
-    rule_attrs['rule_warnings'] = parsed[:errors]
-    rule_attrs['cvs_rule_parsed'] = parsed[:rule]
-    rule_attrs['cvs_rule_content'] = rule_content
-    rule_attrs
-  end
-
   def self.from_rule_content(rule_content)
     parser = VisruleParser.new(rule_content)
 
@@ -528,12 +511,10 @@ class Rule < ApplicationRecord
   # @raise [RuntimeError] could not process
   # def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
   def self.load_rule_from_content(rule_content)
-    rule_attrs = full_parse(rule_content)
-    return nil unless rule_attrs
-    return nil if 'FAILED' == rule_attrs[:state]
-    raise 'No rule gid provided' unless rule_attrs[:gid]
-
     rule = Rule.from_rule_content(rule_content)
+    return nil unless rule
+    return nil unless rule.parsed?
+    raise 'No rule gid' unless rule.gid
 
     rule_db = by_sid(rule.sid, rule.gid).first
 
