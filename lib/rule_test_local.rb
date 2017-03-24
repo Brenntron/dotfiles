@@ -69,12 +69,6 @@ if local_rules        #if rules exist meaning they were passed in for a local te
       :engine_id => 2,    #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
       :local_rules => local_rules
   }
-else                  #if not then this is a pcap vs all rules test.
-  puts "Creating persistent job"
-  req.body = {
-      :pcaps => pcaps.keys,
-      :engine_id => 1,     #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
-  }
 end
 
 #it would seem to me that the engine id is based off of what type of test you want to run.

@@ -51,6 +51,8 @@ HTTPI.log = false
 req = HTTPI::Request.new
 req.auth.gssnegotiate
 
+req.auth.ssl.ca_cert_file = Rails.configuration.cert_file
+
 # General options
 local_cache_path = File.expand_path("tmp/pcaps/#{Time.now.to_i}")
 
@@ -163,62 +165,106 @@ while message = client.receive
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
 
-      binding.pry
-      # NOt sure if the code below returns a proper pcap
-      #
       req.url = 'https://ruleapitest.vrt.sourcefire.com/pcaps'
 
-
-      # Start by hashing the pcap data
-      # sha = Digest.hexencode(sha256.digest(pcap_data))
-      # See if the PCAP exists on the server
-      # pcap = Pcap.where(:file_hash => sha).first
-
       # Should we upload the pcap
-      # if pcap.nil?
-        # TODO this part is broken for some reason this does not create a valid pcap for
-        # ruletestapi
-        # pcap = Pcap.create(:pcap => Base64.encode64(pcap_data))
-      req.body = Curl::PostField.file("pcap", pcap_data) #build the curl request
-
-      resp = HTTPI.post req do |http|           #now we make the request as a post request
+      req.body = Curl::PostField.file("pcap", pcap_path) #build the curl request
+      #now we make the request as a post request
+      resp = HTTPI.post req do |http|
         http.multipart_form_post = true
       end
-      # end
-      # Make sure that worked
 
-      binding.pry
+      # Make sure that worked
       if resp.code != 200 and resp.code != 201         #if it didnt work the say so
         raise Exception.new("Upload of #{pcap_file} failed: #{resp.code} - #{resp.body}")
       else
-        pcaps[JSON.parse(resp.body)['id']] = pcap_data   #now we compile a hash using ids as keys and the pcaps as values
+        pcaps[JSON.parse(resp.body)['id']] = attachment_id   #now we compile a hash using ids as keys and the pcaps as values
       end
-
-      # if pcap.error?
-      #   raise Exception.new(pcap.error)
-      # else
-      #   pcaps[sha] = {:pcap_id => pcap.attributes[:id], :attachment_id => attachment_id}
-      # end
     end
 
-    test_pcaps = pcaps.map { |k, v| v[:pcap_id] }
+    test_pcaps = pcaps.map {|k,v| k}
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size < 1
       raise Exception.new("No pcaps uploaded for testing")
     end
+
+    req.url = 'https://ruleapitest.vrt.sourcefire.com/jobs'
+
     # Create the new job
-    job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))
+    req.body = {
+        :pcaps => pcaps.keys,
+        :engine_id => 2,    #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
+        :local_rules => request['rules']
+    }
+    resp = HTTPI.post(req)  #make the request
 
     # Make sure the job was created
-    raise Exception.new("Failed to create job: #{job.error}") if job.error?
+    if resp.code != 200 and resp.code != 201
+      raise Exception.new("Failed to create new job with pcaps (#{pcaps}): #{resp.code} - #{resp.body}")
+    end
+    job_id = JSON.parse(resp.body)['id']
 
     unless Rails.env == "development"
       # Wait for the job to finish
-      until (job.completed == "1")
-        sleep 1
-        job = Job.find(job.attributes[:id])
+      begin
+        print "Waiting on job #{job_id} to complete: "
+
+        Timeout::timeout(120) do
+          while true
+            resp = HTTPI.get(req)
+
+            if resp.code != 200
+              raise Exception.new( "Failed to fetch job status for #{job_id} #{resp.code}: #{resp.body}")
+            else
+              job = JSON.parse(resp.body)
+
+              if job['completed'] == "1"
+                puts
+                if job['failed'] == "1"
+                  puts "Job failed: #{job}"
+                else
+                  pcaps.each do |pcap_id, pcap_name|
+                    puts "#{pcap_name}:"
+
+                    # Fetch the associated pcap tests
+                    print "getting pcap tests"
+                    req.url = "https://ruleapitest.vrt.sourcefire.com/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
+                    JSON.parse(HTTPI.get(req).body).each do |pt|
+
+                      # Now fetch the alerts
+                      print "getting alerts"
+                      req.url = "https://ruleapitest.vrt.sourcefire.com/alerts?pcap_test_id=#{pt['id']}"
+                      alerts = JSON.parse(HTTPI.get(req).body)
+
+                      if alerts.size == 0
+                        puts "\tNO ALERTS"
+                      else
+                        alerts.each do |alert|
+                          puts "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}"
+                        end
+                      end
+                    end
+                  end
+                end
+
+                # We are done either way
+                break
+              end
+            end
+
+            # Wait before trying again
+            print "."
+            sleep 1
+          end
+        end
+
+      rescue Exception => e
+        raise Exception( e.message )
+      rescue Timeout::Error => e
+        puts "Timed out waiting for #{job_id} to finish"
       end
+
     end
 
     # Send back alerts
