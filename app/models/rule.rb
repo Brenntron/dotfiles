@@ -393,6 +393,92 @@ class Rule < ApplicationRecord
     rule_params
   end
 
+  def set_from_visrule(parser)
+    rule_content = parser.rule_content
+
+    if parser.parsed_lines.match(/FAILED/)
+      rule_params = {
+          message: rule_content.match(/msg:\w*(.+?);/) ? rule_content.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
+          rule_content: rule_content,
+          rule_parsed: parser.parsed_lines,
+          rule_failures: parser.parsed_lines,
+          committed: false,
+          state: 'FAILED',
+          parsed: false,
+      }.reject { |k, v,| v.nil? || v == '<MISSING>' }
+
+    elsif parser.parsed_lines.match(/msg/)
+      parsed_attrs = Rule.hash_visrule(parser.parsed_lines)
+      rule_sid = /sid:\s*(\d+)\s*;/.match(rule_content) ? /sid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : nil
+      message = rule_content.match(/msg:\w*(.+?);/) ? rule_content.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : '<MISSING>'
+
+      rule_params = {
+
+          sid: rule_sid,
+          rule_content: rule_content,
+          rule_parsed: parser.parsed_lines,
+          gid: Rule.gid_from_visrule(rule_content, parsed_attrs),
+          rev: /Rev\s*:\s(.+)/.match(parser.parsed_lines) ? /Rev\s*:\s(.+)/.match(parser.parsed_lines)[1] : 1,
+          connection: rule_content.match(/connection:\s*(.+?)\(/) ? rule_content.match(/connection:\s*(.+?)\(/)[1] : '<MISSING>',
+          message: message,
+          detection: rule_content.match(/detection:\s*(.+?);/) ? rule_content.match(/detection:\s*(.+?);/)[1] : '<MISSING>',
+          flow: rule_content.match(/flow:\s*(.+?);/) ? rule_content.match(/flow:\s*(.+?);/)[1] : '<MISSING>',
+          metadata: /metadata\s*:(.+?)\;/.match(rule_content) ? /metadata\s*:(.+?)\;/.match(rule_content)[1].strip : '<MISSING>',
+          class_type: /classtype\s*:(.*)\)/.match(parser.parsed_lines) ? /classtype\s*:(.*)\)/.match(parser.parsed_lines)[1] : '<MISSING>',
+          committed: true,
+          state: rule_sid ? 'UNCHANGED' : 'NEW',
+          edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
+          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
+          parsed: true,
+      }
+      rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
+      rule_params[:rule_failures] = nil
+
+
+    else
+      parsed_attrs = Rule.hash_visrule(parser.parsed_lines)
+      rule_sid = /sid:\s*(\d+)\s*;/.match(rule_content) ? /sid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : nil
+      detection = /Detection\s*:\n(.*)Metadata/m.match(parser.parsed_lines) ? /Detection\s*:\n(.*)Metadata/m.match(parser.parsed_lines)[1].gsub(/\t|#\n/, '').strip : nil
+      message = /Message\s*:\s(.*)/.match(parser.parsed_lines) ? /Message\s*:\s(.*)/.match(parser.parsed_lines)[1] : '<MISSING>'
+      rule_category = RuleCategory.find_or_create_by(category: message.split(' ')[0])
+
+      rule_params = {
+
+          sid: rule_sid,
+          rule_content: rule_content,
+          rule_parsed: parser.parsed_lines,
+          gid: Rule.gid_from_visrule(rule_content, parsed_attrs),
+          rev: /Rev\s*:\s(.+)/.match(parser.parsed_lines) ? /Rev\s*:\s(.+)/.match(parser.parsed_lines)[1] : 1,
+          connection: /Connection\s*:\s(.+)/.match(parser.parsed_lines) ? /Connection\s*:\s(.+)/.match(parser.parsed_lines)[1] : '<MISSING>',
+          message: message,
+          detection: detection.nil? ? "<MISSING>" : detection[-1, 1] == ';' ? detection : detection + ';',
+          flow: /Flow\s*:\s(.+)/.match(parser.parsed_lines) ? /Flow\s*:\s(.+)/.match(parser.parsed_lines)[1] : '<MISSING>',
+          metadata: /metadata\s*:(.+?)\;/.match(rule_content) ? /metadata\s*:(.+?)\;/.match(rule_content)[1].strip : '<MISSING>',
+          class_type: /Classtype\s*:\s(.*)/.match(parser.parsed_lines) ? /Classtype\s*:\s(.*)/.match(parser.parsed_lines)[1] : '<MISSING>',
+          committed: true,
+          state: rule_sid ? 'UNCHANGED' : 'NEW',
+          edit_status: rule_sid ? EDIT_STATUS_SYNCHED : EDIT_STATUS_NEW,
+          publish_status: rule_sid ? PUBLISH_STATUS_SYNCHED : PUBLISH_STATUS_CURRENT_EDIT,
+          rule_category_id: rule_category.id,
+          parsed: true,
+      }
+      rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
+      rule_params[:rule_failures] = nil
+    end
+
+    assign_attributes(rule_params)
+
+
+    self.on                 = /^\s*#/ !~ rule_content
+
+    self.rule_parsed        = parser.parsed_lines
+    self.rule_warnings      = parser.errors
+    self.cvs_rule_parsed    = parser.parsed_lines
+    self.cvs_rule_content   = rule_content
+
+    self
+  end
+
   # Runs the visruleparser perl script to parse a line of rule text.
   # @param [String, #read] rule_text the line of rule text
   # @return [Hash] hash with :rule and :errors text populated.
@@ -426,10 +512,6 @@ class Rule < ApplicationRecord
     rule_attrs
   end
 
-  def set_from_visrule(parser)
-
-  end
-
   def self.from_rule_content(rule_content)
     parser = VisruleParser.new(rule_content)
 
@@ -442,40 +524,38 @@ class Rule < ApplicationRecord
 
   # Take a line from a rule file and saves to database unless rev is unchanged
   # @param [String, #read] rule_content the line of text from a rule file.
-  # @param [String, #read] filename the path or name of the file.
-  # @param [Fixnum, #read] linenumber the line number from the input rules file.
   # @return [Rule] the rule loaded or nil if failed
   # @raise [RuntimeError] could not process
-  def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
+  # def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
+  def self.load_rule_from_content(rule_content)
     rule_attrs = full_parse(rule_content)
     return nil unless rule_attrs
     return nil if 'FAILED' == rule_attrs[:state]
     raise 'No rule gid provided' unless rule_attrs[:gid]
 
-    rule_attrs[:filename] = filename
-    rule_attrs[:linenumber] = linenumber
-
-    # rule = where(gid: rule_attrs[:gid]).where(sid: rule_attrs[:sid]).first
-
     rule = Rule.from_rule_content(rule_content)
+
+    rule_db = by_sid(rule.sid, rule.gid).first
+
     case
       #can new rule ever happen?
-      when rule.nil?
-        rule_attrs[:edit_status]    = EDIT_STATUS_NEW
-        rule_attrs[:publish_status] = PUBLISH_STATUS_CURRENT_EDIT
-        rule_attrs[:parsed]         = true
-        rule_attrs[:on]             = /^\s*#/ !~ rule_content
-        rule = create!(rule_attrs)
+      when rule_db.nil?
+        rule.edit_status                = EDIT_STATUS_NEW
+        rule.publish_status             = PUBLISH_STATUS_CURRENT_EDIT
+        rule.save!
         rule.associate_references(rule_content)
-      when rule.draft?
-        rule.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
-      when rule.rev != rule_attrs[:rev].to_i
-        rule_attrs[:edit_status] = EDIT_STATUS_SYNCHED
-        rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
-        rule.update(rule_attrs)
+        rule
+      when rule_db.draft?
+        rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
+        nil
+      when rule_db.rev != rule.rev
+        rule.edit_status                = EDIT_STATUS_SYNCHED
+        rule.publish_status             = PUBLISH_STATUS_SYNCHED
+        rule.save!
+        rule
+      else
+        nil
     end
-
-    rule
   end
 
   # Take a line from grep output of a rule file and saves to database unless rev is unchanged
@@ -489,7 +569,8 @@ class Rule < ApplicationRecord
     if rule_content.empty?
       ''
     else
-      load_rule_from_content(rule_content, filename, line_number[1..-2].to_i)
+      rule = load_rule_from_content(rule_content)
+      rule.update!(filename: filename, linenumber: line_number[1..-2].to_i) if rule
     end
   end
 
