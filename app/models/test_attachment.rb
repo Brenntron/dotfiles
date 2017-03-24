@@ -8,7 +8,7 @@ class TestAttachment
             {
               task_id: content.id,
               cookie: xmlrpc_token,
-              attachments: attachments
+              pcaps: attachments
             }.to_json
   end
 

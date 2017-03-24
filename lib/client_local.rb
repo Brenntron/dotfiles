@@ -54,22 +54,17 @@ req.auth.gssnegotiate
 req.auth.ssl.ca_cert_file = Rails.configuration.cert_file
 
 # General options
-local_cache_path = File.expand_path("tmp/pcaps/#{Time.now.to_i}")
+local_cache_path = File.expand_path("tmp/pcaps/")
 
-if Rails.env =="development"
+if Rails.env == "development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
-
 
 # Make sure our pcaps cache exists
 unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
-cert = OpenSSL::X509::Certificate.new()
-ssl_options= {}
 stomp_options = {}
-cert = OpenSSL::X509::Certificate.new(File.read(Rails.configuration.cert_file))
-ssl_options= {ca_file: Rails.configuration.cert_file, client_cert: cert}
 stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
@@ -82,35 +77,6 @@ puts "create stomp client"
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
-
-
-# puts "init API"
-# # Initialize the API
-# tries ||= 3
-# begin
-#   RuleTestAPI.init(Rails.configuration.ruletest_server, ssl_options)
-# rescue Exception => e
-#   retry unless (tries -= 1).zero?
-# end
-#
-# puts "finding engine..."
-# # Find the engine we should be using for these rules
-# engine_type = EngineType.where(:name => 'Single').first
-# snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
-# rule_configuration = RuleConfiguration.where(:name => 'Local Rules Only').first
-#
-# puts "confirming..."
-# # Make sure everything was found
-# raise Exception.new("Unable to find Single engine type") if engine_type.nil?
-# raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
-# raise Exception.new("Unable to find Local Rules Only configuration") if rule_configuration.nil?
-#
-# puts "setting engine..."
-# engine = Engine.where(
-#     :engine_type_id => engine_type[:id],
-#     :snort_configuration_id => snort_configuration[:id],
-#     :rule_configuration_id => rule_configuration[:id]).first
-# raise Exception.new("Unable to find the single All Rules Open Source engine") if engine.nil?
 
 puts "listening to LOCAL queue"
 while message = client.receive
@@ -260,7 +226,7 @@ while message = client.receive
         end
 
       rescue Exception => e
-        raise Exception( e.message )
+        raise Exception.new( e.message )
       rescue Timeout::Error => e
         puts "Timed out waiting for #{job_id} to finish"
       end
