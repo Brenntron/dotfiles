@@ -97,6 +97,7 @@ begin
 
   Timeout::timeout(30) do
     while true
+      sleep 3
       resp = HTTPI.get(req)
 
       if resp.code != 200

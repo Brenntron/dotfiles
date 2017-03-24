@@ -169,8 +169,12 @@ while message = client.receive
     if resp.code != 200 and resp.code != 201
       raise Exception.new("Failed to create new job with pcaps (#{pcaps}): #{resp.code} - #{resp.body}")
     end
+
     job_id = JSON.parse(resp.body)['id']
 
+    # Wait for the job to finish
+    req.url = "https://ruleapitest.vrt.sourcefire.com/jobs/#{job_id}"
+    job={}
     unless Rails.env == "development"
       # Wait for the job to finish
       begin
@@ -194,12 +198,10 @@ while message = client.receive
                     puts "#{pcap_name}:"
 
                     # Fetch the associated pcap tests
-                    print "getting pcap tests"
                     req.url = "https://ruleapitest.vrt.sourcefire.com/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
                     JSON.parse(HTTPI.get(req).body).each do |pt|
 
                       # Now fetch the alerts
-                      print "getting alerts"
                       req.url = "https://ruleapitest.vrt.sourcefire.com/alerts?pcap_test_id=#{pt['id']}"
                       alerts = JSON.parse(HTTPI.get(req).body)
 
@@ -208,6 +210,14 @@ while message = client.receive
                       else
                         alerts.each do |alert|
                           puts "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}"
+                          client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
+                                         {
+                                             :id => pcap_name,
+                                             :gid => alert['gid'],
+                                             :sid => alert['sid'],
+                                             :rev => alert['rev'],
+                                             :message => alert['msg']
+                                         }.to_json
                         end
                       end
                     end
@@ -232,30 +242,13 @@ while message = client.receive
       end
 
     end
-
-    # Send back alerts
-    job.pcap_tests.each do |pt|
-      pt.alerts.each do |alert|
-        puts ({:id => pcaps[pt.pcap.file_hash][:attachment_id], :gid => alert.gid, :sid => alert.sid, :rev => alert.rev, :message => alert.msg}).inspect
-
-        client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
-                       {
-                           :id => pcaps[pt.pcap.file_hash][:attachment_id],
-                           :gid => alert.gid,
-                           :sid => alert.sid,
-                           :rev => alert.rev,
-                           :message => alert.msg
-                       }.to_json
-      end
-    end
-
     # And notify the front end that the job is complete
     client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
                    {
                        :task_id => request['task_id'],
-                       :completed => job.completed,
-                       :result => job.information,
-                       :failed => job.failed,
+                       :completed => job['completed'],
+                       :result => job['information'],
+                       :failed => job['failed'],
                    }.to_json
 
   rescue JSON::ParserError => e

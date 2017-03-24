@@ -89,7 +89,7 @@ puts "listening to ALL queue"
 while message = client.receive
   puts "starting all rule work"
   puts "++++++++++++++++++++++"
-  alerts = Array.new
+  pcap_alerts = Array.new
   errors = Array.new
   task_id = nil
 
@@ -184,6 +184,14 @@ while message = client.receive
       exit(0)
     end
 
+    # Make sure we have a job id
+    job_id = JSON.parse(resp.body)['id']
+
+    # Wait for the job to finish
+    req.url = "https://ruleapitest.vrt.sourcefire.com/jobs/#{job_id}"
+
+    job = {}
+
     unless Rails.env == "development"
       # Wait for the job to finish
       begin
@@ -220,7 +228,16 @@ while message = client.receive
                         puts "\tNO ALERTS"
                       else
                         alerts.each do |alert|
+
                           puts "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}"
+                          pcap_alerts <<
+                              {
+                                  :id => pcap_name,
+                                  :gid => alert['gid'],
+                                  :sid => alert['sid'],
+                                  :rev => alert['rev'],
+                                  :message => alert['msg']
+                              }
                         end
                       end
                     end
@@ -246,20 +263,6 @@ while message = client.receive
 
     end
 
-    # Send back alerts
-    job.pcap_tests.each do |pt|
-      pt.alerts.each do |alert|
-        alerts <<
-            {
-                :id => pcaps[pt.pcap.file_hash][:attachment_id],
-                :gid => alert.gid,
-                :sid => alert.sid,
-                :rev => alert.rev,
-                :message => alert.msg
-            }
-      end
-    end
-
 
   rescue JSON::ParserError => e
     print "Failed to parse json message:"
@@ -279,7 +282,7 @@ while message = client.receive
     client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
                    {
                        :task_id => task_id,
-                       :alerts => alerts,
+                       :alerts => pcap_alerts,
                        :errors => errors,
                    }.to_json
   end
