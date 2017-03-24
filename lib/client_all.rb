@@ -50,7 +50,7 @@ require 'sfbugzilla'
 require 'json'
 require 'tmpdir'
 require 'tempfile'
-require 'vrt/rule_test_api'
+# require 'vrt/rule_test_api'
 require 'base64'
 
 # Make sure we run from the application root

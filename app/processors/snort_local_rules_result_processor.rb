@@ -38,7 +38,9 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
   def on_message(message)
     puts "=============================="
     puts "Configuring local rule results"
+
     result = JSON.parse(message)
+    puts result
 
     attachment = Attachment.find_by_bugzilla_attachment_id(result['id'])
 

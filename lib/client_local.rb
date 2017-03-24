@@ -34,19 +34,25 @@
 #
 ######################
 
+require 'httpi'
+require 'curl'
 require 'open3'
 require 'stomp'
 require 'sfbugzilla'
 require 'json'
 require 'tmpdir'
 require 'tempfile'
-require 'vrt/rule_test_api'
+# require 'vrt/rule_test_api'
 require 'base64'
 require 'pry'
 
+HTTPI.log = false
+
+req = HTTPI::Request.new
+req.auth.gssnegotiate
 
 # General options
-local_cache_path = File.expand_path('tmp/pcaps')
+local_cache_path = File.expand_path("tmp/pcaps/#{Time.now.to_i}")
 
 if Rails.env =="development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
@@ -124,7 +130,7 @@ while message = client.receive
     pcaps = Hash.new
 
     # Fetch all of the needed pcaps into the cache directory
-    request['attachments'].each do |attachment_id|
+    request['pcaps'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
 
       # Updated files get new attachment ids so no need to test the actual data
@@ -157,33 +163,49 @@ while message = client.receive
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
 
+      binding.pry
       # NOt sure if the code below returns a proper pcap
       #
+      req.url = 'https://ruleapitest.vrt.sourcefire.com/pcaps'
+
 
       # Start by hashing the pcap data
-      sha = Digest.hexencode(sha256.digest(pcap_data))
+      # sha = Digest.hexencode(sha256.digest(pcap_data))
       # See if the PCAP exists on the server
-      pcap = Pcap.where(:file_hash => sha).first
+      # pcap = Pcap.where(:file_hash => sha).first
 
       # Should we upload the pcap
-      if pcap.nil?
+      # if pcap.nil?
         # TODO this part is broken for some reason this does not create a valid pcap for
         # ruletestapi
-        pcap = Pcap.create(:pcap => Base64.encode64(pcap_data))
+        # pcap = Pcap.create(:pcap => Base64.encode64(pcap_data))
+      req.body = Curl::PostField.file("pcap", pcap_data) #build the curl request
+
+      resp = HTTPI.post req do |http|           #now we make the request as a post request
+        http.multipart_form_post = true
       end
+      # end
       # Make sure that worked
-      if pcap.error?
-        raise Exception.new(pcap.error)
+
+      binding.pry
+      if resp.code != 200 and resp.code != 201         #if it didnt work the say so
+        raise Exception.new("Upload of #{pcap_file} failed: #{resp.code} - #{resp.body}")
       else
-        pcaps[sha] = {:pcap_id => pcap.attributes[:id], :attachment_id => attachment_id}
+        pcaps[JSON.parse(resp.body)['id']] = pcap_data   #now we compile a hash using ids as keys and the pcaps as values
       end
+
+      # if pcap.error?
+      #   raise Exception.new(pcap.error)
+      # else
+      #   pcaps[sha] = {:pcap_id => pcap.attributes[:id], :attachment_id => attachment_id}
+      # end
     end
 
     test_pcaps = pcaps.map { |k, v| v[:pcap_id] }
 
     # The rest client will only send a single entry if there is only one in the array
-    if test_pcaps.size == 1
-      test_pcaps << ""
+    if test_pcaps.size < 1
+      raise Exception.new("No pcaps uploaded for testing")
     end
     # Create the new job
     job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false, :local_rules => request['rules'].join("\n"))

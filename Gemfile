@@ -22,6 +22,8 @@ gem 'libv8', '~> 3.16', '>= 3.16.14.17'
 gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her'
+gem 'httpi'
+gem 'curl'
 
 gem 'net-ssh'
 gem 'daemons'
