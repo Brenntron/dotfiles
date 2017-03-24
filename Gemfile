@@ -23,7 +23,7 @@ gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her'
 gem 'httpi'
-gem 'curl'
+gem 'curb' #Libcurl bindings for Ruby
 
 gem 'net-ssh'
 gem 'daemons'

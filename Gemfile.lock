@@ -123,9 +123,7 @@ GEM
       nokogiri (~> 1.5)
       railties (>= 3, < 5.1)
     cucumber-wire (0.0.1)
-    curl (0.0.9)
-      awesome_print (>= 0.2.1)
-      unidecoder (>= 1.1.1)
+    curb (0.9.3)
     daemons (1.2.4)
     dalli (2.6.4)
     database_cleaner (1.5.3)
@@ -391,7 +389,6 @@ GEM
       thread_safe (~> 0.1)
     uglifier (3.0.4)
       execjs (>= 0.3.0, < 3)
-    unidecoder (1.1.2)
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -426,7 +423,7 @@ DEPENDENCIES
   chartkick
   coffee-rails
   cucumber-rails (= 1.4.5)
-  curl
+  curb
   daemons
   dalli (~> 2.6.4)
   database_cleaner (= 1.5.3)
