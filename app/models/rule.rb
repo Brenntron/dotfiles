@@ -396,22 +396,9 @@ class Rule < ApplicationRecord
   # Runs the visruleparser perl script to parse a line of rule text.
   # @param [String, #read] rule_text the line of rule text
   # @return [Hash] hash with :rule and :errors text populated.
-  def self.visruleparser(rule_text)
-    return nil if rule_text.empty?
-    parsed = {}
-    temp_rule = Tempfile.new('temp.rules')
-    temp_rule.write(rule_text.gsub(/\#\s/, ''))
-    temp_rule.rewind
-    Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
-      text = stdout.read
-      unless text.empty?
-        parsed[:rule] = text.split(/%{80}|\*{80}/)[1].strip
-        parsed[:errors] = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
-        parsed[:errors] += stderr.read
-      end
-    end
-    temp_rule.close
-    parsed
+  def self.visruleparser(rule_content)
+    parser = VisruleParser.new(rule_content)
+    { rule: parser.parsed_lines, errors: parser.errors }
   end
 
   # Takes the hash and adds some data from the rules text
@@ -439,6 +426,20 @@ class Rule < ApplicationRecord
     rule_attrs
   end
 
+  def set_from_visrule(parser)
+
+  end
+
+  def self.from_rule_content(rule_content)
+    parser = VisruleParser.new(rule_content)
+
+    rule = parser.sid && Rule.by_sid(parser.sid, parser.gid).first
+    rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
+    rule.set_from_visrule(parser)
+
+    rule
+  end
+
   # Take a line from a rule file and saves to database unless rev is unchanged
   # @param [String, #read] rule_content the line of text from a rule file.
   # @param [String, #read] filename the path or name of the file.
@@ -454,7 +455,9 @@ class Rule < ApplicationRecord
     rule_attrs[:filename] = filename
     rule_attrs[:linenumber] = linenumber
 
-    rule = where(gid: rule_attrs[:gid]).where(sid: rule_attrs[:sid]).first
+    # rule = where(gid: rule_attrs[:gid]).where(sid: rule_attrs[:sid]).first
+
+    rule = Rule.from_rule_content(rule_content)
     case
       #can new rule ever happen?
       when rule.nil?
