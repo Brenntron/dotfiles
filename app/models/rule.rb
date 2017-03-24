@@ -395,86 +395,57 @@ class Rule < ApplicationRecord
 
   def assign_from_visrule(parser)
     rule_content = parser.rule_content
+    self.rule_content                   = rule_content
+    self.rule_parsed                    = parser.parsed_lines
+    self.rule_warnings                  = parser.errors
+    self.cvs_rule_parsed                = parser.parsed_lines
+    self.cvs_rule_content               = rule_content
 
-    if parser.parsed_lines.match(/FAILED/)
-      rule_params = {
-          message: rule_content.match(/msg:\w*(.+?);/) ? rule_content.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
-          rule_content: rule_content,
-          rule_parsed: parser.parsed_lines,
-          rule_failures: parser.parsed_lines,
-          committed: false,
-          state: 'FAILED',
-          parsed: false,
-      }.reject { |k, v,| v.nil? || v == '<MISSING>' }
-
-    elsif parser.parsed_lines.match(/msg/)
-      parsed_attrs = Rule.hash_visrule(parser.parsed_lines)
-      message = rule_content.match(/msg:\w*(.+?);/) ? rule_content.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : '<MISSING>'
-
-      rule_params = {
-
-          rule_content: rule_content,
-          rule_parsed: parser.parsed_lines,
-          gid: Rule.gid_from_visrule(rule_content, parsed_attrs),
-          rev: /Rev\s*:\s(.+)/.match(parser.parsed_lines) ? /Rev\s*:\s(.+)/.match(parser.parsed_lines)[1] : 1,
-          connection: rule_content.match(/connection:\s*(.+?)\(/) ? rule_content.match(/connection:\s*(.+?)\(/)[1] : '<MISSING>',
-          message: message,
-          detection: rule_content.match(/detection:\s*(.+?);/) ? rule_content.match(/detection:\s*(.+?);/)[1] : '<MISSING>',
-          flow: rule_content.match(/flow:\s*(.+?);/) ? rule_content.match(/flow:\s*(.+?);/)[1] : '<MISSING>',
-          metadata: /metadata\s*:(.+?)\;/.match(rule_content) ? /metadata\s*:(.+?)\;/.match(rule_content)[1].strip : '<MISSING>',
-          class_type: /classtype\s*:(.*)\)/.match(parser.parsed_lines) ? /classtype\s*:(.*)\)/.match(parser.parsed_lines)[1] : '<MISSING>',
-          committed: true,
-          parsed: true,
-      }
-      rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
-      rule_params[:rule_failures] = nil
-
+    if self.sid
+      self.edit_status                  = EDIT_STATUS_SYNCHED
+      self.publish_status               = PUBLISH_STATUS_SYNCHED
     else
-      parsed_attrs = Rule.hash_visrule(parser.parsed_lines)
-      detection = /Detection\s*:\n(.*)Metadata/m.match(parser.parsed_lines) ? /Detection\s*:\n(.*)Metadata/m.match(parser.parsed_lines)[1].gsub(/\t|#\n/, '').strip : nil
-      message = /Message\s*:\s(.*)/.match(parser.parsed_lines) ? /Message\s*:\s(.*)/.match(parser.parsed_lines)[1] : '<MISSING>'
-      rule_category = RuleCategory.find_or_create_by(category: message.split(' ')[0])
-
-      rule_params = {
-
-          rule_content: rule_content,
-          rule_parsed: parser.parsed_lines,
-          gid: Rule.gid_from_visrule(rule_content, parsed_attrs),
-          rev: /Rev\s*:\s(.+)/.match(parser.parsed_lines) ? /Rev\s*:\s(.+)/.match(parser.parsed_lines)[1] : 1,
-          connection: /Connection\s*:\s(.+)/.match(parser.parsed_lines) ? /Connection\s*:\s(.+)/.match(parser.parsed_lines)[1] : '<MISSING>',
-          message: message,
-          detection: detection.nil? ? "<MISSING>" : detection[-1, 1] == ';' ? detection : detection + ';',
-          flow: /Flow\s*:\s(.+)/.match(parser.parsed_lines) ? /Flow\s*:\s(.+)/.match(parser.parsed_lines)[1] : '<MISSING>',
-          metadata: /metadata\s*:(.+?)\;/.match(rule_content) ? /metadata\s*:(.+?)\;/.match(rule_content)[1].strip : '<MISSING>',
-          class_type: /Classtype\s*:\s(.*)/.match(parser.parsed_lines) ? /Classtype\s*:\s(.*)/.match(parser.parsed_lines)[1] : '<MISSING>',
-          committed: true,
-          rule_category_id: rule_category.id,
-          parsed: true,
-      }
-      rule_params.reject { |k, v,| v.nil? || v == '<MISSING>' }
-      rule_params[:rule_failures] = nil
+      self.edit_status                  = EDIT_STATUS_NEW
+      self.publish_status               = PUBLISH_STATUS_CURRENT_EDIT
     end
 
-    assign_attributes(rule_params)
+
+    self.on                             = /^\s*#/ !~ rule_content
+    self.parsed                         = !(parser.parsed_lines.match(/FAILED/))
+    self.committed                      = !(self.parsed)
 
 
     if self.parsed?
       if self.sid
         self.state                      = 'UNCHANGED'
-        self.edit_status                = EDIT_STATUS_SYNCHED
-        self.publish_status             = PUBLISH_STATUS_SYNCHED
       else
         self.state                      = 'NEW'
-        self.edit_status                = EDIT_STATUS_NEW
-        self.publish_status             = PUBLISH_STATUS_CURRENT_EDIT
       end
-    end
-    self.on                 = /^\s*#/ !~ rule_content
 
-    self.rule_parsed        = parser.parsed_lines
-    self.rule_warnings      = parser.errors
-    self.cvs_rule_parsed    = parser.parsed_lines
-    self.cvs_rule_content   = rule_content
+      parsed_values = parser.parsed_hash
+      self.rev                          = parsed_values[:rev]
+      self.message                      = parsed_values[:message]
+      self.connection                   = parsed_values[:connection]
+      self.flow                         = parsed_values[:flow]
+      self.class_type                   = parsed_values[:classtype]
+
+      self.metadata = /metadata\s*:(?<meta>.+?)\;/ =~ rule_content ? meta.strip : '<MISSING>'
+      self.rule_failures = nil
+
+      # if msg (old?) format
+      if parser.parsed_lines.match(/msg/)
+        self.detection = /detection:\s*(?<det>.+?);/ =~ rule_content ? det : nil
+      else
+        detection = /Detection\s*:\n(?<det>.*)Metadata/m =~ parser.parsed_lines ? det.gsub(/\t|#\n/, '').strip : nil
+        self.detection = detection.nil? ? nil : detection[-1, 1] == ';' ? detection : detection + ';'
+        self.rule_category = RuleCategory.find_or_create_by(category: self.message.split(' ')[0])
+      end
+    else
+      self.state                        = 'FAILED'
+      self.message                      = rule_content.match(/msg:\w*(?<msg>.+?);/) ? msg.gsub(/"/, '') : nil
+      self.rule_failures                = parser.parsed_lines
+    end
+
 
     self
   end
