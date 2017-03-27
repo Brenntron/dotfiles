@@ -406,7 +406,7 @@ class Bug < ApplicationRecord
               new_attachment = Attachment.find_or_create_by(id: attachment['id']) do |new_attach_record|
                 new_attach_record.id = attachment['id']
                 new_attach_record.size = attachment['size']
-                new_attach_record.bugzilla_attachment_id = attachment['bug_id']
+                new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
                 new_attach_record.file_name = attachment['file_name']
                 new_attach_record.summary = attachment['summary']
                 new_attach_record.content_type = attachment['content_type']

@@ -21,9 +21,9 @@ module API
         desc "Create an attachment"
         params do
           requires :attachment, type: Hash do
-            requires :bugzilla_attachment_id, type: String, desc: "id of the bug you want to attach to"
             requires :file_data, type: Hash
             requires :summary, type: String, desc: "what is this attachment"
+            optional :bugzilla_attachment_id, type: String, desc: "id of the attachment located in bugzilla"
             optional :comment, type: String, desc: "a comment to add along with this attachment"
             optional :is_patch, type: Boolean, desc: "true if bugzilla should treat this as a patch"
             optional :is_private, type: Boolean, desc: "true if the attachment should be private"

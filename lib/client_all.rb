@@ -275,7 +275,7 @@ while message = client.receive
     print "Failed to parse json message:"
     puts e.to_s
     puts e.backtrace.join("\n\t")
-      
+
   rescue EOFError => e
     errors << "Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}"
   rescue Exception => e
