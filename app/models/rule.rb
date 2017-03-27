@@ -411,6 +411,8 @@ class Rule < ApplicationRecord
 
   # Extracts components from VisruleParser and sets field of rule.
   # Does not save the rule.
+  # Does not set state, edit_status, or publish_status,
+  # because these depend on where the rule and rule_content originated.
   # @param [VisruleParser, #read] parser initialized to rule content.
   def assign_from_visrule(parser)
     rule_content = parser.rule_content
@@ -420,27 +422,12 @@ class Rule < ApplicationRecord
     self.cvs_rule_parsed                = parser.parsed_lines
     self.cvs_rule_content               = rule_content
 
-    if self.sid
-      self.edit_status                  = EDIT_STATUS_SYNCHED
-      self.publish_status               = PUBLISH_STATUS_SYNCHED
-    else
-      self.edit_status                  = EDIT_STATUS_NEW
-      self.publish_status               = PUBLISH_STATUS_CURRENT_EDIT
-    end
-
-
     self.on                             = /^\s*#/ !~ rule_content
     self.parsed                         = !(parser.parsed_lines.match(/FAILED/))
     self.committed                      = !(self.parsed)
 
 
     if self.parsed?
-      if self.sid
-        self.state                      = 'UNCHANGED'
-      else
-        self.state                      = 'NEW'
-      end
-
       parsed_values = parser.parsed_hash
       self.rev                          = parsed_values[:rev]
       self.message                      = parsed_values[:message]
@@ -460,7 +447,6 @@ class Rule < ApplicationRecord
         self.rule_category = RuleCategory.find_or_create_by(category: self.message.split(' ')[0])
       end
     else
-      self.state                        = 'FAILED'
       self.message                      = /msg:\w*(?<msg>.+?);/ =~ rule_content ? msg.gsub(/"/, '') : nil
       self.rule_failures                = parser.parsed_lines
     end
@@ -475,14 +461,33 @@ class Rule < ApplicationRecord
   # Set the rule fields to components from parsing rule content.
   # Does not save the rule.
   # @param [String, #read] rule_content the rule content
-  def self.assign_rule_content(rule_content)
+  def self.find_and_assign_rule_content(rule_content, rule_id = nil)
     parser = VisruleParser.new(rule_content)
 
     rule = parser.sid && Rule.by_sid(parser.sid, parser.gid).first
+    rule ||= rule_id && Rule.where(id: rule_id).first
     rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
     rule.assign_from_visrule(parser)
 
     rule
+  end
+
+  # Take a line from a user edit and saves to database
+  # @param [String, #read] rule_content the rule content
+  def self.save_rule_content(rule_content, rule_id = nil)
+    find_and_assign_rule_content(rule_content, rule_id).tap do |rule|
+      if rule.sid
+        rule.state                        = 'UPDATED'
+        rule.edit_status                  = EDIT_STATUS_EDIT
+      else
+        rule.state                        = 'NEW'
+        rule.edit_status                  = EDIT_STATUS_NEW
+      end
+      rule.state                          = 'FAILED' unless rule.parsed?
+      rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
+
+      rule.save
+    end
   end
 
   # Take a line from a rule file and saves to database if rule is unedited
@@ -491,14 +496,15 @@ class Rule < ApplicationRecord
   # @return [Rule] the rule loaded or nil if failed
   # @raise [RuntimeError] could not process
   def self.synch_rule_content(rule_content)
-    rule = Rule.assign_rule_content(rule_content)
+    rule = find_and_assign_rule_content(rule_content)
     return nil unless rule.sid          # rule in file is a new rule with sid unassigned
-    return nil unless rule.parsed?
-    raise 'No rule gid' unless rule.gid # could not even default to gid 1
 
     rule_db = by_sid(rule.sid, rule.gid).first
 
     case
+      # do not load when rule file does not parse
+      when !rule.parsed?
+        nil
       # new rule happens when loading from file for the first time.
       when rule_db.nil?
         rule.edit_status                = EDIT_STATUS_SYNCHED
@@ -770,7 +776,7 @@ class Rule < ApplicationRecord
   end
 
   def self.create_rule_action(bug_id, rule_content)
-    rule = Rule.assign_rule_content(rule_content)
+    rule = Rule.save_rule_content(rule_content)
     # rule.save
 
     # bug = Bug.where(id: bug_id).first
@@ -778,19 +784,12 @@ class Rule < ApplicationRecord
   end
 
   def self.update_rule_action(rule_id, rule_content, rule_doc)
-    parser = VisruleParser.new(rule_content)
-    Rule.where(id: rule_id).first.tap do |rule|
-      if rule && (parser.sid == rule.sid) && (parser.gid == rule.gid)
-        rule.assign_from_visrule(parser)
-
-        # if rule.parsed?
-        #   rule.state                    = "UPDATED"
-        #   rule.committed                = false
-        # end
-        # rule.edit_status                = EDIT_STATUS_EDIT
-        # rule.publish_status             = PUBLISH_STATUS_CURRENT_EDIT
-
-        rule.save
+    Rule.save_rule_content(rule_content, rule_id).tap do |rule|
+      rule.update_references(permitted_params[:rule][:rule_content])
+      if rule.rule_doc.present?
+        rule.rule_doc.update(permitted_params[:rule][:rule_doc])
+      else
+        rule.create_rule_doc(permitted_params[:rule][:rule_doc])
       end
     end
   end

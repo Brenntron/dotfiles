@@ -120,25 +120,9 @@ module API
         put ":id", root: "rule" do
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          rule = Rule.update_rule_action(permitted_params[:id],
-                                         permitted_params[:rule][:rule_content],
-                                         permitted_params[:rule][:rule_doc])
-          update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
-          if rule.sid
-            if 'FAILED' == update_params[:state]
-              update_params[:parsed] = false
-            else
-              update_params[:parsed] = true
-              update_params[:state] = "UPDATED"
-              update_params[:committed] = false
-            end
-            update_params[:edit_status] = Rule::EDIT_STATUS_EDIT unless rule.stale_edit?
-            update_params[:publish_status] = Rule::PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
-          end
-          rule.update_references(permitted_params[:rule][:rule_content])
-          rule.rule_doc.present? ? rule.rule_doc.update(permitted_params[:rule][:rule_doc]) : rule.create_rule_doc(permitted_params[:rule][:rule_doc])
-          rule.update(update_params)
-          rule
+          Rule.update_rule_action(permitted_params[:id],
+                                  permitted_params[:rule][:rule_content],
+                                  permitted_params[:rule][:rule_doc])
         end
 
         #import multiple rules
