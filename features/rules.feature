@@ -92,9 +92,8 @@ Feature: Rules
     Then  the "max-detect-ips" field should be "policy max-detect-ips drop"
     Then the "security-ips" field should be "policy security-ips alert"
 
-  # Scenario: New Rule: standard form service options
   @javascript
-  Scenario: When a new rule is created, the service options should populate correctly
+  Scenario: New Rule: standard form service options
     Given a user with role "analyst" exists and is logged in
     And the current user has the following bugs:
       |  id  | state |
@@ -442,7 +441,7 @@ Feature: Rules
   Scenario: load new rule from grep string model test
     Given rule content
     And grep output for rule content
-    When code calls load_rule_from_grep on rule content
+    When code calls load_grep on rule content
     Then a rule record for rule conent will exist
 
   Scenario: synch existing rule with same rev in db model test
@@ -451,7 +450,7 @@ Feature: Rules
       |  1  | 101 |  4  | UNCHANGED |
     And grep output for rule content
     And I wait for "3" seconds
-    When code calls load_rule_from_grep on rule content
+    When code calls load_grep on rule content
     Then rule record will be unchanged
 
   Scenario: synch updated rule with earlier rev in db model test
@@ -461,7 +460,7 @@ Feature: Rules
     And rule content rev set to "5"
     And grep output for rule content
     And I wait for "3" seconds
-    When code calls load_rule_from_grep on rule content
+    When code calls load_grep on rule content
     Then rule record will be updated
 
   Scenario: do not synch updated rule with earlier rev in db model test
@@ -471,7 +470,7 @@ Feature: Rules
     And rule content rev set to "5"
     And grep output for rule content
     And I wait for "3" seconds
-    When code calls load_rule_from_grep on rule content
+    When code calls load_grep on rule content
     Then rule record will marked out of date
 
   Scenario: do not synch updated rule with earlier rev in db model test
@@ -481,6 +480,6 @@ Feature: Rules
     And rule content rev set to "5"
     And grep output for rule content
     And I wait for "3" seconds
-    When code calls load_rule_from_grep on rule content
+    When code calls load_grep on rule content
     Then rule record will marked out of date
 

@@ -120,8 +120,10 @@ module API
         put ":id", root: "rule" do
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+          rule = Rule.update_rule_action(permitted_params[:id],
+                                         permitted_params[:rule][:rule_content],
+                                         permitted_params[:rule][:rule_doc])
           update_params = Rule.parse_and_create_rule(permitted_params[:rule][:rule_content])
-          rule = Rule.where(id:permitted_params[:id]).first
           if rule.sid
             if 'FAILED' == update_params[:state]
               update_params[:parsed] = false

@@ -7,7 +7,7 @@ begin
 
   $stdin.each_line do |line|
     begin
-      if Rule.load_rule_from_grep(line.chomp)
+      if Rule.load_grep(line.chomp)
         $stdout.print "."
       else
         $stdout.print "F"

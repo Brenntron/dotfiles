@@ -492,16 +492,17 @@ class Rule < ApplicationRecord
   # @raise [RuntimeError] could not process
   def self.synch_rule_content(rule_content)
     rule = Rule.assign_rule_content(rule_content)
+    return nil unless rule.sid          # rule in file is a new rule with sid unassigned
     return nil unless rule.parsed?
-    raise 'No rule gid' unless rule.gid
+    raise 'No rule gid' unless rule.gid # could not even default to gid 1
 
     rule_db = by_sid(rule.sid, rule.gid).first
 
     case
-      #can new rule ever happen?
+      # new rule happens when loading from file for the first time.
       when rule_db.nil?
-        rule.edit_status                = EDIT_STATUS_NEW
-        rule.publish_status             = PUBLISH_STATUS_CURRENT_EDIT
+        rule.edit_status                = EDIT_STATUS_SYNCHED
+        rule.publish_status             = PUBLISH_STATUS_SYNCHED
         rule.save!
         rule.associate_references(rule_content)
         rule
@@ -522,7 +523,7 @@ class Rule < ApplicationRecord
   # @param [String, #read] rule_grep_line the line of text from a rule file.
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
-  def self.load_rule_from_grep(rule_grep_line)
+  def self.load_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
 
     rule_content.strip!
@@ -766,5 +767,31 @@ class Rule < ApplicationRecord
       css_classes << 'parsed' if parsed?
       css_classes << 'failed' unless parsed?
     end.join(' ')
+  end
+
+  def self.create_rule_action(bug_id, rule_content)
+    rule = Rule.assign_rule_content(rule_content)
+    # rule.save
+
+    # bug = Bug.where(id: bug_id).first
+    # bug.rules << rule
+  end
+
+  def self.update_rule_action(rule_id, rule_content, rule_doc)
+    parser = VisruleParser.new(rule_content)
+    Rule.where(id: rule_id).first.tap do |rule|
+      if rule && (parser.sid == rule.sid) && (parser.gid == rule.gid)
+        rule.assign_from_visrule(parser)
+
+        # if rule.parsed?
+        #   rule.state                    = "UPDATED"
+        #   rule.committed                = false
+        # end
+        # rule.edit_status                = EDIT_STATUS_EDIT
+        # rule.publish_status             = PUBLISH_STATUS_CURRENT_EDIT
+
+        rule.save
+      end
+    end
   end
 end

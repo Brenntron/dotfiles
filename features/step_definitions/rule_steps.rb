@@ -112,8 +112,8 @@ Given(/^rule with id "(.*)" has a reference with id "(.*)"$/) do |rule_id, ref_i
   @rule.references << Reference.find(ref_id)
 end
 
-When(/^code calls load_rule_from_grep on rule content$/) do
-  Rule.load_rule_from_grep(@rule_grep_line)
+When(/^code calls load_grep on rule content$/) do
+  Rule.load_grep(@rule_grep_line)
 end
 
 Then(/^a rule record for rule conent will exist$/) do
