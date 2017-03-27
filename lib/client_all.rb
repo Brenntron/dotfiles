@@ -56,6 +56,15 @@ require 'base64'
 # Make sure we run from the application root
 Dir.chdir Rails.root
 
+
+HTTPI.log = false
+
+req = HTTPI::Request.new
+req.auth.gssnegotiate
+
+req.auth.ssl.ca_cert_file = Rails.configuration.cert_file
+
+
 # General options
 local_cache_path = File.expand_path('tmp/pcaps')
 
@@ -94,15 +103,13 @@ while message = client.receive
   task_id = nil
 
   begin
-
     # Start by parsing the request
     request = JSON.parse(message.body)
 
+    puts request
+
     # Release the message early
     client.ack(message.headers['message-id'])
-
-    # Use this for hashing the pcaps
-    sha256 = Digest::SHA256.new
 
     # Store the pcaps for testing
     pcaps = Hash.new
@@ -275,9 +282,6 @@ while message = client.receive
   end
 
   # Finally, send the results back
-  puts alerts.inspect
-  puts errors.inspect
-  puts task_id
   unless task_id.nil?
     client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
                    {

@@ -91,9 +91,6 @@ while message = client.receive
     # Release the message early
     client.ack(message.headers['message-id'])
 
-    # Use this for hashing the pcaps
-    sha256 = Digest::SHA256.new
-
     # Store the pcaps for testing
     pcaps = Hash.new
 
