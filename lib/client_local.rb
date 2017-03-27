@@ -145,7 +145,7 @@ while message = client.receive
       end
     end
 
-    test_pcaps = pcaps.map {|k,v| k}
+    test_pcaps = pcaps.map {|k,v| k.to_i}
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size < 1
