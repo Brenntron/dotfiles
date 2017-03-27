@@ -115,7 +115,7 @@ $ ->
       if @checked
         selected.push($(this).val())
     data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: "attachment", created_by: user_id}}
-    $.ajax {
+    $.ajax(
       url: "/api/v1/tasks"
       method: 'POST'
       data: data
@@ -133,14 +133,11 @@ $ ->
           '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
         $('#jobs-tab table tbody').append(string)
         $('.alert_attachments').addClass('success').show().html('Task has been created to test the attachment')
+        window.location.reload()
       error: (response) ->
         $('.alert_attachments').addClass('error').show().html('Task has not been created')
         $(this).attr('disabled', false)
-      complete: ->
-        setTimeout (->
-          $('.alert_rules').hide 'blind', {}, 5000
-          return
-        ), 5000
-    }
+    )
+
 
 

@@ -44,6 +44,8 @@
 # ==========================================================
 ######################
 
+require 'httpi'
+require 'curl'
 require 'open3'
 require 'stomp'
 require 'sfbugzilla'
@@ -52,6 +54,7 @@ require 'tmpdir'
 require 'tempfile'
 # require 'vrt/rule_test_api'
 require 'base64'
+require 'pry'
 
 # Make sure we run from the application root
 Dir.chdir Rails.root
@@ -113,6 +116,7 @@ while message = client.receive
 
     # Store the pcaps for testing
     pcaps = Hash.new
+    pcaps[""] = 0 #rulesAPI doesnt like single pcaps it wants at least 2 adding a blank entry causes it to not fail
 
     # Save the task_id
     task_id = request['task_id']
@@ -168,7 +172,7 @@ while message = client.receive
       end
     end
 
-    test_pcaps = pcaps.map { |k, v| k }
+    test_pcaps = pcaps.map { |k, v| k.to_i }
 
     # The rest client will only send a single entry if there is only one in the array
     if test_pcaps.size < 1
@@ -180,15 +184,14 @@ while message = client.receive
     # Create the new job
     puts "Creating persistent job"
     req.body = {
-        :pcaps => pcaps.keys,
+        :pcaps => test_pcaps,
         :engine_id => 1, #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
     }
 
     resp = HTTPI.post(req) #make the request
 
     if resp.code != 200 and resp.code != 201
-      puts "Failed to create new job with pcaps (#{pcaps}): #{resp.code} - #{resp.body}"
-      exit(0)
+      raise Exception.new("Failed to create new job with pcaps (#{pcaps}): #{resp.code} - #{resp.body}")
     end
 
     # Make sure we have a job id
@@ -198,6 +201,8 @@ while message = client.receive
     req.url = "https://ruleapitest.vrt.sourcefire.com/jobs/#{job_id}"
 
     job = {}
+
+    pcaps.except!("") #remove the blank key that we created for ruleAPI because we dont need it after the job is finished
 
     unless Rails.env == "development"
       # Wait for the job to finish
