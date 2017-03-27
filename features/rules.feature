@@ -79,17 +79,17 @@ Feature: Rules
       |  id  | state |
       | 2222 | OPEN  |
     And a "BLACKLIST" rule category exists
-    Then I wait for "3" seconds
-    And  I goto "/bugs/2222"
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
+    And I wait for "3" seconds
+    When  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
     And  I check "security-ips"
     Then the "security-ips" field should be "policy security-ips drop"
-    Then I toggle "bootstrap-switch-container"
+    When I toggle "bootstrap-switch-container"
     Then the "security-ips" field should be "policy security-ips alert"
-    Then I check "max-detect-ips"
-    Then  the "max-detect-ips" field should be "policy max-detect-ips drop"
+    When I check "max-detect-ips"
+    Then the "max-detect-ips" field should be "policy max-detect-ips drop"
     Then the "security-ips" field should be "policy security-ips alert"
 
   @javascript
@@ -99,7 +99,7 @@ Feature: Rules
       |  id  | state |
       | 2222 | OPEN  |
     And a "BLACKLIST" rule category exists
-    Then I wait for "3" seconds
+    And I wait for "3" seconds
     And  I goto "/bugs/2222"
     Then I click the "Rules" tab
     Then I click button "create"
@@ -123,17 +123,14 @@ Feature: Rules
     Then I should see "service kerberos"
     And  I should not see "telnet"
 
-  # Scenario: New Rule: standard form rule state and css classes
   @javascript
-  Scenario: A new rule can be created and displayed
+  Scenario: New Rule: standard form rule state and css classes
     Given a user with role "analyst" exists and is logged in
+    And the current user has the following bugs:
+      |  id  | state |
+      | 2222 | OPEN  |
+    And a "BLACKLIST" rule category exists
     And I wait for "3" seconds
-    Given the following bugs exist:
-      |  id  | bugzilla_id | state  | user_id |
-      | 2222 |   222222    | OPEN   |    1    |
-    And the following rule categories exist:
-      | category  | id |
-      | BLACKLIST |  1 |
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "create"
@@ -147,13 +144,12 @@ Feature: Rules
     And  I wait for "1" seconds
     When I click the "Rules" tab
     And  I click button "list all"
-    Then I should see "Test message"
-    And  I should see a rule with state "NEW" version "new_rule"
-    And I should see "Test message"
+    Then I should see a rule with state "NEW" version "new_rule"
+    And  I should see "Test message"
 #    And rule "11" is a new rule
-    And I should see a rule row with class "draft" and version "new_rule"
-    And I should see a rule row with class "new-rule" and version "new_rule"
-    And I should see a rule row with class "parsed" and version "new_rule"
+    And  I should see a rule row with class "draft" and version "new_rule"
+    And  I should see a rule row with class "new-rule" and version "new_rule"
+    And  I should see a rule row with class "parsed" and version "new_rule"
     When I check "rule[id]"
     And  I click "edit"
     And  I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
@@ -161,37 +157,37 @@ Feature: Rules
     And  I wait for "8" seconds
     Then I should see a rule with state "FAILED" version "new_rule"
 #    And rule "11" is a new rule
-    And I should see "short msg"
-    And I should see a rule row with class "draft" and version "new_rule"
-    And I should see a rule row with class "new-rule" and version "new_rule"
-    And I should see a rule row with class "failed" and version "new_rule"
-
-  # Scenario: New Rule: legacy form rule state and css classes
-  # Scenario: New Rule: standard form the rule doc impact should populate based on class type selection
-  # Scenario: New Rule: legacy form the rule doc impact should populate based on class type selection
-  ### Scenarios Existing Rule ###
-  # Scenario: Existing Rule: Viewing existing synched rule
-  # Scenario: Existing Rule: Viewing existing parsed new rule
-  # Scenario: Existing Rule: Viewing existing failed new rule
-  # Scenario: Existing Rule: Viewing existing parsed edited rule
-  # Scenario: Existing Rule: Viewing existing failed edited rule
-  # Scenario: Existing Rule: Viewing existing parsed stale edit rule
-  # Scenario: Existing Rule: Viewing existing failed stale edit rule
-  # Scenario: Existing Rule: One or more rules can be selected on a bug to view or edit
-  ### Scenarios Editing Rule ###
-  # Scenario: Edit Rule: A rule can be edited
-  # Scenario: a user can edit rule docs for a new rule
-  ### Scenarios Synching a rule from VC ###
-  # Scenario: Synch Rule: create a rule from synching
-  # Scenario: Synch Rule: update an existing synched rule
-  # Scenario: Synch Rule: do not update a with same rev
-  # Scenario: Synch Rule: VC updated for a parsed edited rule
-  # Scenario: Synch Rule: VC updated for a failed edited rule
-
-
-  # ==== Creating a rule ===
+    And  I should see "short msg"
+    And  I should see a rule row with class "draft" and version "new_rule"
+    And  I should see a rule row with class "new-rule" and version "new_rule"
+    And  I should see a rule row with class "failed" and version "new_rule"
 
   @javascript
+  Scenario: New Rule: legacy form rule state and css classes
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following bugs:
+      |  id  | state |
+      | 2222 | OPEN  |
+    And a "BLACKLIST" rule category exists
+    And I wait for "3" seconds
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"BLACKLIST test msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; rev:1;)"
+    And  I fill in "summary" with "rule doc summary"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    When I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see a rule with state "NEW" version "new_rule"
+    And  I should see "BLACKLIST test msg"
+#    And rule "11" is a new rule
+    And  I should see a rule row with class "draft" and version "new_rule"
+    And  I should see a rule row with class "new-rule" and version "new_rule"
+    And  I should see a rule row with class "parsed" and version "new_rule"
+
+  @javascript
+  # Scenario: New Rule: standard form the rule doc impact should populate based on class type selection
   Scenario: When a new rule is created, the rule doc impact should populate based on class type selection
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
@@ -220,6 +216,26 @@ Feature: Rules
     And  I click "new_rule"
     Then I should see "This is the rule doc summary"
     Then I should see "Unknown Traffic"
+
+  # Scenario: New Rule: legacy form the rule doc impact should populate based on class type selection
+  ### Scenarios Existing Rule ###
+  # Scenario: Existing Rule: Viewing existing synched rule
+  # Scenario: Existing Rule: Viewing existing parsed new rule
+  # Scenario: Existing Rule: Viewing existing failed new rule
+  # Scenario: Existing Rule: Viewing existing parsed edited rule
+  # Scenario: Existing Rule: Viewing existing failed edited rule
+  # Scenario: Existing Rule: Viewing existing parsed stale edit rule
+  # Scenario: Existing Rule: Viewing existing failed stale edit rule
+  # Scenario: Existing Rule: One or more rules can be selected on a bug to view or edit
+  ### Scenarios Editing Rule ###
+  # Scenario: Edit Rule: A rule can be edited
+  # Scenario: a user can edit rule docs for a new rule
+  ### Scenarios Synching a rule from VC ###
+  # Scenario: Synch Rule: create a rule from synching
+  # Scenario: Synch Rule: update an existing synched rule
+  # Scenario: Synch Rule: do not update a with same rev
+  # Scenario: Synch Rule: VC updated for a parsed edited rule
+  # Scenario: Synch Rule: VC updated for a failed edited rule
 
 
   # ==== Existing rule ===
