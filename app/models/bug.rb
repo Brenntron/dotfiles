@@ -403,20 +403,31 @@ class Bug < ApplicationRecord
           end
           unless new_attachments.empty?
             new_attachments['bugs'][bug_id.to_s].each do |attachment|
-              new_attachment = Attachment.find_or_create_by(id: attachment['id']) do |new_attach_record|
-                new_attach_record.id = attachment['id']
-                new_attach_record.size = attachment['size']
-                new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
-                new_attach_record.file_name = attachment['file_name']
-                new_attach_record.summary = attachment['summary']
-                new_attach_record.content_type = attachment['content_type']
-                new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
-                new_attach_record.creator = attachment['attacher']
-                new_attach_record.is_private = attachment['is_private']
-                new_attach_record.is_obsolete = attachment['is_obsolete']
-                new_attach_record.minor_update = false
-                new_attach_record.created_at = attachment['creation_time'].to_time
+              if Attachment.where(file_name: attachment['file_name']).exists?
+                new_attachment = Attachment.where(file_name: attachment['file_name']).first
+                if attachment['is_obsolete'] == true
+                  new_attachment.is_obsolete = true
+                  new_attachment.save
+                end
+              else
+                new_attachment = Attachment.create do |new_attach_record|
+                  new_attach_record.id = attachment['id']
+                  new_attach_record.size = attachment['size']
+                  new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
+                  new_attach_record.file_name = attachment['file_name']
+                  new_attach_record.summary = attachment['summary']
+                  new_attach_record.content_type = attachment['content_type']
+                  new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
+                  new_attach_record.creator = attachment['attacher']
+                  new_attach_record.is_private = attachment['is_private']
+                  new_attach_record.is_obsolete = attachment['is_obsolete']
+                  new_attach_record.minor_update = false
+                  new_attach_record.created_at = attachment['creation_time'].to_time
+                end
               end
+
+
+
               new_record.attachments << new_attachment
             end
           end

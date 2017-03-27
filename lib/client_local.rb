@@ -93,6 +93,7 @@ while message = client.receive
 
     # Store the pcaps for testing
     pcaps = Hash.new
+    pcaps[""] = 0 #rulesAPI doesnt like single pcaps it wants at least 2 adding a blank entry causes it to not fail
 
     # Fetch all of the needed pcaps into the cache directory
     request['pcaps'].each do |attachment_id|
@@ -172,6 +173,8 @@ while message = client.receive
     # Wait for the job to finish
     req.url = "https://ruleapitest.vrt.sourcefire.com/jobs/#{job_id}"
     job={}
+    pcaps.except!("") #remove the blank key that we created for ruleAPI because we dont need it after the job is finished
+
     unless Rails.env == "development"
       # Wait for the job to finish
       begin
