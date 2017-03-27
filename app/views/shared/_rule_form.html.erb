@@ -191,7 +191,7 @@
       <div class="col-xs-12">
         <h5>Metadata</h5>
       </div>
-      <div class="col-xs-12">
+      <div class="col-xs-12 form-inline">
         <div class="entry-type-switch">
           <div class="radio">
             <label>
@@ -200,20 +200,16 @@
             </label>
           </div>
         </div>
-        <div class="col-xs-10 form-inline">
-          <label for="metadata-policy">Policy:&nbsp;&nbsp;</label>
-          <% ['security-ips', 'balanced-ips', 'connectivity-ips', 'max-detect-ips'].each do |policy| %>
-              <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="policy <%= policy %> drop" id=<%= policy %>> <%= policy %>
-              <input type="checkbox" name="alert-drop" class="drop_alert" checked data-size='mini' data-on-color="default" data-on-text="drop" data-off-text="alert" id="drop-alert-<%=policy%>">
-          <%end%>
-        </div>
+        <label for="metadata-policy" class="policy_box">Policy:</label>
+        <% ['security-ips', 'balanced-ips', 'connectivity-ips', 'max-detect-ips'].each do |policy| %>
+            <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="policy <%= policy %> drop" id=<%= policy %>> <%= policy %>
+            <input type="checkbox" name="alert-drop" class="drop_alert" checked data-size='mini' data-on-color="default" data-on-text="drop" data-off-text="alert" id="drop-alert-<%=policy%>">
+        <%end%>
       </div>
       <div class="col-xs-12">
         <div class="entry-type-switch"></div>
-        <div class="col-xs-2 col-sm-1">
-          <label for="metadata-services">Service:</label>
-        </div>
         <div class="col-xs-8 col-sm-9 other-dropdown">
+          <label for="metadata-services" class="service_box">Service:</label>
           <% RulesHelper::TOP_SERVICES.each do |service| %>
               <input type="checkbox" name="rule[metadata][]" class="metadata_form" value="service <%= service %>" <%= "checked" if service == 'ftp-data' || service == 'http' || service == 'imap' || service == 'pop3' %>>&nbsp;<%= service %>&nbsp;&nbsp;
           <% end %>
@@ -222,20 +218,22 @@
       </div>
       <div class="col-xs-12">
         <div class="entry-type-switch"></div>
-        <div class="form-inline col-xs-10">
+      </div>
+      <div class="col-xs-12">
+        <div class="entry-type-switch"></div>
+        <div class="col-xs-8 col-sm-9">
           <div class="form-group">
-            <label for="metadata-flag">Impact Flag:&nbsp;&nbsp;</label>
-            <select class="form-control select-sm code metadata_form" name="rule[metadata][]" id="new-rule-metadata-flag">
-              <option value=""> -- </option>
-              <option value="red">red</option>
-            </select>
+            <label for="metadata-flag">Impact Flag:&nbsp;</label>
+            <input type="checkbox" name="rule[metadata][]" id="new-rule-metadata-flag" value="impact_flag red"> red
           </div>
+        </div>
+      </div>
+      <div class="col-xs-12">
+        <div class="entry-type-switch"></div>
+        <div class="col-xs-8 col-sm-9">
           <div class="form-group">
-            <label for="metadata-ruleset">Ruleset:&nbsp;&nbsp;</label>
-            <select class="form-control select-sm code metadata_form" name="rule[metadata][]" id="new-rule-metadata-ruleset">
-              <option value=""> -- </option>
-              <option value="community">community</option>
-            </select>
+            <label for="metadata-ruleset" class="ruleset_box">Ruleset:</label>
+            <input type="checkbox" name="rule[metadata][]" id="new-rule-metadata-ruleset" value="ruleset community"> community
           </div>
         </div>
       </div>

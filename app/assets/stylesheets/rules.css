@@ -18,3 +18,16 @@ del {
 .onError {
     border-color: red;
 }
+
+.policy_box {
+    padding-right:3.7em;
+    padding-left:1.1em;
+}
+
+.service_box {
+    padding-right:2.9em;
+}
+
+.ruleset_box {
+    padding-right:2.85em;
+}
