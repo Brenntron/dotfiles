@@ -443,7 +443,12 @@ class Rule < ApplicationRecord
         self.detection = /detection:\s*(?<det>.+?);/ =~ rule_content ? det : nil
       else
         detection = /Detection\s*:\n(?<det>.*)Metadata/m =~ parser.parsed_lines ? det.gsub(/\t|#\n/, '').strip : nil
-        self.detection = detection.nil? ? nil : detection[-1, 1] == ';' ? detection : detection + ';'
+        self.detection =
+            if detection.nil?
+              nil
+            else
+              detection[-1, 1] == ';' ? detection : detection + ';'
+            end
         self.rule_category = RuleCategory.find_or_create_by(category: self.message.split(' ')[0])
       end
     else
