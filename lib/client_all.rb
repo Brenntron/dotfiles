@@ -227,12 +227,10 @@ while message = client.receive
                     puts "#{pcap_name}:"
 
                     # Fetch the associated pcap tests
-                    print "getting pcap tests"
                     req.url = "https://ruleapitest.vrt.sourcefire.com/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
                     JSON.parse(HTTPI.get(req).body).each do |pt|
 
                       # Now fetch the alerts
-                      print "getting alerts"
                       req.url = "https://ruleapitest.vrt.sourcefire.com/alerts?pcap_test_id=#{pt['id']}"
                       alerts = JSON.parse(HTTPI.get(req).body)
 

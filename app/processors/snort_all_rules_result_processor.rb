@@ -74,6 +74,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
           end
         end
         attachments.each do |attachment_id, alerts|
+
           attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
 
           alerts.each do |alert|
@@ -87,7 +88,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                   rule = Rule.new(:gid => alert['gid'].to_i, :sid => alert['sid'].to_i, :rev => alert['rev'].to_i, :message => alert['message'])
                 end
 
-                rule.rule_state = RuleState.Unchanged
+                rule.state = "UNCHANGED"
               end
 
               # The rule should have extracted if it was valid

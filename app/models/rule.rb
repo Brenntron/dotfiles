@@ -538,7 +538,7 @@ class Rule < ApplicationRecord
   def update_rule
     begin
       rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
-      rule.rule_state = RuleState.Unchanged
+      rule.state = "UNCHANGED"
       rule.attachments.clear
       rule.save(validate: false)
 
@@ -563,7 +563,7 @@ class Rule < ApplicationRecord
 
   def remove_rule_from_bug(bug, rule)
     # Remove any new alerts from the attachments
-    if rule.rule_state == RuleState.New
+    if rule.state == "NEW"
       bug.attachments.each do |attachment|
         attachment.rules.delete(rule)
       end
@@ -586,14 +586,14 @@ class Rule < ApplicationRecord
         rule.message = parsed['msg'].gsub("\"", "")
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']
-        rule.state = 'Unchanged'
+        rule.state = 'UNCHANGED'
       else
         rule.content = body
         rule.message = parsed['msg'].gsub("\"", "")
         rule.gid = 1
         rule.sid = parsed['sid']
         rule.rev = parsed['revision']
-        rule.state = 'Unchanged'
+        rule.state = 'UNCHANGED'
       end
       rule.edit_status = EDIT_STATUS_SYNCHED
       rule.publish_status = PUBLISH_STATUS_SYNCHED
