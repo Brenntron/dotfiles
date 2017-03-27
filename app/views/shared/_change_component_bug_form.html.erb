@@ -1,8 +1,15 @@
-<form id="change_component_form" style="display:none;" class="form-inline top-space">
-  <div class="form-group row">
-    <div class="col-xs-12 col-lg-10">
-      <%=select_tag :component, options_for_select(['Snort Rules', 'SO Rules', 'Malware'], selected: @bug.component), id: 'bug_component', class: "form-control create-input select-sm code"%>
-      <button class="btn btn-xs btn-default" value="submit" type="submit">change component</button>
+<div class="col-sm-12">
+  <form id="change_component_form" style="display:none;" class="form-inline top-space">
+    <div class="form-group row">
+      <div class="col-xs-12 col-lg-10">
+        <%=select_tag :component, options_for_select(['Snort Rules', 'SO Rules', 'Malware'], selected: @bug.component), id: 'bug_component', class: "form-control create-input select-sm code"%>
+      </div>
+      <div class="col-sm-8">
+        <button class="btn btn-xs btn-default" value="submit" type="submit">change component</button>
+      </div>
+      <div class="col-sm-2">
+        <span class="glyphicon glyphicon-remove cancel-button" style="display:none;"id="cancel_component"></span>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>

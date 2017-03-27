@@ -1,13 +1,19 @@
-
-<form id="change_state_form" style="display:none;" class="form-inline top-space">
-  <div class="form-group row">
-    <div class="col-xs-12 col-lg-10">
-      <%=select_tag :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)), id: 'bug_state', class: 'form-control input-sm'%>
-      <% unless @bug.can_set_pending? %>
-          <br><span class="tiny text-muted ">Cant set to pending. please assign attachments to exploits.</span><br>
-      <% end %>
-      <input type="hidden" name="bug_id" value="<%= @bug.id %>">
-      <button class="btn btn-xs btn-default" value="submit" type="submit" id="submit_change">Submit State</button>
+<div class="col-sm-12">
+  <form id="change_state_form" style="display:none;" class="form-inline top-space">
+    <div class="form-group row">
+      <div class="col-xs-12">
+        <%=select_tag :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)), id: 'bug_state', class: 'form-control input-sm'%>
+        <% unless @bug.can_set_pending? %>
+            <br><span class="tiny text-muted ">Cant set to pending. please assign attachments to exploits.</span><br>
+        <% end %>
+      </div>
+      <div class="col-sm-6">
+        <input type="hidden" name="bug_id" value="<%= @bug.id %>">
+        <button class="btn btn-xs btn-default" value="submit" type="submit" id="submit_change">change state</button>
+      </div>
+      <div class="col-sm-2">
+        <span class="glyphicon glyphicon-remove cancel-button" style="display:none;"id="cancel_state"></span>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>

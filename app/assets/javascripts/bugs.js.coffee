@@ -60,12 +60,25 @@ $ ->
 
 
   $('.edit-summary').on 'click', ->
-    $('.edit-summary-field').toggle()
-    $('.edit-summary').toggle()
+    $('.edit-summary-field, .edit-summary').toggle()
 
-  $('.cancel-button').on 'click', ->
-    $('.edit-summary-field').toggle()
-    $('.edit-summary').toggle()
+  $('#cancel_summary').on 'click', ->
+    $('.edit-summary-field, .edit-summary').toggle()
+
+  $('#cancel_state').on 'click', ->
+    $('#current_bug_state, #change_state_form, #cancel_state').toggle()
+
+  $('#cancel_priority').on 'click', ->
+    $('#current_bug_priority, #change_priority_form, #cancel_priority').toggle()
+
+  $('#cancel_component').on 'click', ->
+    $('#current_bug_component, #change_component_form, #cancel_component').toggle()
+
+  $('#cancel_editor').on 'click', ->
+    $('#current_bug_editor, #change_editor_form, #cancel_editor').toggle()
+
+  $('#cancel_committer').on 'click', ->
+    $('#current_bug_committer, #change_committer_form, #cancel_committer').toggle()
 
   $('#bug_tab a:first').tab('show')
 
@@ -75,19 +88,19 @@ $ ->
       return false;
 
   $(document).on 'click', '.change_current_bug_state', ->
-    $('#current_bug_state, #change_state_form').toggle()
+    $('#current_bug_state, #change_state_form, #cancel_state').toggle()
 
   $(document).on 'click', '.change_current_bug_editor', ->
-    $('#current_bug_editor, #change_editor_form').toggle()
+    $('#current_bug_editor, #change_editor_form, #cancel_editor').toggle()
 
   $(document).on 'click', '.change_current_bug_priority', ->
-    $('#current_bug_priority, #change_priority_form').toggle()
+    $('#current_bug_priority, #change_priority_form, #cancel_priority').toggle()
 
   $(document).on 'click', '.change_current_bug_committer', ->
-    $('#current_bug_committer, #change_committer_form').toggle()
+    $('#current_bug_committer, #change_committer_form, #cancel_committer').toggle()
 
   $(document).on 'click', '.change_current_bug_component', ->
-    $('#current_bug_component, #change_component_form').toggle()
+    $('#current_bug_component, #change_component_form, #cancel_component').toggle()
 
   $('.delete_bug').on 'click', ->
     id = $(this).parents('tr').attr('id')
