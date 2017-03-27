@@ -41,13 +41,37 @@ class VisruleParser
     @parsed ||= !(parsed_lines.match(/FAILED/))
   end
 
-  def parsed_hash
-    @parsed_hash ||= parsed_lines.each_line.inject({}) do |parsed_hash, line|
+  def msg?
+    !!(/msg/ =~ parsed_lines)
+  end
+
+  def msg_hash
+    rule = rule_content
+
+    rule_params = {
+        sid: /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : nil,
+        gid: /gid:\s*(\d+)\s*;/.match(rule) ? /gid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : 1,
+        rev: /[Rr]ev\s*:\s(.+)/.match(rule_content) ? /[Rr]ev\s*:\s(.+)/.match(rule_content)[1] : 1,
+        connection: rule.match(/connection:\s*(.+?)\(/) ? rule.match(/connection:\s*(.+?)\(/)[1] : nil,
+        message: rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
+        detection: rule.match(/detection:\s*(.+?);/) ? rule.match(/detection:\s*(.+?);/)[1] : nil,
+        flow: rule.match(/flow:\s*(.+?);/) ? rule.match(/flow:\s*(.+?);/)[1] : nil,
+        metadata: /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
+        class_type: /classtype\s*:(.*)\)/.match(rule_content) ? /classtype\s*:(.*)\)/.match(rule_content)[1] : nil,
+    }.reject { |k, v,| v.nil? }
+  end
+
+  def nonmsg_hash
+    parsed_lines.each_line.inject({}) do |parsed_hash, line|
       if /\A\s*(?<key>\w+)\s*:\s?(?<value>.*[\S])\s*\z/ =~ line
         parsed_hash[key.downcase.to_sym] = value
       end
       parsed_hash
     end
+  end
+
+  def parsed_hash
+    @parsed_hash ||= msg? ? msg_hash : nonmsg_hash
   end
 
   def gid

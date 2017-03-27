@@ -321,12 +321,12 @@ Feature: Rules
     And  I check "rule_11"
     And  I click "edit"
     Then I should see div element with class "rule_11"
-    When I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    When I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"BLACKLIST short message"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "UPDATED" version "1:22211:3"
     And rule "11" is a current edit
-    And I should see "short msg"
+    And I should see "BLACKLIST short message"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "current-edit" and id "11"
