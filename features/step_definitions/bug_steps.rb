@@ -28,3 +28,9 @@ And(/^I change the "(.*?)" of bug number "(.*?)" to "(.*?)"$/) do |method, id, s
   # binding.pry
   # page.driver.put, "/api/v1/bugs/#{id}", { :params => {method: status} }
 end
+
+Given(/^the bug "(.*?)" has tag "(.*?)"$/) do |bug_id, tag |
+  @bug = Bug.find(bug_id)
+  @tag = Tag.find_or_create_by(name: tag)
+  @bug.tags << @tag
+end

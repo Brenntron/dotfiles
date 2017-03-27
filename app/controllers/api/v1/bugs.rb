@@ -14,6 +14,30 @@ module API
           PublishWebsocket.push_changes(record)
         end
 
+        desc "import all bugs assigned to a user"
+        params do
+          requires :user_id, type: Integer, desc: "the id of the user whose bugs we want"
+        end
+        get '/by_user/:user_id' do
+          xmlrpc_token = request.headers['Xmlrpc-Token']
+          user_email = User.where(id: permitted_params[:user_id]).first.email
+
+          if xmlrpc_token && user_email
+            begin
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+              new_bugs = xmlrpc.search(assigned_to: user_email, component: ['Malware', 'SO Rules', 'Snort Rules'])
+
+              #create the bugs from bugzilla
+              Bug.bugzilla_light_import(current_user, xmlrpc,xmlrpc_token,new_bugs).to_s if new_bugs['bugs'].count > 0
+            rescue Exception => e
+              Rails.logger.info e
+              false
+            end
+          else
+            false
+          end
+        end
+
         desc "get latest bugs from bugzilla"
         get 'import_all' do
           xmlrpc_token = request.headers['Xmlrpc-Token']
@@ -78,12 +102,11 @@ module API
                 end
                 progress_bar.update_attribute("progress", 60)
                 parsed[:tags].each do |tag|
-                  bug.tags << tag
+                  bug.tags << tag unless bug.tags.include?(tag)
                 end
                 progress_bar.update_attribute("progress", 75)
                 parsed[:refs].each do |ref|
                   Exploit.find_exploits(ref)
-                  bug.references << ref
                 end
                 progress_bar.update_attribute("progress", 90)
                 #save the bug
