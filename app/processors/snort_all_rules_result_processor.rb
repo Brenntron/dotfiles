@@ -49,6 +49,8 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
     puts "============================"
     puts "Configuring all rule results"
     result = JSON.parse(message)
+    puts result
+
 
     unless result['task_id'].nil?
 
@@ -72,6 +74,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
           end
         end
         attachments.each do |attachment_id, alerts|
+
           attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
 
           alerts.each do |alert|
@@ -80,17 +83,18 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
               if rule.nil?
                 if alert['gid'].to_i == 1
-                  rule = Rule.new(:content => Rule.find_current_rule(alert['sid'].to_i))
+                  rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i))
                 else
                   rule = Rule.new(:gid => alert['gid'].to_i, :sid => alert['sid'].to_i, :rev => alert['rev'].to_i, :message => alert['message'])
                 end
 
-                rule.rule_state = RuleState.Unchanged
+                rule.state = "UNCHANGED"
+                rule.edit_status = Rule::EDIT_STATUS_NEW
+                rule.publish_status = Rule::PUBLISH_STATUS_SYNCHED
               end
 
               # The rule should have extracted if it was valid
               if rule.valid?
-                rule.attachments << attachment
                 rule.save(:validate => false)
                 attachment.pcap_alerts.create(rule: rule)
               else
@@ -100,7 +104,6 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                     job.result << "#{rule.version} #{v}\n"
                   end
                 else
-                  rule.attachments << attachment
                   rule.save(:validate => false)
                   attachment.pcap_alerts.create(rule: rule)
                 end

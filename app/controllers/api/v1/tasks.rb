@@ -54,11 +54,11 @@ module API
           )
           case options[:task_type]
             when "attachment"
-              TestAttachment.new(new_task, request.headers['Cookie'], options[:attachment_array]).send_work_msg
+              TestAttachment.new(new_task, request.headers['Xmlrpc-Token'], options[:attachment_array]).send_work_msg
             when "rule"
-              TestRule.new(new_task, request.headers['Cookie'], options[:bug], options[:rule_array]).send_work_msg
+              TestRule.new(new_task, request.headers['Xmlrpc-Token'], options[:bug], options[:rule_array]).send_work_msg
             when "commmit"
-              SendCommit.send_work_msg(new_task,options,request.headers['Cookie'])
+              SendCommit.send_work_msg(new_task,options,request.headers['Xmlrpc-Token'])
           end
           new_task
         end

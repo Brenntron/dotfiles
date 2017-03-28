@@ -20,7 +20,7 @@ class TestRule
             {
               task_id: content.id,
               cookie: xmlrpc_token,
-              attachments: all_attachments,
+              pcaps: all_attachments,
               rules: rules_content
             }.to_json
   end

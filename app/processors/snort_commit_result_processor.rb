@@ -44,7 +44,7 @@ class SnortCommitResultProcessor < ApplicationProcessor
           end
 
           # Rule state should be updated
-          rule.rule_state = RuleState.Unchanged
+          rule.state = "UNCHANGED"
 
           # Finally save our rule update
           rule.save(:validate => false)
@@ -78,7 +78,7 @@ class SnortCommitResultProcessor < ApplicationProcessor
           rule.sid = match[0]
           rule.rev = 1
           rule.content = new_rule
-          rule.rule_state = RuleState.Unchanged
+          rule.state = "UNCHANGED"
           rule.save
 
           # Keep track of the new sids

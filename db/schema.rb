@@ -98,14 +98,6 @@ ActiveRecord::Schema.define(version: 20170321201155) do
     t.index ["user_id"], name: "index_bugs_on_user_id", using: :btree
   end
 
-  create_table "bugs_references", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "reference_id", null: false
-    t.integer "bug_id",       null: false
-    t.index ["bug_id", "reference_id"], name: "index_bugs_references_on_bug_id_and_reference_id", unique: true, using: :btree
-    t.index ["bug_id"], name: "index_bugs_references_on_bug_id", using: :btree
-    t.index ["reference_id"], name: "index_bugs_references_on_reference_id", using: :btree
-  end
-
   create_table "bugs_rules", primary_key: ["bug_id", "rule_id"], force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bug_id",  default: 0, null: false
     t.integer "rule_id", default: 0, null: false
@@ -187,13 +179,6 @@ ActiveRecord::Schema.define(version: 20170321201155) do
     t.integer "rule_id"
     t.index ["reference_id"], name: "index_references_rules_on_reference_id", using: :btree
     t.index ["rule_id"], name: "index_references_rules_on_rule_id", using: :btree
-  end
-
-  create_table "relationships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "user_id"
-    t.integer  "team_member_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

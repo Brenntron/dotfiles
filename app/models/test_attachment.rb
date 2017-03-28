@@ -8,14 +8,14 @@ class TestAttachment
             {
               task_id: content.id,
               cookie: xmlrpc_token,
-              attachments: attachments
+              pcaps: attachments
             }.to_json
   end
 
   def initialize(new_task, xmlrpc_token, attachments)
     @xmlrpc_token = xmlrpc_token
     @new_task = new_task
-    @attachments = attachments
+    @attachments = attachments.map { |attachment_id| attachment_id.to_i}
   end
 
   def send_work_msg

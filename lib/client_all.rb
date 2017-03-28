@@ -44,124 +44,109 @@
 # ==========================================================
 ######################
 
+require 'httpi'
+require 'curl'
 require 'open3'
 require 'stomp'
 require 'sfbugzilla'
 require 'json'
 require 'tmpdir'
 require 'tempfile'
-require 'vrt/rule_test_api'
 require 'base64'
+require 'pry'
 
 # Make sure we run from the application root
 Dir.chdir Rails.root
 
+
+HTTPI.log = false
+
+req = HTTPI::Request.new
+req.auth.gssnegotiate
+
+req.auth.ssl.ca_cert_file = Rails.configuration.cert_file
+
+
 # General options
-local_cache_path = File.expand_path('tmp/pcaps')
+local_cache_path = File.expand_path("#{Rails.root}/tmp/pcaps")
 
 if Rails.env =="development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
 # Make sure our pcaps cache exists
-if not File.exists?(local_cache_path)
+unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
 
 max_wait_for_job = 60 #seconds
 
-cert = OpenSSL::X509::Certificate.new()
-ssl_options= {}
 stomp_options = {}
-cert = OpenSSL::X509::Certificate.new(File.read(Rails.configuration.cert_file))
-ssl_options= {ca_file: Rails.configuration.cert_file, client_cert: cert}
 stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
 }
-
+puts "xmlrpc to bugzilla"
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 
+puts "create stomp client and subscribe to amq"
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
 client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", {:ack => :client}
 
-# Initialize the API
-tries ||= 3
-begin
-  RuleTestAPI.init(Rails.configuration.ruletest_server, ssl_options)
-rescue Exception => e
-  retry unless (tries -= 1).zero?
-end
-# Find the engine we should be using for these rules
-engine_type = EngineType.where(:name => 'Persistent').first
-snort_configuration = SnortConfiguration.where(:name => 'Open Source').first
-rule_configuration = RuleConfiguration.where(:name => 'All Rules').first
-
-# Make sure everything was found
-raise Exception.new("Unable to find Persistent engine type") if engine_type.nil?
-raise Exception.new("Unable to find Open Source snort configuration") if snort_configuration.nil?
-raise Exception.new("Unable to find All Rules configuration") if rule_configuration.nil?
-
-engine = Engine.where(
-    :engine_type_id => engine_type[:id],
-    :snort_configuration_id => snort_configuration[:id],
-    :rule_configuration_id => rule_configuration[:id]).first
-raise Exception.new("Unable to find the Persistent All Rules Open Source engine") if engine.nil?
-
-puts "listening to queue"
+puts "listening to ALL queue"
 while message = client.receive
   puts "starting all rule work"
   puts "++++++++++++++++++++++"
-  alerts = Array.new
+  pcap_alerts = Array.new
   errors = Array.new
   task_id = nil
 
   begin
-
     # Start by parsing the request
     request = JSON.parse(message.body)
+
+    puts request
 
     # Release the message early
     client.ack(message.headers['message-id'])
 
-    # Use this for hashing the pcaps
-    sha256 = Digest::SHA256.new
-
     # Store the pcaps for testing
     pcaps = Hash.new
+    pcaps[""] = 0 #rulesAPI doesnt like single pcaps it wants at least 2 adding a blank entry causes it to not fail
 
     # Save the task_id
     task_id = request['task_id']
 
     # Fetch all of the needed pcaps into the cache directory
-    request['attachments'].each do |attachment_id|
+    request['pcaps'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
 
       # Updated files get new attachment ids so no need to test the actual data
-      if not File.exists?(pcap_path)
+      unless File.exists?(pcap_path)
         attempts = 0
 
+        # Retry if we get a bugzilla EOF error
         begin
           xmlrpc.token = request['cookie']
           bug = Bugzilla::Bug.new(xmlrpc)
           res = bug.attachments(:attachment_ids => attachment_id, :include_fields => ['data'])
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
 
-          # Try to fetch and write this pcap
-          IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
+          # Finally, we should actually have data
+          bytes_written = IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
 
         rescue Exception => e
+
           # Try 5 times to let Bugzilla stop sucking before bailing
-          if attempts < 20
+          if attempts < 5
             attempts += 1
             sleep 1
             retry
           else
-            errors << "Unable to fetch attachment #{attachment_id} from Bugzilla: #{e.to_s}"
-            next
+            raise Exception.new("Failed to read pcap from Bugzilla after 5 attempts. Exception was: #{e.to_s}, bytes written: #{bytes_written}")
           end
         end
       end
@@ -169,65 +154,122 @@ while message = client.receive
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
 
-      # Start by hashing the pcap data
-      sha = Digest.hexencode(sha256.digest(pcap_data))
-
-      # See if the PCAP exists on the server
-      pcap = Pcap.where(:file_hash => sha).first
+      req.url = 'https://ruleapitest.vrt.sourcefire.com/pcaps'
 
       # Should we upload the pcap
-      if pcap.nil?
-        pcap = Pcap.create(:pcap => Base64.encode64(pcap_data))
+      req.body = Curl::PostField.file("pcap", pcap_path) #build the curl request
+      #now we make the request as a post request
+      resp = HTTPI.post req do |http|
+        http.multipart_form_post = true
       end
 
       # Make sure that worked
-      if pcap.error?
-        errors << pcap.error
+      if resp.code != 200 and resp.code != 201 #if it didnt work the say so
+        raise Exception.new("Upload of #{pcap_file} failed: #{resp.code} - #{resp.body}")
       else
-        pcaps[sha] = {:pcap_id => pcap.id, :attachment_id => attachment_id}
+        pcaps[JSON.parse(resp.body)['id']] = attachment_id #now we compile a hash using ids as keys and the pcaps as values
       end
     end
 
-    test_pcaps = pcaps.map { |k, v| v[:pcap_id] }
+    test_pcaps = pcaps.map { |k, v| k.to_i }
 
     # The rest client will only send a single entry if there is only one in the array
-    if test_pcaps.size == 1
-      test_pcaps << ""
+    if test_pcaps.size < 1
+      raise Exception.new("No pcaps uploaded for testing")
     end
 
+    req.url = 'https://ruleapitest.vrt.sourcefire.com/jobs'
+
     # Create the new job
-    job = Job.create(:engine_id => engine.attributes[:id], :pcaps => test_pcaps, :completed => false)
+    puts "Creating persistent job"
+    req.body = {
+        :pcaps => test_pcaps,
+        :engine_id => 1, #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
+    }
 
-    # Make sure the job was created
-    raise Exception.new("Failed to create job: #{job.error}") if job.error?
+    resp = HTTPI.post(req) #make the request
 
+    if resp.code != 200 and resp.code != 201
+      raise Exception.new("Failed to create new job with pcaps (#{pcaps}): #{resp.code} - #{resp.body}")
+    end
+
+    # Make sure we have a job id
+    job_id = JSON.parse(resp.body)['id']
+
+    # Wait for the job to finish
+    req.url = "https://ruleapitest.vrt.sourcefire.com/jobs/#{job_id}"
+
+    job = {}
+
+    pcaps.except!("") #remove the blank key that we created for ruleAPI because we dont need it after the job is finished
 
     unless Rails.env == "development"
       # Wait for the job to finish
-      puts "waiting for job to finish..."
-      sleep_counter = 0
-      until (job.completed == "1")
-        sleep_counter += 1
-        sleep 1
-        job = Job.find(job.attributes[:id])
+      begin
+        print "Waiting on job #{job_id} to complete: "
 
-        raise Exception.new("Job Timed Out") if sleep_counter == max_wait_for_job
-      end
-      puts "...done"
-    end
+        Timeout::timeout(120) do
+          while true
+            resp = HTTPI.get(req)
 
-    # Send back alerts
-    job.pcap_tests.each do |pt|
-      pt.alerts.each do |alert|
-        alerts <<
-            {
-                :id => pcaps[pt.pcap.file_hash][:attachment_id],
-                :gid => alert.gid,
-                :sid => alert.sid,
-                :rev => alert.rev,
-                :message => alert.msg
-            }
+            if resp.code != 200
+              raise Exception.new("Failed to fetch job status for #{job_id} #{resp.code}: #{resp.body}")
+            else
+              job = JSON.parse(resp.body)
+
+              if job['completed'] == "1"
+                puts
+                if job['failed'] == "1"
+                  puts "Job failed: #{job}"
+                else
+                  pcaps.each do |pcap_id, pcap_name|
+                    puts "#{pcap_name}:"
+
+                    # Fetch the associated pcap tests
+                    req.url = "https://ruleapitest.vrt.sourcefire.com/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
+                    JSON.parse(HTTPI.get(req).body).each do |pt|
+
+                      # Now fetch the alerts
+                      req.url = "https://ruleapitest.vrt.sourcefire.com/alerts?pcap_test_id=#{pt['id']}"
+                      alerts = JSON.parse(HTTPI.get(req).body)
+
+                      if alerts.size == 0
+                        puts "\tNO ALERTS"
+                      else
+                        alerts.each do |alert|
+
+                          puts "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}"
+                          pcap_alerts <<
+                              {
+                                  :id => pcap_name,
+                                  :gid => alert['gid'],
+                                  :sid => alert['sid'],
+                                  :rev => alert['rev'],
+                                  :message => alert['msg']
+                              }
+                        end
+                      end
+                    end
+                  end
+                end
+
+                # We are done either way
+                break
+              end
+            end
+
+            # Wait before trying again
+            print "."
+            sleep 1
+          end
+        end
+
+      rescue Exception => e
+        raise Exception.new(e.message)
+      rescue Timeout::Error => e
+        puts "Timed out waiting for #{job_id} to finish"
       end
+
     end
 
 
@@ -235,21 +277,19 @@ while message = client.receive
     print "Failed to parse json message:"
     puts e.to_s
     puts e.backtrace.join("\n\t")
+
   rescue EOFError => e
     errors << "Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}"
   rescue Exception => e
-    errors << "An unknown error occurred: #{$!}\n#{e.backtrace.join("\n\t")}"
+    errors << e.message
   end
 
   # Finally, send the results back
-  puts alerts.inspect
-  puts errors.inspect
-  puts task_id
   unless task_id.nil?
     client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
                    {
                        :task_id => task_id,
-                       :alerts => alerts,
+                       :alerts => pcap_alerts,
                        :errors => errors,
                    }.to_json
   end

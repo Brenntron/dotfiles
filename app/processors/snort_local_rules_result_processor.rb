@@ -38,8 +38,10 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
   def on_message(message)
     puts "=============================="
     puts "Configuring local rule results"
+    # if you need a test message the following is a sample of what the rulesapi returns after a successful test.
+    # message = '{"id":79922, "gid":1, "sid":26471, "rev":6, "message":"PROTOCOL-FTP VanDyke AbsoluteFTP LIST command stack buffer overflow attempt"}'
     result = JSON.parse(message)
-
+    puts result
     attachment = Attachment.find_by_bugzilla_attachment_id(result['id'])
 
     # Is this an alert message or a job completion message?
@@ -71,7 +73,6 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
       # Watch out for preproc and file-identify rules in alerts
       unless rule.nil?
         begin
-          rule.attachments << attachment
           attachment.local_alerts.create(rule: rule)
         rescue ActiveRecord::RecordNotUnique => e
           # Ignore
