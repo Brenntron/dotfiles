@@ -503,9 +503,10 @@ class Rule < ApplicationRecord
       when !rule.parsed?
         nil
       # new rule happens when loading from file for the first time.
-      when rule_db.nil?
+      when rule.new_record?
         rule.edit_status                = EDIT_STATUS_SYNCHED
         rule.publish_status             = PUBLISH_STATUS_SYNCHED
+        rule.state                      = 'UNCHANGED'
         rule.save!
         rule.associate_references(rule_content)
         rule
@@ -515,6 +516,7 @@ class Rule < ApplicationRecord
       when rule_db.rev != rule.rev
         rule.edit_status                = EDIT_STATUS_SYNCHED
         rule.publish_status             = PUBLISH_STATUS_SYNCHED
+        rule.state                      = 'UNCHANGED'
         rule.save!
         rule
       else
