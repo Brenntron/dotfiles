@@ -207,6 +207,6 @@ Then(/^rule "(.*)" is a current edit/) do |rule_id|
 end
 
 Given(/^rule sid "(.*)" rev "(.*)" is synched$/) do |sid, rev|
-  rule_content = "alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:\"short msg\"; flow:established; content:\"E_|00 03 05|\"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:#{sid}; rev:#{rev};)"
+  rule_content = "alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:\"BLACKLIST short message\"; flow:established; content:\"E_|00 03 05|\"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:#{sid}; rev:#{rev};)"
   Rule.synch_rule_content(rule_content)
 end

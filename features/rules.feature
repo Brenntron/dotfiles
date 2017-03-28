@@ -152,12 +152,12 @@ Feature: Rules
     And  I should see a rule row with class "parsed" and version "new_rule"
     When I check "rule[id]"
     And  I click "edit"
-    And  I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    And  I fill in "rule[rule_content]" with "# alert (msg:"BLACKLIST short mess"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see a rule with state "FAILED" version "new_rule"
 #    And rule "11" is a new rule
-    And  I should see "short msg"
+    And  I should see "BLACKLIST short mess"
     And  I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "failed" and version "new_rule"
@@ -173,14 +173,14 @@ Feature: Rules
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "create"
-    And  I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"BLACKLIST test msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; rev:1;)"
+    And  I fill in "rule[rule_content]" with "# alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:"BLACKLIST test mess"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; rev:1;)"
     And  I fill in "summary" with "rule doc summary"
     And  I click "Create Rule"
     And  I wait for "1" seconds
     When I click the "Rules" tab
     And  I click button "list all"
     Then I should see a rule with state "NEW" version "new_rule"
-    And  I should see "BLACKLIST test msg"
+    And  I should see "BLACKLIST test mess"
 #    And rule "11" is a new rule
     And  I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
@@ -356,12 +356,12 @@ Feature: Rules
     And  I check "rule_11"
     And  I click "edit"
     Then I should see div element with class "rule_11"
-    When I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+    When I fill in "rule[rule_content]" with "# alert (msg:"BLACKLIST short mess"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "FAILED" version "1:22211:3"
     And rule "11" is a current edit
-    And I should see "short msg"
+    And I should see "BLACKLIST short mess"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "current-edit" and id "11"
