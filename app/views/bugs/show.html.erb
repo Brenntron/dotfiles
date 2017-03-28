@@ -62,7 +62,7 @@
           <h5 class="edit-summary-field"><%= @bug.summary %> <button id="summary" class="tiny text-muted edit-summary"><em>change</em></button></h5>
           <%= form_tag("/bugs/#{@bug.id}", method: :put) do -%>
             <div class="col-xs-12">
-              <%= text_field_tag 'bug[summary]', "#{@bug.summary}", class:"edit-summary-field form-control", style:"display:none"%>
+              <%= text_field_tag 'bug[summary]', "#{@bug.summary}", class:"edit-summary-field form-control create-input select-sm", style:"display:none"%>
             </div>
             <div class="col-sm-2">
               <%= submit_tag 'change summary', class: "edit-summary-field btn btn-default btn-xs", style:"display:none;" %>
