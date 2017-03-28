@@ -53,7 +53,7 @@ req.auth.gssnegotiate
 req.auth.ssl.ca_cert_file = Rails.configuration.cert_file
 
 # General options
-local_cache_path = File.expand_path("tmp/pcaps/")
+local_cache_path = File.expand_path('#{Rails.root}/tmp/pcaps')
 
 if Rails.env == "development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
