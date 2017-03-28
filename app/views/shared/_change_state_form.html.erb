@@ -2,7 +2,7 @@
   <form id="change_state_form" style="display:none;" class="form-inline top-space">
     <div class="form-group row">
       <div class="col-xs-12">
-        <%=select_tag :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)), id: 'bug_state', class: 'form-control input-sm'%>
+        <%=select_tag :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)), id: 'bug_state', class: 'form-control create-input select-sm'%>
         <% unless @bug.can_set_pending? %>
             <br><span class="tiny text-muted ">Cant set to pending. please assign attachments to exploits.</span><br>
         <% end %>
