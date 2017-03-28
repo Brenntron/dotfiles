@@ -1,8 +1,15 @@
-<form id="change_editor_form" style="display:none;" class="form-inline top-space">
-  <div class="form-group row">
-    <div class="col-xs-12 col-lg-10">
-      <%=select_tag :user_id, options_for_select(Bug.allowed_editors(@bug).pluck(:cvs_username,:id), selected: @bug.user_id), id: 'bug_editor', class: 'form-control input-sm'%>
-      <button class="btn btn-xs btn-default" value="submit" type="submit">change editor</button>
+<div class="col-sm-12">
+  <form id="change_editor_form" style="display:none;" class="form-inline top-space">
+    <div class="form-group row">
+      <div class="col-xs-12">
+        <%=select_tag :user_id, options_for_select(Bug.allowed_editors(@bug).pluck(:cvs_username,:id), selected: @bug.user_id), id: 'bug_editor', class: 'form-control create-input select-sm'%>
+      </div>
+      <div class="col-xs-2">
+        <button class="btn btn-xs btn-default" value="submit" type="submit">change editor</button>
+      </div>
+      <div class="col-xs-1">
+        <span class="glyphicon glyphicon-remove cancel-button-sm" style="display:none;"id="cancel_editor"></span>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>
