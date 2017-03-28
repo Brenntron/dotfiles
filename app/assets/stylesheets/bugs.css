@@ -58,6 +58,12 @@ div.progress{
     font-size:18px;
 }
 
+.cancel-button-xs{
+    margin-top:6px;
+    margin-left:8px;
+    font-size:18px;
+}
+
 #bug-rules-table .rule-test-alert {
     display: none;
 }
