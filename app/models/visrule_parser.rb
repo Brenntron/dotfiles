@@ -82,4 +82,8 @@ class VisruleParser
     # sid could be nil for a new rule
     parsed_hash[:sid] && parsed_hash[:sid].to_i
   end
+
+  def rev
+    parsed_hash[:rev] && parsed_hash[:rev].to_i
+  end
 end
