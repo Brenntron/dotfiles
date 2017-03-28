@@ -766,7 +766,7 @@ class Rule < ApplicationRecord
   # draft        | new-rule or edited-rule
   # parsed       | draft parsed correctly in
   # failed       | new-rule or edited-rule
-  # @returns [String] the CSS class name(s), space delimited if multiple
+  # @return [String] the CSS class name(s), space delimited if multiple
   def css_class
     [].tap do |css_classes|
       css_classes << 'synched' if synched?
@@ -780,21 +780,31 @@ class Rule < ApplicationRecord
     end.join(' ')
   end
 
-  def self.create_rule_action(bug_id, rule_content)
-    rule = Rule.save_rule_content(rule_content)
-    # rule.save
+  # Creates a rule and its associations
+  # @return [Rule]
+  def self.create_action(bug_id, rule_content, rule_doc, rule_params)
+    Rule.save_rule_content(rule_content).tap do |rule|
+      if bug_id
+        bug = Bug.where(id: bug_id).first
+        bug.rules << rule if bug
+      end
 
-    # bug = Bug.where(id: bug_id).first
-    # bug.rules << rule
+      rule.associate_references(rule_content)
+      rule.update(detection: rule_params[:detection].strip!, class_type: rule_params[:class_type]) unless rule.parsed?
+      rule.update(rule_category_id: rule_params[:rule_category_id])
+      rule.create_rule_doc(rule_doc)
+    end
   end
 
-  def self.update_rule_action(rule_id, rule_content, rule_doc)
+  # Updates a rule and its associations
+  # @return [Rule]
+  def self.update_action(rule_id, rule_content, rule_doc)
     Rule.save_rule_content(rule_content, rule_id).tap do |rule|
-      rule.update_references(permitted_params[:rule][:rule_content])
+      rule.update_references(rule_content)
       if rule.rule_doc.present?
-        rule.rule_doc.update(permitted_params[:rule][:rule_doc])
+        rule.rule_doc.update(rule_doc)
       else
-        rule.create_rule_doc(permitted_params[:rule][:rule_doc])
+        rule.create_rule_doc(rule_doc)
       end
     end
   end

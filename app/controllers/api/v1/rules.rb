@@ -44,6 +44,8 @@ module API
         end
 
 
+        # Creates a rule and its associations
+        # @return [Rule]
         desc "create a rule"
         params do
           requires :rule, type: Hash do
@@ -70,16 +72,10 @@ module API
         post "", root: "rule" do
           authorize! :create, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          new_rule = Rule.create(Rule.parse_and_create_rule(permitted_params[:rule][:rule_content]))
-
-          bug = Bug.where(id:permitted_params[:rule][:bug_id]).first
-          new_rule.bugs << bug if permitted_params[:rule][:bug_id]
-
-          new_rule.associate_references(permitted_params[:rule][:rule_content])
-          new_rule.update(detection:permitted_params[:rule][:detection].strip!, class_type:permitted_params[:rule][:class_type]) if new_rule.state == 'FAILED'
-          new_rule.update(rule_category_id: permitted_params[:rule][:rule_category_id], edit_status: Rule::EDIT_STATUS_NEW, publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
-          new_rule.create_rule_doc(permitted_params[:rule][:rule_doc])
-          new_rule
+          Rule.create_action(permitted_params[:rule][:bug_id],
+                                        permitted_params[:rule][:rule_content],
+                                        permitted_params[:rule][:rule_doc],
+                                        permitted_params[:rule])
         end
 
 
@@ -97,6 +93,8 @@ module API
         end
 
 
+        # Updates a rule and its associations
+        # @return [Rule]
         desc "Edit a rule"
         params do
           requires :id, type: Integer, desc: "The database id of the rule you want to update."
@@ -120,7 +118,7 @@ module API
         put ":id", root: "rule" do
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          Rule.update_rule_action(permitted_params[:id],
+          Rule.update_action(permitted_params[:id],
                                   permitted_params[:rule][:rule_content],
                                   permitted_params[:rule][:rule_doc])
         end
