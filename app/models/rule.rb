@@ -401,14 +401,6 @@ class Rule < ApplicationRecord
     { rule: parser.parsed_lines, errors: parser.errors }
   end
 
-  # Takes the hash and adds some data from the rules text
-  # @param [String, #read] rule the line of rule text.
-  # @return [Hash] a hash, with data from parsing rule text.
-  def self.parse_and_create_rule(rule)
-    parsed = visruleparser(rule)
-    parse_from_visrule(rule, parsed)
-  end
-
   # Extracts components from VisruleParser and sets field of rule.
   # Does not save the rule.
   # Does not set state, edit_status, or publish_status,
