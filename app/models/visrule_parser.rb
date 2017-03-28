@@ -58,13 +58,13 @@ class VisruleParser
         flow: rule.match(/flow:\s*(.+?);/) ? rule.match(/flow:\s*(.+?);/)[1] : nil,
         metadata: /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
         class_type: /classtype\s*:(.*)\)/.match(rule_content) ? /classtype\s*:(.*)\)/.match(rule_content)[1] : nil,
-    }.reject { |k, v,| v.nil? }
+    }.reject { |k, value,| value.nil? || value == '<MISSING>' }
   end
 
   def nonmsg_hash
     parsed_lines.each_line.inject({}) do |parsed_hash, line|
       if /\A\s*(?<key>\w+)\s*:\s?(?<value>.*[\S])\s*\z/ =~ line
-        parsed_hash[key.downcase.to_sym] = value
+        parsed_hash[key.downcase.to_sym] = value unless value.nil? || value == '<MISSING>'
       end
       parsed_hash
     end
