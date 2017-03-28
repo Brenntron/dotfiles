@@ -42,7 +42,6 @@ require 'sfbugzilla'
 require 'json'
 require 'tmpdir'
 require 'tempfile'
-# require 'vrt/rule_test_api'
 require 'base64'
 require 'pry'
 
