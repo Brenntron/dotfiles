@@ -4,11 +4,11 @@
       <div class="col-xs-12">
         <%=select_tag :priority, options_for_select(['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], selected: @bug.priority), id: 'bug_priority', class: 'form-control input-sm'%>
       </div>
-      <div class="col-sm-7">
+      <div class="col-xs-2">
         <button class="btn btn-xs btn-default" value="submit" type="submit">change priority</button>
       </div>
-      <div class="col-sm-1">
-        <span class="glyphicon glyphicon-remove cancel-button" style="display:none;"id="cancel_priority"></span>
+      <div class="col-xs-1">
+        <span class="glyphicon glyphicon-remove cancel-button-sm" style="display:none;"id="cancel_priority"></span>
       </div>
     </div>
   </form>
