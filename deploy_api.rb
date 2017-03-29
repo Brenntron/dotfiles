@@ -102,6 +102,8 @@ def self.production_config(timestamp, rebuild_gems)
   system "ln -s /usr/local/www/rulesuitest/releases/shared/database.yml #{Dir.pwd}/config/database.yml"
   system "ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml #{Dir.pwd}/config/app_config.yml"
   system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
+  #symlink the documentation to the public folder
+  system "ln -s docs/Talos_Analyst_Console.pdf /usr/local/www/rulesuitest/public/current/public/docs/Talos_Analyst_Console.pdf"
 
   `echo 'simlink the timestamped folder to the app directory'`
   system "rm /usr/local/www/rulesuitest/public/current"
