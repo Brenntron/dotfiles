@@ -64,6 +64,14 @@ div.progress{
     font-size:18px;
 }
 
+.change_button{
+    z-index:3;
+}
+
+.cancel_button{
+    z-index:1;
+}
+
 #bug-rules-table .rule-test-alert {
     display: none;
 }
