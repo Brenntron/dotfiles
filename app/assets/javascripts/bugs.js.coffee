@@ -8,6 +8,9 @@ $ ->
     if (bid == "")
       alert("Please enter a sid to import.")
       return false
+    else if isNaN(bid)
+      alert("Your sid is not a number.")
+      return false
     else
       headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       id = $('input[name="bug_name"]').val()
@@ -94,6 +97,8 @@ $ ->
     else
       $('#button_import').prop('disabled', true)
       return false
+
+  $('#import_bug').keypress (e) ->
     if (e.which == 13)
       $('button#button_import').click()
       return false
