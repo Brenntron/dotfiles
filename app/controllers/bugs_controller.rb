@@ -11,6 +11,7 @@ class BugsController < ApplicationController
       @bug_searchID = params[:bug][:id]
       if @bug_searchID
         @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%")
+                    .paginate(:page => session[:page], :per_page => 32)
       end
     end
   end
