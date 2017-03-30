@@ -3,6 +3,12 @@ Feature: Bug
   as a user
   I will provides ways to interact with bugs
 
+  @javascript
+  Scenario: A user cannot import an empty string
+    Given a user with role "analyst" exists and is logged in
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    Then I cannot click "button_import"
 
   @javascript
   Scenario: A user can view and filter bugs
@@ -111,7 +117,7 @@ Feature: Bug
   # ==== Importing a Bug ===
   @javascript
   Scenario: A bug can be imported
-#    Given a user exists and is logged in
+#    Given a user with role "analyst" exists and is logged in
 #    Then I wait for "3" seconds
 #    And I goto "/bugs"
 #    And I fill in "import_bug" with "145359"
