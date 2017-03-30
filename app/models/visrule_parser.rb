@@ -10,7 +10,7 @@ class VisruleParser
     temp_rule = Tempfile.new('temp.rules')
     temp_rule.write(@rule_content.gsub(/\#\s/, ''))
     temp_rule.rewind
-    Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
+    Open3.popen3("#{Rails.configuration.visruleparser_path} struct #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
       text = stdout.read
       unless text.empty?
         @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
@@ -23,6 +23,13 @@ class VisruleParser
     @parsed_lines
   end
 
+  def errors
+    unless @errors
+      parse
+    end
+    @errors
+  end
+
   def parsed_lines
     unless @parsed_lines
       parse
@@ -30,11 +37,63 @@ class VisruleParser
     @parsed_lines
   end
 
-  def errors
-    unless @errors
-      parse
+  def rubified
+    @rubified ||= parsed_lines.each_line.inject([{}]) do |stack, line|
+      case
+        # $VAR1 = {
+        when (/^\$\w+\s*=\s*\{/ =~ line) && stack.empty?
+          nil
+
+        # 'key' => 999
+        when /^\s*'(?<key>\w+)'\s*=>\s*(?<digits>\d+)\s*,?\s*$/ =~ line
+          stack[0][key.to_sym] = digits.to_i
+
+        # 'key' => 'blah'
+        when /^\s*'(?<key>\w+)'\s*=>\s*'(?<chars>.*)'\s*,?\s*$/ =~ line
+          stack[0][key.to_sym] = chars
+
+        # 'key' => {}
+        when /^\s*'(?<key>\w+)'\s*=>\s*\{\s*\}\s*,?\s*$/ =~ line
+          stack[0][key.to_sym] = {}
+
+        # 'key' => {
+        when /^\s*'(?<key>\w+)'\s*=>\s*\{\s*,?\s*$/ =~ line
+          if /^\d+$/ =~ key
+            stack.unshift({}, key.to_i)
+          else
+            stack.unshift({}, key.to_sym)
+          end
+
+        # 'key' => }
+        when /^\s*\}\s*,?\s*$/ =~ line
+          hash, key = stack.shift(2)
+          stack[0][key] = hash
+
+        # };
+        when /^\s*\}\s*;\s*$/ =~ line
+          nil
+        # else
+        #   stack << line
+      end
+
+      stack
     end
-    @errors
+  end
+
+  def ruby_struct
+    unless @ruby_struct
+      @ruby_struct = rubified.first
+
+      count = @ruby_struct[:options].count
+      @ruby_struct[:options] = (1..count).map do |index|
+        @ruby_struct[:options][index].tap do |option|
+          option[:args] = option[:args].keys.map{|key| key.to_s} if option[:args]
+        end
+      end
+
+      @ruby_struct[:metadata][:service] = @ruby_struct[:metadata][:service].keys.map{|key| key.to_s}
+    end
+    @ruby_struct
   end
 
   def parsed?
