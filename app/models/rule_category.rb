@@ -3,6 +3,8 @@ class RuleCategory < ApplicationRecord
 
   validates :category, uniqueness: true
 
+  scope :ranked, ->{ left_joins(:rules).group(:id).order('count(rules.id) desc, category') }
+
   def filename(gid = 1)
     # Rule.joins(:rule_category).select('rules.id, rules.gid, rules.filename, rule_categories.category').each do |rule|
     #   unless /^extras\/snort\/(?<dir>\w+)\/(?<basename>[-a-z]+)\.rules$/ =~ rule.filename
