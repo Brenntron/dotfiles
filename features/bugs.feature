@@ -3,7 +3,6 @@ Feature: Bug
   as a user
   I will provides ways to interact with bugs
 
-
   @javascript
   Scenario: A user can view and filter bugs
     Given a user with role "analyst" exists and is logged in
@@ -123,6 +122,48 @@ Feature: Bug
 #    And  I goto "/bugs"
 #    Then I should see "[SID] 2330 This is a fake bug"
 #    And I should see "145359"  <- this is broken
+
+  @javascript
+  Scenario: a user can take a bug
+    Given a user with role "analyst" exists and is logged in
+    And the following users exist
+      | id | email                         | cvs_username  | display_name        |
+      | 2  | vrt-incoming@sourcefire.com   | vrt_incoming  | Rainbow Brite       |
+    And the following bugs exist:
+      | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
+      | 111111      | OPEN  | 2       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
+    Then I wait for "3" seconds
+    And  I goto "/bugs?q=open-bugs"
+    Then I should see "take"
+    And I should see "vrt_incoming"
+    When I click "take"
+    And I wait for "5" seconds
+# uncomment when connectivity to bugzilla test fixed
+#    Then I should not see "vrt_incoming"
+#    And I should see "nherbert"
+#    And I should see "return"
+
+
+  @javascript
+  Scenario: a user can return a bug
+    Given a user with role "analyst" exists and is logged in
+    And the following users exist
+      | id | email                         | cvs_username  | display_name        |
+      | 2  | vrt-incoming@sourcefire.com   | vrt_incoming  | Rainbow Brite       |
+    And the following bugs exist:
+      | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
+      | 111111      | OPEN  | 2       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
+    Then I wait for "3" seconds
+    When I goto "/bugs?q=open-bugs"
+    Then I should see "return"
+    And I should see "nherbert"
+    When I click "return"
+    And I wait for "5" seconds
+# uncomment when connectivity to bugzilla test fixed
+#    Then I should not see "nherbert"
+#    And I should see "vrt_incoming"
+#    And I should see "take"
+
 
   @javascript
   Scenario: a user can not set the state of a bug to pending when exploits are missing attachments

@@ -5,6 +5,7 @@ FactoryGirl.define do
     current_sign_in_ip "127.0.0.1"
     authentication_token "12345"
     parent_id nil
+    class_level 0
     sequence :cvs_username do |nn|
       "user#{nn}"
     end

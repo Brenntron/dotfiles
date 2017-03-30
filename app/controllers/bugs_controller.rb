@@ -3,8 +3,10 @@ class BugsController < ApplicationController
 
   before_action :require_login
   before_action :query_bugs
+  before_action :check_bug_permission, only: [:show]
   before_action :get_states_and_users, only: [:index, :show, :new]
   after_action  :sync_summary, only: [:create, :add_tag, :remove_tag]
+
 
   def index
     if params[:bug].present?
@@ -177,6 +179,15 @@ class BugsController < ApplicationController
 
   def require_login
     redirect_to root_url if !current_user
+  end
+
+  def check_bug_permission
+    bug = Bug.where(id: params[:id]).first()
+    unless bug.check_permission(current_user)
+      redirect_to '/bugs'
+      flash[:error] = "You dont have permission to access bug: #{params[:id]}"
+    end
+
   end
 
 end

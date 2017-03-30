@@ -12,6 +12,7 @@
   </thead>
   <tbody>
   <% @bugs.each do |bug| %>
+    <%if bug.check_permission(current_user) %>
       <tr id="bug_<%= bug.id %>" class="<%=set_bug_color(bug) %>">
         <td><%= link_to bug.summary, bug_path(bug.id)%> </td>
         <td><%= bug.tags.map{|t| "[#{t.name}]"}.join(' ') %></td>
@@ -21,10 +22,16 @@
         <td class="bug-user">
           <% if bug.user %>
               <%= bug.user.cvs_username %>
+              <% if bug.user.email != current_user.email %>
+                  <br/><button type=button class="small text-muted bug-actions take-bug" id="take-bug-<%=bug.id%>" data-id="<%=bug.id%>">take</button>
+              <%else%>
+                  <br/><button type=button class="small text-muted bug-actions return-bug" id="return-bug-<%=bug.id%>" data-id="<%=bug.id%>">return</button>
+              <%end%>
           <% else %>
               -
+              <br/><button type=button class="small text-muted bug-actions take-bug" id="take-bug-<%=bug.id%>" data-id="<%=bug.id%>">take</button>
           <% end %>
-          <br/><span class="small text-muted bug-actions">take</span>
+          <br/><span class="small text-muted bug-wait" style="display: none" id="bug-wait-<%=bug.id%>">please wait</span>
         </td>
         <td class="bug-user">
           <% if bug.committer %>
@@ -40,6 +47,7 @@
           <% end %>
         </td>
       </tr>
+    <%end%>
   <% end %>
   </tbody>
 </table>

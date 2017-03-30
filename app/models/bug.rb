@@ -270,6 +270,10 @@ class Bug < ApplicationRecord
     end
   end
 
+  def check_permission(current_user)
+    User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
+  end
+
   private
 
   def create_tags_from_summary(summary_tags)
@@ -655,8 +659,5 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
-  def self.check_permission(current_user, bugs)
-    class_allowed = User.class_levels[current_user.class_level]
-    bugs.reject { |b| Bug.classifications[b.classification] > class_allowed }
-  end
+
 end
