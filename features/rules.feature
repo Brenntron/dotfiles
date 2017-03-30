@@ -6,48 +6,6 @@ Feature: Rules
  # ==== Appending the rule category to the Rule message ===
 
 #  @javascript
-#  Scenario: A new rule can be created and displayed
-#    Given a user with role "analyst" exists and is logged in
-#    And I wait for "3" seconds
-#    Given the following bugs exist:
-#      |  id  | bugzilla_id | state  | user_id |
-#      | 2222 |   222222    | OPEN   |    1    |
-#    And the following rule categories exist:
-#      | category  | id |
-#      | BLACKLIST |  1 |
-#    When I goto "/bugs/2222"
-#    And  I click the "Rules" tab
-#    And  I click button "create"
-#    And  I click "use standard form"
-#    And  I select "BLACKLIST" from "rule_category_id"
-#    And  I fill in "rule[message]" with "Test message"
-#    And  I fill in "rule[detection]" with "Detection test"
-#    And  I select "unknown" from "rule[class_type]"
-#    And  I fill in "summary" with "rule doc summary"
-#    And  I click "Create Rule"
-#    And  I wait for "1" seconds
-#    When I click the "Rules" tab
-#    And  I click button "list all"
-#    Then I should see "Test message"
-#    And  I should see a rule with state "NEW" version "new_rule"
-#    And I should see "Test message"
-##    And rule "11" is a new rule
-#    And I should see a rule row with class "draft" and version "new_rule"
-#    And I should see a rule row with class "new-rule" and version "new_rule"
-#    And I should see a rule row with class "parsed" and version "new_rule"
-#    When I check "rule[id]"
-#    And  I click "edit"
-#    And  I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
-#    And  I click button "Save Changes"
-#    And  I wait for "8" seconds
-#    Then I should see a rule with state "FAILED" version "new_rule"
-##    And rule "11" is a new rule
-#    And I should see "short msg"
-#    And I should see a rule row with class "draft" and version "new_rule"
-#    And I should see a rule row with class "new-rule" and version "new_rule"
-#    And I should see a rule row with class "failed" and version "new_rule"
-
-#  @javascript
 #  Scenario: Rule category drop down should sort by frequency of use
 #    Given a user with role "analyst" exists and is logged in
 #    And the following bugs exist:
@@ -89,8 +47,8 @@ Feature: Rules
 #  Scenario: New Rule: standard form required fields
 #    Given a user with role "analyst" exists and is logged in
 #    And the current user has the following bugs:
-#      |  id  |
-#      | 2222 |
+#      |  id  | state |
+#      | 2222 | OPEN  |
 #    And a "BLACKLIST" rule category exists
 #    And I wait for "3" seconds
 #    When  I goto "/bugs/2222"
@@ -118,8 +76,9 @@ Feature: Rules
 #  Scenario: New Rule: the policy options and toggle should populate checkbox values
 #    Given a user with role "analyst" exists and is logged in
 #    And the current user has the following bugs:
-#      |  id  |
-#      | 2222 |
+#      |  id  | state |
+#      | 2222 | OPEN  |
+#    And a "BLACKLIST" rule category exists
 #    Then I wait for "3" seconds
 #    And  I goto "/bugs/2222"
 #    Then I click the "Rules" tab
@@ -133,11 +92,81 @@ Feature: Rules
 #    Then  the "max-detect-ips" field should be "policy max-detect-ips drop"
 #    Then the "security-ips" field should be "policy security-ips alert"
 
+#  # Scenario: New Rule: standard form service options
+#  @javascript
+#  Scenario: When a new rule is created, the service options should populate correctly
+#    Given a user with role "analyst" exists and is logged in
+#    And the current user has the following bugs:
+#      |  id  | state |
+#      | 2222 | OPEN  |
+#    And a "BLACKLIST" rule category exists
+#    Then I wait for "3" seconds
+#    And  I goto "/bugs/2222"
+#    Then I click the "Rules" tab
+#    Then I click button "create"
+#    Then I click "use standard form"
+#    And  I click "other"
+#    Then I click "mysql"
+#    Then I click "kerberos"
+#    And  I select "BLACKLIST" from "rule_category_id"
+#    And  I fill in "rule[message]" with "Test Message the third"
+#    And  I fill in "rule[detection]" with "Detection test3"
+#    And  I select "unknown" from "rule[class_type]"
+#    And  I fill in "summary" with "This is the rule doc summary"
+#    # dropdown needs to be obscured to find Create Rule button
+#    Then I hide the element with class "other-dropdown"
+#    Then I click "Create Rule"
+#    Then I wait for "1" seconds
+#    Then I click the "Rules" tab
+#    Then I click button "list all"
+#    And  I click "new_rule"
+#    Then I should see "service mysql"
+#    Then I should see "service kerberos"
+#    And  I should not see "telnet"
 
+#  # Scenario: New Rule: standard form rule state and css classes
+#  @javascript
+#  Scenario: A new rule can be created and displayed
+#    Given a user with role "analyst" exists and is logged in
+#    And I wait for "3" seconds
+#    Given the following bugs exist:
+#      |  id  | bugzilla_id | state  | user_id |
+#      | 2222 |   222222    | OPEN   |    1    |
+#    And the following rule categories exist:
+#      | category  | id |
+#      | BLACKLIST |  1 |
+#    When I goto "/bugs/2222"
+#    And  I click the "Rules" tab
+#    And  I click button "create"
+#    And  I click "use standard form"
+#    And  I select "BLACKLIST" from "rule_category_id"
+#    And  I fill in "rule[message]" with "Test message"
+#    And  I fill in "rule[detection]" with "Detection test"
+#    And  I select "unknown" from "rule[class_type]"
+#    And  I fill in "summary" with "rule doc summary"
+#    And  I click "Create Rule"
+#    And  I wait for "1" seconds
+#    When I click the "Rules" tab
+#    And  I click button "list all"
+#    Then I should see "Test message"
+#    And  I should see a rule with state "NEW" version "new_rule"
+#    And I should see "Test message"
+##    And rule "11" is a new rule
+#    And I should see a rule row with class "draft" and version "new_rule"
+#    And I should see a rule row with class "new-rule" and version "new_rule"
+#    And I should see a rule row with class "parsed" and version "new_rule"
+#    When I check "rule[id]"
+#    And  I click "edit"
+#    And  I fill in "rule[rule_content]" with "# alert (msg:"short msg"; flow:established; content:"E_|00 03 05|"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:22211; rev:3;)"
+#    And  I click button "Save Changes"
+#    And  I wait for "8" seconds
+#    Then I should see a rule with state "FAILED" version "new_rule"
+##    And rule "11" is a new rule
+#    And I should see "short msg"
+#    And I should see a rule row with class "draft" and version "new_rule"
+#    And I should see a rule row with class "new-rule" and version "new_rule"
+#    And I should see a rule row with class "failed" and version "new_rule"
 
-
-  # Scenario: New Rule: standard form service options
-  # Scenario: New Rule: standard form rule state and css classes
   # Scenario: New Rule: legacy form rule state and css classes
   # Scenario: New Rule: standard form the rule doc impact should populate based on class type selection
   # Scenario: New Rule: legacy form the rule doc impact should populate based on class type selection
@@ -162,41 +191,6 @@ Feature: Rules
 
 
   # ==== Creating a rule ===
-
-#  @javascript
-#  Scenario: When a new rule is created, the service options should populate correctly
-#    Given a user with role "analyst" exists and is logged in
-#    And the following bugs exist:
-#      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-#      |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
-#    And the following rule categories exist:
-#      |category       | id |
-#      |BLACKLIST      |  1 |
-#      |FILE-EXECUTABLE|  2 |
-#      |OS-LINUX       |  3 |
-#    Then I wait for "3" seconds
-#    And  I goto "/bugs/222222"
-#    Then I click the "Rules" tab
-#    Then I click button "create"
-#    Then I click "use standard form"
-#    And  I click "other"
-#    Then I click "mysql"
-#    Then I click "kerberos"
-#    And  I select "BLACKLIST" from "rule_category_id"
-#    And  I fill in "rule[message]" with "Test Message the third"
-#    And  I fill in "rule[detection]" with "Detection test3"
-#    And  I select "unknown" from "rule[class_type]"
-#    And  I fill in "summary" with "This is the rule doc summary"
-#    # dropdown needs to be obscured to find Create Rule button
-#    Then I hide the element with class "other-dropdown"
-#    Then I click "Create Rule"
-#    Then I wait for "1" seconds
-#    Then I click the "Rules" tab
-#    Then I click button "list all"
-#    And  I click "new_rule"
-#    Then I should see "service mysql"
-#    Then I should see "service kerberos"
-#    And  I should not see "telnet"
 
 #  @javascript
 #  Scenario: When a new rule is created, the rule doc impact should populate based on class type selection
