@@ -62,7 +62,7 @@ class RuleParser
     @parsed_lines
   end
 
-  def rubified
+  def ruby_struct
     @rubified ||= parsed_lines.each_line.inject([{}]) do |stack, line|
       line = line.chomp
       case
@@ -108,11 +108,7 @@ class RuleParser
       end
 
       stack
-    end
-  end
-
-  def ruby_struct
-    @ruby_struct ||= rubified.first
+    end.first
   end
 
   def options
@@ -145,6 +141,7 @@ class RuleParser
         class_type:     ruby_struct[:classification],
         connection:     self.class.build_connection(ruby_struct),
         message:        ruby_struct[:name],
+        flow:           flow,
     })
   end
 
@@ -152,49 +149,15 @@ class RuleParser
     @parsed ||= !(parsed_lines.match(/FAILED/))
   end
 
-  def msg?
-    !!(/msg/ =~ parsed_lines)
-  end
-
-  def msg_hash
-    rule = rule_content
-
-    rule_params = {
-        sid: /sid:\s*(\d+)\s*;/.match(rule) ? /sid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : nil,
-        gid: /gid:\s*(\d+)\s*;/.match(rule) ? /gid:\s*(\d+)\s*;/.match(rule_content)[1].to_i : 1,
-        rev: /rev\s*:\s(.+)/.match(rule_content) ? /rev\s*:\s(.+)/.match(rule_content)[1] : 1,
-        connection: rule.match(/connection:\s*(.+?)\(/) ? rule.match(/connection:\s*(.+?)\(/)[1] : nil,
-        message: rule.match(/msg:\w*(.+?);/) ? rule.match(/msg:\w*(.+?);/)[1].gsub(/"/, '') : nil,
-        detection: rule.match(/detection:\s*(.+?);/) ? rule.match(/detection:\s*(.+?);/)[1] : nil,
-        flow: rule.match(/flow:\s*(.+?);/) ? rule.match(/flow:\s*(.+?);/)[1] : nil,
-        metadata: /metadata\s*:(.+?)\;/.match(rule) ? /metadata\s*:(.+?)\;/.match(rule)[1].strip : nil,
-        class_type: /classtype\s*:(.*)\)/.match(rule_content) ? /classtype\s*:(.*)\)/.match(rule_content)[1] : nil,
-    }.reject { |k, value,| value.nil? || value == '<MISSING>' }
-  end
-
-  def nonmsg_hash
-    parsed_lines.each_line.inject({}) do |parsed_hash, line|
-      if /\A\s*(?<key>\w+)\s*:\s?(?<value>.*[\S])\s*\z/ =~ line
-        parsed_hash[key.downcase.to_sym] = value unless value.nil? || value == '<MISSING>'
-      end
-      parsed_hash
-    end
-  end
-
-  def parsed_hash
-    @parsed_hash ||= msg? ? msg_hash : nonmsg_hash
-  end
-
   def gid
-    parsed_hash[:gid] ? parsed_hash[:gid].to_i : 1
+    attributes[:gid]
   end
 
   def sid
-    # sid could be nil for a new rule
-    parsed_hash[:sid] && parsed_hash[:sid].to_i
+    attributes[:sid]
   end
 
   def rev
-    parsed_hash[:rev] && parsed_hash[:rev].to_i
+    attributes[:rev]
   end
 end
