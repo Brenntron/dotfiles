@@ -110,15 +110,24 @@ module RuleSyntax
       "#{comp[:action]} #{comp[:protocol]} #{comp[:src]} #{comp[:srcport]} #{comp[:direction]} #{comp[:dst]} #{comp[:dstport]}"
     end
 
+    def message
+      ruby_struct[:name]
+    end
+
+    def rule_category
+      message.partition(' ')[0]
+    end
+
     def attributes
       @attributes ||=
           ruby_struct.slice(*%i(sid action protocol src srcport direction dst dstport))
               .merge({
                          gid:            ruby_struct[:gid] || 1,
                          rev:            ruby_struct[:revision],
-                         class_type:     ruby_struct[:classification],
+                         classtype:      ruby_struct[:classification],
                          connection:     self.class.build_connection(ruby_struct),
-                         message:        ruby_struct[:name],
+                         message:        message,
+                         rule_category:  rule_category,
                          metadata:       metadata.to_s,
                          flow:           flow,
                      })

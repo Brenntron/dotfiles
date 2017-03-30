@@ -406,50 +406,26 @@ class Rule < ApplicationRecord
   # Does not set state, edit_status, or publish_status,
   # because these depend on where the rule and rule_content originated.
   # @param [VisruleParser, #read] parser initialized to rule content.
-  def assign_from_visrule(parser)
-    rule_content = parser.rule_content
-    self.rule_content                   = rule_content
-    self.rule_parsed                    = parser.parsed_lines
-    self.rule_warnings                  = parser.errors
-    self.cvs_rule_parsed                = parser.parsed_lines
-    self.cvs_rule_content               = rule_content
+  def assign_from_visrule(rule_content)
+    vparser = RuleSyntax::VisruleParser.new(rule_content)
 
-    self.on                             = /^\s*#/ !~ rule_content
-    self.parsed                         = !(parser.parsed_lines.match(/FAILED/))
-    self.committed                      = !(self.parsed)
+    self.rule_parsed                    = vparser.parsed_lines
+    self.rule_warnings                  = vparser.errors
+    self.cvs_rule_parsed                = vparser.parsed_lines
 
-
-    if self.parsed?
-      parsed_values = parser.parsed_hash
-      self.rev                          = parsed_values[:rev]
-      self.message                      = parsed_values[:message]
-      self.connection                   = parsed_values[:connection]
-      self.flow                         = parsed_values[:flow]
-      self.class_type                   = parsed_values[:classtype]
-
-      self.metadata = /metadata\s*:(?<meta>.+?)\;/ =~ rule_content ? meta.strip : '<MISSING>'
-      self.rule_failures = nil
-
-      # if msg (old?) format
-      if parser.parsed_lines.match(/msg/)
-        self.detection = /detection:\s*(?<det>.+?);/ =~ rule_content ? det : nil
-      else
-        detection = /Detection\s*:\n(?<det>.*)Metadata/m =~ parser.parsed_lines ? det.gsub(/\t|#\n/, '').strip : nil
-        self.detection =
-            if detection.nil?
-              nil
-            else
-              detection[-1, 1] == ';' ? detection : detection + ';'
-            end
-        self.rule_category = RuleCategory.find_or_create_by(category: self.message.split(' ')[0])
-      end
+    if parsed?
+      self.rule_failures                = nil
     else
-      self.message                      = /msg:\w*(?<msg>.+?);/ =~ rule_content ? msg.gsub(/"/, '') : nil
-      self.rule_failures                = parser.parsed_lines
+      self.rule_failures                = vparser.parsed_lines
     end
 
-
     self
+  end
+
+  def assign(attributes)
+    assign_attributes(attributes.slice(*%i(rev message connection flow classtype metadata message)))
+    self.rule_category = RuleCategory.find_or_create_by(category: attributes[:rule_category])
+    self.attributes
   end
 
   # Gets rule with fields set from contents of rule content.
@@ -459,12 +435,24 @@ class Rule < ApplicationRecord
   # Does not save the rule.
   # @param [String, #read] rule_content the rule content
   def self.find_and_assign_rule_content(rule_content, rule_id = nil)
-    parser = VisruleParser.new(rule_content)
+    parser = RuleSyntax::RuleStructParser.new(rule_content)
 
     rule = parser.sid && Rule.by_sid(parser.sid, parser.gid).first
     rule ||= rule_id && Rule.where(id: rule_id).first
     rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
-    rule.assign_from_visrule(parser)
+
+    self.rule_content                   = rule_content
+    self.cvs_rule_content               = rule_content
+
+    self.parsed                         = !(parser.parsed?)
+    self.committed                      = !(self.parsed)
+    self.on                             = /^\s*#/ !~ rule_content
+
+    assign_from_visrule(rule_content)
+
+    if parsed?
+      assign(parser.attributes)
+    end
 
     rule
   end
