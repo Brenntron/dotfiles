@@ -154,7 +154,7 @@ module API
           # search bugs and return the bugs current user is allowed to see
           hits = []
           Bug.search(permitted_params[:summary], terms, range).each do |bug_hit|
-            bug_hit.check_permission(current_user).map { |r| hits.push(r.id)}
+            hits << bug_hit.id if bug_hit.check_permission(current_user)
           end
           hits
         end

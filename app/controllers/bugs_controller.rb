@@ -12,8 +12,7 @@ class BugsController < ApplicationController
     if params[:bug].present?
       @bug_searchID = params[:bug][:id]
       if @bug_searchID
-        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%")
-                    .paginate(:page => session[:page], :per_page => 32)
+        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
       end
     end
   end
