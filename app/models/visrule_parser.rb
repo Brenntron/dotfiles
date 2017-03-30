@@ -37,6 +37,10 @@ class VisruleParser
     @errors
   end
 
+  def parsed?
+    @parsed ||= !(parsed_lines.match(/FAILED/))
+  end
+
   def parsed_hash
     @parsed_hash ||= parsed_lines.each_line.inject({}) do |parsed_hash, line|
       if /\A\s*(?<key>\w+)\s*:\s?(?<value>.*[\S])\s*\z/ =~ line
@@ -51,6 +55,11 @@ class VisruleParser
   end
 
   def sid
-    parsed_hash[:sid].to_i
+    # sid could be nil for a new rule
+    parsed_hash[:sid] && parsed_hash[:sid].to_i
+  end
+
+  def rev
+    parsed_hash[:rev] && parsed_hash[:rev].to_i
   end
 end
