@@ -5,44 +5,51 @@ $ ->
   $('#button_import').on 'click', ->
 
     bid = $('#import_bug').val()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    id = $('input[name="bug_name"]').val()
-    current_user = $(".current_user").html()
-    ### update the progress bar width ###
-    $('.progress_group').show()
-    $('.progress-bar').css('width', '10%')
-    ### and display the numeric value ###
-    $('.progress-bar').html('10%')
-    progresspump = setInterval(( ->
-      ### query the completion percentage from the server ###
-      $.ajax {
-        url: '/api/v1/events/update-progress'
-        method: 'get'
-        headers: headers
-        data:
-          description: $('input[name="token"]').val()
-          user: current_user
-          id: id
-        success: (response) ->
-          ### update the progress bar width ###
-          $('.progress-bar').css('width', response + '%')
-          ### and display the numeric value ###
-          $('.progress-bar').html(response + '%')
-          ### test to see if the job has completed ###
-          if response > 99.999
+    if (bid == "")
+      alert("Please enter a sid to import.")
+      return false
+    else if isNaN(bid)
+      alert("Your sid is not a number.")
+      return false
+    else
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      id = $('input[name="bug_name"]').val()
+      current_user = $(".current_user").html()
+      ### update the progress bar width ###
+      $('.progress_group').show()
+      $('.progress-bar').css('width', '10%')
+      ### and display the numeric value ###
+      $('.progress-bar').html('10%')
+      progresspump = setInterval(( ->
+        ### query the completion percentage from the server ###
+        $.ajax {
+          url: '/api/v1/events/update-progress'
+          method: 'get'
+          headers: headers
+          data:
+            description: $('input[name="token"]').val()
+            user: current_user
+            id: id
+          success: (response) ->
+            ### update the progress bar width ###
+            $('.progress-bar').css('width', response + '%')
+            ### and display the numeric value ###
+            $('.progress-bar').html(response + '%')
+            ### test to see if the job has completed ###
+            if response > 99.999
+              clearInterval(progresspump)
+              $('#progress').html 'Done'
+          error: (response) ->
             clearInterval(progresspump)
-            $('#progress').html 'Done'
-        error: (response) ->
-          clearInterval(progresspump)
-          $('.progress-bar').html 'Done'
-      }
-    ), 1000)
-    $.ajax(
-      url: '/api/v1/bugs/import/' + bid
-      method: 'GET'
-      headers: headers
-    ).done (response) ->
-      window.location.replace '/bugs/' + bid
+            $('.progress-bar').html 'Done'
+        }
+      ), 1000)
+      $.ajax(
+        url: '/api/v1/bugs/import/' + bid
+        method: 'GET'
+        headers: headers
+      ).done (response) ->
+        window.location.replace '/bugs/' + bid
 
   $('#resynch_bug').on 'click', ->
     bid = $('.bugzilla_id').text()
@@ -81,10 +88,19 @@ $ ->
 
   $('#bug_tab a:first').tab('show')
 
+  $('#import_bug').keyup (e) ->
+    bid = $('#import_bug').val()
+    if (bid != "")
+      $('#button_import').prop('disabled', false)
+      return false
+    else
+      $('#button_import').prop('disabled', true)
+      return false
+
   $('#import_bug').keypress (e) ->
     if (e.which == 13)
-      $('button#button_import').click();
-      return false;
+      $('button#button_import').click()
+      return false
 
   $(document).on 'click', '.change_current_bug_state', ->
     $('#current_bug_state, #change_state_form, #cancel_state').toggle()

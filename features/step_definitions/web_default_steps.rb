@@ -13,6 +13,12 @@ When(/^I click "(.*?)"$/) do |target|
       page.find("#{target}").click
     end
 end
+Then(/^I cannot click "(.*?)"$/) do |target|
+  begin
+    raise "Clicked on #{target} when should not have been able to" if click_on(target)
+  rescue Capybara::ElementNotFound => e
+  end
+end
 When(/^I toggle checkbox "(.*?)"$/) do |target|
   page.find(target).click
 end
