@@ -131,16 +131,17 @@ class RuleParser
   end
 
   def self.build_connection(comp)
-    "#{comp[:action]} #{comp[:protocol]} #{comp[:src]} #{comp[:srcport]} -> #{comp[:dst]} #{comp[:dstport]}"
+    "#{comp[:action]} #{comp[:protocol]} #{comp[:src]} #{comp[:srcport]} #{comp[:direction]} #{comp[:dst]} #{comp[:dstport]}"
   end
 
   def attributes
-    @attributes ||= ruby_struct.slice(:sid, :action, :protocol, :src, :srcport, :dst, :dstport).merge({
+    @attributes ||= ruby_struct.slice(*%i(sid action protocol src srcport direction dst dstport)).merge({
         gid:            ruby_struct[:gid] || 1,
         rev:            ruby_struct[:revision],
         class_type:     ruby_struct[:classification],
         connection:     self.class.build_connection(ruby_struct),
         message:        ruby_struct[:name],
+        metadata:       metadata.to_s,
         flow:           flow,
     })
   end
