@@ -18,11 +18,9 @@
       <tbody>
       <% if @bugs %>
           <% @bugs.each do |bug| %>
-              <% if bug.check_permission(current_user) %>
-                  <tr class="highlight <%= 'active' if bug.id.to_s == params[:id] %>" id="show_<%= bug.id %>">
-                    <td><%= link_to bug.id, bug %></td>
-                  </tr>
-              <% end %>
+              <tr class="highlight <%= 'active' if bug.id.to_s == params[:id] %>" id="show_<%= bug.id %>">
+                <td><%= link_to bug.id, bug %></td>
+              </tr>
           <% end %>
       <% end %>
       </tbody>
