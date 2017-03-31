@@ -74,8 +74,7 @@ module API
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
           Rule.create_action(permitted_params[:rule][:bug_id],
                                         permitted_params[:rule][:rule_content],
-                                        permitted_params[:rule][:rule_doc],
-                                        permitted_params[:rule])
+                                        permitted_params[:rule][:rule_doc])
         end
 
 

@@ -417,8 +417,8 @@ class Rule < ApplicationRecord
     self.rule_warnings                  = vparser.errors
     self.cvs_rule_parsed                = vparser.parsed_lines
 
-    self.parsed                         = parser.valid?
-    self.committed                      = !parser.valid?
+    self.parsed                         = vparser.valid?
+    self.committed                      = !vparser.valid?
 
     if parsed?
       self.rule_failures                = nil
@@ -430,7 +430,7 @@ class Rule < ApplicationRecord
   end
 
   def assign(attributes)
-    assign_attributes(attributes.slice(*%i(rev message connection flow classtype metadata message)))
+    assign_attributes(attributes.slice(*%i(rev message connection flow detection class_type metadata message)))
     self.rule_category = RuleCategory.find_or_create_by(category: attributes[:rule_category])
     self.attributes
   end
@@ -442,7 +442,7 @@ class Rule < ApplicationRecord
   # Does not save the rule.
   # @param [String, #read] rule_content the rule content
   def self.find_and_assign_rule_content(rule_content, rule_id = nil)
-    parser = RuleSyntax::RuleStructParser.new(rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
 
     rule = parser.sid && Rule.by_sid(parser.sid, parser.gid).first
     rule ||= rule_id && Rule.where(id: rule_id).first
@@ -450,9 +450,7 @@ class Rule < ApplicationRecord
 
     rule.assign_from_visrule(rule_content)
 
-    if rule.parsed
-      rule.assign(parser.attributes)
-    end
+    rule.assign(parser.attributes) #if rule.parsed?
 
     rule
   end
@@ -764,7 +762,7 @@ class Rule < ApplicationRecord
 
   # Creates a rule and its associations
   # @return [Rule]
-  def self.create_action(bug_id, rule_content, rule_doc, rule_params)
+  def self.create_action(bug_id, rule_content, rule_doc)
     Rule.save_rule_content(rule_content).tap do |rule|
       if bug_id
         bug = Bug.where(id: bug_id).first
@@ -772,8 +770,6 @@ class Rule < ApplicationRecord
       end
 
       rule.associate_references(rule_content)
-      rule.update(detection: rule_params[:detection].strip!, class_type: rule_params[:class_type]) unless rule.parsed?
-      rule.update(rule_category_id: rule_params[:rule_category_id])
       rule.create_rule_doc(rule_doc)
     end
   end

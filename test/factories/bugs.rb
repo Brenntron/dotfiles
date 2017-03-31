@@ -9,5 +9,10 @@ FactoryGirl.define do
     component 'Snort Rules'
     version '2.5.2'
     description 'Description for testing'
+
+    factory :open_bug do
+      # Yes this is currently the default, but a factory specifically making an open bug.
+      state 'OPEN'
+    end
   end
 end

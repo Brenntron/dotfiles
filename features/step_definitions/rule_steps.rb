@@ -55,7 +55,8 @@ Given(/^rule content$/) do
   @rev = 4
   @connection = "alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS"
   @message = "APP-DETECT Acunetix web vulnerability scan attempt"
-  @detection_parsed = "flowbits:set,acunetix-scan;\ncontent:\"Acunetix-\"; fast_pattern:only; http_header;"
+  # @detection_parsed = %Q~flowbits:set,acunetix-scan;\ncontent: "Acunetix-"; fast_pattern:only; http_header;~
+  @detection_parsed = %Q~content: "Acunetix-";~
   @detection = @detection_parsed.gsub("\n", ' ')
   @flow = "to_server,established"
   @metadata = "ruleset community, service http"
@@ -116,7 +117,7 @@ When(/^code calls load_grep on rule content$/) do
   Rule.load_grep(@rule_grep_line)
 end
 
-Then(/^a rule record for rule conent will exist$/) do
+Then(/^a rule record for rule content will exist$/) do
   rule_resultset = Rule.where(sid: @sid)
   rule_resultset.should exist
   rule = rule_resultset.first
@@ -126,7 +127,7 @@ Then(/^a rule record for rule conent will exist$/) do
   rule.rev.should eq(@rev)
   rule.connection.should eq(@connection)
   rule.message.should eq(@message)
-  rule.detection.should eq(@detection_parsed)
+  rule.detection.should eq(@detection)
   rule.flow.should eq(@flow)
   rule.metadata.should eq(@metadata)
   rule.class_type.should eq(@class_type)
@@ -207,6 +208,6 @@ Then(/^rule "(.*)" is a current edit/) do |rule_id|
 end
 
 Given(/^rule sid "(.*)" rev "(.*)" is synched$/) do |sid, rev|
-  rule_content = "alert tcp $HOME_NET any -> 64.245.58.0/23 any (msg:\"BLACKLIST short message\"; flow:established; content:\"E_|00 03 05|\"; depth:5; metadata:ruleset community; classtype:misc-activity; sid:#{sid}; rev:#{rev};)"
+  rule_content = %Q~alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:#{sid}; rev:#{rev};)~
   Rule.synch_rule_content(rule_content)
 end

@@ -1,3 +1,12 @@
+
+# A snort rule parser which calls a parsing lyberry through calling visruleparser with the struct option.
+#
+# This effort turned out to be a blind alley, so it will not be used in the code.
+# I am writing this documentation because I documented the other RuleSyntax classes to reduce confusion.
+# Although not used, this, if you find it, is an area of confusion I thought I should spend 2 minutes dismissing.
+#
+# To parse a snort rule, the visruleparser perl script calls a library which returns a perl "structure".
+# What it returns is perl code, rather than a data format properly designed for information interchange..
 module RuleSyntax
   class RuleStructParser
     attr_reader :rule_content

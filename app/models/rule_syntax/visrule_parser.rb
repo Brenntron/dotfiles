@@ -1,3 +1,4 @@
+
 # Parser for calling the visruleparser perl script.
 #
 # The visruleparser perl script is not intended for parsing exactly.
@@ -62,7 +63,7 @@ module RuleSyntax
       # /^\s*Message\s*:/ =~ parsed_lines
       # errors.empty? #empty string
       # /^\d+:/ !~ parsed_lines
-      (/^\s*Message\s*:/ =~ parsed_lines) && (!errors.empty?)
+      !!(/^\s*Message\s*:/ =~ parsed_lines)
     end
 
     def valid?
