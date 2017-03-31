@@ -21,6 +21,8 @@ module RuleSyntax
       end
       temp_rule.close
 
+      @parsed_lines = @parsed_lines.gsub(/=> $/, "'")
+
       @parsed_lines
     end
 
@@ -52,7 +54,7 @@ module RuleSyntax
               stack[0][key] = hash
             end
 
-          when /\A\s*'(?<lhs>[^']+)'\s*=>\s*(?<rhs_comma>.*)\z/ =~ line
+          when /\A\s*'(?<lhs>[^']+)'\s*=>\s*(?<rhs_comma>.*)\z/m =~ line
             key = (/^\d+$/ =~ lhs) ? lhs.to_i : lhs.downcase.to_sym
 
             rhs = rhs_comma.strip.gsub(/,\z/, '').strip
@@ -74,8 +76,8 @@ module RuleSyntax
                 stack.unshift({}, key)
 
               else
-                puts "!!! key = #{key} => rhs = #{rhs.inspect}"
-                raise "Cannot parse key = #{key} => rhs = #{rhs.inspect}"
+                puts "!!! key = #{key.inspect} => rhs = #{rhs.inspect}"
+                raise "Cannot parse key = #{key.inspect} => rhs = #{rhs.inspect}"
             end
 
           else
@@ -133,7 +135,7 @@ module RuleSyntax
                      })
     end
 
-    def parsed?
+    def valid?
       @parsed ||= !(parsed_lines.match(/FAILED/))
     end
 

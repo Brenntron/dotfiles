@@ -397,7 +397,7 @@ class Rule < ApplicationRecord
   # @param [String, #read] rule_text the line of rule text
   # @return [Hash] hash with :rule and :errors text populated.
   def self.visruleparser(rule_content)
-    parser = VisruleParser.new(rule_content)
+    parser = RuleSyntax::VisruleParser.new(rule_content)
     { rule: parser.parsed_lines, errors: parser.errors }
   end
 
@@ -407,11 +407,18 @@ class Rule < ApplicationRecord
   # because these depend on where the rule and rule_content originated.
   # @param [VisruleParser, #read] parser initialized to rule content.
   def assign_from_visrule(rule_content)
+    self.rule_content                   = rule_content
+    self.cvs_rule_content               = rule_content
+    self.on                             = /^\s*#/ !~ rule_content
+
     vparser = RuleSyntax::VisruleParser.new(rule_content)
 
     self.rule_parsed                    = vparser.parsed_lines
     self.rule_warnings                  = vparser.errors
     self.cvs_rule_parsed                = vparser.parsed_lines
+
+    self.parsed                         = parser.valid?
+    self.committed                      = !parser.valid?
 
     if parsed?
       self.rule_failures                = nil
@@ -441,17 +448,10 @@ class Rule < ApplicationRecord
     rule ||= rule_id && Rule.where(id: rule_id).first
     rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
 
-    self.rule_content                   = rule_content
-    self.cvs_rule_content               = rule_content
+    rule.assign_from_visrule(rule_content)
 
-    self.parsed                         = !(parser.parsed?)
-    self.committed                      = !(self.parsed)
-    self.on                             = /^\s*#/ !~ rule_content
-
-    assign_from_visrule(rule_content)
-
-    if parsed?
-      assign(parser.attributes)
+    if rule.parsed
+      rule.assign(parser.attributes)
     end
 
     rule
