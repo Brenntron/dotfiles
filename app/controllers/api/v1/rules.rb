@@ -11,15 +11,15 @@ module API
         end
 
 
-        desc "import existing rule"
-        params do
-          requires :id, type: Integer, desc: "rule sid."
-        end
-        route_param "import/:id" do
-          get do
-            Rule.import_rule(permitted_params[:id])
-          end
-        end
+        # desc "import existing rule"
+        # params do
+        #   requires :id, type: Integer, desc: "rule sid."
+        # end
+        # route_param "import/:id" do
+        #   get do
+        #     Rule.import_rule(permitted_params[:id])
+        #   end
+        # end
 
 
         desc "Return a rule"
@@ -134,14 +134,15 @@ module API
                                   permitted_params[:rule][:rule_doc])
         end
 
-        #import multiple rules
+        #load multiple rules
         params do
-          group :sids, :type => Array
-          requires :id, desc: "IDs of the rules you wish to import"
+          requires :sids, type: Array[Integer]
         end
-        post "import_multiple/:sids", root: "rule" do
+        get "bulk_fetch/:sids", root: "rule" do
           authorize! :create, Rule
-          Rule.import_multiple(params[:sids])
+          permitted_params[:sids].map do |sid|
+            Rule.find_or_load(sid, 1)
+          end
         end
 
 
