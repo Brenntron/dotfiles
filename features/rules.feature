@@ -35,25 +35,25 @@ Feature: Rules
 #    And  I click button "list all"
 #    Then I should see "BLACKLIST Test Message the third"
 
-  @javascript
-  Scenario: New Rule: the policy options and toggle should populate checkbox values
-    Given a user with role "analyst" exists and is logged in
-    And the current user has the following "open_bug":
-      |  id  |
-      | 2222 |
-    And a "BLACKLIST" rule category exists
-    And I wait for "3" seconds
-    When  I goto "/bugs/2222"
-    And  I click the "Rules" tab
-    And  I click button "create"
-    And  I click "use standard form"
-    And  I check "security-ips"
-    Then the "security-ips" field should be "policy security-ips drop"
-    When I toggle "bootstrap-switch-container"
-    Then the "security-ips" field should be "policy security-ips alert"
-    When I check "max-detect-ips"
-    Then the "max-detect-ips" field should be "policy max-detect-ips drop"
-    Then the "security-ips" field should be "policy security-ips alert"
+#  @javascript
+#  Scenario: New Rule: the policy options and toggle should populate checkbox values
+#    Given a user with role "analyst" exists and is logged in
+#    And the current user has the following "open_bug":
+#      |  id  |
+#      | 2222 |
+#    And a "BLACKLIST" rule category exists
+#    And I wait for "3" seconds
+#    When  I goto "/bugs/2222"
+#    And  I click the "Rules" tab
+#    And  I click button "create"
+#    And  I click "use standard form"
+#    And  I check "security-ips"
+#    Then the "security-ips" field should be "policy security-ips drop"
+#    When I toggle "bootstrap-switch-container"
+#    Then the "security-ips" field should be "policy security-ips alert"
+#    When I check "max-detect-ips"
+#    Then the "max-detect-ips" field should be "policy max-detect-ips drop"
+#    Then the "security-ips" field should be "policy security-ips alert"
 
 #  @javascript
 #  Scenario: New Rule: standard form service options
@@ -149,34 +149,34 @@ Feature: Rules
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "parsed" and version "new_rule"
 
-  @javascript
-  Scenario: New Rule: legacy form: Rule category drop down should sort by frequency of use
-    Given a user with role "analyst" exists and is logged in
-    And the current user has the following "open_bug":
-      |  id  |
-      | 2222 |
-    And the following rule categories exist:
-      |category       | id |
-      |BLACKLIST      |  1 |
-      |FILE-EXECUTABLE|  2 |
-      |OS-LINUX       |  3 |
-    And the following rules exist:
-      | message                 | rule_category_id |
-      | BLACKLIST message       | 1                |
-      | OS-LINUX message        | 3                |
-      | OS-LINUX second message | 3                |
-    And I wait for "3" seconds
-    When I goto "/bugs/2222"
-    And  I click the "Rules" tab
-    And  I click button "create"
-    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
-    And  I fill in "summary" with "some pig"
-    And  I click "Create Rule"
-    And  I wait for "2" seconds
-    When I click the "Rules" tab
-    And I click button "create"
-    And I click "use standard form"
-    Then "BLACKLIST" should be listed first
+#  @javascript
+#  Scenario: New Rule: legacy form: Rule category drop down should sort by frequency of use
+#    Given a user with role "analyst" exists and is logged in
+#    And the current user has the following "open_bug":
+#      |  id  |
+#      | 2222 |
+#    And the following rule categories exist:
+#      |category       | id |
+#      |BLACKLIST      |  1 |
+#      |FILE-EXECUTABLE|  2 |
+#      |OS-LINUX       |  3 |
+#    And the following rules exist:
+#      | message                 | rule_category_id |
+#      | BLACKLIST message       | 1                |
+#      | OS-LINUX message        | 3                |
+#      | OS-LINUX second message | 3                |
+#    And I wait for "3" seconds
+#    When I goto "/bugs/2222"
+#    And  I click the "Rules" tab
+#    And  I click button "create"
+#    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
+#    And  I fill in "summary" with "some pig"
+#    And  I click "Create Rule"
+#    And  I wait for "2" seconds
+#    When I click the "Rules" tab
+#    And I click button "create"
+#    And I click "use standard form"
+#    Then "BLACKLIST" should be listed first
 
 #  @javascript
 #  Scenario: New Rule: standard form: Rule category drop down should sort by frequency of use
@@ -252,12 +252,6 @@ Feature: Rules
   ### Scenarios Editing Rule ###
   # Scenario: Edit Rule: A rule can be edited
   # Scenario: a user can edit rule docs for a new rule
-  ### Scenarios Synching a rule from VC ###
-  # Scenario: Synch Rule: create a rule from synching
-  # Scenario: Synch Rule: update an existing synched rule
-  # Scenario: Synch Rule: do not update a with same rev
-  # Scenario: Synch Rule: VC updated for a parsed edited rule
-  # Scenario: Synch Rule: VC updated for a failed edited rule
 
 
   # ==== Existing rule ===
@@ -476,48 +470,62 @@ Feature: Rules
 #    And I should not see "This is the summary"
 
 
-  Scenario: load new rule from grep string model test
-    Given rule content
-    And grep output for rule content
-    When code calls load_grep on rule content
-    Then a rule record for rule content will exist
+  ### Scenarios Synching a rule from VC ###
 
-  Scenario: synch existing rule with same rev in db model test
-    Given rule content for following rule:
-      | gid | sid | rev | state     |
-      |  1  | 101 |  4  | UNCHANGED |
-    And grep output for rule content
-    And I wait for "3" seconds
-    When code calls load_grep on rule content
-    Then rule record will be unchanged
+  Scenario: Synch Rule: create a valid rule from synching
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "synched"
+    And  A rule gid "1" and sid "22211" has class "parsed"
 
-  Scenario: synch updated rule with earlier rev in db model test
-    Given rule content for following rule:
-      | id | gid | sid | rev | state     |
-      |  7 |  1  | 101 |  4  | UNCHANGED |
-    And rule content rev set to "5"
-    And grep output for rule content
-    And I wait for "3" seconds
-    When code calls load_grep on rule content
-    Then rule record will be updated
+  Scenario: Synch Rule: create a failed rule from synching
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "synched"
+    And  A rule gid "1" and sid "22211" has class "failed"
 
-  Scenario: do not synch updated rule with earlier rev in db model test
-    Given rule content for following rule:
-      | id | gid | sid | rev | state   |edit_status|publish_status|
-      |  7 |  1  | 101 |  4  | UPDATED |   EDIT    | CURRENT_EDIT |
-    And rule content rev set to "5"
-    And grep output for rule content
-    And I wait for "3" seconds
-    When code calls load_grep on rule content
-    Then rule record will marked out of date
+  Scenario: Synch Rule: update an existing valid synched rule with new rev
+    Given the following rules exist:
+      | id | gid |  sid  | rev | state     |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "synched"
+    And  A rule gid "1" and sid "22211" has class "parsed"
+    And  A rule gid "1" and sid "22211" has rev "4"
 
-  Scenario: do not synch updated rule with earlier rev in db model test
-    Given rule content for following rule:
-      | id | gid | sid | rev | state  |edit_status|publish_status|parsed|
-      |  7 |  1  | 101 |  4  | FAILED |   EDIT    | CURRENT_EDIT |false |
-    And rule content rev set to "5"
-    And grep output for rule content
-    And I wait for "3" seconds
-    When code calls load_grep on rule content
-    Then rule record will marked out of date
+  Scenario: Synch Rule: update an existing valid synched rule with same rev
+    Given the following rules exist:
+      | id | gid |  sid  | rev | state     |
+      | 11 |  1  | 22211 |  4  | UNCHANGED |
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "synched"
+    And  A rule gid "1" and sid "22211" has class "parsed"
+    And  A rule gid "1" and sid "22211" has rev "4"
+
+  Scenario: Synch Rule: VC updated for a valid edited rule do not load
+    Given the following rules exist:
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
+      |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "draft"
+    And  A rule gid "1" and sid "22211" has class "edited-rule"
+    And  A rule gid "1" and sid "22211" has class "stale-edit"
+    And  A rule gid "1" and sid "22211" has class "parsed"
+    And  A rule gid "1" and sid "22211" has rev "3"
+
+  Scenario: Synch Rule: VC updated for a failed edited rule do not load
+    Given the following rules exist:
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
+      |  7 |  1  | 22211 |  3  | FAILED  |   EDIT    | CURRENT_EDIT | false|
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "draft"
+    And  A rule gid "1" and sid "22211" has class "edited-rule"
+    And  A rule gid "1" and sid "22211" has class "stale-edit"
+    And  A rule gid "1" and sid "22211" has class "failed"
+    And  A rule gid "1" and sid "22211" has rev "3"
+
 

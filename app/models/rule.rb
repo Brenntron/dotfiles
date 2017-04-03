@@ -59,6 +59,10 @@ class Rule < ApplicationRecord
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid) }
 
+  def deleted?
+    'DELETED' == self.rule_category.category
+  end
+
   def record(action)
     record = { resource: 'rule',
               action: action,
@@ -488,20 +492,20 @@ class Rule < ApplicationRecord
 
     rule.load_status =
         case
-          when !rule.parsed?            # rule failed to parse
-            'F'
           when rule.new_record?         # new rule
             'N'
           when rule_db.draft?           # stale edit
             'X'
+          when !rule.parsed?            # rule failed to parse
+            'F'
           when rule_db.rev == rule.rev  # rev same, reloaded
             'R'
           else                          # updated rule with new rev
             'L'
         end
 
-    case rule.load_status
-      when 'X'
+    case
+      when 'X' == rule.load_status
         rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       else
         rule.edit_status                = EDIT_STATUS_SYNCHED
@@ -526,7 +530,14 @@ class Rule < ApplicationRecord
       ''
     else
       rule = synch_rule_content(rule_content)
-      rule.update!(filename: filename, linenumber: line_number[1..-2].to_i) unless 'X' == rule.load_status
+      case
+        when rule.nil?
+          # do nothing
+        when 'X' == rule.load_status    # stale edit
+          # do nothing
+        else
+          rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
+      end
     end
   end
 
