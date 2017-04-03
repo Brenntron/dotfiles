@@ -20,6 +20,7 @@ class Bug < ApplicationRecord
   scope :open, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }
+  scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
   scope :by_component, ->(component) { where('component = ?', component) }
 
   scope :allowed_editors, ->(bug) { User.all.reject { |u| u.id == bug.committer_id } }

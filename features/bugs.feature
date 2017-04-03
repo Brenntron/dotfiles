@@ -105,7 +105,7 @@ Feature: Bug
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
     Then I wait for "3" seconds
-    And I goto "/bugs"
+    And I goto "/bugs?q=my-bugs"
     Then I should see "[BP][NSS] fixed bug"
     And I wait for "1" seconds
     When I click "delete_bug222222"
@@ -159,7 +159,7 @@ Feature: Bug
       | 2  | vrt-incoming@sourcefire.com   | vrt_incoming  | Rainbow Brite       |
     And the following bugs exist:
       | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
-      | 111111      | OPEN  | 2       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
+      | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
     Then I wait for "3" seconds
     When I goto "/bugs?q=open-bugs"
     Then I should see "return"

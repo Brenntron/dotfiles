@@ -67,7 +67,7 @@ class User < ApplicationRecord
       when has_role?('committer')
         Bug.pending
       when has_role?('analyst')
-        bugs.open + bugs.pending
+        Bug.open_pending
       when has_role?('build coordinator')
         Bug.where(state: 'FIXED').order(:resolved_at)
       else

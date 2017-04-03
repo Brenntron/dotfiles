@@ -159,7 +159,9 @@ class BugsController < ApplicationController
       @bugs = current_user.default_bug_list
     end
     session[:page] = params[:page] || session[:page]
-    @bugs = @bugs.where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
+    if @bugs
+      @bugs = @bugs.where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
+    end
   end
 
   def get_params_hash(params)
