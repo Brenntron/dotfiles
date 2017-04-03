@@ -4,7 +4,7 @@ class BugsController < ApplicationController
   before_action :require_login
   before_action :query_bugs
   before_action :get_states_and_users, only: [:index, :show, :new]
-  after_action  :sync_summary, only: [:create, :add_tag, :remove_tag]
+  after_action  :sync_summary, only: [:add_tag, :remove_tag]
 
   def index
     if params[:bug].present?
@@ -22,34 +22,8 @@ class BugsController < ApplicationController
   end
 
   def create
-    options = bug_params
-    options[:creator] = current_user.id
-    new_bug = Bugzilla::Bug.new(bugzilla_session).create(options.to_h) #the bugzilla session is where we authenticate
-    new_bug_id = new_bug["id"]
-    @tags=params[:bug][:tag_names]
-    @bug = Bug.new(
-        :id => new_bug_id,
-        :bugzilla_id => new_bug_id,
-        :product => params[:bug][:product],
-        :component => params[:bug][:component],
-        :summary => params[:bug][:summary],
-        :version => params[:bug][:version],
-        :description => params[:bug][:description],
-        :state => params[:bug][:state] || 'OPEN',
-        :status => params[:bug][:status] || 'NEW',
-        :resolution => params[:bug][:resolution] || 'OPEN',
-        :creator => current_user.id,
-        :user_id => current_user.id,
-        :opsys => params[:bug][:opsys],
-        :platform => params[:bug][:platform],
-        :priority => params[:bug][:priority],
-        :severity => params[:bug][:severity],
-        :classification => params[:bug][:classification] || 0
-    )
-
-    if @bug.save
-      @tags.each { |tag| @bug.tags << Tag.find_or_create_by(name: tag.upcase) } if @tags
-      redirect_to @bug
+    respond_to do |format|
+      format.js { head :no_content }
     end
   end
 

@@ -263,7 +263,7 @@ module API
           update_params[:platform] = permitted_params[:bug][:platform]
           update_params[:priority] = permitted_params[:bug][:priority]
           update_params[:severity] = permitted_params[:bug][:severity]
-          update_params[:classification] = permitted_params[:bug][:classification]
+          update_params[:classification] = Bug.classifications.key(permitted_params[:bug][:classification])
 
           # update the tags
           bug.tags.delete_all if bug.tags.exists?
@@ -335,10 +335,11 @@ module API
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
               :classification => permitted_params[:bug][:classification]
-          }.reject() { |k, v| v.nil? || v.empty? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
+          }.reject() { |k, v| v.nil? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
           new_bug = Bugzilla::Bug.new(bugzilla_session).create(options.to_h) #the bugzilla session is where we authenticate
           new_bug_id = new_bug["id"]
-          Bug.create(
+          # binding.pry
+          bug = Bug.create(
               :id => new_bug_id,
               :bugzilla_id => new_bug_id,
               :product => permitted_params[:bug][:product],
@@ -352,8 +353,24 @@ module API
               :platform => permitted_params[:bug][:platform],
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification] || 0 #api won't get bugs with classification of nil
+              :classification => Bug.classifications.key(permitted_params[:bug][:classification])
           )
+
+          # pull in the first comment
+          xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+          new_bug_history = xmlrpc.get(new_bug_id)
+          Bug.synch_history(xmlrpc,new_bug_history).to_s
+
+          tags = params[:bug][:tag_names]
+          if tags
+            tags.each do |tag|
+              new_tag = Tag.find_or_create_by(name: tag)
+              bug.tags << new_tag
+            end
+          end
+          # update the summary (regarding tags)
+          bug.compose_summary
+          return bug
         end
 
         desc "remove a bug from the db only"

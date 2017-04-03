@@ -131,6 +131,23 @@ $ ->
     , this)
 
 
+  $('.new_bug').submit (e) ->
+    e.preventDefault()
+    $('.edit-bug').prop('disabled', true)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    data = $('.new_bug').serialize()
+    $.ajax(
+      url: '/api/v1/bugs/'
+      method: 'POST'
+      headers: headers
+      data: data
+      success: (response) ->
+        location.replace('/bugs/' + response['id'])
+      error: (response) ->
+        alert(response.responseText)
+    , this)
+
+
   createSelectOptions = ->
     tags = $('#tag_list')[0]
     if tags
