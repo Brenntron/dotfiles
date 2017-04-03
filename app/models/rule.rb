@@ -485,11 +485,12 @@ class Rule < ApplicationRecord
     rule_db = by_sid(rule.sid, rule.gid).first
 
     case
-      # do not load when rule file does not parse
-      when !rule.parsed?
-        nil
+      # # do not load when rule file does not parse
+      # when !rule.parsed?
+      #   nil
+
       # new rule happens when loading from file for the first time.
-      when rule_db.nil?
+      when rule.new_record?
         rule.edit_status                = EDIT_STATUS_SYNCHED
         rule.publish_status             = PUBLISH_STATUS_SYNCHED
         rule.state                      = 'UNCHANGED'
@@ -506,6 +507,7 @@ class Rule < ApplicationRecord
         rule.publish_status             = PUBLISH_STATUS_SYNCHED
         rule.state                      = 'UNCHANGED'
         rule.save!
+        rule.associate_references(rule_content)
         rule
     end
   end
