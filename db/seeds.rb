@@ -81,6 +81,10 @@ tm.roles << Role.where(role: 'committer')
 cz = User.create(kerberos_login:"cmarczewski",cvs_username:"cmarczewski",cec_username:"cmarczew",display_name:"Chris Marczewski",committer:true,email:"cmarczew@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 cz.roles << Role.where(role: 'committer')
 
+User.all.each do |u|
+  u.update_attributes(class_level: 0)
+end
+
 # Reference.create(reference_data:"12345",reference_type: ref2)
 # Reference.create(reference_data:"cve,1936-7254",reference_type: ref1)
 #

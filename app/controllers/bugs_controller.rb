@@ -82,11 +82,8 @@ class BugsController < ApplicationController
 
   def update
     @bug = Bug.find(params[:id])
-    Bugzilla::Bug.new(bugzilla_session).update(get_params_hash(params).to_h)
-    if @bug.update(bug_params)
-      redirect_to @bug
-    else
-      render json: @bug.errors, status: 422
+    respond_to do |format|
+      format.js { head :no_content }
     end
   end
 
@@ -113,7 +110,7 @@ class BugsController < ApplicationController
   def bug_params
     params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification, :searchID,
                                 :summary, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
-                                                                                                              :metadata, :detection, :class_type, :reference], tag_ids: [])
+                                                                                                              :metadata, :detection, :class_type, :reference], tag_names: [])
   end
 
   def sync_summary

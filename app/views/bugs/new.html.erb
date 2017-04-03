@@ -3,56 +3,13 @@
     <div class="row">
       <div class="col-xs-12">
         <h2 class="subtitle">Create A New Bug <button class="btn btn-sm btn-default">cancel</button></h2>
-        <p>Use this form to open a new Snort Rules bug on bugzilla.</p>
+        <p>Use this form to open a new bug on bugzilla.</p>
       </div>
     </div>
     <div class="row">
       <div class="col-xs-12">
         <div class="spacer"></div>
-        <%= form_for @bug do |f| %>
-        <div class="row">
-          <div class="col-sm-12 form-group">
-            <label for="priority">Priority</label>
-            <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control" %>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12 form-group">
-            <label for="component">Component</label>
-            <%= f.select :component, ['Snort Rules', 'SO Rules', 'Malware'], {}, class: "form-control" %>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12 form-group">
-            <div class="sandbox">
-              <label for="select-to-selectized">Tags</label>
-              <select id="select-to-new"  name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12 form-group">
-            <label for="summary">Summary</label>
-            <%= f.text_field :summary, class: "form-control create-input", required: true %>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12 form-group">
-            <label for="description">Description</label>
-            <%= f.text_area :description, class: "form-control", required: true %>
-          </div>
-        </div>
-        <%= f.hidden_field :product, value: 'Research' %>
-        <%= f.hidden_field :version, value: 'No Version Specified' %>
-        <!--<select id="bug_tag_ids" multiple="multiple" name="bug[tag_names][]"></select>-->
-        <div class="row">
-          <div class="col-sm-12 form-group">
-            <button class="btn btn-success" value="submit">Create Bug</button>
-          </div>
-        </div>
-        <div class="spacer"></div>
-        <% end %>
+        <%= render 'form' %>
       </div>
     </div>
   </div>

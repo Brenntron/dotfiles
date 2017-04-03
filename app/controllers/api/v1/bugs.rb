@@ -209,69 +209,42 @@ module API
             optional :new_research_notes, type: String, desc: "Current working draft of research notes"
             optional :new_committer_notes, type: String, desc: "Current working draft of committer notes"
             optional :editor_id, type: String, desc: "id of the new user to be assigned to the bug"
-            optional :reviewer_id, type: String, desc: "id of the new committer to be assigned to the bug"
+            optional :committer_id, type: String, desc: "id of the new committer to be assigned to the bug"
           end
 
         end
         put ":id", root: "bug" do
           bug     = Bug.find(permitted_params[:id])
-          options = {}
-          update_params = {}
-          if permitted_params[:bug][:editor_id]
+          tags = params[:bug][:tag_names]
 
-            state = nil
-            editor = User.find(permitted_params[:bug][:editor_id])
-            updated_bug_state = Bug.get_new_bug_state(bug, state, editor.email)
-            options = {
-                :ids => permitted_params[:id],
-                :assigned_to => editor.email,
-                :status => updated_bug_state[:status],
-                :resolution => updated_bug_state[:resolution],
-                :comment => updated_bug_state[:comment]
-            }
-            update_params = {
-                :user => editor,
-                :state => updated_bug_state[:state],
-                :status => updated_bug_state[:status],
-                :resolution => updated_bug_state[:resolution],
-                :assigned_at => updated_bug_state[:assigned_at],
-                :pending_at => updated_bug_state[:pending_at],
-                :resolved_at => updated_bug_state[:resolved_at],
-                :reopened_at => updated_bug_state[:reopened_at],
-                :work_time => updated_bug_state[:work_time],
-                :rework_time => updated_bug_state[:rework_time],
-                :review_time => updated_bug_state[:review_time]
-            }
-          elsif permitted_params[:bug][:reviewer_id]
-            reviewer = User.find(permitted_params[:bug][:reviewer_id])
-            options = {
-                :ids => permitted_params[:id],
-                :qa_contact => reviewer.email
-            }
-            update_params = {
-                :committer => reviewer
-            }
-          elsif permitted_params[:bug][:state]
-            updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], nil)
-            options = {
-                :ids => permitted_params[:id],
-                :status => updated_bug_state[:status],
-                :resolution => updated_bug_state[:resolution],
-                :comment => updated_bug_state[:comment]
-            }
-            update_params = {
-                :state => updated_bug_state[:state],
-                :status => updated_bug_state[:status],
-                :resolution => updated_bug_state[:resolution],
-                :assigned_at => updated_bug_state[:assigned_at],
-                :pending_at => updated_bug_state[:pending_at],
-                :resolved_at => updated_bug_state[:resolved_at],
-                :reopened_at => updated_bug_state[:reopened_at],
-                :work_time => updated_bug_state[:work_time],
-                :rework_time => updated_bug_state[:rework_time],
-                :review_time => updated_bug_state[:review_time]
-            }
-          elsif permitted_params[:bug][:new_research_notes]
+          editor = User.find(permitted_params[:bug][:user_id])
+          reviewer = User.find(permitted_params[:bug][:committer_id])
+          updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], editor.email)
+
+          options = {
+              :ids => permitted_params[:id],
+              :assigned_to => editor.email,
+              :status => updated_bug_state[:status],
+              :resolution => updated_bug_state[:resolution],
+              :comment => updated_bug_state[:comment],
+              :qa_contact => reviewer.email
+          }
+          update_params = {
+              :user => editor,
+              :state => updated_bug_state[:state],
+              :status => updated_bug_state[:status],
+              :resolution => updated_bug_state[:resolution],
+              :assigned_at => updated_bug_state[:assigned_at],
+              :pending_at => updated_bug_state[:pending_at],
+              :resolved_at => updated_bug_state[:resolved_at],
+              :reopened_at => updated_bug_state[:reopened_at],
+              :work_time => updated_bug_state[:work_time],
+              :rework_time => updated_bug_state[:rework_time],
+              :review_time => updated_bug_state[:review_time],
+              :committer => reviewer
+          }
+
+          if permitted_params[:bug][:new_research_notes]
             update_params = {
                 :research_notes => permitted_params[:bug][:new_research_notes]
             }
@@ -280,18 +253,6 @@ module API
                 :committer_notes => permitted_params[:bug][:new_committer_notes]
             }
           end
-          options[:ids] = permitted_params[:id]
-          options[:product] = permitted_params[:bug][:product]
-          options[:component] = permitted_params[:bug][:component]
-          options[:summary] = permitted_params[:bug][:summary]
-          options[:version] = permitted_params[:bug][:version]
-          options[:state] = permitted_params[:bug][:state]
-          options[:creator] = permitted_params[:bug][:creator]
-          options[:opsys] = permitted_params[:bug][:opsys]
-          options[:platform] = permitted_params[:bug][:platform]
-          options[:priority] = permitted_params[:bug][:priority]
-          options[:severity] = permitted_params[:bug][:severity]
-          options[:classification] = permitted_params[:bug][:classification]
 
           update_params[:product] = permitted_params[:bug][:product]
           update_params[:component] = permitted_params[:bug][:component]
@@ -304,12 +265,40 @@ module API
           update_params[:severity] = permitted_params[:bug][:severity]
           update_params[:classification] = permitted_params[:bug][:classification]
 
+          # update the tags
+          bug.tags.delete_all if bug.tags.exists?
+          if tags
+            tags.each do |tag|
+              new_tag = Tag.find_or_create_by(name: tag)
+              bug.tags << new_tag
+            end
+          end
+
+          # update the database
+          # (do this first so we can compose the summary properly to send to bugzilla)
+          update_params.reject! { |k, v| v.nil? }
+          Bug.update(permitted_params[:id], update_params)
+
+          # update the summary (regarding tags)
+          bug.compose_summary
+
+          options[:ids] = permitted_params[:id]
+          options[:product] = permitted_params[:bug][:product]
+          options[:component] = permitted_params[:bug][:component]
+          options[:summary] = bug.summary
+          options[:version] = permitted_params[:bug][:version]
+          options[:state] = permitted_params[:bug][:state]
+          options[:creator] = permitted_params[:bug][:creator]
+          options[:opsys] = permitted_params[:bug][:opsys]
+          options[:platform] = permitted_params[:bug][:platform]
+          options[:priority] = permitted_params[:bug][:priority]
+          options[:severity] = permitted_params[:bug][:severity]
+          options[:classification] = permitted_params[:bug][:classification]
+
+
           # update buzilla (if needed)
           options.reject! { |k, v| v.nil? } if options
           Bugzilla::Bug.new(bugzilla_session).update(options.to_h) unless options.blank?
-          # update the database
-          update_params.reject! { |k, v| v.nil? }
-          Bug.update(permitted_params[:id], update_params)
 
         end
 

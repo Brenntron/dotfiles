@@ -1,78 +1,72 @@
 
     <div class='row item-info'>
       <div class="row subheading">
-        <div class="col-xs-12 col-sm-2">
-          <h6>bugzilla id</h6>
-            <h3><a class="top-space bugzilla_id" href="<%= get_bug_url %>" id="bugzilla_<%= @bug.id %>" target="_blank"><%=@bug.id%></a>
-              <button class="tiny text-muted resynch_bug" id="resynch_bug"><i class="glyphicon glyphicon-refresh"></i><em> resynch</em></button></h3>
-              <button class="select-sm btn btn-default hidden" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> synching</button>
-        </div>
-
-        <div class="col-xs-3 col-sm-2 state">
-          <h6>state</h6>
-          <% if @bug.allow_state_change? %>
-            <h5 class="top-space" id="current_bug_state"><%= @bug.state %> &nbsp;<button class="tiny text-muted change_current_bug_state" id="change_state"><em>change</em></button></h5>
-
-            <%= render 'shared/change_state_form' %>
-          <% else %>
-            <h5 class="top-space" id="current_bug_state"><%= @bug.state %></h5>
-            <span id="helpBlock2" class="help-block small text-nowrap">A committer and editor must be assigned before state can be changed.</span>
-          <% end %>
-        </div>
-        <div class="col-xs-3 col-sm-2">
-          <h6>priority</h6>
-          <h5 class="top-space" id="current_bug_priority"><%= @bug.priority %> &nbsp;<button class="tiny text-muted change_current_bug_priority" id="priority"><em>change</em></button></h5>
-
-          <%= render 'shared/change_priority_bug_form' %>
-        </div>
-        <div class="col-xs-3 col-sm-2">
-          <h6>component</h6>
-          <h5 class="top-space" id="current_bug_component"><%= @bug.component %> &nbsp;<button class="tiny text-muted change_current_bug_component" id="component"><em>change</em></button></h5>
-
-          <%= render 'shared/change_component_bug_form' %>
-        </div>
-        <div class="col-xs-3 col-sm-2">
-          <h6>editor</h6>
-
-          <h5 class="top-space" id="current_bug_editor">
-            <% if @bug.user %>
-                <%= @bug.user.cvs_username %> &nbsp;<button class="tiny text-muted change_current_bug_editor" id="editor"><em>change</em></button>
-            <% else %>
-                <button class="tiny text-muted change_current_bug_editor" id="editor"><em>change</em></button>
-            <% end %>
-          </h5>
-
-          <%= render 'shared/change_editor_bug_form' %>
-        </div>
-        <div class="col-xs-3 col-sm-1">
-          <h6>committer</h6>
-          <h5 class="bug-user top-space" id="current_bug_committer">
-            <% if @bug.committer %>
-                <%= @bug.committer.cvs_username %> &nbsp;<button class="tiny text-muted change_current_bug_committer" id="committer"><em>change</em></button>
-            <% else %>
-                <button class="tiny text-muted change_current_bug_committer" id="committer"><em>change</em></button>
-            <% end %>
-          </h5>
-          <%= render 'shared/change_committer_bug_form' %>
-        </div>
-        <div class="col-xs-3 col-sm-1">
-          <button class="select-sm btn btn-info back_btn pull-right" id="back_btn" style="margin-top:4px;"><i class="glyphicon glyphicon-th-list"></i> <strong class="hidden-xs">bug list</strong></button>
-        </div>
-        <div class="col-sm-12 hidden-xs bug_summary">
-          <h5 class="edit-summary-field"><%= @bug.summary %> <button id="summary" class="tiny text-muted edit-summary"><em>change</em></button></h5>
-          <%= form_tag("/bugs/#{@bug.id}", method: :put) do -%>
-            <div class="col-xs-12">
-              <%= text_field_tag 'bug[summary]', "#{@bug.summary}", class:"edit-summary-field form-control create-input select-sm", style:"display:none"%>
+        <div class="col-xs-12">
+          <div class="col-xs-3">
+            <div class="bug-details-columns">
+              <h6>bugzilla id</h6>
+                <h3>
+                  <a class="top-space bugzilla_id" href="<%= get_bug_url %>" id="bugzilla_<%= @bug.id %>" target="_blank"><%=@bug.id%></a>
+                  <small>
+                    <span data-toggle="modal" data-target="#editBug">
+                      <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-pencil edit_bug" id="edit_bug" data-toggle="tooltip" data-placement="bottom" title="edit bug"></a>
+                    </span>
+                    <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-refresh resynch_bug" id="resynch_bug" data-toggle="tooltip" data-placement="bottom" title="resynch this bug with bugzilla"></a>
+                    <button class="select-sm btn btn-default hidden" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> synching</button>
+                  </small>
+                </h3>
             </div>
-            <div class="col-sm-2">
-              <%= submit_tag 'change summary', class: "edit-summary-field btn btn-default btn-xs", style:"display:none;" %>
+          </div>
+
+          <div class="col-xs-1 state">
+            <div class="bug-details-columns">
+              <h6>state</h6>
+              <h5 class="top-space"><%= @bug.state %></h5>
             </div>
-          <% end -%>
-          <div class="col-sm-1">
-            <span class="edit-summary-field glyphicon glyphicon-remove cancel-button-xs pull-left" style="display:none;" id="cancel_summary"></span>
+          </div>
+          <div class="col-xs-1">
+            <div class="bug-details-columns">
+              <h6>classification</h6>
+              <h5 class="top-space"><%= @bug.classification %></h5>
+            </div>
+          </div>
+          <div class="col-xs-1">
+            <div class="bug-details-columns">
+              <h6>component</h6><h5 class="top-space"><%= @bug.component %></h5>
+            </div>
+          </div>
+          <div class="col-xs-1">
+            <div class="bug-details-columns">
+              <h6>priority</h6>
+              <h5 class="top-space"><%= @bug.priority %></h5>
+            </div>
+          </div>
+          <div class="col-xs-1">
+            <div class="bug-details-columns">
+              <h6>assignee</h6>
+              <% if @bug.user %>
+                <h5 class="top-space"><%= @bug.user.cvs_username %></h5>
+              <% end %>
+            </div>
+          </div>
+          <div class="col-xs-1">
+            <div class="bug-details-columns">
+              <h6>committer</h6>
+              <% if @bug.committer %>
+                <h5 class="bug-user top-space"><%= @bug.committer.cvs_username %></h5>
+              <% end %>
+            </div>
+          </div>
+          <div class="col-xs-3">
+            <button class="select-sm btn btn-info back_btn pull-right" id="back_btn" style="margin-top:4px;margin-right:-28px"><i class="glyphicon glyphicon-th-list"></i> <strong class="hidden-xs">bug list</strong></button>
           </div>
         </div>
 
+      <div class="row item-info">
+        <div class="col-xs-12 hidden-xs bug_summary">
+          <h5 class="edit-summary-field"><%= @bug.summary %></h5>
+        </div>
+      </div>
 
       </div>
       <div class="row">
@@ -96,3 +90,21 @@
 </div>
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
 <input type="hidden" name="xml_token" value="<%= xml_token %>">
+
+
+<div class="modal fade" id="editBug" tabindex="-1" role="dialog" aria-labelledby="editBug" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="editBug">Update Bug <%=@bug.id%>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <%=render 'form' %>
+      </div>
+    </div>
+  </div>
+</div>

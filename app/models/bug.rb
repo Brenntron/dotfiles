@@ -22,7 +22,7 @@ class Bug < ApplicationRecord
   scope :pending, -> { where(state: "PENDING") }
   scope :by_component, ->(component) { where('component = ?', component) }
 
-  scope :allowed_editors, ->(bug) { User.all.reject { |u| u.id == bug.committer_id } }
+  scope :allowed_assignees, ->(bug) { User.all.reject { |u| u.id == bug.committer_id } }
   scope :allowed_committers, ->(bug) { User.all.reject { |u| u.id == bug.user_id } }
 
   enum classification: {

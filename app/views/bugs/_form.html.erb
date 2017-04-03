@@ -1,0 +1,81 @@
+<%= form_for @bug, remote:true do |f| %>
+  <% unless @bug.new_record? %>
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <label for="state">State</label>
+        <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control'%>
+        <% unless @bug.can_set_pending? %>
+            <br><span class="tiny text-muted ">Cant set to pending. please assign attachments to exploits.</span><br>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <label for="priority">Priority</label>
+        <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control" %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <label for="component">Component</label>
+        <%= f.select :component, ['Snort Rules', 'SO Rules', 'Malware'], {}, class: "form-control" %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <label for="classification">Classification</label>
+        <%= f.select :classification, options_for_select(Bug.classifications.map{ |k,v| [k.humanize, v] }, selected: Bug.classifications[@bug.classification]), {}, class: "form-control" %>
+      </div>
+    </div>
+    <% unless @bug.new_record? %>
+      <div class="row">
+        <div class="col-sm-12 form-group">
+          <label for="user_id">Assignee</label>
+          <%=f.select :user_id, options_for_select(Bug.allowed_assignees(@bug).pluck(:cvs_username,:id), selected: @bug.user_id), {}, class: 'form-control'%>
+        </div>
+      </div>
+    <% end %>
+    <% unless @bug.new_record? %>
+      <div class="row">
+        <div class="col-sm-12 form-group">
+          <label for="committer_id">Committer</label>
+          <%=f.select :committer_id, options_for_select(Bug.allowed_committers(@bug).pluck(:cvs_username,:id), selected: @bug.committer_id), {}, class: 'form-control'%>
+        </div>
+      </div>
+    <% end %>
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <div class="sandbox">
+          <label for="select-to-selectized">Tags</label>
+          <select id="select-to-new"  name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">
+            <% @bug.tags.each do |tag|%>
+                <option value="<%=tag.name%>" selected="selected"></option>
+            <%end%>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <label for="summary">Summary</label>
+        <%= f.text_field :summary, class: "form-control create-input", required: true %>
+      </div>
+    </div>
+    <% if @bug.new_record? %>
+      <div class="row">
+        <div class="col-sm-12 form-group">
+          <label for="description">Description</label>
+          <%= f.text_area :description, class: "form-control", required: true %>
+        </div>
+      </div>
+    <% end %>
+    <%= f.hidden_field :product, value: 'Research' %>
+    <%= f.hidden_field :version, value: 'No Version Specified' %>
+
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <button class="btn btn-success edit-bug" value="submit">Save</button>
+      </div>
+    </div>
+<% end %>

@@ -64,28 +64,6 @@ $ ->
       window.location.replace '/bugs/' + bid
 
 
-
-  $('.edit-summary').on 'click', ->
-    $('.edit-summary-field, .edit-summary').toggle()
-
-  $('#cancel_summary').on 'click', ->
-    $('.edit-summary-field, .edit-summary').toggle()
-
-  $('#cancel_state').on 'click', ->
-    $('#current_bug_state, #change_state_form, #cancel_state').toggle()
-
-  $('#cancel_priority').on 'click', ->
-    $('#current_bug_priority, #change_priority_form, #cancel_priority').toggle()
-
-  $('#cancel_component').on 'click', ->
-    $('#current_bug_component, #change_component_form, #cancel_component').toggle()
-
-  $('#cancel_editor').on 'click', ->
-    $('#current_bug_editor, #change_editor_form, #cancel_editor').toggle()
-
-  $('#cancel_committer').on 'click', ->
-    $('#current_bug_committer, #change_committer_form, #cancel_committer').toggle()
-
   $('#bug_tab a:first').tab('show')
 
   $('#import_bug').keyup (e) ->
@@ -102,20 +80,6 @@ $ ->
       $('button#button_import').click()
       return false
 
-  $(document).on 'click', '.change_current_bug_state', ->
-    $('#current_bug_state, #change_state_form, #cancel_state').toggle()
-
-  $(document).on 'click', '.change_current_bug_editor', ->
-    $('#current_bug_editor, #change_editor_form, #cancel_editor').toggle()
-
-  $(document).on 'click', '.change_current_bug_priority', ->
-    $('#current_bug_priority, #change_priority_form, #cancel_priority').toggle()
-
-  $(document).on 'click', '.change_current_bug_committer', ->
-    $('#current_bug_committer, #change_committer_form, #cancel_committer').toggle()
-
-  $(document).on 'click', '.change_current_bug_component', ->
-    $('#current_bug_component, #change_component_form, #cancel_component').toggle()
 
   $('.delete_bug').on 'click', ->
     id = $(this).parents('tr').attr('id')
@@ -148,113 +112,22 @@ $ ->
     else
       $(".bugzilla_max").hide()
 
-  $("#change_state_form").submit (e)->
+
+  $('.edit_bug').submit (e) ->
     e.preventDefault()
+    $('.edit-bug').prop('disabled', true)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     id = $('input[name="bug_id"]').val()
-    state = $('#bug_state option:selected').text()
+    data = $('.edit_bug').serialize()
     $.ajax(
       url: '/api/v1/bugs/' + id
       method: 'PUT'
       headers: headers
-      data:
-        id: id
-        bug:
-          'state': state
+      data: data
       success: (response) ->
-        $('#current_bug_state').html(response.state)
-        $('#current_bug_state, #change_state_form').toggle()
         location.reload()
       error: (response) ->
         alert(response.responseText)
-      , this)
-
-
-  $("#change_editor_form").submit (e)->
-    e.preventDefault()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    id = $('input[name="bug_id"]').val()
-    editor = $('#bug_editor option:selected').val()
-    $.ajax(
-      url: '/api/v1/bugs/' + id
-      method: 'PUT'
-      headers: headers
-      data:
-        id: id
-        bug:
-          'editor_id': editor
-      success: (response) ->
-        $('#current_bug_editor').html(response.user_name).append('<button class="tiny text-muted change_current_bug_editor" id="editor"><em>change</em></button>')
-        $('#current_bug_editor, #change_editor_form').toggle()
-        location.reload()
-      error: (response) ->
-        location.reload()
-        alert(response.responseText)
-    , this)
-
-
-  $("#change_committer_form").submit (e)->
-    e.preventDefault()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    id = $('input[name="bug_id"]').val()
-    committer = $('#bug_committer option:selected').val()
-    $.ajax(
-      url: '/api/v1/bugs/' + id
-      method: 'PUT'
-      headers: headers
-      data:
-        id: id
-        bug:
-          'reviewer_id': committer
-      success: (response) ->
-        $('#current_bug_committer').html(response.committer_name).append('<button class="tiny text-muted change_current_bug_committer" id="committer"><em>change</em></button>')
-        $('#current_bug_committer, #change_committer_form').toggle()
-        location.reload()
-      error: (response) ->
-        location.reload()
-        alert(response.responseText)
-    , this)
-
-  $("#change_priority_form").submit (e)->
-    e.preventDefault()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    id = $('input[name="bug_id"]').val()
-    priority = $('#bug_priority option:selected').val()
-    $.ajax(
-      url: '/api/v1/bugs/' + id
-      method: 'PUT'
-      headers: headers
-      data:
-        id: id
-        bug:
-          'priority': priority
-      success: (response) ->
-        $('#current_bug_priority, #change_priority_form').toggle()
-        $('#bug_priority option:selected').val()
-        window.location.reload()
-      error:(response) ->
-        window.location.reload()
-    , this)
-
-  $("#change_component_form").submit (e)->
-    e.preventDefault()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    id = $('input[name="bug_id"]').val()
-    component = $('#bug_component option:selected').val()
-    $.ajax(
-      url: '/api/v1/bugs/' + id
-      method: 'PUT'
-      headers: headers
-      data:
-        id: id
-        bug:
-          'component': component
-      success: (response) ->
-        $('#current_bug_component, #change_component_form').toggle()
-        $('#bug_component option:selected').val()
-        window.location.reload()
-      error:(response) ->
-        window.location.reload()
     , this)
 
 
@@ -325,5 +198,10 @@ $ ->
   $(".rulealert-toggle").on 'click', ->
     which = $(this).data('rulealert');
     $('.'+which).toggle();
+
+
+  $ ->
+    $('[data-toggle="tooltip"]').tooltip()
+    return
 
 
