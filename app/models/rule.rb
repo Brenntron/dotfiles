@@ -265,7 +265,7 @@ class Rule < ApplicationRecord
     rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
     references.each do |r|
       r = r.split(',')
-      unless r[1].empty?
+      unless r[1].nil? || r[1].empty?
         ref_type = ReferenceType.find_or_create_by(name: r[0].strip)
         new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: r[1].strip)
         self.references << new_reference unless self.references.include?(new_reference)
@@ -527,16 +527,17 @@ class Rule < ApplicationRecord
 
     rule_content.strip!
     if rule_content.empty?
-      ''
+      nil
     else
-      rule = synch_rule_content(rule_content)
-      case
-        when rule.nil?
-          # do nothing
-        when 'X' == rule.load_status    # stale edit
-          # do nothing
-        else
-          rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
+      synch_rule_content(rule_content).tap do |rule|
+        case
+          when rule.nil?
+            # do nothing
+          when 'X' == rule.load_status    # stale edit
+            # do nothing
+          else
+            rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
+        end
       end
     end
   end
