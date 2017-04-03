@@ -55,8 +55,15 @@ module RuleSyntax
       @raw_hash
     end
 
+    def detection_hash
+      raw_hash.select{|type, data| %i(content flowbits fast_pattern http_header).include?(type)}
+    end
+
     def detection
-      raw_hash[:content] ? raw_hash[:content].map{|body| "content: #{body};"}.join : []
+      detection_hash.inject([]) do |det_ary, (type, data)|
+        det_ary += data.map{ |datum| "#{type}:#{datum};" }
+        det_ary
+      end.join(' ')
     end
 
     def attributes
