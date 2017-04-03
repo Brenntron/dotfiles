@@ -521,6 +521,16 @@ class Rule < ApplicationRecord
     end
   end
 
+  def self.load_rule(sid, gid, filepath = nil)
+    load_grep(grep_line_from_file(sid, gid, filepath))
+  rescue
+    nil
+  end
+
+  def self.find_or_load(sid, gid)
+    Rule.by_sid(sid, gid).first || load_rule(sid, gid)
+  end
+
   # Replace rule in given file with rule_content.
   # Scans file for rule with same gid and sid and replaces that line with rule_content.
   # Appends rule_content to end of file if gid and sid are not found
