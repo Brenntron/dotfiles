@@ -13,6 +13,7 @@
 /vendor/bundle
 /bundle/
 .DS_Store
+.byebug_history
 /public/assets/*
 /public/system/*
 
