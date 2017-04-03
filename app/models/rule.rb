@@ -36,6 +36,8 @@ require 'tempfile'
 class Rule < ApplicationRecord
   has_paper_trail
 
+  attr_accessor :load_status
+
   has_and_belongs_to_many :bugs
   has_and_belongs_to_many :references, dependent: :destroy
   has_one :rule_doc, dependent: :destroy
@@ -484,32 +486,32 @@ class Rule < ApplicationRecord
 
     rule_db = by_sid(rule.sid, rule.gid).first
 
-    case
-      # # do not load when rule file does not parse
-      # when !rule.parsed?
-      #   nil
+    rule.load_status =
+        case
+          when !rule.parsed?            # rule failed to parse
+            'F'
+          when rule.new_record?         # new rule
+            'N'
+          when rule_db.draft?           # stale edit
+            'X'
+          when rule_db.rev == rule.rev  # rev same, reloaded
+            'R'
+          else                          # updated rule with new rev
+            'L'
+        end
 
-      # new rule happens when loading from file for the first time.
-      when rule.new_record?
-        rule.edit_status                = EDIT_STATUS_SYNCHED
-        rule.publish_status             = PUBLISH_STATUS_SYNCHED
-        rule.state                      = 'UNCHANGED'
-        rule.save!
-        rule.associate_references(rule_content)
-        rule
-      when rule_db.draft?
+    case rule.load_status
+      when 'X'
         rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
-        nil
-      when rule_db.rev == rule.rev
-        rule_db
       else
         rule.edit_status                = EDIT_STATUS_SYNCHED
         rule.publish_status             = PUBLISH_STATUS_SYNCHED
         rule.state                      = 'UNCHANGED'
         rule.save!
         rule.associate_references(rule_content)
-        rule
     end
+
+    rule
   end
 
   # Take a line from grep output of a rule file and saves to database unless rev is unchanged
@@ -524,7 +526,7 @@ class Rule < ApplicationRecord
       ''
     else
       rule = synch_rule_content(rule_content)
-      rule.update!(filename: filename, linenumber: line_number[1..-2].to_i) if rule
+      rule.update!(filename: filename, linenumber: line_number[1..-2].to_i) unless 'X' == rule.load_status
     end
   end
 
