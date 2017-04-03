@@ -489,7 +489,7 @@ class Rule < ApplicationRecord
       when !rule.parsed?
         nil
       # new rule happens when loading from file for the first time.
-      when rule.new_record?
+      when rule_db.nil?
         rule.edit_status                = EDIT_STATUS_SYNCHED
         rule.publish_status             = PUBLISH_STATUS_SYNCHED
         rule.state                      = 'UNCHANGED'
@@ -499,14 +499,14 @@ class Rule < ApplicationRecord
       when rule_db.draft?
         rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
         nil
-      when rule_db.rev != rule.rev
+      when rule_db.rev == rule.rev
+        rule_db
+      else
         rule.edit_status                = EDIT_STATUS_SYNCHED
         rule.publish_status             = PUBLISH_STATUS_SYNCHED
         rule.state                      = 'UNCHANGED'
         rule.save!
         rule
-      else
-        nil
     end
   end
 

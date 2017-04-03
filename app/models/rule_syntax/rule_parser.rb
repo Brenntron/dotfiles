@@ -56,7 +56,7 @@ module RuleSyntax
     end
 
     def detection
-      raw_hash[:content].map{|body| "content: #{body};"}.join
+      raw_hash[:content] ? raw_hash[:content].map{|body| "content: #{body};"}.join : []
     end
 
     def attributes
