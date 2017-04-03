@@ -54,6 +54,7 @@ group :development do
   gem 'guard','2.14.0'
   gem 'guard-livereload', '2.5.2', require: false
   gem 'web-console', '~> 3.4.0'
+  gem 'byebug'
 end
 
 group :test do

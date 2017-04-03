@@ -80,6 +80,7 @@ GEM
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
     builder (3.2.2)
+    byebug (9.0.6)
     cancancan (1.16.0)
     capybara (2.11.0)
       addressable
@@ -418,6 +419,7 @@ DEPENDENCIES
   awesome_print (= 1.2.0)
   bootstrap-multiselect-rails
   bootstrap-sass
+  byebug
   cancancan (= 1.16.0)
   capybara (= 2.11.0)
   chart-js-rails
