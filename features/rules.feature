@@ -7,7 +7,7 @@ Feature: Rules
   ### Scenarios New Rule ###
 
   @javascript
-  Scenario: New Rule: standard form: works
+  Scenario: New Rule: standard form: required fields
     Given a user with role "analyst" exists and is logged in
     And the current user has the following bugs:
       |  id  |
@@ -19,148 +19,70 @@ Feature: Rules
     And  I click button "create"
     And  I click "use standard form"
     And  I select "BLACKLIST" from "rule_category_id"
-    And  I fill in "rule[message]" with "Test msg"
-    And  I fill in "rule[detection]" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
-    And  I select "successful-user" from "rule[class_type]"
-    And  I fill in "summary" with "rule doc summary"
+    And  I click "Create Rule"
+    And  I wait for "2" seconds
+    Then I should see "Please fill in required fields."
+    When I fill in "std-form-message" with "Test msg"
+    And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
+    And  I select "attempted-user" from "rule[class_type]"
+    And  I click "Create Rule"
+    And  I wait for "2" seconds
+    Then I should see "Please fill in required fields."
+    When I fill in "summary" with "some pig"
+    And  I select "$SSH_SERVERS" from "std-form-src"
+    And  I fill in "flow_src_ports" with "$SSH_PORTS"
+    And  I fill in "flow_dst_server" with "$SSH_SERVERS"
+    And  I fill in "flow_dst_ports" with "$SSH_PORTS"
     And  I click "Create Rule"
     And  I wait for "1" seconds
     When I click the "Rules" tab
     And  I click button "list all"
-    Then I should see "BLACKLIST Test msg"
-    And  I should see a rule with state "NEW" version "new_rule"
-#    And rule "11" is a new rule
-    And  I should see a rule row with class "draft" and version "new_rule"
+    Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "parsed" and version "new_rule"
+    And  I should see a rule with state "NEW" version "new_rule"
+    And  I should see "BLACKLIST Test msg"
+#    And rule "11" is a new rule
     When I click "new_rule"
     Then I should see "BLACKLIST Test msg"
+    # default flow:
+    And  I should see "to_client,established"
     And  I should see "content:"200""
     And  I should see "content:"Server: nginx/1.6.2""
+    And  I should see "content:"14""
     And  I should see "fast_pattern:only"
     And  I should see "flowbits:isset,http.mokes"
-
-#  @javascript
-#  Scenario: New Rule: standard form required fields
-#    Given a user with role "analyst" exists and is logged in
-#    And the current user has the following bugs:
-#      |  id  | state |
-#      | 2222 | OPEN  |
-#    And a "BLACKLIST" rule category exists
-#    And I wait for "3" seconds
-#    When  I goto "/bugs/2222"
-#    And  I click the "Rules" tab
-#    And  I click button "create"
-#    And  I click "use standard form"
-#    And  I select "BLACKLIST" from "rule_category_id"
-#    And  I click "Create Rule"
-#    And  I wait for "2" seconds
-#    Then I should see "Please fill in required fields."
-#    When I fill in "rule[message]" with "Test Message the third"
-#    And  I fill in "rule[detection]" with "Detection test3"
-#    And  I select "unknown" from "rule[class_type]"
-#    And  I click "Create Rule"
-#    And  I wait for "2" seconds
-#    Then I should see "Please fill in required fields."
-#    When I fill in "summary" with "This is the rule doc summary"
-#    And  I click "Create Rule"
-#    And  I wait for "1" seconds
-#    And  I click the "Rules" tab
-#    And  I click button "list all"
-#    Then I should see "BLACKLIST Test Message the third"
-
-#  @javascript
-#  Scenario: New Rule: the policy options and toggle should populate checkbox values
-#    Given a user with role "analyst" exists and is logged in
-#    And the current user has the following "open_bug":
-#      |  id  |
-#      | 2222 |
-#    And a "BLACKLIST" rule category exists
-#    And I wait for "3" seconds
-#    When  I goto "/bugs/2222"
-#    And  I click the "Rules" tab
-#    And  I click button "create"
-#    And  I click "use standard form"
-#    And  I check "security-ips"
-#    Then the "security-ips" field should be "policy security-ips drop"
-#    When I toggle "bootstrap-switch-container"
-#    Then the "security-ips" field should be "policy security-ips alert"
-#    When I check "max-detect-ips"
-#    Then the "max-detect-ips" field should be "policy max-detect-ips drop"
-#    Then the "security-ips" field should be "policy security-ips alert"
-
-#  @javascript
-#  Scenario: New Rule: standard form service options
-#    Given a user with role "analyst" exists and is logged in
-#    And the current user has the following "open_bug":
-#      |  id  |
-#      | 2222 |
-#    And a "BLACKLIST" rule category exists
-#    And I wait for "3" seconds
-#    And  I goto "/bugs/2222"
-#    Then I click the "Rules" tab
-#    Then I click button "create"
-#    Then I click "use standard form"
-#    And  I click "other"
-#    Then I click "mysql"
-#    Then I click "kerberos"
-#    And  I select "BLACKLIST" from "rule_category_id"
-#    And  I fill in "rule[message]" with "Test Message the third"
-#    And  I fill in "rule[detection]" with "Detection test3"
-#    And  I select "unknown" from "rule[class_type]"
-#    And  I fill in "summary" with "This is the rule doc summary"
-#    # dropdown needs to be obscured to find Create Rule button
-#    Then I hide the element with class "other-dropdown"
-#    Then I click "Create Rule"
-#    Then I wait for "1" seconds
-#    Then I click the "Rules" tab
-#    Then I click button "list all"
-#    And  I click "new_rule"
-#    Then I should see "service mysql"
-#    Then I should see "service kerberos"
-#    And  I should not see "telnet"
-
-#  @javascript
-#  Scenario: New Rule: standard form rule state and css classes
-#    Given a user with role "analyst" exists and is logged in
-#    And the current user has the following "open_bug":
-#      |  id  |
-#      | 2222 |
-#    And a "BLACKLIST" rule category exists
-#    And I wait for "3" seconds
-#    When I goto "/bugs/2222"
-#    And  I click the "Rules" tab
-#    And  I click button "create"
-#    And  I click "use standard form"
-#    And  I select "BLACKLIST" from "rule_category_id"
-#    And  I fill in "rule[message]" with "Test message"
-#    And  I fill in "rule[detection]" with "Detection test"
-#    And  I select "unknown" from "rule[class_type]"
-#    And  I fill in "summary" with "rule doc summary"
-#    And  I click "Create Rule"
-#    And  I wait for "1" seconds
-#    When I click the "Rules" tab
-#    And  I click button "list all"
-#    Then I should see a rule with state "NEW" version "new_rule"
-#    And  I should see "Test message"
-##    And rule "11" is a new rule
-#    And  I should see a rule row with class "draft" and version "new_rule"
-#    And  I should see a rule row with class "new-rule" and version "new_rule"
-#    And  I should see a rule row with class "parsed" and version "new_rule"
-#    When I check "rule[id]"
-#    And  I click "edit"
-#    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
-#    And  I click button "Save Changes"
-#    And  I wait for "8" seconds
-#    Then I should see a rule with state "FAILED" version "new_rule"
-##    And rule "11" is a new rule
-#    And  I should see "BLACKLIST short mess"
-#    And  I should see a rule row with class "draft" and version "new_rule"
-#    And  I should see a rule row with class "new-rule" and version "new_rule"
-#    And  I should see a rule row with class "failed" and version "new_rule"
+    And  I should see "attempted-user"
+    # default metadata:
+    And  I should see "pop3"
+    And  I should see "imap"
+    And  I should see "ftp-data"
+    And  I should see "http"
+    # rule docs:
+    And  I should see "some pig"
 
   @javascript
-  Scenario: New Rule: legacy form rule state and css classes
+  Scenario: New Rule: standard form: the policy options and toggle should populate checkbox values
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    And I wait for "3" seconds
+    When  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+    And  I check "security-ips"
+    Then the "security-ips" field should be "policy security-ips drop"
+    When I toggle "bootstrap-switch-container"
+    Then the "security-ips" field should be "policy security-ips alert"
+    When I check "max-detect-ips"
+    Then the "max-detect-ips" field should be "policy max-detect-ips drop"
+    And  the "security-ips" field should be "policy security-ips alert"
+
+  @javascript
+  Scenario: New Rule: standard form: service options
     Given a user with role "analyst" exists and is logged in
     And the current user has the following "open_bug":
       |  id  |
@@ -170,108 +92,182 @@ Feature: Rules
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "create"
-    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
+    And  I click "use standard form"
+    And  I click "other"
+    And  I click "mysql"
+    And  I click "kerberos"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "Test Message the third"
+    And  I fill in "rule[detection]" with "Detection test3"
+    And  I select "unknown" from "rule[class_type]"
+    And  I fill in "summary" with "This is the rule doc summary"
+    # dropdown needs to be obscured to find Create Rule button
+    And  I hide the element with class "other-dropdown"
+    When I click "Create Rule"
+    And  I wait for "1" seconds
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    And  I click "new_rule"
+    Then I should see "service mysql"
+    And  I should see "service kerberos"
+    And  I should not see "telnet"
+
+  @javascript
+  Scenario: New Rule: standard form: rule state and css classes
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    And I wait for "3" seconds
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+    And  I select "$SSH_SERVERS" from "std-form-src"
+    And  I fill in "flow_src_ports" with "$SSH_PORTS"
+    And  I fill in "flow_dst_server" with "$SSH_SERVERS"
+    And  I fill in "flow_dst_ports" with "$SSH_PORTS"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "std-form-message" with "Test msg"
+    And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
+    And  I select "attempted-user" from "rule[class_type]"
+    And  I fill in "summary" with "some pig"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    When I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see a rule row with class "draft" and version "new_rule"
+    And  I should see a rule row with class "new-rule" and version "new_rule"
+    And  I should see a rule row with class "parsed" and version "new_rule"
+    And  I should see a rule with state "NEW" version "new_rule"
+    And  I should see "BLACKLIST Test msg"
+#    And rule "11" is a new rule
+    When I check "rule[id]"
+    And  I click "edit"
+    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
+    And  I click button "Save Changes"
+    And  I wait for "8" seconds
+    Then I should see a rule row with class "draft" and version "new_rule"
+    And  I should see a rule row with class "new-rule" and version "new_rule"
+    And  I should see a rule row with class "failed" and version "new_rule"
+    And  I should see a rule with state "FAILED" version "new_rule"
+#    And rule "11" is a new rule
+    And  I should see "BLACKLIST test *.msg"
+
+  @javascript
+  Scenario: New Rule: legacy form: rule state and css classes
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    And I wait for "3" seconds
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation;)"
     And  I fill in "summary" with "some pig"
     And  I click "Create Rule"
     And  I wait for "2" seconds
     And  I click the "Rules" tab
     And  I click button "list all"
-    Then I should see a rule with state "NEW" version "new_rule"
-    And  I should see "BLACKLIST test msg"
-#    And rule "11" is a new rule
-    And  I should see a rule row with class "draft" and version "new_rule"
+    Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "parsed" and version "new_rule"
+    And  I should see a rule with state "NEW" version "new_rule"
+    And  I should see "BLACKLIST test msg"
+#    And rule "11" is a new rule
 
-#  @javascript
-#  Scenario: New Rule: legacy form: Rule category drop down should sort by frequency of use
-#    Given a user with role "analyst" exists and is logged in
-#    And the current user has the following "open_bug":
-#      |  id  |
-#      | 2222 |
-#    And the following rule categories exist:
-#      |category       | id |
-#      |BLACKLIST      |  1 |
-#      |FILE-EXECUTABLE|  2 |
-#      |OS-LINUX       |  3 |
-#    And the following rules exist:
-#      | message                 | rule_category_id |
-#      | BLACKLIST message       | 1                |
-#      | OS-LINUX message        | 3                |
-#      | OS-LINUX second message | 3                |
-#    And I wait for "3" seconds
-#    When I goto "/bugs/2222"
-#    And  I click the "Rules" tab
-#    And  I click button "create"
-#    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
-#    And  I fill in "summary" with "some pig"
-#    And  I click "Create Rule"
-#    And  I wait for "2" seconds
-#    When I click the "Rules" tab
-#    And I click button "create"
-#    And I click "use standard form"
-#    Then "BLACKLIST" should be listed first
+  @javascript
+  Scenario: New Rule: legacy form: Rule category drop down should sort by frequency of use
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And the following rule categories exist:
+      |category       | id |
+      |BLACKLIST      |  1 |
+      |FILE-EXECUTABLE|  2 |
+      |OS-LINUX       |  3 |
+    And the following rules exist:
+      | message                 | rule_category_id |
+      | BLACKLIST message       | 1                |
+      | OS-LINUX message        | 3                |
+      | OS-LINUX second message | 3                |
+    And I wait for "3" seconds
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
+    And  I fill in "summary" with "some pig"
+    And  I click "Create Rule"
+    And  I wait for "2" seconds
+    When I click the "Rules" tab
+    And I click button "create"
+    And I click "use standard form"
+    Then "BLACKLIST" should be listed first
 
-#  @javascript
-#  Scenario: New Rule: standard form: Rule category drop down should sort by frequency of use
-#    Given a user with role "analyst" exists and is logged in
-#    And the current user has the following "open_bug":
-#      |  id  |
-#      | 2222 |
-#    And the following rule categories exist:
-#      |category       | id |
-#      |BLACKLIST      |  1 |
-#      |FILE-EXECUTABLE|  2 |
-#      |OS-LINUX       |  3 |
-#    And the following rules exist:
-#      | message                 | rule_category_id |
-#      | BLACKLIST message       | 1                |
-#      | OS-LINUX message        | 3                |
-#      | OS-LINUX second message | 3                |
-#    Then I wait for "3" seconds
-#    And  I goto "/bugs/2222"
-#    Then I click the "Rules" tab
-#    Then I click button "create"
-#    Then I click "use standard form"
-#    Then "OS-LINUX" should be listed first
-#    And  I select "BLACKLIST" from "rule_category_id"
-#    And  I fill in "rule[message]" with "test msg"
-#    And  I fill in "rule[detection]" with "|04|hola|03|org|00|"
-#    And  I select "attempted-user" from "rule[class_type]"
-#    And  I fill in "summary" with "some pig"
-#    Then I click "Create Rule"
-#    And  I wait for "3" seconds
-#    Then I click the "Rules" tab
-#    Then I click button "create"
-#    Then I click "use standard form"
-#    Then "BLACKLIST" should be listed first
+  @javascript
+  Scenario: New Rule: standard form: Rule category drop down should sort by frequency of use
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And the following rule categories exist:
+      |category       | id |
+      |BLACKLIST      |  1 |
+      |FILE-EXECUTABLE|  2 |
+      |OS-LINUX       |  3 |
+    And the following rules exist:
+      | message                 | rule_category_id |
+      | BLACKLIST message       | 1                |
+      | OS-LINUX message        | 3                |
+      | OS-LINUX second message | 3                |
+    Then I wait for "3" seconds
+    And  I goto "/bugs/2222"
+    Then I click the "Rules" tab
+    Then I click button "create"
+    Then I click "use standard form"
+    Then "OS-LINUX" should be listed first
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "test msg"
+    And  I fill in "rule[detection]" with "|04|hola|03|org|00|"
+    And  I select "attempted-user" from "rule[class_type]"
+    And  I fill in "summary" with "some pig"
+    Then I click "Create Rule"
+    And  I wait for "3" seconds
+    Then I click the "Rules" tab
+    Then I click button "create"
+    Then I click "use standard form"
+    Then "BLACKLIST" should be listed first
 
-#  @javascript
-#  # Scenario: New Rule: standard form: the rule doc impact should populate based on class type selection
-#  Scenario: When a new rule is created, the rule doc impact should populate based on class type selection
-#    Given a user with role "analyst" exists and is logged in
-#    And the current user has the following "open_bug":
-#      |  id  |
-#      | 2222 |
-#    And a "BLACKLIST" rule category exists
-#    Then I wait for "3" seconds
-#    And  I goto "/bugs/2222"
-#    Then I click the "Rules" tab
-#    Then I click button "create"
-#    Then I click "use standard form"
-#    And  I select "BLACKLIST" from "rule_category_id"
-#    And  I fill in "rule[message]" with "Test Message the third"
-#    And  I fill in "rule[detection]" with "Detection test3"
-#    And  I select "unknown" from "rule[class_type]"
-#    And  I fill in "summary" with "This is the rule doc summary"
-#    Then I hide the element with class "other-dropdown"
-#    Then I click "Create Rule"
-#    Then I wait for "1" seconds
-#    Then I click the "Rules" tab
-#    Then I click button "list all"
-#    And  I click "new_rule"
-#    Then I should see "This is the rule doc summary"
-#    Then I should see "Unknown Traffic"
+  @javascript
+  # Scenario: New Rule: standard form: the rule doc impact should populate based on class type selection
+  Scenario: When a new rule is created, the rule doc impact should populate based on class type selection
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    Then I wait for "3" seconds
+    And  I goto "/bugs/2222"
+    Then I click the "Rules" tab
+    Then I click button "create"
+    Then I click "use standard form"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "Test Message the third"
+    And  I fill in "rule[detection]" with "Detection test3"
+    And  I select "unknown" from "rule[class_type]"
+    And  I fill in "summary" with "This is the rule doc summary"
+    Then I hide the element with class "other-dropdown"
+    Then I click "Create Rule"
+    Then I wait for "1" seconds
+    Then I click the "Rules" tab
+    Then I click button "list all"
+    And  I click "new_rule"
+    Then I should see "This is the rule doc summary"
+    Then I should see "Unknown Traffic"
 
   # Scenario: New Rule: legacy form the rule doc impact should populate based on class type selection
   ### Scenarios Existing Rule ###

@@ -207,25 +207,25 @@ $ ->
         msg = form.find('input[name="rule[message]"]').val()
         category = $('#rule_category_id option:selected').text()
         msg = '(msg:"'+ category +  " " + msg + '";'
-        connection = ""
-        form.find('input[name="rule[connection][]"], select[name="rule[connection][]"]').each ->
-          if $(this).is(":enabled")
-            connection = connection + $(this).val() + " "
-        connection = "connection:" + connection
-        flow = "flow:"
+#        connection = ""
+#        form.find('input[name="rule[connection][]"], select[name="rule[connection][]"]').each ->
+#          if $(this).is(":enabled")
+#            connection = connection + $(this).val() + " "
+#        connection = "connection:" + connection
+        flow = ""
         form.find('input[name="rule[flow][]"], select[name="rule[flow][]"]').each ->
           if $(this).is(":enabled")
             flow = flow + $(this).val() + ","
-        flow = flow.replace(/,([^,]*)$/,'$1') + ";"
+        flow = flow.replace(/,([^,]*)$/,'$1')
         detection = "detection:" + form.find('textarea[name="rule[detection]"]').val()
-        metadata = "metadata:"
+        metadata = ""
         form.find('input[name="rule[metadata][]"], select[name="rule[metadata][]"]').each ->
           if $(this).is(":enabled")
             if ($(this).is('input') && $(this).is(':checked')) || $(this).is('input[type="text"]')
               metadata = metadata + " " + $(this).val() + ","
             else if $(this).is('select') && $(this).val() != null
               metadata = metadata + " " + $(this).val() + ","
-        metadata = metadata.replace(/,([^,]*)$/,'$1') + ";"
+        metadata = metadata.replace(/,([^,]*)$/,'$1')
         class_type = "classtype:" + form.find('select[name="rule[class_type]"]').val()
         ref_types = []
         ref_values = []
@@ -243,13 +243,32 @@ $ ->
         $('.rule_doc').find('textarea[type=text]').each ->
           rule_doc[$(this)[0].id] = $(this)[0].value
 
-        rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
-        rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_category_id: $('#rule_category_id option:selected').val(), rule_doc: rule_doc }
-        data = {rule: rule}
+#        rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
+        rule = {
+          connection: {
+            action: $('select[name="rule[action]"] option:selected').val(),
+            protocol: $('select[name="rule[protocol]"] option:selected').val(),
+            src: $('select[name="rule[src]"] option:selected').val(),
+            srcport: $('input[name="rule[srcport]"]').val(),
+            direction: $('select[name="rule[direction]"] option:selected').val(),
+            dst: $('input[name="rule[dst]"]').val(),
+            dstport: $('input[name="rule[dstport]"]').val(),
+          },
+          rule_category_id: $('#rule_category_id option:selected').val(),
+          rule_category: $('#rule_category_id option:selected').text(),
+          message: form.find('input[name="rule[message]"]').val(),
+          flow: flow,
+          detection: $('#std-form-detection').val(),
+          metadata: metadata,
+          class_type: $('#new-rule-classtype-form option:selected').text(),
+          references: references,
+          bug_id: $('input[name="bug_id"]').val(),
+          rule_doc: rule_doc
+        }
         $.ajax {
-          url: "/api/v1/rules"
+          url: "/api/v1/rules/parts"
           method: 'POST'
-          data: data
+          data: {rule: rule}
           headers: headers
           success: (response) ->
             $('.alert_rules').removeClass('error')

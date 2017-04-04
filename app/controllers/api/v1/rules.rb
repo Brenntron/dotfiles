@@ -63,10 +63,6 @@ module API
           requires :rule, type: Hash do
             requires :rule_content,     type: String,  desc: "Compiled rule content"
             optional :bug_id,           type: Integer, desc: "Id of the bug associated with this rule"
-            optional :detection,        type: String,  desc: "Detection for the new rule"
-            optional :class_type,       type: String,  desc: "Classification of the new rule"
-            optional :rule_category_id, type: Integer, desc: "Rule Category"
-
             requires :rule_doc, type: Hash do
               requires :summary,           type: String, desc: "Rule Doc Summary"
               optional :impact,            type: String, desc: "Rule Doc Impact"
@@ -84,9 +80,55 @@ module API
         post "", root: "rule" do
           authorize! :create, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          Rule.create_action(permitted_params[:rule][:bug_id],
-                                        permitted_params[:rule][:rule_content],
-                                        permitted_params[:rule][:rule_doc])
+          Rule.create_action(permitted_params[:rule][:rule_content],
+                             permitted_params[:rule][:rule_doc],
+                             permitted_params[:rule][:bug_id])
+        end
+
+        # Creates a rule and its associations
+        # @return [Rule]
+        desc "create a rule"
+        params do
+          requires :rule, type: Hash do
+            requires :connection, type: Hash do
+              requires :action,         type: String,  desc: "Action ex: 'alert'"
+              requires :protocol,       type: String,  desc: "Protocol ex: 'tcp'"
+              requires :src,            type: String,  desc: "Source addresses ex: '$SSH_SERVERS'"
+              requires :srcport,        type: String,  desc: "Source ports ex: '$SSH_PORTS'"
+              requires :direction,      type: String,  desc: "Direction ex: '->'"
+              requires :dst,            type: String,  desc: "Dst addresses ex: '$SSH_SERVERS'"
+              requires :dstport,        type: String,  desc: "Dst ports ex: '$SSH_PORTS'"
+            end
+            optional :rule_category_id, type: Integer, desc: "Rule Category pkey if known"
+            optional :rule_category,    type: String,  desc: "Rule Category name ex: 'BLACKLIST'"
+            requires :message,          type: String,  desc: "Message part no category ex: 'possible sql injection attempt'"
+            requires :flow,             type: String,  desc: "Flow ex: 'to_client,established'"
+            requires :detection,        type: String,  desc: "Detection ex: 'content:\"200\"; flowbits:isset,http.mokes;'"
+            requires :metadata,         type: String,  desc: "Metadata ex: 'impact_flag red, service dns'"
+            requires :class_type,       type: String,  desc: "Classtype ex: 'attempted-user'"
+            requires :references,       type: String,  desc: "References ex: 'reference:bugtraq,18358; reference:cve,2006-2371;'"
+            optional :bug_id,           type: Integer, desc: "Id of the bug associated with this rule"
+
+            requires :rule_doc, type: Hash do
+              requires :summary,           type: String, desc: "Rule Doc Summary"
+              optional :impact,            type: String, desc: "Rule Doc Impact"
+              optional :details,           type: String, desc: "Rule Doc Detailed Information"
+              optional :affected_sys,      type: String, desc: "Rule Doc Affected Systems"
+              optional :attack_scenarios,  type: String, desc: "Rule Doc Attack Scenarios"
+              optional :ease_of_attack,    type: String, desc: "Rule Doc Ease of Attack"
+              optional :false_positives,   type: String, desc: "Rule Doc False Positives"
+              optional :false_negatives,   type: String, desc: "Rule Doc False Negatives"
+              optional :corrective_action, type: String, desc: "Rule Doc Corrective Action"
+              optional :contributors,      type: String, desc: "Rule Doc Contributors"
+            end
+          end
+        end
+        post "parts", root: "rule" do
+          authorize! :create, Rule
+          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+          Rule.create_parts_action(permitted_params[:rule],
+                                   permitted_params[:rule][:rule_doc],
+                                   permitted_params[:rule][:bug_id])
         end
 
 

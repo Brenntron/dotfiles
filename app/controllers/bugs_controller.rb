@@ -114,7 +114,7 @@ class BugsController < ApplicationController
             @bugs = current_user.siblings.map{ |cw| cw.bugs }[0] || []
           end
         when "open-bugs"
-          @bugs = Bug.open
+          @bugs = Bug.open_bug
         when "pending-bugs"
           @bugs = Bug.pending
         when "fixed-bugs"
