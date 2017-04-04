@@ -97,7 +97,7 @@ module API
                 bug_rules = bug.rules.map {|r| r.id}
                 progress_bar.update_attribute("progress", 50)
                 parsed[:sids].each do |sid|
-                  rule = Rule.import_rule(sid)
+                  rule = Rule.find_or_load(sid, 1)
                   bug.rules << rule unless bug_rules.include? rule.id
                 end
                 progress_bar.update_attribute("progress", 60)
@@ -161,16 +161,12 @@ module API
 
         desc "link a rule to this bug"
         params do
-          requires :bug_id, type: Integer, desc: "ID of the bug"
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
           requires :gid, type: Integer, desc: "gid of the rule"
           requires :sid, type: Integer, desc: "sid of the rule"
         end
         post ':bug_id/rules/:gid~:sid/link' do
-          bug = Bug.where(id: permitted_params[:bug_id]).first
-          rule = Rule.import_rule(permitted_params[:sid], permitted_params[:gid])
-          if bug && rule
-            bug.rules << rule
-          end
+          Bug.link_action(permitted_params[:bug_id], permitted_params[:sid], permitted_params[:gid])
         end
 
         desc "get a single bug"

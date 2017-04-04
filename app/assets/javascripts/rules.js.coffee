@@ -123,12 +123,11 @@ $ ->
   $('#linkRuleForm').submit (e) ->
     e.preventDefault()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    gid_id = $('#linkRuleForm input[name="gid"]').val()
-    rule_id = $('#linkRuleForm input[name="sid"]').val()
+    gid = $('#linkRuleForm input[name="gid"]').val()
+    sid = $('#linkRuleForm input[name="sid"]').val()
     bug_id = $('input[name="bug_id"]').val()
-    query = bug_id+":"+rule_id
     $.ajax {
-      url: "/api/v1/bugs/#{bug_id}/rules/#{gid_id}~#{rule_id}/link"
+      url: "/api/v1/bugs/#{bug_id}/rules/#{gid}~#{sid}/link"
       method: 'POST'
       headers: headers
       data: {'api_key': 'h93hq@hwo9%@ah!jsh'}

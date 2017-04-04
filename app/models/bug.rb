@@ -664,5 +664,11 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
-
+  def self.link_action(bugzilla_id, sid, gid)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    rule = Rule.find_or_load(sid, gid)
+    if bug && rule
+      bug.rules << rule
+    end
+  end
 end
