@@ -89,8 +89,11 @@
                   <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
                 </div>
                 <div class="col-xs-8 col-md-10">
-                  <p><%= bug.summary %></p>
+                  <p><%= bug.summary %>
+                  <button class="btn btn-default tiny-button text-muted return-bug" data-id="<%=bug.id%>">return</button>
+                  </p>
                 </div>
+
               <% end %>
             <% else %>
               <div class="col-xs-12">

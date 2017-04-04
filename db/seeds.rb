@@ -47,6 +47,12 @@ roles.each do |role|
   Role.create(role: role)
 end
 
+vi = User.create(kerberos_login:"vrtincom",cvs_username:"vrtincom",cec_username:"vrtincom",display_name:"Vrt Incoming",committer:true,email:"vrt-incoming@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+vi.roles << Role.where(role: 'analyst')
+
+vq = User.create(kerberos_login:"vrtqa",cvs_username:"vrtqa",cec_username:"vrtqa",display_name:"Vrt quality assurance",committer:true,email:"vrt-qa@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+vq.roles << Role.where(role: 'analyst')
+
 cm = User.create(kerberos_login:"cmarshall",cvs_username:"cmarshall",cec_username:"marshal1",display_name:"Chris Marshall",committer:true,email:"marshal1@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 cm.roles << Role.where(role: 'manager')
 cm.roles << Role.where(role: 'committer')

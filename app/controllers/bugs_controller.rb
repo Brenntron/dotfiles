@@ -3,15 +3,16 @@ class BugsController < ApplicationController
 
   before_action :require_login
   before_action :query_bugs
+  before_action :check_bug_permission, only: [:show]
   before_action :get_states_and_users, only: [:index, :show, :new]
   after_action  :sync_summary, only: [:create, :add_tag, :remove_tag]
+
 
   def index
     if params[:bug].present?
       @bug_searchID = params[:bug][:id]
       if @bug_searchID
-        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%")
-                    .paginate(:page => session[:page], :per_page => 32)
+        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
       end
     end
   end
@@ -158,7 +159,9 @@ class BugsController < ApplicationController
       @bugs = current_user.default_bug_list
     end
     session[:page] = params[:page] || session[:page]
-    @bugs = @bugs.paginate(:page => session[:page], :per_page => 32)
+    if @bugs
+      @bugs = @bugs.where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
+    end
   end
 
   def get_params_hash(params)
@@ -177,6 +180,15 @@ class BugsController < ApplicationController
 
   def require_login
     redirect_to root_url if !current_user
+  end
+
+  def check_bug_permission
+    bug = Bug.where(id: params[:id]).first()
+    unless bug.check_permission(current_user)
+      redirect_to '/bugs'
+      flash[:error] = "You dont have permission to access bug: #{params[:id]}"
+    end
+
   end
 
 end

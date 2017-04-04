@@ -20,6 +20,7 @@ class Bug < ApplicationRecord
   scope :open, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }
+  scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
   scope :by_component, ->(component) { where('component = ?', component) }
 
   scope :allowed_editors, ->(bug) { User.all.reject { |u| u.id == bug.committer_id } }
@@ -268,6 +269,10 @@ class Bug < ApplicationRecord
     else
       0
     end
+  end
+
+  def check_permission(current_user)
+    User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
   end
 
   private
@@ -653,8 +658,5 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
-  def self.check_permission(current_user, bugs)
-    class_allowed = User.class_levels[current_user.class_level]
-    bugs.reject { |b| Bug.classifications[b.classification] > class_allowed }
-  end
+
 end

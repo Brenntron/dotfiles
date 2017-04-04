@@ -2,8 +2,39 @@ $ ->
   $('.active').show();
   $('.hidden').hide();
 
-  $('#button_import').on 'click', ->
+  $(".take-bug").on 'click', (e) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $(this).data("id")
+    $("#take-bug-"+id).hide()
+    $("#bug-wait-"+id).show()
+    $.ajax {
+      url: '/api/v1/bugs/'+id+'/subscribe'
+      method: 'post'
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        alert ("could not take this bug" + response)
+        location.reload()
+    }
 
+  $(".return-bug").on 'click', (e) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $(this).data("id")
+    $("#return-bug-"+id).hide()
+    $("#bug-wait-"+id).show()
+    $.ajax {
+      url: '/api/v1/bugs/'+id+'/unsubscribe'
+      method: 'post'
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        alert ("cant return this bug." + response)
+        location.reload()
+    }
+
+  $('#button_import').on 'click', ->
     bid = $('#import_bug').val()
     if (bid == "")
       alert("Please enter a sid to import.")

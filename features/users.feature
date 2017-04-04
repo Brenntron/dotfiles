@@ -505,7 +505,7 @@ Feature: User Accounts
       | 222222      | OPEN  | 2       | No Tags in this one                         | Research | Snort Rules | 2.6.0   | test description2 |
       | 222222      | FIXED | 2       | [BP][NSS] fixed bug                         | Research | Snort Rules | 2.6.0   | test description3 |
     Then I wait for "3" seconds
-    And  I goto "/bugs"
+    And  I goto "/bugs?q=my-bugs"
     And  I should see "[[TELUS][VULN][BP] [SID] 22078 test summary"
     And  I should not see "[BP][NSS] fixed bug"
 

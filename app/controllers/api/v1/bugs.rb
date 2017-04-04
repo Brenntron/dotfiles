@@ -153,7 +153,9 @@ module API
 
           # search bugs and return the bugs current user is allowed to see
           hits = []
-          Bug.check_permission(current_user, Bug.search(permitted_params[:summary], terms, range)).map { |r| hits.push(r.id)}
+          Bug.search(permitted_params[:summary], terms, range).each do |bug_hit|
+            hits << bug_hit.id if bug_hit.check_permission(current_user)
+          end
           hits
         end
 
@@ -442,7 +444,7 @@ module API
           bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
           unless bug.nil?
             begin
-              if current_user.bugs.exists?(bug)
+              if current_user.bugs.exists?(bug.id)
                 return {error: 'already subscribed to this bug'}
               else
                 options = {:ids => permitted_params[:id], :assigned_to => current_user.email}
@@ -467,10 +469,12 @@ module API
           bug = current_user.bugs.where(id: permitted_params[:id])
           unless bug.nil?
             begin
-              options = {:ids => permitted_params[:id], :reset_assigned_to => true}
+              vrt_incoming = User.where(email: "vrt-incoming@sourcefire.com").first
+              options = {:ids => permitted_params[:id], :reset_assigned_to => true,:assigned_to => "vrt-incoming@sourcefire.com"}
               Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
               current_user.bugs.delete(bug)
               Bug.update(permitted_params[:id], state:"NEW")
+              vrt_incoming.bugs << bug
               return true
             rescue XMLRPC::FaultException => e
               return {error: "#{e}"}
