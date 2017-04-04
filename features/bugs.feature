@@ -69,12 +69,31 @@ Feature: Bug
       | BP    |
     Then I wait for "3" seconds
     And  I goto "/bugs/new"
-    And  I fill in "bug_summary" with "New Bug Summary"
-    And  I fill in "bug_description" with "This is my description."
+    And  I fill in "bug[summary]" with "New Bug Summary"
+    And  I fill in "bug[description]" with "This is my description."
     And  I fill in selectized with "TELUS"
-    Then I click "Create Bug"
-    Then I should see "[TELUS]New Bug Summary"
-    And  the selectize field contains the text "TELUS"
+#    Then I click "Save"
+#    Then I wait for "3" seconds
+#    Then take a photo
+#    Then I should see "[TELUS]New Bug Summary"
+#    And  the selectize field contains the text "TELUS"
+  # need connection to bugzilla for testing the above
+
+
+  @javascript
+  Scenario: After a new bug is created,
+  the description should appear as the first item in the history
+    Given a user with role "analyst" exists and is logged in
+    Then I wait for "3" seconds
+    And  I goto "/bugs/new"
+    And  I fill in "bug[summary]" with "New Bug Summary"
+    And  I fill in "bug[description]" with "This is my description."
+#    Then I click "Save"
+#    Then I wait for "3" seconds
+#    Then I should see "New Bug Summary"
+#    And I click ".history-tab"
+# And I should see "This is my description"
+# need connection to bugzilla for testing the above
 
 
 
@@ -201,9 +220,10 @@ Feature: Bug
     And reference with id "1" has exploit with id "1"
     Then I wait for "2" seconds
     And I goto "/bugs/222222"
-    And I click "change_state"
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
     Then I should see "Cant set to pending."
-    And I can not select "PENDING" from "state"
+    And I can not select "PENDING" from "bug[state]"
 
   @javascript
   Scenario: a user can not set the state of a bug to fixed, wontfix, later or invalid if they aren't a committer
@@ -213,9 +233,10 @@ Feature: Bug
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     Then I wait for "2" seconds
     And I goto "/bugs/222222"
-    And I click "change_state"
-    And the "FIXED" option from "state" is disabled
-    And the "REOPENED" option from "state" is not disabled
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And the "FIXED" option from "bug[state]" is disabled
+    And the "REOPENED" option from "bug[state]" is not disabled
 
   @javascript
   Scenario: a user can set the state of a bug to fixed, wontfix, later or invalid if they are a committer
@@ -225,9 +246,10 @@ Feature: Bug
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     Then I wait for "2" seconds
     And I goto "/bugs/222222"
-    And I click "change_state"
-    And the "FIXED" option from "state" is not disabled
-    And the "REOPENED" option from "state" is not disabled
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And the "FIXED" option from "bug[state]" is not disabled
+    And the "REOPENED" option from "bug[state]" is not disabled
 
 
   @javascript
@@ -289,11 +311,12 @@ Feature: Bug
 
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
-    Then I click "editor"
-    And "rainbow_b" should be in the "bug_editor" dropdown list
-    And "t_bear" should not be in the "bug_editor" dropdown list
-    And I select "rainbow_b" from "bug_editor"
-    Then I click button "change editor"
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And "rainbow_b" should be in the "bug[user_id]" dropdown list
+    And "t_bear" should not be in the "bug[user_id]" dropdown list
+    And I select "rainbow_b" from "bug[user_id]"
+    Then I click button "Save"
     And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "rainbow_b"
@@ -326,11 +349,12 @@ Feature: Bug
 
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
-    Then I click "committer"
-    And "t_bear" should be in the "bug_committer" dropdown list
-    And "d_drumph" should not be in the "bug_committer" dropdown list
-    And I select "t_bear" from "bug_committer"
-    Then I click button "change committer"
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And "t_bear" should be in the "bug[committer_id]" dropdown list
+    And "d_drumph" should not be in the "bug[committer_id]" dropdown list
+    And I select "t_bear" from "bug[committer_id]"
+    Then I click button "Save"
     And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "t_bear"
@@ -343,10 +367,11 @@ Feature: Bug
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
-    Then I click "priority"
-    And I select "P2" from "priority"
-    Then I click button "change priority"
-    And I wait for "3" seconds
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And I select "P2" from "bug[priority]"
+#    Then I click button "Save"
+#    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 #    And I should see "P2"
 
@@ -358,12 +383,29 @@ Feature: Bug
        | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
-    Then I click "component"
-    And I select "Malware" from "component"
-    Then I click button "change component"
-    And I wait for "3" seconds
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And I select "Malware" from "bug[component]"
+#    Then I click button "Save"
+#    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 #    Then I should see "Malware"
+
+  @javascript
+  Scenario: a user can change the classification of a bug
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/222222"
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And I select "Secret" from "bug[classification]"
+#    Then I click button "Save"
+#    And I wait for "3" seconds
+# uncomment when connectivity to bugzilla test fixed
+#    Then I should see "Secret"
 
   @javascript
   Scenario: a user can change the summary of a bug
@@ -373,10 +415,10 @@ Feature: Bug
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
-    Then I click "summary"
-    And I fill in "bug_summary" with "new summary"
-#    Then I click button "change summary"
-#    And I wait for "2" seconds
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    And I fill in "bug[summary]" with "new summary"
+#    Then I click button "Save"
 # uncomment when connectivity to bugzilla test fixed
 # Then I should see "new summary"
 

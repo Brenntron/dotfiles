@@ -41,35 +41,8 @@ div.progress{
     display:none;
 }
 
-.edit-summary-field{
-    width:100%;
-    margin-botom: 10px;
-}
-
-.cancel-button{
-    margin-top:6px;
-    margin-left:105px;
-    font-size:18px;
-}
-
-.cancel-button-sm{
-    margin-top:6px;
-    margin-left:80px;
-    font-size:18px;
-}
-
-.cancel-button-xs{
-    margin-top:6px;
-    margin-left:-15px;
-    font-size:18px;
-}
-
-.change_button{
-    z-index:3;
-}
-
-.cancel_button{
-    z-index:1;
+.bug-details-columns {
+    padding: 5px;
 }
 
 #bug-rules-table .rule-test-alert {
@@ -80,6 +53,10 @@ div.progress{
 }
 #bug-rules-table .no_alert{
     background-color: #ff8080;
+}
+
+.edit-summary-field {
+    margin-top: 20px;
 }
 
 .glyphicon-refresh-animate {

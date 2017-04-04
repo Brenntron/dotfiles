@@ -23,7 +23,7 @@ class Bug < ApplicationRecord
   scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
   scope :by_component, ->(component) { where('component = ?', component) }
 
-  scope :allowed_editors, ->(bug) { User.all.reject { |u| u.id == bug.committer_id } }
+  scope :allowed_assignees, ->(bug) { User.all.reject { |u| u.id == bug.committer_id } }
   scope :allowed_committers, ->(bug) { User.all.reject { |u| u.id == bug.user_id } }
 
   enum classification: {
@@ -493,7 +493,7 @@ class Bug < ApplicationRecord
         Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
           new_record.id             = bug_id
           new_record.summary        = item['summary']
-          new_record.classification = 'unclassified'
+          new_record.classification = item['classification'].parameterize.downcase.underscore
 
           new_record.status     = item['status']
           new_record.resolution = item['resolution']
