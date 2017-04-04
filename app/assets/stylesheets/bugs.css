@@ -64,6 +64,13 @@ div.progress{
     -webkit-animation: spin2 .7s infinite linear;
 }
 
+#bugs_filter > li > a > .glyphicon-ok{
+    visibility:hidden;
+}
+#bugs_filter > li > a.selected > .glyphicon-ok{
+    visibility:visible;
+}
+
 @-webkit-keyframes spin2 {
     from { -webkit-transform: rotate(0deg);}
     to { -webkit-transform: rotate(360deg);}
