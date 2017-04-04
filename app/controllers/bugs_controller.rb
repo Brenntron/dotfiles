@@ -29,7 +29,7 @@ class BugsController < ApplicationController
   end
 
   def show
-    @bug = Bug.where(id: params[:id]).first()
+    @bug = Bug.where(id: params[:id]).first
     if @bug
       @rules = @bug.rules.sort { |a, b| a.sort_rules_by_state <=> b.sort_rules_by_state }
       @ref_types = ReferenceType.all
@@ -46,7 +46,7 @@ class BugsController < ApplicationController
       @tasks = @bug.tasks.order(created_at: :desc)
       @notes = @bug.notes.order(created_at: :desc)
       @tags = Tag.all.map { |tag| tag.name }.join(',')
-      @categories = RuleCategory.all.sort_by { |x| [-x.rules.count, x.category] }
+      @categories = RuleCategory.ranked
       flash.now[:alert] = "Looks like this bug (#{@bug.id}) may be out of synch with bugzilla.
                        Please 'resynch' using the button below." if @bug.bugzilla_synch_needed?
     else

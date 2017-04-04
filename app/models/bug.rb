@@ -38,6 +38,12 @@ class Bug < ApplicationRecord
   #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
+
+  def attachment_local_alerts(rule)
+    attachments.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
+        .select(:file_name, 'alerts.rule_id')
+  end
+
   def record(action)
     obj = JSON.parse(BugSerializer.new(self).to_json)
     obj['bug'] = obj['bug'].except('notes', 'attachments', 'tasks', 'exploits')

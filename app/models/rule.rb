@@ -57,6 +57,10 @@ class Rule < ApplicationRecord
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid) }
 
+  def deleted?
+    'DELETED' == self.rule_category.category
+  end
+
   def record(action)
     record = { resource: 'rule',
               action: action,
@@ -259,7 +263,7 @@ class Rule < ApplicationRecord
     rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
     references.each do |r|
       r = r.split(',')
-      unless r[1].empty?
+      unless r[1].nil? || r[1].empty?
         ref_type = ReferenceType.find_or_create_by(name: r[0].strip)
         new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: r[1].strip)
         self.references << new_reference unless self.references.include?(new_reference)
@@ -396,97 +400,124 @@ class Rule < ApplicationRecord
   # Runs the visruleparser perl script to parse a line of rule text.
   # @param [String, #read] rule_text the line of rule text
   # @return [Hash] hash with :rule and :errors text populated.
-  def self.visruleparser(rule_text)
-    return nil if rule_text.empty?
-    parsed = {}
-    temp_rule = Tempfile.new('temp.rules')
-    temp_rule.write(rule_text.gsub(/\#\s/, ''))
-    temp_rule.rewind
-    Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
-      text = stdout.read
-      unless text.empty?
-        parsed[:rule] = text.split(/%{80}|\*{80}/)[1].strip
-        parsed[:errors] = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
-        parsed[:errors] += stderr.read
-      end
+  def self.visruleparser(rule_content)
+    parser = RuleSyntax::VisruleParser.new(rule_content)
+    { rule: parser.parsed_lines, errors: parser.errors }
+  end
+
+  # Extracts components from VisruleParser and sets field of rule.
+  # Does not save the rule.
+  # Does not set state, edit_status, or publish_status,
+  # because these depend on where the rule and rule_content originated.
+  # @param [VisruleParser, #read] parser initialized to rule content.
+  def assign_from_visrule(rule_content)
+    self.rule_content                   = rule_content
+    self.cvs_rule_content               = rule_content
+    self.on                             = /^\s*#/ !~ rule_content
+
+    vparser = RuleSyntax::VisruleParser.new(rule_content)
+
+    self.rule_parsed                    = vparser.parsed_lines
+    self.rule_warnings                  = vparser.errors
+    self.cvs_rule_parsed                = vparser.parsed_lines
+
+    self.parsed                         = vparser.valid?
+    self.committed                      = !vparser.valid?
+
+    if parsed?
+      self.rule_failures                = nil
+    else
+      self.rule_failures                = vparser.parsed_lines
     end
-    temp_rule.close
-    parsed
+
+    self
   end
 
-  # Takes the hash and adds some data from the rules text
-  # @param [String, #read] rule the line of rule text.
-  # @return [Hash] a hash, with data from parsing rule text.
-  def self.parse_and_create_rule(rule)
-    parsed = visruleparser(rule)
-    parse_from_visrule(rule, parsed)
+  def assign(attributes)
+    assign_attributes(attributes.slice(*%i(rev message connection flow detection class_type metadata message)))
+    self.rule_category = RuleCategory.find_or_create_by(category: attributes[:rule_category])
+    self.attributes
   end
 
-  # Takes a rule and populates all the attributes to create a Rule record object.
-  # @param [String, #read] rule_content the line of rule text.
-  # @return [Hash] a hash, with all the attributes to create a Rule record object
-  def self.full_parse(rule_content)
-    raise "Rule text missing." if rule_content.nil?
+  # Gets rule with fields set from contents of rule content.
+  #
+  # Parses rule content.  Finds or creates rule for the given sid and gid.
+  # Set the rule fields to components from parsing rule content.
+  # Does not save the rule.
+  # @param [String, #read] rule_content the rule content
+  def self.find_and_assign_rule_content(rule_content, rule_id = nil)
+    parser = RuleSyntax::RuleParser.new(rule_content)
 
-    rule_content.strip!
+    rule = nil
+    rule = Rule.by_sid(parser.sid, parser.gid).first if parser.sid
+    rule ||= Rule.where(id: rule_id).first if rule_id
+    rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
 
-    parsed = visruleparser(rule_content)
-    rule_attrs = parse_from_visrule(rule_content, parsed)
-    rule_attrs['rule_parsed'] = parsed[:rule]
-    rule_attrs['rule_warnings'] = parsed[:errors]
-    rule_attrs['cvs_rule_parsed'] = parsed[:rule]
-    rule_attrs['cvs_rule_content'] = rule_content
-    rule_attrs
-  end
+    rule.assign_from_visrule(rule_content)
 
-  # Take a line from a rule file and saves to database unless rev is unchanged
-  # @param [String, #read] rule_content the line of text from a rule file.
-  # @param [String, #read] filename the path or name of the file.
-  # @param [Fixnum, #read] linenumber the line number from the input rules file.
-  # @return [Rule] the rule loaded or nil if failed
-  # @raise [RuntimeError] could not process
-  def self.load_rule_from_content(rule_content, filename = '', linenumber = nil)
-    rule_attrs = full_parse(rule_content)
-    return nil unless rule_attrs
-    return nil if 'FAILED' == rule_attrs[:state]
-    raise 'No rule gid provided' unless rule_attrs[:gid]
-
-    rule_attrs[:filename] = filename
-    rule_attrs[:linenumber] = linenumber
-
-    rule = where(gid: rule_attrs[:gid]).where(sid: rule_attrs[:sid]).first
-    case
-      #can new rule ever happen?
-      when rule.nil?
-        rule_attrs[:edit_status]    = EDIT_STATUS_NEW
-        rule_attrs[:publish_status] = PUBLISH_STATUS_CURRENT_EDIT
-        rule_attrs[:parsed]         = true
-        rule_attrs[:on]             = /^\s*#/ !~ rule_content
-        rule = create!(rule_attrs)
-        rule.associate_references(rule_content)
-      when rule.draft?
-        rule.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
-      when rule.rev != rule_attrs[:rev].to_i
-        rule_attrs[:edit_status] = EDIT_STATUS_SYNCHED
-        rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
-        rule.update(rule_attrs)
-    end
+    rule.assign(parser.attributes) #if rule.parsed?
 
     rule
+  end
+
+  # Take a line from a user edit and saves to database
+  # @param [String, #read] rule_content the rule content
+  def self.save_rule_content(rule_content, rule_id = nil)
+    find_and_assign_rule_content(rule_content, rule_id).tap do |rule|
+      if rule.sid
+        rule.state                        = 'UPDATED'
+        rule.edit_status                  = EDIT_STATUS_EDIT
+      else
+        rule.state                        = 'NEW'
+        rule.edit_status                  = EDIT_STATUS_NEW
+      end
+      rule.state                          = 'FAILED' unless rule.parsed?
+      rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
+
+      rule.save
+    end
+  end
+
+  # Take a line from a rule file and saves to database if rule is unedited
+  # Assumes rule content comes from synching VC.
+  # @param [String, #read] rule_content the line of text from a rule file.
+  # @return [Rule] the rule loaded or nil if failed
+  # @raise [RuntimeError] could not process
+  def self.synch_rule_content(rule_content)
+    rule = find_and_assign_rule_content(rule_content)
+    return nil unless rule.sid          # rule in file is a new rule with sid unassigned
+
+    rule_db = by_sid(rule.sid, rule.gid).first
+
+    if rule.persisted? && rule_db.draft?
+      rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
+      rule_db
+    else
+      rule.edit_status                = EDIT_STATUS_SYNCHED
+      rule.publish_status             = PUBLISH_STATUS_SYNCHED
+      rule.state                      = 'UNCHANGED'
+      rule.save!
+      rule.associate_references(rule_content)
+      rule
+    end
   end
 
   # Take a line from grep output of a rule file and saves to database unless rev is unchanged
   # @param [String, #read] rule_grep_line the line of text from a rule file.
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
-  def self.load_rule_from_grep(rule_grep_line)
-    filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
+  def self.load_grep(rule_grep_line)
+    filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
 
     rule_content.strip!
     if rule_content.empty?
-      ''
+      nil
     else
-      load_rule_from_content(rule_content, filename, line_number[1..-2].to_i)
+      synch_rule_content(rule_content).tap do |rule|
+        if rule && !rule.stale_edit?
+          rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
+        end
+      end
     end
   end
 
@@ -710,7 +741,7 @@ class Rule < ApplicationRecord
   # draft        | new-rule or edited-rule
   # parsed       | draft parsed correctly in
   # failed       | new-rule or edited-rule
-  # @returns [String] the CSS class name(s), space delimited if multiple
+  # @return [String] the CSS class name(s), space delimited if multiple
   def css_class
     [].tap do |css_classes|
       css_classes << 'synched' if synched?
@@ -722,5 +753,32 @@ class Rule < ApplicationRecord
       css_classes << 'parsed' if parsed?
       css_classes << 'failed' unless parsed?
     end.join(' ')
+  end
+
+  # Creates a rule and its associations
+  # @return [Rule]
+  def self.create_action(bug_id, rule_content, rule_doc)
+    Rule.save_rule_content(rule_content).tap do |rule|
+      if bug_id
+        bug = Bug.where(id: bug_id).first
+        bug.rules << rule if bug
+      end
+
+      rule.associate_references(rule_content)
+      rule.create_rule_doc(rule_doc)
+    end
+  end
+
+  # Updates a rule and its associations
+  # @return [Rule]
+  def self.update_action(rule_id, rule_content, rule_doc)
+    Rule.save_rule_content(rule_content, rule_id).tap do |rule|
+      rule.update_references(rule_content)
+      if rule.rule_doc.present?
+        rule.rule_doc.update(rule_doc)
+      else
+        rule.create_rule_doc(rule_doc)
+      end
+    end
   end
 end

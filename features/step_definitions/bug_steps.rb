@@ -15,6 +15,13 @@ Given(/^the current user has the following bugs:$/) do |given_bugs|
   end
 end
 
+Given(/^the current user has the following "(.*?)":$/) do |factory_name, given_bugs|
+  user = User.where(cvs_username: ENV['authenticate_cvs_username']).first || FactoryGirl.create(:current_user)
+  given_bugs.hashes.each do |bug_attrs|
+    FactoryGirl.create(factory_name.to_sym, bug_attrs.merge(user_id: user.id))
+  end
+end
+
 Given(/^I fill in selectized with "(.*?)"$/) do |value|
   find('div.selectize-input input', match: :first).set("#{value}")
   find('div.selectize-dropdown-content > div', match: :first).click
