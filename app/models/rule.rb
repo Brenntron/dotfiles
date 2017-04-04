@@ -448,8 +448,9 @@ class Rule < ApplicationRecord
   def self.find_and_assign_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
 
-    rule = parser.sid && Rule.by_sid(parser.sid, parser.gid).first
-    rule ||= rule_id && Rule.where(id: rule_id).first
+    rule = nil
+    rule = Rule.by_sid(parser.sid, parser.gid).first if parser.sid
+    rule ||= Rule.where(id: rule_id).first if rule_id
     rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
 
     rule.assign_from_visrule(rule_content)
