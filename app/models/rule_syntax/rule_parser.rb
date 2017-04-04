@@ -72,7 +72,8 @@ module RuleSyntax
         attributes[:gid] ||= 1
         attributes[:detection] = detection
 
-        if (msg = attributes[:msg])
+        msg = attributes[:msg]
+        if msg
           if (/\A\s*"/ =~ msg) && (/"\s*\z/ =~ msg)
             msg.gsub!(/\A\s*"/, '').gsub!(/"\s*\z/, '')
           end

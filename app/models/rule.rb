@@ -507,7 +507,7 @@ class Rule < ApplicationRecord
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
   def self.load_grep(rule_grep_line)
-    filename, line_number, rule_content = rule_grep_line. partition(/:\d+:/)
+    filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
 
     rule_content.strip!
     if rule_content.empty?
