@@ -205,7 +205,7 @@ module API
             optional :platform, type: String, desc: "What platform this bug runs on"
             optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
-            optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+            optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
             optional :new_research_notes, type: String, desc: "Current working draft of research notes"
             optional :new_committer_notes, type: String, desc: "Current working draft of committer notes"
             optional :editor_id, type: String, desc: "id of the new user to be assigned to the bug"
@@ -254,17 +254,6 @@ module API
             }
           end
 
-          update_params[:product] = permitted_params[:bug][:product]
-          update_params[:component] = permitted_params[:bug][:component]
-          update_params[:summary] = permitted_params[:bug][:summary]
-          update_params[:version] = permitted_params[:bug][:version]
-          update_params[:state] = permitted_params[:bug][:state]
-          update_params[:opsys] = permitted_params[:bug][:opsys]
-          update_params[:platform] = permitted_params[:bug][:platform]
-          update_params[:priority] = permitted_params[:bug][:priority]
-          update_params[:severity] = permitted_params[:bug][:severity]
-          update_params[:classification] = Bug.classifications.key(permitted_params[:bug][:classification])
-
           # update the tags
           bug.tags.delete_all if bug.tags.exists?
           if tags
@@ -274,13 +263,26 @@ module API
             end
           end
 
+
+          # update the summary (regarding tags)
+          bug.compose_summary
+
+          update_params[:product] = permitted_params[:bug][:product]
+          update_params[:component] = permitted_params[:bug][:component]
+          update_params[:summary] = bug.summary
+          update_params[:version] = permitted_params[:bug][:version]
+          update_params[:state] = permitted_params[:bug][:state]
+          update_params[:opsys] = permitted_params[:bug][:opsys]
+          update_params[:platform] = permitted_params[:bug][:platform]
+          update_params[:priority] = permitted_params[:bug][:priority]
+          update_params[:severity] = permitted_params[:bug][:severity]
+          update_params[:classification] = permitted_params[:bug][:classification]
+
           # update the database
           # (do this first so we can compose the summary properly to send to bugzilla)
           update_params.reject! { |k, v| v.nil? }
           Bug.update(permitted_params[:id], update_params)
 
-          # update the summary (regarding tags)
-          bug.compose_summary
 
           options[:ids] = permitted_params[:id]
           options[:product] = permitted_params[:bug][:product]
@@ -316,7 +318,7 @@ module API
             optional :platform, type: String, desc: "What platform this bug runs on"
             optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
-            optional :classification, type: Integer, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+            optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
             # all the params we need to permit must to go here
           end
         end
@@ -338,7 +340,6 @@ module API
           }.reject() { |k, v| v.nil? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
           new_bug = Bugzilla::Bug.new(bugzilla_session).create(options.to_h) #the bugzilla session is where we authenticate
           new_bug_id = new_bug["id"]
-          # binding.pry
           bug = Bug.create(
               :id => new_bug_id,
               :bugzilla_id => new_bug_id,
@@ -353,7 +354,7 @@ module API
               :platform => permitted_params[:bug][:platform],
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
-              :classification => Bug.classifications.key(permitted_params[:bug][:classification])
+              :classification => permitted_params[:bug][:classification]
           )
 
           # pull in the first comment

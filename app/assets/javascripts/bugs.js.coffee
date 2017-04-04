@@ -119,6 +119,8 @@ $ ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     id = $('input[name="bug_id"]').val()
     data = $('.edit_bug').serialize()
+    $('.edit-bug').hide()
+    $('#saving_bug').removeClass('hidden').show()
     $.ajax(
       url: '/api/v1/bugs/' + id
       method: 'PUT'
@@ -136,6 +138,8 @@ $ ->
     $('.edit-bug').prop('disabled', true)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     data = $('.new_bug').serialize()
+    $('.edit-bug').hide()
+    $('#saving_bug').removeClass('hidden').show()
     $.ajax(
       url: '/api/v1/bugs/'
       method: 'POST'

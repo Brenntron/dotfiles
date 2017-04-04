@@ -25,14 +25,14 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="classification">Classification</label>
-        <%= f.select :classification, options_for_select(Bug.classifications.map{ |k,v| [k.humanize, v] }, selected: Bug.classifications[@bug.classification]), {}, class: "form-control" %>
+        <%= f.select :classification, options_for_select(Bug.classifications.map{ |k,v| [k.humanize, k] }, selected: Bug.classifications[@bug.classification]), {}, class: "form-control" %>
       </div>
     </div>
     <% unless @bug.new_record? %>
       <div class="row">
         <div class="col-sm-12 form-group">
           <label for="user_id">Assignee</label>
-          <%=f.select :user_id, options_for_select(Bug.allowed_assignees(@bug).pluck(:cvs_username,:id), selected: @bug.user_id), {}, class: 'form-control'%>
+          <%=f.select :user_id, options_for_select(Bug.allowed_assignees(@bug).pluck(:cvs_username,:id), selected: @bug.user_id), {include_blank: true}, class: 'form-control', required: true%>
         </div>
       </div>
     <% end %>
@@ -40,7 +40,7 @@
       <div class="row">
         <div class="col-sm-12 form-group">
           <label for="committer_id">Committer</label>
-          <%=f.select :committer_id, options_for_select(Bug.allowed_committers(@bug).pluck(:cvs_username,:id), selected: @bug.committer_id), {}, class: 'form-control'%>
+          <%=f.select :committer_id, options_for_select(Bug.allowed_committers(@bug).pluck(:cvs_username,:id), selected: @bug.committer_id), {include_blank: true}, class: 'form-control', required: true%>
         </div>
       </div>
     <% end %>
@@ -76,6 +76,7 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <button class="btn btn-success edit-bug" value="submit">Save</button>
+        <button class="select-sm btn btn-default hidden" id="saving_bug"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> saving</button>
       </div>
     </div>
 <% end %>
