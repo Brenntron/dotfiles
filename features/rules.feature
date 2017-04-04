@@ -6,6 +6,40 @@ Feature: Rules
 
   ### Scenarios New Rule ###
 
+  @javascript
+  Scenario: New Rule: standard form: works
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following bugs:
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    And I wait for "3" seconds
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "Test msg"
+    And  I fill in "rule[detection]" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
+    And  I select "successful-user" from "rule[class_type]"
+    And  I fill in "summary" with "rule doc summary"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    When I click the "Rules" tab
+    And  I click button "list all"
+    Then I should see "BLACKLIST Test msg"
+    And  I should see a rule with state "NEW" version "new_rule"
+#    And rule "11" is a new rule
+    And  I should see a rule row with class "draft" and version "new_rule"
+    And  I should see a rule row with class "new-rule" and version "new_rule"
+    And  I should see a rule row with class "parsed" and version "new_rule"
+    When I click "new_rule"
+    Then I should see "BLACKLIST Test msg"
+    And  I should see "content:"200""
+    And  I should see "content:"Server: nginx/1.6.2""
+    And  I should see "fast_pattern:only"
+    And  I should see "flowbits:isset,http.mokes"
+
 #  @javascript
 #  Scenario: New Rule: standard form required fields
 #    Given a user with role "analyst" exists and is logged in
