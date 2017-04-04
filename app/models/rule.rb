@@ -36,8 +36,6 @@ require 'tempfile'
 class Rule < ApplicationRecord
   has_paper_trail
 
-  attr_accessor :load_status
-
   has_and_belongs_to_many :bugs
   has_and_belongs_to_many :references, dependent: :destroy
   has_one :rule_doc, dependent: :destroy
@@ -490,32 +488,17 @@ class Rule < ApplicationRecord
 
     rule_db = by_sid(rule.sid, rule.gid).first
 
-    rule.load_status =
-        case
-          when rule.new_record?         # new rule
-            'N'
-          when rule_db.draft?           # stale edit
-            'X'
-          when !rule.parsed?            # rule failed to parse
-            'F'
-          when rule_db.rev == rule.rev  # rev same, reloaded
-            'R'
-          else                          # updated rule with new rev
-            'L'
-        end
-
-    case
-      when 'X' == rule.load_status
-        rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
-      else
-        rule.edit_status                = EDIT_STATUS_SYNCHED
-        rule.publish_status             = PUBLISH_STATUS_SYNCHED
-        rule.state                      = 'UNCHANGED'
-        rule.save!
-        rule.associate_references(rule_content)
+    if rule.persisted? && rule_db.draft?
+      rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
+      rule_db
+    else
+      rule.edit_status                = EDIT_STATUS_SYNCHED
+      rule.publish_status             = PUBLISH_STATUS_SYNCHED
+      rule.state                      = 'UNCHANGED'
+      rule.save!
+      rule.associate_references(rule_content)
+      rule
     end
-
-    rule
   end
 
   # Take a line from grep output of a rule file and saves to database unless rev is unchanged
@@ -530,13 +513,8 @@ class Rule < ApplicationRecord
       nil
     else
       synch_rule_content(rule_content).tap do |rule|
-        case
-          when rule.nil?
-            # do nothing
-          when 'X' == rule.load_status    # stale edit
-            # do nothing
-          else
-            rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
+        if rule && !rule.stale_edit?
+          rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
         end
       end
     end
