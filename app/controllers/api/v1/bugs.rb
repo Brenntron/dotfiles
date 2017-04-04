@@ -338,7 +338,10 @@ module API
               :severity => permitted_params[:bug][:severity],
               :classification => permitted_params[:bug][:classification]
           }.reject() { |k, v| v.nil? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
-          new_bug = Bugzilla::Bug.new(bugzilla_session).create(options.to_h) #the bugzilla session is where we authenticate
+
+          xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+          new_bug = xmlrpc.create(options.to_h) #the bugzilla session is where we authenticate
+
           new_bug_id = new_bug["id"]
           bug = Bug.create(
               :id => new_bug_id,
@@ -358,7 +361,6 @@ module API
           )
 
           # pull in the first comment
-          xmlrpc = Bugzilla::Bug.new(bugzilla_session)
           new_bug_history = xmlrpc.get(new_bug_id)
           Bug.synch_history(xmlrpc,new_bug_history).to_s
 
