@@ -62,6 +62,11 @@ mp = User.create(kerberos_login:"marlpier",cvs_username:"marlpier",cec_username:
 mp.roles << Role.where(role: 'admin')
 mp.move_to_child_of(nh)
 
+je = User.create(kerberos_login:"jesler",cvs_username:"jesler",cec_username:"jesler",display_name:"Joel Esler",committer:true,email:"jesler@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+je.roles << Role.where(role: 'admin')
+je.roles << Role.where(role: 'manager')
+nh.move_to_child_of(je)
+
 pm = User.create(kerberos_login:"pmullen",cvs_username:"pmullen",cec_username:"pamullen",display_name:"Patrick Mullen",committer:true,email:"pamullen@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 pm.roles << Role.where(role: 'manager')
 pm.roles << Role.where(role: 'committer')
