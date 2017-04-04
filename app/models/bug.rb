@@ -351,132 +351,130 @@ class Bug < ApplicationRecord
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
         new_comments = xmlrpc.comments(ids: [bug_id])
+        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
 
-        Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
-          new_record.id             = bug_id
-          new_record.summary        = item['summary']
-          new_record.classification = 'unclassified'
+        bug.id             = bug_id
+        bug.summary        = item['summary']
+        bug.classification = 'unclassified'
 
-          new_record.status     = item['status']
-          new_record.resolution = item['resolution']
-          new_record.resolution = 'OPEN' if new_record.resolution.empty?
+        bug.status     = item['status']
+        bug.resolution = item['resolution']
+        bug.resolution = 'OPEN' if bug.resolution.empty?
 
-          new_record.state     = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
-          new_record.priority  = item['priority']
-          new_record.component = item['component']
-          new_record.product   = item['product']
+        bug.state     = bug.get_state(item['status'], item['resolution'], item['assigned_to'])
+        bug.priority  = item['priority']
+        bug.component = item['component']
+        bug.product   = item['product']
 
-          new_record.created_at = item['creation_time'].to_time
-          last_change_time      = item['last_change_time'].to_time
-          if new_record.state == 'NEW'
-            # do nothing
-          elsif new_record.state == 'ASSIGNED'
-            new_record.assigned_at = last_change_time
-          elsif new_record.state == 'PENDING'
-            new_record.pending_at = last_change_time
-          elsif new_record.state == 'REOPENED'
-            new_record.reopened_at = last_change_time
-          else
-            new_record.resolved_at = last_change_time
-          end
-          creator = User.where('email=?', item['creator']).first
-          new_user = User.where('email=?', item['assigned_to']).first
-          new_committer = User.where('email=?', item['qa_contact']).first
-          if creator.nil?
-            User.create_by_email(item['creator'])
-            new_creator = User.where(email: item['creator']).first
-            new_record.creator = new_creator.id
-          else
-            new_record.creator = creator.id
-          end
-          if new_user.nil?
-            User.create_by_email(item['assigned_to'])
-            new_generated_user = User.where(email: item['assigned_to']).first
-            new_generated_user.roles << Role.where(role:"analyst")
-            new_record.user = new_generated_user
-          else
-            new_record.user = new_user
-          end
-          if new_committer.nil?
-            User.create_by_email(item['qa_contact'])
-            new_generated_committer = User.where(email: item['qa_contact']).first
-            new_generated_committer.roles << Role.where(role:"committer")
-            new_record.committer = new_generated_committer
-          else
-            new_record.committer = new_committer
-          end
-          unless new_attachments.empty?
-            new_attachments['bugs'][bug_id.to_s].each do |attachment|
-              if Attachment.where(file_name: attachment['file_name']).exists?
-                new_attachment = Attachment.where(file_name: attachment['file_name']).first
-                if attachment['is_obsolete'] == true
-                  new_attachment.is_obsolete = true
-                  new_attachment.save
-                end
-              else
-                new_attachment = Attachment.create do |new_attach_record|
-                  new_attach_record.id = attachment['id']
-                  new_attach_record.size = attachment['size']
-                  new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
-                  new_attach_record.file_name = attachment['file_name']
-                  new_attach_record.summary = attachment['summary']
-                  new_attach_record.content_type = attachment['content_type']
-                  new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
-                  new_attach_record.creator = attachment['attacher']
-                  new_attach_record.is_private = attachment['is_private']
-                  new_attach_record.is_obsolete = attachment['is_obsolete']
-                  new_attach_record.minor_update = false
-                  new_attach_record.created_at = attachment['creation_time'].to_time
-                end
+        bug.created_at = item['creation_time'].to_time
+        last_change_time      = item['last_change_time'].to_time
+        if bug.state == 'NEW'
+          # do nothing
+        elsif bug.state == 'ASSIGNED'
+          bug.assigned_at = last_change_time
+        elsif bug.state == 'PENDING'
+          bug.pending_at = last_change_time
+        elsif bug.state == 'REOPENED'
+          bug.reopened_at = last_change_time
+        else
+          bug.resolved_at = last_change_time
+        end
+        creator = User.where('email=?', item['creator']).first
+        new_user = User.where('email=?', item['assigned_to']).first
+        new_committer = User.where('email=?', item['qa_contact']).first
+        if creator.nil?
+          User.create_by_email(item['creator'])
+          new_creator = User.where(email: item['creator']).first
+          bug.creator = new_creator.id
+        else
+          bug.creator = creator.id
+        end
+        if new_user.nil?
+          User.create_by_email(item['assigned_to'])
+          new_generated_user = User.where(email: item['assigned_to']).first
+          new_generated_user.roles << Role.where(role:"analyst")
+          bug.user = new_generated_user
+        else
+          bug.user = new_user
+        end
+        if new_committer.nil?
+          User.create_by_email(item['qa_contact'])
+          new_generated_committer = User.where(email: item['qa_contact']).first
+          new_generated_committer.roles << Role.where(role:"committer")
+          bug.committer = new_generated_committer
+        else
+          bug.committer = new_committer
+        end
+        unless new_attachments.empty?
+          new_attachments['bugs'][bug_id.to_s].each do |attachment|
+            if Attachment.where(file_name: attachment['file_name']).exists?
+              new_attachment = Attachment.where(file_name: attachment['file_name']).first
+              if attachment['is_obsolete'] == true
+                new_attachment.is_obsolete = true
+                new_attachment.save
               end
-
-
-
-              new_record.attachments << new_attachment
+            else
+              new_attachment = Attachment.create do |new_attach_record|
+                new_attach_record.id = attachment['id']
+                new_attach_record.size = attachment['size']
+                new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
+                new_attach_record.file_name = attachment['file_name']
+                new_attach_record.summary = attachment['summary']
+                new_attach_record.content_type = attachment['content_type']
+                new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
+                new_attach_record.creator = attachment['attacher']
+                new_attach_record.is_private = attachment['is_private']
+                new_attach_record.is_obsolete = attachment['is_obsolete']
+                new_attach_record.minor_update = false
+                new_attach_record.created_at = attachment['creation_time'].to_time
+              end
             end
-          end
-          #we need to test these new attachments
-          options = {
-              :bug              => Bug.where(id: bug_id).first,
-              :task_type         => "attachment",
-              :attachment_array => new_record.attachments.map{|a| a.id},
-          }
-          new_task = Task.create(
-              :bug  => options[:bug],
-              :task_type     => options[:task_type],
-              :user => current_user
-          )
-          begin
-            new_task.test_attachments(options, xmlrpc_token)
-          rescue
-            #handle timeouts accordingly
-          end
 
-          new_record.research_notes ||= "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n"
-          unless new_comments.empty?
-            new_comments['bugs'].each do |comment|
-              bug_id = comment[0].to_i
-              comment[1]['comments'].each do |c|
-                if c['text'].downcase.strip.start_with?('commit')
-                  note_type = 'committer'
-                elsif c['text'].start_with?('Created attachment')
-                  note_type = 'attachment'
-                else
-                  note_type = 'research'
-                end
-                comment = c['text'].strip
-                creation_time = c['creation_time'].to_time
-                note = Note.create(id: c['id'],
-                                   author: c['author'],
-                                   comment: comment,
-                                   bug_id: bug_id,
-                                   note_type: note_type,
-                                   created_at: creation_time)
-                new_record.notes << note
+            bug.attachments << new_attachment
+          end
+        end
+        #we need to test these new attachments
+        options = {
+            :bug              => Bug.where(id: bug_id).first,
+            :task_type         => "attachment",
+            :attachment_array => bug.attachments.map{|a| a.id},
+        }
+        new_task = Task.create(
+            :bug  => options[:bug],
+            :task_type     => options[:task_type],
+            :user => current_user
+        )
+        begin
+          new_task.test_attachments(options, xmlrpc_token)
+        rescue
+          #handle timeouts accordingly
+        end
+
+        bug.research_notes ||= "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n"
+        unless new_comments.empty?
+          new_comments['bugs'].each do |comment|
+            bug_id = comment[0].to_i
+            comment[1]['comments'].each do |c|
+              if c['text'].downcase.strip.start_with?('commit')
+                note_type = 'committer'
+              elsif c['text'].start_with?('Created attachment')
+                note_type = 'attachment'
+              else
+                note_type = 'research'
               end
+              comment = c['text'].strip
+              creation_time = c['creation_time'].to_time
+              note = Note.create(id: c['id'],
+                                 author: c['author'],
+                                 comment: comment,
+                                 bug_id: bug_id,
+                                 note_type: note_type,
+                                 created_at: creation_time)
+              bug.notes << note
             end
           end
         end
+        bug.save
       end
     end
     true
