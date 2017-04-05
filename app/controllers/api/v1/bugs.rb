@@ -64,7 +64,7 @@ module API
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
               if permitted_params[:element] == 'attachments'
-                Bug.synch_attachments(xmlrpc,new_bug).to_s
+                Bug.synch_attachments(xmlrpc,new_bug, current_user).to_s
               else
                 # history
                 Bug.synch_history(xmlrpc,new_bug).to_s

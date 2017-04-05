@@ -479,12 +479,12 @@ Feature: Bug
     And I click ".attachments-tab"
     Then I should not see "Newpcap.pcap"
     And I click "#showAddAttachsToggle"
-    And I fill in "new-attach-title" with "new.pcap"
     And I upload "Newpcap.pcap" from_button "file_data"
     When I click "Create Attachment"
     And I wait for "1" seconds
     And I click ".attachments-tab"
     Then I should see "Newpcap.pcap"
+    And the attachment with file name "Newpcap.pcap" summary should be saved as "Newpcap.pcap"
     Then I clean up attachments
 
 

@@ -60,6 +60,8 @@ $ ->
     success = false
     e.preventDefault()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $('.add_attachment').hide()
+    $('#saving_attachment').removeClass('hidden').show()
     data = new FormData()
     data.append( 'attachment[bugzilla_attachment_id]', $('input[name=bug_id]').val())
     data.append( 'attachment[summary]', $('input[name=summary]').val())
