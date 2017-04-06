@@ -459,7 +459,15 @@ code {
     color:#444; background-color:#f2f2f2; white-space: normal;
 a, a:hover, a:focus, a:active { color:@charcoal;}
 }
-.code { font-family: monospace; }
+.code {
+  //Save me! I do not know what I am doing with the font-family setting. :S
+  font-family: "Fira Mono script=all rev=1", "Times New Roman", Georgia, monospace, serif;
+  //Oh, with Fira size 13px seems small!  Try 15 until help arrives! :S
+  font-size: 15px;
+  white-space: pre;
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+}
 
 .label-new { background-color: #bbb;}
 .label-assigned { background-color: #E2865D;}
