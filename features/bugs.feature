@@ -23,11 +23,14 @@ Feature: Bug
     And  I should see "Bugs"
     And  I goto "/bugs?q=open-bugs"
     Then I should see "test summary"
+    And  I should see "Open Bugs"
     And  I should not see "fixed bug"
     And  I goto "/bugs?q=my-bugs"
+    And  I should see "My Bugs"
     Then I should see "[[TELUS][VULN][BP] [SID] 22078 test summary"
     And  I should not see "No Tags in this one"
     Then I goto "/bugs?q=fixed-bugs"
+    And  I should see "Fixed Bugs"
     And  I should see "[BP][NSS] fixed bug"
     And  I should not see "No Tags in this one"
 
@@ -179,10 +182,11 @@ Feature: Bug
     And the following bugs exist:
       | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
       | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
+
     Then I wait for "3" seconds
     When I goto "/bugs?q=open-bugs"
     Then I should see "return"
-    And I should see "nherbert"
+    And I should see my username
     When I click "return"
     And I wait for "5" seconds
 # uncomment when connectivity to bugzilla test fixed
