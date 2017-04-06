@@ -51,3 +51,7 @@ del {
 .dropdown-menu-rules > li > a{
     padding: 3px 2px 2px 6px;
 }
+
+.back_btn_rule {
+    padding-top:15px;
+}
