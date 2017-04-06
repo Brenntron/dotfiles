@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
-  # delete '/rules' => 'rules#destroy'
+  delete '/rules' => 'rules#destroy'
 
 
   # resources :rules, param: :sid
