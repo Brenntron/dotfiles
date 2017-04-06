@@ -60,6 +60,8 @@ $ ->
     success = false
     e.preventDefault()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $('.add_attachment').hide()
+    $('#saving_attachment').removeClass('hidden').show()
     data = new FormData()
     data.append( 'attachment[bugzilla_attachment_id]', $('input[name=bug_id]').val())
     data.append( 'attachment[summary]', $('input[name=summary]').val())
@@ -99,6 +101,8 @@ $ ->
         $('#hideAddAttachsToggle, #showAddAttachsToggle, .attach_button').toggle()
         $('.alert_attachments').addClass('success').show().html(attachment.file_name+' successfully attached')
       error:(response) ->
+        $('.add_attachment').show()
+        $('#saving_attachment').removeClass('hidden').hide()
         $('.alert_attachments').addClass('error').show().html(response.responseText)
     ).done (response) ->
       if success == true
