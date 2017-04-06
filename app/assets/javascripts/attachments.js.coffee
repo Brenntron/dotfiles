@@ -101,6 +101,8 @@ $ ->
         $('#hideAddAttachsToggle, #showAddAttachsToggle, .attach_button').toggle()
         $('.alert_attachments').addClass('success').show().html(attachment.file_name+' successfully attached')
       error:(response) ->
+        $('.add_attachment').show()
+        $('#saving_attachment').removeClass('hidden').hide()
         $('.alert_attachments').addClass('error').show().html(response.responseText)
     ).done (response) ->
       if success == true
