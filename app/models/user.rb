@@ -53,7 +53,9 @@ class User < ApplicationRecord
   end
 
   def available_users
-    User.all.reject{|u| self_and_ancestors.include?(u) || children.include?(u)}
+    User.all.reject{|u| self_and_ancestors.include?(u) ||
+                        children.include?(u) ||
+                        ['vrtincom', 'vrtqa'].include?(u.cvs_username)}
   end
 
   def ensure_authentication_token
