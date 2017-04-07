@@ -294,12 +294,12 @@ Feature: Bug
     Given a user with role "analyst" exists and is logged in
 
     And the following users exist
-      | id | email                | cvs_username  | display_name        | parent_id |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
-      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
-      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+      | id | email                | cvs_username  | display_name        | parent_id | cec_username |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
 
     And the following roles exist:
       | role           |
@@ -332,12 +332,12 @@ Feature: Bug
     Given a user with role "analyst" exists and is logged in
 
     And the following users exist
-      | id | email                | cvs_username  | display_name        | parent_id |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
-      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
-      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+      | id | email                | cvs_username  | display_name        | parent_id | cec_username |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
 
     And the following roles exist:
       | role           |
