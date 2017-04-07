@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170321201155) do
+ActiveRecord::Schema.define(version: 20170407152023) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at",                  null: false
@@ -290,7 +290,7 @@ ActiveRecord::Schema.define(version: 20170321201155) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.integer  "class_level"
+    t.integer  "class_level",            default: 0,     null: false
     t.string   "authentication_token"
     t.integer  "metrics_timeframe",      default: 7
     t.integer  "parent_id"
