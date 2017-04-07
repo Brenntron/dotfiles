@@ -98,6 +98,12 @@ Given(/^current user is a bug user$/) do
   user.save
 end
 
+Given(/^I should see my username$/) do
+  user_attrs = FactoryGirl.attributes_for(:current_user)
+  username  = User.where(cvs_username: user_attrs[:cvs_username]).first
+  raise "content found when it should not have been found" if page.has_content?(username)
+end
+
 Then(/^current user should have kerberos login$/) do
   user_attrs = FactoryGirl.attributes_for(:current_user)
   User.where(cvs_username: user_attrs[:cvs_username]).count.should == 1

@@ -30,4 +30,19 @@ module BugsHelper
       ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'NEW']
     end
   end
+
+  def bug_filter_indicator(filter)
+    'selected' if session[:query] == filter
+  end
+
+  def bug_filter_helper
+    case session[:query]
+      when 'advance-search'
+        'Search'
+      when ''
+        'Bugs'
+      else
+        session[:query].titleize
+    end
+  end
 end

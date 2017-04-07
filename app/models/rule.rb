@@ -307,14 +307,12 @@ class Rule < ApplicationRecord
   # @param [VisruleParser, #read] parser initialized to rule content.
   def assign_from_visrule(rule_content)
     self.rule_content                   = rule_content
-    self.cvs_rule_content               = rule_content
     self.on                             = /^\s*#/ !~ rule_content
 
     vparser = RuleSyntax::VisruleParser.new(rule_content)
 
     self.rule_parsed                    = vparser.parsed_lines
     self.rule_warnings                  = vparser.errors
-    self.cvs_rule_parsed                = vparser.parsed_lines
 
     self.parsed                         = vparser.valid?
     self.committed                      = !vparser.valid?
@@ -406,9 +404,12 @@ class Rule < ApplicationRecord
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db
     else
-      rule.edit_status                = EDIT_STATUS_SYNCHED
-      rule.publish_status             = PUBLISH_STATUS_SYNCHED
-      rule.state                      = 'UNCHANGED'
+      rule.cvs_rule_content             = rule.rule_content
+      rule.cvs_rule_parsed              = rule.rule_parsed
+
+      rule.edit_status                  = EDIT_STATUS_SYNCHED
+      rule.publish_status               = PUBLISH_STATUS_SYNCHED
+      rule.state                        = 'UNCHANGED'
       rule.save!
       rule.associate_references(rule_content)
       rule

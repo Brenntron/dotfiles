@@ -12,7 +12,7 @@
     <table class="right table index-table">
       <thead>
       <tr>
-        <td class="indent" data-defaultsign="nospan"><strong>Bugs</strong></td>
+        <td class="indent" data-defaultsign="nospan"><strong><%= bug_filter_helper %></strong></td>
       </tr>
       </thead>
       <tbody>
@@ -40,15 +40,27 @@
           <button type="button" class="btn btn-link icon-link dropdown-toggle float-left" data-toggle="dropdown" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i>
           </button>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="/bugs?q=my-bugs">my bugs</a></li>
-            <li><a href="/bugs?q=team-bugs">team bugs</a></li>
+          <ul class="dropdown-menu" id="bugs_filter" role="menu">
+            <li>
+              <a href="/bugs?q=my-bugs" class="<%= bug_filter_indicator('my-bugs') %>" ><i class="glyphicon glyphicon-ok"></i> my bugs</a>
+            </li>
+            <li>
+              <a href="/bugs?q=team-bugs" class="<%= bug_filter_indicator('team-bugs') %>"><i class="glyphicon glyphicon-ok"></i> team bugs</a>
+            </li>
             <li class="divider"></li>
-            <li><a href="/bugs?q=open-bugs">open bugs</a></li>
-            <li><a href="/bugs?q=pending-bugs">pending bugs</a></li>
-            <li><a href="/bugs?q=fixed-bugs">fixed bugs</a></li>
+            <li>
+              <a href="/bugs?q=open-bugs" class="<%= bug_filter_indicator('open-bugs') %>" ><i class="glyphicon glyphicon-ok"></i> open bugs</a>
+            </li>
+            <li>
+              <a href="/bugs?q=pending-bugs" class="<%= bug_filter_indicator('pending-bugs') %>"><i class="glyphicon glyphicon-ok"></i> pending bugs</a>
+            </li>
+            <li>
+              <a href="/bugs?q=fixed-bugs" class="<%= bug_filter_indicator('fixed-bugs') %>"><i class="glyphicon glyphicon-ok"></i> fixed bugs</a>
+            </li>
             <li class="divider"></li>
-            <li><a href="/bugs?q=all-bugs">all bugs</a></li>
+            <li>
+              <a href="/bugs?q=all-bugs" class="<%= bug_filter_indicator('all-bugs') %>"><i class="glyphicon glyphicon-ok"></i> all bugs</a>
+            </li>
           </ul>
         </div>
         <div class="col-xs-8 form-inline">
