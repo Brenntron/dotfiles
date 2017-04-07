@@ -38,6 +38,10 @@ class Bug < ApplicationRecord
   #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
+  def test_report_timestamp
+    task = tasks.latest_timestamp.first
+    task ? task.stats_updated_at : nil
+  end
 
   def attachment_local_alerts(rule)
     attachments.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")

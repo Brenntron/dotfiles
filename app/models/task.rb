@@ -1,12 +1,17 @@
 class Task < ApplicationRecord
   belongs_to :bug, optional: true
   belongs_to :user, optional: true
-  has_many :rules
+  has_many :test_reports
+  has_many :rules, through: :test_reports
   has_many :attachments
 
   after_create { |task| task.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |task| task.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   after_destroy { |task| task.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
+
+  scope :latest_timestamp, -> {
+    select('max(tasks.updated_at) as updated_at')
+  }
 
   def record(action)
     record = { resource: 'task',
