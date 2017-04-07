@@ -13,9 +13,6 @@ FactoryGirl.define do
     edit_status         Rule::EDIT_STATUS_SYNCHED
     parsed              true
     on                  true
-    average_check       nil
-    average_match       nil
-    average_nonmatch    nil
     tested              false
     committed           true
     task_id             nil

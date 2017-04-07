@@ -62,7 +62,7 @@ class Task < ApplicationRecord
       end
     end
 
-    test_reports.all.delete_all
+    bug.test_reports.all.delete_all
     performance_stats.each do |stats|
       rule = Rule.by_sid(stats[:sid], stats[:gid]).first
       if rule

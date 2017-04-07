@@ -10,6 +10,7 @@ class Bug < ApplicationRecord
   has_many :attachments, dependent: :destroy
   has_many :tasks, dependent: :destroy
   has_many :notes, dependent: :destroy
+  has_many :test_reports
 
   has_many :alerts, through: :attachments
   has_many :local_alerts, through: :attachments

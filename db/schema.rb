@@ -279,6 +279,7 @@ ActiveRecord::Schema.define(version: 20170407152023) do
     t.datetime "updated_at",                  null: false
     t.integer  "task_id",                     null: false
     t.integer  "rule_id",                     null: false
+    t.integer  "bug_id"
     t.float    "average_check",    limit: 24
     t.float    "average_match",    limit: 24
     t.float    "average_nonmatch", limit: 24
