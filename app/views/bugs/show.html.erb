@@ -11,6 +11,12 @@
                     <span data-toggle="modal" data-target="#editBug">
                       <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-pencil edit_bug" id="edit_bug" data-toggle="tooltip" data-placement="bottom" title="edit bug"></a>
                     </span>
+                    <% if @bug.user.email != current_user.email %>
+                      <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-download-alt take-bug" id="take-bug-<%= @bug.id %>" data-id="<%= @bug.id %>" data-toggle="tooltip" data-placement="bottom" title="Take this bug"></a>
+                    <%else%>
+                      <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-share-alt return-bug" id="return-bug-<%= @bug.id %>" data-id="<%= @bug.id %>" data-toggle="tooltip" data-placement="bottom" title="Return this bug"></a>
+                    <%end%>
+                    <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden" id="loading_image"> </span>
                     <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-refresh resynch_bug" id="resynch_bug" data-toggle="tooltip" data-placement="bottom" title="resynch this bug with bugzilla"></a>
                     <button class="select-sm btn btn-default hidden" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> synching</button>
                   </small>

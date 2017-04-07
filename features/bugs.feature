@@ -39,6 +39,10 @@ Feature: Bug
             out of synch with bugzilla (probably from a light import).
             Out of synch is based on presence of bug tags.
     Given a user with role "analyst" exists and is logged in
+    And the following users exist
+      | id | email                         | cvs_username  | display_name        |
+      | 2  | vrt-incoming@sourcefire.com   | vrt_incoming  | Rainbow Brite       |
+
     And the following bugs exist:
       | id          | state | user_id | summary                                     | product  | component   | version | description       |
       | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |

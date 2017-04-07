@@ -7,6 +7,7 @@ $ ->
     id = $(this).data("id")
     $("#take-bug-"+id).hide()
     $("#bug-wait-"+id).show()
+    $('#loading_image').removeClass('hidden').show()
     $.ajax {
       url: '/api/v1/bugs/'+id+'/subscribe'
       method: 'post'
@@ -23,6 +24,7 @@ $ ->
     id = $(this).data("id")
     $("#return-bug-"+id).hide()
     $("#bug-wait-"+id).show()
+    $('#loading_image').removeClass('hidden').show()
     $.ajax {
       url: '/api/v1/bugs/'+id+'/unsubscribe'
       method: 'post'
