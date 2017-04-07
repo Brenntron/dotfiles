@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
 
   before_save :ensure_authentication_token
+  after_create :add_role
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -55,7 +56,8 @@ class User < ApplicationRecord
   def available_users
     User.all.reject{|u| self_and_ancestors.include?(u) ||
                         children.include?(u) ||
-                        ['vrtincom', 'vrtqa'].include?(u.cvs_username)}
+                        ['vrtincom', 'vrtqa'].include?(u.cvs_username) ||
+                        u.cec_username.nil? }
   end
 
   def ensure_authentication_token
@@ -132,6 +134,11 @@ class User < ApplicationRecord
 
   private
 
+  def add_role
+    analyst = Role.where(role: 'analyst')
+    roles << analyst unless roles.include?(analyst)
+  end
+
   def generate_authentication_token
     loop do
       token = Devise.friendly_token
@@ -141,7 +148,7 @@ class User < ApplicationRecord
 
   def self.create_by_email(email)
     create(#kerberos_login: 'generated',
-        cvs_username: email.gsub("@#{Rails.configuration.bugzilla_domain}", '').gsub('@cisco.com', ''),
+        cvs_username: email.split('@')[0],
         email: email,
         password: 'password',
         password_confirmation: 'password',
