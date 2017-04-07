@@ -67,6 +67,7 @@
       <% if @rules.any? %>
         <tbody>
         <% @rules.each do |rule| %>
+          <% test_rpt = rule.test_reports.where(bug_id: @bug.id).first %>
           <tr id="<%= rule.id %>" class="rule_row <%= rule.css_class %>"
               data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>"
@@ -85,9 +86,9 @@
                 <td class="center">
                   <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
                 </td>
-                <td class="center"><%= rule.average_check ? rule.average_check : '-' %></td>
-                <td class="center"><%= rule.average_match ? rule.average_match : '-' %></td>
-                <td class="center"><%= rule.average_nonmatch ? rule.average_nonmatch : '-' %></td>
+                <td><%= test_rpt ? test_rpt.average_check : '-' %></td>
+                <td><%= test_rpt ? test_rpt.average_match : '-' %></td>
+                <td><%= test_rpt ? test_rpt.average_nonmatch : '-' %></td>
                 <td></td>
               </tr>
                 <% @bug.attachment_local_alerts(rule).each do |attachment| %>
