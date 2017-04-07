@@ -23,24 +23,10 @@ class Task < ApplicationRecord
 
 
   # Parsed output of results from testing rules
-  def stats
-    result.split("\n").inject({}) do |stats, line|
-      line.lstrip!
-      num, sid, gid, rev, checks, matches, alerts, microsecs, ave_check, ave_match, ave_nonmatch, disabled =
-          line.split(/\s+/)
-      if num =~ /^\d+$/
-        stats[sid.to_i] = { average_check: ave_check, average_match: ave_match, average_nonmatch: ave_nonmatch }
-      end
-
-      stats
-    end
-  end
-
   def performance_stats
     result.each_line.map do |line|
       line.lstrip!
-      num, sid, gid, rev, checks, matches, alerts, microsecs, ave_check, ave_match, ave_nonmatch, disabled =
-          line.split(/\s+/)
+      num, sid, gid, rev, cks, mch, alt, micsec, ave_check, ave_match, ave_nonmatch, dis = line.split(/\s+/)
       if num =~ /^\d+$/
         { gid: gid.to_i, sid: sid.to_i,
           average_check: ave_check, average_match: ave_match, average_nonmatch: ave_nonmatch }
@@ -55,13 +41,6 @@ class Task < ApplicationRecord
   # When doing a local test on a bug, performance stats on the top ten slowest rules are returned.
   # Keep these in the test_reports table.
   def update_rule_stats
-    stats.each_pair do |sid, attrs|
-      rule = Rule.by_sid(sid).first
-      if rule && rule.sid
-        rule.update(attrs)
-      end
-    end
-
     bug.test_reports.all.delete_all
     performance_stats.each do |stats|
       rule = Rule.by_sid(stats[:sid], stats[:gid]).first
