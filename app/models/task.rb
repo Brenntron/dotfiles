@@ -66,8 +66,8 @@ class Task < ApplicationRecord
     performance_stats.each do |stats|
       rule = Rule.by_sid(stats[:sid], stats[:gid]).first
       if rule
-        attributes = stats.slice(*%i(average_check average_match average_nonmatch)).merge(rule_id: rule.id)
-        test_reports.create(attributes)
+        data = stats.slice(*%i(average_check average_match average_nonmatch))
+        test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
       end
     end
 
