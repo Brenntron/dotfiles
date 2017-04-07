@@ -36,8 +36,24 @@ class Task < ApplicationRecord
     end
   end
 
+  def performance_stats
+    result.each_line.map do |line|
+      line.lstrip!
+      num, sid, gid, rev, checks, matches, alerts, microsecs, ave_check, ave_match, ave_nonmatch, disabled =
+          line.split(/\s+/)
+      if num =~ /^\d+$/
+        { gid: gid.to_i, sid: sid.to_i,
+          average_check: ave_check, average_match: ave_match, average_nonmatch: ave_nonmatch }
+      else
+        nil
+      end
+    end.select{ |elem| elem }
+  end
 
-  # Set stats fields on rule records
+  # For a local test, set rule performance stats on test_report records
+  #
+  # When doing a local test on a bug, performance stats on the top ten slowest rules are returned.
+  # Keep these in the test_reports table.
   def update_rule_stats
     stats.each_pair do |sid, attrs|
       rule = Rule.by_sid(sid).first
@@ -45,6 +61,17 @@ class Task < ApplicationRecord
         rule.update(attrs)
       end
     end
+
+    test_reports.all.delete_all
+    performance_stats.each do |stats|
+      rule = Rule.by_sid(stats[:sid], stats[:gid]).first
+      if rule
+        attributes = stats.slice(*%i(average_check average_match average_nonmatch)).merge(rule_id: rule.id)
+        test_reports.create(attributes)
+      end
+    end
+
+    update(stats_updated_at: Time.now)
 
     true
   end
