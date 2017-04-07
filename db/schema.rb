@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170321201155) do
+ActiveRecord::Schema.define(version: 20170407152023) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at",                  null: false
@@ -260,17 +260,30 @@ ActiveRecord::Schema.define(version: 20170321201155) do
   end
 
   create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.boolean  "completed",                  default: false
-    t.boolean  "failed",                     default: false
-    t.text     "result",       limit: 65535
+    t.boolean  "completed",                      default: false
+    t.boolean  "failed",                         default: false
+    t.text     "result",           limit: 65535
     t.string   "task_type"
     t.integer  "time_elapsed"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "bug_id"
     t.integer  "user_id"
+    t.datetime "stats_updated_at"
     t.index ["bug_id"], name: "index_tasks_on_bug_id", using: :btree
     t.index ["user_id"], name: "index_tasks_on_user_id", using: :btree
+  end
+
+  create_table "test_reports", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.integer  "task_id",                     null: false
+    t.integer  "rule_id",                     null: false
+    t.integer  "bug_id"
+    t.float    "average_check",    limit: 24
+    t.float    "average_match",    limit: 24
+    t.float    "average_nonmatch", limit: 24
+    t.index ["rule_id", "task_id"], name: "index_test_reports_on_rule_id_and_task_id", unique: true, using: :btree
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -290,7 +303,7 @@ ActiveRecord::Schema.define(version: 20170321201155) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.integer  "class_level"
+    t.integer  "class_level",            default: 0,     null: false
     t.string   "authentication_token"
     t.integer  "metrics_timeframe",      default: 7
     t.integer  "parent_id"

@@ -49,10 +49,8 @@ end
 
 # vrt generic users
 vi = User.create(kerberos_login:"vrtincom",cvs_username:"vrtincom",cec_username:"vrtincom",display_name:"Vrt Incoming",committer:true,email:"vrt-incoming@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-vi.roles << Role.where(role: 'analyst')
 
 vq = User.create(kerberos_login:"vrtqa",cvs_username:"vrtqa",cec_username:"vrtqa",display_name:"Vrt quality assurance",committer:true,email:"vrt-qa@sourcefire.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-vq.roles << Role.where(role: 'analyst')
 
 # admins
 je = User.create(kerberos_login:"jesler",cvs_username:"jesler",cec_username:"jesler",display_name:"Joel Esler",committer:true,email:"jesler@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
@@ -78,7 +76,6 @@ ts.move_to_child_of(nh)
 
 # managers
 chinski = User.create(kerberos_login:"mwatchinski",cvs_username:"mwatchinski",cec_username:"mwatchin",display_name:"Matt Watchinski",committer:true,email:"mwatchin@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-chinski.roles << Role.where(role: 'analyst')
 chinski.roles << Role.where(role: 'manager')
 je.move_to_child_of(chinski)
 
@@ -94,26 +91,21 @@ pm.roles << Role.where(role: 'committer')
 pm.move_to_child_of(cm)
 
 olney = User.create(kerberos_login:"molney",cvs_username:"molney",cec_username:"molney",display_name:"Matt Olney",committer:true,email:"molney@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-olney.roles << Role.where(role: 'analyst')
 olney.roles << Role.where(role: 'manager')
 olney.move_to_child_of(chinski)
 
 nigel = User.create(kerberos_login:"nhoughton",cvs_username:"nhoughton",cec_username:"nhoughto",display_name:"Nigel Houghton",committer:true,email:"nhoughto@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-nigel.roles << Role.where(role: 'analyst')
 nigel.roles << Role.where(role: 'manager')
 nigel.move_to_child_of(chinski)
 
 nr = User.create(kerberos_login:"drandolph",cvs_username:"drandolph",cec_username:"nrandolp",display_name:"Nick Randolph",committer:true,email:"nrandolp@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-nr.roles << Role.where(role: 'analyst')
 nr.roles << Role.where(role: 'manager')
 
 pentney = User.create(kerberos_login:"rpentney",cvs_username:"rpentney",cec_username:"rpentney",display_name:"Ryan Pentney",committer:true,email:"rpentney@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-pentney.roles << Role.where(role: 'analyst')
 pentney.roles << Role.where(role: 'manager')
 pentney.move_to_child_of(olney)
 
 mickel = User.create(kerberos_login:"mmickel",cvs_username:"mmickel",cec_username:"mmickel",display_name:"Matthew Mickel",committer:true,email:"mmickel@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-mickel.roles << Role.where(role: 'analyst')
 mickel.roles << Role.where(role: 'manager')
 
 jmarsh = User.create(kerberos_login:"josmarsh",cvs_username:"josmarsh",cec_username:"josmarsh",display_name:"Joe Marshall",committer:true,email:"josmarsh@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
@@ -121,51 +113,41 @@ jmarsh.roles << Role.where(role: 'manager')
 jmarsh.move_to_child_of(cm)
 
 blunck = User.create(kerberos_login:"ablunck",cvs_username:"ablunck",cec_username:"ablunck",display_name:"Andrew Blunck",committer:true,email:"ablunck@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-blunck.roles << Role.where(role: 'analyst')
 blunck.roles << Role.where(role: 'manager')
 
 yves = User.create(kerberos_login:"yyounan",cvs_username:"yyounan",cec_username:"yvyounan",display_name:"Yves Younan",committer:true,email:"yvyounan@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-yves.roles << Role.where(role: 'analyst')
 yves.roles << Role.where(role: 'manager')
 yves.move_to_child_of(nigel)
 
 alain = User.create(kerberos_login:"azidouemba",cvs_username:"azidouemba",cec_username:"azidouem",display_name:"Alain Zidouemba",committer:true,email:"azidouem@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-alain.roles << Role.where(role: 'analyst')
 alain.roles << Role.where(role: 'manager')
 alain.move_to_child_of(cm)
 
 kambis = User.create(kerberos_login:"akambis",cvs_username:"akambis",cec_username:"akambis",display_name:"Alex Kambis",committer:true,email:"akambis@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-kambis.roles << Role.where(role: 'analyst')
 kambis.roles << Role.where(role: 'manager')
 kambis.move_to_child_of(nigel)
 
 micharr = User.create(kerberos_login:"micharr3",cvs_username:"micharr3",cec_username:"micharr3",display_name:"Michael Harris",committer:true,email:"micharr3@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-micharr.roles << Role.where(role: 'analyst')
 micharr.roles << Role.where(role: 'manager')
 micharr.move_to_child_of(nigel)
 
 nolan = User.create(kerberos_login:"knolan",cvs_username:"knolan",cec_username:"kanolan",display_name:"Kate Nolan",committer:true,email:"kanolan@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-nolan.roles << Role.where(role: 'analyst')
 nolan.roles << Role.where(role: 'manager')
 
 morgan = User.create(kerberos_login:"smorgan",cvs_username:"smorgan",cec_username:"stevmorg",display_name:"Steve Morgan",committer:true,email:"stevmorg@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-morgan.roles << Role.where(role: 'analyst')
 morgan.roles << Role.where(role: 'manager')
 
 raynor = User.create(kerberos_login:"draynor",cvs_username:"draynor",cec_username:"draynor",display_name:"Dave Raynor",committer:true,email:"draynor@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-raynor.roles << Role.where(role: 'analyst')
 raynor.roles << Role.where(role: 'manager')
 raynor.move_to_child_of(olney)
 
 jj = User.create(kerberos_login:"jcummings",cvs_username:"jcummings",cec_username:"jjcummin",display_name:"JJ Cummings",committer:true,email:"jjcummin@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-jj.roles << Role.where(role: 'analyst')
 jj.roles << Role.where(role: 'manager')
 jj.move_to_child_of(olney)
 
 # analysts/committers
 
 am = User.create(kerberos_login:"amcdonnell",cvs_username:"amcdonnell",cec_username:"almcdonn",display_name:"Alex McDonnell",committer:true,email:"almcdonn@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-am.roles << Role.where(role: 'analyst')
 am.move_to_child_of(pm)
 
 
@@ -174,103 +156,145 @@ tm.roles << Role.where(role: 'committer')
 
 cz = User.create(kerberos_login:"cmarczewski",cvs_username:"cmarczewski",cec_username:"cmarczew",display_name:"Chris Marczewski",committer:true,email:"cmarczew@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 cz.roles << Role.where(role: 'committer')
-cz.roles << Role.where(role: 'analyst')
 
 gs = User.create(kerberos_login:"gserrao",cvs_username:"gserrao",cec_username:"gserrao",display_name:"Geoff Serrao",committer:true,email:"gserrao@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-gs.roles << Role.where(role: 'analyst')
 
 
 lieb = User.create(kerberos_login:"dliebenb",cvs_username:"dliebenb",cec_username:"dliebenb",display_name:"David Liebenberg",committer:true,email:"dliebenb@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-lieb.roles << Role.where(role: 'analyst')
 
 graz = User.create(kerberos_login:"magrazia",cvs_username:"magrazia",cec_username:"magrazia",display_name:"Mariano Graziano",committer:true,email:"magrazia@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-graz.roles << Role.where(role: 'analyst')
 
 bania = User.create(kerberos_login:"pbania",cvs_username:"pbania",cec_username:"pbania",display_name:"Piotr Bania",committer:true,email:"pbania@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-bania.roles << Role.where(role: 'analyst')
 
 mercer = User.create(kerberos_login:"wmercer",cvs_username:"wmercer",cec_username:"wamercer",display_name:"Warren Mercer",committer:true,email:"wamercer@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-mercer.roles << Role.where(role: 'analyst')
 
 mcdan = User.create(kerberos_login:"dmcdaniel",cvs_username:"dmcdaniel",cec_username:"davemcda",display_name:"Dave McDaniel",committer:true,email:"davemcda@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-mcdan.roles << Role.where(role: 'analyst')
 
 kbrook = User.create(kerberos_login:"kbrooks",cvs_username:"kbrooks",cec_username:"kevbrook",display_name:"Kevin Brooks",committer:true,email:"kevbrook@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-kbrook.roles << Role.where(role: 'analyst')
 
 pfrank = User.create(kerberos_login:"pfrank",cvs_username:"pfrank",cec_username:"paufrank",display_name:"Paul Frank",committer:true,email:"paufrank@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-pfrank.roles << Role.where(role: 'analyst')
 
 
 arnes = User.create(kerberos_login:"jarneson",cvs_username:"jarneson",cec_username:"jarneson",display_name:"John Arneson",committer:true,email:"jarneson@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-arnes.roles << Role.where(role: 'analyst')
 
 erick = User.create(kerberos_login:"egalinkin",cvs_username:"egalinkin",cec_username:"ergalink",display_name:"Erick Galinkin",committer:true,email:"ergalink@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-erick.roles << Role.where(role: 'analyst')
 
 mavis = User.create(kerberos_login:"nmavis",cvs_username:"nmavis",cec_username:"nmavis",display_name:"Nicholas Mavis",committer:true,email:"nmavis@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-mavis.roles << Role.where(role: 'analyst')
 
 
 rjohn = User.create(kerberos_login:"rjohnson",cvs_username:"rjohnson",cec_username:"richjoh",display_name:"Rich Johnson",committer:true,email:"richjoh@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-rjohn.roles << Role.where(role: 'analyst')
 rjohn.move_to_child_of(nigel)
 
 
 stultz = User.create(kerberos_login:"bstultz",cvs_username:"bstultz",cec_username:"brastult",display_name:"Brandon Stultz",committer:true,email:"brastult@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-stultz.roles << Role.where(role: 'analyst')
 
 
 zeiser = User.create(kerberos_login:"mzeiser",cvs_username:"mzeiser",cec_username:"mzeiser",display_name:"Martin Zeiser",committer:true,email:"mzeiser@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-zeiser.roles << Role.where(role: 'analyst')
 
 jzadd = User.create(kerberos_login:"jzaddach",cvs_username:"jzaddach",cec_username:"jzaddach",display_name:"Jonas Zaddach",committer:true,email:"jzaddach@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-jzadd.roles << Role.where(role: 'analyst')
 
 angel = User.create(kerberos_login:"anvilleg",cvs_username:"anvilleg",cec_username:"anvilleg",display_name:"Angel Villegas",committer:true,email:"anvilleg@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-angel.roles << Role.where(role: 'analyst')
 
 mcbee = User.create(kerberos_login:"cmcbee",cvs_username:"cmcbee",cec_username:"chmcbee",display_name:"Christopher McBee",committer:true,email:"chmcbee@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-mcbee.roles << Role.where(role: 'analyst')
 
 pacho = User.create(kerberos_login:"cpacho",cvs_username:"cpacho",cec_username:"cpacho",display_name:"Carlos Pacho",committer:true,email:"cpacho@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-pacho.roles << Role.where(role: 'analyst')
 
 rich = User.create(kerberos_login:"richard.harman",cvs_username:"richard.harman",cec_username:"rharmanj",display_name:"Richard Harman Jr",committer:true,email:"rharmanj@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-rich.roles << Role.where(role: 'analyst')
 
 suan = User.create(kerberos_login:"nsuan",cvs_username:"nsuan",cec_username:"nsuan",display_name:"Nick Suan",committer:true,email:"nsuan@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-suan.roles << Role.where(role: 'analyst')
 
 dvl = User.create(kerberos_login:"dvl",cvs_username:"dvl",cec_username:"dalangil",display_name:"Dan Langille",committer:true,email:"dalangil@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-dvl.roles << Role.where(role: 'analyst')
 
 lazlo = User.create(kerberos_login:"ldanieli",cvs_username:"ldanieli",cec_username:"ldanieli",display_name:"Laszlo Danielisz",committer:true,email:"ldanieli@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-lazlo.roles << Role.where(role: 'analyst')
 
 
 felder = User.create(kerberos_login:"mafelder",cvs_username:"mafelder",cec_username:"mafelder",display_name:"Mark Felder",committer:true,email:"mafelder@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-felder.roles << Role.where(role: 'analyst')
 
 
 mclov = User.create(kerberos_login:"kmiklavcic",cvs_username:"kmiklavcic",cec_username:"kmiklavc",display_name:"Kevin Miklavcic",committer:true,email:"kmiklavc@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-mclov.roles << Role.where(role: 'analyst')
 
 suffl = User.create(kerberos_login:"dsuffling",cvs_username:"dsuffling",cec_username:"dsufflin",display_name:"Dave Suffling",committer:true,email:"dsufflin@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-suffl.roles << Role.where(role: 'analyst')
 
 samir = User.create(kerberos_login:"ssapra",cvs_username:"ssapra",cec_username:"ssapra",display_name:"Samir Sapra",committer:true,email:"ssapra@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-samir.roles << Role.where(role: 'analyst')
 
 judge = User.create(kerberos_login:"tjudge",cvs_username:"tjudge",cec_username:"tomjudge",display_name:"Tom Judge",committer:true,email:"tomjudge@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-judge.roles << Role.where(role: 'analyst')
 
 
 lin = User.create(kerberos_login:"klin",cvs_username:"klin",cec_username:"kevlin2",display_name:"Kevin Lin",committer:true,email:"kevlin2@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-lin.roles << Role.where(role: 'analyst')
 
 metz = User.create(kerberos_login:"rsteinmetz",cvs_username:"rsteinmetz",cec_username:"rsteinme",display_name:"Ryan Steinmetz",committer:true,email:"rsteinme@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
-metz.roles << Role.where(role: 'analyst')
+metz.move_to_child_of(nigel)
+
+
+
+
+
+gs = User.create(kerberos_login:"gserrao",cvs_username:"gserrao",cec_username:"gserrao",display_name:"Geoff Serrao",committer:true,email:"gserrao@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+lieb = User.create(kerberos_login:"dliebenb",cvs_username:"dliebenb",cec_username:"dliebenb",display_name:"David Liebenberg",committer:true,email:"dliebenb@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+graz = User.create(kerberos_login:"magrazia",cvs_username:"magrazia",cec_username:"magrazia",display_name:"Mariano Graziano",committer:true,email:"magrazia@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+bania = User.create(kerberos_login:"pbania",cvs_username:"pbania",cec_username:"pbania",display_name:"Piotr Bania",committer:true,email:"pbania@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mercer = User.create(kerberos_login:"wmercer",cvs_username:"wmercer",cec_username:"wamercer",display_name:"Warren Mercer",committer:true,email:"wamercer@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mcdan = User.create(kerberos_login:"dmcdaniel",cvs_username:"dmcdaniel",cec_username:"davemcda",display_name:"Dave McDaniel",committer:true,email:"davemcda@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+kbrook = User.create(kerberos_login:"kbrooks",cvs_username:"kbrooks",cec_username:"kevbrook",display_name:"Kevin Brooks",committer:true,email:"kevbrook@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+pfrank = User.create(kerberos_login:"pfrank",cvs_username:"pfrank",cec_username:"paufrank",display_name:"Paul Frank",committer:true,email:"paufrank@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+arnes = User.create(kerberos_login:"jarneson",cvs_username:"jarneson",cec_username:"jarneson",display_name:"John Arneson",committer:true,email:"jarneson@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+erick = User.create(kerberos_login:"egalinkin",cvs_username:"egalinkin",cec_username:"ergalink",display_name:"Erick Galinkin",committer:true,email:"ergalink@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mavis = User.create(kerberos_login:"nmavis",cvs_username:"nmavis",cec_username:"nmavis",display_name:"Nicholas Mavis",committer:true,email:"nmavis@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+rjohn = User.create(kerberos_login:"rjohnson",cvs_username:"rjohnson",cec_username:"richjoh",display_name:"Rich Johnson",committer:true,email:"richjoh@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+rjohn.move_to_child_of(nigel)
+
+
+stultz = User.create(kerberos_login:"bstultz",cvs_username:"bstultz",cec_username:"brastult",display_name:"Brandon Stultz",committer:true,email:"brastult@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+zeiser = User.create(kerberos_login:"mzeiser",cvs_username:"mzeiser",cec_username:"mzeiser",display_name:"Martin Zeiser",committer:true,email:"mzeiser@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+jzadd = User.create(kerberos_login:"jzaddach",cvs_username:"jzaddach",cec_username:"jzaddach",display_name:"Jonas Zaddach",committer:true,email:"jzaddach@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+angel = User.create(kerberos_login:"anvilleg",cvs_username:"anvilleg",cec_username:"anvilleg",display_name:"Angel Villegas",committer:true,email:"anvilleg@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mcbee = User.create(kerberos_login:"cmcbee",cvs_username:"cmcbee",cec_username:"chmcbee",display_name:"Christopher McBee",committer:true,email:"chmcbee@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+pacho = User.create(kerberos_login:"cpacho",cvs_username:"cpacho",cec_username:"cpacho",display_name:"Carlos Pacho",committer:true,email:"cpacho@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+rich = User.create(kerberos_login:"richard.harman",cvs_username:"richard.harman",cec_username:"rharmanj",display_name:"Richard Harman Jr",committer:true,email:"rharmanj@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+suan = User.create(kerberos_login:"nsuan",cvs_username:"nsuan",cec_username:"nsuan",display_name:"Nick Suan",committer:true,email:"nsuan@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+dvl = User.create(kerberos_login:"dvl",cvs_username:"dvl",cec_username:"dalangil",display_name:"Dan Langille",committer:true,email:"dalangil@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+lazlo = User.create(kerberos_login:"ldanieli",cvs_username:"ldanieli",cec_username:"ldanieli",display_name:"Laszlo Danielisz",committer:true,email:"ldanieli@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+felder = User.create(kerberos_login:"mafelder",cvs_username:"mafelder",cec_username:"mafelder",display_name:"Mark Felder",committer:true,email:"mafelder@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+mclov = User.create(kerberos_login:"kmiklavcic",cvs_username:"kmiklavcic",cec_username:"kmiklavc",display_name:"Kevin Miklavcic",committer:true,email:"kmiklavc@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+suffl = User.create(kerberos_login:"dsuffling",cvs_username:"dsuffling",cec_username:"dsufflin",display_name:"Dave Suffling",committer:true,email:"dsufflin@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+samir = User.create(kerberos_login:"ssapra",cvs_username:"ssapra",cec_username:"ssapra",display_name:"Samir Sapra",committer:true,email:"ssapra@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+judge = User.create(kerberos_login:"tjudge",cvs_username:"tjudge",cec_username:"tomjudge",display_name:"Tom Judge",committer:true,email:"tomjudge@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+lin = User.create(kerberos_login:"klin",cvs_username:"klin",cec_username:"kevlin2",display_name:"Kevin Lin",committer:true,email:"kevlin2@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+metz = User.create(kerberos_login:"rsteinmetz",cvs_username:"rsteinmetz",cec_username:"rsteinme",display_name:"Ryan Steinmetz",committer:true,email:"rsteinme@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
 metz.move_to_child_of(nigel)
 
 
