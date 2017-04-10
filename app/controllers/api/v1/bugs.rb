@@ -317,6 +317,7 @@ module API
             optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
             optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+            optional :user_id, type: Integer, desc: "the user this bug is assigned to"
             # all the params we need to permit must to go here
           end
         end
@@ -334,7 +335,8 @@ module API
               :platform => permitted_params[:bug][:platform],
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification]
+              :classification => permitted_params[:bug][:classification],
+              :assigned_to => current_user.email
           }.reject() { |k, v| v.nil? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
 
           xmlrpc = Bugzilla::Bug.new(bugzilla_session)
@@ -355,7 +357,8 @@ module API
               :platform => permitted_params[:bug][:platform],
               :priority => permitted_params[:bug][:priority],
               :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification]
+              :classification => permitted_params[:bug][:classification],
+              :user_id => current_user.id
           )
 
           # pull in the first comment
