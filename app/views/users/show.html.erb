@@ -74,14 +74,14 @@
       </div>
       <div class='col-sm-11'>
         <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="user-tab active" id="open-tab"><a href="#open" aria-controls="open" role="tab" data-toggle="tab">open (<%= @user.bugs.open_bug.count %>)</a></li>
+          <li role="presentation" class="user-tab active" id="open-tab"><a href="#open" aria-controls="open" role="tab" data-toggle="tab">open (<%= @user.bugs.open_bugs.count %>)</a></li>
           <li role="presentation" class="user-tab" id="pending-tab"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">pending (<%= @user.bugs.pending.count %>)</a></li>
           <li role="presentation" class="user-tab" id="closed-tab"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">closed (<%= @user.bugs.closed.count %>)</a></li>
         </ul>
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="open">
-            <% if @user.bugs.open_bug.any? %>
-              <% @user.bugs.open_bug.sort_by{ |b| b.priority_sort }.each do |bug| %>
+            <% if @user.bugs.open_bugs.any? %>
+              <% @user.bugs.open_bugs.sort_by{ |b| b.priority_sort }.each do |bug| %>
                 <div class="col-xs-2 col-md-1 center">
                   <p><strong><%=bug.priority%></strong></p>
                 </div>

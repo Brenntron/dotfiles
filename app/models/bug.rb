@@ -18,7 +18,7 @@ class Bug < ApplicationRecord
   accepts_nested_attributes_for :references
   accepts_nested_attributes_for :rules
 
-  scope :open_bug, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
+  scope :open_bugs, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }
   scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
