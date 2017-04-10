@@ -343,7 +343,7 @@ Feature: Bug
     And "t_bear" should not be in the "bug[user_id]" dropdown list
     And I select "rainbow_b" from "bug[user_id]"
     Then I click button "Save"
-#    And I wait for "3" seconds
+    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "rainbow_b"
 
@@ -381,7 +381,7 @@ Feature: Bug
     And "d_drumph" should not be in the "bug[committer_id]" dropdown list
     And I select "t_bear" from "bug[committer_id]"
     Then I click button "Save"
-#    And I wait for "3" seconds
+    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "t_bear"
 
