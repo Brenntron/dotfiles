@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
 
   before_action :require_login
+  before_action :set_query_session
 
   def index
     @users = current_user.children
@@ -128,6 +129,10 @@ class UsersController < ApplicationController
 
   def require_login
     redirect_to root_url if !current_user
+  end
+
+  def set_query_session
+    session[:query] = ''
   end
 
   def user_params
