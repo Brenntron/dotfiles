@@ -268,7 +268,7 @@ ActiveRecord::Schema.define(version: 20170407202629) do
     t.index ["user_id"], name: "index_tasks_on_user_id", using: :btree
   end
 
-  create_table "test_reports", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "test_reports", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.integer  "task_id",                     null: false

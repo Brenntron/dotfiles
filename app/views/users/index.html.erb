@@ -10,7 +10,7 @@
   </thead>
   <tbody>
     <tr>
-      <td><%= current_user.bugs.open.count %></td>
+      <td><%= current_user.bugs.open_bugs.count %></td>
       <td><%= current_user.bugs.pending.count %></td>
       <td><%= current_user.bugs.pending.count %></td>
       <td><%= current_user.bugs.count %></td>
@@ -24,7 +24,7 @@
       <tr></tr>
       <% current_user.children.each do |user| %>
         <tr>
-          <td><%= user.bugs.open.count %></td>
+          <td><%= user.bugs.open_bugs.count %></td>
           <td><%= user.bugs.pending.count %></td>
           <td><%= user.bugs.closed.count %></td>
           <td><%= user.bugs.count %></td>
@@ -40,7 +40,7 @@
     <% if current_user.child? %>
       <% current_user.siblings.each do |user| %>
           <tr>
-            <td><%= user.bugs.open.count %></td>
+            <td><%= user.bugs.open_bugs.count %></td>
             <td><%= user.bugs.pending.count %></td>
             <td><%= user.bugs.closed.count %></td>
             <td><%= user.bugs.count %></td>
