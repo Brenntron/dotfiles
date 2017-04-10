@@ -36,12 +36,14 @@ require 'tempfile'
 class Rule < ApplicationRecord
   has_paper_trail
 
+  belongs_to :rule_category, optional: true
+
   has_and_belongs_to_many :bugs
   has_and_belongs_to_many :references, dependent: :destroy
+  has_many :test_reports
+  has_many :tasks, through: :test_reports
   has_one :rule_doc, dependent: :destroy
 
-  belongs_to :rule_category, optional: true
-  
   #after_create { |rule| rule.record 'create' if Rails.configuration.websockets_enabled == "true" }
   #after_update { |rule| rule.record 'update' if Rails.configuration.websockets_enabled == "true" }
   #after_destroy { |rule| rule.record 'destroy' if Rails.configuration.websockets_enabled == "true" }
@@ -59,6 +61,13 @@ class Rule < ApplicationRecord
 
   def deleted?
     'DELETED' == self.rule_category.category
+  end
+
+  def latest_test_report(bug, report_timestamp = nil)
+    timestamp = report_timestamp || bug.test_report_timestamp
+    if timestamp
+      test_reports.joins(:task).where(tasks: {bug: bug, stats_updated_at: timestamp}).first
+    end
   end
 
   def record(action)
