@@ -35,6 +35,28 @@ Feature: Bug
     And  I should not see "No Tags in this one"
 
   @javascript
+  Scenario: The bug filter should reset when navigating
+            from the users section to the bugs section
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
+      | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
+      | 222222      | OPEN  | 2       | No Tags in this one                         | Research | Snort Rules | 2.6.0   | test description2 |
+      | 222222      | FIXED | 2       | [BP][NSS] fixed bug                         | Research | Snort Rules | 2.6.0   | test description3 |
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    And  I should see "Bugs"
+    And  I should see "test summary"
+    And  I goto "/bugs?q=open-bugs"
+    Then I should see "No Tags in this one"
+    And  I should see "Open Bugs"
+    And  I should not see "fixed bug"
+    And  I goto "/users"
+    Then I goto "/bugs"
+    And  I should see "test summary"
+    And  I should not see "No Tags in this one"
+
+  @javascript
   Scenario: A user will see a warning message if bug looks to be
             out of synch with bugzilla (probably from a light import).
             Out of synch is based on presence of bug tags.
@@ -166,7 +188,7 @@ Feature: Bug
     Then I should see "take"
     And I should see "vrt_incoming"
     When I click "take"
-    And I wait for "5" seconds
+#    And I wait for "5" seconds
 # uncomment when connectivity to bugzilla test fixed
 #    Then I should not see "vrt_incoming"
 #    And I should see "nherbert"
@@ -188,7 +210,7 @@ Feature: Bug
     Then I should see "return"
     And I should see my username
     When I click "return"
-    And I wait for "5" seconds
+#    And I wait for "5" seconds
 # uncomment when connectivity to bugzilla test fixed
 #    Then I should not see "nherbert"
 #    And I should see "vrt_incoming"
@@ -321,7 +343,7 @@ Feature: Bug
     And "t_bear" should not be in the "bug[user_id]" dropdown list
     And I select "rainbow_b" from "bug[user_id]"
     Then I click button "Save"
-    And I wait for "3" seconds
+#    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "rainbow_b"
 
@@ -359,7 +381,7 @@ Feature: Bug
     And "d_drumph" should not be in the "bug[committer_id]" dropdown list
     And I select "t_bear" from "bug[committer_id]"
     Then I click button "Save"
-    And I wait for "3" seconds
+#    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
 # And I should see "t_bear"
 

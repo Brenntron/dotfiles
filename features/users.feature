@@ -56,10 +56,10 @@ Feature: User Accounts
             A non-manager cannot get to the relationships section.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
-      | id | email                      | cvs_username | display_name        | parent_id |
-      | 2  | rainbows@email.com         | rainbow_b    | Rainbow Brite       |           |
-      | 3  | hclinton@email.com         | h_clinton    | Hillary Clinton     |  2        |
-      | 4  | dtrump@email.com           | d_drumph     | Donald Trump        |           |
+      | id | email                      | cvs_username | display_name        | parent_id | cec_username |
+      | 2  | rainbows@email.com         | rainbow_b    | Rainbow Brite       |           | rainbow_b    |
+      | 3  | hclinton@email.com         | h_clinton    | Hillary Clinton     |  2        | h_clinton    |
+      | 4  | dtrump@email.com           | d_drumph     | Donald Trump        |           | d_drumph     |
 
     And a user with id "1" has a parent with id "2"
 
@@ -191,12 +191,12 @@ Feature: User Accounts
   Scenario: A manager can add and remove team members on the relationships page.
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username  | display_name        | parent_id |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |  1        |
-      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |  2        |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |           |
-      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |  5        |
+      | id | email                | cvs_username  | display_name        | parent_id | cec_username |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |  1        | rainbow_b    |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |  2        | h_clinton    |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |           | d_drumph     |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |  5        | t_bear       |
 
 
     Then I wait for "3" seconds
@@ -216,12 +216,12 @@ Feature: User Accounts
   Scenario: A manager can edit roles of team members on relationships page.
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username  | display_name        | parent_id |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
-      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
-      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+      | id | email                | cvs_username  | display_name        | parent_id | cec_username |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
 
     And the following roles exist:
       | role           |
@@ -253,12 +253,12 @@ Feature: User Accounts
   Scenario: A manager can edit members subordinate manager teams on relationships page.
     Given a manager exists and is logged in
     And the following users exist
-      | id | email                | cvs_username  | display_name        | parent_id |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         |
-      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         |
-      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         |
+      | id | email                | cvs_username  | display_name        | parent_id | cec_username |
+      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
+      | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
 
     And the following roles exist:
       | role           |
@@ -514,7 +514,7 @@ Feature: User Accounts
     Given a user with role "committer" exists and is logged in
     And the following bugs exist:
       | bugzilla_id | state   | user_id | summary                                                 | product  | component   | version | description       |
-      | 111111      | OPEN    | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
+      | 111111      | OPEN    | 2       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
       | 222222      | OPEN    | 2       | No Tags in this one                                     | Research | Snort Rules | 2.6.0   | test description2 |
       | 222222      | FIXED   | 2       | [BP][NSS] fixed bug                                     | Research | Snort Rules | 2.6.0   | test description3 |
       | 333333      | PENDING | 2       | Pending bug I should see                                | Research | Snort Rules | 2.6.0   | test description3 |
@@ -528,7 +528,7 @@ Feature: User Accounts
     Given a user with role "build coordinator" exists and is logged in
     And the following bugs exist:
       | bugzilla_id | state   | user_id | summary                                                 | product  | component   | version | description       |
-      | 111111      | OPEN    | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
+      | 111111      | OPEN    | 2       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
       | 222222      | OPEN    | 2       | No Tags in this one                                     | Research | Snort Rules | 2.6.0   | test description2 |
       | 222222      | FIXED   | 2       | [BP][NSS] fixed bug                                     | Research | Snort Rules | 2.6.0   | test description3 |
       | 333333      | PENDING | 2       | Pending bug I should see                                | Research | Snort Rules | 2.6.0   | test description3 |
