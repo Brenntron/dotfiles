@@ -213,10 +213,12 @@ class Rule < ApplicationRecord
   end
 
   def rule_classification
-    split = rule_content.split(';')
-    classification_index = split.index{|s| s.include?("classtype")}
-    impact = split[classification_index].split(':')[1].scan(/[a-z-]/).join
-    RulesHelper::CLASSIFICATION[impact]
+    if self.class_type
+      impact = self.class_type.scan(/[a-z-]/).join
+      RulesHelper::CLASSIFICATION[impact]
+    else
+      nil
+    end
   end
 
   def self.parse_rule(rule)
@@ -358,6 +360,24 @@ class Rule < ApplicationRecord
     rule.assign(parser.attributes) #if rule.parsed?
 
     rule
+  end
+
+  # Take a line from a user edit and saves to database
+  # @param [String, #read] rule_content the rule content
+  def self.save_assem(assem, rule_id = nil)
+    find_and_assign_rule_content(assem.rule_content, rule_id).tap do |rule|
+      if rule.sid
+        rule.state                        = 'UPDATED'
+        rule.edit_status                  = EDIT_STATUS_EDIT
+      else
+        rule.state                        = 'NEW'
+        rule.edit_status                  = EDIT_STATUS_NEW
+      end
+      rule.state                          = 'FAILED' unless rule.parsed?
+      rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
+
+      rule.save
+    end
   end
 
   # Take a line from a user edit and saves to database
@@ -670,7 +690,7 @@ class Rule < ApplicationRecord
 
   # Creates a rule and its associations
   # @return [Rule]
-  def self.create_action(bug_id, rule_content, rule_doc)
+  def self.create_action(rule_content, rule_doc, bug_id)
     Rule.save_rule_content(rule_content).tap do |rule|
       if bug_id
         bug = Bug.where(id: bug_id).first
@@ -678,6 +698,20 @@ class Rule < ApplicationRecord
       end
 
       rule.associate_references(rule_content)
+      rule.create_rule_doc(rule_doc)
+    end
+  end
+
+  # Creates a rule and its associations
+  # @return [Rule]
+  def self.create_parts_action(rule_params, rule_doc, bug_id)
+    Rule.save_assem(RuleSyntax::Assemposer.new(rule_params)).tap do |rule|
+      if bug_id
+        bug = Bug.where(id: bug_id).first
+        bug.rules << rule if bug
+      end
+
+      rule.associate_references(rule.rule_content)
       rule.create_rule_doc(rule_doc)
     end
   end

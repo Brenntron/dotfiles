@@ -229,6 +229,78 @@ metz.move_to_child_of(nigel)
 
 
 
+gs = User.create(kerberos_login:"gserrao",cvs_username:"gserrao",cec_username:"gserrao",display_name:"Geoff Serrao",committer:true,email:"gserrao@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+lieb = User.create(kerberos_login:"dliebenb",cvs_username:"dliebenb",cec_username:"dliebenb",display_name:"David Liebenberg",committer:true,email:"dliebenb@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+graz = User.create(kerberos_login:"magrazia",cvs_username:"magrazia",cec_username:"magrazia",display_name:"Mariano Graziano",committer:true,email:"magrazia@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+bania = User.create(kerberos_login:"pbania",cvs_username:"pbania",cec_username:"pbania",display_name:"Piotr Bania",committer:true,email:"pbania@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mercer = User.create(kerberos_login:"wmercer",cvs_username:"wmercer",cec_username:"wamercer",display_name:"Warren Mercer",committer:true,email:"wamercer@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mcdan = User.create(kerberos_login:"dmcdaniel",cvs_username:"dmcdaniel",cec_username:"davemcda",display_name:"Dave McDaniel",committer:true,email:"davemcda@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+kbrook = User.create(kerberos_login:"kbrooks",cvs_username:"kbrooks",cec_username:"kevbrook",display_name:"Kevin Brooks",committer:true,email:"kevbrook@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+pfrank = User.create(kerberos_login:"pfrank",cvs_username:"pfrank",cec_username:"paufrank",display_name:"Paul Frank",committer:true,email:"paufrank@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+arnes = User.create(kerberos_login:"jarneson",cvs_username:"jarneson",cec_username:"jarneson",display_name:"John Arneson",committer:true,email:"jarneson@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+erick = User.create(kerberos_login:"egalinkin",cvs_username:"egalinkin",cec_username:"ergalink",display_name:"Erick Galinkin",committer:true,email:"ergalink@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mavis = User.create(kerberos_login:"nmavis",cvs_username:"nmavis",cec_username:"nmavis",display_name:"Nicholas Mavis",committer:true,email:"nmavis@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+rjohn = User.create(kerberos_login:"rjohnson",cvs_username:"rjohnson",cec_username:"richjoh",display_name:"Rich Johnson",committer:true,email:"richjoh@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+rjohn.move_to_child_of(nigel)
+
+
+stultz = User.create(kerberos_login:"bstultz",cvs_username:"bstultz",cec_username:"brastult",display_name:"Brandon Stultz",committer:true,email:"brastult@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+zeiser = User.create(kerberos_login:"mzeiser",cvs_username:"mzeiser",cec_username:"mzeiser",display_name:"Martin Zeiser",committer:true,email:"mzeiser@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+jzadd = User.create(kerberos_login:"jzaddach",cvs_username:"jzaddach",cec_username:"jzaddach",display_name:"Jonas Zaddach",committer:true,email:"jzaddach@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+angel = User.create(kerberos_login:"anvilleg",cvs_username:"anvilleg",cec_username:"anvilleg",display_name:"Angel Villegas",committer:true,email:"anvilleg@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+mcbee = User.create(kerberos_login:"cmcbee",cvs_username:"cmcbee",cec_username:"chmcbee",display_name:"Christopher McBee",committer:true,email:"chmcbee@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+pacho = User.create(kerberos_login:"cpacho",cvs_username:"cpacho",cec_username:"cpacho",display_name:"Carlos Pacho",committer:true,email:"cpacho@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+rich = User.create(kerberos_login:"richard.harman",cvs_username:"richard.harman",cec_username:"rharmanj",display_name:"Richard Harman Jr",committer:true,email:"rharmanj@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+suan = User.create(kerberos_login:"nsuan",cvs_username:"nsuan",cec_username:"nsuan",display_name:"Nick Suan",committer:true,email:"nsuan@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+dvl = User.create(kerberos_login:"dvl",cvs_username:"dvl",cec_username:"dalangil",display_name:"Dan Langille",committer:true,email:"dalangil@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+lazlo = User.create(kerberos_login:"ldanieli",cvs_username:"ldanieli",cec_username:"ldanieli",display_name:"Laszlo Danielisz",committer:true,email:"ldanieli@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+felder = User.create(kerberos_login:"mafelder",cvs_username:"mafelder",cec_username:"mafelder",display_name:"Mark Felder",committer:true,email:"mafelder@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+mclov = User.create(kerberos_login:"kmiklavcic",cvs_username:"kmiklavcic",cec_username:"kmiklavc",display_name:"Kevin Miklavcic",committer:true,email:"kmiklavc@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+suffl = User.create(kerberos_login:"dsuffling",cvs_username:"dsuffling",cec_username:"dsufflin",display_name:"Dave Suffling",committer:true,email:"dsufflin@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+samir = User.create(kerberos_login:"ssapra",cvs_username:"ssapra",cec_username:"ssapra",display_name:"Samir Sapra",committer:true,email:"ssapra@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+judge = User.create(kerberos_login:"tjudge",cvs_username:"tjudge",cec_username:"tomjudge",display_name:"Tom Judge",committer:true,email:"tomjudge@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+
+lin = User.create(kerberos_login:"klin",cvs_username:"klin",cec_username:"kevlin2",display_name:"Kevin Lin",committer:true,email:"kevlin2@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+
+metz = User.create(kerberos_login:"rsteinmetz",cvs_username:"rsteinmetz",cec_username:"rsteinme",display_name:"Ryan Steinmetz",committer:true,email:"rsteinme@cisco.com",confirmed:true,password:'acpassword',password_confirmation:'acpassword')
+metz.move_to_child_of(nigel)
+
+
+
+
+
 User.all.each do |u|
   u.update_attributes(class_level: 0)
 end

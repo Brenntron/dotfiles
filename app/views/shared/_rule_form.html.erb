@@ -49,7 +49,7 @@
         <div class="col-xs-10"><div class="form-inline">
           <%=select_tag :rule_category_id, options_for_select(@categories.map{|rc| [rc.category, rc.id]}), prompt: 'select a category', class: "form-control create-input select-sm code", required: "true"%>
           <label for="message"></label>
-          <input class="form-control create-input select-sm code" name="rule[message]" id="message" type="text" placeholder="enter a message" style="width:75%;" required="required" />
+          <input class="form-control create-input select-sm code" name="rule[message]" id="std-form-message" type="text" placeholder="enter a message" style="width:75%;" required="required" />
         </div>
         </div>
       </div>
@@ -69,58 +69,68 @@
         </div>
         <div class="col-xs-10 col-sm-11">
           <label for="connectionText" class="control-label sr-only">Connection</label>
-          <div class="form-inline code">
-            <select class="form-control select-sm connectionForm" name="rule[connection][]">
+          <div class="form-inline">
+            <select name="rule[action]" id="std-form-action" class="form-control select-sm connectionForm">
               <% ['alert', 'drop'].each do |type| %>
                   <option value="<%= type %>"><%= type %></option>
               <% end %>
             </select>
-            <select class="form-control select-sm connectionForm" name="rule[connection][]">
+            <select name="rule[protocol]" id="std-form-protocol" class="form-control select-sm connectionForm">
               <% ['tcp','udp','ip','icmp'].each do |type| %>
                   <option value="<%= type %>"><%= type %></option>
               <% end %>
             </select>
-            <select class="form-control select-sm connectionForm" name="rule[connection][]">
+            <select name="rule[src]" id="std-form-src" class="form-control select-sm connectionForm">
               <% ['$EXTERNAL_NET', '$HOME_NET', '$DNS_SERVERS', '$SMTP_SERVERS', '$HTTP_SERVERS', '$SQL_SERVERS',
-                  '$TELNET_SERVERS', '$SSH_SERVERS', '$FTP_SERVERS','$SIP_SERVERS', '$AIM_SERVERS'].each do |dstsrc| %>
+                  '$TELNET_SERVERS', '$SSH_SERVERS', '$FTP_SERVERS','$SIP_SERVERS', '$AIM_SERVERS', 'any'].each do |dstsrc| %>
                   <option value=<%= dstsrc %>><%= dstsrc %></option>
               <% end %>
             </select>
             <div class="input-group">
-              <input type="text" class="form-control input-select connectionForm" name="rule[connection][]" id="flow_src_ports" size="14" style="height:28px;">
+              <input type="text" name="rule[srcport]" id="flow_src_ports"
+                     class="form-control input-select connectionForm" size="14" style="height:28px;">
               <div class="input-group-btn">
-                <select class="form-control input-select-include" data-toggle="dropdown" style="height:28px;"><span class="caret"></span></select>
-                <ul class="dropdown-menu-rules">
-                  <% ['$HTTP_PORTS','$SHELLCODE_PORTS', '$ORACLE_PORTS', '$SSH_PORTS', '$FTP_PORTS', '$SIP_PORTS', '$FILE_DATA_PORTS'].each do |srcport| %>
+                <select id="std-form-srcport-select" class="form-control input-select-include"
+                        data-toggle="dropdown" style="height:28px;"><span class="caret"></span></select>
+                <ul class="dropdown-menu">
+                  <% ['$HTTP_PORTS','$SHELLCODE_PORTS', '$ORACLE_PORTS', '$SSH_PORTS',
+                      '$FTP_PORTS', '$SIP_PORTS', '$FILE_DATA_PORTS', 'any'].each do |srcport| %>
                     <li><a class="select-sm flow_src_ports" href="#"><%= srcport %></a></li>
                   <% end %>
                 </ul>
               </div>
             </div>
-            <select class="form-control select-sm connectionForm" name="rule[connection][]">
+            <select class="form-control select-sm connectionForm" name="rule[direction]">
               <% ["->","<->"].each do |direction| %>
                   <option value="<%= direction %>"><%= direction %></option>
               <% end %>
             </select>
             <div class="input-group">
-              <input type="text" class="form-control input-select connectionForm" name="rule[connection][]" id="flow_dst_server" size="14" style="height:28px;">
+              <input type="text" class="form-control input-select connectionForm" name="rule[dst]" id="flow_dst_server" size="14" style="height:28px;">
               <div class="input-group-btn">
                 <select class="form-control input-select-include" data-toggle="dropdown" style="height:28px;"><span class="caret"></span></select>
-                <ul class="dropdown-menu-rules">
+                <ul class="dropdown-menu">
                   <% ['$HOME_NET', '$EXTERNAL_NET', '$DNS_SERVERS', '$SMTP_SERVERS', '$HTTP_SERVERS', '$SQL_SERVERS',
-                      '$TELNET_SERVERS', '$SSH_SERVERS', '$FTP_SERVERS','$SIP_SERVERS', '$AIM_SERVERS'].each do |srcport| %>
-                      <li><a class="select-sm flow_dst_server" href="#"><%= srcport %></a></li>
+                      '$TELNET_SERVERS', '$SSH_SERVERS', '$FTP_SERVERS','$SIP_SERVERS', '$AIM_SERVERS', 'any'].each do |dst| %>
+                      <li><a class="select-sm flow_dst_server" href="#"><%= dst %></a></li>
                   <% end %>
                 </ul>
               </div>
             </div>
-            <select class="form-control select-sm connectionForm" name="rule[connection][]">
-              <% ['$HOME_NET', '$EXTERNAL_NET', '$DNS_SERVERS', '$SMTP_SERVERS', '$HTTP_SERVERS', '$SQL_SERVERS',
-                  '$TELNET_SERVERS', '$SSH_SERVERS', '$FTP_SERVERS','$SIP_SERVERS', '$AIM_SERVERS'].each do |dstsrc| %>
-                  <option value="<%= dstsrc %>"><%= dstsrc %></option>
-              <% end %>
-            </select>
-            <input class="form-control select-sm dst-prt connectionForm" name="rule[connection][]" value="any">
+            <div class="input-group">
+              <input type="text" name="rule[dstport]" id="flow_dst_ports"
+                     class="form-control input-select connectionForm" size="14" style="height:28px;">
+              <div class="input-group-btn">
+                <select id="std-form-dstport-select" class="form-control input-select-include"
+                        data-toggle="dropdown" style="height:28px;"><span class="caret"></span></select>
+                <ul class="dropdown-menu">
+                  <% ['$HTTP_PORTS','$SHELLCODE_PORTS', '$ORACLE_PORTS', '$SSH_PORTS',
+                      '$FTP_PORTS', '$SIP_PORTS', '$FILE_DATA_PORTS', 'any'].each do |dstport| %>
+                      <li><a class="select-sm flow_dst_ports" href="#"><%= dstport %></a></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -183,7 +193,8 @@
         <div class="entry-type-switch">
         </div>
         <div class="col-xs-10">
-          <textarea class="form-control create-input select-sm code" rows=10 name="rule[detection]" placeholder="enter detection" required="true"></textarea>
+          <div class="example">Example: content:"200"; flowbits:isset,http.mokes;</div>
+          <textarea name="rule[detection]" id="std-form-detection" required="true" placeholder="enter detection" class="form-control create-input select-sm code" rows=10></textarea>
         </div>
       </div>
     </div>
@@ -367,7 +378,7 @@
     });
   });
 
-  $('.flow_src_ports, .flow_dst_server').on("click", function(e){
+  $('.flow_src_ports, .flow_dst_server, .flow_dst_ports').on("click", function(e){
     e.preventDefault();
     var id = $(this).attr('class');
     id = id.substr(id.indexOf(' ')+1, id.length);
@@ -375,3 +386,4 @@
   });
 
 </script>
+
