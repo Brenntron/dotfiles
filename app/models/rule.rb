@@ -436,6 +436,25 @@ class Rule < ApplicationRecord
     end
   end
 
+  def load_rule_content(rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+
+    assign_from_visrule(rule_content)
+
+    assign(parser.attributes) #if rule.parsed?
+    byebug
+
+    self.cvs_rule_content               = self.rule_content
+    self.cvs_rule_parsed                = self.rule_parsed
+
+    self.edit_status                    = EDIT_STATUS_SYNCHED
+    self.publish_status                 = PUBLISH_STATUS_SYNCHED
+    self.state                          = 'UNCHANGED'
+    self.save!
+    self.associate_references(rule_content)
+    self
+  end
+
   # Take a line from a rule file and saves to database if rule is unedited
   # Assumes rule content comes from synching VC.
   # @param [String, #read] rule_content the line of text from a rule file.
@@ -467,6 +486,23 @@ class Rule < ApplicationRecord
   # @param [String, #read] rule_grep_line the line of text from a rule file.
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
+  def revert_grep(rule_grep_line)
+    filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+
+    rule_content.strip!
+    if rule_content.empty?
+      nil
+    else
+      load_rule_content(rule_content).tap do |rule|
+        rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
+      end
+    end
+  end
+
+  # Take a line from grep output of a rule file and saves to database unless rev is unchanged
+  # @param [String, #read] rule_grep_line the line of text from a rule file.
+  # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
+  # @raise [RuntimeError] could not process
   def self.load_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
 
@@ -484,6 +520,12 @@ class Rule < ApplicationRecord
 
   def self.load_rule(sid, gid, filepath = nil)
     load_grep(grep_line_from_file(sid, gid, filepath))
+  rescue
+    nil
+  end
+
+  def revert_rule
+    revert_grep(Rule.grep_line_from_file(sid, gid, filename))
   rescue
     nil
   end
@@ -752,6 +794,15 @@ class Rule < ApplicationRecord
       rule.associate_references(rule.rule_content)
       rule.create_rule_doc(rule_doc)
     end
+  end
+
+  def self.revert_rules_action(rule_ids)
+    rule_ids.each do |id|
+      rule = Rule.where(id: id).first
+      rule.revert_rule
+    end
+
+    true
   end
 
   # Updates a rule and its associations
