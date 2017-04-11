@@ -422,7 +422,7 @@ sub process_line {
 #print Dumper($r->{metadata});
    print "Metadata  :";
    if( $r->{metadata} ){
-      if( $r->{metadata}{policy} && keys $r->{metadata}{policy} ){
+      if( $r->{metadata}{policy} && keys %{$r->{metadata}{policy}} ){
 #print "POLICY: >>" . Dumper($r->{metadata}{policy}) . "<<\n";
          print "\n" . " "x$indent . "Policy: " . join(', ', keys %{$r->{metadata}{policy}}) . "\n";
          # ZDNOTE I'd like to sort these in a specific order, but no time atm so at least it'll be consistent
@@ -490,6 +490,10 @@ sub process_line {
                   } else {
                      push(@failed, 'Reference: Improperly formatted Microsoft reference');
                   }
+               }
+            } elsif($key =~ /talosintel.*TALOS/i) {
+               if(!($key =~ /www.talosintelligence.com\/reports\/TALOS-(CAN|\d{4})-\d{4}/)) {
+                  push(@warnings, 'Reference: Improperly formatted Talos Intelligence reference (www.talosintelligence.com/reports/TALOS-YYYY-NNNN)');     
                }
             } elsif($key =~ /osvdb\.org/) {
                if(!($key =~ /osvdb\.org\/show\/osvdb\/\d+($|\s)/)) {
