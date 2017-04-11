@@ -87,7 +87,7 @@
               <% end %>
             </select>
             <div class="input-group">
-              <input type="text" name="rule[srcport]" id="flow_src_ports"
+              <input type="text" name="rule[srcport]" id="flow_src_ports" value="any"
                      class="form-control input-select connectionForm" size="14" style="height:28px;">
               <div class="input-group-btn">
                 <select id="std-form-srcport-select" class="form-control input-select-include"
@@ -106,7 +106,8 @@
               <% end %>
             </select>
             <div class="input-group">
-              <input type="text" class="form-control input-select connectionForm" name="rule[dst]" id="flow_dst_server" size="14" style="height:28px;">
+              <input type="text" name="rule[dst]" id="flow_dst_server"
+                     class="form-control input-select connectionForm" size="14" style="height:28px;">
               <div class="input-group-btn">
                 <select class="form-control input-select-include" data-toggle="dropdown" style="height:28px;"><span class="caret"></span></select>
                 <ul class="dropdown-menu">
@@ -118,7 +119,7 @@
               </div>
             </div>
             <div class="input-group">
-              <input type="text" name="rule[dstport]" id="flow_dst_ports"
+              <input type="text" name="rule[dstport]" id="flow_dst_ports" value="any"
                      class="form-control input-select connectionForm" size="14" style="height:28px;">
               <div class="input-group-btn">
                 <select id="std-form-dstport-select" class="form-control input-select-include"
