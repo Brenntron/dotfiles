@@ -192,7 +192,7 @@ Feature: Bug
     Then I should see "take"
     And I should see "vrt_incoming"
     When I click "take"
-#    And I wait for "5" seconds
+    And I wait for "5" seconds
 # uncomment when connectivity to bugzilla test fixed
 #    Then I should not see "vrt_incoming"
 #    And I should see "nherbert"
@@ -214,7 +214,7 @@ Feature: Bug
     Then I should see "return"
     And I should see my username
     When I click "return"
-#    And I wait for "5" seconds
+    And I wait for "5" seconds
 # uncomment when connectivity to bugzilla test fixed
 #    Then I should not see "nherbert"
 #    And I should see "vrt_incoming"

@@ -160,16 +160,16 @@ class Bug < ApplicationRecord
       state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
       state_params[:pending_at] = Time.now
       if bug.state == 'REOPENED'
-        state_params[:rework_time] = ((state_params[:pending_at] - bug.reopened_at) / 86_400).ceil
+        state_params[:rework_time] = ((state_params[:pending_at] - (bug.reopened_at || Time.now)) / 86_400).ceil
       else
-        state_params[:work_time] = ((state_params[:pending_at] - bug.assigned_at) / 86_400).ceil
+        state_params[:work_time] = ((state_params[:pending_at] - (bug.assigned_at || Time.now)) / 86_400).ceil
       end
     when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
       state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
       state_params[:resolved_at] = Time.now
-      state_params[:review_time] = ((state_params[:resolved_at] - bug.pending_at) / 86_400).ceil
+      state_params[:review_time] = ((state_params[:resolved_at] - (bug.pending_at || Time.now)) / 86_400).ceil
     when 'REOPENED'
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
