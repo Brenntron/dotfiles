@@ -74,6 +74,8 @@ $ ->
     data.append( 'note[comment]', $('textarea[name="research_notes"]').val())
     data.append( 'note[note_type]', $('input[name="note_type"]').val())
     data.append( 'note[id]', $('input[name="note_id"]').val())
+    $('#publishing_note').removeClass('hidden').show()
+    $('#researchNotesPublishBtn').addClass('hidden').hide()
     $.ajax {
       url: "/notes/publish_to_bugzilla"
       data: data
@@ -88,6 +90,8 @@ $ ->
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
         $('#researchNotesPublishBtn').attr('disabled', true)
+        $('#publishing_note').addClass('hidden').hide()
+        $('#researchNotesPublishBtn').removeClass('hidden').show()
         div = '<div class="row top-space research-note">'+
           '<div class="col-xs-6">'+
           '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+
@@ -112,6 +116,8 @@ $ ->
       error: (response) ->
         $('.alert_notes').removeClass('success')
         $('.alert_notes').addClass('error').show().html(response.responseText)
+        $('#publishing_note').addClass('hidden').hide()
+        $('#researchNotesPublishBtn').removeClass('hidden').show()
       complete: ->
         setTimeout (->
           $('.alert_notes').hide 'blind', {}, 5000
@@ -126,6 +132,8 @@ $ ->
     data.append( 'note[comment]', $('textarea[name="committer_notes"]').val())
     data.append( 'note[note_type]', $('input[name="committer_type"]').val())
     data.append( 'note[id]', $('input[name="committer_note_id"]').val())
+    $('#publishing_committer_note').removeClass('hidden').show()
+    $('#committerNotesPublishBtn').addClass('hidden').hide()
     $.ajax {
       url: "/notes/publish_to_bugzilla"
       data: data
@@ -139,6 +147,8 @@ $ ->
         $('.alert_notes').removeClass('error')
         $('.alert_notes').addClass('success').show().html('Notes published to bugzilla')
         $('#committerNotesPublishBtn').attr('disabled', true)
+        $('#publishing_committer_note').addClass('hidden').hide()
+        $('#committerNotesPublishBtn').removeClass('hidden').show()
         div = '<div class="row top-space research-note">'+
           '<div class="col-xs-6">'+
           '<p class="small text-muted">written by <strong>'+note["author"]+'</strong></p>'+
@@ -163,6 +173,8 @@ $ ->
       error: (response) ->
         $('.alert_notes').removeClass('success')
         $('.alert_notes').addClass('error').show().html(response.responseText)
+        $('#publishing_committer_note').addClass('hidden').hide()
+        $('#committerNotesPublishBtn').removeClass('hidden').show()
       complete: ->
         setTimeout (->
           $('.alert_notes').hide 'blind', {}, 5000
