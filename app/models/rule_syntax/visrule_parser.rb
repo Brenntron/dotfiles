@@ -27,7 +27,7 @@ module RuleSyntax
         unless text.empty?
           @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
           @errors = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
-          @errors += stderr.read
+          @stderr = stderr.read
         end
       end
       temp_rule.close
@@ -47,6 +47,13 @@ module RuleSyntax
         parse
       end
       @errors
+    end
+
+    def stderr
+      unless @stderr
+        parse
+      end
+      @stderr
     end
 
     # Is enough in the snort rule format for visruleparser to recognize it as a rule.

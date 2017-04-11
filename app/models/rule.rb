@@ -1,4 +1,3 @@
-require 'open3'
 require 'tempfile'
 
 # Records for rules both synched with CVS and drafts of rules from the UI.
