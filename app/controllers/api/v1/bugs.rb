@@ -317,8 +317,6 @@ module API
             optional :priority, type: String, desc: "How soon should this bug get fixed"
             optional :severity, type: String, desc: "How terrible is this bug"
             optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
-            optional :user_id, type: Integer, desc: "the user this bug is assigned to"
-            # all the params we need to permit must to go here
           end
         end
         post "", root: "bug" do
