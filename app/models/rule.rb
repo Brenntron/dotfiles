@@ -379,6 +379,12 @@ class Rule < ApplicationRecord
     self.attributes
   end
 
+  # Gets rule with fields set from contents of rule content.
+  #
+  # Parses rule content.  Finds or creates rule for the given sid and gid.
+  # Set the rule fields to components from parsing rule content.
+  # Does not save the rule.
+  # @param [String, #read] rule_content the rule content
   def self.robust_find(rule_content, sid, gid, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
 
@@ -390,32 +396,15 @@ class Rule < ApplicationRecord
     rule
   end
 
-
-  # Gets rule with fields set from contents of rule content.
-  #
-  # Parses rule content.  Finds or creates rule for the given sid and gid.
-  # Set the rule fields to components from parsing rule content.
-  # Does not save the rule.
-  # @param [String, #read] rule_content the rule content
-  def self.find_and_assign_rule_content(rule_content, rule_id = nil)
-    parser = RuleSyntax::RuleParser.new(rule_content)
-
-    rule = nil
-    rule = Rule.by_sid(parser.sid, parser.gid).first if parser.sid
-    rule ||= Rule.where(id: rule_id).first if rule_id
-    rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
-
-    rule.assign_from_visrule(rule_content)
-
-    rule.assign(parser.attributes) #if rule.parsed?
-
-    rule
-  end
-
   # Take a line from a user edit and saves to database
   # @param [String, #read] rule_content the rule content
   def self.save_rule_content(rule_content, rule_id = nil)
-    find_and_assign_rule_content(rule_content, rule_id).tap do |rule|
+    parser = RuleSyntax::RuleParser.new(rule_content)
+
+    robust_find(rule_content, parser.sid, parser.gid, rule_id).tap do |rule|
+      rule.assign_from_visrule(rule_content)
+      rule.assign(parser.attributes)
+
       if rule.sid
         rule.state                        = 'UPDATED'
         rule.edit_status                  = EDIT_STATUS_EDIT
