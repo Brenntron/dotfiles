@@ -123,30 +123,30 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.create_a_rule(content)
-    begin
-      raise Exception.new('No rules to add') if content.blank?
-      text_rules = content.each_line.to_a.sort.uniq.map { |t| t.chomp }.compact.reject { |e| e.empty? }
-      raise Exception.new('No rules to add') if text_rules.empty?
-      # Loop through all of the rules
-      text_rules.each do |text_rule|
-        begin
-          if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
-            @record = Rule.update_generate_rule($1)
-            @record.state = 'New'
-            @record.edit_status = EDIT_STATUS_NEW
-            @record.publish_status = PUBLISH_STATUS_CURRENT_EDIT
-            @record.rev = 1
-            @record.save
-          end
-        rescue Exception => e
-          raise Exception.new("{rule_error: {content: #{text_rule},error:#{e}}}")
-        end
-      end
-    rescue Exception => e
-      raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e}}}")
-    end
-  end
+  # def self.create_a_rule(content)
+  #   begin
+  #     raise Exception.new('No rules to add') if content.blank?
+  #     text_rules = content.each_line.to_a.sort.uniq.map { |t| t.chomp }.compact.reject { |e| e.empty? }
+  #     raise Exception.new('No rules to add') if text_rules.empty?
+  #     # Loop through all of the rules
+  #     text_rules.each do |text_rule|
+  #       begin
+  #         if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
+  #           @record = Rule.update_generate_rule($1)
+  #           @record.state = 'New'
+  #           @record.edit_status = EDIT_STATUS_NEW
+  #           @record.publish_status = PUBLISH_STATUS_CURRENT_EDIT
+  #           @record.rev = 1
+  #           @record.save
+  #         end
+  #       rescue Exception => e
+  #         raise Exception.new("{rule_error: {content: #{text_rule},error:#{e}}}")
+  #       end
+  #     end
+  #   rescue Exception => e
+  #     raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e}}}")
+  #   end
+  # end
 
   def self.gid_regexp(gid)
     Regexp.new("gid:\\s*#{gid}\\s*;")
@@ -178,77 +178,65 @@ class Rule < ApplicationRecord
     rule_grep_lines[0]
   end
 
-  # def import
-  #   grep_filename, line_number, rule_content = Rule.grep_line_from_file(sid, gid, filename).partition(/:\d+:/)
+  # def extract_rule
+  #   begin
+  #     if !content.nil?
   #
-  #   rule_attrs = Rule.hash_from_rule_content(rule_content, self.sid)
-  #   rule_attrs[:state] = 'UNCHANGED'
-  #   rule_attrs[:edit_status] = EDIT_STATUS_SYNCHED
-  #   rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
-  #   update!(rule_attrs)
+  #       # Make sure we don't have multiple rules in one
+  #       if content =~ /[\r\n]/
+  #         raise 'Only create one rule at a time'
+  #       end
   #
-  #   self
+  #       # First make sure we can parse it
+  #       parsed = Rule.parse_rule(content)
+  #
+  #       if parsed.nil?
+  #         raise 'Failed to parse rule'
+  #       end
+  #
+  #       if !parsed['sid'].nil? && !sid.nil?
+  #         raise "Mismatched sid in updated rule. Expected #{sid} not #{parsed['sid']}" if parsed['sid'] != sid
+  #       end
+  #
+  #       self.message = parsed['name']
+  #       self.gid = 1
+  #       self.sid = parsed['sid']
+  #       self.rev = parsed['revision']
+  #       self.content = parsed['optomized']
+  #
+  #       unless parsed['references'].nil?
+  #         parsed['references'].each do |type, ref|
+  #           begin
+  #             reference_type = ReferenceType.find_by_name(type)
+  #
+  #             unless reference_type.nil?
+  #               reference = Reference.find_or_create_by_reference_type_id_and_data(reference_type.id, ref.keys.first)
+  #
+  #               if !references.empty?
+  #                 if !references.includes?(reference)
+  #                   references << reference
+  #                 end
+  #               end
+  #             end
+  #           rescue ActiveRecord::RecordNotUnique => e
+  #             # Ignore
+  #           rescue Exception => e
+  #             raise
+  #           end
+  #         end
+  #       end
+  #     elsif gid.nil?
+  #       raise 'Neither gid nor sid content is set'
+  #     end
+  #     return true
+  #   rescue Exception => e
+  #     errors.add(:base, e.to_s)
+  #     e.backtrace.each do |l|
+  #       errors.add(:base, l)
+  #     end
+  #     return false
+  #   end
   # end
-
-  def extract_rule
-    begin
-      if !content.nil?
-
-        # Make sure we don't have multiple rules in one
-        if content =~ /[\r\n]/
-          raise 'Only create one rule at a time'
-        end
-
-        # First make sure we can parse it
-        parsed = Rule.parse_rule(content)
-
-        if parsed.nil?
-          raise 'Failed to parse rule'
-        end
-
-        if !parsed['sid'].nil? && !sid.nil?
-          raise "Mismatched sid in updated rule. Expected #{sid} not #{parsed['sid']}" if parsed['sid'] != sid
-        end
-
-        self.message = parsed['name']
-        self.gid = 1
-        self.sid = parsed['sid']
-        self.rev = parsed['revision']
-        self.content = parsed['optomized']
-
-        unless parsed['references'].nil?
-          parsed['references'].each do |type, ref|
-            begin
-              reference_type = ReferenceType.find_by_name(type)
-
-              unless reference_type.nil?
-                reference = Reference.find_or_create_by_reference_type_id_and_data(reference_type.id, ref.keys.first)
-
-                if !references.empty?
-                  if !references.includes?(reference)
-                    references << reference
-                  end
-                end
-              end
-            rescue ActiveRecord::RecordNotUnique => e
-              # Ignore
-            rescue Exception => e
-              raise
-            end
-          end
-        end
-      elsif gid.nil?
-        raise 'Neither gid nor sid content is set'
-      end
-      return true
-    rescue Exception => e
-      errors.add(:base, e.to_s)
-      e.backtrace.each do |l|
-        errors.add(:base, l)
-      end
-      return false
-    end
-  end
 
   def rule_classification
     if self.class_type
@@ -319,16 +307,16 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.hash_visrule(ruleline)
-    ruleline.split("\n").inject({}) do |attrs, line|
-      if /^\s*(?<key>\w*)\s*:(?<value>.*)$/ =~ line
-        value = value[1..-1] if ' ' == value[0]
-        attrs[key.downcase.to_sym] = value
-      end
-
-      attrs
-    end
-  end
+  # def self.hash_visrule(ruleline)
+  #   ruleline.split("\n").inject({}) do |attrs, line|
+  #     if /^\s*(?<key>\w*)\s*:(?<value>.*)$/ =~ line
+  #       value = value[1..-1] if ' ' == value[0]
+  #       attrs[key.downcase.to_sym] = value
+  #     end
+  #
+  #     attrs
+  #   end
+  # end
 
   def self.gid_from_visrule(rule_content, parsed_attrs)
     return parsed_attrs[:gid] if parsed_attrs[:gid]
@@ -339,15 +327,16 @@ class Rule < ApplicationRecord
     gid_match ? gid_match.to_i : 1
   end
 
-  # Runs the visruleparser perl script to parse a line of rule text.
-  # @param [String, #read] rule_text the line of rule text
-  # @return [Hash] hash with :rule and :errors text populated.
-  def self.visruleparser(rule_content)
-    parser = RuleSyntax::VisruleParser.new(rule_content)
-    { rule: parser.parsed_lines, errors: parser.errors }
-  end
+  # # Runs the visruleparser perl script to parse a line of rule text.
+  # # @param [String, #read] rule_text the line of rule text
+  # # @return [Hash] hash with :rule and :errors text populated.
+  # def self.visruleparser(rule_content)
+  #   parser = RuleSyntax::VisruleParser.new(rule_content)
+  #   { rule: parser.parsed_lines, errors: parser.errors }
+  # end
 
   # Extracts components from VisruleParser and sets field of rule.
+  #
   # Does not save the rule.
   # Does not set state, edit_status, or publish_status,
   # because these depend on where the rule and rule_content originated.
@@ -373,18 +362,24 @@ class Rule < ApplicationRecord
     self
   end
 
+  # assings fields from attributes output of parser
+  #
+  # calls assign_attributes.
+  # does not save rule.
+  # @param [Hash, #read]
   def assign(attributes)
     assign_attributes(attributes.slice(*%i(rev message connection flow detection class_type metadata message)))
     self.rule_category = RuleCategory.find_or_create_by(category: attributes[:rule_category])
     self.attributes
   end
 
-  # Gets rule with fields set from contents of rule content.
+  # Does a robust query or create new rule.
   #
-  # Parses rule content.  Finds or creates rule for the given sid and gid.
-  # Set the rule fields to components from parsing rule content.
-  # Does not save the rule.
-  # @param [String, #read] rule_content the rule content
+  # Finds a rule from the sid and gid of parser, or optionally the rule id.
+  # Returns new rule if none is found.
+  # Does not change or save the rule.
+  # @param [RuleSyntax::RuleParser, #read] parser constructed from the rule_content
+  # @param [Integer, #read] rule_id the rule id if known
   def self.find_from_parser(parser, rule_id = nil)
     rule = nil
     rule = Rule.by_sid(parser.sid, parser.gid).first if parser.sid
@@ -396,6 +391,7 @@ class Rule < ApplicationRecord
 
   # Take a line from a user edit and saves to database
   # @param [String, #read] rule_content the rule content
+  # @param [Integer, #read] rule_id the rule id if known
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
 
@@ -417,6 +413,9 @@ class Rule < ApplicationRecord
     end
   end
 
+  # Forces a load of the rule from the rule_content.
+  # Assumed to be loaded from a rules file (either a synch or revert).
+  # @param [String, #read] rule_content
   def load_rule_content(rule_content)
     parser = RuleSyntax::RuleParser.new(rule_content)
 
@@ -456,7 +455,7 @@ class Rule < ApplicationRecord
     end
   end
 
-  # Take a line from grep output of a rule file and saves to database unless rev is unchanged
+  # Take a line from grep output of a rule file and saves to database
   # @param [String, #read] rule_grep_line the line of text from a rule file.
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
@@ -473,7 +472,7 @@ class Rule < ApplicationRecord
     end
   end
 
-  # Take a line from grep output of a rule file and saves to database unless rev is unchanged
+  # Take a line from grep output of a rule file and saves to database
   # @param [String, #read] rule_grep_line the line of text from a rule file.
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
