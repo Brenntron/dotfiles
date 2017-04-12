@@ -402,24 +402,6 @@ class Rule < ApplicationRecord
 
   # Take a line from a user edit and saves to database
   # @param [String, #read] rule_content the rule content
-  def self.save_assem(assem, rule_id = nil)
-    find_and_assign_rule_content(assem.rule_content, rule_id).tap do |rule|
-      if rule.sid
-        rule.state                        = 'UPDATED'
-        rule.edit_status                  = EDIT_STATUS_EDIT
-      else
-        rule.state                        = 'NEW'
-        rule.edit_status                  = EDIT_STATUS_NEW
-      end
-      rule.state                          = 'FAILED' unless rule.parsed?
-      rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
-
-      rule.save
-    end
-  end
-
-  # Take a line from a user edit and saves to database
-  # @param [String, #read] rule_content the rule content
   def self.save_rule_content(rule_content, rule_id = nil)
     find_and_assign_rule_content(rule_content, rule_id).tap do |rule|
       if rule.sid
@@ -441,7 +423,7 @@ class Rule < ApplicationRecord
 
     assign_from_visrule(rule_content)
 
-    assign(parser.attributes) #if rule.parsed?
+    assign(parser.attributes)
     byebug
 
     self.cvs_rule_content               = self.rule_content
@@ -785,7 +767,7 @@ class Rule < ApplicationRecord
   # Creates a rule and its associations
   # @return [Rule]
   def self.create_parts_action(rule_params, rule_doc, bug_id)
-    Rule.save_assem(RuleSyntax::Assemposer.new(rule_params)).tap do |rule|
+    Rule.save_rule_content(RuleSyntax::Assemposer.new(rule_params).rule_content).tap do |rule|
       if bug_id
         bug = Bug.where(id: bug_id).first
         bug.rules << rule if bug
