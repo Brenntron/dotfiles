@@ -443,15 +443,17 @@ class Rule < ApplicationRecord
   # @return [Rule] the rule loaded or nil if failed
   # @raise [RuntimeError] could not process
   def self.synch_rule_content(rule_content)
-    rule = find_and_assign_rule_content(rule_content)
-    return nil unless rule.sid          # rule in file is a new rule with sid unassigned
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    return nil unless parser.sid          # rule in file is a new rule with sid unassigned
 
-    rule_db = by_sid(rule.sid, rule.gid).first
+    rule_db = by_sid(parser.sid, parser.gid).first
 
-    if rule.persisted? && rule_db.draft?
+    if rule_db && rule_db.draft?
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db
     else
+      rule = find_and_assign_rule_content(rule_content)
+
       rule.cvs_rule_content             = rule.rule_content
       rule.cvs_rule_parsed              = rule.rule_parsed
 
