@@ -379,6 +379,18 @@ class Rule < ApplicationRecord
     self.attributes
   end
 
+  def self.robust_find(rule_content, sid, gid, rule_id = nil)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+
+    rule = nil
+    rule = Rule.by_sid(parser.sid, parser.gid).first if parser.sid
+    rule ||= Rule.where(id: rule_id).first if rule_id
+    rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
+
+    rule
+  end
+
+
   # Gets rule with fields set from contents of rule content.
   #
   # Parses rule content.  Finds or creates rule for the given sid and gid.
@@ -424,7 +436,6 @@ class Rule < ApplicationRecord
     assign_from_visrule(rule_content)
 
     assign(parser.attributes)
-    byebug
 
     self.cvs_rule_content               = self.rule_content
     self.cvs_rule_parsed                = self.rule_parsed
@@ -452,7 +463,9 @@ class Rule < ApplicationRecord
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db
     else
-      rule = find_and_assign_rule_content(rule_content)
+      rule = robust_find(rule_content, parser.sid, parser.gid)
+      rule.assign_from_visrule(rule_content)
+      rule.assign(parser.attributes)
 
       rule.cvs_rule_content             = rule.rule_content
       rule.cvs_rule_parsed              = rule.rule_parsed
