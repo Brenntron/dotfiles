@@ -62,6 +62,19 @@ class Rule < ApplicationRecord
     'DELETED' == self.rule_category.category
   end
 
+  def should_be_on?
+    case
+      when /policy balanced-ips/ =~ self.metadata
+        true
+      when /policy connectivity-ips/ =~ self.metadata
+        true
+      when /flowbits\s*:\s*set\s*,/ =~ self.detection
+        true
+      else
+        false
+    end
+  end
+
   def latest_test_report(bug, report_timestamp = nil)
     timestamp = report_timestamp || bug.test_report_timestamp
     if timestamp

@@ -129,3 +129,13 @@ Given(/^rule sid "(.*)" rev "(.*)" is synched$/) do |sid, rev|
   rule_content = %Q~alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:#{sid}; rev:#{rev};)~
   Rule.synch_rule_content(rule_content)
 end
+
+Then(/^a rule gid "(\d*)" and sid "(\d*)" should be off$/) do |gid, sid|
+  rule = Rule.by_sid(sid, gid).first
+  rule.should_be_on?.should == false
+end
+
+Then(/^a rule gid "(\d*)" and sid "(\d*)" should be on$/) do |gid, sid|
+  rule = Rule.by_sid(sid, gid).first
+  rule.should_be_on?.should == true
+end

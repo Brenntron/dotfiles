@@ -559,3 +559,30 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has rev "3"
 
 
+
+  ### Scenarios should_be_on method ###
+
+  Scenario: should_be_on: should be off model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                             | detection         |
+      |  7 |  1  | 22211 | policy max-detect-ips drop, policy security-ips drop | flowbits:noalert; |
+    Then a rule gid "1" and sid "22211" should be off
+
+  Scenario: should_be_on: balanced-ips is on model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                             | detection         |
+      |  7 |  1  | 22211 | policy balanced-ips drop, policy security-ips drop   | flowbits:noalert; |
+    Then a rule gid "1" and sid "22211" should be on
+
+  Scenario: should_be_on: connectivity-ips is on model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                                 | detection         |
+      |  7 |  1  | 22211 | policy max-detect-ips drop, policy connectivity-ips drop | flowbits:noalert; |
+    Then a rule gid "1" and sid "22211" should be on
+
+  Scenario: should_be_on: flowbits set is on model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                             | detection                           |
+      |  7 |  1  | 22211 | policy max-detect-ips drop, policy security-ips drop | flowbits:set,sybase.tds.connection; |
+    Then a rule gid "1" and sid "22211" should be on
+
