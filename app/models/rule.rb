@@ -491,20 +491,8 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.load_rule(sid, gid, filepath = nil)
-    load_grep(grep_line_from_file(sid, gid, filepath))
-  rescue
-    nil
-  end
-
-  def revert_rule
-    revert_grep(Rule.grep_line_from_file(sid, gid, filename))
-  rescue
-    nil
-  end
-
   def self.find_or_load(sid, gid)
-    Rule.by_sid(sid, gid).first || load_rule(sid, gid)
+    Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file(sid, gid))
   end
 
   # Replace rule in given file with rule_content.
@@ -772,10 +760,12 @@ class Rule < ApplicationRecord
   def self.revert_rules_action(rule_ids)
     rule_ids.each do |id|
       rule = Rule.where(id: id).first
-      rule.revert_rule
+      rule.revert_grep(Rule.grep_line_from_file(sid, gid, filename))
     end
 
     true
+  rescue
+    false
   end
 
   # Updates a rule and its associations
