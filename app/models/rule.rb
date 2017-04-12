@@ -453,17 +453,7 @@ class Rule < ApplicationRecord
       rule_db
     else
       rule = robust_find(rule_content, parser.sid, parser.gid)
-      rule.assign_from_visrule(rule_content)
-      rule.assign(parser.attributes)
-
-      rule.cvs_rule_content             = rule.rule_content
-      rule.cvs_rule_parsed              = rule.rule_parsed
-
-      rule.edit_status                  = EDIT_STATUS_SYNCHED
-      rule.publish_status               = PUBLISH_STATUS_SYNCHED
-      rule.state                        = 'UNCHANGED'
-      rule.save!
-      rule.associate_references(rule_content)
+      rule.load_rule_content(rule_content)
       rule
     end
   end
