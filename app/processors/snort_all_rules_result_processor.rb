@@ -51,13 +51,13 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
     result = JSON.parse(message)
     puts result
 
-
     unless result['task_id'].nil?
 
       begin
         # Make sure to close the job
         job = Task.find(result['task_id'])
         job.result ||= ""
+
         return if job.nil?
 
         attachments = Hash.new
@@ -95,6 +95,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
               # The rule should have extracted if it was valid
               if rule.valid?
+                job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                 rule.save(:validate => false)
                 attachment.pcap_alerts.create(rule: rule)
               else
@@ -104,12 +105,13 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                     job.result << "#{rule.version} #{v}\n"
                   end
                 else
+                  job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                   rule.save(:validate => false)
                   attachment.pcap_alerts.create(rule: rule)
                 end
               end
 
-            rescue RuleError => e
+            rescue Exception => e
               job.failed = true
               job.result << "#{e.to_s} for sid #{alert['sid']}\n"
             rescue ActiveRecord::RecordNotUnique => e

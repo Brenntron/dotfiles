@@ -17,52 +17,58 @@
       </tr>
       </thead>
       <tbody>
-        <% if @tasks.any? %>
+      <% if @tasks.any? %>
           <% @tasks.left_joins(:rules).left_joins(:attachments).group(:id).select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments').each do |task| %>
-            <tr>
-              <% if task.completed %>
-                <td class="center"><input type="checkbox" checked></td>
-              <% else %>
-                  <td class="center"><input type="checkbox"></td>
-              <% end %>
-              <% if task.failed %>
-                <td class="center failed-bg"><input type="checkbox" checked></td>
-              <% else %>
-                <td class="center"><input type="checkbox"></td>
-              <% end %>
-              <td><%= task.task_type %></td>
-              <td></td>
-              <td></td>
-              <td><pre><%= task.result %></pre></td>
-              <td><%= User.find(task.user_id).cvs_username %></td>
-              <td><%= task.created_at.strftime("%m/%d/%y") %></td>
-            </tr>
-            <tr style="display:none;">
-              <td colspan="7" class="code">
-                <strong>Rules:</strong>
-                <% if 0 < task.any_rules %>
-                  <% task.rules.each do |rule| %>
-                    <%= rule.id %>,
-                  <% end %>
+              <tr>
+                <% if task.completed %>
+                    <td class="center"><input type="checkbox" checked></td>
+                <% else %>
+                    <td class="center"><input type="checkbox"></td>
                 <% end %>
-                <br/>
-                <strong>Attachments:</strong>
-                <% if 0 < task.any_attachments %>
-                  <% task.attachments.each do |attach| %>
-                    <%= attach.file_name %>,
-                  <% end %>
+                <% if task.failed %>
+                    <td class="center failed-bg"><input type="checkbox" checked></td>
+                <% else %>
+                    <td class="center"><input type="checkbox"></td>
                 <% end %>
-                <br/>
-                <strong>Result:</strong><br/>
-                <%= task.result %>
-              </td>
-            </tr>
+                <td><%= task.task_type %></td>
+                <td></td>
+                <td></td>
+                <td><pre>
+                  <% if task.result.nil? || task.result.empty? %>
+                    No Alerts returned.
+                  <% else %>
+                    <%= task.result %>
+                  <% end %>
+                </pre></td>
+                <td><%= User.find(task.user_id).cvs_username %></td>
+                <td><%= task.created_at.strftime("%m/%d/%y") %></td>
+              </tr>
+              <tr style="display:none;">
+                <td colspan="7" class="code">
+                  <strong>Rules:</strong>
+                  <% if 0 < task.any_rules %>
+                      <% task.rules.each do |rule| %>
+                          <%= rule.id %>,
+                      <% end %>
+                  <% end %>
+                  <br/>
+                  <strong>Attachments:</strong>
+                  <% if 0 < task.any_attachments %>
+                      <% task.attachments.each do |attach| %>
+                          <%= attach.file_name %>,
+                      <% end %>
+                  <% end %>
+                  <br/>
+                  <strong>Result:</strong><br/>
+                  <%= task.result %>
+                </td>
+              </tr>
           <% end %>
-        <% else %>
+      <% else %>
           <tr>
             <td colspan="7" class="center text-muted"><em>No tasks for this bug.</em></td>
           </tr>
-        <% end %>
+      <% end %>
       </tbody>
     </table>
   </div>
