@@ -385,9 +385,7 @@ class Rule < ApplicationRecord
   # Set the rule fields to components from parsing rule content.
   # Does not save the rule.
   # @param [String, #read] rule_content the rule content
-  def self.robust_find(rule_content, sid, gid, rule_id = nil)
-    parser = RuleSyntax::RuleParser.new(rule_content)
-
+  def self.find_from_parser(parser, rule_id = nil)
     rule = nil
     rule = Rule.by_sid(parser.sid, parser.gid).first if parser.sid
     rule ||= Rule.where(id: rule_id).first if rule_id
@@ -401,7 +399,7 @@ class Rule < ApplicationRecord
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
 
-    robust_find(rule_content, parser.sid, parser.gid, rule_id).tap do |rule|
+    find_from_parser(parser, rule_id).tap do |rule|
       rule.assign_from_visrule(rule_content)
       rule.assign(parser.attributes)
 
@@ -452,7 +450,7 @@ class Rule < ApplicationRecord
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db
     else
-      rule = robust_find(rule_content, parser.sid, parser.gid)
+      rule = find_from_parser(parser)
       rule.load_rule_content(rule_content)
       rule
     end
