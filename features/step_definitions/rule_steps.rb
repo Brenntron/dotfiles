@@ -130,12 +130,22 @@ Given(/^rule sid "(.*)" rev "(.*)" is synched$/) do |sid, rev|
   Rule.synch_rule_content(rule_content)
 end
 
+Then(/^a rule gid "(\d*)" and sid "(\d*)" should be on$/) do |gid, sid|
+  rule = Rule.by_sid(sid, gid).first
+  rule.should_be_on?.should == true
+end
+
 Then(/^a rule gid "(\d*)" and sid "(\d*)" should be off$/) do |gid, sid|
   rule = Rule.by_sid(sid, gid).first
   rule.should_be_on?.should == false
 end
 
-Then(/^a rule gid "(\d*)" and sid "(\d*)" should be on$/) do |gid, sid|
+Then(/^a rule gid "(\d*)" and sid "(\d*)" is on$/) do |gid, sid|
   rule = Rule.by_sid(sid, gid).first
-  rule.should_be_on?.should == true
+  rule.rule_content_for_commit.should_not match(/^\s*#/)
+end
+
+Then(/^a rule gid "(\d*)" and sid "(\d*)" is off/) do |gid, sid|
+  rule = Rule.by_sid(sid, gid).first
+  rule.rule_content_for_commit.should match(/^\s*#/)
 end

@@ -586,3 +586,27 @@ Feature: Rules
       |  7 |  1  | 22211 | policy max-detect-ips drop, policy security-ips drop | flowbits:set,sybase.tds.connection; |
     Then a rule gid "1" and sid "22211" should be on
 
+  Scenario: Onoff: uncommented rule content should be on when it should be on model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy balanced-ips drop | flowbits:noalert; | alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is on
+
+  Scenario: Onoff: uncommented rule content should be off when it should be off model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy security-ips drop | flowbits:noalert; | alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is off
+
+  Scenario: Onoff: commented rule content should be on when it should be on model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy balanced-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is on
+
+  Scenario: Onoff: commented rule content should be off when it should be off model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy security-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is off
+

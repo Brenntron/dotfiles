@@ -75,6 +75,24 @@ class Rule < ApplicationRecord
     end
   end
 
+  def on_rule_content
+    self.rule_content.sub(/^\s*#\s*/, '')
+  end
+
+  def off_rule_content
+    self.rule_content.sub(/^\s*#?\s*/, '# ')
+  end
+
+  def rule_content_for_commit
+    if should_be_on?
+      update(rule_content: on_rule_content, on: true)
+      on_rule_content
+    else
+      update(rule_content: on_rule_content, on: false)
+      off_rule_content
+    end
+  end
+
   def latest_test_report(bug, report_timestamp = nil)
     timestamp = report_timestamp || bug.test_report_timestamp
     if timestamp
