@@ -62,6 +62,8 @@ class Rule < ApplicationRecord
     'DELETED' == self.rule_category.category
   end
 
+  # determines if the rule *should* be on (uncommented) or off (commented)
+  # @return [Boolean] true if it should be on
   def should_be_on?
     case
       when /policy balanced-ips/ =~ self.metadata
@@ -75,14 +77,20 @@ class Rule < ApplicationRecord
     end
   end
 
+  # the rule content uncommented (if a # it is omitted)
+  # @return [String] the rule content uncommented
   def on_rule_content
     self.rule_content.sub(/^\s*#\s*/, '')
   end
 
+  # the rule content commented (with a #)
+  # @return [String] the rule content commented
   def off_rule_content
     self.rule_content.sub(/^\s*#?\s*/, '# ')
   end
 
+  # the rule content in the correct on/off commented/uncommented state to commit
+  # @return [String] the corrected rule content
   def rule_content_for_commit
     if should_be_on?
       update(rule_content: on_rule_content, on: true)
