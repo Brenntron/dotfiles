@@ -9,6 +9,6 @@ if [ $# -eq 0 ]; then
 fi
 
 
-grep -Hn "sid:\s*\d\d*\s*;" $* | bundle exec rails runner extras/synch_rules.rb
+grep -Hn "sid:\s*[0-9][0-9]*\s*;" $* | bundle exec rails runner extras/synch_rules.rb
 
 
