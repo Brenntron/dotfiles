@@ -353,8 +353,9 @@ class Rule < ApplicationRecord
   # because these depend on where the rule and rule_content originated.
   # @param [VisruleParser, #read] parser initialized to rule content.
   def assign_from_visrule(rule_content)
-    self.rule_content                   = rule_content
     self.on                             = /^\s*#/ !~ rule_content
+    self.rule_content                   = rule_content
+    self.rule_content                   = self.on_rule_content
 
     vparser = RuleSyntax::VisruleParser.new(rule_content)
 
