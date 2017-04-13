@@ -504,14 +504,14 @@ class Rule < ApplicationRecord
       tmp.each_line do |line|
         gid_matched = (gid_regex =~ line) || !(anygid_regex =~ line)
         if self.gid && self.sid && gid_matched && (sid_regex =~ line)
-          rulefile.puts(self.rule_content)
+          rulefile.puts(rule_content_for_commit)
           written = true
         else
           rulefile.puts(line)
         end
       end
 
-      rulefile.puts(self.rule_content) unless written
+      rulefile.puts(rule_content_for_commit) unless written
     end
     tmp.close!
 
