@@ -68,6 +68,16 @@ When(/^code calls load_grep on "(.*)"/) do |rule_grep_line|
   Rule.load_grep(rule_grep_line)
 end
 
+When(/^code calls revert_grep for rule gid "(.*)" sid "(.*)" on "(.*)"/) do |gid, sid, rule_grep_line|
+  rule = Rule.by_sid(sid, gid).first
+  rule.revert_grep(rule_grep_line)
+end
+
+When(/^code calls revert_rules_action for rule gid "(.*)" sid "(.*)"$/) do |gid, sid|
+  rule = Rule.by_sid(sid, gid).first
+  Rule.revert_rules_action([rule.id])
+end
+
 Then (/^a rule record for rule gid "(.*)" sid "(.*)" will exist$/) do |gid, sid|
   rule_resultset = Rule.by_sid(sid, gid)
   rule_resultset.should exist

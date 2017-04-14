@@ -500,6 +500,26 @@ Feature: Rules
 #    And I should not see "This is the summary"
 
 
+  Scenario: Editing Rule: A rule can revert_grep
+    Given the following rules exist:
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
+      |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |
+    When code calls revert_grep for rule gid "1" sid "22211" on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "synched"
+    And  A rule gid "1" and sid "22211" has class "parsed"
+    And  A rule gid "1" and sid "22211" has rev "4"
+
+  Scenario: Editing Rule: A rule can revert
+    Given the following rules exist:
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|               rule_content               |
+      |  7 |  1  | 19500 |  3  | UPDATED |   EDIT    | CURRENT_EDIT |false | alert (msg: "the promised one has come") |
+    When code calls revert_rules_action for rule gid "1" sid "19500"
+    Then a rule record for rule gid "1" sid "19500" will exist
+    And  A rule gid "1" and sid "19500" has class "synched"
+    And  A rule gid "1" and sid "19500" has class "parsed"
+    And  A rule gid "1" and sid "19500" has rev "4"
+
   ### Scenarios Synching a rule from VC ###
 
   Scenario: Synch Rule: create a valid rule from synching
