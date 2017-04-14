@@ -142,6 +142,17 @@ module API
         end
 
 
+        #commit a rule
+        params do
+          requires :rule_ids, type: Array[String]
+        end
+        put "commit", root: "rule" do
+          authorize! :update, Rule
+          Rule.commit_action(permitted_params[:rule_ids])
+          true
+        end
+
+
         # Updates a rule and its associations
         # @return [Rule]
         desc "Edit a rule"

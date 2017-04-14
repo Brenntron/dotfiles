@@ -155,7 +155,7 @@ class Rule < ApplicationRecord
   end
 
   def self.anygid_regexp
-    @anygid_regexp ||= Regexp.new("gid:\\s*\\d+\\s*;")
+    @anygid_regexp ||= /gid:\s*\d+\s*;/
   end
 
   def self.grep_line_from_file(sid, gid, filepath = nil)
@@ -497,11 +497,49 @@ class Rule < ApplicationRecord
     Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file(sid, gid))
   end
 
+  # @return [Pathname] path (possibly relative) to the snort directory
+  def self.snort_pathname
+    @snort_path ||= Pathname.new('extras/snort')
+  end
+
+  # @return [Pathname] relative path name of the version control working directory
+  def self.working_root
+    @svn_pathname ||= Pathname.new('working')
+  end
+
+  # @param [Pathname, String] input file name, absolute or relative
+  def self.relative_path_of(filepath)
+    relative_path = Pathname.new(filepath)
+    relative_path = relative_path.relative_path_from(Rails.root) if relative_path.absolute?
+    relative_path = relative_path.relative_path_from(snort_pathname) if relative_path.to_s.starts_with?(snort_pathname.to_s)
+    relative_path
+  end
+
+  # @return [Pathname] check this and related records for pathname
+  def definite_pathname
+    @definite_pathname ||= Pathname.new(self.filename || self.rule_category.filename(self.gid))
+  end
+
+  # @return [Pathname] the rules file directory and rule file filename
+  def relative_pathname
+    @relative_pathname ||= self.class.relative_path_of(definite_pathname)
+  end
+
+  # @return [Pathname] path (possibly relative) to the snort directory
+  def snort_pathname
+    @snort_pathname ||= Rails.root.join(self.class.snort_pathname, relative_pathname)
+  end
+
+  # @return [Pathname] the path to the file in the working directory
+  def working_pathname
+    @working_pathname ||= Rails.root.join(self.class.working_root, relative_pathname)
+  end
+
   # Replace rule in given file with rule_content.
   # Scans file for rule with same gid and sid and replaces that line with rule_content.
   # Appends rule_content to end of file if gid and sid are not found
   # @param [String, #read] path to the file.
-  def patch(filename)
+  def patch_file(filename)
     tmp = Tempfile.new(['tmprule', '.rules'])
     File.open(filename, 'rt') do |input_stream|
       IO.copy_stream(input_stream, tmp)
@@ -509,13 +547,12 @@ class Rule < ApplicationRecord
 
     sid_regex = Regexp.new("sid:\\s*#{self.sid}\\s*;")
     gid_regex = Regexp.new("gid:\\s*#{self.gid}\\s*;")
-    anygid_regex = /gid:\s*\d+\s*;/
 
     tmp.rewind
     File.open(filename, 'wt') do |rulefile|
       written = false
       tmp.each_line do |line|
-        gid_matched = (gid_regex =~ line) || !(anygid_regex =~ line)
+        gid_matched = (gid_regex =~ line) || !(Rule.anygid_regexp =~ line)
         if self.gid && self.sid && gid_matched && (sid_regex =~ line)
           rulefile.puts(rule_content_for_commit)
           written = true
@@ -531,15 +568,30 @@ class Rule < ApplicationRecord
     true
   end
 
-  # Check rule_content into CVS and update rule record.
-  #
-  # Write rule_content to file by calling patch.
-  # Call CVS checkin.
-  # Since CVS has a rewrite rule for checkins, update rule record from file.
-  def checkin
-    filename = self.filename || self.rule_category.filename(self.gid)
+  def self.checkout(rule_ids)
+    rules = Rule.where(id: rule_ids).select(:gid, :filename, :rule_category_id).group(:gid, :filename, :rule_category_id)
+    rules.inject([]) do |working_pathnames, rule|
+      FileUtils.mkpath(rule.working_pathname.dirname)
 
-    patch(filename)
+      # TODO replace copy with svn checkout
+      FileUtils.copy(rule.snort_pathname, rule.working_pathname)
+
+      working_pathnames << rule.working_pathname
+      working_pathnames
+    end
+  end
+
+  # Checks in a set of given rules.
+  # param [Array[Integer]] Integer array of Rule model ids.
+  def self.checkin_rules(rule_ids)
+    checkout(rule_ids)
+
+    Rule.where(id: rule_ids).each do |rule|
+      rule.patch_file(rule.working_pathname)
+    end
+
+    # TODO call svn commit
+    puts `cd #{working_root};ls *`
   end
 
   def update_rule
@@ -729,6 +781,15 @@ class Rule < ApplicationRecord
       css_classes << 'parsed' if parsed?
       css_classes << 'failed' unless parsed?
     end.join(' ')
+  end
+
+  # Creates a rule and its associations
+  # @return [Rule]
+  def self.commit_action(rule_ids)
+    rule_ids.each do |id|
+      rule = Rule.where(id: id).first
+      rule.checkin
+    end
   end
 
   # Creates a rule and its associations
