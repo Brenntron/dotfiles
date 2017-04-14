@@ -4,13 +4,16 @@ $ ->
     tab = $(this).attr('id')
     isSelected = false
     selected = []
+    selected_sids = []
     allboxes = []
     $('input:checkbox.rule_check_box').each ->
       allboxes.push($(this).val())
       if @checked
         isSelected = true
         selected.push($(this).val())
+        selected_sids.push($(this).attr('data-sid'))
     allboxes = $.unique(allboxes)
+    sid_text = if selected_sids.length > 1 then 'sids ' else 'sid '
     if isSelected or tab in ['overview','create']
       switch(tab)
         when 'test'
@@ -45,7 +48,7 @@ $ ->
               ), 5000
           }
         when 'revert'
-          if window.confirm("Are you sure?")
+          if window.confirm("Revert " + sid_text + selected_sids.join() + "?")
             headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
             $.ajax {
               url: "/api/v1/rules/revert"
@@ -67,7 +70,7 @@ $ ->
                   location.reload true
             }
         when 'remove'
-          if window.confirm("Are you sure?")
+          if window.confirm("Remove " + sid_text + selected_sids.join() + "?")
             $.ajax {
               url: "/rules"
               data: { ids: selected }
@@ -102,6 +105,28 @@ $ ->
     else
       alert("please select something")
 
+
+  $('.show_rule').on 'click', (e) ->
+    e.preventDefault()
+    id = $(this).parents('tr').attr('id')
+    #uncheck all others checkboxes
+    $('.rule_check_box').prop('checked', $('.rules_check_box').prop('checked'))
+    #check the current rule
+    $('#rule_' + id).prop('checked', true)
+    $('.view').removeClass('hidden').addClass('active').show()
+    $('.overview').removeClass('active').addClass 'hidden'
+    $('.view-rules').addClass('hidden')
+    $('.list-rules').removeClass('hidden').show()
+
+    $.each $('.rules_table tr'), ->
+      `var id`
+      id = $(this).attr('id')
+      if !isNaN(id)
+        $('.rule_' + id).removeClass('active').addClass('hidden').hide()
+      return
+    $('.rule_' + id).removeClass('hidden').addClass('active').show()
+    return
+
   $('.diff').find('br').remove()
 
   $(document).on 'click', '#legacy_btn', (e) ->
@@ -116,6 +141,9 @@ $ ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))
 
   $(document).on 'click','#overview', ->
+    $('.edit-rules, .remove-rules, ' +
+        '.test-rules, .commit-rules, .view-rules').removeClass('hidden').show()
+    $('.list-rules').addClass('hidden')
     $('input:checkbox.rule_check_box').each ->
       $(this).removeClass('hidden')
       $(this).show()
@@ -200,6 +228,7 @@ $ ->
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
         $('.legacy_form').find(":invalid").each (e) ->
           $(this).addClass('onError')
+          window.scrollTo(0, 0)
     else if $('.standard_form').is(":visible")
       form = $(this).parents('.standard_form')
       if $('.standard_form')[0].checkValidity()
@@ -279,6 +308,7 @@ $ ->
           complete: ->
             $(document).ajaxStop ->
               location.reload true
+              window.scrollTo(0, 0)
         }
       else
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
@@ -321,8 +351,17 @@ $ ->
         ), 5000
         $(document).ajaxStop ->
           location.reload true
+          window.scrollTo(0, 0)
     }
 
+  $('.edit-rules').on "click", (e) ->
+    $('.edit-rules').addClass('hidden')
+    $('.view-rules, .list-rules').removeClass('hidden').show()
+
+  $('.view-rules').on "click", (e) ->
+    $('.edit-rules, .remove-rules, ' +
+        '.test-rules, .commit-rules, .list-rules').removeClass('hidden').show()
+    $('.view-rules').addClass('hidden')
 
 
   $(document).on "change", '.metadata_form', (e) ->
