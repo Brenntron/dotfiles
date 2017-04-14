@@ -62,6 +62,45 @@ class Rule < ApplicationRecord
     'DELETED' == self.rule_category.category
   end
 
+  # determines if the rule *should* be on (uncommented) or off (commented)
+  # @return [Boolean] true if it should be on
+  def should_be_on?
+    case
+      when /policy balanced-ips/ =~ self.metadata
+        true
+      when /policy connectivity-ips/ =~ self.metadata
+        true
+      when /flowbits\s*:\s*set\s*,/ =~ self.detection
+        true
+      else
+        false
+    end
+  end
+
+  # the rule content uncommented (if a # it is omitted)
+  # @return [String] the rule content uncommented
+  def on_rule_content
+    self.rule_content.sub(/^\s*#\s*/, '')
+  end
+
+  # the rule content commented (with a #)
+  # @return [String] the rule content commented
+  def off_rule_content
+    self.rule_content.sub(/^\s*#?\s*/, '# ')
+  end
+
+  # the rule content in the correct on/off commented/uncommented state to commit
+  # @return [String] the corrected rule content
+  def rule_content_for_commit
+    if should_be_on?
+      update(rule_content: on_rule_content, on: true)
+      on_rule_content
+    else
+      update(rule_content: on_rule_content, on: false)
+      off_rule_content
+    end
+  end
+
   def latest_test_report(bug, report_timestamp = nil)
     timestamp = report_timestamp || bug.test_report_timestamp
     if timestamp
@@ -473,14 +512,14 @@ class Rule < ApplicationRecord
       tmp.each_line do |line|
         gid_matched = (gid_regex =~ line) || !(anygid_regex =~ line)
         if self.gid && self.sid && gid_matched && (sid_regex =~ line)
-          rulefile.puts(self.rule_content)
+          rulefile.puts(rule_content_for_commit)
           written = true
         else
           rulefile.puts(line)
         end
       end
 
-      rulefile.puts(self.rule_content) unless written
+      rulefile.puts(rule_content_for_commit) unless written
     end
     tmp.close!
 
