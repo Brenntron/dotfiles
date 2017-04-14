@@ -760,7 +760,7 @@ class Rule < ApplicationRecord
   def self.revert_rules_action(rule_ids)
     rule_ids.each do |id|
       rule = Rule.where(id: id).first
-      rule.revert_grep(Rule.grep_line_from_file(sid, gid, filename))
+      rule.revert_grep(Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename))
     end
 
     true
