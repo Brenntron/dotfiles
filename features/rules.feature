@@ -3,6 +3,45 @@ Feature: Rules
   as a user
   I will provides ways to interact with rules
 
+    ### Rules tab navigation ###
+
+  @javascript
+  Scenario: Selecting a rule to view from the table should
+  'check' the selected rule and 'uncheck' all others
+
+    Given a user with role "committer" exists and is logged in
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    Given the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    When the following rules exist:
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+
+    And bug with id "2222" has rule with id "13"
+    And bug with id "2222" has rule with id "14"
+    And bug with id "2222" has rule with id "15"
+    Then I wait for "3" seconds
+
+    When I goto "/bugs/2222"
+    When I click the "Rules" tab
+    And  I check "rule_13"
+    And  I check "rule_15"
+    And  I click "view"
+    And  I click "back"
+    And  I should see the "#rule_13" checkbox checked
+    And  I should see the "#rule_15" checkbox checked
+    And  I should see the "#rule_14" checkbox unchecked
+    And  I click "22213"
+    And  I click "back"
+    Then I should see the "#rule_14" checkbox checked
+    And  I should see the "#rule_13" checkbox unchecked
+    And  I should see the "#rule_15" checkbox unchecked
+
 
   ### Scenarios New Rule ###
 
