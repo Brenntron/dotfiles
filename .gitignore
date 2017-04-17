@@ -24,7 +24,7 @@
 
 /extras/ssh/*
 
-/workspace/*/.svn
+/workspace/
 /ignore/
 
 /net-snort-parser/
