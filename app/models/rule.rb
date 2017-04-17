@@ -79,14 +79,16 @@ class Rule < ApplicationRecord
 
   # the rule content uncommented (if a # it is omitted)
   # @return [String] the rule content uncommented
-  def on_rule_content
-    self.rule_content.sub(/^\s*#\s*/, '')
+  def on_rule_content(rule_content_given = nil)
+    local_rule_content = rule_content_given || self.rule_content
+    local_rule_content.sub(/^\s*#?\s*/, '')
   end
 
   # the rule content commented (with a #)
   # @return [String] the rule content commented
-  def off_rule_content
-    self.rule_content.sub(/^\s*#?\s*/, '# ')
+  def off_rule_content(rule_content_given = nil)
+    local_rule_content = rule_content_given || self.rule_content
+    local_rule_content.sub(/^\s*#?\s*/, '# ')
   end
 
   # the rule content in the correct on/off commented/uncommented state to commit
@@ -352,10 +354,9 @@ class Rule < ApplicationRecord
   # Does not set state, edit_status, or publish_status,
   # because these depend on where the rule and rule_content originated.
   # @param [VisruleParser, #read] parser initialized to rule content.
-  def assign_from_visrule(rule_content)
-    self.on                             = /^\s*#/ !~ rule_content
-    self.rule_content                   = rule_content
-    self.rule_content                   = self.on_rule_content
+  def assign_from_visrule(given_rule_content)
+    self.on                             = /^\s*#/ !~ given_rule_content
+    self.rule_content                   = on_rule_content(given_rule_content)
 
     vparser = RuleSyntax::VisruleParser.new(rule_content)
 
