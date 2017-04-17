@@ -14,7 +14,7 @@ class TestRule
     # TODO: collect rule content to insert in the local_rules. Dont use numbers.
     rules_content = []
     content.rules.each do |rule|
-      rules_content << rule.rule_content
+      rules_content << rule.on_rule_content
     end
     publish :snort_local_rules_test_work,
             {
