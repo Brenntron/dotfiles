@@ -604,8 +604,7 @@ class Rule < ApplicationRecord
     rule_files.inject([]) do |working_pathnames, rule|
       FileUtils.mkpath(rule.working_pathname.dirname)
 
-      # TODO replace copy with svn checkout
-      FileUtils.copy(rule.snort_pathname, rule.working_pathname)
+      `cd #{working_root}; svn up #{rule.working_pathname}`
 
       working_pathnames << rule.working_pathname
       working_pathnames
