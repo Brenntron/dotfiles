@@ -613,28 +613,30 @@ class Rule < ApplicationRecord
 
   # Checks in a set of given rules.
   # param [Array[Integer]] Integer array of Rule model ids.
-  def self.checkin_rules(rules)
+  def self.commit_rules_action(rules)
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
 
     if rules.any? && publish_lock
       #set all the rules we will update to publishing.
       where(id: rules).update_all(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
 
-      checkout(rules)
+      working_pathnames = checkout(rules)
 
       rules.each do |rule|
         rule.patch_file(rule.working_pathname)
       end
 
-      # TODO call svn commit
-      puts `cd #{working_root};ls *`
+      `cd #{working_root};svn commit #{working_pathnames.join(' ')} -m "committed from Analyst Console"`
+      # byebug
 
       #any rules not set to synch by svn hook should go back to current.
-      where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
-          .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
 
+    true
+
   ensure
+    where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
+        .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     publish_unlock
   end
 

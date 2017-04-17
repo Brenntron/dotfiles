@@ -148,8 +148,7 @@ module API
         end
         put "commit", root: "rule" do
           rules = Rule.where(id: permitted_params[:rule_ids]).to_a.select { |rule| can?(:publish, rule) }
-          Rule.checkin_rules(rules)
-          true
+          Rule.commit_rules_action(rules)
         end
 
 
