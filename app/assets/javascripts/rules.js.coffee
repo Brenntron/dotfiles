@@ -115,8 +115,6 @@ $ ->
     $('#rule_' + id).prop('checked', true)
     $('.view').removeClass('hidden').addClass('active').show()
     $('.overview').removeClass('active').addClass 'hidden'
-    $('.view-rules').addClass('hidden')
-    $('.list-rules').removeClass('hidden').show()
 
     $.each $('.rules_table tr'), ->
       `var id`
@@ -141,9 +139,6 @@ $ ->
     $(".rule_check_box").prop("checked", $(".rules_check_box").prop("checked"))
 
   $(document).on 'click','#overview', ->
-    $('.edit-rules, .remove-rules, ' +
-        '.test-rules, .commit-rules, .view-rules').removeClass('hidden').show()
-    $('.list-rules').addClass('hidden')
     $('input:checkbox.rule_check_box').each ->
       $(this).removeClass('hidden')
       $(this).show()
@@ -353,15 +348,6 @@ $ ->
           location.reload true
           window.scrollTo(0, 0)
     }
-
-  $('.edit-rules').on "click", (e) ->
-    $('.edit-rules').addClass('hidden')
-    $('.view-rules, .list-rules').removeClass('hidden').show()
-
-  $('.view-rules').on "click", (e) ->
-    $('.edit-rules, .remove-rules, ' +
-        '.test-rules, .commit-rules, .list-rules').removeClass('hidden').show()
-    $('.view-rules').addClass('hidden')
 
 
   $(document).on "change", '.metadata_form', (e) ->
