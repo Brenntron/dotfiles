@@ -20,7 +20,7 @@
   <div class="col-xs-12">
     <h4 class="blue"> References </h4>
   </div>
-  <div class="col-xs-12 code">
+  <div class="col-xs-12 overview-code">
     <% if @bug.references.any? %>
         <% if @bug.references.cves.any? %>
             <p>cve:</p>
@@ -60,7 +60,7 @@
   <div class="col-xs-12">
     <div class="exploit_notices red"></div>
   </div>
-  <div class="col-xs-12 code">
+  <div class="col-xs-12 overview-code">
     <% if @bug.references.any? %>
         <p><%= find_exploit_link(@bug.references) %></p>
     <% end %>
