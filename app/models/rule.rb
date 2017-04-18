@@ -831,15 +831,6 @@ class Rule < ApplicationRecord
 
   # Creates a rule and its associations
   # @return [Rule]
-  def self.commit_action(rule_ids)
-    rule_ids.each do |id|
-      rule = Rule.where(id: id).first
-      rule.checkin
-    end
-  end
-
-  # Creates a rule and its associations
-  # @return [Rule]
   def self.create_action(rule_content, rule_doc, bug_id)
     Rule.save_rule_content(rule_content).tap do |rule|
       if bug_id
