@@ -55,7 +55,7 @@ module Api
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
         config.amq_host = "mqtest01.vrt.sourcefire.com"
         config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
-        config.canvas_root = "/usr/local/www/rulesuitest/public/current/extras"
+        config.canvas_root = Rails.root.join('extras')
       when "production"
         config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzilla.vrt.sourcefire.com'
@@ -64,7 +64,7 @@ module Api
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
         config.amq_host = "mq.vrt.sourcefire.com"
         config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
-        config.canvas_root = "/usr/local/www/rulesuitest/public/current/extras" # this will probably need updateing for production
+        config.canvas_root = Rails.root.join('extras') # this may need updating for production depending on where we access CANVAS_CATALOG
       when "test"
         config.ruletest_server = "https://localhost:3000/api_test"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
