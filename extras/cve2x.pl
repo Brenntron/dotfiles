@@ -14,7 +14,7 @@ use Data::Dumper;
 my $telus_user 	= "sourcefirevr";
 my $telus_pass 	= "2~wb32T*";
 my $telus_subn 	= "2051-0001";
-my $canvas_root = $ENV{"CANVAS_ROOT"} || "/usr/local/www/rulesuitest/public/current/extras";
+my $canvas_root = $ENV{"CANVAS_ROOT"} || "/nfs/research";
 my $timeout    	= 5;                             # 5 second timeout for http connect
 
 ##################
