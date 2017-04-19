@@ -131,10 +131,6 @@ def self.production_config(timestamp, rebuild_gems)
   system "mkdir #{Dir.pwd}/tmp"
   system "touch tmp/restart.txt"
 
-  # export things
-  system "export RAILS_ENV=#{Rails.env}"
-  system "export CANVAS_ROOT=/usr/local/www/rulesuitest/public/current/extras"
-
 
   `echo 'removing rulesuitest.tar.gz'`
   system "rm #{Dir.pwd}/rulesuitest.tar.gz"
