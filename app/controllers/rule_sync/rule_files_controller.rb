@@ -29,12 +29,13 @@
 # We get the notification from this actual commit.
 module RuleSync
   class RuleFilesController < ApplicationController
+    layout false
 
     # Takes a comma separated list of file paths, to notify us to update those files from version control.
     # POST /rule_sync/rule_files?filename=rules/file-java.rules,so_rules/file-java.rules
     def create
-      sync = RuleFileSync.sync(params['filenames'] || params['filename'])
-      raise sync.inspect
+      RuleFileSync.sync(params['filenames'] || params['filename'])
+      render :text => "Sync was called."
     end
   end
 end
