@@ -64,10 +64,6 @@ Feature: Rules
     When I fill in "std-form-message" with "Test msg"
     And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
     And  I select "attempted-user" from "rule[class_type]"
-    And  I click "Create Rule"
-    And  I wait for "2" seconds
-    Then I should see "Please fill in required fields."
-    When I fill in "summary" with "some pig"
     And  I select "$SSH_SERVERS" from "std-form-src"
     And  I fill in "flow_src_ports" with "$SSH_PORTS"
     And  I fill in "flow_dst_server" with "$SSH_SERVERS"
@@ -97,8 +93,6 @@ Feature: Rules
     And  I should see "imap"
     And  I should see "ftp-data"
     And  I should see "http"
-    # rule docs:
-    And  I should see "some pig"
 
   @javascript
   Scenario: New Rule: standard form: the policy options and toggle should populate checkbox values
