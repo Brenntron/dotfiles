@@ -35,12 +35,7 @@ This section is the steps for Analyst Console maintenance for developers and for
         $ activemq start
         $ activemq console
 
-### Setup Steps
-
-1.  install the ca.pem found here
-    https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
-    in
-    /System/Library/OpenSSL/certs/
+### Rails App Setup
 
 1.  Make subversion working folders
     -   Snort Rules directory
@@ -59,17 +54,6 @@ This section is the steps for Analyst Console maintenance for developers and for
     
     -   Public copies of these are found at [snort.org](http://snort.org)
     
-1.  regenerating the keytab
-    
-        $ sudo msktutil -u -s HTTP
-        $ sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
-        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p rulesuitest\$
-        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p host/rulesuitest.vrt.sourcefire.com
-    
-    
-        $ bundle exec rails runner lib/poller.rb
-        $ bundle exec rails runner lib/client_local.rb
-
 1.  bundle
 
     When bundling:
@@ -93,6 +77,23 @@ This section is the steps for Analyst Console maintenance for developers and for
 
         ./extras/synch_rules.sh `find extras/snort/snort-rules/ | grep "\.rules$"`
     
+### Credentials
+
+1.  install the ca.pem found here
+    https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
+    in
+    /System/Library/OpenSSL/certs/
+
+1.  regenerating the keytab
+    
+        $ sudo msktutil -u -s HTTP
+        $ sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
+        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p rulesuitest\$
+        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p host/rulesuitest.vrt.sourcefire.com
+    
+        $ bundle exec rails runner lib/poller.rb
+        $ bundle exec rails runner lib/client_local.rb
+
 1.  Below is just to set up a locally signed ssh key not really all that necessary.
 
         http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
