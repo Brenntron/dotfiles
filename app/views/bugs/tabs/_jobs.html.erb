@@ -17,9 +17,9 @@
       </tr>
       </thead>
       <tbody>
-        <% if @tasks.any? %>
-          <% @tasks.left_joins(:rules).left_joins(:attachments).group(:id).select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments').each do |task| %>
-            <tr>
+        <% if @bug.tasks.any? %>
+          <% @bug.tasks.left_joins(:rules).left_joins(:attachments).group(:id).select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments').each do |task| %>
+            <tr data-task-id="<%= task.id %>">
               <% if task.completed %>
                 <td class="center"><input type="checkbox" checked></td>
               <% else %>
