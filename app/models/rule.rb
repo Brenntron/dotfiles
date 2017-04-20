@@ -491,44 +491,11 @@ class Rule < ApplicationRecord
     Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file(sid, gid))
   end
 
-  # @return [Pathname] path (possibly relative) to the snort directory
-  def self.snort_pathname
-    @snort_path ||= Pathname.new('extras/snort')
-  end
-
-  # @return [Pathname] relative path name of the version control working directory
-  def self.working_root
-    @svn_pathname ||= Pathname.new('extras/working')
-  end
-
-  # @param [Pathname, String] input file name, absolute or relative
-  def self.relative_path_of(filepath)
-    relative_path = Pathname.new(filepath)
-    relative_path = relative_path.relative_path_from(Rails.root) if relative_path.absolute?
-    relative_path = relative_path.relative_path_from(snort_pathname) if relative_path.to_s.starts_with?(snort_pathname.to_s)
-    relative_path
-  end
-
   # A filename which will not be nil
   # The filename field may be nil.  If so determine the path from rule_category
   # @return [Pathname] check this and related records for pathname
-  def definite_pathname
-    @definite_pathname ||= Pathname.new(self.filename || self.rule_category.filename(self.gid))
-  end
-
-  # @return [Pathname] the rules file directory and rule file filename
-  def relative_pathname
-    @relative_pathname ||= self.class.relative_path_of(definite_pathname)
-  end
-
-  # @return [Pathname] path (possibly relative) to the snort directory
-  def snort_pathname
-    @snort_pathname ||= Rails.root.join(self.class.snort_pathname, relative_pathname)
-  end
-
-  # @return [Pathname] the path to the file in the working directory
-  def working_pathname
-    @working_pathname ||= Rails.root.join(self.class.working_root, relative_pathname)
+  def nonnil_pathname
+    @nonnil_pathname ||= Pathname.new(self.filename || self.rule_category.filename(self.gid))
   end
 
   # Replace rule in given file with rule_content.
@@ -562,19 +529,6 @@ class Rule < ApplicationRecord
     tmp.close!
 
     true
-  end
-
-  def self.checkout(rules)
-    rule_files = Rule.where(id: rules).select(:gid, :filename, :rule_category_id)
-                     .group(:gid, :filename, :rule_category_id)
-    rule_files.inject([]) do |working_pathnames, rule|
-      FileUtils.mkpath(rule.working_pathname.dirname)
-
-      `cd #{working_root}; svn up #{rule.working_pathname}`
-
-      working_pathnames << rule.working_pathname
-      working_pathnames
-    end
   end
 
   def update_rule
