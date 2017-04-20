@@ -105,10 +105,6 @@ class Rule < ApplicationRecord
     end
   end
 
-  class << self
-    attr_reader :publish_lock_pid
-  end
-
   def record(action)
     record = { resource: 'rule',
               action: action,
@@ -308,36 +304,6 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.publish_mutex
-    @publish_mutex ||= Mutex.new
-  end
-
-  def self.publish_lock
-    publish_mutex.synchronize do
-      if @publish_lock_pid
-        nil
-      else
-        @publish_lock_pid = Process.pid
-        true
-      end
-    end
-  end
-
-  def self.publish_unlock
-    publish_mutex.synchronize do
-      @publish_lock_pid = nil
-    end
-  end
-
-  #unlock on startup when class file is loaded.
-  publish_unlock
-
-  def self.publish_locked?
-    publish_mutex.synchronize do
-      !@publish_lock_pid
-    end
-  end
-
   def self.hash_visrule(ruleline)
     ruleline.split("\n").inject({}) do |attrs, line|
       if /^\s*(?<key>\w*)\s*:\s?(?<value>.*)$/ =~ line
@@ -532,7 +498,7 @@ class Rule < ApplicationRecord
 
   # @return [Pathname] relative path name of the version control working directory
   def self.working_root
-    @svn_pathname ||= Pathname.new('workspace')
+    @svn_pathname ||= Pathname.new('extras/working')
   end
 
   # @param [Pathname, String] input file name, absolute or relative
@@ -609,35 +575,6 @@ class Rule < ApplicationRecord
       working_pathnames << rule.working_pathname
       working_pathnames
     end
-  end
-
-  # Checks in a set of given rules.
-  # param [Array[Integer]] Integer array of Rule model ids.
-  def self.commit_rules_action(rules)
-    rules.reject! { |rule| rule.synched? || rule.stale_edit? }
-
-    if rules.any? && publish_lock
-      #set all the rules we will update to publishing.
-      where(id: rules).update_all(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
-
-      working_pathnames = checkout(rules)
-
-      rules.each do |rule|
-        rule.patch_file(rule.working_pathname)
-      end
-
-      `cd #{working_root};svn commit #{working_pathnames.join(' ')} -m "committed from Analyst Console"`
-      # byebug
-
-      #any rules not set to synch by svn hook should go back to current.
-    end
-
-    true
-
-  ensure
-    where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
-        .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
-    publish_unlock
   end
 
   def update_rule
