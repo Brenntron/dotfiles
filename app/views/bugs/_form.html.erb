@@ -4,8 +4,11 @@
       <div class="col-sm-12 form-group">
         <label for="state">State</label>
         <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control'%>
-        <% unless @bug.can_set_pending? %>
-            <br><span class="tiny text-muted ">Cant set to pending. please assign attachments to exploits.</span><br>
+        <% unless @bug.exploits_complete? %>
+            <br><span class="tiny text-muted ">Can't set to pending. Please assign attachments to exploits.</span><br>
+        <% end %>
+        <% unless @bug.docs_complete? %>
+            <br><span class="tiny text-muted ">Can't set to pending. Please complete the summary for rule docs.</span><br>
         <% end %>
       </div>
     </div>
