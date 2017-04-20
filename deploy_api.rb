@@ -131,6 +131,7 @@ def self.production_config(timestamp, rebuild_gems)
   system "mkdir #{Dir.pwd}/tmp"
   system "touch tmp/restart.txt"
 
+
   `echo 'removing rulesuitest.tar.gz'`
   system "rm #{Dir.pwd}/rulesuitest.tar.gz"
 end

@@ -20,10 +20,13 @@
 
 /extras/snort
 /extras/snort_repo
+/extras/working
 
 /extras/ssh/*
 
 /net-snort-parser/
+
+/ignore
 
 
 .idea/*
