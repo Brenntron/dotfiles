@@ -141,6 +141,7 @@ $ ->
       error: (response) ->
         $('.alert_attachments').addClass('error').show().html('Task has not been created')
         $(this).attr('disabled', false)
+        window.location.reload()
     )
 
 
