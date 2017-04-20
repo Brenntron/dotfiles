@@ -42,26 +42,24 @@ This section is the steps for Analyst Console maintenance for developers and for
     in
     /System/Library/OpenSSL/certs/
 
-1.  put a copy of snort rules in the extras directory.
-    
-    *   download latest snort rule set from [snort.org](http://snort.org)
-    *   extract rules to
-    
-            extras/snort/etc
-            extras/snort/preproc_rules
-            extras/snort/rules
-    
-    *   extract snort so rules to
-    
-            extras/snort/so_rules
-    
-    run synch script to load rules.
+1.  Make subversion working folders
+    -   Snort Rules directory
 
-        $ ./extras/resynch.sh
+        1.  Create `extras/snort` directory
+        1.  `cd` to that directory
+        1.  `svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/`
+        1.  `svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/so_rules/`
+        1.  `rm so_rules/*.c so_rules/*.h`
     
-1.  On the server we need to do this
+    -   Working Directory
+        1.  Create `extras/working` directory
+        1.  `cd` to that directory
+        1.  `svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/`
+        1.  `svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/so_rules/`
     
-    regenerating the keytab
+    -   Public copies of these are found at [snort.org](http://snort.org)
+    
+1.  regenerating the keytab
     
         $ sudo msktutil -u -s HTTP
         $ sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
@@ -72,7 +70,9 @@ This section is the steps for Analyst Console maintenance for developers and for
         $ bundle exec rails runner lib/poller.rb
         $ bundle exec rails runner lib/client_local.rb
 
-1.  When bundling:
+1.  bundle
+
+    When bundling:
 
     * if you have problems with eventmachine, you might need to do this:
     
@@ -83,8 +83,16 @@ This section is the steps for Analyst Console maintenance for developers and for
             $ brew install imagemagick@6
             $ brew link --force imagemagick@6
 
-1.  dont forget to migrate the database
+1.  db setup
 
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rake db:seed
+
+1.  Synch rules
+
+        ./extras/synch_rules.sh `find extras/snort/snort-rules/ | grep "\.rules$"`
+    
 1.  Below is just to set up a locally signed ssh key not really all that necessary.
 
         http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
