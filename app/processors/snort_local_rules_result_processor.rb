@@ -33,6 +33,8 @@
 ######################
 class SnortLocalRulesResultProcessor < ApplicationProcessor
 
+  NEW_RULE_ID_BIAS = 1_000_000
+
   subscribes_to :snort_local_rules_test_result
 
   def on_message(message)
