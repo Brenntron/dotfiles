@@ -196,7 +196,7 @@ $ ->
         form = $(this).parents('.legacy_form');
 
         legacy_rule_doc = {}
-        form.find('textarea[type=text]').each ->
+        form.find('textarea[class*=legacy]').each ->
           legacy_rule_doc[$(this)[0].id] = $(this)[0].value
 
         rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
@@ -264,7 +264,7 @@ $ ->
           i = i + 1
 
         rule_doc = {}
-        $('.rule_doc').find('textarea[type=text]').each ->
+        $('.rule_doc').find('textarea[class*=standard]').each ->
           rule_doc[$(this)[0].id] = $(this)[0].value
 
 #        rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
