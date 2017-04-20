@@ -2,14 +2,12 @@ Analyst Console
 ===============
 # Web Site User Interface
 
+# Development and Ops
+This section is the steps for Analyst Console maintenance for developers and for ops.
 
-# Environment Installation
-This section is the steps for Analyst Console setup for developers and for ops.
+## Environment Installation
 
-1.  install the ca.pem found here
-    https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
-    in
-    /System/Library/OpenSSL/certs/
+### Dependencies
 
 1.  You will need certain perl modules
 
@@ -20,10 +18,6 @@ This section is the steps for Analyst Console setup for developers and for ops.
         $ sudo cpanm WWW::Mechanize
         $ sudo cpanm Try::Tiny
 
-1.  add CANVAS_ROOT to your profile env file
-
-        export CANVAS_ROOT=/Users/<username>/<talos_api_directory>/extras
-    
 1.  install visruleparser dependancies
 
     Net::Snort::Parser::Rule
@@ -34,6 +28,19 @@ This section is the steps for Analyst Console setup for developers and for ops.
         $ sudo make install
 
     set up perl to be able to run visruleparser or make sure visruleparser is using /usr/local/bin/perl not /usr/bin/perl
+
+1.  Make sure active MQ is running
+    
+        $ brew install activemq
+        $ activemq start
+        $ activemq console
+
+### Setup Steps
+
+1.  install the ca.pem found here
+    https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
+    in
+    /System/Library/OpenSSL/certs/
 
 1.  put a copy of snort rules in the extras directory.
     
@@ -52,12 +59,6 @@ This section is the steps for Analyst Console setup for developers and for ops.
 
         $ ./extras/resynch.sh
     
-1.  Make sure active MQ is running
-    
-        $ brew install activemq
-        $ activemq start
-        $ activemq console
-
 1.  On the server we need to do this
     
     regenerating the keytab
@@ -70,8 +71,6 @@ This section is the steps for Analyst Console setup for developers and for ops.
     
         $ bundle exec rails runner lib/poller.rb
         $ bundle exec rails runner lib/client_local.rb
-
-1.  Production also needs to have mysql set up
 
 1.  When bundling:
 
@@ -121,9 +120,9 @@ This section is the steps for Analyst Console setup for developers and for ops.
 
     $ echo "127.0.0.1 localhost.ssl" | sudo tee -a /etc/hosts
 
-# Running the Server
+## Running the Server
 
-## Run the web server
+### Run the web server
 
 *   To use with guard
 
@@ -139,11 +138,11 @@ This section is the steps for Analyst Console setup for developers and for ops.
         $thin start -p 3000 --ssl --ssl-verify --ssl-key-file ~/.ssl/server.key --ssl-cert-file ~/.ssl/server.crt
 
 
-## Add server.crt as trusted !!SYSTEM!! (not login) cert in the mac osx keychain
+### Add server.crt as trusted !!SYSTEM!! (not login) cert in the mac osx keychain
  *Open keychain tool, drag .crt file to system, and trust everything.
 
 
-## View test page
+### View test page
 $ open https://localhost:3000
 
 **Notes:**
@@ -152,9 +151,9 @@ $ open https://localhost:3000
 
 
 
-# Tests
+## Tests
 
-## Guard
+### Guard
 
 -   run all tests
 
@@ -164,13 +163,13 @@ $ open https://localhost:3000
 
         $ bundle exec guard -g now
 
-## Cucumber
+### Cucumber
 
 -   run individual feature files
 
         $ bundle exec cucumber features/users.feature --require features
 
-# Deploying this app to staging
+## Deploying this app to staging
 run the deploy_api.rb file using:
 ruby deploy_api.rb
 
