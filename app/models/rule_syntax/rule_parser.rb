@@ -71,12 +71,9 @@ module RuleSyntax
       end.join(' ')
     end
 
-    def attributes_hash
-      raw_hash.reject{ |type, data| %i(other).include?(type) }
-    end
-
     def attributes
-      @attributes ||= attributes_hash.tap do |attributes|
+      @attributes ||= raw_hash.clone.tap do |attributes|
+        attributes.delete(:other)
         attributes[:connection] = @connection
         attributes[:gid] ||= 1
         attributes[:detection] = detection
