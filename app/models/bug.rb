@@ -189,12 +189,15 @@ class Bug < ApplicationRecord
   end
 
   def can_set_pending?
-    exploits.each do |expl|
-      if expl.attachment.nil?
-        return false
-      end
-    end
-    true
+    exploits_complete? && docs_complete?
+  end
+
+  def exploits_complete?
+    exploits.each{ |expl| return false if expl.attachment.nil? }
+  end
+
+  def docs_complete?
+    rules.each{ |rule| return false if !rule.rule_doc || rule.rule_doc.summary.blank? }
   end
 
   def allow_state_change?
