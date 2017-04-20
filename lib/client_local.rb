@@ -139,7 +139,7 @@ while message = client.receive
 
       # Make sure that worked
       if resp.code != 200 and resp.code != 201         #if it didnt work the say so
-        raise Exception.new("Upload of #{pcap_file} failed: #{resp.code} - #{resp.body}")
+        raise Exception.new("Upload of #{attachment_id} failed: #{resp.code} - #{resp.body}")
       else
         pcaps[JSON.parse(resp.body)['id']] = attachment_id   #now we compile a hash using ids as keys and the pcaps as values
       end
