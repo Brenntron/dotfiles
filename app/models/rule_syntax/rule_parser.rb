@@ -46,6 +46,9 @@ module RuleSyntax
                 raw_hash[key] ||= []
                 raw_hash[key] << data
             end
+          else
+            raw_hash[:other] ||= []
+            raw_hash[:other] << option.downcase
           end
 
           raw_hash
@@ -56,18 +59,21 @@ module RuleSyntax
     end
 
     def detection_hash
-      raw_hash.select{|type, data| %i(content flowbits fast_pattern http_header).include?(type)}
+      raw_hash.reject{ |type, data| %i(msg flow metadata reference class_type classtype connection gid sid rev).include?(type) }
     end
 
     def detection
       detection_hash.inject([]) do |det_ary, (type, data)|
-        det_ary += data.map{ |datum| "#{type}:#{datum};" }
+        det_ary += type == :other ? data.map{ |datum| "#{datum};" } :
+                                    data.map{ |datum| "#{type}:#{datum};" }
+
         det_ary
       end.join(' ')
     end
 
     def attributes
-      @attributes ||= raw_hash.tap do |attributes|
+      @attributes ||= raw_hash.clone.tap do |attributes|
+        attributes.delete(:other)
         attributes[:connection] = @connection
         attributes[:gid] ||= 1
         attributes[:detection] = detection

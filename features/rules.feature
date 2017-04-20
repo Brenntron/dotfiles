@@ -62,7 +62,7 @@ Feature: Rules
     And  I wait for "2" seconds
     Then I should see "Please fill in required fields."
     When I fill in "std-form-message" with "Test msg"
-    And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
+    And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;http_header;"
     And  I select "attempted-user" from "rule[class_type]"
     And  I click "Create Rule"
     And  I wait for "2" seconds
@@ -91,6 +91,7 @@ Feature: Rules
     And  I should see "content:"14""
     And  I should see "fast_pattern:only"
     And  I should see "flowbits:isset,http.mokes"
+    And  I should see "http_header"
     And  I should see "attempted-user"
     # default metadata:
     And  I should see "pop3"
