@@ -40,7 +40,7 @@ class RuleFile
   end
 
   # @return [Pathname] path (possibly relative) to the snort directory
-  def self.synch_pathname
+  def self.synch_root
     @snort_path ||= Pathname.new('extras/snort')
   end
 
@@ -53,7 +53,7 @@ class RuleFile
   def self.relative_path_of(filepath)
     relative_path = Pathname.new(filepath)
     relative_path = relative_path.relative_path_from(Rails.root) if relative_path.absolute?
-    relative_path = relative_path.relative_path_from(synch_pathname) if relative_path.to_s.starts_with?(synch_pathname.to_s)
+    relative_path = relative_path.relative_path_from(synch_root) if relative_path.to_s.starts_with?(synch_root.to_s)
     relative_path
   end
 
@@ -63,7 +63,7 @@ class RuleFile
 
   # @return [Pathname] path (possibly relative) to the snort directory
   def synch_pathname
-    @synch_pathname ||= Rails.root.join(self.class.synch_pathname, relative_pathname)
+    @synch_pathname ||= Rails.root.join(self.class.synch_root, relative_pathname)
   end
 
   # @return [Pathname] the path to the file in the working directory
@@ -85,14 +85,25 @@ class RuleFile
     rule_files.map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
   end
 
-  def remove_file
+  def remove_working_file
     FileUtils.remove_file(working_pathname) rescue nil
   end
 
   def checkout
     FileUtils.mkpath(working_pathname.dirname)
-    remove_file
-    `cd #{self.class.working_root}; svn up #{working_pathname}`
+    remove_working_file
+    `svn up #{working_pathname}`
+  end
+
+  def self.synch_failsafe
+    build(Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)).each do |rule_file|
+      `svn up #{rule_file.synch_pathname}`
+      File.open(rule_file.synch_pathname, 'rt') do |file|
+        file.each_line do |line|
+          Rule.load_line(line)
+        end
+      end
+    end
   end
 
   # Checks in a set of given rules.
@@ -111,12 +122,11 @@ class RuleFile
       rules.each do |rule|
         rule.patch_file(working_pathname_of(rule.nonnil_pathname))
       end
-      binding.pry
 
       log("committing files #{working_file_list(rule_files)}")
       `cd #{working_root};svn commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
 
-      rule_files.each {|rule_file| rule_file.remove_file }
+      rule_files.each {|rule_file| rule_file.remove_file rescue nil }
 
       #any rules not set to synch by svn hook should go back to current.
     end
@@ -124,9 +134,13 @@ class RuleFile
     true
 
   ensure
-    log("setting rules from publishing to current_edit")
-    Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
-        .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
+    if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
+      log("setting rules from publishing to current_edit")
+      synch_failsafe rescue nil
+      Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
+          .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
+    end
+    log("exiting publishing")
     publish_unlock
   end
 end

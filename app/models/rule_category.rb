@@ -28,7 +28,7 @@ class RuleCategory < ApplicationRecord
 
     case gid
       when 1
-        "rules/#{category.downcase}.rules"
+        "snort-rules/#{category.downcase}.rules"
       when 3
         "so_rules/#{category.downcase}.rules"
       else

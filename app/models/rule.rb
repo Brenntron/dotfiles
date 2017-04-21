@@ -58,7 +58,7 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft but VC rev has changed and cannot be checked in
   PUBLISH_STATUS_PUBLISHING     = 'PUBLISHING'      #draft in process of being written to VC
 
-  scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid) }
+  scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
   def deleted?
     'DELETED' == self.rule_category.category
@@ -448,6 +448,18 @@ class Rule < ApplicationRecord
       rule = find_from_parser(parser)
       rule.load_rule_content(rule_content)
       rule
+    end
+  end
+
+  def self.load_line(line)
+    if /sid:\s*(?<sid>\d+)\s*;/ =~ line
+      /gid:\s*(?<gid>\d+)\s*;/ =~ line
+      /rev:\s*(?<rev>\d+)\s*;/ =~ line
+
+      rule = Rule.by_sid(sid, gid || 1).first
+      if rule && (rev.to_i > rule.rev)
+        rule.load_rule_content(line)
+      end
     end
   end
 
