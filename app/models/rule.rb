@@ -79,7 +79,7 @@ class Rule < ApplicationRecord
     end
   end
 
-    # the rule content uncommented (if a # it is omitted)
+  # the rule content uncommented (if a # it is omitted)
   # @return [String] the rule content uncommented
   def on_rule_content(rule_content_given = nil)
     local_rule_content = rule_content_given || self.rule_content
@@ -453,21 +453,21 @@ class Rule < ApplicationRecord
     true
   end
 
-  # def update_rule
-  #   begin
-  #     rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
-  #     rule.state = "UNCHANGED"
-  #     rule.attachments.clear
-  #     rule.save(validate: false)
-  #
-  #   rescue Exception => e
-  #     log_error(e)
-  #   rescue RuleError => e
-  #     add_error("#{rule.sid}: #{e}")
-  #   end
-  #
-  #   redirect_to request.referer
-  # end
+  def update_rule
+    begin
+      rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
+      rule.state = "UNCHANGED"
+      rule.attachments.clear
+      rule.save(validate: false)
+
+    rescue Exception => e
+      log_error(e)
+    rescue RuleError => e
+      add_error("#{rule.sid}: #{e}")
+    end
+
+    redirect_to request.referer
+  end
 
   # def remove_rule
   #   begin

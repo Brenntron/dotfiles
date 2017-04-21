@@ -33,7 +33,7 @@
     <h3>Publish Locks</h3>
 
     <h4>Publish Lock PID</h4>
-    <div><%= Rule.publish_lock_pid.inspect %></div>
+    <div><%= RuleFile.publish_lock_pid.inspect %></div>
 
     <h4>Publishing Rules</h4>
     <% if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists? %>
