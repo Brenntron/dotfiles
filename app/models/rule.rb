@@ -120,31 +120,6 @@ class Rule < ApplicationRecord
     end
   end
 
-  # def self.create_a_rule(content)
-  #   begin
-  #     raise Exception.new('No rules to add') if content.blank?
-  #     text_rules = content.each_line.to_a.sort.uniq.map { |t| t.chomp }.compact.reject { |e| e.empty? }
-  #     raise Exception.new('No rules to add') if text_rules.empty?
-  #     # Loop through all of the rules
-  #     text_rules.each do |text_rule|
-  #       begin
-  #         if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
-  #           @record = Rule.update_generate_rule($1)
-  #           @record.state = 'New'
-  #           @record.edit_status = EDIT_STATUS_NEW
-  #           @record.publish_status = PUBLISH_STATUS_CURRENT_EDIT
-  #           @record.rev = 1
-  #           @record.save
-  #         end
-  #       rescue Exception => e
-  #         raise Exception.new("{rule_error: {content: #{text_rule},error:#{e}}}")
-  #       end
-  #     end
-  #   rescue Exception => e
-  #     raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e}}}")
-  #   end
-  # end
-
   def self.gid_regexp(gid)
     Regexp.new("gid:\\s*#{gid}\\s*;")
   end
@@ -174,66 +149,6 @@ class Rule < ApplicationRecord
 
     rule_grep_lines[0]
   end
-
-  # def extract_rule
-  #   begin
-  #     if !content.nil?
-  #
-  #       # Make sure we don't have multiple rules in one
-  #       if content =~ /[\r\n]/
-  #         raise 'Only create one rule at a time'
-  #       end
-  #
-  #       # First make sure we can parse it
-  #       parsed = Rule.parse_rule(content)
-  #
-  #       if parsed.nil?
-  #         raise 'Failed to parse rule'
-  #       end
-  #
-  #       if !parsed['sid'].nil? && !sid.nil?
-  #         raise "Mismatched sid in updated rule. Expected #{sid} not #{parsed['sid']}" if parsed['sid'] != sid
-  #       end
-  #
-  #       self.message = parsed['name']
-  #       self.gid = 1
-  #       self.sid = parsed['sid']
-  #       self.rev = parsed['revision']
-  #       self.content = parsed['optomized']
-  #
-  #       unless parsed['references'].nil?
-  #         parsed['references'].each do |type, ref|
-  #           begin
-  #             reference_type = ReferenceType.find_by_name(type)
-  #
-  #             unless reference_type.nil?
-  #               reference = Reference.find_or_create_by_reference_type_id_and_data(reference_type.id, ref.keys.first)
-  #
-  #               if !references.empty?
-  #                 if !references.includes?(reference)
-  #                   references << reference
-  #                 end
-  #               end
-  #             end
-  #           rescue ActiveRecord::RecordNotUnique => e
-  #             # Ignore
-  #           rescue Exception => e
-  #             raise
-  #           end
-  #         end
-  #       end
-  #     elsif gid.nil?
-  #       raise 'Neither gid nor sid content is set'
-  #     end
-  #     return true
-  #   rescue Exception => e
-  #     errors.add(:base, e.to_s)
-  #     e.backtrace.each do |l|
-  #       errors.add(:base, l)
-  #     end
-  #     return false
-  #   end
-  # end
 
   def rule_classification
     if self.class_type
@@ -322,14 +237,6 @@ class Rule < ApplicationRecord
 
     gid_match ? gid_match.to_i : 1
   end
-
-  # # Runs the visruleparser perl script to parse a line of rule text.
-  # # @param [String, #read] rule_text the line of rule text
-  # # @return [Hash] hash with :rule and :errors text populated.
-  # def self.visruleparser(rule_content)
-  #   parser = RuleSyntax::VisruleParser.new(rule_content)
-  #   { rule: parser.parsed_lines, errors: parser.errors }
-  # end
 
   # Extracts components from VisruleParser and sets field of rule.
   #
@@ -451,6 +358,9 @@ class Rule < ApplicationRecord
     end
   end
 
+  # loads an rule content from a line in a rule file
+  # Skips lines without sid and where we have a rule with that rev
+  # @param [String] line from rule file
   def self.load_line(line)
     if /sid:\s*(?<sid>\d+)\s*;/ =~ line
       /gid:\s*(?<gid>\d+)\s*;/ =~ line
@@ -543,31 +453,31 @@ class Rule < ApplicationRecord
     true
   end
 
-  def update_rule
-    begin
-      rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
-      rule.state = "UNCHANGED"
-      rule.attachments.clear
-      rule.save(validate: false)
+  # def update_rule
+  #   begin
+  #     rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
+  #     rule.state = "UNCHANGED"
+  #     rule.attachments.clear
+  #     rule.save(validate: false)
+  #
+  #   rescue Exception => e
+  #     log_error(e)
+  #   rescue RuleError => e
+  #     add_error("#{rule.sid}: #{e}")
+  #   end
+  #
+  #   redirect_to request.referer
+  # end
 
-    rescue Exception => e
-      log_error(e)
-    rescue RuleError => e
-      add_error("#{rule.sid}: #{e}")
-    end
-
-    redirect_to request.referer
-  end
-
-  def remove_rule
-    begin
-      remove_rule_from_bug(Bug.find(active_scaffold_session_storage[:constraints][:bugs]), Rule.find(params[:id]))
-    rescue Exception => e
-      log_error(e)
-    end
-
-    redirect_to request.referer
-  end
+  # def remove_rule
+  #   begin
+  #     remove_rule_from_bug(Bug.find(active_scaffold_session_storage[:constraints][:bugs]), Rule.find(params[:id]))
+  #   rescue Exception => e
+  #     log_error(e)
+  #   end
+  #
+  #   redirect_to request.referer
+  # end
 
   def remove_rule_from_bug(bug, rule)
     # Remove any new alerts from the attachments
@@ -629,21 +539,21 @@ class Rule < ApplicationRecord
     raise RuleError.new("Unable to find sid #{sid}")
   end
 
-  def self.update_generate_rule(sid)
-    begin
-      return Rule.create_or_update_rule(Rule.find_current_rule(sid))
-    rescue Exception => e
-      raise Exception.new(e)
-    end
-  end
+  # def self.update_generate_rule(sid)
+  #   begin
+  #     return Rule.create_or_update_rule(Rule.find_current_rule(sid))
+  #   rescue Exception => e
+  #     raise Exception.new(e)
+  #   end
+  # end
 
-  def self.update_rules(rules)
-    ApplicationRecord.transaction do
-      rules.each do |rule|
-        rule.save
-      end
-    end
-  end
+  # def self.update_rules(rules)
+  #   ApplicationRecord.transaction do
+  #     rules.each do |rule|
+  #       rule.save
+  #     end
+  #   end
+  # end
 
   def sort_rules_by_state
     case (state)
