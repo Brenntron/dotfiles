@@ -26,9 +26,9 @@
 #
 # Rule Profile Statistics (worst 10 rules)
 # ==========================================================
-#     Num      SID GID Rev     Checks   Matches    Alerts           Microsecs  Avg/Check  Avg/Match Avg/Nonmatch   Disabled
-#     ===      === === ===     ======   =======    ======           =========  =========  ========= ============   ========
-#     1    23993   1   5          6         2         1                  23        4.0        9.7          1.1          0
+#   Num  SID  GID Rev  Checks Matches  Alerts  Microsecs Avg/Check Avg/Match Avg/Nonmatch Disabled
+#   ===  ===  === ===  ====== =======  ======  ========= ========= ========= ============ ========
+#    1  23993  1   5     6       2       1        23        4.0       9.7        1.1         0
 #
 ######################
 class SnortLocalRulesResultProcessor < ApplicationProcessor
