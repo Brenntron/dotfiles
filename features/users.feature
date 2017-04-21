@@ -151,7 +151,7 @@ Feature: User Accounts
     Then I wait for "3" seconds
     And  I goto "/users"
     Then I click "h_clinton"
-    Then I click the link with data-target "#roleModal_3"
+    Then I click the span with data-target "#roleModal_3"
     And I wait for "1" seconds
     And I should see "Update Role(s) for h_clinton"
     And I check "analyst"

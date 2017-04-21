@@ -10,11 +10,13 @@
         <h2 class="subtitle"><%= @user.cvs_username %>&nbsp;&nbsp;
           <span class="email-link">
             <% if @user.ancestors.include?(current_user) || current_user.has_role?('admin') %>
-              <a type="button" class="glyphicon glyphicon-pencil" data-target='<%= "#roleModal_#{@user.id}" %>' data-toggle="modal"></a>
+              <span data-toggle="modal" data-target='<%= "#roleModal_#{@user.id}" %>'>
+                <a type="button" class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="edit roles"></a>
+              </span>
             <% end %>
-            <a href="mailto:<%= @user.email %>"><i class="glyphicon glyphicon-envelope"></i></a>
+            <a href="mailto:<%= @user.email %>" data-toggle="tooltip" data-placement="top" title="send mail"><i class="glyphicon glyphicon-envelope"></i></a>
             <% if @user == current_user %>
-              <a type="button" class="glyphicon glyphicon-cloud-download" id="user-bugs" value="<%=@user.id%>"></a>
+              <a type="button" class="glyphicon glyphicon-cloud-download" id="user-bugs" value="<%=@user.id%>" data-toggle="tooltip" data-placement="top" title="import <%=@user.cvs_username%>'s bugs from bugzilla"></a>
               <button class="select-sm btn btn-default hidden" id="importing_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> coffee break</button>
             <% end %>
           </span>
