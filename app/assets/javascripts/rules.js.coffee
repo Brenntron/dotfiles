@@ -91,7 +91,27 @@ $ ->
                 ), 5000
             }
         when 'commit'
-          alert('Task Created. Rules sent to be committed')
+          if window.confirm("Are you sure?")
+            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+            $.ajax {
+              url: "/api/v1/rules/commit"
+              headers: headers
+              data:
+                rule_ids: selected
+              type: 'PUT'
+              dataType: 'json'
+              success: (response) ->
+                $('.alert_rules').addClass('success').show().html('Rules has been committed')
+              error: (response) ->
+                $('.alert_rules').addClass('error').show().html('Rules have not been committed')
+              complete: ->
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+                $(document).ajaxStop ->
+                  location.reload true
+            }
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')

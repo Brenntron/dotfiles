@@ -1,0 +1,148 @@
+<style>
+  #rule-publishing {
+    margin: 1em 4ex;
+  }
+
+  #rule-publishing h5 {
+    color: blue;
+  }
+  #rule-publishing h6 {
+    color: darkblue;
+  }
+  #rule-publishing .code {
+    background-color: #e8e8e8;
+    padding-left: 0.5ex;
+    padding-right: 0.5ex;
+  }
+
+  #publishing-rules-table th {
+    padding: 0.3em 2ex;
+  }
+  #publishing-rules-table td {
+    padding: 0.3em 2ex;
+  }
+</style>
+
+<div class="jumbotron">
+  <h2>Diagnostics</h2>
+</div>
+
+<div>
+
+  <div id="rule-publishing">
+    <h3>Publish Locks</h3>
+
+    <h4>Publish Lock PID</h4>
+    <div><%= RuleFile.publish_lock_pid.inspect %></div>
+
+    <h4>Publishing Rules</h4>
+    <% if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists? %>
+      <table id="publishing-rules-table">
+        <caption>Publishing Rules</caption>
+        <thead>
+        <tr>
+          <th>id</th>
+          <th>gid</th>
+          <th>sid</th>
+          <th>rev</th>
+        </tr>
+        </thead>
+        <tbody>
+          <% Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).each do |rule| %>
+              <tr>
+                <td><%= rule.id %></td>
+                <td><%= rule.gid %></td>
+                <td><%= rule.sid || 'new' %></td>
+                <td><%= rule.rev %></td>
+              </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div>No rules in process of being published.</div>
+    <% end %>
+
+    <hr/>
+    <h4>What's up</h4>
+    <h5>Publish Lock</h5>
+    <p>
+      When a user calls the commit action (api/v1/commit),
+      the checkin procedure starts by getting a publish_lock.
+      If another process has the publish lock, the commit action will fail immediately.
+      The process gets the lock by setting the publish_lock_pid to its UNIX process ID (pid).
+    </p>
+    <p>
+      When the commit finishes, it sets the publish_lock_pid to nil, which allows later commit actions.
+      However, if the commit fails to clear the lock by setting it to nil,
+      the whole system will be locked out of commiting.
+    </p>
+
+    <h6>Remedy Unlock</h6>
+    <ol>
+      <li>
+        Determine if a legitimate commit process is running and you should wait.
+        <p>
+          A commit process may be legitimately running.
+          The web server thread should have the pid indicated in the lock.
+          That process shells out to do an svn checkin, which should have a parent process id (ppid)
+          of the pid indicated by the lock.
+          The UNIX command <span class="code">ps -ef</span> should include the pid and ppid information.
+        </p>
+      </li>
+      <li>
+        If the process has a child process, it will be the shell which is calling an svn checkin.
+        This could indicate that the svn checkin is delayed.
+      </li>
+      <li>
+        If there is no process with the publish_lock_pid, then there is no commit process running,
+        but the pubish lock was not unlocked.
+        From the rails console, you can call <span class="code">Rule.publish_unlock</span>.
+      </li>
+    </ol>
+
+    <h6>Remedy Web Server Restart</h6>
+    <ol>
+      <li>
+        Restarting the server should kill all the child processes.
+        This should include the web server threads, and the shells doing the svn commit.
+      </li>
+      <li>
+        This may deadlock the publish lock.
+        Check if there is a publish lock from above on this page.
+        If so, you can call <span class="code">Rule.publish_unlock</span> from the rails console.
+      </li>
+      <li>
+        Stopping the web server may have stopped a subversion hook <span class="code">POST rule_sync/rule_files</span>
+        web service.
+        There may be rules updated in subversion, which have not been updated in our database.
+      </li>
+      <li>
+        If you find any rule files which have been updated in subversion but not in our databaase,
+        run the <span class="code">./extras/synch_rules.sh</span> shell script
+        with the file name or file names of the files to reload.
+      </li>
+    </ol>
+
+
+    <h5>Publishing Rules</h5>
+    <p>
+      When a rule is in the process of being published, it is marked as
+      <span class="code">Rule::PUBLISH_STATUS_PUBLISHING</span>.
+      (This happens at the start of the commit process.)
+      This allows the subversion hook to update the rule content from the new rev in subversion.
+      If the rule were <span class="code">Rule::PUBLISH_STATUS_CURRENT_EDIT</span>,
+      then an update in subversion would just mark it as a stale edit.
+    </p>
+    <p>
+      The Publishing Rules table above shows all the rules currently in the PUBLISHING state.
+    </p>
+
+    <p>
+      When a commit runs, it should trigger the subversion hook and set all the rules with a new rev
+      from PUBLISHING to SYNCHED.
+      When the commit process completes, it cleans up the remaining rules still set to PUBLISHING,
+      but setting them to CURRENT_EDIT.
+    </p>
+  </div>
+</div>
+

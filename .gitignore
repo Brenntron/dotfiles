@@ -23,6 +23,9 @@
 /extras/working
 
 /extras/ssh/*
+/extras/working/
+
+/ignore/
 
 /net-snort-parser/
 

@@ -132,13 +132,23 @@ module API
         end
 
 
-        #revert a rule
+        #revert rules
         params do
           requires :rule_ids, type: Array[String]
         end
         put "revert", root: "rule" do
           authorize! :update, Rule
           Rule.revert_rules_action(permitted_params[:rule_ids])
+        end
+
+
+        #commit rules
+        params do
+          requires :rule_ids, type: Array[String]
+        end
+        put "commit", root: "rule" do
+          rules = Rule.where(id: permitted_params[:rule_ids]).to_a.select { |rule| can?(:publish, rule) }
+          RuleFile.commit_rules_action(rules)
         end
 
 

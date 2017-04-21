@@ -28,11 +28,11 @@ class RuleCategory < ApplicationRecord
 
     case gid
       when 1
-        "extras/snort/rules/#{category.downcase}.rules"
+        "snort-rules/#{category.downcase}.rules"
       when 3
-        "extras/snort/so_rules/#{category.downcase}.rules"
+        "so_rules/#{category.downcase}.rules"
       else
-        "extras/snort/preproc_rules/#{category.downcase}.rules"
+        "preproc_rules/#{category.downcase}.rules"
     end
   end
 end

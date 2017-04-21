@@ -53,6 +53,11 @@ Rails.application.routes.draw do
     resources :references
   end
 
+  namespace :rule_sync do
+    resources :rule_files, only: [:create, :new]
+    resources :diags, only: [:index]
+  end
+
 
   post '/notes' => 'notes#create'
   put '/notes/publish_to_bugzilla' => 'notes#publish_to_bugzilla'
