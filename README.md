@@ -1,13 +1,13 @@
-talos_api
-=========
+Analyst Console
+===============
+# Web Site User Interface
 
-# Environment Installation
+# Development and Ops
+This section is the steps for Analyst Console maintenance for developers and for ops.
 
-install the ca.pem found here
-https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
-in
-/System/Library/OpenSSL/certs/
+## Environment Installation
 
+### Dependencies
 
 1.  You will need certain perl modules
 
@@ -18,12 +18,7 @@ in
         $ sudo cpanm WWW::Mechanize
         $ sudo cpanm Try::Tiny
 
-
-2.  add CANVAS_ROOT to your profile env file
-
-        export CANVAS_ROOT=/Users/<username>/<talos_api_directory>/extras
-    
-3.  install visruleparser dependancies
+1.  install visruleparser dependancies
 
     Net::Snort::Parser::Rule
     
@@ -34,51 +29,34 @@ in
 
     set up perl to be able to run visruleparser or make sure visruleparser is using /usr/local/bin/perl not /usr/bin/perl
 
-4.  put a copy of snort rules in the extras directory.
-    
-    *   download latest snort rule set from [snort.org](http://snort.org)
-    *   extract rules to
-    
-            extras/snort/etc
-            extras/snort/preproc_rules
-            extras/snort/rules
-    
-    *   extract snort so rules to
-    
-            extras/snort/so_rules
-    
-    run synch script to load rules.
-
-        $ ./extras/resynch.sh
-    
-5.  Make sure active MQ is running
+1.  Make sure active MQ is running
     
         $ brew install activemq
         $ activemq start
         $ activemq console
-  
 
+### Rails App Setup
 
+1.  Make subversion working folders
+    -   Snort Rules directory
 
-6.  On the server we need to do this
+        1.  Create `extras/snort` directory
+        1.  `cd` to that directory
+        1.  `svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/`
+        1.  `svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/so_rules/`
+        1.  `rm so_rules/*.c so_rules/*.h`
     
-    regenerating the keytab
+    -   Working Directory
+        1.  Create `extras/working` directory
+        1.  `cd` to that directory
+        1.  `svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/`
+        1.  `svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/so_rules/`
     
-        $ sudo msktutil -u -s HTTP
-        $ sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
-        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p rulesuitest\$
-        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p host/rulesuitest.vrt.sourcefire.com
+    -   Public copies of these are found at [snort.org](http://snort.org)
     
-    
-        $ bundle exec rails runner lib/poller.rb
-        $ bundle exec rails runner lib/client_local.rb
+1.  bundle
 
-7. Production also needs to have mysql set up
-
-
-
-
-8.  When bundling:
+    When bundling:
 
     * if you have problems with eventmachine, you might need to do this:
     
@@ -89,49 +67,71 @@ in
             $ brew install imagemagick@6
             $ brew link --force imagemagick@6
 
+1.  db setup
 
-9.  dont forget to migrate the database
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rake db:seed
 
-10. Below is just to set up a locally signed ssh key not really all that necessary.
+1.  Synch rules
+
+        ./extras/synch_rules.sh `find extras/snort/snort-rules/ | grep "\.rules$"`
+    
+### Credentials
+
+1.  install the ca.pem found here
+    https://sites.google.com/a/sourcefire.com/vrt/training-documentation/authentication
+    in
+    /System/Library/OpenSSL/certs/
+
+1.  regenerating the keytab
+    
+        $ sudo msktutil -u -s HTTP
+        $ sudo cp /etc/krb5.keytab /usr/local/etc/apache22/rulesuitest.keytab
+        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p rulesuitest\$
+        $ sudo ktutil -k /usr/local/etc/apache22/rulesuitest.keytab remove -p host/rulesuitest.vrt.sourcefire.com
+    
+        $ bundle exec rails runner lib/poller.rb
+        $ bundle exec rails runner lib/client_local.rb
+
+1.  Below is just to set up a locally signed ssh key not really all that necessary.
 
         http://www.railway.at/2013/02/12/using-ssl-in-your-local-rails-environment/
     
     SSL self signed localhost for rails start to finish, no red warnings.
 
+1.  Create your private key (any password will do, we remove it below)
 
-## 1) Create your private key (any password will do, we remove it below)
+        $ openssl genrsa -des3 -out server.orig.key 2048
 
-$ openssl genrsa -des3 -out server.orig.key 2048
+1.  Remove the password
 
-## 2) Remove the password
+        $ openssl rsa -in server.orig.key -out server.key
 
-$ openssl rsa -in server.orig.key -out server.key
+1.  Generate the csr (Certificate signing request) (Details are important!)
 
-## 3) Generate the csr (Certificate signing request) (Details are important!)
+        $ openssl req -new -key server.key -out server.csr
 
-$ openssl req -new -key server.key -out server.csr
+    **IMPORTANT**
+    *MUST have localhost.ssl as the common name to keep browsers happy*
+    *(has to do with non internal domain names ... which sadly can be*
+    *avoided with a domain name with a "." in the middle of it somewhere)*
+    *Country Name (2 letter code) [AU]:*
+    *...*
+    *Common Name: localhost.ssl*
+    *...*
 
-**IMPORTANT**
-*MUST have localhost.ssl as the common name to keep browsers happy*
-*(has to do with non internal domain names ... which sadly can be*
-*avoided with a domain name with a "." in the middle of it somewhere)*
-*Country Name (2 letter code) [AU]:*
-*...*
-*Common Name: localhost.ssl*
-*...*
+1.  Generate self signed ssl certificate
 
-## 4) Generate self signed ssl certificate
+        $ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
 
-$ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+1.  Finally Add localhost.ssl to your hosts file
 
-## 5) Finally Add localhost.ssl to your hosts file
+    $ echo "127.0.0.1 localhost.ssl" | sudo tee -a /etc/hosts
 
-$ echo "127.0.0.1 localhost.ssl" | sudo tee -a /etc/hosts
+## Running the Server
 
-
-# Running the Server
-
-## Run the web server
+### Run the web server
 
 *   To use with guard
 
@@ -147,11 +147,11 @@ $ echo "127.0.0.1 localhost.ssl" | sudo tee -a /etc/hosts
         $thin start -p 3000 --ssl --ssl-verify --ssl-key-file ~/.ssl/server.key --ssl-cert-file ~/.ssl/server.crt
 
 
-## Add server.crt as trusted !!SYSTEM!! (not login) cert in the mac osx keychain
+### Add server.crt as trusted !!SYSTEM!! (not login) cert in the mac osx keychain
  *Open keychain tool, drag .crt file to system, and trust everything.
 
 
-## View test page
+### View test page
 $ open https://localhost:3000
 
 **Notes:**
@@ -160,32 +160,25 @@ $ open https://localhost:3000
 
 
 
-# Tests
+## Tests
 
 ### Guard
 
----
+-   run all tests
 
-run all tests
+        $ bundle exec guard
 
-    $ bundle exec guard
+-   run all test with @now tag
 
-run all test with @now tag
-
-    $ bundle exec guard -g now
+        $ bundle exec guard -g now
 
 ### Cucumber
 
----
+-   run individual feature files
 
-run individual feature files
+        $ bundle exec cucumber features/users.feature --require features
 
-    $ bundle exec cucumber features/users.feature --require features
-
-
-
-
-# Deploying this app to production
+## Deploying this app to staging
 run the deploy_api.rb file using:
 ruby deploy_api.rb
 
