@@ -22,7 +22,7 @@ module RuleSyntax
       temp_rule = Tempfile.new('temp.rules')
       temp_rule.write(@rule_content.gsub(/\#\s/, ''))
       temp_rule.rewind
-      Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
+      Open3.popen3("/usr/bin/env perl #{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
         text = stdout.read
         unless text.empty?
           @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
