@@ -422,7 +422,7 @@ class Rule < ApplicationRecord
       rule.state                          = 'FAILED' unless rule.parsed?
       rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
 
-      rule.save
+      rule.save!
     end
   end
 
