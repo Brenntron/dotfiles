@@ -6,7 +6,7 @@ class RuleFile
   end
 
   def self.pwd_switch
-    Rails.configuration.svn_pwd ? "--password #{Rails.configuration.svn_pwd}" : nil
+    Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
   end
 
   def self.log(message)
@@ -116,7 +116,7 @@ class RuleFile
   # run failsafe to update db if callback did not
   def self.synch_failsafe
     build(Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)).each do |rule_file|
-      `svn up #{self.class.pwd_switch} #{rule_file.synch_pathname}`
+      `svn up #{pwd_switch} #{rule_file.synch_pathname}`
       File.open(rule_file.synch_pathname, 'rt') do |file|
         file.each_line do |line|
           Rule.load_line(line)
@@ -143,7 +143,7 @@ class RuleFile
       end
 
       log("committing files #{working_file_list(rule_files)}")
-      `cd #{working_root};svn #{self.class.pwd_switch} commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
+      `cd #{working_root};svn #{pwd_switch} commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
 
       rule_files.each {|rule_file| rule_file.remove_file rescue nil }
 

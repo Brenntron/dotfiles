@@ -48,6 +48,7 @@ module Api
         config.cert_file = "extras/ssh/ca.pem"
         config.canvas_root = Rails.root.join('extras')
         config.perl_cmd = "/usr/bin/env perl"
+        config.svn_pwd = ''
       when "staging"
         config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
@@ -79,6 +80,7 @@ module Api
         config.cert_file = "/System/Library/OpenSSL/certs/ca.pem"
         config.canvas_root = Rails.root.join('extras')
         config.perl_cmd = "/usr/bin/env perl"
+        config.svn_pwd = ''
     end
     config.websockets_enabled = "false"
     config.bugzilla_domain = 'cisco.com'
