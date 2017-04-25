@@ -22,7 +22,7 @@ module RuleSyntax
       temp_rule = Tempfile.new('temp.rules')
       temp_rule.write(@rule_content)
       temp_rule.rewind
-      cmd = "/usr/bin/env perl #{Rails.configuration.visruleparser_path} #{temp_rule.path}"
+      cmd = "#{Rails.configuration.perl_cmd} #{Rails.configuration.visruleparser_path} #{temp_rule.path}"
       Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thru|
         text = stdout.read
         unless text.empty?

@@ -47,6 +47,7 @@ module Api
         config.amq_host = "localhost"
         config.cert_file = "extras/ssh/ca.pem"
         config.canvas_root = Rails.root.join('extras')
+        config.perl_cmd = "/usr/bin/env perl"
       when "staging"
         config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
@@ -56,6 +57,8 @@ module Api
         config.amq_host = "mqtest01.vrt.sourcefire.com"
         config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
         config.canvas_root = Rails.root.join('extras')
+        config.perl_cmd = "/usr/local/bin/perl"
+        config.svn_pwd = "qHa8Wvz9cKcu!"
       when "production"
         config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzilla.vrt.sourcefire.com'
@@ -65,6 +68,7 @@ module Api
         config.amq_host = "mq.vrt.sourcefire.com"
         config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
         config.canvas_root = Rails.root.join('extras') # this may need updating for production depending on where we access CANVAS_CATALOG
+        config.perl_cmd = "/usr/local/bin/perl"
       when "test"
         config.ruletest_server = "https://localhost:3000/api_test"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
@@ -74,6 +78,7 @@ module Api
         config.amq_host = "localhost"
         config.cert_file = "/System/Library/OpenSSL/certs/ca.pem"
         config.canvas_root = Rails.root.join('extras')
+        config.perl_cmd = "/usr/bin/env perl"
     end
     config.websockets_enabled = "false"
     config.bugzilla_domain = 'cisco.com'
