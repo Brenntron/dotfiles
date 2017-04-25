@@ -143,15 +143,17 @@ class RuleFile
 
       rule_files.each {|rule_file| rule_file.remove_file rescue nil }
 
-      #any rules not set to synch by svn hook should go back to current.
+      if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
+        synch_failsafe
+      end
     end
 
     true
 
   ensure
+    #any rules not set to synch by svn hook should go back to current.
     if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
       log("setting rules from publishing to current_edit")
-      synch_failsafe rescue nil
       Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
           .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
