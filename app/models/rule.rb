@@ -248,7 +248,7 @@ class Rule < ApplicationRecord
     self.on                             = /^\s*#/ !~ given_rule_content
     self.rule_content                   = on_rule_content(given_rule_content)
 
-    vparser = RuleSyntax::VisruleParser.new(rule_content)
+    vparser = RuleSyntax::VisruleParser.new(on_rule_content)
 
     self.rule_parsed                    = vparser.parsed_lines
     self.rule_warnings                  = vparser.errors
