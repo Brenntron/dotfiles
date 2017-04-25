@@ -373,6 +373,13 @@ class Rule < ApplicationRecord
     end
   end
 
+  def self.find_and_load_rule_content(rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    rule = Rule.find_from_parser(parser)
+    rule.load_rule_content(rule_content)
+    rule
+  end
+
   # Take a line from grep output of a rule file and saves to database
   # @param [String, #read] rule_grep_line the line of text from a rule file.
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank

@@ -5,6 +5,10 @@ class RuleFile
     attr_reader :publish_lock_pid
   end
 
+  def to_s
+    relative_pathname.to_s
+  end
+
   def self.log(message)
     Rails.logger.info "svn integration: #{message}"
   end
@@ -109,6 +113,18 @@ class RuleFile
     `svn up #{working_pathname}`
   end
 
+  # read diffs from file to add new rules to bug
+  def link_add_lines(bugzilla_id)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    `svn up #{synch_pathname}`
+    `svn diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
+      if (/^\+/ =~ line) && (/^\+\+\+/ !~ line)
+        rule = Rule.find_and_load_rule_content(line[1..-1])
+        bug.rules << rule unless bug.rules.pluck(:sid, :gid).include?([rule.sid, rule.gid])
+      end
+    end
+  end
+
   # run failsafe to update db if callback did not
   def self.synch_failsafe
     build(Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)).each do |rule_file|
@@ -123,7 +139,7 @@ class RuleFile
 
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
-  def self.commit_rules_action(rules)
+  def self.commit_rules_action(rules, bugzilla_id)
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
     if rules.any? && publish_lock
       rule_files = build(rules)
@@ -141,7 +157,9 @@ class RuleFile
       log("committing files #{working_file_list(rule_files)}")
       `cd #{working_root};svn commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
 
-      rule_files.each {|rule_file| rule_file.remove_file rescue nil }
+      rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
+
+      rule_files.each {|rule_file| rule_file.link_add_lines(bugzilla_id) } if bugzilla_id
 
       if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
         synch_failsafe
