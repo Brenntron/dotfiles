@@ -130,7 +130,7 @@ class Rule < ApplicationRecord
 
   def self.grep_line_from_file(sid, gid, given_filepath = nil)
     filepath = given_filepath || "#{Rails.root}/extras/snort/*/*.rules"
-    rule_grep_output = `grep -Hrn "sid:\\s*#{sid}\\s*;" #{filepath}`
+    rule_grep_output = `grep -Hn "sid:\\s*#{sid}\\s*;" #{filepath}`
     thisgid_regexp = gid_regexp(gid)
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
