@@ -113,14 +113,23 @@ class RuleFile
     `svn up #{working_pathname}`
   end
 
+  # links a new rule to the bug
+  # calling code should check that this rule is not already a rule associated with this bug.
+  def link_new_rule(bug, rule)
+    bug.rules << rule
+    publishing_rule =
+        bug.rules.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).where(message: rule.message).first
+    publishing_rule.bugs.delete_all if publishing_rule
+  end
+
   # read diffs from file to add new rules to bug
-  def link_add_lines(bugzilla_id)
+  def load_add_line(bugzilla_id)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
     `svn up #{synch_pathname}`
     `svn diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line)
         rule = Rule.find_and_load_rule_content(line[1..-1])
-        bug.rules << rule unless bug.rules.pluck(:sid, :gid).include?([rule.sid, rule.gid])
+        link_new_rule(bug, rule) unless bug.rules.pluck(:id).include?(rule.id)
       end
     end
   end
@@ -159,7 +168,7 @@ class RuleFile
 
       rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 
-      rule_files.each {|rule_file| rule_file.link_add_lines(bugzilla_id) } if bugzilla_id
+      rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
 
       if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
         synch_failsafe
