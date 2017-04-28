@@ -98,6 +98,33 @@ class Bug < ApplicationRecord
     end
   end
 
+  def self.query(current_user, named_query, search_options)
+    case named_query
+      when Nil
+        nil
+      when "all-bugs"
+        @bugs = Bug.all
+      when "open-bugs"
+        @bugs = Bug.open_bugs
+      when "pending-bugs"
+        @bugs = Bug.pending
+      when 'fixed-bugs'
+        Bug.closed
+      when "my-bugs"
+        current_user.bugs
+      when "team-bugs"
+        if current_user.has_role?('manager')
+          current_user.children.map{ |cw| cw.bugs }[0] || []
+        else
+          current_user.siblings.map{ |cw| cw.bugs }[0] || []
+        end
+      when "advance-search"
+        Bug.bugs_with_search(search_options)
+      else
+        nil
+    end
+  end
+
   def update_attachments(xmlrpc)
     fields = ['file_name', 'id', 'last_change_time', 'is_obsolete', 'size']
 

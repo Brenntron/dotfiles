@@ -9,9 +9,13 @@ class BugsController < ApplicationController
 
 
   def index
+    @bug_query = Bug.query(current_user, session[:query], session[:search]) || current_user.default_bug_list
+    if @bug_query
+      @bugs = @bug_query.where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
+    end
     if params[:bug].present?
-      @bug_searchID = params[:bug][:id]
-      if @bug_searchID
+      @bug_search_id = params[:bug][:id]
+      if @bug_search_id
         @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
       end
     end
@@ -103,38 +107,7 @@ class BugsController < ApplicationController
     else
       session[:query] = session[:query] || ''
     end
-    if session[:query]
-      case session[:query]
-        when "my-bugs"
-          @bugs = current_user.bugs
-        when "my-open-bugs"
-          @bugs = current_user.bugs.open_bugs
-        when "team-bugs"
-          if current_user.has_role?('manager')
-            @bugs = current_user.children.map{ |cw| cw.bugs }[0] || []
-          else
-            @bugs = current_user.siblings.map{ |cw| cw.bugs }[0] || []
-          end
-        when "open-bugs"
-          @bugs = Bug.open_bugs
-        when "pending-bugs"
-          @bugs = Bug.pending
-        when "fixed-bugs"
-          @bugs = Bug.closed
-        when "advance-search"
-          @bugs = Bug.bugs_with_search(session[:search])
-        when "all-bugs"
-          @bugs = Bug.all
-        else
-          @bugs = current_user.default_bug_list
-      end
-    else
-      @bugs = current_user.default_bug_list
-    end
     session[:page] = params[:page] || session[:page]
-    if @bugs
-      @bugs = @bugs.where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
-    end
   end
 
   def get_params_hash(params)
