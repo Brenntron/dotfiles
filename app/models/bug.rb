@@ -101,7 +101,7 @@ class Bug < ApplicationRecord
 
   def self.query(current_user, named_query, search_options)
     case named_query
-      when Nil
+      when NilClass
         nil
       when "all-bugs"
         @bugs = Bug.all
