@@ -11,12 +11,14 @@ class BugsController < ApplicationController
   def index
     @bug_query = Bug.query(current_user, session[:query], session[:search]) || current_user.default_bug_list
     if @bug_query
-      @bugs = @bug_query.where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
+      @bugs = @bug_query.lower_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
     end
     if params[:bug].present?
       @bug_search_id = params[:bug][:id]
       if @bug_search_id
-        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
+        @bugs =
+            Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").lower_class_level(current_user.class_level)
+                .paginate(:page => session[:page], :per_page => 32)
       end
     end
   end
