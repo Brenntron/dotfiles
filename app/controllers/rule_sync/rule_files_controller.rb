@@ -38,7 +38,7 @@ module RuleSync
     # POST /rule_sync/rule_files?filename=rules/file-java.rules,so_rules/file-java.rules
     def create
       RuleFileSync.sync(params['filenames'] || params['filename'])
-      render :text => "Sync was called."
+      render plain: "Sync was called."
     end
   end
 end

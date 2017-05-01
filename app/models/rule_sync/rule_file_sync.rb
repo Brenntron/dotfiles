@@ -16,22 +16,19 @@ module RuleSync
 
     # For each given filename, checks out latest from svn and read into db.
     def sync
-      sync_script_path = Rails.root.join('extras', 'synch_rules.sh')
+      ac_root = Pathname.new(Rails.configuration.ac_root)
+      sync_script_path = ac_root.join('extras', 'synch_rules.sh')
 
       @filenames.each do |filename|
         next unless /[-\w]+\/[-\w]+.rules/ =~ filename
 
-        dirpath = Pathname.new(Rails.configuration.ac_root).join('extras', 'snort', File.dirname(filename))
-        basename = File.basename(filename)
-        filepath = dirpath.join(basename)
+        filepath = ac_root.join('extras', 'snort', filename)
 
-        next unless File.directory?(dirpath)
+        # next unless File.directory?(dirpath)
+        next unless File.directory?(filepath.dirname)
 
-        # TODO replace touch with svc checkout
-        # TODO remove echo
-        # TODO remove puts
-        puts `svn up #{filepath}`
-        puts `cd #{dirpath};touch #{basename};echo #{sync_script_path} #{filepath}`
+        `svn up #{filepath}`
+        `cd #{Rails.configuration.ac_root};#{sync_script_path} #{filepath}`
       end
     end
   end
