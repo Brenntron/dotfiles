@@ -1,7 +1,0 @@
-Enter filenames to test rule sync.
-Example: &quot;snort-rules/sql.rules,snort-rules/blacklist.rules&quot;
-
-<%= form_for :rule_file, method: :post, url: rule_sync_rule_files_path do |rule_file_form| %>
-    <%= rule_file_form.text_area :filename, name: 'filename', cols: 60, rows: 10 %>
-    <%= rule_file_form.submit "POST" %>
-<% end %>
