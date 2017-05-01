@@ -31,6 +31,9 @@ module RuleSync
   class RuleFilesController < ApplicationController
     layout false
 
+    def new
+    end
+
     # Takes a comma separated list of file paths, to notify us to update those files from version control.
     # POST /rule_sync/rule_files?filename=rules/file-java.rules,so_rules/file-java.rules
     def create
