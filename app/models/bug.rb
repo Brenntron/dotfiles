@@ -85,17 +85,11 @@ class Bug < ApplicationRecord
     changed_bug
   end
 
-  def self.bugs_with_search(params)
-    if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
-      query_params = params.reject { |k, v| (v == '' || v.is_a?(Array) || k =='tag_name') }
-      count = 0
-      query = ''
-      query_params.each do |k, v|
-        count = count + 1
-        query = query + k + "='" + v.gsub("'", "\\'") + "'"
-        query = query + ' && ' if count != query_params.to_h.size
-      end
-      Bug.where(query)
+  def self.bugs_with_search(query_params)
+    if query_params[:bugzilla_max] == '' || query_params[:bugzilla_max].nil?
+      Bug.where(query_params)
+    else
+      nil
     end
   end
 
@@ -120,7 +114,7 @@ class Bug < ApplicationRecord
           current_user.siblings.map{ |cw| cw.bugs }[0] || []
         end
       when "advance-search"
-        Bug.bugs_with_search(search_options)
+        Bug.bugs_with_search(search_options) || Bug.all
       else
         nil
     end
