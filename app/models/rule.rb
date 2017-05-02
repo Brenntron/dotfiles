@@ -93,6 +93,17 @@ class Rule < ApplicationRecord
     local_rule_content.sub(/^\s*#?\s*/, '# ')
   end
 
+  def test_rule_content
+    rule_string = on_rule_content
+    if new_rule?
+      rule_string.gsub!(/\)\s*\z/, " gid:#{self.gid || 1};)") unless /gid:\s*\d+\s*;/ =~ rule_string
+      new_sid = id + SnortLocalRulesResultProcessor::NEW_RULE_ID_BIAS
+      rule_string.gsub!(/\)\s*\z/, " sid:#{new_sid};)") unless /sid:\s*\d+\s*;/ =~ rule_string
+      rule_string.gsub!(/\)\s*\z/, " rev:1;)") unless /rev:\s*\d+\s*;/ =~ rule_string
+    end
+    rule_string
+  end
+
   # the rule content in the correct on/off commented/uncommented state to commit
   # @return [String] the corrected rule content
   def rule_content_for_commit
@@ -312,7 +323,7 @@ class Rule < ApplicationRecord
       rule.state                          = 'FAILED' unless rule.parsed?
       rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
 
-      rule.save
+      rule.save!
     end
   end
 
