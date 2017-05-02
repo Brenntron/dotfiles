@@ -47,7 +47,6 @@ module Api
         config.amq_host = "localhost"
         config.cert_file = "extras/ssh/ca.pem"
         config.canvas_root = Rails.root.join('extras')
-        config.ac_root = "/Users/marlpier/projects/Analyst-Console"
       when "staging"
         config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
