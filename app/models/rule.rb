@@ -396,6 +396,7 @@ class Rule < ApplicationRecord
   # @raise [RuntimeError] could not process
   def self.load_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+    filename = nil if /[-\/\w]+/ !~ filename
 
     rule_content.strip!
     if rule_content.empty?
