@@ -101,8 +101,8 @@ def self.production_config(timestamp, rebuild_gems)
   system "ln -s ./shared/.env ."
 
   `echo 'simlink the timestamped folder to the app directory'`
-  system "rm /usr/local/www/analyst-console/public/current"
-  system "ln -s /usr/local/www/analyst-console/releases/#{timestamp} /usr/local/www/analyst-console/public/current"
+  system "rm ../../public/current"
+  system "ln -s /usr/local/www/analyst-console/releases/#{timestamp} ../../public/current"
   # system "rm /usr/local/www/analyst-console/public/app"
   #so we are gonna have to copy it instead
   # system "rsync -r #{Dir.pwd}/* /usr/local/www/analyst-console"
@@ -128,7 +128,7 @@ def self.production_config(timestamp, rebuild_gems)
 
 
   `echo 'removing rulesuitest.tar.gz'`
-  system "rm #{Dir.pwd}/rulesuitest.tar.gz"
+  system "rm #{Dir.pwd}/analyst-console.tar.gz"
 end
 
 process_api = true
