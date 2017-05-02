@@ -94,10 +94,13 @@ class BugsController < ApplicationController
                                                                                                               :metadata, :detection, :class_type, :reference], tag_ids: [])
   end
 
+  def query_params
+    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state)
+  end
+
   def sync_summary
     @bug.compose_summary
   end
-
 
   def query_bugs
     if params[:q]
@@ -105,7 +108,7 @@ class BugsController < ApplicationController
       session[:page] = "1"
     elsif params[:bug].present?
       session[:query] = "advance-search"
-      session[:search] = params[:bug]
+      session[:search] = query_params
     else
       session[:query] = session[:query] || ''
     end
