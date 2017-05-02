@@ -110,6 +110,7 @@ class BugsController < ApplicationController
     elsif params[:bug].present?
       session[:query] = "advance-search"
       session[:search] = query_params
+      session[:page] = "1"
     else
       session[:query] = session[:query] || ''
     end
