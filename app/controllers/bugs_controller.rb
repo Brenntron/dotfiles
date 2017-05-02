@@ -107,6 +107,8 @@ class BugsController < ApplicationController
       case session[:query]
         when "my-bugs"
           @bugs = current_user.bugs
+        when "my-open-bugs"
+          @bugs = current_user.bugs.open_bugs
         when "team-bugs"
           if current_user.has_role?('manager')
             @bugs = current_user.children.map{ |cw| cw.bugs }[0] || []
