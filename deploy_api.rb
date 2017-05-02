@@ -98,7 +98,7 @@ def self.production_config(timestamp, rebuild_gems)
   system "for file in log/*; do echo ### Release #{timestamp} >> $file; done"
 
   system "rm ./.env"
-  system "ln -s ./shared/.env ."
+  system "ln -s ../shared/.env ."
 
   `echo 'simlink the timestamped folder to the app directory'`
   system "rm ../../public/current"
