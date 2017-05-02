@@ -54,7 +54,7 @@ module Api
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
         config.amq_host = "mqtest01.vrt.sourcefire.com"
-        config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
+        config.cert_file = "/usr/local/etc/trusted-certificates.pem"
         config.canvas_root = Rails.root.join('extras')
       when "production"
         config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
@@ -63,7 +63,7 @@ module Api
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
         config.amq_host = "mq.vrt.sourcefire.com"
-        config.cert_file = "/usr/local/www/rulesuitest/releases/shared/ssh/ca.pem"
+        config.cert_file = "/usr/local/etc/trusted-certificates.pem"
         config.canvas_root = Rails.root.join('extras') # this may need updating for production depending on where we access CANVAS_CATALOG
       when "test"
         config.ruletest_server = "https://localhost:3000/api_test"
