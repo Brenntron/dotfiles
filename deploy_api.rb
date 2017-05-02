@@ -100,6 +100,9 @@ def self.production_config(timestamp, rebuild_gems)
   system "rm ./.env"
   system "ln -s ../shared/.env ."
 
+  system "rm -rf extras/ssh"
+  system "ln -s ~/analyst-console/.ssh extras/ssh"
+
   `echo 'simlink the timestamped folder to the app directory'`
   system "rm ../../public/current"
   system "ln -s /usr/local/www/analyst-console/releases/#{timestamp} ../../public/current"
