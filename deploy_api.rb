@@ -95,7 +95,7 @@ def self.production_config(timestamp, rebuild_gems)
 
   system "rm -rf log"
   system "ln -s ../shared/log ."
-  system "for file in log/*(.); do echo ### Release #{timestamp} >> $file; done"
+  system "for file in log/*; do echo ### Release #{timestamp} >> $file; done"
 
   system "rm ./.env"
   system "ln -s ./shared/.env ."
@@ -128,7 +128,7 @@ def self.production_config(timestamp, rebuild_gems)
 
 
   `echo 'removing rulesuitest.tar.gz'`
-  system "rm #{Dir.pwd}/analyst-console.tar.gz"
+  system "rm #{Dir.pwd}/rulesuitest.tar.gz"
 end
 
 process_api = true
