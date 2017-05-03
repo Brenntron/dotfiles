@@ -6,8 +6,8 @@ class SessionsController < ApplicationController
           begin
             login_session = User.login_user(params, request)
             if login_session && login_session.success && login_session.user_id && login_session.xmlrpc_token
-              session[:login_session] = login_session
               session[:user] = login_session.user_id
+              session[:email] = login_session.user_email
               session[:token] = login_session.xmlrpc_token
             end
             login_session.to_h
