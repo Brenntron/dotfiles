@@ -7,6 +7,10 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def require_login
+    redirect_to root_url unless current_user
+  end
+
   def bugzilla_session()
     xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
     xmlrpc.token = request.headers['Xmlrpc-Token'] ? request.headers['Xmlrpc-Token'] : xml_token
