@@ -17,10 +17,15 @@ class ApplicationController < ActionController::Base
     return xmlrpc
   end
 
-
   def current_user
-    @current_user ||= User.where(id: session[:user]).first if session[:user]
-    @current_user
+    user_from_reqeust = User.from_request(params, request)
+
+    if session[:email] && ( user_from_reqeust.email == session[:email])
+      @current_user ||= user_from_reqeust
+    else
+      # force re-authentication
+      nil
+    end
   end
 
   def xml_token
