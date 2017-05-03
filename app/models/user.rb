@@ -219,7 +219,9 @@ class User < ApplicationRecord
     begin
       # we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-      xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
+      xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc),
+                            Rails.configuration.ember_app[:bugzilla_login],
+                            Rails.configuration.ember_app[:bugzilla_key])
 
       user = from_request(params, request)
       user.confirmed = 'true'
