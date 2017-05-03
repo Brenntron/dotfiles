@@ -6,7 +6,6 @@ class LoginSession
     @user = user
     @xmlrpc_token = xmlrpc.token
     @timestamp = Time.now
-    puts "*** @ts = #{timestamp.inspect}"
   end
 
   def success?
