@@ -220,22 +220,14 @@ class User < ApplicationRecord
       # we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
       xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc), Rails.configuration.ember_app[:bugzilla_login], Rails.configuration.ember_app[:bugzilla_key])
+
       user = from_request(params, request)
       user.confirmed = 'true'
       user.updated_at = Time.now
       user.ensure_authentication_token # make sure the user has a token generated
-      resource = {
-          success: true,
-          xmlrpc_token: xmlrpc.token,
-          kerberos_login: user.kerberos_login,
-          user_token: user.authentication_token, # this must be called user_token for the ember app session to persist
-          user_email: user.email, # this also ust be called user_email for the ember app session to persist
-          user_id: user.id,
-          currentUser: { display_name: user.display_name }
-      }
-
       raise Exception.new('Error signing in. Please contact the administrator.') unless user.save
-      return resource
+
+      LoginSession.new(user, xmlrpc)
     end
   end
 end
