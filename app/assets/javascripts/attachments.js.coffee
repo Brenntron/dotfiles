@@ -44,7 +44,7 @@ $ ->
     $('input:checkbox.attach_check_box').each ->
       if @checked
         selected.push($(this).val())
-    data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: "attachment", created_by: user_id}}
+    data = {bugzilla_id: bug_id, attachment_array: selected}
     $.ajax(
       url: "/api/v1/bugs/attachments/link_rules"
       method: 'POST'

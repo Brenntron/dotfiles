@@ -703,4 +703,12 @@ class Bug < ApplicationRecord
       bug.rules << rule
     end
   end
+
+  def self.link_alerts(bugzilla_id, attachment_array)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    attachment_array.each do |attachment_id|
+      byebug
+    end
+    "true"
+  end
 end

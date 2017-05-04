@@ -169,6 +169,15 @@ module API
           Bug.link_action(permitted_params[:bug_id], permitted_params[:sid], permitted_params[:gid])
         end
 
+        desc "link all alerting rules to this bug"
+        params do
+          requires :bugzilla_id, type: String, desc: "The bug associated with the task"
+          requires :attachment_array, type: Array[String], desc: "The attachments to test. this is a list of bugzilla attachment id's"
+        end
+        post 'attachments/link_rules' do
+          Bug.link_alerts(permitted_params[:bugzilla_id], permitted_params[:attachment_array])
+        end
+
         desc "get a single bug"
         params do
           requires :id, type: String, desc: "ID of the bug"
