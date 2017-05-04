@@ -123,12 +123,21 @@ module API
           end
         end
 
-        desc "unlink a rule with this bug"
+        desc "delete a rule with this bug"
         params do
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
         end
         delete '/rules/:link' do
           Bug.where(id:permitted_params[:link].split(':')[0]).first.rules.destroy(permitted_params[:link].split(':')[1]).first
+        end
+
+        desc "unlink a rule with this bug"
+        params do
+          requires :bugzilla_id, type: Integer, desc: "bugzilla id of the bug"
+          requires :rule_ids, type: Array[Integer]
+        end
+        delete '/:bugzilla_id/rules/unlink' do
+          Bug.unlink_action(permitted_params[:bugzilla_id], permitted_params[:rule_ids])
         end
 
         desc "search for bugs"

@@ -689,6 +689,11 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
+  def unlink_rule(rule_id)
+    rule = Rule.where(id: rule_id).first
+    rules.delete(rule) if rule
+  end
+
   def link_alert(attachment_id)
     attachment = Attachment.where(id: attachment_id).first
     attachment.pcap_alerts.each do |alert|
@@ -702,6 +707,12 @@ class Bug < ApplicationRecord
     if bug && rule
       bug.rules << rule
     end
+  end
+
+  def self.unlink_action(bug_id, rule_ids)
+    bug = Bug.where(id: bug_id).first
+    rule_ids.each { |rule_id| bug.unlink_rule(rule_id) } if bug
+    "success"
   end
 
   def self.link_alerts_action(bugzilla_id, attachment_array)
