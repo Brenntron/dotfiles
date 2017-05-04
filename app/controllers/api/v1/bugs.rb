@@ -175,7 +175,7 @@ module API
           requires :attachment_array, type: Array[String], desc: "The attachments to test. this is a list of bugzilla attachment id's"
         end
         post 'attachments/link_rules' do
-          Bug.link_alerts(permitted_params[:bugzilla_id], permitted_params[:attachment_array])
+          Bug.link_alerts_action(permitted_params[:bugzilla_id], permitted_params[:attachment_array])
         end
 
         desc "get a single bug"
