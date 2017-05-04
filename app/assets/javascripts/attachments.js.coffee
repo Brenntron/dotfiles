@@ -35,6 +35,41 @@ $ ->
         max: e.total
     return
 
+  $(document).on 'click', '#pcap-import-alerts-button',  ->
+    $(this).attr('disabled', 'disabled')
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    bug_id = $('input[name="bug_id"]').val()
+    user_id = $('input[name="current_user_id"]').val()
+    selected = []
+    $('input:checkbox.attach_check_box').each ->
+      if @checked
+        selected.push($(this).val())
+    data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: "attachment", created_by: user_id}}
+    $.ajax(
+      url: "/api/v1/bugs/attachments/link_rules"
+      method: 'POST'
+      data: data
+      headers: headers
+      success: (response) ->
+        task = response
+        d = new Date()
+        month = d.getMonth()+1
+        day = d.getDate()
+        date = month + '/' + day + '/' + d.getFullYear()
+        string = '<tr id='+task.id+'><td class="center"><input type="checkbox"></td>'+
+          '<td class="center"><input type="checkbox"></td>'+
+          '<td>'+task.task_type+'</td><td></td><td></td>'+
+          '<td>'+task.result+'</td>'+
+          '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
+        $('#jobs-tab table tbody').append(string)
+        $('.alert_attachments').addClass('success').show().html('Rules have been imported')
+        window.location.reload()
+      error: (response) ->
+        $('.alert_attachments').addClass('error').show().html('Rules have not been imported')
+        $(this).attr('disabled', false)
+        window.location.reload()
+    )
+
   $('.synch').on 'click', ->
     id = $('input[name="bugzilla_id"]').val()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
