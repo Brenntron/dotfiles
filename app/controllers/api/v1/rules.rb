@@ -58,7 +58,7 @@ module API
 
         # Creates a rule and its associations
         # @return [Rule]
-        desc "create a rule"
+        desc "create a rule from rule content"
         params do
           requires :rule, type: Hash do
             requires :rule_content,     type: String,  desc: "Compiled rule content"
@@ -87,7 +87,7 @@ module API
 
         # Creates a rule and its associations
         # @return [Rule]
-        desc "create a rule"
+        desc "create a rule from fields given in parts"
         params do
           requires :rule, type: Hash do
             requires :connection, type: Hash do

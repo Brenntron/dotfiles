@@ -17,19 +17,21 @@ test: &test
   username: root
   host: localhost
 
-production:
-  adapter: mysql2
-  encoding: utf8
-  database: talos_rulesui_production
-  username: root
-  host: localhost
-
 staging:
   adapter: mysql2
   encoding: utf8
+  host: localhost
   database: talos_rulesui_staging
   username: root
+  password: Opensnort
+
+production:
+  adapter: mysql2
+  encoding: utf8
   host: localhost
+  database: analyst_console
+  username: root
+  password: Opensnort
 
 cucumber:
   <<: *test

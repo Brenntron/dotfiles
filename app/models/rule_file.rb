@@ -9,6 +9,11 @@ class RuleFile
     relative_pathname.to_s
   end
 
+  def self.svn_cmd
+    pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
+    "#{Rails.configuration.svn_cmd} #{pwd_switch}"
+  end
+
   def self.log(message)
     Rails.logger.info "svn integration: #{message}"
   end
@@ -110,7 +115,7 @@ class RuleFile
   def checkout
     FileUtils.mkpath(working_pathname.dirname)
     remove_working_file
-    `svn up #{working_pathname}`
+    `#{self.class.svn_cmd} up #{working_pathname}`
   end
 
   # links a new rule to the bug
@@ -137,7 +142,7 @@ class RuleFile
   # run failsafe to update db if callback did not
   def self.synch_failsafe
     build(Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)).each do |rule_file|
-      `svn up #{rule_file.synch_pathname}`
+      `#{svn_cmd} up #{rule_file.synch_pathname}`
       File.open(rule_file.synch_pathname, 'rt') do |file|
         file.each_line do |line|
           Rule.load_line(line)
@@ -164,7 +169,7 @@ class RuleFile
       end
 
       log("committing files #{working_file_list(rule_files)}")
-      `cd #{working_root};svn commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
+      `#{svn_cmd} commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
 
       rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 

@@ -93,6 +93,17 @@ class Rule < ApplicationRecord
     local_rule_content.sub(/^\s*#?\s*/, '# ')
   end
 
+  def test_rule_content
+    rule_string = on_rule_content
+    if new_rule?
+      rule_string.gsub!(/\)\s*\z/, " gid:#{self.gid || 1};)") unless /gid:\s*\d+\s*;/ =~ rule_string
+      new_sid = id + SnortLocalRulesResultProcessor::NEW_RULE_ID_BIAS
+      rule_string.gsub!(/\)\s*\z/, " sid:#{new_sid};)") unless /sid:\s*\d+\s*;/ =~ rule_string
+      rule_string.gsub!(/\)\s*\z/, " rev:1;)") unless /rev:\s*\d+\s*;/ =~ rule_string
+    end
+    rule_string
+  end
+
   # the rule content in the correct on/off commented/uncommented state to commit
   # @return [String] the corrected rule content
   def rule_content_for_commit
@@ -248,7 +259,7 @@ class Rule < ApplicationRecord
     self.on                             = /^\s*#/ !~ given_rule_content
     self.rule_content                   = on_rule_content(given_rule_content)
 
-    vparser = RuleSyntax::VisruleParser.new(rule_content)
+    vparser = RuleSyntax::VisruleParser.new(on_rule_content)
 
     self.rule_parsed                    = vparser.parsed_lines
     self.rule_warnings                  = vparser.errors
@@ -312,7 +323,7 @@ class Rule < ApplicationRecord
       rule.state                          = 'FAILED' unless rule.parsed?
       rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
 
-      rule.save
+      rule.save!
     end
   end
 
@@ -403,6 +414,7 @@ class Rule < ApplicationRecord
   # @raise [RuntimeError] could not process
   def self.load_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+    filename = nil if /[-\/\w]+/ !~ filename
 
     rule_content.strip!
     if rule_content.empty?

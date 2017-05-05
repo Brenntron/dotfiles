@@ -107,6 +107,8 @@ class BugsController < ApplicationController
       case session[:query]
         when "my-bugs"
           @bugs = current_user.bugs
+        when "my-open-bugs"
+          @bugs = current_user.bugs.open_bugs
         when "team-bugs"
           if current_user.has_role?('manager')
             @bugs = current_user.children.map{ |cw| cw.bugs }[0] || []
@@ -154,12 +156,14 @@ class BugsController < ApplicationController
   end
 
   def check_bug_permission
-    bug = Bug.where(id: params[:id]).first()
-    unless bug.check_permission(current_user)
-      redirect_to '/bugs'
-      flash[:error] = "You dont have permission to access bug: #{params[:id]}"
+    bug = Bug.where(id: params[:id]).first
+    case
+      when bug.nil?
+        redirect_to '/bugs'
+        flash[:error] = "Couldn't find Bug #{params[:id]}"
+      when !bug.check_permission(current_user)
+        redirect_to '/bugs'
+        flash[:error] = "You dont have permission to access bug: #{params[:id]}"
     end
-
   end
-
 end
