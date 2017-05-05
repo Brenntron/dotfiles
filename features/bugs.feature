@@ -240,6 +240,9 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
     And the following rules exist belonging to bug "222222":
       |id | message                 | rule_category_id |
       |1  | BLACKLIST message       | 1                |
@@ -269,6 +272,9 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
     And the following rules exist belonging to bug "222222":
       |id | message                 | rule_category_id |
       |1  | BLACKLIST message       | 1                |
@@ -500,7 +506,12 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
-    And a rule exists and belongs to bug "222222"
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist belonging to bug "222222":
+      | message                 | rule_category_id |
+      | BLACKLIST message       | 1                |
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
     And I click ".rules-tab"
@@ -513,14 +524,18 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
-    And a rule exists and belongs to bug "145359"
+    And the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    And the following rules exist belonging to bug "145359":
+      |  id  | message                 | rule_category_id |
+      | 3591 | BLACKLIST message       | 1                |
     And I wait for "3" seconds
     When I goto "/bugs/145359"
     And I click ".jobs-tab"
     Then I should not see "rule"
     And I click ".rules-tab"
-    And I toggle checkbox ".rule_1"
-    Then I should see "ActiveX clsid access attempt"
+    And I toggle checkbox ".rule_3591"
     When I click button "test"
     Then test should be created and I should see "Task has been created to test the rule"
     And I click ".jobs-tab"
