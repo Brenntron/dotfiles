@@ -19,15 +19,15 @@ Given(/^bug with id "(.*)" has rule with id "(.*)"$/) do |bug_id, rule_id|
 end
 
 Given(/^the following rules exist:$/) do |rules|
-  rules.hashes.each do |rule|
-    FactoryGirl.create(:rule, rule)
+  rules.hashes.each do |rule_attrs|
+    FactoryGirl.create(:rule, rule_attrs)
   end
 end
 
 Given(/^the following rules exist belonging to bug "(.*?)":$/) do |bug_id, rules|
   bug = Bug.find(bug_id)
-  rules.hashes.each do |rule|
-    bug.rules << FactoryGirl.create(:rule, rule)
+  rules.hashes.each do |rule_attrs|
+    bug.rules << FactoryGirl.create(:rule, rule_attrs)
   end
 end
 

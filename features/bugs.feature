@@ -270,8 +270,8 @@ Feature: Bug
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     And the following rules exist belonging to bug "222222":
-      |id | message                 | rule_category_id |
-      |1  | BLACKLIST message       | 1                |
+      |id | message                 | rule_category_id | parsed |
+      |1  | BLACKLIST message       | 1                |  true  |
     And the following references exist:
       | id | reference_data | reference_type_id |
       | 1  | 2006-5745      | 1                 |
@@ -280,7 +280,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    Then I should see "Can't set to pending. Please complete the summary for rule docs."
+    Then I should see "Can't set to pending."
     And I can not select "PENDING" from "bug[state]"
 
   @javascript
