@@ -525,59 +525,6 @@ class Rule < ApplicationRecord
     redirect_to request.referer
   end
 
-  # def remove_rule
-  #   begin
-  #     remove_rule_from_bug(Bug.find(active_scaffold_session_storage[:constraints][:bugs]), Rule.find(params[:id]))
-  #   rescue Exception => e
-  #     log_error(e)
-  #   end
-  #
-  #   redirect_to request.referer
-  # end
-
-  def remove_rule_from_bug(bug, rule)
-    # Remove any new alerts from the attachments
-    if rule.state == "NEW"
-      bug.attachments.each do |attachment|
-        attachment.rules.delete(rule)
-      end
-    end
-
-    # Remove the rule reference
-    bug.rules.delete(rule)
-
-    # Remove this rule if it is no longer needed
-    rule.destroy if rule.bugs.empty? && rule.attachments.empty?
-  end
-
-  def self.create_or_update_rule(body)
-    begin
-      parsed = Rule.parse_rule(body)
-      rule = Rule.where('sid = ?', parsed['sid']).first
-      if rule.empty?
-        rule = Rule.create(content: body)
-        rule.gid = 1
-        rule.message = parsed['msg'].gsub("\"", "")
-        rule.sid = parsed['sid']
-        rule.rev = parsed['revision']
-        rule.state = 'UNCHANGED'
-      else
-        rule.content = body
-        rule.message = parsed['msg'].gsub("\"", "")
-        rule.gid = 1
-        rule.sid = parsed['sid']
-        rule.rev = parsed['revision']
-        rule.state = 'UNCHANGED'
-      end
-      rule.edit_status = EDIT_STATUS_SYNCHED
-      rule.publish_status = PUBLISH_STATUS_SYNCHED
-      rule.save
-      return rule
-    rescue Exception => e
-      raise Exception.new(e)
-    end
-  end
-
   def self.find_current_rule(sid)
     Dir.entries(Rails.configuration.snort_rule_path).each do |f|
       # Don't include .stub.rules hidden rule files
@@ -594,22 +541,6 @@ class Rule < ApplicationRecord
 
     raise RuleError.new("Unable to find sid #{sid}")
   end
-
-  # def self.update_generate_rule(sid)
-  #   begin
-  #     return Rule.create_or_update_rule(Rule.find_current_rule(sid))
-  #   rescue Exception => e
-  #     raise Exception.new(e)
-  #   end
-  # end
-
-  # def self.update_rules(rules)
-  #   ApplicationRecord.transaction do
-  #     rules.each do |rule|
-  #       rule.save
-  #     end
-  #   end
-  # end
 
   def sort_rules_by_state
     case (state)
