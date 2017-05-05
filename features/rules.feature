@@ -348,6 +348,9 @@ Feature: Rules
   @javascript
   Scenario: One or more rules can be selected on a bug to view or edit
     Given a user with role "analyst" exists and is logged in
+    And the following rule categories exist:
+      | category        | id |
+      | BROWSER-PLUGINS |  1 |
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
