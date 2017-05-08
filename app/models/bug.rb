@@ -26,6 +26,16 @@ class Bug < ApplicationRecord
 
   scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
 
+  # @return [Array] username (displayable) and id pairs suitable for select drop downs.
+  def allowed_assignees
+    User.allowed_assignees(self).pluck(:cvs_username,:id)
+  end
+
+  # @return [Array] username (displayable) and id pairs suitable for select drop downs.
+  def allowed_committers
+    User.allowed_committers(self).pluck(:cvs_username,:id)
+  end
+
   enum classification: {
                           unclassified: 0,
                           confidential: 1,

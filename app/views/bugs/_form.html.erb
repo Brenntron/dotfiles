@@ -35,7 +35,7 @@
       <div class="row">
         <div class="col-sm-12 form-group">
           <label for="user_id">Assignee</label>
-          <%=f.select :user_id, options_for_select(User.allowed_assignees(@bug).pluck(:cvs_username,:id), selected: @bug.user_id), {include_blank: true}, class: 'form-control', required: true%>
+          <%=f.select :user_id, options_for_select(@bug.allowed_assignees, selected: @bug.user_id), {include_blank: true}, class: 'form-control', required: true%>
         </div>
       </div>
     <% end %>
@@ -43,7 +43,7 @@
       <div class="row">
         <div class="col-sm-12 form-group">
           <label for="committer_id">Committer</label>
-          <%=f.select :committer_id, options_for_select(User.allowed_committers(@bug).pluck(:cvs_username,:id), selected: @bug.committer_id), {include_blank: true}, class: 'form-control', required: true%>
+          <%=f.select :committer_id, options_for_select(@bug.allowed_committers, selected: @bug.committer_id), {include_blank: true}, class: 'form-control', required: true%>
         </div>
       </div>
     <% end %>
