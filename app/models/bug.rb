@@ -247,20 +247,45 @@ class Bug < ApplicationRecord
     end
   end
 
-  def summary_sids
+  # Scans a string for sid expressions.
+  # A sid expression can be a list of sids, or a range denoted with a dash.
+  # @param [String, #read] rest The rest of the string after the [SID] keyword
+  # @return [Array[Integer]] the sids
+  def scan_sids(rest)
     sids = []
-    unless summary.nil?
-      summary.scan(/\[SID\]\s*([\d,\-]+)\b(?:\s)?/).each do |match|
-        match[0].split(/[,\s]/).each do |part|
-          if part =~ /(\d+)-(\d+)/
-            sids << eval("#{$1}..#{$2}").to_a
-          else
-            sids << part.gsub(/\s+/, '').to_i
+    enum = rest.split(/\s*[,\s]\s*/).each_entry
+    curr = enum.next
+    while curr.empty? || (/\A\s*(?<sidexp>[\d,\-]+)\z/ =~ curr)
+      unless curr.empty?
+        if /(?<lo>\d+)-(?<hi>\d+)/ =~ sidexp
+          unless (0 >= lo) || (0 >= hi)
+            sids += (lo.to_i..hi.to_i).to_a
           end
+        else
+          sids << sidexp.to_i unless 0 >= sidexp.to_i
         end
       end
+
+      curr = enum.next
     end
-    sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
+    sids
+  rescue StopIteration
+    sids
+  end
+
+  # Scans summary for sid expressions.
+  # The sids must follow a [SID] substring.
+  # A sid expression can be a list of sids, or a range denoted with a dash.
+  # @return [Array[Integer]] the sids
+  def summary_sids
+    sids = []
+    if summary.present?
+      index = summary.index("[SID]")
+      if index
+        sids = scan_sids(summary[(index + 5)..-1])
+      end
+    end
+    sids
   end
 
   def summary_references
