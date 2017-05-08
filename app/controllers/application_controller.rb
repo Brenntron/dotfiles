@@ -7,16 +7,25 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def require_login
+    redirect_to root_url unless current_user
+  end
+
   def bugzilla_session()
     xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
     xmlrpc.token = request.headers['Xmlrpc-Token'] ? request.headers['Xmlrpc-Token'] : xml_token
     return xmlrpc
   end
 
-
   def current_user
-    @current_user ||= User.where(id: session[:user]).first if session[:user]
-    @current_user
+    user_from_reqeust = User.from_request(params, request)
+
+    if LoginSession.yet_active?(session, user_from_reqeust.email)
+      @current_user ||= user_from_reqeust
+    else
+      # force re-authentication
+      nil
+    end
   end
 
   def xml_token

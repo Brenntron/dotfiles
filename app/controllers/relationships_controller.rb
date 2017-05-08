@@ -21,10 +21,6 @@ class RelationshipsController < ApplicationController
 
   private
 
-  def require_login
-    redirect_to root_url if !current_user
-  end
-
   def manager_only_access
     if !current_user.has_role?('manager')
       flash[:error] = "You must be a manager to access that page."
