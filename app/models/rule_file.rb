@@ -134,7 +134,7 @@ class RuleFile
     `svn diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line)
         rule = Rule.find_and_load_rule_content(line[1..-1])
-        link_new_rule(bug, rule) unless bug.rules.pluck(:id).include?(rule.id)
+        link_new_rule(bug, rule) unless rule.new_record? || bug.rules.pluck(:id).include?(rule.id)
       end
     end
   end

@@ -58,7 +58,7 @@ module RuleSyntax
     end
 
     # @return [Boolean] false if this class rejected the string as not even content
-    def is_rule_content?
+    def has_rule_content?
       !!parse
     end
 
@@ -86,7 +86,7 @@ module RuleSyntax
         @valid =
             case
               # this ruby class rejected the rule content before even calling visrule parser
-              when !is_rule_content?
+              when !has_rule_content?
                 false
 
               # visruleparser rejected the string as not enough like a snort rule to even parse
@@ -111,7 +111,7 @@ module RuleSyntax
     def all_clear?
       case
         # this ruby class rejected the rule content before even calling visrule parser
-        when !is_rule_content?
+        when !has_rule_content?
           false
 
         # visruleparser rejected the string as not enough like a snort rule to even parse

@@ -276,6 +276,36 @@ class Rule < ApplicationRecord
     self
   end
 
+  PARSE_QUALITY_ALL_CLEAR               = 100
+  PARSE_QUALITY_VALID                   =  70
+  PARSE_QUALITY_IS_A_RULE               =  20
+  PARSE_QUALITY_CONTENT_HAS_SID         =  15
+  PARSE_QUALITY_CONTENT_PRESENT         =  10
+  PARSE_QUALITY_NO_CONTENT              =   5
+  PARSE_QUALITY_NOT_AVAILABLE           =   0
+
+  # @return [Integer] different levels of validity, for documentation if nothing else.
+  def parse_quality
+    vparser = RuleSyntax::VisruleParser.new(on_rule_content)
+
+    case
+      when !rule_content || !rule_parsed
+        PARSE_QUALITY_NOT_AVAILABLE
+      when vparser.all_clear?
+        PARSE_QUALITY_ALL_CLEAR
+      when vparser.valid?
+        PARSE_QUALITY_VALID
+      when vparser.is_a_rule?
+        PARSE_QUALITY_IS_A_RULE
+      when /sid:\s*\d+\s*;/ =~ rule_content
+        PARSE_QUALITY_CONTENT_HAS_SID
+      when vparser.has_rule_content?
+        PARSE_QUALITY_CONTENT_PRESENT
+      else
+        PARSE_QUALITY_NO_CONTENT
+    end
+  end
+
   # assings fields from attributes output of parser
   #
   # calls assign_attributes.
@@ -384,6 +414,13 @@ class Rule < ApplicationRecord
     end
   end
 
+  # Looks up rule from rule_content or creates a new rule object.
+  #
+  # Finds a rule from the sid and gid of parser.
+  # Returns new rule if none is found.
+  # Saves the rule.
+  # @param [String, #read]  rule_content
+  # @return [Rule] A rule object for the rule content.
   def self.find_and_load_rule_content(rule_content)
     parser = RuleSyntax::RuleParser.new(rule_content)
     rule = Rule.find_from_parser(parser)
@@ -548,7 +585,7 @@ class Rule < ApplicationRecord
         File.read("#{Rails.configuration.snort_rule_path}/#{f}").each_line do |line|
           line = line.chomp.gsub(/^# /, '')
 
-          if line =~ /sid:#{sid};/
+          if line =~ /sid:\s*#{sid}\s*;/
             return line
           end
         end
