@@ -5,6 +5,10 @@ class RuleFile
     attr_reader :publish_lock_pid
   end
 
+  def to_s
+    relative_pathname.to_s
+  end
+
   def self.svn_cmd
     pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
     "#{Rails.configuration.svn_cmd} #{pwd_switch}"
@@ -114,6 +118,27 @@ class RuleFile
     `#{self.class.svn_cmd} up #{working_pathname}`
   end
 
+  # links a new rule to the bug
+  # calling code should check that this rule is not already a rule associated with this bug.
+  def link_new_rule(bug, rule)
+    bug.rules << rule
+    publishing_rule =
+        bug.rules.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).where(message: rule.message).first
+    publishing_rule.bugs.delete_all if publishing_rule
+  end
+
+  # read diffs from file to add new rules to bug
+  def load_add_line(bugzilla_id)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    `svn up #{synch_pathname}`
+    `svn diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
+      if (/^\+/ =~ line) && (/^\+\+\+/ !~ line) && (/sid:\s*\d+\s*;/ =~ line)
+        rule = Rule.find_and_load_rule_content(line[1..-1])
+        link_new_rule(bug, rule) unless rule.new_record? || bug.rules.pluck(:id).include?(rule.id)
+      end
+    end
+  end
+
   # run failsafe to update db if callback did not
   def self.synch_failsafe
     build(Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)).each do |rule_file|
@@ -128,7 +153,7 @@ class RuleFile
 
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
-  def self.commit_rules_action(rules)
+  def self.commit_rules_action(rules, bugzilla_id)
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
     if rules.any? && publish_lock
       rule_files = build(rules)
@@ -146,17 +171,21 @@ class RuleFile
       log("committing files #{working_file_list(rule_files)}")
       `#{svn_cmd} commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
 
-      rule_files.each {|rule_file| rule_file.remove_file rescue nil }
+      rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 
-      #any rules not set to synch by svn hook should go back to current.
+      rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
+
+      if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
+        synch_failsafe
+      end
     end
 
     true
 
   ensure
+    #any rules not set to synch by svn hook should go back to current.
     if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
       log("setting rules from publishing to current_edit")
-      synch_failsafe rescue nil
       Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
           .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end

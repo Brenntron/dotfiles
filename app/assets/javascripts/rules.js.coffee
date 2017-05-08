@@ -98,6 +98,7 @@ $ ->
               headers: headers
               data:
                 rule_ids: selected
+                bug_id: $('.bugzilla_id').text()
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
