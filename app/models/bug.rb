@@ -26,7 +26,7 @@ class Bug < ApplicationRecord
 
   scope :allowed_assignees, ->(bug) { User.all.reject { |u| u.id == bug.committer_id || u.cec_username.nil? } }
   scope :allowed_committers, ->(bug) { User.all.reject { |u| u.id == bug.user_id || u.cec_username.nil? } }
-  scope :lower_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
+  scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
 
   enum classification: {
                           unclassified: 0,
