@@ -64,7 +64,6 @@ class LoginSession
       session[:email] = user_email
       session[:token] = xmlrpc_token
       session[:session_version] = self.class.session_version
-      puts "*** ts := #{timestamp.inspect}"
       session[:session_timestamp] = timestamp
     end
   end
