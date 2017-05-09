@@ -148,7 +148,7 @@ class RuleFile
     unless File.directory?(synch_pathname.dirname)
       FileUtils.mkpath(synch_pathname.dirname)
       svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
-      `#{self.class.svn_cmd} co --depth empty #{svn_url} #{synch_pathname.dirname}`
+      `#{self.class.svn_cmd} co --depth files #{svn_url} #{synch_pathname.dirname}`
     end
 
     `#{self.class.svn_cmd} up #{synch_pathname}`
