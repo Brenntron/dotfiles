@@ -90,7 +90,7 @@ class RuleFile
 
   # @param [String|Pathname] file path relative to a working folder
   def initialize(relative_pathname)
-    @relative_pathname = relative_pathname
+    @relative_pathname = Pathname.new(relative_pathname)
   end
 
   # @param [Array[Rule]] array of rules
@@ -113,7 +113,11 @@ class RuleFile
 
   # gets file from svn prepared for later commit
   def checkout
-    FileUtils.mkpath(working_pathname.dirname)
+    unless File.directory?(working_pathname.dirname)
+      FileUtils.mkpath(working_pathname.dirname)
+      svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
+      `#{self.class.svn_cmd} co --depth empty #{svn_url} #{working_pathname.dirname}`
+    end
     remove_working_file
     `#{self.class.svn_cmd} up #{working_pathname}`
   end
