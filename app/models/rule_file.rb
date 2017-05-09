@@ -153,7 +153,7 @@ class RuleFile
 
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
-  def self.commit_rules_action(rules, bugzilla_id)
+  def self.commit_rules_action(rules, username, bugzilla_id)
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
     if rules.any? && publish_lock
       rule_files = build(rules)
@@ -169,7 +169,7 @@ class RuleFile
       end
 
       log("committing files #{working_file_list(rule_files)}")
-      `#{svn_cmd} commit #{working_file_list(rule_files)} -m "committed from Analyst Console"`
+      `#{svn_cmd} commit #{working_file_list(rule_files)} -m "#{username} committed from Analyst Console"`
 
       rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 
