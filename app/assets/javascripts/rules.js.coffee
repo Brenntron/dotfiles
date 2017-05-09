@@ -102,6 +102,7 @@ $ ->
               headers: headers
               data:
                 rule_ids: selected
+                username: $('#username').text()
                 bug_id: $('.bugzilla_id').text()
               type: 'PUT'
               dataType: 'json'
