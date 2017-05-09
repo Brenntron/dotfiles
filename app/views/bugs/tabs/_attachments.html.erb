@@ -4,6 +4,10 @@
   </div>
   <div class="col-xs-6 right">
     <p>
+      <button id="pcap-import-alerts-button" class="select-sm btn btn-default right">
+        <i class="glyphicon glyphicon-arrow-right"></i>
+        <strong class="hidden-xs" id="test_attachments"> import </strong>
+      </button>
       <% if can? :create, Attachment %>
         <button class="select-sm btn btn-default right create_attachment">
           <span id="showAddAttachsToggle"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs"> attachment</strong></span>

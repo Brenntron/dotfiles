@@ -40,11 +40,6 @@ class Bug < ApplicationRecord
   #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
-  def test_report_timestamp
-    task = tasks.latest_timestamp.first
-    task ? task.stats_updated_at : nil
-  end
-
   def attachment_local_alerts(rule)
     attachments.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
         .select(:file_name, 'alerts.rule_id')
@@ -310,8 +305,6 @@ class Bug < ApplicationRecord
   def check_permission(current_user)
     User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
   end
-
-  private
 
   def create_tags_from_summary(summary_tags)
     summary_tags.each do |tag|
@@ -718,11 +711,37 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
+  def unlink_rule(rule_id)
+    rule = Rule.where(id: rule_id).first
+    rules.delete(rule) if rule
+  end
+
+  def link_alert(attachment_id)
+    attachment = Attachment.where(id: attachment_id).first
+    attachment.pcap_alerts.each do |alert|
+      rules << alert.rule unless rules.include?(alert.rule)
+    end
+  end
+
   def self.link_action(bugzilla_id, sid, gid)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
     rule = Rule.find_or_load(sid, gid)
     if bug && rule
       bug.rules << rule
     end
+  end
+
+  def self.unlink_action(bug_id, rule_ids)
+    bug = Bug.where(id: bug_id).first
+    rule_ids.each { |rule_id| bug.unlink_rule(rule_id) } if bug
+    "success"
+  end
+
+  def self.link_alerts_action(bugzilla_id, attachment_array)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    attachment_array.each do |attachment_id|
+      bug.link_alert(attachment_id)
+    end
+    "success"
   end
 end
