@@ -26,6 +26,7 @@ class Bug < ApplicationRecord
 
   scope :allowed_assignees, ->(bug) { User.all.reject { |u| u.id == bug.committer_id || u.cec_username.nil? } }
   scope :allowed_committers, ->(bug) { User.all.reject { |u| u.id == bug.user_id || u.cec_username.nil? } }
+  scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
 
   enum classification: {
                           unclassified: 0,
@@ -38,11 +39,6 @@ class Bug < ApplicationRecord
   #after_create { |bug| bug.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
-
-  def test_report_timestamp
-    task = tasks.latest_timestamp.first
-    task ? task.stats_updated_at : nil
-  end
 
   def attachment_local_alerts(rule)
     attachments.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
@@ -84,17 +80,38 @@ class Bug < ApplicationRecord
     changed_bug
   end
 
-  def self.bugs_with_search(params)
-    if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
-      query_params = params.reject { |k, v| (v == '' || v.is_a?(Array) || k =='tag_name') }
-      count = 0
-      query = ''
-      query_params.each do |k, v|
-        count = count + 1
-        query = query + k + "='" + v.gsub("'", "\\'") + "'"
-        query = query + ' && ' if count != query_params.to_h.size
-      end
-      Bug.where(query)
+  def self.bugs_with_search(query_params)
+    if query_params[:bugzilla_max] == '' || query_params[:bugzilla_max].nil?
+      Bug.where(query_params)
+    else
+      nil
+    end
+  end
+
+  def self.query(current_user, named_query, search_options)
+    case named_query
+      when NilClass
+        nil
+      when "all-bugs"
+        @bugs = Bug.all
+      when "open-bugs"
+        @bugs = Bug.open_bugs
+      when "pending-bugs"
+        @bugs = Bug.pending
+      when 'fixed-bugs'
+        Bug.closed
+      when "my-bugs"
+        current_user.bugs
+      when "team-bugs"
+        if current_user.has_role?('manager')
+          current_user.children.map{ |cw| cw.bugs }[0] || []
+        else
+          current_user.siblings.map{ |cw| cw.bugs }[0] || []
+        end
+      when "advance-search"
+        Bug.bugs_with_search(search_options) || Bug.all
+      else
+        nil
     end
   end
 
@@ -294,8 +311,6 @@ class Bug < ApplicationRecord
   def check_permission(current_user)
     User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
   end
-
-  private
 
   def create_tags_from_summary(summary_tags)
     summary_tags.each do |tag|
@@ -702,11 +717,37 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
+  def unlink_rule(rule_id)
+    rule = Rule.where(id: rule_id).first
+    rules.delete(rule) if rule
+  end
+
+  def link_alert(attachment_id)
+    attachment = Attachment.where(id: attachment_id).first
+    attachment.pcap_alerts.each do |alert|
+      rules << alert.rule unless rules.include?(alert.rule)
+    end
+  end
+
   def self.link_action(bugzilla_id, sid, gid)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
     rule = Rule.find_or_load(sid, gid)
     if bug && rule
       bug.rules << rule
     end
+  end
+
+  def self.unlink_action(bug_id, rule_ids)
+    bug = Bug.where(id: bug_id).first
+    rule_ids.each { |rule_id| bug.unlink_rule(rule_id) } if bug
+    "success"
+  end
+
+  def self.link_alerts_action(bugzilla_id, attachment_array)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    attachment_array.each do |attachment_id|
+      bug.link_alert(attachment_id)
+    end
+    "success"
   end
 end

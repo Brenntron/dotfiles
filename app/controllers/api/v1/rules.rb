@@ -145,10 +145,12 @@ module API
         #commit rules
         params do
           requires :rule_ids, type: Array[String]
+          optional :username, type: String
+          optional :bug_id,   type: Integer, desc: "Bugzilla id."
         end
         put "commit", root: "rule" do
           rules = Rule.where(id: permitted_params[:rule_ids]).to_a.select { |rule| can?(:publish, rule) }
-          RuleFile.commit_rules_action(rules)
+          RuleFile.commit_rules_action(rules, permitted_params[:username], permitted_params[:bug_id])
         end
 
 

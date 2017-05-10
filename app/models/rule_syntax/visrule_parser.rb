@@ -57,6 +57,11 @@ module RuleSyntax
       @stderr
     end
 
+    # @return [Boolean] false if this class rejected the string as not even content
+    def has_rule_content?
+      !!parse
+    end
+
     # Is enough in the snort rule format for visruleparser to recognize it as a rule.
     #
     # Some strings (particularly comment lines in snort rule files) do fit proper snort rule syntax,
@@ -77,12 +82,11 @@ module RuleSyntax
     def valid?
       # skips if @valid is false
       if @valid.nil?
-        parse_return = parse
 
         @valid =
             case
               # this ruby class rejected the rule content before even calling visrule parser
-              when !parse_return
+              when !has_rule_content?
                 false
 
               # visruleparser rejected the string as not enough like a snort rule to even parse
@@ -102,6 +106,35 @@ module RuleSyntax
             end
       end
       @valid
+    end
+
+    def all_clear?
+      case
+        # this ruby class rejected the rule content before even calling visrule parser
+        when !has_rule_content?
+          false
+
+        # visruleparser rejected the string as not enough like a snort rule to even parse
+        when !is_a_rule?
+          false
+
+        # visruleparser returned FAIL, FAILED, or FAILURES
+        when /FAIL/ =~ parsed_lines
+          false
+
+        # visruleparser returned FAIL, FAILED, or FAILURES in stderr which is more logical than stdout
+        when /FAIL/ =~ errors
+          false
+
+        when /WARN/ =~ parsed_lines
+          false
+
+        when /WARN/ =~ errors
+          false
+
+        else
+          true
+      end
     end
 
     def parsed_hash

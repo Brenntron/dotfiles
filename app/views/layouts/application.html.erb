@@ -38,9 +38,12 @@
             <% if current_user %>
               <a href="/users/<%= current_user[:id] %>">
               <p class="login-area">
-             <span class="login-label"> <strong class="current_user"><%= current_user[:display_name] %></strong> </span>
+                <span class="login-label">
+                  <strong class="current_user"><%= current_user[:display_name] %></strong>
+                </span>
               </p>
               </a>
+              <div id="username" style="display:none;"><%= current_user.cvs_username %></div>
             <% end %>
             <% if controller_name == 'bugs' %>
               <%= render 'layouts/bugs_layout'%>

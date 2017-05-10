@@ -71,9 +71,13 @@ $ ->
             }
         when 'remove'
           if window.confirm("Remove " + sid_text + selected_sids.join() + "?")
+            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+            bug_id = $('input[name="bug_id"]').val()
             $.ajax {
-              url: "/rules"
-              data: { ids: selected }
+              url: "/api/v1/bugs/#{bug_id}/rules/unlink"
+              headers: headers
+              data:
+                rule_ids: selected
               type: 'DELETE'
               dataType: 'json'
               success: (response) ->
@@ -98,6 +102,8 @@ $ ->
               headers: headers
               data:
                 rule_ids: selected
+                username: $('#username').text()
+                bug_id: $('.bugzilla_id').text()
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
