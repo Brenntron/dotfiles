@@ -139,9 +139,9 @@ class Rule < ApplicationRecord
     @anygid_regexp ||= /gid:\s*\d+\s*;/
   end
 
-  def self.grep_line_from_file(sid, gid, filepath = nil)
-    filepath ||= "#{Rails.root}/extras/snort/*/*.rules"
-    rule_grep_output = `grep -Hrn "sid:\\s*#{sid}\\s*;" #{filepath}`
+  def self.grep_line_from_file(sid, gid, given_filepath = nil)
+    filepath = given_filepath || "#{Rails.root}/extras/snort/*/*.rules"
+    rule_grep_output = `grep -Hn "sid:\\s*#{sid}\\s*;" #{filepath}`
     thisgid_regexp = gid_regexp(gid)
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
@@ -276,6 +276,36 @@ class Rule < ApplicationRecord
     self
   end
 
+  PARSE_QUALITY_ALL_CLEAR               = 100
+  PARSE_QUALITY_VALID                   =  70
+  PARSE_QUALITY_IS_A_RULE               =  20
+  PARSE_QUALITY_CONTENT_HAS_SID         =  15
+  PARSE_QUALITY_CONTENT_PRESENT         =  10
+  PARSE_QUALITY_NO_CONTENT              =   5
+  PARSE_QUALITY_NOT_AVAILABLE           =   0
+
+  # @return [Integer] different levels of validity, for documentation if nothing else.
+  def parse_quality
+    vparser = RuleSyntax::VisruleParser.new(on_rule_content)
+
+    case
+      when !rule_content || !rule_parsed
+        PARSE_QUALITY_NOT_AVAILABLE
+      when vparser.all_clear?
+        PARSE_QUALITY_ALL_CLEAR
+      when vparser.valid?
+        PARSE_QUALITY_VALID
+      when vparser.is_a_rule?
+        PARSE_QUALITY_IS_A_RULE
+      when /sid:\s*\d+\s*;/ =~ rule_content
+        PARSE_QUALITY_CONTENT_HAS_SID
+      when vparser.has_rule_content?
+        PARSE_QUALITY_CONTENT_PRESENT
+      else
+        PARSE_QUALITY_NO_CONTENT
+    end
+  end
+
   # assings fields from attributes output of parser
   #
   # calls assign_attributes.
@@ -382,6 +412,20 @@ class Rule < ApplicationRecord
         rule.load_rule_content(line)
       end
     end
+  end
+
+  # Looks up rule from rule_content or creates a new rule object.
+  #
+  # Finds a rule from the sid and gid of parser.
+  # Returns new rule if none is found.
+  # Saves the rule.
+  # @param [String, #read]  rule_content
+  # @return [Rule] A rule object for the rule content.
+  def self.find_and_load_rule_content(rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    rule = Rule.find_from_parser(parser)
+    rule.load_rule_content(rule_content)
+    rule
   end
 
   # Take a line from grep output of a rule file and saves to database
@@ -541,7 +585,7 @@ class Rule < ApplicationRecord
         File.read("#{Rails.configuration.snort_rule_path}/#{f}").each_line do |line|
           line = line.chomp.gsub(/^# /, '')
 
-          if line =~ /sid:#{sid};/
+          if line =~ /sid:\s*#{sid}\s*;/
             return line
           end
         end
