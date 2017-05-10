@@ -16,7 +16,7 @@ FactoryGirl.define do
     tested              false
     committed           true
     task_id             nil
-    rule_category_id    7
+    rule_category_id    1
   end
 end
 
