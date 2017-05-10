@@ -220,7 +220,15 @@ class Bug < ApplicationRecord
   end
 
   def docs_complete?
-    rules.each{ |rule| return false if !rule.rule_doc || rule.rule_doc.summary.blank? }
+    rules.each do |rule|
+      next if 'FILE-IDENTIFY' == rule.rule_category.category
+
+      if !rule.rule_doc || rule.rule_doc.summary.blank?
+        return false
+      end
+    end
+
+    true
   end
 
   def allow_state_change?
