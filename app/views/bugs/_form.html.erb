@@ -10,7 +10,14 @@
         <% unless @bug.docs_complete? %>
           <br>
           <span class="tiny text-muted ">
-            Can't set to pending. Please complete exploits, make valid rules, and complete the summary for rule docs.
+            Can't set to pending. Please complete exploits, complete the summary for rule docs.
+          </span>
+          <br>
+        <% end %>
+        <% unless @bug.rules_parsed? %>
+          <br>
+          <span class="tiny text-muted ">
+            Can't set to pending. Please complete exploits, rules must be valid.
           </span>
           <br>
         <% end %>
