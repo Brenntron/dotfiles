@@ -6,8 +6,11 @@ class NotesController < ApplicationController
       @note = Note.where("id=?", params[:note][:id]).first
       @note.comment = params[:note][:comment]
     else
-      @note = Note.new(note_params.merge(author: current_user.email, bug_id: params[:note][:bugzilla_id]))
+      @note = Note.new(note_params.merge(author: current_user.email))
+      @note.bug_id ||= params[:note][:bugzilla_id]
     end
+    byebug
+    raise 'raspberry' if true
     if @note.save
       render json: @note
     else
