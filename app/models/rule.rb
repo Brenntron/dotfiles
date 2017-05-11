@@ -230,25 +230,6 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.hash_visrule(ruleline)
-    ruleline.split("\n").inject({}) do |attrs, line|
-      if /^\s*(?<key>\w*)\s*:\s?(?<value>.*)$/ =~ line
-        attrs[key.downcase.to_sym] = value
-      end
-
-      attrs
-    end
-  end
-
-  def self.gid_from_visrule(rule_content, parsed_attrs)
-    return parsed_attrs[:gid] if parsed_attrs[:gid]
-
-    gid_match = nil
-    /gid:\s*(?<gid_match>\d+)\s*;/ =~ rule_content
-
-    gid_match ? gid_match.to_i : 1
-  end
-
   # Extracts components from VisruleParser and sets field of rule.
   #
   # Does not save the rule.

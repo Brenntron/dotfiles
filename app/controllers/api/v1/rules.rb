@@ -205,26 +205,6 @@ module API
           ::PaperTrail.whodunnit = current_user.cvs_username
           Rule.update(permitted_params[:id])
         end
-
-
-        desc "remove a rule from the db only"
-        params do
-          requires :id, type: Integer, desc: "rule id"
-        end
-        delete ":id", root: "rule" do
-          authorize! :destroy, Rule
-          Rule.destroy(permitted_params[:id])
-        end
-
-
-        #delete a rule
-        params do
-          requires :id, type: Integer, desc: "the id for the rule to be deleted"
-        end
-        delete "delete", root: "rule" do
-          authorize! :destroy, Rule
-          Rule.remove_rule(permitted_params[:id])
-        end
       end
     end
   end
