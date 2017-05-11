@@ -8,7 +8,18 @@
             <br><span class="tiny text-muted ">Can't set to pending. Please assign attachments to exploits.</span><br>
         <% end %>
         <% unless @bug.docs_complete? %>
-            <br><span class="tiny text-muted ">Can't set to pending. Please complete the summary for rule docs.</span><br>
+          <br>
+          <span class="tiny text-muted ">
+            Can't set to pending. Please complete exploits, complete the summary for rule docs.
+          </span>
+          <br>
+        <% end %>
+        <% unless @bug.rules_parsed? %>
+          <br>
+          <span class="tiny text-muted ">
+            Can't set to pending. Please complete exploits, rules must be valid.
+          </span>
+          <br>
         <% end %>
       </div>
     </div>

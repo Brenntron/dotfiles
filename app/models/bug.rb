@@ -214,11 +214,17 @@ class Bug < ApplicationRecord
   end
 
   def can_set_pending?
-    exploits_complete? && docs_complete?
+    exploits_complete? && rules_parsed? && docs_complete?
   end
 
   def exploits_complete?
     exploits.each{ |expl| return false if expl.attachment.nil? }
+    true
+  end
+
+  def rules_parsed?
+    rules.each{ |rule| return false unless rule.parsed? }
+    true
   end
 
   def docs_complete?
