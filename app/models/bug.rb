@@ -48,11 +48,6 @@ class Bug < ApplicationRecord
   #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
-  def test_report_timestamp
-    task = tasks.latest_timestamp.first
-    task ? task.stats_updated_at : nil
-  end
-
   def attachment_local_alerts(rule)
     attachments.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
         .select(:file_name, 'alerts.rule_id')
@@ -227,7 +222,15 @@ class Bug < ApplicationRecord
   end
 
   def docs_complete?
-    rules.each{ |rule| return false if !rule.rule_doc || rule.rule_doc.summary.blank? }
+    rules.each do |rule|
+      next if 'FILE-IDENTIFY' == rule.rule_category.category
+
+      if !rule.rule_doc || rule.rule_doc.summary.blank?
+        return false
+      end
+    end
+
+    true
   end
 
   def allow_state_change?
@@ -255,20 +258,45 @@ class Bug < ApplicationRecord
     end
   end
 
-  def summary_sids
+  # Scans a string for sid expressions.
+  # A sid expression can be a list of sids, or a range denoted with a dash.
+  # @param [String, #read] rest The rest of the string after the [SID] keyword
+  # @return [Array[Integer]] the sids
+  def scan_sids(rest)
     sids = []
-    unless summary.nil?
-      summary.scan(/\[SID\]\s*([\d,\-]+)\b(?:\s)?/).each do |match|
-        match[0].split(/[,\s]/).each do |part|
-          if part =~ /(\d+)-(\d+)/
-            sids << eval("#{$1}..#{$2}").to_a
-          else
-            sids << part.gsub(/\s+/, '').to_i
+    enum = rest.split(/\s*[,\s]\s*/).each_entry
+    curr = enum.next
+    while curr.empty? || (/\A\s*(?<sidexp>[\d,\-]+)\z/ =~ curr)
+      unless curr.empty?
+        if /(?<lo>\d+)-(?<hi>\d+)/ =~ sidexp
+          unless (0 >= lo) || (0 >= hi)
+            sids += (lo.to_i..hi.to_i).to_a
           end
+        else
+          sids << sidexp.to_i unless 0 >= sidexp.to_i
         end
       end
+
+      curr = enum.next
     end
-    sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
+    sids
+  rescue StopIteration
+    sids
+  end
+
+  # Scans summary for sid expressions.
+  # The sids must follow a [SID] substring.
+  # A sid expression can be a list of sids, or a range denoted with a dash.
+  # @return [Array[Integer]] the sids
+  def summary_sids
+    sids = []
+    if summary.present?
+      index = summary.index("[SID]")
+      if index
+        sids = scan_sids(summary[(index + 5)..-1])
+      end
+    end
+    sids
   end
 
   def summary_references
@@ -318,8 +346,6 @@ class Bug < ApplicationRecord
   def check_permission(current_user)
     User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
   end
-
-  private
 
   def create_tags_from_summary(summary_tags)
     summary_tags.each do |tag|
@@ -726,11 +752,37 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
+  def unlink_rule(rule_id)
+    rule = Rule.where(id: rule_id).first
+    rules.delete(rule) if rule
+  end
+
+  def link_alert(attachment_id)
+    attachment = Attachment.where(id: attachment_id).first
+    attachment.pcap_alerts.each do |alert|
+      rules << alert.rule unless rules.include?(alert.rule)
+    end
+  end
+
   def self.link_action(bugzilla_id, sid, gid)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
     rule = Rule.find_or_load(sid, gid)
     if bug && rule
       bug.rules << rule
     end
+  end
+
+  def self.unlink_action(bug_id, rule_ids)
+    bug = Bug.where(id: bug_id).first
+    rule_ids.each { |rule_id| bug.unlink_rule(rule_id) } if bug
+    "success"
+  end
+
+  def self.link_alerts_action(bugzilla_id, attachment_array)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    attachment_array.each do |attachment_id|
+      bug.link_alert(attachment_id)
+    end
+    "success"
   end
 end
