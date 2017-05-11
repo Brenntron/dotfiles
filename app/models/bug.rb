@@ -24,9 +24,17 @@ class Bug < ApplicationRecord
   scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
   scope :by_component, ->(component) { where('component = ?', component) }
 
-  scope :allowed_assignees, ->(bug) { User.all.reject { |u| u.id == bug.committer_id || u.cec_username.nil? } }
-  scope :allowed_committers, ->(bug) { User.all.reject { |u| u.id == bug.user_id || u.cec_username.nil? } }
   scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
+
+  # @return [Array] username (displayable) and id pairs suitable for select drop downs.
+  def allowed_assignees
+    User.allowed_assignees(self).pluck(:cvs_username,:id)
+  end
+
+  # @return [Array] username (displayable) and id pairs suitable for select drop downs.
+  def allowed_committers
+    User.allowed_committers(self).pluck(:cvs_username,:id)
+  end
 
   enum classification: {
                           unclassified: 0,

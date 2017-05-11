@@ -6,6 +6,11 @@ class User < ApplicationRecord
 
   validates :cvs_username, presence: true, uniqueness: true
 
+  scope :has_cec, -> { where.not(cec_username: nil) }
+  scope :not_user, ->(user_id) { where.not(id: user_id) }
+  scope :allowed_assignees, ->(bug) { has_cec.not_user(bug.committer_id) }
+  scope :allowed_committers, ->(bug) { has_cec.not_user(bug.user_id) }
+
 
   before_save :ensure_authentication_token
   after_create :add_role
