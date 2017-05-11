@@ -90,7 +90,7 @@ class RuleFile
 
   # @param [String|Pathname] file path relative to a working folder
   def initialize(relative_pathname)
-    @relative_pathname = relative_pathname
+    @relative_pathname = Pathname.new(relative_pathname)
   end
 
   # @param [Array[Rule]] array of rules
@@ -113,7 +113,12 @@ class RuleFile
 
   # gets file from svn prepared for later commit
   def checkout
-    FileUtils.mkpath(working_pathname.dirname)
+    unless File.directory?(working_pathname.dirname)
+      FileUtils.mkpath(working_pathname.dirname)
+      svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
+      `#{self.class.svn_cmd} co --depth empty #{svn_url} #{working_pathname.dirname}`
+    end
+
     remove_working_file
     `#{self.class.svn_cmd} up #{working_pathname}`
   end
@@ -139,15 +144,25 @@ class RuleFile
     end
   end
 
+  def synch_failsafe
+    unless File.directory?(synch_pathname.dirname)
+      FileUtils.mkpath(synch_pathname.dirname)
+      svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
+      `#{self.class.svn_cmd} co --depth files #{svn_url} #{synch_pathname.dirname}`
+    end
+
+    `#{self.class.svn_cmd} up #{synch_pathname}`
+    File.open(synch_pathname, 'rt') do |file|
+      file.each_line do |line|
+        Rule.load_line(line)
+      end
+    end
+  end
+
   # run failsafe to update db if callback did not
   def self.synch_failsafe
     build(Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)).each do |rule_file|
-      `#{svn_cmd} up #{rule_file.synch_pathname}`
-      File.open(rule_file.synch_pathname, 'rt') do |file|
-        file.each_line do |line|
-          Rule.load_line(line)
-        end
-      end
+      rule_file.synch_failsafe
     end
   end
 
