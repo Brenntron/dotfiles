@@ -2,7 +2,7 @@
 development:
   adapter: mysql2
   encoding: utf8
-  database: talos_development
+  database: ac_dev
   username: root
   host: localhost
 
@@ -13,7 +13,7 @@ development:
 test: &test
   adapter: mysql2
   encoding: utf8
-  database: talos_test
+  database: ac_test
   username: root
   host: localhost
 
@@ -21,7 +21,7 @@ staging:
   adapter: mysql2
   encoding: utf8
   host: localhost
-  database: talos_rulesui_staging
+  database: analyst_console_staging
   username: root
   password: Opensnort
 
