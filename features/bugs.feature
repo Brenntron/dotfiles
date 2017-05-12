@@ -647,7 +647,7 @@ Feature: Bug
     Then I wait for "3" seconds
     And I goto "/bugs/145359"
     And I click ".notes-tab"
-    And the textarea with id "researchNotesEditArea" should contain "THESIS: RESEARCH: DETECTION GUIDANCE: DETECTION BREAKDOWN: REFERENCES:"
+    Then the textarea with id "researchNotesEditArea" should contain "THESIS: RESEARCH: DETECTION GUIDANCE: DETECTION BREAKDOWN: REFERENCES:"
     And I click "edit"
     And  I fill in "research_notes" with "This is a research note"
     And I click "save"

@@ -56,8 +56,11 @@ Rails.application.routes.draw do
   end
 
 
-  post '/notes' => 'notes#create'
-  put '/notes/publish_to_bugzilla' => 'notes#publish_to_bugzilla'
+  resources :notes, only: [:create] do
+    collection do
+      put :publish_to_bugzilla
+    end
+  end
 
 
   mount API::Base => '/api'
