@@ -53,7 +53,7 @@ class RuleDoc < ApplicationRecord
     self.class.basepath.join(ruledir, "sid_#{sid_group}").tap do |dirpath|
       self.class.mk_basepath
       unless File.directory?(dirpath)
-        FileUtils.mkpath(dirpath)
+        `#{RuleFile.svn_cmd} co --depth files #{self.class.baseurl}#{ruledir}/sid_#{sid_group} #{dirpath}`
       end
     end
   end
@@ -74,27 +74,43 @@ class RuleDoc < ApplicationRecord
     corrective_action.present? ? [ corrective_action ] : []
   end
 
-  def reference_data_array
-    references.map{|ref| ref.reference_data}
-  end
-
   def contributors_array
     contributors.present? ? [ contributors ] : []
   end
 
+  def reference_data_array
+    references.map{|ref| ref.reference_data}
+  end
+
   def nested
     {
-        "Summary:" => summary,
-        "Impact:" => impact,
-        "Detailed Information:" => details,
-        "Affected Systems:" => affected_sys_array,
-        "Attack Scenarios:" => attack_scenarios,
-        "False Positives:" => false_positives,
-        "False Negatives:" => false_negatives,
-        "Corrective Action:" => corrective_action_array,
-        "Contributors:" => contributors_array,
-        "Additional References:" => reference_data_array,
+        "Summary" => summary,
+        "Impact" => impact,
+        "Detailed Information" => details,
+        "Affected Systems" => affected_sys_array,
+        "Attack Scenarios" => attack_scenarios,
+        "False Positives" => false_positives,
+        "False Negatives" => false_negatives,
+        "Corrective Action" => corrective_action_array,
+        "Contributors" => contributors_array,
+        "Additional References" => reference_data_array,
     }
+  end
+
+  def assign_from_json(json)
+    byebug
+    data_collection = JSON.parse(json)
+    data = data_collection[sid.to_s].first
+    self.summary = data["Summary"]
+    self.impact = data["Impact"]
+    self.details = data["Detailed Information"]
+    self.affected_sys = data["Affected Systems"].join(' ')
+    self.attack_scenarios = data["Attack Scenarios"]
+    self.false_positives = data["False Positives"]
+    self.false_negatives = data["False Negatives"]
+    self.corrective_action = data["Corrective Action"].join(' ')
+    self.contributors = data["Contributors"].join(' ')
+    self
   end
 
   def write_to_file
@@ -106,15 +122,31 @@ class RuleDoc < ApplicationRecord
     true
   end
 
+  def read_from_file
+    File.open(filepath, 'rt') do |file|
+      file.read
+    end
+  end
+
+  def fetch_from_repo
+    `#{RuleFile.svn_cmd} up #{filepath}`
+  end
+
   def call_commit(username = '')
-    `svn add --force #{self.class.basepath}`
-    `svn ci #{self.class.basepath} -m "#{username} committed from Analyst Console"`
+    `#{RuleFile.svn_cmd} add --force #{self.class.basepath}`
+    `#{RuleFile.svn_cmd} ci #{self.class.basepath} -m "#{username} committed from Analyst Console"`
   end
 
   def commit_doc(username = '')
     if write_to_file
       call_commit(username)
     end
+  end
+
+  def revert_doc
+    fetch_from_repo
+    assign_from_json(read_from_file)
+    save!
   end
 end
 
