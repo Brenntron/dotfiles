@@ -555,7 +555,7 @@ class Bug < ApplicationRecord
           #handle timeouts accordingly
         end
 
-        bug.research_notes ||= "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n"
+        bug.research_notes ||= Note::TEMPLATE_RESEARCH
         unless new_comments.empty?
           new_comments['bugs'].each do |comment|
             bug_id = comment[0].to_i
