@@ -135,8 +135,8 @@ class RuleFile
   # read diffs from file to add new rules to bug
   def load_add_line(bugzilla_id)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
-    `svn up #{synch_pathname}`
-    `svn diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
+    `#{self.class.svn_cmd} up #{synch_pathname}`
+    `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line) && (/sid:\s*\d+\s*;/ =~ line)
         rule = Rule.find_and_load_rule_content(line[1..-1])
         link_new_rule(bug, rule) unless rule.new_record? || bug.rules.pluck(:id).include?(rule.id)
@@ -191,6 +191,7 @@ class RuleFile
       rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
 
       if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
+        log("calling failsafe")
         synch_failsafe
       end
     end
