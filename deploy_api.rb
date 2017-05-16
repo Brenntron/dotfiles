@@ -53,7 +53,7 @@ def self.build_API(include_snort)
     raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
   end
 
-  if (include_snort)
+  if include_snort
     `cp -r extras/snort ../production/extras`
   end
 
@@ -65,19 +65,19 @@ def self.build_API(include_snort)
 
 
   puts "tar up the contents of the production folder"
-  system 'cd ../production/ && tar -zcvf ../rulesuitest.tar.gz . && cd ..'
+  system 'cd ../production/ && tar -zcvf ../analyst-console.tar.gz . && cd ..'
 end
 
 def self.upload_API
   begin
     puts "create a new folder on the server with a new timestamp"
     timestamp = Time.now.to_i
-    if File.exists?("../rulesuitest.tar.gz")
+    if File.exists?("../analyst-console.tar.gz")
       system "ssh talosweb@rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/analyst-console/releases/#{timestamp}"
       puts "scp the tarball to rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp} folder"
-      system "scp ../rulesuitest.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:/usr/local/www/analyst-console/releases/#{timestamp}/"
+      system "scp ../analyst-console.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:/usr/local/www/analyst-console/releases/#{timestamp}/"
       puts "unload the zip file into timestamp folder"
-      system "ssh talosweb@rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/analyst-console/releases/#{timestamp}/ -zxvf /usr/local/www/analyst-console/releases/#{timestamp}/rulesuitest.tar.gz"
+      system "ssh talosweb@rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/analyst-console/releases/#{timestamp}/ -zxvf /usr/local/www/analyst-console/releases/#{timestamp}/analyst-console.tar.gz"
     else
       raise("Please build the project first")
     end
@@ -130,8 +130,8 @@ def self.production_config(timestamp, rebuild_gems)
   system "touch tmp/restart.txt"
 
 
-  `echo 'removing rulesuitest.tar.gz'`
-  system "rm #{Dir.pwd}/rulesuitest.tar.gz"
+  `echo 'removing analyst-console.tar.gz'`
+  system "rm #{Dir.pwd}/analyst-console.tar.gz"
 end
 
 process_api = true
