@@ -98,7 +98,6 @@ class RuleDoc < ApplicationRecord
   end
 
   def assign_from_json(json)
-    byebug
     data_collection = JSON.parse(json)
     data = data_collection[sid.to_s].first
     self.summary = data["Summary"]
