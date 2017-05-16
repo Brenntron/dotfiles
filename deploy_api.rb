@@ -74,7 +74,7 @@ def self.upload_API
     timestamp = Time.now.to_i
     if File.exists?("../analyst-console.tar.gz")
       system "ssh talosweb@rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/analyst-console/releases/#{timestamp}"
-      puts "scp the tarball to rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp} folder"
+      puts "scp the tarball to rulesuitest.vrt.sourcefire.com:analyst-console/releases/#{timestamp} folder"
       system "scp ../analyst-console.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:/usr/local/www/analyst-console/releases/#{timestamp}/"
       puts "unload the zip file into timestamp folder"
       system "ssh talosweb@rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/analyst-console/releases/#{timestamp}/ -zxvf /usr/local/www/analyst-console/releases/#{timestamp}/analyst-console.tar.gz"
