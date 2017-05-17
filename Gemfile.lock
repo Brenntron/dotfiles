@@ -418,7 +418,7 @@ DEPENDENCIES
   chart-js-rails (= 0.1.2)
   chartkick (= 2.2.4)
   coffee-rails (= 4.2.1)
-  cucumber-rails (>= 1.4.5)
+  cucumber-rails (>= 1.5.0)
   curb (= 0.9.3)
   daemons (= 1.2.4)
   dalli (= 2.6.4)

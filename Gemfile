@@ -67,7 +67,7 @@ group :test do
   gem 'factory_girl_rails', '4.8.0'
   gem 'capybara', '2.11.0'
   gem 'poltergeist', '1.11.0'
-  gem 'cucumber-rails', '>= 1.4.5', :require => false
+  gem 'cucumber-rails', '>= 1.5.0', :require => false
   gem 'database_cleaner', '1.5.3'
   gem 'launchy', '2.4.2'
   gem 'rb-fsevent', '0.9.8'
