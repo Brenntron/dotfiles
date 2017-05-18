@@ -73,18 +73,4 @@ class Task < ApplicationRecord
 
     true
   end
-
-  def test_attachments(options, xmlrpc_token)
-    options[:attachment_array].split(',').each do |attachment_id|
-      self.attachments << Attachment.where(id: attachment_id).first unless nil
-    end
-    TestAttachment.send_work_msg(self, xmlrpc_token, options[:attachment_array])
-  end
-
-  def test_rules(options, xmlrpc_token)
-    options[:rule_array].split(',').each do |rule_id|
-      self.rules << Rule.where(id: rule_id).first unless nil
-    end
-    TestRule.send_work_msg(self, xmlrpc_token, self.bug)
-  end
 end
