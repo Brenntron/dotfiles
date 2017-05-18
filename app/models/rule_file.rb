@@ -115,7 +115,7 @@ class RuleFile
   def checkout
     unless File.directory?(working_pathname.dirname)
       FileUtils.mkpath(working_pathname.dirname)
-      svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
+      svn_url = "#{Rails.configuration.rules_repo_url}/#{relative_pathname.dirname}/"
       `#{self.class.svn_cmd} co --depth empty #{svn_url} #{working_pathname.dirname}`
     end
 
@@ -147,7 +147,7 @@ class RuleFile
   def synch_failsafe
     unless File.directory?(synch_pathname.dirname)
       FileUtils.mkpath(synch_pathname.dirname)
-      svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
+      svn_url = "#{Rails.configuration.rules_repo_url}/#{relative_pathname.dirname}/"
       `#{self.class.svn_cmd} co --depth files #{svn_url} #{synch_pathname.dirname}`
     end
 

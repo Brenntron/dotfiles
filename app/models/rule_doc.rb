@@ -23,7 +23,7 @@ class RuleDoc < ApplicationRecord
   end
 
   def self.baseurl
-    'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+    Rails.configuration.ruledocs_repo_url
   end
 
   def self.basepath
@@ -33,7 +33,7 @@ class RuleDoc < ApplicationRecord
   def self.mk_basepath
     unless File.directory?(basepath)
       FileUtils.mkpath(basepath)
-      `#{RuleFile.svn_cmd} co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ #{basepath}`
+      `#{RuleFile.svn_cmd} co --depth empty #{baseurl} #{basepath}`
     end
 
   end
