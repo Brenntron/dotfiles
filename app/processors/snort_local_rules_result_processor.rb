@@ -33,7 +33,7 @@
 ######################
 class SnortLocalRulesResultProcessor < ApplicationProcessor
 
-  NEW_RULE_ID_BIAS = 1_000_000
+  NEW_RULE_ID_BIAS = 1_000_000 unless defined? NEW_RULE_ID_BIAS
 
   subscribes_to :snort_local_rules_test_result
 
