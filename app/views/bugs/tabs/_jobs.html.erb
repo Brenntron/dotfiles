@@ -8,9 +8,9 @@
       <tr>
         <td class="narrow-column">Completed</td>
         <td class="narrow-column">Failed</td>
-        <td>Type</td>
+        <td class="task-type-col">Type</td>
         <td>Result</td>
-        <td>User</td>
+        <td class="user-col">User</td>
         <td class="narrow-column">CreatedAt</td>
       </tr>
       </thead>
@@ -42,7 +42,7 @@
                   <pre><%= task.result %></pre>
                 </div>
               </td>
-              <td><%= User.find(task.user_id).cvs_username %></td>
+              <td class="user-col"><%= User.find(task.user_id).cvs_username %></td>
               <td><%= task.created_at.strftime("%m/%d/%y") %></td>
             </tr>
             <tr style="display:none;">
