@@ -30,14 +30,14 @@
               <% end %>
               <td><%= task.task_type %></td>
               <td>
-                <div>
-                  <span id="job-expand-<%= task.id %>" data-collapse="job-collapse-<%= task.id %>"
+                <div id="job-expand-<%= task.id %>">
+                  <span data-expand-id="job-expand-<%= task.id %>" data-collapse-id="job-collapse-<%= task.id %>"
                         onclick="expand_job_result(this)"
                         class="glyphicon glyphicon-expand" title="Expand"></span>
                 </div>
-                <div>
-                  <span id="job-collapse-<%= task.id %>" data-collapse="job-expand-<%= task.id %>"
-                        onclick="expand_job_result(this)"
+                <div id="job-collapse-<%= task.id %>">
+                  <span data-expand-id="job-expand-<%= task.id %>" data-collapse-id="job-collapse-<%= task.id %>"
+                        onclick="collapse_job_result(this)"
                         class="glyphicon glyphicon-collapse-up" title="Expand"></span>
                   <pre><%= task.result %></pre>
                 </div>
