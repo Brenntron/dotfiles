@@ -33,7 +33,7 @@ class RuleDoc < ApplicationRecord
   def self.mk_basepath
     unless File.directory?(basepath)
       FileUtils.mkpath(basepath)
-      `svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ #{basepath}`
+      `#{RuleFile.svn_cmd} co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ #{basepath}`
     end
 
   end
