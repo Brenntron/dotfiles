@@ -16,7 +16,7 @@
       </thead>
       <tbody>
         <% if @bug.tasks.any? %>
-          <% @bug.tasks.left_joins(:rules).left_joins(:attachments).group(:id).select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments').each do |task| %>
+          <% @bug.tasks.any_relations.reverse_chron.each_with_index do |task, index| %>
             <tr data-task-id="<%= task.id %>">
               <% if task.completed %>
                 <td class="center"><input type="checkbox" checked></td>
@@ -35,7 +35,7 @@
                         onclick="expand_job_result(this)"
                         class="glyphicon glyphicon-expand" title="Expand"></span>
                 </div>
-                <div id="job-collapse-<%= task.id %>">
+                <div id="job-collapse-<%= task.id %>" style="<%= display_job(task, index) %>">
                   <span data-expand-id="job-expand-<%= task.id %>" data-collapse-id="job-collapse-<%= task.id %>"
                         onclick="collapse_job_result(this)"
                         class="glyphicon glyphicon-collapse-up" title="Expand"></span>
