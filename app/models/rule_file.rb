@@ -115,7 +115,7 @@ class RuleFile
   def checkout
     unless File.directory?(working_pathname.dirname)
       FileUtils.mkpath(working_pathname.dirname)
-      svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
+      svn_url = "#{Rails.configuration.rules_repo_url}/#{relative_pathname.dirname}/"
       `#{self.class.svn_cmd} co --depth empty #{svn_url} #{working_pathname.dirname}`
     end
 
@@ -147,7 +147,7 @@ class RuleFile
   def synch_failsafe
     unless File.directory?(synch_pathname.dirname)
       FileUtils.mkpath(synch_pathname.dirname)
-      svn_url = "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/#{relative_pathname.dirname}/"
+      svn_url = "#{Rails.configuration.rules_repo_url}/#{relative_pathname.dirname}/"
       `#{self.class.svn_cmd} co --depth files #{svn_url} #{synch_pathname.dirname}`
     end
 
@@ -187,6 +187,15 @@ class RuleFile
       `#{svn_cmd} commit #{working_file_list(rule_files)} -m "#{username} committed from Analyst Console"`
 
       rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
+
+      rules.each do |rule|
+        if rule.rule_doc
+          rule.rule_doc.commit_doc(username)
+          rule.update(publish_status: Rule::PUBLISH_STATUS_SYNCHED,
+                      edit_status: Rule::EDIT_STATUS_SYNCHED,
+                      state: 'UNCHANGED')
+        end
+      end
 
       rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
 

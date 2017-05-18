@@ -21,6 +21,7 @@
 /extras/snort
 /extras/snort_repo
 /extras/working
+/extras/rulesdocs
 
 /extras/ssh/*
 /extras/working/

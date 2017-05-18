@@ -53,6 +53,8 @@ module Api
         config.perl_cmd = "/usr/bin/env perl"
         config.svn_cmd = "/usr/bin/env svn"
         config.svn_pwd = ''
+        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
+        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "staging"
         config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
@@ -65,6 +67,8 @@ module Api
         config.perl_cmd = "/usr/local/bin/perl"
         config.svn_cmd = "/usr/local/bin/svn"
         config.svn_pwd = "qHa8Wvz9cKcu!"
+        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
+        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "production"
         config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
         config.bugzilla_host = 'bugzilla.vrt.sourcefire.com'
@@ -76,6 +80,8 @@ module Api
         config.canvas_root = Rails.root.join('extras') # this may need updating for production depending on where we access CANVAS_CATALOG
         config.perl_cmd = "/usr/local/bin/perl"
         config.svn_cmd = "/usr/local/bin/svn"
+        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
+        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "test"
         config.ruletest_server = "https://localhost:3000/api_test"
         config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
@@ -88,6 +94,8 @@ module Api
         config.perl_cmd = "/usr/bin/env perl"
         config.svn_cmd = "/usr/bin/env svn"
         config.svn_pwd = ''
+        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
+        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
     end
     config.websockets_enabled = "false"
     config.bugzilla_domain = 'cisco.com'
