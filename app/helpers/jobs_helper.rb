@@ -1,9 +1,9 @@
 module JobsHelper
-  def display_job(task, index)
+  def job_collapse_display(task, index)
     3 > index ? "" : "display: none;"
   end
 
-  def display_job2(task, index)
+  def job_expand_display(task, index)
     3 > index ? "display: none;" : ""
   end
 end
