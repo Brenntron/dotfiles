@@ -13,6 +13,16 @@ class Task < ApplicationRecord
     select('max(tasks.updated_at) as updated_at')
   }
 
+  TASK_TYPE_LOCAL                       = "local test"
+
+  def self.create_rule_test(bug_id, user_id)
+    create(
+        :bug_id         => bug_id,
+        :task_type      => TASK_TYPE_LOCAL,
+        :user_id        => user_id,
+    )
+  end
+
   def record(action)
     record = { resource: 'task',
                action: action,
