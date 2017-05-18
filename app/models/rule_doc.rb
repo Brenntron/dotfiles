@@ -133,7 +133,7 @@ class RuleDoc < ApplicationRecord
 
   def call_commit(username = '')
     `#{RuleFile.svn_cmd} add --force #{self.class.basepath}`
-    `#{RuleFile.svn_cmd} ci #{self.class.basepath} -m "#{username} committed from Analyst Console"`
+    `#{RuleFile.svn_cmd} ci #{filepath} -m "#{username} committed from Analyst Console"`
   end
 
   def commit_doc(username = '')
