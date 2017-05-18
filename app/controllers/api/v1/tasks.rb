@@ -36,7 +36,7 @@ module API
           end
         end
         post "", root: "task" do
-
+          new_task = nil
           if permitted_params[:task][:bugzilla_id]
             options = {
                 :bug              => Bug.where(id: permitted_params[:task][:bugzilla_id]).first,
@@ -45,20 +45,19 @@ module API
                 :attachment_array => permitted_params[:task][:attachment_array],
                 :rule_array       => permitted_params[:task][:rule_array]
             }.reject() { |k, v| v.nil? }
-          else   # (legacy form)
-          end
-          new_task = Task.create(
-              :bug  => options[:bug],
-              :task_type     => options[:task_type],
-              :user => options[:current_user],
-          )
-          case options[:task_type]
-            when "attachment"
-              TestAttachment.new(new_task, request.headers['Xmlrpc-Token'], options[:attachment_array]).send_work_msg
-            when "rule"
-              TestRule.new(new_task, request.headers['Xmlrpc-Token'], options[:bug], options[:rule_array]).send_work_msg
-            when "commmit"
-              SendCommit.send_work_msg(new_task,options,request.headers['Xmlrpc-Token'])
+            case options[:task_type]
+              when "attachment"
+                new_task = Task.create(
+                    :bug  => options[:bug],
+                    :task_type     => options[:task_type],
+                    :user => options[:current_user],
+                )
+                TestAttachment.new(new_task, request.headers['Xmlrpc-Token'], options[:attachment_array]).send_work_msg
+              when "rule"
+                new_task = Task.create_rule_test(permitted_params[:task][:bugzilla_id],
+                                                 permitted_params[:task][:created_by])
+                TestRule.new(new_task, request.headers['Xmlrpc-Token'], options[:bug], options[:rule_array]).send_work_msg
+            end
           end
           new_task
         end
