@@ -13,12 +13,21 @@ class Task < ApplicationRecord
     select('max(tasks.updated_at) as updated_at')
   }
 
-  TASK_TYPE_LOCAL                       = "local test"
+  TASK_TYPE_PCAP_TEST                   = "pcap test"
+  TASK_TYPE_LOCAL_TEST                  = "local test"
+
+  def self.create_pcap_test(bug_id, user_id)
+    create(
+        :bug_id         => bug_id,
+        :task_type      => TASK_TYPE_PCAP_TEST,
+        :user_id        => user_id,
+    )
+  end
 
   def self.create_rule_test(bug_id, user_id)
     create(
         :bug_id         => bug_id,
-        :task_type      => TASK_TYPE_LOCAL,
+        :task_type      => TASK_TYPE_LOCAL_TEST,
         :user_id        => user_id,
     )
   end

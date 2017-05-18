@@ -47,11 +47,8 @@ module API
             }.reject() { |k, v| v.nil? }
             case options[:task_type]
               when "attachment"
-                new_task = Task.create(
-                    :bug  => options[:bug],
-                    :task_type     => options[:task_type],
-                    :user => options[:current_user],
-                )
+                new_task = Task.create_pcap_test(permitted_params[:task][:bugzilla_id],
+                                                 permitted_params[:task][:created_by])
                 TestAttachment.new(new_task, request.headers['Xmlrpc-Token'], options[:attachment_array]).send_work_msg
               when "rule"
                 new_task = Task.create_rule_test(permitted_params[:task][:bugzilla_id],
