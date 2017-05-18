@@ -9,8 +9,6 @@
         <td class="narrow-column">Completed</td>
         <td class="narrow-column">Failed</td>
         <td>Type</td>
-        <td class="narrow-column">Time</td>
-        <td class="narrow-column">Committed</td>
         <td>Result</td>
         <td>User</td>
         <td class="narrow-column">CreatedAt</td>
@@ -31,9 +29,15 @@
                 <td class="center"><input type="checkbox"></td>
               <% end %>
               <td><%= task.task_type %></td>
-              <td></td>
-              <td></td>
-              <td><pre><%= task.result %></pre></td>
+              <td>
+                <div>
+                  <span onclick="expand_job_result('')" class="glyphicon glyphicon-expand" title="Expand"></span>
+                </div>
+                <div>
+                  <span class="glyphicon glyphicon-collapse-up" title="Expand"></span>
+                  <pre><%= task.result %></pre>
+                </div>
+              </td>
               <td><%= User.find(task.user_id).cvs_username %></td>
               <td><%= task.created_at.strftime("%m/%d/%y") %></td>
             </tr>
