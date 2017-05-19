@@ -229,6 +229,7 @@ class Bug < ApplicationRecord
 
   def docs_complete?
     rules.each do |rule|
+      next unless rule.rule_category
       next if 'FILE-IDENTIFY' == rule.rule_category.category
 
       if !rule.rule_doc || rule.rule_doc.summary.blank?
@@ -766,7 +767,8 @@ class Bug < ApplicationRecord
   def link_alert(attachment_id)
     attachment = Attachment.where(id: attachment_id).first
     attachment.pcap_alerts.each do |alert|
-      rules << alert.rule unless rules.include?(alert.rule)
+      rule = alert.rule
+      rules << rule unless rule.rule_content.blank? || rules.include?(rule)
     end
   end
 
