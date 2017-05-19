@@ -18,6 +18,7 @@
 //= require Chart.bundle
 //= require chartkick
 //= require bootstrap-multiselect
+//= require tree-table
 //= require_tree .
 
 

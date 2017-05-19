@@ -22,3 +22,16 @@
 .modal-backdrop, .modal-backdrop.in{
     display: none;
 }
+
+.tree-table{
+    margin:0px !important;
+    table-layout:fixed;
+}
+.tree-table td{
+    padding-bottom: 0px !important;
+    overflow:hidden;
+}
+
+.lengthen-table {
+    width:500px;
+}
