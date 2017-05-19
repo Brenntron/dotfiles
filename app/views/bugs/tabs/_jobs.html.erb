@@ -17,13 +17,33 @@
       </tr>
       </thead>
       <tbody>
-      <% if @tasks.any? %>
-          <% @tasks.left_joins(:rules).left_joins(:attachments).group(:id).select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments').each do |task| %>
-              <tr>
-                <% if task.completed %>
-                    <td class="center"><input type="checkbox" checked></td>
-                <% else %>
-                    <td class="center"><input type="checkbox"></td>
+        <% if @bug.tasks.any? %>
+          <% @bug.tasks.left_joins(:rules).left_joins(:attachments).group(:id).select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments').each do |task| %>
+            <tr data-task-id="<%= task.id %>">
+              <% if task.completed %>
+                <td class="center"><input type="checkbox" checked></td>
+              <% else %>
+                  <td class="center"><input type="checkbox"></td>
+              <% end %>
+              <% if task.failed %>
+                <td class="center failed-bg"><input type="checkbox" checked></td>
+              <% else %>
+                <td class="center"><input type="checkbox"></td>
+              <% end %>
+              <td><%= task.task_type %></td>
+              <td></td>
+              <td></td>
+              <td><pre><%= task.result %></pre></td>
+              <td><%= User.find(task.user_id).cvs_username %></td>
+              <td><%= task.created_at.strftime("%m/%d/%y") %></td>
+            </tr>
+            <tr style="display:none;">
+              <td colspan="7" class="code">
+                <strong>Rules:</strong>
+                <% if 0 < task.any_rules %>
+                  <% task.rules.each do |rule| %>
+                    <%= rule.id %>,
+                  <% end %>
                 <% end %>
                 <% if task.failed %>
                     <td class="center failed-bg"><input type="checkbox" checked></td>

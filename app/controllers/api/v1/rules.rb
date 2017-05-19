@@ -58,7 +58,7 @@ module API
 
         # Creates a rule and its associations
         # @return [Rule]
-        desc "create a rule"
+        desc "create a rule from rule content"
         params do
           requires :rule, type: Hash do
             requires :rule_content,     type: String,  desc: "Compiled rule content"
@@ -87,7 +87,7 @@ module API
 
         # Creates a rule and its associations
         # @return [Rule]
-        desc "create a rule"
+        desc "create a rule from fields given in parts"
         params do
           requires :rule, type: Hash do
             requires :connection, type: Hash do
@@ -132,17 +132,25 @@ module API
         end
 
 
-        #revert a rule
+        #revert rules
         params do
-          requires :ids, type: Array[String]
+          requires :rule_ids, type: Array[String]
         end
         put "revert", root: "rule" do
           authorize! :update, Rule
-          permitted_params[:ids].each do |id|
-            rule = Rule.where(id: id).first
-            rule.import
-          end
-          true
+          Rule.revert_rules_action(permitted_params[:rule_ids])
+        end
+
+
+        #commit rules
+        params do
+          requires :rule_ids, type: Array[String]
+          optional :username, type: String
+          optional :bug_id,   type: Integer, desc: "Bugzilla id."
+        end
+        put "commit", root: "rule" do
+          rules = Rule.where(id: permitted_params[:rule_ids]).to_a.select { |rule| can?(:publish, rule) }
+          RuleFile.commit_rules_action(rules, permitted_params[:username], permitted_params[:bug_id])
         end
 
 
@@ -196,26 +204,6 @@ module API
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.cvs_username
           Rule.update(permitted_params[:id])
-        end
-
-
-        desc "remove a rule from the db only"
-        params do
-          requires :id, type: Integer, desc: "rule id"
-        end
-        delete ":id", root: "rule" do
-          authorize! :destroy, Rule
-          Rule.destroy(permitted_params[:id])
-        end
-
-
-        #delete a rule
-        params do
-          requires :id, type: Integer, desc: "the id for the rule to be deleted"
-        end
-        delete "delete", root: "rule" do
-          authorize! :destroy, Rule
-          Rule.remove_rule(permitted_params[:id])
         end
       end
     end

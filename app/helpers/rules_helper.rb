@@ -52,13 +52,4 @@ module RulesHelper
       :'client-side-exploit'            => 'Known client side exploit attempt'
   )
 
-
-  def rule_status(rule)
-    if rule.new_record?
-      html = "<div class='entry-type-switch'></div>"
-    else
-      html = ''
-    end
-    html.html_safe
-  end
 end

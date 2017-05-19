@@ -24,8 +24,17 @@ class Bug < ApplicationRecord
   scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
   scope :by_component, ->(component) { where('component = ?', component) }
 
-  scope :allowed_assignees, ->(bug) { User.all.reject { |u| u.id == bug.committer_id || u.cec_username.nil? } }
-  scope :allowed_committers, ->(bug) { User.all.reject { |u| u.id == bug.user_id || u.cec_username.nil? } }
+  scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
+
+  # @return [Array] username (displayable) and id pairs suitable for select drop downs.
+  def allowed_assignees
+    User.allowed_assignees(self).pluck(:cvs_username,:id)
+  end
+
+  # @return [Array] username (displayable) and id pairs suitable for select drop downs.
+  def allowed_committers
+    User.allowed_committers(self).pluck(:cvs_username,:id)
+  end
 
   enum classification: {
                           unclassified: 0,
@@ -38,11 +47,6 @@ class Bug < ApplicationRecord
   #after_create { |bug| bug.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   #after_update { |bug| bug.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
-
-  def test_report_timestamp
-    task = tasks.latest_timestamp.first
-    task ? task.stats_updated_at : nil
-  end
 
   def attachment_local_alerts(rule)
     attachments.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
@@ -84,17 +88,38 @@ class Bug < ApplicationRecord
     changed_bug
   end
 
-  def self.bugs_with_search(params)
-    if params[:bugzilla_max] == '' || params[:bugzilla_max].nil?
-      query_params = params.reject { |k, v| (v == '' || v.is_a?(Array) || k =='tag_name') }
-      count = 0
-      query = ''
-      query_params.each do |k, v|
-        count = count + 1
-        query = query + k + "='" + v.gsub("'", "\\'") + "'"
-        query = query + ' && ' if count != query_params.to_h.size
-      end
-      Bug.where(query)
+  def self.bugs_with_search(query_params)
+    if query_params[:bugzilla_max] == '' || query_params[:bugzilla_max].nil?
+      Bug.where(query_params)
+    else
+      nil
+    end
+  end
+
+  def self.query(current_user, named_query, search_options)
+    case named_query
+      when NilClass
+        nil
+      when "all-bugs"
+        @bugs = Bug.all
+      when "open-bugs"
+        @bugs = Bug.open_bugs
+      when "pending-bugs"
+        @bugs = Bug.pending
+      when 'fixed-bugs'
+        Bug.closed
+      when "my-bugs"
+        current_user.bugs
+      when "team-bugs"
+        if current_user.has_role?('manager')
+          current_user.children.map{ |cw| cw.bugs }[0] || []
+        else
+          current_user.siblings.map{ |cw| cw.bugs }[0] || []
+        end
+      when "advance-search"
+        Bug.bugs_with_search(search_options) || Bug.all
+      else
+        nil
     end
   end
 
@@ -160,16 +185,16 @@ class Bug < ApplicationRecord
       state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
       state_params[:pending_at] = Time.now
       if bug.state == 'REOPENED'
-        state_params[:rework_time] = ((state_params[:pending_at] - bug.reopened_at) / 86_400).ceil
+        state_params[:rework_time] = bug.reopened_at? ? ((state_params[:pending_at] - bug.reopened_at) / 86_400).ceil : nil
       else
-        state_params[:work_time] = ((state_params[:pending_at] - bug.assigned_at) / 86_400).ceil
+        state_params[:work_time] = bug.assigned_at? ? ((state_params[:pending_at] - bug.assigned_at) / 86_400).ceil : nil
       end
     when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
       state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
       state_params[:resolved_at] = Time.now
-      state_params[:review_time] = ((state_params[:resolved_at] - bug.pending_at) / 86_400).ceil
+      state_params[:review_time] = bug.pending_at? ? ((state_params[:resolved_at] - bug.pending_at) / 86_400).ceil : nil
     when 'REOPENED'
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
@@ -189,11 +214,28 @@ class Bug < ApplicationRecord
   end
 
   def can_set_pending?
-    exploits.each do |expl|
-      if expl.attachment.nil?
+    exploits_complete? && rules_parsed? && docs_complete?
+  end
+
+  def exploits_complete?
+    exploits.each{ |expl| return false if expl.attachment.nil? }
+    true
+  end
+
+  def rules_parsed?
+    rules.each{ |rule| return false unless rule.parsed? }
+    true
+  end
+
+  def docs_complete?
+    rules.each do |rule|
+      next if 'FILE-IDENTIFY' == rule.rule_category.category
+
+      if !rule.rule_doc || rule.rule_doc.summary.blank?
         return false
       end
     end
+
     true
   end
 
@@ -222,20 +264,45 @@ class Bug < ApplicationRecord
     end
   end
 
-  def summary_sids
+  # Scans a string for sid expressions.
+  # A sid expression can be a list of sids, or a range denoted with a dash.
+  # @param [String, #read] rest The rest of the string after the [SID] keyword
+  # @return [Array[Integer]] the sids
+  def scan_sids(rest)
     sids = []
-    unless summary.nil?
-      summary.scan(/\[SID\]\s*([\d,\-]+)\b(?:\s)?/).each do |match|
-        match[0].split(/[,\s]/).each do |part|
-          if part =~ /(\d+)-(\d+)/
-            sids << eval("#{$1}..#{$2}").to_a
-          else
-            sids << part.gsub(/\s+/, '').to_i
+    enum = rest.split(/\s*[,\s]\s*/).each_entry
+    curr = enum.next
+    while curr.empty? || (/\A\s*(?<sidexp>[\d,\-]+)\z/ =~ curr)
+      unless curr.empty?
+        if /(?<lo>\d+)-(?<hi>\d+)/ =~ sidexp
+          unless (0 >= lo) || (0 >= hi)
+            sids += (lo.to_i..hi.to_i).to_a
           end
+        else
+          sids << sidexp.to_i unless 0 >= sidexp.to_i
         end
       end
+
+      curr = enum.next
     end
-    sids.flatten.sort.uniq.delete_if { |a| a <= 0 }
+    sids
+  rescue StopIteration
+    sids
+  end
+
+  # Scans summary for sid expressions.
+  # The sids must follow a [SID] substring.
+  # A sid expression can be a list of sids, or a range denoted with a dash.
+  # @return [Array[Integer]] the sids
+  def summary_sids
+    sids = []
+    if summary.present?
+      index = summary.index("[SID]")
+      if index
+        sids = scan_sids(summary[(index + 5)..-1])
+      end
+    end
+    sids
   end
 
   def summary_references
@@ -285,8 +352,6 @@ class Bug < ApplicationRecord
   def check_permission(current_user)
     User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
   end
-
-  private
 
   def create_tags_from_summary(summary_tags)
     summary_tags.each do |tag|
@@ -490,7 +555,7 @@ class Bug < ApplicationRecord
           #handle timeouts accordingly
         end
 
-        bug.research_notes ||= "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n"
+        bug.research_notes ||= Note::TEMPLATE_RESEARCH
         unless new_comments.empty?
           new_comments['bugs'].each do |comment|
             bug_id = comment[0].to_i
@@ -693,11 +758,37 @@ class Bug < ApplicationRecord
     Bug.where(summary: query_str) | Bug.where(bugzilla_id: range[:gte]...range[:lte]) | Bug.where(terms.symbolize_keys!)
   end
 
+  def unlink_rule(rule_id)
+    rule = Rule.where(id: rule_id).first
+    rules.delete(rule) if rule
+  end
+
+  def link_alert(attachment_id)
+    attachment = Attachment.where(id: attachment_id).first
+    attachment.pcap_alerts.each do |alert|
+      rules << alert.rule unless rules.include?(alert.rule)
+    end
+  end
+
   def self.link_action(bugzilla_id, sid, gid)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
     rule = Rule.find_or_load(sid, gid)
     if bug && rule
       bug.rules << rule
     end
+  end
+
+  def self.unlink_action(bug_id, rule_ids)
+    bug = Bug.where(id: bug_id).first
+    rule_ids.each { |rule_id| bug.unlink_rule(rule_id) } if bug
+    "success"
+  end
+
+  def self.link_alerts_action(bugzilla_id, attachment_array)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+    attachment_array.each do |attachment_id|
+      bug.link_alert(attachment_id)
+    end
+    "success"
   end
 end

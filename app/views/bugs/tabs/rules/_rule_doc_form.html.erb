@@ -5,7 +5,7 @@
     <label for="rule_doc_summary">Summary</label>
     <br>
     <textarea class="form-control create-input select-sm code summary-<%=local_assigns[:form_type]%>" rows=4 cols="65"  name="rule[rule_doc][][summary]" type="text" id="summary"
-              placeholder="This event is generated when..." required="true"><%=rule.rule_doc.try(:summary)%></textarea>
+              placeholder="This event is generated when..."><%=rule.rule_doc.try(:summary)%></textarea>
   </div>
   <div class="form-group">
     <label for="rule_doc_impact">Impact</label>
@@ -15,7 +15,7 @@
 </div>
 </div>
 <div class="col-xs-12"></div>
-<%=rule_status(rule)%>
+<div class="rule-doc-padding"></div>
 <div class="col-xs-10"><div class="form-inline">
   <div class="form-group">
     <label for="rule_doc_details">Detailed Information</label>
@@ -31,7 +31,7 @@
 </div>
 </div>
 <div class="col-xs-12"></div>
-<%=rule_status(rule)%>
+<div class="rule-doc-padding"></div>
 <div class="col-xs-10"><div class="form-inline">
   <div class="form-group">
     <label for="rule_doc_attack_scenarios">Attack Scenarios</label>
@@ -48,7 +48,7 @@
 </div>
 </div>
 <div class="col-xs-12"></div>
-<%=rule_status(rule)%>
+<div class="rule-doc-padding"></div>
 <div class="col-xs-10"><div class="form-inline">
   <div class="form-group">
     <label for="rule_doc_false_positives">False Positives</label>
@@ -63,7 +63,7 @@
 </div>
 </div>
 <div class="col-xs-12"></div>
-<%=rule_status(rule)%>
+<div class="rule-doc-padding"></div>
 <div class="col-xs-10"><div class="form-inline">
   <div class="form-group">
     <label for="rule_doc_corrective_action">Corrective Action</label>

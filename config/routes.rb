@@ -16,12 +16,10 @@ Rails.application.routes.draw do
   end
 
   # some of these named routes need to be rethought to conform to rails conventions
-  # get 'rules/add_form' => 'rules#add_form', format: 'js'
   get 'rules/get_impact' => 'rules#get_impact', format: 'js'
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
-  delete '/rules' => 'rules#destroy'
 
 
   # resources :rules, param: :sid
@@ -53,9 +51,16 @@ Rails.application.routes.draw do
     resources :references
   end
 
+  namespace :rule_sync do
+    resources :diags, only: [:index]
+  end
 
-  post '/notes' => 'notes#create'
-  put '/notes/publish_to_bugzilla' => 'notes#publish_to_bugzilla'
+
+  resources :notes, only: [:create] do
+    collection do
+      put :publish_to_bugzilla
+    end
+  end
 
 
   mount API::Base => '/api'

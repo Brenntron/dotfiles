@@ -14,7 +14,7 @@ def self.current_git_branch
 end
 
 
-def self.build_API(include_snort)
+def self.build_api(include_snort)
   puts "delete production folder"
   production_folder = "production"
   if File.directory?("../#{production_folder}")
@@ -53,8 +53,12 @@ def self.build_API(include_snort)
     raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
   end
 
-  if (include_snort)
-    `cp -r extras/snort ../production/extras`
+  if include_snort
+    # `cp -r extras/snort ../production/extras`
+    system "mkdir ../production/extras/snort"
+    system "svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ ../production/extras/snort/snort-rules/"
+    system "svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/so_rules/ ../production/extras/snort/so_rules/"
+    system "rm ../production/extras/snort/so_rules/*.c ../production/extras/snort/so_rules/*.h"
   end
 
   puts "compile assets"
@@ -65,19 +69,19 @@ def self.build_API(include_snort)
 
 
   puts "tar up the contents of the production folder"
-  system 'cd ../production/ && tar -zcvf ../rulesuitest.tar.gz . && cd ..'
+  system 'cd ../production/ && tar -zcvf ../analyst-console.tar.gz . && cd ..'
 end
 
-def self.upload_API
+def self.upload_api
   begin
     puts "create a new folder on the server with a new timestamp"
     timestamp = Time.now.to_i
-    if File.exists?("../rulesuitest.tar.gz")
-      system "ssh talosweb@rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/rulesuitest/releases/#{timestamp}"
-      puts "scp the tarball to rulesuitest.vrt.sourcefire.com:rulesuitest/releases/#{timestamp} folder"
-      system "scp ../rulesuitest.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:/usr/local/www/rulesuitest/releases/#{timestamp}/"
+    if File.exists?("../analyst-console.tar.gz")
+      system "ssh talosweb@rulesuitest.vrt.sourcefire.com mkdir /usr/local/www/analyst-console/releases/#{timestamp}"
+      puts "scp the tarball to rulesuitest.vrt.sourcefire.com:analyst-console/releases/#{timestamp} folder"
+      system "scp ../analyst-console.tar.gz talosweb@rulesuitest.vrt.sourcefire.com:/usr/local/www/analyst-console/releases/#{timestamp}/"
       puts "unload the zip file into timestamp folder"
-      system "ssh talosweb@rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/rulesuitest/releases/#{timestamp}/ -zxvf /usr/local/www/rulesuitest/releases/#{timestamp}/rulesuitest.tar.gz"
+      system "ssh talosweb@rulesuitest.vrt.sourcefire.com tar -C /usr/local/www/analyst-console/releases/#{timestamp}/ -zxvf /usr/local/www/analyst-console/releases/#{timestamp}/analyst-console.tar.gz"
     else
       raise("Please build the project first")
     end
@@ -86,44 +90,42 @@ def self.upload_API
 end
 
 def self.run_server_config(timestamp, rebuild_gems)
-   `ssh talosweb@rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/rulesuitest/releases/#{timestamp}/deploy_api.rb --no-api #{rebuild_gems} --run-config #{timestamp}`
+   `ssh talosweb@rulesuitest.vrt.sourcefire.com  ruby /usr/local/www/analyst-console/releases/#{timestamp}/deploy_api.rb --no-api #{rebuild_gems} --run-config #{timestamp}`
 end
 
 def self.production_config(timestamp, rebuild_gems)
-  Dir.chdir "/usr/local/www/rulesuitest/releases/#{timestamp}"
+  Dir.chdir "/usr/local/www/analyst-console/releases/#{timestamp}"
   `echo 'copy the app config and the database yaml files to the #{timestamp} folder'`
-  system "rm #{Dir.pwd}/.env"
-  system "rm #{Dir.pwd}/config/database.yml"
-  system "rm #{Dir.pwd}/config/app_config.yml"
-  system "rm #{Dir.pwd}/config/secrets.yml"
-  system "rm #{Dir.pwd}/extras/ssh/ca.pem"
-  system "ln -s /usr/local/www/rulesuitest/releases/shared/.env #{Dir.pwd}/.env"
-  system "ln -s /usr/local/www/rulesuitest/releases/shared/secrets.yml #{Dir.pwd}/config/secrets.yml"
-  system "ln -s /usr/local/www/rulesuitest/releases/shared/database.yml #{Dir.pwd}/config/database.yml"
-  system "ln -s /usr/local/www/rulesuitest/releases/shared/app_config.yml #{Dir.pwd}/config/app_config.yml"
-  system "ln -s /usr/local/www/rulesuitest/releases/shared/ssh/ca.pem #{Dir.pwd}/extras/ssh/ca.pem"
-  #symlink the documentation to the public folder
-  system "ln -s docs/talos_analyst_console.pdf /usr/local/www/rulesuitest/public/current/public/docs/talos_analyst_console.pdf"
+
+  system "rm -rf log"
+  system "ln -s ../shared/log ."
+  system "for file in log/*; do echo ### Release #{timestamp} >> $file; done"
+
+  system "rm ./.env"
+  system "ln -s ../shared/.env ."
+
+  system "rm -rf extras/ssh"
+  system "ln -s ~/analyst-console/.ssh extras/ssh"
 
   `echo 'simlink the timestamped folder to the app directory'`
-  system "rm /usr/local/www/rulesuitest/public/current"
-  system "ln -s /usr/local/www/rulesuitest/releases/#{timestamp} /usr/local/www/rulesuitest/public/current"
-  # system "rm /usr/local/www/rulesuitest/public/app"
+  system "rm ../../public/current"
+  system "ln -s /usr/local/www/analyst-console/releases/#{timestamp} ../../public/current"
+  # system "rm /usr/local/www/analyst-console/public/app"
   #so we are gonna have to copy it instead
-  # system "rsync -r #{Dir.pwd}/* /usr/local/www/rulesuitest"
+  # system "rsync -r #{Dir.pwd}/* /usr/local/www/analyst-console"
 
 
   `echo 'build the gems locally if folder exists'`
   # if vendor folder doesnt exist or we ask to rebuild the gems then build the gems and create a copy for later
-  if !File.directory?("/usr/local/www/rulesuitest/releases/shared/vendor") || rebuild_gems
+  if !File.directory?("/usr/local/www/analyst-console/releases/shared/vendor") || rebuild_gems
     `echo 'rebuilding gems and over writing the ones in shared vendor'`
     system "bundle install --deployment"
-    system "rm -rf /usr/local/www/rulesuitest/releases/shared/vendor"
-    system "cp -r #{Dir.pwd}/vendor /usr/local/www/rulesuitest/releases/shared/"
+    system "rm -rf /usr/local/www/analyst-console/releases/shared/vendor"
+    system "cp -r #{Dir.pwd}/vendor /usr/local/www/analyst-console/releases/shared/"
   else
     `echo 'dont rebuild gems and copy shared/vendor to app/vendor'`
     system "rm -rf #{Dir.pwd}/vendor"
-    system "cp -r /usr/local/www/rulesuitest/releases/shared/vendor #{Dir.pwd}/vendor"
+    system "cp -r /usr/local/www/analyst-console/releases/shared/vendor #{Dir.pwd}/vendor"
     system "bundle install --deployment --without development test"
   end
 
@@ -131,8 +133,9 @@ def self.production_config(timestamp, rebuild_gems)
   system "mkdir #{Dir.pwd}/tmp"
   system "touch tmp/restart.txt"
 
-  `echo 'removing rulesuitest.tar.gz'`
-  system "rm #{Dir.pwd}/rulesuitest.tar.gz"
+
+  `echo 'removing analyst-console.tar.gz'`
+  system "rm #{Dir.pwd}/analyst-console.tar.gz"
 end
 
 process_api = true
@@ -192,10 +195,10 @@ end
 if process_api
   begin
     if build_api
-      build_API(include_snort)
+      build_api(include_snort)
     end
     if send_upload
-      timestamp = upload_API
+      timestamp = upload_api
       if rebuild_gems
         run_server_config(timestamp, "--rebuild-gems")
       else
@@ -214,8 +217,4 @@ if run_config
     puts e.message
   end
 end
-
-
-
-
 

@@ -79,7 +79,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
           alerts.each do |alert|
             begin
-              rule = Rule.find_by_gid_and_sid(alert['gid'].to_i, alert['sid'].to_i)
+              rule = Rule.by_sid(alert['sid'].to_i, alert['gid'].to_i).first
 
               if rule.nil?
                 if alert['gid'].to_i == 1

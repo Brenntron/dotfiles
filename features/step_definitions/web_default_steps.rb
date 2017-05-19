@@ -108,6 +108,14 @@ Then(/^I should see the "(.*?)" radio checked$/) do |radio_class|
   raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
 end
 
+Then(/^I should see the "(.*?)" checkbox checked$/) do |checkbox_class|
+  page.find(checkbox_class).should be_checked
+end
+
+Then(/^I should see the "(.*?)" checkbox unchecked$/) do |checkbox_class|
+  page.find(checkbox_class).should_not be_checked
+end
+
 Given(/^I click an image button in table "(.*?)" at row "(.*?)" and col "(.*?)" with class name "(.*?)"$/) do |table, row, column,class_name|
 page.find(:xpath, "//table[#{table}]//tr[#{row}]//td[#{column}]//*[contains(@class, '#{class_name}')]").click
 end
@@ -209,6 +217,10 @@ end
 
 Then(/^"(.*?)" should be visible$/) do |target| #target is #id or .class
   page.find(target).visible?
+end
+
+Then(/^"(.*?)" should not be visible$/) do |target| #target is #id or .class
+  expect(page).not_to have_selector(target)
 end
 
 Then(/^I should see button with class "(.*?)"$/) do |element|

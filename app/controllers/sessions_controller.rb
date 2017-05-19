@@ -4,11 +4,9 @@ class SessionsController < ApplicationController
       respond_to do |format|
         format.json do
           begin
-            resource = User.login_user(params, request)
-            if resource[:user_id] && resource[:xmlrpc_token]
-              session[:user] = resource[:user_id]
-              session[:token] = resource[:xmlrpc_token]
-            end
+            login_session = User.login_user(params, request)
+            login_session.set_session(session) if login_session
+            login_session ? login_session.to_h : {}
           rescue StandardError => e
             return system_not_ready(e)
           rescue XMLRPC::FaultException => e

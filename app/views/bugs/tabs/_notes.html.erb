@@ -15,7 +15,9 @@
         <div class="panel-body row">
             <form id="notes_form">
               <div class="form-group col-xs-12 col-md-10">
-                <textarea id="researchNotesEditArea" class="form-control disabled code select-sm" name="research_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= note ? note.comment : "THESIS:\n\nRESEARCH:\n\nDETECTION GUIDANCE:\n\nDETECTION BREAKDOWN:\n\nREFERENCES:\n" %></textarea>
+                <textarea id="researchNotesEditArea" class="form-control disabled code select-sm" name="research_notes"
+                          rows="10" cols="100" style="background-color: #F0F0F0"
+                          readonly><%= note ? note.comment : Note::TEMPLATE_RESEARCH %></textarea>
                 <input type="hidden" name="note_id" value="<%= note ? note.id : nil %>">
               </div>
               <input type="hidden" name="note_type" value="research">

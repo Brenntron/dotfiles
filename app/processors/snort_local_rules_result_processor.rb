@@ -26,12 +26,14 @@
 #
 # Rule Profile Statistics (worst 10 rules)
 # ==========================================================
-#     Num      SID GID Rev     Checks   Matches    Alerts           Microsecs  Avg/Check  Avg/Match Avg/Nonmatch   Disabled
-#     ===      === === ===     ======   =======    ======           =========  =========  ========= ============   ========
-#     1    23993   1   5          6         2         1                  23        4.0        9.7          1.1          0
+#   Num  SID  GID Rev  Checks Matches  Alerts  Microsecs Avg/Check Avg/Match Avg/Nonmatch Disabled
+#   ===  ===  === ===  ====== =======  ======  ========= ========= ========= ============ ========
+#    1  23993  1   5     6       2       1        23        4.0       9.7        1.1         0
 #
 ######################
 class SnortLocalRulesResultProcessor < ApplicationProcessor
+
+  NEW_RULE_ID_BIAS = 1_000_000 unless defined? NEW_RULE_ID_BIAS
 
   subscribes_to :snort_local_rules_test_result
 
@@ -61,10 +63,11 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
 
     else
       # This code is for an alert message from the queue
+      # Note: for a new rule, a temporary sid is used as a million plus the rule id.
       if result['sid'].to_i > 1000000
-        rule = Rule.find_by_id(result['sid'].to_i - 1000000)
+        rule = Rule.where(id: (result['sid'].to_i - 1000000)).first
       else
-        rule = Rule.find_by_sid(result['sid'])
+        rule = Rule.by_sid(result['sid'], result['gid']).first
       end
 
       # what this code is doing is attaching an attachment to a rule to indicate that it alerted on the rule.

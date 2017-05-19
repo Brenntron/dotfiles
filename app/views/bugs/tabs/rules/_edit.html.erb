@@ -20,10 +20,13 @@
               <textarea class="form-control code select-sm" name="rule[rule_content]" rows="13" required="true"><%= rule.rule_content %></textarea>
             </div>
           </div>
-          <h4 class="blue">Documentation</h4>
-          <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: rule} %>
+          <div class="col-xs-10 col-xs-offset-1 center rule_doc rule_docs_warning">
+            <h4>Documentation - Customer Facing Rule Documentation&nbsp;&nbsp;</h4>
+            <div class="rule-doc-padding"></div>
+            <%= render partial: "bugs/tabs/rules/rule_doc_form", locals: { rule: rule} %>
+          </div>
           <div class="form-group right">
-            <div class="col-xs-12">
+            <div class="col-xs-12 top-space">
               <button class="btn btn-warning update-rule-btn" type="submit">Save Changes</button>
             </div>
           </div>

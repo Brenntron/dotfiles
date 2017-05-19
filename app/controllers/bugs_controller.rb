@@ -9,10 +9,16 @@ class BugsController < ApplicationController
 
 
   def index
+    @bug_query = Bug.query(current_user, session[:query], session[:search]) || current_user.default_bug_list
+    if @bug_query
+      @bugs = @bug_query.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
+    end
     if params[:bug].present?
-      @bug_searchID = params[:bug][:id]
-      if @bug_searchID
-        @bugs = Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
+      @bug_search_id = params[:bug][:id]
+      if @bug_search_id.present?
+        @bugs =
+            Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").permit_class_level(current_user.class_level)
+                .paginate(:page => session[:page], :per_page => 32)
       end
     end
   end
@@ -88,10 +94,14 @@ class BugsController < ApplicationController
                                                                                                               :metadata, :detection, :class_type, :reference], tag_ids: [])
   end
 
+  def query_params
+    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state)
+        .reject { |key, value| (value.blank? || value.is_a?(Array) || key =='tag_name') }
+  end
+
   def sync_summary
     @bug.compose_summary
   end
-
 
   def query_bugs
     if params[:q]
@@ -99,40 +109,12 @@ class BugsController < ApplicationController
       session[:page] = "1"
     elsif params[:bug].present?
       session[:query] = "advance-search"
-      session[:search] = params[:bug]
+      session[:search] = query_params
+      session[:page] = "1"
     else
       session[:query] = session[:query] || ''
     end
-    if session[:query]
-      case session[:query]
-        when "my-bugs"
-          @bugs = current_user.bugs
-        when "team-bugs"
-          if current_user.has_role?('manager')
-            @bugs = current_user.children.map{ |cw| cw.bugs }[0] || []
-          else
-            @bugs = current_user.siblings.map{ |cw| cw.bugs }[0] || []
-          end
-        when "open-bugs"
-          @bugs = Bug.open_bugs
-        when "pending-bugs"
-          @bugs = Bug.pending
-        when "fixed-bugs"
-          @bugs = Bug.closed
-        when "advance-search"
-          @bugs = Bug.bugs_with_search(session[:search])
-        when "all-bugs"
-          @bugs = Bug.all
-        else
-          @bugs = current_user.default_bug_list
-      end
-    else
-      @bugs = current_user.default_bug_list
-    end
     session[:page] = params[:page] || session[:page]
-    if @bugs
-      @bugs = @bugs.where("classification <= ?" ,"%#{current_user.class_level}%").paginate(:page => session[:page], :per_page => 32)
-    end
   end
 
   def get_params_hash(params)
@@ -149,17 +131,15 @@ class BugsController < ApplicationController
     @users = User.all
   end
 
-  def require_login
-    redirect_to root_url if !current_user
-  end
-
   def check_bug_permission
-    bug = Bug.where(id: params[:id]).first()
-    unless bug.check_permission(current_user)
-      redirect_to '/bugs'
-      flash[:error] = "You dont have permission to access bug: #{params[:id]}"
+    bug = Bug.where(id: params[:id]).first
+    case
+      when bug.nil?
+        redirect_to '/bugs'
+        flash[:error] = "Couldn't find Bug #{params[:id]}"
+      when !bug.check_permission(current_user)
+        redirect_to '/bugs'
+        flash[:error] = "You dont have permission to access bug: #{params[:id]}"
     end
-
   end
-
 end

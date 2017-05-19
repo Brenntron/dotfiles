@@ -3,6 +3,45 @@ Feature: Rules
   as a user
   I will provides ways to interact with rules
 
+    ### Rules tab navigation ###
+
+  @javascript
+  Scenario: Selecting a rule to view from the table should
+  'check' the selected rule and 'uncheck' all others
+
+    Given a user with role "committer" exists and is logged in
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    Given the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    When the following rules exist:
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+
+    And bug with id "2222" has rule with id "13"
+    And bug with id "2222" has rule with id "14"
+    And bug with id "2222" has rule with id "15"
+    Then I wait for "3" seconds
+
+    When I goto "/bugs/2222"
+    When I click the "Rules" tab
+    And  I check "rule_13"
+    And  I check "rule_15"
+    And  I click "view"
+    And  I click "back"
+    And  I should see the "#rule_13" checkbox checked
+    And  I should see the "#rule_15" checkbox checked
+    And  I should see the "#rule_14" checkbox unchecked
+    And  I click "22213"
+    And  I click "back"
+    Then I should see the "#rule_14" checkbox checked
+    And  I should see the "#rule_13" checkbox unchecked
+    And  I should see the "#rule_15" checkbox unchecked
+
 
   ### Scenarios New Rule ###
 
@@ -23,12 +62,8 @@ Feature: Rules
     And  I wait for "2" seconds
     Then I should see "Please fill in required fields."
     When I fill in "std-form-message" with "Test msg"
-    And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
+    And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;http_header;"
     And  I select "attempted-user" from "rule[class_type]"
-    And  I click "Create Rule"
-    And  I wait for "2" seconds
-    Then I should see "Please fill in required fields."
-    When I fill in "summary" with "some pig"
     And  I select "$SSH_SERVERS" from "std-form-src"
     And  I fill in "flow_src_ports" with "$SSH_PORTS"
     And  I fill in "flow_dst_server" with "$SSH_SERVERS"
@@ -52,14 +87,13 @@ Feature: Rules
     And  I should see "content:"14""
     And  I should see "fast_pattern:only"
     And  I should see "flowbits:isset,http.mokes"
+    And  I should see "http_header"
     And  I should see "attempted-user"
     # default metadata:
     And  I should see "pop3"
     And  I should see "imap"
     And  I should see "ftp-data"
     And  I should see "http"
-    # rule docs:
-    And  I should see "some pig"
 
   @javascript
   Scenario: New Rule: standard form: the policy options and toggle should populate checkbox values
@@ -314,6 +348,9 @@ Feature: Rules
   @javascript
   Scenario: One or more rules can be selected on a bug to view or edit
     Given a user with role "analyst" exists and is logged in
+    And the following rule categories exist:
+      | category        | id |
+      | BROWSER-PLUGINS |  1 |
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
       |222222   | 222222      | OPEN   | 1       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
@@ -500,21 +537,40 @@ Feature: Rules
 #    And I should not see "This is the summary"
 
 
+  Scenario: Editing Rule: A rule can revert_grep model test
+    Given the following rules exist:
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
+      |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |
+    When code calls revert_grep for rule gid "1" sid "22211" on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    Then a rule record for rule gid "1" sid "22211" will exist
+    And  A rule gid "1" and sid "22211" has class "synched"
+    And  A rule gid "1" and sid "22211" has class "parsed"
+    And  A rule gid "1" and sid "22211" has rev "4"
+
+  Scenario: Editing Rule: A rule can revert model test
+    Given the following rules exist:
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|               rule_content               |
+      |  7 |  1  | 19500 |  3  | UPDATED |   EDIT    | CURRENT_EDIT |false | alert (msg: "the promised one has come") |
+    When code calls revert_rules_action for rule gid "1" sid "19500"
+    Then a rule record for rule gid "1" sid "19500" will exist
+    And  A rule gid "1" and sid "19500" has class "synched"
+    And  A rule gid "1" and sid "19500" has class "parsed"
+
   ### Scenarios Synching a rule from VC ###
 
-  Scenario: Synch Rule: create a valid rule from synching
+  Scenario: Synch Rule: create a valid rule from synching model test
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "parsed"
 
-  Scenario: Synch Rule: create a failed rule from synching
+  Scenario: Synch Rule: create a failed rule from synching model test
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "failed"
 
-  Scenario: Synch Rule: update an existing valid synched rule with new rev
+  Scenario: Synch Rule: update an existing valid synched rule with new rev model test
     Given the following rules exist:
       | id | gid |  sid  | rev | state     |
       | 11 |  1  | 22211 |  3  | UNCHANGED |
@@ -524,7 +580,7 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
 
-  Scenario: Synch Rule: update an existing valid synched rule with same rev
+  Scenario: Synch Rule: update an existing valid synched rule with same rev model test
     Given the following rules exist:
       | id | gid |  sid  | rev | state     |
       | 11 |  1  | 22211 |  4  | UNCHANGED |
@@ -534,7 +590,7 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
 
-  Scenario: Synch Rule: VC updated for a valid edited rule do not load
+  Scenario: Synch Rule: VC updated for a valid edited rule do not load model test
     Given the following rules exist:
       | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
       |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |
@@ -546,7 +602,7 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "3"
 
-  Scenario: Synch Rule: VC updated for a failed edited rule do not load
+  Scenario: Synch Rule: VC updated for a failed edited rule do not load model test
     Given the following rules exist:
       | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
       |  7 |  1  | 22211 |  3  | FAILED  |   EDIT    | CURRENT_EDIT | false|
@@ -558,4 +614,55 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has class "failed"
     And  A rule gid "1" and sid "22211" has rev "3"
 
+
+
+  ### Scenarios should_be_on method ###
+
+  Scenario: should_be_on: should be off model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                             | detection         |
+      |  7 |  1  | 22211 | policy max-detect-ips drop, policy security-ips drop | flowbits:noalert; |
+    Then a rule gid "1" and sid "22211" should be off
+
+  Scenario: should_be_on: balanced-ips is on model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                             | detection         |
+      |  7 |  1  | 22211 | policy balanced-ips drop, policy security-ips drop   | flowbits:noalert; |
+    Then a rule gid "1" and sid "22211" should be on
+
+  Scenario: should_be_on: connectivity-ips is on model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                                 | detection         |
+      |  7 |  1  | 22211 | policy max-detect-ips drop, policy connectivity-ips drop | flowbits:noalert; |
+    Then a rule gid "1" and sid "22211" should be on
+
+  Scenario: should_be_on: flowbits set is on model test
+    Given the following rules exist:
+      | id | gid |  sid  | metadata                                             | detection                           |
+      |  7 |  1  | 22211 | policy max-detect-ips drop, policy security-ips drop | flowbits:set,sybase.tds.connection; |
+    Then a rule gid "1" and sid "22211" should be on
+
+  Scenario: Onoff: uncommented rule content should be on when it should be on model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy balanced-ips drop | flowbits:noalert; | alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is on
+
+  Scenario: Onoff: uncommented rule content should be off when it should be off model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy security-ips drop | flowbits:noalert; | alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is off
+
+  Scenario: Onoff: commented rule content should be on when it should be on model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy balanced-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is on
+
+  Scenario: Onoff: commented rule content should be off when it should be off model test
+    Given the following rules exist:
+      | gid |  sid  | metadata                 | detection         | rule_content             |
+      |  1  | 22211 | policy security-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
+    Then a rule gid "1" and sid "22211" is off
 

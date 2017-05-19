@@ -4,21 +4,20 @@ class TestRule
   publishes_to :snort_local_rules_test_work
 
 
-  def self.send_work_msg(content, xmlrpc_token, bug)
+  def self.send_work_msg(task, xmlrpc_token, bug)
     # be sure to collect all the attachments too but only the ones that are pcaps
     all_attachments = bug.attachments.inject([]) do | memo, attachment |
       memo << attachment.id if /^[-\w]+.pcap$/.match(attachment.file_name)
       memo
     end
 
-    # TODO: collect rule content to insert in the local_rules. Dont use numbers.
     rules_content = []
-    content.rules.each do |rule|
-      rules_content << rule.rule_content
+    task.rules.each do |rule|
+      rules_content << rule.test_rule_content
     end
     publish :snort_local_rules_test_work,
             {
-              task_id: content.id,
+              task_id: task.id,
               cookie: xmlrpc_token,
               pcaps: all_attachments,
               rules: rules_content

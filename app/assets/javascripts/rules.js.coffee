@@ -4,13 +4,16 @@ $ ->
     tab = $(this).attr('id')
     isSelected = false
     selected = []
+    selected_sids = []
     allboxes = []
     $('input:checkbox.rule_check_box').each ->
       allboxes.push($(this).val())
       if @checked
         isSelected = true
         selected.push($(this).val())
+        selected_sids.push($(this).attr('data-sid'))
     allboxes = $.unique(allboxes)
+    sid_text = if selected_sids.length > 1 then 'sids ' else 'sid '
     if isSelected or tab in ['overview','create']
       switch(tab)
         when 'test'
@@ -45,13 +48,13 @@ $ ->
               ), 5000
           }
         when 'revert'
-          if window.confirm("Are you sure?")
+          if window.confirm("Revert " + sid_text + selected_sids.join() + "?")
             headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
             $.ajax {
               url: "/api/v1/rules/revert"
               headers: headers
               data:
-                ids: selected
+                rule_ids: selected
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
@@ -67,10 +70,14 @@ $ ->
                   location.reload true
             }
         when 'remove'
-          if window.confirm("Are you sure?")
+          if window.confirm("Remove " + sid_text + selected_sids.join() + "?")
+            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+            bug_id = $('input[name="bug_id"]').val()
             $.ajax {
-              url: "/rules"
-              data: { ids: selected }
+              url: "/api/v1/bugs/#{bug_id}/rules/unlink"
+              headers: headers
+              data:
+                rule_ids: selected
               type: 'DELETE'
               dataType: 'json'
               success: (response) ->
@@ -88,7 +95,29 @@ $ ->
                 ), 5000
             }
         when 'commit'
-          alert('Task Created. Rules sent to be committed')
+          if window.confirm("Are you sure?")
+            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+            $.ajax {
+              url: "/api/v1/rules/commit"
+              headers: headers
+              data:
+                rule_ids: selected
+                username: $('#username').text()
+                bug_id: $('.bugzilla_id').text()
+              type: 'PUT'
+              dataType: 'json'
+              success: (response) ->
+                $('.alert_rules').addClass('success').show().html('Rules has been committed')
+              error: (response) ->
+                $('.alert_rules').addClass('error').show().html('Rules have not been committed')
+              complete: ->
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+                $(document).ajaxStop ->
+                  location.reload true
+            }
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')
@@ -101,6 +130,26 @@ $ ->
           $('.standard_form').hide()
     else
       alert("please select something")
+
+
+  $('.show_rule').on 'click', (e) ->
+    e.preventDefault()
+    id = $(this).parents('tr').attr('id')
+    #uncheck all others checkboxes
+    $('.rule_check_box').prop('checked', $('.rules_check_box').prop('checked'))
+    #check the current rule
+    $('#rule_' + id).prop('checked', true)
+    $('.view').removeClass('hidden').addClass('active').show()
+    $('.overview').removeClass('active').addClass 'hidden'
+
+    $.each $('.rules_table tr'), ->
+      `var id`
+      id = $(this).attr('id')
+      if !isNaN(id)
+        $('.rule_' + id).removeClass('active').addClass('hidden').hide()
+      return
+    $('.rule_' + id).removeClass('hidden').addClass('active').show()
+    return
 
   $('.diff').find('br').remove()
 
@@ -173,7 +222,7 @@ $ ->
         form = $(this).parents('.legacy_form');
 
         legacy_rule_doc = {}
-        form.find('textarea[type=text]').each ->
+        form.find('textarea[class*=legacy]').each ->
           legacy_rule_doc[$(this)[0].id] = $(this)[0].value
 
         rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
@@ -200,6 +249,7 @@ $ ->
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
         $('.legacy_form').find(":invalid").each (e) ->
           $(this).addClass('onError')
+          window.scrollTo(0, 0)
     else if $('.standard_form').is(":visible")
       form = $(this).parents('.standard_form')
       if $('.standard_form')[0].checkValidity()
@@ -240,7 +290,7 @@ $ ->
           i = i + 1
 
         rule_doc = {}
-        $('.rule_doc').find('textarea[type=text]').each ->
+        $('.rule_doc').find('textarea[class*=standard]').each ->
           rule_doc[$(this)[0].id] = $(this)[0].value
 
 #        rule_content = connection + msg + flow + detection + ";" + metadata + references + class_type + ")"
@@ -279,6 +329,7 @@ $ ->
           complete: ->
             $(document).ajaxStop ->
               location.reload true
+              window.scrollTo(0, 0)
         }
       else
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
@@ -321,8 +372,8 @@ $ ->
         ), 5000
         $(document).ajaxStop ->
           location.reload true
+          window.scrollTo(0, 0)
     }
-
 
 
   $(document).on "change", '.metadata_form', (e) ->

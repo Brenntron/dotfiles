@@ -4,7 +4,7 @@
       <div class="input-group input-group-sm">
 
         <%= form_tag('/bugs', method: :get) do -%>
-            <%= text_field_tag 'bug[id]', "#{@bug_searchID}", class: "searchID", placeholder: "BugID" %>
+            <%= text_field_tag 'bug[id]', "#{@bug_search_id}", class: "searchID", placeholder: "BugID" %>
         <% end -%>
 
       </div><!-- /input-group -->
@@ -43,6 +43,9 @@
           <ul class="dropdown-menu" id="bugs_filter" role="menu">
             <li>
               <a href="/bugs?q=my-bugs" class="<%= bug_filter_indicator('my-bugs') %>" ><i class="glyphicon glyphicon-ok"></i> my bugs</a>
+            </li>
+            <li>
+              <a href="/bugs?q=my-open-bugs" class="<%= bug_filter_indicator('my-open-bugs') %>" ><i class="glyphicon glyphicon-ok"></i> my open bugs</a>
             </li>
             <li>
               <a href="/bugs?q=team-bugs" class="<%= bug_filter_indicator('team-bugs') %>"><i class="glyphicon glyphicon-ok"></i> team bugs</a>

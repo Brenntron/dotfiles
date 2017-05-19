@@ -4,6 +4,10 @@
   </div>
   <div class="col-xs-6 right">
     <p>
+      <button id="pcap-import-alerts-button" class="select-sm btn btn-default right">
+        <i class="glyphicon glyphicon-arrow-right"></i>
+        <strong class="hidden-xs" id="test_attachments"> import rules </strong>
+      </button>
       <% if can? :create, Attachment %>
         <button class="select-sm btn btn-default right create_attachment">
           <span id="showAddAttachsToggle"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs"> attachment</strong></span>
@@ -18,7 +22,7 @@
       </button>
     </p>
   </div>
-  <div class="alert_attachments"></div>
+  <div class="col-xs-12 alert_attachments"></div>
   <div class="col-xs-12">
     <div class="attach_button" style="display:none">
       <form action='/api/v1/attachments' method='post' role="form" id="attachment_form" enctype="multipart/form-data">

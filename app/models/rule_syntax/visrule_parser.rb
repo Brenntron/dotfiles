@@ -20,14 +20,15 @@ module RuleSyntax
     def parse
       return nil if @rule_content.empty?
       temp_rule = Tempfile.new('temp.rules')
-      temp_rule.write(@rule_content.gsub(/\#\s/, ''))
+      temp_rule.write(@rule_content)
       temp_rule.rewind
-      Open3.popen3("#{Rails.configuration.visruleparser_path} #{temp_rule.path}") do |stdin, stdout, stderr, wait_thru|
+      cmd = "#{Rails.configuration.perl_cmd} #{Rails.configuration.visruleparser_path} #{temp_rule.path}"
+      Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thru|
         text = stdout.read
         unless text.empty?
           @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
           @errors = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
-          @errors += stderr.read
+          @stderr = stderr.read
         end
       end
       temp_rule.close
@@ -47,6 +48,18 @@ module RuleSyntax
         parse
       end
       @errors
+    end
+
+    def stderr
+      unless @stderr
+        parse
+      end
+      @stderr
+    end
+
+    # @return [Boolean] false if this class rejected the string as not even content
+    def has_rule_content?
+      !!parse
     end
 
     # Is enough in the snort rule format for visruleparser to recognize it as a rule.
@@ -69,12 +82,11 @@ module RuleSyntax
     def valid?
       # skips if @valid is false
       if @valid.nil?
-        parse_return = parse
 
         @valid =
             case
               # this ruby class rejected the rule content before even calling visrule parser
-              when !parse_return
+              when !has_rule_content?
                 false
 
               # visruleparser rejected the string as not enough like a snort rule to even parse
@@ -94,6 +106,35 @@ module RuleSyntax
             end
       end
       @valid
+    end
+
+    def all_clear?
+      case
+        # this ruby class rejected the rule content before even calling visrule parser
+        when !has_rule_content?
+          false
+
+        # visruleparser rejected the string as not enough like a snort rule to even parse
+        when !is_a_rule?
+          false
+
+        # visruleparser returned FAIL, FAILED, or FAILURES
+        when /FAIL/ =~ parsed_lines
+          false
+
+        # visruleparser returned FAIL, FAILED, or FAILURES in stderr which is more logical than stdout
+        when /FAIL/ =~ errors
+          false
+
+        when /WARN/ =~ parsed_lines
+          false
+
+        when /WARN/ =~ errors
+          false
+
+        else
+          true
+      end
     end
 
     def parsed_hash

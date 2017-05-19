@@ -1,4 +1,4 @@
-#!/usr/local/bin perl
+#!/usr/local/bin/perl
 
 #use warnings;
 use strict;
@@ -21,30 +21,30 @@ my $timeout    	= 5;                             # 5 second timeout for http con
 
 # Global variables
 
-my ($cve_file, $type, @cves, $cve, $msid, $source, $write, $verbose, $print, $ignore);
+my ($cve_file, $type, @cves, $cve, $msid, $source, $write, $verbose, $print, $ignore, $csv);
 
 $ENV{"PERL_LWP_SSL_VERIFY_HOSTNAME"} = 0;
 
 # All source information
 
 my $source = {
-	# Source abbreviation	  , Associated subroutine	 , Source full-name				, Source URL
-	all    => { checked => "N", func => \&searchStart,         sname => "All",                                url => "Runs All Tests" },
-	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security",               url => "http://packetstormsecurity.org/" },
-	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",                     url => "http://securityfocus.com/" },
-	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",                         url => "http://exploit-db.com/" },
-	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",                         url => "http://metasploit.com/" },
-	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",                      url => "http://coresecurity.com/" },
-	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                              url => "http://telussecuritylabs.com/" },
-	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                              url => "http://osvdb.org/" },
-	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                              url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=" },
-	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",                             url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG" } 
+	# Source abbreviation	  , Associated subroutine	 , Source full-name				, Source URL, 		CSV short name
+	all    => { checked => "N", func => \&searchStart,         sname => "All",                                url => "Runs All Tests", csv_name => "" },
+	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security",               url => "http://packetstormsecurity.org/", csv_name => "other" },
+	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",                     url => "http://securityfocus.com/", csv_name => "bugtraq" },
+	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",                         url => "http://exploit-db.com/", csv_name => "expldb" },
+	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",                         url => "http://metasploit.com/", csv_name => "metasploit" },
+	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",                      url => "http://coresecurity.com/", csv_name => "core" },
+	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                              url => "http://telussecuritylabs.com/", csv_name => "telus" },
+	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                              url => "http://osvdb.org/", csv_name => "other" },
+	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                              url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=", csv_name => "other" },
+	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",                             url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG", csv_name => "canvas" }
 };
 
 
 my @sources = sort keys %{$source};
 
-GetOptions('c=s' => \$cve, 'f=s' => \$cve_file, 'p' => \$print, 't=s' => \$type, 'w' => \$write, 'v' => \$verbose, 'i=s' => \$ignore );
+GetOptions('c=s' => \$cve, 'f=s' => \$cve_file, 'p' => \$print, 't=s' => \$type, 'w' => \$write, 'v' => \$verbose, 'i=s' => \$ignore, 'y' => \$csv  );
 
 
 ##
@@ -406,7 +406,9 @@ sub cve2msid
 sub printHeader
 {
 	my $cve = shift;
-	print "[*] Searching CVE: $cve\n\n";
+	if(!$csv) {
+            print "[*] Searching CVE: $cve\n\n";
+    	}
 	return;
 } ## end sub printHeader
 
@@ -443,11 +445,20 @@ sub templateOut($)
 
 		if ($#{ $source->{$k}{"links"} } >= 0)
 		{
+            if($csv) {
+                foreach my $link (@{ $source->{$k}{"links"} }) {
+                    print $source->{$k}->{"csv_name"} . ",$link\n";
+                }
+		    }
 			$notes .= $source->{$k}{"sname"} . ":\n";
 			$notes .= "  " . join("\n  ", @{ $source->{$k}{"links"} }) . "\n\n";
 
 		} ## end if ($#{ $source->{$k}{...}})
 	} ## end foreach my $k (sort @sources...)
+
+	if($csv) {
+        exit;
+    }
 
 	my $template = <<EOS;
 
@@ -543,6 +554,7 @@ sub syntaxExit
 	print "\t-f\t - File containing CVEs (one per line. format: YYYY-NNNN)\n";
 	print "\t-p\t - Print out a blank template and exit.\n";
 	print "\t-v\t - Verbose\n";
+	print "\t-y\t - Print CSV of links\n";
 	print "\t-w\t - Write Template to CVE.vrt instead of STDOUT (ie - 2008-4250.vrt)\n";
 	print "\t-i\t - Ignore sources.  (ie - -i ms,osvdb,telus)\n";
 	print "\t-t\t - Search Type (Options below):\n\n";

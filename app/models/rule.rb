@@ -1,4 +1,3 @@
-require 'open3'
 require 'tempfile'
 
 # Records for rules both synched with CVS and drafts of rules from the UI.
@@ -25,10 +24,12 @@ require 'tempfile'
 #   * new
 #     * valid               |nil|   NEW   |    NEW    | CURRENT_EDIT | true | new rule created from UI or web services
 #     * failed parse        |nil|  FAILED |    NEW    | CURRENT_EDIT |false | new rule which failed visruleparse
+#     * committing          |nil|   NEW   |    NEW    |  PUBLISHING  | true | the rule is in the process of being commited.
 #   * edit
 #     * current edit
 #       * valid             |int| UPDATED |   EDIT    | CURRENT_EDIT | true | CVS rule edited in UI or web service
 #       * failed parse      |int|  FAILED |   EDIT    | CURRENT_EDIT |false | edited rule which failed visruleparse
+#       * committing        |int| UPDATED |   EDIT    |  PUBLISHING  | true | the rule is in the process of being commited.
 #     * out of date
 #       * valid             |int| UPDATED |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
 #       * failed parse      |int|  FAILED |   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
@@ -57,16 +58,61 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft but VC rev has changed and cannot be checked in
   PUBLISH_STATUS_PUBLISHING     = 'PUBLISHING'      #draft in process of being written to VC
 
-  scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid) }
+  scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
   def deleted?
     'DELETED' == self.rule_category.category
   end
 
-  def latest_test_report(bug, report_timestamp = nil)
-    timestamp = report_timestamp || bug.test_report_timestamp
-    if timestamp
-      test_reports.joins(:task).where(tasks: {bug: bug, stats_updated_at: timestamp}).first
+  # determines if the rule *should* be on (uncommented) or off (commented)
+  # @return [Boolean] true if it should be on
+  def should_be_on?
+    case
+      when /policy balanced-ips/ =~ self.metadata
+        true
+      when /policy connectivity-ips/ =~ self.metadata
+        true
+      when /flowbits\s*:\s*set\s*,/ =~ self.detection
+        true
+      else
+        false
+    end
+  end
+
+  # the rule content uncommented (if a # it is omitted)
+  # @return [String] the rule content uncommented
+  def on_rule_content(rule_content_given = nil)
+    local_rule_content = rule_content_given || self.rule_content
+    local_rule_content.sub(/^\s*#?\s*/, '')
+  end
+
+  # the rule content commented (with a #)
+  # @return [String] the rule content commented
+  def off_rule_content(rule_content_given = nil)
+    local_rule_content = rule_content_given || self.rule_content
+    local_rule_content.sub(/^\s*#?\s*/, '# ')
+  end
+
+  def test_rule_content
+    rule_string = on_rule_content
+    if new_rule?
+      rule_string.gsub!(/\)\s*\z/, " gid:#{self.gid || 1};)") unless /gid:\s*\d+\s*;/ =~ rule_string
+      new_sid = id + SnortLocalRulesResultProcessor::NEW_RULE_ID_BIAS
+      rule_string.gsub!(/\)\s*\z/, " sid:#{new_sid};)") unless /sid:\s*\d+\s*;/ =~ rule_string
+      rule_string.gsub!(/\)\s*\z/, " rev:1;)") unless /rev:\s*\d+\s*;/ =~ rule_string
+    end
+    rule_string
+  end
+
+  # the rule content in the correct on/off commented/uncommented state to commit
+  # @return [String] the corrected rule content
+  def rule_content_for_commit
+    if should_be_on?
+      update(rule_content: on_rule_content, on: true)
+      on_rule_content
+    else
+      update(rule_content: on_rule_content, on: false)
+      off_rule_content
     end
   end
 
@@ -85,42 +131,17 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.create_a_rule(content)
-    begin
-      raise Exception.new('No rules to add') if content.blank?
-      text_rules = content.each_line.to_a.sort.uniq.map { |t| t.chomp }.compact.reject { |e| e.empty? }
-      raise Exception.new('No rules to add') if text_rules.empty?
-      # Loop through all of the rules
-      text_rules.each do |text_rule|
-        begin
-          if text_rule =~ / sid:(\d+);/ # if this rule has a sid then we can attempt to create it
-            @record = Rule.update_generate_rule($1)
-            @record.state = 'New'
-            @record.edit_status = EDIT_STATUS_NEW
-            @record.publish_status = PUBLISH_STATUS_CURRENT_EDIT
-            @record.rev = 1
-            @record.save
-          end
-        rescue Exception => e
-          raise Exception.new("{rule_error: {content: #{text_rule},error:#{e}}}")
-        end
-      end
-    rescue Exception => e
-      raise Exception.new("{rule_error: {content: 'Error creating rule.', error:#{e}}}")
-    end
-  end
-
   def self.gid_regexp(gid)
     Regexp.new("gid:\\s*#{gid}\\s*;")
   end
 
   def self.anygid_regexp
-    @anygid_regexp ||= Regexp.new("gid:\\s*\\d+\\s*;")
+    @anygid_regexp ||= /gid:\s*\d+\s*;/
   end
 
-  def self.grep_line_from_file(sid, gid, filepath = nil)
-    filepath ||= "#{Rails.root}/extras/snort"
-    rule_grep_output = `grep -Hrn "sid:\\s*#{sid}\\s*;" #{filepath}`
+  def self.grep_line_from_file(sid, gid, given_filepath = nil)
+    filepath = given_filepath || "#{Rails.root}/extras/snort/*/*.rules"
+    rule_grep_output = `grep -Hn "sid:\\s*#{sid}\\s*;" #{filepath}`
     thisgid_regexp = gid_regexp(gid)
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
@@ -138,78 +159,6 @@ class Rule < ApplicationRecord
     raise "Duplicate rules found for sid #{sid}." unless 1 == rule_grep_lines.length
 
     rule_grep_lines[0]
-  end
-
-  # def import
-  #   grep_filename, line_number, rule_content = Rule.grep_line_from_file(sid, gid, filename).partition(/:\d+:/)
-  #
-  #   rule_attrs = Rule.hash_from_rule_content(rule_content, self.sid)
-  #   rule_attrs[:state] = 'UNCHANGED'
-  #   rule_attrs[:edit_status] = EDIT_STATUS_SYNCHED
-  #   rule_attrs[:publish_status] = PUBLISH_STATUS_SYNCHED
-  #   update!(rule_attrs)
-  #
-  #   self
-  # end
-
-  def extract_rule
-    begin
-      if !content.nil?
-
-        # Make sure we don't have multiple rules in one
-        if content =~ /[\r\n]/
-          raise 'Only create one rule at a time'
-        end
-
-        # First make sure we can parse it
-        parsed = Rule.parse_rule(content)
-
-        if parsed.nil?
-          raise 'Failed to parse rule'
-        end
-
-        if !parsed['sid'].nil? && !sid.nil?
-          raise "Mismatched sid in updated rule. Expected #{sid} not #{parsed['sid']}" if parsed['sid'] != sid
-        end
-
-        self.message = parsed['name']
-        self.gid = 1
-        self.sid = parsed['sid']
-        self.rev = parsed['revision']
-        self.content = parsed['optomized']
-
-        unless parsed['references'].nil?
-          parsed['references'].each do |type, ref|
-            begin
-              reference_type = ReferenceType.find_by_name(type)
-
-              unless reference_type.nil?
-                reference = Reference.find_or_create_by_reference_type_id_and_data(reference_type.id, ref.keys.first)
-
-                if !references.empty?
-                  if !references.includes?(reference)
-                    references << reference
-                  end
-                end
-              end
-            rescue ActiveRecord::RecordNotUnique => e
-              # Ignore
-            rescue Exception => e
-              raise
-            end
-          end
-        end
-      elsif gid.nil?
-        raise 'Neither gid nor sid content is set'
-      end
-      return true
-    rescue Exception => e
-      errors.add(:base, e.to_s)
-      e.backtrace.each do |l|
-        errors.add(:base, l)
-      end
-      return false
-    end
   end
 
   def rule_classification
@@ -281,44 +230,17 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.hash_visrule(ruleline)
-    ruleline.split("\n").inject({}) do |attrs, line|
-      if /^\s*(?<key>\w*)\s*:(?<value>.*)$/ =~ line
-        value = value[1..-1] if ' ' == value[0]
-        attrs[key.downcase.to_sym] = value
-      end
-
-      attrs
-    end
-  end
-
-  def self.gid_from_visrule(rule_content, parsed_attrs)
-    return parsed_attrs[:gid] if parsed_attrs[:gid]
-
-    gid_match = nil
-    /gid:\s*(?<gid_match>\d+)\s*;/ =~ rule_content
-
-    gid_match ? gid_match.to_i : 1
-  end
-
-  # Runs the visruleparser perl script to parse a line of rule text.
-  # @param [String, #read] rule_text the line of rule text
-  # @return [Hash] hash with :rule and :errors text populated.
-  def self.visruleparser(rule_content)
-    parser = RuleSyntax::VisruleParser.new(rule_content)
-    { rule: parser.parsed_lines, errors: parser.errors }
-  end
-
   # Extracts components from VisruleParser and sets field of rule.
+  #
   # Does not save the rule.
   # Does not set state, edit_status, or publish_status,
   # because these depend on where the rule and rule_content originated.
   # @param [VisruleParser, #read] parser initialized to rule content.
-  def assign_from_visrule(rule_content)
-    self.rule_content                   = rule_content
-    self.on                             = /^\s*#/ !~ rule_content
+  def assign_from_visrule(given_rule_content)
+    self.on                             = /^\s*#/ !~ given_rule_content
+    self.rule_content                   = on_rule_content(given_rule_content)
 
-    vparser = RuleSyntax::VisruleParser.new(rule_content)
+    vparser = RuleSyntax::VisruleParser.new(on_rule_content)
 
     self.rule_parsed                    = vparser.parsed_lines
     self.rule_warnings                  = vparser.errors
@@ -335,37 +257,73 @@ class Rule < ApplicationRecord
     self
   end
 
+  PARSE_QUALITY_ALL_CLEAR               = 100
+  PARSE_QUALITY_VALID                   =  70
+  PARSE_QUALITY_IS_A_RULE               =  20
+  PARSE_QUALITY_CONTENT_HAS_SID         =  15
+  PARSE_QUALITY_CONTENT_PRESENT         =  10
+  PARSE_QUALITY_NO_CONTENT              =   5
+  PARSE_QUALITY_NOT_AVAILABLE           =   0
+
+  # @return [Integer] different levels of validity, for documentation if nothing else.
+  def parse_quality
+    vparser = RuleSyntax::VisruleParser.new(on_rule_content)
+
+    case
+      when !rule_content || !rule_parsed
+        PARSE_QUALITY_NOT_AVAILABLE
+      when vparser.all_clear?
+        PARSE_QUALITY_ALL_CLEAR
+      when vparser.valid?
+        PARSE_QUALITY_VALID
+      when vparser.is_a_rule?
+        PARSE_QUALITY_IS_A_RULE
+      when /sid:\s*\d+\s*;/ =~ rule_content
+        PARSE_QUALITY_CONTENT_HAS_SID
+      when vparser.has_rule_content?
+        PARSE_QUALITY_CONTENT_PRESENT
+      else
+        PARSE_QUALITY_NO_CONTENT
+    end
+  end
+
+  # assings fields from attributes output of parser
+  #
+  # calls assign_attributes.
+  # does not save rule.
+  # @param [Hash, #read]
   def assign(attributes)
     assign_attributes(attributes.slice(*%i(rev message connection flow detection class_type metadata message)))
     self.rule_category = RuleCategory.find_or_create_by(category: attributes[:rule_category])
     self.attributes
   end
 
-  # Gets rule with fields set from contents of rule content.
+  # Does a robust query or create new rule.
   #
-  # Parses rule content.  Finds or creates rule for the given sid and gid.
-  # Set the rule fields to components from parsing rule content.
-  # Does not save the rule.
-  # @param [String, #read] rule_content the rule content
-  def self.find_and_assign_rule_content(rule_content, rule_id = nil)
-    parser = RuleSyntax::RuleParser.new(rule_content)
-
+  # Finds a rule from the sid and gid of parser, or optionally the rule id.
+  # Returns new rule if none is found.
+  # Does not change or save the rule.
+  # @param [RuleSyntax::RuleParser, #read] parser constructed from the rule_content
+  # @param [Integer, #read] rule_id the rule id if known
+  def self.find_from_parser(parser, rule_id = nil)
     rule = nil
     rule = Rule.by_sid(parser.sid, parser.gid).first if parser.sid
     rule ||= Rule.where(id: rule_id).first if rule_id
     rule ||= Rule.new(sid: parser.sid, gid: parser.gid)
-
-    rule.assign_from_visrule(rule_content)
-
-    rule.assign(parser.attributes) #if rule.parsed?
 
     rule
   end
 
   # Take a line from a user edit and saves to database
   # @param [String, #read] rule_content the rule content
-  def self.save_assem(assem, rule_id = nil)
-    find_and_assign_rule_content(assem.rule_content, rule_id).tap do |rule|
+  # @param [Integer, #read] rule_id the rule id if known
+  def self.save_rule_content(rule_content, rule_id = nil)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+
+    find_from_parser(parser, rule_id).tap do |rule|
+      rule.assign_from_visrule(rule_content)
+      rule.assign(parser.attributes)
+
       if rule.sid
         rule.state                        = 'UPDATED'
         rule.edit_status                  = EDIT_STATUS_EDIT
@@ -376,26 +334,29 @@ class Rule < ApplicationRecord
       rule.state                          = 'FAILED' unless rule.parsed?
       rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
 
-      rule.save
+      rule.save!
     end
   end
 
-  # Take a line from a user edit and saves to database
-  # @param [String, #read] rule_content the rule content
-  def self.save_rule_content(rule_content, rule_id = nil)
-    find_and_assign_rule_content(rule_content, rule_id).tap do |rule|
-      if rule.sid
-        rule.state                        = 'UPDATED'
-        rule.edit_status                  = EDIT_STATUS_EDIT
-      else
-        rule.state                        = 'NEW'
-        rule.edit_status                  = EDIT_STATUS_NEW
-      end
-      rule.state                          = 'FAILED' unless rule.parsed?
-      rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
+  # Forces a load of the rule from the rule_content.
+  # Assumed to be loaded from a rules file (either a synch or revert).
+  # @param [String, #read] rule_content
+  def load_rule_content(rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
 
-      rule.save
-    end
+    assign_from_visrule(rule_content)
+
+    assign(parser.attributes)
+
+    self.cvs_rule_content               = self.rule_content
+    self.cvs_rule_parsed                = self.rule_parsed
+
+    self.edit_status                    = EDIT_STATUS_SYNCHED
+    self.publish_status                 = PUBLISH_STATUS_SYNCHED
+    self.state                          = 'UNCHANGED'
+    self.save!
+    self.associate_references(rule_content)
+    self
   end
 
   # Take a line from a rule file and saves to database if rule is unedited
@@ -404,33 +365,74 @@ class Rule < ApplicationRecord
   # @return [Rule] the rule loaded or nil if failed
   # @raise [RuntimeError] could not process
   def self.synch_rule_content(rule_content)
-    rule = find_and_assign_rule_content(rule_content)
-    return nil unless rule.sid          # rule in file is a new rule with sid unassigned
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    return nil unless parser.sid          # rule in file is a new rule with sid unassigned
 
-    rule_db = by_sid(rule.sid, rule.gid).first
+    rule_db = by_sid(parser.sid, parser.gid).first
 
-    if rule.persisted? && rule_db.draft?
+    if rule_db && rule_db.draft?
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db
     else
-      rule.cvs_rule_content             = rule.rule_content
-      rule.cvs_rule_parsed              = rule.rule_parsed
-
-      rule.edit_status                  = EDIT_STATUS_SYNCHED
-      rule.publish_status               = PUBLISH_STATUS_SYNCHED
-      rule.state                        = 'UNCHANGED'
-      rule.save!
-      rule.associate_references(rule_content)
+      rule = find_from_parser(parser)
+      rule.load_rule_content(rule_content)
       rule
     end
   end
 
-  # Take a line from grep output of a rule file and saves to database unless rev is unchanged
+  # loads an rule content from a line in a rule file
+  # Skips lines without sid and where we have a rule with that rev
+  # @param [String] line from rule file
+  def self.load_line(line)
+    if /sid:\s*(?<sid>\d+)\s*;/ =~ line
+      /gid:\s*(?<gid>\d+)\s*;/ =~ line
+      /rev:\s*(?<rev>\d+)\s*;/ =~ line
+
+      rule = Rule.by_sid(sid, gid || 1).first
+      if rule && (rev.to_i > rule.rev)
+        rule.load_rule_content(line)
+      end
+    end
+  end
+
+  # Looks up rule from rule_content or creates a new rule object.
+  #
+  # Finds a rule from the sid and gid of parser.
+  # Returns new rule if none is found.
+  # Saves the rule.
+  # @param [String, #read]  rule_content
+  # @return [Rule] A rule object for the rule content.
+  def self.find_and_load_rule_content(rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    rule = Rule.find_from_parser(parser)
+    rule.load_rule_content(rule_content)
+    rule
+  end
+
+  # Take a line from grep output of a rule file and saves to database
+  # @param [String, #read] rule_grep_line the line of text from a rule file.
+  # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
+  # @raise [RuntimeError] could not process
+  def revert_grep(rule_grep_line)
+    filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+
+    rule_content.strip!
+    if rule_content.empty?
+      nil
+    else
+      load_rule_content(rule_content).tap do |rule|
+        rule.update!(filename: filename, linenumber: line_number[1..-2].to_i)
+      end
+    end
+  end
+
+  # Take a line from grep output of a rule file and saves to database
   # @param [String, #read] rule_grep_line the line of text from a rule file.
   # @return [Rule] the rule loaded, nil if failed, empty string if input was blank
   # @raise [RuntimeError] could not process
   def self.load_grep(rule_grep_line)
     filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+    filename = nil if /[-\/\w]+/ !~ filename
 
     rule_content.strip!
     if rule_content.empty?
@@ -444,21 +446,22 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.load_rule(sid, gid, filepath = nil)
-    load_grep(grep_line_from_file(sid, gid, filepath))
-  rescue
-    nil
+  def self.find_or_load(sid, gid)
+    Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file(sid, gid))
   end
 
-  def self.find_or_load(sid, gid)
-    Rule.by_sid(sid, gid).first || load_rule(sid, gid)
+  # A filename which will not be nil
+  # The filename field may be nil.  If so determine the path from rule_category
+  # @return [Pathname] check this and related records for pathname
+  def nonnil_pathname
+    @nonnil_pathname ||= Pathname.new(self.filename || self.rule_category.filename(self.gid))
   end
 
   # Replace rule in given file with rule_content.
   # Scans file for rule with same gid and sid and replaces that line with rule_content.
   # Appends rule_content to end of file if gid and sid are not found
   # @param [String, #read] path to the file.
-  def patch(filename)
+  def patch_file(filename)
     tmp = Tempfile.new(['tmprule', '.rules'])
     File.open(filename, 'rt') do |input_stream|
       IO.copy_stream(input_stream, tmp)
@@ -466,37 +469,25 @@ class Rule < ApplicationRecord
 
     sid_regex = Regexp.new("sid:\\s*#{self.sid}\\s*;")
     gid_regex = Regexp.new("gid:\\s*#{self.gid}\\s*;")
-    anygid_regex = /gid:\s*\d+\s*;/
 
     tmp.rewind
     File.open(filename, 'wt') do |rulefile|
       written = false
       tmp.each_line do |line|
-        gid_matched = (gid_regex =~ line) || !(anygid_regex =~ line)
+        gid_matched = (gid_regex =~ line) || !(Rule.anygid_regexp =~ line)
         if self.gid && self.sid && gid_matched && (sid_regex =~ line)
-          rulefile.puts(self.rule_content)
+          rulefile.puts(rule_content_for_commit)
           written = true
         else
           rulefile.puts(line)
         end
       end
 
-      rulefile.puts(self.rule_content) unless written
+      rulefile.puts(rule_content_for_commit) unless written
     end
     tmp.close!
 
     true
-  end
-
-  # Check rule_content into CVS and update rule record.
-  #
-  # Write rule_content to file by calling patch.
-  # Call CVS checkin.
-  # Since CVS has a rewrite rule for checkins, update rule record from file.
-  def checkin
-    filename = self.filename || self.rule_category.filename(self.gid)
-
-    patch(filename)
   end
 
   def update_rule
@@ -515,59 +506,6 @@ class Rule < ApplicationRecord
     redirect_to request.referer
   end
 
-  def remove_rule
-    begin
-      remove_rule_from_bug(Bug.find(active_scaffold_session_storage[:constraints][:bugs]), Rule.find(params[:id]))
-    rescue Exception => e
-      log_error(e)
-    end
-
-    redirect_to request.referer
-  end
-
-  def remove_rule_from_bug(bug, rule)
-    # Remove any new alerts from the attachments
-    if rule.state == "NEW"
-      bug.attachments.each do |attachment|
-        attachment.rules.delete(rule)
-      end
-    end
-
-    # Remove the rule reference
-    bug.rules.delete(rule)
-
-    # Remove this rule if it is no longer needed
-    rule.destroy if rule.bugs.empty? && rule.attachments.empty?
-  end
-
-  def self.create_or_update_rule(body)
-    begin
-      parsed = Rule.parse_rule(body)
-      rule = Rule.where('sid = ?', parsed['sid']).first
-      if rule.empty?
-        rule = Rule.create(content: body)
-        rule.gid = 1
-        rule.message = parsed['msg'].gsub("\"", "")
-        rule.sid = parsed['sid']
-        rule.rev = parsed['revision']
-        rule.state = 'UNCHANGED'
-      else
-        rule.content = body
-        rule.message = parsed['msg'].gsub("\"", "")
-        rule.gid = 1
-        rule.sid = parsed['sid']
-        rule.rev = parsed['revision']
-        rule.state = 'UNCHANGED'
-      end
-      rule.edit_status = EDIT_STATUS_SYNCHED
-      rule.publish_status = PUBLISH_STATUS_SYNCHED
-      rule.save
-      return rule
-    rescue Exception => e
-      raise Exception.new(e)
-    end
-  end
-
   def self.find_current_rule(sid)
     Dir.entries(Rails.configuration.snort_rule_path).each do |f|
       # Don't include .stub.rules hidden rule files
@@ -575,7 +513,7 @@ class Rule < ApplicationRecord
         File.read("#{Rails.configuration.snort_rule_path}/#{f}").each_line do |line|
           line = line.chomp.gsub(/^# /, '')
 
-          if line =~ /sid:#{sid};/
+          if line =~ /sid:\s*#{sid}\s*;/
             return line
           end
         end
@@ -583,22 +521,6 @@ class Rule < ApplicationRecord
     end
 
     raise RuleError.new("Unable to find sid #{sid}")
-  end
-
-  def self.update_generate_rule(sid)
-    begin
-      return Rule.create_or_update_rule(Rule.find_current_rule(sid))
-    rescue Exception => e
-      raise Exception.new(e)
-    end
-  end
-
-  def self.update_rules(rules)
-    ApplicationRecord.transaction do
-      rules.each do |rule|
-        rule.save
-      end
-    end
   end
 
   def sort_rules_by_state
@@ -705,7 +627,7 @@ class Rule < ApplicationRecord
   # Creates a rule and its associations
   # @return [Rule]
   def self.create_parts_action(rule_params, rule_doc, bug_id)
-    Rule.save_assem(RuleSyntax::Assemposer.new(rule_params)).tap do |rule|
+    Rule.save_rule_content(RuleSyntax::Assemposer.new(rule_params).rule_content).tap do |rule|
       if bug_id
         bug = Bug.where(id: bug_id).first
         bug.rules << rule if bug
@@ -714,6 +636,18 @@ class Rule < ApplicationRecord
       rule.associate_references(rule.rule_content)
       rule.create_rule_doc(rule_doc)
     end
+  end
+
+  def self.revert_rules_action(rule_ids)
+    rule_ids.each do |id|
+      rule = Rule.where(id: id).first
+      rule.revert_grep(Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename))
+      rule.rule_doc.revert_doc if rule.rule_doc
+    end
+
+    true
+  rescue
+    false
   end
 
   # Updates a rule and its associations
