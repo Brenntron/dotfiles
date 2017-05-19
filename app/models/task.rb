@@ -22,12 +22,21 @@ class Task < ApplicationRecord
     order("created_at desc")
   }
 
-  TASK_TYPE_LOCAL                       = "local test"
+  TASK_TYPE_PCAP_TEST                   = "pcap test"
+  TASK_TYPE_LOCAL_TEST                  = "local test"
+
+  def self.create_pcap_test(bug_id, user_id)
+    create(
+        :bug_id         => bug_id,
+        :task_type      => TASK_TYPE_PCAP_TEST,
+        :user_id        => user_id,
+    )
+  end
 
   def self.create_rule_test(bug_id, user_id)
     create(
         :bug_id         => bug_id,
-        :task_type      => TASK_TYPE_LOCAL,
+        :task_type      => TASK_TYPE_LOCAL_TEST,
         :user_id        => user_id,
     )
   end
@@ -72,19 +81,5 @@ class Task < ApplicationRecord
     update(stats_updated_at: Time.now)
 
     true
-  end
-
-  def test_attachments(options, xmlrpc_token)
-    options[:attachment_array].split(',').each do |attachment_id|
-      self.attachments << Attachment.where(id: attachment_id).first unless nil
-    end
-    TestAttachment.send_work_msg(self, xmlrpc_token, options[:attachment_array])
-  end
-
-  def test_rules(options, xmlrpc_token)
-    options[:rule_array].split(',').each do |rule_id|
-      self.rules << Rule.where(id: rule_id).first unless nil
-    end
-    TestRule.send_work_msg(self, xmlrpc_token, self.bug)
   end
 end

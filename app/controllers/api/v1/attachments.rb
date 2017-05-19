@@ -73,8 +73,12 @@ module API
               :task_type     => options[:task_type],
               :user => User.where(cvs_username: current_user.cvs_username).first
             )
+            user = User.where(cvs_username: current_user.cvs_username).first
+            new_task = Task.create_pcap_test(bug.id, user.id)
             begin
-                new_task.test_attachments(options, request.headers['Xmlrpc-Token'])
+                TestAttachment.new(new_task,
+                                   request.headers['Xmlrpc-Token'],
+                                   bug.attachments.map{|a| a.id}).send_work_msg
             rescue
               #handle timeouts accordingly
             end

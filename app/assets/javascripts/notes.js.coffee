@@ -123,6 +123,7 @@ $ ->
           $('.alert_notes').hide 'blind', {}, 5000
           return
         ), 8000
+        window.location.reload()
     }
 
   $(document).on 'click', '#committerNotesPublishBtn', (e) ->
