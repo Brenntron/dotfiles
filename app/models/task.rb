@@ -13,6 +13,15 @@ class Task < ApplicationRecord
     select('max(tasks.updated_at) as updated_at')
   }
 
+  scope :any_relations, -> {
+    left_joins(:rules).left_joins(:attachments).group(:id)
+        .select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments')
+  }
+
+  scope :reverse_chron, -> {
+    order("created_at desc")
+  }
+
   TASK_TYPE_PCAP_TEST                   = "pcap test"
   TASK_TYPE_LOCAL_TEST                  = "local test"
 
