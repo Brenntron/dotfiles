@@ -767,7 +767,8 @@ class Bug < ApplicationRecord
   def link_alert(attachment_id)
     attachment = Attachment.where(id: attachment_id).first
     attachment.pcap_alerts.each do |alert|
-      rules << alert.rule unless rules.include?(alert.rule)
+      rule = alert.rule
+      rules << rule unless rule.rule_content.blank? || rules.include?(rule)
     end
   end
 
