@@ -1,0 +1,53 @@
+<div id="rule-part-form-<%= rule.id %>" class="rule-part-form-section"
+     data-rule-id="<%= rule.id %>" data-rule-sid="<%= rule.sid %>" data-rule-gid="<%= rule.gid %>">
+  <div class="rule-part-header-section">
+    <h4 class="blue">
+      <% if rule.sid %>
+          <%= "#{rule.gid}:#{rule.sid}:#{rule.rev}" %>
+      <% else %>
+          New rule
+      <% end %>
+    </h4>
+  </div>
+
+  <%= form_for rule, url: "/rules" do |rule_form| %>
+    <%= rule_form.hidden_field(:id, value: rule.id) %>
+    <%= rule_form.hidden_field(:sid, value: rule.sid) %>
+    <%= rule_form.hidden_field(:gid, value: rule.gid) %>
+    <%= rule_form.hidden_field(:rule_content, value: rule.rule_content) %>
+
+    <div class="form-group">
+      <div class="col-xs-12 references_add">
+        <h5>References
+          <a class="top-space add-reference-btn blue">
+            <span class="glyphicon glyphicon-plus"></span>
+            add reference
+          </a>
+        </h5>
+        <% if rule.references.any? %>
+          <% rule.references.distinct.each do |ref| %>
+              <%= rule_form.fields_for :references, ref do |ref_fields| %>
+              <div class="col-xs-10">
+                <div class="form-inline reference-input-section">
+                  <div class="form-group">
+                    <%= ref_fields.text_field(:reference_type_id, value: ref.reference_type.name,
+                                              size: 8, class: 'form-control select-sm code') %>
+                  </div>
+                  <div class="form-group">
+                    <%= ref_fields.text_field(:reference_data,
+                                              size: 40, class: 'form-control select-sm code') %>
+                  </div>
+                  <div class="form-group">
+                    <button class="btn select-sm btn-link remove-ref">remove</button>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <%= rule_form.submit %>
+  <% end %>
+</div>

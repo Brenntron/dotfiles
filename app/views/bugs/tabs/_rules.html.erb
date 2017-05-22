@@ -150,6 +150,11 @@
     <%= render '/bugs/tabs/rules/edit' %>
   </div>
 </div>
+<div id="rule-parts-section">
+  <% @bug.rules.each do |rule| %>
+    <%= render partial: 'bugs/tabs/rule_parts/form', locals: { rule: rule } %>
+  <% end %>
+</div>
 <div class="row spacer"></div>
 
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
