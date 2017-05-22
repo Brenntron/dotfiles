@@ -318,6 +318,60 @@ Feature: Bug
     And I can not select "PENDING" from "bug[state]"
 
   @javascript
+  Scenario: a user can set the state of a bug to pending when deleted rule doc summaries are missing
+    Given a user with role "analyst" exists and is logged in
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+    And the following rule categories exist:
+      | category  | id |
+      | DELETED   |  1 |
+    And the following rules exist belonging to bug "222222":
+      |id | message                 | rule_category_id | parsed |
+      |1  | BLACKLIST message       | 1                |  true  |
+    And the following references exist:
+      | id | reference_data | reference_type_id |
+      | 1  | 2006-5745      | 1                 |
+    And rule with id "1" has a reference with id "1"
+    Then I wait for "2" seconds
+    And I goto "/bugs/222222"
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    Then I select "PENDING" from "bug[state]"
+
+  @javascript
+  Scenario: a user can set the state of a bug to pending when file-identify rule doc summaries are missing
+    Given a user with role "analyst" exists and is logged in
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+    And the following rule categories exist:
+      | category      | id |
+      | FILE-IDENTIFY |  1 |
+    And the following rules exist belonging to bug "222222":
+      |id | message                 | rule_category_id | parsed |
+      |1  | BLACKLIST message       | 1                |  true  |
+    And the following references exist:
+      | id | reference_data | reference_type_id |
+      | 1  | 2006-5745      | 1                 |
+    And rule with id "1" has a reference with id "1"
+    Then I wait for "2" seconds
+    And I goto "/bugs/222222"
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    Then I select "PENDING" from "bug[state]"
+
+  @javascript
   Scenario: a user can not set the state of a bug to pending when a rule does not parse
     Given a user with role "analyst" exists and is logged in
     And the following reference types exist:

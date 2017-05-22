@@ -61,7 +61,11 @@ class Rule < ApplicationRecord
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
   def deleted?
-    'DELETED' == self.rule_category.category
+    rule_category && rule_category.deleted?
+  end
+
+  def has_doc?
+    rule_doc && rule_doc.summary.present?
   end
 
   # determines if the rule *should* be on (uncommented) or off (commented)
