@@ -556,7 +556,6 @@ Feature: Bug
 #    And  I fill in "sid" with "24397" <- this next step is broken
 
 
-
   @javascript
   Scenario: a user can remove a rule from a bug
     Given a user with role "analyst" exists and is logged in
@@ -572,7 +571,6 @@ Feature: Bug
     Then I wait for "3" seconds
     And I goto "/bugs/222222"
     And I click ".rules-tab"
-
 
 
   @javascript
@@ -591,12 +589,12 @@ Feature: Bug
     When I goto "/bugs/145359"
     And I click ".jobs-tab"
     Then I should not see "rule"
-    And I click ".rules-tab"
+    When I click ".rules-tab"
     And I toggle checkbox ".rule_3591"
-    When I click button "test"
+    And I click button "test"
     Then test should be created and I should see "Task has been created to test the rule"
-    And I click ".jobs-tab"
-    Then I should see "rule"
+    When I click ".jobs-tab"
+    Then I should see "local test"
 
   @javascript
   Scenario: a user can test add an attachment
@@ -630,13 +628,13 @@ Feature: Bug
     When I goto "/bugs/145359"
     And I click ".jobs-tab"
     Then I should not see "attachment"
-    And I click ".attachments-tab"
+    When I click ".attachments-tab"
     And I toggle checkbox ".attach_1"
     Then I should see "new.pcap"
     When I click button "test"
     Then test should be created and I should see "Task has been created to test the attachment"
-    And I click ".jobs-tab"
-    Then I should see "attachment"
+    When I click ".jobs-tab"
+    Then I should see "pcap test"
 
   @javascript
   Scenario: a user can edit research notes
