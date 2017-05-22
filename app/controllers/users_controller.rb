@@ -38,14 +38,18 @@ class UsersController < ApplicationController
 
   def add_to_team
     @user = User.find(params[:user_id])
-    @child = User.find(params[:child_id])
-    @child.move_to_child_of(@user)
-    redirect_back(fallback_location: :back)
-    if @child.save
-      flash[:notice] = "#{@child.cvs_username} successfully added to #{@user.cvs_username}'s team."
+    @child = User.where(id: params[:child_id]).first
+    if @child
+      @child.move_to_child_of(@user)
+      if @child.save
+        flash[:notice] = "#{@child.cvs_username} successfully added to #{@user.cvs_username}'s team."
+      else
+        flash[:alert] = "Unable to add #{@child.cvs_username} to #{@user.cvs_username}'s team."
+      end
     else
-      flash[:alert] = "Unable to add #{@child.cvs_username} to #{@user.cvs_username}'s team."
+      flash[:alert] = "Please select a team member from the list."
     end
+    redirect_back(fallback_location: :back)
   end
 
   def remove_from_team
