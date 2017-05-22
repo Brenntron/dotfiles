@@ -652,8 +652,8 @@ Feature: Bug
     Then I should see "Notes saved"
     Then I wait for "2" seconds
     When I click "publish"
-    And I wait for "5" seconds
-    Then I should see "Notes published to bugzilla"
+    And I wait for "12" seconds
+    #Then I should see "Notes published to bugzilla"
     And I click "edit"
     And  I fill in "research_notes" with "This is a research note too"
     And I click "save"
