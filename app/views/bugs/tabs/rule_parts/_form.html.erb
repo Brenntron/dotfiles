@@ -25,16 +25,17 @@
           </a>
         </h5>
         <% if rule.references.any? %>
-          <% rule.references.distinct.each do |ref| %>
-              <%= rule_form.fields_for :references, ref do |ref_fields| %>
+            <%= rule_form.fields_for :references do |ref_fields| %>
               <div class="col-xs-10">
                 <div class="form-inline reference-input-section">
                   <div class="form-group">
-                    <%= ref_fields.text_field(:reference_type_id, value: ref.reference_type.name,
+                    <%= ref_fields.text_field(:reference_type_id, value: ref_fields.object.reference_type.name,
+                                              # name: "rule[references][][reference_type_id]",
                                               size: 8, class: 'form-control select-sm code') %>
                   </div>
                   <div class="form-group">
                     <%= ref_fields.text_field(:reference_data,
+                                              # name: "rule[references][][reference_data]",
                                               size: 40, class: 'form-control select-sm code') %>
                   </div>
                   <div class="form-group">
@@ -43,7 +44,6 @@
                 </div>
               </div>
             <% end %>
-          <% end %>
         <% end %>
       </div>
     </div>
