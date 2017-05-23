@@ -201,6 +201,7 @@ Feature: User Accounts
 
     Then I wait for "3" seconds
     And  I goto "/users/1/relationships"
+    And I click ".glyphicon-chevron-right"
     And  I should see "h_clinton"
     And  "-- Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
     And  I select "Donald Trump (d_drumph)" from "child_id"
@@ -230,6 +231,7 @@ Feature: User Accounts
 
     Then I wait for "3" seconds
     And  I goto "/users/1/relationships"
+    And I click ".glyphicon-chevron-right"
     And  I should see "h_clinton"
     And  "Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
     Then I click the link with data-target "#roleModal_3"
@@ -238,6 +240,7 @@ Feature: User Accounts
     Then I check "analyst"
     Then I click "Save changes"
     Then I should see "h_clinton updated successfully."
+    Then I click ".glyphicon-chevron-right"
     And I should see "analyst"
     And I should not see "committer"
     And I click the link with data-target "#roleModal_4"
