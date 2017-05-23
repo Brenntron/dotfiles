@@ -528,6 +528,10 @@ class Rule < ApplicationRecord
     raise RuleError.new("Unable to find sid #{sid}")
   end
 
+  def update_parts(rule_data)
+
+  end
+
   def sort_rules_by_state
     case (state)
     when 'FAILED'
@@ -666,5 +670,10 @@ class Rule < ApplicationRecord
         rule.create_rule_doc(rule_doc)
       end
     end
+  end
+
+  def self.update_parts_action(sid, gid, rule_data)
+    rule = Rule.by_sid(sid, gid).first
+    rule.update_parts(rule_data)
   end
 end

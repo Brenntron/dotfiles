@@ -382,13 +382,19 @@ $ ->
     sid = form.find('input[name="rule[sid]"]').val()
     gid = form.find('input[name="rule[gid]"]').val()
 
-    edit_rule_doc = {}
-    form.find('textarea[type=text]').each ->
-      edit_rule_doc[$(this)[0].id] = $(this)[0].value
+    rule_input_data = {}
+    form.find('input.api-data-input').each ->
+      data_index = this.getAttribute("data-index")
+      name = this.getAttribute("name")
+      value = this.getAttribute("value")
+      rule_input_data[data_index] = rule_input_data[data_index] || {}
+      rule_input_data[data_index][name] = value
 
-    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: edit_rule_doc}
-#    data = {id: id, rule: rule}
-    data = {rule: rule}
+    reference_data = []
+    for kk of rule_input_data
+      reference_data.push rule_input_data[kk]
+
+    data = { rule: JSON.stringify( {references: reference_data} ) }
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax {
       url: "/api/v1/rules/"+gid+"/"+sid+"/rule-parts"

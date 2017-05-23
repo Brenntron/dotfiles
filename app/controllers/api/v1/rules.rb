@@ -184,8 +184,17 @@ module API
                                   permitted_params[:rule][:rule_doc])
         end
 
+        params do
+          optional :sid, type: Integer
+          optional :gid, type: Integer, default: 1
+          # optional :references, type: Array do
+          #   optional :x, type: String
+          # end
+          optional :rule, type: JSON
+        end
         put ":gid/:sid/rule-parts", root: "rule" do
-          Rails.logger.info "\n\n*** here\n\n"
+          Rule.update_parts_action(sid, gid, permitted_params[:rule])
+          true
         end
 
         #load multiple rules
