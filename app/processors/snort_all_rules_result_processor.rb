@@ -50,7 +50,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
     puts "Configuring all rule results"
     result = JSON.parse(message)
     puts result
-
+    
     unless result['task_id'].nil?
 
       begin

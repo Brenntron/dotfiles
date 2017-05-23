@@ -289,7 +289,7 @@ while message = client.receive
     client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
                    {
                        :task_id => task_id,
-                       :alerts => [{"id"=>82631, "gid"=>"1", "sid"=>"24397", "rev"=>"3", "message"=>"APP-DETECT Steam game URI handler"}], #temp
+                       :alerts => [{"id"=>85842, "gid"=>"1", "sid"=>"25366", "rev"=>"10", "message"=>"FILE-OFFICE Microsoft Office Excel invalid Window2 BIFF record value attempt"}], #temp
                        :errors => errors,
                    }.to_json
   end
