@@ -9,8 +9,10 @@
       <% end %>
     </h4>
   </div>
-
-  <%= form_for rule, url: "/rules" do |rule_form| %>
+  <%= form_for rule,
+               url: "/api/v1/rules/#{rule.gid}/#{rule.sid}/rule-parts",
+               remote: true,
+               html: {class: 'rule-parts-form'} do |rule_form| %>
     <%= rule_form.hidden_field(:id, value: rule.id) %>
     <%= rule_form.hidden_field(:sid, value: rule.sid) %>
     <%= rule_form.hidden_field(:gid, value: rule.gid) %>
@@ -48,6 +50,6 @@
       </div>
     </div>
 
-    <%= rule_form.submit %>
+    <%= rule_form.submit class: 'btn btn-warning update-rule-parts-btn' %>
   <% end %>
 </div>

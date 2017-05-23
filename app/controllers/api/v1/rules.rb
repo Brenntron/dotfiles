@@ -184,6 +184,10 @@ module API
                                   permitted_params[:rule][:rule_doc])
         end
 
+        put ":gid/:sid/rule-parts", root: "rule" do
+          Rails.logger.info "\n\n*** here\n\n"
+        end
+
         #load multiple rules
         params do
           requires :sids, type: Array[Integer]
