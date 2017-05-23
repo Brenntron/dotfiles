@@ -8,17 +8,15 @@
       <tr>
         <td class="narrow-column">Completed</td>
         <td class="narrow-column">Failed</td>
-        <td>Type</td>
-        <td class="narrow-column">Time</td>
-        <td class="narrow-column">Committed</td>
+        <td class="task-type-col">Type</td>
         <td>Result</td>
-        <td>User</td>
+        <td class="user-col">User</td>
         <td class="narrow-column">CreatedAt</td>
       </tr>
       </thead>
       <tbody>
         <% if @bug.tasks.any? %>
-          <% @bug.tasks.left_joins(:rules).left_joins(:attachments).group(:id).select('tasks.*, count(rules.id) as any_rules, count(attachments.id) as any_attachments').each do |task| %>
+          <% @bug.tasks.any_relations.reverse_chron.each_with_index do |task, index| %>
             <tr data-task-id="<%= task.id %>">
               <% if task.completed %>
                 <td class="center"><input type="checkbox" checked></td>
@@ -30,11 +28,21 @@
               <% else %>
                 <td class="center"><input type="checkbox"></td>
               <% end %>
-              <td><%= task.task_type %></td>
-              <td></td>
-              <td></td>
-              <td><pre><%= task.result %></pre></td>
-              <td><%= User.find(task.user_id).cvs_username %></td>
+              <td class="task-type-col"><%= task.task_type %></td>
+              <td>
+                <div id="job-expand-<%= task.id %>" style="<%= job_expand_display(task, index) %>">
+                  <span data-expand-id="job-expand-<%= task.id %>" data-collapse-id="job-collapse-<%= task.id %>"
+                        onclick="expand_job_result(this)"
+                        class="glyphicon glyphicon-expand job-results-button" title="Expand"></span>
+                </div>
+                <div id="job-collapse-<%= task.id %>" style="<%= job_collapse_display(task, index) %>">
+                  <span data-expand-id="job-expand-<%= task.id %>" data-collapse-id="job-collapse-<%= task.id %>"
+                        onclick="collapse_job_result(this)"
+                        class="glyphicon glyphicon-collapse-up job-results-button" title="Expand"></span>
+                  <pre><%= task.result %></pre>
+                </div>
+              </td>
+              <td class="user-col"><%= User.find(task.user_id).cvs_username %></td>
               <td><%= task.created_at.strftime("%m/%d/%y") %></td>
             </tr>
             <tr style="display:none;">
