@@ -386,7 +386,7 @@ $ ->
     form.find('input.api-data-input').each ->
       data_index = this.getAttribute("data-index")
       name = this.getAttribute("name")
-      value = this.getAttribute("value")
+      value = this.value
       rule_input_data[data_index] = rule_input_data[data_index] || {}
       rule_input_data[data_index][name] = value
 

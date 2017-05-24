@@ -193,7 +193,7 @@ module API
           optional :rule, type: JSON
         end
         put ":gid/:sid/rule-parts", root: "rule" do
-          Rule.update_parts_action(sid, gid, permitted_params[:rule])
+          Rule.update_parts_action(permitted_params[:sid], permitted_params[:gid], permitted_params[:rule])
           true
         end
 

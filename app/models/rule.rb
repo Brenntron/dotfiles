@@ -194,24 +194,26 @@ class Rule < ApplicationRecord
     end
   end
 
-  def associate_references(rule_text)
-    references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
-    references.each do |r|
+  def associate_references(rule_content)
+    references_ary = []
+    rule_content.split(';').each { |r| references_ary << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
+
+    self.references.delete_all
+    references_ary.each do |r|
       r = r.split(',')
       unless r[1].nil? || r[1].empty?
         ref_type = ReferenceType.find_or_create_by(name: r[0].strip)
         new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: r[1].strip)
-        self.references << new_reference unless self.references.include?(new_reference)
+        self.references << new_reference
       end
     end
   end
 
-  def update_references(rule_text)
+  def update_references(rule_content)
     current_references = []
     references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
     references = []
-    rule_text.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
+    rule_content.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
     references.each do |r|
       # skip this reference if it already exists
       if current_references.include? r
@@ -528,8 +530,31 @@ class Rule < ApplicationRecord
     raise RuleError.new("Unable to find sid #{sid}")
   end
 
-  def update_parts(rule_data)
+  def build_rule_params(rule_data)
+    rule_params = {}
+    rule_params['sid'] = sid
+    rule_params['gid'] = gid
+    rule_params['rev'] = rev
+    rule_params['connection'] = connection
+    rule_params['msg'] = message
+    rule_params['flow'] = flow
+    rule_params['class_type'] = class_type
+    rule_params['detection'] = detection
+    rule_params['metadata'] = metadata
 
+    reference_data = rule_data['references']
+    rule_params['references'] = reference_data.map do |reference_datum|
+      "reference:#{reference_datum['reference_type']},#{reference_datum['reference_data']}; "
+    end.join
+
+    rule_params
+  end
+
+  def update_parts(rule_data)
+    rule_params = build_rule_params(rule_data)
+    rule_content_local = RuleSyntax::Assemposer.new(rule_params).rule_content
+    Rule.save_rule_content(rule_content_local)
+    associate_references(rule_content_local)
   end
 
   def sort_rules_by_state
@@ -552,28 +577,24 @@ class Rule < ApplicationRecord
   # @return [boolean] true iff rule is latest version synced with VC
   def synched?
     EDIT_STATUS_SYNCHED == edit_status
-    # %w[UNCHANGED].include?(state)
   end
 
   # Tests if edited rule is new
   # @return [boolean] true iff rule is a new edited rule
   def new_rule?
     EDIT_STATUS_NEW == edit_status
-    # draft? && sid.nil?
   end
 
   # Tests if edited rule is an edited update to an existing rule
   # @return [boolean] true iff rule is a updated edited rule
   def edited_rule?
     EDIT_STATUS_EDIT == edit_status
-    # draft? && sid.present?
   end
 
   # Tests if rule is a user edited version
   # @return [boolean] true iff rule is a user edited version
   def draft?
     new_rule? || edited_rule?
-    # %w[NEW UPDATED FAILED].include?(state)
   end
 
   # Tests if edited rule is in progress while VC updated the rule externally
@@ -673,6 +694,9 @@ class Rule < ApplicationRecord
   end
 
   def self.update_parts_action(sid, gid, rule_data)
+    puts "*** rule_data = #{rule_data.inspect}"
+    byebug
+    raise 'raspberry' if true
     rule = Rule.by_sid(sid, gid).first
     rule.update_parts(rule_data)
   end
