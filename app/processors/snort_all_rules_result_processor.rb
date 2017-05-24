@@ -115,7 +115,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                 end
               end
 
-            rescue Exception => e
+            rescue RuleError => e
               job.failed = true
               job.result << "#{e.to_s} for sid #{alert['sid']}\n"
             rescue ActiveRecord::RecordNotUnique => e
