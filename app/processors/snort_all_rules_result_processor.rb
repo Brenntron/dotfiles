@@ -50,14 +50,14 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
     puts "Configuring all rule results"
     result = JSON.parse(message)
     puts result
-
-
+    
     unless result['task_id'].nil?
 
       begin
         # Make sure to close the job
         job = Task.find(result['task_id'])
         job.result ||= ""
+
         return if job.nil?
 
         attachments = Hash.new
@@ -76,6 +76,10 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
         attachments.each do |attachment_id, alerts|
 
           attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
+          # give some kind of feedback about the alerts on the pcap test
+          job.result << "Alerts on pcap: #{attachment.file_name}\n"
+          job.result << "===============================================\n"
+          job.result << "NONE" if alerts.count == 0
 
           alerts.each do |alert|
             begin
@@ -95,6 +99,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
               # The rule should have extracted if it was valid
               if rule.valid?
+                job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                 rule.save(:validate => false)
                 attachment.pcap_alerts.create(rule: rule)
               else
@@ -104,6 +109,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                     job.result << "#{rule.version} #{v}\n"
                   end
                 else
+                  job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                   rule.save(:validate => false)
                   attachment.pcap_alerts.create(rule: rule)
                 end
@@ -116,6 +122,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
               # Ignore these
             end
           end
+          job.result << "\n"
         end
 
         job.completed = true
