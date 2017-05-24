@@ -76,6 +76,10 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
         attachments.each do |attachment_id, alerts|
 
           attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
+          # give some kind of feedback about the alerts on the pcap test
+          job.result << "Alerts on pcap: #{attachment.file_name}\n"
+          job.result << "===============================================\n"
+          job.result << "NONE" if alerts.count == 0
 
           alerts.each do |alert|
             begin
@@ -118,6 +122,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
               # Ignore these
             end
           end
+          job.result << "\n"
         end
 
         job.completed = true
