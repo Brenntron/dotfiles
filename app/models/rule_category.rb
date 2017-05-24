@@ -1,31 +1,26 @@
 class RuleCategory < ApplicationRecord
   has_many :rules
 
+  CATEGORY_DELETED                      = 'DELETED'
+  CATEGORY_FILE_IDENTIFY                = 'FILE-IDENTIFY'
+
   validates :category, uniqueness: true
 
   scope :ranked, ->{ left_joins(:rules).group(:id).order('count(rules.id) desc, category') }
 
-  def filename(gid = 1)
-    # Rule.joins(:rule_category).select('rules.id, rules.gid, rules.filename, rule_categories.category').each do |rule|
-    #   unless /^extras\/snort\/(?<dir>\w+)\/(?<basename>[-a-z]+)\.rules$/ =~ rule.filename
-    #     puts "!!!1 rule #{rule.id} filename not in directory: '#{rule.filename}'"
-    #   end
-    #
-    #   unless basename == rule.category.downcase
-    #     unless %w[preprocessor decoder].include?(basename)
-    #       puts "!!!2 rule #{rule.id} gid = #{rule.gid} file basename = '#{basename}', category = '#{rule.category.downcase}'"
-    #     end
-    #   end
-    #
-    #   case
-    #     when (1 == rule.gid) && ('rules' == dir)
-    #     when (3 == rule.gid) && ('so_rules' == dir)
-    #     when ('preproc_rules' == dir)
-    #     else
-    #       puts "!!!3 cannot determine dir gid = #{rule.gid} dir = #{dir}"
-    #   end
-    # end; nil
+  def deleted?
+    CATEGORY_DELETED == self.category
+  end
 
+  def file_identiy?
+    CATEGORY_FILE_IDENTIFY == self.category
+  end
+
+  def requires_doc?
+    (!deleted?) && (!file_identiy?)
+  end
+
+  def filename(gid = 1)
     case gid
       when 1
         "snort-rules/#{category.downcase}.rules"

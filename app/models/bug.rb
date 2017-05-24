@@ -230,11 +230,9 @@ class Bug < ApplicationRecord
   def docs_complete?
     rules.each do |rule|
       next unless rule.rule_category
-      next if 'FILE-IDENTIFY' == rule.rule_category.category
+      next unless rule.rule_category.requires_doc?
 
-      if !rule.rule_doc || rule.rule_doc.summary.blank?
-        return false
-      end
+      return false unless rule.has_doc?
     end
 
     true
