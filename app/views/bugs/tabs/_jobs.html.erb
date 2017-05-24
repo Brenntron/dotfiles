@@ -46,13 +46,14 @@
               <td><%= task.created_at.strftime("%m/%d/%y") %></td>
             </tr>
             <tr style="display:none;">
-              <td colspan="7" class="code">
+              <td class="code">
                 <strong>Rules:</strong>
                 <% if 0 < task.any_rules %>
                   <% task.rules.each do |rule| %>
                     <%= rule.id %>,
                   <% end %>
                 <% end %>
+              </td>
                 <% if task.failed %>
                     <td class="center failed-bg"><input type="checkbox" checked></td>
                 <% else %>
