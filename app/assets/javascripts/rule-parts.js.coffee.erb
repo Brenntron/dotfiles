@@ -1,17 +1,20 @@
 $ ->
 
-  new_index = 0
+  window.new_ref_index = 0
 
   $('.rule-parts-add-reference-btn').on "click", (event) ->
     reference_form = '<div class="col-xs-10"> <div class="form-inline reference-input-section"> ' +
         '<div class="form-group"> ' +
-        '<%= select(:rule, :reference, ReferenceType.all.pluck(:name, :id), {}, class: 'api-data-input', data: {'index': 'new0'}, name: 'reference_type_id') %>' +
+        '<%= select(:rule, :reference, ReferenceType.all.pluck(:name, :id), {}, class: 'api-data-input', name: 'reference_type_id', id: 'new-ref-type-select') %>' +
         ' </div>' +
         '<div class="form-group"> '+
-        '<input name="reference_data" size="40" class="form-control select-sm code api-data-input" data-index="new' + new_index + '" type="text" placeholder="reference data" required="true">' +
+        '<input name="reference_data" size="40" class="form-control select-sm code api-data-input" data-index="new-' + window.new_ref_index + '" type="text" placeholder="reference data" required="true">' +
         ' </div>' +
         '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>' +
         ' </div> </div>'
-    new_index = new_index + 1
     reference = $(this).parents('.references_add')
     $(reference_form).appendTo(reference)
+    ref_type_select = reference.find('#new-ref-type-select')[0]
+    ref_type_select.id = 'ref-type-select-new-' + window.new_ref_index
+    ref_type_select.setAttribute('data-index', 'new-' + window.new_ref_index)
+    window.new_ref_index = window.new_ref_index + 1
