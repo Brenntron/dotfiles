@@ -187,9 +187,6 @@ module API
         params do
           optional :sid, type: Integer
           optional :gid, type: Integer, default: 1
-          # optional :references, type: Array do
-          #   optional :x, type: String
-          # end
           optional :rule, type: JSON
         end
         put ":gid/:sid/rule-parts", root: "rule" do

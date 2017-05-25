@@ -20,7 +20,7 @@
     <div class="form-group">
       <div class="col-xs-12 references_add">
         <h5>References
-          <a class="top-space add-reference-btn blue">
+          <a class="top-space rule-parts-add-reference-btn blue">
             <span class="glyphicon glyphicon-plus"></span>
             add reference
           </a>
@@ -30,14 +30,17 @@
               <div class="col-xs-10">
                 <div class="form-inline reference-input-section">
                   <div class="form-group">
-                    <%= ref_fields.text_field(:reference_type, value: ref_fields.object.reference_type.name,
+                    <%= ref_fields.text_field(:reference_type, name: 'reference_type',
+                                              id: "rule-parts-#{ref_fields.index}-reference_type",
                                               size: 8, class: 'form-control select-sm code api-data-input',
-                                              "data-index" => ref_fields.index, name: 'reference_type') %>
+                                              "data-index" => ref_fields.index,
+                                              value: ref_fields.object.reference_type.name) %>
                   </div>
                   <div class="form-group">
-                    <%= ref_fields.text_field(:reference_data,
+                    <%= ref_fields.text_field(:reference_data, name: 'reference_data',
+                                              id: "rule-parts-#{ref_fields.index}-reference_data",
                                               size: 40, class: 'form-control select-sm code api-data-input',
-                                              "data-index" => ref_fields.index, name: 'reference_data') %>
+                                              "data-index" => ref_fields.index) %>
                   </div>
                   <div class="form-group">
                     <button class="btn select-sm btn-link remove-ref">remove</button>

@@ -383,7 +383,7 @@ $ ->
     gid = form.find('input[name="rule[gid]"]').val()
 
     rule_input_data = {}
-    form.find('input.api-data-input').each ->
+    form.find('.api-data-input').each ->
       data_index = this.getAttribute("data-index")
       name = this.getAttribute("name")
       value = this.value
