@@ -30,6 +30,11 @@
               <% end %>
               <td class="task-type-col"><%= task.task_type %></td>
               <td>
+                <% if Task::TASK_TYPE_LOCAL_TEST == task.task_type %>
+                  <% task.rules.each do |rule| %>
+                      <%= rule.new_rule? ? 'new-rule' : "#{rule.gid}:#{rule.sid}:#{rule.rev}; " %>
+                  <% end %>
+                <% end %>
                 <div id="job-expand-<%= task.id %>" style="<%= job_expand_display(task, index) %>">
                   <span data-expand-id="job-expand-<%= task.id %>" data-collapse-id="job-collapse-<%= task.id %>"
                         onclick="expand_job_result(this)"
