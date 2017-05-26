@@ -544,7 +544,15 @@ class Rule < ApplicationRecord
 
     reference_data = rule_data['references']
     rule_params['references'] = reference_data.map do |reference_datum|
-      "reference:#{reference_datum['reference_type']},#{reference_datum['reference_data']}; "
+      case
+        when reference_datum['reference_type_id'].present?
+          reference_type = ReferenceType.where(id: reference_datum['reference_type_id']).first
+          "reference:#{reference_type.name},#{reference_datum['reference_data']}; "
+        when reference_datum['reference_type'].present?
+          "reference:#{reference_datum['reference_type']},#{reference_datum['reference_data']}; "
+        else
+          next
+      end
     end.join
 
     rule_params
@@ -694,9 +702,6 @@ class Rule < ApplicationRecord
   end
 
   def self.update_parts_action(sid, gid, rule_data)
-    puts "*** rule_data = #{rule_data.inspect}"
-    byebug
-    raise 'raspberry' if true
     rule = Rule.by_sid(sid, gid).first
     rule.update_parts(rule_data)
   end
