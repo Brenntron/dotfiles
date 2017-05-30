@@ -21,6 +21,9 @@ module API
         end
         route_param "gids/:gid/sids/:sid" do
           get do
+            puts "*** here"
+            puts "*** sid = #{permitted_params[:sid].inspect}"
+            puts "*** gid = #{permitted_params[:gid].inspect}"
             Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
           end
         end
