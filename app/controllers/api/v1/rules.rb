@@ -5,23 +5,6 @@ module API
 
       resource :rules do
 
-        desc "import all existing rules"
-        get 'import_all' do
-          true
-        end
-
-
-        # desc "import existing rule"
-        # params do
-        #   requires :id, type: Integer, desc: "rule sid."
-        # end
-        # route_param "import/:id" do
-        #   get do
-        #     Rule.import_rule(permitted_params[:id])
-        #   end
-        # end
-
-
         desc "Return a rule"
         params do
           requires :sid, type: Integer, desc: "sid of the rule"
