@@ -107,7 +107,7 @@ module API
 
         desc "Edit a rule"
         params do
-          requires :gid, type: Integer, desc: "gid of the rule"
+          requires :gid, type: Integer, default: 1, desc: "gid of the rule"
           requires :sid, type: Integer, desc: "sid of the rule"
           requires :rule, type: Hash do
             requires :rule_content, type: String, desc: "Compiled rule content"
@@ -116,9 +116,8 @@ module API
         put "gids/:gid/sids/:sid", root: "rule" do
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          Rule.update_action(permitted_params[:id],
-                             permitted_params[:rule][:rule_content],
-                             permitted_params[:rule][:rule_doc])
+          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+          Rule.update_action(rule, permitted_params[:rule][:rule_content])
         end
 
 
@@ -169,9 +168,10 @@ module API
         put ":id", root: "rule" do
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          Rule.update_action(permitted_params[:id],
-                                  permitted_params[:rule][:rule_content],
-                                  permitted_params[:rule][:rule_doc])
+          rule = Rule.where(id: permitted_params[:id]).first
+          Rule.update_action(rule,
+                             permitted_params[:rule][:rule_content],
+                             permitted_params[:rule][:rule_doc])
         end
 
         params do

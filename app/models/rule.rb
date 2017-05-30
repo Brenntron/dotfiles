@@ -690,8 +690,8 @@ class Rule < ApplicationRecord
 
   # Updates a rule and its associations
   # @return [Rule]
-  def self.update_action(rule_id, rule_content, rule_doc)
-    Rule.save_rule_content(rule_content, rule_id).tap do |rule|
+  def self.update_action(rule, rule_content, rule_doc = nil)
+    Rule.save_rule_content(rule_content, rule.id).tap do |rule|
       rule.update_references(rule_content)
       if rule.rule_doc.present?
         rule.rule_doc.update(rule_doc)

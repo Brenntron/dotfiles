@@ -40,16 +40,17 @@ describe API::V1::Rules do
     end
 
     it "edits a rule" do
-      rule = FactoryGirl.create(:synched_rule)
-      rule_content = %Q~alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any (msg:"BROWSER-PLUGINS mess"; flow:to_client,established; file_data; content:"Msxml2.FreeThreadedDOMDocument.6.0"; fast_pattern:only; content:".definition("; nocase; metadata:policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3; classtype:attempted-user; sid:#{rule.sid}; rev:#{rule.rev};)~
-      puts "*** rule = #{rule.inspect}"
+      @rule = FactoryGirl.create(:synched_rule)
+      @rule_content = %Q~alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any (msg:"BROWSER-PLUGINS mess"; flow:to_client,established; file_data; content:"Msxml2.FreeThreadedDOMDocument.6.0"; fast_pattern:only; content:".definition("; nocase; metadata:policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3; classtype:attempted-user; sid:#{@rule.sid}; rev:#{@rule.rev};)~
 
-      put "/api/v1/rules/gids/#{rule[:gid]}/sids/#{rule[:sid]}",
-          { params: { rule: { rule_content: rule_content } },
+      put "/api/v1/rules/gids/#{@rule[:gid]}/sids/#{@rule[:sid]}",
+          { params: { rule: { rule_content: @rule_content } },
             headers: @std_headers }
-      puts "*** response = #{response.body.inspect}"
 
       expect(response).to be_success
+
+      rule = Rule.find(@rule.id)
+      expect(rule.rule_content).to eq(@rule_content)
     end
   end
 end
