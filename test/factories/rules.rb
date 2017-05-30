@@ -25,8 +25,9 @@ FactoryGirl.define do
       state               "UNCHANGED"
       publish_status      Rule::PUBLISH_STATUS_SYNCHED
       edit_status         Rule::EDIT_STATUS_SYNCHED
+      cvs_rule_content    { rule_content }
+      cvs_rule_parsed     { rule_parsed }
     end
   end
 end
-
 
