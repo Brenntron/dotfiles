@@ -7,21 +7,13 @@ module API
 
         desc "Return a rule"
         params do
-          requires :sid, type: Integer, desc: "sid of the rule"
-        end
-        get ":sid", root: "rule" do
-          Rule.find_or_load(permitted_params[:sid], 1)
-        end
-
-
-        desc "Return a rule"
-        params do
           requires :gid, type: Integer, desc: "gid of the rule"
           requires :sid, type: Integer, desc: "sid of the rule"
         end
         route_param "gids/:gid/sids/:sid" do
           get do
-            Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
+            rule = Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
+            rule ? {rule: rule} : nil
           end
         end
 

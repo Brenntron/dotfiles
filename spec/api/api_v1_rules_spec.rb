@@ -12,7 +12,8 @@ describe API::V1::Rules do
 
       expect(response).to be_success
 
-      rule_attrs = JSON.parse(response.body)
+      data = JSON.parse(response.body)
+      rule_attrs = data["rule"]
       expect(rule_attrs["sid"]).to eq(rule.sid)
       expect(rule_attrs["gid"]).to eq(rule.gid)
     end
@@ -24,7 +25,8 @@ describe API::V1::Rules do
 
       expect(response).to be_success
 
-      rule_attrs = JSON.parse(response.body)
+      data = JSON.parse(response.body)
+      rule_attrs = data["rule"]
       expect(rule_attrs["sid"]).to eq(rule[:sid])
       expect(rule_attrs["gid"]).to eq(rule[:gid])
     end
