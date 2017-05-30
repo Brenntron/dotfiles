@@ -17,6 +17,15 @@ FactoryGirl.define do
     committed           true
     task_id             nil
     rule_category_id    1
+
+    factory :synched_rule do
+      sid                 10127
+      gid                 1
+      rev                 3
+      state               "UNCHANGED"
+      publish_status      Rule::PUBLISH_STATUS_SYNCHED
+      edit_status         Rule::EDIT_STATUS_SYNCHED
+    end
   end
 end
 

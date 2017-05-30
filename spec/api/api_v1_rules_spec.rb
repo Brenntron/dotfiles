@@ -5,10 +5,28 @@ describe API::V1::Rules do
       @std_headers = { headers: {'Token' => @current_user.authentication_token} }
     end
 
-    it "gets a rule" do
-      get "/api/v1/rules/gids/1/sids/19500", @std_headers
-      puts ">>> response.body = #{response.body.inspect}"
+    it "gets a rule from database" do
+      rule = FactoryGirl.create(:synched_rule)
+
+      get "/api/v1/rules/gids/#{rule.gid}/sids/#{rule.sid}", @std_headers
+
       expect(response).to be_success
+
+      rule_attrs = JSON.parse(response.body)
+      expect(rule_attrs["sid"]).to eq(rule.sid)
+      expect(rule_attrs["gid"]).to eq(rule.gid)
+    end
+
+    it "gets a rule from repo" do
+      rule = FactoryGirl.attributes_for(:synched_rule, gid: 1, sid: 19500)
+
+      get "/api/v1/rules/gids/#{rule[:gid]}/sids/#{rule[:sid]}", @std_headers
+
+      expect(response).to be_success
+
+      rule_attrs = JSON.parse(response.body)
+      expect(rule_attrs["sid"]).to eq(rule[:sid])
+      expect(rule_attrs["gid"]).to eq(rule[:gid])
     end
   end
 end
