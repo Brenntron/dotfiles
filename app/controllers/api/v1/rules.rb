@@ -10,11 +10,9 @@ module API
           requires :gid, type: Integer, desc: "gid of the rule"
           requires :sid, type: Integer, desc: "sid of the rule"
         end
-        route_param "gids/:gid/sids/:sid" do
-          get do
-            rule = Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
-            rule ? {rule: rule} : nil
-          end
+        get "gids/:gid/sids/:sid", root: :rules do
+          rule = Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
+          rule ? {rule: rule} : nil
         end
 
 
@@ -107,6 +105,23 @@ module API
         end
 
 
+        desc "Edit a rule"
+        params do
+          requires :gid, type: Integer, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+          requires :rule, type: Hash do
+            requires :rule_content, type: String, desc: "Compiled rule content"
+          end
+        end
+        put "gids/:gid/sids/:sid", root: "rule" do
+          authorize! :update, Rule
+          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+          Rule.update_action(permitted_params[:id],
+                             permitted_params[:rule][:rule_content],
+                             permitted_params[:rule][:rule_doc])
+        end
+
+
         #revert rules
         params do
           requires :rule_ids, type: Array[String]
@@ -131,7 +146,7 @@ module API
 
         # Updates a rule and its associations
         # @return [Rule]
-        desc "Edit a rule"
+        desc "Edit a rule from the id primary key"
         params do
           requires :id, type: Integer, desc: "The database id of the rule you want to update."
           requires :rule, type: Hash do
