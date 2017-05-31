@@ -6,6 +6,7 @@
     <td><strong>&nbsp;&nbsp;&nbsp;State</strong></td>
     <td><strong>Priority</strong></td>
     <td><strong>User</strong></td>
+    <th></th>
     <td><strong>Committer</strong></td>
     <td></td>
   </tr>
@@ -20,20 +21,18 @@
 
         <td class="bug-user">
           <% if bug.user %>
-              <%= bug.user.cvs_username %>
-              <% if bug.user.email != current_user.email %>
-                  <br/>
-                  <button type=button class="small text-muted bug-actions take-bug" id="take-bug-<%= bug.id %>" data-id="<%= bug.id %>">take</button>
-              <% else %>
-                  <br/>
-                  <button type=button class="small text-muted bug-actions return-bug" id="return-bug-<%= bug.id %>" data-id="<%= bug.id %>">return</button>
-              <% end %>
+            <%= bug.user.cvs_username %>
           <% else %>
-              -
-              <br/>
-              <button type=button class="small text-muted bug-actions take-bug" id="take-bug-<%= bug.id %>" data-id="<%= bug.id %>">take</button>
+            -
           <% end %>
           <br/><span class="small text-muted bug-wait" style="display: none" id="bug-wait-<%= bug.id %>">please wait</span>
+        </td>
+        <td>
+          <% if bug.user && (bug.user.email != current_user.email) %>
+            <button type=button class="small text-muted bug-actions take-bug" id="take-bug-<%= bug.id %>" data-id="<%= bug.id %>">take</button>
+          <% else %>
+            <button type=button class="small text-muted bug-actions take-bug" id="take-bug-<%= bug.id %>" data-id="<%= bug.id %>">take</button>
+          <% end %>
         </td>
         <td class="bug-user">
           <% if bug.committer %>
