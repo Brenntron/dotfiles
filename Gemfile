@@ -5,11 +5,9 @@ gem 'rails', '5.1.0'
 gem 'haml', '5.0.1'
 
 gem 'grape', '0.19.0'
-gem 'grape-swagger', '0.25.3'
 gem 'hashie-forbidden_attributes', '0.1.1'
 gem 'active_model_serializers', '0.10.6'
 gem 'grape-active_model_serializers', '1.5.1'
-gem 'grape-swagger-rails', '0.3.0'
 gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'kaminari', '0.16.3'
 
