@@ -14,11 +14,15 @@ module RuleSyntax
     end
 
     def connection
-      if conn_params
-        %w(action protocol src srcport direction dst dstport).map{|key| conn_params[key]}.join(' ')
-      else
-        nil
-      end
+      @connection ||=
+          case conn_params
+            when NilClass
+              nil
+            when String
+              conn_params
+            when Hash
+              %w(action protocol src srcport direction dst dstport).map{|key| conn_params[key]}.join(' ')
+          end
     end
 
     # @return [RuleCategory]
@@ -51,16 +55,15 @@ module RuleSyntax
     end
 
     def msg
-      unless @msg
-        @msg = %Q~"#{rule_category.category if rule_category} #{message if message.present?}"~
-      end
-      @msg
+      @msg ||=
+          %Q~"#{rule_params['msg']}"~ ||
+              %Q~"#{rule_category.category if rule_category} #{message if message.present?}"~
     end
 
     def attributes
-      rule_params.to_h.slice(*%w"class_type detection flow metadata references").merge(
+      rule_params.to_h.slice(*%w(sid gid rev class_type detection flow metadata references)).merge(
           connection: connection,
-          rule_category: rule_category.category,
+          rule_category: rule_category ? rule_category.category : nil,
           message: msg,
       )
     end
@@ -69,8 +72,10 @@ module RuleSyntax
       unless @options
         options_ary = []
         options_ary << "msg:#{msg};" if msg.present?
-        options_ary << "flow:#{attributes['flow']};" if attributes['flow'].present?
-        options_ary << "metadata:#{attributes['metadata']};" if attributes['metadata'].present?
+        options_ary = %w(sid gid rev flow metadata).inject(options_ary) do |ary, key|
+          ary << "#{key}:#{attributes[key]};" if attributes[key].present?
+          ary
+        end
         options_ary = %w(detection references).inject(options_ary) do |ary, key|
           ary << attributes[key] if attributes[key]
           ary
@@ -86,15 +91,15 @@ module RuleSyntax
     end
 
     def gid
-      rule_params[:gid] || 1
+      rule_params[:gid] || rule_params['gid'] || 1
     end
 
     def sid
-      rule_params[:sid]
+      rule_params[:sid] || rule_params['sid']
     end
 
     def rev
-      rule_params[:rev]
+      rule_params[:rev] || rule_params['rev']
     end
   end
 end
