@@ -155,6 +155,18 @@ module API
           RuleFile.commit_rules_action(rules, permitted_params[:username], permitted_params[:bug_id])
         end
 
+        desc "Commit a rule"
+        params do
+          requires :gid, type: Integer, default: 1, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+          optional :username, type: String
+          optional :bug_id,   type: Integer, desc: "Bugzilla id."
+        end
+        put "gids/:gid/sids/:sid/commit", root: "rule" do
+          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+          RuleFile.commit_rules_action([rule], permitted_params[:username], permitted_params[:bug_id])
+        end
+
 
         # Updates a rule and its associations
         # @return [Rule]
