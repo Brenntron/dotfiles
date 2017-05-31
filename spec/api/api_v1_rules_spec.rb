@@ -2,14 +2,14 @@ describe API::V1::Rules do
   before(:context) do
     @current_user = FactoryGirl.create(:current_user)
     @std_headers = {'Token' => @current_user.authentication_token}
-    @std_args = { headers: @std_headers }
+    @std_params = { headers: @std_headers }
   end
 
   describe "GET gids/:gid/sids/:sid", type: :api do
     it "gets a rule from database" do
       rule = FactoryGirl.create(:synched_rule)
 
-      get "/api/v1/rules/gids/#{rule.gid}/sids/#{rule.sid}", @std_args
+      get "/api/v1/rules/gids/#{rule.gid}/sids/#{rule.sid}", @std_params
 
       expect(response).to be_success
 
@@ -22,7 +22,7 @@ describe API::V1::Rules do
     it "gets a rule from repo" do
       rule = FactoryGirl.attributes_for(:synched_rule, gid: 1, sid: 19500)
 
-      get "/api/v1/rules/gids/#{rule[:gid]}/sids/#{rule[:sid]}", @std_args
+      get "/api/v1/rules/gids/#{rule[:gid]}/sids/#{rule[:sid]}", @std_params
 
       expect(response).to be_success
 
@@ -36,7 +36,7 @@ describe API::V1::Rules do
   describe "PUT gids/:gid/sids/:sid", type: :api do
     before (:context) do
       analyst_role = Role.where(role: 'analyst').first || FactoryGirl.create(:analyst_role)
-      @current_user.roles << analyst_role
+      @current_user.roles << analyst_role unless @current_user.has_role?('analyst')
     end
 
     it "edits a rule" do
@@ -51,6 +51,24 @@ describe API::V1::Rules do
 
       rule = Rule.find(@rule.id)
       expect(rule.rule_content).to eq(@rule_content)
+    end
+  end
+
+  describe "PUT gids/:gid/sids/:sid/revert", type: :api do
+    before (:context) do
+      analyst_role = Role.where(role: 'analyst').first || FactoryGirl.create(:analyst_role)
+      @current_user.roles << analyst_role unless @current_user.has_role?('analyst')
+    end
+
+    it "edits a rule" do
+      @rule = FactoryGirl.create(:edited_rule)
+
+      put "/api/v1/rules/gids/#{@rule[:gid]}/sids/#{@rule[:sid]}/revert", @std_params
+
+      expect(response).to be_success
+
+      rule = Rule.find(@rule.id)
+      expect(rule.rule_content).to_not eq(@rule.rule_content)
     end
   end
 end

@@ -676,9 +676,8 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.revert_rules_action(rule_ids)
-    rule_ids.each do |id|
-      rule = Rule.where(id: id).first
+  def self.revert_rules_action(rules)
+    rules.each do |rule|
       rule.revert_grep(Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename))
       rule.rule_doc.revert_doc if rule.rule_doc
     end

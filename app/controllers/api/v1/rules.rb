@@ -127,7 +127,20 @@ module API
         end
         put "revert", root: "rule" do
           authorize! :update, Rule
-          Rule.revert_rules_action(permitted_params[:rule_ids])
+          rules = permitted_params[:rule_ids].map{|id| Rule.where(id: id).first}
+          Rule.revert_rules_action(rules)
+        end
+
+        desc "Revert a rule"
+        params do
+          requires :gid, type: Integer, default: 1, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+        end
+        put "gids/:gid/sids/:sid/revert", root: "rule" do
+          authorize! :update, Rule
+          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+          Rule.revert_rules_action([rule])
         end
 
 

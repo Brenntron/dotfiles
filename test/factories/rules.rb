@@ -28,6 +28,21 @@ FactoryGirl.define do
       cvs_rule_content    { rule_content }
       cvs_rule_parsed     { rule_parsed }
     end
+
+    factory :edited_rule do
+      before(:create) do |rule, evaluator|
+        rule_grep_line = Rule.grep_line_from_file(19500, 1)
+        filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+        rule.load_rule_content(rule_content)
+        rule.update(rule_content: rule.rule_content.gsub('->', '<->'))
+      end
+
+      sid                 19500
+      gid                 1
+      state               "UPDATED"
+      publish_status      Rule::PUBLISH_STATUS_CURRENT_EDIT
+      edit_status         Rule::EDIT_STATUS_EDIT
+    end
   end
 end
 
