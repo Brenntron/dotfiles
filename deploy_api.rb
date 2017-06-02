@@ -24,7 +24,7 @@ def self.build_api(include_snort)
 
 
   puts "clone the git repo to the production folder"
-  system "git clone https://git.vrt.sourcefire.com/talosweb/Analyst-Console.git -b #{current_git_branch} --single-branch ../production"
+  system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{current_git_branch} --single-branch ../production"
 
   if File.directory?("../production")
     if File.directory?("vendor/bundle")
@@ -39,11 +39,11 @@ def self.build_api(include_snort)
       end
     else
       puts "Vendor bundle folder does NOT exist. Building gems."
-      puts "build the gems into Analyst-Console/vendor/bundle"
+      puts "build the gems into analyst-console/vendor/bundle"
       system 'bundle install --deployment'
       system 'bundle package'
       system 'bundle install --standalone'
-      puts "copying gems from Analyst-Console/vendor/bundle to production"
+      puts "copying gems from analyst-console/vendor/bundle to production"
       `cp -r vendor/bundle ../production/vendor`
       `cp -r vendor/cache ../production/vendor`
     end
@@ -64,7 +64,7 @@ def self.build_api(include_snort)
   puts "compile assets"
   Dir.chdir "../production"
   system 'bundle exec rake assets:precompile'
-  Dir.chdir "../Analyst-Console"
+  Dir.chdir "../analyst-console"
 
 
 
