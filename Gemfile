@@ -20,7 +20,7 @@ gem 'mysql2', '0.3.21'
 gem 'rmagick', '2.13.2'
 gem 'ruby-bugzilla', '0.6.4'
 
-gem 'libv8', '3.16.14.19'
+gem 'libv8', '3.16.14.17'
 gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her', '0.8.6'
