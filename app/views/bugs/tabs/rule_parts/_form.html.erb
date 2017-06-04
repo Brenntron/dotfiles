@@ -1,0 +1,29 @@
+<div id="rule-part-form-<%= rule.id %>" class="rule-part-form-section"
+     data-rule-id="<%= rule.id %>" data-rule-sid="<%= rule.sid %>" data-rule-gid="<%= rule.gid %>">
+  <div class="rule-part-header-section">
+    <h4 class="blue">
+      <% if rule.new_rule? %>
+        New rule
+      <% else %>
+        <%= "#{rule.gid}:#{rule.sid}:#{rule.rev}" %>
+      <% end %>
+    </h4>
+  </div>
+  <%= form_for rule,
+               url: "/api/v1/rules/#{rule.gid}/#{rule.sid}/rule-parts",
+               remote: true,
+               html: {class: 'rule-parts-form'} do |rule_form| %>
+    <%= rule_form.hidden_field(:sid, value: rule.sid) %>
+    <%= rule_form.hidden_field(:gid, value: rule.gid) %>
+    <%= rule_form.hidden_field(:rule_content, value: rule.rule_content) %>
+
+    <%= render partial: 'bugs/tabs/rule_parts/references',
+               locals: { rule_form: rule_form, rule: rule } %>
+
+    <div class="form-group right">
+      <div class="col-xs-12 top-space">
+        <%= rule_form.submit class: 'btn btn-warning update-rule-parts-btn' %>
+      </div>
+    </div>
+  <% end %>
+</div>

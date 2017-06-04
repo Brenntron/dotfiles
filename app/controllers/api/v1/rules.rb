@@ -184,6 +184,16 @@ module API
                                   permitted_params[:rule][:rule_doc])
         end
 
+        params do
+          optional :sid, type: Integer
+          optional :gid, type: Integer, default: 1
+          optional :rule, type: JSON
+        end
+        put ":gid/:sid/rule-parts", root: "rule" do
+          Rule.update_parts_action(permitted_params[:sid], permitted_params[:gid], permitted_params[:rule])
+          true
+        end
+
         #load multiple rules
         params do
           requires :sids, type: Array[Integer]

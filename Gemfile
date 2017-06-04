@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'haml', '5.0.1'
+
 gem 'grape', '0.19.0'
 gem 'grape-swagger', '0.25.3'
 gem 'hashie-forbidden_attributes'

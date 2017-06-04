@@ -375,6 +375,50 @@ $ ->
           window.scrollTo(0, 0)
     }
 
+  $('.update-rule-parts-btn').on "click", (ev) ->
+    ev.preventDefault()
+    form = $(this).parents('.rule-parts-form')
+    rule_content = form.find('textarea[name="rule[rule_content]"]').val()
+    sid = form.find('input[name="rule[sid]"]').val()
+    gid = form.find('input[name="rule[gid]"]').val()
+
+    rule_input_data = {}
+    form.find('.api-data-input').each ->
+      data_index = this.getAttribute("data-index")
+      name = this.getAttribute("name")
+      value = this.value
+      rule_input_data[data_index] = rule_input_data[data_index] || {}
+      rule_input_data[data_index][name] = value
+
+    reference_data = []
+    for kk of rule_input_data
+      reference_data.push rule_input_data[kk]
+
+    data = { rule: JSON.stringify( {references: reference_data} ) }
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax {
+      url: "/api/v1/rules/"+gid+"/"+sid+"/rule-parts"
+      method: 'PUT'
+      data: data
+      headers: headers
+      success: (response) ->
+        $('.alert_rules').addClass('success').show().html('Rule has been updated')
+        form.hide()
+        $('.rule_'+id).append('<div class="col-xs-12 alert_edit">Rule has been updated</div>')
+      error: (response) ->
+        $('.alert_rules').addClass('error').show().html('Rule has not been updated')
+      complete: ->
+        setTimeout (->
+          $('.alert_rules').hide 'blind', {}, 500
+          $('.alert_edit').remove()
+          form.show()
+          return
+        ), 5000
+        $(document).ajaxStop ->
+          location.reload true
+          window.scrollTo(0, 0)
+    }
+
 
   $(document).on "change", '.metadata_form', (e) ->
     id = $(this)[0].id
