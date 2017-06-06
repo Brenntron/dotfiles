@@ -148,7 +148,7 @@ Feature: Bug
     And I should not see "[BP][NSS] fixed bug"
 
 
-  # ==== Deleteing Bugs ===
+  # ==== Deleting Bugs ===
   @javascript
   Scenario: A bug can be deleted
     Given a user with role "analyst" exists and is logged in
