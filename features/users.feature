@@ -51,6 +51,40 @@ Feature: User Accounts
     Then I should see could not find user "malformed" flash massage
 
   @javascript
+  Scenario: A user can see accurate ticket category counts on the users index page
+    Given a manager exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
+    Then I wait for "3" seconds
+    And  I goto "/users"
+    And  I should not see "5"
+    And  I should not see "3"
+    And  I should not see "4"
+    And the following bugs exist:
+      | id      | bugzilla_id | state     | user_id | summary              | product | component   | version | description       |
+      |2        | 2           | OPEN      | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
+      |21       | 21          | OPEN      | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
+      |22       | 22          | OPEN      | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
+      |23       | 23          | OPEN      | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
+      |24       | 24          | OPEN      | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
+      |3        | 3           | PENDING   | 3       | [TELUS] broken bug   | Research| Snort Rules | 2.6.0   | test description4 |
+      |31       | 31          | PENDING   | 3       | [TELUS] broken bug   | Research| Snort Rules | 2.6.0   | test description4 |
+      |32       | 32          | PENDING   | 3       | [TELUS] broken bug   | Research| Snort Rules | 2.6.0   | test description4 |
+      |4        | 4           | FIXED     | 3       | [TELUS] broken bug2  | Research| Snort Rules | 2.6.0   | test description  |
+      |41       | 41          | DUPLICATE | 3       | [TELUS] broken bug3  | Research| Snort Rules | 2.6.0   | test description  |
+      |42       | 42          | WONTFIX   | 3       | [TELUS] broken bug4  | Research| Snort Rules | 2.6.0   | test description  |
+      |43       | 43          | INVALID   | 3       | [TELUS] broken bug5  | Research| Snort Rules | 2.6.0   | test description  |
+
+
+    Then I wait for "3" seconds
+    And  I goto "/users"
+    And  I should see "5"
+    And  I should see "3"
+    And  I should see "4"
+
+
+  @javascript
   Scenario: A non-manager user can go to the users index page and see only their co-workers.
             Assigned bugs should be on users show page.
             A non-manager cannot get to the relationships section.
