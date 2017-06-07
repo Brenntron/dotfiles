@@ -7,4 +7,8 @@ class RulesController < ApplicationController
       }
     end
   end
+
+  def export
+    send_file ''
+  end
 end
