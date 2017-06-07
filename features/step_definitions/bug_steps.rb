@@ -46,13 +46,13 @@ When(/^I send a GET request to "(.*)"$/) do |url|
   get(url)
 end
 
-When(/^I make an API request to bug "(.*)"$/) do |id|
-  get("/api/v1/bugs/${id}.json")
+When(/^I make an API request to bug "(.*?)"$/) do |id|
+  get("/api/v1/bugs/#{id}.json")
 end
 
-Then(/^response should have bug_id$/) do
+Then(/^response should have bug_id "(.*?)"$/) do |id|
   $stdout.puts "\n\n*** last response = #{last_response.body}\n\n\n"
 
   target = JSON.parse(last_response.body)
-  target[0]["id"].should eq(121778)
+  target[0]["id"].should eq(id)
 end

@@ -44,7 +44,6 @@ Feature: Rules
 
 
   ### Scenarios New Rule ###
-
   @javascript
   Scenario: New Rule: standard form: required fields
     Given a user with role "analyst" exists and is logged in
@@ -145,7 +144,6 @@ Feature: Rules
     Then I should see "service mysql"
     And  I should see "service kerberos"
     And  I should not see "telnet"
-
   @javascript
   Scenario: New Rule: standard form: rule state and css classes
     Given a user with role "analyst" exists and is logged in
@@ -250,22 +248,23 @@ Feature: Rules
       | 2222 |
     And the following rule categories exist:
       |category       | id |
-      |BLACKLIST      |  1 |
-      |FILE-EXECUTABLE|  2 |
-      |OS-LINUX       |  3 |
+      |OS-LINUX       |  1 |
+      |BLACKLIST      |  2 |
+      |FILE-EXECUTABLE|  3 |
     And the following rules exist:
-      | message                 | rule_category_id |
-      | BLACKLIST message       | 1                |
-      | OS-LINUX message        | 3                |
-      | OS-LINUX second message | 3                |
+      | message                        | rule_category_id |
+      | BLACKLIST message              | 2                |
+      | OS-LINUX message               | 1                |
+      | FILE-EXECUTABLE second message | 3                |
     Then I wait for "3" seconds
     And  I goto "/bugs/2222"
     Then I click the "Rules" tab
     Then I click button "create"
     Then I click "use standard form"
-    Then "OS-LINUX" should be listed first
-    And  I select "BLACKLIST" from "rule_category_id"
+    Then "BLACKLIST" should be listed first
+    And  I select "OS-LINUX" from "rule_category_id"
     And  I fill in "rule[message]" with "test msg"
+    And  I fill in "rule[dst]" with "$HOME_NET"
     And  I fill in "rule[detection]" with "|04|hola|03|org|00|"
     And  I select "attempted-user" from "rule[class_type]"
     And  I fill in "summary" with "some pig"
@@ -274,7 +273,7 @@ Feature: Rules
     Then I click the "Rules" tab
     Then I click button "create"
     Then I click "use standard form"
-    Then "BLACKLIST" should be listed first
+    Then "OS-LINUX" should be listed first
 
   @javascript
   # Scenario: New Rule: standard form: the rule doc impact should populate based on class type selection

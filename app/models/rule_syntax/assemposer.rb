@@ -55,9 +55,7 @@ module RuleSyntax
     end
 
     def msg
-      @msg ||=
-          %Q~"#{rule_params['msg']}"~ ||
-              %Q~"#{rule_category.category if rule_category} #{message if message.present?}"~
+      @msg = rule_params['msg'].nil? ? "#{rule_category.category if rule_category} #{message if message.present?}" : rule_params['msg']
     end
 
     def attributes
@@ -71,7 +69,7 @@ module RuleSyntax
     def options
       unless @options
         options_ary = []
-        options_ary << "msg:#{msg};" if msg.present?
+        options_ary << "msg:\"#{msg}\";" if msg.present?
         options_ary = %w(sid gid rev flow metadata).inject(options_ary) do |ary, key|
           ary << "#{key}:#{attributes[key]};" if attributes[key].present?
           ary

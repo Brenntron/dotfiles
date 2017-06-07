@@ -326,7 +326,6 @@ class Rule < ApplicationRecord
   # @param [Integer, #read] rule_id the rule id if known
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
-
     find_from_parser(parser, rule_id).tap do |rule|
       rule.assign_from_visrule(rule_content)
       rule.assign(parser.attributes)
@@ -670,7 +669,6 @@ class Rule < ApplicationRecord
         bug = Bug.where(id: bug_id).first
         bug.rules << rule if bug
       end
-
       rule.associate_references(rule.rule_content)
       rule.create_rule_doc(rule_doc)
     end
