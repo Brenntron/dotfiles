@@ -10,7 +10,7 @@ class ReferenceSerializer < ActiveModel::Serializer
     object.reference_type.name if object.reference_type
   end
   def url
-    object.reference_type.url.gsub('DATA', object.reference_data) if object.reference_type
+    object.reference_type.url.gsub('DATA', object.reference_data) if object.reference_type && object.reference_type.url
   end
   def bugs # writing a new method because AMS doesn't have has_and_belongs_to_many
     bug_ids = []

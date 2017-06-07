@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'haml', '5.0.1'
 
 gem 'grape', '0.19.0'
+
 gem 'grape-swagger', '0.25.3'
 gem 'hashie-forbidden_attributes'
 gem 'active_model_serializers'
@@ -73,8 +74,9 @@ group :test do
   gem 'launchy', '2.4.2'
   gem 'rb-fsevent', '0.9.8'
   gem 'guard-cucumber', '2.1.2'
-  gem 'rspec', '3.4.0'
+  gem 'rspec-rails', '~>3.6.0'
   gem 'faker', '~> 1.7.3'
+  gem 'json_spec'
 end
 
 gem 'httparty'

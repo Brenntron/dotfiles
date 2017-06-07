@@ -5,41 +5,14 @@ module API
 
       resource :rules do
 
-        desc "import all existing rules"
-        get 'import_all' do
-          true
-        end
-
-
-        # desc "import existing rule"
-        # params do
-        #   requires :id, type: Integer, desc: "rule sid."
-        # end
-        # route_param "import/:id" do
-        #   get do
-        #     Rule.import_rule(permitted_params[:id])
-        #   end
-        # end
-
-
-        desc "Return a rule"
-        params do
-          requires :sid, type: Integer, desc: "sid of the rule"
-        end
-        get ":sid", root: "rule" do
-          Rule.find_or_load(permitted_params[:sid], 1)
-        end
-
-
         desc "Return a rule"
         params do
           requires :gid, type: Integer, desc: "gid of the rule"
           requires :sid, type: Integer, desc: "sid of the rule"
         end
-        route_param "gids/:gid/sids/:sid" do
-          get do
-            Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
-          end
+        get "gids/:gid/sids/:sid", root: :rules do
+          rule = Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
+          rule ? {rule: rule} : nil
         end
 
 
@@ -132,13 +105,42 @@ module API
         end
 
 
+        desc "Edit a rule"
+        params do
+          requires :gid, type: Integer, default: 1, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+          requires :rule, type: Hash do
+            requires :rule_content, type: String, desc: "Compiled rule content"
+          end
+        end
+        put "gids/:gid/sids/:sid", root: "rule" do
+          authorize! :update, Rule
+          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+          Rule.update_action(rule, permitted_params[:rule][:rule_content])
+        end
+
+
         #revert rules
         params do
           requires :rule_ids, type: Array[String]
         end
         put "revert", root: "rule" do
           authorize! :update, Rule
-          Rule.revert_rules_action(permitted_params[:rule_ids])
+          rules = permitted_params[:rule_ids].map{|id| Rule.where(id: id).first}
+          Rule.revert_rules_action(rules)
+        end
+
+        desc "Revert a rule"
+        params do
+          requires :gid, type: Integer, default: 1, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+        end
+        put "gids/:gid/sids/:sid/revert", root: "rule" do
+          authorize! :update, Rule
+          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+          Rule.revert_rules_action([rule])
         end
 
 
@@ -153,10 +155,22 @@ module API
           RuleFile.commit_rules_action(rules, permitted_params[:username], permitted_params[:bug_id])
         end
 
+        desc "Commit a rule"
+        params do
+          requires :gid, type: Integer, default: 1, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+          optional :username, type: String
+          optional :bug_id,   type: Integer, desc: "Bugzilla id."
+        end
+        put "gids/:gid/sids/:sid/commit", root: "rule" do
+          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+          RuleFile.commit_rules_action([rule], permitted_params[:username], permitted_params[:bug_id])
+        end
+
 
         # Updates a rule and its associations
         # @return [Rule]
-        desc "Edit a rule"
+        desc "Edit a rule from the id primary key"
         params do
           requires :id, type: Integer, desc: "The database id of the rule you want to update."
           requires :rule, type: Hash do
@@ -179,9 +193,10 @@ module API
         put ":id", root: "rule" do
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          Rule.update_action(permitted_params[:id],
-                                  permitted_params[:rule][:rule_content],
-                                  permitted_params[:rule][:rule_doc])
+          rule = Rule.where(id: permitted_params[:id]).first
+          Rule.update_action(rule,
+                             permitted_params[:rule][:rule_content],
+                             permitted_params[:rule][:rule_doc])
         end
 
         params do

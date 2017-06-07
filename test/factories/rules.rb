@@ -17,7 +17,32 @@ FactoryGirl.define do
     committed           true
     task_id             nil
     rule_category_id    1
+
+    factory :synched_rule do
+      sid                 10127
+      gid                 1
+      rev                 3
+      state               "UNCHANGED"
+      publish_status      Rule::PUBLISH_STATUS_SYNCHED
+      edit_status         Rule::EDIT_STATUS_SYNCHED
+      cvs_rule_content    { rule_content }
+      cvs_rule_parsed     { rule_parsed }
+    end
+
+    factory :edited_rule do
+      sid                 19500
+      gid                 1
+      state               "UPDATED"
+      publish_status      Rule::PUBLISH_STATUS_CURRENT_EDIT
+      edit_status         Rule::EDIT_STATUS_EDIT
+
+      before(:create) do |rule, evaluator|
+        rule_grep_line = Rule.grep_line_from_file(rule.sid, rule.gid)
+        filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+        rule.load_rule_content(rule_content)
+        rule.update(rule_content: rule.rule_content.gsub('->', '<->'))
+      end
+    end
   end
 end
-
 

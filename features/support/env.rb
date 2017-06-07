@@ -5,6 +5,7 @@
 # files.
 
 require 'cucumber/rails'
+require 'json'
 require 'capybara/poltergeist'
 require 'paper_trail/frameworks/cucumber'
 require 'will_paginate/array'

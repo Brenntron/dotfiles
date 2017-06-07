@@ -326,7 +326,6 @@ class Rule < ApplicationRecord
   # @param [Integer, #read] rule_id the rule id if known
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
-
     find_from_parser(parser, rule_id).tap do |rule|
       rule.assign_from_visrule(rule_content)
       rule.assign(parser.attributes)
@@ -670,15 +669,13 @@ class Rule < ApplicationRecord
         bug = Bug.where(id: bug_id).first
         bug.rules << rule if bug
       end
-
       rule.associate_references(rule.rule_content)
       rule.create_rule_doc(rule_doc)
     end
   end
 
-  def self.revert_rules_action(rule_ids)
-    rule_ids.each do |id|
-      rule = Rule.where(id: id).first
+  def self.revert_rules_action(rules)
+    rules.each do |rule|
       rule.revert_grep(Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename))
       rule.rule_doc.revert_doc if rule.rule_doc
     end
@@ -690,8 +687,8 @@ class Rule < ApplicationRecord
 
   # Updates a rule and its associations
   # @return [Rule]
-  def self.update_action(rule_id, rule_content, rule_doc)
-    Rule.save_rule_content(rule_content, rule_id).tap do |rule|
+  def self.update_action(rule, rule_content, rule_doc = nil)
+    Rule.save_rule_content(rule_content, rule.id).tap do |rule|
       rule.update_references(rule_content)
       if rule.rule_doc.present?
         rule.rule_doc.update(rule_doc)
