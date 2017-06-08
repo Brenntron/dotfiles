@@ -9,6 +9,6 @@ class RulesController < ApplicationController
   end
 
   def export
-    send_file ''
+    send_file RuleSyntax::RuleExporter.new(params).export 
   end
 end

@@ -1,3 +1,48 @@
+Then /^I should receive a file "([^\"]*)"$/ do |filename|
+  page.response_headers['Content-Disposition'].should include("filename=\"#{filename}\"")
+end
+
+Then /^explore/ do
+  File.open("/tmp/exported_rules.rules", "r") do |f|
+    f.each_line do |line|
+      puts line
+    end
+  end
+
+end
+
+Then /^I should expect three rule lines/ do
+  rules = []
+  lines = 0
+  rule_content   = 'alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any (msg:"BROWSER-PLUGINS Microsoft Internet Explorer MSXML .definition ActiveX clsid access attempt"; flow:to_client,established; file_data; content:"Msxml2.FreeThreadedDOMDocument.6.0"; fast_pattern:only; content:".definition("; nocase; pcre:"/(var|set)\s+\w+\s*=\s*(new\s+ActiveXObject|CreateObject)\s*\((?P<q1>(\x22|\x27|))Msxml2\.FreeThreadedDOMDocument\.6\.0(?P=q1)\)/smi"; metadata:policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3; reference:cve,2012-1889; reference:url,technet.microsoft.com/en-us/security/bulletin/ms12-043; classtype:attempted-user; sid:23304; rev:4;)'
+
+  File.open("/tmp/exported_rules.rules", "r") do |f|
+    f.each_line do |line|
+      rules << line
+      lines += 1
+    end
+  end
+  expect(lines).to eql(3)
+  expect(rules.first.chomp()).to eql(rule_content)
+
+end
+
+Then /^I should expect two rule lines/ do
+  rules = []
+  lines = 0
+  rule_content   = 'alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any (msg:"BROWSER-PLUGINS Microsoft Internet Explorer MSXML .definition ActiveX clsid access attempt"; flow:to_client,established; file_data; content:"Msxml2.FreeThreadedDOMDocument.6.0"; fast_pattern:only; content:".definition("; nocase; pcre:"/(var|set)\s+\w+\s*=\s*(new\s+ActiveXObject|CreateObject)\s*\((?P<q1>(\x22|\x27|))Msxml2\.FreeThreadedDOMDocument\.6\.0(?P=q1)\)/smi"; metadata:policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3; reference:cve,2012-1889; reference:url,technet.microsoft.com/en-us/security/bulletin/ms12-043; classtype:attempted-user; sid:23304; rev:4;)'
+
+  File.open("/tmp/exported_rules.rules", "r") do |f|
+    f.each_line do |line|
+      rules << line
+      lines += 1
+    end
+  end
+  expect(lines).to eql(2)
+  expect(rules.first.chomp()).to eql(rule_content)
+
+end
+
 Given (/^a "(.*?)" rule exists$/) do |rule|
   @rule = FactoryGirl.create(:rule)
 end
