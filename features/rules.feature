@@ -44,6 +44,7 @@ Feature: Rules
 
 
   ### Scenarios New Rule ###
+
   @javascript
   Scenario: New Rule: standard form: required fields
     Given a user with role "analyst" exists and is logged in
@@ -145,6 +146,7 @@ Feature: Rules
     Then I should see "service mysql"
     And  I should see "service kerberos"
     And  I should not see "telnet"
+
   @javascript
   Scenario: New Rule: standard form: rule state and css classes
     Given a user with role "analyst" exists and is logged in
