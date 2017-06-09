@@ -2,15 +2,6 @@ Then /^I should receive a file "([^\"]*)"$/ do |filename|
   page.response_headers['Content-Disposition'].should include("filename=\"#{filename}\"")
 end
 
-Then /^explore/ do
-  File.open("/tmp/exported_rules.rules", "r") do |f|
-    f.each_line do |line|
-      puts line
-    end
-  end
-
-end
-
 Then /^I should expect three rule lines/ do
   rules = []
   lines = 0
