@@ -12,7 +12,7 @@
     <tr>
       <td><%= current_user.bugs.open_bugs.count %></td>
       <td><%= current_user.bugs.pending.count %></td>
-      <td><%= current_user.bugs.pending.count %></td>
+      <td><%= current_user.bugs.closed.count %></td>
       <td><%= current_user.bugs.count %></td>
       <td>
         <% if current_user.has_role?('committer') %>
