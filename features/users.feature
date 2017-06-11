@@ -357,6 +357,87 @@ Feature: User Accounts
     And  I should not see "[BP][NSS] fixed bug"
 
   @javascript
+  Scenario: Bugs in open tab should be paginated
+    Given a manager exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
+
+
+    And the following bugs exist:
+      | id      | bugzilla_id | state    | user_id | summary              | product | component   | version | description       |
+      |222222   | 222222      | OPEN     | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
+      |333333   | 333333      | OPEN     | 3       | [TELUS] broken bug   | Research| Snort Rules | 2.6.0   | test description4 |
+      |4        | 4           | OPEN     | 3       | [TELUS] broken bug2  | Research| Snort Rules | 2.6.0   | test description  |
+      |5        | 5           | OPEN     | 3       | [TELUS] broken bug3  | Research| Snort Rules | 2.6.0   | test description  |
+      |6        | 6           | OPEN     | 3       | [TELUS] broken bug4  | Research| Snort Rules | 2.6.0   | test description  |
+      |7        | 7           | OPEN     | 3       | [TELUS] broken bug5  | Research| Snort Rules | 2.6.0   | test description  |
+      |8        | 8           | OPEN     | 3       | [TELUS] broken bug6  | Research| Snort Rules | 2.6.0   | test description  |
+      |9        | 9           | OPEN     | 3       | [TELUS] broken bug7  | Research| Snort Rules | 2.6.0   | test description  |
+      |10       | 10          | OPEN     | 3       | [TELUS] broken bug8  | Research| Snort Rules | 2.6.0   | test description  |
+      |11       | 11          | OPEN     | 3       | [TELUS] broken bug9  | Research| Snort Rules | 2.6.0   | test description  |
+      |12       | 12          | OPEN     | 3       | [TELUS] broken bug10 | Research| Snort Rules | 2.6.0   | test description  |
+      |13       | 13          | OPEN     | 3       | [TELUS] broken bug11 | Research| Snort Rules | 2.6.0   | test description  |
+      |14       | 14          | OPEN     | 3       | [TELUS] broken bug12 | Research| Snort Rules | 2.6.0   | test description  |
+      |15       | 15          | OPEN     | 3       | [TELUS] broken bug13 | Research| Snort Rules | 2.6.0   | test description  |
+      |16       | 16          | OPEN     | 3       | [TELUS] broken bug14 | Research| Snort Rules | 2.6.0   | test description  |
+      |17       | 17          | OPEN     | 3       | [TELUS] broken bug15 | Research| Snort Rules | 2.6.0   | test description  |
+      |18       | 18          | OPEN     | 3       | [TELUS] broken bug16 | Research| Snort Rules | 2.6.0   | test description  |
+      |19       | 19          | OPEN     | 3       | [TELUS] broken bug17 | Research| Snort Rules | 2.6.0   | test description  |
+      |20       | 20          | OPEN     | 3       | [TELUS] broken bug18 | Research| Snort Rules | 2.6.0   | test description  |
+
+
+    Then I wait for "3" seconds
+    And  I goto "/users/3"
+    And  I should see "[BP][NSS] fixed bug"
+    And  I should not see "[TELUS] broken bug9"
+    Then I click "Next"
+    And  I should see "[TELUS] broken bug9"
+
+  @javascript
+  Scenario: Bugs in pending tab should be paginated
+    Given a manager exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
+
+
+    And the following bugs exist:
+      | id      | bugzilla_id | state     | user_id | summary              | product | component   | version | description       |
+      |222222   | 222222      | OPEN      | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
+      |333333   | 333333      | PENDING   | 3       | [TELUS] broken bug   | Research| Snort Rules | 2.6.0   | test description4 |
+      |4        | 4           | PENDING   | 3       | [TELUS] broken bug2  | Research| Snort Rules | 2.6.0   | test description  |
+      |5        | 5           | PENDING   | 3       | [TELUS] broken bug3  | Research| Snort Rules | 2.6.0   | test description  |
+      |6        | 6           | PENDING   | 3       | [TELUS] broken bug4  | Research| Snort Rules | 2.6.0   | test description  |
+      |7        | 7           | PENDING   | 3       | [TELUS] broken bug5  | Research| Snort Rules | 2.6.0   | test description  |
+      |8        | 8           | PENDING   | 3       | [TELUS] broken bug6  | Research| Snort Rules | 2.6.0   | test description  |
+      |9        | 9           | PENDING   | 3       | [TELUS] broken bug7  | Research| Snort Rules | 2.6.0   | test description  |
+      |10       | 10          | PENDING   | 3       | [TELUS] broken bug8  | Research| Snort Rules | 2.6.0   | test description  |
+      |11       | 11          | PENDING   | 3       | [TELUS] broken bug9  | Research| Snort Rules | 2.6.0   | test description  |
+      |12       | 12          | PENDING   | 3       | [TELUS] broken bug10 | Research| Snort Rules | 2.6.0   | test description  |
+      |13       | 13          | PENDING   | 3       | [TELUS] broken bug11 | Research| Snort Rules | 2.6.0   | test description  |
+      |14       | 14          | PENDING   | 3       | [TELUS] broken bug12 | Research| Snort Rules | 2.6.0   | test description  |
+      |15       | 15          | PENDING   | 3       | [TELUS] broken bug13 | Research| Snort Rules | 2.6.0   | test description  |
+      |16       | 16          | PENDING   | 3       | [TELUS] broken bug14 | Research| Snort Rules | 2.6.0   | test description  |
+      |17       | 17          | PENDING   | 3       | [TELUS] broken bug15 | Research| Snort Rules | 2.6.0   | test description  |
+      |18       | 18          | PENDING   | 3       | [TELUS] broken bug16 | Research| Snort Rules | 2.6.0   | test description  |
+      |19       | 19          | PENDING   | 3       | [TELUS] broken bug17 | Research| Snort Rules | 2.6.0   | test description  |
+      |20       | 20          | PENDING   | 3       | [TELUS] broken bug18 | Research| Snort Rules | 2.6.0   | test description  |
+
+
+    Then I wait for "3" seconds
+    And  I goto "/users/3"
+    And  I should see "[BP][NSS] fixed bug"
+    And  I should not see "[TELUS] broken bug"
+
+    Then I click "pending (20)"
+    And  I should see "[TELUS] broken bug"
+    And  I should not see "[BP][NSS] fixed bug"
+
+    Then I click "Next"
+    And  I should see "[TELUS] broken bug11"
+
+  @javascript
   Scenario: Bugs in closed tab should be paginated
     Given a manager exists and is logged in
     And the following users exist

@@ -1,8 +1,10 @@
 class UsersController < ApplicationController
 
   #per_page for User show page Closed bugs tab 
-  CLOSED_BUGS_PAGINATION_SIZE = 40
- 
+  CLOSED_BUGS_PAGINATION_SIZE = 25
+  PENDING_BUGS_PAGINATION_SIZE = 10
+  OPEN_BUGS_PAGINATION_SIZE = 10
+
   before_action :require_login
   before_action :set_query_session
 
@@ -12,7 +14,10 @@ class UsersController < ApplicationController
 
   def show
     @user = User.where(id: params[:id]).first
-    @closed_bugs = @user.bugs.closed.order("created_at DESC").paginate(:page => params[:page], :per_page => CLOSED_BUGS_PAGINATION_SIZE)
+    @closed_bugs = @user.bugs.closed.order("created_at DESC").paginate(:page => params[:closed_page], :per_page => CLOSED_BUGS_PAGINATION_SIZE)
+    @pending_bugs = @user.bugs.pending.paginate(:page => params[:pending_page], :per_page => PENDING_BUGS_PAGINATION_SIZE)
+    @open_bugs = @user.bugs.open_bugs.paginate(:page => params[:open_page], :per_page => OPEN_BUGS_PAGINATION_SIZE)
+
     case
       when @user.nil?
         flash[:error] = "Could not find user '#{params[:id]}'"

@@ -77,14 +77,14 @@
       <div class='col-sm-11'>
         <ul class="nav nav-tabs" role="tablist">
           <li role="presentation" class="user-tab <%= "active" if (params[:active_tab].blank? || params[:active_tab] == "open") %>" id="open-tab"><a href="#open" aria-controls="open" role="tab" data-toggle="tab">open (<%= @user.bugs.open_bugs.count %>)</a></li>
-          <li role="presentation" class="user-tab" id="pending-tab"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">pending (<%= @user.bugs.pending.count %>)</a></li>
+          <li role="presentation" class="user-tab <%= "active" if params[:active_tab] == "pending" %>" id="pending-tab"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">pending (<%= @user.bugs.pending.count %>)</a></li>
           <li role="presentation" class="user-tab <%= "active" if params[:active_tab] == "closed" %>" id="closed-tab"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">closed (<%= @user.bugs.closed.count %>)</a></li>
         </ul>
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane <%= "active" if (params[:active_tab].blank? || params[:active_tab] == "open") %>" id="open">
             <table class="table table-hover table-borderless">
-              <% if @user.bugs.open_bugs.any? %>
-                <% @user.bugs.open_bugs.sort_by{ |b| b.priority_sort }.each do |bug| %>
+              <% if @open_bugs.any? %>
+                <% @open_bugs.sort_by{ |b| b.priority_sort }.each do |bug| %>
                   <tr>
                     <td>
                       <p><strong><%=bug.priority%></strong></p>
@@ -100,6 +100,11 @@
                   </tr>
 
                 <% end %>
+                  <th colspan=3>
+                    <div class="apple_pagination">
+                      <%= will_paginate @open_bugs, :param_name => "open_page", params: {active_tab: "open"} %>
+                    </div>
+                  </th>
               <% else %>
                 <div class="col-xs-12">
                   <p class="text-muted"><em>No open bugs at this time.</em></p>
@@ -107,10 +112,10 @@
               <% end %>
             </table>
           </div>
-          <div role="tabpanel" class="tab-pane" id="pending">
+          <div role="tabpanel" class="tab-pane <%= "active" if params[:active_tab] == "pending" %>" id="pending">
             <table class="table table-hover table-borderless">
-              <% if @user.bugs.pending.any? %>
-                <% @user.bugs.pending.each do |bug| %>
+              <% if @pending_bugs.any? %>
+                <% @pending_bugs.each do |bug| %>
                   <tr>
                     <td>
                       <strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong>
@@ -120,6 +125,13 @@
                     </td>
                   </tr>
                 <% end %>
+                <tfoot>
+                  <th colspan=2>
+                    <div class="apple_pagination">
+                    <%= will_paginate @pending_bugs, :param_name => "pending_page", params: {active_tab: "pending"} %>
+                    </div>
+                  </th>
+                </tfoot>
               <% else %>
                 <div class="col-xs-12">
                   <p class="text-muted"><em>No pending bugs at this time.</em></p>
@@ -143,7 +155,7 @@
                 <tfoot>
                   <th colspan=2>
                     <div class="apple_pagination">
-                    <%= will_paginate @closed_bugs, :param_name => "page", params: {active_tab: "closed"} %>
+                    <%= will_paginate @closed_bugs, :param_name => "closed_page", params: {active_tab: "closed"} %>
                     </div>
                   </th>
                 </tfoot>
