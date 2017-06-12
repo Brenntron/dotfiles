@@ -389,10 +389,10 @@ Feature: User Accounts
 
     Then I wait for "3" seconds
     And  I goto "/users/3"
-    And  I should see "[BP][NSS] fixed bug"
-    And  I should not see "[TELUS] broken bug9"
+    And  I should see "[TELUS] broken bug2"
+    And  I should not see "[TELUS] broken bug12"
     Then I click "Next"
-    And  I should see "[TELUS] broken bug9"
+    And  I should see "[TELUS] broken bug12"
 
   @javascript
   Scenario: Bugs in pending tab should be paginated
@@ -430,12 +430,12 @@ Feature: User Accounts
     And  I should see "[BP][NSS] fixed bug"
     And  I should not see "[TELUS] broken bug"
 
-    Then I click "pending (20)"
+    Then I click "pending (18)"
     And  I should see "[TELUS] broken bug"
     And  I should not see "[BP][NSS] fixed bug"
 
     Then I click "Next"
-    And  I should see "[TELUS] broken bug11"
+    And  I should see "[TELUS] broken bug12"
 
   @javascript
   Scenario: Bugs in closed tab should be paginated
