@@ -67,6 +67,9 @@ cp $SHAREDDIR/config/database.yml config
 
 ln -s $SHAREDDIR/.env .
 
+echo '* bundle package'
+bundle _1.12.5_ package --frozen --without development test
+
 echo '* bundle install'
 bundle _1.12.5_ install --no-deployment --frozen --no-local --without development test
 
@@ -77,7 +80,7 @@ echo '* precompile assets'
 bundle exec rake assets:precompile
 
 echo '* svn working folders'
-rm $RELPATH/$TAGDIR/extras/working
+rm -rf $RELPATH/$TAGDIR/extras/working
 svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/working/snort-rules
 if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
     svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
