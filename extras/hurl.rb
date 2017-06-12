@@ -8,9 +8,11 @@ end
 
 
 class Hurl
-  def initialize(args, build_dir: '../production')
+  attr_reader :build_base
+
+  def initialize(args, build_base: '../releases')
     @args = args
-    @build_dir = build_dir
+    @build_base = build_base
   end
 
   # Figure out the name of the current local branch
@@ -24,12 +26,34 @@ class Hurl
     @args[0] || current_git_branch
   end
 
+  def use_tar?
+    source_arg && File.exist?(source_arg)
+  end
+
+  def tag_dir
+    @tag_dir ||=
+        case
+          when use_tar?
+            File.basename(source_arg.sub(/.gz$/, '').sub(/.tar$/, ''))
+          else
+            source_arg
+        end
+  end
+
+  def build_path
+    @build_path ||= File.join(build_base, tag_dir)
+  end
+
   def get_source
-    FileUtils.mkdir(@build_dir) unless File.directory?(@build_dir)
-    if source_arg && File.exist?(source_arg)
+    FileUtils.mkdir(build_base) unless File.directory?(build_base)
+    if use_tar?
       puts "* untaring #{source_arg}"
+      puts "tar -C #{build_base} -xf #{source_arg}"
+      system "tar -C #{build_base} -xf #{source_arg}"
     else
-      puts "* checkout #{source_arg}"
+      puts "* checkout #{tag_dir}"
+      FileUtils.rm_r(build_path, force: true) if File.directory?(build_path)
+      system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{source_arg} --single-branch #{build_path}"
     end
   end
 end
