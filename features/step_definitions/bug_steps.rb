@@ -51,8 +51,6 @@ When(/^I make an API request to bug "(.*?)"$/) do |id|
 end
 
 Then(/^response should have bug_id "(.*?)"$/) do |id|
-  $stdout.puts "\n\n*** last response = #{last_response.body}\n\n\n"
-
   target = JSON.parse(last_response.body)
   target[0]["id"].should eq(id)
 end

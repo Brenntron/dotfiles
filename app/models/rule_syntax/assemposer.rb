@@ -55,7 +55,13 @@ module RuleSyntax
     end
 
     def msg
-      @msg = rule_params['msg'].nil? ? "#{rule_category.category if rule_category} #{message if message.present?}" : rule_params['msg']
+      @msg ||=
+          case
+            when rule_params['msg'].present?
+              rule_params['msg']
+            when message.present?
+              "#{rule_category.category if rule_category} #{message}"
+          end
     end
 
     def attributes
