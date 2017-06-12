@@ -6,12 +6,35 @@ def red(str)
   "\e[31m#{str}\e[0m"
 end
 
-# Figure out the name of the current local branch
-def self.current_git_branch
-  branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
-  puts "Deploying branch #{red branch}"
-  branch
+
+class Hurl
+  def initialize(args, build_dir: '../production')
+    @args = args
+    @build_dir = build_dir
+  end
+
+  # Figure out the name of the current local branch
+  def current_git_branch
+    branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
+    puts "Deploying branch #{red branch}"
+    branch
+  end
+
+  def source_arg
+    @args[0] || current_git_branch
+  end
+
+  def get_source
+    FileUtils.mkdir(@build_dir) unless File.directory?(@build_dir)
+    if source_arg && File.exist?(source_arg)
+      puts "* untaring #{source_arg}"
+    else
+      puts "* checkout #{source_arg}"
+    end
+  end
 end
+
+
 
 
 def self.build_api(include_snort)
@@ -197,13 +220,14 @@ ARGV.each do |arg|
       end
   end
 end
-puts args_pos.inspect
-puts "eh, exiting"
-exit
 
 if process_api
   begin
     if build_api
+      hurl = Hurl.new(args_pos)
+      hurl.get_source
+      puts "eh, exiting"
+      exit
       build_api(include_snort)
     end
     if send_upload
