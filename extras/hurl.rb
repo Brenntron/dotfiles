@@ -61,44 +61,27 @@ end
 
 
 
-def self.build_api(include_snort)
-  puts "delete production folder"
-  production_folder = "production"
-  if File.directory?("../#{production_folder}")
-    puts "production folder exists. deleting it now."
-    FileUtils.rm_rf("../#{production_folder}")
-  end
-
-
-  puts "clone the git repo to the production folder"
-  system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{current_git_branch} --single-branch ../production"
-
-  if File.directory?("../production")
-    if File.directory?("vendor/bundle")
-      puts "Vendor bundle folder exists. Copying bundle to production."
-      `cp -r vendor/bundle ../production/vendor`
-      if File.directory?("vendor/cache")
-        `cp -r vendor/cache ../production/vendor`
-      else
-        Dir.chdir "../production"
-        system 'bundle package'
-        Dir.chdir ".."
-      end
-    else
-      puts "Vendor bundle folder does NOT exist. Building gems."
-      puts "build the gems into analyst-console/vendor/bundle"
-      system 'bundle install --deployment'
-      system 'bundle package'
-      system 'bundle install --standalone'
-      puts "copying gems from analyst-console/vendor/bundle to production"
-      `cp -r vendor/bundle ../production/vendor`
-      `cp -r vendor/cache ../production/vendor`
-    end
-    puts "copying libv8 to cache folder this is needed on the server"
-    `cp vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem vendor/cache`
-  else
+def self.build_api(hurl, include_snort)
+  unless File.directory?(hurl.build_path)
     raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
   end
+
+
+
+  puts "* build the gems into vendor/bundle"
+  # system 'bundle install --deployment'
+  puts "cd #{hurl.build_path};bundle package --frozen --all"
+  system "cd #{hurl.build_path};bundle _1.12.5_ package --frozen --all"
+  puts "cd #{hurl.build_path};bundle install --standalone --deployment --frozen"
+  system "cd #{hurl.build_path};bundle _1.12.5_ install --standalone --deployment --frozen"
+  puts "eh, exiting"
+  exit
+
+  puts "copying gems from analyst-console/vendor/bundle to production"
+  `cp -r vendor/bundle ../production/vendor`
+  `cp -r vendor/cache ../production/vendor`
+  puts "copying libv8 to cache folder this is needed on the server"
+  `cp vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem vendor/cache`
 
   if include_snort
     # `cp -r extras/snort ../production/extras`
@@ -250,9 +233,7 @@ if process_api
     if build_api
       hurl = Hurl.new(args_pos)
       hurl.get_source
-      puts "eh, exiting"
-      exit
-      build_api(include_snort)
+      build_api(hurl, include_snort)
     end
     if send_upload
       timestamp = upload_api
