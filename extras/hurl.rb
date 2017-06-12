@@ -44,6 +44,22 @@ class Hurl
     @build_path ||= File.join(build_base, tag_dir)
   end
 
+  def scp_dir
+    "disgorge"
+  end
+
+  def release_base
+    "~/disgorge"
+  end
+
+  def scp_path(tag_dir)
+    "#{scp_dir}/releases/#{tag_dir}.tar.gz"
+  end
+
+  def tar_path(tag_dir)
+    "~/#{scp_dir}/releases/#{tag_dir}.tar.gz"
+  end
+
   def get_source
     FileUtils.mkdir(build_base) unless File.directory?(build_base)
     if use_tar?
@@ -56,51 +72,39 @@ class Hurl
       system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{source_arg} --single-branch #{build_path}"
     end
   end
+
+  def build_api
+    unless File.directory?(build_path)
+      raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
+    end
+
+    puts "* build the gems into vendor/bundle"
+    # system 'bundle install --deployment'
+    system "cd #{build_path} && bundle _1.12.5_ package --frozen --all"
+    puts "* copying libv8 to cache folder this is needed on the server"
+    system "cp #{build_path}/vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem #{build_path}/vendor/cache"
+    # system "cd #{build_path} && bundle _1.12.5_ install --standalone --deployment --frozen"
+
+    puts "* compile assets"
+    # Dir.chdir "../production"
+    system "cd #{build_path};bundle exec rake assets:precompile"
+    # Dir.chdir "../analyst-console"
+
+    puts "* tar up the contents of the production folder"
+    system "cd #{build_base} && tar -zcf #{tag_dir}.tar.gz #{tag_dir}"
+  end
+
+  def hurl
+    system "scp #{build_base}/#{tag_dir}.tar.gz rulesuitest.vrt.sourcefire.com:#{scp_path(tag_dir)}"
+  end
+
+  def disgorge
+    system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/disgorge.env && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+  end
 end
 
 
 
-
-def self.build_api(hurl, include_snort)
-  unless File.directory?(hurl.build_path)
-    raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
-  end
-
-
-
-  puts "* build the gems into vendor/bundle"
-  # system 'bundle install --deployment'
-  puts "cd #{hurl.build_path};bundle package --frozen --all"
-  system "cd #{hurl.build_path};bundle _1.12.5_ package --frozen --all"
-  puts "cd #{hurl.build_path};bundle install --standalone --deployment --frozen"
-  system "cd #{hurl.build_path};bundle _1.12.5_ install --standalone --deployment --frozen"
-  puts "eh, exiting"
-  exit
-
-  puts "copying gems from analyst-console/vendor/bundle to production"
-  `cp -r vendor/bundle ../production/vendor`
-  `cp -r vendor/cache ../production/vendor`
-  puts "copying libv8 to cache folder this is needed on the server"
-  `cp vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem vendor/cache`
-
-  if include_snort
-    # `cp -r extras/snort ../production/extras`
-    system "mkdir ../production/extras/snort"
-    system "svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ ../production/extras/snort/snort-rules/"
-    system "svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/so_rules/ ../production/extras/snort/so_rules/"
-    system "rm ../production/extras/snort/so_rules/*.c ../production/extras/snort/so_rules/*.h"
-  end
-
-  puts "compile assets"
-  Dir.chdir "../production"
-  system 'bundle exec rake assets:precompile'
-  Dir.chdir "../analyst-console"
-
-
-
-  puts "tar up the contents of the production folder"
-  system 'cd ../production/ && tar -zcvf ../analyst-console.tar.gz . && cd ..'
-end
 
 def self.upload_api
   begin
@@ -172,7 +176,6 @@ process_api = true
 build_api = true
 send_upload = true
 rebuild_gems = false
-include_snort = true
 run_config = false
 timestamp = 0
 
@@ -199,8 +202,6 @@ ARGV.each do |arg|
       send_upload = false
     when "--rebuild-gems"
       rebuild_gems = true
-    when "--no_snort"
-      include_snort = false
     when "-h", "--help"
       puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
       puts "This script deploys all the content in the API directory and the UI directory up to the server"
@@ -210,7 +211,6 @@ ARGV.each do |arg|
       puts "--no-api           use this flag to prevent the API from being built and sent to the server"
       puts "--no-upload        apps will be built but they will be prevented from being sent to the server"
       puts "--rebuild-gems     gems are stored in the shared folder on the server. Use this flag to rebuild them."
-      puts "--no_snort         Snort rules will not be packaged with the production tarball"
       process_api = false
       send_upload = false
       break
@@ -230,12 +230,16 @@ end
 
 if process_api
   begin
+    hurl = Hurl.new(args_pos)
     if build_api
-      hurl = Hurl.new(args_pos)
       hurl.get_source
-      build_api(hurl, include_snort)
+      hurl.build_api
     end
     if send_upload
+      # hurl.hurl
+      hurl.disgorge
+      puts "eh, exiting"
+      exit
       timestamp = upload_api
       if rebuild_gems
         run_server_config(timestamp, "--rebuild-gems")
