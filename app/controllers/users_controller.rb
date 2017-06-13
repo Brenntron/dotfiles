@@ -14,10 +14,11 @@ class UsersController < ApplicationController
 
   def show
     @user = User.where(id: params[:id]).first
-    @closed_bugs = @user.bugs.closed.order("created_at DESC").paginate(:page => params[:closed_page], :per_page => CLOSED_BUGS_PAGINATION_SIZE)
-    @pending_bugs = @user.bugs.pending.paginate(:page => params[:pending_page], :per_page => PENDING_BUGS_PAGINATION_SIZE)
-    @open_bugs = @user.bugs.open_bugs.paginate(:page => params[:open_page], :per_page => OPEN_BUGS_PAGINATION_SIZE)
-
+    if @user
+      @closed_bugs = @user.bugs.closed.order("created_at DESC").paginate(:page => params[:closed_page], :per_page => CLOSED_BUGS_PAGINATION_SIZE)
+      @pending_bugs = @user.bugs.pending.paginate(:page => params[:pending_page], :per_page => PENDING_BUGS_PAGINATION_SIZE)
+      @open_bugs = @user.bugs.open_bugs.paginate(:page => params[:open_page], :per_page => OPEN_BUGS_PAGINATION_SIZE)
+    end
     case
       when @user.nil?
         flash[:error] = "Could not find user '#{params[:id]}'"
