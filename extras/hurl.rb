@@ -1,6 +1,29 @@
 require 'fileutils'
 require 'digest'
 
+
+# This is an install system which, unlike deploy_api.rb, avoids using the talosweb service account.
+#
+# Assumptions:
+# -   The disgorge system is installed on the backend to complete the install
+#
+# This script first collects the source code.
+# It optionally will:
+# -   Check out code from git using a given branch or tag name
+# -   Check out code from git using the current branch
+# -   Untar a given file
+#
+# This cript will package gems, precompile assets, and re-tar file with results.
+#
+# The script will tar up the resulting files, scp them to the backend and call the disgorge system.
+#
+# The disgorge script will uncompress the tar,
+# Then copy or link shared files and directories.
+# Disgorge will then bundle install, and run migrations.
+# Disgorge then sets up the subverion.
+# Finally it creates a link to the new release directory.
+
+
 class Hurl
   attr_reader :build_base
 
