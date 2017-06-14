@@ -107,7 +107,7 @@ class Hurl
     end
 
     puts "* package the gems into vendor/cache"
-    # system 'bundle install --deployment'
+    system "cd #{build_path}; rm Gemfile.lock; bundle _1.12.5_  install"
     system "cd #{build_path} && bundle _1.12.5_ package --frozen --all"
     puts "* copying libv8 to cache folder this is needed on the server"
     system "cp #{build_path}/vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem #{build_path}/vendor/cache"
