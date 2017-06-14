@@ -7,4 +7,8 @@ class RulesController < ApplicationController
       }
     end
   end
+
+  def export
+    send_file RuleSyntax::RuleExporter.new(params).export 
+  end
 end

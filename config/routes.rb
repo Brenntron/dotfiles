@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   # some of these named routes need to be rethought to conform to rails conventions
   get 'rules/get_impact' => 'rules#get_impact', format: 'js'
+  get 'rules/export' => 'rules#export'
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
