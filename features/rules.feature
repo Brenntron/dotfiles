@@ -68,7 +68,7 @@ Feature: Rules
     And  I click "export"
 
     Then I should receive a file "exported_rules.rules"
-    Then I should expect three rule lines
+    Then I should expect 3 rule lines
 
   @javascript
   Scenario: Selecting rules with a bug with rules exports only selected rules
@@ -96,7 +96,7 @@ Feature: Rules
     And  I check "rule_15"
     And  I click "export"
     Then I should receive a file "exported_rules.rules"
-    Then I should expect two rule lines
+    Then I should expect 2 rule lines
   ### Scenarios New Rule ###
 
   @javascript
