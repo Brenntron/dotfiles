@@ -29,9 +29,14 @@ require 'digest'
 class Hurl
   attr_reader :build_base
 
-  def initialize(args, build_base: '../releases')
+  def initialize(args, precompile_assets, build_base: '../releases')
     @args = args
     @build_base = build_base
+    @precompile_assets = precompile_assets
+  end
+
+  def precompile_assets?
+    @precompile_assets
   end
 
   def red(str)
@@ -101,19 +106,21 @@ class Hurl
       raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
     end
 
-    puts "* build the gems into vendor/bundle"
+    puts "* package the gems into vendor/cache"
     # system 'bundle install --deployment'
     system "cd #{build_path} && bundle _1.12.5_ package --frozen --all"
     puts "* copying libv8 to cache folder this is needed on the server"
     system "cp #{build_path}/vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem #{build_path}/vendor/cache"
     # system "cd #{build_path} && bundle _1.12.5_ install --standalone --deployment --frozen"
 
-    puts "* compile assets"
-    # Dir.chdir "../production"
-    system "cd #{build_path};bundle exec rake assets:precompile"
-    # Dir.chdir "../analyst-console"
+    if precompile_assets?
+      puts "* compile assets"
+      # Dir.chdir "../production"
+      system "cd #{build_path};bundle exec rake assets:precompile"
+      # Dir.chdir "../analyst-console"
+    end
 
-    puts "* tar up the contents of the production folder"
+    puts "* tar up the contents of the production folder #{build_base}/#{tag_dir}.tar.gz"
     system "cd #{build_base} && tar -zcf #{tag_dir}.tar.gz #{tag_dir}"
   end
 
@@ -125,7 +132,7 @@ class Hurl
     system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/disgorge.env && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
   end
 
-  def process_api(build_ac, send_upload)
+  def run(build_ac, send_upload)
     if build_ac
       get_source
       build_install_tar
@@ -142,6 +149,7 @@ end
 
 
 build_ac = true
+precompile_assets = true
 send_upload = true
 timestamp = 0
 
@@ -150,6 +158,8 @@ ARGV.each do |arg|
   case arg
     when "--no-build"
       build_ac = false
+    when "--no-assets"
+      precompile_assets = false
     when "--no-upload"
       send_upload = false
     when "-h", "--help"
@@ -158,10 +168,12 @@ ARGV.each do |arg|
       puts "============"
       puts "Valid flags are"
       puts "--help             this message"
+      puts "--no-build         skip building new tar file, use exisiting one"
+      puts "--no-assets        skip precompiling assets"
       puts "--no-upload        apps will be built but they will be prevented from being sent to the server"
       process_api = false
       send_upload = false
-      break
+      exit
     when timestamp
       puts "processing time stamp"
     else
@@ -169,12 +181,12 @@ ARGV.each do |arg|
         puts "One of your flags '#{arg}' is not valid. Try again. use -h or --help"
         build_ac = false
         send_upload = false
-        break
+        exit
       else
         args_pos << arg
       end
   end
 end
 
-Hurl.new(args_pos).process_api(build_ac, send_upload)
+Hurl.new(args_pos, precompile_assets).run(build_ac, send_upload)
 
