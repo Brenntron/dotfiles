@@ -29,14 +29,24 @@ require 'digest'
 class Hurl
   attr_reader :build_base
 
-  def initialize(args, precompile_assets, build_base: '../releases')
+  def initialize(args,
+                 bundler_version: '_1.12.5_',
+                 precompile_assets: true,
+                 vendor_bundle: false,
+                 build_base: '../releases')
     @args = args
+    @bundler_version = bundler_version
     @build_base = build_base
     @precompile_assets = precompile_assets
+    @vendor_bundle = vendor_bundle
   end
 
   def precompile_assets?
     @precompile_assets
+  end
+
+  def vendor_bundle?
+    @vendor_bundle
   end
 
   def red(str)
@@ -107,17 +117,21 @@ class Hurl
     end
 
     puts "* package the gems into vendor/cache"
-    system "cd #{build_path}; rm Gemfile.lock; bundle _1.12.5_  install"
-    system "cd #{build_path} && bundle _1.12.5_ package --frozen --all"
+    system "cd #{build_path}; rm Gemfile.lock; bundle #{@bundler_version}  install"
+    system "cd #{build_path} && bundle #{@bundler_version} package --frozen --all"
     puts "* copying libv8 to cache folder this is needed on the server"
     system "cp #{build_path}/vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem #{build_path}/vendor/cache"
-    # system "cd #{build_path} && bundle _1.12.5_ install --standalone --deployment --frozen"
+    # system "cd #{build_path} && bundle #{@bundler_version} install --standalone --deployment --frozen"
 
     if precompile_assets?
       puts "* compile assets"
       # Dir.chdir "../production"
       system "cd #{build_path};bundle exec rake assets:precompile"
       # Dir.chdir "../analyst-console"
+    end
+
+    if vendor_bundle?
+      system "cd #{build_path} && bundle install --deployment --frozen --without development test"
     end
 
     puts "* tar up the contents of the production folder #{build_base}/#{tag_dir}.tar.gz"
@@ -150,14 +164,23 @@ end
 
 build_ac = true
 precompile_assets = true
+vendor_bundle = false
 send_upload = true
-timestamp = 0
+bundler_version = '_1.12.5_'
 
 args_pos = []
 ARGV.each do |arg|
   case arg
+    when "--deployment"
+      build_ac = true
+      precompile_assets = true
+      vendor_bundle = true
+      send_upload = false
+      bundler_version = '_1.15.1_'
     when "--no-build"
       build_ac = false
+    when "--vendor-bundle"
+      vendor_bundle = true
     when "--no-assets"
       precompile_assets = false
     when "--no-upload"
@@ -168,19 +191,15 @@ ARGV.each do |arg|
       puts "============"
       puts "Valid flags are"
       puts "--help             this message"
+      puts "--deployment       build tar file for deployment"
       puts "--no-build         skip building new tar file, use exisiting one"
       puts "--no-assets        skip precompiling assets"
+      puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
       puts "--no-upload        apps will be built but they will be prevented from being sent to the server"
-      process_api = false
-      send_upload = false
       exit
-    when timestamp
-      puts "processing time stamp"
     else
       if 1 <= args_pos.length
         puts "One of your flags '#{arg}' is not valid. Try again. use -h or --help"
-        build_ac = false
-        send_upload = false
         exit
       else
         args_pos << arg
@@ -188,5 +207,9 @@ ARGV.each do |arg|
   end
 end
 
-Hurl.new(args_pos, precompile_assets).run(build_ac, send_upload)
+hurl = Hurl.new(args_pos,
+                bundler_version: bundler_version,
+                precompile_assets: precompile_assets,
+                vendor_bundle: vendor_bundle)
+hurl.run(build_ac, send_upload)
 
