@@ -29,13 +29,29 @@ require 'digest'
 class Hurl
   attr_reader :build_base
 
+  def scan_args(args)
+    args.inject([]) do |pos_args, arg|
+      case arg
+        when /\A-/
+          #do nothing
+        when /\A_.*_\z/
+          @bundler_version = arg
+        else
+          pos_args << arg
+      end
+      pos_args
+    end
+  end
+
   def initialize(args,
-                 bundler_version: '_1.12.5_',
+                 bundler_version: nil,
                  precompile_assets: true,
                  vendor_bundle: false,
                  build_base: '../releases')
     @args = args
-    @bundler_version = bundler_version
+    @bundler_version = '_1.12.5_'
+    @args_pos = scan_args(args)
+    @bundler_version = bundler_version if bundler_version
     @build_base = build_base
     @precompile_assets = precompile_assets
     @vendor_bundle = vendor_bundle
@@ -61,7 +77,7 @@ class Hurl
   end
 
   def source_arg
-    @args[0] || current_git_branch
+    @args_pos[0] || current_git_branch
   end
 
   def use_tar?
@@ -166,9 +182,8 @@ build_ac = true
 precompile_assets = true
 vendor_bundle = false
 send_upload = true
-bundler_version = '_1.12.5_'
+bundler_version = nil
 
-args_pos = []
 ARGV.each do |arg|
   case arg
     when "--deployment"
@@ -197,17 +212,13 @@ ARGV.each do |arg|
       puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
       puts "--no-upload        apps will be built but they will be prevented from being sent to the server"
       exit
-    else
-      if 1 <= args_pos.length
-        puts "One of your flags '#{arg}' is not valid. Try again. use -h or --help"
-        exit
-      else
-        args_pos << arg
-      end
+    when /\A-/
+      puts "One of your flags '#{arg}' is not valid. Try again. use -h or --help"
+      exit
   end
 end
 
-hurl = Hurl.new(args_pos,
+hurl = Hurl.new(ARGV,
                 bundler_version: bundler_version,
                 precompile_assets: precompile_assets,
                 vendor_bundle: vendor_bundle)
