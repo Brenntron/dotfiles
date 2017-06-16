@@ -68,16 +68,16 @@ cp $SHAREDDIR/config/database.yml config
 ln -s $SHAREDDIR/.env .
 
 #echo '* bundle package'
-#bundle _1.12.5_ package --frozen --without development test
+#bundle _1.15.1_ package --frozen
 
 echo '* bundle install'
-bundle _1.12.5_ install --deployment --frozen --local --without development test
+bundle _1.15.1_ install --deployment --frozen --local --without development test
 
 echo '* migrations'
 bundle exec rake db:migrate
 
-#echo '* precompile assets'
-#bundle exec rake assets:precompile
+echo '* precompile assets'
+bundle exec rake assets:precompile
 
 echo '* svn working folders'
 rm -rf $RELPATH/$TAGDIR/extras/working
