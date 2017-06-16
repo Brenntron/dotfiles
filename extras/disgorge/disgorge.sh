@@ -44,50 +44,64 @@ if [ "" == "$SHAREDDIR" ]; then
     SHAREDDIR=$RELBASE/shared
 fi
 
-if [ "" == "$CURRDIR" ]; then
-    CURRDIR=$RELBASE/current
+#if [ "" == "$CURRDIR" ]; then
+#    CURRDIR=$RELBASE/current
+#fi
+#echo $CURRDIR
+if [ "" != "$CURRDIR" ]; then
+    echo $CURRDIR
 fi
-echo $CURRDIR
-
 
 
 
 echo ''
 echo '* Installing'
+echo $RELPATH
+echo $TAGDIR
 cd $RELPATH/$TAGDIR
 
-rm -rf extras/ssh
-ln -s $SHAREDDIR/.ssh extras/ssh
+if [ "SKIP" != "$SHARED" ]; then
+    echo '* using shared files and directories'
 
-rm -rf log
-ln -s $SHAREDDIR/log .
-for file in log/*; do echo "--- Release $RELDIR $TAGDIR" >> $file; done
+    rm -rf extras/ssh
+    ln -s $SHAREDDIR/.ssh extras/ssh
 
-cp $SHAREDDIR/config/database.yml config
+    rm -rf log
+    ln -s $SHAREDDIR/log .
+    for file in log/*; do echo "--- Release $RELDIR $TAGDIR" >> $file; done
 
-ln -s $SHAREDDIR/.env .
+    cp $SHAREDDIR/config/database.yml config
 
-#echo '* bundle package'
-#bundle _1.14.6_ package --frozen --without development test
+    ln -s $SHAREDDIR/.env .
+fi
+
+echo '* bundle package'
+bundle _1.14.6_ package --frozen --path vendor/bundle
 
 echo '* bundle install'
-bundle _1.14.6_ install --deployment --frozen --local --without development test
+bundle _1.14.6_ install --deployment --frozen --local --path vendor/bundle --without development test
 
-echo '* migrations'
-bundle exec rake db:migrate
+if [ "SKIP" != "$MIGRATE" ]; then
+    echo '* migrations'
+    bundle exec rake db:migrate
+fi
 
 echo '* precompile assets'
 bundle exec rake assets:precompile
 
-echo '* svn working folders'
-rm -rf $RELPATH/$TAGDIR/extras/working
-svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/working/snort-rules
-if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
-    svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
+if [ "SKIP" != "$SVN_WORKING" ]; then
+    echo '* svn working folders'
+    rm -rf $RELPATH/$TAGDIR/extras/working
+    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/working/snort-rules
+    if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
+        svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
+    fi
 fi
 
-echo '* Simlink to $RAILS_ROOT'
-rm $CURRDIR
-ln -s $RELPATH/$TAGDIR $CURRDIR
-cd $CURRDIR
+if [ "" != "$CURRDIR" ]; then
+    echo '* Simlink to $RAILS_ROOT'
+    rm $CURRDIR
+    ln -s $RELPATH/$TAGDIR $CURRDIR
+    cd $CURRDIR
+fi
 
