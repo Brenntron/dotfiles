@@ -74,7 +74,7 @@
               data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>"
                        name="rule[id]" value="<%= rule.id %>" data-sid="<%= rule.sid%>"></td>
-                <td class="rule_state_col"><%= rule.state %></td>
+                <td class="rule_state_col"><div data-toggle="tooltip" data-placement="right" title="<%= raw rule.tool_tip %>"><%= rule.state %></div></td>
                 <td>
                   <a class="blue show_rule" href="#">
                     <% if rule.sid %>
@@ -157,5 +157,8 @@
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
 <input type="hidden" name="xml_token" value="<%= xml_token %>">
 <input type="hidden" name="current_user" value="<%= current_user.id %>">
-
-
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>

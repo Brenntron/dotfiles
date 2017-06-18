@@ -228,14 +228,7 @@ class Bug < ApplicationRecord
   end
 
   def docs_complete?
-    rules.each do |rule|
-      next unless rule.rule_category
-      next unless rule.rule_category.requires_doc?
-
-      return false unless rule.has_doc?
-    end
-
-    true
+    rules.all? { |rule| rule.doc_complete? }
   end
 
   def allow_state_change?

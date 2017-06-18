@@ -15,24 +15,24 @@ require 'tempfile'
 # filename [String] the (relative or absolute) filename where the rule came from or is stored
 # linenumber [Integer] the line in the rule file where the rule was read from
 #
-#                           |sid|  state  |edit_status|publish_status|parsed|
+#                           |sid|  state   |edit_status|publish_status|parsed|
 # All Rules
 # * synched with CVS
-#   * valid                 |int|UNCHANGED|  SYNCHED  |    SYNCHED   | true | valid rule up to date with CVS
+#   * valid                 |int|UNCHANGED |  SYNCHED  |    SYNCHED   | true | valid rule up to date with CVS
 #   * failed visruleparse   .............................. rules which fail visruleparse are not loaded
 # * draft
 #   * new
-#     * valid               |nil|   NEW   |    NEW    | CURRENT_EDIT | true | new rule created from UI or web services
-#     * failed parse        |nil|  FAILED |    NEW    | CURRENT_EDIT |false | new rule which failed visruleparse
-#     * committing          |nil|   NEW   |    NEW    |  PUBLISHING  | true | the rule is in the process of being commited.
+#     * valid               |nil|   NEW    |    NEW    | CURRENT_EDIT | true | new rule created from UI or web services
+#     * failed parse        |nil|INCOMPLETE|    NEW    | CURRENT_EDIT |false | new rule which failed visruleparse
+#     * committing          |nil|   NEW    |    NEW    |  PUBLISHING  | true | the rule is in the process of being commited.
 #   * edit
 #     * current edit
-#       * valid             |int| UPDATED |   EDIT    | CURRENT_EDIT | true | CVS rule edited in UI or web service
-#       * failed parse      |int|  FAILED |   EDIT    | CURRENT_EDIT |false | edited rule which failed visruleparse
-#       * committing        |int| UPDATED |   EDIT    |  PUBLISHING  | true | the rule is in the process of being commited.
+#       * valid             |int| UPDATED  |   EDIT    | CURRENT_EDIT | true | CVS rule edited in UI or web service
+#       * failed parse      |int|INCOMPLETE|   EDIT    | CURRENT_EDIT |false | edited rule which failed visruleparse
+#       * committing        |int| UPDATED  |   EDIT    |  PUBLISHING  | true | the rule is in the process of being commited.
 #     * out of date
-#       * valid             |int| UPDATED |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
-#       * failed parse      |int|  FAILED |   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
+#       * valid             |int| UPDATED  |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
+#       * failed parse      |int|INCOMPLETE|   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
 #
 class Rule < ApplicationRecord
   has_paper_trail
@@ -59,6 +59,14 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft but VC rev has changed and cannot be checked in
   PUBLISH_STATUS_PUBLISHING     = 'PUBLISHING'      #draft in process of being written to VC
 
+  INCOMPLETE_STATE              = 'INCOMPLETE'
+  UNCHANGED_STATE                = 'UNCHANGED'
+  UPDATED_STATE                 = 'UPDATED'
+  NEW_STATE                     = 'NEW'
+  STALE_STATE                   = 'STALE'           #is set to stale when publish status is set to stale
+  DELETED_STATE                 = 'DELETED'
+  
+
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
   def deleted?
@@ -67,6 +75,18 @@ class Rule < ApplicationRecord
 
   def has_doc?
     rule_doc && rule_doc.summary.present?
+  end
+
+  def doc_complete?
+    return true if rule_category.blank?
+    return true if !rule_category.requires_doc?
+    return false if !has_doc?
+
+
+    #  next unless rule.rule_category
+    #  next unless rule.rule_category.requires_doc?
+
+    #  return false unless rule.has_doc?
   end
 
   # determines if the rule *should* be on (uncommented) or off (commented)
@@ -331,14 +351,19 @@ class Rule < ApplicationRecord
       rule.assign(parser.attributes)
 
       if rule.sid
-        rule.state                        = 'UPDATED'
+        rule.state                        = UPDATED_STATE
         rule.edit_status                  = EDIT_STATUS_EDIT
       else
-        rule.state                        = 'NEW'
+        rule.state                        = NEW_STATE
         rule.edit_status                  = EDIT_STATUS_NEW
       end
-      rule.state                          = 'FAILED' unless rule.parsed?
+
+      rule.state                          = INCOMPLETE_STATE unless rule.parsed? || !rule.has_doc?
       rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
+
+      if rule.deleted?
+        rule.state                        = DELETED_STATE
+      end
 
       rule.save!
     end
@@ -359,7 +384,11 @@ class Rule < ApplicationRecord
 
     self.edit_status                    = EDIT_STATUS_SYNCHED
     self.publish_status                 = PUBLISH_STATUS_SYNCHED
-    self.state                          = 'UNCHANGED'
+    if self.deleted?
+      self.state                          = DELETED_STATE
+    else
+      self.state                          = UNCHANGED_STATE
+    end
     self.save!
     self.associate_references(rule_content)
     self
@@ -378,7 +407,10 @@ class Rule < ApplicationRecord
 
     if rule_db && rule_db.draft?
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
+      rule_db.update(state: STALE_STATE)
       rule_db
+    elsif rule_db.deleted?
+      rule_db.update(state: DELETED_STATE)
     else
       rule = find_from_parser(parser)
       rule.load_rule_content(rule_content)
@@ -499,7 +531,7 @@ class Rule < ApplicationRecord
   def update_rule
     begin
       rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
-      rule.state = "UNCHANGED"
+      rule.state = UNCHANGED_STATE
       rule.attachments.clear
       rule.save(validate: false)
 
@@ -566,14 +598,18 @@ class Rule < ApplicationRecord
 
   def sort_rules_by_state
     case (state)
-    when 'FAILED'
+    when INCOMPLETE_STATE
       val = 0
-    when 'NEW'
+    when NEW_STATE
       val = 1
-    when 'UPDATED'
+    when UPDATED_STATE
       val = 2
-    when 'UNCHANGED'
+    when UNCHANGED_STATE
       val = 3
+    when STALE_STATE
+      val = 4
+    when DELETED_STATE
+      val = 5
     else
       val = 3
     end
@@ -643,8 +679,51 @@ class Rule < ApplicationRecord
       css_classes << 'current-edit' if current_edit?
       css_classes << 'stale-edit' if stale_edit?
       css_classes << 'parsed' if parsed?
-      css_classes << 'failed' unless parsed?
+      css_classes << 'incomplete-unparsed' unless parsed?
+      if parsed?
+        css_classes << 'incomplete-missing-doc' if !doc_complete?
+      end
+
+      if deleted?
+        css_classes << 'deleted-rule'
+      end
+
     end.join(' ')
+  end
+
+  def tool_tip
+    tip_text = []
+
+    if synched?
+      tip_text << ToolTip::SYNCHED
+    end
+    if draft?
+      tip_text << ToolTip::DRAFT
+    end
+    if new_rule?
+      tip_text << ToolTip::NEW_RULE
+    end
+    if edited_rule?
+      tip_text << ToolTip::EDITED_RULE
+    end
+    if current_edit?
+      tip_text << ToolTip::CURRENT_EDIT
+    end
+    if stale_edit?
+      tip_text << ToolTip::STALE_EDIT
+    end
+    if parsed?
+      tip_text << ToolTip::PARSED
+    end
+    if !parsed?
+      tip_text << ToolTip::NOT_PARSED
+    end
+    if deleted?
+      tip_text << ToolTip::DELETED
+    end
+     
+    tip_text.join("    ")
+
   end
 
   # Creates a rule and its associations
