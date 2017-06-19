@@ -358,7 +358,7 @@ class Rule < ApplicationRecord
         rule.edit_status                  = EDIT_STATUS_NEW
       end
 
-      rule.state                          = INCOMPLETE_STATE unless rule.parsed? || !rule.has_doc?
+      rule.state                          = INCOMPLETE_STATE unless rule.parsed? || rule.doc_complete?
       rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
 
       if rule.deleted?
@@ -409,7 +409,7 @@ class Rule < ApplicationRecord
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db.update(state: STALE_STATE)
       rule_db
-    elsif rule_db.deleted?
+    elsif rule_db && rule_db.deleted?
       rule_db.update(state: DELETED_STATE)
     else
       rule = find_from_parser(parser)

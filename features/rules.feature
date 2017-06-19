@@ -240,7 +240,7 @@ Feature: Rules
     Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "failed" and version "new_rule"
-    And  I should see a rule with state "FAILED" version "new_rule"
+    And  I should see a rule with state "INCOMPLETE" version "new_rule"
 #    And rule "11" is a new rule
     And  I should see "BLACKLIST test *.msg"
 
@@ -375,6 +375,66 @@ Feature: Rules
   # Scenario: a user can edit rule docs for a new rule
 
 
+  # ==== Deleted rules ===
+
+  @javascript
+  Scenario: Editing a deleted rule
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | DELETED   |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |    SYNCHED     |     message       |        1         |
+    And bug with id "2222" has rule with id "11"
+    When I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    And  I uncheck "rule_11"
+    And  I click "edit"
+    Then I should not see div element with class "rule_11"
+    When I click the "Rules" tab
+    And  I check "rule_11"
+    And  I click "edit"
+    Then I should see div element with class "rule_11"
+    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"DELETED msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
+    And  I click button "Save Changes"
+    And  I wait for "8" seconds
+    Then I should see rule "11" state "DELETED" version "1:22211:3"
+    And rule "11" is a current edit
+    And I should see a rule row with class "draft" and id "11"
+    And I should see a rule row with class "edited-rule" and id "11"
+    And I should see a rule row with class "current-edit" and id "11"
+    And I should see a rule row with class "deleted-rule" and id "11"
+
+  @javascript
+  Scenario: VC updating a deleted rule
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    And the following rule categories exist:
+      | category  | id |
+      | DELETED   |  1 |
+    And the following rules exist:
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  |     message       |        1         |
+    And bug with id "2222" has rule with id "11"
+    When rule sid "22211" rev "4" is synched
+    And  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    And I should see a rule row with class "draft" and id "11"
+    And I should see a rule row with class "edited-rule" and id "11"
+    And I should see a rule row with class "stale-edit" and id "11"
+    And I should see a rule row with class "deleted-rule" and id "11"
+
+
   # ==== Existing rule ===
 
   @javascript
@@ -499,13 +559,13 @@ Feature: Rules
     And  I fill in "rule[rule_content]" with "alert (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
-    Then I should see rule "11" state "FAILED" version "1:22211:3"
+    Then I should see rule "11" state "INCOMPLETE" version "1:22211:3"
     And rule "11" is a current edit
     And I should see "BLACKLIST test msg"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "current-edit" and id "11"
-    And I should see a rule row with class "failed" and id "11"
+    And I should see a rule row with class "incomplete-unparsed" and id "11"
 
 
   # ==== Synching a rule from VC ===
@@ -546,7 +606,7 @@ Feature: Rules
       | BLACKLIST |  1 |
     And the following rules exist:
       | id | gid |  sid  | rev |   state   |edit_status| publish_status |parsed|     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |   FAILED  |   EDIT    |  CURRENT_EDIT  |false | BLACKLIST message |        1         |
+      | 11 |  1  | 22211 |  3  |   INCOMPLETE  |   EDIT    |  CURRENT_EDIT  |false | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
@@ -556,7 +616,7 @@ Feature: Rules
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "stale-edit" and id "11"
-    And I should see a rule row with class "failed" and id "11"
+    And I should see a rule row with class "incomplete-unparsed" and id "11"
 
 
   # ==== Editing rule docs ===
@@ -625,7 +685,7 @@ Feature: Rules
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
-    And  A rule gid "1" and sid "22211" has class "failed"
+    And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
 
   Scenario: Synch Rule: update an existing valid synched rule with new rev model test
     Given the following rules exist:
@@ -658,18 +718,21 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has class "stale-edit"
     And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "3"
+    And  A rule id "7" should have state "STALE"
 
   Scenario: Synch Rule: VC updated for a failed edited rule do not load model test
     Given the following rules exist:
       | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
-      |  7 |  1  | 22211 |  3  | FAILED  |   EDIT    | CURRENT_EDIT | false|
+      |  7 |  1  | 22211 |  3  | INCOMPLETE  |   EDIT    | CURRENT_EDIT | false|
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "draft"
     And  A rule gid "1" and sid "22211" has class "edited-rule"
     And  A rule gid "1" and sid "22211" has class "stale-edit"
-    And  A rule gid "1" and sid "22211" has class "failed"
+    And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
     And  A rule gid "1" and sid "22211" has rev "3"
+    And  A rule id "7" should have state "STALE"
+
 
 
 

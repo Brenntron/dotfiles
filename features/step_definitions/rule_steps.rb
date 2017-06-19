@@ -109,7 +109,7 @@ Then(/^I should see a rule with state "(.*)" version "(.*)"$/) do |state, versio
 end
 
 Then(/^I should see rule "(.*)" state "(.*)" version "(.*)"$/) do |rule_id, state, version|
-  page.find(:xpath, "//tr[@id='#{rule_id}']/td[text()='#{state}']")
+  page.find(:xpath, "//tr[@id='#{rule_id}']/td/div[text()='#{state}']")
   page.find(:xpath, "//tr[@id='#{rule_id}']//*[normalize-space(text())='#{version}']")
 end
 
@@ -129,6 +129,11 @@ end
 Then(/^A rule gid "(.*)" and sid "(.*)" has class "(.*)"$/) do |gid, sid, css_class|
   rule = Rule.by_sid(sid, gid).first
   rule && rule.css_class.split(' ').should(include(css_class))
+end
+
+Then(/^A rule id "(.*)" should have state "(.*)"$/) do |id, state|
+  rule = Rule.find(id)
+  rule && rule.state.should(eql(state))
 end
 
 Then(/^I should see a rule row with class "(.*)" and id "(.*)"$/) do |css_class, rule_id|
