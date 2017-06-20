@@ -78,15 +78,16 @@ class Rule < ApplicationRecord
   end
 
   def doc_complete?
-    return true if rule_category.blank?
-    return true if !rule_category.requires_doc?
-    return false if !has_doc?
-
-
-    #  next unless rule.rule_category
-    #  next unless rule.rule_category.requires_doc?
-
-    #  return false unless rule.has_doc?
+    case
+      when rule_category.blank?
+        true
+      when !rule_category.requires_doc?
+        true
+      when !has_doc?
+        false
+      else
+        true
+    end
   end
 
   # determines if the rule *should* be on (uncommented) or off (commented)
