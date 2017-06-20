@@ -528,22 +528,6 @@ class Rule < ApplicationRecord
     true
   end
 
-  def update_rule
-    begin
-      rule = Rule.find_rule(Rule.find(params[:id]).sid) # This will update if found
-      rule.state = UNCHANGED_STATE
-      rule.attachments.clear
-      rule.save(validate: false)
-
-    rescue Exception => e
-      log_error(e)
-    rescue RuleError => e
-      add_error("#{rule.sid}: #{e}")
-    end
-
-    redirect_to request.referer
-  end
-
   def self.find_current_rule(sid)
     Dir.entries(Rails.configuration.snort_rule_path).each do |f|
       # Don't include .stub.rules hidden rule files
@@ -684,9 +668,7 @@ class Rule < ApplicationRecord
         css_classes << 'incomplete-missing-doc' if !doc_complete?
       end
 
-      if deleted?
-        css_classes << 'deleted-rule'
-      end
+      css_classes << 'deleted-rule' if deleted?
 
     end.join(' ')
   end
