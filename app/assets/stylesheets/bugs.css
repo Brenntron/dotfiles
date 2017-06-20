@@ -24,9 +24,17 @@ table#bug-rules-table tr.parsed.new-rule td.rule_state_col {
     color:green;
 }
 /*.rule_state_red{*/
-table#bug-rules-table tr.failed td.rule_state_col {
+table#bug-rules-table tr.incomplete-unparsed td.rule_state_col {
     color:white;
     background-color:red;
+}
+table#bug-rules-table tr.incomplete-missing-doc td.rule_state_col {
+    color:white;
+    background-color:orange;
+}
+table#bug-rules-table tr.deleted-rule td.rule_state_col {
+    color:white;
+    background-color:black;
 }
 table#bug-rules-table tr.parsed.stale-edit td.rule_state_col {
     background-color: #e8e8e8;
