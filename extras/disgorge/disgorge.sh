@@ -96,6 +96,8 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
     if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
         svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
     fi
+    rm -rf tmp
+    mkdir tmp
 fi
 
 if [ "" != "$CURRDIR" ]; then
@@ -105,3 +107,6 @@ if [ "" != "$CURRDIR" ]; then
     cd $CURRDIR
 fi
 
+if [ "" != "$VERSION" ]; then
+    bash -c "cd $RELPATH; mv $TAGDIR $VERSION; tar czf $VERSION.tar.gz $VERSION"
+fi
