@@ -1,10 +1,10 @@
 class LoginSession
-  attr_reader :success, :user, :xmlrpc_token, :timestamp
+  attr_reader :success, :user, :xmlrpc, :xmlrpc_token, :timestamp
 
   def initialize(user, xmlrpc, success = true)
     @success = success
     @user = user
-    @xmlrpc_token = xmlrpc.token
+    @xmlrpc = xmlrpc
     @timestamp = Time.now
   end
 
@@ -56,6 +56,13 @@ class LoginSession
 
   def user_display_name
     user.display_name
+  end
+
+  def bugzilla_login
+    @xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc),
+                           Rails.configuration.bugzilla_username,
+                           Rails.configuration.bugzilla_password)
+    @xmlrpc_token = @xmlrpc.token
   end
 
   def set_session(session)
