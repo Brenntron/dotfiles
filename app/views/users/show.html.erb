@@ -1,4 +1,4 @@
-<div class='row item-info'>
+<div class='row item-info users-split-color'>
   <div class="row subheading">
     <button class="btn back_btn_user pull-right">
       <i class="glyphicon glyphicon-th-list"></i> <strong class="hidden-xs">user list</strong>
@@ -75,12 +75,13 @@
         </div>
       </div>
       <div class='col-sm-11'>
-        <ul class="nav nav-tabs" role="tablist">
+        <ul class="nav nav-tabs users-split-color users-split-color-nav-tweak" role="tablist">
           <li role="presentation" class="user-tab <%= "active" if (params[:active_tab].blank? || params[:active_tab] == "open") %>" id="open-tab"><a href="#open" aria-controls="open" role="tab" data-toggle="tab">open (<%= @user.bugs.open_bugs.count %>)</a></li>
           <li role="presentation" class="user-tab <%= "active" if params[:active_tab] == "pending" %>" id="pending-tab"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">pending (<%= @user.bugs.pending.count %>)</a></li>
           <li role="presentation" class="user-tab <%= "active" if params[:active_tab] == "closed" %>" id="closed-tab"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">closed (<%= @user.bugs.closed.count %>)</a></li>
         </ul>
-        <div class="tab-content">
+
+        <div class="tab-content users-split-color-content-tweak">
           <div role="tabpanel" class="tab-pane <%= "active" if (params[:active_tab].blank? || params[:active_tab] == "open") %>" id="open">
             <table class="table table-hover table-borderless">
               <% if @open_bugs.any? %>
@@ -167,9 +168,10 @@
             </table>
           </div>
         </div>
+
       </div>
     </div>
-    <div class="row">
+    <div class="row users-split-color-row-tweak">
       <div class="col-xs-11"><hr/></div>
       <div class='col-xs-12'>
         <div class='col-xs-11'>
@@ -193,7 +195,7 @@
       </div>
 
     </div>
-    <div class="footer-spacer"></div>
+    <!--<div class="footer-spacer"></div>-->
 
   </div>
 </div>

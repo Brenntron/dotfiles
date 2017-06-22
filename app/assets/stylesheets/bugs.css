@@ -125,3 +125,12 @@ div.progress{
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
+
+.bugs-split-color {
+    background-color: #f2f6f6;
+}
+
+.bugs-split-colors-tweak {
+    padding-left: 25px;
+    margin-left: -25px;
+}

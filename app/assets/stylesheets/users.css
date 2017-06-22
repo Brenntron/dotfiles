@@ -35,3 +35,29 @@
 .lengthen-table {
     width:500px;
 }
+
+.users-split-color {
+    background-color: #fbf7f1;
+}
+
+.users-split-color-nav-tweak {
+    width: 130%;
+    padding-left: 35px;
+    margin-left: -35px !important;
+}
+
+.users-split-color-row-tweak {
+    background-color: white;
+    width: 115%;
+    padding-left: 35px;
+    margin-left: -35px;
+}
+
+.users-split-color-content-tweak {
+    background-color: white;
+    width: 130%;
+    margin-left: -35px;
+    padding-left: 35px;
+    margin-top: -12px;
+    padding-top: 12px;
+}
