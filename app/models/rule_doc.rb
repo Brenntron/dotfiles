@@ -1,11 +1,24 @@
 class RuleDoc < ApplicationRecord
   belongs_to :rule
 
+  #DEFAULT LANGUAGE FOR FORM
+
+  DEFAULT_SUMMARY_TEXT = "This event is generated when "
+  DEFAULT_CONTRIBUTOR_TEXT = "Cisco's Talos Intelligence Group "
+
+
   before_create :compose_impact, if: Proc.new { |doc| doc.impact.blank? }
+  before_save   :check_default_text
 
   has_many :references, through: :rule
 
   delegate :sid, :gid, :new_rule?, to: :rule, allow_nil: true
+
+  def check_default_text
+    if self.summary == DEFAULT_SUMMARY_TEXT
+      self.summary = ""
+    end
+  end
 
   def compose_impact
     self.impact = self.rule.rule_classification

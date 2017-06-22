@@ -618,6 +618,35 @@ Feature: Rules
     And I should see a rule row with class "stale-edit" and id "11"
     And I should see a rule row with class "incomplete-unparsed" and id "11"
 
+  @javascript
+  Scenario: When a new rule is created, the summary has default text (validated), and default contributors text
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    When I wait for "3" seconds
+    And  I goto "/bugs/2222"
+    When I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+    And  I select "BLACKLIST" from "rule_category_id"
+    And  I fill in "rule[message]" with "Test Message the third"
+    And  I fill in "rule[dst]" with "$HOME_NET"
+    And  I fill in "rule[detection]" with "Detection test3"
+    And  I select "unknown" from "rule[class_type]"
+    Then the "summary" field should be "This event is generated when "
+    Then the "contributors" field should be "Cisco's Talos Intelligence Group "
+    When I hide the element with class "other-dropdown"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    And  I click the "Rules" tab
+    And  I click button "list all"
+    And  I click "new_rule"
+    Then a rule doc column "summary" should equal "" in the database
+    Then a rule doc column "contributors" should equal "Cisco's Talos Intelligence Group " in the database
+
+
 
   # ==== Editing rule docs ===
 

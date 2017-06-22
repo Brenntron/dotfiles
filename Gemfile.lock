@@ -1,16 +1,16 @@
 PATH
-  remote: ./vendor/gems/activemessaging
+  remote: vendor/gems/activemessaging
   specs:
     activemessaging (0.13.1.2)
 
 PATH
-  remote: ./vendor/gems/rule_test_api
+  remote: vendor/gems/rule_test_api
   specs:
     rule_test_api (0.1.4)
       her (>= 0.7.2)
 
 PATH
-  remote: ./vendor/gems/sfbugzilla
+  remote: vendor/gems/sfbugzilla
   specs:
     sfbugzilla (0.1.6)
       highline
@@ -499,4 +499,4 @@ DEPENDENCIES
   will_paginate (= 3.1.5)
 
 BUNDLED WITH
-   1.12.5
+   1.14.6
