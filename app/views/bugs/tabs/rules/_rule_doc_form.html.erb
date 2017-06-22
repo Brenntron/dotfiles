@@ -5,7 +5,7 @@
     <label for="rule_doc_summary">Summary</label>
     <br>
     <textarea class="form-control create-input select-sm code summary-<%=local_assigns[:form_type]%>" rows=4 cols="65"  name="rule[rule_doc][][summary]" type="text" id="summary"
-              placeholder="This event is generated when..."><%=rule.rule_doc.try(:summary)%></textarea>
+              ><%=get_summary(rule) %></textarea>
   </div>
   <div class="form-group">
     <label for="rule_doc_impact">Impact</label>
@@ -75,7 +75,7 @@
     <label for="rule_doc_contributors">Contributors</label>
     <br>
     <textarea class="form-control create-input select-sm code contributors-<%=local_assigns[:form_type]%>" rows=4 cols=65 name="rule[rule_doc][][contributors]" id="contributors" type="text"
-              placeholder="Original Rule writer (if not Talos, for instance Community Submission)&#10;Cisco's Talos Intelligence Group"><%=rule.rule_doc.try(:contributors)%></textarea>
+              ><%=get_contributor(rule)%></textarea>
   </div>
 </div>
 </div>

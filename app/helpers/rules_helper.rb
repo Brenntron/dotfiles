@@ -52,4 +52,20 @@ module RulesHelper
       :'client-side-exploit'            => 'Known client side exploit attempt'
   )
 
+  def get_summary(rule)
+    if rule && rule.rule_doc && rule.rule_doc.summary.present?
+      rule.rule_doc.summary
+    else
+      RuleDoc::DEFAULT_SUMMARY_TEXT
+    end
+  end
+
+  def get_contributor(rule)
+    if rule && rule.rule_doc && rule.rule_doc.contributors.present?
+      rule.rule_doc.contributors
+    else
+      RuleDoc::DEFAULT_CONTRIBUTOR_TEXT
+    end
+  end
+
 end

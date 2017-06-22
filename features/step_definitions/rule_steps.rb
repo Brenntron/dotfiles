@@ -183,3 +183,7 @@ Then(/^a rule gid "(\d*)" and sid "(\d*)" is off/) do |gid, sid|
   rule = Rule.by_sid(sid, gid).first
   rule.rule_content_for_commit.should match(/^\s*#/)
 end
+Then(/^a rule doc column "(.*)" should equal "(.*)" in the database$/) do |column, value|
+  rule = RuleDoc.all.first
+  expect(rule.send(column.to_sym)).to eql(value)
+end
