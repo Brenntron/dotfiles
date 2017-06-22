@@ -625,11 +625,11 @@ Feature: Rules
       |  id  |
       | 2222 |
     And a "BLACKLIST" rule category exists
-    Then I wait for "3" seconds
+    When I wait for "3" seconds
     And  I goto "/bugs/2222"
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
+    When I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
     And  I select "BLACKLIST" from "rule_category_id"
     And  I fill in "rule[message]" with "Test Message the third"
     And  I fill in "rule[dst]" with "$HOME_NET"
@@ -637,13 +637,12 @@ Feature: Rules
     And  I select "unknown" from "rule[class_type]"
     Then the "summary" field should be "This event is generated when "
     Then the "contributors" field should be "Cisco's Talos Intelligence Group "
-    Then I hide the element with class "other-dropdown"
-    Then I click "Create Rule"
-    Then I wait for "1" seconds
-    Then I click the "Rules" tab
-    Then I click button "list all"
+    When I hide the element with class "other-dropdown"
+    And  I click "Create Rule"
+    And  I wait for "1" seconds
+    And  I click the "Rules" tab
+    And  I click button "list all"
     And  I click "new_rule"
-
     Then a rule doc column "summary" should equal "" in the database
     Then a rule doc column "contributors" should equal "Cisco's Talos Intelligence Group " in the database
 
