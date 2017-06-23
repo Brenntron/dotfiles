@@ -29,6 +29,21 @@ require 'digest'
 class Hurl
   attr_reader :build_base
 
+  def self.usage
+    puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
+    puts "This script deploys all the content in the API directory and the UI directory up to the server"
+    puts "============"
+    puts "Valid flags are"
+    puts "--help             this message"
+    puts "--deployment       build tar file for deployment"
+    puts "--no-build         skip building new tar file, use exisiting one"
+    puts "--no-assets        skip precompiling assets"
+    puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
+    puts "--no-upload        app will be built but they will be prevented from being sent to the server"
+    puts "--no-disgorge      app will not be expanded on the server"
+    exit
+  end
+
   def set_defaults
     @do_upload = true
     @do_disgorge = true
@@ -37,6 +52,8 @@ class Hurl
   def scan_args(args)
     args.inject([]) do |pos_args, arg|
       case arg
+        when "-h", "--help"
+          self.class.usage
         when "--no-upload"
           @do_upload = false
         when "--no-disgorge"
@@ -207,21 +224,6 @@ ARGV.each do |arg|
       vendor_bundle = true
     when "--no-assets"
       precompile_assets = false
-    # when "--no-upload"
-    #   send_upload = false
-    when "-h", "--help"
-      puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
-      puts "This script deploys all the content in the API directory and the UI directory up to the server"
-      puts "============"
-      puts "Valid flags are"
-      puts "--help             this message"
-      puts "--deployment       build tar file for deployment"
-      puts "--no-build         skip building new tar file, use exisiting one"
-      puts "--no-assets        skip precompiling assets"
-      puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
-      puts "--no-upload        app will be built but they will be prevented from being sent to the server"
-      puts "--no-disgorge      app will not be expanded on the server"
-      exit
     when /\A-/
       # puts "One of your flags '#{arg}' is not valid. Try again. use -h or --help"
       puts "One of your flags '#{arg}' is not valid. Ignored, use -h or --help"
