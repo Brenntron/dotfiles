@@ -45,10 +45,15 @@ class Hurl
   end
 
   def set_defaults
+    @build_base         = '../releases'
     @get_source         = true
     @do_create_tar      = true
+    @do_vendor_bundle   = false
+    @precompile_assets  = true
     @do_upload          = true
     @do_disgorge        = true
+    # @bundler_version    = '_1.12.5_'
+    @bundler_version    = '_1.14.6_'
   end
 
   def scan_args(args)
@@ -56,14 +61,29 @@ class Hurl
       case arg
         when "-h", "--help"
           self.class.usage
+        when "--no-build"
+          @get_source         = false
+          @do_create_tar      = false
+        when "--vendor-bundle"
+          @do_vendor_bundle   = true
+        when "--no-assets"
+          @precompile_assets  = false
         when "--no-upload"
           @do_upload = false
         when "--no-disgorge"
           @do_disgorge = false
+        when "--deployment"
+          @get_source         = true
+          @do_vendor_bundle   = false
+          @precompile_assets  = false
+          @do_create_tar      = true
+          # @bundler_version    = '_1.15.1_'
+          @bundler_version    = '_1.14.6_'
         when /\A-/
-          #do nothing
+          puts "One of your flags '#{arg}' is not valid. Ignored, use -h or --help"
+          self.class.usage
         when /\A_.*_\z/
-          @bundler_version = arg
+          @bundler_version    = arg
         else
           pos_args << arg
       end
@@ -71,19 +91,10 @@ class Hurl
     end
   end
 
-  def initialize(args,
-                 bundler_version: nil,
-                 precompile_assets: true,
-                 vendor_bundle: false,
-                 build_base: '../releases')
+  def initialize(args)
     @args = args
     set_defaults
-    @bundler_version = '_1.12.5_'
     @args_pos = scan_args(args)
-    @bundler_version = bundler_version if bundler_version
-    @build_base = build_base
-    @precompile_assets = precompile_assets
-    @vendor_bundle = vendor_bundle
   end
 
   def precompile_assets?
@@ -91,7 +102,7 @@ class Hurl
   end
 
   def vendor_bundle?
-    @vendor_bundle
+    @do_vendor_bundle
   end
 
   def red(str)
@@ -191,11 +202,9 @@ class Hurl
     system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/disgorge.env && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
   end
 
-  def run(build_ac)
-    if build_ac
-      get_source      if @get_source
-      create_tar      if @do_create_tar
-    end
+  def run
+    get_source      if @get_source
+    create_tar      if @do_create_tar
     hurl            if @do_upload
     disgorge        if @do_disgorge
 
@@ -205,35 +214,6 @@ class Hurl
 end
 
 
-build_ac = true
-precompile_assets = true
-vendor_bundle = false
-bundler_version = nil
-
-ARGV.each do |arg|
-  case arg
-    when "--deployment"
-      build_ac = true
-      precompile_assets = false
-      vendor_bundle = false
-      # bundler_version = '_1.15.1_'
-      bundler_version = '_1.14.6_'
-    when "--no-build"
-      build_ac = false
-    when "--vendor-bundle"
-      vendor_bundle = true
-    when "--no-assets"
-      precompile_assets = false
-    when /\A-/
-      # puts "One of your flags '#{arg}' is not valid. Try again. use -h or --help"
-      puts "One of your flags '#{arg}' is not valid. Ignored, use -h or --help"
-      # exit
-  end
-end
-
-hurl = Hurl.new(ARGV,
-                bundler_version: bundler_version,
-                precompile_assets: precompile_assets,
-                vendor_bundle: vendor_bundle)
-hurl.run(build_ac)
+hurl = Hurl.new(ARGV)
+hurl.run
 
