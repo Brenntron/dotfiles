@@ -123,6 +123,11 @@ class RuleFile
     `#{self.class.svn_cmd} up #{working_pathname}`
   end
 
+  def self.commit_files(rule_files, username)
+    commit_out = `#{svn_cmd} commit #{working_file_list(rule_files)} -m "#{username} committed from Analyst Console" 2>&1`
+    Rails.logger.debug commit_out
+  end
+
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_new_rule(bug, rule)
@@ -184,7 +189,7 @@ class RuleFile
       end
 
       log("committing files #{working_file_list(rule_files)}")
-      `#{svn_cmd} commit #{working_file_list(rule_files)} -m "#{username} committed from Analyst Console"`
+      commit_files(rule_files, username)
 
       rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 
