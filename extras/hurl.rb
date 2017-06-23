@@ -45,8 +45,10 @@ class Hurl
   end
 
   def set_defaults
-    @do_upload = true
-    @do_disgorge = true
+    @get_source         = true
+    @do_create_tar      = true
+    @do_upload          = true
+    @do_disgorge        = true
   end
 
   def scan_args(args)
@@ -154,7 +156,7 @@ class Hurl
     end
   end
 
-  def build_install_tar
+  def create_tar
     unless File.directory?(build_path)
       raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
     end
@@ -189,15 +191,13 @@ class Hurl
     system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/disgorge.env && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
   end
 
-  def run(build_ac, send_upload = true)
+  def run(build_ac)
     if build_ac
-      get_source
-      build_install_tar
+      get_source      if @get_source
+      create_tar      if @do_create_tar
     end
-    if send_upload || @do_upload || @do_disgorge
-      hurl          if @do_upload
-      disgorge      if @do_disgorge
-    end
+    hurl            if @do_upload
+    disgorge        if @do_disgorge
 
   rescue Exception => e
     puts e.message
