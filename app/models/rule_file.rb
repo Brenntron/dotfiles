@@ -128,6 +128,20 @@ class RuleFile
     Rails.logger.debug commit_out
   end
 
+  def self.commit_docs(rules)
+    rules.each do |rule|
+      if rule.rule_doc
+        rule.rule_doc.commit_doc(username)
+        rule.update(publish_status: Rule::PUBLISH_STATUS_SYNCHED,
+                    edit_status: Rule::EDIT_STATUS_SYNCHED,
+                    state: 'UNCHANGED')
+      end
+    end
+
+  rescue
+    Rails.logger.error("Rule.commit_docs exception #{$!}")
+  end
+
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_new_rule(bug, rule)
