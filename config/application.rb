@@ -63,7 +63,7 @@ module Api
         config.canvas_root = Rails.root.join('extras')
         config.perl_cmd = "/usr/local/bin/perl"
         config.svn_cmd = "/usr/local/bin/svn"
-        config.svn_pwd = "qHa8Wvz9cKcu!"
+        config.svn_pwd = ''
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "production"
@@ -77,6 +77,7 @@ module Api
         config.canvas_root = Rails.root.join('extras') # this may need updating for production depending on where we access CANVAS_CATALOG
         config.perl_cmd = "/usr/local/bin/perl"
         config.svn_cmd = "/usr/local/bin/svn"
+        config.svn_pwd = ''
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "test"
