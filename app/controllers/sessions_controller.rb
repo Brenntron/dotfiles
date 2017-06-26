@@ -26,10 +26,18 @@ class SessionsController < ApplicationController
   private
 
   def invalid_login_attempt(error_message)
+    logger.error(error_message)
+    logger.error(error_message.backtrace[0])
+    logger.error(error_message.backtrace[1])
+    logger.error(error_message.backtrace[2])
     warden.custom_failure!
     render :json => {:errors => ["#{error_message}"]}, :success => false, :status => :unauthorized
   end
   def system_not_ready(error_message)
+    logger.error(error_message)
+    logger.error(error_message.backtrace[0])
+    logger.error(error_message.backtrace[1])
+    logger.error(error_message.backtrace[2])
     render json:  {errors: ["#{error_message}"]}, success: false, status: 533
   end
 end

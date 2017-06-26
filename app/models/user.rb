@@ -222,19 +222,15 @@ class User < ApplicationRecord
 
   def self.login_user(params, request)
     begin
-      # we need to get the bugzilla user email by looking up the keerberos login Email using request.env['REMOTE_USER']
-      xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-      xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc),
-                            Rails.configuration.ember_app[:bugzilla_login],
-                            Rails.configuration.ember_app[:bugzilla_key])
-
       user = from_request(params, request)
       user.confirmed = 'true'
       user.updated_at = Time.now
       user.ensure_authentication_token # make sure the user has a token generated
       raise Exception.new('Error signing in. Please contact the administrator.') unless user.save
 
-      LoginSession.new(user, xmlrpc)
+      login_session = LoginSession.new(user)
+      login_session.bugzilla_login
+      login_session
     end
   end
 end

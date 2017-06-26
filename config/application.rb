@@ -40,7 +40,6 @@ module Api
     case Rails.env
       when "development"
         config.ruletest_server = "https://localhost:3000/api_test"
-        config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')
@@ -54,7 +53,6 @@ module Api
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "staging"
         config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
-        config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
@@ -68,7 +66,6 @@ module Api
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "production"
         config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
-        config.bugzilla_host = 'bugzilla.vrt.sourcefire.com'
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
@@ -81,7 +78,6 @@ module Api
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "test"
         config.ruletest_server = "https://localhost:3000/api_test"
-        config.bugzilla_host = 'bugzillaTest02.vrt.sourcefire.com'
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')

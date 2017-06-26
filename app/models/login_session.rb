@@ -1,15 +1,9 @@
 class LoginSession
-  attr_reader :success, :user, :xmlrpc_token, :timestamp
+  attr_reader :user, :xmlrpc, :xmlrpc_token, :timestamp
 
-  def initialize(user, xmlrpc, success = true)
-    @success = success
+  def initialize(user)
     @user = user
-    @xmlrpc_token = xmlrpc.token
     @timestamp = Time.now
-  end
-
-  def success?
-    @success
   end
 
   def self.session_version
@@ -56,6 +50,33 @@ class LoginSession
 
   def user_display_name
     user.display_name
+  end
+
+  def bugzilla_login
+    bugzilla_username = Rails.configuration.bugzilla_username
+    bugzilla_password = Rails.configuration.bugzilla_password
+    if bugzilla_username && bugzilla_password
+      @xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+      @xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc),
+                             bugzilla_username,
+                             bugzilla_password)
+      @xmlrpc_token = @xmlrpc.token
+    else
+      Rails.logger.error("Missing bugzilla_username or bugzilla_password.")
+      raise "Missing bugzilla_username or bugzilla_password."
+    end
+  end
+
+  def bugzilla_success?
+    !!(@xmlrpc && @xmlrpc.token)
+  end
+
+  def success?
+    bugzilla_success?
+  end
+
+  def success
+    success?
   end
 
   def set_session(session)
