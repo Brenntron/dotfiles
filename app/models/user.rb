@@ -185,7 +185,7 @@ class User < ApplicationRecord
           else
             nil
         end
-    remote_user.sub!(/@.*\z/, '')
+    remote_user = remote_user.sub(/@.*\z/, '')
     raise Exception.new('You are not logged into Kerberos. Please try again.') unless remote_user
 
     user_email =
