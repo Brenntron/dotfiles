@@ -36,8 +36,9 @@ class Hurl
     puts "Valid flags are"
     puts "--help             this message"
     puts "--deployment       build tar file for deployment"
+    puts "--development      build tar file for development and install it on the test/dev host"
     puts "--no-build         skip building new tar file, use exisiting one"
-    puts "--no-assets        skip precompiling assets"
+    puts "--[no-]assets      [skip] precompile assets"
     puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
     puts "--no-upload        app will be built but they will be prevented from being sent to the server"
     puts "--no-disgorge      app will not be expanded on the server"
@@ -45,6 +46,7 @@ class Hurl
   end
 
   def set_defaults
+    @env                = nil
     @build_base         = '../releases'
     @get_source         = true
     @do_create_tar      = true
@@ -66,6 +68,8 @@ class Hurl
           @do_create_tar      = false
         when "--vendor-bundle"
           @do_vendor_bundle   = true
+        when "--assets"
+          @precompile_assets  = true
         when "--no-assets"
           @precompile_assets  = false
         when "--no-upload"
@@ -73,6 +77,15 @@ class Hurl
         when "--no-disgorge"
           @do_disgorge = false
         when "--deployment"
+          @env                = 'deployment.env'
+          @get_source         = true
+          @do_vendor_bundle   = false
+          @precompile_assets  = false
+          @do_create_tar      = true
+          # @bundler_version    = '_1.15.1_'
+          @bundler_version    = '_1.14.6_'
+        when "--development"
+          @env                = 'development.env'
           @get_source         = true
           @do_vendor_bundle   = false
           @precompile_assets  = false
@@ -199,7 +212,11 @@ class Hurl
   end
 
   def disgorge
-    system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/disgorge.env && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+    if @env
+      system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/#{@env} && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+    else
+      system "ssh rulesuitest.vrt.sourcefire.com '#{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+    end
   end
 
   def run

@@ -64,15 +64,22 @@ if [ "SKIP" != "$SHARED" ]; then
     echo '* using shared files and directories'
 
     rm -rf extras/ssh
-    ln -s $SHAREDDIR/.ssh extras/ssh
+    ln -s $SHAREDDIR/ssh extras/ssh
 
     rm -rf log
     ln -s $SHAREDDIR/log .
-    for file in log/*; do echo "--- Release $RELDIR $TAGDIR" >> $file; done
+    if [ -f log/staging.log ]; then
+        echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
+    fi
+    if [ -f log/development.log ]; then
+        echo "--- Release $RELDIR $TAGDIR" >> log/development.log
+    fi
+
 
     cp $SHAREDDIR/config/database.yml config
+    cp $SHAREDDIR/config/secrets.yml config
 
-    ln -s $SHAREDDIR/.env .
+    #ln -s $SHAREDDIR/.env .
 fi
 
 echo '* bundle package'
@@ -93,13 +100,16 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
     echo '* svn working folders'
     rm -rf $RELPATH/$TAGDIR/extras/working
     svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/working/snort-rules
-    if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
-        svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
-    fi
+    #if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
+    #    svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
+    #fi
+    ln -s $SHAREDDIR/extras/snort extras/snort
+
+    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ $RELPATH/$TAGDIR/extras/rulesdocs
 fi
 
 if [ "" != "$CURRDIR" ]; then
-    echo '* Simlink to $RAILS_ROOT'
+    echo "* Simlink $CURRDIR to $RELPATH/$TAGDIR"
     rm $CURRDIR
     ln -s $RELPATH/$TAGDIR $CURRDIR
     cd $CURRDIR

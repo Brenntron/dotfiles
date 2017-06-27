@@ -2,9 +2,9 @@
 development:
   adapter: mysql2
   encoding: utf8
-  database: ac_dev
+  database: username_ac_dev
   username: root
-  host: localhost
+  password: Opensnort
 
 
 # Warning: The database defined as "test" will be erased and
@@ -13,9 +13,9 @@ development:
 test: &test
   adapter: mysql2
   encoding: utf8
-  database: ac_test
+  database: username_ac_test
   username: root
-  host: localhost
+  password: Opensnort
 
 staging:
   adapter: mysql2
@@ -23,15 +23,9 @@ staging:
   host: localhost
   database: analyst_console_staging
   username: root
-  password: KeepSecret
-
-production:
-  adapter: mysql2
   encoding: utf8
-  host: localhost
-  database: analyst_console
-  username: root
-  password: KeepSecret
+  password: Opensnort
 
 cucumber:
   <<: *test
+

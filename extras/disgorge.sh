@@ -61,7 +61,12 @@ ln -s $SHAREDDIR/.ssh extras/ssh
 
 rm -rf log
 ln -s $SHAREDDIR/log .
-for file in log/*; do echo "--- Release $RELDIR $TAGDIR" >> $file; done
+if [ -f log/staging.log ]; then
+    echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
+fi
+if [ -f log/development.log ]; then
+    echo "--- Release $RELDIR $TAGDIR" >> log/development.log
+fi
 
 cp $SHAREDDIR/config/database.yml config
 
