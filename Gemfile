@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '5.0.1'
+gem 'rails', '5.1.0'
 gem 'haml', '5.0.1'
 
 gem 'grape', '0.19.0'
@@ -31,7 +31,8 @@ gem 'curb', '0.9.3' #Libcurl bindings for Ruby
 
 gem 'net-ssh', '4.1.0'
 gem 'daemons', '1.2.4'
-gem 'activemessaging', '0.13.1.2', path: './vendor/gems/activemessaging'
+# gem 'activemessaging', '0.13.1.2', path: './vendor/gems/activemessaging'
+gem 'activemessaging', '0.13.1.2'    #, path: './vendor/gems/activemessaging'
 gem 'stomp', '1.4.3'
 gem 'dalli', '2.6.4'
 gem 'pry', '0.9.12.4'

@@ -18,10 +18,10 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    user_from_reqeust = User.from_request(params, request)
+    user_from_request = User.from_request(params, request)
 
-    if LoginSession.yet_active?(session, user_from_reqeust.email)
-      @current_user ||= user_from_reqeust
+    if LoginSession.yet_active?(session, user_from_request.email)
+      @current_user ||= user_from_request
     else
       # force re-authentication
       nil

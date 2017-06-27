@@ -122,10 +122,10 @@ class Rule < ApplicationRecord
   def test_rule_content
     rule_string = on_rule_content
     if new_rule?
-      rule_string.gsub!(/\)\s*\z/, " gid:#{self.gid || 1};)") unless /gid:\s*\d+\s*;/ =~ rule_string
+      rule_string = rule_string.gsub(/\)\s*\z/, " gid:#{self.gid || 1};)") unless /gid:\s*\d+\s*;/ =~ rule_string
       new_sid = id + SnortLocalRulesResultProcessor::NEW_RULE_ID_BIAS
-      rule_string.gsub!(/\)\s*\z/, " sid:#{new_sid};)") unless /sid:\s*\d+\s*;/ =~ rule_string
-      rule_string.gsub!(/\)\s*\z/, " rev:1;)") unless /rev:\s*\d+\s*;/ =~ rule_string
+      rule_string = rule_string.gsub(/\)\s*\z/, " sid:#{new_sid};)") unless /sid:\s*\d+\s*;/ =~ rule_string
+      rule_string = rule_string.gsub(/\)\s*\z/, " rev:1;)") unless /rev:\s*\d+\s*;/ =~ rule_string
     end
     rule_string
   end
@@ -217,7 +217,7 @@ class Rule < ApplicationRecord
 
   def associate_references(rule_content)
     references_ary = []
-    rule_content.split(';').each { |r| references_ary << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
+    rule_content.split(';').each { |r| references_ary << r.strip.gsub('reference:', '') if r.match(/reference\W*:/) }
 
     self.references.delete_all
     references_ary.each do |r|
@@ -234,7 +234,7 @@ class Rule < ApplicationRecord
     current_references = []
     references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
     references = []
-    rule_content.split(';').each { |r| references << r.strip.gsub!('reference:', '') if r.match(/reference\W*:/) }
+    rule_content.split(';').each { |r| references << r.strip.gsub('reference:', '') if r.match(/reference\W*:/) }
     references.each do |r|
       # skip this reference if it already exists
       if current_references.include? r
