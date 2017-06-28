@@ -1,4 +1,4 @@
-# Disgorge
+# Analyst Console Deployment
 
 This system, hurl and disgorge, will build the Analyst Console project
 on a remote UNIX host.
