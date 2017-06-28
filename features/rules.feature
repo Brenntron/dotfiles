@@ -239,8 +239,8 @@ Feature: Rules
     And  I wait for "8" seconds
     Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
-    And  I should see a rule row with class "failed" and version "new_rule"
-    And  I should see a rule with state "INCOMPLETE" version "new_rule"
+    And  I should see a rule row with class "incomplete-unparsed" and version "new_rule"
+    And  I should see a rule with state "NEW" version "new_rule"
 #    And rule "11" is a new rule
     And  I should see "BLACKLIST test *.msg"
 
