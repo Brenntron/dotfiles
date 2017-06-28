@@ -104,7 +104,7 @@ Then (/^a rule record for rule gid "(.*)" sid "(.*)" will exist$/) do |gid, sid|
 end
 
 Then(/^I should see a rule with state "(.*)" version "(.*)"$/) do |state, version|
-  page.find(:xpath, "//td[text()='#{state}']")
+  page.find(:xpath, "//td//div[text()='#{state}']")
   page.find(:xpath, "//td//*[normalize-space(text())='#{version}']")
 end
 
