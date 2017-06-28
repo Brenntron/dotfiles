@@ -1,37 +1,40 @@
 # Disgorge
 
-This system, hurl and disgorge, build the Analyst Console project
+This system, hurl and disgorge, will build the Analyst Console project
 on a remote UNIX host.
 
-The original design was for the following two purposes:
-1.  To build a tar file of the Analyst Console image to install in a FreeBSD package for production deployment.
-2.  To install the source code into the remote dev/test environment.
+The original design was built for the following two purposes:
+
+  1.  To build a tar file of the Analyst Console image to install in a FreeBSD package for production deployment.
+  2.  To install the source code into the remote dev/test environment.
 
 
 ## System
 This is a system between hurl and disgorge.
 
 ### Hurl
-The hurl part is a ruby script which runs on the development environment, such as a laptop.
+The hurl part is a ruby script which runs on the local development environment, such as a laptop.
 The hurl script `extras/hurl.rb` will:
-1.  Check out source code from our internal github server.
-2.  Tar the files into a tar file.
-3.  Copy (hurl) the tar file onto the remote host.
-4.  Kick off the disgorge process on the remote host.
+
+  1.  Check out source code from our internal github server.
+  2.  Tar the files into a tar file.
+  3.  Copy (hurl) the tar file onto the remote host.
+  4.  Kick off the disgorge process on the remote host.
 
 ### Disgorge
 The disgorge part is a shell script which must reside on the remote host to install and build the project image on that host.
 The disgorge script `extras/disgorge.sh` will (in some cases optionally):
-1.  Create a working or destination directory specific to the release version.
-2.  Untar the tar file of the source.
-3.  Set up symbolic links to shared files.
-4.  bundle package
-5.  bundle install
-6.  Run the database schema migrations.
-7.  Precompile assets.
-8.  Initialize the subversion working directories for Analyst Console.
-9.  Create a symbolic link to the version installed.
-10. Retar the file image to be delivered in order to build the package for a production release.
+
+  1.  Create a working or destination directory specific to the release version.
+  2.  Untar the tar file of the source.
+  3.  Set up symbolic links to shared files.
+  4.  bundle package
+  5.  bundle install
+  6.  Run the database schema migrations.
+  7.  Precompile assets.
+  8.  Initialize the subversion working directories for Analyst Console.
+  9.  Create a symbolic link to the version installed.
+  10. Retar the file image to be delivered in order to build the package for a production release.
 
 
 
@@ -44,6 +47,34 @@ Follow the instructions in the section below.
 Also, by default, hurl assumes you have a `../releases` directory
 *(reative to the current working directory when you run hurl)*
 for it to work in.
+
+## Disgorge Backend Setup
+To set up the remote dev web server do the following:
+
+  1.  Copy the contents of the extras/disgorge directory to ~/disgorge
+
+        cd extras
+        tar czvf disgorge.tar.gz extras/disgorge
+        scp disgorge.tar.gz rulesuitest.vrt.sourcefire.com:.
+        ssh rulesuitest.vrt.sourcefire.com
+        tar xvf disgorge.tar.gz
+        
+  2.  Rename database in database.yml
+
+        vi ~/disgorge/shared/config/database.yml
+
+    
+  3.  Edit the shared/.env file with appropriate values
+
+        vi ~/disgorge/shared/.env
+        
+  4.  Fill in secret_key_base
+
+        vi ~/disgorge/shared/config/secrets.yml
+
+  5.  Put the ca.pem file in shared/ssh (you may need to scp it to the server first)
+
+        cp ca.pem ~/disgorge/shared/ssh
 
 
 ### For Deployment
@@ -106,31 +137,3 @@ Additional optional steps:
     for the vendor/bundle directory to be included in the tar for upload to the remote host
     with the `--vendor-bundle` switch.
 
-
-## Disgorge Backend Setup
-To set up the remote dev web server do the following:
-
-1.  Copy the contents of the extras/disgorge directory to ~/disgorge
-
-        cd extras
-        tar czvf disgorge.tar.gz extras/disgorge
-        scp disgorge.tar.gz rulesuitest.vrt.sourcefire.com:.
-        ssh rulesuitest.vrt.sourcefire.com
-        tar xvf disgorge.tar.gz
-        
-2.  Replace username in database.yml
-
-        vi ~/disgorge/shared/config/database.yml
-
-    
-3.  Edit the shared/.env file with appropriate values
-
-        vi ~/disgorge/shared/.env
-        
-4.  Fill in secret_key_base
-
-        vi ~/disgorge/shared/config/secrets.yml
-
-5.  Put the ca.pem file in shared/ssh
-
-        cp ca.pem ~/disgorge/shared/ssh
