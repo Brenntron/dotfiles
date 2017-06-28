@@ -188,9 +188,6 @@ class Hurl
     puts "* package the gems into vendor/cache"
     system "cd #{build_path}; rm Gemfile.lock; bundle #{@bundler_version} install --without development test"
     system "cd #{build_path} && bundle #{@bundler_version} package --frozen --all"
-    puts "* copying libv8 to cache folder this is needed on the server"
-    system "cp #{build_path}/vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem #{build_path}/vendor/cache"
-    # system "cd #{build_path} && bundle #{@bundler_version} install --standalone --deployment --frozen"
 
     if precompile_assets?
       puts "* compile assets"
@@ -208,6 +205,7 @@ class Hurl
   end
 
   def hurl
+    puts "* hurling tar to remote system."
     system "scp #{build_base}/#{tag_dir}.tar.gz rulesuitest.vrt.sourcefire.com:#{scp_path(tag_dir)}"
   end
 

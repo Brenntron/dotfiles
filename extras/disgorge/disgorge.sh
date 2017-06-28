@@ -83,6 +83,8 @@ if [ "SKIP" != "$SHARED" ]; then
 fi
 
 echo '* bundle package'
+cp vendor/gems/activemessaging/activemessaging-*.gem vendor/cache
+cp vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem vendor/cache
 bundle _1.14.6_ package --frozen --path vendor/bundle
 
 echo '* bundle install'
