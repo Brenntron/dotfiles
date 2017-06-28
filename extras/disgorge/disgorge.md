@@ -5,7 +5,7 @@ on a remote UNIX host.
 
 The original design was for the following two purposes:
 1.  To build a tar file of the Analyst Console image to install in a FreeBSD package for production deployment.
-2.  To install the source code into the remove dev/test environment.
+2.  To install the source code into the remote dev/test environment.
 
 
 ## System
@@ -16,7 +16,7 @@ The hurl part is a ruby script which runs on the development environment, such a
 The hurl script `extras/hurl.rb` will:
 1.  Check out source code from our internal github server.
 2.  Tar the files into a tar file.
-3.  Copy the tar file onto the remote host.
+3.  Copy (hurl) the tar file onto the remote host.
 4.  Kick off the disgorge process on the remote host.
 
 ### Disgorge
@@ -54,8 +54,8 @@ run hurl with the --deployment switch.
 
 This will get the source code from git,
 and build the tar file needed to deliver for building the FreeBSD package.
-The system will use rulestestui as a build machine
-and leave the resulting tar file on ruesstestui.
+The system will use rulesuitest as a build machine
+and leave the resulting tar file on rulesuitest.
 
 Notice that the directory tree image of Analyst Console in the resulting tar file
 will omit certain directories, as intended for the port which builds the FreeBSD package.
@@ -110,7 +110,7 @@ Additional optional steps:
 ## Disgorge Backend Setup
 To set up the remote dev web server do the following:
 
-1.  Copy the contents of the extras/disgorge dirtory to ~/disgorge
+1.  Copy the contents of the extras/disgorge directory to ~/disgorge
 
         cd extras
         tar czvf disgorge.tar.gz extras/disgorge
