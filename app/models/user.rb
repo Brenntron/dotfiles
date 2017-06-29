@@ -176,8 +176,6 @@ class User < ApplicationRecord
   def self.from_request(params, request)
     remote_user =
         case
-          when params[:kerberos_login]
-            params[:kerberos_login]
           when request.env['REMOTE_USER']
             request.env['REMOTE_USER']
           when Rails.configuration.ember_app[:remote_user]
@@ -185,8 +183,8 @@ class User < ApplicationRecord
           else
             nil
         end
-    remote_user = remote_user.sub(/@.*\z/, '')
     raise Exception.new('You are not logged into Kerberos. Please try again.') unless remote_user
+    remote_user = remote_user.sub(/@.*\z/, '')
 
     user_email =
       case
