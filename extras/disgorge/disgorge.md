@@ -48,7 +48,7 @@ Also, by default, hurl assumes you have a `../releases` directory
 *(reative to the current working directory when you run hurl)*
 for it to work in.
 
-## Disgorge Backend Setup
+### Disgorge Backend Setup
 To set up the remote dev web server do the following:
 
   1.  Copy the contents of the extras/disgorge directory to ~/disgorge
