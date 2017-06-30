@@ -95,6 +95,10 @@ class RuleDoc < ApplicationRecord
     references.map{|ref| ref.reference_data}
   end
 
+  def policies_array
+    policies.present? ? [ policies ] : []
+  end
+
   def nested
     {
         "Summary" => summary,
@@ -107,6 +111,8 @@ class RuleDoc < ApplicationRecord
         "Corrective Action" => corrective_action_array,
         "Contributors" => contributors_array,
         "Additional References" => reference_data_array,
+        "Policies" => policies_array,
+        "Community" => is_community
     }
   end
 
@@ -122,6 +128,8 @@ class RuleDoc < ApplicationRecord
     self.false_negatives = data["False Negatives"]
     self.corrective_action = data["Corrective Action"].join(' ')
     self.contributors = data["Contributors"].join(' ')
+    self.policies = data["Policies"].join(' ')
+    self.is_community = data["Community"]
     self
   end
 
@@ -159,6 +167,38 @@ class RuleDoc < ApplicationRecord
     fetch_from_repo
     assign_from_json(read_from_file)
     save!
+  end
+
+
+  #prepare_rule_doc_hash rule doc by translating certain information from rule to rule doc for persistence
+  #right now this is all #metadata driven, so if that's empty, just stop here and return the hash
+  #explicity set community to false, since the only way community can be true is if it exists in metadata
+  #peel policy strings from the metadata comma-delimited list; accumulate in policies variable
+  #find ruleset community? If so, now it can explicity be set to true.
+  #set rule_set.policies to the accumulated policies and then return hash
+  #rule_doc must be a hash at this time, in the future it will probably be able to support AR objects
+  def self.prepare_rule_doc_hash(rule_doc, rule)
+    policies = []
+    metadata = rule.metadata
+
+    return rule_doc if metadata.blank?
+    raise "rule_doc must be a hash, not an active record object" if !rule_doc.kind_of?(Hash)
+
+    rule_doc[:is_community] = false
+
+    metadata.split(",").each do |token|
+      if token.include?("policy")
+        policies << token.gsub("policy", "").strip
+      end
+
+      if token.strip == "ruleset community"
+        rule_doc[:is_community] = true
+      end
+    end
+
+    rule_doc[:policies] = policies.join(", ")
+
+    rule_doc
   end
 end
 

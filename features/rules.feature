@@ -646,6 +646,35 @@ Feature: Rules
     Then a rule doc column "summary" should equal "" in the database
     Then a rule doc column "contributors" should equal "Cisco's Talos Intelligence Group " in the database
 
+  @javascript
+  Scenario: When a new rule is created, the rule doc will populate with the rule's policies and ruleset community
+    Given a user with role "analyst" exists and is logged in
+    And the current user has the following "open_bug":
+      |  id  |
+      | 2222 |
+    And a "BLACKLIST" rule category exists
+    And I wait for "3" seconds
+    When  I goto "/bugs/2222"
+    And  I click the "Rules" tab
+    And  I click button "create"
+    And  I click "use standard form"
+
+    And  I select "BLACKLIST" from "rule_category_id"
+    When I fill in "std-form-message" with "Test msg"
+    And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;http_header;"
+    And  I select "attempted-user" from "rule[class_type]"
+    And  I select "$SSH_SERVERS" from "std-form-src"
+    And  I fill in "flow_src_ports" with "$SSH_PORTS"
+    And  I fill in "flow_dst_server" with "$SSH_SERVERS"
+    And  I fill in "flow_dst_ports" with "$SSH_PORTS"
+    And  I check "security-ips"
+    And  I check "max-detect-ips"
+    And  I check "new-rule-metadata-ruleset"
+
+    And  I click "Create Rule"
+    And  I wait for "5" seconds
+    Then a rule doc column "policies" should equal "security-ips drop, max-detect-ips drop" in the database
+    Then a rule doc column "is_community" should equal "true" in the database
 
 
   # ==== Editing rule docs ===
