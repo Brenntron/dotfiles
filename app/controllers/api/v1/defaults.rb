@@ -22,7 +22,7 @@ module API
           end
 
           def authenticated
-            kerb_auth = request.env['REMOTE_USER'] ||  Rails.configuration.ember_app[:remote_user]
+            kerb_auth = request.env['REMOTE_USER'] ||  Rails.configuration.backend_auth[:default_remote_user]
             access_token = request.headers['Token'] #we just want to use headers and not url parameters
             return true if warden.authenticated?
             @user = User.where("authentication_token = ?", access_token).first

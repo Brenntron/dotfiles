@@ -178,8 +178,8 @@ class User < ApplicationRecord
         case
           when request.env['REMOTE_USER']
             request.env['REMOTE_USER']
-          when Rails.configuration.ember_app[:remote_user]
-            Rails.configuration.ember_app[:remote_user]
+          when Rails.configuration.backend_auth[:default_remote_user]
+            Rails.configuration.backend_auth[:default_remote_user]
           else
             nil
         end
