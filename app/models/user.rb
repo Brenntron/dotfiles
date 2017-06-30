@@ -222,10 +222,12 @@ class User < ApplicationRecord
   def self.login_user(params, request)
     begin
       user = from_request(params, request)
-      user.confirmed = 'true'
-      user.updated_at = Time.now
-      user.ensure_authentication_token # make sure the user has a token generated
-      raise Exception.new('Error signing in. Please contact the administrator.') unless user.save
+      if user
+        user.confirmed = 'true'
+        user.updated_at = Time.now
+        user.ensure_authentication_token # make sure the user has a token generated
+      end
+      raise Exception.new('Error signing in. Please contact the administrator.') unless user&.save
 
       login_session = LoginSession.new(user)
       login_session.bugzilla_login

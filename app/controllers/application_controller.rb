@@ -14,13 +14,13 @@ class ApplicationController < ActionController::Base
   def bugzilla_session()
     xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
     xmlrpc.token = request.headers['Xmlrpc-Token'] ? request.headers['Xmlrpc-Token'] : xml_token
-    return xmlrpc
+    xmlrpc
   end
 
   def current_user
     user_from_request = User.from_request(params, request)
 
-    if LoginSession.yet_active?(session, user_from_request.email)
+    if LoginSession.yet_active?(session, user_from_request&.email)
       @current_user ||= user_from_request
     else
       # force re-authentication
