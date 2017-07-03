@@ -17,7 +17,7 @@ class LoginSession
     case
       when session[:email].nil?
         false
-      when email != session[:email]
+      when email && (email != session[:email])
         false
       when session_version != session[:session_version]
         false

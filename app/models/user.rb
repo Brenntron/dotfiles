@@ -176,17 +176,15 @@ class User < ApplicationRecord
   def self.from_request(params, request)
     remote_user =
         case
-          when params[:kerberos_login]
-            params[:kerberos_login]
           when request.env['REMOTE_USER']
             request.env['REMOTE_USER']
-          when Rails.configuration.ember_app[:remote_user]
-            Rails.configuration.ember_app[:remote_user]
+          when Rails.configuration.backend_auth[:default_remote_user]
+            Rails.configuration.backend_auth[:default_remote_user]
           else
             nil
         end
-    remote_user = remote_user.sub(/@.*\z/, '')
     raise Exception.new('You are not logged into Kerberos. Please try again.') unless remote_user
+    remote_user = remote_user.sub(/@.*\z/, '')
 
     user_email =
       case
@@ -224,10 +222,12 @@ class User < ApplicationRecord
   def self.login_user(params, request)
     begin
       user = from_request(params, request)
-      user.confirmed = 'true'
-      user.updated_at = Time.now
-      user.ensure_authentication_token # make sure the user has a token generated
-      raise Exception.new('Error signing in. Please contact the administrator.') unless user.save
+      if user
+        user.confirmed = 'true'
+        user.updated_at = Time.now
+        user.ensure_authentication_token # make sure the user has a token generated
+      end
+      raise Exception.new('Error signing in. Please contact the administrator.') unless user&.save
 
       login_session = LoginSession.new(user)
       login_session.bugzilla_login
