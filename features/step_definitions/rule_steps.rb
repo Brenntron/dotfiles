@@ -185,5 +185,5 @@ Then(/^a rule gid "(\d*)" and sid "(\d*)" is off/) do |gid, sid|
 end
 Then(/^a rule doc column "(.*)" should equal "(.*)" in the database$/) do |column, value|
   rule = RuleDoc.all.first
-  expect(rule.send(column.to_sym)).to eql(value)
+  expect(rule.send(column.to_sym).to_s).to eql(value)
 end

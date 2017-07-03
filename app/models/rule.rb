@@ -719,6 +719,11 @@ class Rule < ApplicationRecord
       end
 
       rule.associate_references(rule_content)
+
+      if rule_doc.present?
+        rule_doc = RuleDoc.prepare_rule_doc_hash(rule_doc, rule)
+      end
+
       rule.create_rule_doc(rule_doc)
     end
   end
@@ -732,6 +737,11 @@ class Rule < ApplicationRecord
         bug.rules << rule if bug
       end
       rule.associate_references(rule.rule_content)
+
+      if rule_doc.present?
+        rule_doc = RuleDoc.prepare_rule_doc_hash(rule_doc, rule)
+      end
+
       rule.create_rule_doc(rule_doc)
     end
   end
@@ -752,6 +762,11 @@ class Rule < ApplicationRecord
   def self.update_action(rule, rule_content, rule_doc = nil)
     Rule.save_rule_content(rule_content, rule.id).tap do |rule|
       rule.update_references(rule_content)
+
+      if rule_doc.present?
+        rule_doc = RuleDoc.prepare_rule_doc_hash(rule_doc, rule)
+      end
+
       if rule.rule_doc.present?
         rule.rule_doc.update(rule_doc)
       else
