@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-if [ "$#" -lt 1 ]; then
+if [[ $# -lt 1 ]]; then
     echo 'USAGE: disgorge.sh tar-file (RELDIR)'
     echo 'Script to uncompress web site source and install'
     echo ''
@@ -20,7 +20,7 @@ fi
 TARFILE=$1
 echo $TARFILE
 
-if [ "$#" -lt 2 ]; then
+if [[ $# -lt 2 ]]; then
     RELDIR=`date +%Y%m%d-%H%M%S`
 else
     RELDIR=$2
@@ -126,5 +126,4 @@ if [ "" != "$VERSION" ]; then
 
     bash -c "cd $RELPATH; mv $TAGDIR $VERSION; tar czf $VERSION.tar.gz $VERSION"
 fi
-
 
