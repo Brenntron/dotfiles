@@ -37,7 +37,7 @@ class BugsController < ApplicationController
   def show
     @bug = Bug.where(id: params[:id]).first
     if @bug
-      @rules = @bug.rules.sort { |a, b| a.sort_rules_by_state <=> b.sort_rules_by_state }
+      @rules = @bug.rules.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.all
       @pcap_attachments = []
       @other_attachments = []

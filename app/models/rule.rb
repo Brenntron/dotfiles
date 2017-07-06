@@ -581,24 +581,39 @@ class Rule < ApplicationRecord
     associate_references(rule_content_local)
   end
 
-  def sort_rules_by_state
+  def sort_state_ordinal
     case (state)
-    when INCOMPLETE_STATE
-      val = 0
-    when NEW_STATE
-      val = 1
-    when UPDATED_STATE
-      val = 2
-    when UNCHANGED_STATE
-      val = 3
-    when STALE_STATE
-      val = 4
-    when DELETED_STATE
-      val = 5
-    else
-      val = 3
+      when DELETED_STATE
+        val = 7
+      when INCOMPLETE_STATE
+        val = 1
+      when NEW_STATE
+        val = 2
+      when STALE_STATE
+        val = 3
+      when UPDATED_STATE
+        val = 4
+      when UNCHANGED_STATE
+        val = 6
+      else
+        val = 5
     end
     val
+  end
+
+  def <=> (rule)
+    case
+      when self.sort_state_ordinal != rule.sort_state_ordinal
+        self.sort_state_ordinal <=> rule.sort_state_ordinal
+      when self.sid && rule.sid
+        self.sid <=> rule.sid
+      when self.sid.nil?
+        -1
+      when rule.sid.nil?
+        1
+      else
+        self.id <=> rule.id
+    end
   end
 
   # Tests if rule is the current version in VC
