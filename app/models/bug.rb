@@ -377,12 +377,24 @@ class Bug < ApplicationRecord
                 end
                 comment = c['text'].strip
                 creation_time = c['creation_time'].to_time
-                Note.where(id: c['id']).first_or_create do |note|
-                                   note.author       = c['author'],
-                                   note.comment      = comment,
-                                   note.bug_id       = bug_id,
-                                   note.note_type    = note_type,
-                                   note.created_at   = creation_time
+                note = Note.where(id: c['id']).first
+                if note.present?
+                  note.update_attributes({
+                    author:     c['author'],
+		                comment:    comment,
+		                bug_id:     bug_id,
+                    note_type:  note_type,
+		                created_at: creation_time
+	                })
+                else
+                  Note.create({
+	                  id:         c['id'],
+                    author:     c['author'],
+                    comment:    comment,
+                    bug_id:     bug_id,
+                    note_type:  note_type,
+                    created_at: creation_time
+                  })
                 end
 
               end
@@ -568,14 +580,28 @@ class Bug < ApplicationRecord
 
                 comment = c['text'].strip
                 creation_time = c['creation_time'].to_time
-                Note.where(id: c['id']).first_or_create do |note|
-                                   note.id         = c['id'],
-                                   note.author     = c['author'],
-                                   note.comment    = comment,
-                                   note.bug_id     = bug_id,
-                                   note.note_type  = note_type,
-                                   note.created_at = creation_time
+
+		            note = Note.where(id: c['id']).first
+
+                if note.present?
+                  note.update_attributes({
+                    author:     c['author'],
+                    comment:    comment,
+                    bug_id:     bug_id,
+                    note_type:  note_type,
+                    created_at: creation_time
+	                })
+                else
+                  Note.create({
+                    id:         c['id'],
+                    author:     c['author'],
+                    comment:    comment,
+                    bug_id:     bug_id,
+                    note_type:  note_type,
+                    created_at: creation_time
+                  })
                 end
+
               end
             end
           end
