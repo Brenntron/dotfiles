@@ -48,6 +48,11 @@ Also, by default, hurl assumes you have a `../releases` directory
 *(reative to the current working directory when you run hurl)*
 for it to work in.
 
+Make sure to install the exact version of bundler 
+```
+gem install bundler -v 1.14.6
+```
+
 ### Disgorge Backend Setup
 To set up the remote dev web server do the following:
 
