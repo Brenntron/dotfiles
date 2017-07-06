@@ -5,7 +5,7 @@
 # In development and test, we don't use apache, and may need to set values
 # using UNIX environment variables.
 
-if Rails.env.development? || Rail.env.test?
+if Rails.env.development? || Rails.env.test?
   Rails.configuration.backend_auth = {
       default_remote_user: ENV['remote_user'],
       authenticate_email: ENV['authenticate_email'],

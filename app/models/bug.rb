@@ -549,25 +549,30 @@ class Bug < ApplicationRecord
 
         bug.research_notes ||= Note::TEMPLATE_RESEARCH
         unless new_comments.empty?
-          new_comments['bugs'].each do |comment|
-            bug_id = comment[0].to_i
-            comment[1]['comments'].each do |c|
-              if c['text'].downcase.strip.start_with?('commit')
-                note_type = 'committer'
-              elsif c['text'].start_with?('Created attachment')
-                note_type = 'attachment'
-              else
-                note_type = 'research'
+
+          ActiveRecord::Base.transaction do
+            new_comments['bugs'].each do |comment|
+              bug_id = comment[0].to_i
+              comment[1]['comments'].each do |c|
+                if c['text'].downcase.strip.start_with?('commit')
+                  note_type = 'committer'
+                elsif c['text'].start_with?('Created attachment')
+                  note_type = 'attachment'
+                else
+                  note_type = 'research'
+                end
+
+                comment = c['text'].strip
+                creation_time = c['creation_time'].to_time
+                Note.where(id: c['id']).first_or_create do |note|
+                                   note.id         = c['id'],
+                                   note.author     = c['author'],
+                                   note.comment    = comment,
+                                   note.bug_id     = bug_id,
+                                   note.note_type  = note_type,
+                                   note.created_at = creation_time
+                end
               end
-              comment = c['text'].strip
-              creation_time = c['creation_time'].to_time
-              note = Note.create(id: c['id'],
-                                 author: c['author'],
-                                 comment: comment,
-                                 bug_id: bug_id,
-                                 note_type: note_type,
-                                 created_at: creation_time)
-              bug.notes << note
             end
           end
         end
