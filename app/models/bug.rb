@@ -267,7 +267,7 @@ class Bug < ApplicationRecord
     while curr.empty? || (/\A\s*(?<sidexp>[\d,\-]+)\z/ =~ curr)
       unless curr.empty?
         if /(?<lo>\d+)-(?<hi>\d+)/ =~ sidexp
-          unless (0 >= lo) || (0 >= hi)
+          unless (0 >= lo.to_i) || (0 >= hi.to_i)
             sids += (lo.to_i..hi.to_i).to_a
           end
         else
