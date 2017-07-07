@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-if [ "$#" -lt 1 ]; then
+if [[ $# -lt 1 ]]; then
     echo 'USAGE: disgorge.sh tar-file (RELDIR)'
     echo 'Script to uncompress web site source and install'
     echo ''
@@ -20,7 +20,7 @@ fi
 TARFILE=$1
 echo $TARFILE
 
-if [ "$#" -lt 2 ]; then
+if [[ $# -lt 2 ]]; then
     RELDIR=`date +%Y%m%d-%H%M%S`
 else
     RELDIR=$2
@@ -44,50 +44,86 @@ if [ "" == "$SHAREDDIR" ]; then
     SHAREDDIR=$RELBASE/shared
 fi
 
-if [ "" == "$CURRDIR" ]; then
-    CURRDIR=$RELBASE/current
+#if [ "" == "$CURRDIR" ]; then
+#    CURRDIR=$RELBASE/current
+#fi
+#echo $CURRDIR
+if [ "" != "$CURRDIR" ]; then
+    echo $CURRDIR
 fi
-echo $CURRDIR
-
 
 
 
 echo ''
 echo '* Installing'
+echo $RELPATH
+echo $TAGDIR
 cd $RELPATH/$TAGDIR
 
-rm -rf extras/ssh
-ln -s $SHAREDDIR/.ssh extras/ssh
+if [ "SKIP" != "$SHARED" ]; then
+    echo '* using shared files and directories'
 
-rm -rf log
-ln -s $SHAREDDIR/log .
-for file in log/*; do echo "--- Release $RELDIR $TAGDIR" >> $file; done
+    rm -rf extras/ssh
+    ln -s $SHAREDDIR/ssh extras/ssh
 
-cp $SHAREDDIR/config/database.yml config
+    rm -rf log
+    ln -s $SHAREDDIR/log .
+    if [ -f log/staging.log ]; then
+        echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
+    fi
+    if [ -f log/development.log ]; then
+        echo "--- Release $RELDIR $TAGDIR" >> log/development.log
+    fi
 
-ln -s $SHAREDDIR/.env .
 
-#echo '* bundle package'
-#bundle _1.12.5_ package --frozen --without development test
+    cp $SHAREDDIR/config/database.yml config
+    cp $SHAREDDIR/config/secrets.yml config
 
-echo '* bundle install'
-bundle _1.12.5_ install --deployment --frozen --local --without development test
-
-echo '* migrations'
-bundle exec rake db:migrate
-
-#echo '* precompile assets'
-#bundle exec rake assets:precompile
-
-echo '* svn working folders'
-rm -rf $RELPATH/$TAGDIR/extras/working
-svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/working/snort-rules
-if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
-    svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
+    #ln -s $SHAREDDIR/.env .
 fi
 
-echo '* Simlink to $RAILS_ROOT'
-rm $CURRDIR
-ln -s $RELPATH/$TAGDIR $CURRDIR
-cd $CURRDIR
+echo '* bundle package'
+cp vendor/gems/activemessaging/activemessaging-*.gem vendor/cache
+cp vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem vendor/cache
+bundle _1.14.6_ package --frozen --path vendor/bundle
+
+echo '* bundle install'
+bundle _1.14.6_ install --deployment --frozen --local --path vendor/bundle --without development test
+
+if [ "SKIP" != "$MIGRATE" ]; then
+    echo '* migrations'
+    bundle exec rake db:migrate
+fi
+
+echo '* precompile assets'
+bundle exec rake assets:precompile
+
+if [ "SKIP" != "$SVN_WORKING" ]; then
+    echo '* svn working folders'
+    rm -rf $RELPATH/$TAGDIR/extras/working
+    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/working/snort-rules
+    #if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
+    #    svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
+    #fi
+    ln -s $SHAREDDIR/extras/snort extras/snort
+
+    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ $RELPATH/$TAGDIR/extras/rulesdocs
+fi
+
+if [ "" != "$CURRDIR" ]; then
+    echo "* Simlink $CURRDIR to $RELPATH/$TAGDIR"
+    rm $CURRDIR
+    ln -s $RELPATH/$TAGDIR $CURRDIR
+    cd $CURRDIR
+fi
+
+if [ "" != "$VERSION" ]; then
+    rm -rf tmp
+    #mkdir tmp
+    rm -rf log
+    rm config/database.yml
+    rm config/secrets.yml
+
+    bash -c "cd $RELPATH; mv $TAGDIR $VERSION; tar czf $VERSION.tar.gz $VERSION"
+fi
 

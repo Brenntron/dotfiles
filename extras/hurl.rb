@@ -29,9 +29,93 @@ require 'digest'
 class Hurl
   attr_reader :build_base
 
-  def initialize(args, build_base: '../releases')
+  def self.usage
+    puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
+    puts "This script deploys all the content in the API directory and the UI directory up to the server"
+    puts "============"
+    puts "Valid flags are"
+    puts "--help             this message"
+    puts "--deployment       build tar file for deployment"
+    puts "--development      build tar file for development and install it on the test/dev host"
+    puts "--no-build         skip building new tar file, use exisiting one"
+    puts "--[no-]assets      [skip] precompile assets"
+    puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
+    puts "--no-upload        app will be built but they will be prevented from being sent to the server"
+    puts "--no-disgorge      app will not be expanded on the server"
+    exit
+  end
+
+  def set_defaults
+    @env                = nil
+    @build_base         = '../releases'
+    @get_source         = true
+    @do_create_tar      = true
+    @do_vendor_bundle   = false
+    @precompile_assets  = true
+    @do_upload          = true
+    @do_disgorge        = true
+    # @bundler_version    = '_1.12.5_'
+    @bundler_version    = '_1.14.6_'
+  end
+
+  def scan_args(args)
+    args.inject([]) do |pos_args, arg|
+      case arg
+        when "-h", "--help"
+          self.class.usage
+        when "--no-build"
+          @get_source         = false
+          @do_create_tar      = false
+        when "--vendor-bundle"
+          @do_vendor_bundle   = true
+        when "--assets"
+          @precompile_assets  = true
+        when "--no-assets"
+          @precompile_assets  = false
+        when "--no-upload"
+          @do_upload = false
+        when "--no-disgorge"
+          @do_disgorge = false
+        when "--deployment"
+          @env                = 'deployment.env'
+          @get_source         = true
+          @do_vendor_bundle   = false
+          @precompile_assets  = false
+          @do_create_tar      = true
+          # @bundler_version    = '_1.15.1_'
+          @bundler_version    = '_1.14.6_'
+        when "--development"
+          @env                = 'development.env'
+          @get_source         = true
+          @do_vendor_bundle   = false
+          @precompile_assets  = false
+          @do_create_tar      = true
+          # @bundler_version    = '_1.15.1_'
+          @bundler_version    = '_1.14.6_'
+        when /\A-/
+          puts "One of your flags '#{arg}' is not valid. Ignored, use -h or --help"
+          self.class.usage
+        when /\A_.*_\z/
+          @bundler_version    = arg
+        else
+          pos_args << arg
+      end
+      pos_args
+    end
+  end
+
+  def initialize(args)
     @args = args
-    @build_base = build_base
+    set_defaults
+    @args_pos = scan_args(args)
+  end
+
+  def precompile_assets?
+    @precompile_assets
+  end
+
+  def vendor_bundle?
+    @do_vendor_bundle
   end
 
   def red(str)
@@ -46,7 +130,7 @@ class Hurl
   end
 
   def source_arg
-    @args[0] || current_git_branch
+    @args_pos[0] || current_git_branch
   end
 
   def use_tar?
@@ -96,44 +180,48 @@ class Hurl
     end
   end
 
-  def build_install_tar
+  def create_tar
     unless File.directory?(build_path)
       raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
     end
 
-    puts "* build the gems into vendor/bundle"
-    # system 'bundle install --deployment'
-    system "cd #{build_path} && bundle _1.12.5_ package --frozen --all"
-    puts "* copying libv8 to cache folder this is needed on the server"
-    system "cp #{build_path}/vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem #{build_path}/vendor/cache"
-    # system "cd #{build_path} && bundle _1.12.5_ install --standalone --deployment --frozen"
+    puts "* package the gems into vendor/cache"
+    system "cd #{build_path}; rm Gemfile.lock; bundle #{@bundler_version} install --without development test"
+    system "cd #{build_path} && bundle #{@bundler_version} package --frozen --all"
 
-    puts "* compile assets"
-    # Dir.chdir "../production"
-    system "cd #{build_path};bundle exec rake assets:precompile"
-    # Dir.chdir "../analyst-console"
+    if precompile_assets?
+      puts "* compile assets"
+      # Dir.chdir "../production"
+      system "cd #{build_path};bundle exec rake assets:precompile"
+      # Dir.chdir "../analyst-console"
+    end
 
-    puts "* tar up the contents of the production folder"
+    if vendor_bundle?
+      system "cd #{build_path} && bundle install --deployment --frozen --without development test"
+    end
+
+    puts "* tar up the contents of the production folder #{build_base}/#{tag_dir}.tar.gz"
     system "cd #{build_base} && tar -zcf #{tag_dir}.tar.gz #{tag_dir}"
   end
 
   def hurl
+    puts "* hurling tar to remote system."
     system "scp #{build_base}/#{tag_dir}.tar.gz rulesuitest.vrt.sourcefire.com:#{scp_path(tag_dir)}"
   end
 
   def disgorge
-    system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/disgorge.env && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+    if @env
+      system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/#{@env} && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+    else
+      system "ssh rulesuitest.vrt.sourcefire.com '#{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+    end
   end
 
-  def process_api(build_ac, send_upload)
-    if build_ac
-      get_source
-      build_install_tar
-    end
-    if send_upload
-      hurl
-      disgorge
-    end
+  def run
+    get_source      if @get_source
+    create_tar      if @do_create_tar
+    hurl            if @do_upload
+    disgorge        if @do_disgorge
 
   rescue Exception => e
     puts e.message
@@ -141,40 +229,6 @@ class Hurl
 end
 
 
-build_ac = true
-send_upload = true
-timestamp = 0
-
-args_pos = []
-ARGV.each do |arg|
-  case arg
-    when "--no-build"
-      build_ac = false
-    when "--no-upload"
-      send_upload = false
-    when "-h", "--help"
-      puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
-      puts "This script deploys all the content in the API directory and the UI directory up to the server"
-      puts "============"
-      puts "Valid flags are"
-      puts "--help             this message"
-      puts "--no-upload        apps will be built but they will be prevented from being sent to the server"
-      process_api = false
-      send_upload = false
-      break
-    when timestamp
-      puts "processing time stamp"
-    else
-      if 1 <= args_pos.length
-        puts "One of your flags '#{arg}' is not valid. Try again. use -h or --help"
-        build_ac = false
-        send_upload = false
-        break
-      else
-        args_pos << arg
-      end
-  end
-end
-
-Hurl.new(args_pos).process_api(build_ac, send_upload)
+hurl = Hurl.new(ARGV)
+hurl.run
 
