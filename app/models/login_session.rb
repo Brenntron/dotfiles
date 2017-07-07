@@ -55,14 +55,16 @@ class LoginSession
   def bugzilla_login
     bugzilla_username = Rails.configuration.bugzilla_username
     bugzilla_password = Rails.configuration.bugzilla_password
+    Rails.logger.info("bugzilla: Using username: #{bugzilla_username}")
     if bugzilla_username && bugzilla_password
       @xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       @xmlrpc.bugzilla_login(Bugzilla::User.new(xmlrpc),
                              bugzilla_username,
                              bugzilla_password)
+      Rails.logger.debug("bugzilla: Received xmlrpc token: #{@xmlrpc.token}")
       @xmlrpc_token = @xmlrpc.token
     else
-      Rails.logger.error("Missing bugzilla_username or bugzilla_password.")
+      Rails.logger.error("bugzilla: Missing bugzilla_username or bugzilla_password.")
       raise "Missing bugzilla_username or bugzilla_password."
     end
   end

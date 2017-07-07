@@ -84,6 +84,7 @@ module API
             xmlrpc_token = request.headers['Xmlrpc-Token']
 
             if xmlrpc_token
+              Rails.logger.debug("bugzilla: Importing bug: #{params[:id]}")
               begin
                 progress_bar = Event.create(user:current_user.display_name,action:"import_bug:#{params[:id]}",description:"#{request.headers["Token"]}",progress:1)
                 xmlrpc = Bugzilla::Bug.new(bugzilla_session)

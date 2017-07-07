@@ -13,7 +13,7 @@ button.back_btn {
 }
 .searchID{
     width:100%;
-    margin-botom: 10px;
+    margin-bottom: 10px;
 }
 /*.rule_state_blue{*/
 table#bug-rules-table tr.parsed.edited-rule td.rule_state_col {
@@ -42,7 +42,7 @@ table#bug-rules-table tr.parsed.stale-edit td.rule_state_col {
 div.progress{
     background-color: #80a9ba;
     width:100%;
-    margin-bottom: 0px;
+    margin-bottom: 0;
     margin-right:100px;
 }
 .progress_group{
@@ -115,7 +115,7 @@ div.progress{
     text-decoration: underline; }
 
 .modal-header {
-    padding:0px;
+    padding:0;
     border-bottom:1px solid #eee;
     background-color: #f2f2f2;
     -webkit-border-top-left-radius: 5px;
