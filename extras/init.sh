@@ -1,47 +1,29 @@
 #!/usr/bin/env bash
 
+. /usr/local/etc/analyst-console/processes.conf
+
 # Set the number of each you want run
 declare -A processes
 
-processes["poller"]=1
-processes["client_local"]=1
-processes["client_all"]=1
-processes["rules_updater"]=1	# Only run 1
-processes["committer"]=1		# Only run 1	
-processes["job_cleaner"]=1		# Only run 1
+processes["poller"]=${analyst_console_poller_num}
+processes["client_local"]=${analyst_console_client_local_num}
+processes["client_all"]=${analyst_console_client_all_num}
 
-if [ "$1" == "start" ]
-then
-	# Make sure we add the ssh key for cvs
-	ulimit -c 0
-	ssh-agent > tmp/ssh.script
-	source tmp/ssh.script
-	chmod 600 extras/ssh/id_rsa
-	ssh-add extras/ssh/id_rsa
-
-elif [ "$1" == "stop" ]
-then
-	source tmp/ssh.script
-	ssh-agent -k
-	rm tmp/ssh.script
-else
-	echo "Usage: $0 <start|stop>"
-	exit
-fi
+cd ${RAILS_ROOT}
 
 for process in ${!processes[@]}
 do
 	for x in $(seq 1 ${processes[$process]})
 	do
 	    echo "$1ing: $process"
-		bundle exec rails runner script/$process $1
+		                HOME=/var/log/analyst-console RAILS_ENV=production GEM_HOME=./vendor/bundle/ruby/2.3/gems ${PREFIX}/bin/bundle exec ./vendor/bundle/ruby/2.3/bin/rails runner script/$process $1
 
 		if [ $1 == "start" ]
 		then
 			sleep 1
 		else
-			rm tmp/$process.output
-			rm tmp/snort.pipe.*
+			/bin/rm tmp/$process.output
+			/bin/rm tmp/snort.pipe.*
 		fi
 	done
 done
