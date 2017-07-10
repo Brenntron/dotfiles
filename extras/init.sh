@@ -16,7 +16,7 @@ do
 	for x in $(seq 1 ${processes[$process]})
 	do
 	    echo "$1ing: $process"
-		                HOME=/var/log/analyst-console RAILS_ENV=production GEM_HOME=./vendor/bundle/ruby/2.3/gems ${PREFIX}/bin/bundle exec ./vendor/bundle/ruby/2.3/bin/rails runner script/$process $1
+		                HOME=/var/log/analyst-console RAILS_ENV=production GEM_HOME=${RAILS_ROOT}/vendor/bundle/ruby/2.3/gems ${PREFIX}/bin/bundle exec ${RAILS_ROOT}/vendor/bundle/ruby/2.3/bin/rails runner script/$process $1
 
 		if [ $1 == "start" ]
 		then
