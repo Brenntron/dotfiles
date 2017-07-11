@@ -168,7 +168,10 @@ class Hurl
   end
 
   def get_source
-    FileUtils.mkdir(build_base) unless File.directory?(build_base)
+    if File.directory?(build_base)
+      FileUtils.rmtree(build_base)
+    end
+    FileUtils.mkdir(build_base)
     if use_tar?
       puts "* untaring #{source_arg}"
       puts "tar -C #{build_base} -xf #{source_arg}"
