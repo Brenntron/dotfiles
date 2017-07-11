@@ -154,7 +154,7 @@ while message = client.receive
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
 
-      req.url = 'https://ruleapitest.vrt.sourcefire.com/pcaps'
+      req.url = "#{Rails.configuration.ruletest_server}/pcaps"
 
       # Should we upload the pcap
       req.body = Curl::PostField.file("pcap", pcap_path) #build the curl request
@@ -178,7 +178,7 @@ while message = client.receive
       raise Exception.new("No pcaps uploaded for testing")
     end
 
-    req.url = 'https://ruleapitest.vrt.sourcefire.com/jobs'
+    req.url = "#{Rails.configuration.ruletest_server}/jobs"
 
     # Create the new job
     puts "Creating persistent job"
@@ -197,7 +197,7 @@ while message = client.receive
     job_id = JSON.parse(resp.body)['id']
 
     # Wait for the job to finish
-    req.url = "https://ruleapitest.vrt.sourcefire.com/jobs/#{job_id}"
+    req.url = "#{Rails.configuration.ruletest_server}/jobs/#{job_id}"
 
     job = {}
 
@@ -226,11 +226,11 @@ while message = client.receive
                     puts "#{pcap_name}:"
 
                     # Fetch the associated pcap tests
-                    req.url = "https://ruleapitest.vrt.sourcefire.com/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
+                    req.url = "#{Rails.configuration.ruletest_server}/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
                     JSON.parse(HTTPI.get(req).body).each do |pt|
 
                       # Now fetch the alerts
-                      req.url = "https://ruleapitest.vrt.sourcefire.com/alerts?pcap_test_id=#{pt['id']}"
+                      req.url = "#{Rails.configuration.ruletest_server}/alerts?pcap_test_id=#{pt['id']}"
                       alerts = JSON.parse(HTTPI.get(req).body)
 
                       if alerts.size == 0
