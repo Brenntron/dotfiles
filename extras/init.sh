@@ -22,8 +22,8 @@ do
 		then
 			sleep 1
 		else
-			/bin/rm tmp/$process.output
-			/bin/rm tmp/snort.pipe.*
+			/bin/rm -f tmp/$process.output
+			/bin/rm -f tmp/snort.pipe.*
 		fi
 	done
 done
