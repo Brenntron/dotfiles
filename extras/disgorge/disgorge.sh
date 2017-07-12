@@ -121,7 +121,7 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
 fi
 
 if [ "" != "$CURRDIR" ]; then
-    echo "* Simlink $CURRDIR to $RELPATH/$TAGDIR"
+    echo "* simlink $CURRDIR to $RELPATH/$TAGDIR"
     rm $CURRDIR
     ln -s $RELPATH/$TAGDIR $CURRDIR
     cd $CURRDIR
@@ -140,6 +140,7 @@ if [ "" != "$VERSION" ]; then
        echo mv $TAGDIR $VERSION
        bash -c "cd $RELPATH; mv $TAGDIR $VERSION"
     fi
+    echo "* tar file = $VERSION.tar.gz"
     bash -c "cd $RELPATH; tar czf $VERSION.tar.gz $VERSION"
 fi
 

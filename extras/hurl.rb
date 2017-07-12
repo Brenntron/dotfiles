@@ -27,7 +27,7 @@ require 'digest'
 
 
 class Hurl
-  attr_reader :build_base
+  attr_reader :project, :build_base, :output_tar_path
 
   def self.usage
     puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
@@ -38,7 +38,7 @@ class Hurl
     puts "--deployment       build tar file for deployment"
     puts "--development      build tar file for development and install it on the test/dev host"
     puts "--no-build         skip building new tar file, use exisiting one"
-    puts "--[no-]assets      [skip] precompile assets"
+    puts "--assets           precompile assets"
     puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
     puts "--no-upload        app will be built but they will be prevented from being sent to the server"
     puts "--no-disgorge      app will not be expanded on the server"
@@ -47,11 +47,12 @@ class Hurl
 
   def set_defaults
     @env                = nil
+    @project            = 'analyst-console'
     @build_base         = '../releases'
     @get_source         = true
     @do_create_tar      = true
     @do_vendor_bundle   = false
-    @precompile_assets  = true
+    @precompile_assets  = false
     @do_upload          = true
     @do_disgorge        = true
     # @bundler_version    = '_1.12.5_'
@@ -70,8 +71,6 @@ class Hurl
           @do_vendor_bundle   = true
         when "--assets"
           @precompile_assets  = true
-        when "--no-assets"
-          @precompile_assets  = false
         when "--no-upload"
           @do_upload = false
         when "--no-disgorge"
@@ -118,6 +117,10 @@ class Hurl
     @do_vendor_bundle
   end
 
+  def rebuild?
+    precompile_assets? || vendor_bundle?
+  end
+
   def red(str)
     "\e[31m#{str}\e[0m"
   end
@@ -130,11 +133,19 @@ class Hurl
   end
 
   def source_arg
-    @args_pos[0] || current_git_branch
+    @args_pos[0]
+  end
+
+  def git_label
+    source_arg || current_git_branch
   end
 
   def use_tar?
     source_arg && File.exist?(source_arg)
+  end
+
+  def input_tar_path
+    @in_tar_path ||= (use_tar? ? source_arg : nil)
   end
 
   def tag_dir
@@ -143,8 +154,12 @@ class Hurl
           when use_tar?
             File.basename(source_arg.sub(/.gz$/, '').sub(/.tar$/, ''))
           else
-            source_arg
+            git_label
         end
+  end
+
+  def tar_filename
+    @tar_filename = "#{tag_dir}.tar.gz"
   end
 
   def build_path
@@ -167,20 +182,19 @@ class Hurl
     "~/#{scp_dir}/releases/#{tag_dir}.tar.gz"
   end
 
-  def get_source
-    if File.directory?(build_base)
-      FileUtils.rmtree(build_base)
-    end
-    FileUtils.mkdir(build_base)
-    if use_tar?
-      puts "* untaring #{source_arg}"
-      puts "tar -C #{build_base} -xf #{source_arg}"
-      system "tar -C #{build_base} -xf #{source_arg}"
-    else
-      puts "* checkout #{tag_dir}"
-      FileUtils.rm_r(build_path, force: true) if File.directory?(build_path)
-      system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{source_arg} --single-branch #{build_path}"
-    end
+  def untar(input_tar_path, build_base_given = build_base)
+    puts "* untarring #{input_tar_path}"
+    FileUtils.mkdir(build_base_given) unless File.directory?(build_base_given)
+    FileUtils.rmtree(build_path) if File.directory?(build_path)
+    puts "tar -C #{build_base_given} -xf #{input_tar_path}"
+    system "tar -C #{build_base_given} -xf #{input_tar_path}"
+  end
+
+  def clone(git_label_given, build_base_given = build_base)
+    puts "* checkout #{git_label_given}"
+    FileUtils.mkdir(build_base_given) unless File.directory?(build_base_given)
+    FileUtils.rmtree(build_path) if File.directory?(build_path)
+    system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{git_label_given} --single-branch #{build_path}"
   end
 
   def create_tar
@@ -200,16 +214,17 @@ class Hurl
     end
 
     if vendor_bundle?
-      system "cd #{build_path} && bundle install --deployment --frozen --without development test"
+      system "cd #{build_path} && bundle install --deployment --without development test"
     end
 
     puts "* tar up the contents of the production folder #{build_base}/#{tag_dir}.tar.gz"
     system "cd #{build_base} && tar -zcf #{tag_dir}.tar.gz #{tag_dir}"
+    tag_dir
   end
 
-  def hurl
+  def hurl(tar_path)
     puts "* hurling tar to remote system."
-    system "scp #{build_base}/#{tag_dir}.tar.gz rulesuitest.vrt.sourcefire.com:#{scp_path(tag_dir)}"
+    system "scp #{tar_path} rulesuitest.vrt.sourcefire.com:#{scp_path(tag_dir)}"
   end
 
   def disgorge
@@ -221,10 +236,21 @@ class Hurl
   end
 
   def run
-    get_source      if @get_source
-    create_tar      if @do_create_tar
-    hurl            if @do_upload
-    disgorge        if @do_disgorge
+    if rebuild?
+      untar(input_tar_path)             if input_tar_path
+      clone(git_label)                  unless input_tar_path
+      @output_tar_path = create_tar
+    else
+      if input_tar_path
+        @output_tar_path = input_tar_path
+      else
+        @output_tar_path = "#{build_base}/#{tag_dir}.tar.gz"
+        system "curl -L https://git.vrt.sourcefire.com/talosweb/#{project}/tarball/#{tag_dir} > #{output_tar_path}"
+      end
+    end
+
+    hurl(@output_tar_path)              if @do_upload
+    disgorge                            if @do_disgorge
 
   rescue Exception => e
     puts e.message
