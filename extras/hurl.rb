@@ -75,6 +75,8 @@ class HurlArgs
           @do_upload = false
         when "--no-disgorge"
           @do_disgorge = false
+        when "--notify-app"
+          @project = "analyst-console-notify"
         when "--deployment"
           @env                = 'deployment.env'
           @get_source         = true
@@ -261,15 +263,14 @@ class Hurl
       output_tar_path = rebuild(args)
     else
       if args.input_tar?
-        puts "*** input_tar_path = #{args.input_tar_path.inspect}"
         output_tar_path = args.input_tar_path
       else
         output_tar_path = args.gen_output_tar_path
+        puts "curl -L https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
         system "curl -L https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
       end
     end
 
-    puts "*** output_tar_path = #{output_tar_path.inspect}"
     hurl(output_tar_path)               if args.do_upload
     disgorge(args)                      if args.do_disgorge
   end
