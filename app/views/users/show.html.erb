@@ -34,7 +34,7 @@
             <h6 class="text-muted">managers</h6>
             <% if @user.parent.present? %>
               <ul class="compact-list">
-                <li><%=@user.parent.cvs_username %></li> 
+                <li><%= link_for_manager(current_user, @user) %></li>
               </ul>
             <% else %>
               <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> answers to no one!</em></p>

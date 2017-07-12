@@ -22,4 +22,12 @@ module ApplicationHelper
       Role.exclude_admin
     end
   end
+
+  def link_for_manager(session_user, viewed_user)
+    if session_user.has_role?('admin')
+      link_to viewed_user.parent.cvs_username, user_path(viewed_user.parent)
+    else
+      viewed_user.parent.cvs_username
+    end
+  end
 end

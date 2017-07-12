@@ -1,5 +1,5 @@
 <%= form_for user do |f| %>
-  <%= f.collection_check_boxes(:role_ids, role_options_for(user), :id, :role) do |r| %>
+  <%= f.collection_check_boxes(:role_ids, role_options_for(current_user), :id, :role) do |r| %>
     <%= r.label { r.check_box + ' ' + r.text } %>
     <br>
   <% end %>

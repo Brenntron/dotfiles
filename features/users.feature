@@ -194,6 +194,38 @@ Feature: User Accounts
     And I should see "analyst"
     And I should not see "committer"
 
+  @javascript
+  Scenario: An admin user can make any user an admin, including managers.
+    Given a user with role "admin" exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       |           |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     |     2     |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        |           |
+
+    And the following roles exist:
+      | role           |
+      | analyst        |
+      | committer      |
+
+    And the following bugs exist:
+      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
+      |222222   | 222222      | OPEN   | 3       | [BP][NSS] fixed bug | Research| Snort Rules | 2.6.0   | test description3 |
+      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
+
+    And a user with id "1" has a parent with id "3"
+
+    Then I wait for "3" seconds
+    And  I goto "/users/1"
+    Then I click "h_clinton"
+    Then I click the span with data-target "#roleModal_3"
+    And I wait for "1" seconds
+    And I should see "Update Role(s) for h_clinton"
+    And I check "admin"
+    Then I click "Save changes"
+    And I should see "h_clinton updated successfully"
+    And I should see "admin"
+    And I should not see "committer"
 
   @javascript
   Scenario: A manager user can go to the users index page and see only their co-workers and team members.
