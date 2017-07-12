@@ -198,11 +198,11 @@ class Hurl
     system "tar -C #{build_base} -xf #{input_tar_path}"
   end
 
-  def clone(git_label, build_base:, build_path:)
+  def clone(git_label, project:, build_base:, build_path:)
     puts "* checkout #{git_label}"
     FileUtils.mkdir(build_base) unless File.directory?(build_base)
     FileUtils.rmtree(build_path) if File.directory?(build_path)
-    system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{git_label} --single-branch #{build_path}"
+    system "git clone https://git.vrt.sourcefire.com/talosweb/#{project}.git -b #{git_label} --single-branch #{build_path}"
   end
 
   def create_tar(args, build_base:, build_path:, base_dir:)
@@ -220,9 +220,7 @@ class Hurl
 
     if args.do_precompile_assets
       puts "* compile assets"
-      # Dir.chdir "../production"
       system "cd #{build_path};bundle exec rake assets:precompile"
-      # Dir.chdir "../analyst-console"
     end
 
     puts "* tar up the contents of the production folder #{build_base}/#{base_dir}.tar.gz"
@@ -234,7 +232,7 @@ class Hurl
     if args.input_tar?
       untar(args.input_tar_path, build_base: args.build_base, build_path: args.build_path)
     else
-      clone(args.git_label, build_base: args.build_base, build_path: args.build_path)
+      clone(args.git_label, project: args.project, build_base: args.build_base, build_path: args.build_path)
     end
     create_tar(args,
                build_base: args.build_base,
