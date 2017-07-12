@@ -198,7 +198,7 @@ class Hurl
     system "tar -C #{build_base} -xf #{input_tar_path}"
   end
 
-  def clone(git_label, project:, build_base:, build_path:)
+  def clone_git(git_label, project:, build_base:, build_path:)
     puts "* checkout #{git_label}"
     FileUtils.mkdir(build_base) unless File.directory?(build_base)
     FileUtils.rmtree(build_path) if File.directory?(build_path)
@@ -232,7 +232,7 @@ class Hurl
     if args.input_tar?
       untar(args.input_tar_path, build_base: args.build_base, build_path: args.build_path)
     else
-      clone(args.git_label, project: args.project, build_base: args.build_base, build_path: args.build_path)
+      clone_git(args.git_label, project: args.project, build_base: args.build_base, build_path: args.build_path)
     end
     create_tar(args,
                build_base: args.build_base,
@@ -277,4 +277,3 @@ end
 
 hurl = Hurl.new(ARGV)
 hurl.run
-
