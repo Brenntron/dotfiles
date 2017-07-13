@@ -79,6 +79,10 @@ module Repo
       end
       `#{RuleFile.svn_cmd} add --force extras/rulesdocs/snort-rules`
       `#{RuleFile.svn_cmd} ci extras/rulesdocs/snort-rules -m "#{username} committed from Analyst Console"`
+
+      Rule.where(id: rules).update_all(publish_status: Rule::PUBLISH_STATUS_SYNCHED,
+                                       edit_status: Rule::EDIT_STATUS_SYNCHED,
+                                       state: Rule::UNCHANGED_STATE)
     end
   end
 end
