@@ -22,7 +22,7 @@ class Bug < ApplicationRecord
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }
   scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
-  scope :by_component, ->(component) { where('component = ?', component) }
+  scope :by_component, ->(component) { whe#handle re('component = ?', component) }
 
   scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
 
@@ -450,9 +450,10 @@ class Bug < ApplicationRecord
             :user => current_user
         )
         begin
-          new_task.test_attachments(options, xmlrpc_token)
-        rescue
+          TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+        rescue Exception => e
           #handle timeouts accordingly
+          Rails.logger.info("Rails encountered an error but is powering through it. #{e.message}")
         end
       end
     end
@@ -558,9 +559,10 @@ class Bug < ApplicationRecord
             :user => current_user
         )
         begin
-          new_task.test_attachments(options, xmlrpc_token)
-        rescue
+          TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+        rescue Exception => e
           #handle timeouts accordingly
+          Rails.logger.info("Rails encountered an error but is moving through it. #{e.message}")
         end
 
         bug.research_notes ||= Note::TEMPLATE_RESEARCH
