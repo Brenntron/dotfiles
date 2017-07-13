@@ -24,6 +24,13 @@ Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   visit root_path
 end
 
+Given(/^a user with id "(.*?)" has a role "(.*?)" and is logged in$/) do |user_id, role|
+  @user = User.find(user_id)
+  @role = Role.find_by_role(role)
+  @user.roles << @role
+  visit root_path
+end
+
 Given(/^a user with id "(.*?)" has a parent with id "(.*?)"$/) do |user_id, parent_id|
   @user = User.find(user_id)
   @user.update(parent_id: parent_id)
