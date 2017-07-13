@@ -57,10 +57,11 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_SYNCHED        = 'SYNCHED'         #unchanged from VC and up to date with VC
   PUBLISH_STATUS_CURRENT_EDIT   = 'CURRENT_EDIT'    #draft of rule edited in UI, but optimistic it can be checked in
   PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft but VC rev has changed and cannot be checked in
-  PUBLISH_STATUS_PUBLISHING     = 'PUBLISHING'      #draft in process of being written to VC
+  PUBLISH_STATUS_PUBLISHING     = 'PUBCONTENT'      #draft in process of rule content being written to VC
+  PUBLISH_STATUS_PUBDOC         = 'PUBDOC'          #draft in process of rule docs being written to VC
 
   INCOMPLETE_STATE              = 'INCOMPLETE'
-  UNCHANGED_STATE                = 'UNCHANGED'
+  UNCHANGED_STATE               = 'UNCHANGED'
   UPDATED_STATE                 = 'UPDATED'
   NEW_STATE                     = 'NEW'
   STALE_STATE                   = 'STALE'           #is set to stale when publish status is set to stale
@@ -73,15 +74,22 @@ class Rule < ApplicationRecord
     rule_category && rule_category.deleted?
   end
 
+  def requires_doc?
+    case
+      when rule_category.blank?
+        false
+      else
+        rule_category.requires_doc?
+    end
+  end
+
   def has_doc?
     rule_doc && rule_doc.summary.present?
   end
 
   def doc_complete?
     case
-      when rule_category.blank?
-        true
-      when !rule_category.requires_doc?
+      when !requires_doc?
         true
       when !has_doc?
         false
@@ -117,6 +125,10 @@ class Rule < ApplicationRecord
   def off_rule_content(rule_content_given = nil)
     local_rule_content = rule_content_given || self.rule_content
     local_rule_content.sub(/^\s*#?\s*/, '# ')
+  end
+
+  def content_changed?
+    new_rule? || (cvs_rule_content != rule_content)
   end
 
   def test_rule_content
@@ -430,6 +442,7 @@ class Rule < ApplicationRecord
       rule = Rule.by_sid(sid, gid || 1).first
       if rule && (rev.to_i > rule.rev)
         rule.load_rule_content(line)
+        rule.update(publish_status: PUBLISH_STATUS_PUBDOC) if PUBLISH_STATUS_PUBLISHING == rule.publish_status
       end
     end
   end

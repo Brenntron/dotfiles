@@ -66,7 +66,8 @@ class RuleDoc < ApplicationRecord
     self.class.basepath.join(ruledir, "sid_#{sid_group}").tap do |dirpath|
       self.class.mk_basepath
       unless File.directory?(dirpath)
-        `#{RuleFile.svn_cmd} co --depth files #{self.class.baseurl}#{ruledir}/sid_#{sid_group} #{dirpath}`
+        # `#{RuleFile.svn_cmd} co --depth files #{self.class.baseurl}#{ruledir}/sid_#{sid_group} #{dirpath}`
+        FileUtils.mkpath(dirpath)
       end
     end
   end
@@ -150,17 +151,6 @@ class RuleDoc < ApplicationRecord
 
   def fetch_from_repo
     `#{RuleFile.svn_cmd} up #{filepath}`
-  end
-
-  def call_commit(username = '')
-    `#{RuleFile.svn_cmd} add --force #{self.class.basepath}`
-    `#{RuleFile.svn_cmd} ci #{filepath} -m "#{username} committed from Analyst Console"`
-  end
-
-  def commit_doc(username = '')
-    if write_to_file
-      call_commit(username)
-    end
   end
 
   def revert_doc
