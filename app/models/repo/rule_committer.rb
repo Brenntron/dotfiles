@@ -73,7 +73,7 @@ module Repo
       `#{RuleFile.svn_cmd} up extras/rulesdocs/snort-rules`
       rules.each do |rule|
         if commit_doc?(rule)
-          rule.rule_doc.write_to_file
+          rule.rule_doc.write_to_file if rule.rule_doc
           # set_rule_to_synched(rule)
         end
       end
