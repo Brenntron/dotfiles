@@ -2,6 +2,10 @@ module Repo
   class RuleCommitter
     attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :username
 
+    def self.log(message)
+      Rails.logger.info "svn integration: #{message}"
+    end
+
     # @return [Pathname] path (possibly relative) to the snort directory synchronized with svn
     def self.synch_root
       @snort_path ||= Pathname.new('extras/snort')
@@ -49,18 +53,12 @@ module Repo
       rule_files.each(&block)
     end
 
-    def set_rule_to_synched(rule)
-      rule.update(publish_status: Rule::PUBLISH_STATUS_SYNCHED,
-                  edit_status: Rule::EDIT_STATUS_SYNCHED,
-                  state: Rule::UNCHANGED_STATE)
-    end
-
     def commit_doc?(rule)
       case
         when Rule::PUBLISH_STATUS_PUBLISHING == rule.publish_status
           false #rule content failed to commit
         when (!rule.requires_doc?) && (!rule.has_doc?)
-          set_rule_to_synched(rule)
+          Rule.set_synched_state(rule)
           false
         else
           true
@@ -68,6 +66,7 @@ module Repo
     end
 
     def commit_docs
+      log("publishing rule docn #{rules.count} rules")
       Rule.where(id: unchanged_rules).update(publish_status: Rule::PUBLISH_STATUS_PUBDOC)
 
       `#{RuleFile.svn_cmd} up extras/rulesdocs/snort-rules`
@@ -80,9 +79,7 @@ module Repo
       `#{RuleFile.svn_cmd} add --force extras/rulesdocs/snort-rules`
       `#{RuleFile.svn_cmd} ci extras/rulesdocs/snort-rules -m "#{username} committed from Analyst Console"`
 
-      Rule.where(id: rules).update_all(publish_status: Rule::PUBLISH_STATUS_SYNCHED,
-                                       edit_status: Rule::EDIT_STATUS_SYNCHED,
-                                       state: Rule::UNCHANGED_STATE)
+      Rule.set_synched_state(Rule.where(id: rules))
     end
   end
 end

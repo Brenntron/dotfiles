@@ -66,12 +66,16 @@ class Rule < ApplicationRecord
   NEW_STATE                     = 'NEW'
   STALE_STATE                   = 'STALE'           #is set to stale when publish status is set to stale
   DELETED_STATE                 = 'DELETED'
-  
+
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
+  scope :pub_content, -> { where(publish_status: PUBLISH_STATUS_PUBLISHING) }
+  scope :pub_doc, -> { where(publish_status: PUBLISH_STATUS_PUBDOC) }
+  scope :pub_any, -> { where(publish_status: [PUBLISH_STATUS_PUBLISHING, PUBLISH_STATUS_PUBDOC]) }
+
   def deleted?
-    rule_category && rule_category.deleted?
+    rule_category&.deleted?
   end
 
   def requires_doc?
@@ -418,16 +422,32 @@ class Rule < ApplicationRecord
 
     rule_db = by_sid(parser.sid, parser.gid).first
 
-    if rule_db && rule_db.draft?
+    if rule_db&.draft?
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db.update(state: STALE_STATE)
       rule_db
-    elsif rule_db && rule_db.deleted?
+    elsif rule_db&.deleted?
       rule_db.update(state: DELETED_STATE)
     else
       rule = find_from_parser(parser)
       rule.load_rule_content(rule_content)
       rule
+    end
+  end
+
+  # Sets a rule or rules to a synched state
+  #
+  # @param [Rule|Relation] A single rule object or an ActiveRecord relation
+  def self.set_synched_state(rule_arg)
+    state_values = { publish_status: PUBLISH_STATUS_SYNCHED,
+                     edit_status: EDIT_STATUS_SYNCHED,
+                     state: UNCHANGED_STATE }
+
+    case rule_arg
+      when Rule
+        rule_arg.update(state_values)
+      else
+        rule_arg.update_all(state_values)
     end
   end
 
@@ -442,7 +462,7 @@ class Rule < ApplicationRecord
       rule = Rule.by_sid(sid, gid || 1).first
       if rule && (rev.to_i > rule.rev)
         rule.load_rule_content(line)
-        rule.update(publish_status: PUBLISH_STATUS_PUBDOC) if PUBLISH_STATUS_PUBLISHING == rule.publish_status
+        rule.update(publish_status: PUBLISH_STATUS_PUBDOC) if rule.publishing_content?
       end
     end
   end
@@ -665,10 +685,12 @@ class Rule < ApplicationRecord
     PUBLISH_STATUS_STALE_EDIT == publish_status
   end
 
-  # Tests if edited rule is in progress while VC updated the rule externally
-  # @return [boolean] true iff rule is a updated edited rule and VC has updated the rule
-  def publishing?
+  def publishing_content?
     PUBLISH_STATUS_PUBLISHING == publish_status
+  end
+
+  def publishing_doc?
+    PUBLISH_STATUS_PUBDOC == publish_status
   end
 
   # The CSS class identifiers to identify the type of rule this is.

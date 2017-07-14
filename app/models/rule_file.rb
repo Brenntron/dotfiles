@@ -113,8 +113,8 @@ class RuleFile
   end
 
   # @return [String] space separated list of relative file paths
-  def self.working_file_list(rule_files)
-    rule_files.map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
+  def self.relative_file_list(rule_files)
+    rule_files.map{|rule_file| rule_file.relative_pathname.to_s}.join(' ')
   end
 
   # deletes the file in the working folder used for commits
@@ -135,7 +135,7 @@ class RuleFile
   end
 
   def self.commit_files(rule_files, username)
-    commit_out = `#{svn_cmd} commit #{working_file_list(rule_files)} -m "#{username} committed from Analyst Console" 2>&1`
+    commit_out = `#{svn_cmd} commit #{relative_file_list(rule_files)} -m "#{username} committed from Analyst Console" 2>&1`
     Rails.logger.debug commit_out
   end
 
@@ -143,8 +143,9 @@ class RuleFile
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_new_rule(bug, rule)
     bug.rules << rule
-    publishing_rule =
-        bug.rules.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).where(message: rule.message).first
+
+    #unlink a matching new rule
+    publishing_rule = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).pub_content.where(message: rule.message).first
     publishing_rule.bugs.delete_all if publishing_rule
   end
 
@@ -177,7 +178,7 @@ class RuleFile
 
   # run failsafe to update db if callback did not
   def self.synch_failsafe
-    committer = Repo::RuleCommitter.new(Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING))
+    committer = Repo::RuleCommitter.new(Rule.pub_content)
     committer.rule_files.each do |rule_file|
       rule_file.synch_failsafe
     end
@@ -193,7 +194,7 @@ class RuleFile
 
       if rules.any?
         rule_files = committer.rule_files
-        log("publishing #{rules.count} rules, #{rule_files.count} files")
+        log("publishing content #{rules.count} rules, #{rule_files.count} files")
 
         #set all the rules we will update to publishing.
         Rule.where(id: rules).update_all(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
@@ -201,19 +202,17 @@ class RuleFile
         rule_files.each {|rule_file| rule_file.checkout }
 
         rules.each do |rule|
-          if rule.content_changed?
-            rule.patch_file(working_pathname_of(rule.nonnil_pathname))
-          end
+          rule.patch_file(working_pathname_of(rule.nonnil_pathname))
         end
 
-        log("committing files #{working_file_list(rule_files)}")
+        log("committing files #{relative_file_list(rule_files)}")
         commit_files(rule_files, username)
 
         rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 
         rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
 
-        if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists?
+        if Rule.pub_content.exists?
           log("calling failsafe")
           synch_failsafe
         end
@@ -226,10 +225,9 @@ class RuleFile
 
   ensure
     #any rules not set to synch by svn hook should go back to current.
-    if Rule.where(publish_status: [Rule::PUBLISH_STATUS_PUBLISHING, Rule::PUBLISH_STATUS_PUBDOC]).exists?
+    if Rule.pub_any.exists?
       log("setting rules from publishing to current_edit")
-      Rule.where(publish_status: [Rule::PUBLISH_STATUS_PUBLISHING, Rule::PUBLISH_STATUS_PUBDOC])
-          .update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
+      Rule.pub_any.update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
     log("exiting publishing")
     publish_unlock
