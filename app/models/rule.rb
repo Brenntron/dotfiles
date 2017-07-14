@@ -70,9 +70,9 @@ class Rule < ApplicationRecord
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
-  scope :pub_content, -> { where(publish_status: PUBLISH_STATUS_PUBLISHING) }
-  scope :pub_doc, -> { where(publish_status: PUBLISH_STATUS_PUBDOC) }
-  scope :pub_any, -> { where(publish_status: [PUBLISH_STATUS_PUBLISHING, PUBLISH_STATUS_PUBDOC]) }
+  scope :with_pub_content, -> { where(publish_status: PUBLISH_STATUS_PUBLISHING) }
+  scope :with_pub_doc, -> { where(publish_status: PUBLISH_STATUS_PUBDOC) }
+  scope :with_pub_any, -> { where(publish_status: [PUBLISH_STATUS_PUBLISHING, PUBLISH_STATUS_PUBDOC]) }
 
   def deleted?
     rule_category&.deleted?
