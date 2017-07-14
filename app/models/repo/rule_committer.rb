@@ -2,7 +2,7 @@ module Repo
   class RuleCommitter
     attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :username
 
-    def self.log(message)
+    def log(message)
       Rails.logger.info "svn integration: #{message}"
     end
 
