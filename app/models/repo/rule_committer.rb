@@ -57,7 +57,7 @@ module Repo
       case
         when Rule::PUBLISH_STATUS_PUBLISHING == rule.publish_status
           false #rule content failed to commit
-        when (!rule.requires_doc?) && (!rule.has_doc?)
+        when rule.requires_doc? && !rule.has_doc?
           Rule.set_synched_state(rule)
           false
         else
@@ -67,7 +67,10 @@ module Repo
 
     def commit_docs
       log("publishing rule docn #{rules.count} rules")
-      Rule.where(id: unchanged_rules).update(publish_status: Rule::PUBLISH_STATUS_PUBDOC)
+      Rule.set_pubdoc_state(Rule.where(id: unchanged_rules))
+
+      #refresh rule objects from database
+      @rules = Rule.where(id: @rules)
 
       `#{RuleFile.svn_cmd} up extras/rulesdocs/snort-rules`
       rules.each do |rule|

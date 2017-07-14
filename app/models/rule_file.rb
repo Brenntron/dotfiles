@@ -148,9 +148,13 @@ class RuleFile
 
     if found_rule
       found_rule.load_rule_content(rule_content)
+      Rule.set_pubdoc_state(found_rule)
+      found_rule
     else
       new_rule = Rule.find_and_load_rule_content(rule_content)
       bug.rules << new_rule unless new_rule.new_record? || bug.rules.pluck(:id).include?(new_rule.id)
+      Rule.set_pubdoc_state(new_rule)
+      new_rule
     end
   end
 

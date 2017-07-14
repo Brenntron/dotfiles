@@ -451,6 +451,15 @@ class Rule < ApplicationRecord
     end
   end
 
+  def self.set_pubdoc_state(rule_arg)
+    case rule_arg
+      when Rule
+        rule_arg.update( publish_status: PUBLISH_STATUS_PUBDOC )
+      else
+        rule_arg.update_all( publish_status: PUBLISH_STATUS_PUBDOC )
+    end
+  end
+
   # loads an rule content from a line in a rule file
   # Skips lines without sid and where we have a rule with that rev
   # @param [String] line from rule file
@@ -462,7 +471,7 @@ class Rule < ApplicationRecord
       rule = Rule.by_sid(sid, gid || 1).first
       if rule && (rev.to_i > rule.rev)
         rule.load_rule_content(line)
-        rule.update(publish_status: PUBLISH_STATUS_PUBDOC) if rule.publishing_content?
+        Rule.set_pubdoc_state(rule) if rule.publishing_content?
       end
     end
   end
