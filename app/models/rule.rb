@@ -336,8 +336,8 @@ class Rule < ApplicationRecord
   # calls assign_attributes.
   # does not save rule.
   # @param [Hash, #read]
-  def assign(attributes)
-    assign_attributes(attributes.slice(*%i(rev message connection flow detection class_type metadata message)))
+  def assign_from_parser(attributes)
+    assign_attributes(attributes.slice(*%i(gid sid rev message connection flow detection class_type metadata message)))
     self.rule_category = RuleCategory.find_or_create_by(category: attributes[:rule_category])
     self.attributes
   end
@@ -365,7 +365,7 @@ class Rule < ApplicationRecord
     parser = RuleSyntax::RuleParser.new(rule_content)
     find_from_parser(parser, rule_id).tap do |rule|
       rule.assign_from_visrule(rule_content)
-      rule.assign(parser.attributes)
+      rule.assign_from_parser(parser.attributes)
 
       if rule.sid
         rule.state                        = UPDATED_STATE
@@ -394,7 +394,7 @@ class Rule < ApplicationRecord
 
     assign_from_visrule(rule_content)
 
-    assign(parser.attributes)
+    assign_from_parser(parser.attributes)
 
     self.cvs_rule_content               = self.rule_content
     self.cvs_rule_parsed                = self.rule_parsed

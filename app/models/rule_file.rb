@@ -141,12 +141,17 @@ class RuleFile
 
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
-  def link_new_rule(bug, rule)
-    bug.rules << rule
+  def link_new_rule(bug, rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    msg = parser.attributes[:msg]
+    found_rule = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content.where(message: msg).first
 
-    #unlink a matching new rule
-    publishing_rule = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content.where(message: rule.message).first
-    publishing_rule.bugs.delete_all if publishing_rule
+    if found_rule
+      found_rule.load_rule_content(rule_content)
+    else
+      new_rule = Rule.find_and_load_rule_content(rule_content)
+      bug.rules << new_rule unless new_rule.new_record? || bug.rules.pluck(:id).include?(new_rule.id)
+    end
   end
 
   # read diffs from file to add new rules to bug
@@ -155,8 +160,7 @@ class RuleFile
     `#{self.class.svn_cmd} up #{synch_pathname}`
     `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line) && (/sid:\s*\d+\s*;/ =~ line)
-        rule = Rule.find_and_load_rule_content(line[1..-1])
-        link_new_rule(bug, rule) unless rule.new_record? || bug.rules.pluck(:id).include?(rule.id)
+        link_new_rule(bug, line[1..-1])
       end
     end
   end
