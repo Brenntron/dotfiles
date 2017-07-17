@@ -70,7 +70,7 @@ module Repo
       Rule.set_pubdoc_state(Rule.where(id: unchanged_rules))
 
       #refresh rule objects from database
-      @rules = Rule.where(id: @rules)
+      @rules = Rule.where(id: @rules).to_a
 
       `#{RuleFile.svn_cmd} up extras/rulesdocs/snort-rules`
       rules.each do |rule|
