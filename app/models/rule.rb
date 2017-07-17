@@ -451,6 +451,15 @@ class Rule < ApplicationRecord
     end
   end
 
+  def self.set_pubcontent_state(rule_arg)
+    case rule_arg
+      when Rule
+        rule_arg.update( publish_status: PUBLISH_STATUS_PUBLISHING )
+      else
+        rule_arg.update_all( publish_status: PUBLISH_STATUS_PUBLISHING )
+    end
+  end
+
   def self.set_pubdoc_state(rule_arg)
     case rule_arg
       when Rule

@@ -206,7 +206,7 @@ class RuleFile
         log("publishing content #{rules.count} rules, #{rule_files.count} files")
 
         #set all the rules we will update to publishing.
-        Rule.where(id: rules).update_all(publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
+        Rule.set_pubcontent_state(Rule.where(id: rules))
 
         rule_files.each {|rule_file| rule_file.checkout }
 
