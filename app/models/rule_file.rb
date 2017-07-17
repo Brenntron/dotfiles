@@ -137,6 +137,7 @@ class RuleFile
   def self.commit_files(rule_files, username)
     commit_out = `#{svn_cmd} commit #{working_file_list(rule_files)} -m "#{username} committed from Analyst Console" 2>&1`
     Rails.logger.debug commit_out
+    raise "Rule content commit failed." unless commit_out =~ /\(exit code 199\)/
   end
 
   # links a new rule to the bug
@@ -237,7 +238,8 @@ class RuleFile
       log("setting rules from publishing to current_edit")
       Rule.with_pub_any.update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
-    log("exiting publishing")
+    log("unlocking publishing")
     publish_unlock
+    log("exiting publishing")
   end
 end
