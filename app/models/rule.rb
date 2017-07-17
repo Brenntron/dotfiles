@@ -461,11 +461,15 @@ class Rule < ApplicationRecord
   end
 
   def self.set_pubdoc_state(rule_arg)
+    state_values = { publish_status: PUBLISH_STATUS_PUBDOC,
+                     edit_status: EDIT_STATUS_EDIT,
+                     state: UPDATED_STATE }
+
     case rule_arg
       when Rule
-        rule_arg.update( publish_status: PUBLISH_STATUS_PUBDOC )
+        rule_arg.update( state_values )
       else
-        rule_arg.update_all( publish_status: PUBLISH_STATUS_PUBDOC )
+        rule_arg.update_all( state_values )
     end
   end
 

@@ -142,7 +142,7 @@ class RuleFile
 
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
-  def link_new_rule(bug, rule_content)
+  def link_add_line_rule(bug, rule_content)
     parser = RuleSyntax::RuleParser.new(rule_content)
     msg = parser.attributes[:msg]
     found_rule = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content.where(message: msg).first
@@ -152,10 +152,10 @@ class RuleFile
       Rule.set_pubdoc_state(found_rule)
       found_rule
     else
-      new_rule = Rule.find_and_load_rule_content(rule_content)
-      bug.rules << new_rule unless new_rule.new_record? || bug.rules.pluck(:id).include?(new_rule.id)
-      Rule.set_pubdoc_state(new_rule)
-      new_rule
+      loaded_rule = Rule.find_and_load_rule_content(rule_content)
+      bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.pluck(:id).include?(loaded_rule.id)
+      Rule.set_pubdoc_state(loaded_rule)
+      loaded_rule
     end
   end
 
@@ -165,7 +165,7 @@ class RuleFile
     `#{self.class.svn_cmd} up #{synch_pathname}`
     `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line) && (/sid:\s*\d+\s*;/ =~ line)
-        link_new_rule(bug, line[1..-1])
+        link_add_line_rule(bug, line[1..-1])
       end
     end
   end
