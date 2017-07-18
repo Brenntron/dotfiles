@@ -26,8 +26,9 @@ require 'digest'
 # -   create a link to the new release directory
 
 
-class Hurl
-  attr_reader :build_base
+class HurlArgs
+  attr_reader :source_arg, :project, :build_base, :output_tar_path, :env
+  attr_reader :do_vendor_bundle, :do_precompile_assets, :do_upload, :do_disgorge
 
   def self.usage
     puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
@@ -38,7 +39,7 @@ class Hurl
     puts "--deployment       build tar file for deployment"
     puts "--development      build tar file for development and install it on the test/dev host"
     puts "--no-build         skip building new tar file, use exisiting one"
-    puts "--[no-]assets      [skip] precompile assets"
+    puts "--assets           precompile assets"
     puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
     puts "--no-upload        app will be built but they will be prevented from being sent to the server"
     puts "--no-disgorge      app will not be expanded on the server"
@@ -46,16 +47,16 @@ class Hurl
   end
 
   def set_defaults
-    @env                = nil
-    @build_base         = '../releases'
-    @get_source         = true
-    @do_create_tar      = true
-    @do_vendor_bundle   = false
-    @precompile_assets  = true
-    @do_upload          = true
-    @do_disgorge        = true
-    # @bundler_version    = '_1.12.5_'
-    @bundler_version    = '_1.14.6_'
+    @env                    = nil
+    @project                = 'analyst-console'
+    @build_base             = '../releases'
+    @get_source             = true
+    @do_create_tar          = true
+    @do_vendor_bundle       = false
+    @do_precompile_assets   = false
+    @do_upload              = true
+    @do_disgorge            = true
+    @bundler_version        = '_1.14.6_'
   end
 
   def scan_args(args)
@@ -69,18 +70,18 @@ class Hurl
         when "--vendor-bundle"
           @do_vendor_bundle   = true
         when "--assets"
-          @precompile_assets  = true
-        when "--no-assets"
-          @precompile_assets  = false
+          @do_precompile_assets  = true
         when "--no-upload"
           @do_upload = false
         when "--no-disgorge"
           @do_disgorge = false
+        when "--notify-app"
+          @project = "analyst-console-notify"
         when "--deployment"
           @env                = 'deployment.env'
           @get_source         = true
           @do_vendor_bundle   = false
-          @precompile_assets  = false
+          @do_precompile_assets  = false
           @do_create_tar      = true
           # @bundler_version    = '_1.15.1_'
           @bundler_version    = '_1.14.6_'
@@ -88,7 +89,7 @@ class Hurl
           @env                = 'development.env'
           @get_source         = true
           @do_vendor_bundle   = false
-          @precompile_assets  = false
+          @do_precompile_assets  = false
           @do_create_tar      = true
           # @bundler_version    = '_1.15.1_'
           @bundler_version    = '_1.14.6_'
@@ -110,45 +111,54 @@ class Hurl
     @args_pos = scan_args(args)
   end
 
-  def precompile_assets?
-    @precompile_assets
-  end
-
-  def vendor_bundle?
-    @do_vendor_bundle
-  end
-
-  def red(str)
-    "\e[31m#{str}\e[0m"
+  def rebuild?
+    do_precompile_assets || do_vendor_bundle
   end
 
   # Figure out the name of the current local branch
   def current_git_branch
-    branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
-    puts "Deploying branch #{red branch}"
-    branch
+    `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
   end
 
   def source_arg
-    @args_pos[0] || current_git_branch
+    @args_pos[0]
   end
 
-  def use_tar?
-    source_arg && File.exist?(source_arg)
+  def git_label
+    source_arg || current_git_branch
   end
 
-  def tag_dir
-    @tag_dir ||=
+  def input_tar?
+    case
+      when source_arg.nil?
+        false
+      when File.exist?(source_arg)
+        true
+      else
+        false
+    end
+  end
+
+  def input_tar_path
+    if input_tar?
+      source_arg
+    else
+      nil
+    end
+  end
+
+  def base_dir
+    @base_dir ||=
         case
-          when use_tar?
+          when input_tar?
             File.basename(source_arg.sub(/.gz$/, '').sub(/.tar$/, ''))
           else
-            source_arg
+            git_label
         end
   end
 
   def build_path
-    @build_path ||= File.join(build_base, tag_dir)
+    @build_path ||= File.join(build_base, base_dir)
   end
 
   def scp_dir
@@ -159,76 +169,111 @@ class Hurl
     "~/disgorge"
   end
 
-  def scp_path(tag_dir)
-    "#{scp_dir}/releases/#{tag_dir}.tar.gz"
+  def relative_dir
+    "disgorge/releases"
   end
 
-  def tar_path(tag_dir)
-    "~/#{scp_dir}/releases/#{tag_dir}.tar.gz"
+  def disgorge_tar_path
+    "~/#{scp_dir}/releases/#{base_dir}.tar.gz"
   end
 
-  def get_source
+  def gen_output_tar_path
+    "#{build_base}/#{base_dir}.tar.gz"
+  end
+end
+
+
+class Hurl
+  attr_reader :args
+
+  def initialize(args)
+    @args = HurlArgs.new(args)
+  end
+
+  def untar(input_tar_path, build_base:, build_path:)
+    puts "* untarring #{input_tar_path}"
     FileUtils.mkdir(build_base) unless File.directory?(build_base)
-    if use_tar?
-      puts "* untaring #{source_arg}"
-      puts "tar -C #{build_base} -xf #{source_arg}"
-      system "tar -C #{build_base} -xf #{source_arg}"
-    else
-      puts "* checkout #{tag_dir}"
-      FileUtils.rm_r(build_path, force: true) if File.directory?(build_path)
-      system "git clone https://git.vrt.sourcefire.com/talosweb/analyst-console.git -b #{source_arg} --single-branch #{build_path}"
-    end
+    FileUtils.rmtree(build_path) if File.directory?(build_path)
+    puts "tar -C #{build_base} -xf #{input_tar_path}"
+    system "tar -C #{build_base} -xf #{input_tar_path}"
   end
 
-  def create_tar
+  def clone_git(git_label, project:, build_base:, build_path:)
+    puts "* checkout #{git_label}"
+    FileUtils.mkdir(build_base) unless File.directory?(build_base)
+    FileUtils.rmtree(build_path) if File.directory?(build_path)
+    system "git clone https://git.vrt.sourcefire.com/talosweb/#{project}.git -b #{git_label} --single-branch #{build_path}"
+  end
+
+  def create_tar(args, build_base:, build_path:, base_dir:)
     unless File.directory?(build_path)
       raise("Production folder doesnt exist. Probably couldn't clone it from git. Did you upload your branch to git?")
     end
 
-    puts "* package the gems into vendor/cache"
-    system "cd #{build_path}; rm Gemfile.lock; bundle #{@bundler_version} install --without development test"
-    system "cd #{build_path} && bundle #{@bundler_version} package --frozen --all"
+    if args.do_vendor_bundle
+      puts "* package the gems into vendor/cache"
+      system "cd #{build_path}; rm Gemfile.lock; bundle #{@bundler_version} install --without development test"
+      system "cd #{build_path} && bundle #{@bundler_version} package --frozen --all"
 
-    if precompile_assets?
+      system "cd #{build_path} && bundle install --deployment --without development test"
+    end
+
+    if args.do_precompile_assets
       puts "* compile assets"
-      # Dir.chdir "../production"
       system "cd #{build_path};bundle exec rake assets:precompile"
-      # Dir.chdir "../analyst-console"
     end
 
-    if vendor_bundle?
-      system "cd #{build_path} && bundle install --deployment --frozen --without development test"
-    end
-
-    puts "* tar up the contents of the production folder #{build_base}/#{tag_dir}.tar.gz"
-    system "cd #{build_base} && tar -zcf #{tag_dir}.tar.gz #{tag_dir}"
+    puts "* tar up the contents of the production folder #{build_base}/#{base_dir}.tar.gz"
+    system "cd #{build_base} && tar -zcf #{base_dir}.tar.gz #{base_dir}"
+    "#{build_base}/#{base_dir}.tar.gz"
   end
 
-  def hurl
-    puts "* hurling tar to remote system."
-    system "scp #{build_base}/#{tag_dir}.tar.gz rulesuitest.vrt.sourcefire.com:#{scp_path(tag_dir)}"
-  end
-
-  def disgorge
-    if @env
-      system "ssh rulesuitest.vrt.sourcefire.com '. #{release_base}/#{@env} && #{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+  def rebuild(args)
+    if args.input_tar?
+      untar(args.input_tar_path, build_base: args.build_base, build_path: args.build_path)
     else
-      system "ssh rulesuitest.vrt.sourcefire.com '#{release_base}/disgorge.sh #{tar_path(tag_dir)}'"
+      clone_git(args.git_label, project: args.project, build_base: args.build_base, build_path: args.build_path)
     end
+    create_tar(args,
+               build_base: args.build_base,
+               build_path: args.build_path,
+               base_dir: args.base_dir)
+  end
+
+  def hurl(tar_path, relative_dir: args.relative_dir)
+    puts "* hurling tar to remote system."
+    puts "scp #{tar_path} rulesuitest.vrt.sourcefire.com:#{relative_dir}"
+    system "scp #{tar_path} rulesuitest.vrt.sourcefire.com:#{relative_dir}"
+  end
+
+  def disgorge(args)
+    if args.env
+      disgorge_cmd = ". #{args.release_base}/#{args.env} && #{args.release_base}/disgorge.sh #{args.disgorge_tar_path}"
+    else
+      disgorge_cmd = "#{args.release_base}/disgorge.sh #{args.disgorge_tar_path}"
+    end
+    puts disgorge_cmd
+    system "ssh rulesuitest.vrt.sourcefire.com '#{disgorge_cmd}'"
   end
 
   def run
-    get_source      if @get_source
-    create_tar      if @do_create_tar
-    hurl            if @do_upload
-    disgorge        if @do_disgorge
+    if args.rebuild?
+      output_tar_path = rebuild(args)
+    else
+      if args.input_tar?
+        output_tar_path = args.input_tar_path
+      else
+        output_tar_path = args.gen_output_tar_path
+        puts "curl -L https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        system "curl -L https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+      end
+    end
 
-  rescue Exception => e
-    puts e.message
+    hurl(output_tar_path)               if args.do_upload
+    disgorge(args)                      if args.do_disgorge
   end
 end
 
 
 hurl = Hurl.new(ARGV)
 hurl.run
-

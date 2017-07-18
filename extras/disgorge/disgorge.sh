@@ -2,10 +2,11 @@
 
 
 if [[ $# -lt 1 ]]; then
-    echo 'USAGE: disgorge.sh tar-file (RELDIR)'
+    echo 'USAGE: RAILS_ENV=production disgorge.sh TARFILE (RELDIR)'
     echo 'Script to uncompress web site source and install'
     echo ''
     echo 'Variables and Defaults:'
+    echo 'RAILS_ENV                             Cannot be test or development from bundle install --without'
     echo 'TARFILE                               First ARG -- path to tar file'
     echo 'RELDIR=<timestamp>                    Second ARG -- subdir for this build'
     echo 'RELBASE=~/disgorge                    Base dir with releases, shared, and current subdirs'
@@ -16,6 +17,8 @@ if [[ $# -lt 1 ]]; then
     echo ''
     exit
 fi
+
+echo VERSION=$VERSION
 
 TARFILE=$1
 echo $TARFILE
@@ -55,7 +58,7 @@ fi
 
 
 echo ''
-echo '* Installing'
+echo '* installing'
 echo $RELPATH
 echo $TAGDIR
 cd $RELPATH/$TAGDIR
@@ -75,28 +78,35 @@ if [ "SKIP" != "$SHARED" ]; then
         echo "--- Release $RELDIR $TAGDIR" >> log/development.log
     fi
 
-
     cp $SHAREDDIR/config/database.yml config
     cp $SHAREDDIR/config/secrets.yml config
-
-    #ln -s $SHAREDDIR/.env .
 fi
 
-echo '* bundle package'
-cp vendor/gems/activemessaging/activemessaging-*.gem vendor/cache
-cp vendor/gems/libv8/libv8-3.16.14.17-amd64-freebsd-10.gem vendor/cache
-bundle _1.14.6_ package --frozen --path vendor/bundle
+if [ "SKIP" != "$BUNDLE_PACKAGE" ]; then
+    echo '* bundle package'
+    if [ ! -d vendor/cache ]; then
+        mkdir vendor/cache
+    fi
+    if [ -d vendor/gems ]; then
+        cp `find vendor/gems -name '*.gem'` vendor/cache
+    fi
+    bundle _1.14.6_ package --path vendor/bundle
+fi
 
-echo '* bundle install'
-bundle _1.14.6_ install --deployment --frozen --local --path vendor/bundle --without development test
+if [ "SKIP" != "$BUNDLE_INSTALL" ]; then
+    echo '* bundle install'
+    bundle _1.14.6_ install --deployment --local --path vendor/bundle --without development test
+fi
 
 if [ "SKIP" != "$MIGRATE" ]; then
     echo '* migrations'
     bundle exec rake db:migrate
 fi
 
-echo '* precompile assets'
-bundle exec rake assets:precompile
+if [ "SKIP" != "$PRECOMPILE" ]; then
+    echo '* precompile assets'
+    bundle exec rake assets:precompile
+fi
 
 if [ "SKIP" != "$SVN_WORKING" ]; then
     echo '* svn working folders'
@@ -111,19 +121,27 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
 fi
 
 if [ "" != "$CURRDIR" ]; then
-    echo "* Simlink $CURRDIR to $RELPATH/$TAGDIR"
+    echo "* simlink $CURRDIR to $RELPATH/$TAGDIR"
     rm $CURRDIR
     ln -s $RELPATH/$TAGDIR $CURRDIR
     cd $CURRDIR
 fi
 
 if [ "" != "$VERSION" ]; then
+    echo "* tar output"
+    echo VERSION=$VERSION
     rm -rf tmp
     #mkdir tmp
     rm -rf log
     rm config/database.yml
     rm config/secrets.yml
 
-    bash -c "cd $RELPATH; mv $TAGDIR $VERSION; tar czf $VERSION.tar.gz $VERSION"
+    if [ "$TAGDIR" != "$VERSION" ]; then
+       echo mv $TAGDIR $VERSION
+       bash -c "cd $RELPATH; mv $TAGDIR $VERSION"
+    fi
+    echo "* tar file = $VERSION.tar.gz"
+    bash -c "cd $RELPATH; tar czf $VERSION.tar.gz $VERSION"
 fi
+
 
