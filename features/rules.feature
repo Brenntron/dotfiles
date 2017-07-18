@@ -645,8 +645,7 @@ Feature: Rules
     And  I click "new_rule"
     Then a rule doc column "summary" should equal "" in the database
     Then a rule doc column "contributors" should equal "Cisco's Talos Intelligence Group " in the database
-
-  
+    
   @javascript
   Scenario: When a new rule is created, the rule doc will populate with the rule's policies and ruleset community
     Given a user with role "analyst" exists and is logged in
