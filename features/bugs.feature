@@ -651,7 +651,7 @@ Feature: Bug
     Then I should see "local test"
 
   @javascript
-  Scenario: a user can test add an attachment
+  Scenario: a user can add an attachment
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
@@ -669,6 +669,18 @@ Feature: Bug
     And the attachment with file name "Newpcap.pcap" summary should be saved as "Newpcap.pcap"
     Then I clean up attachments
 
+  @javascript
+  Scenario: attachments should be tested after importing a bug
+    Given a user with role "analyst" exists and is logged in
+    And I wait for "3" seconds
+    When I goto "/bugs"
+    And I fill in "bug_name" with "145359"
+    And I click "#button_import"
+    And I wait for "10" seconds
+    Then I goto "/bugs/145359"
+    #then you should see the bug but this doesnt happen because there is no easy way to test the import feature
+    #When I click ".jobs-tab"
+    #Then I should see "attachment"
 
 
   @javascript

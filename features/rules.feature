@@ -646,6 +646,7 @@ Feature: Rules
     Then a rule doc column "summary" should equal "" in the database
     Then a rule doc column "contributors" should equal "Cisco's Talos Intelligence Group " in the database
 
+  
   @javascript
   Scenario: When a new rule is created, the rule doc will populate with the rule's policies and ruleset community
     Given a user with role "analyst" exists and is logged in
@@ -672,7 +673,7 @@ Feature: Rules
     And  I check "new-rule-metadata-ruleset"
 
     And  I click "Create Rule"
-    And  I wait for "5" seconds
+    And  I wait for "10" seconds
     Then a rule doc column "policies" should equal "security-ips drop, max-detect-ips drop" in the database
     Then a rule doc column "is_community" should equal "true" in the database
 

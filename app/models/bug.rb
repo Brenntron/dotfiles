@@ -22,7 +22,7 @@ class Bug < ApplicationRecord
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }
   scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
-  scope :by_component, ->(component) { whe#handle re('component = ?', component) }
+  scope :by_component, ->(component) { where('component = ?', component) }
 
   scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
 
