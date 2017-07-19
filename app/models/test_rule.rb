@@ -1,7 +1,15 @@
 require 'activemessaging/processor'
 include ActiveMessaging::MessageSender
 class TestRule
-  publishes_to :snort_local_rules_test_work
+  case
+    when Rails.env.production?
+      publishes_to :snort_local_rules_work
+    when Rails.env.staging?
+      publishes_to :snort_local_rules_stage_work
+    else
+      publishes_to :snort_local_rules_test_work
+  end
+
 
 
   def self.send_work_msg(task, xmlrpc_token, bug)
@@ -15,13 +23,33 @@ class TestRule
     task.rules.each do |rule|
       rules_content << rule.test_rule_content
     end
-    publish :snort_local_rules_test_work,
-            {
-              task_id: task.id,
-              cookie: xmlrpc_token,
-              pcaps: all_attachments,
-              rules: rules_content
-            }.to_json
+    case
+      when Rails.env.production?
+        publish :snort_local_rules_work,
+                {
+                    task_id: task.id,
+                    cookie: xmlrpc_token,
+                    pcaps: all_attachments,
+                    rules: rules_content
+                }.to_json
+      when Rails.env.staging?
+        publish :snort_local_rules_stage_work,
+                {
+                    task_id: task.id,
+                    cookie: xmlrpc_token,
+                    pcaps: all_attachments,
+                    rules: rules_content
+                }.to_json
+      else
+        publish :snort_local_rules_test_work,
+                {
+                    task_id: task.id,
+                    cookie: xmlrpc_token,
+                    pcaps: all_attachments,
+                    rules: rules_content
+                }.to_json
+    end
+
   end
 
   def initialize(new_task, xmlrpc_token, bug, rules)

@@ -59,6 +59,18 @@ if Rails.env == "development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
+case
+  when Rails.env.production?
+    publish_local_result = "/queue/RulesUI.Snort.Run.Local.Result"
+    subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Work"
+  when Rails.env.staging?
+    publish_local_result = "/queue/RulesUI.Snort.Run.Local.Stage.Result"
+    subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Stage.Work"
+  else
+    publish_local_result = "/queue/RulesUI.Snort.Run.Local.Test.Result"
+    subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Test.Work"
+end
+
 # Make sure our pcaps cache exists
 unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
@@ -68,24 +80,24 @@ stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
 }
-puts "talk to bugzilla"
+Rails.logger.info("#{Time.now} -> talk to bugzilla")
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 
-puts "create stomp client"
+Rails.logger.info( "#{Time.now} -> create stomp client")
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
-client.subscribe "/queue/RulesUI.Snort.Run.Local.Test.Work", {:ack => :client}
+client.subscribe subscribe_local_work, {:ack => :client}
 
-puts "listening to LOCAL queue"
+Rails.logger.info( "#{Time.now} -> listening to LOCAL queue")
 while message = client.receive
   begin
-    puts "starting local rule work"
-    puts "++++++++++++++++++++++++"
+    Rails.logger.info( "#{Time.now} -> starting local rule work")
+    Rails.logger.info( "++++++++++++++++++++++++")
     # Start by parsing the request
     request = JSON.parse(message.body)
 
-    puts request
+    Rails.logger.debug("#{Time.now} -> #{request}")
 
     # Release the message early
     client.ack(message.headers['message-id'])
@@ -108,7 +120,7 @@ while message = client.receive
           bug = Bugzilla::Bug.new(xmlrpc)
           res = bug.attachments(:attachment_ids => attachment_id, :include_fields => ['data'])
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
-
+          Rails.logger.debug("#{Time.now} -> Found attachments in bugzilla")
           # Finally, we should actually have data
           bytes_written = IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
 
@@ -133,6 +145,7 @@ while message = client.receive
       # Should we upload the pcap
       req.body = Curl::PostField.file("pcap", pcap_path) #build the curl request
       #now we make the request as a post request
+      Rails.logger.debug("#{Time.now} ->  Making pcap request to #{Rails.env} ruletest server")
       resp = HTTPI.post req do |http|
         http.multipart_form_post = true
       end
@@ -160,6 +173,7 @@ while message = client.receive
         :engine_id => 2,    #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
         :local_rules => request['rules']
     }
+    Rails.logger.debug("#{Time.now} ->  Making job request to #{Rails.env} ruletest server")
     resp = HTTPI.post(req)  #make the request
 
     # Make sure the job was created
@@ -177,7 +191,7 @@ while message = client.receive
     unless Rails.env == "development"
       # Wait for the job to finish
       begin
-        print "Waiting on job #{job_id} to complete: "
+        Rails.logger.info("Waiting on job #{job_id} to complete: ")
 
         Timeout::timeout(120) do
           while true
@@ -189,12 +203,12 @@ while message = client.receive
               job = JSON.parse(resp.body)
 
               if job['completed'] == "1"
-                puts
+                Rails.logger.info("job completed")
                 if job['failed'] == "1"
-                  puts "Job failed: #{job}"
+                  Rails.logger.info("Job failed: #{job}")
                 else
                   pcaps.each do |pcap_id, pcap_name|
-                    puts "#{pcap_name}:"
+                    Rails.logger.info("#{pcap_name}:")
 
                     # Fetch the associated pcap tests
                     req.url = "#{Rails.configuration.ruletest_server}/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
@@ -205,11 +219,12 @@ while message = client.receive
                       alerts = JSON.parse(HTTPI.get(req).body)
 
                       if alerts.size == 0
-                        puts "\tNO ALERTS"
+                        Rails.logger.info( "\tNO ALERTS")
                       else
                         alerts.each do |alert|
-                          puts "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}"
-                          client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
+                          Rails.logger.info( "#{Time.now} -> Publishing RESULTS:")
+                          Rails.logger.info( "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}")
+                          client.publish publish_local_result,
                                          {
                                              :id => pcap_name,
                                              :gid => alert['gid'],
@@ -229,7 +244,7 @@ while message = client.receive
             end
 
             # Wait before trying again
-            print "."
+            Rails.logger.info(".")
             sleep 1
           end
         end
@@ -237,12 +252,12 @@ while message = client.receive
       rescue Exception => e
         raise Exception.new( e.message )
       rescue Timeout::Error => e
-        puts "Timed out waiting for #{job_id} to finish"
+        Rails.logger.error("Timed out waiting for #{job_id} to finish")
       end
 
     end
     # And notify the front end that the job is complete
-    client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
+    client.publish publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :completed => job['completed'],
@@ -251,9 +266,9 @@ while message = client.receive
                    }.to_json
 
   rescue JSON::ParserError => e
-    puts e.inspect
+    Rails.logger.error(e.inspect)
   rescue EOFError => e
-    client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
+    client.publish publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :failed => true,
@@ -261,7 +276,7 @@ while message = client.receive
                        :result => "Bugzilla appears to be fucking off: #{e.to_s}"
                    }.to_json
   rescue Exception => e
-    client.publish "/queue/RulesUI.Snort.Run.Local.Test.Result",
+    client.publish publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :failed => true,

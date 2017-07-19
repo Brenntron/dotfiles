@@ -74,6 +74,18 @@ if Rails.env =="development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
+case
+  when Rails.env.production?
+    publish_all_result = "/queue/RulesUI.Snort.Run.All.Result"
+    subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Work"
+  when Rails.env.staging?
+    publish_all_result = "/queue/RulesUI.Snort.Run.All.Stage.Result"
+    subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Stage.Work"
+  else
+    publish_all_result = "/queue/RulesUI.Snort.Run.All.Test.Result"
+    subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Test.Work"
+end
+
 # Make sure our pcaps cache exists
 unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
@@ -86,20 +98,20 @@ stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
 }
-puts "xmlrpc to bugzilla"
+Rails.logger.info("#{Time.now} -> xmlrpc to bugzilla")
 # Create the xmlrpc instance for updating later
 xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 
-puts "create stomp client and subscribe to amq"
+Rails.logger.info("#{Time.now} -> create stomp client and subscribe to amq")
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
-client.subscribe "/queue/RulesUI.Snort.Run.All.Test.Work", {:ack => :client}
+client.subscribe subscribe_all_work, {:ack => :client}
 
-puts "listening to ALL queue"
+Rails.logger.info("#{Time.now} -> listening to ALL queue")
 while message = client.receive
-  puts "starting all rule work"
-  puts "++++++++++++++++++++++"
+  Rails.logger.info( "#{Time.now} -> starting all rule work")
+  Rails.logger.info( "++++++++++++++++++++++")
   pcap_alerts = Array.new
   errors = Array.new
   task_id = nil
@@ -107,8 +119,8 @@ while message = client.receive
   begin
     # Start by parsing the request
     request = JSON.parse(message.body)
-
-    puts request
+    Rails.logger.info("#{Time.now} -> received request")
+    Rails.logger.debug(request)
 
     # Release the message early
     client.ack(message.headers['message-id'])
@@ -134,7 +146,7 @@ while message = client.receive
           bug = Bugzilla::Bug.new(xmlrpc)
           res = bug.attachments(:attachment_ids => attachment_id, :include_fields => ['data'])
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
-
+          Rails.logger.debug("#{Time.now} -> Found attachments in bugzilla")
           # Finally, we should actually have data
           bytes_written = IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
 
@@ -159,6 +171,7 @@ while message = client.receive
       # Should we upload the pcap
       req.body = Curl::PostField.file("pcap", pcap_path) #build the curl request
       #now we make the request as a post request
+      Rails.logger.debug("#{Time.now} ->  Making pcap request to #{Rails.env} ruletest server")
       resp = HTTPI.post req do |http|
         http.multipart_form_post = true
       end
@@ -181,12 +194,12 @@ while message = client.receive
     req.url = "#{Rails.configuration.ruletest_server}/jobs"
 
     # Create the new job
-    puts "Creating persistent job"
+    Rails.logger.info( "Creating persistent job")
     req.body = {
         :pcaps => test_pcaps,
         :engine_id => 1, #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
     }
-
+    Rails.logger.debug("#{Time.now} ->  Making job request to #{Rails.env} ruletest server")
     resp = HTTPI.post(req) #make the request
 
     if resp.code != 200 and resp.code != 201
@@ -206,7 +219,7 @@ while message = client.receive
     unless Rails.env == "development"
       # Wait for the job to finish
       begin
-        print "Waiting on job #{job_id} to complete: "
+        Rails.logger.info("Waiting on job #{job_id} to complete: ")
 
         Timeout::timeout(120) do
           while true
@@ -218,12 +231,12 @@ while message = client.receive
               job = JSON.parse(resp.body)
 
               if job['completed'] == "1"
-                puts
+                Rails.logger.info("Job Completed")
                 if job['failed'] == "1"
-                  puts "Job failed: #{job}"
+                  Rails.logger.info( "Job failed: #{job}")
                 else
                   pcaps.each do |pcap_id, pcap_name|
-                    puts "#{pcap_name}:"
+                    Rails.logger.info( "#{pcap_name}:")
 
                     # Fetch the associated pcap tests
                     req.url = "#{Rails.configuration.ruletest_server}/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
@@ -234,11 +247,10 @@ while message = client.receive
                       alerts = JSON.parse(HTTPI.get(req).body)
 
                       if alerts.size == 0
-                        puts "\tNO ALERTS"
+                        Rails.logger.info( "\tNO ALERTS")
                       else
                         alerts.each do |alert|
-
-                          puts "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}"
+                          Rails.logger.info( "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}")
                           pcap_alerts <<
                               {
                                   :id => pcap_name,
@@ -259,7 +271,7 @@ while message = client.receive
             end
 
             # Wait before trying again
-            print "."
+            Rails.logger.info(".")
             sleep 1
           end
         end
@@ -267,26 +279,28 @@ while message = client.receive
       rescue Exception => e
         raise Exception.new(e.message)
       rescue Timeout::Error => e
-        puts "Timed out waiting for #{job_id} to finish"
+        Rails.logger.error( "Timed out waiting for #{job_id} to finish")
       end
 
     end
 
 
   rescue JSON::ParserError => e
-    print "Failed to parse json message:"
-    puts e.to_s
-    puts e.backtrace.join("\n\t")
+    Rails.logger.error("Failed to parse json message:#{e.to_s}")
+    Rails.logger.error( e.backtrace.join("\n\t"))
 
   rescue EOFError => e
+    Rails.logger.error("Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}")
     errors << "Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}"
   rescue Exception => e
+    Rails.logger.error("Rails encountered an error: #{e.message}")
     errors << e.message
   end
 
   # Finally, send the results back
   unless task_id.nil?
-    client.publish "/queue/RulesUI.Snort.Run.All.Test.Result",
+    Rails.logger.info( "#{Time.now} -> Publishing to AMQ")
+    client.publish publish_all_result,
                    {
                        :task_id => task_id,
                        :alerts => pcap_alerts,

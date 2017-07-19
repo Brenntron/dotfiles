@@ -55,18 +55,18 @@ module Api
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "staging"
-        config.ruletest_server = "https://ruleapitest.vrt.sourcefire.com"
+        config.ruletest_server = "https://fmd-rultst-01stg.vrt.sourcefire.com"
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
-        config.amq_host = "mqtest01.vrt.sourcefire.com"
+        config.amq_host = "fmd-actmq-01stg.vrt.sourcefire.com"
         config.cert_file = "/usr/local/etc/trusted-certificates.pem"
         config.canvas_root = Rails.root.join('extras')
         config.perl_cmd = "/usr/local/bin/perl"
         config.svn_cmd = "/usr/local/bin/svn"
         config.svn_pwd = ''
-        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+        config.rules_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk'
+        config.ruledocs_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
       when "production"
         config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')

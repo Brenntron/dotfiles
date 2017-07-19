@@ -1,15 +1,41 @@
 require 'activemessaging/processor'
 include ActiveMessaging::MessageSender
 class TestAttachment
-  publishes_to :snort_all_rules_test_work
+  case
+    when Rails.env.production?
+      publishes_to :snort_all_rules_test_work
+    when Rails.env.staging?
+      publishes_to :snort_all_rules_test_work
+    else
+      publishes_to :snort_all_rules_test_work
+  end
+
 
   def self.send_work_msg(content, xmlrpc_token, attachments)
-    publish :snort_all_rules_test_work,
-            {
-              task_id: content.id,
-              cookie: xmlrpc_token,
-              pcaps: attachments
-            }.to_json
+    case
+      when Rails.env.production?
+        publish :snort_all_rules_work,
+                {
+                    task_id: content.id,
+                    cookie: xmlrpc_token,
+                    pcaps: attachments
+                }.to_json
+      when Rails.env.staging?
+        publish :snort_all_rules_stage_work,
+                {
+                    task_id: content.id,
+                    cookie: xmlrpc_token,
+                    pcaps: attachments
+                }.to_json
+      else
+        publish :snort_all_rules_test_work,
+                {
+                    task_id: content.id,
+                    cookie: xmlrpc_token,
+                    pcaps: attachments
+                }.to_json
+    end
+
   end
 
   def initialize(new_task, xmlrpc_token, attachments)

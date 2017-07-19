@@ -34,8 +34,14 @@
 class SnortLocalRulesResultProcessor < ApplicationProcessor
 
   NEW_RULE_ID_BIAS = 1_000_000 unless defined? NEW_RULE_ID_BIAS
-
-  subscribes_to :snort_local_rules_test_result
+  case
+    when Rails.env.production?
+      subscribes_to :snort_local_rules_result
+    when Rails.env.staging?
+      subscribes_to :snort_local_rules_stage_result
+    else
+      subscribes_to :snort_local_rules_test_result
+  end
 
   def on_message(message)
     puts "=============================="
