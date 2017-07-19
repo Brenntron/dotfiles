@@ -756,7 +756,6 @@ class Rule < ApplicationRecord
       if rule_doc.present?
         rule_doc = RuleDoc.prepare_rule_doc_hash(rule_doc, rule)
       end
-
       rule.create_rule_doc(rule_doc)
     end
   end
