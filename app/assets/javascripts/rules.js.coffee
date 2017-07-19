@@ -1,8 +1,17 @@
 window.disparage =(chkbox) ->
+  disparage_messages = [
+    "You should feel bad about yourself",
+    "Really?",
+    "whoa, dude",
+    "Oh man, did you have to?",
+    "Does your mother know you are doing this?",
+    "Maybe your low self esteem is just good sense.",
+    "Bad dog, no biscuit.",
+    ]
+
   if (chkbox.checked)
-    alert("on")
-  else
-    alert("off")
+    message_index = Math.floor(Math.random() * disparage_messages.length)
+    alert(disparage_messages[message_index])
 
 $ ->
   $('.rule-toolbar').click ->
