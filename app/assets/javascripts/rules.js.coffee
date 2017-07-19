@@ -1,5 +1,6 @@
-$ ->
+window.disparage = -> alert("shame")
 
+$ ->
   $('.rule-toolbar').click ->
     tab = $(this).attr('id')
     isSelected = false
@@ -469,3 +470,4 @@ $ ->
         $('.impact-standard')[0].value = e.responseText
 
     }
+
