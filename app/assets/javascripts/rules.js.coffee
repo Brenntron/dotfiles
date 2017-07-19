@@ -1,4 +1,8 @@
-window.disparage = -> alert("shame")
+window.disparage =(chkbox) ->
+  if (chkbox.checked)
+    alert("on")
+  else
+    alert("off")
 
 $ ->
   $('.rule-toolbar').click ->
