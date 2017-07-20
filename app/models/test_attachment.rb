@@ -6,7 +6,7 @@ class TestAttachment
 
 
   def self.send_work_msg(content, xmlrpc_token, attachments)
-    publish Rails.configuration.amq_snort_local,
+    publish Rails.configuration.amq_snort_all,
             {
                 task_id: content.id,
                 cookie: xmlrpc_token,
