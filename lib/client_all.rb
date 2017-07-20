@@ -74,18 +74,6 @@ if Rails.env =="development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
-case
-  when Rails.env.production?
-    publish_all_result = "/queue/RulesUI.Snort.Run.All.Result"
-    subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Work"
-  when Rails.env.staging?
-    publish_all_result = "/queue/RulesUI.Snort.Run.All.Stage.Result"
-    subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Stage.Work"
-  else
-    publish_all_result = "/queue/RulesUI.Snort.Run.All.Test.Result"
-    subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Test.Work"
-end
-
 # Make sure our pcaps cache exists
 unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)

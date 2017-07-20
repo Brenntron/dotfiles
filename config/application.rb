@@ -54,6 +54,19 @@ module Api
         config.svn_pwd = ''
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+
+        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Test.Result"
+        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Test.Result"
+        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Test.Work"
+        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Test.Work"
+
+        config.amq_snort_local = :snort_local_rules_test_work
+        config.amq_snort_all = :snort_all_rules_test_work
+        config.amq_snort_all_result = :snort_all_rules_test_result
+        config.amq_snort_local_result = :snort_local_rules_test_result
+
+        config.amq_snort_commit_result = :snort_commit_test_result
+
       when "staging"
         config.ruletest_server = "https://fmd-rultst-01stg.vrt.sourcefire.com"
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
@@ -67,6 +80,19 @@ module Api
         config.svn_pwd = ''
         config.rules_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+
+        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Stage.Result"
+        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Stage.Result"
+        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Stage.Work"
+        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Stage.Work"
+
+        config.amq_snort_local = :snort_local_rules_stage_work
+        config.amq_snort_all = :snort_all_rules_stage_work
+        config.amq_snort_all_result = :snort_all_rules_stage_result
+        config.amq_snort_local_result = :snort_local_rules_stage_result
+
+        config.amq_snort_commit_result = :snort_commit_stage_result
+
       when "production"
         config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
@@ -80,6 +106,18 @@ module Api
         config.svn_pwd = ''
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+
+        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Result"
+        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Result"
+        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Work"
+        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Work"
+
+        config.amq_snort_local_work = :snort_local_rules_work
+        config.amq_snort_all_work = :snort_all_rules_work
+        config.amq_snort_all_result = :snort_all_rules_result
+        config.amq_snort_local_result = :snort_local_rules_result
+
+        config.amq_snort_commit_result = :snort_commit_result
       when "test"
         config.ruletest_server = "https://localhost:3000/api_test"
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
@@ -93,6 +131,18 @@ module Api
         config.svn_pwd = ''
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+
+        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Test.Result"
+        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Test.Result"
+        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Test.Work"
+        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Test.Work"
+
+        config.amq_snort_local = :snort_local_rules_test_work
+        config.amq_snort_all = :snort_all_rules_test_work
+        config.amq_snort_all_result = :snort_all_rules_test_result
+        config.amq_snort_local_result = :snort_local_rules_test_result
+
+        config.amq_snort_commit_result = :snort_commit_test_result
     end
     config.websockets_enabled = "false"
     config.bugzilla_domain = 'cisco.com'
