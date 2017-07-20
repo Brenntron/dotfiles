@@ -19,10 +19,10 @@ class TestRule
 
     publish Rails.configuration.amq_snort_local,
             {
-                task_id: task.id,
-                cookie: xmlrpc_token,
-                pcaps: all_attachments,
-                rules: rules_content
+              task_id: task.id,
+              cookie: xmlrpc_token,
+              pcaps: all_attachments,
+              rules: rules_content
             }.to_json
   end
 

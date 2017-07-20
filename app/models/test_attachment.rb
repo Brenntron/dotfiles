@@ -8,9 +8,9 @@ class TestAttachment
   def self.send_work_msg(content, xmlrpc_token, attachments)
     publish Rails.configuration.amq_snort_all,
             {
-                task_id: content.id,
-                cookie: xmlrpc_token,
-                pcaps: attachments
+              task_id: content.id,
+              cookie: xmlrpc_token,
+              pcaps: attachments
             }.to_json
   end
 

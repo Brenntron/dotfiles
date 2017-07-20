@@ -99,7 +99,6 @@ client.subscribe Rails.configuration.subscribe_all_work, {:ack => :client}
 Rails.logger.info("#{Time.now} -> listening to ALL queue")
 while message = client.receive
   Rails.logger.info( "#{Time.now} -> starting all rule work")
-  Rails.logger.info( "++++++++++++++++++++++")
   pcap_alerts = Array.new
   errors = Array.new
   task_id = nil
@@ -259,7 +258,6 @@ while message = client.receive
             end
 
             # Wait before trying again
-            Rails.logger.info(".")
             sleep 1
           end
         end

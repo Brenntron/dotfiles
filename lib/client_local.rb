@@ -82,7 +82,6 @@ Rails.logger.info( "#{Time.now} -> listening to LOCAL queue")
 while message = client.receive
   begin
     Rails.logger.info( "#{Time.now} -> starting local rule work")
-    Rails.logger.info( "++++++++++++++++++++++++")
     # Start by parsing the request
     request = JSON.parse(message.body)
 
@@ -233,7 +232,6 @@ while message = client.receive
             end
 
             # Wait before trying again
-            Rails.logger.info(".")
             sleep 1
           end
         end
