@@ -92,7 +92,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                   rule = Rule.new(:gid => alert['gid'].to_i, :sid => alert['sid'].to_i, :rev => alert['rev'].to_i, :message => alert['message'])
                 end
 
-                rule.state = "UNCHANGED"
+                rule.state = Rule::UNCHANGED_STATE
                 rule.edit_status = Rule::EDIT_STATUS_NEW
                 rule.publish_status = Rule::PUBLISH_STATUS_SYNCHED
               end

@@ -57,20 +57,34 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_SYNCHED        = 'SYNCHED'         #unchanged from VC and up to date with VC
   PUBLISH_STATUS_CURRENT_EDIT   = 'CURRENT_EDIT'    #draft of rule edited in UI, but optimistic it can be checked in
   PUBLISH_STATUS_STALE_EDIT     = 'STALE_EDIT'      #draft but VC rev has changed and cannot be checked in
-  PUBLISH_STATUS_PUBLISHING     = 'PUBLISHING'      #draft in process of being written to VC
+  PUBLISH_STATUS_PUBLISHING     = 'PUBCONTENT'      #draft in process of rule content being written to VC
+  PUBLISH_STATUS_PUBDOC         = 'PUBDOC'          #draft in process of rule docs being written to VC
 
   INCOMPLETE_STATE              = 'INCOMPLETE'
-  UNCHANGED_STATE                = 'UNCHANGED'
+  UNCHANGED_STATE               = 'UNCHANGED'
   UPDATED_STATE                 = 'UPDATED'
   NEW_STATE                     = 'NEW'
   STALE_STATE                   = 'STALE'           #is set to stale when publish status is set to stale
   DELETED_STATE                 = 'DELETED'
-  
+
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
+  scope :with_pub_content, -> { where(publish_status: PUBLISH_STATUS_PUBLISHING) }
+  scope :with_pub_doc, -> { where(publish_status: PUBLISH_STATUS_PUBDOC) }
+  scope :with_pub_any, -> { where(publish_status: [PUBLISH_STATUS_PUBLISHING, PUBLISH_STATUS_PUBDOC]) }
+
   def deleted?
-    rule_category && rule_category.deleted?
+    rule_category&.deleted?
+  end
+
+  def requires_doc?
+    case
+      when rule_category.blank?
+        false
+      else
+        rule_category.requires_doc?
+    end
   end
 
   def has_doc?
@@ -79,9 +93,7 @@ class Rule < ApplicationRecord
 
   def doc_complete?
     case
-      when rule_category.blank?
-        true
-      when !rule_category.requires_doc?
+      when !requires_doc?
         true
       when !has_doc?
         false
@@ -117,6 +129,10 @@ class Rule < ApplicationRecord
   def off_rule_content(rule_content_given = nil)
     local_rule_content = rule_content_given || self.rule_content
     local_rule_content.sub(/^\s*#?\s*/, '# ')
+  end
+
+  def content_changed?
+    new_rule? || (cvs_rule_content != rule_content)
   end
 
   def test_rule_content
@@ -320,8 +336,8 @@ class Rule < ApplicationRecord
   # calls assign_attributes.
   # does not save rule.
   # @param [Hash, #read]
-  def assign(attributes)
-    assign_attributes(attributes.slice(*%i(rev message connection flow detection class_type metadata message)))
+  def assign_from_parser(attributes)
+    assign_attributes(attributes.slice(*%i(gid sid rev message connection flow detection class_type metadata message)))
     self.rule_category = RuleCategory.find_or_create_by(category: attributes[:rule_category])
     self.attributes
   end
@@ -349,7 +365,7 @@ class Rule < ApplicationRecord
     parser = RuleSyntax::RuleParser.new(rule_content)
     find_from_parser(parser, rule_id).tap do |rule|
       rule.assign_from_visrule(rule_content)
-      rule.assign(parser.attributes)
+      rule.assign_from_parser(parser.attributes)
 
       if rule.sid
         rule.state                        = UPDATED_STATE
@@ -378,7 +394,7 @@ class Rule < ApplicationRecord
 
     assign_from_visrule(rule_content)
 
-    assign(parser.attributes)
+    assign_from_parser(parser.attributes)
 
     self.cvs_rule_content               = self.rule_content
     self.cvs_rule_parsed                = self.rule_parsed
@@ -406,16 +422,54 @@ class Rule < ApplicationRecord
 
     rule_db = by_sid(parser.sid, parser.gid).first
 
-    if rule_db && rule_db.draft?
+    if rule_db&.draft?
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db.update(state: STALE_STATE)
       rule_db
-    elsif rule_db && rule_db.deleted?
+    elsif rule_db&.deleted?
       rule_db.update(state: DELETED_STATE)
     else
       rule = find_from_parser(parser)
       rule.load_rule_content(rule_content)
       rule
+    end
+  end
+
+  # Sets a rule or rules to a synched state
+  #
+  # @param [Rule|Relation] A single rule object or an ActiveRecord relation
+  def self.set_synched_state(rule_arg)
+    state_values = { publish_status: PUBLISH_STATUS_SYNCHED,
+                     edit_status: EDIT_STATUS_SYNCHED,
+                     state: UNCHANGED_STATE }
+
+    case rule_arg
+      when Rule
+        rule_arg.update(state_values)
+      else
+        rule_arg.update_all(state_values)
+    end
+  end
+
+  def self.set_pubcontent_state(rule_arg)
+    case rule_arg
+      when Rule
+        rule_arg.update( publish_status: PUBLISH_STATUS_PUBLISHING )
+      else
+        rule_arg.update_all( publish_status: PUBLISH_STATUS_PUBLISHING )
+    end
+  end
+
+  def self.set_pubdoc_state(rule_arg)
+    state_values = { publish_status: PUBLISH_STATUS_PUBDOC,
+                     edit_status: EDIT_STATUS_EDIT,
+                     state: UPDATED_STATE }
+
+    case rule_arg
+      when Rule
+        rule_arg.update( state_values )
+      else
+        rule_arg.update_all( state_values )
     end
   end
 
@@ -430,6 +484,7 @@ class Rule < ApplicationRecord
       rule = Rule.by_sid(sid, gid || 1).first
       if rule && (rev.to_i > rule.rev)
         rule.load_rule_content(line)
+        Rule.set_pubdoc_state(rule) if rule.publishing_content?
       end
     end
   end
@@ -652,10 +707,12 @@ class Rule < ApplicationRecord
     PUBLISH_STATUS_STALE_EDIT == publish_status
   end
 
-  # Tests if edited rule is in progress while VC updated the rule externally
-  # @return [boolean] true iff rule is a updated edited rule and VC has updated the rule
-  def publishing?
+  def publishing_content?
     PUBLISH_STATUS_PUBLISHING == publish_status
+  end
+
+  def publishing_doc?
+    PUBLISH_STATUS_PUBDOC == publish_status
   end
 
   # The CSS class identifiers to identify the type of rule this is.
