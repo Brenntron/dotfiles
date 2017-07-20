@@ -1,6 +1,9 @@
 class SnortCommitResultProcessor < ApplicationProcessor
 
-  subscribes_to :snort_commit_test_result
+
+
+  subscribes_to Rails.configuration.amq_snort_commit_result
+
 
   def on_message(message)
     puts "=========================="

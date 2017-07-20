@@ -1,10 +1,12 @@
 require 'activemessaging/processor'
 include ActiveMessaging::MessageSender
 class TestAttachment
-  publishes_to :snort_all_rules_test_work
+
+  publishes_to Rails.configuration.amq_snort_all
+
 
   def self.send_work_msg(content, xmlrpc_token, attachments)
-    publish :snort_all_rules_test_work,
+    publish Rails.configuration.amq_snort_all,
             {
               task_id: content.id,
               cookie: xmlrpc_token,
@@ -15,7 +17,7 @@ class TestAttachment
   def initialize(new_task, xmlrpc_token, attachments)
     @xmlrpc_token = xmlrpc_token
     @new_task = new_task
-    @attachments = attachments.map { |attachment_id| attachment_id.to_i}
+    @attachments = attachments.map { |attachment_id| attachment_id.to_i }
   end
 
   def send_work_msg

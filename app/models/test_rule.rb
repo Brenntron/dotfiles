@@ -1,12 +1,13 @@
 require 'activemessaging/processor'
 include ActiveMessaging::MessageSender
 class TestRule
-  publishes_to :snort_local_rules_test_work
+
+  publishes_to Rails.configuration.amq_snort_local
 
 
   def self.send_work_msg(task, xmlrpc_token, bug)
     # be sure to collect all the attachments too but only the ones that are pcaps
-    all_attachments = bug.attachments.inject([]) do | memo, attachment |
+    all_attachments = bug.attachments.inject([]) do |memo, attachment|
       memo << attachment.id if /^[-\w]+.pcap$/.match(attachment.file_name)
       memo
     end
@@ -15,7 +16,8 @@ class TestRule
     task.rules.each do |rule|
       rules_content << rule.test_rule_content
     end
-    publish :snort_local_rules_test_work,
+
+    publish Rails.configuration.amq_snort_local,
             {
               task_id: task.id,
               cookie: xmlrpc_token,

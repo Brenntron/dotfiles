@@ -43,7 +43,9 @@
 ######################
 class SnortAllRulesResultProcessor < ApplicationProcessor
 
-  subscribes_to :snort_all_rules_test_result
+
+  subscribes_to Rails.configuration.amq_snort_all_result
+
 
   def on_message(message)
     puts "============================"

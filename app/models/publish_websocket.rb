@@ -3,10 +3,11 @@ require 'json'
 include ActiveMessaging::MessageSender
 
 class PublishWebsocket
-  publishes_to :snort_local_rules_test_work
+
+  publishes_to Rails.configuration.amq_snort_local
 
   def self.push_changes(record)
-    publish :snort_local_rules_test_work,
+    publish Rails.configuration.amq_snort_local,
             {record: record.to_json}.to_json
   end
 end
