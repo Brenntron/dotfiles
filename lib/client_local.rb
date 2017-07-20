@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env rails runner
 
 ######################
 #=============
@@ -87,7 +87,7 @@ xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
 Rails.logger.info( "#{Time.now} -> create stomp client")
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
-client.subscribe subscribe_local_work, {:ack => :client}
+client.subscribe Rails.configuration.subscribe_local_work, {:ack => :client}
 
 Rails.logger.info( "#{Time.now} -> listening to LOCAL queue")
 while message = client.receive
@@ -224,7 +224,7 @@ while message = client.receive
                         alerts.each do |alert|
                           Rails.logger.info( "#{Time.now} -> Publishing RESULTS:")
                           Rails.logger.info( "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}")
-                          client.publish publish_local_result,
+                          client.publish Rails.configuration.publish_local_result,
                                          {
                                              :id => pcap_name,
                                              :gid => alert['gid'],
@@ -257,7 +257,7 @@ while message = client.receive
 
     end
     # And notify the front end that the job is complete
-    client.publish publish_local_result,
+    client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :completed => job['completed'],
@@ -268,7 +268,7 @@ while message = client.receive
   rescue JSON::ParserError => e
     Rails.logger.error(e.inspect)
   rescue EOFError => e
-    client.publish publish_local_result,
+    client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :failed => true,
@@ -276,7 +276,7 @@ while message = client.receive
                        :result => "Bugzilla appears to be fucking off: #{e.to_s}"
                    }.to_json
   rescue Exception => e
-    client.publish publish_local_result,
+    client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :failed => true,

@@ -1,14 +1,10 @@
 class SnortCommitResultProcessor < ApplicationProcessor
 
 
-  case
-    when Rails.env.production?
-      subscribes_to :snort_commit_result
-    when Rails.env.staging?
-      subscribes_to :snort_commit_stage_result
-    else
-      subscribes_to :snort_commit_test_result
-  end
+
+  subscribes_to Rails.configuration.amq_snort_commit_result
+
+
   def on_message(message)
     puts "=========================="
     puts "Configuring commit results"

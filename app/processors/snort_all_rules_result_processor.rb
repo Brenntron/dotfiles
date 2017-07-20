@@ -43,14 +43,9 @@
 ######################
 class SnortAllRulesResultProcessor < ApplicationProcessor
 
-  case
-    when Rails.env.production?
-      subscribes_to :snort_all_rules_result
-    when Rails.env.staging?
-      subscribes_to :snort_all_rules_stage_result
-    else
-      subscribes_to :snort_all_rules_test_result
-  end
+
+  subscribes_to Rails.configuration.amq_snort_all_result
+
 
   def on_message(message)
     puts "============================"

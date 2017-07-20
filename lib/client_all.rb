@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env rails runner
 
 ######################
 #=============
@@ -106,7 +106,7 @@ Rails.logger.info("#{Time.now} -> create stomp client and subscribe to amq")
 # Create our stomp client
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
-client.subscribe subscribe_all_work, {:ack => :client}
+client.subscribe Rails.configuration.subscribe_all_work, {:ack => :client}
 
 Rails.logger.info("#{Time.now} -> listening to ALL queue")
 while message = client.receive
@@ -300,7 +300,7 @@ while message = client.receive
   # Finally, send the results back
   unless task_id.nil?
     Rails.logger.info( "#{Time.now} -> Publishing to AMQ")
-    client.publish publish_all_result,
+    client.publish Rails.configuration.publish_all_result,
                    {
                        :task_id => task_id,
                        :alerts => pcap_alerts,
