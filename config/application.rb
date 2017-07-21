@@ -55,10 +55,10 @@ module Api
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
 
-        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Test.Result"
-        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Test.Result"
-        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Test.Work"
-        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Test.Work"
+        config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
+        config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Test.Result"
+        config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Test.Work"
+        config.subscribe_all_work = "/queue/AnalystConsole.Snort.Run.All.Test.Work"
 
         config.amq_snort_local = :snort_local_rules_test_work
         config.amq_snort_all = :snort_all_rules_test_work
@@ -81,10 +81,10 @@ module Api
         config.rules_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
 
-        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Stage.Result"
-        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Stage.Result"
-        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Stage.Work"
-        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Stage.Work"
+        config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Stage.Result"
+        config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Stage.Result"
+        config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Stage.Work"
+        config.subscribe_all_work = "/queue/AnalystConsole.Snort.Run.All.Stage.Work"
 
         config.amq_snort_local = :snort_local_rules_stage_work
         config.amq_snort_all = :snort_all_rules_stage_work
@@ -107,10 +107,10 @@ module Api
         config.rules_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
 
-        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Result"
-        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Result"
-        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Work"
-        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Work"
+        config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Result"
+        config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Result"
+        config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Work"
+        config.subscribe_all_work = "/queue/AnalystConsole.Snort.Run.All.Work"
 
         config.amq_snort_local = :snort_local_rules_work
         config.amq_snort_all = :snort_all_rules_work
@@ -132,10 +132,10 @@ module Api
         config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
         config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
 
-        config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Test.Result"
-        config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Test.Result"
-        config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Test.Work"
-        config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Test.Work"
+        config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
+        config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Test.Result"
+        config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Test.Work"
+        config.subscribe_all_work = "/queue/AnalystConsole.Snort.Run.All.Test.Work"
 
         config.amq_snort_local = :snort_local_rules_test_work
         config.amq_snort_all = :snort_all_rules_test_work
