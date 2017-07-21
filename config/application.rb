@@ -112,8 +112,8 @@ module Api
         config.subscribe_local_work = "/queue/RulesUI.Snort.Run.Local.Work"
         config.subscribe_all_work = "/queue/RulesUI.Snort.Run.All.Work"
 
-        config.amq_snort_local_work = :snort_local_rules_work
-        config.amq_snort_all_work = :snort_all_rules_work
+        config.amq_snort_local = :snort_local_rules_work
+        config.amq_snort_all = :snort_all_rules_work
         config.amq_snort_all_result = :snort_all_rules_result
         config.amq_snort_local_result = :snort_local_rules_result
 
