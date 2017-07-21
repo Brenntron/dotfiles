@@ -104,8 +104,8 @@ module Api
         config.perl_cmd = "/usr/local/bin/perl"
         config.svn_cmd = "/usr/local/bin/svn"
         config.svn_pwd = ''
-        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+        config.rules_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk'
+        config.ruledocs_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
 
         config.publish_local_result = "/queue/RulesUI.Snort.Run.Local.Result"
         config.publish_all_result = "/queue/RulesUI.Snort.Run.All.Result"
