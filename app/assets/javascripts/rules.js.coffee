@@ -1,5 +1,39 @@
-$ ->
+window.disparage =(chkbox) ->
+  disparage_messages = [
+    "You should feel bad about yourself",
+    "Really?",
+    "Whoa, duuude!",
+    "Oh man, did you have to?",
+    "Does your mother know you are doing this?",
+    "Maybe your low self esteem is just good sense.",
+    "Bad dog, no biscuit.",
+    "Does Marshall know you are doing this?",
+    "Thanks for contributing to the nightmare that is no documentation for the user.",
+    "Are you sure you know what you are doing?",
+    "OK, but you may have to explain yourself later.",
+    "... and there shall be weeping and gnashing of teeth",
+    "You're being very undude.",
+    "Am I the only one who gives a shit about the rules?!",
+    "uncool!",
+    "Do you really have such writer’s block that you cannot wait to write a summary?",
+    "Would it kill you to write a summary?",
+    "OMG, Like, I literally just can't even ...",
+    "Mister self important fancy pants, in a such hurry, can’t write a summary.",
+    "How dare you?",
+    "*ding*  *ding* *ding* Shame, Shame, Shame.",
+    "With all we did for you, you couldn't be bothered to write documentation.",
+    "I hope you can live with yourself.",
+    "Such a thing you are doing, but we still care about you.",
+    "What monster would do this?",
+    "I won't tell anyone, but *I* know. :(",
+    ]
 
+  if (chkbox.checked)
+    message_index = Math.floor(Math.random() * disparage_messages.length)
+    alert(disparage_messages[message_index])
+
+
+$ ->
   $('.rule-toolbar').click ->
     tab = $(this).attr('id')
     isSelected = false
@@ -116,6 +150,7 @@ $ ->
                 rule_ids: selected
                 username: $('#username').text()
                 bug_id: $('.bugzilla_id').text()
+                nodoc_override: $('#missing-doc-override')[0].checked
               type: 'PUT'
               dataType: 'json'
               success: (response) ->
@@ -469,3 +504,4 @@ $ ->
         $('.impact-standard')[0].value = e.responseText
 
     }
+

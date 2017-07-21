@@ -195,11 +195,17 @@ class RuleFile
 
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
-  def self.commit_rules_action(rules_input, username, bugzilla_id)
+  def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
     rules_input.reject! { |rule| rule.synched? || rule.stale_edit? }
+
+    unless nodoc_override
+      return false unless rules.all? {|rule| rule.doc_complete? }
+    end
+
     if rules_input.any? && publish_lock
-      committer = Repo::RuleCommitter.new(rules_input, username: username)
-      rules = committer.changed_rules
+        committer = Repo::RuleCommitter.new(rules_input, username: username)
+        rules = committer.changed_rules
+      log("publishing #{rules.count} rules, #{rule_files.count} files")
 
       if rules.any?
         rule_files = committer.rule_files
