@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
-. /usr/local/etc/analyst-console/processes.conf
+CONFIGFILE="/usr/local/etc/analyst-console/processes.conf"
+
+if [ -f ${CONFIGFILE} ]; then
+	. ${CONFIGFILE}
+else
+	echo configuration file ${CONFIGFILE} does not exist
+	exit
+fi
 
 # Set the number of each you want run
 declare -A processes
