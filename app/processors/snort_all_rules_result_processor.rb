@@ -75,56 +75,62 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
             job.result << "#{err}\n"
           end
         end
-        attachments.each do |attachment_id, alerts|
+        if attachments.empty?
+          attachments.each do |attachment_id, alerts|
 
-          attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
-          # give some kind of feedback about the alerts on the pcap test
-          job.result << "Alerts on pcap: #{attachment.file_name}\n"
-          job.result << "===============================================\n"
-          job.result << "NONE" if alerts.count == 0
+            attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
+            # give some kind of feedback about the alerts on the pcap test
+            job.result << "Alerts on pcap: #{attachment.file_name}\n"
+            job.result << "===============================================\n"
+            job.result << "NONE" if alerts.count == 0
 
-          alerts.each do |alert|
-            begin
-              rule = Rule.by_sid(alert['sid'].to_i, alert['gid'].to_i).first
+            alerts.each do |alert|
+              begin
+                rule = Rule.by_sid(alert['sid'].to_i, alert['gid'].to_i).first
 
-              if rule.nil?
-                if alert['gid'].to_i == 1
-                  rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i))
-                else
-                  rule = Rule.new(:gid => alert['gid'].to_i, :sid => alert['sid'].to_i, :rev => alert['rev'].to_i, :message => alert['message'])
+                if rule.nil?
+                  if alert['gid'].to_i == 1
+                    rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i))
+                  else
+                    rule = Rule.new(:gid => alert['gid'].to_i, :sid => alert['sid'].to_i, :rev => alert['rev'].to_i, :message => alert['message'])
+                  end
+
+                  rule.state = Rule::UNCHANGED_STATE
+                  rule.edit_status = Rule::EDIT_STATUS_NEW
+                  rule.publish_status = Rule::PUBLISH_STATUS_SYNCHED
                 end
 
-                rule.state = Rule::UNCHANGED_STATE
-                rule.edit_status = Rule::EDIT_STATUS_NEW
-                rule.publish_status = Rule::PUBLISH_STATUS_SYNCHED
-              end
-
-              # The rule should have extracted if it was valid
-              if rule.valid?
-                job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
-                rule.save(:validate => false)
-                attachment.pcap_alerts.create(rule: rule)
-              else
-                if rule.message.nil?
-                  job.failed = true
-                  rule.errors.each do |k, v|
-                    job.result << "#{rule.version} #{v}\n"
-                  end
-                else
+                # The rule should have extracted if it was valid
+                if rule.valid?
                   job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                   rule.save(:validate => false)
                   attachment.pcap_alerts.create(rule: rule)
+                else
+                  if rule.message.nil?
+                    job.failed = true
+                    rule.errors.each do |k, v|
+                      job.result << "#{rule.version} #{v}\n"
+                    end
+                  else
+                    job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
+                    rule.save(:validate => false)
+                    attachment.pcap_alerts.create(rule: rule)
+                  end
                 end
-              end
 
-            rescue RuleError => e
-              job.failed = true
-              job.result << "#{e.to_s} for sid #{alert['sid']}\n"
-            rescue ActiveRecord::RecordNotUnique => e
-              # Ignore these
+              rescue RuleError => e
+                job.failed = true
+                job.result << "#{e.to_s} for sid #{alert['sid']}\n"
+              rescue ActiveRecord::RecordNotUnique => e
+                # Ignore these
+              end
             end
+            job.result << "\n"
           end
-          job.result << "\n"
+
+        else
+          job.result << "No alerts on any pcaps"
+          job.result << "======================\n"
         end
 
         job.completed = true
