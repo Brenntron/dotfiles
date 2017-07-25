@@ -159,7 +159,7 @@ while message = client.receive
     req.body = {
         :pcaps => pcaps.keys,
         :engine_id => 2,    #TODO: figure out what these ids mean and why we dont generate them based off of the snort and rule configurations
-        :local_rules => request['rules']
+        :local_rules => request['rules'].join("\n")
     }
     Rails.logger.debug("#{Time.now} ->  Making job request to #{Rails.env} ruletest server")
     resp = HTTPI.post(req)  #make the request
