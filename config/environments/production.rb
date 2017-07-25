@@ -80,6 +80,10 @@ Rails.application.configure do
   # Use a different logger for distributed setups.
   config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'analyst-console')
 
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    config.logger           = ActiveSupport::Logger.new(STDOUT)
+    config.logger.formatter = config.log_formatter
+  end
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
