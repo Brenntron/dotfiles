@@ -1,3 +1,5 @@
+require 'syslog/logger'
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -77,6 +79,9 @@ Rails.application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
+
+  # Use a different logger for distributed setups.
+  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'analyst-console')
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
