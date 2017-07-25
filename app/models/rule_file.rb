@@ -35,6 +35,7 @@ class RuleFile
 
   # lock publishing, so current thread is only thread doing a commit
   def self.publish_lock
+    log("publish lock")
     publish_mutex.synchronize do
       if @publish_lock_pid
         nil
@@ -49,6 +50,7 @@ class RuleFile
   # Threads other than the one which locked publishing can unlock it.
   # It is up to the developer (via writting the code) to only unlock it from the right thread.
   def self.publish_unlock
+    log("publish unlock")
     publish_mutex.synchronize do
       @publish_lock_pid = nil
     end
@@ -127,10 +129,12 @@ class RuleFile
     unless File.directory?(working_pathname.dirname)
       FileUtils.mkpath(working_pathname.dirname)
       svn_url = "#{Rails.configuration.rules_repo_url}/#{relative_pathname.dirname}/"
+      self.class.log("svn co --depth empty #{svn_url} #{working_pathname.dirname}")
       `#{self.class.svn_cmd} co --depth empty #{svn_url} #{working_pathname.dirname}`
     end
 
     remove_working_file
+    self.class.log("svn up #{working_pathname}")
     `#{self.class.svn_cmd} up #{working_pathname}`
   end
 
@@ -196,16 +200,16 @@ class RuleFile
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
-    rules_input.reject! { |rule| rule.synched? || rule.stale_edit? }
+    rules.reject! { |rule| rule.synched? || rule.stale_edit? }
 
     unless nodoc_override
       return false unless rules.all? {|rule| rule.doc_complete? }
     end
 
-    if rules_input.any? && publish_lock
-        committer = Repo::RuleCommitter.new(rules_input, username: username)
-        rules = committer.changed_rules
-      log("publishing #{rules.count} rules, #{rule_files.count} files")
+    if rules.any? && publish_lock
+      committer = Repo::RuleCommitter.new(rules, username: username)
+      rules = committer.changed_rules
+      log("publishing #{rules.count} rules")
 
       if rules.any?
         rule_files = committer.rule_files
@@ -238,6 +242,10 @@ class RuleFile
 
     true
 
+  rescue
+    Rails.logger.error $!
+    Rails.logger.error $!.backtrace.join("\n")
+    raise
   ensure
     #any rules not set to synch by svn hook should go back to current.
     if Rule.with_pub_any.exists?
