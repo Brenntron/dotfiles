@@ -441,7 +441,7 @@ class Bug < ApplicationRecord
         #we need to test these new attachments
         options = {
             :bug              => Bug.where(id: bug_id).first,
-            :task_type         => "attachment",
+            :task_type        => Task::TASK_TYPE_PCAP_TEST,
             :attachment_array => bug.attachments.map{|a| a.id},
         }
         new_task = Task.create(
@@ -550,7 +550,7 @@ class Bug < ApplicationRecord
         #we need to test these new attachments
         options = {
             :bug              => Bug.where(id: bug_id).first,
-            :task_type         => "attachment",
+            :task_type        => Task::TASK_TYPE_PCAP_TEST,
             :attachment_array => bug.attachments.map{|a| a.id},
         }
         new_task = Task.create(
