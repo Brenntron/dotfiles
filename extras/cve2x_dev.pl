@@ -2,10 +2,10 @@
 
 #use warnings;
 use strict;
+use Switch;
 use Getopt::Long;
 use WWW::Mechanize;
 use Data::Dumper;
-use Try::Tiny;
 
 ##### Config #####
 
@@ -28,23 +28,23 @@ $ENV{"PERL_LWP_SSL_VERIFY_HOSTNAME"} = 0;
 # All source information
 
 my $source = {
-	# Source abbreviation	  , Associated subroutine	 , Source full-name				, Source URL			, 		CSV short name 
-	all    => { checked => "N", func => \&searchStart,         sname => "All",                  url => "Runs All Tests",			csv_name => "" },
-	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security", url => "http://packetstormsecurity.org/", 	csv_name => "other" },
-	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",       url => "http://securityfocus.com/",		csv_name => "bugtraq" },
-	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",           url => "http://exploit-db.com/",		csv_name => "expldb" },
-	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",           url => "http://metasploit.com/",		csv_name => "metasploit" },
-	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",        url => "http://coresecurity.com/",		csv_name => "core" },
-	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                url => "http://telussecuritylabs.com/",	csv_name => "telus" },
-	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                url => "http://osvdb.org/",			csv_name => "other" },
-	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=", csv_name => "other" },
-	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",               url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG", csv_name => "canvas" }
+	# Source abbreviation	  , Associated subroutine	 , Source full-name				, Source URL, 		CSV short name
+	all    => { checked => "N", func => \&searchStart,         sname => "All",                                url => "Runs All Tests", csv_name => "" },
+	ps     => { checked => "N", func => \&searchPacketstorm,   sname => "Packetstorm Security",               url => "http://packetstormsecurity.org/", csv_name => "other" },
+	sf     => { checked => "N", func => \&searchSecurityfocus, sname => "Security Focus",                     url => "http://securityfocus.com/", csv_name => "bugtraq" },
+	edb    => { checked => "N", func => \&searchExploitdb,     sname => "Exploit DB",                         url => "http://exploit-db.com/", csv_name => "expldb" },
+	ms     => { checked => "N", func => \&searchMetasploit,    sname => "Metasploit",                         url => "http://metasploit.com/", csv_name => "metasploit" },
+	cs     => { checked => "N", func => \&searchCore,          sname => "CORE Security",                      url => "http://coresecurity.com/", csv_name => "core" },
+	telus  => { checked => "N", func => \&searchTelus,         sname => "TELUS",                              url => "http://telussecuritylabs.com/", csv_name => "telus" },
+	osvdb  => { checked => "N", func => \&searchOSVDB,         sname => "OSVDB",                              url => "http://osvdb.org/", csv_name => "other" },
+	mitre  => { checked => "N", func => \&searchMITRE,         sname => "MITRE",                              url => "http://cve.mitre.org/cgi-bin/cvename.cgi?name=", csv_name => "other" },
+	canvas => { checked => "N", func => \&searchCANVAS,        sname => "CANVAS",                             url => "http://immunitysec.com/",  catalog => "$canvas_root/CANVAS_CATALOG", csv_name => "canvas" }
 };
 
 
 my @sources = sort keys %{$source};
 
-GetOptions('c=s' => \$cve, 'f=s' => \$cve_file, 'p' => \$print, 't=s' => \$type, 'w' => \$write, 'v' => \$verbose, 'i=s' => \$ignore, 'y' => \$csv );
+GetOptions('c=s' => \$cve, 'f=s' => \$cve_file, 'p' => \$print, 't=s' => \$type, 'w' => \$write, 'v' => \$verbose, 'i=s' => \$ignore, 'y' => \$csv  );
 
 
 ##
@@ -66,7 +66,7 @@ sub searchStart($$)
 	my @ignore = split( /,\s?/, $ignore );
 
 	## If we are looking for all, pull in the sources alphabetically.
-	## Otherwise, usemeh type specified with -t
+	## Otherwise, use type specified with -t
 	($type eq lc "all") ? @search = sort @sources : $search[0] = $type;
 
 	for my $sauce (sort @search)
@@ -93,6 +93,7 @@ sub searchStart($$)
 		$source->{$sauce}->{"func"}->($cve);
 
 	} ## end for (sort @search)
+
 	print "-" x 45, "\n" unless $write;
 } ## end sub searchStart($$)
 
@@ -102,24 +103,10 @@ sub searchMITRE
 	setChecked("mitre", "Y");
 
 	my $cve = shift;
-
 	my $url = $source->{"mitre"}->{"url"} . "CVE-$cve";
 	my $mech = mechInit("mitre");
 
 	$mech->get($url);
-
-	#<tr>
-	#	<th colspan="2">Description</th>
-	#</tr>
-	#<tr>
-	#	<td colspan="2">Race condition in the PCNTL extension in PHP before 5.3.4, when a
-	#user-defined signal handler exists, might allow context-dependent
-	#attackers to cause a denial of service (memory corruption) via a large
-	#number of concurrent signals.
-	#
-	#</td>
-	#	</tr>
-
 
 	my $info = ($mech->content =~ /<tr>\s*<th colspan="2">Description<\/th>\s*<\/tr>\s*<tr>\s*<td colspan="2">(.*?)<\/td>\s*<\/tr>/smig)[0];
 	# Put the description all on one line.
@@ -191,9 +178,14 @@ sub searchExploitdb
 
 	my $mech = mechInit("edb");
 
-	$mech->get("http://www.exploit-db.com/search/?action=search&filter_cve=$cve");
+	# Sometimes Exploit-DB can be a bit lazy
+	my $numtries = 3;
+	do {
+		$mech->get("https://www.exploit-db.com/search/?action=search&cve=$cve");
+		$numtries--;
+	} while(!($mech->success()) && ($numtries != 0) && (print STDERR ">>> Trying Exploit-DB again.\n"));
 
-	my @results = $mech->content =~ /(http:\/\/www.exploit-db.com\/exploits\/\d+)/smig;
+	my @results = $mech->content =~ /(https?:\/\/www.exploit-db.com\/exploits\/\d+)/smig;
 
 	push(@{ $source->{"edb"}{"links"} }, $_) for @results;
 } ## end sub searchExploitdb
@@ -205,36 +197,40 @@ sub searchMetasploit
 	my $cve = shift;
 
 	my $mech = mechInit("ms");
-	$mech->get("http://www.rapid7.com/db/search?q=cve-$cve&t=m");
 
-	my $content = $mech->content;
+	$mech->get("http://www.rapid7.com/db/search?q=$cve&t=m");
+	my @results = $mech->content =~ /(https?:\/\/github.com\/rapid7\/metasploit-framework\/blob\/master\/modules\/exploits\/[^"']+)["']\s*>\s*Source Code/smi;
 
-	if($mech->content =~ /<a href='(.*?)'>Source Code<\/a>/) {
-		push(@{$source->{"ms"}{"links"}}, $1);
-	}
-
+	push(@{ $source->{"ms"}{"links"} }, $_) for @results;
 } ## end sub searchMetasploit
 
 sub searchCore
 {
+	print STDERR ">>> Core Security link has changed.  Check disabled!\n";
+        setChecked("cs", "DISABLED");
+        return;
+
 	setChecked("cs", "Y");
 
 	my $cve = shift;
 
 	my $mech = mechInit("cs");
 
-	$mech->get("http://www.coresecurity.com/products/core-impact/recent-exploits-and-updates?title=&field_exploit_type_tid=All&field_vulnerabilty_id_value=cve-$cve&field_operating_system_tid=All&order=field_released_date&sort=desc");
+	$mech->get("http://www.coresecurity.com/index.php?module=SearchMod&action=index&q=$cve&x=12&y=10");
 
-	my @results = $mech->content =~ /<td class="views-field views-field-title" >\s+(.*?)\s+<\/td>/gs;
-
-	if(scalar(@results) > 0)
+	if ($mech->content =~ /.*class="linkSearch" href="(http:\/\/www.coresecurity.com\/content\/.*[^\"]+)">/i)
 	{
-		push(@{ $source->{"cs"}{"links"} }, $_) for @results;
+		push(@{ $source->{"cs"}{"links"} }, $1);
 	}
 } ## end sub searchCore
 
 sub searchOSVDB
 {
+
+        print STDERR ">>> Need to add CloudFlare bybass.  Check disabled!\n";
+        setChecked("osvdb", "DISABLED");
+        return;
+
 	setChecked("osvdb", "Y");
 
 	my $cve = shift;
@@ -258,11 +254,14 @@ sub searchOSVDB
 
 sub searchTelus
 {
+
+        print STDERR ">>> Contract negotiations FTL.  Check disabled!\n";
+        setChecked("telus", "DISABLED");
+        return;
+
 	setChecked("telus", "Y");
 
 	my $cve = shift;
-
-	try {
 
 	my $mech = mechInit("telus");
 
@@ -284,6 +283,7 @@ sub searchTelus
 	$mech->get("https://portal.telussecuritylabs.com/search/search_results?kw=$cve");
 
 	# the page above will have a link that matches this regex if the cve is found
+
 	my @results = uniq( $mech->content =~ /<a href="\/(threat\/TSL\d+-\d+)">/msgi );
 
 	for my $part ( @results )	
@@ -300,7 +300,6 @@ sub searchTelus
 			push(@{ $source->{"telus"}{"links"} }, "https://portal.telussecuritylabs.com/$part/vulnerability_proof_of_concept/");
 		} ## end if ($mech->content =~ ...)
 	} ## end if ($mech->content =~ ...)
-	};
 } ## end sub searchTelus
 
 sub search1337Day
@@ -308,7 +307,6 @@ sub search1337Day
 	setChecked("1337", "Y");
 
 	my $cve  = shift;
-
 	my $msid = cve2msid($cve);
 
 	my $mech = mechInit("1337");
@@ -347,7 +345,6 @@ sub searchCANVAS
         setChecked("canvas", "Y");
 
         my $cve  = shift;
-
         my $msid = cve2msid($cve);
         my $cat  = $source->{canvas}->{catalog};
 
@@ -410,8 +407,8 @@ sub printHeader
 {
 	my $cve = shift;
 	if(!$csv) {
-		print "[*] Searching CVE: $cve\n\n";
-	}
+            print "[*] Searching CVE: $cve\n\n";
+    	}
 	return;
 } ## end sub printHeader
 
@@ -448,11 +445,11 @@ sub templateOut($)
 
 		if ($#{ $source->{$k}{"links"} } >= 0)
 		{
-			if($csv) {
-				foreach my $link (@{ $source->{$k}{"links"} }) {
-					print $source->{$k}->{"csv_name"} . ",$link\n";
-				}
-			}
+            if($csv) {
+                foreach my $link (@{ $source->{$k}{"links"} }) {
+                    print $source->{$k}->{"csv_name"} . ",$link\n";
+                }
+		    }
 			$notes .= $source->{$k}{"sname"} . ":\n";
 			$notes .= "  " . join("\n  ", @{ $source->{$k}{"links"} }) . "\n\n";
 
@@ -460,8 +457,9 @@ sub templateOut($)
 	} ## end foreach my $k (sort @sources...)
 
 	if($csv) {
-		exit;
-	}
+        exit;
+    }
+
 	my $template = <<EOS;
 
 Research Checks:
@@ -477,21 +475,23 @@ EOS
 
 		$template .= sprintf("%s: %s ", $source->{ $k }{ sname }, "." x ( 41 - length( $source->{ $k }{ sname } ) ) );
 
-		if( $source->{ $k }{ checked } eq "ERROR" )
-		{
-			$template .= "ERROR\n";
-		} else
-		{
-			# Borked - figure it out - vague undescriptive comments for the win
+                if( $source->{ $k }{ checked } eq 'Y' ) {
 
-			if( scalar @{ $source->{ $k }{ "links" } } )
-			{
-				$template .= "Y\n";
-			} else
-			{
-				$template .= "N\n";
-			}
-		}
+                        if( scalar @{ $source->{ $k }{ "links" } } ) {
+                                $template .= "Y\n";
+                        } else {
+                                $template .= "N\n";
+                        }
+
+                } elsif( $source->{ $k }{ checked } eq 'N' ) {
+
+			$template .= "NOT CHECKED\n";
+
+                } else {
+
+			$template .= $source->{ $k }{ checked } . "\n";
+
+                }
 
 		# Clear out the links for the next source
 		$source->{$k}{"links"} = undef;
