@@ -76,7 +76,6 @@ module Repo
       working_file_list = working_file_list(rule_files)
       log("committing files #{working_file_list}")
 
-      svn_result_output = %Q`#{svn_cmd} commit #{working_file_list} -m "#{svn_commit_message}" 2>&1`
       svn_result_output = `#{svn_cmd} commit #{working_file_list} -m "#{svn_commit_message}" 2>&1`
       Rails.logger.info svn_result_output
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
@@ -85,10 +84,8 @@ module Repo
 
       if bug
         changed_rules.each do |rule|
-          bug_rule = rule.bugs_rules.where(bug_id: bug).first
-          if bug_rule
-            bug_rule.update!(svn_result_output: svn_result_output, svn_result_code: svn_result_code || 0)
-          end
+          rule.bugs_rules.where(bug_id: bug)
+              .update_all(svn_result_output: svn_result_output, svn_result_code: svn_result_code || 0)
         end
       end
 

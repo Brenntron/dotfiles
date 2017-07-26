@@ -197,7 +197,14 @@ class RuleFile
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
 
     unless nodoc_override
-      return false unless rules.all? {|rule| rule.doc_complete? }
+      incomplete_rules = rules.reject { |rule| rule.doc_complete? }
+      if incomplete_rules.any?
+        incomplete_rules.each do |incomplete_rule|
+          incomplete_rule.bugs_rules.where(bug_id: bugzilla_id)
+              .update_all(svn_result_output: "Cannot commit with incomplete rule docs", svn_result_code: -1)
+        end
+        raise "Cannot commit with incomplete rule docs"
+      end
     end
 
     if rules.any? && publish_lock
