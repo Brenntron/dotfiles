@@ -142,6 +142,7 @@ $ ->
             }
         when 'commit'
           if window.confirm("Are you sure?")
+            debugger
             headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
             $.ajax {
               url: "/api/v1/rules/commit"
@@ -156,6 +157,7 @@ $ ->
               success: (response) ->
                 $('.alert_rules').addClass('success').show().html('Rules has been committed')
               error: (response) ->
+                alert(response.responseText.match(/^[^\n]*\n[^\n]*/)[0])
                 $('.alert_rules').addClass('error').show().html('Rules have not been committed')
               complete: ->
                 setTimeout (->
