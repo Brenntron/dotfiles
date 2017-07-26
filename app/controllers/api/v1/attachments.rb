@@ -64,7 +64,7 @@ module API
             bug.attachments << new_attach
             options = {
                 :bug              => bug,
-                :task_type         => "attachment",
+                :task_type        => Task::TASK_TYPE_PCAP_TEST,
                 :attachment_array => bug.attachments.map{|a| a.id},
 
             }
