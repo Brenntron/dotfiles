@@ -39,7 +39,8 @@ class Rule < ApplicationRecord
 
   belongs_to :rule_category, optional: true
 
-  has_and_belongs_to_many :bugs
+  has_many :bugs_rules
+  has_many :bugs, through: :bugs_rules
   has_and_belongs_to_many :references, dependent: :destroy
   accepts_nested_attributes_for :references
   has_many :test_reports

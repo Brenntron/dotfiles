@@ -1,0 +1,4 @@
+class BugsRule < ApplicationRecord
+  belongs_to :bug
+  belongs_to :rule
+end
