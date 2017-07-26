@@ -98,7 +98,7 @@ ActiveRecord::Schema.define(version: 20170726135926) do
   create_table "bugs_rules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bug_id", default: 0, null: false
     t.integer "rule_id", default: 0, null: false
-    t.string "svn_result_output"
+    t.text "svn_result_output"
     t.integer "svn_result_code"
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
   end

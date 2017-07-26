@@ -51,10 +51,10 @@ module BugsHelper
     case
       when bug_rule.nil? || bug_rule.svn_result_code.nil?
         '-'
-      when bug_rule.svn_success
-        content_tag(:i, class: "glyphicon glyphicon-plus-sign", title: "money honey") { '' }
+      when bug_rule.svn_success?
+        content_tag(:i, class: "glyphicon glyphicon-plus-sign", title: bug_rule.svn_result_output) { '' }
       else
-        content_tag(:i, class: "glyphicon glyphicon-minus-sign", title: "money honey") { '' }
+        content_tag(:i, class: "glyphicon glyphicon-minus-sign", title: bug_rule.svn_result_output) { '' }
     end
   end
 end

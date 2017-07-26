@@ -138,12 +138,6 @@ class RuleFile
     `#{self.class.svn_cmd} up #{working_pathname}`
   end
 
-  def self.commit_files(rule_files, username)
-    commit_out = `#{svn_cmd} commit #{working_file_list(rule_files)} -m "#{username} committed from Analyst Console" 2>&1`
-    Rails.logger.debug commit_out
-    raise "Rule content commit failed." unless commit_out =~ /\(exit code 199\)/
-  end
-
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_add_line_rule(bug, rule_content)
@@ -207,7 +201,7 @@ class RuleFile
     end
 
     if rules.any? && publish_lock
-      committer = Repo::RuleCommitter.new(rules, username: username)
+      committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
       rules = committer.changed_rules
       log("publishing #{rules.count} rules")
 
@@ -224,8 +218,7 @@ class RuleFile
           rule.patch_file(working_pathname_of(rule.nonnil_pathname))
         end
 
-        log("committing files #{working_file_list(rule_files)}")
-        commit_files(rule_files, username)
+        committer.commit_rule_content
 
         rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
 
