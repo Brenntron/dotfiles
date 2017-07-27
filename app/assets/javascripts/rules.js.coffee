@@ -156,6 +156,7 @@ $ ->
               success: (response) ->
                 $('.alert_rules').addClass('success').show().html('Rules has been committed')
               error: (response) ->
+                alert(response.responseText.match(/^[^\n]*\n[^\n]*/)[0])
                 $('.alert_rules').addClass('error').show().html('Rules have not been committed')
               complete: ->
                 setTimeout (->

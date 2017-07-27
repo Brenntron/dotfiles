@@ -1,6 +1,7 @@
 class Bug < ApplicationRecord
 
-  has_and_belongs_to_many :rules
+  has_many :bugs_rules
+  has_many :rules, through: :bugs_rules
   has_and_belongs_to_many :tags, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true

@@ -59,6 +59,7 @@
         <td>State</td>
         <td>Version</td>
         <td>Message</td>
+        <td>Commit</td>
         <td>Alerts</td>
         <td>Check</td>
         <td>Match</td>
@@ -85,6 +86,7 @@
                   </a>
                 </td>
                 <td><code><%= rule.message %></code></td>
+                <td class="center"><%= display_commit_status(@bug, rule) %></td>
                 <td class="center">
                   <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
                 </td>
