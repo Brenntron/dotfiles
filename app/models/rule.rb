@@ -39,7 +39,8 @@ class Rule < ApplicationRecord
 
   belongs_to :rule_category, optional: true
 
-  has_and_belongs_to_many :bugs
+  has_many :bugs_rules
+  has_many :bugs, through: :bugs_rules
   has_and_belongs_to_many :references, dependent: :destroy
   accepts_nested_attributes_for :references
   has_many :test_reports
@@ -156,6 +157,10 @@ class Rule < ApplicationRecord
       update(rule_content: on_rule_content, on: false)
       off_rule_content
     end
+  end
+
+  def clear_svn_result
+    bugs_rules.update_all(svn_result_output: nil, svn_result_code: nil)
   end
 
   def record(action)
@@ -358,38 +363,32 @@ class Rule < ApplicationRecord
     rule
   end
 
-  # Take a line from a user edit and saves to database
+  # Take a line from a user edit and assign the rule state
   # @param [String, #read] rule_content the rule content
-  # @param [Integer, #read] rule_id the rule id if known
-  def self.save_rule_content(rule_content, rule_id = nil)
-    parser = RuleSyntax::RuleParser.new(rule_content)
-    find_from_parser(parser, rule_id).tap do |rule|
-      rule.assign_from_visrule(rule_content)
-      rule.assign_from_parser(parser.attributes)
+  # @param [RuleSyntax::RuleParser, #read] parser a standard parser constructed from the rule_content
+  def assign_from_user_edit(rule_content, parser:)
+    assign_from_visrule(rule_content)
+    assign_from_parser(parser.attributes)
 
-      if rule.sid
-        rule.state                        = UPDATED_STATE
-        rule.edit_status                  = EDIT_STATUS_EDIT
-      else
-        rule.state                        = NEW_STATE
-        rule.edit_status                  = EDIT_STATUS_NEW
-      end
+    if self.sid
+      self.state                        = UPDATED_STATE
+      self.edit_status                  = EDIT_STATUS_EDIT
+    else
+      self.state                        = NEW_STATE
+      self.edit_status                  = EDIT_STATUS_NEW
+    end
 
-      rule.state                          = INCOMPLETE_STATE unless rule.parsed? || rule.doc_complete?
-      rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
+    self.state                          = INCOMPLETE_STATE unless parsed? || doc_complete?
+    self.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless stale_edit?
 
-      if rule.deleted?
-        rule.state                        = DELETED_STATE
-      end
-
-      rule.save!
+    if deleted?
+      self.state                        = DELETED_STATE
     end
   end
 
-  # Forces a load of the rule from the rule_content.
-  # Assumed to be loaded from a rules file (either a synch or revert).
-  # @param [String, #read] rule_content
-  def load_rule_content(rule_content)
+  # Take a line from a user edit and assign the rule state
+  # @param [String, #read] rule_content the rule content
+  def assign_from_rule_file(rule_content)
     parser = RuleSyntax::RuleParser.new(rule_content)
 
     assign_from_visrule(rule_content)
@@ -406,8 +405,28 @@ class Rule < ApplicationRecord
     else
       self.state                          = UNCHANGED_STATE
     end
-    self.save!
-    self.associate_references(rule_content)
+  end
+
+  # Take a line from a user edit and saves to database
+  # @param [String, #read] rule_content the rule content
+  # @param [Integer, #read] rule_id the rule id if known
+  def self.save_rule_content(rule_content, rule_id = nil)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    find_from_parser(parser, rule_id).tap do |rule|
+      rule.assign_from_user_edit(rule_content, parser: parser)
+      rule.save!
+      rule.clear_svn_result
+    end
+  end
+
+  # Forces a load of the rule from the rule_content.
+  # Assumed to be loaded from a rules file (either a synch or revert).
+  # @param [String, #read] rule_content
+  def load_rule_content(rule_content)
+    assign_from_rule_file(rule_content)
+    save!
+    associate_references(rule_content)
+    clear_svn_result
     self
   end
 

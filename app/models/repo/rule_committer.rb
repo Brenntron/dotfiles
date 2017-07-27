@@ -1,6 +1,8 @@
 module Repo
   class RuleCommitter
-    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :username
+    include Enumerable
+
+    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :username
 
     def log(message)
       Rails.logger.info "svn integration: #{message}"
@@ -41,7 +43,8 @@ module Repo
       end
     end
 
-    def initialize(rules, username: nil)
+    def initialize(rules, bugzilla_id: nil, username: nil)
+      @bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
       @username = username
       @rules = rules
       @changed_rules, @unchanged_rules = rules.partition { |rule| rule.content_changed? }
@@ -51,6 +54,43 @@ module Repo
 
     def each(&block)
       rule_files.each(&block)
+    end
+
+    def svn_commit_message
+      user_prefix = username ? "#{username} " : ''
+      "#{user_prefix}committed from Analyst Console"
+    end
+
+    def svn_cmd
+      pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
+      "#{Rails.configuration.svn_cmd} #{pwd_switch}"
+    end
+
+    # @return [String] space separated list of relative file paths
+    def working_file_list(rule_files)
+      map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
+    end
+
+    # def commit_rule_content(bug: nil, username: nil)
+    def commit_rule_content
+      working_file_list = working_file_list(rule_files)
+      log("committing files #{working_file_list}")
+
+      svn_result_output = `#{svn_cmd} commit #{working_file_list} -m "#{svn_commit_message}" 2>&1`
+      Rails.logger.info svn_result_output
+      svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
+                          svn_result_code_str.to_i
+                        end
+
+      if bug
+        changed_rules.each do |rule|
+          rule.bugs_rules.where(bug_id: bug)
+              .update_all(svn_result_output: svn_result_output, svn_result_code: svn_result_code || 0)
+        end
+      end
+
+      raise "Rule content commit failed." unless 199 == svn_result_code
+      svn_result_code
     end
 
     def commit_doc?(rule)
