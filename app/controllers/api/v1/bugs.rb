@@ -107,6 +107,7 @@ module API
                 end
                 progress_bar.update_attribute("progress", 75)
                 parsed[:refs].each do |ref|
+                  bug.references << ref unless bug.references.map {|r| r.reference_data}.include? ref.reference_data
                   Exploit.find_exploits(ref)
                 end
                 progress_bar.update_attribute("progress", 90)

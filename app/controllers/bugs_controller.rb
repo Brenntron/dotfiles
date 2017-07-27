@@ -36,6 +36,9 @@ class BugsController < ApplicationController
 
   def show
     @bug = Bug.where(id: params[:id]).first
+    @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
+
+
     if @bug
       @rules = @bug.rules.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.all
