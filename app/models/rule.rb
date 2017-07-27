@@ -359,30 +359,36 @@ class Rule < ApplicationRecord
     rule
   end
 
+  # Take a line from a user edit and assign the rule state
+  # @param [String, #read] rule_content the rule content
+  # @param [RuleSyntax::RuleParser, #read] parser a standard parser constructed from the rule_content
+  def assign_from_user_edit(rule_content, parser:)
+    assign_from_visrule(rule_content)
+    assign_from_parser(parser.attributes)
+
+    if self.sid
+      self.state                        = UPDATED_STATE
+      self.edit_status                  = EDIT_STATUS_EDIT
+    else
+      self.state                        = NEW_STATE
+      self.edit_status                  = EDIT_STATUS_NEW
+    end
+
+    self.state                          = INCOMPLETE_STATE unless parsed? || doc_complete?
+    self.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless stale_edit?
+
+    if deleted?
+      self.state                        = DELETED_STATE
+    end
+  end
+
   # Take a line from a user edit and saves to database
   # @param [String, #read] rule_content the rule content
   # @param [Integer, #read] rule_id the rule id if known
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
     find_from_parser(parser, rule_id).tap do |rule|
-      rule.assign_from_visrule(rule_content)
-      rule.assign_from_parser(parser.attributes)
-
-      if rule.sid
-        rule.state                        = UPDATED_STATE
-        rule.edit_status                  = EDIT_STATUS_EDIT
-      else
-        rule.state                        = NEW_STATE
-        rule.edit_status                  = EDIT_STATUS_NEW
-      end
-
-      rule.state                          = INCOMPLETE_STATE unless rule.parsed? || rule.doc_complete?
-      rule.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless rule.stale_edit?
-
-      if rule.deleted?
-        rule.state                        = DELETED_STATE
-      end
-
+      rule.assign_from_user_edit(rule_content, parser: parser)
       rule.save!
     end
   end
