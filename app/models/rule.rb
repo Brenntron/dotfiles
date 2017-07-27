@@ -382,21 +382,9 @@ class Rule < ApplicationRecord
     end
   end
 
-  # Take a line from a user edit and saves to database
+  # Take a line from a user edit and assign the rule state
   # @param [String, #read] rule_content the rule content
-  # @param [Integer, #read] rule_id the rule id if known
-  def self.save_rule_content(rule_content, rule_id = nil)
-    parser = RuleSyntax::RuleParser.new(rule_content)
-    find_from_parser(parser, rule_id).tap do |rule|
-      rule.assign_from_user_edit(rule_content, parser: parser)
-      rule.save!
-    end
-  end
-
-  # Forces a load of the rule from the rule_content.
-  # Assumed to be loaded from a rules file (either a synch or revert).
-  # @param [String, #read] rule_content
-  def load_rule_content(rule_content)
+  def assign_from_rule_file(rule_content)
     parser = RuleSyntax::RuleParser.new(rule_content)
 
     assign_from_visrule(rule_content)
@@ -413,9 +401,6 @@ class Rule < ApplicationRecord
     else
       self.state                          = UNCHANGED_STATE
     end
-    self.save!
-    self.associate_references(rule_content)
-    self
   end
 
   # Take a line from a rule file and saves to database if rule is unedited
@@ -440,6 +425,27 @@ class Rule < ApplicationRecord
       rule.load_rule_content(rule_content)
       rule
     end
+  end
+
+  # Take a line from a user edit and saves to database
+  # @param [String, #read] rule_content the rule content
+  # @param [Integer, #read] rule_id the rule id if known
+  def self.save_rule_content(rule_content, rule_id = nil)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    find_from_parser(parser, rule_id).tap do |rule|
+      rule.assign_from_user_edit(rule_content, parser: parser)
+      rule.save!
+    end
+  end
+
+  # Forces a load of the rule from the rule_content.
+  # Assumed to be loaded from a rules file (either a synch or revert).
+  # @param [String, #read] rule_content
+  def load_rule_content(rule_content)
+    self.assign_from_rule_file(rule_content)
+    self.save!
+    self.associate_references(rule_content)
+    self
   end
 
   # Sets a rule or rules to a synched state
