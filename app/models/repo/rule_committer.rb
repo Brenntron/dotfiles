@@ -117,7 +117,6 @@ module Repo
       #refresh rule objects from database
       @rules = Rule.where(id: @rules).to_a
 
-      byebug
       `#{RuleFile.svn_cmd} up #{self.class.ruledocs_root}/snort-rules`
       rules.each do |rule|
         if commit_doc?(rule)
