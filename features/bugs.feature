@@ -772,7 +772,7 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
-    And the folltig sowing notes exist:
+    And the following notes exist:
       | id |   comment     |  note_type |        author       | bug_id  |
       | 1  |i like comments| "research" | "nicherbe@cisco.com"| 145359  |
       | 2  |pork sandwiches| "research" | "nicherbe@cisco.com"| 145359  |
