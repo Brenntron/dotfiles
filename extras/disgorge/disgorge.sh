@@ -117,7 +117,7 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
     #fi
     ln -s $SHAREDDIR/extras/snort extras/snort
 
-    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ $RELPATH/$TAGDIR/extras/rulesdocs
+    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/ $RELPATH/$TAGDIR/extras/ruledocs
 fi
 
 if [ "" != "$CURRDIR" ]; then

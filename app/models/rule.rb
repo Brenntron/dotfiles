@@ -423,11 +423,11 @@ class Rule < ApplicationRecord
   # Forces a load of the rule from the rule_content.
   # Assumed to be loaded from a rules file (either a synch or revert).
   # @param [String, #read] rule_content
-  def load_rule_content(rule_content)
+  def load_rule_content(rule_content, should_clear_svn_result: true)
     assign_from_rule_file(rule_content)
     save!
     associate_references(rule_content)
-    clear_svn_result
+    clear_svn_result if should_clear_svn_result
     self
   end
 
@@ -516,10 +516,10 @@ class Rule < ApplicationRecord
   # Saves the rule.
   # @param [String, #read]  rule_content
   # @return [Rule] A rule object for the rule content.
-  def self.find_and_load_rule_content(rule_content)
+  def self.find_and_load_rule_content(rule_content, should_clear_svn_result: true)
     parser = RuleSyntax::RuleParser.new(rule_content)
     rule = Rule.find_from_parser(parser)
-    rule.load_rule_content(rule_content)
+    rule.load_rule_content(rule_content, should_clear_svn_result: should_clear_svn_result)
     rule
   end
 

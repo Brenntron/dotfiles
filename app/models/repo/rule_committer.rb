@@ -18,6 +18,10 @@ module Repo
       @svn_pathname ||= Pathname.new('extras/working')
     end
 
+    def self.ruledocs_root
+      @svn_pathname ||= Pathname.new('extras/ruledocs')
+    end
+
     # @param [Pathname, String] input file name, absolute or relative
     # @return [Pathname] the part of the file name relative to a working folder, the synchronized or working folder
     def self.relative_path_of(filepath)
@@ -77,7 +81,7 @@ module Repo
       log("committing files #{working_file_list}")
 
       svn_result_output = `#{svn_cmd} commit #{working_file_list} -m "#{svn_commit_message}" 2>&1`
-      Rails.logger.info svn_result_output
+      Rails.logger.info svn_result_output.gsub("\n", "~\n   ")
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
                           svn_result_code_str.to_i
                         end
@@ -89,6 +93,7 @@ module Repo
         end
       end
 
+      log("content commit return code #{svn_result_code.inspect}")
       raise "Rule content commit failed." unless 199 == svn_result_code
       svn_result_code
     end
@@ -112,15 +117,17 @@ module Repo
       #refresh rule objects from database
       @rules = Rule.where(id: @rules).to_a
 
-      `#{RuleFile.svn_cmd} up extras/rulesdocs/snort-rules`
+      `#{RuleFile.svn_cmd} up #{self.class.ruledocs_root}/snort-rules`
       rules.each do |rule|
         if commit_doc?(rule)
           rule.rule_doc.write_to_file if rule.rule_doc
           # set_rule_to_synched(rule)
         end
       end
-      `#{RuleFile.svn_cmd} add --force extras/rulesdocs/snort-rules`
-      `#{RuleFile.svn_cmd} ci extras/rulesdocs/snort-rules -m "#{username} committed from Analyst Console"`
+      `#{RuleFile.svn_cmd} add --force #{self.class.ruledocs_root}/snort-rules`
+      svn_result_output =
+          `#{RuleFile.svn_cmd} ci #{self.class.ruledocs_root}/snort-rules -m "#{username} committed from Analyst Console"`
+      Rails.logger.info svn_result_output.gsub("\n", "~\n   ")
 
       Rule.set_synched_state(Rule.where(id: rules))
     end
