@@ -77,7 +77,7 @@ module Repo
       log("committing files #{working_file_list}")
 
       svn_result_output = `#{svn_cmd} commit #{working_file_list} -m "#{svn_commit_message}" 2>&1`
-      Rails.logger.info svn_result_output
+      Rails.logger.info svn_result_output.gsub("\n", "~\n   ")
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
                           svn_result_code_str.to_i
                         end
@@ -89,6 +89,7 @@ module Repo
         end
       end
 
+      log("content commit return code #{svn_result_code.inspect}")
       raise "Rule content commit failed." unless 199 == svn_result_code
       svn_result_code
     end
@@ -120,7 +121,9 @@ module Repo
         end
       end
       `#{RuleFile.svn_cmd} add --force extras/rulesdocs/snort-rules`
-      `#{RuleFile.svn_cmd} ci extras/rulesdocs/snort-rules -m "#{username} committed from Analyst Console"`
+      svn_result_output =
+          `#{RuleFile.svn_cmd} ci extras/rulesdocs/snort-rules -m "#{username} committed from Analyst Console"`
+      Rails.logger.info svn_result_output.gsub("\n", "~\n   ")
 
       Rule.set_synched_state(Rule.where(id: rules))
     end

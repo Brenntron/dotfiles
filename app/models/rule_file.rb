@@ -240,6 +240,7 @@ class RuleFile
       committer.commit_docs
     end
 
+    log('returning a success')
     true
 
   rescue
