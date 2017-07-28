@@ -3,18 +3,6 @@
   They will automatically be included in application.css.
 */
 
-ins{
-    text-decoration: none;
-    background-color: lightgreen;
-}
-del {
-    text-decoration: none;
-    background-color: #ff4d1e;
-}
-.diff ul{
-    list-style: none;
-}
-
 .onError {
     border-color: red;
 }
