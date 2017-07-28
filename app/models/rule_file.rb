@@ -146,11 +146,11 @@ class RuleFile
     found_rule = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content.where(message: msg).first
 
     if found_rule
-      found_rule.load_rule_content(rule_content)
+      found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
       Rule.set_pubdoc_state(found_rule)
       found_rule
     else
-      loaded_rule = Rule.find_and_load_rule_content(rule_content)
+      loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
       bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.pluck(:id).include?(loaded_rule.id)
       Rule.set_pubdoc_state(loaded_rule)
       loaded_rule
