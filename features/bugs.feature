@@ -772,7 +772,7 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
-    And the following notes exist:
+    And the folltig sowing notes exist:
       | id |   comment     |  note_type |        author       | bug_id  |
       | 1  |i like comments| "research" | "nicherbe@cisco.com"| 145359  |
       | 2  |pork sandwiches| "research" | "nicherbe@cisco.com"| 145359  |
@@ -785,4 +785,46 @@ Feature: Bug
     Then note number "1" should say "pork sandwiches"
     And note number "2" should say "i like comments"
 
+  @javascript
+  Scenario: a bug that has a reference in the bug summary should display that reference in the overview tab
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                                          | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 CVE-2008-1434 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
+    And the following references exist belonging to bug "145359":
+      | id | reference_data | reference_type_id |
+      | 1  | 2008-1434      | 1                 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/145359"
+    And I click ".overview"
+    Then I should see "2008-1434"
 
+  @javascript
+  Scenario: a bug that has a rule with a reference should display that rule reference in the overview tab
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                                          | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And the following rule categories exist:
+      | category  | id |
+      | DELETED   |  1 |
+    And the following reference types exist:
+      | id | name    | description  | example |
+      | 1  | cve     | just a thing | 222-222 |
+      | 2  | url     | just a thing | 222-222 |
+      | 3  | bugtraq | just a thing | 222-222 |
+    And the following rules exist belonging to bug "145359":
+      |id | message                 | rule_category_id | parsed | sid  |
+      |1  | BLACKLIST message       | 1                |  true  | 19001|
+    And the following references exist belonging to rule with sid "19001":
+      | id | reference_data | reference_type_id |
+      | 1  | 2006-5745      | 1                 |
+    Then I wait for "3" seconds
+    And I goto "/bugs/145359"
+    And I click ".overview"
+    Then I should see "2006-5745"

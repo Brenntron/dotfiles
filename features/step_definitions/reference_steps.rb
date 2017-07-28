@@ -3,6 +3,18 @@ Given(/^the following references exist:$/) do |refs|
     FactoryGirl.create(:reference, ref)
   end
 end
+Given(/^the following references exist belonging to bug "(.*?)":$/) do |bug_id, references|
+  bug = Bug.where(id: bug_id).first
+  references.hashes.each do |ref_attrs|
+    bug.references << FactoryGirl.create(:reference, ref_attrs)
+  end
+end
+Given(/^the following references exist belonging to rule with sid "(.*?)":$/) do |rule_sid, references|
+  rule = Rule.where(sid: rule_sid).first
+  references.hashes.each do |ref_attrs|
+    rule.references << FactoryGirl.create(:reference, ref_attrs)
+  end
+end
 
 Given(/^a reference type exists$/) do
   FactoryGirl.create(:reference_type)
