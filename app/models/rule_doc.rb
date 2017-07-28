@@ -40,7 +40,7 @@ class RuleDoc < ApplicationRecord
   end
 
   def self.basepath
-    @basepath ||= Pathname.new('extras/rulesdocs')
+    @basepath ||= Pathname.new('extras/ruledocs')
   end
 
   def self.mk_basepath

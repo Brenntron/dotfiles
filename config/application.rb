@@ -79,7 +79,7 @@ module Api
         config.svn_cmd = "/usr/local/bin/svn"
         config.svn_pwd = ''
         config.rules_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+        config.ruledocs_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/'
 
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Stage.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Stage.Result"
@@ -105,7 +105,7 @@ module Api
         config.svn_cmd = "/usr/local/bin/svn"
         config.svn_pwd = ''
         config.rules_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
+        config.ruledocs_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/'
 
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Result"
