@@ -6,7 +6,9 @@ class Bug < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
 
-  has_many :references, through: :rules
+  has_many :bug_reference_rule_links, as: :link
+  has_many :references, through: :bug_reference_rule_links
+
   has_many :exploits, through: :references
   has_many :attachments, dependent: :destroy
   has_many :tasks, dependent: :destroy
@@ -16,7 +18,6 @@ class Bug < ApplicationRecord
   has_many :alerts, through: :attachments
   has_many :local_alerts, through: :attachments
 
-  accepts_nested_attributes_for :references
   accepts_nested_attributes_for :rules
 
   scope :open_bugs, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }

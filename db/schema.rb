@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170726135926) do
+ActiveRecord::Schema.define(version: 20170726183644) do
 
   create_table "alerts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
   end
 
-  create_table "attachments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bugzilla_attachment_id"
     t.string "file_name"
     t.string "summary"
@@ -32,12 +32,12 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.boolean "is_obsolete", default: false
     t.boolean "is_private", default: false
     t.boolean "minor_update", default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "bug_id"
-    t.integer "rule_id"
-    t.integer "reference_id"
-    t.integer "task_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "bug_id"
+    t.bigint "rule_id"
+    t.bigint "reference_id"
+    t.bigint "task_id"
     t.index ["bug_id"], name: "index_attachments_on_bug_id"
     t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id"
     t.index ["reference_id"], name: "index_attachments_on_reference_id"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.index ["task_id"], name: "index_attachments_on_task_id"
   end
 
-  create_table "attachments_exploits", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "attachments_exploits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "attachment_id"
     t.integer "exploit_id"
   end
@@ -55,7 +55,16 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.integer "rule_id"
   end
 
-  create_table "bugs", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "bug_reference_rule_links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "reference_id"
+    t.integer "link_id"
+    t.string "link_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["link_id", "link_type"], name: "index_bug_reference_rule_links_on_link_id_and_link_type"
+  end
+
+  create_table "bugs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bugzilla_id"
     t.string "state"
     t.string "status"
@@ -84,12 +93,13 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.integer "work_time"
     t.integer "review_time"
     t.integer "rework_time"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "user_id"
-    t.integer "reference_id"
-    t.integer "rule_id"
-    t.integer "attachment_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.bigint "reference_id"
+    t.bigint "rule_id"
+    t.bigint "attachment_id"
+    t.index ["attachment_id"], name: "index_bugs_on_attachment_id"
     t.index ["reference_id"], name: "index_bugs_on_reference_id"
     t.index ["rule_id"], name: "index_bugs_on_rule_id"
     t.index ["user_id"], name: "index_bugs_on_user_id"
@@ -104,59 +114,59 @@ ActiveRecord::Schema.define(version: 20170726135926) do
   end
 
   create_table "bugs_tags", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "bug_id", null: false
-    t.integer "tag_id", null: false
+    t.bigint "bug_id", null: false
+    t.bigint "tag_id", null: false
     t.index ["bug_id", "tag_id"], name: "index_bugs_tags_on_bug_id_and_tag_id", unique: true
     t.index ["bug_id"], name: "index_bugs_tags_on_bug_id"
     t.index ["tag_id"], name: "index_bugs_tags_on_tag_id"
   end
 
-  create_table "events", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "events", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "user"
     t.string "action"
     t.string "description"
     t.integer "progress"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
-  create_table "exploit_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "exploit_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.string "description"
     t.string "pcap_validation"
-    t.integer "exploit_id"
+    t.bigint "exploit_id"
     t.index ["exploit_id"], name: "index_exploit_types_on_exploit_id"
   end
 
-  create_table "exploits", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "exploits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "data"
-    t.integer "exploit_type_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "attachment_id"
-    t.integer "reference_id"
+    t.bigint "exploit_type_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "attachment_id"
+    t.bigint "reference_id"
     t.index ["attachment_id"], name: "index_exploits_on_attachment_id"
     t.index ["exploit_type_id"], name: "index_exploits_on_exploit_type_id"
     t.index ["reference_id"], name: "index_exploits_on_reference_id"
   end
 
-  create_table "exploits_references", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "exploits_references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "exploit_id"
     t.integer "reference_id"
   end
 
-  create_table "notes", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.text "comment"
     t.string "note_type"
     t.string "author"
     t.integer "notes_bugzilla_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "bug_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "bug_id"
     t.index ["bug_id"], name: "index_notes_on_bug_id"
   end
 
-  create_table "reference_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "reference_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.string "description"
     t.string "validation"
@@ -166,17 +176,17 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.string "url"
   end
 
-  create_table "references", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "reference_data"
-    t.integer "reference_type_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.bigint "reference_type_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
   create_table "references_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "reference_id"
-    t.integer "rule_id"
+    t.bigint "reference_id"
+    t.bigint "rule_id"
     t.index ["reference_id"], name: "index_references_rules_on_reference_id"
     t.index ["rule_id"], name: "index_references_rules_on_rule_id"
   end
@@ -186,20 +196,20 @@ ActiveRecord::Schema.define(version: 20170726135926) do
   end
 
   create_table "roles_users", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "user_id", null: false
-    t.integer "role_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "role_id", null: false
     t.index ["role_id"], name: "index_roles_users_on_role_id"
     t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id", unique: true
     t.index ["user_id"], name: "index_roles_users_on_user_id"
   end
 
-  create_table "rule_categories", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "rule_categories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "category"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
-  create_table "rule_docs", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "rule_docs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "rule_id"
     t.text "summary"
     t.text "impact"
@@ -211,14 +221,14 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.text "false_negatives"
     t.text "corrective_action"
     t.text "contributors"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "policies"
     t.boolean "is_community"
     t.index ["rule_id"], name: "index_rule_docs_on_rule_id"
   end
 
-  create_table "rules", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "rules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.text "rule_content"
     t.text "rule_parsed"
     t.text "rule_warnings"
@@ -237,10 +247,10 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.string "state"
     t.boolean "tested", default: false
     t.boolean "committed", default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "task_id"
-    t.integer "rule_category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "task_id"
+    t.bigint "rule_category_id"
     t.string "filename"
     t.integer "linenumber"
     t.string "edit_status", null: false
@@ -252,22 +262,22 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.index ["task_id"], name: "index_rules_on_task_id"
   end
 
-  create_table "tags", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
-  create_table "tasks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.boolean "completed", default: false
     t.boolean "failed", default: false
     t.text "result"
     t.string "task_type"
     t.integer "time_elapsed"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "bug_id"
-    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "bug_id"
+    t.bigint "user_id"
     t.datetime "stats_updated_at"
     t.index ["bug_id"], name: "index_tasks_on_bug_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
@@ -285,7 +295,7 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.index ["rule_id", "task_id"], name: "index_test_reports_on_rule_id_and_task_id", unique: true
   end
 
-  create_table "users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "cvs_username", null: false
     t.string "cec_username"
     t.string "kerberos_login"
@@ -309,8 +319,8 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.integer "lft", null: false
     t.integer "rgt", null: false
     t.integer "depth", default: 0, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["cvs_username"], name: "index_users_on_cvs_username", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["lft"], name: "index_users_on_lft"
@@ -319,7 +329,7 @@ ActiveRecord::Schema.define(version: 20170726135926) do
     t.index ["rgt"], name: "index_users_on_rgt"
   end
 
-  create_table "versions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
+  create_table "versions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false

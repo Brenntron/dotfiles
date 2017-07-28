@@ -1,9 +1,11 @@
 class Reference < ApplicationRecord
-  has_and_belongs_to_many :rules
   belongs_to :reference_type, optional: true
   has_and_belongs_to_many :exploits
-  has_many :bugs, through: :rules
 
+  has_many :bug_reference_rule_links
+  has_many :rules, through: :bug_reference_rule_links, source: :link, source_type: "Rule"
+  has_many :bugs, through: :bug_reference_rule_links, source: :link, source_type: "Bug"
+  
   validates :reference_data, uniqueness: { scope: :reference_type_id }
 
   after_create { |reference| reference.record 'create' if Rails.configuration.websockets_enabled == 'true' }

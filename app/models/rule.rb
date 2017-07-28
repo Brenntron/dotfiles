@@ -41,8 +41,9 @@ class Rule < ApplicationRecord
 
   has_many :bugs_rules
   has_many :bugs, through: :bugs_rules
-  has_and_belongs_to_many :references, dependent: :destroy
-  accepts_nested_attributes_for :references
+  has_many :bug_reference_rule_links, as: :link
+  has_many :references, through: :bug_reference_rule_links
+
   has_many :test_reports
   has_many :tasks, through: :test_reports
   has_one :rule_doc, dependent: :destroy
