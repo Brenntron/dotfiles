@@ -1,0 +1,61 @@
+/*
+**  Styling to override standard and gem default styling.
+**
+**  We are running the differences between the current edited rule and what is in the repo.
+**  We do this by running the diffy gem.
+**  The diffy gem, marks up the differences in ins tags, del tags, tags with class ins or del,
+**  and strong tags for the part of the line which changed.
+**
+**  The standard styling for ins and del tags is underline and strikethrough.
+**  The diffy gem has CSS you can include using an erb ruby call for green and red color.
+**  This styling may be undesirable and need to be overriden.
+**  The diffy colors, for instance, do not make a readable contrast.
+*/
+
+
+/*
+**  Nesting:
+**    Rule differences are in div.rule_detail_view section.
+**    All diffy output will be under a div.diff section.
+**    Lines are in li tags, with ins class for inserts and del class for deletes.
+**    With the li, there are ins and del tags for inserts and deletes.
+**    The part of the line which changed is marked in a strong tag.
+*/
+
+
+<%= Diffy::CSS %>
+
+
+.diff ins {
+  text-decoration: none;
+}
+
+.diff del {
+  text-decoration: none;
+}
+
+.diff ul {
+  list-style: none;
+}
+
+
+.diff li.ins {
+  background:#dfd;
+  color: #007800;
+}
+.diff li.del {
+  background:#fee;
+  color: #900000;
+}
+
+.diff ins strong {
+  font-weight:normal;
+  background: #4fcc4f;
+  color: #0d610d;
+}
+.diff del strong {
+  font-weight:normal;
+  background: #e07070;
+  color: #670505;
+}
+
