@@ -37,7 +37,7 @@ staging:
     adapter: stomp
     login: "guest"
     passcode: "guest"
-    host: mqtest01.vrt.sourcefire.com
+    host: fmd-actmq-01stg.vrt.sourcefire.com
     port: 61613
     reliable: true
     reconnectDelay: 5
