@@ -75,8 +75,7 @@ module Repo
       map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
     end
 
-    # def commit_rule_content(bug: nil, username: nil)
-    def commit_rule_content
+    def commit_rule_files
       working_file_list = working_file_list(rule_files)
       log("committing files #{working_file_list}")
 
@@ -96,6 +95,14 @@ module Repo
       log("content commit return code #{svn_result_code.inspect}")
       raise "Rule content commit failed." unless 199 == svn_result_code
       svn_result_code
+    end
+
+    def commit_rule_content(bugzilla_id:)
+      commit_rule_files
+
+      rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
+
+      rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
     end
 
     def commit_doc?(rule)
