@@ -415,6 +415,7 @@ class Rule < ApplicationRecord
     parser = RuleSyntax::RuleParser.new(rule_content)
     find_from_parser(parser, rule_id).tap do |rule|
       rule.assign_from_user_edit(rule_content, parser: parser)
+      rule.tested = false
       rule.save!
       rule.clear_svn_result
     end
