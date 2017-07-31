@@ -228,7 +228,6 @@ class RuleFile
         rules.each do |rule|
           rule.patch_file(working_pathname_of(rule.nonnil_pathname))
         end
-        byebug
 
         committer.commit_rule_content(bugzilla_id: bugzilla_id)
 
