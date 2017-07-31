@@ -125,6 +125,10 @@ class Bug < ApplicationRecord
     end
   end
 
+  def clear_rule_tested
+    rules.update_all(tested: false)
+  end
+
   def update_attachments(xmlrpc)
     fields = ['file_name', 'id', 'last_change_time', 'is_obsolete', 'size']
 
@@ -148,6 +152,7 @@ class Bug < ApplicationRecord
 
           if attach.bug != self
             self.attachments << attach
+            clear_rule_tested
           end
         else
           begin

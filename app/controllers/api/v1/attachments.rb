@@ -62,17 +62,9 @@ module API
             )
             bug = Bug.where(id: options[:ids]).first
             bug.attachments << new_attach
-            options = {
-                :bug              => bug,
-                :task_type        => Task::TASK_TYPE_PCAP_TEST,
-                :attachment_array => bug.attachments.map{|a| a.id},
 
-            }
-            new_task = Task.create(
-              :bug  => options[:bug],
-              :task_type     => options[:task_type],
-              :user => User.where(cvs_username: current_user.cvs_username).first
-            )
+            bug.clear_rule_tested
+
             user = User.where(cvs_username: current_user.cvs_username).first
             new_task = Task.create_pcap_test(bug.id, user.id)
             begin
