@@ -36,7 +36,7 @@
     <div><%= RuleFile.publish_lock_pid.inspect %></div>
 
     <h4>Publishing Rules</h4>
-    <% if Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).exists? %>
+    <% if Rule.with_pub_any.exists? %>
       <table id="publishing-rules-table">
         <caption>Publishing Rules</caption>
         <thead>
@@ -45,15 +45,23 @@
           <th>gid</th>
           <th>sid</th>
           <th>rev</th>
+          <th>state</th>
+          <th>edit_status</th>
+          <th>publish_status</th>
+          <th>parsed</th>
         </tr>
         </thead>
         <tbody>
-          <% Rule.where(publish_status: Rule::PUBLISH_STATUS_PUBLISHING).each do |rule| %>
+          <% Rule.with_pub_any.each do |rule| %>
               <tr>
                 <td><%= rule.id %></td>
                 <td><%= rule.gid %></td>
                 <td><%= rule.sid || 'new' %></td>
                 <td><%= rule.rev %></td>
+                <td><%= rule.state %></td>
+                <td><%= rule.edit_status %></td>
+                <td><%= rule.publish_status %></td>
+                <td><%= rule.parsed %></td>
               </tr>
           <% end %>
         </tbody>
