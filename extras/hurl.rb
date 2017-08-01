@@ -38,6 +38,7 @@ class HurlArgs
     puts "--help             this message"
     puts "--deployment       build tar file for deployment"
     puts "--development      build tar file for development and install it on the test/dev host"
+    puts "--notify-app       build analyst-console-notify instead of analyst-console"
     puts "--no-build         skip building new tar file, use exisiting one"
     puts "--assets           precompile assets"
     puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"

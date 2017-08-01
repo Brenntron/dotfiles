@@ -130,6 +130,7 @@ fi
 if [ "" != "$VERSION" ]; then
     echo "* tar output"
     echo VERSION=$VERSION
+    echo $VERSION > public/version.html
     rm -rf tmp
     #mkdir tmp
     rm -rf log
