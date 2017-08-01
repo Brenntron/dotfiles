@@ -46,6 +46,14 @@ module BugsHelper
     end
   end
 
+  def display_tested_status(rule)
+    if rule.tested?
+      content_tag(:i, class: "glyphicon glyphicon-plus-sign") { '' }
+    else
+      '-'
+    end
+  end
+
   def display_commit_status(bug, rule)
     bug_rule = bug.bugs_rules.where(rule_id: rule).first
     case

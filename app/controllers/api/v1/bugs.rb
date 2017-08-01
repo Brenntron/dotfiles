@@ -114,6 +114,8 @@ module API
                 #save the bug
                 bug.save
 
+                bug.clear_rule_tested
+
                 progress_bar.update_attribute("progress", 100)
               rescue Exception => e
                 Rails.logger.info e

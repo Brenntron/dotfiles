@@ -196,6 +196,10 @@ class RuleFile
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
 
+    unless rules.all? {|rule| rule.tested?}
+      raise "Cannot commit with untested rules."
+    end
+
     unless nodoc_override
       incomplete_rules = rules.reject { |rule| rule.doc_complete? }
       if incomplete_rules.any?
@@ -225,11 +229,7 @@ class RuleFile
           rule.patch_file(working_pathname_of(rule.nonnil_pathname))
         end
 
-        committer.commit_rule_content
-
-        rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
-
-        rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
+        committer.commit_rule_content(bugzilla_id: bugzilla_id)
 
         if Rule.with_pub_content.exists?
           log("calling failsafe")
