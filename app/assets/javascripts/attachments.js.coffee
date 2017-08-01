@@ -153,7 +153,7 @@ $ ->
     $('input:checkbox.attach_check_box').each ->
       if @checked
         selected.push($(this).val())
-    data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: Task::TASK_TYPE_PCAP_TEST, created_by: user_id}}
+    data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: "attachment", created_by: user_id}}
     $.ajax(
       url: "/api/v1/tasks"
       method: 'POST'
