@@ -39,17 +39,18 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
 
 
   def on_message(message)
-    puts "=============================="
-    puts "Configuring local rule results"
+    Rails.logger.info ("==============================")
+    Rails.logger.info ("Configuring local rule results")
     # if you need a test message the following is a sample of what the rulesapi returns after a successful test.
     # message = '{"id":79922, "gid":1, "sid":26471, "rev":6, "message":"PROTOCOL-FTP VanDyke AbsoluteFTP LIST command stack buffer overflow attempt"}'
     result = JSON.parse(message)
-    puts result
+    Rails.logger.info( result)
     attachment = Attachment.find_by_bugzilla_attachment_id(result['id'])
 
     # Is this an alert message or a job completion message?
     if result['completed'] and result['task_id']
-      # this code is for a job completed message
+      Rails.logger.info( "#{result['task_id']}")
+          # this code is for a job completed message
       job = Task.find(result['task_id'])
       job.result = result['result']
       job.completed = true
@@ -76,12 +77,14 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
       # on a rule are alerts
       # Watch out for preproc and file-identify rules in alerts
       unless rule.nil?
+        Rails.logger.info( "Rule wasnt nill")
         begin
           attachment.local_alerts.create(rule: rule)
         rescue ActiveRecord::RecordNotUnique => e
           # Ignore
         end
 
+        Rails.logger.info( "saving rule")
         rule.save
       end
     end
