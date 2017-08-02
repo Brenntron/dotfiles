@@ -75,7 +75,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
             job.result << "#{err}\n"
           end
         end
-        if attachments.empty?
+        unless attachments.empty?
           attachments.each do |attachment_id, alerts|
 
             attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
