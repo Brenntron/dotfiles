@@ -252,7 +252,7 @@ class Hurl
   end
 
   def disgorge_cmd
-    disgorge = "#{'VERSION=' + args.version if args.version}#{args.release_base}/disgorge.sh #{args.disgorge_tar_path}"
+    disgorge = "#{'VERSION=' + args.version + ' ' if args.version}#{args.release_base}/disgorge.sh #{args.disgorge_tar_path}"
     if args.env
       ". #{args.release_base}/#{args.env} && #{disgorge}"
     else
