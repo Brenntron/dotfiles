@@ -27,7 +27,7 @@ require 'digest'
 
 
 class HurlArgs
-  attr_reader :source_arg, :project, :build_base, :output_tar_path, :env
+  attr_reader :source_arg, :project, :build_base, :output_tar_path, :env, :version
   attr_reader :do_vendor_bundle, :do_precompile_assets, :do_upload, :do_disgorge
 
   def self.usage
@@ -44,6 +44,7 @@ class HurlArgs
     puts "--vendor-bundle    bundle install --deployment to tar vendor/bundle directory"
     puts "--no-upload        app will be built but they will be prevented from being sent to the server"
     puts "--no-disgorge      app will not be expanded on the server"
+    puts "--version=<ver>    use ver as VERSION, for name of disgorged tar file"
     exit
   end
 
@@ -94,6 +95,9 @@ class HurlArgs
           @do_create_tar      = true
           # @bundler_version    = '_1.15.1_'
           @bundler_version    = '_1.14.6_'
+        when /\A--version=(?<version>.*)\z/
+          /\A--version=(?<version>.*)\z/ =~ arg
+          @version = version
         when /\A-/
           puts "One of your flags '#{arg}' is not valid. Ignored, use -h or --help"
           self.class.usage
@@ -247,12 +251,16 @@ class Hurl
     system "scp #{tar_path} rulesuitest.vrt.sourcefire.com:#{relative_dir}"
   end
 
-  def disgorge(args)
+  def disgorge_cmd
+    disgorge = "#{'VERSION=' + args.version if args.version}#{args.release_base}/disgorge.sh #{args.disgorge_tar_path}"
     if args.env
-      disgorge_cmd = ". #{args.release_base}/#{args.env} && #{args.release_base}/disgorge.sh #{args.disgorge_tar_path}"
+      ". #{args.release_base}/#{args.env} && #{disgorge}"
     else
-      disgorge_cmd = "#{args.release_base}/disgorge.sh #{args.disgorge_tar_path}"
+      disgorge
     end
+  end
+
+  def disgorge(args)
     puts disgorge_cmd
     system "ssh rulesuitest.vrt.sourcefire.com '#{disgorge_cmd}'"
   end
