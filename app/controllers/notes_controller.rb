@@ -1,6 +1,6 @@
 class NotesController < ApplicationController
   load_and_authorize_resource
-  
+
   def create
     if Note::TEMPLATE_RESEARCH == params[:note][:comment]
       render json: 'Unchanged content', status: 422
@@ -55,7 +55,9 @@ class NotesController < ApplicationController
 
   private
 
-def note_params
-  params.require(:note).permit(:comment, :author, :flow, :note_type, :bug_id, :notes_bugzilla_id, :id)
+  def note_params
+    params.require(:note).permit(:comment, :author, :flow, :note_type, :bug_id, :notes_bugzilla_id, :id)
+  end
+
 end
 
