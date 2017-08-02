@@ -196,9 +196,9 @@ class RuleFile
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
 
-    unless rules.all? {|rule| rule.tested?}
-      raise "Cannot commit with untested rules."
-    end
+    # unless rules.all? {|rule| rule.tested?}
+    #   raise "Cannot commit with untested rules."
+    # end
 
     unless nodoc_override
       incomplete_rules = rules.reject { |rule| rule.doc_complete? }
