@@ -8,9 +8,10 @@ class TestRule
   def self.send_work_msg(task, xmlrpc_token, bug)
     # be sure to collect all the attachments too but only the ones that are pcaps
     all_attachments = bug.attachments.inject([]) do |memo, attachment|
-      memo << attachment.id if /^[-\w]+.pcap$/.match(attachment.file_name)
+      memo << attachment if /^[-\w]+.pcap$/.match(attachment.file_name)
       memo
     end
+    Rails.logger.info("rule testing: Testing attachments #{all_attachments.pluck(:file_name).join(", ")}")
 
     rules_content = []
     task.rules.each do |rule|
@@ -21,7 +22,7 @@ class TestRule
             {
               task_id: task.id,
               cookie: xmlrpc_token,
-              pcaps: all_attachments,
+              pcaps: all_attachments.pluck(:id),
               rules: rules_content
             }.to_json
   end
