@@ -157,8 +157,12 @@ $ ->
                 $('.alert_rules').addClass('success').show().html('Rules has been committed')
               error: (response) ->
                 debugger
-#                alert(response.responseText.match(/^[^\n]*\n[^\n]*/)[0])
-                alert(response.responseText)
+                if "string" == typeof(response.responseText)
+                  response_lines = response.responseText.split("\n")
+                  if 2 < response_lines.length
+                    alert(response_lines[0] + "\n" + response_lines[1])
+                  else
+                    alert(response.responseText)
                 $('.alert_rules').addClass('error').show().html('Rules have not been committed')
               complete: ->
                 setTimeout (->

@@ -58,6 +58,5 @@ class NotesController < ApplicationController
   def note_params
     params.require(:note).permit(:comment, :author, :flow, :note_type, :bug_id, :notes_bugzilla_id, :id)
   end
-
 end
 
