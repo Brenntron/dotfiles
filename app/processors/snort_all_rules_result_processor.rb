@@ -48,10 +48,10 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
 
   def on_message(message)
-    puts "============================"
-    puts "Configuring all rule results"
+    Rails.logger.info( "============================")
+    Rails.logger.info ("Configuring all rule results")
     result = JSON.parse(message)
-    puts result
+    Rails.logger.info (result)
     
     unless result['task_id'].nil?
 
@@ -76,6 +76,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
           end
         end
         unless attachments.empty?
+          Rails.logger.info ("Has alerts on attachments")
           attachments.each do |attachment_id, alerts|
 
             attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
@@ -89,6 +90,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                 rule = Rule.by_sid(alert['sid'].to_i, alert['gid'].to_i).first
 
                 if rule.nil?
+                  Rails.logger.info( "Rule was NIL")
                   if alert['gid'].to_i == 1
                     rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i))
                   else
@@ -102,10 +104,12 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
                 # The rule should have extracted if it was valid
                 if rule.valid?
+                  Rails.logger.info( "Rule was valid")
                   job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                   rule.save(:validate => false)
                   attachment.pcap_alerts.create(rule: rule)
                 else
+                  Rails.logger.info( "Rule was NOT valid")
                   if rule.message.nil?
                     job.failed = true
                     rule.errors.each do |k, v|
@@ -119,6 +123,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                 end
 
               rescue RuleError => e
+                Rails.logger.info( "Job failed #{e.message}")
                 job.failed = true
                 job.result << "#{e.to_s} for sid #{alert['sid']}\n"
               rescue ActiveRecord::RecordNotUnique => e
@@ -129,13 +134,16 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
           end
 
         else
+          Rails.logger.info " NO alerts"
           job.result << "No alerts on any pcaps"
           job.result << "======================\n"
         end
 
         job.completed = true
         job.save
+        Rails.logger.info "Job was saved."
       rescue Exception => e
+        Rails.logger.info "there was an exception #{e.message}"
         puts e.to_s
         puts e.backtrace.join("\n")
       end
