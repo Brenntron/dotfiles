@@ -243,6 +243,7 @@ while message = client.receive
       end
 
     end
+    Rails.logger.info("Publishing back to MQ for job #{job_id}")
     # And notify the front end that the job is complete
     client.publish Rails.configuration.publish_local_result,
                    {
@@ -255,6 +256,7 @@ while message = client.receive
   rescue JSON::ParserError => e
     Rails.logger.error(e.inspect)
   rescue EOFError => e
+    Rails.logger.error("error Publishing eof error back to MQ for job #{job_id}")
     client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
@@ -263,6 +265,7 @@ while message = client.receive
                        :result => "Bugzilla appears to be fucking off: #{e.to_s}"
                    }.to_json
   rescue Exception => e
+    Rails.logger.error("Error Publishing exception back to MQ for job #{job_id}")
     client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
