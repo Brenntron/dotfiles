@@ -1,21 +1,21 @@
 <div class="jumbotron">
   <div class="col-sm-offset-2">
     <p class="tagline">
-      Please wait while we sign you in.
+
+      Please sign in using your CEC credentials
+
+      <%= form_tag('/sessions/create', method: :post, :content_type => 'application/json') do -%>
+        <div class="container">
+          <label><b>Username</b></label>
+          <input type="text" placeholder="Enter Username" name="uname" required>
+
+          <label><b>Password</b></label>
+          <input type="password" placeholder="Enter Password" name="psw" required>
+
+          <button type="submit">Login</button>
+        </div>
+    <% end %>
+
     </p>
   </div>
 </div>
-
-<script>
-  function signIn(){
-    var response_promise = $.ajax({
-      url: "/sessions/create",
-      method: 'POST'
-    }).done(function (data, status, response_promise) {
-      window.location.replace("/")
-    }).fail(function (response_promise,status, err) {
-      $(".tagline").html(response_promise.responseJSON['errors'][0])
-    });
-  };
-  window.onload = signIn;
-</script>

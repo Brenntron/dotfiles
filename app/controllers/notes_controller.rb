@@ -1,6 +1,6 @@
 class NotesController < ApplicationController
   load_and_authorize_resource
-  
+
   def create
     if Note::TEMPLATE_RESEARCH == params[:note][:comment]
       render json: 'Unchanged content', status: 422
