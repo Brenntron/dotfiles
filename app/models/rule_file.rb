@@ -193,7 +193,7 @@ class RuleFile
 
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
-  def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
+  def self.locked_commit(rules, username:, bugzilla_id:, nodoc_override: false)
     rules.reject! { |rule| rule.synched? || rule.stale_edit? }
 
     # unless rules.all? {|rule| rule.tested?}
@@ -256,5 +256,9 @@ class RuleFile
     log("unlocking publishing")
     publish_unlock
     log("exiting publishing")
+  end
+
+  def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
+    locked_commit(rules, username: username, bugzilla_id: bugzilla_id, nodoc_override: nodoc_override)
   end
 end
