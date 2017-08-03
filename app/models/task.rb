@@ -22,7 +22,7 @@ class Task < ApplicationRecord
     order("created_at desc")
   }
 
-  TASK_TYPE_PCAP_TEST                   = "pcap test"
+  TASK_TYPE_PCAP_TEST                   = "all rules test"
   TASK_TYPE_LOCAL_TEST                  = "local test"
 
   def self.create_pcap_test(bug_id, user_id)
