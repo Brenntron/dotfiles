@@ -52,9 +52,9 @@ class LoginSession
     user.display_name
   end
 
-  def bugzilla_login
-    bugzilla_username = Rails.configuration.bugzilla_username
-    bugzilla_password = Rails.configuration.bugzilla_password
+  def bugzilla_login(username: Rails.configuration.bugzilla_username, password: Rails.configuration.bugzilla_password)
+    bugzilla_username = username
+    bugzilla_password = password
     Rails.logger.info("bugzilla: Using username: #{bugzilla_username}")
     if bugzilla_username && bugzilla_password
       @xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)

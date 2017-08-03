@@ -230,7 +230,9 @@ class User < ApplicationRecord
       raise Exception.new('Error signing in. Please contact the administrator.') unless user&.save
 
       login_session = LoginSession.new(user)
-      login_session.bugzilla_login
+      #to turn off the login form remove the form from the view and remove these variables from the bugzilla login method
+      #and it will default to using talosweb again.
+      login_session.bugzilla_login(username: params['uname'], password: params['psw'] )
       login_session
     end
   end
