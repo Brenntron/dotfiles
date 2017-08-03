@@ -1,4 +1,4 @@
-class CreateReferencesAndRules < ActiveRecord::Migration
+class CreateReferencesAndRules < ActiveRecord::Migration[4.2]
   def change
     create_table :references do |t|
       t.string :reference_data

@@ -1,4 +1,4 @@
-class BugsRules < ActiveRecord::Migration
+class BugsRules < ActiveRecord::Migration[4.2]
   def change
     create_table :bugs_rules, id: false do |t|
       t.integer :bug_id

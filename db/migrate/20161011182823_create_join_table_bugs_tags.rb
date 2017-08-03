@@ -1,4 +1,4 @@
-class CreateJoinTableBugsTags < ActiveRecord::Migration
+class CreateJoinTableBugsTags < ActiveRecord::Migration[4.2]
   def change
     create_join_table :bugs, :tags do |t|
       t.index :bug_id

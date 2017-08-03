@@ -1,4 +1,4 @@
-class CreateRuleDocs < ActiveRecord::Migration
+class CreateRuleDocs < ActiveRecord::Migration[4.2]
   def change
     create_table :rule_docs do |t|
       t.integer :rule_id, index: true

@@ -1,4 +1,4 @@
-class AttachmentsRules < ActiveRecord::Migration
+class AttachmentsRules < ActiveRecord::Migration[4.2]
   def change
     create_table :attachments_rules, id: false do |t|
       t.integer :attachment_id
