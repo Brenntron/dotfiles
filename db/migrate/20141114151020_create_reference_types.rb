@@ -1,4 +1,4 @@
-class CreateReferenceTypes < ActiveRecord::Migration
+class CreateReferenceTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :reference_types do |t|
       t.string :name

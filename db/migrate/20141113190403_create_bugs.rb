@@ -1,4 +1,4 @@
-class CreateBugs < ActiveRecord::Migration
+class CreateBugs < ActiveRecord::Migration[4.2]
   def change
     create_table :bugs do |t|
       t.integer :bugzilla_id
