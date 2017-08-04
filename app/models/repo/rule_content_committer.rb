@@ -68,5 +68,9 @@ module Repo
     def prescreen!(nodoc_override: false)
       self.class.prescreen!(rules, nodoc_override: nodoc_override)
     end
+
+    def commit_rule_content
+      rule_files.each {|rule_file| rule_file.patch_file}
+    end
   end
 end

@@ -119,6 +119,12 @@ class RuleFile
     rule_files.map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
   end
 
+  def patch_file
+    rules.each do |rule|
+      rule.patch_file(self.class.working_pathname_of(rule.nonnil_pathname))
+    end
+  end
+
   # deletes the file in the working folder used for commits
   def remove_working_file
     FileUtils.remove_file(working_pathname) rescue nil
@@ -193,9 +199,9 @@ class RuleFile
 
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
-  def self.locked_commit(rules, username:, bugzilla_id:)
-    if rules.any? && publish_lock
-      committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
+  def self.locked_commit(rules_given, username:, bugzilla_id:, content_committer:)
+    if publish_lock
+      committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, username: username)
       rules = committer.changed_rules
       log("publishing #{rules.count} rules")
 
@@ -208,9 +214,7 @@ class RuleFile
 
         rule_files.each {|rule_file| rule_file.checkout }
 
-        rules.each do |rule|
-          rule.patch_file(working_pathname_of(rule.nonnil_pathname))
-        end
+        content_committer.commit_rule_content
 
         committer.commit_rule_content(bugzilla_id: bugzilla_id)
 
@@ -242,7 +246,7 @@ class RuleFile
 
     content_committer.prescreen!(nodoc_override: nodoc_override)
 
-    locked_commit(rules, username: username, bugzilla_id: bugzilla_id)
+    locked_commit(rules, username: username, bugzilla_id: bugzilla_id, content_committer: content_committer)
 
   rescue
     Rails.logger.error $!
