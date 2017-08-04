@@ -118,7 +118,7 @@ module Repo
     end
 
     def commit_docs
-      log("publishing rule docn #{rules.count} rules")
+      log("publishing rule docs for #{rules.count} rules")
       Rule.set_pubdoc_state(Rule.where(id: unchanged_rules))
 
       #refresh rule objects from database

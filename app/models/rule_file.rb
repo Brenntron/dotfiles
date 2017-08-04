@@ -212,10 +212,9 @@ class RuleFile
         #set all the rules we will update to publishing.
         Rule.set_pubcontent_state(Rule.where(id: rules))
 
-        rule_files.each {|rule_file| rule_file.checkout }
-
         content_committer.commit_rule_content
 
+        # TODO: Move the code in RuleCommitter#commit_rule_content to RuleContentCommitter#commit_rule_content
         committer.commit_rule_content(bugzilla_id: bugzilla_id)
 
         if Rule.with_pub_content.exists?
