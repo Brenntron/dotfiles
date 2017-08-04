@@ -286,7 +286,7 @@ while message = client.receive
   # Finally, send the results back
   unless task_id.nil?
     Rails.logger.info( "#{Time.now} -> Publishing to AMQ")
-    client.publish Rails.configuration.amq_snort_all_result,
+    client.publish Rails.configuration.publish_all_result,
                    {
                        :task_id => task_id,
                        :alerts => pcap_alerts,
