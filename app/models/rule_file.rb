@@ -223,6 +223,9 @@ class RuleFile
         end
       end
 
+      log("publishing rule docs for #{rules.count} rules")
+      Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
+
       committer.commit_docs
     end
 

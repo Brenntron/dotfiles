@@ -117,10 +117,8 @@ module Repo
       end
     end
 
+    # TODO: Move commit_docs to its own class
     def commit_docs
-      log("publishing rule docs for #{rules.count} rules")
-      Rule.set_pubdoc_state(Rule.where(id: unchanged_rules))
-
       #refresh rule objects from database
       @rules = Rule.where(id: @rules).to_a
 
