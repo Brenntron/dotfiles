@@ -1,4 +1,5 @@
 module Repo
+  # class RuleContentCommitter handles committing the rule content.
   class RuleContentCommitter
     include Enumerable
 
@@ -56,6 +57,10 @@ module Repo
       rule_files.each(&block)
     end
 
+    # Checks conditions which may prohibit a commit.
+    # @param [Array[Rule]] rules collection of rules to check
+    # @param [Boolean] nodoc_override true if should skip check for complete doc
+    # @raise [RuntimeError] an exception if commit is prohibited.
     def self.prescreen!(rules, nodoc_override: false)
 
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
@@ -69,6 +74,7 @@ module Repo
       self.class.prescreen!(rules, nodoc_override: nodoc_override)
     end
 
+    # Commits the rule content of its collection of rule files and rules.
     def commit_rule_content
       rule_files.each {|rule_file| rule_file.checkout }
       rule_files.each {|rule_file| rule_file.patch_file}

@@ -1,4 +1,6 @@
 module Repo
+  # class RuleCommitter handles committing rule content and rule docs.
+  # Calls RuleContentCommitter class to commit the rule content.
   class RuleCommitter
     include Enumerable
 

@@ -1,3 +1,13 @@
+# class RuleFile
+# This is a class for a rules file representing one *.rules file.
+#
+# This object has the file path of the *.rules file,
+# and a collection of rules which are a subset of rules which belong in the rule.
+# The object has self knowledge of how to update the file with rule content.
+#
+# TODO: Move the commit code to a committer object.
+# TODO: Move the code not involved in committing to the RuleSyntax module.
+# TODO: Merge this class after removing the committer code, with the RuleSyntax::RuleExporter class.
 class RuleFile
   include Enumerable
 
@@ -197,8 +207,11 @@ class RuleFile
     end
   end
 
-  # Checks in a set of given rules.
-  # param [Array[Rule]] array of rules.
+  # Rule committing code when the publish is locked
+  # param [Array[Rule]] rules_given array of rules.
+  # param [Repo::RuleContentCommitter] content_committer The committer object.
+  # TODO: move to RuleCommitter class.
+  # TODO: aggregate Repo::RuleContentCommitter object instead of passing to this method
   def self.locked_commit(rules_given, username:, bugzilla_id:, content_committer:)
     if publish_lock
       committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, username: username)
@@ -243,6 +256,18 @@ class RuleFile
     log("exiting publishing")
   end
 
+  # Handle the action from the API controller for committing rules.
+  #
+  # This method handles setup and cleanup around constructing the committer object and calling it.
+  # Note that if it was merged with the method which does the work,
+  # then there would be too much in the rescue and ensure sections.
+  # That is a bad situation, because exceptions raised in the rescue and ensure sections
+  # are not handled properly (or alternatively the code gets out of hand).
+  #
+  # param [Array[Rule]] rules array of rules.
+  # param [String] username The username to add to the svn comment (message)
+  # param [FixNum] bugzilla_id The bugzilla id of the bug
+  # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
     content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
 
