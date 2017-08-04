@@ -194,8 +194,6 @@ class RuleFile
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
   def self.locked_commit(rules, username:, bugzilla_id:, nodoc_override: false)
-    rules.reject! { |rule| rule.synched? || rule.stale_edit? }
-
     # unless rules.all? {|rule| rule.tested?}
     #   raise "Cannot commit with untested rules."
     # end
@@ -243,10 +241,6 @@ class RuleFile
     log('returning a success')
     true
 
-  rescue
-    Rails.logger.error $!
-    Rails.logger.error $!.backtrace.join("\n")
-    raise
   ensure
     #any rules not set to synch by svn hook should go back to current.
     if Rule.with_pub_any.exists?
@@ -259,6 +253,15 @@ class RuleFile
   end
 
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
+    content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
+
+    content_committer.prescreen!
+
     locked_commit(rules, username: username, bugzilla_id: bugzilla_id, nodoc_override: nodoc_override)
+
+  rescue
+    Rails.logger.error $!
+    Rails.logger.error $!.backtrace.join("\n")
+    raise
   end
 end
