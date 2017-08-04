@@ -212,7 +212,7 @@ while message = client.receive
                         alerts.each do |alert|
                           Rails.logger.info( "#{Time.now} -> Publishing RESULTS:")
                           Rails.logger.info( "\t#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['msg']}")
-                          client.publish Rails.configuration.amq_snort_local_result,
+                          client.publish Rails.configuration.publish_local_result,
                                          {
                                              :id => pcap_name,
                                              :gid => alert['gid'],
@@ -245,7 +245,7 @@ while message = client.receive
     end
     Rails.logger.info("Publishing back to MQ for job #{job_id}")
     # And notify the front end that the job is complete
-    client.publish Rails.configuration.amq_snort_local_result,
+    client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :completed => job['completed'],
@@ -257,7 +257,7 @@ while message = client.receive
     Rails.logger.error(e.inspect)
   rescue EOFError => e
     Rails.logger.error("error Publishing eof error: #{e.message} back to MQ for job #{job_id}")
-    client.publish Rails.configuration.amq_snort_local_result,
+    client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :failed => true,
@@ -266,7 +266,7 @@ while message = client.receive
                    }.to_json
   rescue Exception => e
     Rails.logger.error("Error Publishing exception: #{e.message}, back to MQ for job #{job_id}")
-    client.publish Rails.configuration.amq_snort_local_result,
+    client.publish Rails.configuration.publish_local_result,
                    {
                        :task_id => request['task_id'],
                        :failed => true,
