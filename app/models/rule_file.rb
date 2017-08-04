@@ -194,10 +194,6 @@ class RuleFile
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
   def self.locked_commit(rules, username:, bugzilla_id:, nodoc_override: false)
-    # unless rules.all? {|rule| rule.tested?}
-    #   raise "Cannot commit with untested rules."
-    # end
-
     unless nodoc_override
       incomplete_rules = rules.reject { |rule| rule.doc_complete? }
       if incomplete_rules.any?

@@ -56,12 +56,16 @@ module Repo
       rule_files.each(&block)
     end
 
-    def prescreen!
-      # rules.reject! { |rule| rule.synched? || rule.stale_edit? }
+    def self.prescreen!(rules)
 
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
       raise 'Some of those rules cannot be committed because they have changed!' if rules.any? {|rule| rule.stale_edit?}
+      raise "Cannot commit with untested rules." unless rules.all? {|rule| rule.tested?}
 
+    end
+
+    def prescreen!
+      self.class.prescreen!(rules)
     end
   end
 end
