@@ -193,18 +193,7 @@ class RuleFile
 
   # Checks in a set of given rules.
   # param [Array[Rule]] array of rules.
-  def self.locked_commit(rules, username:, bugzilla_id:, nodoc_override: false)
-    unless nodoc_override
-      incomplete_rules = rules.reject { |rule| rule.doc_complete? }
-      if incomplete_rules.any?
-        incomplete_rules.each do |incomplete_rule|
-          incomplete_rule.bugs_rules.where(bug_id: bugzilla_id)
-              .update_all(svn_result_output: "Cannot commit with incomplete rule docs", svn_result_code: -1)
-        end
-        raise "Cannot commit with incomplete rule docs"
-      end
-    end
-
+  def self.locked_commit(rules, username:, bugzilla_id:)
     if rules.any? && publish_lock
       committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
       rules = committer.changed_rules
@@ -251,9 +240,9 @@ class RuleFile
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
     content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
 
-    content_committer.prescreen!
+    content_committer.prescreen!(nodoc_override: nodoc_override)
 
-    locked_commit(rules, username: username, bugzilla_id: bugzilla_id, nodoc_override: nodoc_override)
+    locked_commit(rules, username: username, bugzilla_id: bugzilla_id)
 
   rescue
     Rails.logger.error $!

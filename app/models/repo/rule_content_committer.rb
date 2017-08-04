@@ -56,16 +56,17 @@ module Repo
       rule_files.each(&block)
     end
 
-    def self.prescreen!(rules)
+    def self.prescreen!(rules, nodoc_override: false)
 
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
       raise 'Some of those rules cannot be committed because they have changed!' if rules.any? {|rule| rule.stale_edit?}
-      raise "Cannot commit with untested rules." unless rules.all? {|rule| rule.tested?}
+      raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested?}
+      raise "Cannot commit with incomplete rule docs!" unless nodoc_override || rules.all? { |rule| rule.doc_complete? }
 
     end
 
-    def prescreen!
-      self.class.prescreen!(rules)
+    def prescreen!(nodoc_override: false)
+      self.class.prescreen!(rules, nodoc_override: nodoc_override)
     end
   end
 end
