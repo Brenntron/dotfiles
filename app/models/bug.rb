@@ -420,14 +420,15 @@ class Bug < ApplicationRecord
         bug = Bug.find(bug_id)
         unless new_attachments.empty?
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
-            if Attachment.where(file_name: attachment['file_name']).exists?
-              new_attachment = Attachment.where(file_name: attachment['file_name']).first
+            local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
+            if local_attachment.present?
               if attachment['is_obsolete'] == true
-                new_attachment.is_obsolete = true
-                new_attachment.save
+                local_attachment.is_obsolete = true
+                local_attachment.save
               end
+
             else
-              new_attachment = Attachment.create do |new_attach_record|
+              local_attachment = Attachment.create do |new_attach_record|
                 new_attach_record.id = attachment['id']
                 new_attach_record.size = attachment['size']
                 new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
@@ -442,7 +443,7 @@ class Bug < ApplicationRecord
                 new_attach_record.created_at = attachment['creation_time'].to_time
               end
             end
-            bug.attachments << new_attachment unless bug.attachments.pluck(:file_name).include?(new_attachment.file_name)
+            bug.attachments << local_attachment unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
           end
         end
         #we need to test these new attachments
@@ -527,15 +528,16 @@ class Bug < ApplicationRecord
           bug.committer = new_committer
         end
         unless new_attachments.empty?
+
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
-            if Attachment.where(file_name: attachment['file_name']).exists?
-              new_attachment = Attachment.where(file_name: attachment['file_name']).first
+            local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
+            if local_attachment.present?
               if attachment['is_obsolete'] == true
-                new_attachment.is_obsolete = true
-                new_attachment.save
+                local_attachment.is_obsolete = true
+                local_attachment.save
               end
             else
-              new_attachment = Attachment.create do |new_attach_record|
+              local_attachment = Attachment.create do |new_attach_record|
                 new_attach_record.id = attachment['id']
                 new_attach_record.size = attachment['size']
                 new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
@@ -551,7 +553,7 @@ class Bug < ApplicationRecord
               end
             end
 
-            bug.attachments << new_attachment unless bug.attachments.pluck(:file_name).include?(new_attachment.file_name)
+            bug.attachments << local_attachment unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
           end
         end
         #we need to test these new attachments
