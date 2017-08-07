@@ -243,6 +243,8 @@ class RuleFile
 
       committer.commit_docs
 
+      committer.event_success
+
       log('returning a success')
       true
     end
