@@ -3,7 +3,7 @@ module Repo
   class RuleContentCommitter
     include Enumerable
 
-    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :username
+    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
 
     # @return [Pathname] path (possibly relative) to the snort directory synchronized with svn
     def self.synch_root
@@ -44,9 +44,10 @@ module Repo
       end
     end
 
-    def initialize(rules, bugzilla_id: nil, username: nil)
+    def initialize(rules, bugzilla_id: nil, user: nil, username: nil)
       @bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
-      @username = username
+      @user = user
+      @username = username || user.cvs_username
       @rules = rules
       @changed_rules, @unchanged_rules = rules.partition { |rule| rule.content_changed? }
 
@@ -61,8 +62,9 @@ module Repo
     # @param [Array[Rule]] rules collection of rules to check
     # @param [Boolean] nodoc_override true if should skip check for complete doc
     # @raise [RuntimeError] an exception if commit is prohibited.
-    def self.prescreen!(rules, nodoc_override: false)
+    def self.prescreen!(rules, user, nodoc_override: false)
 
+      raise "unknown user" unless user
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
       raise 'Some of those rules cannot be committed because they have changed!' if rules.any? {|rule| rule.stale_edit?}
       raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested?}
@@ -71,7 +73,8 @@ module Repo
     end
 
     def prescreen!(nodoc_override: false)
-      self.class.prescreen!(rules, nodoc_override: nodoc_override)
+      raise "unknown user #{username.inspect}" unless user
+      self.class.prescreen!(rules, user, nodoc_override: nodoc_override)
     end
 
     # Commits the rule content of its collection of rule files and rules.

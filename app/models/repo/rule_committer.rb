@@ -4,7 +4,7 @@ module Repo
   class RuleCommitter
     include Enumerable
 
-    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :username
+    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
 
     def log(message)
       Rails.logger.info "svn integration: #{message}"
@@ -49,13 +49,18 @@ module Repo
       end
     end
 
-    def initialize(rules, bugzilla_id: nil, username: nil)
+    def initialize(rules, bugzilla_id: nil, user: nil, username: nil)
       @bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
-      @username = username
+      @user = user
+      @username = username || user.cvs_username
       @rules = rules
       @changed_rules, @unchanged_rules = rules.partition { |rule| rule.content_changed? }
 
       @rule_files = self.class.collect_rule_files(@changed_rules)
+    end
+
+    def start_event
+      @rule_commit_event = RuleEvent::RuleCommitEvent.start(bug.bugzilla_id, rules, user.id)
     end
 
     def each(&block)

@@ -212,9 +212,11 @@ class RuleFile
   # param [Repo::RuleContentCommitter] content_committer The committer object.
   # TODO: move to RuleCommitter class.
   # TODO: aggregate Repo::RuleContentCommitter object instead of passing to this method
-  def self.locked_commit(rules_given, username:, bugzilla_id:, content_committer:)
+  def self.locked_commit(rules_given, user:, username:, bugzilla_id:, content_committer:)
     if publish_lock
-      committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, username: username)
+      committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, user: user, username: username)
+      committer.start_event
+
       rules = committer.changed_rules
       log("publishing #{rules.count} rules")
 
@@ -240,10 +242,10 @@ class RuleFile
       Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
 
       committer.commit_docs
-    end
 
-    log('returning a success')
-    true
+      log('returning a success')
+      true
+    end
 
   ensure
     #any rules not set to synch by svn hook should go back to current.
@@ -269,11 +271,13 @@ class RuleFile
   # param [FixNum] bugzilla_id The bugzilla id of the bug
   # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
-    content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
+    user = User.where(cvs_username: username).first
+
+    content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
 
     content_committer.prescreen!(nodoc_override: nodoc_override)
 
-    locked_commit(rules, username: username, bugzilla_id: bugzilla_id, content_committer: content_committer)
+    locked_commit(rules, user: user, username: username, bugzilla_id: bugzilla_id, content_committer: content_committer)
 
   rescue
     Rails.logger.error $!
