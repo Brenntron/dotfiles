@@ -228,9 +228,6 @@ class RuleFile
 
         content_committer.commit_rule_content
 
-        # TODO: Move the code in RuleCommitter#commit_rule_content to RuleContentCommitter#commit_rule_content
-        committer.commit_rule_content(bugzilla_id: committer.bug.bugzilla_id)
-
         if Rule.with_pub_content.exists?
           log("calling failsafe")
           synch_failsafe
