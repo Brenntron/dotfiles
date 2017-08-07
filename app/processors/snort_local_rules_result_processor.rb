@@ -49,7 +49,7 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
 
     # Is this an alert message or a job completion message?
     if result['completed'] and result['task_id']
-      Rails.logger.info( "#{result['task_id']}")
+      Rails.logger.info( "processing Task : #{result['task_id']}")
           # this code is for a job completed message
       job = Task.find(result['task_id'])
       job.result = result['result']
@@ -58,12 +58,15 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
       job.save
 
       # Nothing to do on a failed job
-      return if job.failed
+      if job.failed
+        Rails.logger.info( "Job Failed. Returning from processing")
+        return
+      end
 
       # Parse performance results (as Donald Knuth would approve)
       job.update_rule_stats
-
     else
+      Rails.logger.info( "processing local Alert : #{result['sid']}")
       # This code is for an alert message from the queue
       # Note: for a new rule, a temporary sid is used as a million plus the rule id.
       if result['sid'].to_i > 1000000
@@ -88,5 +91,6 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
         rule.save
       end
     end
+    Rails.logger.info( "Finished processing parsed message")
   end
 end

@@ -52,8 +52,8 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
     Rails.logger.info ("Configuring all rule results")
     result = JSON.parse(message)
     Rails.logger.info (result)
-    
-    unless result['task_id'].nil?
+
+    if result['task_id'].present?
 
       begin
         # Make sure to close the job
@@ -81,7 +81,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
             attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
             # give some kind of feedback about the alerts on the pcap test
-            job.result << "Alerts on pcap: #{attachment.file_name}\n"
+            job.result << "Alerts on pcap: #{attachment.file_name}\n" if attachment.present?
             job.result << "===============================================\n"
             job.result << "NONE" if alerts.count == 0
 
@@ -147,6 +147,9 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
         puts e.to_s
         puts e.backtrace.join("\n")
       end
+    else
+      Rails.logger.info "NO TASK!"
     end
+    Rails.logger.info( "Finished processing message")
   end
 end
