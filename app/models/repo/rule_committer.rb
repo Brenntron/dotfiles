@@ -1,4 +1,6 @@
 module Repo
+  # class RuleCommitter handles committing rule content and rule docs.
+  # Calls RuleContentCommitter class to commit the rule content.
   class RuleCommitter
     include Enumerable
 
@@ -117,10 +119,8 @@ module Repo
       end
     end
 
+    # TODO: Move commit_docs to its own class
     def commit_docs
-      log("publishing rule docn #{rules.count} rules")
-      Rule.set_pubdoc_state(Rule.where(id: unchanged_rules))
-
       #refresh rule objects from database
       @rules = Rule.where(id: @rules).to_a
 

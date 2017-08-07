@@ -1,3 +1,13 @@
+# class RuleFile
+# This is a class for a rules file representing one *.rules file.
+#
+# This object has the file path of the *.rules file,
+# and a collection of rules which are a subset of rules which belong in the rule.
+# The object has self knowledge of how to update the file with rule content.
+#
+# TODO: Move the commit code to a committer object.
+# TODO: Move the code not involved in committing to the RuleSyntax module.
+# TODO: Merge this class after removing the committer code, with the RuleSyntax::RuleExporter class.
 class RuleFile
   include Enumerable
 
@@ -119,6 +129,12 @@ class RuleFile
     rule_files.map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
   end
 
+  def patch_file
+    rules.each do |rule|
+      rule.patch_file(self.class.working_pathname_of(rule.nonnil_pathname))
+    end
+  end
+
   # deletes the file in the working folder used for commits
   def remove_working_file
     FileUtils.remove_file(working_pathname) rescue nil
@@ -191,28 +207,14 @@ class RuleFile
     end
   end
 
-  # Checks in a set of given rules.
-  # param [Array[Rule]] array of rules.
-  def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
-    rules.reject! { |rule| rule.synched? || rule.stale_edit? }
-
-    # unless rules.all? {|rule| rule.tested?}
-    #   raise "Cannot commit with untested rules."
-    # end
-
-    unless nodoc_override
-      incomplete_rules = rules.reject { |rule| rule.doc_complete? }
-      if incomplete_rules.any?
-        incomplete_rules.each do |incomplete_rule|
-          incomplete_rule.bugs_rules.where(bug_id: bugzilla_id)
-              .update_all(svn_result_output: "Cannot commit with incomplete rule docs", svn_result_code: -1)
-        end
-        raise "Cannot commit with incomplete rule docs"
-      end
-    end
-
-    if rules.any? && publish_lock
-      committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
+  # Rule committing code when the publish is locked
+  # param [Array[Rule]] rules_given array of rules.
+  # param [Repo::RuleContentCommitter] content_committer The committer object.
+  # TODO: move to RuleCommitter class.
+  # TODO: aggregate Repo::RuleContentCommitter object instead of passing to this method
+  def self.locked_commit(rules_given, username:, bugzilla_id:, content_committer:)
+    if publish_lock
+      committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, username: username)
       rules = committer.changed_rules
       log("publishing #{rules.count} rules")
 
@@ -223,12 +225,9 @@ class RuleFile
         #set all the rules we will update to publishing.
         Rule.set_pubcontent_state(Rule.where(id: rules))
 
-        rule_files.each {|rule_file| rule_file.checkout }
+        content_committer.commit_rule_content
 
-        rules.each do |rule|
-          rule.patch_file(working_pathname_of(rule.nonnil_pathname))
-        end
-
+        # TODO: Move the code in RuleCommitter#commit_rule_content to RuleContentCommitter#commit_rule_content
         committer.commit_rule_content(bugzilla_id: bugzilla_id)
 
         if Rule.with_pub_content.exists?
@@ -237,16 +236,15 @@ class RuleFile
         end
       end
 
+      log("publishing rule docs for #{rules.count} rules")
+      Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
+
       committer.commit_docs
     end
 
     log('returning a success')
     true
 
-  rescue
-    Rails.logger.error $!
-    Rails.logger.error $!.backtrace.join("\n")
-    raise
   ensure
     #any rules not set to synch by svn hook should go back to current.
     if Rule.with_pub_any.exists?
@@ -256,5 +254,30 @@ class RuleFile
     log("unlocking publishing")
     publish_unlock
     log("exiting publishing")
+  end
+
+  # Handle the action from the API controller for committing rules.
+  #
+  # This method handles setup and cleanup around constructing the committer object and calling it.
+  # Note that if it was merged with the method which does the work,
+  # then there would be too much in the rescue and ensure sections.
+  # That is a bad situation, because exceptions raised in the rescue and ensure sections
+  # are not handled properly (or alternatively the code gets out of hand).
+  #
+  # param [Array[Rule]] rules array of rules.
+  # param [String] username The username to add to the svn comment (message)
+  # param [FixNum] bugzilla_id The bugzilla id of the bug
+  # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
+  def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
+    content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
+
+    content_committer.prescreen!(nodoc_override: nodoc_override)
+
+    locked_commit(rules, username: username, bugzilla_id: bugzilla_id, content_committer: content_committer)
+
+  rescue
+    Rails.logger.error $!
+    Rails.logger.error $!.backtrace.join("\n")
+    raise
   end
 end

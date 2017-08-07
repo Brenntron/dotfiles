@@ -152,7 +152,11 @@ module API
           optional :nodoc_override, type: Boolean
         end
         put "commit", root: "rule" do
-          rules = Rule.where(id: permitted_params[:rule_ids]).to_a.select { |rule| can?(:publish, rule) }
+          rules = Rule.where(id: permitted_params[:rule_ids]).all.to_a
+
+          raise "You must select a rule to commit!" if rules.empty?
+          raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
+
           RuleFile.commit_rules_action(rules,
                                        username: permitted_params[:username],
                                        bugzilla_id: permitted_params[:bug_id],
@@ -167,8 +171,14 @@ module API
           optional :bug_id,   type: Integer, desc: "Bugzilla id."
         end
         put "gids/:gid/sids/:sid/commit", root: "rule" do
-          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
-          RuleFile.commit_rules_action([rule], permitted_params[:username], permitted_params[:bug_id])
+          rules = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).all.to_a
+
+          raise "You must select a rule to commit!" if rules.empty?
+          raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
+
+          RuleFile.commit_rules_action(rules,
+                                       username: permitted_params[:username],
+                                       bugzilla_id: permitted_params[:bug_id])
         end
 
 
