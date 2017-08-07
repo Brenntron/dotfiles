@@ -80,6 +80,7 @@ client.subscribe Rails.configuration.subscribe_local_work, {:ack => :client}
 
 Rails.logger.info( "#{Time.now} -> listening to LOCAL queue")
 while message = client.receive
+  task_id = nil
   begin
     Rails.logger.info( "#{Time.now} -> starting local rule work")
     # Start by parsing the request
@@ -94,6 +95,7 @@ while message = client.receive
     pcaps = Hash.new
     pcaps[""] = 0 #rulesAPI doesnt like single pcaps it wants at least 2 adding a blank entry causes it to not fail
 
+    task_id = request['task_id']
     # Fetch all of the needed pcaps into the cache directory
     request['pcaps'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
@@ -247,7 +249,7 @@ while message = client.receive
     # And notify the front end that the job is complete
     client.publish Rails.configuration.publish_local_result,
                    {
-                       :task_id => request['task_id'],
+                       :task_id => task_id,
                        :completed => job['completed'],
                        :result => job['information'],
                        :failed => job['failed'],
@@ -259,7 +261,7 @@ while message = client.receive
     Rails.logger.error("error Publishing eof error: #{e.message} back to MQ for job #{job_id}")
     client.publish Rails.configuration.publish_local_result,
                    {
-                       :task_id => request['task_id'],
+                       :task_id => task_id,
                        :failed => true,
                        :completed => true,
                        :result => "Bugzilla appears to be fucking off: #{e.to_s}"
@@ -268,7 +270,7 @@ while message = client.receive
     Rails.logger.error("Error Publishing exception: #{e.message}, back to MQ for job #{job_id}")
     client.publish Rails.configuration.publish_local_result,
                    {
-                       :task_id => request['task_id'],
+                       :task_id => task_id,
                        :failed => true,
                        :completed => true,
                        :result => "#{$!}\n#{e.backtrace.join("\n\t")}",
