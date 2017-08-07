@@ -4,7 +4,7 @@ module Repo
   class RuleCommitter
     include Enumerable
 
-    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
+    attr_reader :content_committer, :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
 
     def log(message)
       Rails.logger.info "svn integration: #{message}"
@@ -57,6 +57,9 @@ module Repo
       @changed_rules, @unchanged_rules = rules.partition { |rule| rule.content_changed? }
 
       @rule_files = self.class.collect_rule_files(@changed_rules)
+
+      @content_committer =
+          Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
     end
 
     def event_start
