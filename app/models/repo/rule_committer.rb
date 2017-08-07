@@ -59,8 +59,16 @@ module Repo
       @rule_files = self.class.collect_rule_files(@changed_rules)
     end
 
-    def start_event
+    def event_start
       @rule_commit_event = RuleEvent::RuleCommitEvent.start(bug.bugzilla_id, rules, user.id)
+    end
+
+    def event_success
+      @rule_commit_event&.update(failed: false)
+    end
+
+    def event_complete
+      @rule_commit_event&.update(completed: true)
     end
 
     def each(&block)

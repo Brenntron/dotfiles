@@ -215,7 +215,7 @@ class RuleFile
   def self.locked_commit(rules_given, user:, username:, bugzilla_id:, content_committer:)
     if publish_lock
       committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, user: user, username: username)
-      committer.start_event
+      committer.event_start
 
       rules = committer.changed_rules
       log("publishing #{rules.count} rules")
@@ -253,6 +253,9 @@ class RuleFile
       log("setting rules from publishing to current_edit")
       Rule.with_pub_any.update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
+
+    committer.event_complete if defined? committer
+
     log("unlocking publishing")
     publish_unlock
     log("exiting publishing")
