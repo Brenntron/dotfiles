@@ -274,11 +274,11 @@ class RuleFile
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
     user = User.where(cvs_username: username).first
 
-    content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
-
-    content_committer.prescreen!(nodoc_override: nodoc_override)
+    Repo::RuleContentCommitter.prescreen!(rules, user, nodoc_override: nodoc_override)
 
     committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
+    content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
+
     locked_commit(committer: committer, content_committer: content_committer)
 
   rescue

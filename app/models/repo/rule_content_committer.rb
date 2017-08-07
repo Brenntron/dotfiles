@@ -87,11 +87,6 @@ module Repo
 
     end
 
-    def prescreen!(nodoc_override: false)
-      raise "unknown user #{username.inspect}" unless user
-      self.class.prescreen!(rules, user, nodoc_override: nodoc_override)
-    end
-
     def commit_rule_files
       working_file_list = working_file_list(rule_files)
       Rails.logger.info("svn integration: committing files #{working_file_list}")
