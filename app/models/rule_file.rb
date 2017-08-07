@@ -212,9 +212,8 @@ class RuleFile
   # param [Repo::RuleContentCommitter] content_committer The committer object.
   # TODO: move to RuleCommitter class.
   # TODO: aggregate Repo::RuleContentCommitter object instead of passing to this method
-  def self.locked_commit(rules_given, user:, username:, bugzilla_id:, content_committer:)
+  def self.locked_commit(committer:, content_committer:)
     if publish_lock
-      committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, user: user, username: username)
       committer.event_start
 
       rules = committer.changed_rules
@@ -230,7 +229,7 @@ class RuleFile
         content_committer.commit_rule_content
 
         # TODO: Move the code in RuleCommitter#commit_rule_content to RuleContentCommitter#commit_rule_content
-        committer.commit_rule_content(bugzilla_id: bugzilla_id)
+        committer.commit_rule_content(bugzilla_id: committer.bug.bugzilla_id)
 
         if Rule.with_pub_content.exists?
           log("calling failsafe")
@@ -256,7 +255,7 @@ class RuleFile
       Rule.with_pub_any.update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
 
-    committer.event_complete if defined? committer
+    committer.event_complete
 
     log("unlocking publishing")
     publish_unlock
@@ -282,7 +281,8 @@ class RuleFile
 
     content_committer.prescreen!(nodoc_override: nodoc_override)
 
-    locked_commit(rules, user: user, username: username, bugzilla_id: bugzilla_id, content_committer: content_committer)
+    committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
+    locked_commit(committer: committer, content_committer: content_committer)
 
   rescue
     Rails.logger.error $!
