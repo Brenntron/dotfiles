@@ -60,11 +60,11 @@ module Repo
 
       @content_committer =
           Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
-    end
+    end #initialize
 
     def event_start
       @rule_commit_event = RuleEvent::RuleCommitEvent.start(bug.bugzilla_id, rules, user.id)
-    end
+    end #event_start
 
     def event_success
       @rule_commit_event&.update(failed: false)
