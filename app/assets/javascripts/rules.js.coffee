@@ -156,7 +156,6 @@ $ ->
               success: (response) ->
                 $('.alert_rules').addClass('success').show().html('Rules has been committed')
               error: (response) ->
-                debugger
                 if response.responseJSON == undefined
                   response_lines = response.responseText.split("\n")
                   if 2 < response_lines.length
