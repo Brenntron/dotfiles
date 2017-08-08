@@ -41,7 +41,6 @@
 #     1:38027:2 POLICY-OTHER Adobe Flash file containing ExternalInterface function download detected
 # ==========================================================
 ######################
-require 'pry'
 class SnortAllRulesResultProcessor < ApplicationProcessor
 
 
