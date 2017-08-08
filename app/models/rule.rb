@@ -618,8 +618,7 @@ class Rule < ApplicationRecord
         end
       end
     end
-
-    raise RuleError.new("Unable to find sid #{sid}")
+    raise Exception.new("Unable to find sid #{sid}")
   end
 
   def build_rule_params(rule_data)

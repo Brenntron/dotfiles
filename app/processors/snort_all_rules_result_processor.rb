@@ -75,7 +75,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
             job.result << "#{err}\n"
           end
         end
-        unless attachments.empty?
+        if attachments.any?
           Rails.logger.info ("Has alerts on attachments")
           attachments.each do |attachment_id, alerts|
 
@@ -122,10 +122,9 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                   end
                 end
 
-              rescue RuleError => e
-                Rails.logger.info( "Job failed #{e.message}")
-                job.failed = true
-                job.result << "#{e.to_s} for sid #{alert['sid']}\n"
+              rescue Exception => e
+                Rails.logger.info( "Rule failed #{e.message}")
+                job.result << "#{e.to_s} -> #{e.message} : for sid #{alert['sid']}\n"
               rescue ActiveRecord::RecordNotUnique => e
                 # Ignore these
               end
