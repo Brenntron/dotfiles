@@ -1,5 +1,8 @@
 <div class="row top-bar">
   <div class="col-xs-12">
+    <div id="missing-doc-override-div" onclick="$('#missing-doc-override')[0].style.visibility='visible'">
+      <input id="missing-doc-override" type="checkbox" onclick="disparage(this);" />
+    </div>
     <button class="select-sm btn btn-default rule-toolbar" id="overview">
       <i class="glyphicon glyphicon-list"></i><strong class="hidden-xs">&nbsp;&nbsp; list all</strong></button>
     <button class="select-sm btn btn-default rule-toolbar view-rules" id="view">
@@ -98,24 +101,17 @@
                   <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
                     <td colspan="6"><%= attachment.file_name %>
                     </td>
-                    <td>
-                      <% if attachment.rule_id.nil? %>
-                        <td colspan="2" class="no_alert">No Alert</td>
-                      <% else %>
-                        <td colspan="2" class="alerted">Alerted</td>
-                      <% end %>
-                    </td>
+                    <% if attachment.rule_id.nil? %>
+                      <td colspan="2" class="no_alert">No Alert</td>
+                    <% else %>
+                      <td colspan="2" class="alerted">Alerted</td>
+                    <% end %>
                   </tr>
               <% end %>
           <% end %>
           </tbody>
       <% end %>
     </table>
-
-    <div style="height: 100em;"></div>
-    <input id="missing-doc-override" type="checkbox" onclick="disparage(this);" />
-    Emergency only, do not check unless you are sure you know what you are doing.
-
   </div>
 </div>
 <div class="row create hidden">
