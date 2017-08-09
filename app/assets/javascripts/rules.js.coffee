@@ -1,3 +1,7 @@
+window.dismiss_alert_rules = ->
+  $('.alert_rules').hide 'blind', {}, 500
+
+
 window.disparage =(chkbox) ->
   disparage_messages = [
     "You should feel bad about yourself",
@@ -155,6 +159,12 @@ $ ->
               dataType: 'json'
               success: (response) ->
                 $('.alert_rules').addClass('success').show().html('Rules has been committed')
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+                $(document).ajaxStop ->
+                  location.reload true
               error: (response) ->
                 if response.responseJSON == undefined
                   response_lines = response.responseText.split("\n")
@@ -164,14 +174,8 @@ $ ->
                     alert(response.responseText)
                 else
                   alert(response.responseJSON["error"])
-                $('.alert_rules').addClass('error').show().html('Rules have not been committed')
+                $('.alert_rules').addClass('error').show().html('Rules have not been committed.  (Click text to dismiss)')
               complete: ->
-                setTimeout (->
-                  $('.alert_rules').hide 'blind', {}, 500
-                  return
-                ), 5000
-                $(document).ajaxStop ->
-                  location.reload true
             }
         else
           $.each allboxes, (i, v) ->
