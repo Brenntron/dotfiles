@@ -155,6 +155,12 @@ $ ->
               dataType: 'json'
               success: (response) ->
                 $('.alert_rules').addClass('success').show().html('Rules has been committed')
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+                $(document).ajaxStop ->
+                  location.reload true
               error: (response) ->
                 if response.responseJSON == undefined
                   response_lines = response.responseText.split("\n")
@@ -166,12 +172,6 @@ $ ->
                   alert(response.responseJSON["error"])
                 $('.alert_rules').addClass('error').show().html('Rules have not been committed')
               complete: ->
-                setTimeout (->
-                  $('.alert_rules').hide 'blind', {}, 500
-                  return
-                ), 5000
-                $(document).ajaxStop ->
-                  location.reload true
             }
         else
           $.each allboxes, (i, v) ->
