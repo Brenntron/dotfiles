@@ -8,7 +8,7 @@ class TestRule
   def self.send_work_msg(task, xmlrpc_token, bug)
     # be sure to collect all the attachments too but only the ones that are pcaps
     all_attachments = bug.attachments.inject([]) do |memo, attachment|
-      memo << attachment if /^[-\w]+.pcap$/.match(attachment.file_name)
+      memo << attachment if File.extname(attachment.file_name.downcase) == ".pcap" && attachment.is_obsolete == false
       memo
     end
     Rails.logger.info("rule testing: Testing attachments #{all_attachments.pluck(:file_name).join(", ")}")
