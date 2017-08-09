@@ -97,10 +97,9 @@ while message = client.receive
 
     task_id = request['task_id']
     # Fetch all of the needed pcaps into the cache directory
-    pcap_test_files = []
     request['pcaps'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
-      pcap_test_files << pcap_path
+
       # Updated files get new attachment ids so no need to test the actual data
       unless File.exists?(pcap_path)
         attempts = 0
@@ -140,19 +139,11 @@ while message = client.receive
       resp = HTTPI.post req do |http|
         http.multipart_form_post = true
       end
-      logging_blob = ""
 
-      logging_blob += "\n first line of each file:\n"
-
-      pcap_test_files.each do |filename|
-        logging_blob += "#{filename}: #{File.open(filename, &:readline)}"
-      end
 
       # Make sure that worked
       if resp.code != 200 and resp.code != 201         #if it didnt work the say so
-        logging_blob += "\nrequest json hash: #{request.inspect}\n"
-
-        raise Exception.new("Upload of #{attachment_id} failed: LOG BLOB: #{logging_blob} \n\n #{resp.code} - #{resp.body}")
+        raise Exception.new("Upload of #{attachment_id} failed:\n #{resp.code} - #{resp.body}")
       else
         pcaps[JSON.parse(resp.body)['id']] = attachment_id   #now we compile a hash using ids as keys and the pcaps as values
       end
