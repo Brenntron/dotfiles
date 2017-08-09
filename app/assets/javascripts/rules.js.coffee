@@ -1,3 +1,7 @@
+window.dismiss_alert_rules = ->
+  $('.alert_rules').hide 'blind', {}, 500
+
+
 window.disparage =(chkbox) ->
   disparage_messages = [
     "You should feel bad about yourself",
@@ -170,7 +174,7 @@ $ ->
                     alert(response.responseText)
                 else
                   alert(response.responseJSON["error"])
-                $('.alert_rules').addClass('error').show().html('Rules have not been committed')
+                $('.alert_rules').addClass('error').show().html('Rules have not been committed.  (Click text to dismiss)')
               complete: ->
             }
         else
