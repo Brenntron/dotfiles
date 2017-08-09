@@ -211,10 +211,10 @@ class RuleFile
   # param [Array[Rule]] rules_given array of rules.
   # param [Repo::RuleContentCommitter] content_committer The committer object.
   # TODO: move to RuleCommitter class.
-  # TODO: aggregate Repo::RuleContentCommitter object instead of passing to this method
-  def self.locked_commit(rules_given, username:, bugzilla_id:, content_committer:)
+  def self.locked_commit(committer)
     if publish_lock
-      committer = Repo::RuleCommitter.new(rules_given, bugzilla_id: bugzilla_id, username: username)
+      committer.event_start
+
       rules = committer.changed_rules
       log("publishing #{rules.count} rules")
 
@@ -225,10 +225,7 @@ class RuleFile
         #set all the rules we will update to publishing.
         Rule.set_pubcontent_state(Rule.where(id: rules))
 
-        content_committer.commit_rule_content
-
-        # TODO: Move the code in RuleCommitter#commit_rule_content to RuleContentCommitter#commit_rule_content
-        committer.commit_rule_content(bugzilla_id: bugzilla_id)
+        committer.content_committer.commit_rule_content
 
         if Rule.with_pub_content.exists?
           log("calling failsafe")
@@ -237,13 +234,15 @@ class RuleFile
       end
 
       log("publishing rule docs for #{rules.count} rules")
-      Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
+      Rule.set_pubdoc_state(Rule.where(id: committer.content_committer.unchanged_rules))
 
       committer.commit_docs
-    end
 
-    log('returning a success')
-    true
+      committer.event_success
+
+      log('returning a success')
+      true
+    end
 
   ensure
     #any rules not set to synch by svn hook should go back to current.
@@ -251,6 +250,9 @@ class RuleFile
       log("setting rules from publishing to current_edit")
       Rule.with_pub_any.update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
     end
+
+    committer.event_complete
+
     log("unlocking publishing")
     publish_unlock
     log("exiting publishing")
@@ -269,11 +271,11 @@ class RuleFile
   # param [FixNum] bugzilla_id The bugzilla id of the bug
   # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
   def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
-    content_committer = Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, username: username)
+    user = User.where(cvs_username: username).first
+    Repo::RuleContentCommitter.prescreen!(rules, user, nodoc_override: nodoc_override)
 
-    content_committer.prescreen!(nodoc_override: nodoc_override)
-
-    locked_commit(rules, username: username, bugzilla_id: bugzilla_id, content_committer: content_committer)
+    committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
+    locked_commit(committer)
 
   rescue
     Rails.logger.error $!

@@ -4,7 +4,7 @@ module Repo
   class RuleCommitter
     include Enumerable
 
-    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :username
+    attr_reader :content_committer, :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
 
     def log(message)
       Rails.logger.info "svn integration: #{message}"
@@ -49,62 +49,29 @@ module Repo
       end
     end
 
-    def initialize(rules, bugzilla_id: nil, username: nil)
+    def initialize(rules, bugzilla_id: nil, user: nil, username: nil)
       @bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
-      @username = username
+      @user = user
+      @username = username || user.cvs_username
       @rules = rules
       @changed_rules, @unchanged_rules = rules.partition { |rule| rule.content_changed? }
 
       @rule_files = self.class.collect_rule_files(@changed_rules)
+
+      @content_committer =
+          Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
+    end #initialize
+
+    def event_start
+      @rule_commit_event = RuleEvent::RuleCommitEvent.start(bug.bugzilla_id, rules, user.id)
+    end #event_start
+
+    def event_success
+      @rule_commit_event&.update(failed: false)
     end
 
-    def each(&block)
-      rule_files.each(&block)
-    end
-
-    def svn_commit_message
-      user_prefix = username ? "#{username} " : ''
-      "#{user_prefix}committed from Analyst Console"
-    end
-
-    def svn_cmd
-      pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
-      "#{Rails.configuration.svn_cmd} #{pwd_switch}"
-    end
-
-    # @return [String] space separated list of relative file paths
-    def working_file_list(rule_files)
-      map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
-    end
-
-    def commit_rule_files
-      working_file_list = working_file_list(rule_files)
-      log("committing files #{working_file_list}")
-
-      svn_result_output = `#{svn_cmd} commit #{working_file_list} -m "#{svn_commit_message}" 2>&1`
-      Rails.logger.info svn_result_output.gsub("\n", "~\n   ")
-      svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
-                          svn_result_code_str.to_i
-                        end
-
-      if bug
-        changed_rules.each do |rule|
-          rule.bugs_rules.where(bug_id: bug)
-              .update_all(svn_result_output: svn_result_output, svn_result_code: svn_result_code || 0)
-        end
-      end
-
-      log("content commit return code #{svn_result_code.inspect}")
-      raise "Rule content commit failed." unless 199 == svn_result_code
-      svn_result_code
-    end
-
-    def commit_rule_content(bugzilla_id:)
-      commit_rule_files
-
-      rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }
-
-      rule_files.each {|rule_file| rule_file.load_add_line(bugzilla_id) } if bugzilla_id
+    def event_complete
+      @rule_commit_event&.update(completed: true)
     end
 
     def commit_doc?(rule)

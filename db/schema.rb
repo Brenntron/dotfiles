@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170726183644) do
+ActiveRecord::Schema.define(version: 20170807140953) do
 
   create_table "alerts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -268,7 +268,7 @@ ActiveRecord::Schema.define(version: 20170726183644) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "tasks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.boolean "completed", default: false
     t.boolean "failed", default: false
     t.text "result"
@@ -279,6 +279,7 @@ ActiveRecord::Schema.define(version: 20170726183644) do
     t.bigint "bug_id"
     t.bigint "user_id"
     t.datetime "stats_updated_at"
+    t.string "type", default: "Task"
     t.index ["bug_id"], name: "index_tasks_on_bug_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
