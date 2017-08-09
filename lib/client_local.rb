@@ -140,20 +140,11 @@ while message = client.receive
       resp = HTTPI.post req do |http|
         http.multipart_form_post = true
       end
-      logging_blob = ""
 
-      logging_blob += "\n first line of each file:\n"
-
-      #pcap_test_files.each do |filename|
-        #IO.foreach maybe?C
-        #logging_blob += "#{filename}: #{File.open(filename, &:readline)}"
-      #end
 
       # Make sure that worked
       if resp.code != 200 and resp.code != 201         #if it didnt work the say so
-        logging_blob += "\nrequest json hash: #{request.inspect}\n"
-
-        raise Exception.new("Upload of #{attachment_id} failed: LOG BLOB: #{logging_blob} \n\n #{resp.code} - #{resp.body}")
+        raise Exception.new("Upload of #{attachment_id} failed:\n #{resp.code} - #{resp.body}")
       else
         pcaps[JSON.parse(resp.body)['id']] = attachment_id   #now we compile a hash using ids as keys and the pcaps as values
       end
