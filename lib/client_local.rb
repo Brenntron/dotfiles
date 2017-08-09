@@ -97,10 +97,9 @@ while message = client.receive
 
     task_id = request['task_id']
     # Fetch all of the needed pcaps into the cache directory
-    #pcap_test_files = []
     request['pcaps'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
-      #pcap_test_files << pcap_path
+
       # Updated files get new attachment ids so no need to test the actual data
       unless File.exists?(pcap_path)
         attempts = 0
