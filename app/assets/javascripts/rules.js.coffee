@@ -293,6 +293,7 @@ $ ->
             success: (response) ->
               $('.alert_rules').removeClass('error')
               $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
+              $('html,body').scrollTop(0);
             error: (response) ->
               $('.alert_rules').removeClass('success')
               $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
