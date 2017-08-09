@@ -97,10 +97,10 @@ while message = client.receive
 
     task_id = request['task_id']
     # Fetch all of the needed pcaps into the cache directory
-    pcap_test_files = []
+    #pcap_test_files = []
     request['pcaps'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
-      pcap_test_files << pcap_path
+      #pcap_test_files << pcap_path
       # Updated files get new attachment ids so no need to test the actual data
       unless File.exists?(pcap_path)
         attempts = 0
@@ -144,9 +144,10 @@ while message = client.receive
 
       logging_blob += "\n first line of each file:\n"
 
-      pcap_test_files.each do |filename|
-        logging_blob += "#{filename}: #{File.open(filename, &:readline)}"
-      end
+      #pcap_test_files.each do |filename|
+        #IO.foreach maybe?C
+        #logging_blob += "#{filename}: #{File.open(filename, &:readline)}"
+      #end
 
       # Make sure that worked
       if resp.code != 200 and resp.code != 201         #if it didnt work the say so
