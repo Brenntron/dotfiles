@@ -121,11 +121,10 @@ module Api
         config.amq_snort_commit_result = :snort_commit_test_result
     end
     config.websockets_enabled = "false"
-    config.bugzilla_domain = 'cisco.com'
-    config.snort_rule_path = Rails.root.join('extras', 'snort', 'rules')
-    config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'
-    config.osvdb_search_url = "http://www.osvdb.org/search/search?search[refid]=DATA"
-    config.max_attachment_size = 50000000 # 50MB
+    # config.bugzilla_domain = 'cisco.com'
+    # config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'
+    # config.osvdb_search_url = "http://www.osvdb.org/search/search?search[refid]=DATA"
+    # config.max_attachment_size = 50000000 # 50MB
     config.job_timeout = 300    # 5 minutes
     config.action_controller.per_form_csrf_tokens = true
     config.ssl_options = { hsts: { subdomains: true } }

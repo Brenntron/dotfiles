@@ -14,4 +14,5 @@ Rails.configuration.svn_cmd             = env_config['svn']['cmd']
 Rails.configuration.svn_pwd             = env_config['svn']['password']
 Rails.configuration.rules_repo_url      = env_config['svn']['rules_repo_url']
 Rails.configuration.ruledocs_repo_url   = env_config['svn']['ruledocs_repo_url']
+Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['snort_rule_path'])
 

@@ -10,6 +10,7 @@ development:
     password: ""
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
+    snort_rule_path: "extras/snort/rules"
 
 test:
   amq:
@@ -23,6 +24,7 @@ test:
     password: ""
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
+    snort_rule_path: "extras/snort/rules"
 
 staging:
   amq:
@@ -36,6 +38,7 @@ staging:
     password: ""
     rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
+    snort_rule_path: "extras/snort/rules"
 
 production:
   amq:
@@ -49,4 +52,5 @@ production:
     password: ""
     rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
+    snort_rule_path: "extras/snort/rules"
 
