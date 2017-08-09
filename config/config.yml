@@ -1,0 +1,16 @@
+development:
+   bugzilla:
+     host: "bugzillaTest02.vrt.sourcefire.com"
+
+test:
+   bugzilla:
+     host: "bugzillaTest02.vrt.sourcefire.com"
+
+staging:
+   bugzilla:
+     host: "bugzilla-staging.vrt.sourcefire.com"
+
+production:
+   bugzilla:
+     host: "bugzilla.vrt.sourcefire.com"
+
