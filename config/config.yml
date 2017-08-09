@@ -1,16 +1,52 @@
 development:
-   bugzilla:
-     host: "bugzillaTest02.vrt.sourcefire.com"
+  amq:
+    host: "localhost"
+  bugzilla:
+    host: "bugzillaTest02.vrt.sourcefire.com"
+  perl:
+    cmd: "/usr/bin/env perl"
+  svn:
+    cmd: "/usr/bin/env svn"
+    password: ""
+    rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
+    ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
 
 test:
-   bugzilla:
-     host: "bugzillaTest02.vrt.sourcefire.com"
+  amq:
+    host: "localhost"
+  bugzilla:
+    host: "bugzillaTest02.vrt.sourcefire.com"
+  perl:
+    cmd: "/usr/bin/env perl"
+  svn:
+    cmd: "/usr/bin/env svn"
+    password: ""
+    rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
+    ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
 
 staging:
-   bugzilla:
-     host: "bugzilla-staging.vrt.sourcefire.com"
+  amq:
+    host: "fmd-actmq-01stg.vrt.sourcefire.com"
+  bugzilla:
+    host: "bugzilla-staging.vrt.sourcefire.com"
+  perl:
+    cmd: "/usr/local/bin/perl"
+  svn:
+    cmd: "/usr/local/bin/svn"
+    password: ""
+    rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
+    ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
 
 production:
-   bugzilla:
-     host: "bugzilla.vrt.sourcefire.com"
+  amq:
+    host: "mq.vrt.sourcefire.com"
+  bugzilla:
+    host: "bugzilla.vrt.sourcefire.com"
+  perl:
+    cmd: "/usr/local/bin/perl"
+  svn:
+    cmd: "/usr/local/bin/svn"
+    password: ""
+    rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
+    ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
 

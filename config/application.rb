@@ -46,14 +46,8 @@ module Api
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')
-        config.amq_host = "localhost"
         config.cert_file = "extras/ssh/ca.pem"
         config.canvas_root = Rails.root.join('extras')
-        config.perl_cmd = "/usr/bin/env perl"
-        config.svn_cmd = "/usr/bin/env svn"
-        config.svn_pwd = ''
-        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
 
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Test.Result"
@@ -72,14 +66,8 @@ module Api
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
-        config.amq_host = "fmd-actmq-01stg.vrt.sourcefire.com"
         config.cert_file = "/usr/local/etc/trusted-certificates.pem"
         config.canvas_root = Rails.root.join('extras')
-        config.perl_cmd = "/usr/local/bin/perl"
-        config.svn_cmd = "/usr/local/bin/svn"
-        config.svn_pwd = ''
-        config.rules_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/'
 
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Stage.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Stage.Result"
@@ -98,14 +86,8 @@ module Api
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
-        config.amq_host = "mq.vrt.sourcefire.com"
         config.cert_file = "/usr/local/etc/trusted-certificates.pem"
         config.canvas_root = Rails.root.join('extras') # this may need updating for production depending on where we access CANVAS_CATALOG
-        config.perl_cmd = "/usr/local/bin/perl"
-        config.svn_cmd = "/usr/local/bin/svn"
-        config.svn_pwd = ''
-        config.rules_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/'
 
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Result"
@@ -123,14 +105,8 @@ module Api
         config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
         config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
         config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')
-        config.amq_host = "localhost"
         config.cert_file = "/System/Library/OpenSSL/certs/ca.pem"
         config.canvas_root = Rails.root.join('extras')
-        config.perl_cmd = "/usr/bin/env perl"
-        config.svn_cmd = "/usr/bin/env svn"
-        config.svn_pwd = ''
-        config.rules_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk'
-        config.ruledocs_repo_url = 'https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/'
 
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Test.Result"
