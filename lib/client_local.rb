@@ -107,8 +107,10 @@ while message = client.receive
         # Retry if we get a bugzilla EOF error
         begin
           xmlrpc.token = request['cookie']
+
           bug = Bugzilla::Bug.new(xmlrpc)
           res = bug.attachments(:attachment_ids => attachment_id, :include_fields => ['data'])
+
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
           Rails.logger.debug("#{Time.now} -> Found attachments in bugzilla")
           # Finally, we should actually have data

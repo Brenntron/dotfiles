@@ -28,7 +28,7 @@ class TestAttachment
     @attachments.each do |attachment_id|
       attachment = Attachment.where(id: attachment_id).first
       Alert.reset_pcap(attachment)
-      if File.extname(attachment.file_name.downcase) == “.pcap” && attachment.is_obsolete == false
+      if File.extname(attachment.file_name.downcase) == ".pcap" && attachment.is_obsolete == false
         @new_task.attachments << attachment
         pcap_attachment_ids << attachment_id
       end
