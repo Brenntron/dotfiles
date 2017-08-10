@@ -42,13 +42,6 @@ module Api
 
     case Rails.env
       when "development"
-        config.ruletest_server = "https://localhost:3000/api_test"
-        config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
-        config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
-        config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')
-        config.cert_file = "extras/ssh/ca.pem"
-        config.canvas_root = Rails.root.join('extras')
-
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Test.Result"
         config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Test.Work"
@@ -62,13 +55,6 @@ module Api
         config.amq_snort_commit_result = :snort_commit_test_result
 
       when "staging"
-        config.ruletest_server = "https://fmd-rultst-01stg.vrt.sourcefire.com"
-        config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
-        config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
-        config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
-        config.cert_file = "/usr/local/etc/trusted-certificates.pem"
-        config.canvas_root = Rails.root.join('extras')
-
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Stage.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Stage.Result"
         config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Stage.Work"
@@ -82,13 +68,6 @@ module Api
         config.amq_snort_commit_result = :snort_commit_stage_result
 
       when "production"
-        config.ruletest_server = "https://ruletest.vrt.sourcefire.com"
-        config.visruleparser_path = Rails.root.join('extras', 'visruleparser.pl')
-        config.cve2x_path = Rails.root.join('extras', 'cve2x.pl')
-        config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml.pl')
-        config.cert_file = "/usr/local/etc/trusted-certificates.pem"
-        config.canvas_root = Rails.root.join('extras') # this may need updating for production depending on where we access CANVAS_CATALOG
-
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Result"
         config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Work"
@@ -101,13 +80,6 @@ module Api
 
         config.amq_snort_commit_result = :snort_commit_result
       when "test"
-        config.ruletest_server = "https://localhost:3000/api_test"
-        config.visruleparser_path = Rails.root.join('extras', 'visruleparser_dev.pl')
-        config.cve2x_path = Rails.root.join('extras', 'cve2x_dev.pl')
-        config.rule2yaml_path = Rails.root.join('extras', 'rule2yaml_dev.pl')
-        config.cert_file = "/System/Library/OpenSSL/certs/ca.pem"
-        config.canvas_root = Rails.root.join('extras')
-
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Test.Result"
         config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Test.Work"
@@ -121,10 +93,6 @@ module Api
         config.amq_snort_commit_result = :snort_commit_test_result
     end
     config.websockets_enabled = "false"
-    # config.bugzilla_domain = 'cisco.com'
-    # config.osvdb_api_key = '00wJFQuHKue2GRFAiQ0neXcqks'
-    # config.osvdb_search_url = "http://www.osvdb.org/search/search?search[refid]=DATA"
-    # config.max_attachment_size = 50000000 # 50MB
     config.job_timeout = 300    # 5 minutes
     config.action_controller.per_form_csrf_tokens = true
     config.ssl_options = { hsts: { subdomains: true } }
