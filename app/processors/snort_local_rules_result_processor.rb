@@ -57,6 +57,8 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
       job.failed = result['failed']
       job.save
 
+      job.set_rule_tested unless job.failed
+
       # Nothing to do on a failed job
       if job.failed
         Rails.logger.info( "Job Failed. Returning from processing")

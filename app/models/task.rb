@@ -41,6 +41,10 @@ class Task < ApplicationRecord
     )
   end
 
+  def set_rule_tested
+    rules.update_all(tested: true)
+  end
+
   def record(action)
     record = { resource: 'task',
                action: action,
