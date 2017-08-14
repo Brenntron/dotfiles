@@ -41,7 +41,7 @@
             <% end %>
           </div>
           <div class="col-xs-6 col-sm-4">
-            <h6 class="text-muted">team</h6>
+            <h6 class="text-muted"><%= link_to 'team', users_path %></h6>
             <% if @user.children.any? %>
               <ul class="compact-list">
                 <% @user.children.each do |member| %>
@@ -53,7 +53,7 @@
             <% end %>
           </div>
           <div class="col-xs-6 col-sm-4">
-            <h6 class="text-muted">co-workers</h6>
+            <h6 class="text-muted"><%= link_to 'co-workers', users_path %></h6>
             <% if @user.siblings.any?  && @user.child? %>
                 <ul class="compact-list">
                   <% @user.siblings.each do |co| %>
