@@ -48,7 +48,7 @@
                 </div>
               </td>
               <td class="user-col"><%= User.find(task.user_id).cvs_username %></td>
-              <td><%= task.created_at.strftime("%m/%d/%y") %></td>
+              <td><%= task.created_at.strftime("%m/%d/%y %H:%M:%S") %></td>
             </tr>
             <tr style="display:none;">
               <td class="code">
@@ -75,7 +75,7 @@
                   <% end %>
                 </pre></td>
                 <td><%= User.find(task.user_id).cvs_username %></td>
-                <td><%= task.created_at.strftime("%m/%d/%y") %></td>
+                <td><%= task.created_at.strftime("%m/%d/%y %H:%M:%S") %></td>
               </tr>
               <tr style="display:none;">
                 <td colspan="7" class="code">
