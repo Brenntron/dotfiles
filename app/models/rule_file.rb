@@ -66,9 +66,6 @@ class RuleFile
     end
   end
 
-  #unlock on startup when this class file is loaded.
-  publish_unlock
-
   # @return [Boolean] if publishing is currently locked by some thread
   def self.publish_locked?
     publish_mutex.synchronize do
