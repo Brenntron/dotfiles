@@ -11,6 +11,8 @@ class Bug < ApplicationRecord
 
   has_many :exploits, through: :references
   has_many :attachments, dependent: :destroy
+  # has_many :pcaps, -> { where("attachments.file_name like '%.pcap'") }, class_name: 'Attachment'
+  has_many :pcaps, -> { pcap }, class_name: 'Attachment'
   has_many :tasks, dependent: :destroy
   has_many :notes, dependent: :destroy
   has_many :test_reports
@@ -51,7 +53,7 @@ class Bug < ApplicationRecord
   #after_destroy { |bug| bug.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
   def attachment_local_alerts(rule)
-    attachments.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
+    pcaps.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
         .select(:file_name, 'alerts.rule_id')
   end
 
