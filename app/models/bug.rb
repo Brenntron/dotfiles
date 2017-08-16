@@ -11,7 +11,6 @@ class Bug < ApplicationRecord
 
   has_many :exploits, through: :references
   has_many :attachments, dependent: :destroy
-  # has_many :pcaps, -> { where("attachments.file_name like '%.pcap'") }, class_name: 'Attachment'
   has_many :pcaps, -> { pcap }, class_name: 'Attachment'
   has_many :tasks, dependent: :destroy
   has_many :notes, dependent: :destroy
