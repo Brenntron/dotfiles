@@ -33,22 +33,6 @@ module Repo
       relative_path
     end
 
-    def self.collect_rule_files(rules)
-      Rule.where(id: rules).select(:gid, :filename, :rule_category_id)
-          .group(:gid, :filename, :rule_category_id)
-          .map { |rule_group| ::RuleFile.new(relative_path_of(rule_group.nonnil_pathname)) }.tap do |rule_files|
-
-        rules.each do |rule|
-          rule_file = rule_files.detect do |rule_file|
-            relative_path_of(rule.nonnil_pathname) == rule_file.relative_pathname
-          end
-          rule_file << rule if rule_file
-        end
-
-        rule_files.select! { |rule_file| 0 < rule_file.count }
-      end
-    end
-
     def initialize(rules, bugzilla_id: nil, user: nil, username: nil)
       @bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
       @user = user
@@ -56,11 +40,13 @@ module Repo
       @rules = rules
       @changed_rules, @unchanged_rules = rules.partition { |rule| rule.content_changed? }
 
-      @rule_files = self.class.collect_rule_files(@changed_rules)
-
       @content_committer =
           Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
-    end #initialize
+    end
+
+    def rule_files
+      content_committer.rule_files
+    end
 
     def event_start
       @rule_commit_event = RuleEvent::RuleCommitEvent.start(bug.bugzilla_id, rules, user.id)
