@@ -33,6 +33,8 @@ module Repo
           .group(:gid, :filename, :rule_category_id)
           .map { |rule_group| ::RuleFile.new(relative_path_of(rule_group.nonnil_pathname)) }.tap do |rule_files|
 
+        rule_files.each { |rule_file| Repo::RuleCommitter.log("*** Rule file path #{rule_file.relative_pathname}") }
+
         rules.each do |rule|
           rule_file = rule_files.detect do |rule_file|
             relative_path_of(rule.nonnil_pathname) == rule_file.relative_pathname
