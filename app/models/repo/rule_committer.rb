@@ -6,6 +6,10 @@ module Repo
 
     attr_reader :content_committer, :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
 
+    def self.log(message)
+      Rails.logger.info "svn integration: #{message}"
+    end
+
     def log(message)
       Rails.logger.info "svn integration: #{message}"
     end
