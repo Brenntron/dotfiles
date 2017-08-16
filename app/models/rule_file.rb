@@ -137,6 +137,7 @@ class RuleFile
 
   # deletes the file in the working folder used for commits
   def remove_working_file
+    self.class.log("removing #{working_pathname}")
     FileUtils.remove_file(working_pathname) rescue nil
   end
 
@@ -176,7 +177,9 @@ class RuleFile
   # read diffs from file to add new rules to bug
   def load_add_line(bugzilla_id)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
+    self.class.log("svn up #{synch_pathname}")
     `#{self.class.svn_cmd} up #{synch_pathname}`
+    self.class.log("svn diff -r PREV:BASE #{synch_pathname}")
     `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line) && (/sid:\s*\d+\s*;/ =~ line)
         link_add_line_rule(bug, line[1..-1])
