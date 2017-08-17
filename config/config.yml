@@ -18,7 +18,7 @@ development:
     password: ""
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
-    snort_rule_path: "extras/snort/rules"
+    snort_rule_path: "extras/snort/snort-rules"
 
 test:
   amq:
@@ -40,7 +40,7 @@ test:
     password: ""
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
-    snort_rule_path: "extras/snort/rules"
+    snort_rule_path: "extras/snort/snort-rules"
 
 staging:
   amq:
@@ -62,27 +62,27 @@ staging:
     password: ""
     rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
-    snort_rule_path: "extras/snort/rules"
+    snort_rule_path: "extras/snort/snort-rules"
 
-production:
-  amq:
-    host: "mq.vrt.sourcefire.com"
-  bugzilla:
-    host: "bugzilla.vrt.sourcefire.com"
-  cert:
-    vrt: "/usr/local/etc/trusted-certificates.pem"
-  perl:
-    cmd: "/usr/local/bin/perl"
-    canvas_root: "extras"
-    visruleparser_path: "extras/visruleparser.pl"
-    cve2x_path: "extras/cve2x.pl"
-    rule2yaml_path: "extras/rule2yaml.pl"
-  ruletest:
-    url: "https://ruletest.vrt.sourcefire.com"
-  svn:
-    cmd: "/usr/local/bin/svn"
-    password: ""
-    rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
-    ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
-    snort_rule_path: "extras/snort/rules"
+#production:
+#  amq:
+#    host: "mq.vrt.sourcefire.com"
+#  bugzilla:
+#    host: "bugzilla.vrt.sourcefire.com"
+#  cert:
+#    vrt: "/usr/local/etc/trusted-certificates.pem"
+#  perl:
+#    cmd: "/usr/local/bin/perl"
+#    canvas_root: "extras"
+#    visruleparser_path: "extras/visruleparser.pl"
+#    cve2x_path: "extras/cve2x.pl"
+#    rule2yaml_path: "extras/rule2yaml.pl"
+#  ruletest:
+#    url: "https://ruletest.vrt.sourcefire.com"
+#  svn:
+#    cmd: "/usr/local/bin/svn"
+#    password: ""
+#    rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
+#    ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
+#    snort_rule_path: "extras/snort/snort-rules"
 
