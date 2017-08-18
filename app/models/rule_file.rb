@@ -73,38 +73,14 @@ class RuleFile
     end
   end
 
-  # @return [Pathname] path (possibly relative) to the snort directory synchronized with svn
-  def self.synch_root
-    @snort_path ||= Pathname.new('extras/snort')
-  end
-
-  # @return [Pathname] relative path name of the version control working directory to use for commits
-  def self.working_root
-    @svn_pathname ||= Pathname.new('extras/working')
-  end
-
-  # @param [Pathname, String] input file name, absolute or relative
-  # @return [Pathname] the part of the file name relative to a working folder, the synchronized or working folder
-  def self.relative_path_of(filepath)
-    relative_path = Pathname.new(filepath)
-    relative_path = relative_path.relative_path_from(Rails.root) if relative_path.absolute?
-    relative_path = relative_path.relative_path_from(synch_root) if relative_path.to_s.starts_with?(synch_root.to_s)
-    relative_path
-  end
-
-  # @return [Pathname] file path in the working folder for commits
-  def self.working_pathname_of(pathname)
-    Rails.root.join(working_root, relative_path_of(pathname))
-  end
-
   # @return [Pathname] path (possibly relative) to the snort directory directory synchronized with svn
   def synch_pathname
-    @synch_pathname ||= Rails.root.join(self.class.synch_root, relative_pathname)
+    @synch_pathname ||= Rails.root.join(Repo::RuleContentCommitter.synch_root, relative_pathname)
   end
 
   # @return [Pathname] the path to the file in the working directory
   def working_pathname
-    @working_pathname ||= self.class.working_pathname_of(relative_pathname)
+    @working_pathname ||= Repo::RuleContentCommitter.working_pathname_of(relative_pathname)
   end
 
   # @param [String|Pathname] file path relative to a working folder
@@ -118,24 +94,13 @@ class RuleFile
   def self.build(rules)
     Rule.where(id: rules).select(:gid, :filename, :rule_category_id)
         .group(:gid, :filename, :rule_category_id)
-        .map { |rule_group| new(relative_path_of(rule_group.nonnil_pathname)) }
-  end
-
-  # @return [String] space separated list of relative file paths
-  def self.working_file_list(rule_files)
-    rule_files.map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
+        .map { |rule_group| new(Repo::RuleContentCommitter.relative_path_of(rule_group.nonnil_pathname)) }
   end
 
   def patch_file
     rules.each do |rule|
-      rule.patch_file(self.class.working_pathname_of(rule.nonnil_pathname))
+      rule.patch_file(Repo::RuleContentCommitter.working_pathname_of(rule.nonnil_pathname))
     end
-  end
-
-  # deletes the file in the working folder used for commits
-  def remove_working_file
-    self.class.log("removing #{working_pathname}")
-    FileUtils.remove_file(working_pathname) rescue nil
   end
 
   # links a new rule to the bug
