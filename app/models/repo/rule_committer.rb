@@ -14,6 +14,7 @@ module Repo
       self.class.log(message)
     end
 
+    # build svn command for command line
     def self.svn_cmd
       unless @svn_cmd
         pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
@@ -22,6 +23,8 @@ module Repo
       @svn_cmd
     end
 
+    # call svn
+    # params [String] svn_args string of command line after the svn command.
     def self.call_svn(svn_args)
       log("calling svn #{svn_args}")
       output = `#{svn_cmd} #{svn_args} 2>&1`

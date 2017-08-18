@@ -102,6 +102,7 @@ module Repo
 
     end
 
+    # deletes the file in the working folder used for commits
     def remove_working_file(working_pathname)
       log("removing #{working_pathname}")
       FileUtils.remove_file(working_pathname) rescue nil
