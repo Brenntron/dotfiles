@@ -13,10 +13,6 @@ class RuleFile
 
   attr_reader :relative_pathname, :rules
 
-  class << self
-    attr_reader :publish_lock_pid
-  end
-
   def to_s
     relative_pathname.to_s
   end
@@ -36,41 +32,6 @@ class RuleFile
 
   def self.log(message)
     Rails.logger.info "svn integration: #{message}"
-  end
-
-  # @return [Mutex] mutex to exclusively change publishing lock
-  def self.publish_mutex
-    @publish_mutex ||= Mutex.new
-  end
-
-  # lock publishing, so current thread is only thread doing a commit
-  def self.publish_lock
-    log("publish lock")
-    publish_mutex.synchronize do
-      if @publish_lock_pid
-        nil
-      else
-        @publish_lock_pid = Process.pid
-        true
-      end
-    end
-  end
-
-  # unlock publishing, so other threads can log publishing
-  # Threads other than the one which locked publishing can unlock it.
-  # It is up to the developer (via writting the code) to only unlock it from the right thread.
-  def self.publish_unlock
-    log("publish unlock")
-    publish_mutex.synchronize do
-      @publish_lock_pid = nil
-    end
-  end
-
-  # @return [Boolean] if publishing is currently locked by some thread
-  def self.publish_locked?
-    publish_mutex.synchronize do
-      !@publish_lock_pid
-    end
   end
 
   # @return [Pathname] path (possibly relative) to the snort directory directory synchronized with svn
@@ -156,81 +117,5 @@ class RuleFile
     committer.rule_files.each do |rule_file|
       rule_file.synch_failsafe
     end
-  end
-
-  # Rule committing code when the publish is locked
-  # param [Array[Rule]] rules_given array of rules.
-  # param [Repo::RuleContentCommitter] content_committer The committer object.
-  # TODO: move to RuleCommitter class.
-  def self.locked_commit(committer)
-    if publish_lock
-      committer.event_start
-
-      rules = committer.changed_rules
-      log("publishing #{rules.count} rules")
-
-      if rules.any?
-        rule_files = committer.rule_files
-        log("publishing content #{rules.count} rules, #{rule_files.count} files")
-
-        #set all the rules we will update to publishing.
-        Rule.set_pubcontent_state(Rule.where(id: rules))
-
-        committer.content_committer.commit_rule_content
-
-        if Rule.with_pub_content.exists?
-          log("calling failsafe")
-          synch_failsafe
-        end
-      end
-
-      log("publishing rule docs for #{rules.count} rules")
-      Rule.set_pubdoc_state(Rule.where(id: committer.content_committer.unchanged_rules))
-
-      committer.commit_docs
-
-      committer.event_success
-
-      log('returning a success')
-      true
-    end
-
-  ensure
-    #any rules not set to synch by svn hook should go back to current.
-    if Rule.with_pub_any.exists?
-      log("setting rules from publishing to current_edit")
-      Rule.with_pub_any.update_all(publish_status: Rule::PUBLISH_STATUS_CURRENT_EDIT)
-    end
-
-    committer.event_complete
-
-    log("unlocking publishing")
-    publish_unlock
-    log("exiting publishing")
-  end
-
-  # Handle the action from the API controller for committing rules.
-  #
-  # This method handles setup and cleanup around constructing the committer object and calling it.
-  # Note that if it was merged with the method which does the work,
-  # then there would be too much in the rescue and ensure sections.
-  # That is a bad situation, because exceptions raised in the rescue and ensure sections
-  # are not handled properly (or alternatively the code gets out of hand).
-  #
-  # param [Array[Rule]] rules array of rules.
-  # param [String] username The username to add to the svn comment (message)
-  # param [FixNum] bugzilla_id The bugzilla id of the bug
-  # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
-  def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
-    user = User.where(cvs_username: username).first
-    Repo::RuleContentCommitter.prescreen!(rules, user, nodoc_override: nodoc_override)
-
-    committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
-    locked_commit(committer)
-
-  rescue
-    Rails.logger.error $!
-    Rails.logger.error $!.backtrace.join("\n")
-    raise
   end
 end

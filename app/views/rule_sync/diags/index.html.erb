@@ -33,7 +33,7 @@
     <h3>Publish Locks</h3>
 
     <h4>Publish Lock PID</h4>
-    <div><%= RuleFile.publish_lock_pid.inspect %></div>
+    <div><%= Repo::RuleCommitter.publish_lock_pid.inspect %></div>
 
     <h4>Publishing Rules</h4>
     <% if Rule.with_pub_any.exists? %>

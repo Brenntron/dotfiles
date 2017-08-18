@@ -146,6 +146,8 @@ module Repo
 
     # Commits the rule content of its collection of rule files and rules.
     def commit_rule_content
+      log("publishing content #{rules.count} rules, #{rule_files.count} files")
+
       rule_files.each {|rule_file| checkout(rule_file.relative_pathname) }
       rule_files.each {|rule_file| rule_file.patch_file}
       commit_rule_files

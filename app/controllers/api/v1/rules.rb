@@ -157,10 +157,10 @@ module API
           raise "You must select a rule to commit!" if rules.empty?
           raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
 
-          RuleFile.commit_rules_action(rules,
-                                       username: permitted_params[:username],
-                                       bugzilla_id: permitted_params[:bug_id],
-                                       nodoc_override: permitted_params[:nodoc_override])
+          Repo::RuleCommitter.commit_rules_action(rules,
+                                                  username: permitted_params[:username],
+                                                  bugzilla_id: permitted_params[:bug_id],
+                                                  nodoc_override: permitted_params[:nodoc_override])
         end
 
         desc "Commit a rule"
@@ -176,9 +176,9 @@ module API
           raise "You must select a rule to commit!" if rules.empty?
           raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
 
-          RuleFile.commit_rules_action(rules,
-                                       username: permitted_params[:username],
-                                       bugzilla_id: permitted_params[:bug_id])
+          Repo::RuleCommitter.commit_rules_action(rules,
+                                                  username: permitted_params[:username],
+                                                  bugzilla_id: permitted_params[:bug_id])
         end
 
 
