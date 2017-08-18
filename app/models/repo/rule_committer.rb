@@ -171,7 +171,9 @@ module Repo
 
           if Rule.with_pub_content.exists?
             log("calling failsafe")
-            synch_failsafe
+            rule_files.each do |rule_file|
+              rule_file.synch_failsafe
+            end
           end
         end
 

@@ -110,12 +110,4 @@ class RuleFile
       end
     end
   end
-
-  # run failsafe to update db if callback did not
-  def self.synch_failsafe
-    committer = Repo::RuleCommitter.new(Rule.with_pub_content)
-    committer.rule_files.each do |rule_file|
-      rule_file.synch_failsafe
-    end
-  end
 end
