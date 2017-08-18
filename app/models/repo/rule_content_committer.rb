@@ -28,6 +28,11 @@ module Repo
       relative_path
     end
 
+    # @return [Pathname] file path in the working folder for commits
+    def self.working_pathname_of(pathname)
+      Rails.root.join(working_root, relative_path_of(pathname))
+    end
+
     def self.collect_rule_files(rules)
       Rule.where(id: rules).select(:gid, :filename, :rule_category_id)
           .group(:gid, :filename, :rule_category_id)
@@ -60,6 +65,14 @@ module Repo
       rule_files.each(&block)
     end
 
+    def log(message)
+      Repo::RuleCommitter.log(message)
+    end
+
+    def call_svn(svn_args)
+      Repo::RuleCommitter.call_svn(svn_args)
+    end
+
     def svn_commit_message
       user_prefix = username ? "#{username} " : ''
       "#{user_prefix}committed from Analyst Console"
@@ -89,6 +102,26 @@ module Repo
 
     end
 
+    def remove_working_file(working_pathname)
+      log("removing #{working_pathname}")
+      FileUtils.remove_file(working_pathname) rescue nil
+    end
+
+    # gets file from svn prepared for later commit
+    def checkout(relative_pathname)
+      working_pathname = self.class.working_pathname_of(relative_pathname)
+      working_dir = working_pathname.dirname
+
+      unless File.directory?(working_dir)
+        FileUtils.mkpath(working_dir)
+        svn_url = "#{Rails.configuration.rules_repo_url}/#{relative_pathname.dirname}/"
+        call_svn("co --depth empty #{svn_url} #{working_dir}")
+      end
+
+      remove_working_file(working_pathname)
+      call_svn("up #{working_pathname}")
+    end
+
     def commit_rule_files
       working_file_list = working_file_list(rule_files)
       Rails.logger.info("svn integration: committing files #{working_file_list}")
@@ -113,7 +146,7 @@ module Repo
 
     # Commits the rule content of its collection of rule files and rules.
     def commit_rule_content
-      rule_files.each {|rule_file| rule_file.checkout }
+      rule_files.each {|rule_file| checkout(rule_file.relative_pathname) }
       rule_files.each {|rule_file| rule_file.patch_file}
       commit_rule_files
       rule_files.each {|rule_file| rule_file.remove_working_file rescue nil }

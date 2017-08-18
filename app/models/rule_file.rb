@@ -138,20 +138,6 @@ class RuleFile
     FileUtils.remove_file(working_pathname) rescue nil
   end
 
-  # gets file from svn prepared for later commit
-  def checkout
-    unless File.directory?(working_pathname.dirname)
-      FileUtils.mkpath(working_pathname.dirname)
-      svn_url = "#{Rails.configuration.rules_repo_url}/#{relative_pathname.dirname}/"
-      self.class.log("svn co --depth empty #{svn_url} #{working_pathname.dirname}")
-      `#{self.class.svn_cmd} co --depth empty #{svn_url} #{working_pathname.dirname}`
-    end
-
-    remove_working_file
-    self.class.log("svn up #{working_pathname}")
-    `#{self.class.svn_cmd} up #{working_pathname}`
-  end
-
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_add_line_rule(bug, rule_content)

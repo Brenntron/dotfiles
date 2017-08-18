@@ -11,7 +11,21 @@ module Repo
     end
 
     def log(message)
-      Rails.logger.info "svn integration: #{message}"
+      self.class.log(message)
+    end
+
+    def self.svn_cmd
+      unless @svn_cmd
+        pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
+        @svn_cmd = "#{Rails.configuration.svn_cmd} #{pwd_switch}"
+      end
+      @svn_cmd
+    end
+
+    def self.call_svn(svn_args)
+      log("calling svn #{svn_args}")
+      output = `#{svn_cmd} #{svn_args} 2>&1`
+      log('svn output: ' + output.split("\n").join(' ~')) unless output.blank?
     end
 
     # @return [Pathname] path (possibly relative) to the snort directory synchronized with svn
