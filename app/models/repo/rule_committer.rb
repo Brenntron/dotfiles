@@ -26,6 +26,7 @@ module Repo
       log("calling svn #{svn_args}")
       output = `#{svn_cmd} #{svn_args} 2>&1`
       log('svn output: ' + output.split("\n").join(' ~')) unless output.blank?
+      output
     end
 
     # @return [Pathname] path (possibly relative) to the snort directory synchronized with svn
