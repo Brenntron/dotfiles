@@ -18,6 +18,10 @@ module Repo
       self.class.log(message)
     end
 
+    def doc_committer
+      @doc_committer ||= Repo::RuleDocCommitter.new(rules, username: username)
+    end
+
     # @return [Mutex] mutex to exclusively change publishing lock
     def self.publish_mutex
       @publish_mutex ||= Mutex.new
@@ -81,10 +85,6 @@ module Repo
       @svn_pathname ||= Pathname.new('extras/working')
     end
 
-    def self.ruledocs_root
-      @svn_pathname ||= Pathname.new('extras/ruledocs')
-    end
-
     # @param [Pathname, String] input file name, absolute or relative
     # @return [Pathname] the part of the file name relative to a working folder, the synchronized or working folder
     def self.relative_path_of(filepath)
@@ -121,38 +121,6 @@ module Repo
       @rule_commit_event&.update(completed: true)
     end
 
-    def commit_doc?(rule)
-      case
-        when Rule::PUBLISH_STATUS_PUBLISHING == rule.publish_status
-          false #rule content failed to commit
-        when rule.requires_doc? && !rule.has_doc?
-          Rule.set_synched_state(rule)
-          false
-        else
-          true
-      end
-    end
-
-    # TODO: Move commit_docs to its own class
-    def commit_docs
-      #refresh rule objects from database
-      @rules = Rule.where(id: @rules).to_a
-
-      `#{RuleFile.svn_cmd} up #{self.class.ruledocs_root}/snort-rules`
-      rules.each do |rule|
-        if commit_doc?(rule)
-          rule.rule_doc.write_to_file if rule.rule_doc
-          # set_rule_to_synched(rule)
-        end
-      end
-      `#{RuleFile.svn_cmd} add --force #{self.class.ruledocs_root}/snort-rules`
-      svn_result_output =
-          `#{RuleFile.svn_cmd} ci #{self.class.ruledocs_root}/snort-rules -m "#{username} committed from Analyst Console"`
-      Rails.logger.info svn_result_output.gsub("\n", "~\n   ")
-
-      Rule.set_synched_state(Rule.where(id: rules))
-    end
-
     # Rule committing code when the publish is locked
     # param [Array[Rule]] rules_given array of rules.
     # param [Repo::RuleContentCommitter] content_committer The committer object.
@@ -180,7 +148,7 @@ module Repo
         log("publishing rule docs for #{rules.count} rules")
         Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
 
-        commit_docs
+        doc_committer.commit_docs
 
         event_success
 
