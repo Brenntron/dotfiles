@@ -111,7 +111,11 @@ module Repo
 
     def event_start
       @rule_commit_event = RuleEvent::RuleCommitEvent.start(bug.bugzilla_id, rules, user.id)
-    end #event_start
+    end
+
+    def event_set_result(result)
+      @rule_commit_event&.update(result: result)
+    end
 
     def event_success
       @rule_commit_event&.update(failed: false)
@@ -167,7 +171,9 @@ module Repo
           #set all the rules we will update to publishing.
           Rule.set_pubcontent_state(Rule.where(id: rules))
 
-          content_committer.commit_rule_content
+          svn_result_output = content_committer.commit_rule_content
+          event_set_result(svn_result_output)
+          raise "Rule content commit failed." unless content_committer.success
 
           if Rule.with_pub_content.exists?
             log("calling failsafe")

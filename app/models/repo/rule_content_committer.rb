@@ -3,7 +3,7 @@ module Repo
   class RuleContentCommitter
     include Enumerable
 
-    attr_reader :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
+    attr_reader :success, :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
 
     # @return [Pathname] path (possibly relative) to the snort directory synchronized with svn
     def self.synch_root
@@ -52,6 +52,7 @@ module Repo
     end
 
     def initialize(rules, bugzilla_id: nil, user: nil, username: nil)
+      @success = false
       @bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
       @user = user
       @username = username || user.cvs_username
@@ -140,8 +141,8 @@ module Repo
       end
 
       Rails.logger.info("svn integration: content commit return code #{svn_result_code.inspect}")
-      raise "Rule content commit failed." unless 199 == svn_result_code
-      svn_result_code
+      @success = (199 == svn_result_code ? true : false)
+      svn_result_output
     end
 
     # Commits the rule content of its collection of rule files and rules.
@@ -150,9 +151,12 @@ module Repo
 
       rule_files.each {|rule_file| checkout(rule_file.relative_pathname) }
       rule_files.each {|rule_file| rule_file.patch_file}
-      commit_rule_files
-      rule_files.each {|rule_file| remove_working_file(rule_file.working_pathname) rescue nil }
-      rule_files.each {|rule_file| rule_file.load_add_line(bug.bugzilla_id) } if bug
+      commit_rule_files.tap do
+        if success
+          rule_files.each {|rule_file| remove_working_file(rule_file.working_pathname) rescue nil }
+          rule_files.each {|rule_file| rule_file.load_add_line(bug.bugzilla_id) } if bug
+        end
+      end
     end
   end
 end
