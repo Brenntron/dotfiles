@@ -74,9 +74,9 @@ module Repo
       Repo::RuleCommitter.call_svn(svn_args)
     end
 
-    def svn_commit_message
+    def svn_commit_message(rules)
       user_prefix = username ? "#{username} " : ''
-      "#{user_prefix}committed from Analyst Console"
+      "#{user_prefix}committed #{rules.count} rule(s) from Analyst Console"
     end
 
     def svn_cmd
@@ -128,7 +128,7 @@ module Repo
       working_file_list = working_file_list(rule_files)
       Rails.logger.info("svn integration: committing files #{working_file_list}")
 
-      svn_result_output = call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message}"~)
+      svn_result_output = call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~)
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
                           svn_result_code_str.to_i
                         end
