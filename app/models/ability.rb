@@ -1,28 +1,32 @@
 class Ability
   include CanCan::Ability
 
-  def initialize(user)
-    user ||= User.new
-    if user.has_role?('admin')
-      can :manage, :all
-    elsif user.has_role?('manager')
-      can :manage, :all
+  def initialize(user_given)
+    current_user = user_given || User.new
+
+    can :read, :all
+
+    if current_user.has_role?('admin')
+      can :manage, User
+    end
+    if current_user.has_role?('manager')
+      can :manage, User do |user|
+        user.ancestors.include?(current_user)
+      end
       cannot :publish, Rule
-    elsif user.has_role?('committer')
-      can :read, :all
+    end
+    if current_user.has_role?('committer')
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
       can :publish, Rule
       can :publish_to_bugzilla, Note
-    elsif user.has_role?('analyst')
-      can :read, :all
+    end
+    if current_user.has_role?('analyst')
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
       can :publish_to_bugzilla, Note
       cannot :publish, Rule
-    elsif user.has_role?('build coordinator')
-      can :read, :all
+    end
+    if current_user.has_role?('build coordinator')
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
-    else
-      can :read, :all
     end
   end
 end
