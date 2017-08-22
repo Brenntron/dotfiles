@@ -141,7 +141,7 @@ module Repo
       end
 
       Rails.logger.info("svn integration: content commit return code #{svn_result_code.inspect}")
-      @success = (199 == svn_result_code ? true : false)
+      @success = (BugsRule::SVN_SUCCESS_COMMIT_HOOK == svn_result_code ? true : false)
       svn_result_output
     end
 
