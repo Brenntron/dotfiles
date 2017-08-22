@@ -13,7 +13,7 @@ class Ability
       can :manage, User do |user|
         user.ancestors.include?(current_user)
       end
-      cannot :publish, Rule
+      cannot :publish, Rule unless current_user.has_role?('committer')
     end
     if current_user.has_role?('committer')
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
