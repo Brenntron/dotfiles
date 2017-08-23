@@ -82,6 +82,7 @@ $ ->
         method: 'GET'
         headers: headers
       ).done (response) ->
+        sleep(3000)
         window.location.replace '/bugs/' + bid
 
   $('#resynch_bug').on 'click', ->
