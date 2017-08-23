@@ -160,6 +160,7 @@ module API
           Repo::RuleCommitter.commit_rules_action(rules,
                                                   username: permitted_params[:username],
                                                   bugzilla_id: permitted_params[:bug_id],
+                                                  xmlrpc: bugzilla_session,
                                                   nodoc_override: permitted_params[:nodoc_override])
         end
 
