@@ -698,6 +698,14 @@ class Bug < ApplicationRecord
     latest_bug_date.nil? ? Time.now - 1.day : latest_bug_date.created_at
   end
 
+  def update_summary_sids(rules, xmlrpc:)
+    sids = summary_sids + rules.pluck(:sid)
+    self.summary = "[SID] #{to_ranges_compact_string(sids)} #{summary_without_sids}"
+    save!
+
+    update_bugzilla_attributes(xmlrpc, ids: [bugzilla_id], summary: self.summary )
+  end
+
   def bug_state(xmlrpc, notes=nil, status, resolution)
     deps = open_dependencies(xmlrpc)
     if deps.size > 0
@@ -759,11 +767,30 @@ class Bug < ApplicationRecord
     end
   end
 
+  def to_ranges(sids)
+    sids.uniq.sort.inject([]) do |ranges, sid|
+      case
+        when ranges.empty?
+          ranges << [sid, sid]
+        when ranges.last.last + 1 == sid
+          ranges.last[1] = sid
+        else
+          ranges << [sid, sid]
+      end
+      ranges
+    end
+  end
+
+  def to_ranges_compact_string(sids)
+    to_ranges(sids).map {|range| range.first == range.last ? range.first.to_s : "#{range.first}-#{range.last}"}
+        .join(", ")
+  end
+
   def bugzilla_summary_sids_replace(xmlrpc, sids)
     unless xmlrpc.nil?
       sids.delete_if { |sid| sid.zero? }
       unless sids.nil? || sids.empty?
-        self.summary = "[SID] #{sids.to_ranges_compact_string} #{summary_without_sids}"
+        self.summary = "[SID] #{to_ranges_compact_string(sids)} #{summary_without_sids}"
       end
       options = { ids: [bugzilla_id],
                   summary: summary }

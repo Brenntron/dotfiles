@@ -8,7 +8,8 @@ module Repo
       attr_reader :publish_lock_pid
     end
 
-    attr_reader :content_committer, :rule_files, :rules, :changed_rules, :unchanged_rules, :bug, :user, :username
+    attr_reader :content_committer, :rule_files, :rules, :changed_rules, :unchanged_rules
+    attr_reader :xmlrpc, :bug, :user, :username
 
     def self.log(message)
       Rails.logger.info "svn integration: #{message}"
@@ -18,8 +19,8 @@ module Repo
       self.class.log(message)
     end
 
-    def doc_committer
-      @doc_committer ||= Repo::RuleDocCommitter.new(rules, username: username)
+    def doc_committer(rules_given)
+      Repo::RuleDocCommitter.new(rules_given, username: username)
     end
 
     # @return [Mutex] mutex to exclusively change publishing lock
@@ -94,7 +95,8 @@ module Repo
       relative_path
     end
 
-    def initialize(rules, bugzilla_id: nil, user: nil, username: nil)
+    def initialize(rules, xmlrpc:, bugzilla_id: nil, user: nil, username: nil)
+      @xmlrpc = xmlrpc
       @bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
       @user = user
       @username = username || user.cvs_username
@@ -132,12 +134,11 @@ module Repo
       if self.class.publish_lock
         event_start
 
-        rules = changed_rules
-        log("publishing #{rules.count} rules")
+        log("publishing #{changed_rules.count} rules")
 
         if rules.any?
           #set all the rules we will update to publishing.
-          Rule.set_pubcontent_state(Rule.where(id: rules))
+          Rule.set_pubcontent_state(Rule.where(id: changed_rules))
 
           svn_result_output = content_committer.commit_rule_content
           event_set_result(svn_result_output)
@@ -151,10 +152,16 @@ module Repo
           end
         end
 
+        # update revs and get sids of new rules
+        @rules = Rule.where(id: rules).all.to_a
+
+
+        bug.update_summary_sids(rules, xmlrpc: xmlrpc)
+
         log("publishing rule docs for #{rules.count} rules")
         Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
 
-        doc_committer.commit_docs
+        doc_committer(@rules).commit_docs
 
         event_success
 
@@ -188,11 +195,15 @@ module Repo
     # param [String] username The username to add to the svn comment (message)
     # param [FixNum] bugzilla_id The bugzilla id of the bug
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
-    def self.commit_rules_action(rules, username:, bugzilla_id:, nodoc_override: false)
+    def self.commit_rules_action(rules, username:, bugzilla_id:, xmlrpc:, nodoc_override: false)
       user = User.where(cvs_username: username).first
       Repo::RuleContentCommitter.prescreen!(rules, user, nodoc_override: nodoc_override)
 
-      committer = Repo::RuleCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
+      committer = Repo::RuleCommitter.new(rules,
+                                          xmlrpc: xmlrpc,
+                                          bugzilla_id: bugzilla_id,
+                                          user: user,
+                                          username: username)
       committer.locked_commit
 
     rescue

@@ -2,7 +2,8 @@ development:
   amq:
     host: "localhost"
   bugzilla:
-    host: "bugzillaTest02.vrt.sourcefire.com"
+#    host: "bugzillaTest02.vrt.sourcefire.com"
+    host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
     vrt: "extras/ssh/ca.pem"
   perl:
@@ -24,7 +25,8 @@ test:
   amq:
     host: "localhost"
   bugzilla:
-    host: "bugzillaTest02.vrt.sourcefire.com"
+#    host: "bugzillaTest02.vrt.sourcefire.com"
+    host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
     vrt: "/System/Library/OpenSSL/certs/ca.pem"
   perl:
