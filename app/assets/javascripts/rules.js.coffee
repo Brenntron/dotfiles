@@ -242,8 +242,10 @@ $ ->
       success: (response) ->
         window.location.reload()
       error: (response) ->
+        $('#import-rule-button').prop('disabled', false)
+        $('#import-rule-button').html('Import')
         $('.alert_rules').removeClass('.success')
-        $('.alert_rules').addClass('error').append('Please provide correct rule sid')
+        $('.alert_rules').addClass('error').html('Please provide correct rule sid')
     }
 
   $(document).on 'change', '.scratch_connection, .connection', ->
