@@ -158,6 +158,12 @@ module Repo
 
         bug.update_summary_sids(rules, xmlrpc: xmlrpc)
 
+        bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
+                          status: "resolved",
+                          resolution: "Fixed",
+                          comment: { body: svn_result_output } }
+        bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
+
         log("publishing rule docs for #{rules.count} rules")
         Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
 
