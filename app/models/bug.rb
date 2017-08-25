@@ -459,7 +459,9 @@ class Bug < ApplicationRecord
             :user => current_user
         )
         begin
-          TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          if options[:attachment_array].any?
+            TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          end
         rescue Exception => e
           #handle timeouts accordingly
           Rails.logger.info("Rails encountered an error but is powering through it. #{e.message}")
@@ -569,7 +571,9 @@ class Bug < ApplicationRecord
             :user => current_user
         )
         begin
-          TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          if options[:attachment_array].any?
+            TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          end
         rescue Exception => e
           #handle timeouts accordingly
           Rails.logger.info("Rails encountered an error but is moving through it. #{e.message}")
