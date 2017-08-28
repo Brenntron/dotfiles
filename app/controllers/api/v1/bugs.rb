@@ -119,7 +119,8 @@ module API
                 progress_bar.update_attribute("progress", 100)
               rescue Exception => e
                 Rails.logger.info e
-                false
+
+                {:error => e.to_s}.to_json
               end
             else
               false

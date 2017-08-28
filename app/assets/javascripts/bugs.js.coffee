@@ -95,7 +95,15 @@ $ ->
       method: 'GET'
       headers: headers
     ).done (response) ->
-      window.location.replace '/bugs/' + bid
+      json = $.parseJSON(response)
+      if (json.error)
+        message = "There was a problem attempting to synch this bug:"
+        message += json.error
+        $('.resynch_bug').show()
+        $('#loading_image').hide()
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
+      else
+        window.location.replace '/bugs/' + bid
 
 
   $('#bug_tab a:first').tab('show')
