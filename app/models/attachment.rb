@@ -6,11 +6,15 @@ class Attachment < ApplicationRecord
   has_many :local_alerts, -> { local_alerts }, class_name: 'Alert'
   has_many :exploits
 
-  scope :pcap, -> { where("attachments.file_name like '%.pcap'") }
+  scope :pcap, -> { where("attachments.file_name like '%.pcap'").where.not(is_obsolete: true) }
 
   after_create { |attachment| attachment.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |attachment| attachment.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   after_destroy { |attachment| attachment.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
+
+  def is_pcap?
+    File.extname(file_name.downcase) == ".pcap"
+  end
 
   def record(action)
     record = { resource: 'attachment',

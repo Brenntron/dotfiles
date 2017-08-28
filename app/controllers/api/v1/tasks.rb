@@ -45,15 +45,20 @@ module API
                 :attachment_array => permitted_params[:task][:attachment_array],
                 :rule_array       => permitted_params[:task][:rule_array]
             }.reject() { |k, v| v.nil? }
+            raise Exception.new("Bug has no attachments") if options[:bug].attachments.empty?
             case options[:task_type]
               when "attachment"
-                new_task = Task.create_pcap_test(permitted_params[:task][:bugzilla_id],
-                                                 permitted_params[:task][:created_by])
-                TestAttachment.new(new_task, request.headers['Xmlrpc-Token'], options[:attachment_array]).send_work_msg
+                if options[:attachment_array].any?
+                  new_task = Task.create_pcap_test(permitted_params[:task][:bugzilla_id],
+                                                   permitted_params[:task][:created_by])
+                  TestAttachment.new(new_task, request.headers['Xmlrpc-Token'], options[:attachment_array]).send_work_msg
+                end
               when "rule"
-                new_task = Task.create_rule_test(permitted_params[:task][:bugzilla_id],
-                                                 permitted_params[:task][:created_by])
-                TestRule.new(new_task, request.headers['Xmlrpc-Token'], options[:bug], options[:rule_array]).send_work_msg
+                if options[:rule_array].any?
+                  new_task = Task.create_rule_test(permitted_params[:task][:bugzilla_id],
+                                                   permitted_params[:task][:created_by])
+                  TestRule.new(new_task, request.headers['Xmlrpc-Token'], options[:bug], options[:rule_array]).send_work_msg
+                end
             end
           end
           new_task

@@ -134,7 +134,10 @@ $ ->
         headers: headers
         success: (response) ->
           if(typeof response != 'undefined')
-            alert(response.error + " \n" + response.message)
+            if ("bugzilla_id" of response)
+              alert("Removed bug " + response.bugzilla_id + " from analyst-console")
+            else
+              alert(response.error + " \n" + response.message)
           window.location.reload()
         error: (response) ->
           alert 'Could not delete the bug'

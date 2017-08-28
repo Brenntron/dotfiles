@@ -466,15 +466,17 @@ class Bug < ApplicationRecord
         options = {
             :bug              => Bug.where(id: bug_id).first,
             :task_type        => Task::TASK_TYPE_PCAP_TEST,
-            :attachment_array => bug.attachments.map{|a| a.id},
+            :attachment_array => bug.attachments.pcap.map{|a| a.id},
         }
-        new_task = Task.create(
-            :bug  => options[:bug],
-            :task_type     => options[:task_type],
-            :user => current_user
-        )
         begin
-          TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          if options[:attachment_array].any?
+            new_task = Task.create(
+                :bug  => options[:bug],
+                :task_type     => options[:task_type],
+                :user => current_user
+            )
+            TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          end
         rescue Exception => e
           #handle timeouts accordingly
           Rails.logger.info("Rails encountered an error but is powering through it. #{e.message}")
@@ -576,15 +578,18 @@ class Bug < ApplicationRecord
         options = {
             :bug              => Bug.where(id: bug_id).first,
             :task_type        => Task::TASK_TYPE_PCAP_TEST,
-            :attachment_array => bug.attachments.map{|a| a.id},
+            :attachment_array => bug.attachments.pcap.map{|a| a.id},
         }
-        new_task = Task.create(
-            :bug  => options[:bug],
-            :task_type     => options[:task_type],
-            :user => current_user
-        )
+
         begin
-          TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          if options[:attachment_array].any?
+            new_task = Task.create(
+                :bug  => options[:bug],
+                :task_type     => options[:task_type],
+                :user => current_user
+            )
+            TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+          end
         rescue Exception => e
           #handle timeouts accordingly
           Rails.logger.info("Rails encountered an error but is moving through it. #{e.message}")

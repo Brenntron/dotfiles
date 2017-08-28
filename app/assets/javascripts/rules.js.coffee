@@ -65,7 +65,6 @@ $ ->
           }
           
           window.location.href = "/rules/export?" + $.param( arr )
-
         when 'test'
           headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
           bug_id = $('input[name="bug_id"]').val()
