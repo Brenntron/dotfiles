@@ -54,7 +54,6 @@ require 'tmpdir'
 require 'tempfile'
 require 'base64'
 require 'pry'
-require 'timeout'
 
 # Make sure we run from the application root
 Dir.chdir Rails.root
