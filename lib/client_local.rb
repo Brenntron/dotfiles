@@ -245,6 +245,13 @@ while message = client.receive
         raise Exception.new( e.message )
       rescue Timeout::Error => e
         Rails.logger.error("Timed out waiting for #{job_id} to finish")
+        client.publish Rails.configuration.publish_local_result,
+                       {
+                           :task_id => task_id,
+                           :failed => true,
+                           :completed => true,
+                           :result => "Timed out waiting for #{job_id} to finish. Either Rules API is really slow or the poller down again."
+                       }.to_json
       end
 
     end

@@ -79,7 +79,7 @@ unless File.exists?(local_cache_path)
   Dir.mkdir(local_cache_path)
 end
 
-max_wait_for_job = 60 #seconds
+max_wait_for_job = 120 #seconds
 
 stomp_options = {}
 stomp_options = {
@@ -208,7 +208,7 @@ while message = client.receive
       begin
         Rails.logger.info("Waiting on job #{job_id} to complete: ")
 
-        Timeout::timeout(120) do
+        Timeout::timeout(max_wait_for_job) do
           while true
             resp = HTTPI.get(req)
 
@@ -265,6 +265,7 @@ while message = client.receive
       rescue Exception => e
         raise Exception.new(e.message)
       rescue Timeout::Error => e
+        errors << "Timed out waiting for #{job_id} to finish. Either Rules API is really slow or the poller down again."
         Rails.logger.error( "Timed out waiting for #{job_id} to finish")
       end
 
