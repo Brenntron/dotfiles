@@ -27,10 +27,11 @@ module RuleSyntax
     end
 
     def export
-      open(filename, 'w') { |f|
-        rules.each do |rule|
-          f.puts rule.rule_content 
-        end 
+      open(filename, 'w') { |file|
+        rules.each_with_index do |rule, index|
+          file.print "\n" unless 0 == index
+          file.print rule.rule_content.strip
+        end
       }  
 
       filename
