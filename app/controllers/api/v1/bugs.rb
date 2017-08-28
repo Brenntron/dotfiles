@@ -97,7 +97,6 @@ module API
                 parsed = bug.parse_summary
                 bug_rules = bug.rules.map {|r| r.id}
                 progress_bar.update_attribute("progress", 50)
-                puts 'ONE'
                 parsed[:sids].each do |sid|
                   rule = Rule.find_or_load(sid, 1)
                   bug.rules << rule unless bug_rules.include? rule.id

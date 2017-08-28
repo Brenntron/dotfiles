@@ -563,7 +563,7 @@ class Rule < ApplicationRecord
 
   def self.find_or_load(sid, gid)
 
-    output = `#{RuleFile.svn_cmd} up #{Repo::RuleContentCommitter.synch_root.to_s}/snort-rules/`
+    `#{RuleFile.svn_cmd} up #{Repo::RuleContentCommitter.synch_root.to_s}/snort-rules/`
     
     Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file(sid, gid))
   end
