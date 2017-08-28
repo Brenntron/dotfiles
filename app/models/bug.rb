@@ -56,6 +56,21 @@ class Bug < ApplicationRecord
         .select(:file_name, 'alerts.rule_id')
   end
 
+  def has_due_date?
+    due_date.present?
+  end
+
+  def due_date
+    self.tags.each do |tag|
+      date = Date.parse(tag.name) rescue nil
+      if date.present?
+        return date.to_s
+      end
+    end
+
+    nil
+  end
+
   def record(action)
     obj = JSON.parse(BugSerializer.new(self).to_json)
     obj['bug'] = obj['bug'].except('notes', 'attachments', 'tasks', 'exploits')
