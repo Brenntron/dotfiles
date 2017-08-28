@@ -150,34 +150,39 @@ $ ->
     bug_id = $('input[name="bug_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
     selected = []
+    isSelected = false
     $('input:checkbox.attach_check_box').each ->
       if @checked
+        isSelected = true
         selected.push($(this).val())
-    data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: "attachment", created_by: user_id}}
-    $.ajax(
-      url: "/api/v1/tasks"
-      method: 'POST'
-      data: data
-      headers: headers
-      success: (response) ->
-        task = response
-        d = new Date()
-        month = d.getMonth()+1
-        day = d.getDate()
-        date = month + '/' + day + '/' + d.getFullYear()
-        string = '<tr id='+task.id+'><td class="center"><input type="checkbox"></td>'+
-          '<td class="center"><input type="checkbox"></td>'+
-          '<td>'+task.task_type+'</td><td></td><td></td>'+
-          '<td>'+task.result+'</td>'+
-          '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
-        $('#jobs-tab table tbody').append(string)
-        $('.alert_attachments').addClass('success').show().html('Task has been created to test the attachment')
-        window.location.reload()
-      error: (response) ->
-        $('.alert_attachments').addClass('error').show().html('Task has not been created')
-        $(this).attr('disabled', false)
-        window.location.reload()
-    )
+    if isSelected
+      data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: "attachment", created_by: user_id}}
+      $.ajax(
+        url: "/api/v1/tasks"
+        method: 'POST'
+        data: data
+        headers: headers
+        success: (response) ->
+          task = response
+          d = new Date()
+          month = d.getMonth()+1
+          day = d.getDate()
+          date = month + '/' + day + '/' + d.getFullYear()
+          string = '<tr id='+task.id+'><td class="center"><input type="checkbox"></td>'+
+            '<td class="center"><input type="checkbox"></td>'+
+            '<td>'+task.task_type+'</td><td></td><td></td>'+
+            '<td>'+task.result+'</td>'+
+            '<td>'+task.user_name+'</td><td>'+date+'</td></tr>'
+          $('#jobs-tab table tbody').append(string)
+          $('.alert_attachments').addClass('success').show().html('Task has been created to test the attachment')
+          window.location.reload()
+        error: (response) ->
+          $('.alert_attachments').addClass('error').show().html('Task has not been created')
+          $(this).attr('disabled', false)
+          window.location.reload()
+      )
+    else
+      alert("please select something")
 
 
 

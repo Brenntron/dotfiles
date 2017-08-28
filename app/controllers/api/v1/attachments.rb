@@ -66,10 +66,10 @@ module API
             bug.clear_rule_tested
 
             user = User.where(cvs_username: current_user.cvs_username).first
-            new_task = Task.create_pcap_test(bug.id, user.id)
             attachments = bug.attachments.map{|a| a.id}
             begin
               if attachments.any?
+                new_task = Task.create_pcap_test(bug.id, user.id)
                 TestAttachment.new(new_task,
                                    request.headers['Xmlrpc-Token'],
                                    attachments).send_work_msg

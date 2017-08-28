@@ -451,15 +451,15 @@ class Bug < ApplicationRecord
         options = {
             :bug              => Bug.where(id: bug_id).first,
             :task_type        => Task::TASK_TYPE_PCAP_TEST,
-            :attachment_array => bug.attachments.map{|a| a.id},
+            :attachment_array => bug.attachments.pcap.map{|a| a.id},
         }
-        new_task = Task.create(
-            :bug  => options[:bug],
-            :task_type     => options[:task_type],
-            :user => current_user
-        )
         begin
           if options[:attachment_array].any?
+            new_task = Task.create(
+                :bug  => options[:bug],
+                :task_type     => options[:task_type],
+                :user => current_user
+            )
             TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
           end
         rescue Exception => e
@@ -563,15 +563,16 @@ class Bug < ApplicationRecord
         options = {
             :bug              => Bug.where(id: bug_id).first,
             :task_type        => Task::TASK_TYPE_PCAP_TEST,
-            :attachment_array => bug.attachments.map{|a| a.id},
+            :attachment_array => bug.attachments.pcap.map{|a| a.id},
         }
-        new_task = Task.create(
-            :bug  => options[:bug],
-            :task_type     => options[:task_type],
-            :user => current_user
-        )
+
         begin
           if options[:attachment_array].any?
+            new_task = Task.create(
+                :bug  => options[:bug],
+                :task_type     => options[:task_type],
+                :user => current_user
+            )
             TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
           end
         rescue Exception => e
