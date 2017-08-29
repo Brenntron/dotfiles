@@ -381,7 +381,7 @@ class Rule < ApplicationRecord
       when sid.nil?
         self.edit_status                = EDIT_STATUS_NEW
         self.state                      = NEW_STATE
-      when self.rule_content == self.cvs_rule_content
+      when !content_changed?
         self.edit_status                = EDIT_STATUS_SYNCHED
         self.state                      = UNCHANGED_STATE
       else
