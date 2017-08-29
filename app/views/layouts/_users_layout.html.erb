@@ -35,8 +35,8 @@
       <!-- action links -->
       <div class="col-xs-4 actions-bar">
         <% if current_user.has_role?('manager') %>
-          <%= link_to user_relationships_path(current_user) do %>
-              <button class="btn btn-link icon-link custom-icon" data-toggle="tooltip" data-placement="right" title="manage team"><%= image_tag "tree-diagram-icon.png" %></button>
+          <%= link_to user_relationships_path(current_user), {name: "Tree Diagram Icon"} do %>
+              <button name="manage_team" class="btn btn-link icon-link custom-icon" data-toggle="tooltip" data-placement="right" title="manage team"><%= image_tag "tree-diagram-icon.png" %></button>
           <% end %>
         <%end%>
       </div>

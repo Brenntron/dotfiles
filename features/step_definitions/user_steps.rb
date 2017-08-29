@@ -14,21 +14,21 @@ Given(/^a user with commit permission exists and is logged in$/) do
   @user = FactoryGirl.create(:current_user, confirmed: true)
   @role = Role.create(role: 'committer')
   @user.roles << @role
-  visit root_path
+  sign_in_user
 end
 
 Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   @user = FactoryGirl.create(:current_user, confirmed: true)
   @role = Role.create(role: role)
   @user.roles << @role
-  visit root_path
+  sign_in_user
 end
 
 Given(/^a user with id "(.*?)" has a role "(.*?)" and is logged in$/) do |user_id, role|
   @user = User.find(user_id)
   @role = Role.find_by_role(role)
   @user.roles << @role
-  visit root_path
+  sign_in_user
 end
 
 Given(/^a user with id "(.*?)" has a parent with id "(.*?)"$/) do |user_id, parent_id|
@@ -45,11 +45,26 @@ Given(/^a manager exists and is logged in$/) do
   @user = FactoryGirl.create(:current_user, confirmed: true)
   @role = Role.create(role: 'manager')
   @user.roles << @role
-  visit root_path(api_key: "h93hq@hwo9%@ah!jsh")
+  sign_in_user
 end
 
 Given(/^current user exists$/) do
   @user = FactoryGirl.create(:current_user, confirmed: true)
+end
+
+def fill_in_login_form
+  fill_in "uname", :with => ENV['Bugzilla_login']
+  fill_in "psw", :with => ENV['Bugzilla_secret']
+end
+
+def sign_in_user
+  visit root_path
+  fill_in_login_form
+  click_on("Login")
+  sleep 1
+end
+Given (/^the user signs in$/) do
+  sign_in_user
 end
 
 Then(/^I visit the root url$/) do
@@ -109,6 +124,13 @@ Given(/^I should see my username$/) do
   user_attrs = FactoryGirl.attributes_for(:current_user)
   username  = User.where(cvs_username: user_attrs[:cvs_username]).first
   raise "content found when it should not have been found" if page.has_content?(username)
+end
+
+Then (/^current user should not have kerberos login$/) do
+  user_attrs = FactoryGirl.attributes_for(:current_user)
+  User.where(cvs_username: user_attrs[:cvs_username]).count.should == 1
+  user = User.where(cvs_username: user_attrs[:cvs_username]).first
+  user.kerberos_login.should == nil
 end
 
 Then(/^current user should have kerberos login$/) do
