@@ -3,7 +3,7 @@ $(document).ready(function() {
     $('.active').show();
     $('.hidden').hide();
 
-    $('#button_import').click(function() {
+    /*$('#button_import').click(function() {
         var headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
         var id = $('#import_bug').val();
         $.ajax({
@@ -13,7 +13,7 @@ $(document).ready(function() {
         }).done(function(response) {
             window.location.replace("/bugs/"+id);
         });
-    });
+    });*/
 
     $('.rules').click(function () {
         var tab = $(this).attr("id");

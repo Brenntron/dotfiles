@@ -50,7 +50,7 @@ $ ->
       current_user = $(".current_user").html()
       ### update the progress bar width ###
       $('.progress_group').show()
-      $('.progress-bar').css('width', '10%')
+      $('.progress-bar').css('width', '1%')
       ### and display the numeric value ###
       $('.progress-bar').html('10%')
       progresspump = setInterval(( ->
@@ -71,7 +71,11 @@ $ ->
             ### test to see if the job has completed ###
             if response > 99.999
               clearInterval(progresspump)
+              $('.progress_group').hide()
               $('#progress').html 'Done'
+            if response < 0
+              clearInterval(progresspump)
+              $('.progress_group').hide()
           error: (response) ->
             clearInterval(progresspump)
             $('.progress-bar').html 'Done'
@@ -82,8 +86,15 @@ $ ->
         method: 'GET'
         headers: headers
       ).done (response) ->
-        sleep(3000)
-        window.location.replace '/bugs/' + bid
+        json = $.parseJSON(response)
+        if (json.error)
+
+          message = "There was a problem attempting to import this bug:"
+          message += json.error
+
+          $("#alert_message").addClass('alert alert-danger alert-dismissable').html(message)
+        else
+          window.location.replace '/bugs/' + bid
 
   $('#resynch_bug').on 'click', ->
     bid = $('.bugzilla_id').text()

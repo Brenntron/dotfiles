@@ -486,7 +486,7 @@ class Bug < ApplicationRecord
   end
 
   def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs)
-    unless new_bugs.empty?
+    unless new_bugs['bugs'].empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
@@ -639,6 +639,13 @@ class Bug < ApplicationRecord
           end
         end
         bug.save
+      end
+    else
+      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
+        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
+        raise message
+      else
+        raise "there was a problem importing from Bugzilla."
       end
     end
     true
