@@ -68,4 +68,14 @@ module RulesHelper
     end
   end
 
+  def doc_status(rule)
+    case
+      when !rule.doc_complete?
+        'X'
+      when rule.doc_updated?
+        '->'
+      else
+        ''
+    end
+  end
 end

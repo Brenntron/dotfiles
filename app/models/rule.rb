@@ -62,12 +62,14 @@ class Rule < ApplicationRecord
   PUBLISH_STATUS_PUBLISHING     = 'PUBCONTENT'      #draft in process of rule content being written to VC
   PUBLISH_STATUS_PUBDOC         = 'PUBDOC'          #draft in process of rule docs being written to VC
 
-  INCOMPLETE_STATE              = 'INCOMPLETE'
   UNCHANGED_STATE               = 'UNCHANGED'
   UPDATED_STATE                 = 'UPDATED'
   NEW_STATE                     = 'NEW'
   STALE_STATE                   = 'STALE'           #is set to stale when publish status is set to stale
   DELETED_STATE                 = 'DELETED'
+
+  DOC_STATUS_UPDATED            = 'UPDATED'
+  DOC_STATUS_SYNCHED            = 'SYNCHED'
 
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
@@ -102,6 +104,10 @@ class Rule < ApplicationRecord
       else
         true
     end
+  end
+
+  def doc_updated?
+    DOC_STATUS_UPDATED == self.doc_status
   end
 
   # determines if the rule *should* be on (uncommented) or off (commented)
@@ -371,23 +377,28 @@ class Rule < ApplicationRecord
     assign_from_visrule(rule_content)
     assign_from_parser(parser.attributes)
 
-    if self.sid
-      self.state                        = UPDATED_STATE
-      self.edit_status                  = EDIT_STATUS_EDIT
-    else
-      self.state                        = NEW_STATE
-      self.edit_status                  = EDIT_STATUS_NEW
+    case
+      when sid.nil?
+        self.edit_status                = EDIT_STATUS_NEW
+        self.state                      = NEW_STATE
+      when self.rule_content == self.cvs_rule_content
+        self.edit_status                = EDIT_STATUS_SYNCHED
+        self.state                      = UNCHANGED_STATE
+      else
+        self.edit_status                = EDIT_STATUS_EDIT
+        self.state                      = UPDATED_STATE
     end
 
-    self.state                          = INCOMPLETE_STATE unless parsed? || doc_complete?
     self.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless stale_edit?
 
     if deleted?
       self.state                        = DELETED_STATE
     end
+
+    self.doc_status                     = DOC_STATUS_UPDATED
   end
 
-  # Take a line from a user edit and assign the rule state
+  # Take a line from a rule file and assign the rule state
   # @param [String, #read] rule_content the rule content
   def assign_from_rule_file(rule_content)
     parser = RuleSyntax::RuleParser.new(rule_content)
@@ -462,7 +473,8 @@ class Rule < ApplicationRecord
   def self.set_synched_state(rule_arg)
     state_values = { publish_status: PUBLISH_STATUS_SYNCHED,
                      edit_status: EDIT_STATUS_SYNCHED,
-                     state: UNCHANGED_STATE }
+                     state: UNCHANGED_STATE,
+                     doc_status: DOC_STATUS_SYNCHED }
 
     case rule_arg
       when Rule
@@ -483,7 +495,6 @@ class Rule < ApplicationRecord
 
   def self.set_pubdoc_state(rule_arg)
     state_values = { publish_status: PUBLISH_STATUS_PUBDOC,
-                     edit_status: EDIT_STATUS_EDIT,
                      state: UPDATED_STATE }
 
     case rule_arg
@@ -663,8 +674,6 @@ class Rule < ApplicationRecord
     case (state)
       when DELETED_STATE
         val = 7
-      when INCOMPLETE_STATE
-        val = 1
       when NEW_STATE
         val = 2
       when STALE_STATE
@@ -697,7 +706,7 @@ class Rule < ApplicationRecord
   # Tests if rule is the current version in VC
   # @return [boolean] true iff rule is latest version synced with VC
   def synched?
-    EDIT_STATUS_SYNCHED == edit_status
+    (EDIT_STATUS_SYNCHED == edit_status) && (DOC_STATUS_SYNCHED == doc_status)
   end
 
   # Tests if edited rule is new

@@ -134,9 +134,9 @@ module Repo
       if self.class.publish_lock
         event_start
 
-        log("publishing #{changed_rules.count} rules")
+        if changed_rules.any?
+          log("publishing #{changed_rules.count} rules")
 
-        if rules.any?
           #set all the rules we will update to publishing.
           Rule.set_pubcontent_state(Rule.where(id: changed_rules))
 
@@ -150,19 +150,20 @@ module Repo
               rule_file.synch_failsafe
             end
           end
+
+          bug.update_summary_sids(changed_rules, xmlrpc: xmlrpc)
+
+          bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
+                            status: "resolved",
+                            resolution: "Fixed",
+                            comment: { body: svn_result_output } }
+          bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
         end
+
 
         # update revs and get sids of new rules
         @rules = Rule.where(id: rules).all.to_a
 
-
-        bug.update_summary_sids(rules, xmlrpc: xmlrpc)
-
-        bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
-                          status: "resolved",
-                          resolution: "Fixed",
-                          comment: { body: svn_result_output } }
-        bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
 
         log("publishing rule docs for #{rules.count} rules")
         Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
