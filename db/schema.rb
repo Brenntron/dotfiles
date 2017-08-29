@@ -257,6 +257,7 @@ ActiveRecord::Schema.define(version: 20170807140953) do
     t.boolean "parsed", default: true, null: false
     t.boolean "on", default: true, null: false
     t.string "publish_status", null: false
+    t.string "doc_status", default: "New", null: false
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
