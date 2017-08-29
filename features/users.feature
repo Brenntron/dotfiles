@@ -7,31 +7,26 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user with proper credentials should get logged in
-            and redirected to their user page
+            and redirected to the bugs page
     Given current user exists
     And I visit the root url
-    And I should see "Please wait while we sign you in"
-    Then I wait for "3" seconds
-    And I should not see "Please wait while we sign you in"
-    And I should see "/users/1" in the current url
+    And I should see "Please sign in using your Talos credentials"
+    When the user signs in
+    Then I should not see "Please sign in using your Talos credentials"
+    And I should see "/bugs" in the current url
 
   @javascript
   Scenario: A user logging in not in the database should be added to the database
     Given current user not in database
-    When I visit the root url
-    Then I should see "Please wait while we sign you in"
-    When I wait for "3" seconds
-    Then I should not see "Please wait while we sign you in"
+    When the user signs in
     And  current user should be in database
 
   @javascript
   Scenario: A user logging in, in the database for a bug, should have the kerberos login updated
     Given current user is a bug user
     Then current user should be in database
-    When I visit the root url
-    Then I should see "Please wait while we sign you in"
-    When I wait for "3" seconds
-    Then I should not see "Please wait while we sign you in"
+    And  current user should not have kerberos login
+    When the user signs in
     And  current user should be in database
     And  current user should have kerberos login
 
@@ -670,7 +665,7 @@ Feature: User Accounts
     And I should see content "publish" within "#notes_form"
 
   @javascript
-  Scenario: A manager should be able to do everything related to a bug except commit
+  Scenario: A user with only a manager role should only be able to manage users
     Given a user with role "manager" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
@@ -678,15 +673,17 @@ Feature: User Accounts
     Given I wait for "3" seconds
     And I goto "/bugs/333333"
     When I click ".rules-tab"
-    Then I should see content "edit" within ".top-bar"
-    And I should see content "create" within ".top-bar"
-    And I should see content "remove" within ".top-bar"
+    Then I should not see content "edit" within ".top-bar"
+    And I should not see content "create" within ".top-bar"
+    And I should not see content "remove" within ".top-bar"
     And I should not see content "commit" within ".top-bar"
     When I click ".attachments-tab"
-    Then I should see button with class "create_attachment"
+    Then I should not see button with class "create_attachment"
     When I click ".notes-tab"
-    Then I should see content "edit" within "#notes_form"
-    And I should see content "publish" within "#notes_form"
+    Then I should not see content "edit" within "#notes_form"
+    And I should not see content "publish" within "#notes_form"
+    When I goto "/users/1"
+    Then I should see "manage"
 
   @javascript @allow-rescue
   Scenario: A build coordinator should be able to view everything related to a bug but not alter it
