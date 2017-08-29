@@ -251,7 +251,7 @@ Feature: Bug
     When I click the span with data-target "#editBug"
     And I wait for "1" seconds
     Then I select "PENDING" from "bug[state]"
-@now
+
   @javascript
   Scenario: a user can not set the state of a bug to pending when exploits are missing attachments
     Given a user with role "analyst" exists and is logged in
