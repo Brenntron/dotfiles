@@ -251,7 +251,7 @@ Feature: Bug
     When I click the span with data-target "#editBug"
     And I wait for "1" seconds
     Then I select "PENDING" from "bug[state]"
-
+@now
   @javascript
   Scenario: a user can not set the state of a bug to pending when exploits are missing attachments
     Given a user with role "analyst" exists and is logged in
@@ -286,7 +286,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    Then I should see "Can't set to pending. Please assign attachments to exploits."
+    Then I should see "Can't set to pending. Please complete exploits, complete the summary for rule docs."
     And I can not select "PENDING" from "bug[state]"
 
   @javascript
@@ -639,6 +639,7 @@ Feature: Bug
     And the following rules exist belonging to bug "145359":
       |  id  | message                 | rule_category_id |
       | 3591 | BLACKLIST message       | 1                |
+    And an attachment exists and belongs to bug "145359"
     And I wait for "3" seconds
     When I goto "/bugs/145359"
     And I click ".jobs-tab"
@@ -700,7 +701,7 @@ Feature: Bug
     When I click button "test"
     Then test should be created and I should see "Task has been created to test the attachment"
     When I click ".jobs-tab"
-    Then I should see "pcap test"
+    Then I should see "all rules test"
 
   @javascript
   Scenario: a user can edit research notes
