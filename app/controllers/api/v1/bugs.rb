@@ -257,6 +257,7 @@ module API
               :user => editor,
               :state => updated_bug_state[:state],
               :status => updated_bug_state[:status],
+              summary: updated_bug_state[:summary],
               :resolution => updated_bug_state[:resolution],
               :assigned_at => updated_bug_state[:assigned_at],
               :pending_at => updated_bug_state[:pending_at],
@@ -293,7 +294,7 @@ module API
 
           update_params[:product] = permitted_params[:bug][:product]
           update_params[:component] = permitted_params[:bug][:component]
-          update_params[:summary] = bug.summary
+          update_params[:summary] = permitted_params[:bug][:summary]
           update_params[:version] = permitted_params[:bug][:version]
           update_params[:state] = permitted_params[:bug][:state]
           update_params[:opsys] = permitted_params[:bug][:opsys]
