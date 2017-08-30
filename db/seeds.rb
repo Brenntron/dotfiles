@@ -7,7 +7,7 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 
-ReferenceType.create(:name => 'cve',:description => 'Common Vulnerabilities and Exposures',:validation => '^(19|20)\d{2}-\d{4}$',:bugzilla_format => 'cve-((19|20)\d{2}-\d{4})',:example => '1999-1234',:rule_format => 'cve,<reference>',:url => 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-DATA')
+ReferenceType.create(:name => 'cve',:description => 'Common Vulnerabilities and Exposures',:validation => '^(19|20)\d{2}-\d{4,}$',:bugzilla_format => 'cve-((19|20)\d{2}-\d{4,})',:example => '1999-1234',:rule_format => 'cve,<reference>',:url => 'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-DATA')
 ReferenceType.create(:name => 'bugtraq',:description => 'Bugtraq - SecurityFocus',:validation => '^\d{1,10}$',:example => '12345',:rule_format => 'bugtraq,<reference>',:url => 'http://www.securityfocus.com/bid/DATA')
 ReferenceType.create(:name => 'url',:description => 'Generic URL for vulnerability information',:validation => '^(?!http|ftp).*',:example => 'www.somesite.com/whatever/whocares',:rule_format => 'url,<reference>',:url => 'http://DATA')
 ReferenceType.create(:name => 'nessus', :url => 'http://cgi.nessus.org/plugins/dump.php3?id=')
