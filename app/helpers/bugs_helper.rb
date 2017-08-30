@@ -54,7 +54,7 @@ module BugsHelper
     end
   end
 
-  def get_classifications(class_level)
+  def classification_selections(class_level)
     Bug.classifications.select{|k,v| v <= Bug.classifications[class_level]}.map{ |k,v| [k.humanize, k] }
   end
 
