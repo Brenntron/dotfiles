@@ -98,10 +98,7 @@ module API
                 parsed = bug.parse_summary
                 bug_rules = bug.rules.map {|r| r.id}
                 progress_bar.update_attribute("progress", 50)
-                parsed[:sids].each do |sid|
-                  rule = Rule.find_or_load(sid, 1)
-                  bug.rules << rule unless bug_rules.include? rule.id
-                end
+                bug.load_rules_from_sids(parsed[:sids])
                 progress_bar.update_attribute("progress", 60)
                 parsed[:tags].each do |tag|
                   bug.tags << tag unless bug.tags.include?(tag)
