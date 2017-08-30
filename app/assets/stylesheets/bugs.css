@@ -134,3 +134,25 @@ div.progress{
     padding-left: 25px;
     margin-left: -25px;
 }
+
+/*** Overriding styles that cause wonky layout ***/
+#search-bugs-form .form-group {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.modal-body .row {
+    margin-right: -15px !important; /* overrides custom to return to standard bootstrap structure */
+}
+
+#search-bugs-form .form-inline .form-control {
+    width: 100%;
+}
+
+.nested-col {
+    padding: 0 !important;
+}
+
+.pad-left-override {
+    padding-left: 0 !important;
+}
