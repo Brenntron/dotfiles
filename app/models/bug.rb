@@ -339,9 +339,8 @@ class Bug < ApplicationRecord
     references.uniq
   end
 
-  def load_references(references)
-    byebug
-    references.each do |ref|
+  def load_references(summary_references)
+    summary_references.each do |ref|
       references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
       Exploit.find_exploits(ref)
     end
