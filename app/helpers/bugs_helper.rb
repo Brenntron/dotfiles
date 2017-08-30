@@ -54,6 +54,10 @@ module BugsHelper
     end
   end
 
+  def get_classifications(class_level)
+    Bug.classifications.select{|k,v| v <= Bug.classifications[class_level]}.map{ |k,v| [k.humanize, k] }
+  end
+
   def display_commit_status(bug, rule)
     bug_rule = bug.bugs_rules.where(rule_id: rule).first
     case

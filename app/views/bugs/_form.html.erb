@@ -39,7 +39,7 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="classification">Classification</label>
-        <%= f.select :classification, options_for_select(Bug.classifications.map{ |k,v| [k.humanize, k] }, selected: Bug.classifications[@bug.classification]), {}, class: "form-control" %>
+        <%= f.select :classification, options_for_select(get_classifications(current_user.class_level), selected: Bug.classifications[@bug.classification]), {}, class: "form-control" %>
       </div>
     </div>
     <% unless @bug.new_record? %>

@@ -132,11 +132,20 @@ while message = client.receive
           xmlrpc.token = request['cookie']
           bug = Bugzilla::Bug.new(xmlrpc)
           res = bug.attachments(:attachment_ids => attachment_id, :include_fields => ['data'])
+
+          # if res['attachments'].first[1]['data'].size < 500
+          #   Rails.logger.debug( res )
+          # else
+          #   Rails.logger.debug( res['attachments'].first[1]['data'].size)
+          # end
+
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
           Rails.logger.debug("#{Time.now} -> Found attachments in bugzilla")
           # Finally, we should actually have data
           bytes_written = IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
 
+          #file size check here
+          # Rails.logger.debug ("bytes_written: #{bytes_written}")
         rescue Exception => e
 
           # Try 5 times to let Bugzilla stop sucking before bailing
@@ -152,6 +161,9 @@ while message = client.receive
 
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
+
+      #filesize check here
+      # Rails.logger.debug ("pcap_data: #{pcap_data.size}")
 
       req.url = "#{Rails.configuration.ruletest_server}/pcaps"
 
