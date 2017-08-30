@@ -70,7 +70,7 @@ group :test do
   gem 'capybara', '~> 2.11.0'
   gem 'poltergeist', '~> 1.11.0'
   gem 'cucumber-rails', '~> 1.5.0', :require => false
-  gem 'database_cleaner', '~> 1.5.3'
+  gem 'database_cleaner', '~> 1.6.1'
   gem 'launchy', '~> 2.4.2'
   gem 'rb-fsevent', '~> 0.9.8'
   gem 'guard-cucumber', '~> 2.1.2'

@@ -49,8 +49,8 @@
           &nbsp;&nbsp;
         </h4>
       </div>
-      <% committer_note = get_last_notes 'committer', current_user.email %>
-      <div id="comm_notes_collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+      <% committer_note = @bug.notes.last_committer_note.first %>
+      <div id="comm_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingThree">
         <div class="panel-body row">
           <form id="committer_notes_form">
             <div class="form-group col-xs-12 col-md-10 col-lg-11">

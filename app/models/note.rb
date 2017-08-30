@@ -5,10 +5,12 @@ class Note < ApplicationRecord
   TEMPLATE_RESEARCH =
       "THESIS:\r\n\r\nRESEARCH:\r\n\r\nDETECTION GUIDANCE:\r\n\r\nDETECTION BREAKDOWN:\r\n\r\nREFERENCES:\r\n"
 
+  scope :committer_note, -> { where(note_type: 'committer') }
   scope :unpublished, -> { where(notes_bugzilla_id: nil) }
   scope :reverse_chron, -> {
     order("created_at desc")
   }
+  scope :last_committer_note, -> { committer_note.reverse_chron.limit(1) }
 
   after_create { |note| note.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |note| note.record 'update' if Rails.configuration.websockets_enabled == 'true' }

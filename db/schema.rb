@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170807140953) do
+ActiveRecord::Schema.define(version: 20170829145347) do
 
   create_table "alerts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -269,10 +269,10 @@ ActiveRecord::Schema.define(version: 20170807140953) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "tasks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.boolean "completed", default: false
     t.boolean "failed", default: false
-    t.text "result"
+    t.text "result", limit: 16777215
     t.string "task_type"
     t.integer "time_elapsed"
     t.datetime "created_at", null: false
