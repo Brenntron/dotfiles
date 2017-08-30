@@ -15,29 +15,37 @@ button.back_btn {
     width:100%;
     margin-bottom: 10px;
 }
-/*.rule_state_blue{*/
-table#bug-rules-table tr.parsed.edited-rule td.rule_state_col {
-    color:blue;
+.rule_state_col div {
+    display: inline-block;
 }
-/*.rule_state_green{*/
-table#bug-rules-table tr.parsed.new-rule td.rule_state_col {
-    color:green;
-}
+
 /*.rule_state_red{*/
-table#bug-rules-table tr.incomplete-unparsed td.rule_state_col {
-    color:white;
-    background-color:red;
+table#bug-rules-table tr.incomplete-unparsed td.rule_state_col::before {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    content: '';
+    display: inline-block;
+    margin-right: 6px;
+    background-color: #ff5500;
 }
-table#bug-rules-table tr.incomplete-missing-doc td.rule_state_col {
-    color:white;
-    background-color:orange;
+table#bug-rules-table tr.deleted-rule td.rule_state_col::before {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    content: '';
+    display: inline-block;
+    margin-right: 6px;
+    background-color: #fff;
 }
-table#bug-rules-table tr.deleted-rule td.rule_state_col {
-    color:white;
-    background-color:black;
-}
-table#bug-rules-table tr.parsed.stale-edit td.rule_state_col {
-    background-color: #e8e8e8;
+table#bug-rules-table tr.parsed.stale-edit td.rule_state_col::before {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    content: '';
+    display: inline-block;
+    margin-right: 6px;
+    background-color: #bbbbbb;
 }
 div.progress{
     background-color: #80a9ba;
@@ -133,4 +141,9 @@ div.progress{
 .bugs-split-colors-tweak {
     padding-left: 25px;
     margin-left: -25px;
+}
+
+.icon-docs {
+    max-width: 20px;
+    height: auto;
 }
