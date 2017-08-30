@@ -339,6 +339,14 @@ class Bug < ApplicationRecord
     references.uniq
   end
 
+  def load_references(references)
+    byebug
+    references.each do |ref|
+      references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
+      Exploit.find_exploits(ref)
+    end
+  end
+
   def tag_array
     # array of tags for comparison
     tags.map { |t| "[#{t.name}]" }
@@ -363,9 +371,10 @@ class Bug < ApplicationRecord
 
   def update_summary(summary_given)
     update!(summary: summary_given)
-    load_rules_from_sids(summary_sids)
 
+    load_rules_from_sids(summary_sids)
     compose_summary
+    load_references(summary_references)
   end
 
   def bugzilla_synch_needed?
