@@ -289,8 +289,8 @@ module API
           end
 
 
-          # update the summary (regarding tags)
-          bug.compose_summary
+          # update the summary
+          bug.update_summary(permitted_params[:bug][:summary])
 
           update_params[:product] = permitted_params[:bug][:product]
           update_params[:component] = permitted_params[:bug][:component]

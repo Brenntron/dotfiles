@@ -320,6 +320,15 @@ class Bug < ApplicationRecord
     sids
   end
 
+  # Takes an array of sids and adds their rules to the bug if not already on the bug.
+  def load_rules_from_sids(sids)
+    sids.each do |sid|
+      unless rules.by_sid(sid).exists?
+        rules << Rule.by_sid(sid).first
+      end
+    end
+  end
+
   def summary_references
     references = []
     ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
@@ -350,6 +359,13 @@ class Bug < ApplicationRecord
 
       self.update(summary: summary_string)
     end
+  end
+
+  def update_summary(summary_given)
+    update!(summary: summary_given)
+    load_rules_from_sids(summary_sids)
+
+    compose_summary
   end
 
   def bugzilla_synch_needed?
