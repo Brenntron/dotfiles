@@ -2,6 +2,10 @@ window.dismiss_alert_rules = ->
   $('.alert_rules').hide 'blind', {}, 500
 
 
+window.show_bz_commit_msg =(buttn) ->
+  $('#bz-commit-div').show()
+
+
 window.disparage =(chkbox) ->
   disparage_messages = [
     "You should feel bad about yourself",

@@ -25,7 +25,7 @@
     <button class="select-sm btn btn-default rule-toolbar" id="test">
       <strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
     <% if can? :publish, Rule %>
-        <button class="select-sm btn btn-default rule-toolbar" id="commit">
+        <button class="select-sm btn btn-default" onclick="show_bz_commit_msg(this)">
           <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i></button>
     <% end %>
     <button class="select-sm btn btn-default rule-toolbar" id="export">
@@ -47,6 +47,14 @@
       </div><!-- /input-group -->
     </form>
   </div>
+</div>
+<div id="bz-commit-div">
+  <div class="bz-commit-inline">
+    <textarea name="" id="" cols="100" rows="14"><%= @bug.notes.last_committer_note.first&.comment %></textarea>
+  </div>
+  <button id="commit" class="small-buttn btn btn-default bz-commit-inline rule-toolbar">
+    <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>
+  </button>
 </div>
 <hr class="short"/>
 <div class="col-xs-12 alert_rules" onclick="dismiss_alert_rules()"></div>
