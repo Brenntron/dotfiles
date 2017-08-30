@@ -27,7 +27,7 @@ class Bug < ApplicationRecord
   scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
   scope :by_component, ->(component) { where('component = ?', component) }
 
-  scope :permit_class_level, ->(class_level) { where("classification <= :class_pattern", class_pattern: "%#{class_level}%") }
+  scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
   # @return [Array] username (displayable) and id pairs suitable for select drop downs.
   def allowed_assignees

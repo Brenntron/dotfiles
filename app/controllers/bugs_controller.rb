@@ -11,7 +11,7 @@ class BugsController < ApplicationController
   def index
     @bug_query = Bug.query(current_user, session[:query], session[:search]) || current_user.default_bug_list
 
-    if !@bug_query.empty?
+    if @bug_query.any?
       @bugs = @bug_query.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
     else
       @bugs = Bug.none.paginate(:page => session[:page], :per_page => 32)

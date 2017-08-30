@@ -118,7 +118,6 @@ while message = client.receive
 
     # Save the task_id
     task_id = request['task_id']
-
     # Fetch all of the needed pcaps into the cache directory
     request['pcaps'].each do |attachment_id|
       pcap_path = "#{local_cache_path}/#{attachment_id}"
@@ -132,13 +131,25 @@ while message = client.receive
           xmlrpc.token = request['cookie']
           bug = Bugzilla::Bug.new(xmlrpc)
           res = bug.attachments(:attachment_ids => attachment_id, :include_fields => ['data'])
+
+          if res['attachments'].first[1]['data'].size < 500
+            Rails.logger.debug("Resource data is not found. Here is what the variable contains: #{res}" )
+          else
+            Rails.logger.debug("Resource data is found. This is the size from bugzilla: #{res['attachments'].first[1]['data'].size}")
+          end
+
           raise Exception.new("Bugzilla was unable to find attachment #{attachment_id}") if res.nil? or res['attachments'].nil?
+          raise Exception.new("Bugzilla could not retrieve data for attachment #{attachment_id}") if res['attachments'].first[1]['data'].empty?
           Rails.logger.debug("#{Time.now} -> Found attachments in bugzilla")
           # Finally, we should actually have data
           bytes_written = IO.binwrite(pcap_path, res['attachments'].first[1]['data'])
 
+          #file size check here
+          Rails.logger.debug ("bytes_written: #{bytes_written}")
         rescue Exception => e
-
+          if res['attachments'].first[1]['data'].empty?
+            raise Exception.new(e.message)
+          end
           # Try 5 times to let Bugzilla stop sucking before bailing
           if attempts < 5
             attempts += 1
@@ -152,6 +163,9 @@ while message = client.receive
 
       # Read the file to send
       pcap_data = IO.binread(pcap_path)
+
+      #filesize check here
+      Rails.logger.debug ("pcap_data: #{pcap_data.size}")
 
       req.url = "#{Rails.configuration.ruletest_server}/pcaps"
 
