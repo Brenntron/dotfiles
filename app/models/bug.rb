@@ -320,6 +320,15 @@ class Bug < ApplicationRecord
     sids
   end
 
+  # Takes an array of sids and adds their rules to the bug if not already on the bug.
+  def load_rules_from_sids(sids)
+    sids.each do |sid|
+      unless rules.by_sid(sid).exists?
+        rules << Rule.by_sid(sid).first
+      end
+    end
+  end
+
   def summary_references
     references = []
     ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
@@ -328,6 +337,13 @@ class Bug < ApplicationRecord
       end
     end
     references.uniq
+  end
+
+  def load_references(summary_references)
+    summary_references.each do |ref|
+      references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
+      Exploit.find_exploits(ref)
+    end
   end
 
   def tag_array
@@ -350,6 +366,14 @@ class Bug < ApplicationRecord
 
       self.update(summary: summary_string)
     end
+  end
+
+  def update_summary(summary_given)
+    update!(summary: summary_given)
+
+    load_rules_from_sids(summary_sids)
+    compose_summary
+    load_references(summary_references)
   end
 
   def bugzilla_synch_needed?

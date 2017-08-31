@@ -98,10 +98,7 @@ module API
                 parsed = bug.parse_summary
                 bug_rules = bug.rules.map {|r| r.id}
                 progress_bar.update_attribute("progress", 50)
-                parsed[:sids].each do |sid|
-                  rule = Rule.find_or_load(sid, 1)
-                  bug.rules << rule unless bug_rules.include? rule.id
-                end
+                bug.load_rules_from_sids(parsed[:sids])
                 progress_bar.update_attribute("progress", 60)
                 parsed[:tags].each do |tag|
                   bug.tags << tag unless bug.tags.include?(tag)
@@ -257,6 +254,7 @@ module API
               :user => editor,
               :state => updated_bug_state[:state],
               :status => updated_bug_state[:status],
+              summary: updated_bug_state[:summary],
               :resolution => updated_bug_state[:resolution],
               :assigned_at => updated_bug_state[:assigned_at],
               :pending_at => updated_bug_state[:pending_at],
@@ -288,12 +286,12 @@ module API
           end
 
 
-          # update the summary (regarding tags)
-          bug.compose_summary
+          # update the summary
+          bug.update_summary(permitted_params[:bug][:summary])
 
           update_params[:product] = permitted_params[:bug][:product]
           update_params[:component] = permitted_params[:bug][:component]
-          update_params[:summary] = bug.summary
+          update_params[:summary] = permitted_params[:bug][:summary]
           update_params[:version] = permitted_params[:bug][:version]
           update_params[:state] = permitted_params[:bug][:state]
           update_params[:opsys] = permitted_params[:bug][:opsys]
