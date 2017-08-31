@@ -754,7 +754,8 @@ class Bug < ApplicationRecord
     self.summary = "[SID] #{to_ranges_compact_string(sids)} #{summary_without_sids}"
     save!
 
-    update_bugzilla_attributes(xmlrpc, ids: [bugzilla_id], summary: self.summary )
+    # update_bugzilla_attributes(xmlrpc, ids: [bugzilla_id], summary: self.summary )
+    self.summary
   end
 
   def bug_state(xmlrpc, notes=nil, status, resolution)

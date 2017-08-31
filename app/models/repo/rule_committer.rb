@@ -127,11 +127,34 @@ module Repo
       @rule_commit_event&.update(completed: true)
     end
 
+    # Write commit information to bugzilla
+    def commit_bugzilla(bugzilla_comment: '', svn_result_output:)
+      new_summary = bug.update_summary_sids(changed_rules, xmlrpc: xmlrpc)
+
+      bugzilla_commit_note = <<~NOTE
+          Commit Log:
+          --------------
+          #{svn_result_output}
+          --------------
+          
+          Committer Notes:
+          ---------------
+          #{bugzilla_comment}
+          ---------------
+      NOTE
+
+      bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
+                        summary: new_summary,
+                        status: "resolved",
+                        resolution: "Fixed",
+                        comment: { body: bugzilla_commit_note } }
+      bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
+    end
+
     # Rule committing code when the publish is locked
     # param [Array[Rule]] rules_given array of rules.
     # param [Repo::RuleContentCommitter] content_committer The committer object.
     def locked_commit(bugzilla_comment: '')
-      byebug
       if self.class.publish_lock
         event_start
 
@@ -152,13 +175,7 @@ module Repo
             end
           end
 
-          bug.update_summary_sids(changed_rules, xmlrpc: xmlrpc)
-
-          bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
-                            status: "resolved",
-                            resolution: "Fixed",
-                            comment: { body: svn_result_output } }
-          bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
+          commit_bugzilla(bugzilla_comment: bugzilla_comment, svn_result_output: svn_result_output)
         end
 
 
