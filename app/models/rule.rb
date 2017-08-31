@@ -390,6 +390,8 @@ class Rule < ApplicationRecord
         self.state                      = UPDATED_STATE
     end
 
+    self.state                          = FAILED_STATE unless parsed?
+
     self.publish_status                 = PUBLISH_STATUS_CURRENT_EDIT unless stale_edit?
 
     if deleted?
