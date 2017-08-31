@@ -335,7 +335,7 @@ $ ->
             if ($(this).is('input') && $(this).is(':checked')) || $(this).is('input[type="text"]')
               metadata = metadata + " " + $(this).val() + ","
             else if $(this).is('select') && $(this).val() != null
-              metadata = metadata + " " + $(this).val() + ","
+              metadata = metadata + $(this).val() + ","
         metadata = metadata.replace(/,([^,]*)$/,'$1')
         class_type = "classtype:" + form.find('select[name="rule[class_type]"]').val()
         ref_types = []
