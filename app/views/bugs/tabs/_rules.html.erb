@@ -57,6 +57,7 @@
       <tr>
         <td><input type="checkbox" class="rules_check_box"></td>
         <td>State</td>
+        <td>Doc</td>
         <td>Version</td>
         <td>Message</td>
         <td>Alerts</td>
@@ -77,6 +78,7 @@
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>"
                        name="rule[id]" value="<%= rule.id %>" data-sid="<%= rule.sid%>"></td>
                 <td class="rule_state_col"><div data-toggle="tooltip" data-placement="right" title="<%= raw rule.tool_tip %>"><%= rule.state %></div></td>
+            <td class="center"><%= doc_status(rule) %></td>
                 <td>
                   <a class="blue show_rule" href="#">
                     <% if rule.sid %>

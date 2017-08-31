@@ -68,4 +68,14 @@ module RulesHelper
     end
   end
 
+  def doc_status(rule)
+    case
+      when !rule.doc_complete?
+        content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
+      when rule.doc_updated?
+        content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs')
+      else
+        content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs')
+    end
+  end
 end

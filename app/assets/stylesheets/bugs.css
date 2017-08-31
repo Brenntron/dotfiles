@@ -15,30 +15,36 @@ button.back_btn {
     width:100%;
     margin-bottom: 10px;
 }
-/*.rule_state_blue{*/
-table#bug-rules-table tr.parsed.edited-rule td.rule_state_col {
-    color:blue;
+.rule_state_col div {
+    display: inline-block;
 }
-/*.rule_state_green{*/
-table#bug-rules-table tr.parsed.new-rule td.rule_state_col {
-    color:green;
+
+#bug-rules-table .rule_state_col {
+    min-width: 115px;
+    text-wrap: none;
 }
+
+/* Rule state default */
+#bug-rules-table .rule_state_col::before {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    content: '';
+    display: inline-block;
+    margin-right: 6px;
+}
+
 /*.rule_state_red{*/
-table#bug-rules-table tr.incomplete-unparsed td.rule_state_col {
-    color:white;
-    background-color:red;
+#bug-rules-table .incomplete-unparsed .rule_state_col::before {
+    background-color: #ff5500;
 }
-table#bug-rules-table tr.incomplete-missing-doc td.rule_state_col {
-    color:white;
-    background-color:orange;
+#bug-rules-table .deleted-rule .rule_state_col::before {
+    background-color: transparent;
 }
-table#bug-rules-table tr.deleted-rule td.rule_state_col {
-    color:white;
-    background-color:black;
+#bug-rules-table .parsed.stale-edit .rule_state_col::before {
+    background-color: #bbbbbb;
 }
-table#bug-rules-table tr.parsed.stale-edit td.rule_state_col {
-    background-color: #e8e8e8;
-}
+
 div.progress{
     background-color: #80a9ba;
     width:100%;
@@ -133,6 +139,12 @@ div.progress{
 .bugs-split-colors-tweak {
     padding-left: 25px;
     margin-left: -25px;
+}
+
+
+.icon-docs {
+    max-width: 20px;
+    height: auto;
 }
 
 /*** Overriding styles that cause wonky layout ***/

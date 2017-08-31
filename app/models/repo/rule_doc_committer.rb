@@ -25,10 +25,7 @@ module Repo
       case
         when Rule::PUBLISH_STATUS_PUBLISHING == rule.publish_status
           false #rule content failed to commit
-        when rule.requires_doc? && !rule.has_doc?
-          Rule.set_synched_state(rule)
-          false
-        when !(rule.rule_doc)
+        when !(rule.has_doc?)
           false
         else
           true

@@ -98,7 +98,7 @@ module Repo
       raise "unknown user" unless user
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
       raise 'Some of those rules cannot be committed because they have changed!' if rules.any? {|rule| rule.stale_edit?}
-      raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested?}
+      raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested? || !rule.content_changed?}
       raise "Cannot commit with incomplete rule docs!" unless nodoc_override || rules.all? { |rule| rule.doc_complete? }
 
     end
