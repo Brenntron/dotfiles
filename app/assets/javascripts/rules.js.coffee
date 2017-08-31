@@ -157,6 +157,7 @@ $ ->
                 rule_ids: selected
                 username: $('#username').text()
                 bug_id: $('.bugzilla_id').text()
+                bugzilla_comment: $('#bugzilla-comment-text').val()
                 nodoc_override: $('#missing-doc-override')[0].checked
               type: 'PUT'
               dataType: 'json'

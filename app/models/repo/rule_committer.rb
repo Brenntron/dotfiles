@@ -130,7 +130,8 @@ module Repo
     # Rule committing code when the publish is locked
     # param [Array[Rule]] rules_given array of rules.
     # param [Repo::RuleContentCommitter] content_committer The committer object.
-    def locked_commit
+    def locked_commit(bugzilla_comment: '')
+      byebug
       if self.class.publish_lock
         event_start
 
@@ -202,7 +203,7 @@ module Repo
     # param [String] username The username to add to the svn comment (message)
     # param [FixNum] bugzilla_id The bugzilla id of the bug
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
-    def self.commit_rules_action(rules, username:, bugzilla_id:, xmlrpc:, nodoc_override: false)
+    def self.commit_rules_action(rules, username:, bugzilla_id:, bugzilla_comment:, xmlrpc:, nodoc_override: false)
       user = User.where(cvs_username: username).first
       Repo::RuleContentCommitter.prescreen!(rules, user, nodoc_override: nodoc_override)
 
@@ -211,7 +212,7 @@ module Repo
                                           bugzilla_id: bugzilla_id,
                                           user: user,
                                           username: username)
-      committer.locked_commit
+      committer.locked_commit(bugzilla_comment: bugzilla_comment)
 
     rescue
       Rails.logger.error $!

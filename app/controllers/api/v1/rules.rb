@@ -149,7 +149,8 @@ module API
           requires :rule_ids, type: Array[String]
           optional :username, type: String
           optional :bug_id,   type: Integer, desc: "Bugzilla id."
-          optional :nodoc_override, type: Boolean
+          optional :bugzilla_comment,   type: String
+          optional :nodoc_override,     type: Boolean
         end
         put "commit", root: "rule" do
           rules = Rule.where(id: permitted_params[:rule_ids]).all.to_a
@@ -160,6 +161,7 @@ module API
           Repo::RuleCommitter.commit_rules_action(rules,
                                                   username: permitted_params[:username],
                                                   bugzilla_id: permitted_params[:bug_id],
+                                                  bugzilla_comment: permitted_params[:bugzilla_comment],
                                                   xmlrpc: bugzilla_session,
                                                   nodoc_override: permitted_params[:nodoc_override])
         end

@@ -50,7 +50,8 @@
 </div>
 <div id="bz-commit-div">
   <div class="bz-commit-inline">
-    <textarea name="" id="" cols="100" rows="14"><%= @bug.notes.last_committer_note.first&.comment %></textarea>
+    <textarea id="bugzilla-comment-text"
+              cols="100" rows="14"><%= @bug.notes.last_committer_note.first&.comment %></textarea>
   </div>
   <button id="commit" class="small-buttn btn btn-default bz-commit-inline rule-toolbar">
     <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>
