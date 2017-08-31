@@ -18,13 +18,16 @@ class Ability
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
       can :publish, Rule
       can :publish_to_bugzilla, Note
+      can :update_preferences, User, id: current_user.id
     end
     if current_user.has_role?('analyst')
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
       can :publish_to_bugzilla, Note
+      can :update_preferences, User, id: current_user.id
     end
     if current_user.has_role?('build coordinator')
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
+      can :update_preferences, User, id: current_user.id
     end
   end
 end
