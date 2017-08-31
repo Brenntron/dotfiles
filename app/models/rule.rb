@@ -66,6 +66,7 @@ class Rule < ApplicationRecord
   UPDATED_STATE                 = 'UPDATED'
   NEW_STATE                     = 'NEW'
   STALE_STATE                   = 'STALE'           #is set to stale when publish status is set to stale
+  FAILED_STATE                  = 'FAILED'
   DELETED_STATE                 = 'DELETED'
 
   DOC_STATUS_UPDATED            = 'UPDATED'
@@ -674,6 +675,8 @@ class Rule < ApplicationRecord
     case (state)
       when DELETED_STATE
         val = 7
+      when FAILED_STATE
+        val = 1
       when NEW_STATE
         val = 2
       when STALE_STATE
