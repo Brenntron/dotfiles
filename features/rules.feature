@@ -844,3 +844,34 @@ Feature: Rules
       |  1  | 22211 | policy security-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
     Then a rule gid "1" and sid "22211" is off
 
+
+  ### Duplicate a Rule
+  @javascript
+  Scenario: A duplicated rule should parse the message
+            and populate the rule category and message fields correctly
+
+    Given a user with role "committer" exists and is logged in
+    Given the following bugs exist:
+      |  id  | bugzilla_id | state  | user_id |
+      | 2222 |   222222    | OPEN   |    1    |
+    Given the following rule categories exist:
+      | category  | id |
+      | BLACKLIST |  1 |
+    When the following rules exist:
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+
+    And bug with id "2222" has rule with id "13"
+
+    When I goto "/bugs/2222"
+    Then I click the "Rules" tab
+    And  I click "create"
+    Then I click "use standard form"
+    And  I fill in "rule_id" with "22212"
+    Then I click "duplicate"
+    And  I wait for "3" seconds
+    Then I should not see "select a category"
+    And  the "std-form-message" field should be "message"
+    Then "BLACKLIST" should be selected in the "rule_category_id" dropdown
+
+
