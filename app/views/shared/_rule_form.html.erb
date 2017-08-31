@@ -360,9 +360,11 @@
           var reference, references, rule, standard_form;
           rule = response.rule;
           references = response.references;
+          parsed_message = rule.message.match(/^(\S+)\s(.*)/).slice(1);
           $('.legacy_form').find('textarea[name="rule[rule_content]"]').val(rule.rule_content);
           standard_form = $('.standard_form');
-          standard_form.find('input[name="rule[message]"]').val(rule.message);
+          AC.Helpers.populateDropdown(parsed_message[0], standard_form.find('select[name="rule_category_id"]')[0]);
+          standard_form.find('input[name="rule[message]"]').val(parsed_message[1]);
           standard_form.find('.scratch_connection, .scratch_flow, .scratch_metadata').trigger("click");
           standard_form.find('.scratch_connection_text').val(rule.connection);
           standard_form.find('textarea[name="rule[detection]"]').val(rule.detection);
