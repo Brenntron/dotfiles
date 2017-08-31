@@ -279,6 +279,10 @@ And(/^"(.*?)" should not be in the "(.*?)" dropdown list$/) do |value, field|
   find_field(field).all('option').collect(&:text).include?(value).should == false
 end
 
+And(/^"(.*?)" should be selected in the "(.*?)" dropdown$/) do |value, field|
+  expect(page).to have_select(field, selected: value)
+end
+
 Then(/^show me the page$/) do
   save_and_open_page
 end
@@ -311,3 +315,5 @@ end
 Then(/^open inspector$/) do
   page.driver.debug
 end
+
+

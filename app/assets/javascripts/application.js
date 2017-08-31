@@ -19,6 +19,7 @@
 //= require chartkick
 //= require bootstrap-multiselect
 //= require tree-table
+//= require util
 //= require_tree .
 
 
