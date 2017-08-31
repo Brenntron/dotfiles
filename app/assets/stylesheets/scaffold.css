@@ -61,3 +61,6 @@ div.field, div.actions {
 .error {
     color: red;
 }
+
+#login-area {padding-top: 100px;}
+#login-flash {margin-left: 170px;}
