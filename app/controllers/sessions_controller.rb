@@ -28,7 +28,7 @@ class SessionsController < ApplicationController
           rescue Exception => e
             return invalid_login_attempt(e)
           end
-          render json: {  }
+          render json: { }
         end
       end
   end
@@ -45,13 +45,15 @@ class SessionsController < ApplicationController
     logger.error(error_message.backtrace[1])
     logger.error(error_message.backtrace[2])
     warden.custom_failure!
-    render :json => {:errors => ["#{error_message}"]}, :success => false, :status => :unauthorized
+    flash[:error] = error_message
+    redirect_to root_url
   end
   def system_not_ready(error_message)
     logger.error(error_message)
     logger.error(error_message.backtrace[0])
     logger.error(error_message.backtrace[1])
     logger.error(error_message.backtrace[2])
-    render json:  {errors: ["#{error_message}"]}, success: false, status: 533
+    flash[:error] = error_message
+    redirect_to root_url
   end
 end
