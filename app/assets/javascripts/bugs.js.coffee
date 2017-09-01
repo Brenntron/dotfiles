@@ -1,4 +1,5 @@
 $ ->
+  $('#bugzilla_popover_state').popover();
   $('.active').show();
   $('.hidden').hide();
 
