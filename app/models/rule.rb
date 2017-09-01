@@ -72,12 +72,19 @@ class Rule < ApplicationRecord
   DOC_STATUS_UPDATED            = 'UPDATED'
   DOC_STATUS_SYNCHED            = 'SYNCHED'
 
+  # Pre-commit hook intercepted commit, failed it, and successfully checked in the rule
+  SVN_SUCCESS_COMMIT_HOOK = 199
+
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
 
   scope :with_pub_content, -> { where(publish_status: PUBLISH_STATUS_PUBLISHING) }
   scope :with_pub_doc, -> { where(publish_status: PUBLISH_STATUS_PUBDOC) }
   scope :with_pub_any, -> { where(publish_status: [PUBLISH_STATUS_PUBLISHING, PUBLISH_STATUS_PUBDOC]) }
+
+  def svn_success?
+    SVN_SUCCESS_COMMIT_HOOK == self.svn_result_code
+  end
 
   def deleted?
     rule_category&.deleted?
@@ -176,7 +183,7 @@ class Rule < ApplicationRecord
   end
 
   def clear_svn_result
-    bugs_rules.update_all(svn_result_output: nil, svn_result_code: nil)
+    update_all(svn_result_output: nil, svn_result_code: nil, svn_success: nil)
   end
 
   def record(action)

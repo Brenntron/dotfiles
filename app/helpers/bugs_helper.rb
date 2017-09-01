@@ -59,14 +59,13 @@ module BugsHelper
   end
 
   def display_commit_status(bug, rule)
-    bug_rule = bug.bugs_rules.where(rule_id: rule).first
     case
-      when bug_rule.nil? || bug_rule.svn_result_code.nil?
+      when rule.svn_result_code.nil?
         '-'
-      when bug_rule.svn_success?
-        content_tag(:i, class: "glyphicon glyphicon-plus-sign", title: bug_rule.svn_result_output) { '' }
+      when rule.svn_success?
+        content_tag(:i, class: "glyphicon glyphicon-plus-sign", title: rule.svn_result_output) { '' }
       else
-        content_tag(:i, class: "glyphicon glyphicon-minus-sign", title: bug_rule.svn_result_output) { '' }
+        content_tag(:i, class: "glyphicon glyphicon-minus-sign", title: rule.svn_result_output) { '' }
     end
   end
 end

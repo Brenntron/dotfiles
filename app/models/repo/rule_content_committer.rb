@@ -132,16 +132,17 @@ module Repo
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
                           svn_result_code_str.to_i
                         end
+      @success = (Rule::SVN_SUCCESS_COMMIT_HOOK == svn_result_code ? true : false)
 
       if bug
         changed_rules.each do |rule|
-          rule.bugs_rules.where(bug_id: bug)
-              .update_all(svn_result_output: svn_result_output, svn_result_code: svn_result_code || 0)
+          rule.update(svn_result_output: svn_result_output,
+                      svn_result_code: svn_result_code || 0,
+                      svn_success: @success)
         end
       end
 
       Rails.logger.info("svn integration: content commit return code #{svn_result_code.inspect}")
-      @success = (BugsRule::SVN_SUCCESS_COMMIT_HOOK == svn_result_code ? true : false)
       svn_result_output
     end
 
