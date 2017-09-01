@@ -323,9 +323,8 @@ class Bug < ApplicationRecord
   # Takes an array of sids and adds their rules to the bug if not already on the bug.
   def load_rules_from_sids(sids)
     sids.each do |sid|
-      unless rules.by_sid(sid).exists?
-        rules << Rule.by_sid(sid).first
-      end
+      rule = Rule.find_or_load(sid, 1)
+      rules << rule unless self.rules.include? rule
     end
   end
 
