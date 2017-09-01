@@ -818,6 +818,18 @@ class Rule < ApplicationRecord
 
   end
 
+  def dup
+    rule = Rule.new(self.attributes)
+    rule.sid = nil
+    rule.rev = nil
+    byebug
+    references_input = self.references.map{|ref| ref.attributes}
+    rule_params = rule.build_rule_params({ 'references' => references_input })
+    rule.rule_content = RuleSyntax::Assemposer.new(rule_params).rule_content
+
+    rule
+  end
+
   # Creates a rule and its associations
   # @return [Rule]
   def self.create_action(rule_content, rule_doc, bug_id)

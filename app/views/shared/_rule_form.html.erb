@@ -349,7 +349,7 @@
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
     id = form[0].value;
     return $.ajax({
-      url: "/api/v1/rules/gids/1/sids/" + id,
+      url: "/api/v1/rules/gids/1/sids/" + id + "/dup",
       method: 'GET',
       data: data,
       headers: headers,
