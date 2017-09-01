@@ -46,6 +46,15 @@
                 </div>
             <% end %>
         <% end %>
+        <% if (@bug_references.telus | @bug.references.telus).any? %>
+            <p>telus:</p>
+            <% (@bug_references.telus.distinct | @bug.references.telus.distinct).each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "telus") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
+        <% end %>
+
     <% else %>
         <p>< MISSING ></p>
     <% end %>

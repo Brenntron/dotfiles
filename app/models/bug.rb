@@ -60,6 +60,10 @@ class Bug < ApplicationRecord
     due_date.present?
   end
 
+  def rule_relevant_references
+    self.references.select {|ref| ReferenceType.valid_reference_type_ids.include?(ref.reference_type_id) }
+  end
+
   def due_date
     self.tags.each do |tag|
       date = Date.parse(tag.name) rescue nil

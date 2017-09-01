@@ -44,7 +44,7 @@ class BugsController < ApplicationController
 
     if @bug
       @rules = @bug.rules.sort { |left, right| left <=> right }
-      @ref_types = ReferenceType.all
+      @ref_types = ReferenceType.valid_reference_types
       @pcap_attachments = []
       @other_attachments = []
       @bug.attachments.where(is_obsolete: false).map do |att|
