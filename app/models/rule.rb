@@ -183,7 +183,7 @@ class Rule < ApplicationRecord
   end
 
   def clear_svn_result
-    update_all(svn_result_output: nil, svn_result_code: nil, svn_success: nil)
+    update(svn_result_output: nil, svn_result_code: nil, svn_success: nil)
   end
 
   def record(action)
