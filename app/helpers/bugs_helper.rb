@@ -46,9 +46,9 @@ module BugsHelper
     end
   end
 
-  def display_tested_status(rule)
-    if rule.tested?
-      content_tag(:i, class: "glyphicon glyphicon-plus-sign") { '' }
+  def display_tested_status(bug, rule)
+    if rule.tested_on_bug?(bug)
+      content_tag(:span, class: "glyphicon glyphicon-plus-sign") { '' }
     else
       '-'
     end

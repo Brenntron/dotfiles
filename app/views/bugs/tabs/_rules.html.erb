@@ -92,7 +92,7 @@
                 <td class="center">
                   <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
                 </td>
-                <td class="center"><%= display_tested_status(rule) %></td>
+                <td class="center"><%= display_tested_status(@bug, rule) %></td>
                 <td class="center"><%= display_commit_status(@bug, rule) %></td>
                 <td><%= test_rpt ? test_rpt.average_check : '-' %></td>
                 <td><%= test_rpt ? test_rpt.average_match : '-' %></td>

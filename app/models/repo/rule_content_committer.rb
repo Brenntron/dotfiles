@@ -93,12 +93,12 @@ module Repo
     # @param [Array[Rule]] rules collection of rules to check
     # @param [Boolean] nodoc_override true if should skip check for complete doc
     # @raise [RuntimeError] an exception if commit is prohibited.
-    def self.prescreen!(rules, user, nodoc_override: false)
+    def self.prescreen!(rules, user, bug:, nodoc_override: false)
 
       raise "unknown user" unless user
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
       raise 'Some of those rules cannot be committed because they have changed!' if rules.any? {|rule| rule.stale_edit?}
-      raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested? || !rule.content_changed?}
+      raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested_on_bug?(bug) || rule.content_same?}
       raise "Cannot commit with incomplete rule docs!" unless nodoc_override || rules.all? { |rule| rule.doc_complete? }
 
     end

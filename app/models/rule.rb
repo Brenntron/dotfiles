@@ -140,8 +140,16 @@ class Rule < ApplicationRecord
     local_rule_content.sub(/^\s*#?\s*/, '# ')
   end
 
+  def content_same?
+    (!new_rule?) && (cvs_rule_content == rule_content)
+  end
+
   def content_changed?
     new_rule? || (cvs_rule_content != rule_content)
+  end
+
+  def tested_on_bug?(bug)
+    bugs_rules.where(bug_id: bug, rule_id: self, tested: true).exists?
   end
 
   def test_rule_content
@@ -429,7 +437,7 @@ class Rule < ApplicationRecord
     parser = RuleSyntax::RuleParser.new(rule_content)
     find_from_parser(parser, rule_id).tap do |rule|
       rule.assign_from_user_edit(rule_content, parser: parser)
-      rule.tested = false
+      rule.bugs_rules.update_all(tested: false)
       rule.save!
       rule.clear_svn_result
     end
