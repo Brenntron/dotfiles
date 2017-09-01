@@ -63,6 +63,12 @@
               <% end %>
             </div>
           </div>
+          <div class="col-xs-1">
+            <div class="bug-details-columns">
+              <h6>bugzilla status</h6>
+                <h5 class="bug-user top-space"><%= @bug.status + "," + @bug.resolution %></h5>
+            </div>
+          </div>
           <% if @bug.has_due_date? %>
           <div class="col-xs-1">
             <div class="bug-details-columns">
