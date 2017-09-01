@@ -148,7 +148,7 @@ $ ->
                 ), 5000
             }
         when 'commit'
-          if window.confirm("Are you sure?")
+#          if window.confirm("Are you sure?") Removing in lieu of modal.
             headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
             $.ajax {
               url: "/api/v1/rules/commit"
