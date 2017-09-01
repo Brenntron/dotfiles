@@ -76,9 +76,12 @@ module RuleSyntax
       unless @options
         options_ary = []
         options_ary << "msg:\"#{msg}\";" if msg.present?
-        options_ary = %w(sid gid rev flow metadata).inject(options_ary) do |ary, key|
+        options_ary = %w(sid rev flow metadata).inject(options_ary) do |ary, key|
           ary << "#{key}:#{attributes[key]};" if attributes[key].present?
           ary
+        end
+        if attributes['gid'] && 1 != attributes['gid']
+          ary << "#{key}:#{attributes[key]};" if attributes[key].present?
         end
         options_ary = %w(detection references).inject(options_ary) do |ary, key|
           ary << attributes[key] if attributes[key]
