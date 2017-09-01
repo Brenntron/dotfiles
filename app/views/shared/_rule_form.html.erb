@@ -8,7 +8,7 @@
         <div class="form-group">
           <label class="sr-only">Duplicate: </label>
           <input class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID">
-          <button class="btn btn-default select-sm" value="submit">duplicate</button>
+          <button id="dup-rule-button" class="btn btn-default select-sm" value="submit" data-disable-with="duplicating rule..." autocomplete="off">duplicate</button>
         </div>
       </form>
     </div>
@@ -354,6 +354,7 @@
       data: data,
       headers: headers,
       success: function(response) {
+        $('#dup-rule-button').prop('disabled', false).html('duplicate');
         if(response == null){
           alert('No rule id exists');
         }else{
