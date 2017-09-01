@@ -5,7 +5,13 @@ module NotesHelper
   end
 
   def get_last_notes type, author
-    @bug.notes.unpublished.where("note_type=? and author=?", type, author).reverse_chron.first if @bug.notes.any?
+    
+    latest_author_research_note = @bug.notes.unpublished.where("note_type=? and author=?", type, author).reverse_chron.first if @bug.notes.any?
+    if latest_author_research_note.blank?
+      @bug.notes.where("note_type=?", type).reverse_chron.first if @bug.notes.any? 
+    else
+      latest_author_research_note
+    end
   end
 
   def get_username(email)
