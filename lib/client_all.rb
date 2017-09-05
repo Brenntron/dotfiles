@@ -225,11 +225,13 @@ while message = client.receive
         Timeout::timeout(max_wait_for_job) do
           while true
             resp = HTTPI.get(req)
+            Rails.logger.info("Response was: #{resp}")
 
             if resp.code != 200
               raise Exception.new("Failed to fetch job status for #{job_id} #{resp.code}: #{resp.body}")
             else
               job = JSON.parse(resp.body)
+              Rails.logger.info("Job is: #{job.inspect}")
 
               if job['completed'] == "1"
                 Rails.logger.info("Job Completed")
@@ -272,11 +274,13 @@ while message = client.receive
             end
 
             # Wait before trying again
+            Rails.logger.info(".")
             sleep 1
           end
         end
 
       rescue Exception => e
+        Rails.logger.error("Not a time out error it was something else. #{e.message}")
         raise Exception.new(e.message)
       rescue Timeout::Error => e
         errors << "Timed out waiting for #{job_id} to finish. Either Rules API is really slow or the poller down again."
@@ -289,7 +293,7 @@ while message = client.receive
   rescue JSON::ParserError => e
     Rails.logger.error("Failed to parse json message:#{e.to_s}")
     Rails.logger.error( e.backtrace.join("\n\t"))
-
+    errors << "Failed to parse json message:#{e.to_s}. #{e.backtrace.join("\n\t")}"
   rescue EOFError => e
     Rails.logger.error("Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}")
     errors << "Bugzilla appears to be fucking off: #{$!}\n#{e.backtrace.join("\n\t")}"

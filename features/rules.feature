@@ -240,7 +240,7 @@ Feature: Rules
     Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "incomplete-unparsed" and version "new_rule"
-    And  I should see a rule with state "NEW" version "new_rule"
+    And  I should see a rule with state "FAILED" version "new_rule"
 #    And rule "11" is a new rule
     And  I should see "BLACKLIST test *.msg"
 
@@ -448,8 +448,8 @@ Feature: Rules
       | category  | id |
       | BLACKLIST |  1 |
     When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status | doc_status |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    |   SYNCHED  | BLACKLIST message |        1         |
     Then rule "11" is synched
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
@@ -559,7 +559,7 @@ Feature: Rules
     And  I fill in "rule[rule_content]" with "alert (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
-    Then I should see rule "11" state "INCOMPLETE" version "1:22211:3"
+    Then I should see rule "11" state "FAILED" version "1:22211:3"
     And rule "11" is a current edit
     And I should see "BLACKLIST test msg"
     And I should see a rule row with class "draft" and id "11"
@@ -711,11 +711,10 @@ Feature: Rules
 #    And I should see "Attempted User Privilege Gain"
 #    And I should not see "This is the summary"
 
-
   Scenario: Editing Rule: A rule can revert_grep model test
     Given the following rules exist:
-      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
-      |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed| doc_status |
+      |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |  SYNCHED   |
     When code calls revert_grep for rule gid "1" sid "22211" on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
@@ -724,21 +723,21 @@ Feature: Rules
 
   Scenario: Editing Rule: A rule can revert model test
     Given the following rules exist:
-      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|               rule_content               |
-      |  7 |  1  | 19500 |  3  | UPDATED |   EDIT    | CURRENT_EDIT |false | alert (msg: "the promised one has come") |
+      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|               rule_content               | doc_status |
+      |  7 |  1  | 19500 |  3  | UPDATED |   EDIT    | CURRENT_EDIT |false | alert (msg: "the promised one has come") |  SYNCHED   |
     When code calls revert_rules_action for rule gid "1" sid "19500"
     Then a rule record for rule gid "1" sid "19500" will exist
     And  A rule gid "1" and sid "19500" has class "synched"
     And  A rule gid "1" and sid "19500" has class "parsed"
 
   ### Scenarios Synching a rule from VC ###
-
+  @now
   Scenario: Synch Rule: create a valid rule from synching model test
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "parsed"
-
+@now
   Scenario: Synch Rule: create a failed rule from synching model test
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
@@ -747,18 +746,19 @@ Feature: Rules
 
   Scenario: Synch Rule: update an existing valid synched rule with new rev model test
     Given the following rules exist:
-      | id | gid |  sid  | rev | state     |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |
+      | id | gid |  sid  | rev | state     | doc_status | edit_status |
+      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED   |   SYNCHED   |
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
 
+  @javascript
   Scenario: Synch Rule: update an existing valid synched rule with same rev model test
     Given the following rules exist:
-      | id | gid |  sid  | rev | state     |
-      | 11 |  1  | 22211 |  4  | UNCHANGED |
+      | id | gid |  sid  | rev | state     | doc_status | edit_status |
+      | 11 |  1  | 22211 |  4  | UNCHANGED |  SYNCHED   |   SYNCHED   |
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
