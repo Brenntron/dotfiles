@@ -34,7 +34,8 @@ $ ->
   $('.back_btn_user').click ->
     window.location.replace('/users')
 
-  $(document).on 'click', '.change_metrics_timeframe', ->
+  $(document).on 'click', '.change_metrics_timeframe', (e)->
+    e.preventDefault()
     $('#change_metrics_timeframe, #change_metrics_timeframe_form').toggle()
 
 
