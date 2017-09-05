@@ -25,11 +25,6 @@
     <button class="select-sm btn btn-default rule-toolbar" id="test">
       <strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
     <% if can? :publish, Rule %>
-        <!--<button class="select-sm btn btn-default" onclick="show_bz_commit_msg(this)">-->
-          <!--<strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>-->
-        <!--</button>-->
-
-
         <button id="commit-modal-trigger" class="select-sm btn btn-default" onclick="commit()"   >
           <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>
         </button>
@@ -54,18 +49,6 @@
     </form>
   </div>
 </div>
-
-<!--<div id="bz-commit-div">-->
-  <!--<div class="bz-commit-inline">-->
-    <!--<textarea id="bugzilla-comment-text" cols="100" rows="14">-->
-      <!--<%= @bug.notes.last_committer_note.first&.comment %>-->
-    <!--</textarea>-->
-  <!--</div>-->
-  <!--<button id="commit" class="small-buttn btn btn-default bz-commit-inline rule-toolbar">-->
-    <!--<strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>-->
-  <!--</button>-->
-<!--</div>-->
-
 <div class="modal fade" id="commit-modal" tabindex="-1" role="dialog" aria-labelledby="commit-modal-title">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -75,9 +58,7 @@
       </div>
       <div class="modal-body">
         <div class="bz-commit-inline">
-          <textarea id="bugzilla-comment-text" cols="68" rows="14">
-            <%= @bug.notes.last_committer_note.first&.comment %>
-          </textarea>
+          <textarea id="bugzilla-comment-text" cols="68" rows="14"><%= @bug.notes.last_committer_note.first&.comment %></textarea>
         </div>
       </div>
       <div class="modal-footer">

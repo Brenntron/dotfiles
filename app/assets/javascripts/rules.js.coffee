@@ -148,39 +148,38 @@ $ ->
                 ), 5000
             }
         when 'commit'
-#          if window.confirm("Are you sure?") Removing in lieu of modal.
-            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-            $.ajax {
-              url: "/api/v1/rules/commit"
-              headers: headers
-              data:
-                rule_ids: selected
-                username: $('#username').text()
-                bug_id: $('.bugzilla_id').text()
-                bugzilla_comment: $('#bugzilla-comment-text').val()
-                nodoc_override: $('#missing-doc-override')[0].checked
-              type: 'PUT'
-              dataType: 'json'
-              success: (response) ->
-                $('.alert_rules').addClass('success').show().html('Rules has been committed')
-                setTimeout (->
-                  $('.alert_rules').hide 'blind', {}, 500
-                  return
-                ), 5000
-                $(document).ajaxStop ->
-                  location.reload true
-              error: (response) ->
-                if response.responseJSON == undefined
-                  response_lines = response.responseText.split("\n")
-                  if 2 < response_lines.length
-                    alert(response_lines[0] + "\n" + response_lines[1])
-                  else
-                    alert(response.responseText)
+          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+          $.ajax {
+            url: "/api/v1/rules/commit"
+            headers: headers
+            data:
+              rule_ids: selected
+              username: $('#username').text()
+              bug_id: $('.bugzilla_id').text()
+              bugzilla_comment: $('#bugzilla-comment-text').val()
+              nodoc_override: $('#missing-doc-override')[0].checked
+            type: 'PUT'
+            dataType: 'json'
+            success: (response) ->
+              $('.alert_rules').addClass('success').show().html('Rules has been committed')
+              setTimeout (->
+                $('.alert_rules').hide 'blind', {}, 500
+                return
+              ), 5000
+              $(document).ajaxStop ->
+                location.reload true
+            error: (response) ->
+              if response.responseJSON == undefined
+                response_lines = response.responseText.split("\n")
+                if 2 < response_lines.length
+                  alert(response_lines[0] + "\n" + response_lines[1])
                 else
-                  alert(response.responseJSON["error"])
-                $('.alert_rules').addClass('error').show().html('Rules have not been committed.  (Click text to dismiss)')
-              complete: ->
-            }
+                  alert(response.responseText)
+              else
+                alert(response.responseJSON["error"])
+              $('.alert_rules').addClass('error').show().html('Rules have not been committed.  (Click text to dismiss)')
+            complete: ->
+          }
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')
