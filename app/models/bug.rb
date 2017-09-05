@@ -146,7 +146,7 @@ class Bug < ApplicationRecord
   end
 
   def clear_rule_tested
-    rules.update_all(tested: false)
+    bugs_rules.update_all(tested:false)
   end
 
   def update_attachments(xmlrpc)

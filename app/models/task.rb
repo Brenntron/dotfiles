@@ -42,7 +42,8 @@ class Task < ApplicationRecord
   end
 
   def set_rule_tested
-    rules.update_all(tested: true)
+    BugsRule.joins(rule: :test_reports).where(test_reports: {task_id: self}).where(bug_id: bug_id)
+        .update_all(tested: true)
   end
 
   def record(action)
