@@ -360,6 +360,25 @@ Feature: User Accounts
     And  I wait for "2" seconds
     Then I should see "Bug status changes last 30 days"
 
+  @javascript
+  Scenario: A user can go to a metrics page and update their metrics timeframe preference.
+    Given a user with role "analyst" exists and is logged in
+    And the following users exist
+      | id | email                | cvs_username | display_name        | parent_id |
+      | 2  | rainbows@email.com   | rainbow_b    | Rainbow Brite       | 1         |
+      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
+      | 4  | dtrump@email.com     | d_drumph     | Donald Trump        | 1         |
+
+    Then I wait for "3" seconds
+    And  I goto "/users"
+    And  I goto "/users/3"
+    And  I should see "Bug status changes last 7 days"
+    Then I click "change"
+    And  I select "30" from "user_metrics_timeframe"
+    Then I click "done"
+    And  I wait for "2" seconds
+    Then I should see "Bug status changes last 30 days"
+
 
 
   @javascript

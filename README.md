@@ -2,6 +2,8 @@ Analyst Console
 ===============
 This is the home for the Analyst Console Project.
 
+*    Documentation for setup for this project is found in this [wiki](https://git.vrt.sourcefire.com/talosweb/General/wiki/Analyst-Console)
+
 *    Documentation for this project is in the [wiki](https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki)
 
 *    Release notes for this project are also in the [wiki](https://git.vrt.sourcefire.com/talosweb/Analyst-Console/releases)

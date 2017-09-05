@@ -16,6 +16,21 @@ module API
         end
 
 
+        desc "Return a rule for duplications"
+        params do
+          requires :gid, type: Integer, desc: "gid of the rule"
+          requires :sid, type: Integer, desc: "sid of the rule"
+        end
+        get "gids/:gid/sids/:sid/dup", root: :rules do
+          rule = Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
+          if rule
+            {rule: rule.dup}
+          else
+            nil
+          end
+        end
+
+
         desc "Return all rules"
         params do
           optional :sid, type: String, desc: "SID of the rule"

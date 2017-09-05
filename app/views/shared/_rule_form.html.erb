@@ -8,7 +8,7 @@
         <div class="form-group">
           <label class="sr-only">Duplicate: </label>
           <input class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID">
-          <button class="btn btn-default select-sm" value="submit">duplicate</button>
+          <button id="dup-rule-button" class="btn btn-default select-sm" value="submit" data-disable-with="duplicating rule..." autocomplete="off">duplicate</button>
         </div>
       </form>
     </div>
@@ -276,8 +276,8 @@
     <div class="form-group">
       <div class="col-xs-12 references_add">
         <h5>References&nbsp;&nbsp;<a class="top-space add-reference-btn blue"><i class="glyphicon glyphicon-plus"></i> add reference</a></h5>
-        <% if @bug.references.any? %>
-          <% @bug.references.distinct.each do |ref| %>
+        <% if @bug.rule_relevant_references.any? %>
+          <% @bug.rule_relevant_references.uniq.each do |ref| %>
             <div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">
               <div class="form-group">
                 <input class="form-control select-sm code" name="rule[reference][][reference_type_id]" size=8 value="<%= ref.reference_type.name %>">
@@ -349,11 +349,12 @@
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()};
     id = form[0].value;
     return $.ajax({
-      url: "/api/v1/rules/gids/1/sids/" + id,
+      url: "/api/v1/rules/gids/1/sids/" + id + "/dup",
       method: 'GET',
       data: data,
       headers: headers,
       success: function(response) {
+        $('#dup-rule-button').prop('disabled', false).html('duplicate');
         if(response == null){
           alert('No rule id exists');
         }else{

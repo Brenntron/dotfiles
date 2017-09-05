@@ -7,7 +7,7 @@
       <div id="rule_detail_edit_<%= rule.id %>" class="col-xs-12 col-md-11 hidden rule_<%= rule.id %> <%= rule.css_class %>">
         <h4 class="blue">
           <% if rule.new_rule? %>
-            New rule
+            New rule (no sid)
           <% else %>
             <%= "#{rule.gid}:#{rule.sid}:#{rule.rev}" %>
           <% end %>

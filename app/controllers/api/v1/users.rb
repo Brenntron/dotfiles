@@ -23,7 +23,7 @@ module API
           optional :metrics_timeframe, type: Integer, desc: "the user's preferred time frame to view metrics'"
         end
         put ":id", root: "user" do
-          authorize! :update, User
+          authorize! :update_preferences, User
           current_user.update_attributes(metrics_timeframe: permitted_params[:metrics_timeframe])
         end
       end

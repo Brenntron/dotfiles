@@ -84,9 +84,13 @@ To set up the remote dev web server do the following:
 
 ### For Deployment
 In order to build a package for a production deployment,
+First make sure there is a tag in git for what you are trying to deploy.
 run hurl with the --deployment switch.
+also be sure to use the --version switch as well
+finally the tag should be added to the command. If it is not added, the zip that is created will be called master.tar.gz
 
-    $ ruby extras/hurl.rb --deployment
+
+    $ ruby extras/hurl.rb --deployment --version=analyst-console-X.X.X vX.X.X
 
 This will get the source code from git,
 and build the tar file needed to deliver for building the FreeBSD package.

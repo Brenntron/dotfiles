@@ -222,7 +222,8 @@ module Repo
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
     def self.commit_rules_action(rules, username:, bugzilla_id:, bugzilla_comment:, xmlrpc:, nodoc_override: false)
       user = User.where(cvs_username: username).first
-      Repo::RuleContentCommitter.prescreen!(rules, user, nodoc_override: nodoc_override)
+      bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
+      Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
 
       committer = Repo::RuleCommitter.new(rules,
                                           xmlrpc: xmlrpc,

@@ -60,6 +60,10 @@ class Bug < ApplicationRecord
     due_date.present?
   end
 
+  def rule_relevant_references
+    self.references.select {|ref| ReferenceType.valid_reference_type_ids.include?(ref.reference_type_id) }
+  end
+
   def due_date
     self.tags.each do |tag|
       date = Date.parse(tag.name) rescue nil
@@ -142,7 +146,7 @@ class Bug < ApplicationRecord
   end
 
   def clear_rule_tested
-    rules.update_all(tested: false)
+    bugs_rules.update_all(tested:false)
   end
 
   def update_attachments(xmlrpc)
@@ -323,9 +327,8 @@ class Bug < ApplicationRecord
   # Takes an array of sids and adds their rules to the bug if not already on the bug.
   def load_rules_from_sids(sids)
     sids.each do |sid|
-      unless rules.by_sid(sid).exists?
-        rules << Rule.by_sid(sid).first
-      end
+      rule = Rule.find_or_load(sid, 1)
+      rules << rule unless self.rules.include? rule
     end
   end
 
@@ -675,12 +678,22 @@ class Bug < ApplicationRecord
     true
   end
 
-  def self.bugzilla_light_import(current_user, xmlrpc, xmlrpc_token, new_bugs)
+  def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
 
-        Bug.find_or_create_by(bugzilla_id: bug_id) do |new_record|
+        bug = Bug.where(bugzilla_id: bug_id).first
+        user = nil
+        if bug
+          user ||= User.where(email: user_email).first
+          bug.user = user
+          if bug.changed?
+            bug.save!
+          end
+        else
+          new_record = Bug.new(bugzilla_id: bug_id)
+
           new_record.id             = bug_id
           new_record.summary        = item['summary']
           new_record.classification = item['classification'].parameterize.downcase.underscore
@@ -733,6 +746,8 @@ class Bug < ApplicationRecord
           else
             new_record.committer = new_committer
           end
+
+          new_record.save!
         end
       end
     end

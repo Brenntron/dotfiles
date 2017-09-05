@@ -28,7 +28,10 @@ module API
               new_bugs = xmlrpc.search(assigned_to: user_email, component: ['Malware', 'SO Rules', 'Snort Rules'])
 
               #create the bugs from bugzilla
-              Bug.bugzilla_light_import(current_user, xmlrpc,xmlrpc_token,new_bugs).to_s if new_bugs['bugs'].count > 0
+              if new_bugs['bugs'].any?
+                Bug.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token,
+                                          user_email: user_email, current_user: current_user).to_s
+              end
             rescue Exception => e
               Rails.logger.info e
               false
