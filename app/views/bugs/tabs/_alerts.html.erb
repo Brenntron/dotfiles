@@ -1,6 +1,6 @@
 <div class="row top-space">
   <div class="col-xs-6">
-    <h4 class="blue">Attachments</h4>
+    <h4 class="blue">Alerts</h4>
   </div>
   <div class="col-xs-6 right">
     <p>
@@ -61,8 +61,8 @@
         <thead>
         <tr>
           <th>Filename</th>
-          <th>All Rules</th>
           <th>Local</th>
+          <th>All Rules</th>
         </tr>
         </thead>
         <tbody>
@@ -70,6 +70,20 @@
           <tr>
             <td>
               <code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code>
+            </td>
+            <td>
+              <table>
+                <tbody>
+                <% @rules.each do |rule| %>
+                    <tr>
+                      <td><strong><%= sid_colon_format(rule) %></strong></td>
+                      <td>
+                        <%= alert_status(@bug, rule) %>
+                      </td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
             </td>
             <td>
               <% if attachment.pcap_alerts.any? %>
@@ -85,52 +99,6 @@
               <% end %>
             </td>
           </tr>
-        <% end %>
-        </tbody>
-      </table>
-      <table class="table table-condensed small table-hover" id="pcap-attachments">
-        <thead>
-        <tr>
-          <td class="narrow-column"><input type="checkbox" class="selectallcheckbox"></td>
-          <td class="narrow-column"></td>
-          <td>Filename</td>
-          <td>Alerts</td>
-        </tr>
-        </thead>
-        <tbody>
-        <% @pcap_attachments.each do |attachment| %>
-            <tr>
-              <td>
-                <input type="checkbox" value=<%= attachment.id %> class="attach_check_box attach_<%= attachment.id %>">
-              </td>
-              <td class="center narrow-column">
-                <a class="blue" href="<%= attachment.direct_upload_url %>" target="_blank">
-                  <i class="glyphicon glyphicon-download"></i></a></td>
-              <td>
-                <code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code>
-              </td>
-              <td class="center narrow-column">
-                <h5>
-                  <a class="attachment_alert <%= attachment.id %>"><%= attachment.pcap_alerts.count %></a>
-                </h5>
-              </td>
-            </tr>
-            <% if attachment.pcap_alerts.any? %>
-                <tr id="attachment_<%= attachment.id %>">
-                  <td></td>
-                  <td colspan=2>
-                    <table class="table-condensed small">
-                      <% attachment.pcap_alerts.each do |alert| %>
-                        <% rule = alert.rule %>
-                          <tr>
-                            <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
-                            <td><strong><%= rule.message %></strong></td>
-                          </tr>
-                      <% end %>
-                    </table>
-                  </td>
-                </tr>
-            <% end %>
         <% end %>
         </tbody>
       </table>
