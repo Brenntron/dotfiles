@@ -1,0 +1,54 @@
+<div class="row top-space">
+  <div class="col-xs-6">
+    <h4 class="blue">Alerts</h4>
+  </div>
+</div>
+<div class="row top-bar">
+  <div class="col-xs-12 alert-tab-div">
+    <% if @pcap_attachments.any? %>
+      <table class="table table-condensed small table-hover">
+        <thead>
+        <tr>
+          <th>Filename</th>
+          <th>Local</th>
+          <th>All Rules</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @pcap_attachments.each do |attachment| %>
+          <tr>
+            <td>
+              <code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code>
+            </td>
+            <td>
+              <table class="local-alerts-table">
+                <tbody>
+                <% @rules.each do |rule| %>
+                    <tr class="<%= alert_css_class(attachment, rule) %>">
+                      <td><strong><%= sid_colon_format(rule) %></strong></td>
+                      <td class="alert-status-col"><%= alert_status(attachment, rule) %></td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td>
+              <% if attachment.pcap_alerts.any? %>
+                <table class="table-condensed small">
+                  <% attachment.pcap_alerts.each do |alert| %>
+                    <% rule = alert.rule %>
+                    <tr>
+                      <td class="blue"><%= sid_colon_format(rule) %></td>
+                      <td><strong><%= rule.message %></strong></td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>
