@@ -49,7 +49,11 @@
   </div>
 </div>
 <hr class="short"/>
-<div class="col-xs-12 alert_rules" onclick="dismiss_alert_rules();location.reload();;"></div>
+<div class="rule-error-div">
+  <button onclick="dismiss_rule_error();"><span class="glyphicon glyphicon-remove"></span></button>
+  <div class="rule-error-msg"></div>
+</div>
+<div class="col-xs-12 alert_rules" onclick="dismiss_alert_rules();location.reload();"></div>
 <div class="row overview active">
   <div class="col-xs-12">
     <table id="bug-rules-table" class="table table-condensed table-hover rules_table">
