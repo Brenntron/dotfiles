@@ -2,10 +2,9 @@
   <div class="col-xs-6">
     <h4 class="blue">Alerts</h4>
   </div>
-
 </div>
 <div class="row top-bar">
-  <div class="col-xs-12">
+  <div class="col-xs-12 alert-tab-div">
     <% if @pcap_attachments.any? %>
       <table class="table table-condensed small table-hover">
         <thead>
@@ -22,14 +21,12 @@
               <code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code>
             </td>
             <td>
-              <table>
+              <table class="local-alerts-table">
                 <tbody>
                 <% @rules.each do |rule| %>
-                    <tr>
+                    <tr class="<%= alert_css_class(@bug, rule) %>">
                       <td><strong><%= sid_colon_format(rule) %></strong></td>
-                      <td>
-                        <%= alert_status(@bug, rule) %>
-                      </td>
+                      <td class="alert-status-col"><%= alert_status(@bug, rule) %></td>
                     </tr>
                 <% end %>
                 </tbody>
@@ -41,7 +38,7 @@
                   <% attachment.pcap_alerts.each do |alert| %>
                     <% rule = alert.rule %>
                     <tr>
-                      <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
+                      <td class="blue"><%= sid_colon_format(rule) %></td>
                       <td><strong><%= rule.message %></strong></td>
                     </tr>
                   <% end %>

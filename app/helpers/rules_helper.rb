@@ -67,6 +67,17 @@ module RulesHelper
     end
   end
 
+  def alert_css_class(bug, rule)
+    case
+      when !(bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+        'untested'
+      when bug.local_alerts.by_rule(rule).exists?
+        'alerted'
+      else
+        'no-alert'
+    end
+  end
+
   def get_summary(rule)
     if rule && rule.rule_doc && rule.rule_doc.summary.present?
       rule.rule_doc.summary
