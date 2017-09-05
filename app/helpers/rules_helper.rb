@@ -56,22 +56,22 @@ module RulesHelper
     "#{rule.gid}:#{rule.sid}:#{rule.rev}"
   end
 
-  def alert_status(bug, rule)
+  def alert_status(attachment, rule)
     case
-      when !(bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+      when !(attachment.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
         'Untested'
-      when bug.local_alerts.by_rule(rule).exists?
+      when attachment.local_alerts.by_rule(rule).exists?
         'Alerted'
       else
         'No alert'
     end
   end
 
-  def alert_css_class(bug, rule)
+  def alert_css_class(attachment, rule)
     case
-      when !(bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+      when !(attachment.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
         'untested'
-      when bug.local_alerts.by_rule(rule).exists?
+      when attachment.local_alerts.by_rule(rule).exists?
         'alerted'
       else
         'no-alert'

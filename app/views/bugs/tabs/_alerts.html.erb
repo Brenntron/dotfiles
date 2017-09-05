@@ -24,9 +24,9 @@
               <table class="local-alerts-table">
                 <tbody>
                 <% @rules.each do |rule| %>
-                    <tr class="<%= alert_css_class(@bug, rule) %>">
+                    <tr class="<%= alert_css_class(attachment, rule) %>">
                       <td><strong><%= sid_colon_format(rule) %></strong></td>
-                      <td class="alert-status-col"><%= alert_status(@bug, rule) %></td>
+                      <td class="alert-status-col"><%= alert_status(attachment, rule) %></td>
                     </tr>
                 <% end %>
                 </tbody>
