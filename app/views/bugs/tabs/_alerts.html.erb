@@ -57,6 +57,37 @@
       <strong>Obsolete (<%= @obsolete_attachments.count %>) &nbsp;&nbsp;</strong></button>
 
     <% if @pcap_attachments.any? %>
+      <table class="table table-condensed small table-hover">
+        <thead>
+        <tr>
+          <th>Filename</th>
+          <th>All Rules</th>
+          <th>Local</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @pcap_attachments.each do |attachment| %>
+          <tr>
+            <td>
+              <code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code>
+            </td>
+            <td>
+              <% if attachment.pcap_alerts.any? %>
+                <table class="table-condensed small">
+                  <% attachment.pcap_alerts.each do |alert| %>
+                    <% rule = alert.rule %>
+                    <tr>
+                      <td class="blue"><%= rule.gid %>:<%= rule.sid %>:<%= rule.rev %></td>
+                      <td><strong><%= rule.message %></strong></td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
       <table class="table table-condensed small table-hover" id="pcap-attachments">
         <thead>
         <tr>
@@ -85,7 +116,7 @@
               </td>
             </tr>
             <% if attachment.pcap_alerts.any? %>
-                <tr style="display: none;" id="attachment_<%= attachment.id %>">
+                <tr id="attachment_<%= attachment.id %>">
                   <td></td>
                   <td colspan=2>
                     <table class="table-condensed small">
@@ -100,68 +131,6 @@
                   </td>
                 </tr>
             <% end %>
-        <% end %>
-        </tbody>
-      </table>
-    <% end %>
-    <% if @other_attachments.any? %>
-      <table class="table table-condensed small table-hover hidden" id="other-attachments">
-        <thead>
-        <tr>
-          <td class="narrow-column"></td>
-          <td>Filename</td>
-        </tr>
-        </thead>
-        <tbody>
-        <% @other_attachments.each do |attachment| %>
-            <tr>
-              <td class="center narrow-column"><a class="blue" href="<%= attachment.direct_upload_url %>">
-                <i class="glyphicon glyphicon-download"></i></a></td>
-              <td><code><a><%= attachment.file_name %></a></code></td>
-              <td class="center narrow-column">
-              </td>
-            </tr>
-        <% end %>
-        </tbody>
-      </table>
-    <% end %>
-    <% if @obsolete_attachments %>
-      <table class="table table-condensed small table-hover hidden" id="obsolete-attachments">
-        <thead>
-        <tr>
-          <td class="narrow-column"></td>
-          <td>Filename</td>
-          <td>Alerts</td>
-        </tr>
-        </thead>
-        <tbody>
-        <% @obsolete_attachments.each do |attachment| %>
-            <tr>
-              <td class="center narrow-column"><a class="blue"><i class="glyphicon glyphicon-download"></i></a></td>
-              <td><code><a><%= attachment.file_name %></a></code></td>
-              <td class="center narrow-column">
-                <h5 class="ember-tooltip bottom" style="display: none;">
-                  1
-                  <div class="tip">
-                    <table class="table-condensed small">
-                      <tr>
-                        <td class="blue">120:9:1</td>
-                        <td><strong>(http_inspect) JAVASCRIPT OBFUSCATION LEVELS EXCEEDS 1</strong></td>
-                      </tr>
-                      <tr>
-                        <td class="blue">1:29519:1</td>
-                        <td><strong>INDICATOR-OBFUSCATION Javascript obfuscation using split reverse
-                          join</strong></td>
-                      </tr>
-                      <tr>
-                        <td class="blue">1:32246:3</td>
-                        <td><strong>BROWSER-PLUGINS Samsung iPOLiS device manager clsid access attempt</strong>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </h5>
-            </tr>
         <% end %>
         </tbody>
       </table>
