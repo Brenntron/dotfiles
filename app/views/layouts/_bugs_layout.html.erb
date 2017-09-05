@@ -97,7 +97,13 @@
     </div>
     <div id="alert_message" role="alert"></div>
     <%= render partial: "shared/flash_messages", flash: flash %>
-    <%= yield %>
+    <% if 'show' == action_name %>
+      <div class="bugs-split-color" style="padding-top: 50px;">
+        <%= yield %>
+      </div>
+    <% else %>
+      <%= yield %>
+    <% end %>
   </div>
 </div>
 <div id="blanket" style="display:none;"></div>
