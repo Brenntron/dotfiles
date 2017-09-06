@@ -771,7 +771,6 @@ Feature: Bug
     And I click "save"
     Then I should see "Notes saved"
 
-
   @javascript
   Scenario: a user can add a comment
     Given a user with role "analyst" exists and is logged in
