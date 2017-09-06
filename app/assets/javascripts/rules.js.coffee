@@ -202,7 +202,7 @@ $ ->
                 $(document).ajaxStop ->
                   location.reload true
               error: (response) ->
-                api_error(response, 'Rules have not been committed.', {failure_reload: false})
+                api_error(response, 'Rules have not been committed.', {failure_reload: true})
               complete: ->
             }
         else
@@ -328,12 +328,11 @@ $ ->
               $('.alert_rules').removeClass('error')
               $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
               $('html,body').scrollTop(0);
-            error: (response) ->
-              $('.alert_rules').removeClass('success')
-              $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
-            complete: ->
               $(document).ajaxStop ->
                 location.reload true
+            error: (response) ->
+              api_error(response, "New rule has not been created", {failure_reload: true})
+            complete: ->
           }
       else
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
