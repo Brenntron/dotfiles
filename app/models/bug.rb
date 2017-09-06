@@ -908,7 +908,7 @@ class Bug < ApplicationRecord
     bug = Bug.where(bugzilla_id: bugzilla_id).first
     rule = Rule.find_or_load(sid, gid)
     if bug && rule
-      bug.rules << rule
+      bug.rules << rule unless bug.rules.include?(rule)
     end
   end
 
