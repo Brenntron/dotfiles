@@ -1,3 +1,40 @@
+
+window.dismiss_rule_error = ->
+  $('.rule-error-div').hide 'blind', {}, 500
+
+window.set_rule_message =(message) ->
+  $('.rule-error-msg').text(message)
+  $('.rule-error-div').show()
+
+window.set_rule_error =(message) ->
+  $('.rule-error-msg').removeClass('success')
+  $('.rule-error-msg').addClass('error')
+  set_rule_message(message)
+
+window.set_rule_success =(message) ->
+  $('.rule-error-msg').removeClass('error')
+  $('.rule-error-msg').addClass('success')
+  set_rule_message(message)
+
+
+window.api_error =(response, prefix, options = {}) ->
+  if response.responseJSON != undefined
+    errormsg = 'not'
+  else
+    response_lines = response.responseText.split("\n")
+    if 2 < response_lines.length
+      errormsg = response_lines[0] + "\n" + response_lines[1]
+    else
+      errormsg = response.responseText
+
+  if options["failure_reload"] == true
+    alert(prefix + "\n" + errormsg)
+    location.reload(true)
+  else
+    set_rule_error(prefix + " " + errormsg)
+
+
+
 window.dismiss_alert_rules = ->
   $('.alert_rules').hide 'blind', {}, 500
 
@@ -183,15 +220,7 @@ $ ->
               $(document).ajaxStop ->
                 location.reload true
             error: (response) ->
-              if response.responseJSON == undefined
-                response_lines = response.responseText.split("\n")
-                if 2 < response_lines.length
-                  alert(response_lines[0] + "\n" + response_lines[1])
-                else
-                  alert(response.responseText)
-              else
-                alert(response.responseJSON["error"])
-              $('.alert_rules').addClass('error').show().html('Rules have not been committed.  (Click text to dismiss)')
+              api_error(response, 'Rules have not been committed.', {failure_reload: true})
             complete: ->
           }
         else
@@ -317,12 +346,11 @@ $ ->
               $('.alert_rules').removeClass('error')
               $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
               $('html,body').scrollTop(0);
-            error: (response) ->
-              $('.alert_rules').removeClass('success')
-              $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
-            complete: ->
               $(document).ajaxStop ->
                 location.reload true
+            error: (response) ->
+              api_error(response, "New rule has not been created", {failure_reload: true})
+            complete: ->
           }
       else
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
@@ -402,13 +430,12 @@ $ ->
           success: (response) ->
             $('.alert_rules').removeClass('error')
             $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
-          error: (response) ->
-            $('.alert_rules').removeClass('success')
-            $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
-          complete: ->
             $(document).ajaxStop ->
               location.reload true
               window.scrollTo(0, 0)
+          error: (response) ->
+            api_error(response, "New rule has not been created.", failure_reload: true)
+          complete: ->
         }
       else
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
