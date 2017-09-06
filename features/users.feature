@@ -600,10 +600,10 @@ Feature: User Accounts
     Given I goto "/users"
     Given I fill in "user_search_name" with "CAR"
     When I click button "search"
-    Then I see a user_searches result for name "carlzipp"
-    And I see a user_searches result for name "davecarr"
-    And I do not see a user_searches result for name "porsche"
-    And I do not see a user_searches result for name "bentley"
+    Then I see a user_searches result for name "email1@cisco.com"
+    And I see a user_searches result for name "email2@cisco.com"
+    And I do not see a user_searches result for name "email3@cisco.com"
+    And I do not see a user_searches result for name "email4@cisco.com"
 
   @javascript
   Scenario: A user can search using CEC username
@@ -618,10 +618,10 @@ Feature: User Accounts
     Given I goto "/users"
     Given I fill in "user_search_name" with "CAR"
     When I click button "search"
-    Then I see a user_searches result for name "carlzipp"
-    And I see a user_searches result for name "davecarr"
-    And I do not see a user_searches result for name "porsche"
-    And I do not see a user_searches result for name "bentley"
+    Then I see a user_searches result for name "email1@cisco.com"
+    And I see a user_searches result for name "email2@cisco.com"
+    And I do not see a user_searches result for name "email3@cisco.com"
+    And I do not see a user_searches result for name "email4@cisco.com"
 
   @javascript
   Scenario: A user can search using Kerberos Login
@@ -636,10 +636,10 @@ Feature: User Accounts
     Given I goto "/users"
     Given I fill in "user_search_name" with "CAR"
     When I click button "search"
-    Then I see a user_searches result for name "carlzipp"
-    And I see a user_searches result for name "davecarr"
-    And I do not see a user_searches result for name "porsche"
-    And I do not see a user_searches result for name "bentley"
+    Then I see a user_searches result for name "email1@cisco.com"
+    And I see a user_searches result for name "email2@cisco.com"
+    And I do not see a user_searches result for name "email3@cisco.com"
+    And I do not see a user_searches result for name "email4@cisco.com"
 
 
   ### Scenarios User Role access ###
