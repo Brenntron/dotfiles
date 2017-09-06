@@ -32,7 +32,7 @@ class Note < ApplicationRecord
                          author: options[:author],
                          note_type: options[:note_type])
     else
-      note = Note.where("id=?", options[:id]).first
+      note = Note.where("id=?", options[:note_id]).first
     end
     bug = Bug.find options[:id]
     bug.notes << note
