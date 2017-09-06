@@ -765,7 +765,7 @@ Feature: Bug
     Then I should see "Notes saved"
     When I click "#committerNotesPublishBtn"
     And I wait for "3" seconds
-    Then I should see "Notes published to bugzilla"
+    Then I should see "Note Published"
     And I click "#committerNotesEditBtn"
     And  I fill in "committer_notes" with "This is a research note too"
     And I click "save"
@@ -784,7 +784,7 @@ Feature: Bug
     And  I fill in "noteCommentField" with "I love testing"
     And I click "save"
     And I wait for "2" seconds
-    Then I should see "Comment saved and published to bugzilla"
+    Then I should see "Note Published"
     And I wait for "1" seconds
     Then I should see "I love testing"
 
