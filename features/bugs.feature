@@ -62,7 +62,7 @@ Feature: Bug
   @javascript
   Scenario: A user will see a warning message if bug looks to be
             out of synch with bugzilla (probably from a light import).
-            Out of synch is based on presence of bug tags.
+            Out of synch is based on presence of notes on the bug.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
       | id | email                         | cvs_username  | display_name        |
@@ -74,13 +74,10 @@ Feature: Bug
       | 222222      | OPEN  | 2       | No Tags in this one                         | Research | Snort Rules | 2.6.0   | test description2 |
       | 333333      | FIXED | 2       | [BP][NSS] fixed bug                         | Research | Snort Rules | 2.6.0   | test description3 |
 
-    And the following tags exist:
-      | name  |
-      | TELUS |
-      | VULN  |
-      | BP    |
-    Given the bug "222222" has tag "BP"
-    Given the bug "222222" has tag "NSS"
+    And the following notes exist:
+      | id |   comment     |  note_type |        author       | bug_id  |
+      | 1  |i like comments| "research" | "nicherbe@cisco.com"| 222222  |
+      | 2  |pork sandwiches| "research" | "nicherbe@cisco.com"| 222222  |
 
     Then I wait for "3" seconds
     And  I goto "/bugs/222222"
