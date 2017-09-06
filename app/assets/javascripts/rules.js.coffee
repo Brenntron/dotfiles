@@ -6,7 +6,7 @@ window.set_rule_error =(message) ->
   $('.rule-error-msg').text(message)
   $('.rule-error-div').show()
 
-window.handle_ajax_error =(response, prefix) ->
+window.api_error =(response, prefix, options = {}) ->
   if response.responseJSON != undefined
     errormsg = 'not'
   else
@@ -16,7 +16,11 @@ window.handle_ajax_error =(response, prefix) ->
     else
       errormsg = response.responseText
 
-  set_rule_error(prefix + " " + errormsg)
+  if options["failure_reload"] == true
+    alert(prefix + "\n" + errormsg)
+    location.reload(true)
+  else
+    set_rule_error(prefix + " " + errormsg)
 
 
 
@@ -187,15 +191,7 @@ $ ->
                 $(document).ajaxStop ->
                   location.reload true
               error: (response) ->
-                handle_ajax_error(response, 'Rules have not been committed.')
-                if response.responseJSON == undefined
-                  response_lines = response.responseText.split("\n")
-                  if 2 < response_lines.length
-                    alert(response_lines[0] + "\n" + response_lines[1])
-                  else
-                    alert(response.responseText)
-                else
-                  alert(response.responseJSON["error"])
+                api_error(response, 'Rules have not been committed.', {failure_reload: true})
               complete: ->
             }
         else
