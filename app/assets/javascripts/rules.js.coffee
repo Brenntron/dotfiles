@@ -412,13 +412,12 @@ $ ->
           success: (response) ->
             $('.alert_rules').removeClass('error')
             $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
-          error: (response) ->
-            $('.alert_rules').removeClass('success')
-            $('.alert_rules').addClass('error').show().append('New rule has not been created\n')
-          complete: ->
             $(document).ajaxStop ->
               location.reload true
               window.scrollTo(0, 0)
+          error: (response) ->
+            api_error(response, "New rule has not been created.", failure_reload: true)
+          complete: ->
         }
       else
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
