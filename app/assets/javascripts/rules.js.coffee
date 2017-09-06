@@ -287,6 +287,8 @@ $ ->
       data: {'api_key': 'h93hq@hwo9%@ah!jsh'}
       success: (response) ->
         window.location.reload()
+        $('.alert_rules').removeClass('error')
+        $('.alert_rules').addClass('success').html("Rule " + "#{sid}" + " imported")
       error: (response) ->
         $('#import-rule-button').prop('disabled', false)
         $('#import-rule-button').html('Import')
