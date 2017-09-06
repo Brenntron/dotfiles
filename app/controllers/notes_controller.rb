@@ -23,6 +23,7 @@ class NotesController < ApplicationController
   def publish_to_bugzilla
     begin
       options = {
+          :note_id => params[:note][:id],
           :id => params[:note][:bugzilla_id],
           :comment => params[:note][:comment],
           :note_type => params[:note][:note_type],
@@ -31,19 +32,8 @@ class NotesController < ApplicationController
           :is_markdown => params[:note][:is_markdown],
           :minor_update => params[:note][:minor_update]
       }.reject() { |k, v| v.nil? }
-      new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options)
-      if params[:note][:id].blank?
-        note = Note.create(id: new_note['id'],
-                           comment: options[:comment],
-                           author: options[:author],
-                           note_type: options[:note_type])
-      else
-        note = Note.where("id=?", params[:note][:id]).first
-      end
-      bug = Bug.find params[:note][:bugzilla_id]
-      bug.notes << note
-      if note.update(:id => new_note['id'], :comment => params[:note][:comment], :notes_bugzilla_id => new_note['id'])
-        render json: {bug: bug.as_json, note: note.as_json}
+      if Note.process_note(options, bugzilla_session)
+        render json: "Note Published!", status: 200
       else
         render json: "Published to bugzilla but not updated in local db", status: 422
       end

@@ -3,6 +3,11 @@ $ ->
   $('.active').show();
   $('.hidden').hide();
 
+  $('#bug_state').change (e) ->
+    $("#state_comment_row").show()
+    $("#state_comment").prop('required',true);
+
+
   $(".take-bug").on 'click', (e) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     id = $(this).data("id")
@@ -175,7 +180,10 @@ $ ->
     $('.edit-bug').prop('disabled', true)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     id = $('input[name="bug_id"]').val()
+    state_comment = $("#state_comment").val()
     data = $('.edit_bug').serialize()
+    if state_comment
+      data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
     $('.edit-bug').hide()
     $('#saving_bug').removeClass('hidden').show()
     $.ajax(
@@ -187,7 +195,9 @@ $ ->
         location.reload()
       error: (response) ->
         alert(response.responseText)
+        location.reload()
     , this)
+
 
 
   $('.new_bug').submit (e) ->
@@ -206,6 +216,7 @@ $ ->
         location.replace('/bugs/' + response['id'])
       error: (response) ->
         alert(response.responseText)
+        location.reload()
     , this)
 
 

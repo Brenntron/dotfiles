@@ -17,10 +17,30 @@ class Note < ApplicationRecord
   after_destroy { |note| note.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
   def record(action)
-    record = { resource: 'note',
-               action: action,
-               id: self.id,
-               obj: self }
+    record = {resource: 'note',
+              action: action,
+              id: self.id,
+              obj: self}
     PublishWebsocket.push_changes(record)
   end
+
+  def self.process_note(options,bugzilla_session)
+    new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options)
+    if options[:note_id].blank?
+      note = Note.create(id: new_note['id'],
+                         comment: options[:comment],
+                         author: options[:author],
+                         note_type: options[:note_type])
+    else
+      note = Note.where("id=?", options[:note_id]).first
+    end
+    bug = Bug.find options[:id]
+    bug.notes << note
+    if note.update(:id => new_note['id'], :comment => options[:comment], :notes_bugzilla_id => new_note['id'])
+      return true
+    else
+      raise "Published to bugzilla but not updated in local db"
+    end
+  end
+
 end
