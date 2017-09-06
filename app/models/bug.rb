@@ -380,7 +380,7 @@ class Bug < ApplicationRecord
   end
 
   def bugzilla_synch_needed?
-    tags.empty? && !summary_tag_array.empty?
+    notes.empty?
   end
 
   def resolution_time
