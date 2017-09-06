@@ -66,6 +66,8 @@
             </li>
           </ul>
         </div>
+        <a type="button" class="glyphicon glyphicon-cloud-download btn btn-link float-left icon-link" id="user-bugs" value="<%=current_user.id%>" data-toggle="tooltip" data-placement="bottom" title="import <%=current_user.cvs_username%>'s bugs from bugzilla"></a>
+        <button class="select-sm btn btn-default hidden btn-link float-left icon-link" id="importing_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> coffee break</button>
         <div class="col-xs-8 form-inline">
           <div class="input-group">
             <input id="import_bug" name="bug_name" type="number" class="form-control" placeholder="Import Bug...">

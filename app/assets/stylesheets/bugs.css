@@ -172,3 +172,7 @@ div.progress{
 .hidden_comment{
     display:none;
 }
+
+.glyphicon-cloud-download {
+    margin-top: -3px;
+}
