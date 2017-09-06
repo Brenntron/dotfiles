@@ -6,6 +6,20 @@ window.show_bz_commit_msg =(buttn) ->
   $('#bz-commit-div').show()
 
 
+window.pre_commit = ->
+  # if at least one checkbox is checked let modal work
+  if ($(':checkbox[name="rule[id]"]').is(':checked'))
+    console.log('something is checked.'); # this can be removed when finalized
+    $("#commit-modal-trigger").attr("data-toggle", "modal")
+    $("#commit-modal-trigger").attr("data-target", "#commit-modal")
+
+  # remove modal call if everything is unchecked
+  else if ($(':checkbox[name="rule[id]"]').not(':checked').length > 0)
+    $("#commit-modal-trigger").removeAttr("data-toggle")
+    $("#commit-modal-trigger").removeAttr("data-target")
+    alert("please select something")
+
+
 window.disparage =(chkbox) ->
   disparage_messages = [
     "You should feel bad about yourself",
