@@ -2,9 +2,20 @@
 window.dismiss_rule_error = ->
   $('.rule-error-div').hide 'blind', {}, 500
 
-window.set_rule_error =(message) ->
+window.set_rule_message =(message) ->
   $('.rule-error-msg').text(message)
   $('.rule-error-div').show()
+
+window.set_rule_error =(message) ->
+  $('.rule-error-msg').removeClass('success')
+  $('.rule-error-msg').addClass('error')
+  set_rule_message(message)
+
+window.set_rule_success =(message) ->
+  $('.rule-error-msg').removeClass('error')
+  $('.rule-error-msg').addClass('success')
+  set_rule_message(message)
+
 
 window.api_error =(response, prefix, options = {}) ->
   if response.responseJSON != undefined
@@ -191,7 +202,7 @@ $ ->
                 $(document).ajaxStop ->
                   location.reload true
               error: (response) ->
-                api_error(response, 'Rules have not been committed.', {failure_reload: true})
+                api_error(response, 'Rules have not been committed.', {failure_reload: false})
               complete: ->
             }
         else
