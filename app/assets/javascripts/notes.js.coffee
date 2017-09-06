@@ -57,6 +57,7 @@ $ ->
         $('textarea[name="committer_notes"]').attr("readonly", true)
         $('input[name="committer_note_id"]').val(response.id)
         $('#committerNotesPublishBtn').attr('disabled', false)
+        window.location.reload()
       error: (response) ->
         $('.alert_notes').removeClass('success')
         $('.alert_notes').addClass('error').show().html(response.responseText)
@@ -171,6 +172,7 @@ $ ->
           $('#list_history').append(div)
         else
           $('#list_history').prepend(div)
+        window.location.reload()
       error: (response) ->
         $('.alert_notes').removeClass('success')
         $('.alert_notes').addClass('error').show().html(response.responseText)
