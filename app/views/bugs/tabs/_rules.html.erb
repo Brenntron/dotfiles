@@ -25,8 +25,9 @@
     <button class="select-sm btn btn-default rule-toolbar" id="test">
       <strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
     <% if can? :publish, Rule %>
-        <button class="select-sm btn btn-default rule-toolbar" id="commit">
-          <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i></button>
+        <button id="commit-modal-trigger" class="select-sm btn btn-default" onclick="pre_commit()"   >
+          <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>
+        </button>
     <% end %>
     <button class="select-sm btn btn-default rule-toolbar" id="export">
       <strong class="hidden-xs">export &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-download"></i></button>
@@ -48,6 +49,28 @@
     </form>
   </div>
 </div>
+<div class="modal fade" id="commit-modal" tabindex="-1" role="dialog" aria-labelledby="commit-modal-title">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="commit-modal-title">Commit Message</h4>
+      </div>
+      <div class="modal-body">
+        <div class="bz-commit-inline">
+          <textarea id="bugzilla-comment-text" cols="68" rows="14"><%= @bug.notes.last_committer_note.first&.comment %></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default small-buttn" data-dismiss="modal"><strong>cancel</strong></button>
+        <button id="commit" type="button" class="rule-toolbar btn btn-default small-buttn">
+          <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <hr class="short"/>
 <div class="rule-error-div">
   <button onclick="dismiss_rule_error();"><span class="glyphicon glyphicon-remove"></span></button>
@@ -168,5 +191,5 @@
 <script>
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
-})
+});
 </script>

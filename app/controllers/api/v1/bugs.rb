@@ -223,6 +223,7 @@ module API
             optional :version, type: String, desc: "A version of the product above; the version the bug was found in."
             optional :description, type: String, desc: "A full text description of the bug"
             optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
+            optional :state_comment, type: String, desc: "When changing the state there should be a comment about changing it."
             optional :state_id, type: String, desc: "The new state of the bug, Open, Closed, ReOpened,etc"
             optional :creator, type: String, desc: "The person who created the bug"
             optional :opsys, type: String, desc: "The operating system that this bug affects"
@@ -278,7 +279,16 @@ module API
                 :committer_notes => permitted_params[:bug][:new_committer_notes]
             }
           end
-
+          #if a comment is made about a state then add it to the history here.
+          if permitted_params[:bug][:state_comment]
+            note_options = {
+                :id => permitted_params[:id],
+                :comment => permitted_params[:bug][:state_comment],
+                :note_type => "research",
+                :author => current_user.email,
+            }
+            Note.process_note(note_options, bugzilla_session)
+          end
           # update the tags
           bug.tags.delete_all if bug.tags.exists?
           if tags
@@ -321,7 +331,6 @@ module API
           options[:priority] = permitted_params[:bug][:priority]
           options[:severity] = permitted_params[:bug][:severity]
           options[:classification] = permitted_params[:bug][:classification]
-
 
           # update buzilla (if needed)
           options.reject! { |k, v| v.nil? } if options

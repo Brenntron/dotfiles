@@ -39,6 +39,24 @@ window.dismiss_alert_rules = ->
   $('.alert_rules').hide 'blind', {}, 500
 
 
+window.show_bz_commit_msg =(buttn) ->
+  $('#bz-commit-div').show()
+
+
+window.pre_commit = ->
+  # if at least one checkbox is checked let modal work
+  if ($(':checkbox[name="rule[id]"]').is(':checked'))
+    console.log('something is checked.'); # this can be removed when finalized
+    $("#commit-modal-trigger").attr("data-toggle", "modal")
+    $("#commit-modal-trigger").attr("data-target", "#commit-modal")
+
+  # remove modal call if everything is unchecked
+  else if ($(':checkbox[name="rule[id]"]').not(':checked').length > 0)
+    $("#commit-modal-trigger").removeAttr("data-toggle")
+    $("#commit-modal-trigger").removeAttr("data-target")
+    alert("please select something")
+
+
 window.disparage =(chkbox) ->
   disparage_messages = [
     "You should feel bad about yourself",
@@ -181,30 +199,30 @@ $ ->
                 ), 5000
             }
         when 'commit'
-          if window.confirm("Are you sure?")
-            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-            $.ajax {
-              url: "/api/v1/rules/commit"
-              headers: headers
-              data:
-                rule_ids: selected
-                username: $('#username').text()
-                bug_id: $('.bugzilla_id').text()
-                nodoc_override: $('#missing-doc-override')[0].checked
-              type: 'PUT'
-              dataType: 'json'
-              success: (response) ->
-                $('.alert_rules').addClass('success').show().html('Rules has been committed')
-                setTimeout (->
-                  $('.alert_rules').hide 'blind', {}, 500
-                  return
-                ), 5000
-                $(document).ajaxStop ->
-                  location.reload true
-              error: (response) ->
-                api_error(response, 'Rules have not been committed.', {failure_reload: true})
-              complete: ->
-            }
+          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+          $.ajax {
+            url: "/api/v1/rules/commit"
+            headers: headers
+            data:
+              rule_ids: selected
+              username: $('#username').text()
+              bug_id: $('.bugzilla_id').text()
+              bugzilla_comment: $('#bugzilla-comment-text').val()
+              nodoc_override: $('#missing-doc-override')[0].checked
+            type: 'PUT'
+            dataType: 'json'
+            success: (response) ->
+              $('.alert_rules').addClass('success').show().html('Rules has been committed')
+              setTimeout (->
+                $('.alert_rules').hide 'blind', {}, 500
+                return
+              ), 5000
+              $(document).ajaxStop ->
+                location.reload true
+            error: (response) ->
+              api_error(response, 'Rules have not been committed.', {failure_reload: true})
+            complete: ->
+          }
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')

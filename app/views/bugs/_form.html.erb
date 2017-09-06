@@ -4,6 +4,7 @@
       <div class="col-sm-12 form-group">
         <label for="state">State</label>
         <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control'%>
+
         <% unless @bug.exploits_complete? %>
             <br><span class="tiny text-muted ">Can't set to pending. Please assign attachments to exploits.</span><br>
         <% end %>
@@ -24,6 +25,12 @@
       </div>
     </div>
   <% end %>
+    <div id="state_comment_row" class="row hidden_comment">
+      <div class="col-sm-12 form-group">
+        <label for="comment">State Comment</label>
+        <input id="state_comment" type="text" class="form-control create-input" placeholder="Please comment on why you are changing the state.">
+      </div>
+    </div>
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="priority">Priority</label>

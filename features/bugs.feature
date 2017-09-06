@@ -79,12 +79,12 @@ Feature: Bug
       | TELUS |
       | VULN  |
       | BP    |
-
     Given the bug "222222" has tag "BP"
     Given the bug "222222" has tag "NSS"
 
     Then I wait for "3" seconds
     And  I goto "/bugs/222222"
+
     And  I should not see "Looks like this bug(222222) may be out of synch"
     Then I goto "/bugs/111111"
     And  I should see "Looks like this bug (111111) may be out of synch"
@@ -232,6 +232,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
@@ -265,6 +266,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
@@ -297,6 +299,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
@@ -325,6 +328,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
@@ -352,6 +356,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
@@ -379,6 +384,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following bugs exist:
       | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
@@ -399,6 +405,22 @@ Feature: Bug
     And I wait for "2" seconds
     Then I should see "Can't set to pending."
     And I can not select "PENDING" from "bug[state]"
+
+  @javascript
+  Scenario: a user can add a comment when manually changing the state of a bug
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+    Then I wait for "2" seconds
+    And I goto "/bugs/222222"
+    Then I click the span with data-target "#editBug"
+    And I wait for "1" seconds
+    Then I should not see "State Comment"
+    Then I select "ASSIGNED" from "bug[state]"
+    Then I should see "State Comment"
+
+
 
   @javascript
   Scenario: a user can not set the state of a bug to fixed, wontfix, later or invalid if they aren't a committer
@@ -743,12 +765,15 @@ Feature: Bug
     Then I should see "Notes saved"
     When I click "#committerNotesPublishBtn"
     And I wait for "3" seconds
-    Then I should see "Notes published to bugzilla"
+    Then I should see "Note Published"
+    And I goto "/bugs/145359"
+    And I click ".notes-tab"
+    And I click "Committer notes"
+    Then I wait for "1" seconds
     And I click "#committerNotesEditBtn"
     And  I fill in "committer_notes" with "This is a research note too"
     And I click "save"
     Then I should see "Notes saved"
-
 
   @javascript
   Scenario: a user can add a comment
@@ -763,7 +788,7 @@ Feature: Bug
     And  I fill in "noteCommentField" with "I love testing"
     And I click "save"
     And I wait for "2" seconds
-    Then I should see "Comment saved and published to bugzilla"
+    Then I should see "Note Published"
     And I wait for "1" seconds
     Then I should see "I love testing"
 
@@ -797,6 +822,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following references exist belonging to bug "145359":
       | id | reference_data | reference_type_id |
       | 1  | 2008-1434      | 1                 |
@@ -819,6 +845,7 @@ Feature: Bug
       | 1  | cve     | just a thing | 222-222 |
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
+      | 4  | telus   | just a thing | 222-222 |
     And the following rules exist belonging to bug "145359":
       |id | message                 | rule_category_id | parsed | sid  |
       |1  | BLACKLIST message       | 1                |  true  | 19001|

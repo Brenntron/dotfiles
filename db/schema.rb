@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(version: 20170829145347) do
     t.integer "rule_id", default: 0, null: false
     t.text "svn_result_output"
     t.integer "svn_result_code"
+    t.boolean "tested"
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
   end
 
@@ -257,6 +258,9 @@ ActiveRecord::Schema.define(version: 20170829145347) do
     t.boolean "parsed", default: true, null: false
     t.boolean "on", default: true, null: false
     t.string "publish_status", null: false
+    t.text "svn_result_output"
+    t.integer "svn_result_code"
+    t.boolean "svn_success"
     t.string "doc_status", default: "New", null: false
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"

@@ -52,6 +52,32 @@ module RulesHelper
       :'client-side-exploit'            => 'Known client side exploit attempt'
   )
 
+  def sid_colon_format(rule)
+    "#{rule.gid}:#{rule.sid}:#{rule.rev}"
+  end
+
+  def alert_status(attachment, rule)
+    case
+      when !(attachment.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+        'Untested'
+      when attachment.local_alerts.by_rule(rule).exists?
+        'Alerted'
+      else
+        'No alert'
+    end
+  end
+
+  def alert_css_class(attachment, rule)
+    case
+      when !(attachment.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+        'untested'
+      when attachment.local_alerts.by_rule(rule).exists?
+        'alerted'
+      else
+        'no-alert'
+    end
+  end
+
   def get_summary(rule)
     if rule && rule.rule_doc && rule.rule_doc.summary.present?
       rule.rule_doc.summary

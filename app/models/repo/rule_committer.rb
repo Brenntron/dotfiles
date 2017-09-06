@@ -127,10 +127,34 @@ module Repo
       @rule_commit_event&.update(completed: true)
     end
 
+    # Write commit information to bugzilla
+    def commit_bugzilla(bugzilla_comment: '', svn_result_output:)
+      new_summary = bug.update_summary_sids(changed_rules, xmlrpc: xmlrpc)
+
+      bugzilla_commit_note = <<~NOTE
+          Commit Log:
+          --------------
+          #{svn_result_output}
+          --------------
+          
+          Committer Notes:
+          ---------------
+          #{bugzilla_comment}
+          ---------------
+      NOTE
+
+      bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
+                        summary: new_summary,
+                        status: "resolved",
+                        resolution: "Fixed",
+                        comment: { body: bugzilla_commit_note } }
+      bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
+    end
+
     # Rule committing code when the publish is locked
     # param [Array[Rule]] rules_given array of rules.
     # param [Repo::RuleContentCommitter] content_committer The committer object.
-    def locked_commit
+    def locked_commit(bugzilla_comment: '')
       if self.class.publish_lock
         event_start
 
@@ -151,13 +175,7 @@ module Repo
             end
           end
 
-          bug.update_summary_sids(changed_rules, xmlrpc: xmlrpc)
-
-          bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
-                            status: "resolved",
-                            resolution: "Fixed",
-                            comment: { body: svn_result_output } }
-          bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
+          commit_bugzilla(bugzilla_comment: bugzilla_comment, svn_result_output: svn_result_output)
         end
 
 
@@ -202,7 +220,7 @@ module Repo
     # param [String] username The username to add to the svn comment (message)
     # param [FixNum] bugzilla_id The bugzilla id of the bug
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
-    def self.commit_rules_action(rules, username:, bugzilla_id:, xmlrpc:, nodoc_override: false)
+    def self.commit_rules_action(rules, username:, bugzilla_id:, bugzilla_comment:, xmlrpc:, nodoc_override: false)
       user = User.where(cvs_username: username).first
       bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
       Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
@@ -212,7 +230,7 @@ module Repo
                                           bugzilla_id: bugzilla_id,
                                           user: user,
                                           username: username)
-      committer.locked_commit
+      committer.locked_commit(bugzilla_comment: bugzilla_comment)
 
     rescue
       Rails.logger.error $!
