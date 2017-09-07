@@ -84,7 +84,7 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
       unless rule.nil?
         Rails.logger.info( "Rule wasnt nill")
         begin
-          attachment.local_alerts.create(rule: rule)
+          attachment.local_alerts.create(rule: rule) unless attachment.local_alerts.map{|p| p.rule}.include?(rule)
         rescue ActiveRecord::RecordNotUnique => e
           # Ignore
         end
