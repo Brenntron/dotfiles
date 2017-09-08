@@ -52,4 +52,6 @@
     /*outline: 2px solid #a94442;*/
     box-shadow: 0 0 0 2pt #F0A219;
 }
-
+.rule_failures{
+    white-space: pre-wrap;
+}

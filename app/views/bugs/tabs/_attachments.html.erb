@@ -129,15 +129,12 @@
       <table class="table table-condensed small table-hover hidden" id="obsolete-attachments">
         <thead>
         <tr>
-          <td class="narrow-column"></td>
           <td>Filename</td>
-          <td>Alerts</td>
         </tr>
         </thead>
         <tbody>
         <% @obsolete_attachments.each do |attachment| %>
             <tr>
-              <td class="center narrow-column"><a class="blue"><i class="glyphicon glyphicon-download"></i></a></td>
               <td><code><a><%= attachment.file_name %></a></code></td>
               <td class="center narrow-column">
                 <h5 class="ember-tooltip bottom" style="display: none;">
