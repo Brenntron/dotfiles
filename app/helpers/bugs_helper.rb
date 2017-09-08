@@ -1,6 +1,6 @@
 module BugsHelper
 
-  def set_bug_color(bug)
+def set_bug_color(bug)
     if ["P1", "P2"].include?(bug.priority)
       if ["NEW", "ASSIGNED", "REOPENED"].include?(bug.state)
         'bg-danger'
@@ -48,9 +48,9 @@ module BugsHelper
 
   def display_tested_status(bug, rule)
     if rule.tested_on_bug?(bug)
-      content_tag(:span, class: "glyphicon glyphicon-plus-sign") { '' }
+      glyph_success(title: rule.svn_result_output)
     else
-      '-'
+      glyph_nonstatus
     end
   end
 
@@ -61,11 +61,11 @@ module BugsHelper
   def display_commit_status(bug, rule)
     case
       when rule.svn_result_code.nil?
-        '-'
+        glyph_nonstatus
       when rule.svn_success?
-        content_tag(:i, class: "glyphicon glyphicon-plus-sign", title: rule.svn_result_output) { '' }
+        glyph_success(title: rule.svn_result_output)
       else
-        content_tag(:i, class: "glyphicon glyphicon-minus-sign", title: rule.svn_result_output) { '' }
+        glyph_failure(title: rule.svn_result_output)
     end
   end
 end

@@ -14,6 +14,18 @@ module ApplicationHelper
     end
   end
 
+  def glyph_success(**html_attr)
+    content_tag(:span, class: "glyphicon glyphicon-ok", **html_attr) { '' }
+  end
+
+  def glyph_failure(**html_attr)
+    content_tag(:span, class: "glyphicon glyphicon-remove", **html_attr) { '' }
+  end
+
+  def glyph_nonstatus(**html_attr)
+    content_tag(:span, class: "glyphicon glyphicon-minus", **html_attr) { '' }
+  end
+
 
   def role_options_for(user)
     if user.has_role?('admin')
