@@ -1,6 +1,6 @@
 module BugsHelper
 
-  def set_bug_color(bug)
+def set_bug_color(bug)
     if ["P1", "P2"].include?(bug.priority)
       if ["NEW", "ASSIGNED", "REOPENED"].include?(bug.state)
         'bg-danger'
