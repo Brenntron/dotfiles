@@ -225,7 +225,7 @@ while message = client.receive
         Timeout::timeout(max_wait_for_job) do
           while true
             resp = HTTPI.get(req)
-            Rails.logger.info("Response was: #{resp}")
+            Rails.logger.info("Response was: #{resp.inspect}")
 
             if resp.code != 200
               raise Exception.new("Failed to fetch job status for #{job_id} #{resp.code}: #{resp.body}")
@@ -238,16 +238,24 @@ while message = client.receive
                 if job['failed'] == "1"
                   Rails.logger.info( "Job failed: #{job}")
                 else
+                  Rails.logger.info("Job Did Not Fail. getting pcaps...")
                   pcaps.each do |pcap_id, pcap_name|
-                    Rails.logger.info( "#{pcap_name}:")
+                    Rails.logger.info( "pcap_id: #{pcap_id} --- pcap_name: #{pcap_name}")
 
                     # Fetch the associated pcap tests
                     req.url = "#{Rails.configuration.ruletest_server}/pcap_tests?job_id=#{job_id}&pcap_id=#{pcap_id}"
-                    JSON.parse(HTTPI.get(req).body).each do |pt|
+                    Rails.logger.info("fetching requests from: #{req.url.inspect}")
+                    pcap_response_body = HTTPI.get(req).body
+                    Rails.logger.info("response was: #{pcap_response_body.inspect}")
+                    JSON.parse(pcap_response_body).each do |pt|
+                      Rails.logger.info("request returned pt is: #{pt.inspect}")
 
                       # Now fetch the alerts
                       req.url = "#{Rails.configuration.ruletest_server}/alerts?pcap_test_id=#{pt['id']}"
-                      alerts = JSON.parse(HTTPI.get(req).body)
+                      Rails.logger.info("fetching requests from: #{req.url.inspect}")
+                      alert_response_body = HTTPI.get(req).body
+                      Rails.logger.info("response was: #{alert_response_body.inspect}")
+                      alerts = JSON.parse(alert_response_body)
 
                       if alerts.size == 0
                         Rails.logger.info( "\tNO ALERTS")
