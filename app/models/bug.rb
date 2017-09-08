@@ -132,6 +132,8 @@ class Bug < ApplicationRecord
         Bug.closed
       when "my-bugs"
         current_user.bugs
+      when "my-open-bugs"
+        current_user.bugs.open_bugs
       when "team-bugs"
         if current_user.has_role?('manager')
           current_user.children.map{ |cw| cw.bugs }[0] || []
