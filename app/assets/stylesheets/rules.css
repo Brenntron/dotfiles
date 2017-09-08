@@ -48,8 +48,9 @@
     background-color: #e0e0e0;
     border-color: #f0ad4e;
     color: #e48e11;
-    border-radius: 5px;
+    border-radius: 1px;
     /*outline: 2px solid #a94442;*/
     box-shadow: 0 0 0 2pt #F0A219;
+    margin-top: -4px;
 }
 
