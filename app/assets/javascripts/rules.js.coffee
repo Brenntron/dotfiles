@@ -107,7 +107,7 @@ $ ->
         selected_sids.push($(this).attr('data-sid'))
     allboxes = $.unique(allboxes)
     sid_text = if selected_sids.length > 1 then 'sids ' else 'sid '
-    if isSelected or tab in ['overview','create','export']
+    if isSelected or tab in ['overview','create']
       switch(tab)
         when 'export'
           headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
