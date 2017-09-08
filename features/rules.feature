@@ -234,7 +234,7 @@ Feature: Rules
 #    And rule "11" is a new rule
     When I check "rule[id]"
     And  I click "edit"
-    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
+    And  I fill in "rule_content_1" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see a rule row with class "draft" and version "new_rule"
@@ -401,7 +401,7 @@ Feature: Rules
     And  I check "rule_11"
     And  I click "edit"
     Then I should see div element with class "rule_11"
-    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"DELETED msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
+    And  I fill in "rule_content_11" with "alert udp $HOME_NET any -> any 53 (msg:"DELETED msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "DELETED" version "1:22211:3"
@@ -521,7 +521,7 @@ Feature: Rules
     And  I check "rule_11"
     And  I click "edit"
     Then I should see div element with class "rule_11"
-    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
+    And  I fill in "rule_content_11" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "UPDATED" version "1:22211:3"
@@ -556,7 +556,7 @@ Feature: Rules
     And  I check "rule_11"
     And  I click "edit"
     Then I should see div element with class "rule_11"
-    And  I fill in "rule[rule_content]" with "alert (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
+    And  I fill in "rule_content_11" with "alert (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "FAILED" version "1:22211:3"
