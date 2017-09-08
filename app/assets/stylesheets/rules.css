@@ -51,6 +51,8 @@
     border-radius: 1px;
     /*outline: 2px solid #a94442;*/
     box-shadow: 0 0 0 2pt #F0A219;
-    margin-top: -4px;
+    display: inline-block;
+    width: 100%;
+    padding: 10px 0 5px 0;
 }
 
