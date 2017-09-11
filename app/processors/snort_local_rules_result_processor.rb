@@ -84,9 +84,7 @@ class SnortLocalRulesResultProcessor < ApplicationProcessor
       unless rule.nil?
         Rails.logger.info( "Rule wasnt nill")
         begin
-          if rule.task_id == self.id
-            attachment.local_alerts.create(rule: rule) unless attachment.local_alerts.map{|p| p.rule}.include?(rule)
-          end
+          attachment.local_alerts.create(rule: rule) unless attachment.local_alerts.map{|p| p.rule}.include?(rule)
         rescue ActiveRecord::RecordNotUnique => e
           # Ignore
         end
