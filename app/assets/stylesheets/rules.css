@@ -48,9 +48,13 @@
     background-color: #e0e0e0;
     border-color: #f0ad4e;
     color: #e48e11;
-    border-radius: 5px;
+    border-radius: 1px;
     /*outline: 2px solid #a94442;*/
     box-shadow: 0 0 0 2pt #F0A219;
+    display: inline-block;
+    width: 100%;
+    padding: 10px 0 5px 0;
+    margin-top: -4px;
 }
 .rule_failures{
     white-space: pre-wrap;

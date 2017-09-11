@@ -450,38 +450,40 @@ $ ->
   $('.edit').on "click", '.update-rule-btn', (e) ->
     e.preventDefault()
     form = $(this).parents('.edit_legacy_form')
-    rule_content = form.find('textarea[name="rule[rule_content]"]').val()
-    id = form.find('input[name="rule_id"]').val()
 
-    edit_rule_doc = {}
-    form.find('textarea[type=text]').each ->
-      edit_rule_doc[$(this)[0].id] = $(this)[0].value
+    form.find('div[name="rule_id"]:visible').each ->
+      id = $(this).attr('value')
+      rule_content = $('.rule_content_' + id).val()
 
-    rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: edit_rule_doc}
-    data = {id: id, rule: rule}
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax {
-      url: "/api/v1/rules/"+id
-      method: 'PUT'
-      data: data
-      headers: headers
-      success: (response) ->
-        $('.alert_rules').addClass('success').show().html('Rule has been updated')
-        form.hide()
-        $('.rule_'+id).append('<div class="col-xs-12 alert_edit">Rule has been updated</div>')
-      error: (response) ->
-        $('.alert_rules').addClass('error').show().html('Rule has not been updated')
-      complete: ->
-        setTimeout (->
-          $('.alert_rules').hide 'blind', {}, 500
-          $('.alert_edit').remove()
-          form.show()
-          return
-        ), 5000
-        $(document).ajaxStop ->
-          location.reload true
-          window.scrollTo(0, 0)
-    }
+      edit_rule_doc = {}
+      $('.rule_doc_' + id).each ->
+        edit_rule_doc[$(this)[0].id] = $(this)[0].value
+
+      rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: edit_rule_doc}
+      data = {id: id, rule: rule}
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax {
+        url: "/api/v1/rules/"+id
+        method: 'PUT'
+        data: data
+        headers: headers
+        success: (response) ->
+          $('.alert_rules').addClass('success').show().html('Rule has been updated')
+          form.hide()
+          $('.rule_'+id).append('<div class="col-xs-12 alert_edit">Rule has been updated</div>')
+        error: (response) ->
+          $('.alert_rules').addClass('error').show().html('Rule has not been updated')
+        complete: ->
+          setTimeout (->
+            $('.alert_rules').hide 'blind', {}, 500
+            $('.alert_edit').remove()
+            form.show()
+            return
+          ), 5000
+          $(document).ajaxStop ->
+            location.reload true
+            window.scrollTo(0, 0)
+      }
 
   $('.update-rule-parts-btn').on "click", (ev) ->
     ev.preventDefault()
