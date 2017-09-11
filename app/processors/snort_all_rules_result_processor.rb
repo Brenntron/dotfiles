@@ -114,9 +114,8 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                   Rails.logger.info( "Rule was valid")
                   job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                   rule.save(:validate => false)
-                  if rule.task_id == self.id
-                    attachment.pcap_alerts.create(rule: rule) unless attachment.pcap_alerts.map{|p| p.rule}.include?(rule)
-                  end                else
+                  attachment.pcap_alerts.create(rule: rule) unless attachment.pcap_alerts.map{|p| p.rule}.include?(rule)
+                else
                   Rails.logger.info( "Rule was NOT valid")
                   if rule.message.nil?
                     job.failed = true
@@ -126,9 +125,8 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                   else
                     job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
                     rule.save(:validate => false)
-                    if rule.task_id == self.id
-                      attachment.pcap_alerts.create(rule: rule) unless attachment.pcap_alerts.map{|p| p.rule}.include?(rule)
-                    end                  end
+                    attachment.pcap_alerts.create(rule: rule) unless attachment.pcap_alerts.map{|p| p.rule}.include?(rule)
+                  end
                 end
 
               rescue Exception => e
