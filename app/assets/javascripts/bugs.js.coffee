@@ -1,3 +1,16 @@
+window.spaz = ->
+  alert("spazzing")
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax {
+    url: '/api/v1/bugs/spaz'
+    method: 'post'
+    headers: headers
+    success: (response) ->
+      alert("success")
+    error: (response) ->
+      alert("error")
+  }
+  alert("spazzed")
 
 window.bug_resolve =(this_tag) ->
   user_id = $('#resolve-form').find("input[name='user_id']").val()
@@ -100,7 +113,6 @@ window.ruleShow = (rule) ->
   $('.view').removeClass('hidden').addClass('active').show()
   $('.rule_' + id).removeClass('hidden').addClass('active').show()
   return
-
 
 $ ->
   $('#bugzilla_popover_state').popover();

@@ -51,6 +51,17 @@ module API
           end
         end
 
+        desc "post to bridge"
+        post 'spaz' do
+          byebug
+          conn = PeakeBridge::BasicPeakeBridge.new(channel: 'bug-state-change',
+                                                   addressee: 'analyst-console',
+                                                   host: "localhost",
+                                                   port: 9969)
+          response = conn.post(body: {bugzilla_id: 32000, new_state: 'Pending'})
+          puts response.body
+        end
+
         desc "test the websocket"
         get 'websocket' do
           bug = Bug.first

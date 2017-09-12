@@ -94,3 +94,5 @@ gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
 gem "sprockets", '~> 3.6.3' # removes deprecation warnings
 
+gem 'peake-bridge', '~> 0.0.0.1'
+
