@@ -75,7 +75,7 @@ function status_draw(data) {
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderJoinStyle: 'miter',
-                borderWidth: 2,
+                borderWidth: 1,
                 pointBorderColor: 'rgba(54, 162, 235, 1)',
                 pointBackgroundColor: 'rgba(54, 162, 235, 1)',
                 pointBorderWidth: 1,
@@ -93,7 +93,7 @@ function status_draw(data) {
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255,99,132,1)',
                 borderJoinStyle: 'miter',
-                borderWidth: 2,
+                borderWidth: 1,
                 pointBorderColor: 'rgba(255,99,132,1)',
                 pointBackgroundColor: 'rgba(255,99,132,1)',
                 pointBorderWidth: 1,
@@ -108,7 +108,10 @@ function status_draw(data) {
         },
         options: {
             legend: {
-                display: true
+                display: true,
+                labels: {
+                    usePointStyle: true
+                }
             },
             tooltips: {
                 y: "String",
@@ -222,7 +225,10 @@ function status_team_draw(data, status, type) {
         },
         options: {
             legend: {
-                display: true
+                display: true,
+                labels: {
+                    usePointStyle: true
+                }
             },
             tooltips: {
                 y: "String",
@@ -262,7 +268,10 @@ function team_work_time_draw(data, id) {
         },
         options: {
             legend: {
-                display: true
+                display: true,
+                labels: {
+                    usePointStyle: true
+                }
             },
             tooltips: {
             },
@@ -313,7 +322,7 @@ function create_data_hash(data) {
             backgroundColor: color[colorCount][0],
             borderColor: color[colorCount][1],
             borderJoinStyle: 'miter',
-            borderWidth: 2,
+            borderWidth: 1,
             pointBorderColor: color[colorCount][1],
             pointBackgroundColor: color[colorCount][0],
             pointBorderWidth: 1,
