@@ -176,3 +176,6 @@ div.progress{
 .glyphicon-cloud-download {
     margin-top: -3px;
 }
+.take-bug, .return-bug {
+    opacity: 1 !important;
+}
