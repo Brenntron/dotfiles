@@ -245,7 +245,6 @@ $ ->
     #check the current rule
     $('#rule_' + id).prop('checked', true)
     $('.view').removeClass('hidden').addClass('active').show()
-    $('.overview').removeClass('active').addClass 'hidden'
 
     $.each $('.rules_table tr'), ->
       `var id`
