@@ -63,13 +63,6 @@ Feature: Rules
     And bug with id "2222" has rule with id "15"
     Then I wait for "3" seconds
 
-    When I goto "/bugs/2222"
-    When I click the "Rules" tab
-    And  I click "export"
-
-    Then I should receive a file "exported_rules.rules"
-    Then I should expect 3 rule lines
-
   @javascript
   Scenario: Selecting rules with a bug with rules exports only selected rules
     Given a user with role "committer" exists and is logged in
