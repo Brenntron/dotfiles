@@ -38,11 +38,12 @@ def set_bug_color(bug)
   def bug_filter_helper
     case session[:query]
       when 'advance-search'
-        'Search'
+        ' Search'
       when ''
-        'Bugs'
+        ' Bugs'
       else
-        session[:query].titleize
+        ' ' + session[:query].titleize
+
     end
   end
 
