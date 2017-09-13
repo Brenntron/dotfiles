@@ -32,12 +32,12 @@ Feature: Rules
     And  I check "rule_13"
     And  I check "rule_15"
     And  I click "view"
-    And  I click "back"
+    And  I click "list all"
     And  I should see the "#rule_13" checkbox checked
     And  I should see the "#rule_15" checkbox checked
     And  I should see the "#rule_14" checkbox unchecked
     And  I click "22213"
-    And  I click "back"
+    And  I click "list all"
     Then I should see the "#rule_14" checkbox checked
     And  I should see the "#rule_13" checkbox unchecked
     And  I should see the "#rule_15" checkbox unchecked
