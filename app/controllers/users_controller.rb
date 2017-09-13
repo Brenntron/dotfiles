@@ -32,7 +32,7 @@ class UsersController < ApplicationController
   end
 
   def results
-    @users = User.search(params.require(:user).require(:search).permit(:name))
+    @users = User.search(params.require(:user).require(:search).permit(:name)).order(:display_name)
   end
 
   def update
