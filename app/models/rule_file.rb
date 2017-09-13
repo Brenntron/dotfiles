@@ -96,6 +96,17 @@ class RuleFile
     end
   end
 
+  # read diffs from file to add to svn output
+  def load_additional_output
+    output = ''
+    `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
+      if /^\+|^\-|^\@|^\=|^Index/ =~ line
+        output += line
+      end
+    end
+    output
+  end
+
   def synch_failsafe
     unless File.directory?(synch_pathname.dirname)
       FileUtils.mkpath(synch_pathname.dirname)
