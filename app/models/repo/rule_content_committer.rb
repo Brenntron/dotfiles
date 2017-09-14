@@ -128,7 +128,7 @@ module Repo
       working_file_list = working_file_list(rule_files)
       Rails.logger.info("svn integration: committing files #{working_file_list}")
 
-      additional_output = rule_files.map {|rule_file| rule_file.load_additional_output}.join("\n")
+      additional_output = rule_files.map {|rule_file| rule_file.build_additional_output}.join("\n")
 
       svn_result_output = call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~) + additional_output
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
