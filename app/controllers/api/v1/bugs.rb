@@ -29,6 +29,8 @@ module API
             tasks = @bug.tasks.any_relations.reverse_chron
 
             tasks.each do |task|
+              task.check_timeout
+              task.reload
               response_task = {}
               response_task['id'] = task.id
               response_task['rule_list'] = task.task_type == Task::TASK_TYPE_LOCAL_TEST ? task.rules.map {|rule| rule.new_rule? ? 'new-rule' : "#{rule.gid}:#{rule.sid}:#{rule.rev}" }.join('; ') : ""

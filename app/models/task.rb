@@ -41,6 +41,14 @@ class Task < ApplicationRecord
     )
   end
 
+  def check_timeout
+    if (Time.now - self.created_at) > 10.minutes  && self.completed.blank?
+      self.failed = true
+      self.result = "Task timed-out.  Possible poller down or network error."
+      save
+    end
+  end
+
   def set_rule_tested
     BugsRule.joins(rule: :test_reports).where(test_reports: {task_id: self}).where(bug_id: bug_id)
         .update_all(tested: true)
