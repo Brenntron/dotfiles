@@ -98,11 +98,21 @@ class RuleFile
 
   # read diffs from file to add to svn output
   def load_additional_output
-    output = ''
+    output = "\n"
+    new_rules = ''
+
     `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if /^\+|^\-|^\@|^\=|^Index/ =~ line
         output += line
+        if (/rev:1/i =~ line) && (/^\+/ =~ line)
+          new_rules += line[1..-1]
+        end
       end
+    end
+
+    if !new_rules.empty?
+      output += "\nNew Rules:\n"
+      output += new_rules
     end
     output
   end
