@@ -14,6 +14,44 @@ module API
           PublishWebsocket.push_changes(record)
         end
 
+        desc "get job queue for a bug"
+        params do
+          requires :id, type: Integer, desc: "Bugzilla id."
+        end
+        get '/queue/:id' do
+          begin
+            @bug = Bug.find_by_id(params[:id])
+            response = {}
+            response[:status] = 'success'
+            response[:data] = []
+            bug_queue = []
+
+            tasks = @bug.tasks.any_relations.reverse_chron
+
+            tasks.each do |task|
+              response_task = {}
+              response_task['id'] = task.id
+              response_task['rule_list'] = task.task_type == Task::TASK_TYPE_LOCAL_TEST ? task.rules.map {|rule| rule.new_rule? ? 'new-rule' : "#{rule.gid}:#{rule.sid}:#{rule.rev}" }.join('; ') : ""
+              response_task['completed'] = task.completed
+              response_task['failed'] = task.failed
+              response_task['cvs_username'] = User.find(task.user_id).cvs_username
+              response_task['task_type'] = task.task_type
+              response_task['result'] = task.result
+              response_task['created_at'] = task.created_at.strftime("%m/%d/%y %H:%M:%S")
+              bug_queue << response_task
+            end
+            response[:data] = bug_queue
+            response.to_json
+          rescue
+            Rails.logger.error($!)
+            Rails.logger.error($!.backtrace.join("\n"))
+            response = {}
+            response[:status] = "fail"
+            response[:error] = "Something went wrong. The job queue has not been updated."
+            response.to_json
+          end
+        end
+
         desc "import all bugs assigned to a user"
         params do
           requires :user_id, type: Integer, desc: "the id of the user whose bugs we want"
@@ -40,6 +78,7 @@ module API
             false
           end
         end
+
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
