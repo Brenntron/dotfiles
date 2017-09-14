@@ -4,7 +4,7 @@ module PeakeBridge
       super(channel: 'bug-state-change',
             addressee: 'analyst-console',
             host: "localhost",
-            port: 9969)
+            port: 9966)
       @bugzilla_id = bugzilla_id
       @new_state = new_state
     end
