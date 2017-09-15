@@ -60,6 +60,26 @@
     <% end %>
   </div>
   <input id="tag_list" class="hidden" value="<%=@tags%>"></input>
+  <div id="add-bug-ref-div" class="col-xs-10">
+    <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
+      <%= bug_form.fields_for :references do |refs_fields| %>
+        <div class="form-group">
+          <%= refs_fields.select(:id, [[' - ', '']] + @ref_types.pluck(:name),
+                                 {selected: ''},
+                                 class: 'form-control select-sm code') %>
+        </div>
+        <div class="form-group">
+          <%= refs_fields.text_field(:reference_data,
+                                     class: 'form-control select-sm code',
+                                     required: 'required',
+                                     placeholder: 'reference data') %>
+        </div>
+        <div class="form-group">
+          <%= bug_form.button('Add Reference', type: 'button', class: 'select-sm btn btn-default') %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
 </div>
 <hr>
 <div class="row top-space">
