@@ -129,7 +129,10 @@ module Repo
 
     # Write commit information to bugzilla
     def commit_bugzilla(bugzilla_comment: '', svn_result_output:)
-      new_summary = bug.update_summary_sids(new_rules, xmlrpc: self.xmlrpc)
+      new_summary = bug.summary
+      if new_rules
+        new_summary = bug.update_summary_sids(new_rules, xmlrpc: self.xmlrpc)
+      end
       bugzilla_commit_note = <<~NOTE
           Commit Log:
           --------------
