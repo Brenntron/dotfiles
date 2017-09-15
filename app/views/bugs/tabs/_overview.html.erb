@@ -18,7 +18,10 @@
 <hr>
 <div class="row top-space">
   <div class="col-xs-12">
-    <h4 class="blue"> References </h4>
+    <h4 class="blue">
+      References
+      <span class="glyphicon glyphicon-plus-sign" onclick="$('#add-bug-ref-div').show();"/>
+    </h4>
   </div>
   <div class="col-xs-12 overview-code">
     <% if (@bug_references | @bug.references).any? %>
