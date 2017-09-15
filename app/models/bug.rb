@@ -767,10 +767,13 @@ class Bug < ApplicationRecord
   end
 
   def update_summary_sids(rules, xmlrpc:)
-    sids = summary_sids + rules.pluck(:sid)
+    if rules
+      sids = summary_sids + rules.pluck(:sid)
+    else
+      sids = summary_sids
+    end
     self.summary = "[SID] #{to_ranges_compact_string(sids)} #{summary_without_sids}"
     save!
-
     # update_bugzilla_attributes(xmlrpc, ids: [bugzilla_id], summary: self.summary )
     self.summary
   end

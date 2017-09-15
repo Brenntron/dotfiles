@@ -8,7 +8,7 @@ module Repo
       attr_reader :publish_lock_pid
     end
 
-    attr_reader :content_committer, :rule_files, :rules, :changed_rules, :unchanged_rules
+    attr_reader :content_committer, :rule_files, :rules, :new_rules, :changed_rules, :unchanged_rules
     attr_reader :xmlrpc, :bug, :user, :username
 
     def self.log(message)
@@ -102,7 +102,7 @@ module Repo
       @username = username || user.cvs_username
       @rules = rules
       @changed_rules, @unchanged_rules = rules.partition { |rule| rule.content_changed? }
-
+      @new_rules = nil
       @content_committer =
           Repo::RuleContentCommitter.new(rules, bugzilla_id: bugzilla_id, user: user, username: username)
     end
@@ -129,8 +129,7 @@ module Repo
 
     # Write commit information to bugzilla
     def commit_bugzilla(bugzilla_comment: '', svn_result_output:)
-      new_summary = bug.update_summary_sids(changed_rules, xmlrpc: xmlrpc)
-
+      new_summary = bug.update_summary_sids(new_rules, xmlrpc: self.xmlrpc)
       bugzilla_commit_note = <<~NOTE
           Commit Log:
           --------------
@@ -142,13 +141,14 @@ module Repo
           #{bugzilla_comment}
           ---------------
       NOTE
-
+      bug.state = bug.get_state("RESOLVED", "FIXED", bug.user.email)
+      bug.save!
       bug_attributes = {ids: [bug.id], qa_contact: content_committer.user.email,
                         summary: new_summary,
-                        status: "resolved",
-                        resolution: "Fixed",
+                        status: "RESOLVED",
+                        resolution: "FIXED",
                         comment: { body: bugzilla_commit_note } }
-      bug.update_bugzilla_attributes(xmlrpc, bug_attributes)
+      bug.update_bugzilla_attributes(self.xmlrpc, bug_attributes)
     end
 
     # Rule committing code when the publish is locked
@@ -167,13 +167,13 @@ module Repo
           svn_result_output = content_committer.commit_rule_content
           event_set_result(svn_result_output)
           raise "Rule content commit failed." unless content_committer.success
-
           if Rule.with_pub_content.exists?
             log("calling failsafe")
             rule_files.each do |rule_file|
               rule_file.synch_failsafe
             end
           end
+          @new_rules = Rule.where(id: changed_rules.partition { |rule| rule.sid.nil? }.first).all.to_a
 
           commit_bugzilla(bugzilla_comment: bugzilla_comment, svn_result_output: svn_result_output)
         end
@@ -224,6 +224,7 @@ module Repo
       user = User.where(cvs_username: username).first
       bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
       Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
+
 
       committer = Repo::RuleCommitter.new(rules,
                                           xmlrpc: xmlrpc,
