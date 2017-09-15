@@ -287,6 +287,19 @@ $ ->
     which = $(this).data('rulealert');
     $('.'+which).toggle();
 
+  $("#add-bug-ref-btn").on 'click', ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/444111/addref'
+      method: 'POST'
+      data: {bug: {id: "bug_id", tag_name: "item"}}
+      headers: headers
+      success: (response) ->
+        alert("success")
+      error: (response) ->
+        alert("error")
+      , this)
+
 
   $ ->
     $('[data-toggle="tooltip"]').tooltip()

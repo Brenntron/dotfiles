@@ -562,12 +562,18 @@ module API
             rescue XMLRPC::FaultException => e
               return {error: "#{e}"}
             end
-
-            return true
           end
           return false
         end
 
+        desc "link a rule to this bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        post ':bug_id/addref' do
+          Rails.logger.info("add bug ref api")
+          'happy'
+        end
       end
     end
   end

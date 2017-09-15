@@ -59,7 +59,7 @@
         <p>< MISSING ></p>
     <% end %>
   </div>
-  <input id="tag_list" class="hidden" value="<%=@tags%>"></input>
+  <input id="tag_list" class="hidden" value="<%=@tags%>"/>
   <div id="add-bug-ref-div" class="col-xs-10">
     <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
       <%= bug_form.fields_for :references do |refs_fields| %>
@@ -75,7 +75,8 @@
                                      placeholder: 'reference data') %>
         </div>
         <div class="form-group">
-          <%= bug_form.button('Add Reference', type: 'button', class: 'select-sm btn btn-default') %>
+          <%= bug_form.button('Add Reference', type: 'button', id: 'add-bug-ref-btn',
+                              class: 'select-sm btn btn-default') %>
         </div>
       <% end %>
     <% end %>
