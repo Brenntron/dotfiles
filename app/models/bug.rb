@@ -928,7 +928,8 @@ class Bug < ApplicationRecord
   end
 
   def add_ref_action(ref_type_name, ref_data)
-    Rails.logger.debug(">>> add_ref_action(#{ref_type_name}, #{ref_data})")
-    'success'
+    ref_type = ReferenceType.where(name: ref_type_name).first
+    raise 'Invalid reference type' unless ref_type
+    references.create(reference_type_id: ref_type.id, reference_data: ref_data)
   end
 end

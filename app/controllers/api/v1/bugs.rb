@@ -566,13 +566,13 @@ module API
           return false
         end
 
-        desc "link a rule to this bug"
+        desc "add a reference to a bug"
         params do
           requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
         end
         post ':bug_id/addref' do
           bug = Bug.where(id: params['bug_id']).first
-          bug.add_ref_action(params['bug']['ref']['ref_type_name'], params['bug']['ref']['ref_data'])
+          bug.add_ref_action(params['bug']['reference']['ref_type_name'], params['bug']['reference']['ref_data'])
         end
       end
     end
