@@ -298,9 +298,10 @@ $ ->
       data: {bug: {reference: {ref_type_name: ref_id, ref_data: ref_data}}}
       headers: headers
       success: (response) ->
-        alert("success")
+        location.reload()
       error: (response) ->
-        alert("error")
+        notice_html = "<p>Something went wrong.</p>"
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
       , this)
 
 
