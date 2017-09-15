@@ -926,4 +926,9 @@ class Bug < ApplicationRecord
     end
     "success"
   end
+
+  def add_ref_action(ref_type_name, ref_data)
+    Rails.logger.debug(">>> add_ref_action(#{ref_type_name}, #{ref_data})")
+    'success'
+  end
 end

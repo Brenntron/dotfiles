@@ -289,10 +289,13 @@ $ ->
 
   $("#add-bug-ref-btn").on 'click', ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    bug_id = $('#select-to-edit').attr('bug_id')
+    ref_id = $('#add-bug-ref-type-name').val()
+    ref_data = $('#add-bug-ref-data').val()
     $.ajax(
-      url: '/api/v1/bugs/444111/addref'
+      url: '/api/v1/bugs/' + bug_id + '/addref'
       method: 'POST'
-      data: {bug: {id: "bug_id", tag_name: "item"}}
+      data: {bug: {ref: {ref_type_name: ref_id, ref_data: ref_data}}}
       headers: headers
       success: (response) ->
         alert("success")

@@ -571,8 +571,8 @@ module API
           requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
         end
         post ':bug_id/addref' do
-          Rails.logger.info("add bug ref api")
-          'happy'
+          bug = Bug.where(id: params['bug_id']).first
+          bug.add_ref_action(params['bug']['ref']['ref_type_name'], params['bug']['ref']['ref_data'])
         end
       end
     end

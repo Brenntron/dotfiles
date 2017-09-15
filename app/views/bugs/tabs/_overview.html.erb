@@ -64,12 +64,14 @@
     <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
       <%= bug_form.fields_for :references do |refs_fields| %>
         <div class="form-group">
-          <%= refs_fields.select(:id, [[' - ', '']] + @ref_types.pluck(:name),
+          <%= refs_fields.select(:type_name, [[' - ', '']] + @ref_types.pluck(:name),
                                  {selected: ''},
+                                 id: 'add-bug-ref-type-name',
                                  class: 'form-control select-sm code') %>
         </div>
         <div class="form-group">
           <%= refs_fields.text_field(:reference_data,
+                                     id: 'add-bug-ref-data',
                                      class: 'form-control select-sm code',
                                      required: 'required',
                                      placeholder: 'reference data') %>
