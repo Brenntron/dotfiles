@@ -572,6 +572,7 @@ module API
         end
         post ':bug_id/addref' do
           bug = Bug.where(id: params['bug_id']).first
+          raise 'bug not found' unless bug
           bug.add_ref_action(params['bug']['reference']['ref_type_name'], params['bug']['reference']['ref_data'])
         end
 
@@ -581,9 +582,12 @@ module API
         end
         post ':bug_id/addexploit' do
           bug = Bug.where(id: params['bug_id']).first
-          # byebug
-          # bug.add_ref_action(params['bug']['reference']['ref_type_name'], params['bug']['reference']['ref_data'])
-          # puts params.inspect
+          raise 'bug not found' unless bug
+          bug.add_exploit_action(reference_id: params['reference_id'],
+                                 exploit_type_id: params['exploit_type_id'],
+                                 attachment_id: params['attachment_id'],
+                                 exploit_data: params['exploit_data'])
+          puts params.inspect
         end
       end
     end

@@ -317,16 +317,10 @@ $ ->
       method: 'POST'
       data:
         {
-          bug:
-            {
-              exploit:
-                {
-                  reference_id: ref_id,
-                  exploit_type_id: exploit_type_id,
-                  attachment_id: attach_id,
-                  exploit_data: exploit_data
-                }
-            }
+          reference_id: ref_id,
+          exploit_type_id: exploit_type_id,
+          attachment_id: attach_id,
+          exploit_data: exploit_data
         }
       headers: headers
       success: (response) ->

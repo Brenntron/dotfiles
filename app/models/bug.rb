@@ -932,4 +932,10 @@ class Bug < ApplicationRecord
     raise 'Invalid reference type' unless ref_type
     references.create(reference_type_id: ref_type.id, reference_data: ref_data)
   end
+
+  def add_exploit_action(reference_id:, exploit_type_id:, attachment_id:, exploit_data:)
+    ref = references.where(id: reference_id).first
+    raise "Cannot find reference #{reference_id}" unless ref
+    ref.exploits.create(exploit_type_id: exploit_type_id, attachment_id: attachment_id, data: exploit_data)
+  end
 end
