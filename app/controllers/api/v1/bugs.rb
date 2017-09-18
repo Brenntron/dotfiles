@@ -93,10 +93,15 @@ module API
               begin
                 xmlrpc = Bugzilla::Bug.new(bugzilla_session)
                 new_bug = xmlrpc.get(permitted_params[:id])
+                initial_bug_state = Bug.find(permitted_params[:id])
+                if initial_bug_state.present?
+                  initial_bug_state = initial_bug_state.clone
+                end
+
+
                 progress_bar.update_attribute("progress", 10)
                 #create the bug from bugzilla
-                Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug).to_s
-                bug = Bug.where(id:params[:id]).first
+                bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug)
                 #parse the bug summary
                 parsed = bug.parse_summary
                 bug_rules = bug.rules.map {|r| r.id}
@@ -104,10 +109,12 @@ module API
                 bug.load_rules_from_sids(parsed[:sids])
                 progress_bar.update_attribute("progress", 60)
                 parsed[:tags].each do |tag|
+                  bug.import_report[:new_tags] += 1 unless bug.tags.include?(tag)
                   bug.tags << tag unless bug.tags.include?(tag)
                 end
                 progress_bar.update_attribute("progress", 75)
                 parsed[:refs].each do |ref|
+                  bug.import_report[:new_refs] += 1 unless bug.references.map {|r| r.reference_data}.include? ref.reference_data
                   bug.references << ref unless bug.references.map {|r| r.reference_data}.include? ref.reference_data
                   Exploit.find_exploits(ref)
                 end
@@ -116,9 +123,10 @@ module API
                 bug.save
 
                 bug.clear_rule_tested
-
+                report = bug.compile_import_report(initial_bug_state)
                 progress_bar.update_attribute("progress", 100)
                 sleep(2)
+                {:status => "success", :import_report => report}.to_json
               rescue Exception => e
                 Rails.logger.info e
                 progress_bar.update_attribute("progress", -1)
