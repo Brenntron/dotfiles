@@ -305,6 +305,38 @@ $ ->
       , this)
 
 
+  $("#add-bug-exploit-btn").on 'click', ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    bug_id = $('#select-to-edit').attr('bug_id')
+    ref_id = $('#add-bug-exploit-ref-id').val()
+    exploit_type_id = $('#add-bug-exploit-type-id').val()
+    attach_id = $('#add-bug-exploit-attach-id').val()
+    exploit_data = $('#add-bug-exploit-data').val()
+    $.ajax(
+      url: '/api/v1/bugs/' + bug_id + '/addexploit'
+      method: 'POST'
+      data:
+        {
+          bug:
+            {
+              exploit:
+                {
+                  reference_id: ref_id,
+                  exploit_type_id: exploit_type_id,
+                  attachment_id: attach_id,
+                  exploit_data: exploit_data
+                }
+            }
+        }
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        notice_html = "<p>Something went wrong.</p>"
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      , this)
+
+
   $ ->
     $('[data-toggle="tooltip"]').tooltip()
     return

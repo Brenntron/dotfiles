@@ -574,6 +574,17 @@ module API
           bug = Bug.where(id: params['bug_id']).first
           bug.add_ref_action(params['bug']['reference']['ref_type_name'], params['bug']['reference']['ref_data'])
         end
+
+        desc "add an exploit to a bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        post ':bug_id/addexploit' do
+          bug = Bug.where(id: params['bug_id']).first
+          # byebug
+          # bug.add_ref_action(params['bug']['reference']['ref_type_name'], params['bug']['reference']['ref_data'])
+          # puts params.inspect
+        end
       end
     end
   end
