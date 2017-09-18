@@ -587,7 +587,6 @@ module API
                                  exploit_type_id: params['exploit_type_id'],
                                  attachment_id: params['attachment_id'],
                                  exploit_data: params['exploit_data'])
-          puts params.inspect
         end
       end
     end
