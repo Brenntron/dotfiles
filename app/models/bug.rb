@@ -927,7 +927,7 @@ class Bug < ApplicationRecord
     "success"
   end
 
-  def add_ref_action(ref_type_name, ref_data)
+  def add_ref_action(ref_type_name:, ref_data:)
     ref_type = ReferenceType.where(name: ref_type_name).first
     raise 'Invalid reference type' unless ref_type
     references.create(reference_type_id: ref_type.id, reference_data: ref_data)

@@ -573,7 +573,7 @@ module API
         post ':bug_id/addref' do
           bug = Bug.where(id: params['bug_id']).first
           raise 'bug not found' unless bug
-          bug.add_ref_action(params['bug']['reference']['ref_type_name'], params['bug']['reference']['ref_data'])
+          bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
         end
 
         desc "add an exploit to a bug"

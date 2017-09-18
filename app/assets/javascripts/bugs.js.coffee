@@ -295,7 +295,7 @@ $ ->
     $.ajax(
       url: '/api/v1/bugs/' + bug_id + '/addref'
       method: 'POST'
-      data: {bug: {reference: {ref_type_name: ref_id, ref_data: ref_data}}}
+      data: { ref_type_name: ref_id, ref_data: ref_data }
       headers: headers
       success: (response) ->
         location.reload()
