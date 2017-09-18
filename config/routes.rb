@@ -86,6 +86,13 @@ Rails.application.routes.draw do
   end
 
 
+  namespace :peake_bridge do
+    resources :channels, only: [] do
+      resources :messages, only: [:create]
+    end
+  end
+
+
   mount API::Base => '/api'
 
 end
