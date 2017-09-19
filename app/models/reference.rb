@@ -20,6 +20,8 @@ class Reference < ApplicationRecord
   scope :msb, ->      { where('reference_type_id=?', ReferenceType.find_by_name('msb').id) }
   scope :osvdb, ->    { where('reference_type_id=?', ReferenceType.find_by_name('osvdb').id) }
 
+  delegate(:name, to: :reference_type, prefix: true, allow_nil: true)
+
   def record(action)
     record = { resource: 'reference',
                action: action,
