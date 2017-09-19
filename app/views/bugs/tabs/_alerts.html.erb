@@ -34,12 +34,12 @@
             </td>
             <td>
               <% if attachment.pcap_alerts.any? %>
-                <table class="table-condensed small">
+                <table class="table-condensed small pcap-alerts-table">
                   <% attachment.pcap_alerts.each do |alert| %>
                     <% rule = alert.rule %>
                     <tr>
-                      <td class="blue"><%= sid_colon_format(rule) %></td>
-                      <td><strong><%= rule.message %></strong></td>
+                      <td class="sid-col"><span class="blue"><%= sid_colon_format(rule) %></span></td>
+                      <td class="content-col"><strong><%= rule.message %></strong></td>
                     </tr>
                   <% end %>
                 </table>
