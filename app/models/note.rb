@@ -24,6 +24,28 @@ class Note < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
+  def self.parse_research_from_note(note)
+    research_note_block = ""
+    line_started = 0
+    started = false
+    message = note.comment
+    message.each_line.with_index do |line, i|
+      if line.include?("Research Notes:")
+        started = true
+        line_started = i
+      end
+      if started
+        research_note_block += line
+      end
+      if line.starts_with?("----------") and i > (line_started + 1)
+        started = false
+      end
+    end
+
+    research_note_block
+
+  end
+
   def self.process_note(options,bugzilla_session)
     new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options)
     if options[:note_id].blank?

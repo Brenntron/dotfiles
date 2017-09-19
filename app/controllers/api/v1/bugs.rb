@@ -131,7 +131,7 @@ module API
               Rails.logger.debug("bugzilla: Importing bug: #{params[:id]}")
               progress_bar = Event.create(user:current_user.display_name,action:"import_bug:#{params[:id]}",description:"#{request.headers["Token"]}",progress:10)
 
-              begin
+              #begin
                 xmlrpc = Bugzilla::Bug.new(bugzilla_session)
                 new_bug = xmlrpc.get(permitted_params[:id])
                 progress_bar.update_attribute("progress", 10)
@@ -160,11 +160,11 @@ module API
 
                 progress_bar.update_attribute("progress", 100)
                 sleep(2)
-              rescue Exception => e
-                Rails.logger.info e
-                progress_bar.update_attribute("progress", -1)
-                {:error => e.to_s}.to_json
-              end
+              #rescue Exception => e
+              #  Rails.logger.info e
+              #  progress_bar.update_attribute("progress", -1)
+              #  {:error => e.to_s}.to_json
+              #end
             else
               false
             end

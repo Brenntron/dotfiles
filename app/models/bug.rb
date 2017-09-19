@@ -445,7 +445,8 @@ class Bug < ApplicationRecord
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
-                    created_at: creation_time
+                    created_at: creation_time,
+                    notes_bugzilla_id: c['id']
                   })
                 end
 
@@ -520,6 +521,7 @@ class Bug < ApplicationRecord
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
         new_comments = xmlrpc.comments(ids: [bug_id])
+        bug_is_new = Bug.find(bug_id).blank?
         bug = Bug.find_or_create_by(bugzilla_id: bug_id)
 
         bug.id             = bug_id
@@ -659,7 +661,8 @@ class Bug < ApplicationRecord
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
-                    created_at: creation_time
+                    created_at: creation_time,
+                    notes_bugzilla_id: c['id']
                   })
                 end
 
@@ -667,6 +670,17 @@ class Bug < ApplicationRecord
             end
           end
         end
+
+        latest_research = bug.notes.where("note_type=?", "research").reverse_chron.first
+        if latest_research.present? && bug_is_new
+          new_draft = Note.parse_research_from_note(latest_research)
+          Note.create({
+                          comment: new_draft,
+                          note_type: 'research',
+                          author: current_user.email
+                      })
+        end
+
         bug.save
       end
     else
