@@ -169,7 +169,8 @@ module API
                 sleep(2)
                 {:status => "success", :import_report => report}.to_json
               rescue Exception => e
-                Rails.logger.info e
+                Rails.logger.error $!
+                Rails.logger.error $!.backtrace.join("\n")
                 progress_bar.update_attribute("progress", -1)
                 {:error => e.to_s}.to_json
               end

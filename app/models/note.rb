@@ -25,6 +25,35 @@ class Note < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
+  def self.parse_from_note(text, delimiter, include_delimiter = false)
+    new_note_block = ""
+    line_started = 0
+    started = false
+
+    text.each_line.with_index do |line, i|
+      if line.include?(delimiter)
+        started = true
+        line_started = i
+      end
+      if started
+        if (line_started == i || line.starts_with?("------")) && !include_delimiter
+          next
+        end
+
+        new_note_block += line
+
+      end
+      if line.starts_with?("----------") and i > (line_started + 1)
+        started = false
+      end
+    end
+    unless include_delimiter
+      new_note_block.gsub!(delimiter, "")
+    end
+    new_note_block
+
+  end
+
   def self.process_note(options,bugzilla_session)
     new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options)
     if options[:note_id].blank?
