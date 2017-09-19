@@ -10,7 +10,7 @@ development:
     addressees:
       peakebridge:
         host: "localhost"
-        port: 2996
+        port: 2966
         ssl: false
         uri_base: "/peakebridge/channels"
   perl:
