@@ -6,6 +6,13 @@ development:
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
     vrt: "extras/ssh/ca.pem"
+  peakebridge:
+    addressees:
+      peakebridge:
+        host: "localhost"
+        port: 2996
+        ssl: false
+        uri_base: "/peakebridge/channels"
   perl:
     cmd: "/usr/bin/env perl"
     canvas_root: "extras"

@@ -14,6 +14,18 @@ Rails.configuration.bugzilla_password   = ENV['Bugzilla_secret'] || env_config['
 raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt']
 
+Rails.configuration.peakebridge         = {}
+
+raise "config.yml missing peakebridge section" unless env_config['peakebridge']
+raise "config.yml missing peakebridge section" unless env_config['peakebridge']['addressees']
+raise "config.yml missing peakebridge section" unless env_config['peakebridge']['addressees']['peakebridge']
+peakebridge                             = OpenStruct.new
+peakebridge.host                        = env_config['peakebridge']['addressees']['peakebridge']['host']
+peakebridge.port                        = env_config['peakebridge']['addressees']['peakebridge']['port']
+peakebridge.ssl                         = env_config['peakebridge']['addressees']['peakebridge']['ssl']
+peakebridge.uri_base                    = env_config['peakebridge']['addressees']['peakebridge']['uri_base']
+Rails.configuration.peakebridge['peakebridge'] = peakebridge
+
 raise "config.yml missing perl section" unless env_config['perl']
 Rails.configuration.perl_cmd            = env_config['perl']['cmd']
 Rails.configuration.canvas_root         = Rails.root.join(env_config['perl']['canvas_root'])
