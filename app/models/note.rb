@@ -24,25 +24,25 @@ class Note < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
-  def self.parse_research_from_note(note)
-    research_note_block = ""
+  def self.parse_from_note(note, delimiter)
+    new_note_block = ""
     line_started = 0
     started = false
     message = note.comment
     message.each_line.with_index do |line, i|
-      if line.include?("Research Notes:")
+      if line.include?(delimiter)
         started = true
         line_started = i
       end
       if started
-        research_note_block += line
+        new_note_block += line
       end
       if line.starts_with?("----------") and i > (line_started + 1)
         started = false
       end
     end
-
-    research_note_block
+    new_note_block.gsub!(delimiter, "")
+    new_note_block
 
   end
 

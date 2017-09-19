@@ -8,7 +8,7 @@ module NotesHelper
     
     latest_author_research_note = @bug.notes.unpublished.where("note_type=?", type).reverse_chron.first if @bug.notes.any?
     if latest_author_research_note.blank?
-      @bug.notes.where("note_type=?", type).reverse_chron.first if @bug.notes.any? 
+      nil
     else
       latest_author_research_note
     end

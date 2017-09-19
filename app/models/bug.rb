@@ -521,7 +521,7 @@ class Bug < ApplicationRecord
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
         new_comments = xmlrpc.comments(ids: [bug_id])
-        bug_is_new = Bug.find(bug_id).blank?
+        bug_is_new = Bug.find_by_id(bug_id).blank?
         bug = Bug.find_or_create_by(bugzilla_id: bug_id)
 
         bug.id             = bug_id
@@ -550,6 +550,7 @@ class Bug < ApplicationRecord
         else
           bug.resolved_at = last_change_time
         end
+        bug.save
         creator = User.where('email=?', item['creator']).first
         new_user = User.where('email=?', item['assigned_to']).first
         new_committer = User.where('email=?', item['qa_contact']).first
@@ -630,6 +631,7 @@ class Bug < ApplicationRecord
         unless new_comments.empty?
 
           ActiveRecord::Base.transaction do
+
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
               comment[1]['comments'].each do |c|
@@ -671,14 +673,16 @@ class Bug < ApplicationRecord
           end
         end
 
-        latest_research = bug.notes.where("note_type=?", "research").reverse_chron.first
+        latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
         if latest_research.present? && bug_is_new
-          new_draft = Note.parse_research_from_note(latest_research)
-          Note.create({
+          new_draft = Note.parse_from_note(latest_research, "Research Notes:")
+          new_note = Note.new({
                           comment: new_draft,
                           note_type: 'research',
-                          author: current_user.email
+                          author: current_user.email,
+                          bug_id:     bug_id
                       })
+          new_note.save
         end
 
         bug.save
