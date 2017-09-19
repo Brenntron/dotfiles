@@ -134,12 +134,10 @@ module API
               begin
                 xmlrpc = Bugzilla::Bug.new(bugzilla_session)
                 new_bug = xmlrpc.get(permitted_params[:id])
-                initial_bug_state = Bug.find(permitted_params[:id])
-                if initial_bug_state.present?
+                initial_bug_state = Bug.where(id: permitted_params[:id]).first
+                if initial_bug_state
                   initial_bug_state = initial_bug_state.clone
                 end
-
-
                 progress_bar.update_attribute("progress", 10)
                 #create the bug from bugzilla
                 bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug)
@@ -164,7 +162,9 @@ module API
                 bug.save
 
                 bug.clear_rule_tested
-                report = bug.compile_import_report(initial_bug_state)
+                if initial_bug_state
+                  report = bug.compile_import_report(initial_bug_state)
+                end
                 progress_bar.update_attribute("progress", 100)
                 sleep(2)
                 {:status => "success", :import_report => report}.to_json

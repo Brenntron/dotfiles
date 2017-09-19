@@ -55,7 +55,7 @@ class BugsController < ApplicationController
       end
       @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
       @tasks = @bug.tasks.order(created_at: :desc)
-      @notes = @bug.notes.order(created_at: :desc)
+      @notes = @bug.notes.published.order(created_at: :desc)
       @tags = Tag.all.map { |tag| tag.name }.join(',')
       @categories = RuleCategory.ranked
       flash.now[:alert] = "Looks like this bug (#{@bug.id}) may be out of synch with bugzilla.
