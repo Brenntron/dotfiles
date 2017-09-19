@@ -285,7 +285,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    Then I should see "Can't set to pending. Please complete exploits, complete the summary for rule docs."
+    Then I should see "Can't set to pending. Please complete the summary for rule docs."
     And I can not select "PENDING" from "bug[state]"
 
   @javascript

@@ -7,6 +7,7 @@ class Note < ApplicationRecord
 
   scope :committer_note, -> { where(note_type: 'committer') }
   scope :unpublished, -> { where(notes_bugzilla_id: nil) }
+  scope :published, -> {where.not(notes_bugzilla_id: nil) }
   scope :reverse_chron, -> {
     order("created_at desc")
   }
@@ -24,24 +25,31 @@ class Note < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
-  def self.parse_from_note(note, delimiter)
+  def self.parse_from_note(text, delimiter, include_delimiter = false)
     new_note_block = ""
     line_started = 0
     started = false
-    message = note.comment
-    message.each_line.with_index do |line, i|
+
+    text.each_line.with_index do |line, i|
       if line.include?(delimiter)
         started = true
         line_started = i
       end
       if started
+        if (line_started == i || line.starts_with?("------")) && !include_delimiter
+          next
+        end
+
         new_note_block += line
+
       end
       if line.starts_with?("----------") and i > (line_started + 1)
         started = false
       end
     end
-    new_note_block.gsub!(delimiter, "")
+    unless include_delimiter
+      new_note_block.gsub!(delimiter, "")
+    end
     new_note_block
 
   end
