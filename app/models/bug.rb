@@ -433,10 +433,11 @@ class Bug < ApplicationRecord
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
         new_comments = xmlrpc.comments(ids: [bug_id])
-        bug = Bug.find(bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
         unless new_comments.empty?
 
           ActiveRecord::Base.transaction do
+            new_bug = bug.notes.published.blank?
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
               comment[1]['comments'].each do |c|
@@ -457,7 +458,8 @@ class Bug < ApplicationRecord
 		                comment:    comment,
 		                bug_id:     bug_id,
                     note_type:  note_type,
-		                created_at: creation_time
+                    notes_bugzilla_id: c['id'],
+                    created_at: creation_time
 	                })
                 else
                   Note.create({
@@ -466,11 +468,27 @@ class Bug < ApplicationRecord
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
+                    notes_bugzilla_id: c['id'],
                     created_at: creation_time
                   })
                 end
-
               end
+            end
+            if new_bug
+              last_committer_note = bug.notes.last_committer_note.first
+              committer_note_text_area = ""
+              if last_committer_note
+                committer_note_text_area = parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
+              end
+              if committer_note_text_area.strip.blank?
+                committer_note_text_area = "The last committer did not leave a note."
+              end
+              new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).first_or_create
+              new_note.note_type = 'committer'
+              new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
+              new_note.author = last_committer_note.author
+              new_note.created_at = Time.now.to_time
+              new_note.save
             end
           end
         end
@@ -483,7 +501,7 @@ class Bug < ApplicationRecord
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
-        bug = Bug.find(bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
         unless new_attachments.empty?
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
             local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
@@ -542,8 +560,9 @@ class Bug < ApplicationRecord
         new_attachments = xmlrpc.attachments(ids: [bug_id])
         new_comments = xmlrpc.comments(ids: [bug_id])
         bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug.id = bug_id
+        bug.save
         bug.initialize_report
-        bug.id             = bug_id
         bug.summary        = item['summary']
         bug.classification = 'unclassified'
 
@@ -558,6 +577,7 @@ class Bug < ApplicationRecord
 
         bug.created_at = item['creation_time'].to_time
         last_change_time      = item['last_change_time'].to_time
+
         if bug.state == 'NEW'
           # do nothing
         elsif bug.state == 'ASSIGNED'
@@ -595,6 +615,7 @@ class Bug < ApplicationRecord
         else
           bug.committer = new_committer
         end
+
         unless new_attachments.empty?
 
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
@@ -650,6 +671,7 @@ class Bug < ApplicationRecord
         unless new_comments.empty?
 
           ActiveRecord::Base.transaction do
+            new_bug = bug.notes.published.blank?
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
               comment[1]['comments'].each do |c|
@@ -660,8 +682,8 @@ class Bug < ApplicationRecord
                 else
                   note_type = 'research'
                 end
-
                 comment = c['text'].strip
+
                 creation_time = c['creation_time'].to_time
 
 		            note = Note.where(id: c['id']).first
@@ -672,6 +694,7 @@ class Bug < ApplicationRecord
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
+                    notes_bugzilla_id: c['id'],
                     created_at: creation_time
 	                })
                 else
@@ -682,11 +705,27 @@ class Bug < ApplicationRecord
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
+                    notes_bugzilla_id: c['id'],
                     created_at: creation_time
                   })
                 end
-
               end
+            end
+            if new_bug
+              last_committer_note = bug.notes.last_committer_note.first
+              committer_note_text_area = ""
+              if last_committer_note
+                committer_note_text_area = parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
+              end
+              if committer_note_text_area.strip.blank?
+                committer_note_text_area = "The last committer did not leave a note."
+              end
+              new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).first_or_create
+              new_note.note_type = 'committer'
+              new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
+              new_note.author = last_committer_note.author
+              new_note.created_at = Time.now.to_time
+              new_note.save
             end
           end
         end
@@ -702,6 +741,26 @@ class Bug < ApplicationRecord
       end
     end
     true
+  end
+
+  def self.parse_from_note(text,delimiter_string)
+    note_block = ""
+    line_started = 0
+    started = false
+    message = text
+    message.each_line.with_index do |line, i|
+      if line.include?(delimiter_string)
+        started = true
+        line_started = i
+      end
+      if started && line_started != i && !line.starts_with?("------")
+        note_block += line
+      end
+      if line.starts_with?("------") and i > (line_started + 1)
+        started = false
+      end
+    end
+    note_block
   end
 
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)

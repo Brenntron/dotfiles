@@ -7,6 +7,7 @@ class Note < ApplicationRecord
 
   scope :committer_note, -> { where(note_type: 'committer') }
   scope :unpublished, -> { where(notes_bugzilla_id: nil) }
+  scope :published, -> {where.not(notes_bugzilla_id: nil) }
   scope :reverse_chron, -> {
     order("created_at desc")
   }
