@@ -168,7 +168,7 @@ module API
           optional :nodoc_override,     type: Boolean
         end
         put "commit", root: "rule" do
-          rules = Rule.where(id: permitted_params[:rule_ids]).all.to_a
+          rules = Rule.where(id: permitted_params[:rule_ids]).where(state:['UPDATED','NEW']).all.to_a
 
           raise "You must select a rule to commit!" if rules.empty?
           raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
