@@ -100,7 +100,7 @@ class RuleFile
   def build_additional_output
     output = "\n"
     new_rules = ''
-
+    `#{self.class.svn_cmd} up #{synch_pathname}`
     `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
       if /^\+|^\-|^\@|^\=|^Index/ =~ line
         output += line
