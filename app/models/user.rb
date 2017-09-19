@@ -74,13 +74,13 @@ class User < ApplicationRecord
   def default_bug_list
     case
       when has_role?('committer')
-        bugs.empty? ? Bug.pending : bugs.open_pending
+        'pending-bugs'
       when has_role?('analyst')
-        bugs.empty? ? Bug.open_pending : bugs.open_pending
+        'my-bugs'
       when has_role?('build coordinator')
-        bugs.empty? ? Bug.where(state: 'FIXED').order(:resolved_at) : bugs.open_pending
+        'fixed-bugs'
       else
-        Bug.all
+        'all-bugs'
     end
   end
 
