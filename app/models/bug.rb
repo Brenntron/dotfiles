@@ -521,9 +521,9 @@ class Bug < ApplicationRecord
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
         new_comments = xmlrpc.comments(ids: [bug_id])
-        bug_is_new = Bug.find_by_id(bug_id).blank?
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
 
+        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug_is_new = bug.notes.blank?
         bug.id             = bug_id
         bug.summary        = item['summary']
         bug.classification = 'unclassified'
