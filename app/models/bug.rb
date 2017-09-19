@@ -29,6 +29,26 @@ class Bug < ApplicationRecord
 
   scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
+  attr_accessor :import_report
+
+  def initialize_report
+    @import_report = {}
+    @import_report[:new_rules] = 0
+    @import_report[:new_attachments] = 0
+    @import_report[:new_notes] = 0
+    @import_report[:new_tags] = 0
+    @import_report[:new_refs] = 0
+  end
+
+  def compile_import_report(initial_bug_state = nil)
+    total_report = @import_report.clone
+    if initial_bug_state.present?
+      total_report[:changed_bug_columns] = ((self.attributes.to_h.to_a) - (initial_bug_state.attributes.to_h.to_a))
+    end
+    total_report[:total_changes] = total_report[:new_rules] + total_report[:new_attachments] + total_report[:new_notes] + total_report[:new_tags] + total_report[:new_refs] + total_report[:changed_bug_columns].size
+    total_report
+  end
+
   # @return [Array] username (displayable) and id pairs suitable for select drop downs.
   def allowed_assignees
     User.allowed_assignees(self).pluck(:cvs_username,:id)
@@ -330,6 +350,7 @@ class Bug < ApplicationRecord
   def load_rules_from_sids(sids)
     sids.each do |sid|
       rule = Rule.find_or_load(sid, 1)
+      @import_report[:new_rules] += 1 unless self.rules.include? rule
       rules << rule unless self.rules.include? rule
     end
   end
@@ -524,6 +545,7 @@ class Bug < ApplicationRecord
 
         bug = Bug.find_or_create_by(bugzilla_id: bug_id)
         bug_is_new = bug.notes.blank?
+        bug.initialize_report
         bug.id             = bug_id
         bug.summary        = item['summary']
         bug.classification = 'unclassified'
@@ -587,6 +609,7 @@ class Bug < ApplicationRecord
                 local_attachment.save
               end
             else
+              bug.import_report[:new_attachments] += 1
               local_attachment = Attachment.create do |new_attach_record|
                 new_attach_record.id = attachment['id']
                 new_attach_record.size = attachment['size']
@@ -657,6 +680,7 @@ class Bug < ApplicationRecord
                     created_at: creation_time
 	                })
                 else
+                  bug.import_report[:new_notes] += 1
                   Note.create({
                     id:         c['id'],
                     author:     c['author'],
@@ -686,6 +710,7 @@ class Bug < ApplicationRecord
         end
 
         bug.save
+        return bug
       end
     else
       if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
@@ -943,5 +968,19 @@ class Bug < ApplicationRecord
       bug.link_alert(attachment_id)
     end
     "success"
+  end
+
+  def add_ref_action(ref_type_name:, ref_data:)
+    ref_type = ReferenceType.where(name: ref_type_name).first
+    raise 'Invalid reference type' unless ref_type
+    unless references.where(reference_type_id: ref_type.id, reference_data: ref_data).exists?
+      references.create(reference_type_id: ref_type.id, reference_data: ref_data)
+    end
+  end
+
+  def add_exploit_action(reference_id:, exploit_type_id:, attachment_id:, exploit_data:)
+    ref = references.where(id: reference_id).first
+    raise "Cannot find reference #{reference_id}" unless ref
+    ref.exploits.create(exploit_type_id: exploit_type_id, attachment_id: attachment_id, data: exploit_data)
   end
 end

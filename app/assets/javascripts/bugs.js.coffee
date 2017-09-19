@@ -178,24 +178,65 @@ $ ->
     e.preventDefault()
     $('.edit-bug').prop('disabled', true)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    id = $('input[name="bug_id"]').val()
-    state_comment = $("#state_comment").val()
-    data = $('.edit_bug').serialize()
-    if state_comment
-      data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
-    $('.edit-bug').hide()
-    $('#saving_bug').removeClass('hidden').show()
-    $.ajax(
-      url: '/api/v1/bugs/' + id
-      method: 'PUT'
-      headers: headers
-      data: data
-      success: (response) ->
-        location.reload()
-      error: (response) ->
-        alert(response.responseText)
-        location.reload()
-    , this)
+    bid = $('input[name="bug_id"]').val()
+    bug_state = $('#bug_state').val()
+    if bug_state == "PENDING"
+      $('.edit-bug').hide()
+      $('#synching_bug_form_button').removeClass('hidden').show()
+      $.ajax(
+        url: '/api/v1/bugs/import/' + bid
+        method: 'GET'
+        headers: headers
+      ).done (response) ->
+        json = $.parseJSON(response)
+
+        if (json.error)
+          message = "There was a problem attempting to synch this bug:"
+          message += json.error
+          $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
+        else
+          if(json.import_report.total_changes == 0)
+            state_comment = $("#state_comment").val()
+            data = $('.edit_bug').serialize()
+            if state_comment
+              data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
+            $('#synching_bug_form_button').hide()
+            $('#saving_bug').removeClass('hidden').show()
+            $.ajax(
+              url: '/api/v1/bugs/' + bid
+              method: 'PUT'
+              headers: headers
+              data: data
+              success: (response) ->
+                window.location.reload()
+              error: (response) ->
+                alert(response.responseText)
+                window.location.reload()
+            , this)
+          else
+            if(!alert("There have been #{json.import_report.total_changes} changes to this bug after synching.  You should review the bug, rules, attachments, notes, tags, and references before changing the bug state"))
+              window.location.reload()
+    else
+      state_comment = $("#state_comment").val()
+      data = $('.edit_bug').serialize()
+      if state_comment
+        data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
+      $('.edit-bug').hide()
+      $('#saving_bug').removeClass('hidden').show()
+      $.ajax(
+        url: '/api/v1/bugs/' + bid
+        method: 'PUT'
+        headers: headers
+        data: data
+        success: (response) ->
+          window.location.reload()
+        error: (response) ->
+          alert(response.responseText)
+          window.location.reload()
+      , this)
+
+
+
 
 
 
@@ -286,6 +327,49 @@ $ ->
   $(".rulealert-toggle").on 'click', ->
     which = $(this).data('rulealert');
     $('.'+which).toggle();
+
+  $("#add-bug-ref-btn").on 'click', ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    bug_id = $('#select-to-edit').attr('bug_id')
+    ref_id = $('#add-bug-ref-type-name').val()
+    ref_data = $('#add-bug-ref-data').val()
+    $.ajax(
+      url: '/api/v1/bugs/' + bug_id + '/addref'
+      method: 'POST'
+      data: { ref_type_name: ref_id, ref_data: ref_data }
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        notice_html = "<p>Something went wrong.</p>"
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      , this)
+
+
+  $("#add-bug-exploit-btn").on 'click', ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    bug_id = $('#select-to-edit').attr('bug_id')
+    ref_id = $('#add-bug-exploit-ref-id').val()
+    exploit_type_id = $('#add-bug-exploit-type-id').val()
+    attach_id = $('#add-bug-exploit-attach-id').val()
+    exploit_data = $('#add-bug-exploit-data').val()
+    $.ajax(
+      url: '/api/v1/bugs/' + bug_id + '/addexploit'
+      method: 'POST'
+      data:
+        {
+          reference_id: ref_id,
+          exploit_type_id: exploit_type_id,
+          attachment_id: attach_id,
+          exploit_data: exploit_data
+        }
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        notice_html = "<p>Something went wrong.</p>"
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      , this)
 
 
   $ ->
