@@ -23,6 +23,29 @@
       <span class="glyphicon glyphicon-plus-sign" onclick="$('#add-bug-ref-div').show();"></span>
     </h4>
   </div>
+  <div id="add-bug-ref-div" class="col-xs-10">
+    <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
+        <%= bug_form.fields_for :references do |refs_fields| %>
+            <div class="form-group">
+              <%= refs_fields.select(:type_name, [[' - ', '']] + @ref_types.pluck(:name),
+                                     {selected: ''},
+                                     id: 'add-bug-ref-type-name',
+                                     class: 'form-control select-sm code') %>
+            </div>
+            <div class="form-group">
+              <%= refs_fields.text_field(:reference_data,
+                                         id: 'add-bug-ref-data',
+                                         class: 'form-control select-sm code',
+                                         required: 'required',
+                                         placeholder: 'reference data') %>
+            </div>
+            <div class="form-group">
+              <%= bug_form.button('Add Reference', type: 'button', id: 'add-bug-ref-btn',
+                                  class: 'select-sm btn btn-default') %>
+            </div>
+        <% end %>
+    <% end %>
+  </div>
   <div class="col-xs-12 overview-code">
     <% if (@bug_references | @bug.references).any? %>
         <% if (@bug_references.cves | @bug.references.cves).any? %>
@@ -63,29 +86,6 @@
     <% end %>
   </div>
   <input id="tag_list" class="hidden" value="<%=@tags%>"/>
-  <div id="add-bug-ref-div" class="col-xs-10">
-    <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
-      <%= bug_form.fields_for :references do |refs_fields| %>
-        <div class="form-group">
-          <%= refs_fields.select(:type_name, [[' - ', '']] + @ref_types.pluck(:name),
-                                 {selected: ''},
-                                 id: 'add-bug-ref-type-name',
-                                 class: 'form-control select-sm code') %>
-        </div>
-        <div class="form-group">
-          <%= refs_fields.text_field(:reference_data,
-                                     id: 'add-bug-ref-data',
-                                     class: 'form-control select-sm code',
-                                     required: 'required',
-                                     placeholder: 'reference data') %>
-        </div>
-        <div class="form-group">
-          <%= bug_form.button('Add Reference', type: 'button', id: 'add-bug-ref-btn',
-                              class: 'select-sm btn btn-default') %>
-        </div>
-      <% end %>
-    <% end %>
-  </div>
 </div>
 <hr>
 <div class="row top-space">
@@ -95,54 +95,54 @@
       <span class="glyphicon glyphicon-plus-sign" onclick="$('#add-bug-exploit-div').show();"></span>
     </h4>
   </div>
+  <div id="add-bug-exploit-div" class="col-xs-10">
+    <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
+        <%= bug_form.fields_for :exploits do |exploit_fields| %>
+            <div>
+              <div class="form-group">
+                <%= exploit_fields.select(:reference_id,
+                                          @bug.references.map{ |ref| [ "#{ref.reference_type_name}, #{ref.reference_data}", ref.id ] },
+                                          { prompt: "Select reference" },
+                                          id: 'add-bug-exploit-ref-id',
+                                          class: 'form-control select-sm code') %>
+              </div>
+              <div class="form-group">
+                <%= exploit_fields.select(:exploit_type_id, ExploitType.pluck(:name, :id),
+                                          { prompt: "Select type" },
+                                          id: 'add-bug-exploit-type-id',
+                                          class: 'form-control select-sm code') %>
+              </div>
+              <div class="form-group">
+                <%= exploit_fields.select(:exploit_type_id, @bug.attachments.pluck(:file_name, :id),
+                                          { prompt: "Select attachment" },
+                                          id: 'add-bug-exploit-attach-id',
+                                          class: 'form-control select-sm code') %>
+              </div>
+            </div>
+            <div>
+              <div class="form-group">
+                <%= exploit_fields.label(:data) %>
+                <%= exploit_fields.text_field(:data,
+                                              size: 80,
+                                              id: 'add-bug-exploit-data',
+                                              class: 'form-control select-sm') %>
+              </div>
+            </div>
+            <div>
+              <div class="form-group">
+                <%= bug_form.button('Add Exploit', type: 'button', id: 'add-bug-exploit-btn',
+                                    class: 'select-sm btn btn-default') %>
+              </div>
+            </div>
+        <% end %>
+    <% end %>
+  </div>
   <div class="col-xs-12">
     <div class="exploit_notices red"></div>
   </div>
   <div class="col-xs-12 overview-code">
     <% if (@bug_references | @bug.references).any? %>
         <p><%= find_exploit_link(@bug_references | @bug.references) %></p>
-    <% end %>
-  </div>
-  <div id="add-bug-exploit-div" class="col-xs-10">
-    <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
-      <%= bug_form.fields_for :exploits do |exploit_fields| %>
-        <div>
-          <div class="form-group">
-            <%= exploit_fields.select(:reference_id,
-                                      @bug.references.map{ |ref| [ "#{ref.reference_type_name}, #{ref.reference_data}", ref.id ] },
-                                      { prompt: "Select reference" },
-                                      id: 'add-bug-exploit-ref-id',
-                                      class: 'form-control select-sm code') %>
-          </div>
-          <div class="form-group">
-            <%= exploit_fields.select(:exploit_type_id, ExploitType.pluck(:name, :id),
-                                      { prompt: "Select type" },
-                                      id: 'add-bug-exploit-type-id',
-                                      class: 'form-control select-sm code') %>
-          </div>
-          <div class="form-group">
-            <%= exploit_fields.select(:exploit_type_id, @bug.attachments.pluck(:file_name, :id),
-                                      { prompt: "Select attachment" },
-                                      id: 'add-bug-exploit-attach-id',
-                                      class: 'form-control select-sm code') %>
-          </div>
-        </div>
-        <div>
-          <div class="form-group">
-            <%= exploit_fields.label(:data) %>
-            <%= exploit_fields.text_field(:data,
-                                          size: 80,
-                                          id: 'add-bug-exploit-data',
-                                          class: 'form-control select-sm') %>
-          </div>
-        </div>
-        <div>
-          <div class="form-group">
-            <%= bug_form.button('Add Exploit', type: 'button', id: 'add-bug-exploit-btn',
-                                class: 'select-sm btn btn-default') %>
-          </div>
-        </div>
-      <% end %>
     <% end %>
   </div>
 </div>
