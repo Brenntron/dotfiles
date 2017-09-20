@@ -15,7 +15,7 @@ class BugsController < ApplicationController
     if @bug_query.any?
       @bugs = @bug_query.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
     else
-      flash.now[:alert] = "We didn't find any bugs, please try selecting another filter."
+      flash.now[:alert] = "Zarro Boogs found, please try selecting any other filter."
       @bugs = Bug.none.paginate(:page => session[:page], :per_page => 32)
     end
     if params[:bug].present?
