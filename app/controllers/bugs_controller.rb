@@ -133,7 +133,7 @@ class BugsController < ApplicationController
 
   def get_states_and_users
     @states = Bug.distinct.pluck(:state)
-    @users = User.all
+    @users = User.order(:cvs_username).all
   end
 
   def check_bug_permission
