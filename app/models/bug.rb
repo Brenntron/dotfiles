@@ -131,10 +131,13 @@ class Bug < ApplicationRecord
   end
 
   def self.bugs_with_search(query_params)
-    if query_params[:bugzilla_max] == '' || query_params[:bugzilla_max].nil?
-      Bug.where(query_params).or(Bug.where('summary LIKE ?', "%#{query_params[:summary]}%"))
-    else
-      nil
+    case
+      when query_params[:bugzilla_max].present?
+        nil
+      when query_params[:summary].present?
+        Bug.where(query_params).or(Bug.where('summary LIKE ?', "%#{query_params[:summary]}%"))
+      else
+        Bug.where(query_params)
     end
   end
 

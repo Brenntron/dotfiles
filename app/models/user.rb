@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_many :bugs
   has_and_belongs_to_many :roles, dependent: :destroy
+  has_many :committed_bugs, class_name: 'Bug', foreign_key: :committer_id
 
   validates :cvs_username, presence: true, uniqueness: true
 
