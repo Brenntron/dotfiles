@@ -37,19 +37,22 @@ class Note < ApplicationRecord
       end
       if started
         if (line_started == i || line.starts_with?("------")) && !include_delimiter
+          if i > (line_started + 1)
+            started = false
+          end
           next
         end
 
-        new_note_block += line
+        line_to_add = line.blank? ? line : line.lstrip
+        new_note_block += line_to_add
 
       end
-      if line.starts_with?("----------") and i > (line_started + 1)
-        started = false
-      end
+
     end
     unless include_delimiter
       new_note_block.gsub!(delimiter, "")
     end
+
     new_note_block
 
   end

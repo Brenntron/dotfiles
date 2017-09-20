@@ -736,7 +736,7 @@ class Bug < ApplicationRecord
 
         latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
         if latest_research.present? && bug_is_new
-          new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", true)
+          new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
           new_note = Note.new({
                           comment: new_draft,
                           note_type: 'research',
