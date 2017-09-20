@@ -1,3 +1,18 @@
+
+window.bug_resolve =(tag) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  bugzilla_id = $('.bugzilla_id').text()
+  $.ajax {
+    url: '/api/v1/bugs/' + bugzilla_id + '/resolve'
+    method: 'patch'
+    headers: headers
+    success: (response) ->
+      location.reload()
+    error: (response) ->
+      alert ("could not take this bug" + response)
+      location.reload()
+  }
+
 $ ->
   $('#bugzilla_popover_state').popover();
   $('.active').show();

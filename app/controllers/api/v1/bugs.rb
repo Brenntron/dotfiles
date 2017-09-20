@@ -597,6 +597,21 @@ module API
                                  attachment_id: params['attachment_id'],
                                  exploit_data: params['exploit_data'])
         end
+
+        desc "resolve a bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        patch ':bug_id/resolve' do
+          byebug
+          bug = Bug.where(id: params['bug_id']).first
+          raise 'bug not found' unless bug
+          # bug.add_exploit_action(reference_id: params['reference_id'],
+          #              exploit_type_id: params['exploit_type_id'],
+          #              attachment_id: params['attachment_id'],
+          #              exploit_data: params['exploit_data'])
+          Rails.logger.debug("<<< /api/v1/bugs/:bug_id/resolve")
+        end
       end
     end
   end
