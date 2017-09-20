@@ -142,7 +142,7 @@ class UsersController < ApplicationController
   private
 
   def set_query_session
-    session[:query] = ''
+    session[:query] = current_user.default_bug_list
   end
 
   def user_params
