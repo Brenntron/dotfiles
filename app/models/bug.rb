@@ -265,10 +265,6 @@ class Bug < ApplicationRecord
     end
   end
 
-  def can_set_pending?
-    exploits_complete? && rules_parsed? && docs_complete?
-  end
-
   def exploits_complete?
     exploits.all? { |expl| expl.attachment.present? }
   end
