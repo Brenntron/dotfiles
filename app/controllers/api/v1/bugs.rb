@@ -38,7 +38,7 @@ module API
               response_task['failed'] = task.failed
               response_task['cvs_username'] = User.find(task.user_id).cvs_username
               response_task['task_type'] = task.task_type
-              response_task['result'] = task.result
+              response_task['result'] = task.result.present? ? task.result : ""
               response_task['created_at'] = task.created_at.strftime("%m/%d/%y %H:%M:%S")
               bug_queue << response_task
             end
