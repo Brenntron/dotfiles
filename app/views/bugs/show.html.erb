@@ -26,7 +26,13 @@
           <div class="col-xs-1">
             <div class="bug-details-columns">
               <h6>resolve</h6>
-              <h5 class="top-space"><button onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button></h5>
+              <h5 class="top-space">
+                <% if @bug.can_resolve? %>
+                  <button onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button>
+                <% else %>
+                    <button onclick="bug_resolve(this)" class="select-sm btn btn-default" disabled="disabled">Resolve</button>
+                <% end %>
+              </h5>
             </div>
           </div>
           <div class="col-xs-1 state">
@@ -68,7 +74,6 @@
               <% end %>
             </div>
           </div>
-
           <% if @bug.has_due_date? %>
           <div class="col-xs-1">
             <div class="bug-details-columns">
@@ -77,12 +82,24 @@
             </div>
           </div>
           <% end %>
+
           <div class="col-xs-3">
             <button class="select-sm btn btn-info back_btn pull-right" id="back_btn" style="margin-top:4px;margin-right:-28px"><i class="glyphicon glyphicon-th-list"></i> <strong class="hidden-xs">bug list</strong></button>
           </div>
         </div>
 
-      <div class="row item-info">
+        <div class="row item-info">
+          <% unless @bug.can_resolve? %>
+          <div class="col-xs-12">
+            <div>Can't set to pending.</div>
+            <ul>
+              <% @bug.resolve_errors.each do |error_message| %>
+                  <li><%= error_message %></li>
+              <% end %>
+            </ul>
+          </div>
+          <% end %>
+
         <div class="col-xs-12 hidden-xs bug_summary">
           <h5 class="edit-summary-field"><%= @bug.summary %></h5>
         </div>

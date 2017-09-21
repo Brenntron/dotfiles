@@ -270,17 +270,31 @@ class Bug < ApplicationRecord
   end
 
   def exploits_complete?
-    exploits.each{ |expl| return false if expl.attachment.nil? }
-    true
+    exploits.all? { |expl| expl.attachment.present? }
   end
 
   def rules_parsed?
-    rules.each{ |rule| return false unless rule.parsed? }
-    true
+    rules.all? { |rule| rule.parsed? }
   end
 
   def docs_complete?
     rules.all? { |rule| rule.doc_complete? }
+  end
+
+  def resolve_errors
+    unless @resolve_errors
+      @resolve_errors = []
+
+      @resolve_errors << "Please assign attachments to exploits." unless exploits_complete?
+      @resolve_errors << "Please complete the summary for rule docs." unless docs_complete?
+      @resolve_errors << "Rules must be valid." unless rules_parsed?
+
+    end
+    @resolve_errors
+  end
+
+  def can_resolve?
+    resolve_errors.empty?
   end
 
   def allow_state_change?
