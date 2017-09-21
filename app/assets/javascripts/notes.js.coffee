@@ -34,6 +34,39 @@ $ ->
         ), 5000
     }
 
+  $(document).on 'click', '#scratchpadNotesSaveBtn', (e) ->
+    e.preventDefault()
+    data = new FormData()
+    data.append( 'note[bugzilla_id]', $('input[name="bugzilla_id"]').val())
+    data.append( 'note[comment]', $('textarea[name="scratchpad_notes"]').val())
+    data.append( 'note[note_type]', $('input[name="scratchpad_type"]').val())
+    if $('input[name="scratchpad_note_id"]').val() != ""
+      data.append( 'note[id]', $('input[name="scratchpad_note_id"]').val())
+    $.ajax {
+      url: "/notes"
+      data: data
+      processData: false
+      contentType: false
+      type: 'POST'
+      dataType: 'json'
+      success: (response) ->
+        $('.alert_notes').removeClass('error')
+        $('.alert_notes').addClass('success').show().html('Notes saved')
+        $('#scratchpadNotesCancelBtn, #scratchpadNotesSaveBtn, #scratchpadNotesPublishBtn, #scratchpadNotesEditBtn').toggle()
+        $('textarea[name="scratchpad_notes"]').attr("readonly", true)
+        $('#scratchpadNotesEditBtn').html('edit')
+        $('input[name="scratchpad_note_id"]').val(response.id)
+        window.location.reload()
+      error: (response) ->
+        $('.alert_notes').removeClass('success')
+        $('.alert_notes').addClass('error').show().html(response.responseText)
+      complete: ->
+        setTimeout (->
+          $('.alert_notes').hide 'blind', {}, 500
+          return
+        ), 5000
+    }
+
   $(document).on 'click', '#committerNotesSaveBtn', (e) ->
     e.preventDefault()
     data = new FormData()
@@ -184,6 +217,16 @@ $ ->
           return
         ), 8000
     }
+
+  $(document).on 'click', '#scratchpadNotesEditBtn', (e) ->
+    e.preventDefault()
+    $('#scratchpadNotesEditArea').focus()
+
+  $(document).on 'click', '#scratchpadNotesCancelBtn', (e) ->
+    e.preventDefault()
+    $('#scratchpadNotesCancelBtn, #scratchpadNotesSaveBtn, #scratchpadNotesPublishBtn, #scratchpadNotesEditBtn').toggle()
+    $('textarea[name="scratchpad_notes"]').attr("readonly", true)
+
   $(document).on 'click', '#researchNotesEditBtn', (e) ->
     e.preventDefault()
     $('#researchNotesEditArea').focus()
@@ -211,4 +254,9 @@ $ ->
     if $('textarea[name="committer_notes"]').attr("readonly")
       $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
       $('textarea[name="committer_notes"]').attr("readonly", false)
+
+  $(document).on 'focusin',  '#scratchpadNotesEditArea', (e) ->
+    if $('textarea[name="scratchpad_notes"]').attr("readonly")
+      $('#scratchpadNotesCancelBtn, #scratchpadNotesSaveBtn, #scratchpadNotesPublishBtn, #scratchpadNotesEditBtn').toggle()
+      $('textarea[name="scratchpad_notes"]').attr("readonly", false)
 
