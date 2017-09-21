@@ -607,7 +607,6 @@ class Bug < ApplicationRecord
         if new_user.nil?
           User.create_by_email(item['assigned_to'])
           new_generated_user = User.where(email: item['assigned_to']).first
-          new_generated_user.roles << Role.where(role:"analyst")
           bug.user = new_generated_user
         else
           bug.user = new_user
