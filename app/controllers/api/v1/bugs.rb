@@ -14,6 +14,46 @@ module API
           PublishWebsocket.push_changes(record)
         end
 
+        desc "get job queue for a bug"
+        params do
+          requires :id, type: Integer, desc: "Bugzilla id."
+        end
+        get '/queue/:id' do
+          begin
+            @bug = Bug.find_by_id(params[:id])
+            response = {}
+            response[:status] = 'success'
+            response[:data] = []
+            bug_queue = []
+
+            tasks = @bug.tasks.any_relations.reverse_chron
+
+            tasks.each do |task|
+              task.check_timeout
+              task.reload
+              response_task = {}
+              response_task['id'] = task.id
+              response_task['rule_list'] = task.task_type == Task::TASK_TYPE_LOCAL_TEST ? task.rules.map {|rule| rule.new_rule? ? 'new-rule' : "#{rule.gid}:#{rule.sid}:#{rule.rev}" }.join('; ') : ""
+              response_task['completed'] = task.completed
+              response_task['failed'] = task.failed
+              response_task['cvs_username'] = User.find(task.user_id).cvs_username
+              response_task['task_type'] = task.task_type
+              response_task['result'] = task.result.present? ? task.result : "Please wait while task completes."
+              response_task['created_at'] = task.created_at.strftime("%m/%d/%y %H:%M:%S")
+              bug_queue << response_task
+            end
+            response[:data] = bug_queue
+            response.to_json
+          rescue
+            Rails.logger.error($!)
+            Rails.logger.error($!.backtrace.join("\n"))
+            response = {}
+            response[:status] = "fail"
+            response[:error] = "Something went wrong. The job queue has not been updated."
+            response.to_json
+          end
+        end
+
         desc "import all bugs assigned to a user"
         params do
           requires :user_id, type: Integer, desc: "the id of the user whose bugs we want"
@@ -40,6 +80,7 @@ module API
             false
           end
         end
+
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
@@ -93,12 +134,10 @@ module API
               begin
                 xmlrpc = Bugzilla::Bug.new(bugzilla_session)
                 new_bug = xmlrpc.get(permitted_params[:id])
-                initial_bug_state = Bug.find(permitted_params[:id])
-                if initial_bug_state.present?
+                initial_bug_state = Bug.where(id: permitted_params[:id]).first
+                if initial_bug_state
                   initial_bug_state = initial_bug_state.clone
                 end
-
-
                 progress_bar.update_attribute("progress", 10)
                 #create the bug from bugzilla
                 bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug)
@@ -123,12 +162,15 @@ module API
                 bug.save
 
                 bug.clear_rule_tested
-                report = bug.compile_import_report(initial_bug_state)
+                if initial_bug_state
+                  report = bug.compile_import_report(initial_bug_state)
+                end
                 progress_bar.update_attribute("progress", 100)
                 sleep(2)
                 {:status => "success", :import_report => report}.to_json
               rescue Exception => e
-                Rails.logger.info e
+                Rails.logger.error $!
+                Rails.logger.error $!.backtrace.join("\n")
                 progress_bar.update_attribute("progress", -1)
                 {:error => e.to_s}.to_json
               end
@@ -529,12 +571,32 @@ module API
             rescue XMLRPC::FaultException => e
               return {error: "#{e}"}
             end
-
-            return true
           end
           return false
         end
 
+        desc "add a reference to a bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        post ':bug_id/addref' do
+          bug = Bug.where(id: params['bug_id']).first
+          raise 'bug not found' unless bug
+          bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
+        end
+
+        desc "add an exploit to a bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        post ':bug_id/addexploit' do
+          bug = Bug.where(id: params['bug_id']).first
+          raise 'bug not found' unless bug
+          bug.add_exploit_action(reference_id: params['reference_id'],
+                                 exploit_type_id: params['exploit_type_id'],
+                                 attachment_id: params['attachment_id'],
+                                 exploit_data: params['exploit_data'])
+        end
       end
     end
   end

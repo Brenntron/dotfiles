@@ -9,11 +9,13 @@ class BugsController < ApplicationController
 
 
   def index
-    @bug_query = Bug.query(current_user, session[:query], session[:search]) || current_user.default_bug_list
+    session[:query] = session[:query].blank? ? current_user.default_bug_list : session[:query]
+    @bug_query = Bug.query(current_user, session[:query], session[:search])
 
     if @bug_query.any?
       @bugs = @bug_query.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
     else
+      flash.now[:alert] = "Zarro Boogs found, please try selecting any other filter."
       @bugs = Bug.none.paginate(:page => session[:page], :per_page => 32)
     end
     if params[:bug].present?
@@ -55,7 +57,7 @@ class BugsController < ApplicationController
       end
       @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
       @tasks = @bug.tasks.order(created_at: :desc)
-      @notes = @bug.notes.order(created_at: :desc)
+      @notes = @bug.notes.published.order(created_at: :desc)
       @tags = Tag.all.map { |tag| tag.name }.join(',')
       @categories = RuleCategory.ranked
       flash.now[:alert] = "Looks like this bug (#{@bug.id}) may be out of synch with bugzilla.
@@ -133,7 +135,7 @@ class BugsController < ApplicationController
 
   def get_states_and_users
     @states = Bug.distinct.pluck(:state)
-    @users = User.all
+    @users = User.order(:cvs_username).all
   end
 
   def check_bug_permission
