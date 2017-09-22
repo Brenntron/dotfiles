@@ -44,6 +44,7 @@ class BugsController < ApplicationController
     @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
 
     if @bug
+      @show_resolve_button = ["WONTFIX","FIXED","LATER","INVALID","PENDING"].include?(@bug.state)
       @rules = @bug.rules.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.valid_reference_types
       @pcap_attachments = []

@@ -16,7 +16,7 @@ def set_bug_color(bug)
                    'FIXED', 'WONTFIX', 'LATER', 'INVALID']
 
   def state_options(bug)
-    if bug.can_set_pending? || bug.state == 'PENDING'
+    if bug.can_resolve? || bug.state == 'PENDING'
       STATE_OPTIONS
     else
       STATE_OPTIONS.reject{ |so| so == "PENDING" }
