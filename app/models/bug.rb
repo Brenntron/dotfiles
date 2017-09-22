@@ -214,27 +214,27 @@ class Bug < ApplicationRecord
     end
   end
 
-  def self.get_new_bug_state(bug, state, editor_email)
+  def self.get_new_bug_state(bug, state, state_comment, editor_email)
     updated_state = state
-    updated_state = 'NEW' if editor_email == 'vrt-incoming@sourcefire.com' && bug.resolution == 'OPEN'
-    updated_state = 'ASSIGNED' unless (editor_email == 'vrt-incoming@sourcefire.com') || (%w(RESOLVED REOPENED).include? bug.status) || state == 'PENDING'
+    updated_state = 'NEW' if editor_email == 'vrt-incoming@sourcefire.com' && bug.resolution == 'OPEN' && state == 'NEW'
+    updated_state = 'ASSIGNED' unless (editor_email == 'vrt-incoming@sourcefire.com') || (%w(RESOLVED REOPENED).include? bug.status) || ['PENDING','FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE'].include?(state)
     updated_state = nil if updated_state == bug.state
     state_params = {}
 
-    case updated_state
+    case updated_state #if the state is the same as the bug state then dont do anything.
     when 'NEW'
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
-      state_params[:comment] = { comment: "This bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug." }
+      state_params[:comment] = { comment: "#{state_comment} \nThis bug has been set back to NEW. #{bug.user.email} is no longer assigned to this bug." }
     when 'ASSIGNED'
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
-      state_params[:comment] = { comment: "This bug is now ASSIGNED to #{editor_email}." }
+      state_params[:comment] = { comment: "#{state_comment} \nThis bug is now ASSIGNED to #{editor_email}." }
       state_params[:assigned_at] = Time.now
     when 'PENDING'
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
-      state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params[:comment] = { comment: "#{state_comment} \nThis bug is now RESOLVED - #{updated_state}." }
       state_params[:pending_at] = Time.now
       if bug.state == 'REOPENED'
         state_params[:rework_time] = bug.reopened_at? ? ((state_params[:pending_at] - bug.reopened_at) / 86_400).ceil : nil
@@ -244,15 +244,22 @@ class Bug < ApplicationRecord
     when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
-      state_params[:comment] = { comment: "This bug is now RESOLVED - #{updated_state}." }
+      state_params[:comment] = { comment: "#{state_comment} \nThis bug is now RESOLVED - #{updated_state}." }
       state_params[:resolved_at] = Time.now
       state_params[:review_time] = bug.pending_at? ? ((state_params[:resolved_at] - bug.pending_at) / 86_400).ceil : nil
     when 'REOPENED'
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
-      state_params[:comment] = { comment: "This bug is now #{updated_state}." }
+      state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{updated_state}." }
+      state_params[:reopened_at] = Time.now
+    when 'OPEN'
+      state_params[:status] = updated_state
+      state_params[:resolution] = 'OPEN'
+      state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{updated_state}." }
       state_params[:reopened_at] = Time.now
     end
+
+
     #return state params hash
     state_params
   end

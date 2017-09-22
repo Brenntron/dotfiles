@@ -23,27 +23,22 @@
             </div>
           </div>
 
-          <div class="col-xs-1">
-            <div class="bug-details-columns">
-              <h6>resolve</h6>
-              <h5 class="top-space">
-                <form id="resolve-form">
-                  <input type="hidden" name="user_id" value="<%= @bug.user_id %>">
-                  <input type="hidden" name="committer_id" value="<%= @bug.committer_id %>">
-                  <input type="hidden" name="summary" value="<%= @bug.summary %>">
-                  <% if @bug.can_resolve? %>
-                    <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button>
-                  <% else %>
-                    <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default" disabled="disabled">Resolve</button>
-                  <% end %>
-                </form>
-              </h5>
-            </div>
-          </div>
           <div class="col-xs-1 state">
             <div class="bug-details-columns">
               <h6>state</h6>
               <h5 id="bugzilla_popover_state" class="top-space" data-content="<%= "#{@bug.status}, #{@bug.resolution}" %>" rel="popover" data-placement="top" data-original-title="Bugzilla status" data-trigger="hover"><strong><%= @bug.state %></strong></h5>
+              <% unless @show_resolve_button %>
+              <form id="resolve-form">
+                <input type="hidden" name="user_id" value="<%= @bug.user_id %>">
+                <input type="hidden" name="committer_id" value="<%= @bug.committer_id %>">
+                <input type="hidden" name="summary" value="<%= @bug.summary %>">
+                <% if @bug.can_resolve? %>
+                    <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button>
+                <% else %>
+                    <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default" disabled="disabled">Resolve</button>
+                <% end %>
+              </form>
+              <%end%>
             </div>
           </div>
           <div class="col-xs-1">
