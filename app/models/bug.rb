@@ -158,10 +158,14 @@ class Bug < ApplicationRecord
       when "my-open-bugs"
         current_user.bugs.open_bugs
       when "team-bugs"
-        if current_user.has_role?('manager')
-          current_user.children.map{ |cw| cw.bugs }[0] || []
+        if current_user.is_on_team?
+          if current_user.has_role?('manager')
+            Bug.where(user_id: [current_user.id] + current_user.siblings.map{ |cw| cw.id } + current_user.children.map{ |cw| cw.id }) || []
+          else
+            Bug.where(user_id: current_user.siblings.map{ |cw| cw.id } << current_user.id) || []
+          end
         else
-          current_user.siblings.map{ |cw| cw.bugs }[0] || []
+          current_user.bugs
         end
       when "advance-search"
         Bug.bugs_with_search(search_options) || Bug.all

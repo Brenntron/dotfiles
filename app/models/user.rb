@@ -58,6 +58,9 @@ class User < ApplicationRecord
   def has_role?(role)
     roles.where(role: role).any?
   end
+  def is_on_team?
+    (parent.nil? && children.empty?) ? false : true
+  end
 
   def available_users
     User.all.reject{|u| self_and_ancestors.include?(u) ||
