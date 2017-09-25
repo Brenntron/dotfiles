@@ -645,7 +645,6 @@ Feature: Bug
     And I goto "/bugs/222222"
     And I click ".rules-tab"
 
-
   @javascript
   Scenario: a user can test a rule
     Given a user with role "analyst" exists and is logged in
@@ -662,7 +661,7 @@ Feature: Bug
     And I wait for "3" seconds
     When I goto "/bugs/145359"
     And I click ".jobs-tab"
-    Then I should not see "rule"
+    Then I should not see "local test"
     When I click ".rules-tab"
     And I toggle checkbox ".rule_3591"
     And I click button "test"
@@ -732,17 +731,17 @@ Feature: Bug
     And I goto "/bugs/145359"
     And I click ".notes-tab"
     Then the textarea with id "researchNotesEditArea" should contain "THESIS: RESEARCH: DETECTION GUIDANCE: DETECTION BREAKDOWN: REFERENCES:"
-    And I click "edit"
+    And I click "researchNotesEditBtn"
     And  I fill in "research_notes" with "This is a research note"
-    And I click "save"
+    And I click "researchNotesSaveBtn"
     Then I should see "Notes saved"
     Then I wait for "2" seconds
     When I click "publish"
     And I wait for "12" seconds
     #Then I should see "Notes published to bugzilla"
-    And I click "edit"
+    And I click "researchNotesEditBtn"
     And  I fill in "research_notes" with "This is a research note too"
-    And I click "save"
+    And I click "researchNotesSaveBtn"
     Then I should see "Notes saved"
 
   @javascript
@@ -789,16 +788,16 @@ Feature: Bug
     And I wait for "1" seconds
     Then I should see "I love testing"
 
-  @javascript
+@javascript
   Scenario: a user can sort history from oldest to newest messages.
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
     And the following notes exist:
-      | id |   comment     |  note_type |        author       | bug_id  |
-      | 1  |i like comments| "research" | "nicherbe@cisco.com"| 145359  |
-      | 2  |pork sandwiches| "research" | "nicherbe@cisco.com"| 145359  |
+      | id |   comment     |  note_type |        author       | bug_id  | notes_bugzilla_id |
+      | 1  |i like comments| "research" | "nicherbe@cisco.com"| 145359  |   1927402          |
+      | 2  |pork sandwiches| "research" | "nicherbe@cisco.com"| 145359  |   1720346          |
     Then I wait for "3" seconds
     And I goto "/bugs/145359"
     And I click ".history-tab"
