@@ -160,9 +160,9 @@ class Bug < ApplicationRecord
       when "team-bugs"
         if current_user.is_on_team?
           if current_user.has_role?('manager')
-            current_user.children.map{ |cw| cw.bugs }[0] || []
+            Bug.where(user_id: [current_user.id] + current_user.siblings.map{ |cw| cw.id } + current_user.children.map{ |cw| cw.id }) || []
           else
-            current_user.siblings.map{ |cw| cw.bugs }[0] || []
+            Bug.where(user_id: current_user.siblings.map{ |cw| cw.id } << current_user.id) || []
           end
         else
           current_user.bugs
