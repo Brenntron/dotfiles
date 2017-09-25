@@ -5,22 +5,13 @@
         <label for="state">State</label>
         <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control'%>
 
-        <% unless @bug.exploits_complete? %>
-            <br><span class="tiny text-muted ">Can't set to pending. Please assign attachments to exploits.</span><br>
-        <% end %>
-        <% unless @bug.docs_complete? %>
-          <br>
-          <span class="tiny text-muted ">
-            Can't set to pending. Please complete the summary for rule docs.
-          </span>
-          <br>
-        <% end %>
-        <% unless @bug.rules_parsed? %>
-          <br>
-          <span class="tiny text-muted ">
-            Can't set to pending. Rules must be valid.
-          </span>
-          <br>
+        <% unless @bug.can_resolve? %>
+        <span class="tiny text-muted">Can't set to pending.</span>
+        <ul>
+          <% @bug.resolve_errors.each do |error_message| %>
+          <li><span class="tiny text-muted"><%= error_message %></span></li>
+          <% end %>
+        </ul>
         <% end %>
       </div>
     </div>

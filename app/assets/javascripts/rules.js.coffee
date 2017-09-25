@@ -200,48 +200,32 @@ $ ->
             }
         when 'commit'
           bid = $('.bugzilla_id').text()
-
           headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-          $.ajax(
-            url: '/api/v1/bugs/import/' + bid
-            method: 'GET'
+          $.ajax {
+            url: "/api/v1/rules/commit"
             headers: headers
-          ).done (response) ->
-            json = $.parseJSON(response)
+            data:
+              rule_ids: selected
+              username: $('#username').text()
+              bug_id: $('.bugzilla_id').text()
+              bugzilla_comment: $('#bugzilla-comment-text').val()
+              nodoc_override: $('#missing-doc-override')[0].checked
+            type: 'PUT'
+            dataType: 'json'
+            success: (response) ->
+              $('.alert_rules').addClass('success').show().html('Rules has been committed')
+              setTimeout (->
+                $('.alert_rules').hide 'blind', {}, 500
+                return
+              ), 5000
+              $(document).ajaxStop ->
+                location.reload true
+            error: (response) ->
+              api_error(response, 'Rules have not been committed.', {failure_reload: true})
+            complete: ->
+          }
 
-            if (json.error)
-              message = "There was a problem attempting to synch this bug:"
-              message += json.error
-              $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
-            else
-              if(json.import_report.total_changes == 0)
-                $.ajax {
-                  url: "/api/v1/rules/commit"
-                  headers: headers
-                  data:
-                    rule_ids: selected
-                    username: $('#username').text()
-                    bug_id: $('.bugzilla_id').text()
-                    bugzilla_comment: $('#bugzilla-comment-text').val()
-                    nodoc_override: $('#missing-doc-override')[0].checked
-                  type: 'PUT'
-                  dataType: 'json'
-                  success: (response) ->
-                    $('.alert_rules').addClass('success').show().html('Rules has been committed')
-                    setTimeout (->
-                      $('.alert_rules').hide 'blind', {}, 500
-                      return
-                    ), 5000
-                    $(document).ajaxStop ->
-                      location.reload true
-                  error: (response) ->
-                    api_error(response, 'Rules have not been committed.', {failure_reload: true})
-                  complete: ->
-                }
-              else
-                if(!alert("There have been #{json.import_report.total_changes} changes to this bug after synching.  You should review the bug, rules, attachments, notes, tags, and references before committing"))
-                  window.location.reload()
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')

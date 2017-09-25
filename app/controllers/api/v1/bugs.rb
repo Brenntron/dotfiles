@@ -294,7 +294,7 @@ module API
 
           editor = User.find(permitted_params[:bug][:user_id])
           reviewer = User.find(permitted_params[:bug][:committer_id])
-          updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], editor.email)
+          updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], editor.email)
 
           options = {
               :ids => permitted_params[:id],
