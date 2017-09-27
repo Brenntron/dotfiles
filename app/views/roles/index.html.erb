@@ -1,0 +1,21 @@
+<div style="margin-top:50px;">
+  <%= link_to new_role_path, class: "btn btn-primary btn-xs" do %>
+      <i class="glyphicon glyphicon-plus" title="Add"> Add</i>
+  <% end %>
+  <table class="table table-striped">
+    <% @roles.each do |role| %>
+        <tr>
+          <td>
+            <%= role.role %>
+            <%= link_to edit_role_path(role.id), class: "btn btn-primary btn-xs" do %>
+                <i class="glyphicon glyphicon-pencil" title="Edit"></i>
+            <% end %>
+            <%= link_to role_path(role.id), method: :delete, class: "btn btn-danger btn-xs", data: {confirm: 'Are you sure you want to Delete this?'} do %>
+                <i class="glyphicon glyphicon-remove" title="Delete"></i>
+            <% end %>
+          </td>
+
+        </tr>
+    <% end %>
+  </table>
+</div>
