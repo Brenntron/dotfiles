@@ -2,12 +2,23 @@
   Channels - Analyst Console
 
 - content_for(:side_space) do
-  .hamburger-height.hamburger-spacer.target-highlight
+  .hamburger-height.hamburger-spacer
     .input-group.input-group-sm
       %form
         %input.searchID{type: 'text'}
 
   %h5
     %strong Channels
+
+
+- content_for(:top_banner) do
+  %div{style: 'display: inline-block'}
+    %button.btn{onclick: 'spaz();'} Test
+  %div{style: 'display: inline-block'}
+    %button.btn{onclick: 'spaz();'} Close
+  %div{style: 'display: inline-block'}
+    %button.btn{onclick: 'spaz();'} FP
+
+
 
 = render template: "layouts/sections"

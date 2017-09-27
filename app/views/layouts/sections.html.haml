@@ -30,15 +30,19 @@
 
                   #hamburger-space
 
-                  = content_for(:side_space)
-                %td
-                  tada
+                  = content_for(:side_space) if content_for?(:side_space)
 
-          - if current_user
-            %a{href: "/users/#{current_user[:id]}"}
-              %p.login-area
-                %span.login-label
-                  %strong.current_user= current_user[:display_name]
-            #username{style: "display:none;"}= current_user.cvs_username
+                %td#main-area
+                  #top-banner.header
+                    - if current_user
+                      %a{href: "/users/#{current_user[:id]}"}
+                        %p.login-area
+                          %span.login-label
+                            %strong.current_user= current_user[:display_name]
+                      #username{style: "display:none;"}= current_user.cvs_username
 
-          =yield
+                    = content_for(:top_banner) if content_for?(:top_banner)
+
+                  #yield-div
+
+                    =yield
