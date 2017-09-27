@@ -6,10 +6,7 @@
     <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
     <%= csrf_meta_tags %>
   </head>
-  <body>
-  <% if controller_name == 'bugs' %>
-    <%= render 'shared/bug_search_modal' %>
-  <% end %>
+  <body class="<%= controller_name %>-controller <%= action_name %>-action">
     <div class="sidebar">
       <div class="sidebar-header center">
         <h1 class="logo"><%= link_to 'Analyst Console', root_url  %></h1>

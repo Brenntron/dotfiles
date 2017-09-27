@@ -1,3 +1,13 @@
--#= yield
+- content_for(:title) do
+  Channels - Analyst Console
+
+- content_for(:side_space) do
+  .hamburger-height.hamburger-spacer.target-highlight
+    .input-group.input-group-sm
+      %form
+        %input.searchID{type: 'text'}
+
+  %h5
+    %strong Channels
 
 = render template: "layouts/sections"

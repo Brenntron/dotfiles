@@ -1,0 +1,44 @@
+!!! html
+%html
+  %head
+    %title= content_for?(:title) ? content_for(:title) : 'Analyst Console'
+    = stylesheet_link_tag("application", media: "all", "data-turbolinks-track" => true)
+    = javascript_include_tag("application", "data-turbolinks-track" => true)
+    = csrf_meta_tags
+  %body{class: "#{controller_name}-controller #{action_name}-action"}
+    .sidebar
+      .sidebar-header.center
+        %h1.logo= link_to('Analyst Console', root_url)
+        .sidebar-footer
+          %p &copy; 2017 Cisco Systems, Inc
+      %nav.navbar.nav-stacked.rules-ui-nav
+        %ul.nav.nav-stacked
+          %li= link_to('BUG LIST', bugs_path)
+          %li= link_to('USERS', users_path)
+          %li.doc-link= link_to('Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank')
+    #main-content.overall
+      .container-fluid
+        .row
+          %table#layout-table
+            %tbody
+              %tr
+                %td#side-area.col-xs-3.col-sm-2.col-md-2.col-lg-2.item-ids-column
+                  %a.sidebar-toggle
+                    %span.icon-bar
+                    %span.icon-bar
+                    %span.icon-bar
+
+                  #hamburger-space
+
+                  = content_for(:side_space)
+                %td
+                  tada
+
+          - if current_user
+            %a{href: "/users/#{current_user[:id]}"}
+              %p.login-area
+                %span.login-label
+                  %strong.current_user= current_user[:display_name]
+            #username{style: "display:none;"}= current_user.cvs_username
+
+          =yield
