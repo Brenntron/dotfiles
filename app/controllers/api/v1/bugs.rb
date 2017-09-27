@@ -539,17 +539,21 @@ module API
               if current_user.bugs.exists?(bug.id)
                 return {error: 'already subscribed to this bug'}
               else
-                options = {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
                 Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                 current_user.bugs << bug
                 Bug.update(permitted_params[:id], state:"ASSIGNED")
               end
               return true
             rescue XMLRPC::FaultException => e
-              return {error: "#{e}"}
+               throw :error,
+                     status: 400,
+                     message: "#{e.message}"
             end
           end
-          return {error: 'cannot find bug to subscribe'}
+          throw :error,
+                status: 404,
+                message: 'cannot find bug to subscribe'
         end
 
 
@@ -569,10 +573,14 @@ module API
               vrt_incoming.bugs << bug
               return true
             rescue XMLRPC::FaultException => e
-              return {error: "#{e}"}
+              throw :error,
+                    status: 400,
+                    message: "#{e.message}"
             end
           end
-          return false
+          throw :error,
+                status: 404,
+                message: 'cannot find bug to unsubscribe'
         end
 
         desc "add a reference to a bug"

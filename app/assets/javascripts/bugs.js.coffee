@@ -53,7 +53,7 @@ $ ->
       success: (response) ->
         location.reload()
       error: (response) ->
-        alert ("could not take this bug" + response)
+        alert ("Sorry, you can not take this bug\n" + response.responseJSON.error)
         location.reload()
     }
 
@@ -70,7 +70,7 @@ $ ->
       success: (response) ->
         location.reload()
       error: (response) ->
-        alert ("cant return this bug." + response)
+        alert ("cant return this bug." + response.responseJSON.error)
         location.reload()
     }
 
