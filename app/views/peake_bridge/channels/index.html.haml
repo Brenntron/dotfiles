@@ -1,0 +1,16 @@
+Index
+
+%table
+  %caption Channels
+  %thead
+    %tr
+      %th Name
+      %th Sender
+      %th subscribers
+  %tbody
+    - @channels.each do |channel|
+      %tr
+        %td=channel[:name]
+        %td=channel[:sender]
+        %td=channel[:subscribers].join(", ")
+
