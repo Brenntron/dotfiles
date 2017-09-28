@@ -122,9 +122,11 @@ module API
         desc "import one bug from bugzilla"
         params do
           requires :id, type: Integer, desc: "Bugzilla id."
+          optional :import_type, type: String, desc: "Type of Import"
         end
         route_param "import/:id" do
           get do
+            import_type = params[:import_type].present? ? params[:import_type] : "import"
             xmlrpc_token = request.headers['Xmlrpc-Token']
 
             if xmlrpc_token
@@ -132,47 +134,32 @@ module API
               progress_bar = Event.create(user:current_user.display_name,action:"import_bug:#{params[:id]}",description:"#{request.headers["Token"]}",progress:10)
 
               begin
-                xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-                new_bug = xmlrpc.get(permitted_params[:id])
-                initial_bug_state = Bug.where(id: permitted_params[:id]).first
-                if initial_bug_state
-                  initial_bug_state = initial_bug_state.clone
-                end
-                progress_bar.update_attribute("progress", 10)
-                #create the bug from bugzilla
-                bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug)
-                #parse the bug summary
-                parsed = bug.parse_summary
-                bug_rules = bug.rules.map {|r| r.id}
-                progress_bar.update_attribute("progress", 50)
-                bug.load_rules_from_sids(parsed[:sids])
-                progress_bar.update_attribute("progress", 60)
-                parsed[:tags].each do |tag|
-                  bug.import_report[:new_tags] += 1 unless bug.tags.include?(tag)
-                  bug.tags << tag unless bug.tags.include?(tag)
-                end
-                progress_bar.update_attribute("progress", 75)
-                parsed[:refs].each do |ref|
-                  bug.import_report[:new_refs] += 1 unless bug.references.map {|r| r.reference_data}.include? ref.reference_data
-                  bug.references << ref unless bug.references.map {|r| r.reference_data}.include? ref.reference_data
-                  Exploit.find_exploits(ref)
-                end
-                progress_bar.update_attribute("progress", 90)
-                #save the bug
-                bug.save
+                ActiveRecord::Base.transaction do
+                  xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+                  new_bug = xmlrpc.get(permitted_params[:id])
+                  initial_bug_state = Bug.where(id: permitted_params[:id]).first
+                  if initial_bug_state
+                    initial_bug_state = initial_bug_state.clone
+                  end
+                  progress_bar.update_attribute("progress", 10)
+                  #create the bug from bugzilla
+                  bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug, progress_bar, import_type).first
 
-                bug.clear_rule_tested
-                if initial_bug_state
-                  report = bug.compile_import_report(initial_bug_state)
+                  if initial_bug_state.present?
+                    report = bug.compile_import_report(initial_bug_state)
+                  end
+
+                  sleep(1)
+                  {:status => "success", :import_report => report}.to_json
                 end
-                progress_bar.update_attribute("progress", 100)
-                sleep(2)
-                {:status => "success", :import_report => report}.to_json
+
               rescue Exception => e
+                Rails.logger.error "Bug failed to upload, backing out all DB changes."
                 Rails.logger.error $!
                 Rails.logger.error $!.backtrace.join("\n")
                 progress_bar.update_attribute("progress", -1)
-                {:error => e.to_s}.to_json
+                error = "There was an error when attempting to upload bug, no bug was uploaded or synched as a result."
+                {:error => error}.to_json
               end
             else
               false
