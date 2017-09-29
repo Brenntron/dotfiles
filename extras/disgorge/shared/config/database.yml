@@ -23,7 +23,6 @@ staging:
   host: localhost
   database: analyst_console_staging
   username: root
-  encoding: utf8
   password: Opensnort
 
 cucumber:

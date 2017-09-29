@@ -11,9 +11,11 @@ if [[ $# -lt 1 ]]; then
     echo 'RELDIR=<timestamp>                    Second ARG -- subdir for this build'
     echo 'RELBASE=~/disgorge                    Base dir with releases, shared, and current subdirs'
     echo 'RELPATH=$RELBASE/releases/$RELDIR     Dir for source files'
+    echo 'SHARED=SHARED                         SHARED to use shared dir, SKIP to omit'
     echo 'SHAREDDIR=$RELBASE/shared             Location of Shared files and dirs'
     echo 'CURRDIR=$RELBASE/current              Path of sym link to source file directory'
     echo 'VENDORDIR=$SHAREDDIR/vendor           Shared vendor directory if exists'
+    echo 'BUNDLE_SHARE=CLEAN                    CLEAN to not use shared, SHARE to use shared, COPY to copy from shared'
     echo ''
     exit
 fi
@@ -65,21 +67,52 @@ cd $RELPATH/$TAGDIR
 
 if [ "SKIP" != "$SHARED" ]; then
     echo '* using shared files and directories'
+    echo $SHAREDDIR
 
-    rm -rf extras/ssh
-    ln -s $SHAREDDIR/ssh extras/ssh
-
-    rm -rf log
-    ln -s $SHAREDDIR/log .
-    if [ -f log/staging.log ]; then
-        echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
-    fi
-    if [ -f log/development.log ]; then
-        echo "--- Release $RELDIR $TAGDIR" >> log/development.log
+    if [ -d $SHAREDDIR/ssh ]; then
+        rm -rf extras/ssh
+        ln -s $SHAREDDIR/ssh extras/ssh
     fi
 
-    cp $SHAREDDIR/config/database.yml config
-    cp $SHAREDDIR/config/secrets.yml config
+    if [ -d $SHAREDDIR/log ]; then
+        rm -rf log
+        ln -s $SHAREDDIR/log .
+        if [ -f log/staging.log ]; then
+            echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
+        fi
+        if [ -f log/development.log ]; then
+            echo "--- Release $RELDIR $TAGDIR" >> log/development.log
+        fi
+    fi
+
+    if [ -f $SHAREDDIR/config/database.yml ]; then
+        echo $SHAREDDIR/config/database.yml
+        rm config/database.yml
+        ln -s $SHAREDDIR/config/database.yml config
+    fi
+    if [ -f $SHAREDDIR/config/secrets.yml ]; then
+        echo $SHAREDDIR/config/secrets.yml
+        rm config/secrets.yml
+        ln -s $SHAREDDIR/config/secrets.yml config
+    fi
+    if [ -f $SHAREDDIR/config/config.yml ]; then
+        echo $SHAREDDIR/config/config.yml
+        rm config/config.yml
+        ln -s $SHAREDDIR/config/config.yml config
+    fi
+fi
+
+
+
+if [ "SHARE" == "$BUNDLE_SHARE" ]; then
+    ln -s $SHAREDDIR/vendor/bundle vendor/bundle
+else
+    mkdir vendor/bundle
+fi
+
+if [ "COPY" == "$BUNDLE_SHARE" ]; then
+    echo "* copying vendor bundle"
+    cp -R $SHAREDDIR/vendor/bundle vendor
 fi
 
 if [ "SKIP" != "$BUNDLE_PACKAGE" ]; then
@@ -95,8 +128,14 @@ fi
 
 if [ "SKIP" != "$BUNDLE_INSTALL" ]; then
     echo '* bundle install'
-    bundle _1.14.6_ install --deployment --local --path vendor/bundle --without development test
+    if [ "DEPLOYMENT" == "$DEPLOYMENT" ]; then
+        bundle _1.14.6_ install --deployment --clean --local --path vendor/bundle --without development test
+    else
+        bundle _1.14.6_ install --local --path vendor/bundle
+    fi
 fi
+
+
 
 if [ "SKIP" != "$MIGRATE" ]; then
     echo '* migrations'
@@ -117,14 +156,25 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
     #fi
     ln -s $SHAREDDIR/extras/snort extras/snort
 
-    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/ $RELPATH/$TAGDIR/extras/ruledocs
+    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ $RELPATH/$TAGDIR/extras/rulesdocs
 fi
 
 if [ "" != "$CURRDIR" ]; then
     echo "* simlink $CURRDIR to $RELPATH/$TAGDIR"
     rm $CURRDIR
     ln -s $RELPATH/$TAGDIR $CURRDIR
+
     cd $CURRDIR
+
+    if [ ! -d tmp ]; then
+        mkdir tmp
+    fi
+    touch tmp/restart.txt
+
+    if [ ! -d tmp/cache ]; then
+        mkdir tmp/cache
+    fi
+    chmod 777 tmp/cache/
 fi
 
 if [ "" != "$VERSION" ]; then
