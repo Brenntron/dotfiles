@@ -851,7 +851,6 @@ class Rule < ApplicationRecord
   end
 
   def check_to_smtp
-    byebug
     errors = []
 
     errors << 'from FILE-OTHER' unless "FILE-OTHER" == rule_category.category
@@ -861,7 +860,12 @@ class Rule < ApplicationRecord
   end
 
   def to_smtp
+    byebug
+    new_metadata = metadata.split(/\s*,\s*/).reject{|metadatum| /\Aservice\s+/ =~ metadatum}
+    new_metadata << 'service smtp'
+    self.metadata = new_metadata.join(', ')
 
+    Rails.logger.debug('<<< to_smtp')
   end
 
   # Creates a rule and its associations

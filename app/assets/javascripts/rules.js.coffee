@@ -93,7 +93,19 @@ window.disparage =(chkbox) ->
 
 
 window.to_smtp =(rule_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   alert('no particular place to go ' + rule_id)
+  $.ajax {
+    url: '/api/v1/rules/to_smtp/' + rule_id
+    method: 'POST'
+    data: ''
+    headers: headers
+    success: (response) ->
+      debugger
+      alert(response)
+    error: (response) ->
+      alert(response.responseText)
+  }
 
 
 window.check_to_smtp = ->
