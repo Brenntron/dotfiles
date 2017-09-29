@@ -92,6 +92,10 @@ window.disparage =(chkbox) ->
     alert(disparage_messages[message_index])
 
 
+window.to_smtp = ->
+  alert("to smtp")
+
+
 $ ->
   $('.rule-toolbar').click ->
     tab = $(this).attr('id')
