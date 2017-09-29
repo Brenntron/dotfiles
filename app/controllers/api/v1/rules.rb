@@ -285,7 +285,7 @@ module API
         post "to_smtp/:sid", root: 'rule' do
           rule = Rule.find_or_load(permitted_params[:sid], 1)
           if rule
-            {rule: rule.dup.to_smtp}
+            {rule: rule.to_smtp}
           else
             nil
           end

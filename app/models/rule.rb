@@ -861,9 +861,13 @@ class Rule < ApplicationRecord
 
   def to_smtp
     byebug
+
     new_metadata = metadata.split(/\s*,\s*/).reject{|metadatum| /\Aservice\s+/ =~ metadatum}
     new_metadata << 'service smtp'
     self.metadata = new_metadata.join(', ')
+
+    new_flow = ['to_server'] + flow.split(/\s*,\s*/).reject{|flow_datum| 'to_client' == flow_datum}
+    self.flow = new_flow.join(',')
 
     Rails.logger.debug('<<< to_smtp')
   end
