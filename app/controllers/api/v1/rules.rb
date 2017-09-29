@@ -271,11 +271,11 @@ module API
 
         desc "Checks rule to convert to SMTP"
         params do
-          requires :rule_id, type: Integer, desc: "the id for the rule to be checked"
+          requires :sid, type: Integer, desc: "the id for the rule to be checked"
         end
-        get "to_smtp/:rule_id", root: 'rule' do
-          "-- #{permitted_params[:rule_id]} --"
-          ''
+        get "to_smtp/:sid", root: 'rule' do
+          rule = Rule.by_sid(permitted_params[:sid]).first
+          rule.check_to_smtp
         end
       end
     end

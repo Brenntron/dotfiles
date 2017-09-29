@@ -850,6 +850,20 @@ class Rule < ApplicationRecord
     rule
   end
 
+  def check_to_smtp
+    byebug
+    errors = []
+
+    errors << 'from FILE-OTHER' unless "FILE-OTHER" == rule_category.category
+    errors << 'from to_client' unless flow.split(',').include?('to_client')
+
+    errors.empty? ? '' : "Intended to covert to STMP\n#{errors.join("\n")}"
+  end
+
+  def to_smtp
+
+  end
+
   # Creates a rule and its associations
   # @return [Rule]
   def self.create_action(rule_content, rule_doc, bug_id)
