@@ -268,6 +268,15 @@ module API
           ::PaperTrail.whodunnit = current_user.cvs_username
           Rule.update(permitted_params[:id])
         end
+
+        desc "Checks rule to convert to SMTP"
+        params do
+          requires :rule_id, type: Integer, desc: "the id for the rule to be checked"
+        end
+        get "to_smtp/:rule_id", root: 'rule' do
+          "-- #{permitted_params[:rule_id]} --"
+          ''
+        end
       end
     end
   end

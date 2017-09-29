@@ -92,8 +92,26 @@ window.disparage =(chkbox) ->
     alert(disparage_messages[message_index])
 
 
-window.to_smtp = ->
-  alert("to smtp")
+window.to_smtp =(rule_id) ->
+  alert('no particular place to go ' + rule_id)
+
+
+window.check_to_smtp = ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  rule_id = $('#dup-rule-id').val()
+  $.ajax {
+    url: '/api/v1/rules/to_smtp/' + rule_id
+    method: 'GET'
+    data: ''
+    headers: headers
+    success: (response) ->
+      if "" != response
+        if !confirm(response)
+          return
+      to_smtp(rule_id)
+    error: (response) ->
+      alert(response.responseText)
+  }
 
 
 $ ->

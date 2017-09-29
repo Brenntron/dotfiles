@@ -7,9 +7,9 @@
       <form role="form" class="form-inline pull-right prepopulate-form" id="duplicate_rule">
         <div class="form-group">
           <label class="sr-only">Duplicate: </label>
-          <input class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID">
+          <input id="dup-rule-id" class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID">
           <button id="dup-rule-button" class="btn btn-default select-sm" value="submit" data-disable-with="duplicating rule..." autocomplete="off">duplicate</button>
-          <button type="button" id="to-stmp-button" class="btn btn-default select-sm" onclick="to_smtp()">to smtp</button>
+          <button type="button" id="to-stmp-button" class="btn btn-default select-sm" onclick="check_to_smtp()">to smtp</button>
         </div>
       </form>
     </div>
