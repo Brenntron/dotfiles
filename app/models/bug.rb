@@ -794,25 +794,25 @@ class Bug < ApplicationRecord
 		            note = Note.where(id: c['id']).first
 
                 if note.present?
-                  note.update_attributes({
-                    author:     c['author'],
-                    comment:    comment,
-                    bug_id:     bug_id,
-                    note_type:  note_type,
-                    notes_bugzilla_id: c['id'],
-                    created_at: creation_time
-	                }) unless import_type == "status"
+                  unless import_type == "status"
+                    note.update_attributes(author: c['author'],
+                                           comment: comment,
+                                           bug_id: bug_id,
+                                           note_type: note_type,
+                                           notes_bugzilla_id: c['id'],
+                                           created_at: creation_time)
+                  end
                 else
                   bug.import_report[:new_notes] += 1
-                  Note.create({
-                    id:         c['id'],
-                    author:     c['author'],
-                    comment:    comment,
-                    bug_id:     bug_id,
-                    note_type:  note_type,
-                    created_at: creation_time,
-                    notes_bugzilla_id: c['id']
-                  }) unless import_type == "status"
+                  unless import_type == "status"
+                    Note.create(id: c['id'],
+                                author: c['author'],
+                                comment: comment,
+                                bug_id: bug_id,
+                                note_type: note_type,
+                                created_at: creation_time,
+                                notes_bugzilla_id: c['id']                     )
+                  end
                 end
               end
             end
