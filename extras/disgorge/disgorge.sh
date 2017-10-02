@@ -175,6 +175,8 @@ if [ "" != "$CURRDIR" ]; then
         mkdir tmp/cache
     fi
     chmod 777 tmp/cache/
+    cd tmp/cache/
+    umask 000
 fi
 
 if [ "" != "$VERSION" ]; then
