@@ -14,14 +14,15 @@ module API
           rule.check_to_smtp
         end
 
-        desc "Checks rule to convert to SMTP"
+        desc "Converts rule to SMTP"
         params do
           requires :sid, type: Integer, desc: "the id for the rule to be checked"
         end
         post ":sid/to_smtp", root: 'rule' do
           rule = Rule.find_or_load(permitted_params[:sid], 1)
           if rule
-            {rule: rule.to_smtp}
+            rule_smtp = rule.to_smtp
+            { rule: rule_smtp, references: rule_smtp.references }
           else
             nil
           end

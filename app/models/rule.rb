@@ -860,6 +860,7 @@ class Rule < ApplicationRecord
     rule_content = RuleSyntax::Assemposer.new(rule_params).rule_content
     parser = RuleSyntax::RuleParser.new(rule_content)
     rule.assign_from_user_edit(rule_content, parser: parser)
+    rule.associate_references(rule_content)
 
     rule
   end
