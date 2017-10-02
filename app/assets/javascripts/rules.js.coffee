@@ -118,9 +118,10 @@ window.to_smtp =(rule_id, reference_form) ->
         standard_form.find('select[name="rule[class_type]"]').val(rule.class_type)
         reference_add = standard_form.find('.references_add')
         $.each references, (ref_index, reference) ->
+          debugger
           ref_form = $(reference_form).appendTo(reference_add)
           ref_form.find('input[name="rule[reference][][reference_data]"]').val(reference.reference_data)
-          ref_form.find('select[name="rule[reference][][reference_type_id]"]').val(reference.reference_type_id)
+          ref_form.find('select[name="rule[reference][][reference_type_id]"]').val(reference.reference_type_name)
     error: (response) ->
       alert(response.responseText)
   }

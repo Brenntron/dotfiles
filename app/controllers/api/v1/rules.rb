@@ -22,7 +22,10 @@ module API
           rule = Rule.find_or_load(permitted_params[:sid], 1)
           if rule
             rule_smtp = rule.to_smtp
-            { rule: rule_smtp, references: rule_smtp.references }
+            references = rule_smtp.references.map do |ref|
+              { reference_data: ref.reference_data, reference_type_name: ref.reference_type.name }
+            end
+            { rule: rule_smtp, references: references }
           else
             nil
           end
