@@ -84,12 +84,13 @@ module API
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
+          import_type = params[:import_type].present? ? params[:import_type] : "import"
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
             new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bugs)
+            Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bugs, import_type)
             "true"
           else
             "false"

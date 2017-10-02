@@ -637,13 +637,13 @@ class Bug < ApplicationRecord
   ####   that checks for bug changes in Bugzilla before executing certain actions (like committing a rule or setting a bug to 'PENDING')
 
 
-  def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar, import_type = "import")
+  def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []
     unless new_bugs['bugs'].empty?
       new_bugs['bugs'].each do |item|
 
-        progress_bar.update_attribute("progress", 10)
+        progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
 
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
@@ -864,18 +864,18 @@ class Bug < ApplicationRecord
           end
         end
 
-        progress_bar.update_attribute("progress", 30)
+        progress_bar.update_attribute("progress", 30) unless progress_bar.blank?
 
         parsed = bug.parse_summary
-        progress_bar.update_attribute("progress", 50)
+        progress_bar.update_attribute("progress", 50) unless progress_bar.blank?
         bug.load_rules_from_sids(parsed[:sids], import_type)
-        progress_bar.update_attribute("progress", 60)
+        progress_bar.update_attribute("progress", 60) unless progress_bar.blank?
         bug.load_tags_from_summary(parsed[:tags], import_type)
 
-        progress_bar.update_attribute("progress", 75)
+        progress_bar.update_attribute("progress", 75) unless progress_bar.blank?
         bug.load_refs_from_summary(parsed[:refs], import_type)
 
-        progress_bar.update_attribute("progress", 90)
+        progress_bar.update_attribute("progress", 90) unless progress_bar.blank?
 
         #save the bug and clear all rule tests unless the import action is a status check
         if import_type != "status"
@@ -883,7 +883,7 @@ class Bug < ApplicationRecord
           bug.clear_rule_tested
         end
 
-        progress_bar.update_attribute("progress", 100)
+        progress_bar.update_attribute("progress", 100) unless progress_bar.blank?
 
         total_bugs << bug
 
