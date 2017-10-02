@@ -839,6 +839,30 @@ class Rule < ApplicationRecord
 
   end
 
+  def copy(arg_attributes = {})
+    changed_attributes = arg_attributes
+    references = changed_attributes.delete('references')
+
+    new_attributes = self.attributes.merge(changed_attributes)
+    new_attributes['sid'] = nil
+    new_attributes['rev'] = nil
+    new_attributes['rule_content'] = nil
+    new_attributes['rule_parsed'] = nil
+    new_attributes['cvs_rule_content'] = nil
+    new_attributes['cvs_rule_parsed'] = nil
+    new_attributes['filename'] = nil
+    new_attributes['linenumber'] = nil
+
+    rule = Rule.new(new_attributes)
+
+    rule_params = rule.build_rule_params({ 'references' => references })
+    rule_content = RuleSyntax::Assemposer.new(rule_params).rule_content
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    rule.assign_from_user_edit(rule_content, parser: parser)
+
+    rule
+  end
+
   def dup
     rule = Rule.new(self.attributes)
     rule.sid = nil
