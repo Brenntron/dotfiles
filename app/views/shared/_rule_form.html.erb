@@ -9,7 +9,7 @@
           <label class="sr-only">Duplicate: </label>
           <input id="dup-rule-id" class="form-control select-sm input-extra-narrow" name="rule_id" placeholder="rule SID">
           <button id="dup-rule-button" class="btn btn-default select-sm" value="submit" data-disable-with="duplicating rule..." autocomplete="off">duplicate</button>
-          <button type="button" id="to-stmp-button" class="btn btn-default select-sm" onclick="check_to_smtp()">to smtp</button>
+          <button type="button" id="to-stmp-button" class="btn btn-default select-sm" onclick="check_to_smtp(window.reference_form)">to smtp</button>
         </div>
       </form>
     </div>
@@ -390,6 +390,19 @@
     id = id.substr(id.indexOf(' ')+1, id.length);
     $('#'+id).val($(this).text());
   });
+
+  window.reference_form = '<div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">' +
+      '<div class="form-group">' +
+      '<select type="text" name="rule[reference][][reference_type_id]" class="form-control select-sm code">' +
+      '<option class="text-muted" value="" selected> - </option>' +
+      '"<% @ref_types.each do |ref| %> <option value="<%= ref.name %>"><%= ref.name %></option><% end %>"' +
+      '</select>' +
+      '</div>' +
+      '<div class="form-group">' +
+      '<input class="form-control select-sm code" placeholder="reference data" name="rule[reference][][reference_data]" required="true">' +
+      '</div>' +
+      '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>' +
+      '</div></div>'
 
 </script>
 

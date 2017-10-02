@@ -92,25 +92,7 @@ window.disparage =(chkbox) ->
     alert(disparage_messages[message_index])
 
 
-window.check_to_smtp = ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  rule_id = $('#dup-rule-id').val()
-  $.ajax {
-    url: '/api/v1/rules/' + rule_id + '/to_smtp'
-    method: 'GET'
-    data: ''
-    headers: headers
-    success: (response) ->
-      if "" != response
-        if !confirm(response)
-          return
-      to_smtp(rule_id)
-    error: (response) ->
-      alert(response.responseText)
-  }
-
-
-window.to_smtp =(rule_id) ->
+window.to_smtp =(rule_id, reference_form) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax {
     url: '/api/v1/rules/' + rule_id + '/to_smtp'
@@ -121,18 +103,6 @@ window.to_smtp =(rule_id) ->
       if (response == null)
         alert('No rule id exists')
       else
-        reference_form = '<div class="col-xs-10"><div class="form-inline" style="padding:0 20px 10px 40px;">' +
-          '<div class="form-group">' +
-          '<select type="text" name="rule[reference][][reference_type_id]" class="form-control select-sm code">' +
-          '<option class="text-muted" value="" selected> - </option>' +
-          '"<% @ref_types.each do |ref| %> <option value="<%= ref.name %>"><%= ref.name %></option><% end %>"' +
-          '</select>' +
-          '</div>' +
-          '<div class="form-group">' +
-          '<input class="form-control select-sm code" placeholder="reference data" name="rule[reference][][reference_data]" required="true">' +
-          '</div>' +
-          '<div class="form-group"> <button class="btn select-sm btn-link remove-ref">remove</button> </div>' +
-          '</div></div>'
         rule = response.rule
         references = response.references
         parsed_message = rule.message.match(/^(\S+)\s(.*)/).slice(1)
@@ -151,6 +121,24 @@ window.to_smtp =(rule_id) ->
           ref_form = $(reference_form).appendTo(reference_add)
           ref_form.find('input[name="rule[reference][][reference_data]"]').val(reference.reference_data)
           ref_form.find('select[name="rule[reference][][reference_type_id]"]').val(reference.reference_type_id)
+    error: (response) ->
+      alert(response.responseText)
+  }
+
+
+window.check_to_smtp =(reference_form) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  rule_id = $('#dup-rule-id').val()
+  $.ajax {
+    url: '/api/v1/rules/' + rule_id + '/to_smtp'
+    method: 'GET'
+    data: ''
+    headers: headers
+    success: (response) ->
+      if "" != response
+        if !confirm(response)
+          return
+      to_smtp(rule_id, reference_form)
     error: (response) ->
       alert(response.responseText)
   }
