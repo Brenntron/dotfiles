@@ -885,8 +885,6 @@ class Rule < ApplicationRecord
   end
 
   def to_smtp
-    byebug
-
     new_metadata = metadata.split(/\s*,\s*/).reject{|metadatum| /\Aservice\s+/ =~ metadatum}
     new_metadata << 'service smtp'
     # self.metadata = new_metadata.join(', ')

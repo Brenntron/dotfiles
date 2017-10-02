@@ -92,26 +92,11 @@ window.disparage =(chkbox) ->
     alert(disparage_messages[message_index])
 
 
-window.to_smtp =(rule_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax {
-    url: '/api/v1/rules/to_smtp/' + rule_id
-    method: 'POST'
-    data: ''
-    headers: headers
-    success: (response) ->
-      debugger
-      alert(response)
-    error: (response) ->
-      alert(response.responseText)
-  }
-
-
 window.check_to_smtp = ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   rule_id = $('#dup-rule-id').val()
   $.ajax {
-    url: '/api/v1/rules/to_smtp/' + rule_id
+    url: '/api/v1/rules/' + rule_id + '/to_smtp'
     method: 'GET'
     data: ''
     headers: headers
@@ -120,6 +105,42 @@ window.check_to_smtp = ->
         if !confirm(response)
           return
       to_smtp(rule_id)
+    error: (response) ->
+      alert(response.responseText)
+  }
+
+
+window.to_smtp =(rule_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax {
+    url: '/api/v1/rules/' + rule_id + '/to_smtp'
+    method: 'POST'
+    data: ''
+    headers: headers
+    success: (response) ->
+      if (response == null)
+        alert('No rule id exists')
+      else
+        rule = response.rule
+        references = response.references
+        parsed_message = rule.message.match(/^(\S+)\s(.*)/).slice(1)
+        $('.legacy_form').find('textarea[name="rule[rule_content]"]').val(rule.rule_content)
+        standard_form = $('.standard_form')
+        AC.Helpers.populateDropdown(parsed_message[0], standard_form.find('select[name="rule_category_id"]')[0])
+        standard_form.find('input[name="rule[message]"]').val(parsed_message[1])
+        standard_form.find('.scratch_connection, .scratch_flow, .scratch_metadata').trigger("click")
+        standard_form.find('.scratch_connection_text').val(rule.connection)
+        standard_form.find('textarea[name="rule[detection]"]').val(rule.detection)
+        standard_form.find('.scratch_flow_text').val(rule.flow)
+        standard_form.find('.scratch_metadata_text').val(rule.metadata)
+        standard_form.find('select[name="rule[class_type]"]').val(rule.class_type)
+#        reference = standard_form.find('.references_add')
+##        $.each(references, function(i, v) {
+##          var ref_form = $(reference_form).appendTo(reference)
+##          ref_form.find('input[name="rule[reference][][reference_data]"]').val(v.reference_data)
+##          ref_form.find('select[name="rule[reference][][reference_type_id]"]').val(v.type)
+##        })
+#      }
     error: (response) ->
       alert(response.responseText)
   }

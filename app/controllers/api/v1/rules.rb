@@ -5,6 +5,28 @@ module API
 
       resource :rules do
 
+        desc "Checks rule to convert to SMTP"
+        params do
+          requires :sid, type: Integer, desc: "the id for the rule to be checked"
+        end
+        get ":sid/to_smtp", root: 'rule' do
+          rule = Rule.by_sid(permitted_params[:sid]).first
+          rule.check_to_smtp
+        end
+
+        desc "Checks rule to convert to SMTP"
+        params do
+          requires :sid, type: Integer, desc: "the id for the rule to be checked"
+        end
+        post ":sid/to_smtp", root: 'rule' do
+          rule = Rule.find_or_load(permitted_params[:sid], 1)
+          if rule
+            {rule: rule.to_smtp}
+          else
+            nil
+          end
+        end
+
         desc "Return a rule"
         params do
           requires :gid, type: Integer, desc: "gid of the rule"
@@ -267,28 +289,6 @@ module API
           authorize! :update, Rule
           ::PaperTrail.whodunnit = current_user.cvs_username
           Rule.update(permitted_params[:id])
-        end
-
-        desc "Checks rule to convert to SMTP"
-        params do
-          requires :sid, type: Integer, desc: "the id for the rule to be checked"
-        end
-        get "to_smtp/:sid", root: 'rule' do
-          rule = Rule.by_sid(permitted_params[:sid]).first
-          rule.check_to_smtp
-        end
-
-        desc "Checks rule to convert to SMTP"
-        params do
-          requires :sid, type: Integer, desc: "the id for the rule to be checked"
-        end
-        post "to_smtp/:sid", root: 'rule' do
-          rule = Rule.find_or_load(permitted_params[:sid], 1)
-          if rule
-            {rule: rule.to_smtp}
-          else
-            nil
-          end
         end
       end
     end
