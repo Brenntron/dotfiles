@@ -80,6 +80,14 @@ class Bug < ApplicationRecord
     due_date.present?
   end
 
+  def has_notes?
+    notes.exists?
+  end
+
+  def has_published_notes?
+    notes.published.exists?
+  end
+
   def rule_relevant_references
     self.references.select {|ref| ReferenceType.valid_reference_type_ids.include?(ref.reference_type_id) }
   end
@@ -773,9 +781,6 @@ class Bug < ApplicationRecord
         unless new_comments.empty?
 
           ActiveRecord::Base.transaction do
-            bug_has_no_notes = bug.notes.blank?
-            bug_has_no_published_notes = bug.notes.published.blank?
-
             #import any new comments from bugzilla
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
@@ -823,7 +828,7 @@ class Bug < ApplicationRecord
 
               #prepopulating committer notes in notes tab
 
-              if bug_has_no_published_notes
+              unless bug.has_published_notes?
                 last_committer_note = bug.notes.last_committer_note.first
                 if last_committer_note.present?
                   committer_note_text_area = ""
@@ -844,7 +849,7 @@ class Bug < ApplicationRecord
 
               #prepopulating research notes in notes tab
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
-              if latest_research.present? && bug_has_no_notes
+              if latest_research.present? && !(bug.has_notes?)
                 new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
                 new_note = Note.new({
                                         comment: new_draft,
