@@ -839,9 +839,10 @@ class Rule < ApplicationRecord
 
   end
 
-  def copy(arg_attributes = {})
+  def copy_rule(arg_attributes = {})
     changed_attributes = arg_attributes
     references = changed_attributes.delete('references')
+    new_references = references || self.references.map{|ref| ref.attributes}
 
     new_attributes = self.attributes.merge(changed_attributes)
     new_attributes['sid'] = nil
@@ -855,7 +856,7 @@ class Rule < ApplicationRecord
 
     rule = Rule.new(new_attributes)
 
-    rule_params = rule.build_rule_params({ 'references' => references })
+    rule_params = rule.build_rule_params({ 'references' => new_references })
     rule_content = RuleSyntax::Assemposer.new(rule_params).rule_content
     parser = RuleSyntax::RuleParser.new(rule_content)
     rule.assign_from_user_edit(rule_content, parser: parser)
@@ -888,12 +889,13 @@ class Rule < ApplicationRecord
 
     new_metadata = metadata.split(/\s*,\s*/).reject{|metadatum| /\Aservice\s+/ =~ metadatum}
     new_metadata << 'service smtp'
-    self.metadata = new_metadata.join(', ')
+    # self.metadata = new_metadata.join(', ')
 
     new_flow = ['to_server'] + flow.split(/\s*,\s*/).reject{|flow_datum| 'to_client' == flow_datum}
-    self.flow = new_flow.join(',')
+    # self.flow = new_flow.join(',')
 
-    Rails.logger.debug('<<< to_smtp')
+    # Rails.logger.debug('<<< to_smtp')
+    copy_rule('metadata' => new_metadata.join(', '), 'flow' => new_flow.join(','))
   end
 
   # Creates a rule and its associations
