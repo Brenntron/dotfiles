@@ -504,9 +504,6 @@ class Bug < ApplicationRecord
               if last_committer_note
                 committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
               end
-              if committer_note_text_area.strip.blank?
-                committer_note_text_area = "The last committer did not leave a note."
-              end
               new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
               new_note.note_type = 'committer'
               new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
