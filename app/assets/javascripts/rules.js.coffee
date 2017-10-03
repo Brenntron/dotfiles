@@ -279,9 +279,17 @@ $ ->
             complete: ->
           }
         when 'tosmtp'
-          debugger
           rule_ids = selected
           if 1 <= rule_ids.length
+            $.each allboxes, (i, v) ->
+              $('.rule_'+v).removeClass('active').addClass('hidden')
+            $.each selected, (i, v) ->
+              $('.rule_'+v).removeClass('hidden').addClass('active')
+            $('.row.active').addClass('hidden').removeClass 'active'
+            $('.create').addClass('active').removeClass 'hidden'
+            $('.active').show()
+            $('.hidden').hide()
+            $('.standard_form').hide()
             check_to_smtp(rule_ids[0], window.reference_form)
         else
           $.each allboxes, (i, v) ->
