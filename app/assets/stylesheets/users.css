@@ -61,3 +61,7 @@
     margin-top: -12px;
     padding-top: 12px;
 }
+
+#roles-table a.btn-primary {
+    color: white;
+}
