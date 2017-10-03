@@ -533,15 +533,11 @@ class Bug < ApplicationRecord
             end
             if new_bug
               last_committer_note = bug.notes.last_committer_note.first
-
               if last_committer_note.present?
 
                 committer_note_text_area = ""
                 if last_committer_note
                   committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
-                end
-                if committer_note_text_area.strip.blank?
-                  committer_note_text_area = "The last committer did not leave a note."
                 end
                 new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
                 new_note.note_type = 'committer'
@@ -551,7 +547,6 @@ class Bug < ApplicationRecord
                 new_note.save
 
               end
-
             end
           end
         end
@@ -838,9 +833,6 @@ class Bug < ApplicationRecord
                   committer_note_text_area = ""
                   if last_committer_note
                     committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
-                  end
-                  if committer_note_text_area.strip.blank?
-                    committer_note_text_area = "The last committer did not leave a note."
                   end
                   new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
                   new_note.note_type = 'committer'
