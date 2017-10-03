@@ -895,7 +895,9 @@ class Rule < ApplicationRecord
     # self.flow = new_flow.join(',')
 
     # Rails.logger.debug('<<< to_smtp')
-    copy_rule('metadata' => new_metadata.join(', '), 'flow' => new_flow.join(','))
+    copy_rule('connection' => 'alert tcp $EXTERNAL_NET any -> $SMTP_SERVERS 25',
+              'metadata' => new_metadata.join(', '),
+              'flow' => new_flow.join(','))
   end
 
   # Creates a rule and its associations
