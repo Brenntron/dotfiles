@@ -127,9 +127,8 @@ window.to_smtp =(rule_id, reference_form) ->
   }
 
 
-window.check_to_smtp =(reference_form) ->
+window.check_to_smtp =(rule_id, reference_form) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  rule_id = $('#dup-rule-id').val()
   $.ajax {
     url: '/api/v1/rules/' + rule_id + '/to_smtp'
     method: 'GET'
@@ -279,7 +278,11 @@ $ ->
               api_error(response, 'Rules have not been committed.', {failure_reload: true})
             complete: ->
           }
-
+        when 'tosmtp'
+          debugger
+          rule_ids = selected
+          if 1 <= rule_ids.length
+            check_to_smtp(rule_ids[0], window.reference_form)
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')
