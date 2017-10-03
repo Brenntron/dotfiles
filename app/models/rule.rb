@@ -265,11 +265,11 @@ class Rule < ApplicationRecord
     rule_content.split(';').each { |r| references_ary << r.strip.gsub('reference:', '') if r.match(/reference\W*:/) }
 
     self.references.delete_all
-    references_ary.each do |r|
-      r = r.split(',')
-      unless r[1].nil? || r[1].empty?
-        ref_type = ReferenceType.find_or_create_by(name: r[0].strip)
-        new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: r[1].strip)
+    references_ary.each do |ref_str|
+      ref_pair = ref_str.split(',')
+      unless ref_pair[1].nil? || ref_pair[1].empty?
+        ref_type = ReferenceType.find_or_create_by(name: ref_pair[0].strip)
+        new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: ref_pair[1].strip)
         self.references << new_reference
       end
     end
@@ -839,12 +839,13 @@ class Rule < ApplicationRecord
 
   end
 
-  def copy_rule(arg_attributes = {})
-    changed_attributes = arg_attributes
-    references = changed_attributes.delete('references')
-    new_references = references || self.references.map{|ref| ref.attributes}
+  def copy_rule(attributes_arg = {})
+    changed_attributes = attributes_arg
+    references_arg = changed_attributes.delete('references')
+    new_references = references_arg || self.references.map{|ref| ref.attributes}
 
     new_attributes = self.attributes.merge(changed_attributes)
+    new_attributes['id'] = nil
     new_attributes['sid'] = nil
     new_attributes['rev'] = nil
     new_attributes['rule_content'] = nil
