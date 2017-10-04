@@ -124,17 +124,31 @@ module Repo
       call_svn("up #{working_pathname}")
     end
 
+    def check_rev(rule)
+      rule_grep_line = Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename)
+      filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+      unless rule.rev_matches?(rule_content)
+        rule.update(publish_status: Rule::PUBLISH_STATUS_STALE_EDIT, state: Rule::STALE_STATE)
+      end
+    end
+
+    def check_all_revs
+      changed_rules.each {|rule| check_rev(rule)}
+      raise 'Cannot commit; revisions do not match the repo' if changed_rules.any?{ |rule| rule.stale_edit? }
+    end
+
     def commit_rule_files
       working_file_list = working_file_list(rule_files)
       Rails.logger.info("svn integration: committing files #{working_file_list}")
 
-      additional_output = rule_files.map {|rule_file| rule_file.build_additional_output}.join("\n")
-
-      svn_result_output = call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~) + additional_output
+      svn_result_output = call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~)
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
                           svn_result_code_str.to_i
                         end
       @success = (Rule::SVN_SUCCESS_COMMIT_HOOK == svn_result_code ? true : false)
+
+      additional_output = rule_files.map {|rule_file| rule_file.build_additional_output}.join("\n")
+      svn_result_output = svn_result_output + additional_output
 
       if bug
         changed_rules.each do |rule|
@@ -153,6 +167,7 @@ module Repo
       log("publishing content #{rules.count} rules, #{rule_files.count} files")
 
       rule_files.each {|rule_file| checkout(rule_file.relative_pathname) }
+      check_all_revs
       rule_files.each {|rule_file| rule_file.patch_file}
       commit_rule_files.tap do
         if success

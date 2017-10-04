@@ -184,3 +184,9 @@ div.progress{
     text-decoration:none;
 }
 
+.no_alert{
+    background-color: #ff8080;
+}
+.alerted{
+    background-color: #a1f9c0;
+}

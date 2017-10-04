@@ -146,6 +146,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:parent_id, :display_name, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
+    params.require(:user).permit(:parent_id, :display_name,:cvs_username, :cec_username, :kerberos_login, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
   end
 end

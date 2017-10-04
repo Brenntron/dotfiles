@@ -226,6 +226,7 @@ $ ->
           bid = $('.bugzilla_id').text()
           headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+          $('#commit').prop('disabled', true)
           $.ajax {
             url: "/api/v1/rules/commit"
             headers: headers

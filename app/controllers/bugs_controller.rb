@@ -15,7 +15,11 @@ class BugsController < ApplicationController
     if @bug_query.any?
       @bugs = @bug_query.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
     else
-      flash.now[:alert] = "Zarro Boogs found, please try selecting any other filter."
+      if flash.now[:alert]
+        flash.now[:alert] += " Zarro Boogs found, please try selecting any other filter."
+      else
+        flash.now[:alert] = "Zarro Boogs found, please try selecting any other filter."
+      end
       @bugs = Bug.none.paginate(:page => session[:page], :per_page => 32)
     end
     if params[:bug].present?
@@ -44,6 +48,7 @@ class BugsController < ApplicationController
     @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
 
     if @bug
+      @show_resolve_button = ["WONTFIX","FIXED","LATER","INVALID","PENDING"].include?(@bug.state)
       @rules = @bug.rules.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.valid_reference_types
       @pcap_attachments = []

@@ -486,6 +486,11 @@ class Rule < ApplicationRecord
     end
   end
 
+  def rev_matches?(rule_content)
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    parser.rev == self.rev
+  end
+
   # Sets a rule or rules to a synched state
   #
   # @param [Rule|Relation] A single rule object or an ActiveRecord relation

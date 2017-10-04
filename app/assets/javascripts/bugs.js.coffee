@@ -1,3 +1,36 @@
+
+window.bug_resolve =(this_tag) ->
+  user_id = $('#resolve-form').find("input[name='user_id']").val()
+  committer_id = $('#resolve-form').find("input[name='committer_id']").val()
+  summary = $('#resolve-form').find("input[name='summary']").val()
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  bugzilla_id = $('.bugzilla_id').text()
+  $('#synching_bug_form_button').hide()
+  $('#saving_bug').removeClass('hidden').show()
+  $.ajax(
+    url: '/api/v1/bugs/' + bugzilla_id
+    method: 'PUT'
+    headers: headers
+    data:
+      {
+        bug:
+          {
+            state: "PENDING",
+            state_comment: "Resolved bug",
+            user_id: user_id,
+            committer_id: committer_id,
+            summary: summary
+          }
+      }
+    success: (response) ->
+      location.reload(true)
+    error: (response) ->
+      if response.responseText != undefined && response.responseText != ""
+        alert(response.responseText)
+      location.reload(true)
+  , this)
+
+
 $ ->
   $('#bugzilla_popover_state').popover();
   $('.active').show();
@@ -20,7 +53,7 @@ $ ->
       success: (response) ->
         location.reload()
       error: (response) ->
-        alert ("could not take this bug" + response)
+        alert ("Sorry, you can not take this bug\n" + response.responseJSON.error)
         location.reload()
     }
 
@@ -37,7 +70,7 @@ $ ->
       success: (response) ->
         location.reload()
       error: (response) ->
-        alert ("cant return this bug." + response)
+        alert ("cant return this bug." + response.responseJSON.error)
         location.reload()
     }
 
