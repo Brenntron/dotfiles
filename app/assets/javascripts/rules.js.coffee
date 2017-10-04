@@ -71,8 +71,8 @@ window.pre_commit = ->
           $('#commit_label').html("commit")
           $("#commit-modal").modal('show')
         else
-          if(!alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action"))
-            window.location.reload()
+          alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action")
+          window.location.reload()
 
   # remove modal call if everything is unchecked
   else if ($(':checkbox[name="rule[id]"]').not(':checked').length > 0)
