@@ -8,6 +8,7 @@ class Ability
 
     if current_user.has_role?('admin')
       can :manage, User
+      can :manage, Admin
     end
     if current_user.has_role?('manager')
       can :manage, User do |user|
