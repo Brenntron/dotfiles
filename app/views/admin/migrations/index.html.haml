@@ -1,13 +1,10 @@
 #hamburger-space
 
 .admin-title
-  %h1 Schema Migrations Index
+  %h1 Schema Migrations
 
-#migration-table-div
-  %table#migration-table
-    %caption Schema Migrations
-    %tbody
-      - @migrations.each do |migration|
-        %tr
-          %td= migration.first
+#migrations-div
+  - @migrations.each do |migration|
+    .migration= migration.first
+
 
