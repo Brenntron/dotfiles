@@ -46,9 +46,33 @@ window.show_bz_commit_msg =(buttn) ->
 window.pre_commit = ->
   # if at least one checkbox is checked let modal work
   if ($(':checkbox[name="rule[id]"]').is(':checked'))
+    $('#commit_button_icon').hide()
+    $('#commit_label').html("checking..")
+    $('#commit_loading').removeClass('hidden').show()
     console.log('something is checked.'); # this can be removed when finalized
-    $("#commit-modal-trigger").attr("data-toggle", "modal")
-    $("#commit-modal-trigger").attr("data-target", "#commit-modal")
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    bid = $('input[name="bug_id"]').val()
+    $.ajax(
+      url: '/api/v1/bugs/import/' + bid + '?import_type=status'
+      method: 'GET'
+      headers: headers
+    ).done (response) ->
+      json = $.parseJSON(response)
+
+      if (json.error)
+        message = "There was a problem attempting to synch this bug:"
+        message += json.error
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
+      else
+        if(json.import_report.total_changes == 0)
+          $('#commit_button_icon').show()
+          $('#commit_loading').hide()
+          $('#commit_label').html("commit")
+          $("#commit-modal").modal('show')
+        else
+          if(!alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action"))
+            window.location.reload()
 
   # remove modal call if everything is unchecked
   else if ($(':checkbox[name="rule[id]"]').not(':checked').length > 0)
@@ -225,7 +249,6 @@ $ ->
               api_error(response, 'Rules have not been committed.', {failure_reload: true})
             complete: ->
           }
-
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')
