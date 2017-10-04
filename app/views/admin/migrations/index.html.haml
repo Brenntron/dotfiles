@@ -1,0 +1,10 @@
+%h2 --- Schema Migrations Index
+
+#migration-table-div
+  %table#migration-table
+    %caption Schema Migrations
+    %tbody
+      - @migrations.each do |migration|
+        %tr
+          %td= migration.first
+
