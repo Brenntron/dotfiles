@@ -4,6 +4,25 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
+if ENV['COVERAGE'] && ("0" != ENV['COVERAGE'])
+  require 'simplecov'
+  SimpleCov.start do
+    add_filter %r{^/config}
+    add_filter %r{^/vendor}
+    add_filter %r{^/test}
+    add_filter %r{^/features}
+    add_filter %r{^/spec}
+    add_filter %r{^/app/processors}
+
+    add_group "Controllers", %r{app/controllers(?!/api)}
+    add_group "API", "app/controllers/api"
+    add_group "Models", "app/models"
+    add_group "Helpers", "app/helpers"
+
+    merge_timeout 3600
+  end
+end
+
 require 'cucumber/rails'
 require 'json'
 require 'capybara/poltergeist'
