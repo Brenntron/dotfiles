@@ -886,7 +886,6 @@ class Bug < ApplicationRecord
 
         total_bugs << bug
 
-        return total_bugs
       end
     else
       if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
@@ -896,7 +895,7 @@ class Bug < ApplicationRecord
         raise "there was a problem importing from Bugzilla."
       end
     end
-    true
+    return total_bugs
   end
 
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)
