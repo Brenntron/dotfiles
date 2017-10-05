@@ -11,6 +11,7 @@ if ENV['COVERAGE'] && ("0" != ENV['COVERAGE'])
     add_filter %r{^/vendor}
     add_filter %r{^/test}
     add_filter %r{^/features}
+    add_filter %r{^/spec}
     add_filter %r{^/app/processors}
 
     add_group "Controllers", %r{app/controllers(?!/api)}

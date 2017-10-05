@@ -13,6 +13,26 @@
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+if ENV['COVERAGE'] && ("0" != ENV['COVERAGE'])
+  require 'simplecov'
+  SimpleCov.start do
+    add_filter %r{^/config}
+    add_filter %r{^/vendor}
+    add_filter %r{^/test}
+    add_filter %r{^/features}
+    add_filter %r{^/spec}
+    add_filter %r{^/app/processors}
+
+    add_group "Controllers", %r{app/controllers(?!/api)}
+    add_group "API", "app/controllers/api"
+    add_group "Models", "app/models"
+    add_group "Helpers", "app/helpers"
+
+    merge_timeout 3600
+  end
+end
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
