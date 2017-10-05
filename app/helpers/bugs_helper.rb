@@ -22,10 +22,13 @@ def set_bug_color(bug)
         remove_list << "OPEN" << "REOPENED"
       when "ASSIGNED", "DUPLICATE"
         remove_list << "OPEN"
-      when "REOPENED", "PENDING" || !bug.can_resolve?
+      when "REOPENED", "PENDING"
         remove_list << "NEW" << "ASSIGNED" << "OPEN" << "PENDING"
       when "FIXED", "WONTFIX", "LATER", "INVALID"
         remove_list  << "ASSIGNED" << "OPEN" << "PENDING"
+    end
+    unless bug.can_resolve?
+      remove_list << "PENDING"
     end
     unless current_user.has_role?('committer')
       remove_list << "FIXED" << "WONTFIX" << "LATER" << "INVALID"
