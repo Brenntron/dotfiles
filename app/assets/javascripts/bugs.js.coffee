@@ -217,23 +217,62 @@ $ ->
 
     bug_state = $('#bug_state').val()
 
-    state_comment = $("#state_comment").val()
-    data = $('.edit_bug').serialize()
-    if state_comment
-      data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
-    $('#synching_bug_form_button').hide()
-    $('#saving_bug').removeClass('hidden').show()
-    $.ajax(
-      url: '/api/v1/bugs/' + bid
-      method: 'PUT'
-      headers: headers
-      data: data
-      success: (response) ->
-        window.location.reload()
-      error: (response) ->
-        alert(response.responseText)
-        window.location.reload()
-    , this)
+
+    if bug_state == "PENDING"
+      $('.edit-bug').hide()
+      $('#synching_bug_form_button').removeClass('hidden').show()
+      $.ajax(
+          url: '/api/v1/bugs/import/' + bid + '?import_type=status'
+          method: 'GET'
+          headers: headers
+        ).done (response) ->
+          json = $.parseJSON(response)
+
+          if (json.error)
+            message = "There was a problem attempting to synch this bug:"
+            message += json.error
+            $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
+          else
+            if(json.import_report.total_changes == 0)
+              state_comment = $("#state_comment").val()
+              data = $('.edit_bug').serialize()
+              if state_comment
+                data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
+              $('#synching_bug_form_button').hide()
+              $('#saving_bug').removeClass('hidden').show()
+              $.ajax(
+                  url: '/api/v1/bugs/' + bid
+                  method: 'PUT'
+                  headers: headers
+                  data: data
+                  success: (response) ->
+                    window.location.reload()
+                  error: (response) ->
+                    alert(response.responseText)
+                    window.location.reload()
+                , this)
+            else
+              alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action")
+              window.location.reload()
+    else
+      state_comment = $("#state_comment").val()
+      data = $('.edit_bug').serialize()
+      if state_comment
+        data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
+      $('.edit-bug').hide()
+      $('#saving_bug').removeClass('hidden').show()
+      $.ajax(
+          url: '/api/v1/bugs/' + bid
+          method: 'PUT'
+          headers: headers
+          data: data
+          success: (response) ->
+            window.location.reload()
+          error: (response) ->
+            alert(response.responseText)
+            window.location.reload()
+        , this)
+
 
   $('.new_bug').submit (e) ->
     e.preventDefault()

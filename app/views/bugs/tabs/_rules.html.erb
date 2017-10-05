@@ -26,7 +26,7 @@
       <strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
     <% if can? :publish, Rule %>
         <button id="commit-modal-trigger" class="select-sm btn btn-default" onclick="pre_commit()">
-          <strong class="hidden-xs">commit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-record"></i>
+          <strong id="commit_label" class="hidden-xs">commit</strong> &nbsp;&nbsp;<i id="commit_button_icon" class="glyphicon glyphicon-record"></i><i class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden" id="commit_loading"></i>
         </button>
     <% end %>
     <button class="select-sm btn btn-default rule-toolbar" id="export">
