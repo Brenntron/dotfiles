@@ -835,7 +835,7 @@ class Bug < ApplicationRecord
                 if last_committer_note.present?
                   committer_note_text_area = ""
                   if last_committer_note
-                    committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
+                    committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:", true) + "\n"
                   end
                   new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
                   new_note.note_type = 'committer'

@@ -5,7 +5,9 @@ window.bug_resolve =(this_tag) ->
   summary = $('#resolve-form').find("input[name='summary']").val()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   bugzilla_id = $('.bugzilla_id').text()
+  $('#resolve_bug_form_button').hide()
   $('#synching_bug_form_button').hide()
+  $('#resolving_bug_form_button').removeClass('hidden').show()
   $('#saving_bug').removeClass('hidden').show()
   $.ajax(
     url: '/api/v1/bugs/' + bugzilla_id

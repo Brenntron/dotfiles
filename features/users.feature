@@ -156,6 +156,7 @@ Feature: User Accounts
     And  I goto "/users/3"
     Then I should not see link with class "glyphicon-cloud-download"
 
+
   @javascript
   Scenario: A non-manager admin user can edit the role for any user.
     Given a user with role "admin" exists and is logged in
@@ -187,7 +188,8 @@ Feature: User Accounts
     Then I click "Save changes"
     And I should see "h_clinton updated successfully"
     And I should see "analyst"
-    And I should not see "committer"
+
+
 
   @javascript
   Scenario: An admin user can make any user an admin, including managers.
@@ -220,7 +222,6 @@ Feature: User Accounts
     Then I click "Save changes"
     And I should see "h_clinton updated successfully"
     And I should see "admin"
-    And I should not see "committer"
 
   @javascript
   Scenario: A manager user can go to the users index page and see only their co-workers and team members.

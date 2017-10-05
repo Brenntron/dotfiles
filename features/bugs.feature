@@ -418,26 +418,25 @@ Feature: Bug
     Then I should see "State Comment"
 
 
-
   @javascript
   Scenario: a user can not set the state of a bug to fixed, wontfix, later or invalid if they aren't a committer
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+      | id     | bugzilla_id | state     | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | ASSIGNED  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     Then I wait for "2" seconds
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And the "FIXED" option from "bug[state]" is disabled
+    And I can not select "FIXED" from "bug[state]"
     And the "REOPENED" option from "bug[state]" is not disabled
 
   @javascript
   Scenario: a user can set the state of a bug to fixed, wontfix, later or invalid if they are a committer
     Given a user with role "committer" exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+      | id     | bugzilla_id | state     | user_id | summary             | product  | component   | version | description       | committer_id |
+      | 222222 | 222222      | ASSIGNED  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     Then I wait for "2" seconds
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"

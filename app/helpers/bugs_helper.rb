@@ -16,19 +16,32 @@ def set_bug_color(bug)
                    'FIXED', 'WONTFIX', 'LATER', 'INVALID']
 
   def state_options(bug)
-    if bug.can_resolve? || bug.state == 'PENDING'
-      STATE_OPTIONS
-    else
-      STATE_OPTIONS.reject{ |so| so == "PENDING" }
+    remove_list = []
+    case bug.state
+      when "NEW", "OPEN"
+        remove_list << "OPEN" << "REOPENED"
+      when "ASSIGNED", "DUPLICATE"
+        remove_list << "OPEN"
+      when "REOPENED", "PENDING"
+        remove_list << "NEW" << "ASSIGNED" << "OPEN" << "PENDING"
+      when "FIXED", "WONTFIX", "LATER", "INVALID"
+        remove_list  << "ASSIGNED" << "OPEN" << "PENDING"
     end
+    unless bug.can_resolve?
+      remove_list << "PENDING"
+    end
+    unless current_user.has_role?('committer')
+      remove_list << "FIXED" << "WONTFIX" << "LATER" << "INVALID"
+    end
+    STATE_OPTIONS.reject{ |so| remove_list.include? so }
   end
 
   def disabled_state_options(user)
-    if user.has_role?('committer')
-      ['NEW']
-    else
-      ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'NEW']
+
+    unless user.has_role?('committer')
+      ['FIXED', 'WONTFIX', 'LATER', 'INVALID']
     end
+
   end
 
   def bug_filter_indicator(filter)
