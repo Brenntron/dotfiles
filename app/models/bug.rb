@@ -80,6 +80,14 @@ class Bug < ApplicationRecord
     due_date.present?
   end
 
+  def has_notes?
+    notes.exists?
+  end
+
+  def has_published_notes?
+    notes.published.exists?
+  end
+
   def rule_relevant_references
     self.references.select {|ref| ReferenceType.valid_reference_type_ids.include?(ref.reference_type_id) }
   end
@@ -371,11 +379,13 @@ class Bug < ApplicationRecord
   end
 
   # Takes an array of sids and adds their rules to the bug if not already on the bug.
-  def load_rules_from_sids(sids)
+  def load_rules_from_sids(sids, import_type = "import")
     sids.each do |sid|
       rule = Rule.find_or_load(sid, 1)
       @import_report[:new_rules] += 1 unless self.rules.include? rule
-      rules << rule unless self.rules.include? rule
+      if import_type != "status"
+        rules << rule unless self.rules.include? rule
+      end
     end
   end
 
@@ -452,6 +462,29 @@ class Bug < ApplicationRecord
     Bugzilla::Bug.new(xmlrpc).attach_file(bugzilla_id, file)
   end
 
+  ####methods for bug importing######
+
+  def load_tags_from_summary(tags, import_type='import')
+    tags.each do |tag|
+      @import_report[:new_tags] += 1 unless self.tags.include?(tag)
+      if import_type != "status"
+        self.tags << tag unless self.tags.include?(tag)
+      end
+    end
+  end
+
+  def load_refs_from_summary(refs, import_type='import_type')
+    refs.each do |ref|
+      @import_report[:new_refs] += 1 unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+      if import_type != "status"
+        self.references << ref unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+      end
+      Exploit.find_exploits(ref)
+    end
+  end
+
+  ####end method group###############
+
   def self.synch_history(xmlrpc, new_bugs)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
@@ -500,19 +533,20 @@ class Bug < ApplicationRecord
             end
             if new_bug
               last_committer_note = bug.notes.last_committer_note.first
-              committer_note_text_area = ""
-              if last_committer_note
-                committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
+              if last_committer_note.present?
+
+                committer_note_text_area = ""
+                if last_committer_note
+                  committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
+                end
+                new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
+                new_note.note_type = 'committer'
+                new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
+                new_note.author = last_committer_note.author
+                new_note.created_at = Time.now.to_time
+                new_note.save
+
               end
-              if committer_note_text_area.strip.blank?
-                committer_note_text_area = "The last committer did not leave a note."
-              end
-              new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
-              new_note.note_type = 'committer'
-              new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
-              new_note.author = last_committer_note.author
-              new_note.created_at = Time.now.to_time
-              new_note.save
             end
           end
         end
@@ -577,20 +611,51 @@ class Bug < ApplicationRecord
     end
   end
 
-  def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs)
+  ####BUGZILLA IMPORT PROCESS  (tbd: maybe move this into a dedicated process model, it will slim up the Bug class and
+  ####                          allow the workflow of the import process to be better broken up while having all relevant
+  ####                          code accessible in one spot.)
+
+  ####List of operations:
+  ####   1.  Creates and/or updates bug record columns and persists those changes
+  ####   2.  Creates and/or updates various User records that are associated with the bug and then associates them with said Bug (createor, assignee, committer)
+  ####   3.  Creates and/or updates any attachments that are associated with the Bug and associates them with said Bug.
+  ####   4.  Create a task to run tests on those attachments (provided they are pcap files)
+  ####   5.  Creates and/or updates any Notes ('comment' in bugzilla) that are associated with the Bug and associate them said Bug.
+  ####   6.  If applicable, prepoulate running commit and research notes drafts (found under the Notes tab in a bug view page) from existing comments.  This should only happen in a fresh import or a first time synch from light import
+  ####   7.  Load rules from any SIDS parsed from the summary line
+  ####   8.  Load any tags parsed from the summary line
+  ####   9.  Load any references parsed from the summary line
+  ####   10.  Do a final #save to cement all changs and associations
+  ####   11.  KEY:  CLEAR ALL TESTED RULES.  User will have to retest to see test results.
+
+  ####   Caveat:
+  ####   There is a roaming variable 'import_type' that will run through the same process listed above, but prevent any database persistence
+  ####   regarding column changes or relation associations and prevent the tests from being cleared if that import_type has a value of 'status'
+  ####   Ideally the possible values of import_type should be ['status', 'import', 'synch'].
+  ####   An import_type = 'status' preventing persistence and test clearing should allow for any client side UI functionality
+  ####   that checks for bug changes in Bugzilla before executing certain actions (like committing a rule or setting a bug to 'PENDING')
+
+
+  def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
+    import_type = import_type.blank? ? "import" : import_type
+    total_bugs = []
     unless new_bugs['bugs'].empty?
       new_bugs['bugs'].each do |item|
+
+        progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
+
         bug_id = item['id']
         new_attachments = xmlrpc.attachments(ids: [bug_id])
         new_comments = xmlrpc.comments(ids: [bug_id])
 
+        #Update Bug record attributes from bugzilla############
         bug = Bug.find_or_create_by(bugzilla_id: bug_id)
-        bug_is_new = bug.notes.blank?
-        bug.id = bug_id
+
         bug.initialize_report
+
+        bug.id = bug_id
         bug.summary        = item['summary']
         bug.classification = 'unclassified'
-
         bug.status     = item['status']
         bug.resolution = item['resolution']
         bug.resolution = 'OPEN' if bug.resolution.empty?
@@ -614,7 +679,13 @@ class Bug < ApplicationRecord
         else
           bug.resolved_at = last_change_time
         end
-        bug.save
+        if import_type != "status"
+          bug.save
+        end
+        #end Bug attributes update##################
+
+
+        #Create/update Bug User relationships
         creator = User.where('email=?', item['creator']).first
         new_user = User.where('email=?', item['assigned_to']).first
         new_committer = User.where('email=?', item['qa_contact']).first
@@ -640,7 +711,12 @@ class Bug < ApplicationRecord
         else
           bug.committer = new_committer
         end
+        if import_type != "status"
+          bug.save
+        end
 
+
+        #Create/update Bug Attachments
         unless new_attachments.empty?
 
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
@@ -667,38 +743,47 @@ class Bug < ApplicationRecord
                 new_attach_record.created_at = attachment['creation_time'].to_time
               end
             end
-
-            bug.attachments << local_attachment unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
+            if import_type != "status"
+              bug.attachments << local_attachment unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
+            end
           end
         end
-        #we need to test these new attachments
-        options = {
-            :bug              => Bug.where(id: bug_id).first,
-            :task_type        => Task::TASK_TYPE_PCAP_TEST,
-            :attachment_array => bug.attachments.pcap.map{|a| a.id},
-        }
 
-        begin
-          if options[:attachment_array].any?
-            new_task = Task.create(
-                :bug  => options[:bug],
-                :task_type     => options[:task_type],
-                :user => current_user
-            )
-            TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+        ####we need to test these new attachments #unless its a status check
+        if import_type != "status"
+          options = {
+              :bug              => Bug.where(id: bug_id).first,
+              :task_type        => Task::TASK_TYPE_PCAP_TEST,
+              :attachment_array => bug.attachments.pcap.map{|a| a.id},
+          }
+
+          begin
+            if options[:attachment_array].any?
+              new_task = Task.create(
+                  :bug  => options[:bug],
+                  :task_type     => options[:task_type],
+                  :user => current_user
+              )
+              TestAttachment.new(new_task, xmlrpc_token, options[:attachment_array]).send_work_msg
+            end
+          rescue Exception => e
+            #handle timeouts accordingly
+            Rails.logger.info("Rails encountered an error but is moving through it. #{e.message}")
           end
-        rescue Exception => e
-          #handle timeouts accordingly
-          Rails.logger.info("Rails encountered an error but is moving through it. #{e.message}")
         end
+        ####end attachment testing###
 
+
+        bug_has_published_notes = bug.has_published_notes?
+        bug_has_notes = bug.has_notes?
+
+        ###build any comments/notes (research and commit messages) from bugzilla####
+        ###prepolate running notes (for the Notes tab)
         bug.research_notes ||= Note::TEMPLATE_RESEARCH
         unless new_comments.empty?
 
           ActiveRecord::Base.transaction do
-
-            new_bug = bug.notes.published.blank?
-
+            #import any new comments from bugzilla
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
               comment[1]['comments'].each do |c|
@@ -716,61 +801,91 @@ class Bug < ApplicationRecord
 		            note = Note.where(id: c['id']).first
 
                 if note.present?
-                  note.update_attributes({
-                    author:     c['author'],
-                    comment:    comment,
-                    bug_id:     bug_id,
-                    note_type:  note_type,
-                    notes_bugzilla_id: c['id'],
-                    created_at: creation_time
-	                })
+                  unless import_type == "status"
+                    note.update_attributes(author: c['author'],
+                                           comment: comment,
+                                           bug_id: bug_id,
+                                           note_type: note_type,
+                                           notes_bugzilla_id: c['id'],
+                                           created_at: creation_time)
+                  end
                 else
                   bug.import_report[:new_notes] += 1
-                  Note.create({
-                    id:         c['id'],
-                    author:     c['author'],
-                    comment:    comment,
-                    bug_id:     bug_id,
-                    note_type:  note_type,
-                    created_at: creation_time,
-                    notes_bugzilla_id: c['id']
-                  })
+                  unless import_type == "status"
+                    Note.create(id: c['id'],
+                                author: c['author'],
+                                comment: comment,
+                                bug_id: bug_id,
+                                note_type: note_type,
+                                created_at: creation_time,
+                                notes_bugzilla_id: c['id']                     )
+                  end
                 end
               end
             end
-            if new_bug
-              last_committer_note = bug.notes.last_committer_note.first
-              committer_note_text_area = ""
-              if last_committer_note
-                committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
+            #end comment importing####
+
+            ##Running note prepoluation logic here#########
+            if import_type != "status"
+
+              #prepopulating committer notes in notes tab
+
+              unless bug_has_published_notes
+                last_committer_note = bug.notes.last_committer_note.first
+                if last_committer_note.present?
+                  committer_note_text_area = ""
+                  if last_committer_note
+                    committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:",true) + "\n"
+                  end
+                  new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
+                  new_note.note_type = 'committer'
+                  new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
+                  new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
+                  new_note.created_at = Time.now.to_time
+                  new_note.save
+                end
               end
-              if committer_note_text_area.strip.blank?
-                committer_note_text_area = "The last committer did not leave a note."
+
+              #prepopulating research notes in notes tab
+              latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
+              if latest_research.present? && !(bug_has_notes)
+                new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
+                new_note = Note.new({
+                                        comment: new_draft,
+                                        note_type: 'research',
+                                        author: current_user.email,
+                                        bug_id:     bug_id
+                                    })
+                new_note.save
               end
-              new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
-              new_note.note_type = 'committer'
-              new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
-              new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
-              new_note.created_at = Time.now.to_time
-              new_note.save
             end
+
           end
         end
 
-        latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
-        if latest_research.present? && bug_is_new
-          new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
-          new_note = Note.new({
-                          comment: new_draft,
-                          note_type: 'research',
-                          author: current_user.email,
-                          bug_id:     bug_id
-                      })
-          new_note.save
+        progress_bar.update_attribute("progress", 30) unless progress_bar.blank?
+
+        parsed = bug.parse_summary
+        progress_bar.update_attribute("progress", 50) unless progress_bar.blank?
+        bug.load_rules_from_sids(parsed[:sids], import_type)
+        progress_bar.update_attribute("progress", 60) unless progress_bar.blank?
+        bug.load_tags_from_summary(parsed[:tags], import_type)
+
+        progress_bar.update_attribute("progress", 75) unless progress_bar.blank?
+        bug.load_refs_from_summary(parsed[:refs], import_type)
+
+        progress_bar.update_attribute("progress", 90) unless progress_bar.blank?
+
+        #save the bug and clear all rule tests unless the import action is a status check
+        if import_type != "status"
+          bug.save
+          bug.clear_rule_tested
         end
 
-        bug.save
-        return bug
+        progress_bar.update_attribute("progress", 100) unless progress_bar.blank?
+
+        total_bugs << bug
+
       end
     else
       if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
@@ -780,7 +895,7 @@ class Bug < ApplicationRecord
         raise "there was a problem importing from Bugzilla."
       end
     end
-    true
+    return total_bugs
   end
 
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)

@@ -23,6 +23,11 @@
         </h2>
         <p class="text-muted"><em><strong><%=@user.roles.map(&:role).join(', ')%></strong></em></p>
       </div>
+      <% if current_user.has_role?('admin') %>
+          <div class="col-xs-12 col-sm-8">
+            <%= render 'form' %>
+          </div>
+      <% end %>
     </div>
     <div class='row top-space'>
       <div class="col-xs-11">

@@ -84,12 +84,13 @@ module API
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
+          import_type = params[:import_type].present? ? params[:import_type] : "import"
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
             new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bugs)
+            Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bugs, import_type)
             "true"
           else
             "false"
@@ -122,9 +123,11 @@ module API
         desc "import one bug from bugzilla"
         params do
           requires :id, type: Integer, desc: "Bugzilla id."
+          optional :import_type, type: String, desc: "Type of Import"
         end
         route_param "import/:id" do
           get do
+            import_type = params[:import_type].present? ? params[:import_type] : "import"
             xmlrpc_token = request.headers['Xmlrpc-Token']
 
             if xmlrpc_token
@@ -132,47 +135,32 @@ module API
               progress_bar = Event.create(user:current_user.display_name,action:"import_bug:#{params[:id]}",description:"#{request.headers["Token"]}",progress:10)
 
               begin
-                xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-                new_bug = xmlrpc.get(permitted_params[:id])
-                initial_bug_state = Bug.where(id: permitted_params[:id]).first
-                if initial_bug_state
-                  initial_bug_state = initial_bug_state.clone
-                end
-                progress_bar.update_attribute("progress", 10)
-                #create the bug from bugzilla
-                bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug)
-                #parse the bug summary
-                parsed = bug.parse_summary
-                bug_rules = bug.rules.map {|r| r.id}
-                progress_bar.update_attribute("progress", 50)
-                bug.load_rules_from_sids(parsed[:sids])
-                progress_bar.update_attribute("progress", 60)
-                parsed[:tags].each do |tag|
-                  bug.import_report[:new_tags] += 1 unless bug.tags.include?(tag)
-                  bug.tags << tag unless bug.tags.include?(tag)
-                end
-                progress_bar.update_attribute("progress", 75)
-                parsed[:refs].each do |ref|
-                  bug.import_report[:new_refs] += 1 unless bug.references.map {|r| r.reference_data}.include? ref.reference_data
-                  bug.references << ref unless bug.references.map {|r| r.reference_data}.include? ref.reference_data
-                  Exploit.find_exploits(ref)
-                end
-                progress_bar.update_attribute("progress", 90)
-                #save the bug
-                bug.save
+                ActiveRecord::Base.transaction do
+                  xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+                  new_bug = xmlrpc.get(permitted_params[:id])
+                  initial_bug_state = Bug.where(id: permitted_params[:id]).first
+                  if initial_bug_state
+                    initial_bug_state = initial_bug_state.clone
+                  end
+                  progress_bar.update_attribute("progress", 10)
+                  #create the bug from bugzilla
+                  bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug, progress_bar, import_type).first
 
-                bug.clear_rule_tested
-                if initial_bug_state
-                  report = bug.compile_import_report(initial_bug_state)
+                  if initial_bug_state.present?
+                    report = bug.compile_import_report(initial_bug_state)
+                  end
+
+                  sleep(1)
+                  {:status => "success", :import_report => report}.to_json
                 end
-                progress_bar.update_attribute("progress", 100)
-                sleep(2)
-                {:status => "success", :import_report => report}.to_json
+
               rescue Exception => e
+                Rails.logger.error "Bug failed to upload, backing out all DB changes."
                 Rails.logger.error $!
                 Rails.logger.error $!.backtrace.join("\n")
                 progress_bar.update_attribute("progress", -1)
-                {:error => e.to_s}.to_json
+                error = "There was an error when attempting to upload bug, no bug was uploaded or synched as a result."
+                {:error => error}.to_json
               end
             else
               false
@@ -539,17 +527,21 @@ module API
               if current_user.bugs.exists?(bug.id)
                 return {error: 'already subscribed to this bug'}
               else
-                options = {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
                 Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                 current_user.bugs << bug
                 Bug.update(permitted_params[:id], state:"ASSIGNED")
               end
               return true
             rescue XMLRPC::FaultException => e
-              return {error: "#{e}"}
+               throw :error,
+                     status: 400,
+                     message: "#{e.message}"
             end
           end
-          return {error: 'cannot find bug to subscribe'}
+          throw :error,
+                status: 404,
+                message: 'cannot find bug to subscribe'
         end
 
 
@@ -569,10 +561,14 @@ module API
               vrt_incoming.bugs << bug
               return true
             rescue XMLRPC::FaultException => e
-              return {error: "#{e}"}
+              throw :error,
+                    status: 400,
+                    message: "#{e.message}"
             end
           end
-          return false
+          throw :error,
+                status: 404,
+                message: 'cannot find bug to unsubscribe'
         end
 
         desc "add a reference to a bug"

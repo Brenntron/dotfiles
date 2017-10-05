@@ -24,8 +24,9 @@ Rails.application.routes.draw do
 
 
   # resources :rules, param: :sid
-
+  resources :roles
   resources :users do
+
     collection do
       get :results
     end
