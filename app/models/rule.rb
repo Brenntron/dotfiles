@@ -265,11 +265,11 @@ class Rule < ApplicationRecord
     rule_content.split(';').each { |r| references_ary << r.strip.gsub('reference:', '') if r.match(/reference\W*:/) }
 
     self.references.delete_all
-    references_ary.each do |r|
-      r = r.split(',')
-      unless r[1].nil? || r[1].empty?
-        ref_type = ReferenceType.find_or_create_by(name: r[0].strip)
-        new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: r[1].strip)
+    references_ary.each do |ref_str|
+      ref_pair = ref_str.split(',')
+      unless ref_pair[1].nil? || ref_pair[1].empty?
+        ref_type = ReferenceType.find_or_create_by(name: ref_pair[0].strip)
+        new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: ref_pair[1].strip)
         self.references << new_reference
       end
     end
@@ -839,6 +839,33 @@ class Rule < ApplicationRecord
 
   end
 
+  def copy_rule(attributes_arg = {})
+    changed_attributes = attributes_arg
+    references_arg = changed_attributes.delete('references')
+    new_references = references_arg || self.references.map{|ref| ref.attributes}
+
+    new_attributes = self.attributes.merge(changed_attributes)
+    new_attributes['id'] = nil
+    new_attributes['sid'] = nil
+    new_attributes['rev'] = nil
+    new_attributes['rule_content'] = nil
+    new_attributes['rule_parsed'] = nil
+    new_attributes['cvs_rule_content'] = nil
+    new_attributes['cvs_rule_parsed'] = nil
+    new_attributes['filename'] = nil
+    new_attributes['linenumber'] = nil
+
+    rule = Rule.new(new_attributes)
+
+    rule_params = rule.build_rule_params({ 'references' => new_references })
+    rule_content = RuleSyntax::Assemposer.new(rule_params).rule_content
+    parser = RuleSyntax::RuleParser.new(rule_content)
+    rule.assign_from_user_edit(rule_content, parser: parser)
+    rule.associate_references(rule_content)
+
+    rule
+  end
+
   def dup
     rule = Rule.new(self.attributes)
     rule.sid = nil
@@ -848,6 +875,26 @@ class Rule < ApplicationRecord
     rule.rule_content = RuleSyntax::Assemposer.new(rule_params).rule_content
 
     rule
+  end
+
+  def check_to_smtp
+    errors = []
+
+    errors << 'from FILE-OTHER' unless "FILE-OTHER" == rule_category.category
+    errors << 'from to_client' unless flow.split(',').include?('to_client')
+
+    errors.empty? ? '' : "Intended to covert to STMP\n#{errors.join("\n")}"
+  end
+
+  def to_smtp
+    new_metadata = metadata.split(/\s*,\s*/).reject{|metadatum| /\Aservice\s+/ =~ metadatum}
+    new_metadata << 'service smtp'
+
+    new_flow = ['to_server'] + flow.split(/\s*,\s*/).reject{|flow_datum| 'to_client' == flow_datum}
+
+    copy_rule('connection' => 'alert tcp $EXTERNAL_NET any -> $SMTP_SERVERS 25',
+              'metadata' => new_metadata.join(', '),
+              'flow' => new_flow.join(','))
   end
 
   # Creates a rule and its associations
