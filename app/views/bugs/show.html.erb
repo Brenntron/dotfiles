@@ -33,7 +33,8 @@
                 <input type="hidden" name="committer_id" value="<%= @bug.committer_id %>">
                 <input type="hidden" name="summary" value="<%= @bug.summary %>">
                 <% if @bug.can_resolve? %>
-                    <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button>
+                    <button id="resolve_bug_form_button" type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button>
+                    <button class="select-sm btn btn-default hidden" id="resolving_bug_form_button" disabled="disabled"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Resolving</button>
                 <% else %>
                     <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default" disabled="disabled">Resolve</button>
                 <% end %>

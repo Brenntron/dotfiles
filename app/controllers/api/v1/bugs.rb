@@ -350,24 +350,8 @@ module API
 
 
           # update the summary
-          bug.update_summary(permitted_params[:bug][:summary])
-
-          update_params[:product] = permitted_params[:bug][:product]
-          update_params[:component] = permitted_params[:bug][:component]
-          update_params[:summary] = permitted_params[:bug][:summary]
-          update_params[:version] = permitted_params[:bug][:version]
-          update_params[:state] = permitted_params[:bug][:state]
-          update_params[:opsys] = permitted_params[:bug][:opsys]
-          update_params[:platform] = permitted_params[:bug][:platform]
-          update_params[:priority] = permitted_params[:bug][:priority]
-          update_params[:severity] = permitted_params[:bug][:severity]
-          update_params[:classification] = permitted_params[:bug][:classification]
-
-          # update the database
           # (do this first so we can compose the summary properly to send to bugzilla)
-          update_params.reject! { |k, v| v.nil? }
-          Bug.update(permitted_params[:id], update_params)
-
+          bug.update_summary(permitted_params[:bug][:summary])
 
           options[:ids] = permitted_params[:id]
           options[:product] = permitted_params[:bug][:product]
@@ -385,6 +369,22 @@ module API
           # update buzilla (if needed)
           options.reject! { |k, v| v.nil? } if options
           Bugzilla::Bug.new(bugzilla_session).update(options.to_h) unless options.blank?
+
+          update_params[:product] = permitted_params[:bug][:product]
+          update_params[:component] = permitted_params[:bug][:component]
+          update_params[:summary] = permitted_params[:bug][:summary]
+          update_params[:version] = permitted_params[:bug][:version]
+          update_params[:state] = permitted_params[:bug][:state]
+          update_params[:opsys] = permitted_params[:bug][:opsys]
+          update_params[:platform] = permitted_params[:bug][:platform]
+          update_params[:priority] = permitted_params[:bug][:priority]
+          update_params[:severity] = permitted_params[:bug][:severity]
+          update_params[:classification] = permitted_params[:bug][:classification]
+
+          # update the database
+          update_params.reject! { |k, v| v.nil? }
+          Bug.update(permitted_params[:id], update_params)
+
 
         end
 
