@@ -774,6 +774,9 @@ class Bug < ApplicationRecord
         ####end attachment testing###
 
 
+        bug_has_published_notes = bug.has_published_notes?
+        bug_has_notes = bug.has_notes?
+
         ###build any comments/notes (research and commit messages) from bugzilla####
         ###prepolate running notes (for the Notes tab)
         bug.research_notes ||= Note::TEMPLATE_RESEARCH
@@ -827,7 +830,7 @@ class Bug < ApplicationRecord
 
               #prepopulating committer notes in notes tab
 
-              unless bug.has_published_notes?
+              unless bug_has_published_notes
                 last_committer_note = bug.notes.last_committer_note.first
                 if last_committer_note.present?
                   committer_note_text_area = ""
@@ -845,7 +848,7 @@ class Bug < ApplicationRecord
 
               #prepopulating research notes in notes tab
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
-              if latest_research.present? && !(bug.has_notes?)
+              if latest_research.present? && !(bug_has_notes)
                 new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
                 new_note = Note.new({
                                         comment: new_draft,
