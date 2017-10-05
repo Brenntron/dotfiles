@@ -1,0 +1,10 @@
+#hamburger-space
+
+.admin-title
+  %h1 Schema Migrations
+
+#migrations-div
+  - @migrations.each do |migration|
+    .migration= migration.first
+
+

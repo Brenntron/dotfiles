@@ -5,6 +5,32 @@ module API
 
       resource :rules do
 
+        desc "Checks rule to convert to SMTP"
+        params do
+          requires :rule_id, type: Integer, desc: "the id for the rule to be checked"
+        end
+        get ":rule_id/to_smtp", root: 'rule' do
+          rule = Rule.find(permitted_params[:rule_id])
+          rule.check_to_smtp
+        end
+
+        desc "Converts rule to SMTP"
+        params do
+          requires :rule_id, type: Integer, desc: "the id for the rule to be checked"
+        end
+        post ":rule_id/to_smtp", root: 'rule' do
+          rule = Rule.find(permitted_params[:rule_id])
+          if rule
+            rule_smtp = rule.to_smtp
+            references = rule_smtp.references.map do |ref|
+              { reference_data: ref.reference_data, reference_type_name: ref.reference_type.name }
+            end
+            { rule: rule_smtp, references: references }
+          else
+            nil
+          end
+        end
+
         desc "Return a rule"
         params do
           requires :gid, type: Integer, desc: "gid of the rule"

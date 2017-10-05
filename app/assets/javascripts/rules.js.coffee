@@ -116,6 +116,58 @@ window.disparage =(chkbox) ->
     alert(disparage_messages[message_index])
 
 
+window.to_smtp =(rule_id, reference_form) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax {
+    url: '/api/v1/rules/' + rule_id + '/to_smtp'
+    method: 'POST'
+    data: ''
+    headers: headers
+    success: (response) ->
+      if (response == null)
+        alert('No rule id exists')
+      else
+        rule = response.rule
+        references = response.references
+        parsed_message = rule.message.match(/^(\S+)\s(.*)/).slice(1)
+        $('.legacy_form').find('textarea[name="rule[rule_content]"]').val(rule.rule_content)
+        standard_form = $('.standard_form')
+        AC.Helpers.populateDropdown(parsed_message[0], standard_form.find('select[name="rule_category_id"]')[0])
+        standard_form.find('input[name="rule[message]"]').val(parsed_message[1])
+        standard_form.find('.scratch_connection, .scratch_flow, .scratch_metadata').trigger("click")
+        standard_form.find('.scratch_connection_text').val(rule.connection)
+        standard_form.find('textarea[name="rule[detection]"]').val(rule.detection)
+        standard_form.find('.scratch_flow_text').val(rule.flow)
+        standard_form.find('.scratch_metadata_text').val(rule.metadata)
+        standard_form.find('select[name="rule[class_type]"]').val(rule.class_type)
+        reference_add = standard_form.find('.references_add')
+        reference_add.find('div.form-inline').remove()
+        $.each references, (ref_index, reference) ->
+          ref_form = $(reference_form).appendTo(reference_add)
+          ref_form.find('input[name="rule[reference][][reference_data]"]').val(reference.reference_data)
+          ref_form.find('select[name="rule[reference][][reference_type_id]"]').val(reference.reference_type_name)
+    error: (response) ->
+      alert(response.responseText)
+  }
+
+
+window.check_to_smtp =(rule_id, reference_form) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax {
+    url: '/api/v1/rules/' + rule_id + '/to_smtp'
+    method: 'GET'
+    data: ''
+    headers: headers
+    success: (response) ->
+      if "" != response
+        if !confirm(response)
+          return
+      to_smtp(rule_id, reference_form)
+    error: (response) ->
+      alert(response.responseText)
+  }
+
+
 $ ->
   $('.rule-toolbar').click ->
     tab = $(this).attr('id')
@@ -250,6 +302,19 @@ $ ->
               api_error(response, 'Rules have not been committed.', {failure_reload: true})
             complete: ->
           }
+        when 'tosmtp'
+          rule_ids = selected
+          if 1 <= rule_ids.length
+            $.each allboxes, (i, v) ->
+              $('.rule_'+v).removeClass('active').addClass('hidden')
+            $.each selected, (i, v) ->
+              $('.rule_'+v).removeClass('hidden').addClass('active')
+            $('.row.active').addClass('hidden').removeClass 'active'
+            $('.create').addClass('active').removeClass 'hidden'
+            $('.active').show()
+            $('.hidden').hide()
+            $('.standard_form').hide()
+            check_to_smtp(rule_ids[0], window.reference_form)
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')

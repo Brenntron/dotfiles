@@ -23,20 +23,23 @@
           <div class="alert alert-warning small"><%= simple_format rule.rule_warnings.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') if rule.rule_warnings %></div>
         <% end %>
         </br>
-        <%if @bug.local_alerts.by_rule(rule).count > 0 %>
-        <h4 class="blue">Alerts</h4>
-          <% @bug.attachment_local_alerts(rule).each do |attachment| %>
-            <div class="row">
-              <div class="col-xs-4" ><%= attachment.file_name %></div>
-              <% if attachment.rule_id.nil? %>
-                  <div class="col-xs-4 "><span class="no_alert">No Alert</span></div>
-              <% else %>
-                  <div class="col-xs-4 alerted"><span class="no_alert">Alerted</span></div>
-              <% end %>
-            </div>
+        <div class="view-tab-alerts">
+          <h4 class="blue">Alerts</h4>
+          <% if @bug.bugs_rules.where(rule: rule).where(tested: true).any? %>
+              <table class="view-tab-alerts-table">
+                <tbody>
+                <% @bug.attachment_local_alerts(rule).each do |attachment| %>
+                    <tr class="<%= attachment.rule_id.nil? ? 'row-no_alert' : 'row-alerted' %>">
+                      <td class="alert-col"><%= attachment.rule_id.nil? ? 'No Alert' : 'Alerted' %></td>
+                      <td class="pcap-col"><%= attachment.file_name %></td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+          <% else %>
+              Rule is not tested.
           <% end %>
-        <%end%>
-        </br>
+        </div>
         <h4 class="blue">Documentation</h4>
         <div class="alert alert-info small">
           <% if rule.rule_doc.present? %>

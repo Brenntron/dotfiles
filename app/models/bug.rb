@@ -774,6 +774,9 @@ class Bug < ApplicationRecord
         ####end attachment testing###
 
 
+        bug_has_published_notes = bug.has_published_notes?
+        bug_has_notes = bug.has_notes?
+
         ###build any comments/notes (research and commit messages) from bugzilla####
         ###prepolate running notes (for the Notes tab)
         bug.research_notes ||= Note::TEMPLATE_RESEARCH
@@ -827,12 +830,12 @@ class Bug < ApplicationRecord
 
               #prepopulating committer notes in notes tab
 
-              unless bug.has_published_notes?
+              unless bug_has_published_notes
                 last_committer_note = bug.notes.last_committer_note.first
                 if last_committer_note.present?
                   committer_note_text_area = ""
                   if last_committer_note
-                    committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:") + "\n"
+                    committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:", true) + "\n"
                   end
                   new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
                   new_note.note_type = 'committer'
@@ -845,7 +848,7 @@ class Bug < ApplicationRecord
 
               #prepopulating research notes in notes tab
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
-              if latest_research.present? && !(bug.has_notes?)
+              if latest_research.present? && !(bug_has_notes)
                 new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
                 new_note = Note.new({
                                         comment: new_draft,
@@ -883,7 +886,6 @@ class Bug < ApplicationRecord
 
         total_bugs << bug
 
-        return total_bugs
       end
     else
       if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
@@ -893,7 +895,7 @@ class Bug < ApplicationRecord
         raise "there was a problem importing from Bugzilla."
       end
     end
-    true
+    return total_bugs
   end
 
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)

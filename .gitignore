@@ -30,7 +30,7 @@
 
 /net-snort-parser/
 
-/ignore
+coverage
 
 
 .idea/*

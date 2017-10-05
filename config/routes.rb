@@ -2,6 +2,11 @@ Rails.application.routes.draw do
 
   devise_for :users, controllers: { sessions: 'sessions' }
 
+  namespace :admin do
+    root 'home#index'
+    resources :migrations, only: [:index]
+  end
+
   resources :events do
     collection {get :send_event}
   end
