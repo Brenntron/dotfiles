@@ -1,7 +1,8 @@
 describe 'an empty Repo::RuleContentCommitter' do
   before(:context) do
+    @username = 'marlpier'
     @relative_filename = 'snort-rules/x11.rules'
-    @rule_committer = Repo::RuleContentCommitter.new([], username: 'marlpier')
+    @rule_committer = Repo::RuleContentCommitter.new([], username: @username)
   end
 
   describe 'for a given path' do
@@ -30,8 +31,26 @@ describe 'an empty Repo::RuleContentCommitter' do
 
       @rule_committer.checkout(@relative_path)
     end
-  end
 
+    describe 'a Repo::RuleContentCommitter with a RuleFile' do
+      before(:context) do
+        @relative_filename = 'snort-rules/x11.rules'
+        @rule_file = RuleFile.new(@relative_filename)
+      end
+
+      it 'passes a test' do
+        allow(Repo::RuleContentCommitter).to receive(:collect_rule_files).and_return([@rule_file])
+        rule_committer = Repo::RuleContentCommitter.new([], username: 'marlpier')
+
+        # expect(@rule_committer).to receive(:call_svn).with(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~)
+        commit_msg = "#{@username} committed 0 rule(s) from Analyst Console"
+        commit_cmd = %Q~commit #{@absolute_working_path} -m "#{commit_msg}"~
+        expect(rule_committer).to receive(:call_svn).with(commit_cmd)
+
+        rule_committer.call_commit
+      end
+    end
+  end
 end
 
 describe 'a Repo::RuleContentCommitter with content' do
@@ -66,11 +85,5 @@ describe 'a Repo::RuleContentCommitter with content' do
 
       expect {@rule_committer.check_all_revs}.to raise_error('Cannot commit; revisions do not match the repo')
     end
-  end
-end
-
-describe Repo::RuleContentCommitter do
-  it 'passes a test' do
-    expect(true).to be_truthy
   end
 end

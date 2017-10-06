@@ -137,11 +137,15 @@ module Repo
       raise 'Cannot commit; revisions do not match the repo' if changed_rules.any?{ |rule| rule.stale_edit? }
     end
 
-    def commit_rule_files
+    def call_commit
       working_file_list = working_file_list(rule_files)
       Rails.logger.info("svn integration: committing files #{working_file_list}")
 
-      svn_result_output = call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~)
+      call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~)
+    end
+
+    def commit_rule_files
+      svn_result_output = call_commit
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
                           svn_result_code_str.to_i
                         end
