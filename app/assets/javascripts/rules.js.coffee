@@ -318,7 +318,10 @@ $ ->
         when 'copydoc'
           rule_ids = selected
           if 1 == rule_ids.length
-            window.copydoc_rule_id = rule_ids[0]
+            copydoc_rule_id = rule_ids[0]
+            window.copydoc_rule_id = copydoc_rule_id
+            $(".rule_row").removeClass("copydoc_rule")
+            $("#" + copydoc_rule_id).addClass("copydoc_rule")
           else
             alert("Select only one rule to copy")
         when 'pastedoc'
