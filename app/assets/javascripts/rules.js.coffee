@@ -315,6 +315,14 @@ $ ->
             $('.hidden').hide()
             $('.standard_form').hide()
             check_to_smtp(rule_ids[0], window.reference_form)
+        when 'copydoc'
+          rule_ids = selected
+          if 1 == rule_ids.length
+            window.copydoc_rule_id = rule_ids[0]
+          else
+            alert("Select only one rule to copy")
+        when 'pastedoc'
+          alert(window.copydoc_rule_id)
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')
