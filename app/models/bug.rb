@@ -379,12 +379,15 @@ class Bug < ApplicationRecord
   end
 
   # Takes an array of sids and adds their rules to the bug if not already on the bug.
-  def load_rules_from_sids(sids, import_type = "import")
+  def load_rules_from_sids(sids, component, import_type = "import")
     sids.each do |sid|
-      rule = Rule.find_or_load(sid, 1)
-      @import_report[:new_rules] += 1 unless self.rules.include? rule
-      if import_type != "status"
-        rules << rule unless self.rules.include? rule
+      gid = component == "SO Rules" ? 3 : 1
+      rule = Rule.find_or_load(sid, gid)
+      if rule
+        @import_report[:new_rules] += 1 unless self.rules.include? rule
+        if import_type != "status"
+          rules << rule unless self.rules.include? rule
+        end
       end
     end
   end
@@ -867,7 +870,7 @@ class Bug < ApplicationRecord
 
         parsed = bug.parse_summary
         progress_bar.update_attribute("progress", 50) unless progress_bar.blank?
-        bug.load_rules_from_sids(parsed[:sids], import_type)
+        bug.load_rules_from_sids(parsed[:sids], bug.component, import_type)
         progress_bar.update_attribute("progress", 60) unless progress_bar.blank?
         bug.load_tags_from_summary(parsed[:tags], import_type)
 
