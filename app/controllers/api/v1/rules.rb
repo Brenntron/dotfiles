@@ -294,6 +294,15 @@ module API
           ::PaperTrail.whodunnit = current_user.cvs_username
           Rule.update(permitted_params[:id])
         end
+
+        params do
+          optional :rule_id, type: Integer
+          requires :rule_ids, type: Array[String]
+        end
+        patch ":rule_id/copy_doc", root: 'rule' do
+          RuleDoc.copy_doc_action(permitted_params[:rule_id],
+                                  permitted_params[:rule_ids])
+        end
       end
     end
   end

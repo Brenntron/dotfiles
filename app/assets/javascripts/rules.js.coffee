@@ -322,7 +322,25 @@ $ ->
           else
             alert("Select only one rule to copy")
         when 'pastedoc'
-          alert(window.copydoc_rule_id)
+          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+          rule_ids = selected
+          $.ajax {
+            url: "/api/v1/rules/#{window.copydoc_rule_id}/copy_doc"
+            headers: headers
+            data:
+              rule_ids: selected
+            type: 'PATCH'
+            dataType: 'json'
+            success: (response) ->
+              alert('success')
+            error: (response) ->
+              alert('error')
+            complete: ->
+              setTimeout (->
+                $('.alert_rules').hide 'blind', {}, 500
+                return
+              ), 5000
+          }
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')

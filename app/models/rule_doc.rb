@@ -190,5 +190,12 @@ class RuleDoc < ApplicationRecord
 
     rule_doc
   end
+
+  def self.copy_doc_action(src_rule_id, rule_ids)
+    byebug
+
+    Rails.logger.debug("<<< copy_doc_action")
+    'success'
+  end
 end
 
