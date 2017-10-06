@@ -6,6 +6,9 @@ class RuleDoc < ApplicationRecord
   DEFAULT_SUMMARY_TEXT = "This event is generated when "
   DEFAULT_CONTRIBUTOR_TEXT = "Cisco's Talos Intelligence Group "
 
+  COPY_KEYS = %w{summary impact details affected_sys attack_scenarios ease_of_attack false_positives false_negatives
+                 corrective_action contributors policies is_community}
+
 
   before_create :compose_impact, if: Proc.new { |doc| doc.impact.blank? }
   before_save   :check_default_text
@@ -159,6 +162,20 @@ class RuleDoc < ApplicationRecord
     save!
   end
 
+  def copy_to_rule_ids(rule_ids)
+    copy_attrs = self.attributes.slice(*COPY_KEYS)
+
+    rule_ids.each do |curr_rule_id|
+      next if curr_rule_id.to_i == self.rule_id
+
+      curr_rule_doc = RuleDoc.where(rule_id: curr_rule_id).first
+      curr_rule_doc ||= RuleDoc.new(rule_id: curr_rule_id)
+      curr_rule_doc.update!(copy_attrs)
+    end
+
+    'success'
+  end
+
 
   #prepare_rule_doc_hash rule doc by translating certain information from rule to rule doc for persistence
   #right now this is all #metadata driven, so if that's empty, just stop here and return the hash
@@ -192,10 +209,10 @@ class RuleDoc < ApplicationRecord
   end
 
   def self.copy_doc_action(src_rule_id, rule_ids)
-    byebug
+    rule_doc = RuleDoc.where(rule_id: src_rule_id).first
+    raise "Cannot find rule doc" unless rule_doc
 
-    Rails.logger.debug("<<< copy_doc_action")
-    'success'
+    rule_doc.copy_to_rule_ids(rule_ids)
   end
 end
 
