@@ -336,9 +336,10 @@ $ ->
               type: 'PATCH'
               dataType: 'json'
               success: (response) ->
-                alert('success')
+                $(document).ajaxStop ->
+                  location.reload true
               error: (response) ->
-                alert('error')
+                api_error(response, "Cannot paste")
               complete: ->
                 setTimeout (->
                   $('.alert_rules').hide 'blind', {}, 500
