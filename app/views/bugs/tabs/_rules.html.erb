@@ -1,54 +1,62 @@
 <div class="row top-bar">
   <div class="col-xs-12">
-    <div id="missing-doc-override-div" onclick="$('#missing-doc-override')[0].style.visibility='visible'">
-      <input id="missing-doc-override" type="checkbox" onclick="disparage(this);" />
-    </div>
-    <button class="select-sm btn btn-default rule-toolbar" id="overview">
-      <i class="glyphicon glyphicon-list"></i><strong class="hidden-xs">&nbsp;&nbsp; list all</strong></button>
-    <button class="select-sm btn btn-default rule-toolbar view-rules" id="view">
-      <strong class="hidden-xs">view &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-eye-open"></i></button>
-    <% if can? :update, Rule %>
-        <button class="select-sm btn btn-default rule-toolbar" id="edit">
-          <strong class="hidden-xs">edit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-pencil"></i></button>
-        <button class="select-sm btn btn-default rule-toolbar" id="revert">
-          <strong class="hidden-xs">revert &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-repeat"></i>
-        </button>
-    <% end %>
-    <% if can? :create, Rule %>
-        <button class="select-sm btn btn-default rule-toolbar" id="create">
-          <strong class="hidden-xs">create &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-plus"></i></button>
-    <% end %>
-    <% if can? :destroy, Rule %>
-        <button class="select-sm btn btn-default rule-toolbar" id="remove">
-          <strong class="hidden-xs">remove &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-minus"></i></button>
-    <% end %>
-    <button class="select-sm btn btn-default rule-toolbar" id="test">
-      <strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
-    <% if can? :publish, Rule %>
-        <button id="commit-modal-trigger" class="select-sm btn btn-default" onclick="pre_commit()">
-          <strong id="commit_label" class="hidden-xs">commit</strong> &nbsp;&nbsp;<i id="commit_button_icon" class="glyphicon glyphicon-record"></i><i class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden" id="commit_loading"></i>
-        </button>
-    <% end %>
-    <button class="select-sm btn btn-default rule-toolbar" id="export">
-      <strong class="hidden-xs">export &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-download"></i></button>
-    <button class="select-sm btn btn-default rule-toolbar" id="tosmtp">
-      <strong class="hidden-xs">to smtp &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-envelope"></i></button>
-    <span class="text-muted small hidden-xs"><i id="bug-rules-loader" class="glyphicon glyphicon-refresh spin" style="display:none;"></i><i id="bug-rules-error" class="glyphicon glyphicon-alert" style="display:none;"></i> &nbsp;&nbsp;</span>
-    <form class="form-inline pull-right" id="linkRuleForm">
-      <div class="input-group">
-        <span class="input-label">gid:</span>
-        <span class="input-group-btn">
+    <div id="rule-import-form-div" class="pull-right">
+      <form class="form-inline" id="linkRuleForm">
+        <div class="input-group">
+          <span class="input-label">gid:</span>
+          <span class="input-group-btn">
           <input name="gid" class="form-control select-xs input-extra-narrow " value="1" disabled/>
         </span>
-        <span class="input-label">sid:</span>
-        <span class="input-group-btn">
+          <span class="input-label">sid:</span>
+          <span class="input-group-btn">
           <input name="sid" class="form-control select-sm input-extra-narrow" placeholder="import rule" />
         </span>
-      <span class="input-group-btn">
+          <span class="input-group-btn">
         <button id="import-rule-button" class="btn btn-default" type="submit" data-disable-with="Importing rule..." autocomplete="off">Import</button>
       </span>
-      </div><!-- /input-group -->
-    </form>
+        </div><!-- /input-group -->
+      </form>
+    </div>
+    <div id="rule-button-row-div">
+      <div id="missing-doc-override-div" onclick="$('#missing-doc-override')[0].style.visibility='visible'">
+        <input id="missing-doc-override" type="checkbox" onclick="disparage(this);" />
+      </div>
+      <button class="select-sm btn btn-default rule-toolbar" id="overview">
+        <i class="glyphicon glyphicon-list"></i><strong class="hidden-xs">&nbsp;&nbsp; list all</strong></button>
+      <button class="select-sm btn btn-default rule-toolbar view-rules" id="view">
+        <strong class="hidden-xs">view &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-eye-open"></i></button>
+      <% if can? :update, Rule %>
+          <button class="select-sm btn btn-default rule-toolbar" id="edit">
+            <strong class="hidden-xs">edit &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-pencil"></i></button>
+          <button class="select-sm btn btn-default rule-toolbar" id="revert">
+            <strong class="hidden-xs">revert &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-repeat"></i>
+          </button>
+      <% end %>
+      <% if can? :create, Rule %>
+          <button class="select-sm btn btn-default rule-toolbar" id="create">
+            <strong class="hidden-xs">create &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-plus"></i></button>
+      <% end %>
+      <% if can? :destroy, Rule %>
+          <button class="select-sm btn btn-default rule-toolbar" id="remove">
+            <strong class="hidden-xs">remove &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-minus"></i></button>
+      <% end %>
+      <button class="select-sm btn btn-default rule-toolbar" id="test">
+        <strong class="hidden-xs">test rules &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-flag"></i></button>
+      <% if can? :publish, Rule %>
+          <button id="commit-modal-trigger" class="select-sm btn btn-default" onclick="pre_commit()">
+            <strong id="commit_label" class="hidden-xs">commit</strong> &nbsp;&nbsp;<i id="commit_button_icon" class="glyphicon glyphicon-record"></i><i class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden" id="commit_loading"></i>
+          </button>
+      <% end %>
+      <button class="select-sm btn btn-default rule-toolbar" id="export">
+        <strong class="hidden-xs">export &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-download"></i></button>
+      <button class="select-sm btn btn-default rule-toolbar" id="tosmtp">
+        <strong class="hidden-xs">to smtp &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-envelope"></i></button>
+      <button class="select-sm btn btn-default rule-toolbar" id="copydoc">
+        <strong class="hidden-xs">copy doc &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-envelope"></i></button>
+      <button class="select-sm btn btn-default rule-toolbar" id="pastedoc">
+        <strong class="hidden-xs">paste doc &nbsp;&nbsp;</strong><i class="glyphicon glyphicon-envelope"></i></button>
+      <span class="text-muted small hidden-xs"><i id="bug-rules-loader" class="glyphicon glyphicon-refresh spin" style="display:none;"></i><i id="bug-rules-error" class="glyphicon glyphicon-alert" style="display:none;"></i> &nbsp;&nbsp;</span>
+    </div>
   </div>
 </div>
 <div class="modal fade" id="commit-modal" tabindex="-1" role="dialog" aria-labelledby="commit-modal-title">
