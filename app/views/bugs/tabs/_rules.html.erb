@@ -91,7 +91,9 @@
         <td>Message</td>
         <td>Alerts</td>
         <td>Tested</td>
-        <td>Svn</td>
+        <% if can? :publish, Rule %>
+            <td>Svn</td>
+        <% end %>
         <td>Check</td>
         <td>Match</td>
         <td>Nonmatch</td>
@@ -122,7 +124,9 @@
                   <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
                 </td>
                 <td class="center"><%= display_tested_status(@bug, rule) %></td>
-                <td class="center"><%= display_commit_status(@bug, rule) %></td>
+                <% if can? :publish, Rule %>
+                    <td class="center"><%= display_commit_status(@bug, rule) %></td>
+                <% end %>
                 <td><%= test_rpt ? test_rpt.average_check : '-' %></td>
                 <td><%= test_rpt ? test_rpt.average_match : '-' %></td>
                 <td><%= test_rpt ? test_rpt.average_nonmatch : '-' %></td>
