@@ -277,103 +277,10 @@ module API
 
         end
         put ":id", root: "bug" do
-          bug     = Bug.find(permitted_params[:id])
-          tags = params[:bug][:tag_names]
-
-          editor = User.find(permitted_params[:bug][:user_id])
-          reviewer = User.find(permitted_params[:bug][:committer_id])
-          updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], editor.email)
-
-          options = {
-              :ids => permitted_params[:id],
-              :assigned_to => editor.email,
-              :status => updated_bug_state[:status],
-              :resolution => updated_bug_state[:resolution],
-              :comment => updated_bug_state[:comment],
-              :qa_contact => reviewer.email
-          }
-          update_params = {
-              :user => editor,
-              :state => updated_bug_state[:state],
-              :status => updated_bug_state[:status],
-              summary: updated_bug_state[:summary],
-              :resolution => updated_bug_state[:resolution],
-              :assigned_at => updated_bug_state[:assigned_at],
-              :pending_at => updated_bug_state[:pending_at],
-              :resolved_at => updated_bug_state[:resolved_at],
-              :reopened_at => updated_bug_state[:reopened_at],
-              :work_time => updated_bug_state[:work_time],
-              :rework_time => updated_bug_state[:rework_time],
-              :review_time => updated_bug_state[:review_time],
-              :committer => reviewer
-          }
-
-          if permitted_params[:bug][:new_research_notes]
-            update_params = {
-                :research_notes => permitted_params[:bug][:new_research_notes]
-            }
-          elsif permitted_params[:bug][:new_committer_notes]
-            update_params = {
-                :committer_notes => permitted_params[:bug][:new_committer_notes]
-            }
+          ActiveRecord::Base.transaction do
+            bug = Bug.find(permitted_params[:id])
+            Bug.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
           end
-          #if a comment is made about a state then add it to the history here.
-          if permitted_params[:bug][:state_comment]
-            note_options = {
-                :id => permitted_params[:id],
-                :comment => permitted_params[:bug][:state_comment],
-                :note_type => "research",
-                :author => current_user.email,
-            }
-            Note.process_note(note_options, bugzilla_session)
-          end
-          # update the tags
-          bug.tags.delete_all if bug.tags.exists?
-          if tags
-            tags.each do |tag|
-              new_tag = Tag.find_or_create_by(name: tag)
-              bug.tags << new_tag
-            end
-          end
-
-
-          # update the summary
-          # (do this first so we can compose the summary properly to send to bugzilla)
-          bug.update_summary(permitted_params[:bug][:summary])
-
-          options[:ids] = permitted_params[:id]
-          options[:product] = permitted_params[:bug][:product]
-          options[:component] = permitted_params[:bug][:component]
-          options[:summary] = bug.summary
-          options[:version] = permitted_params[:bug][:version]
-          options[:state] = permitted_params[:bug][:state]
-          options[:creator] = permitted_params[:bug][:creator]
-          options[:opsys] = permitted_params[:bug][:opsys]
-          options[:platform] = permitted_params[:bug][:platform]
-          options[:priority] = permitted_params[:bug][:priority]
-          options[:severity] = permitted_params[:bug][:severity]
-          options[:classification] = permitted_params[:bug][:classification]
-
-          # update buzilla (if needed)
-          options.reject! { |k, v| v.nil? } if options
-          Bugzilla::Bug.new(bugzilla_session).update(options.to_h) unless options.blank?
-
-          update_params[:product] = permitted_params[:bug][:product]
-          update_params[:component] = permitted_params[:bug][:component]
-          update_params[:summary] = permitted_params[:bug][:summary]
-          update_params[:version] = permitted_params[:bug][:version]
-          update_params[:state] = permitted_params[:bug][:state]
-          update_params[:opsys] = permitted_params[:bug][:opsys]
-          update_params[:platform] = permitted_params[:bug][:platform]
-          update_params[:priority] = permitted_params[:bug][:priority]
-          update_params[:severity] = permitted_params[:bug][:severity]
-          update_params[:classification] = permitted_params[:bug][:classification]
-
-          # update the database
-          update_params.reject! { |k, v| v.nil? }
-          Bug.update(permitted_params[:id], update_params)
-
-
         end
 
         desc "create a bug"

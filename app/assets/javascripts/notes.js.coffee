@@ -6,6 +6,7 @@ $ ->
     data.append( 'note[bugzilla_id]', $('input[name="bugzilla_id"]').val())
     data.append( 'note[comment]', $('textarea[name="research_notes"]').val())
     data.append( 'note[note_type]', $('input[name="note_type"]').val())
+    data.append(  'is_research_notes', 'true' )
     if $('#researchNotesEditBtn').html()=='edit' && $('input[name="note_id"]').val()
       data.append( 'note[id]', $('input[name="note_id"]').val())
     $.ajax {

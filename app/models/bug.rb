@@ -495,6 +495,7 @@ class Bug < ApplicationRecord
 
           ActiveRecord::Base.transaction do
             new_bug = bug.notes.published.blank?
+            bug_has_notes = bug.has_notes?
             new_comments['bugs'].each do |comment|
               bug_id = comment[0].to_i
               comment[1]['comments'].each do |c|
@@ -547,6 +548,11 @@ class Bug < ApplicationRecord
                 new_note.save
 
               end
+            end
+            latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
+            if latest_research.present? && !(bug_has_notes)
+              new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
+              bug.research_notes = new_draft
             end
           end
         end
@@ -610,6 +616,233 @@ class Bug < ApplicationRecord
       end
     end
   end
+
+  ####PROCESSING THE WORKFLOW OF A BUG UPDATE#########
+
+  def self.publish_research_notes(bugzilla_session, current_user, bug)
+
+    note = bug.research_notes
+
+    notes_to_append = note + "\n\n--------------------------------------------------\n"
+
+    ###NEW AND/OR UPDATED RULES####
+
+    if bug.rules.any?
+      updated_rules = []
+      new_rules = []
+      bug.rules.each do |rule|
+        if rule.state == Rule::NEW_STATE
+          new_rules << rule
+        end
+        if rule.state == Rule::UPDATED_STATE
+          updated_rules << rule
+        end
+      end
+
+      if new_rules.any?
+        new_rules_text = "\nNew Rules:\n--------------------------------------------------\n"
+        new_rules.each do |rule|
+          new_rules_text += "     #{rule.rule_content}\n"
+        end
+        new_rules_text += "--------------------------------------------------\n"
+      end
+
+      if updated_rules.any?
+        updated_rules_text = "\nUpdated Rules:\n--------------------------------------------------\n"
+        updated_rules.each do |rule|
+          updated_rules_text += "     #{rule.rule_content}\n"
+        end
+        updated_rules_text += "--------------------------------------------------\n"
+      end
+
+    end
+
+    if new_rules_text.present?
+      notes_to_append += new_rules_text
+    end
+    if updated_rules_text.present?
+      notes_to_append += updated_rules_text
+    end
+
+    ####################
+
+    ###append alerts#####
+
+    alert_base = "\nAlerts:\n--------------------------------------------------\n"
+    pcap_attachments = []
+    bug.attachments.where(is_obsolete: false).map do |att|
+      if att.file_name.include? '.pcap'
+        pcap_attachments << att
+      end
+    end
+
+    if pcap_attachments.any?
+      alerts_message = ""
+      did_alert = false
+      pcap_attachments.each do |attachment|
+        if attachment.pcap_alerts.any?
+          alerts_message += "     #{attachment.file_name}:\n"
+          attachment.pcap_alerts.joins(:rule).where.not(rules: {sid: nil}).order('rules.gid, rules.sid').each do |alert|
+            p_rule = alert.rule
+            alerts_message += "          #{p_rule.gid}:#{p_rule.sid}:#{p_rule.rev} - #{p_rule.message}\n"
+            did_alert = true
+          end
+        end
+      end
+      if did_alert
+        final_alert_message = alert_base
+        final_alert_message += alerts_message
+        final_alert_message += "\n--------------------------------------------------\n"
+      end
+
+    end
+
+    if final_alert_message.present?
+      notes_to_append += final_alert_message
+    end
+
+
+
+    bug_related_base = "\nBug Related Rules:\n--------------------------------------------------\n"
+
+    if bug.rules.any?
+      related_bugs_message = bug_related_base
+      bug.rules.each do |rule|
+        related_bugs_message += "     #{rule.gid}:#{rule.sid}:#{rule.rev} #{rule.message}\n"
+      end
+      related_bugs_message += "--------------------------------------------------\n"
+    end
+
+    if related_bugs_message.present?
+      notes_to_append += related_bugs_message
+    end
+
+    options = {}
+    options[:id] = bug.id
+    options[:comment] = notes_to_append
+    options[:note_type] = "research"
+    options[:author] = current_user.email
+
+    Note.process_note(options, bugzilla_session)
+
+  end
+
+  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
+    bug.initialize_report
+    bug_is_being_resolved = bug.state != "PENDING" ? false : true
+
+    ###
+    tags = permitted_params[:bug][:tag_names]
+    editor = User.find(permitted_params[:bug][:user_id])
+    reviewer = User.find(permitted_params[:bug][:committer_id])
+    updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], editor.email)
+    ###
+
+    ###
+    options = {
+        :ids => permitted_params[:id],
+        :assigned_to => editor.email,
+        :status => updated_bug_state[:status],
+        :resolution => updated_bug_state[:resolution],
+        :comment => updated_bug_state[:comment],
+        :qa_contact => reviewer.email
+    }
+    update_params = {
+        :user => editor,
+        :state => updated_bug_state[:state],
+        :status => updated_bug_state[:status],
+        summary: updated_bug_state[:summary],
+        :resolution => updated_bug_state[:resolution],
+        :assigned_at => updated_bug_state[:assigned_at],
+        :pending_at => updated_bug_state[:pending_at],
+        :resolved_at => updated_bug_state[:resolved_at],
+        :reopened_at => updated_bug_state[:reopened_at],
+        :work_time => updated_bug_state[:work_time],
+        :rework_time => updated_bug_state[:rework_time],
+        :review_time => updated_bug_state[:review_time],
+        :committer => reviewer
+    }
+
+    if permitted_params[:bug][:new_research_notes]
+      update_params = {
+          :research_notes => permitted_params[:bug][:new_research_notes]
+      }
+    elsif permitted_params[:bug][:new_committer_notes]
+      update_params = {
+          :committer_notes => permitted_params[:bug][:new_committer_notes]
+      }
+    end
+    ###
+
+    ###
+    #if a comment is made about a state then add it to the history here.
+    if permitted_params[:bug][:state_comment]
+      note_options = {
+          :id => permitted_params[:id],
+          :comment => permitted_params[:bug][:state_comment],
+          :note_type => "research",
+          :author => current_user.email,
+      }
+      Note.process_note(note_options, bugzilla_session)
+    end
+    # update the tags
+    bug.tags.delete_all if bug.tags.exists?
+    if tags
+      tags.each do |tag|
+        new_tag = Tag.find_or_create_by(name: tag)
+        bug.tags << new_tag
+      end
+    end
+    ###
+
+    # update the summary
+    # (do this first so we can compose the summary properly to send to bugzilla)
+    bug.update_summary(permitted_params[:bug][:summary])
+
+    options[:ids] = permitted_params[:id]
+    options[:product] = permitted_params[:bug][:product]
+    options[:component] = permitted_params[:bug][:component]
+    options[:summary] = bug.summary
+    options[:version] = permitted_params[:bug][:version]
+    options[:state] = permitted_params[:bug][:state]
+    options[:creator] = permitted_params[:bug][:creator]
+    options[:opsys] = permitted_params[:bug][:opsys]
+    options[:platform] = permitted_params[:bug][:platform]
+    options[:priority] = permitted_params[:bug][:priority]
+    options[:severity] = permitted_params[:bug][:severity]
+    options[:classification] = permitted_params[:bug][:classification]
+
+    # update buzilla (if needed)
+    options.reject! { |k, v| v.nil? } if options
+    Bugzilla::Bug.new(bugzilla_session).update(options.to_h) unless options.blank?
+
+    update_params[:product] = permitted_params[:bug][:product]
+    update_params[:component] = permitted_params[:bug][:component]
+    update_params[:summary] = permitted_params[:bug][:summary]
+    update_params[:version] = permitted_params[:bug][:version]
+    update_params[:state] = permitted_params[:bug][:state]
+    update_params[:opsys] = permitted_params[:bug][:opsys]
+    update_params[:platform] = permitted_params[:bug][:platform]
+    update_params[:priority] = permitted_params[:bug][:priority]
+    update_params[:severity] = permitted_params[:bug][:severity]
+    update_params[:classification] = permitted_params[:bug][:classification]
+
+    # update the database
+    update_params.reject! { |k, v| v.nil? }
+    Bug.update(permitted_params[:id], update_params)
+
+    bug.reload
+    if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
+      bug_is_being_resolved = !bug_is_being_resolved
+    end
+
+    if bug_is_being_resolved
+     publish_research_notes(bugzilla_session, current_user, bug)
+    end
+
+  end
+
+  ####END BUG UPDATE PROCESS WORKFLOW#############
 
   ####BUGZILLA IMPORT PROCESS  (tbd: maybe move this into a dedicated process model, it will slim up the Bug class and
   ####                          allow the workflow of the import process to be better broken up while having all relevant
@@ -850,13 +1083,14 @@ class Bug < ApplicationRecord
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
               if latest_research.present? && !(bug_has_notes)
                 new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
-                new_note = Note.new({
-                                        comment: new_draft,
-                                        note_type: 'research',
-                                        author: current_user.email,
-                                        bug_id:     bug_id
-                                    })
-                new_note.save
+                #new_note = Note.new({
+                #                        comment: new_draft,
+                #                        note_type: 'research',
+                #                        author: current_user.email,
+                #                        bug_id:     bug_id
+                #                    })
+                #new_note.save
+                bug.research_notes = new_draft
               end
             end
 

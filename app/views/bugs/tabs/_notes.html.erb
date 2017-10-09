@@ -10,15 +10,15 @@
           &nbsp;&nbsp;
         </h4>
       </div>
-      <% note = get_last_notes 'research', current_user.email %>
+      <%# note = get_last_notes 'research', current_user.email %>
       <div id="research_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingTwo">
         <div class="panel-body row">
             <form id="notes_form">
               <div class="form-group col-xs-12 col-md-10">
                 <textarea id="researchNotesEditArea" class="form-control disabled code wrapped_code select-sm" name="research_notes"
                           rows="10" cols="100" style="background-color: #F0F0F0" wrap="soft"
-                          readonly><%= note ? note.comment : Note::TEMPLATE_RESEARCH %></textarea>
-                <input type="hidden" name="note_id" value="<%= note ? note.id : nil %>">
+                          readonly><%= @bug.research_notes.present? ? @bug.research_notes : Note::TEMPLATE_RESEARCH %></textarea>
+                <input type="hidden" name="note_id" value="<%# note ? note.id : nil %>">
               </div>
               <input type="hidden" name="note_type" value="research">
               <input type="hidden" name="bugzilla_id" value="<%= @bug.id %>">
@@ -28,12 +28,7 @@
                   <button id="researchNotesCancelBtn" class="btn btn-default btn-sm"  style="display:none;">cancel</button>
                   <div class="top-space"></div>
                   <button id="researchNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
-                  <% if note %>
-                    <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" <%= note.notes_bugzilla_id ? 'disabled' : ''  %>>publish</button>
-                  <% else %>
-                    <button id="researchNotesPublishBtn" class="btn btn-default btn-sm" disabled>publish</button>
-                  <% end %>
-                  <button class="select-sm btn btn-default hidden" id="publishing_note"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> publishing</button>
+
                 <% end %>
               </div>
             </form>
@@ -65,12 +60,6 @@
                 <button id="committerNotesCancelBtn" class="btn btn-default btn-sm" style="display:none;">cancel</button>
                 <div class="top-space"></div>
                 <button id="committerNotesSaveBtn" class="btn btn-warning btn-sm" value="submit" style="display:none;">save</button>
-                <% if committer_note %>
-                  <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" <%= committer_note.notes_bugzilla_id ? 'disabled' : ''  %>>publish</button>
-                <% else %>
-                  <button id="committerNotesPublishBtn" class="btn btn-default btn-sm" disabled>publish</button>
-                <% end %>
-                <button class="select-sm btn btn-default hidden" id="publishing_committer_note"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> publishing</button>
               </div>
             <% end %>
           </form>
