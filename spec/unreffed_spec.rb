@@ -18,7 +18,6 @@ describe ApiTest::RuleConfigurationsController
 describe ApiTest::SnortConfigurationsController
 
 describe Repo::RuleCommitter
-describe Repo::RuleDocCommitter
 describe RuleEvent::RuleCommitEvent
 describe RuleSyntax::Metadata
 
