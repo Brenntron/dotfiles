@@ -15,10 +15,6 @@ module Repo
       @svn_pathname ||= Pathname.new('extras/working')
     end
 
-    def self.ruledocs_root
-      @svn_pathname ||= Pathname.new('extras/ruledocs')
-    end
-
     # @param [Pathname, String] input file name, absolute or relative
     # @return [Pathname] the part of the file name relative to a working folder, the synchronized or working folder
     def self.relative_path_of(filepath)
@@ -77,11 +73,6 @@ module Repo
     def svn_commit_message(rules)
       user_prefix = username ? "#{username} " : ''
       "#{user_prefix}committed #{rules.count} rule(s) from Analyst Console"
-    end
-
-    def svn_cmd
-      pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
-      "#{Rails.configuration.svn_cmd} #{pwd_switch}"
     end
 
     # @return [String] space separated list of relative file paths
@@ -151,16 +142,14 @@ module Repo
                         end
       @success = (Rule::SVN_SUCCESS_COMMIT_HOOK == svn_result_code ? true : false)
 
+      changed_rules.each do |rule|
+        rule.update(svn_result_output: svn_result_output,
+                    svn_result_code: svn_result_code || 0,
+                    svn_success: @success)
+      end
+
       additional_output = rule_files.map {|rule_file| rule_file.build_additional_output}.join("\n")
       svn_result_output = svn_result_output + additional_output
-
-      if bug
-        changed_rules.each do |rule|
-          rule.update(svn_result_output: svn_result_output,
-                      svn_result_code: svn_result_code || 0,
-                      svn_success: @success)
-        end
-      end
 
       Rails.logger.info("svn integration: content commit return code #{svn_result_code.inspect}")
       svn_result_output
