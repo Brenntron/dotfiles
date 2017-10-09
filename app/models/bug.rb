@@ -21,6 +21,9 @@ class Bug < ApplicationRecord
 
   accepts_nested_attributes_for :rules
 
+  LIBERTY_CLEAR                         = "CLEAR"
+  LIBERTY_EMBARGO                       = "EMBARGO"
+
   scope :open_bugs, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }
