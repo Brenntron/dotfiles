@@ -61,9 +61,9 @@ def set_bug_color(bug)
 
   def display_tested_status(bug, rule)
     if rule.tested_on_bug?(bug)
-      glyph_success(title: rule.svn_result_output)
+      icon_success(title: rule.svn_result_output)
     else
-      glyph_nonstatus
+      icon_nonstatus
     end
   end
 
@@ -74,11 +74,11 @@ def set_bug_color(bug)
   def display_commit_status(bug, rule)
     case
       when rule.svn_result_code.nil?
-        glyph_nonstatus
+        icon_nonstatus
       when rule.svn_success?
-        glyph_success(title: rule.svn_result_output)
+        icon_success(title: rule.svn_result_output)
       else
-        glyph_failure(title: rule.svn_result_output)
+        icon_failure(title: rule.svn_result_output)
     end
   end
 end

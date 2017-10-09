@@ -14,15 +14,27 @@ module ApplicationHelper
     end
   end
 
-  def glyph_success(**html_attr)
+  def icon_smtp(**html_attr)
+    content_tag(:i, class: "glyphicon glyphicon-envelope", **html_attr) { '' }
+  end
+
+  def icon_copy(**html_attr)
+    content_tag(:i, class: "glyphicon glyphicon-copy", **html_attr) { '' }
+  end
+
+  def icon_paste(**html_attr)
+    content_tag(:i, class: "glyphicon glyphicon-paste", **html_attr) { '' }
+  end
+
+  def icon_success(**html_attr)
     content_tag(:span, class: "glyphicon glyphicon-ok", **html_attr) { '' }
   end
 
-  def glyph_failure(**html_attr)
+  def icon_failure(**html_attr)
     content_tag(:span, class: "glyphicon glyphicon-remove", **html_attr) { '' }
   end
 
-  def glyph_nonstatus(**html_attr)
+  def icon_nonstatus(**html_attr)
     content_tag(:span, class: "glyphicon glyphicon-minus", **html_attr) { '' }
   end
 

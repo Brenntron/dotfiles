@@ -315,6 +315,40 @@ $ ->
             $('.hidden').hide()
             $('.standard_form').hide()
             check_to_smtp(rule_ids[0], window.reference_form)
+        when 'copydoc'
+          rule_ids = selected
+          if 1 == rule_ids.length
+            copydoc_rule_id = rule_ids[0]
+            window.copydoc_rule_id = copydoc_rule_id
+            $(".rule_row").removeClass("copydoc_rule")
+            $("#" + copydoc_rule_id).addClass("copydoc_rule")
+          else
+            alert("Select only one rule to copy")
+        when 'pastedoc'
+          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+          src_rule_id = window.copydoc_rule_id
+          if src_rule_id == undefined
+            alert("Cannot paste, no rule doc copied")
+          else
+            rule_ids = selected
+            $.ajax {
+              url: "/api/v1/rules/#{src_rule_id}/copy_doc"
+              headers: headers
+              data:
+                rule_ids: selected
+              type: 'PATCH'
+              dataType: 'json'
+              success: (response) ->
+                $(document).ajaxStop ->
+                  location.reload true
+              error: (response) ->
+                api_error(response, "Cannot paste")
+              complete: ->
+                setTimeout (->
+                  $('.alert_rules').hide 'blind', {}, 500
+                  return
+                ), 5000
+            }
         else
           $.each allboxes, (i, v) ->
             $('.rule_'+v).removeClass('active').addClass('hidden')

@@ -6,9 +6,12 @@ class RuleDoc < ApplicationRecord
   DEFAULT_SUMMARY_TEXT = "This event is generated when "
   DEFAULT_CONTRIBUTOR_TEXT = "Cisco's Talos Intelligence Group "
 
+  COPY_KEYS = %w{summary impact details affected_sys attack_scenarios ease_of_attack false_positives false_negatives
+                 corrective_action contributors policies is_community}
+
 
   before_create :compose_impact, if: Proc.new { |doc| doc.impact.blank? }
-  before_save   :check_default_text
+  before_save :check_default_text
 
   has_many :references, through: :rule
 
@@ -81,23 +84,23 @@ class RuleDoc < ApplicationRecord
   end
 
   def affected_sys_array
-    affected_sys.present? ? [ affected_sys ] : []
+    affected_sys.present? ? [affected_sys] : []
   end
 
   def corrective_action_array
-    corrective_action.present? ? [ corrective_action ] : []
+    corrective_action.present? ? [corrective_action] : []
   end
 
   def contributors_array
-    contributors.present? ? [ contributors ] : []
+    contributors.present? ? [contributors] : []
   end
 
   def reference_data_array
-    references.map{|ref| ref.reference_data}
+    references.map { |ref| ref.reference_data }
   end
 
   def policies_array
-    policies.present? ? [ policies ] : []
+    policies.present? ? [policies] : []
   end
 
   def nested
@@ -138,7 +141,7 @@ class RuleDoc < ApplicationRecord
     return false if new_rule?
 
     File.open(filepath, 'wt') do |file|
-      file.puts(JSON.pretty_generate( {sid => [ nested ]}) )
+      file.puts(JSON.pretty_generate({sid => [nested]}))
     end
     true
   end
@@ -157,6 +160,31 @@ class RuleDoc < ApplicationRecord
     fetch_from_repo
     assign_from_json(read_from_file)
     save!
+  end
+
+  def copy_to_rule_ids(rule_ids)
+    begin
+      ActiveRecord::Base.transaction do
+        copy_attrs = self.attributes.slice(*COPY_KEYS)
+
+        rule_ids.each do |curr_rule_id|
+          next if curr_rule_id.to_i == self.rule_id
+
+          curr_rule_doc = RuleDoc.where(rule_id: curr_rule_id).first
+          curr_rule_doc ||= RuleDoc.new(rule_id: curr_rule_id)
+          curr_rule_doc.update!(copy_attrs)
+        end
+      end
+    rescue Exception => e
+      Rails.logger.error "Docs failed to copy, backing out all changes."
+      Rails.logger.error $!
+      Rails.logger.error $!.backtrace.join("\n")
+      error = "There was an error when attempting to copy a rule doc, no docs were copied."
+      {:error => error}.to_json
+    end
+
+
+    'success'
   end
 
 
@@ -189,6 +217,13 @@ class RuleDoc < ApplicationRecord
     rule_doc[:policies] = policies.join(", ")
 
     rule_doc
+  end
+
+  def self.copy_doc_action(src_rule_id, rule_ids)
+    rule_doc = RuleDoc.where(rule_id: src_rule_id).first
+    raise "Cannot find rule doc" unless rule_doc
+
+    rule_doc.copy_to_rule_ids(rule_ids)
   end
 end
 

@@ -2,11 +2,11 @@ module TasksHelper
   def task_status(task)
     case
       when !task.completed
-        glyph_nonstatus
+        icon_nonstatus
       when task.failed
-        glyph_failure
+        icon_failure
       else
-        glyph_success
+        icon_success
     end
   end
 
