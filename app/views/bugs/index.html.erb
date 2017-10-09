@@ -17,7 +17,7 @@
       <tr id="bug_<%= bug.id %>" class="<%= set_bug_color(bug) %>">
         <td><%= link_to bug.summary, bug_path(bug.id) %> </td>
         <td><%= bug.tags.map { |t| "[#{t.name}]" }.join(' ') %></td>
-        <td><span onclick="toggle_liberty(<%= bug.id %>)"><%= bug.liberty_clear? ? "OK" : "NO" %></span></td>
+        <td><span onclick="toggle_liberty(this, <%= bug.id %>)"><%= bug.liberty_clear? ? "OK" : "NO" %></span></td>
         <td><%= bug.state %></td>
         <td><%= bug.priority %></td>
 

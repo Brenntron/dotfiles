@@ -147,6 +147,7 @@ class Bug < ApplicationRecord
     else
       update(liberty: LIBERTY_CLEAR)
     end
+    self.liberty
   end
 
   def update_bug(xmlrpc, options)
