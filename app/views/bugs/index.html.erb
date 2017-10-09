@@ -3,7 +3,8 @@
   <tr>
     <td class="indent" data-defaultsign="nospan"><strong>Summary</strong></td>
     <td><strong>Tags</strong></td>
-    <td><strong>&nbsp;&nbsp;&nbsp;State</strong></td>
+    <td><strong>X</strong></td>
+    <td><strong>State</strong></td>
     <td><strong>Priority</strong></td>
     <td><strong>User</strong></td>
     <th></th>
@@ -16,7 +17,8 @@
       <tr id="bug_<%= bug.id %>" class="<%= set_bug_color(bug) %>">
         <td><%= link_to bug.summary, bug_path(bug.id) %> </td>
         <td><%= bug.tags.map { |t| "[#{t.name}]" }.join(' ') %></td>
-        <td>&nbsp;&nbsp;&nbsp;<%= bug.state %></td>
+        <td><span onclick="toggle_liberty(<%= bug.id %>)"><%= bug.liberty_clear? ? "OK" : "NO" %></span></td>
+        <td><%= bug.state %></td>
         <td><%= bug.priority %></td>
 
         <td class="bug-user">

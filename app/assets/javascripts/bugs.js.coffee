@@ -33,6 +33,16 @@ window.bug_resolve =(this_tag) ->
   , this)
 
 
+window.toggle_liberty =(bug_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
+    method: 'PATCH'
+    headers: headers
+    data: { }
+  , this)
+
+
 $ ->
   $('#bugzilla_popover_state').popover();
   $('.active').show();

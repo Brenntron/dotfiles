@@ -34,6 +34,14 @@ class Bug < ApplicationRecord
 
   attr_accessor :import_report
 
+  def liberty_clear?
+    LIBERTY_CLEAR == self.liberty
+  end
+
+  def liberty_embargo?
+    LIBERTY_EMBARGO == self.liberty
+  end
+
   def initialize_report
     @import_report = {}
     @import_report[:new_rules] = 0
@@ -131,6 +139,14 @@ class Bug < ApplicationRecord
       end
     end
     bug_state
+  end
+
+  def toggle_liberty
+    if liberty_clear?
+      update(liberty: LIBERTY_EMBARGO)
+    else
+      update(liberty: LIBERTY_CLEAR)
+    end
   end
 
   def update_bug(xmlrpc, options)
