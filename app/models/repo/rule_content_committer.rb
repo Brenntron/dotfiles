@@ -15,10 +15,6 @@ module Repo
       @svn_pathname ||= Pathname.new('extras/working')
     end
 
-    def self.ruledocs_root
-      @svn_pathname ||= Pathname.new('extras/ruledocs')
-    end
-
     # @param [Pathname, String] input file name, absolute or relative
     # @return [Pathname] the part of the file name relative to a working folder, the synchronized or working folder
     def self.relative_path_of(filepath)
@@ -79,11 +75,6 @@ module Repo
       "#{user_prefix}committed #{rules.count} rule(s) from Analyst Console"
     end
 
-    def svn_cmd
-      pwd_switch = Rails.configuration.svn_pwd.present? ? "--password #{Rails.configuration.svn_pwd}" : nil
-      "#{Rails.configuration.svn_cmd} #{pwd_switch}"
-    end
-
     # @return [String] space separated list of relative file paths
     def working_file_list(rule_files)
       map{|rule_file| rule_file.working_pathname.to_s}.join(' ')
@@ -137,26 +128,28 @@ module Repo
       raise 'Cannot commit; revisions do not match the repo' if changed_rules.any?{ |rule| rule.stale_edit? }
     end
 
-    def commit_rule_files
+    def call_commit
       working_file_list = working_file_list(rule_files)
       Rails.logger.info("svn integration: committing files #{working_file_list}")
 
-      svn_result_output = call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~)
+      call_svn(%Q~commit #{working_file_list} -m "#{svn_commit_message(changed_rules)}"~)
+    end
+
+    def commit_rule_files
+      svn_result_output = call_commit
       svn_result_code = if /\(exit code (?<svn_result_code_str>\d*)\)/ =~ svn_result_output
                           svn_result_code_str.to_i
                         end
       @success = (Rule::SVN_SUCCESS_COMMIT_HOOK == svn_result_code ? true : false)
 
+      changed_rules.each do |rule|
+        rule.update(svn_result_output: svn_result_output,
+                    svn_result_code: svn_result_code || 0,
+                    svn_success: @success)
+      end
+
       additional_output = rule_files.map {|rule_file| rule_file.build_additional_output}.join("\n")
       svn_result_output = svn_result_output + additional_output
-
-      if bug
-        changed_rules.each do |rule|
-          rule.update(svn_result_output: svn_result_output,
-                      svn_result_code: svn_result_code || 0,
-                      svn_success: @success)
-        end
-      end
 
       Rails.logger.info("svn integration: content commit return code #{svn_result_code.inspect}")
       svn_result_output
