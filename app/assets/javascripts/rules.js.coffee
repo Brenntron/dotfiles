@@ -337,13 +337,6 @@ $ ->
     #check the current rule
     $('#rule_' + id).prop('checked', true)
     $('.view').removeClass('hidden').addClass('active').show()
-
-    $.each $('.rules_table tr'), ->
-      `var id`
-      id = $(this).attr('id')
-      if !isNaN(id)
-        $('.rule_' + id).removeClass('active').addClass('hidden').hide()
-      return
     $('.rule_' + id).removeClass('hidden').addClass('active').show()
     return
 
