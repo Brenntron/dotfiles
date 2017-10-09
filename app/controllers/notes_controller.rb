@@ -6,12 +6,17 @@ class NotesController < ApplicationController
       render json: 'Unchanged content', status: 422
       return
     end
-    if params[:note][:id]
-      @note = Note.where("id=?", params[:note][:id]).first
-      @note.comment = params[:note][:comment]
+    if params[:is_research_notes].present?
+      @note = Bug.where("id=?", params[:note][:bugzilla_id]).first
+      @note.research_notes = params[:note][:comment]
     else
-      @note = Note.new(note_params.merge(author: current_user.email))
-      @note.bug_id ||= params[:note][:bugzilla_id]
+      if params[:note][:id]
+        @note = Note.where("id=?", params[:note][:id]).first
+        @note.comment = params[:note][:comment]
+      else
+        @note = Note.new(note_params.merge(author: current_user.email))
+        @note.bug_id ||= params[:note][:bugzilla_id]
+      end
     end
     if @note.save
       render json: @note
