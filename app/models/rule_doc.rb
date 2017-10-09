@@ -11,7 +11,7 @@ class RuleDoc < ApplicationRecord
 
 
   before_create :compose_impact, if: Proc.new { |doc| doc.impact.blank? }
-  before_save   :check_default_text
+  before_save :check_default_text
 
   has_many :references, through: :rule
 
@@ -84,23 +84,23 @@ class RuleDoc < ApplicationRecord
   end
 
   def affected_sys_array
-    affected_sys.present? ? [ affected_sys ] : []
+    affected_sys.present? ? [affected_sys] : []
   end
 
   def corrective_action_array
-    corrective_action.present? ? [ corrective_action ] : []
+    corrective_action.present? ? [corrective_action] : []
   end
 
   def contributors_array
-    contributors.present? ? [ contributors ] : []
+    contributors.present? ? [contributors] : []
   end
 
   def reference_data_array
-    references.map{|ref| ref.reference_data}
+    references.map { |ref| ref.reference_data }
   end
 
   def policies_array
-    policies.present? ? [ policies ] : []
+    policies.present? ? [policies] : []
   end
 
   def nested
@@ -141,7 +141,7 @@ class RuleDoc < ApplicationRecord
     return false if new_rule?
 
     File.open(filepath, 'wt') do |file|
-      file.puts(JSON.pretty_generate( {sid => [ nested ]}) )
+      file.puts(JSON.pretty_generate({sid => [nested]}))
     end
     true
   end
@@ -163,15 +163,26 @@ class RuleDoc < ApplicationRecord
   end
 
   def copy_to_rule_ids(rule_ids)
-    copy_attrs = self.attributes.slice(*COPY_KEYS)
+    begin
+      ActiveRecord::Base.transaction do
+        copy_attrs = self.attributes.slice(*COPY_KEYS)
 
-    rule_ids.each do |curr_rule_id|
-      next if curr_rule_id.to_i == self.rule_id
+        rule_ids.each do |curr_rule_id|
+          next if curr_rule_id.to_i == self.rule_id
 
-      curr_rule_doc = RuleDoc.where(rule_id: curr_rule_id).first
-      curr_rule_doc ||= RuleDoc.new(rule_id: curr_rule_id)
-      curr_rule_doc.update!(copy_attrs)
+          curr_rule_doc = RuleDoc.where(rule_id: curr_rule_id).first
+          curr_rule_doc ||= RuleDoc.new(rule_id: curr_rule_id)
+          curr_rule_doc.update!(copy_attrs)
+        end
+      end
+    rescue Exception => e
+      Rails.logger.error "Docs failed to copy, backing out all changes."
+      Rails.logger.error $!
+      Rails.logger.error $!.backtrace.join("\n")
+      error = "There was an error when attempting to copy a rule doc, no docs were copied."
+      {:error => error}.to_json
     end
+
 
     'success'
   end
