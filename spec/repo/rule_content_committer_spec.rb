@@ -38,7 +38,7 @@ describe 'an empty Repo::RuleContentCommitter' do
         @rule_file = RuleFile.new(@relative_filename)
       end
 
-      it 'passes a test' do
+      it 'calls commit' do
         allow(Repo::RuleContentCommitter).to receive(:collect_rule_files).and_return([@rule_file])
         rule_committer = Repo::RuleContentCommitter.new([], username: 'marlpier')
 
@@ -63,6 +63,11 @@ describe 'a Repo::RuleContentCommitter with content' do
     @rule = Rule.new(gid: @gid, sid: @sid, rev: @rev, filename: @relative_filename,
                      edit_status: Rule::EDIT_STATUS_EDIT,
                      rule_content: @rule_content)
+    @rule = FactoryGirl.create(:rule,
+                               gid: @gid, sid: @sid, rev: @rev, filename: @relative_filename,
+                               edit_status: Rule::EDIT_STATUS_EDIT,
+                               rule_content: @rule_content)
+
     @rule_grep_line = "#{@relative_filename}:101:#{@rule_content}"
     @rule_committer = Repo::RuleContentCommitter.new([@rule], username: 'marlpier')
   end
