@@ -42,9 +42,9 @@ window.toggle_liberty =(this_tag, bug_id) ->
     data: { }
     success: (response) ->
       if "CLEAR" == response
-        this_tag.innerHTML = "OK"
+        this_tag.className = "embargo_off"
       else
-        this_tag.innerHTML = "NO"
+        this_tag.className = "embargo_on"
   , this)
 
 
