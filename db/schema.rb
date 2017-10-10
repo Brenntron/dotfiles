@@ -100,6 +100,7 @@ ActiveRecord::Schema.define(version: 20171009143501) do
     t.bigint "rule_id"
     t.bigint "attachment_id"
     t.index ["attachment_id"], name: "index_bugs_on_attachment_id"
+    t.string "liberty", default: "CLEAR"
     t.index ["reference_id"], name: "index_bugs_on_reference_id"
     t.index ["rule_id"], name: "index_bugs_on_rule_id"
     t.string "liberty", default: "CLEAR"
