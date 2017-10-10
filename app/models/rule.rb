@@ -883,7 +883,6 @@ class Rule < ApplicationRecord
   def check_to_smtp
     errors = []
 
-    errors << 'from FILE-OTHER' unless "FILE-OTHER" == rule_category.category
     errors << 'from to_client' unless flow.split(',').include?('to_client')
 
     errors.empty? ? '' : "Intended to covert to STMP\n#{errors.join("\n")}"
