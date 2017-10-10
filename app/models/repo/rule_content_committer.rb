@@ -86,7 +86,8 @@ module Repo
     # @raise [RuntimeError] an exception if commit is prohibited.
     def self.prescreen!(rules, user, bug:, nodoc_override: false)
 
-      raise "unknown user" unless user
+      raise "bug is in #{bug.liberty} state" unless bug.liberty_clear?
+      raise 'unknown user' unless user
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
       raise 'Some of those rules cannot be committed because they have changed!' if rules.any? {|rule| rule.stale_edit?}
       raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested_on_bug?(bug) || rule.content_same?}
