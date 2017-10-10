@@ -23,10 +23,10 @@
             <td>
               <table class="local-alerts-table">
                 <tbody>
-                <% @rules.each do |rule| %>
+                <% @rules.each_with_index do |rule,index| %>
                     <tr class="<%= alert_css_class(attachment, rule) %>">
-                      <td><strong><%= sid_colon_format(rule) %></strong></td>
                       <td class="alert-status-col"><%= alert_status(attachment, rule) %></td>
+                      <td><strong><%= sid_colon_format(rule)%> <%=index+1%></strong> <%=rule.message %></td>
                     </tr>
                 <% end %>
                 </tbody>
