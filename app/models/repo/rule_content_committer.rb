@@ -89,7 +89,7 @@ module Repo
       raise "bug is in #{bug.liberty} state" unless bug.liberty_clear?
       raise 'unknown user' unless user
       raise 'Some of those rules are unchanged!' if rules.any? {|rule| rule.synched?}
-      raise 'Some of those rules cannot be committed because they have changed!' if rules.any? {|rule| rule.stale_edit?}
+      raise 'Some of those rules cannot be committed because they have changed in the repo!' if rules.any? {|rule| rule.stale_edit?}
       raise "Cannot commit with untested rules!" unless rules.all? {|rule| rule.tested_on_bug?(bug) || rule.content_same?}
       raise "Cannot commit with incomplete rule docs!" unless nodoc_override || rules.all? { |rule| rule.doc_complete? }
 

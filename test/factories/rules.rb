@@ -1,5 +1,8 @@
 FactoryGirl.define do
   factory :rule do
+    gid                 1
+    sequence(:sid)      {|n| 19500 + n }
+    rev                 3
     rule_content "alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any (msg:\"BROWSER-PLUGINS Microsoft Internet Explorer MSXML .definition ActiveX clsid access attempt\"; flow:to_client,established; file_data; content:\"Msxml2.FreeThreadedDOMDocument.6.0\"; fast_pattern:only; content:\".definition(\"; nocase; pcre:\"/(var|set)\\s+\\w+\\s*=\\s*(new\\s+ActiveXObject|CreateObject)\\s*\\((?P<q1>(\\x22|\\x27|))Msxml2\\.FreeThreadedDOMDocument\\.6\\.0(?P=q1)\\)/smi\"; metadata:policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3; reference:cve,2012-1889; reference:url,technet.microsoft.com/en-us/security/bulletin/ms12-043; classtype:attempted-user; sid:23304; rev:4;)"
     rule_parsed "Connection: alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any\nMessage   : BROWSER-PLUGINS Microsoft Internet Explorer MSXML .definition ActiveX clsid access attempt\nFlow      : to_client,established\nDetection :\n\tfile_data;\n\tcontent:\"Msxml2.FreeThreadedDOMDocument.6.0\"; fast_pattern:only;\n\tcontent:\".definition(\"; nocase;\n\tpcre:\"/(var|set)\\s+\\w+\\s*=\\s*(new\\s+ActiveXObject|CreateObject)\\s*\\((?P<q1>(\\x22|\\x27|))Msxml2\\.FreeThreadedDOMDocument\\.6\\.0(?P=q1)\\)/smi\";\nMetadata  :\n\tPolicy: balanced-ips drop, security-ips drop\n\tService: ftp-data, imap, pop3, http\nReferences:\n\tCVE:     2012-1889\n\tBUGTRAQ: <MISSING>\n\tURL:     technet.microsoft.com/en-us/security/bulletin/ms12-043\nClasstype : attempted-user\nSid       : 23304\nRev       : 4"
     connection "alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any"
@@ -19,27 +22,40 @@ FactoryGirl.define do
     rule_category_id    1
 
     factory :synched_rule do
-      sid                 10127
-      gid                 1
-      rev                 3
-      state               "UNCHANGED"
+      state               Rule::UNCHANGED_STATE
       publish_status      Rule::PUBLISH_STATUS_SYNCHED
       edit_status         Rule::EDIT_STATUS_SYNCHED
+      doc_status          Rule::DOC_STATUS_SYNCHED
       cvs_rule_content    { rule_content }
       cvs_rule_parsed     { rule_parsed }
     end
 
     factory :edited_rule do
-      sid                 19500
-      gid                 1
-      state               "UPDATED"
+      state               Rule::UPDATED_STATE
       publish_status      Rule::PUBLISH_STATUS_CURRENT_EDIT
       edit_status         Rule::EDIT_STATUS_EDIT
+      doc_status          Rule::DOC_STATUS_UPDATED
 
       before(:create) do |rule, evaluator|
         rule_grep_line = Rule.grep_line_from_file(rule.sid, rule.gid)
         filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
-        rule.load_rule_content(rule_content)
+        parser = RuleSyntax::RuleParser.new(rule_content)
+        rule.assign_from_user_edit(rule_content, parser: parser)
+        rule.update(rule_content: rule.rule_content.gsub('->', '<->'))
+      end
+    end
+
+    factory :stale_rule do
+      state               Rule::STALE_STATE
+      publish_status      Rule::PUBLISH_STATUS_STALE_EDIT
+      edit_status         Rule::EDIT_STATUS_EDIT
+      doc_status          Rule::DOC_STATUS_UPDATED
+
+      before(:create) do |rule, evaluator|
+        rule_grep_line = Rule.grep_line_from_file(rule.sid, rule.gid)
+        filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
+        parser = RuleSyntax::RuleParser.new(rule_content)
+        rule.assign_from_user_edit(rule_content, parser: parser)
         rule.update(rule_content: rule.rule_content.gsub('->', '<->'))
       end
     end
