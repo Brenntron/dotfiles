@@ -18,14 +18,16 @@ window.set_rule_success =(message) ->
 
 
 window.api_error =(response, prefix, options = {}) ->
-  if response.responseJSON != undefined
-    errormsg = 'not'
-  else
+  if response.responseJSON == undefined
     response_lines = response.responseText.split("\n")
     if 2 < response_lines.length
       errormsg = response_lines[0] + "\n" + response_lines[1]
     else
       errormsg = response.responseText
+  else if response.responseJSON.error != undefined
+    errormsg = response.responseJSON.error
+  else
+    errormsg = response.responseText
 
   if options["failure_reload"] == true
     alert(prefix + "\n" + errormsg)
