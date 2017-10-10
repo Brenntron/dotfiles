@@ -26,7 +26,7 @@
                 <% @rules.each_with_index do |rule,index| %>
                     <tr class="<%= alert_css_class(attachment, rule) %>">
                       <td class="alert-status-col"><%= alert_status(attachment, rule) %></td>
-                      <td><strong><%= sid_colon_format(rule)%> <%=index+1%></strong> <%=rule.message %></td>
+                      <td><strong><%= sid_colon_format(rule)%> [<%=index+1%>]</strong> <%=rule.message %></td>
                     </tr>
                 <% end %>
                 </tbody>
