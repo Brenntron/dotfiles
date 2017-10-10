@@ -53,7 +53,11 @@ module RulesHelper
   )
 
   def sid_colon_format(rule)
-    "#{rule.gid}:#{rule.sid}:#{rule.rev}"
+    if rule.new_rule?
+      "new rule"
+    else
+      "#{rule.gid}:#{rule.sid}:#{rule.rev}"
+    end
   end
 
   def alert_status(attachment, rule)
