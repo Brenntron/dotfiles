@@ -379,7 +379,7 @@ class Bug < ApplicationRecord
   end
 
   # Takes an array of sids and adds their rules to the bug if not already on the bug.
-  def load_rules_from_sids(sids, component, import_type = "import")
+  def load_rules_from_sids(sids, component = "Snort Rules", import_type = "import")
     sids.each do |sid|
       gid = component == "SO Rules" ? 3 : 1
       rule = Rule.find_or_load(sid, gid)
