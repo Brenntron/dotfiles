@@ -507,6 +507,7 @@ module API
         patch ':bug_id/toggle_liberty' do
           bug = Bug.where(id: params['bug_id']).first
           raise 'bug not found' unless bug
+          authorize!(:toggle_liberty, bug)
           bug.toggle_liberty
         end
       end
