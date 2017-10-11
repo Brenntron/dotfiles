@@ -16,7 +16,7 @@ def set_bug_color(bug)
                    'FIXED', 'WONTFIX', 'LATER', 'INVALID']
 
   def state_options(bug)
-    remove_list = ['DUPLICATE']
+    remove_list = ['DUPLICATE'] 
     case bug.state
       when "NEW", "OPEN"
         remove_list << "OPEN" << "REOPENED"
