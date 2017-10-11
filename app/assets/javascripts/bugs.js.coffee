@@ -50,6 +50,7 @@ $ ->
     $('#loading_image').removeClass('hidden').show()
     $.ajax {
       url: '/api/v1/bugs/'+id+'/subscribe'
+      data: {committer: false}
       method: 'post'
       headers: headers
       success: (response) ->
@@ -67,6 +68,43 @@ $ ->
     $('#loading_image').removeClass('hidden').show()
     $.ajax {
       url: '/api/v1/bugs/'+id+'/unsubscribe'
+      data: {committer: false}
+      method: 'post'
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        alert ("cant return this bug." + response.responseJSON.error)
+        location.reload()
+    }
+
+  $(".take-bug-committer").on 'click', (e) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $(this).data("id")
+    $("#take-bug-committer-"+id).hide()
+    $("#bug-wait-committer-"+id).show()
+    $('#loading_image').removeClass('hidden').show()
+    $.ajax {
+      url: '/api/v1/bugs/'+id+'/subscribe'
+      data: {committer: true}
+      method: 'post'
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        alert ("Sorry, you can not take this bug\n" + response.responseJSON.error)
+        location.reload()
+    }
+
+  $(".return-bug-committer").on 'click', (e) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $(this).data("id")
+    $("#return-bug-committer-"+id).hide()
+    $("#bug-wait-committer-"+id).show()
+    $('#loading_image').removeClass('hidden').show()
+    $.ajax {
+      url: '/api/v1/bugs/'+id+'/unsubscribe'
+      data: {committer: true}
       method: 'post'
       headers: headers
       success: (response) ->
