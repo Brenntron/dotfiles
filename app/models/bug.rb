@@ -21,6 +21,9 @@ class Bug < ApplicationRecord
 
   accepts_nested_attributes_for :rules
 
+  LIBERTY_CLEAR                         = "CLEAR"
+  LIBERTY_EMBARGO                       = "EMBARGO"
+
   scope :open_bugs, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
   scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
   scope :pending, -> { where(state: "PENDING") }
@@ -30,6 +33,14 @@ class Bug < ApplicationRecord
   scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
   attr_accessor :import_report
+
+  def liberty_clear?
+    LIBERTY_CLEAR == self.liberty
+  end
+
+  def liberty_embargo?
+    LIBERTY_EMBARGO == self.liberty
+  end
 
   def initialize_report
     @import_report = {}
@@ -128,6 +139,15 @@ class Bug < ApplicationRecord
       end
     end
     bug_state
+  end
+
+  def toggle_liberty
+    if liberty_clear?
+      update(liberty: LIBERTY_EMBARGO)
+    else
+      update(liberty: LIBERTY_CLEAR)
+    end
+    self.liberty
   end
 
   def update_bug(xmlrpc, options)

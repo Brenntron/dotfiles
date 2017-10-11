@@ -190,3 +190,19 @@ div.progress{
 .alerted{
     background-color: #a1f9c0;
 }
+
+.embargo_on {
+    background-image: url('icon_flag_orange.svg');
+}
+
+.embargo_off {
+    background-image: url('icon_flag_grey.svg');
+}
+
+.embargo_on, .embargo_off {
+    width: 25px;
+    height: 20px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    display: block;
+}

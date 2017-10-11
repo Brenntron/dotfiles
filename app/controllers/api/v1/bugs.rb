@@ -500,6 +500,16 @@ module API
                                  attachment_id: params['attachment_id'],
                                  exploit_data: params['exploit_data'])
         end
+
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        patch ':bug_id/toggle_liberty' do
+          bug = Bug.where(id: params['bug_id']).first
+          raise 'bug not found' unless bug
+          authorize!(:toggle_liberty, bug)
+          bug.toggle_liberty
+        end
       end
     end
   end
