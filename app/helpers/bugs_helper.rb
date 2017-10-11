@@ -16,14 +16,14 @@ def set_bug_color(bug)
                    'FIXED', 'WONTFIX', 'LATER', 'INVALID']
 
   def state_options(bug)
-    remove_list = []
+    remove_list = ['DUPLICATE']
     case bug.state
       when "NEW", "OPEN"
         remove_list << "OPEN" << "REOPENED"
       when "ASSIGNED", "DUPLICATE"
         remove_list << "OPEN"
       when "REOPENED", "PENDING"
-        remove_list << "NEW" << "ASSIGNED" << "OPEN" << "PENDING"
+        remove_list << "NEW" << "ASSIGNED" << "OPEN"
       when "FIXED", "WONTFIX", "LATER", "INVALID"
         remove_list  << "ASSIGNED" << "OPEN" << "PENDING"
     end
