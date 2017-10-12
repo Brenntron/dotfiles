@@ -225,16 +225,13 @@ class User < ApplicationRecord
 
   def self.login_user(params, request)
     begin
-      byebug
       user = from_request(params, request)
       raise Exception.new("Error signing in user. (no user object) Please contact the administrator.") unless user
       Rails.logger.info("login_user user #{user.id.inspect} name : #{user.cvs_username.inspect} -- #{user.display_name.inspect}")
 
-      if user
-        user.confirmed = 'true'
-        user.updated_at = Time.now
-        user.ensure_authentication_token # make sure the user has a token generated
-      end
+      user.confirmed = 'true'
+      user.updated_at = Time.now
+      user.ensure_authentication_token # make sure the user has a token generated
       Rails.logger.info("login_user user #{user.id.inspect} updated : #{user.cvs_username.inspect} #{user.updated_at.inspect} -- #{user.display_name.inspect}")
 
       raise Exception.new("Error signing in user #{user.display_name}. Please contact the administrator.") unless user.save
