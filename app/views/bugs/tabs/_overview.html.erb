@@ -20,7 +20,8 @@
   <div class="col-xs-12">
     <h4 class="blue">
       References
-      <span class="glyphicon glyphicon-plus-sign" onclick="$('#add-bug-ref-div').show();"></span>
+      <span id="add-bug-ref-show" class="glyphicon glyphicon-plus-sign" onclick="add_bug_ref_show();"></span>
+      <span id="add-bug-ref-hide" class="glyphicon glyphicon-collapse-up" onclick="add_bug_ref_hide();"></span>
     </h4>
   </div>
   <div id="add-bug-ref-div" class="col-xs-10">
@@ -92,7 +93,8 @@
   <div class="col-xs-12">
     <h4 class="blue">
       Exploits
-      <span class="glyphicon glyphicon-plus-sign" onclick="$('#add-bug-exploit-div').show();"></span>
+      <span id="add-bug-exploit-show" class="glyphicon glyphicon-plus-sign" onclick="add_bug_exploit_show();"></span>
+      <span id="add-bug-exploit-hide" class="glyphicon glyphicon-collapse-up" onclick="add_bug_exploit_hide();"></span>
     </h4>
   </div>
   <div id="add-bug-exploit-div" class="col-xs-10">

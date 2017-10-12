@@ -48,6 +48,27 @@ window.toggle_liberty =(this_tag, bug_id) ->
   , this)
 
 
+window.add_bug_ref_show = ->
+  $('#add-bug-ref-div').show();
+  $('#add-bug-ref-show').hide();
+  $('#add-bug-ref-hide').show();
+
+window.add_bug_ref_hide = ->
+  $('#add-bug-ref-div').hide();
+  $('#add-bug-ref-show').show();
+  $('#add-bug-ref-hide').hide();
+
+window.add_bug_exploit_show = ->
+  $('#add-bug-exploit-div').show();
+  $('#add-bug-exploit-show').hide();
+  $('#add-bug-exploit-hide').show();
+
+window.add_bug_exploit_hide = ->
+  $('#add-bug-exploit-div').hide();
+  $('#add-bug-exploit-show').show();
+  $('#add-bug-exploit-hide').hide();
+
+
 $ ->
   $('#bugzilla_popover_state').popover();
   $('.active').show();
