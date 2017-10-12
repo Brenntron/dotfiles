@@ -163,7 +163,8 @@ class Bug < ApplicationRecord
       when query_params[:bugzilla_max].present?
         nil
       when query_params[:summary].present?
-        Bug.where(query_params).or(Bug.where('summary LIKE ?', "%#{query_params[:summary]}%"))
+        summary_param = query_params.delete(:summary)
+        Bug.where(query_params).where('summary LIKE ?', "%#{summary_param}%")
       else
         Bug.where(query_params)
     end
