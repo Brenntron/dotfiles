@@ -231,7 +231,7 @@ class User < ApplicationRecord
         user.updated_at = Time.now
         user.ensure_authentication_token # make sure the user has a token generated
       end
-      raise Exception.new('Error signing in. Please contact the administrator.') unless user&.save
+      raise Exception.new("Error signing in user #{user.display_name}. Please contact the administrator.") unless user&.save
 
       login_session = LoginSession.new(user)
       #to turn off the login form remove the form from the view and remove these variables from the bugzilla login method
