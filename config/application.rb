@@ -92,6 +92,9 @@ module Api
 
         config.amq_snort_commit_result = :snort_commit_test_result
     end
+
+    config.active_job.queue_adapter = :delayed_job
+
     config.websockets_enabled = "false"
     config.job_timeout = 300    # 5 minutes
     config.action_controller.per_form_csrf_tokens = true

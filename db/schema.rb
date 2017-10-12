@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171009143501) do
+ActiveRecord::Schema.define(version: 20171012172610) do
 
   create_table "alerts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -99,11 +99,10 @@ ActiveRecord::Schema.define(version: 20171009143501) do
     t.bigint "reference_id"
     t.bigint "rule_id"
     t.bigint "attachment_id"
-    t.index ["attachment_id"], name: "index_bugs_on_attachment_id"
     t.string "liberty", default: "CLEAR"
+    t.index ["attachment_id"], name: "index_bugs_on_attachment_id"
     t.index ["reference_id"], name: "index_bugs_on_reference_id"
     t.index ["rule_id"], name: "index_bugs_on_rule_id"
-    t.string "liberty", default: "CLEAR"
     t.index ["user_id"], name: "index_bugs_on_user_id"
   end
 
@@ -122,6 +121,21 @@ ActiveRecord::Schema.define(version: 20171009143501) do
     t.index ["bug_id", "tag_id"], name: "index_bugs_tags_on_bug_id_and_tag_id", unique: true
     t.index ["bug_id"], name: "index_bugs_tags_on_bug_id"
     t.index ["tag_id"], name: "index_bugs_tags_on_tag_id"
+  end
+
+  create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "priority", default: 0, null: false
+    t.integer "attempts", default: 0, null: false
+    t.text "handler", null: false
+    t.text "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string "locked_by"
+    t.string "queue"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
   create_table "events", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
