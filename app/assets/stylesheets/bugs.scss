@@ -192,11 +192,11 @@ div.progress{
 }
 
 .embargo_on {
-    background-image: url('icon_flag_orange.svg');
+    background-image: url(image_path("icon_flag_orange.svg"));
 }
 
 .embargo_off {
-    background-image: url('icon_flag_grey.svg');
+    background-image: url(image_path("icon_flag_grey.svg"));
 }
 
 .embargo_on, .embargo_off {
