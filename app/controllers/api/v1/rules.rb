@@ -205,12 +205,6 @@ module API
                                                   bugzilla_comment: permitted_params[:bugzilla_comment],
                                                   xmlrpc: bugzilla_session,
                                                   nodoc_override: permitted_params[:nodoc_override])
-
-          #synch history to pick up new bugzilla commit note created by rulecommitter.
-          xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-          bug = xmlrpc.get(permitted_params[:bug_id])
-          Bug.synch_history(xmlrpc,bug)
-          
         end
 
         desc "Commit a rule"
