@@ -53,8 +53,8 @@ module RulesHelper
   )
 
   def sid_colon_format(rule)
-    if rule.new_rule?
-      "new rule"
+    if rule.sid.nil?
+      "No SID"
     else
       "#{rule.gid}:#{rule.sid}:#{rule.rev}"
     end
