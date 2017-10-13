@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
+    resources :delayed_jobs, only: [:index]
   end
 
   resources :events do
