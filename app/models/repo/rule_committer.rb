@@ -234,7 +234,14 @@ module Repo
                                           bugzilla_id: bugzilla_id,
                                           user: user,
                                           username: username)
-      committer.locked_commit(bugzilla_comment: bugzilla_comment)
+      committer.locked_commit(bugzilla_comment: bugzilla_comment).tap do
+
+        #synch history to pick up new bugzilla commit note created by rulecommitter.
+        bugzilla_bug = Bugzilla::Bug.new(xmlrpc)
+        bug = bugzilla_bug.get(bugzilla_id)
+        Bug.synch_history(bugzilla_bug, bug)
+
+      end
 
     rescue
       Rails.logger.error $!
