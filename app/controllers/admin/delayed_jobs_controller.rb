@@ -5,6 +5,12 @@ module Admin
     def index
       @delayed_jobs = DelayedJob.all
     end
+
+    def start_import
+      DelayedJob.run_rake("bugs:import_all",current_user,bugzilla_session)
+      render json: "", status: 200
+    end
+
     def create
 
     end
