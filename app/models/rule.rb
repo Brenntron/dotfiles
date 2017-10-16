@@ -492,6 +492,36 @@ class Rule < ApplicationRecord
     parser.rev == self.rev
   end
 
+  def sid_colon_format
+    if new_rule?
+      "new rule"
+    else
+      "#{self.gid}:#{self.sid}:#{self.rev}"
+    end
+  end
+
+  def self.get_alert_css_class_for(rule, att)
+    case
+      when !(att.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+        'untested'
+      when att.local_alerts.by_rule(rule).exists?
+        'alerted'
+      else
+        'no-alert'
+    end
+  end
+
+  def self.get_alert_status_for(rule, att)
+    case
+      when !(att.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+        'Untested'
+      when att.local_alerts.by_rule(rule).exists?
+        'Alerted'
+      else
+        'No alert'
+    end
+  end
+
   # Sets a rule or rules to a synched state
   #
   # @param [Rule|Relation] A single rule object or an ActiveRecord relation

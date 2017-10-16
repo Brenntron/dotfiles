@@ -6,7 +6,7 @@
 <div class="row top-bar">
   <div class="col-xs-12 alert-tab-div">
     <% if @pcap_attachments.any? %>
-      <table class="table table-condensed small table-hover">
+      <table id="alerts-table" class="table table-condensed small table-hover">
         <thead>
         <tr>
           <th>Filename</th>
@@ -15,42 +15,6 @@
         </tr>
         </thead>
         <tbody>
-        <% @pcap_attachments.each do |attachment| %>
-          <tr>
-            <td>
-              <code><a href="<%= attachment.direct_upload_url %>" target="_blank"><%= attachment.file_name %></a></code>
-            </td>
-            <td>
-              <table class="local-alerts-table">
-                <tbody>
-                <% @rules.each_with_index do |rule,index| %>
-                    <tr class="<%= alert_css_class(attachment, rule) %>">
-                      <td class="alert-status-col"><%= alert_status(attachment, rule) %></td>
-                      <td><strong><%= sid_colon_format(rule)%> [<%=index+1%>]</strong> <%=rule.message %></td>
-                    </tr>
-                <% end %>
-                </tbody>
-              </table>
-            </td>
-            <td>
-              <% if attachment.pcap_alerts.any? %>
-                <table class="table-condensed small pcap-alerts-table">
-                  <% attachment.pcap_alerts.joins(:rule)
-                               .where.not(rules: {sid: nil})
-                               .order('rules.gid, rules.sid').each do |alert| %>
-                    <% rule = alert.rule %>
-                    <tr>
-                      <td class="sid-col"><span class="blue"><%= sid_colon_format(rule) %></span></td>
-                      <td class="content-col"><strong><%= rule.message %></strong></td>
-                    </tr>
-                  <% end %>
-                </table>
-              <%else%>
-                  <p>No alerts</p>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
         </tbody>
       </table>
     <% end %>

@@ -415,11 +415,153 @@ namespace 'AC.Bugs', (exports) ->
 
   exports.monitorJobQueue = () ->
     AC.Bugs.rebuildJobQueue()
+    AC.Bugs.rebuildRulesTab()
+    AC.Bugs.rebuildAttachmentsTab()
+    AC.Bugs.rebuildAlertsTab()
     setInterval ->
-      tab = $('.nav-tabs .active').text()
-      if tab == 'Jobs'
-        AC.Bugs.rebuildJobQueue()
-    , 20000
+      AC.Bugs.rebuildJobQueue()
+      AC.Bugs.rebuildRulesTab()
+      AC.Bugs.rebuildAttachmentsTab()
+      AC.Bugs.rebuildAlertsTab()
+    , 8000
+
+
+  #Rebuild Alerts Tab
+  exports.rebuildAlertsTab = () ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/alerts/' + bid
+      headers: headers
+      method: 'GET'
+
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.status == "success")
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("")
+        $("#alert_message").removeClass('alert alert-danger alert-dismissable')
+        rows = AC.Bugs.buildAlertRows(json.data)
+        $("#alerts-table tbody").html(rows)
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
+
+
+  exports.buildAlertRows = (data) ->
+    rows = []
+    alerts = data.alerts
+    for alert in alerts
+      rows.push "<tr>#{AC.Bugs.buildAlertAttachment(alert)}#{AC.Bugs.buildAlertName(alert)}#{AC.Bugs.buildAlertPcaps(alert)}</tr>"
+    if rows.length > 0
+      content = rows.join("")
+    else
+      content = "<tr><td colspan='7' class='center text-muted'><em>No alerts for this bug.</em></td></tr>"
+    return content
+
+  exports.buildAlertAttachment = (data) ->
+    return "<td><code><a href='#{data.direct_upload_url}' target='_blank'>#{data.file_name}</a></code></td>"
+  exports.buildAlertName = (data) ->
+    return "<td><table class='local-alerts-table'>#{AC.Bugs.buildAlertNameTable(data)}</table></td>"
+  exports.buildAlertNameTable = (data) ->
+    rows = []
+    i = 1
+    content = ""
+    rules = data.rules
+    for rule in rules
+      rows.push "<tr class='#{rule.alert_css_class}'><td class='alert-status-col'>#{rule.alert_status}</td><td><strong>#{rule.sid_colon_format} #{i}</strong> #{rule.message}</td></tr>"
+      i = i + 1
+
+    if rows.length > 0
+      content = rows.join("")
+    return content
+  exports.buildAlertPcaps = (data) ->
+    content = "<td>"
+    if data.pcap_alerts.length > 0
+      content += "<table class='table-condensed small pcap-alerts-table'>"
+      rows = []
+
+      for pcap_alert in data.pcap_alerts
+         rows.push "<tr><td class='sid-col'><span class='blue'>#{pcap_alert.sid_colon_format}</span></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
+      content += rows.join("")
+      content = content + "</table>"
+    else
+      content += "<p>No alerts</p>"
+    content = content + "</td>"
+
+    return content
+
+
+
+  #Rebuild Rules Tab
+  exports.rebuildRulesTab = () ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/rules/' + bid
+      headers: headers
+      method: 'GET'
+
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.status == "success")
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("")
+        $("#alert_message").removeClass('alert alert-danger alert-dismissable')
+        AC.Bugs.buildRulesRows(json.data)
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
+
+  exports.buildRulesRows = (data) ->
+    for rule in data
+      if $("#rule_count_#{rule.id}").length != 0
+        $("#rule_count_#{rule.id}").html(rule.alert_count)
+        if rule.tested == true
+          $("#tested_rule_#{rule.id}").html("<span class='glyphicon glyphicon-ok' title='#{rule.svn_output}'></span>")
+          $('[data-toggle="tooltip"]').tooltip();
+        else
+          $("#tested_rule_#{rule.id}").html("<span class='glyphicon glyphicon-minus'></span>")
+        for att in rule.attachments
+          if att.rule_id_nil == true
+            $("#rule_#{rule.id}_att_#{att.att_id}").html("No Alert")
+            $("#rule_#{rule.id}_att_#{att.att_id}").removeClass();
+            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('no_alert')
+
+          else
+            $("#rule_#{rule.id}_att_#{att.att_id}").html("Alerted")
+            $("#rule_#{rule.id}_att_#{att.att_id}").removeClass();
+            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('alerted')
+  #Rebuild Attachments Tab
+  exports.rebuildAttachmentsTab = () ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/attachments/' + bid
+      headers: headers
+      method: 'GET'
+
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.status == "success")
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("")
+        $("#alert_message").removeClass('alert alert-danger alert-dismissable')
+        AC.Bugs.buildAttachmentsRows(json.data)
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
+
+  exports.buildAttachmentsRows = (data) ->
+    for attachment in data
+      if $("#attachment_count_#{attachment.id}").length != 0
+        $("#attachment_count_#{attachment.id}").html(attachment.alert_count)
+
+        if attachment.pcap_alerts.length > 0 && $("#attachment_#{attachment.id}").length == 0
+
+          content = "<tr style='display:none;' id='attachment_#{attachment.id}'><td></td><td colspan=2><table class='table-condensed small'>"
+          for pcap in attachment.pcap_alerts
+            content += "<tr><td class='blue'>#{pcap.sid_colon_format}</td><td><strong>#{pcap.message}</strong></td></tr>"
+          content += "</table></td></tr>"
+          #alert(content)
+          $("#attachment_base_#{attachment.id}").after(content);
+
+
+  #Rebuild Job Queue
   exports.buildJobRows = (data) ->
     rows = []
     for job in data

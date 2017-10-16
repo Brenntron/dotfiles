@@ -73,7 +73,7 @@ class Bug < ApplicationRecord
 
   def attachment_local_alerts(rule)
     pcaps.joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
-        .select(:file_name, 'alerts.rule_id')
+        .select(:file_name, 'alerts.rule_id', 'id')
   end
 
   def has_due_date?
