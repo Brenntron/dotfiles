@@ -192,9 +192,7 @@ function time_draw(data) {
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true,
-                        stepSize: 2,
-                        max: Math.max.apply(null, data.users) + 2
+                        beginAtZero: true
                     },
                     scaleLabel: {
                         display: true,
@@ -278,8 +276,7 @@ function team_work_time_draw(data, id) {
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true,
-                        stepSize: 10
+                        beginAtZero: true
                     },
                     scaleLabel: {
                         display: true,
