@@ -594,7 +594,7 @@ class Bug < ApplicationRecord
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
             local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
             if local_attachment.present?
-              if attachment['is_obsolete'] == true
+              if attachment['is_obsolete'] == 1
                 local_attachment.is_obsolete = true
                 local_attachment.save
               end
@@ -979,7 +979,7 @@ class Bug < ApplicationRecord
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
             local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
             if local_attachment.present?
-              if attachment['is_obsolete'] == true
+              if attachment['is_obsolete'] == 1
                 local_attachment.is_obsolete = true
                 local_attachment.save
               end
