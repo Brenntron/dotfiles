@@ -98,7 +98,7 @@ class Task < ApplicationRecord
 
 
   def run_rake(task_name,current_user,bugzilla_session)
-    load File.join(Rails.root, 'lib', 'tasks', 'import_bugs.rake')
+    load File.join(Rails.root, 'lib', 'tasks', 'admin_rake_tasks.rake')
     Rake::Task[task_name].invoke(id, current_user, bugzilla_session, Rails.env)
     Rake::Task[task_name].reenable
   end
