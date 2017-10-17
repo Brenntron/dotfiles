@@ -81,4 +81,12 @@ def set_bug_color(bug)
         icon_failure(title: rule.svn_result_output)
     end
   end
+
+  def display_last_updated_date(bug)
+    bug.updated_at.strftime("%Y %b %e")
+  end
+  def display_last_updated_time(bug)
+    bug.updated_at.strftime("%k:%M:%S")
+  end
+
 end

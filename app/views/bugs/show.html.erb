@@ -22,7 +22,11 @@
                 </h3>
             </div>
           </div>
-
+          <div class="col-xs-1">
+            <div class="bug-details-columns">
+              <h6>last updated</h6><h5 class="top-space"><%= display_last_updated_date(@bug)%><br></h5><h6><%= display_last_updated_time(@bug)%></h6>
+            </div>
+          </div>
           <div class="col-xs-1 state">
             <div class="bug-details-columns">
               <h6>state</h6>
@@ -84,7 +88,7 @@
           </div>
           <% end %>
 
-          <div class="col-xs-3">
+          <div class="col-xs-2">
             <button class="select-sm btn btn-info back_btn pull-right" id="back_btn" style="margin-top:4px;margin-right:-28px"><i class="glyphicon glyphicon-th-list"></i> <strong class="hidden-xs">bug list</strong></button>
           </div>
         </div>
