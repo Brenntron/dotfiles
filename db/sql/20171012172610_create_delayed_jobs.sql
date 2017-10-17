@@ -1,0 +1,3 @@
+CREATE TABLE `delayed_jobs` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `priority` int DEFAULT 0 NOT NULL, `attempts` int DEFAULT 0 NOT NULL, `handler` text NOT NULL, `last_error` text, `run_at` datetime, `locked_at` datetime, `failed_at` datetime, `locked_by` varchar(255), `queue` varchar(255), `created_at` datetime, `updated_at` datetime)
+CREATE  INDEX `delayed_jobs_priority`  ON `delayed_jobs` (`priority`, `run_at`)
+INSERT INTO `schema_migrations` (`version`) VALUES ('20171012172610')
