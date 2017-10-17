@@ -147,6 +147,50 @@
   </div>
 </div>
 
+<div class="modal fade" id="status_report" tabindex="-1" role="dialog" aria-labelledby="status_report" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="editBug">Bug Diff Report
+          <button type="button" class="close close-status-report" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <p><b>This is a diff report of this bug between Analyst Console and Bugzilla.  This bug has NOT been synced with Bugzilla as it has the potential to change the state of this bug on Analyst Console.  You must manually sync this bug to bring these changes to Analyst Console and continue.</b></p><hr />
+
+        <div id="status_new_rules">
+        </div>
+        <div id="status_new_attachments">
+        </div>
+        <div id="status_new_notes">
+        </div>
+        <div id="status_new_tags">
+        </div>
+        <div id="status_new_refs">
+        </div>
+        <div id="status_bug_changes">
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reloading_page" tabindex="-1" role="dialog" aria-labelledby="status_report" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="editBug">Please Wait</h4>
+      </div>
+      <div class="modal-body">
+        <h5>Reloading Page.......</h5>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
   $(document).ready(function() {

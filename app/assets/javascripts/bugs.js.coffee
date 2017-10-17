@@ -10,28 +10,42 @@ window.bug_resolve =(this_tag) ->
   $('#resolving_bug_form_button').removeClass('hidden').show()
   $('#saving_bug').removeClass('hidden').show()
   $.ajax(
-    url: '/api/v1/bugs/' + bugzilla_id
-    method: 'PUT'
+    url: '/api/v1/bugs/import/' + bugzilla_id + '?import_type=status'
+    method: 'GET'
     headers: headers
-    data:
-      {
-        bug:
-          {
-            state: "PENDING",
-            state_comment: "Resolved bug",
-            user_id: user_id,
-            committer_id: committer_id,
-            summary: summary
-          }
-      }
-    success: (response) ->
-      location.reload(true)
-    error: (response) ->
-      if response.responseText != undefined && response.responseText != ""
-        alert(response.responseText)
-      location.reload(true)
-  , this)
+  ).done (response) ->
+    json = $.parseJSON(response)
 
+    if (json.error)
+      message = "There was a problem attempting to synch this bug:"
+      message += json.error
+      $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
+    else
+      if(json.import_report.total_changes == 0)
+        $.ajax(
+          url: '/api/v1/bugs/' + bugzilla_id
+          method: 'PUT'
+          headers: headers
+          data:
+            {
+              bug:
+                {
+                  state: "PENDING",
+                  state_comment: "Resolved bug",
+                  user_id: user_id,
+                  committer_id: committer_id,
+                  summary: summary
+                }
+            }
+          success: (response) ->
+            location.reload(true)
+          error: (response) ->
+            if response.responseText != undefined && response.responseText != ""
+              alert(response.responseText)
+            location.reload(true)
+        , this)
+      else
+        AC.Bugs.buildStatusReportModal(json.import_report)
 
 window.toggle_liberty =(this_tag, bug_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -326,8 +340,9 @@ $ ->
                     window.location.reload()
                 , this)
             else
-              alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action")
-              window.location.reload()
+              AC.Bugs.buildStatusReportModal(json.import_report)
+              #alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action")
+              #window.location.reload()
     else
       state_comment = $("#state_comment").val()
       data = $('.edit_bug').serialize()
@@ -485,7 +500,52 @@ $ ->
     return
 
 
+  $(".close-status-report").on 'click', ->
+    $("#reloading_page").modal({backdrop: 'static', keyboard: false})
+    window.location.reload()
+
 namespace 'AC.Bugs', (exports) ->
+
+  exports.buildStatusReportModal = (status_report) ->
+
+    if status_report.changed_bug_columns.length > 0
+      bug_change_content = "<h5><b>In Bugzilla:</b></h5>"
+      for bug_change in status_report.changed_bug_columns
+        bug_change_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{bug_change[0]} = #{bug_change[1]}<br />"
+      $("#status_bug_changes").html(bug_change_content)
+
+    if status_report.new_rules.length > 0
+      new_rules_content = "<h5><b>New Rules Detected:</b></h5>"
+      for new_rule in status_report.new_rules
+        new_rules_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_rule}<br />"
+      $('#status_new_rules').html(new_rules_content)
+
+    if status_report.new_attachments.length > 0
+      new_attachments_content = "<h5><b>New Attachments Detected:</b></h5>"
+      for new_attachment in status_report.new_attachments
+        new_attachments_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_attachment}<br />"
+      $('#status_new_attachments').html(new_attachments_content)
+
+    if status_report.new_notes > 0
+      new_notes_content = "<h5><b>New Entries in History</b></h5>"
+      new_notes_content += "&nbsp;&nbsp;&nbsp;&nbsp;There are #{status_report.new_notes} new notes/comments detected."
+      $('#status_new_notes').html(new_notes_content)
+
+    if status_report.new_tags.length > 0
+      new_tags_content = "<h5><b>New Tags Detected:</b></h5>"
+      for new_tag in status_report.new_tags
+        new_tags_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_tag}<br />"
+      $('#status_new_tags').html(new_tags_content)
+
+    if status_report.new_refs.length > 0
+      new_refs_content = "<h5><b>New Refs Detected:</b></h5>"
+      for new_ref in status_report.new_refs
+        new_refs_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_ref}<br />"
+      $('#status_new_refs').html(new_refs_content)
+
+
+    $('#status_report').modal({backdrop: 'static', keyboard: false})
+
 
   exports.monitorJobQueue = () ->
     AC.Bugs.rebuildJobQueue()
