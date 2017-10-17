@@ -842,7 +842,8 @@ class Rule < ApplicationRecord
 
   end
 
-  def copy_rule(attributes_arg = {})
+  # Creates a new rule from a copy of this rule.
+  def new_copy_rule(attributes_arg = {})
     changed_attributes = attributes_arg
     references_arg = changed_attributes.delete('references')
     new_references = references_arg || self.references.map{|ref| ref.attributes}
@@ -894,7 +895,7 @@ class Rule < ApplicationRecord
 
     new_flow = ['to_server'] + flow.split(/\s*,\s*/).reject{|flow_datum| 'to_client' == flow_datum}
 
-    copy_rule('connection' => 'alert tcp $EXTERNAL_NET any -> $SMTP_SERVERS 25',
+    new_copy_rule('connection' => 'alert tcp $EXTERNAL_NET any -> $SMTP_SERVERS 25',
               'metadata' => new_metadata.join(', '),
               'flow' => new_flow.join(','))
   end
