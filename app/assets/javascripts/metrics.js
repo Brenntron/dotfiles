@@ -147,7 +147,7 @@ function time_draw(data) {
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
+            labels: ["Work Time", "Re-work Time", "Review Time"],
             datasets: [{
                 data: data,
                 backgroundColor: [
@@ -180,9 +180,6 @@ function time_draw(data) {
                         }
                         else if (tooltipItem[0].xLabel == 'Review Time') {
                             return "Time between being set to pending and resolved."
-                        }
-                        else if (tooltipItem[0].xLabel == 'Resolution Time') {
-                            return "Time between bug creation and resolution."
                         }
                         else {
                             return tooltipItem[0].xLabel;
@@ -266,7 +263,7 @@ function team_work_time_draw(data, id) {
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
+            labels: ["Work Time", "Re-work Time", "Review Time"],
             datasets: create_work_time_data_hash(data)
         },
         options: {
@@ -288,9 +285,6 @@ function team_work_time_draw(data, id) {
                         }
                         else if (tooltipItem[0].xLabel == 'Review Time') {
                             return "Time between being set to pending and resolved."
-                        }
-                        else if (tooltipItem[0].xLabel == 'Resolution Time') {
-                            return "Time between bug creation and resolution."
                         }
                         else {
                             return tooltipItem[0].xLabel;

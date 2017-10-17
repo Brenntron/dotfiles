@@ -116,13 +116,7 @@ class User < ApplicationRecord
   def team_work_times
     descendants.map { |tm| { "#{tm.cvs_username}" => [tm.bugs.average(:work_time).try(:round) || 0,
                                                      tm.bugs.average(:rework_time).try(:round) || 0,
-                                                     tm.bugs.average(:review_time).try(:round) || 0,
-                                                     tm.average_resolution_times] } }
-  end
-
-  def average_resolution_times
-    resolution_times = bugs.where('resolved_at is NOT ?', nil).map(&:resolution_time)
-    resolution_times.empty? ? 0 : (resolution_times.sum / resolution_times.size).round()
+                                                     tm.bugs.average(:review_time).try(:round) || 0] } }
   end
 
   def team_by_component(component)
@@ -132,7 +126,6 @@ class User < ApplicationRecord
     result[:work_time]       = bugs.map(&:work_time).compact
     result[:rework_time]     = bugs.map(&:rework_time).compact
     result[:review_time]     = bugs.map(&:review_time).compact
-    result[:resolution_time] = bugs.map{ |x| x.resolution_time if x.resolution_time }.compact
 
     { "#{component}" => result.map { |k, v| ((v.inject { |sum, el| sum + el }.to_f / v.size).try(:round) unless v.empty?) || 0 } }
   end
