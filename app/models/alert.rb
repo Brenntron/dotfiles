@@ -13,7 +13,7 @@ class Alert < ApplicationRecord
     Alert.pcap_alerts.where(attachment: attachment).delete_all
   end
 
-  def self.reset_local(bug)
-    Alert.local_alerts.joins(:attachment).where(attachments: { bug: bug }).delete_all
+  def self.reset_local(bug, rules)
+    Alert.local_alerts.joins(:attachment).where(attachments: { bug: bug }).where(rule: rules).delete_all
   end
 end
