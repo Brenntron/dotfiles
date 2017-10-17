@@ -129,9 +129,9 @@
                 </td>
                 <td><code><%= rule.message %></code></td>
                 <td class="center">
-                  <a href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
+                  <a id="rule_count_<%= rule.id %>" href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
                 </td>
-                <td class="center"><%= display_tested_status(@bug, rule) %></td>
+                <td id="tested_rule_<%= rule.id %>" class="center"><%= display_tested_status(@bug, rule) %></td>
                 <% if can? :publish, Rule %>
                     <td class="center"><%= display_commit_status(@bug, rule) %></td>
                 <% end %>
@@ -145,9 +145,9 @@
                     <td colspan="6"><%= attachment.file_name %>
                     </td>
                     <% if attachment.rule_id.nil? %>
-                      <td colspan="2" class="no_alert">No Alert</td>
+                      <td id="rule_<%= rule.id %>_att_<%= attachment.id %>" colspan="2" class="no_alert">No Alert</td>
                     <% else %>
-                      <td colspan="2" class="alerted">Alerted</td>
+                      <td id="rule_<%= rule.id %>_att_<%= attachment.id %>" colspan="2" class="alerted">Alerted</td>
                     <% end %>
                   </tr>
               <% end %>

@@ -68,7 +68,7 @@
         </thead>
         <tbody>
         <% @pcap_attachments.each do |attachment| %>
-            <tr>
+            <tr id="attachment_base_<%= attachment.id %>">
               <td>
                 <input type="checkbox" value=<%= attachment.id %> class="attach_check_box attach_<%= attachment.id %>">
               </td>
@@ -80,7 +80,7 @@
               </td>
               <td class="center narrow-column">
                 <h5>
-                  <a class="attachment_alert <%= attachment.id %>"><%= attachment.pcap_alerts.count %></a>
+                  <a id="attachment_count_<%= attachment.id %>" class="attachment_alert <%= attachment.id %>"><%= attachment.pcap_alerts.count %></a>
                 </h5>
               </td>
             </tr>
