@@ -33,6 +33,42 @@ window.bug_resolve =(this_tag) ->
   , this)
 
 
+window.toggle_liberty =(this_tag, bug_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
+    method: 'PATCH'
+    headers: headers
+    data: { }
+    success: (response) ->
+      if "CLEAR" == response
+        this_tag.className = "embargo_off"
+      else
+        this_tag.className = "embargo_on"
+  , this)
+
+
+window.add_bug_ref_show = ->
+  $('#add-bug-ref-div').show();
+  $('#add-bug-ref-show').hide();
+  $('#add-bug-ref-hide').show();
+
+window.add_bug_ref_hide = ->
+  $('#add-bug-ref-div').hide();
+  $('#add-bug-ref-show').show();
+  $('#add-bug-ref-hide').hide();
+
+window.add_bug_exploit_show = ->
+  $('#add-bug-exploit-div').show();
+  $('#add-bug-exploit-show').hide();
+  $('#add-bug-exploit-hide').show();
+
+window.add_bug_exploit_hide = ->
+  $('#add-bug-exploit-div').hide();
+  $('#add-bug-exploit-show').show();
+  $('#add-bug-exploit-hide').hide();
+
+
 $ ->
   $('#bugzilla_popover_state').popover();
   $('.active').show();
@@ -50,6 +86,7 @@ $ ->
     $('#loading_image').removeClass('hidden').show()
     $.ajax {
       url: '/api/v1/bugs/'+id+'/subscribe'
+      data: {committer: false}
       method: 'post'
       headers: headers
       success: (response) ->
@@ -67,6 +104,43 @@ $ ->
     $('#loading_image').removeClass('hidden').show()
     $.ajax {
       url: '/api/v1/bugs/'+id+'/unsubscribe'
+      data: {committer: false}
+      method: 'post'
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        alert ("cant return this bug." + response.responseJSON.error)
+        location.reload()
+    }
+
+  $(".take-bug-committer").on 'click', (e) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $(this).data("id")
+    $("#take-bug-committer-"+id).hide()
+    $("#bug-wait-committer-"+id).show()
+    $('#loading_image').removeClass('hidden').show()
+    $.ajax {
+      url: '/api/v1/bugs/'+id+'/subscribe'
+      data: {committer: true}
+      method: 'post'
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        alert ("Sorry, you can not take this bug\n" + response.responseJSON.error)
+        location.reload()
+    }
+
+  $(".return-bug-committer").on 'click', (e) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    id = $(this).data("id")
+    $("#return-bug-committer-"+id).hide()
+    $("#bug-wait-committer-"+id).show()
+    $('#loading_image').removeClass('hidden').show()
+    $.ajax {
+      url: '/api/v1/bugs/'+id+'/unsubscribe'
+      data: {committer: true}
       method: 'post'
       headers: headers
       success: (response) ->

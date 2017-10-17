@@ -261,3 +261,25 @@ $ ->
       $('#scratchpadNotesCancelBtn, #scratchpadNotesSaveBtn, #scratchpadNotesPublishBtn, #scratchpadNotesEditBtn').toggle()
       $('textarea[name="scratchpad_notes"]').attr("readonly", false)
 
+
+  $(document).on 'ready page:load', (e) ->
+    $('.autosize').each ->
+      autosize(this)
+
+
+  $(document).on('focus.autoExpand', 'textarea.autoExpand', ->
+        savedValue = @value
+        @value = ''
+        @baseScrollHeight = @scrollHeight
+        @value = savedValue
+        return
+      ).on 'input.autoExpand', 'textarea.autoExpand', ->
+        minRows = @getAttribute('data-min-rows') | 0
+        rows = undefined
+        @rows = minRows
+        rows = Math.ceil((@scrollHeight - (@baseScrollHeight)) / 17)
+        @rows = minRows + rows
+        return
+
+
+

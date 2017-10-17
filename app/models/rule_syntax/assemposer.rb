@@ -72,22 +72,31 @@ module RuleSyntax
       )
     end
 
+    # Output order:
+    #   connection
+    #   msg
+    #   flow
+    #   detection
+    #   metadata
+    #   references
+    #   classtype
+    #   gid
+    #   sid
+    #   rev
     def options
       unless @options
         options_ary = []
         options_ary << "msg:\"#{msg}\";" if msg.present?
-        options_ary = %w(sid rev flow metadata).inject(options_ary) do |ary, key|
-          ary << "#{key}:#{attributes[key]};" if attributes[key].present?
-          ary
-        end
-        if attributes['gid'] && 1 != attributes['gid']
-          ary << "#{key}:#{attributes[key]};" if attributes[key].present?
-        end
-        options_ary = %w(detection references).inject(options_ary) do |ary, key|
-          ary << attributes[key] if attributes[key]
-          ary
-        end
+        options_ary << "flow:#{attributes["flow"]};" if attributes["flow"].present?
+        options_ary << attributes["detection"] if attributes["detection"]
+        options_ary << "metadata:#{attributes["metadata"]};" if attributes["metadata"].present?
+        options_ary << attributes["references"] if attributes["references"]
         options_ary << "classtype:#{attributes['class_type']};" if attributes['class_type'].present?
+        if attributes['gid'] && 1 != attributes['gid']
+          options_ary << "gid:#{attributes["gid"]};"
+        end
+        options_ary << "sid:#{attributes["sid"]};" if attributes["sid"].present?
+        options_ary << "rev:#{attributes["rev"]};" if attributes["rev"].present?
         @options = options_ary.join(' ')
       end
       @options

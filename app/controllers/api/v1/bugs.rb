@@ -570,18 +570,30 @@ module API
         desc "subscribe to a bug"
         params do
           requires :id, type: String, desc: "id of the bug"
+          requires :committer, type: Boolean, desc: "is this a committer subscribe"
         end
         post ':id/subscribe' do
           bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
           unless bug.nil?
             begin
-              if current_user.bugs.exists?(bug.id)
-                return {error: 'already subscribed to this bug'}
+              if params[:committer]
+                if bug.committer == current_user
+                  return {error: 'already subscribed to this bug'}
+                else
+                  options = Rails.env.development? ? {:ids => permitted_params[:id], :qa_contact => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :qa_contact => current_user.email}
+                  Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                  Bug.update(permitted_params[:id], committer_id: current_user.id)
+                end
               else
-                options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
-                Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
-                current_user.bugs << bug
-                Bug.update(permitted_params[:id], state:"ASSIGNED")
+                if current_user.bugs.exists?(bug.id)
+                  return {error: 'already subscribed to this bug'}
+                else
+                  options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                  Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                  current_user.bugs << bug
+                  binding.pry
+                  Bug.update(permitted_params[:id], state:"ASSIGNED") unless ['PENDING','FIXED','WONTFIX','INVALID','LATER'].include? bug.state
+                end
               end
               return true
             rescue XMLRPC::FaultException => e
@@ -599,17 +611,25 @@ module API
         desc "unsubscribe to a bug"
         params do
           requires :id, type: String, desc: "id of the bug"
+          requires :committer, type: Boolean, desc: "is this a committer subscribe"
         end
         post ':id/unsubscribe' do
           bug = current_user.bugs.where(id: permitted_params[:id])
           unless bug.nil?
             begin
-              vrt_incoming = User.where(email: "vrt-incoming@sourcefire.com").first
-              options = {:ids => permitted_params[:id], :reset_assigned_to => true,:assigned_to => "vrt-incoming@sourcefire.com"}
-              Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
-              current_user.bugs.delete(bug)
-              Bug.update(permitted_params[:id], state:"NEW")
-              vrt_incoming.bugs << bug
+              if params[:committer]
+                vrt_qa = User.where(email: "vrt-qa@sourcefire.com").first
+                options = {:ids => permitted_params[:id], :qa_contact => "vrt-qa@sourcefire.com"}
+                Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                Bug.update(permitted_params[:id], committer_id: vrt_qa.id)
+              else
+                vrt_incoming = User.where(email: "vrt-incoming@sourcefire.com").first
+                options = {:ids => permitted_params[:id], :reset_assigned_to => true,:assigned_to => "vrt-incoming@sourcefire.com"}
+                Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                current_user.bugs.delete(bug)
+                Bug.update(permitted_params[:id], state:"NEW")
+                vrt_incoming.bugs << bug
+              end
               return true
             rescue XMLRPC::FaultException => e
               throw :error,
@@ -643,6 +663,16 @@ module API
                                  exploit_type_id: params['exploit_type_id'],
                                  attachment_id: params['attachment_id'],
                                  exploit_data: params['exploit_data'])
+        end
+
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        patch ':bug_id/toggle_liberty' do
+          bug = Bug.where(id: params['bug_id']).first
+          raise 'bug not found' unless bug
+          authorize!(:toggle_liberty, bug)
+          bug.toggle_liberty
         end
       end
     end

@@ -18,14 +18,16 @@ window.set_rule_success =(message) ->
 
 
 window.api_error =(response, prefix, options = {}) ->
-  if response.responseJSON != undefined
-    errormsg = 'not'
-  else
+  if response.responseJSON == undefined
     response_lines = response.responseText.split("\n")
     if 2 < response_lines.length
       errormsg = response_lines[0] + "\n" + response_lines[1]
     else
       errormsg = response.responseText
+  else if response.responseJSON.error != undefined
+    errormsg = response.responseJSON.error
+  else
+    errormsg = response.responseText
 
   if options["failure_reload"] == true
     alert(prefix + "\n" + errormsg)
@@ -455,23 +457,24 @@ $ ->
         rule_contents = form.find('textarea[name="rule[rule_content]"]').val()
         contents_arr = rule_contents.split('\n')
         contents_arr.forEach (rule_content) ->
-          rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: legacy_rule_doc}
-          data = { rule: rule}
-          $.ajax {
-            url: "/api/v1/rules"
-            method: 'POST'
-            data: data
-            headers: headers
-            success: (response) ->
-              $('.alert_rules').removeClass('error')
-              $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
-              $('html,body').scrollTop(0);
-              $(document).ajaxStop ->
-                location.reload true
-            error: (response) ->
-              api_error(response, "New rule has not been created", {failure_reload: true})
-            complete: ->
-          }
+          if rule_content.trim().length
+            rule = {rule_content: rule_content, bug_id: $('input[name="bug_id"]').val(), rule_doc: legacy_rule_doc}
+            data = { rule: rule}
+            $.ajax {
+              url: "/api/v1/rules"
+              method: 'POST'
+              data: data
+              headers: headers
+              success: (response) ->
+                $('.alert_rules').removeClass('error')
+                $('.alert_rules').addClass('success').show().append('<p>New rule has been created\n</p>')
+                $('html,body').scrollTop(0);
+                $(document).ajaxStop ->
+                  location.reload true
+              error: (response) ->
+                api_error(response, "New rule has not been created", {failure_reload: true})
+              complete: ->
+            }
       else
         $('.alert_rules').addClass('error').show().append('<p>Please fill in required fields.\n</p>')
         $('.legacy_form').find(":invalid").each (e) ->
