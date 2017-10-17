@@ -700,7 +700,7 @@ Feature: Bug
     Then test should be created and I should see "Task has been created to test the rule"
     When I click ".jobs-tab"
     Then I should see "local test"
-@now
+
   @javascript
   Scenario: a user can add an attachment
     Given a user with role "analyst" exists and is logged in
@@ -796,7 +796,7 @@ Feature: Bug
     And  I fill in "committer_notes" with "This is a research note too"
     And I click "save"
     Then I should see "Notes saved"
-@now
+
   @javascript
   Scenario: a user can add a comment
     Given a user with role "analyst" exists and is logged in

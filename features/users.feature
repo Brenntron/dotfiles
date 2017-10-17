@@ -483,7 +483,7 @@ Feature: User Accounts
 
     Then I click "Next"
     And  I should see "[TELUS] broken bug12"
-@now
+
   @javascript
   Scenario: Bugs in closed tab should be paginated
     Given a manager exists and is logged in
