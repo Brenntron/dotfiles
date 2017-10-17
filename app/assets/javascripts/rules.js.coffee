@@ -263,19 +263,15 @@ $ ->
           }
         when 'revert'
           if window.confirm("Revert " + sid_text + selected_sids.join() + "?")
-            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-            $.ajax {
+            $.std_api_ajax {
+              type: 'PUT'
               url: "/api/v1/rules/revert"
-              headers: headers
               data:
                 rule_ids: selected
-              type: 'PUT'
-              dataType: 'json'
+              error_prefix: "Rules have not been reverted."
+              failure_reload: false
               success: (response) ->
                 $('.alert_rules').addClass('success').show().html('Rules has been reverted')
-              error: (response) ->
-                $('.alert_rules').addClass('error').show().html('Rules have not been reverted')
-              complete: ->
                 setTimeout (->
                   $('.alert_rules').hide 'blind', {}, 500
                   return
@@ -310,20 +306,19 @@ $ ->
             }
         when 'commit'
           bid = $('.bugzilla_id').text()
-          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
           $('#commit').prop('disabled', true)
-          $.ajax {
+          $.std_api_ajax {
+            type: 'PUT'
             url: "/api/v1/rules/commit"
-            headers: headers
             data:
               rule_ids: selected
               username: $('#username').text()
               bug_id: $('.bugzilla_id').text()
               bugzilla_comment: $('#bugzilla-comment-text').val()
               nodoc_override: $('#missing-doc-override')[0].checked
-            type: 'PUT'
-            dataType: 'json'
+            error_prefix: "Rules have not been committed."
+            failure_reload: true
             success: (response) ->
               $('.alert_rules').addClass('success').show().html('Rules has been committed')
               setTimeout (->
@@ -332,9 +327,6 @@ $ ->
               ), 5000
               $(document).ajaxStop ->
                 location.reload true
-            error: (response) ->
-              api_error(response, 'Rules have not been committed.', {failure_reload: true})
-            complete: ->
           }
         when 'tosmtp'
           rule_ids = selected
