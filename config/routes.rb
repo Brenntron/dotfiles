@@ -5,9 +5,9 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
-    resources :delayed_jobs do
+    resources :scheduled_tasks do
       collection do
-        get :start_import
+        get :run_once
       end
     end
 

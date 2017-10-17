@@ -1,0 +1,22 @@
+#hamburger-space
+
+.admin-title
+  %h1 Scheduled Tasks
+
+#alert_message{:role => "alert"}
+  = render "shared/flash_messages", flash: flash
+
+%li= link_to 'Start Import', run_once_admin_scheduled_tasks_path
+
+#content
+  .row
+    .col-xs-6
+      %h3 scheduled tasks
+      #scheduled-tasks-div
+        - @scheduled_tasks.each do |s_t|
+          .scheduled_task= s_t
+    .col-xs-6
+      %h3 delayed jobs
+      #delayed_jobs-div
+        - @delayed_jobs.each do |d_j|
+          .delayed_job= d_j
