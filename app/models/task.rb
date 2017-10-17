@@ -97,10 +97,24 @@ class Task < ApplicationRecord
   end
 
 
-  def run_rake(task_name,current_user,bugzilla_session)
+  def run_rake(task_name,run_at,current_user,bugzilla_session)
     load File.join(Rails.root, 'lib', 'tasks', 'admin_rake_tasks.rake')
-    Rake::Task[task_name].invoke(id, current_user, bugzilla_session, Rails.env)
+    Rake::Task[task_name].invoke(id,run_at, current_user, bugzilla_session, Rails.env)
     Rake::Task[task_name].reenable
   end
+
+  def self.schedule_task(task_type, run_at, current_user, bugzilla_session)
+    new_scheduled_task = Task.new(task_type: task_type)
+    if new_scheduled_task.save
+      case task_type
+        when "import_all"
+          new_scheduled_task.delay(run_at: run_at).run_rake("bugs:import_all",run_at,current_user,bugzilla_session)
+      end
+    else
+      return false
+    end
+    true
+  end
+
 
 end

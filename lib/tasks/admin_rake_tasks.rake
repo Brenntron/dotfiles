@@ -2,7 +2,7 @@ require 'pry'
 require 'rake'
 namespace :bugs do
   task(:import_all).clear
-  task :import_all, [:task_id, :current_user, :xmlrpc, :environment] do |t, args|
+  task :import_all, [:task_id, :run_at, :current_user, :xmlrpc, :environment,] do |t, args|
 
     desc "imports all bugs that were updated in the last 24 hours"
 
@@ -33,6 +33,9 @@ namespace :bugs do
     task.completed = true
     task.result = task_result
     task.save
+
+
+    Task.schedule_task("import_all", run_at + 24.hours, current_user, xmlrpc)
 
   end
 
