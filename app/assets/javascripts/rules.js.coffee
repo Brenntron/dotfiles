@@ -36,6 +36,38 @@ window.api_error =(response, prefix, options = {}) ->
     set_rule_error(prefix + " " + errormsg)
 
 
+window.std_api_error =(response, prefix = "", options = {}) ->
+  if response.responseJSON == undefined
+    errormsg = response.responseText
+  else if response.responseJSON.message != undefined
+    errormsg = response.responseJSON.message
+  else
+    errormsg = response.responseText
+
+  if prefix != ""
+    errormsg = prefix + "\n" + errormsg
+
+  if options["failure_reload"] == true
+    alert(errormsg)
+    location.reload(true)
+  else
+    set_rule_error(errormsg)
+
+
+$.std_api_ajax =(ajax_data) ->
+  ajax_data.headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  ajax_data.dataType = 'json'
+
+  if ajax_data.error_prefix == undefined
+    ajax_data.error_prefix = ''
+  if ajax_data.failure_reload == undefined
+    ajax_data.failure_reload = false
+
+
+  ajax_data.error =(response) ->
+    std_api_error(response, ajax_data.error_prefix, failure_reload: ajax_data.failure_reload)
+  $.ajax ajax_data
+
 
 window.dismiss_alert_rules = ->
   $('.alert_rules').hide 'blind', {}, 500
