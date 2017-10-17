@@ -35,7 +35,7 @@ class TestRule
   end
 
   def send_work_msg
-    Alert.reset_local(@bug)
+    Alert.reset_local(@bug, @rules)
     @rules.each do |rule_id|
       @new_task.rules << Rule.where(id: rule_id).first unless nil
     end
