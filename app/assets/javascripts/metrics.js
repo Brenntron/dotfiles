@@ -109,6 +109,7 @@ function status_draw(data) {
         options: {
             legend: {
                 display: true,
+                position: 'right',
                 labels: {
                     usePointStyle: true
                 }
@@ -170,22 +171,25 @@ function time_draw(data) {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItem, data) {
-                        if (tooltipItem.xLabel == 'Work Time') {
+                    title: function (tooltipItem, data) {
+                        if (tooltipItem[0].xLabel == 'Work Time') {
                             return "Time between assignment and being set to pending."
                         }
-                        else if (tooltipItem.xLabel == 'Re-work Time') {
+                        else if (tooltipItem[0].xLabel == 'Re-work Time') {
                             return "Time between reopen and being set back to pending."
                         }
-                        else if (tooltipItem.xLabel == 'Review Time') {
+                        else if (tooltipItem[0].xLabel == 'Review Time') {
                             return "Time between being set to pending and resolved."
                         }
-                        else if (tooltipItem.xLabel == 'Resolution Time') {
+                        else if (tooltipItem[0].xLabel == 'Resolution Time') {
                             return "Time between bug creation and resolution."
                         }
                         else {
-                            return tooltipItem.xLabel;
+                            return tooltipItem[0].xLabel;
                         }
+                    },
+                    label: function (tooltipItem, data) {
+                        return 'Days: ' + tooltipItem.yLabel
                     }
                 },
             },
@@ -224,6 +228,7 @@ function status_team_draw(data, status, type) {
         options: {
             legend: {
                 display: true,
+                position: 'right',
                 labels: {
                     usePointStyle: true
                 }
@@ -267,11 +272,31 @@ function team_work_time_draw(data, id) {
         options: {
             legend: {
                 display: true,
+                position: 'right',
                 labels: {
                     usePointStyle: true
                 }
             },
             tooltips: {
+                callbacks: {
+                    title: function (tooltipItem, data) {
+                        if (tooltipItem[0].xLabel == 'Work Time') {
+                            return "Time between assignment and being set to pending."
+                        }
+                        else if (tooltipItem[0].xLabel == 'Re-work Time') {
+                            return "Time between reopen and being set back to pending."
+                        }
+                        else if (tooltipItem[0].xLabel == 'Review Time') {
+                            return "Time between being set to pending and resolved."
+                        }
+                        else if (tooltipItem[0].xLabel == 'Resolution Time') {
+                            return "Time between bug creation and resolution."
+                        }
+                        else {
+                            return tooltipItem[0].xLabel;
+                        }
+                    }
+                },
             },
             scales: {
                 yAxes: [{
