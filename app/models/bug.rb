@@ -1432,4 +1432,22 @@ class Bug < ApplicationRecord
     raise "Cannot find reference #{reference_id}" unless ref
     ref.exploits.create(exploit_type_id: exploit_type_id, attachment_id: attachment_id, data: exploit_data)
   end
+
+  def update_bug_action(assignee_id:,
+                        committer_id:,
+                        current_user:,
+                        bugzilla_session:,
+                        permitted_params:)
+    # byebug
+
+    raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id
+    assignee = User.where(id: assignee_id).first
+    Rails.logger.error("Cannot find bug assignee id = #{assignee_id.inspect} for bug #{self.bugzilla_id}")
+    raise "Cannot find bug assignee for bug #{self.bugzilla_id}." unless assignee
+
+    # raise 'raspberry' if true
+
+    Bug.process_bug_update(current_user, bugzilla_session, self, permitted_params)
+
+  end
 end
