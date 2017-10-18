@@ -288,7 +288,7 @@ module API
                   end
                   progress_bar.update_attribute("progress", 10)
                   #create the bug from bugzilla
-                  bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug, progress_bar, import_type).first
+                  bug = Bug.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bug, progress_bar, import_type).first
 
                   if initial_bug_state.present?
                     report = bug.compile_import_report(initial_bug_state)
