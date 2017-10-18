@@ -53,6 +53,34 @@ module API
             end
             xmlrpc
           end
+
+          # Standard (our standard) handling of an exception
+          # @param [Exception, #read] exception is the exception to report
+          # @param [Fixnum] status is the HTTP status code
+          def std_exception(exception, status: 500)
+            Rails.logger.error("exception: #{exception.message}")
+            exception.backtrace[0..4].each_with_index do |traceline, index|
+              Rails.logger.error("backtrace[#{index}] #{traceline}")
+            end
+            error!(message: exception.message, status: status, success: false)
+          end
+
+          # Transition to implement V2 API handling from the V1 API
+          #
+          # This method was implemented to prototype a new error handling for V2.
+          # In a V1 API method, put the code in a block for this method,
+          # and the response will be handled in the V2 API standard.
+          def std_api_v2
+            yield
+          rescue CanCan::AccessDenied => exception
+            std_exception(exception, status: 403)
+          rescue ActiveRecord::RecordNotFound => exception
+            std_exception(exception, status: 404)
+          rescue Grape::Exceptions::ValidationErrors => exception
+            std_exception(exception, status: 406)
+          rescue => exception
+            std_exception(exception)
+          end
         end
 
         # global handler for simple not found case
