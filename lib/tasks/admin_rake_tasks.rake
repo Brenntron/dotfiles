@@ -2,18 +2,18 @@ require 'pry'
 require 'rake'
 namespace :bugs do
   task(:import_all).clear
-  task :import_all, [:task_id, :run_at, :current_user, :xmlrpc, :environment,] do |t, args|
+  task :import_all, [:task_id, :run_at,:re_run, :current_user, :xmlrpc, :environment] do |t, args|
 
     desc "imports all bugs that were updated in the last 24 hours"
 
     Rails.logger.info "Importing bugs..."
-
+    re_run = args[:re_run]
+    run_at = args[:run_at]
     current_user = User.where(id: args[:current_user]).first
     task = Task.where(id: args[:task_id]).first
     Rails.logger.info "Current user: #{current_user.display_name}"
 
     bug_ids_to_update = Bug.where("updated_at > ? ",(Time.now - 24.hours)).map{|a| a.id}
-    import_type = "import"
     xmlrpc = args[:xmlrpc]
     xmlrpc_token = xmlrpc.token
 
@@ -34,9 +34,9 @@ namespace :bugs do
     task.result = task_result
     task.save
 
-
-    Task.schedule_task("import_all", run_at + 24.hours, current_user, xmlrpc)
-
+    if re_run
+      Task.schedule_task(task.task_type, run_at + 24.hours, re_run, current_user, xmlrpc)
+    end
   end
 
 

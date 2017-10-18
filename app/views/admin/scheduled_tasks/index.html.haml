@@ -8,10 +8,11 @@
 
 
 #content.index-table
-  = form_tag run_once_admin_scheduled_tasks_path, :method => :post do
-    =time_select 'task', 'run_at', {minute_step: 15}
-    =select_tag 'child_id', options_for_select(["Start Import"])
-
+  = form_tag run_job_admin_scheduled_tasks_path, :method => :post do
+    =select_datetime(Time.now, prefix: 'run_at')
+    =select_tag 'task_type', options_for_select(["","Import all"])
+    =check_box_tag 're_run'
+    %label Reoccuring job
     =submit_tag "Submit"
 
 

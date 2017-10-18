@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     resources :migrations, only: [:index]
     resources :scheduled_tasks do
       collection do
-        get :run_once
+        post :run_job
       end
     end
 

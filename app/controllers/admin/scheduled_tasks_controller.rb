@@ -5,14 +5,16 @@ module Admin
 
 
     def index
-      @scheduled_tasks = Task.where(task_type: "import_all").order(updated_at: :desc)
+      @scheduled_tasks = Task.where(task_type: "Import all").order(updated_at: :desc)
       @delayed_jobs = DelayedJob.all
     end
 
-    def run_once
-      task_type = "import_all" #change to params when we have multiple types
-      run_at = 10.seconds.from_now
-      if Task.schedule_task(task_type, run_at, current_user, bugzilla_session)
+    def run_job
+      re_run = params[:re_run].nil? ? false : true
+      task_type = params[:task_type]
+      start_time = params.require(:run_at).permit(:year,:month,:day,:hour,:minute).to_h
+      run_at = Time.new(start_time[:year],start_time[:month],start_time[:day],start_time[:hour],start_time[:minute])
+      if Task.schedule_task(task_type, run_at, re_run, current_user, bugzilla_session)
         redirect_to admin_scheduled_tasks_path, :notice => "Job has been queued."
       else
         redirect_to admin_scheduled_tasks_path, :notice => "Job create encountered an error"
@@ -42,11 +44,6 @@ module Admin
     # Use callbacks to share common setup or constraints between actions.
     def set_scheduled_task
       @scheduled_task = Task.find(params[:id])
-    end
-
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def role_params
-      params.require(:task).permit(:task)
     end
 
   end
