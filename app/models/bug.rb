@@ -21,18 +21,27 @@ class Bug < ApplicationRecord
 
   accepts_nested_attributes_for :rules
 
+  STATE_PENDING                         = 'PENDING'
+  STATES_OPEN                           = %w{OPEN ASSIGNED REOPENED}
+  STATES_CLOSED                         = %w{FIXED WONTFIX LATER INVALID DUPLICATE}
+  STATES                                = [STATE_PENDING] + STATES_OPEN + STATES_CLOSED
+
   LIBERTY_CLEAR                         = "CLEAR"
   LIBERTY_EMBARGO                       = "EMBARGO"
 
-  scope :open_bugs, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
-  scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
-  scope :pending, -> { where(state: "PENDING") }
-  scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
+  scope :open_bugs, -> { where('state in (?)', STATES_OPEN) }
+  scope :closed, -> { where('state in (?)', STATES_CLOSED) }
+  scope :pending, -> { where(state: STATE_PENDING) }
+  scope :open_pending, -> {where('state in (?)', [STATE_PENDING] + STATES_OPEN)}
   scope :by_component, ->(component) { where('component = ?', component) }
 
   scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
   attr_accessor :import_report
+
+  def pending?
+    STATE_PENDING == self.state
+  end
 
   def liberty_clear?
     LIBERTY_CLEAR == self.liberty
@@ -757,6 +766,7 @@ class Bug < ApplicationRecord
 
   end
 
+  # TODO Why is this a Bug class method when it takes a required bug object as an argument?
   def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
     bug.initialize_report
     bug_is_being_resolved = bug.state != "PENDING" ? false : true
