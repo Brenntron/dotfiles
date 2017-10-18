@@ -767,13 +767,12 @@ class Bug < ApplicationRecord
   end
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
-  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params, assignee:)
+  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params, assignee:, committer:)
     bug.initialize_report
     bug_is_being_resolved = bug.state != "PENDING" ? false : true
 
     ###
     tags = permitted_params[:bug][:tag_names]
-    reviewer = User.find(permitted_params[:bug][:committer_id])
     updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], assignee.email)
     ###
 
@@ -784,7 +783,7 @@ class Bug < ApplicationRecord
         :status => updated_bug_state[:status],
         :resolution => updated_bug_state[:resolution],
         :comment => updated_bug_state[:comment],
-        :qa_contact => reviewer.email
+        :qa_contact => committer&.email
     }
     update_params = {
         :user => assignee,
@@ -799,7 +798,7 @@ class Bug < ApplicationRecord
         :work_time => updated_bug_state[:work_time],
         :rework_time => updated_bug_state[:rework_time],
         :review_time => updated_bug_state[:review_time],
-        :committer => reviewer
+        :committer => committer
     }
 
     if permitted_params[:bug][:new_research_notes]
@@ -1437,16 +1436,24 @@ class Bug < ApplicationRecord
                         assignee_id:,
                         committer_id:,
                         permitted_params:)
-    # byebug
 
-    raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id
+    raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id.present?
     assignee = User.where(id: assignee_id).first
     Rails.logger.error("Cannot find bug assignee id = #{assignee_id.inspect} for bug #{self.bugzilla_id}")
     raise "Cannot find bug assignee for bug #{self.bugzilla_id}." unless assignee
 
+    committer = committer_id.presence && User.where(id: committer_id).first
+
+    # raise "Cannot update bug #{bugzilla_id} without committer identified" unless committer || no_committer_ok?
+
     # raise 'raspberry' if true
 
-    Bug.process_bug_update(current_user, bugzilla_session, self, permitted_params, assignee: assignee)
+    Bug.process_bug_update(current_user,
+                           bugzilla_session,
+                           self,
+                           permitted_params,
+                           assignee: assignee,
+                           committer: committer)
 
   end
 end
