@@ -802,19 +802,7 @@ class Bug < ApplicationRecord
           :committer_notes => permitted_params[:bug][:new_committer_notes]
       }
     end
-    ###
 
-    ###
-    #if a comment is made about a state then add it to the history here.
-    if permitted_params[:bug][:state_comment]
-      note_options = {
-          :id => permitted_params[:id],
-          :comment => permitted_params[:bug][:state_comment],
-          :note_type => "research",
-          :author => current_user.email,
-      }
-      Note.process_note(note_options, bugzilla_session)
-    end
     # update the tags
     bug.tags.delete_all if bug.tags.exists?
     if tags
