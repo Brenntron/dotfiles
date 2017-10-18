@@ -1431,6 +1431,14 @@ class Bug < ApplicationRecord
     ref.exploits.create(exploit_type_id: exploit_type_id, attachment_id: attachment_id, data: exploit_data)
   end
 
+  def has_draft_rules?
+    rules.any? { |rule| rule.draft? }
+  end
+
+  def no_committer_ok?(new_state)
+    (STATES_CLOSED.include?(new_state) && has_draft_rules?) ? false : true
+  end
+
   def update_bug_action(current_user:,
                         bugzilla_session:,
                         assignee_id:,
@@ -1444,9 +1452,9 @@ class Bug < ApplicationRecord
 
     committer = committer_id.presence && User.where(id: committer_id).first
 
-    # raise "Cannot update bug #{bugzilla_id} without committer identified" unless committer || no_committer_ok?
-
-    # raise 'raspberry' if true
+    unless committer || no_committer_ok?(permitted_params[:bug][:state])
+      raise "Cannot update bug #{bugzilla_id} without committer identified"
+    end
 
     Bug.process_bug_update(current_user,
                            bugzilla_session,
