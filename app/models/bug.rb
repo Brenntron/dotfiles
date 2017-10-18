@@ -487,6 +487,10 @@ class Bug < ApplicationRecord
     end
   end
 
+  def metrics_available?
+    work_time || rework_time || review_time || resolution_time != 0
+  end
+
   def check_permission(current_user)
     User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
   end

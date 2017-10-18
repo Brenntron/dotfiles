@@ -63,6 +63,7 @@ Rails.application.routes.draw do
       patch :remove_tag
     end
     resources :references
+    get :bug_metrics, defaults: { format: :json }
   end
 
   namespace :rule_sync do
