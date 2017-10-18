@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    get_bug_chart_data('bug_metrics');
     get_user_chart_data('status_metrics');
     get_user_chart_data('time_metrics');
     get_manager_chart_data('pending_team_metrics');
@@ -6,6 +7,25 @@ $(document).ready(function() {
     get_manager_chart_data('time_team_metrics');
     get_manager_chart_data('component_team_metrics');
 });
+
+//bug metrics
+function get_bug_chart_data(url) {
+    if ($('.bug-metrics').length > 0) {
+        var bug_id = $('.bug-metrics')[0].id;
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: bug_id + '/' + url,
+            dataType: 'json',
+            success: function (data) {
+                bug_draw(data);
+            },
+            error: function (result) {
+                $('#msg').html("<div class='alert alert-danger'>Something went wrong loading the metrics.</div>");
+            }
+        });
+    }
+}
 
 //users metrics
 function get_user_chart_data(url) {
@@ -60,6 +80,70 @@ function get_manager_chart_data(url) {
         });
     }
 }
+
+//bug view charts
+
+function bug_draw(data) {
+    var ctx = document.getElementById("bugChart");
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Work Time", "Re-work Time", "Review Time", "Resolution Time"],
+            datasets: [{
+                label: "Number of Days",
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            legend: {
+                position: 'right',
+                labels: {
+                    usePointStyle: true
+                }
+            },
+            tooltips: {
+                callbacks: {
+                    title: function (tooltipItem, data) {
+                        // debugger
+                        if (data['labels'][tooltipItem[0]['index']] == 'Work Time') {
+                            return "Time between assignment and being set to pending."
+                        }
+                        else if (data['labels'][tooltipItem[0]['index']] == 'Re-work Time') {
+                            return "Time between reopen and being set back to pending."
+                        }
+                        else if (data['labels'][tooltipItem[0]['index']] == 'Review Time') {
+                            return "Time between being set to pending and resolved."
+                        }
+                        else if (data['labels'][tooltipItem[0]['index']] == 'Resolution Time') {
+                            return "Time between bug creation and resolution."
+                        }
+                        else {
+                            return data['labels'][tooltipItem[0]['index']];
+                        }
+                    },
+                    label: function (tooltipItem, data) {
+                        return 'Days: ' + data['datasets'][0]['data'][tooltipItem['index']]
+                    }
+                }
+            }
+        }
+    });
+}
+
+
 
 //users view charts
 function status_draw(data) {

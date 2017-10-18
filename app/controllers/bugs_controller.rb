@@ -1,5 +1,5 @@
 class BugsController < ApplicationController
-  load_and_authorize_resource except: [:add_tag, :remove_tag, :show]
+  load_and_authorize_resource except: [:add_tag, :remove_tag, :show, :bug_metrics]
 
   before_action :require_login
   before_action :query_bugs
@@ -95,6 +95,19 @@ class BugsController < ApplicationController
     @bug.tags.destroy(@tag)
     respond_to do |format|
       format.json { head :no_content }
+    end
+  end
+
+  def bug_metrics
+    @bug = Bug.find(params[:bug_id])
+
+    respond_to do |format|
+      format.json {
+        render :json => [@bug.work_time,
+                         @bug.rework_time,
+                         @bug.review_time,
+                         @bug.resolution_time]
+      }
     end
   end
 

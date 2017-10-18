@@ -151,7 +151,13 @@
 <hr>
 <div class="row top-space">
   <div class="col-xs-12">
-    <h4 class="blue"> Metrics
-    </h4>
+    <h4 class="blue"> Metrics</h4>
+    <% if @bug.metrics_available? %>
+      <div class="bug-metrics" id='<%=@bug.id%>'></div>
+      <div class="col-lg-5 col-md-6">
+        <p>Timeline</p>
+        <canvas id="bugChart" width="700" height="350"></canvas>
+      </div>
+    <% end %>
   </div>
 </div>
