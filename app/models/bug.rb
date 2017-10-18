@@ -767,28 +767,27 @@ class Bug < ApplicationRecord
   end
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
-  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
+  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params, assignee:)
     bug.initialize_report
     bug_is_being_resolved = bug.state != "PENDING" ? false : true
 
     ###
     tags = permitted_params[:bug][:tag_names]
-    editor = User.find(permitted_params[:bug][:user_id])
     reviewer = User.find(permitted_params[:bug][:committer_id])
-    updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], editor.email)
+    updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], assignee.email)
     ###
 
     ###
     options = {
         :ids => permitted_params[:id],
-        :assigned_to => editor.email,
+        :assigned_to => assignee.email,
         :status => updated_bug_state[:status],
         :resolution => updated_bug_state[:resolution],
         :comment => updated_bug_state[:comment],
         :qa_contact => reviewer.email
     }
     update_params = {
-        :user => editor,
+        :user => assignee,
         :state => updated_bug_state[:state],
         :status => updated_bug_state[:status],
         summary: updated_bug_state[:summary],
@@ -1433,10 +1432,10 @@ class Bug < ApplicationRecord
     ref.exploits.create(exploit_type_id: exploit_type_id, attachment_id: attachment_id, data: exploit_data)
   end
 
-  def update_bug_action(assignee_id:,
-                        committer_id:,
-                        current_user:,
+  def update_bug_action(current_user:,
                         bugzilla_session:,
+                        assignee_id:,
+                        committer_id:,
                         permitted_params:)
     # byebug
 
@@ -1447,7 +1446,7 @@ class Bug < ApplicationRecord
 
     # raise 'raspberry' if true
 
-    Bug.process_bug_update(current_user, bugzilla_session, self, permitted_params)
+    Bug.process_bug_update(current_user, bugzilla_session, self, permitted_params, assignee: assignee)
 
   end
 end
