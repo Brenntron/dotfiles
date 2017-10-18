@@ -36,6 +36,38 @@ window.api_error =(response, prefix, options = {}) ->
     set_rule_error(prefix + " " + errormsg)
 
 
+window.std_api_error =(response, prefix = "", options = {}) ->
+  if response.responseJSON == undefined
+    errormsg = response.responseText
+  else if response.responseJSON.message != undefined
+    errormsg = response.responseJSON.message
+  else
+    errormsg = response.responseText
+
+  if prefix != ""
+    errormsg = prefix + "\n" + errormsg
+
+  if options["failure_reload"] == true
+    alert(errormsg)
+    location.reload(true)
+  else
+    set_rule_error(errormsg)
+
+
+$.std_api_ajax =(ajax_data) ->
+  ajax_data.headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  ajax_data.dataType = 'json'
+
+  if ajax_data.error_prefix == undefined
+    ajax_data.error_prefix = ''
+  if ajax_data.failure_reload == undefined
+    ajax_data.failure_reload = false
+
+
+  ajax_data.error =(response) ->
+    std_api_error(response, ajax_data.error_prefix, failure_reload: ajax_data.failure_reload)
+  $.ajax ajax_data
+
 
 window.dismiss_alert_rules = ->
   $('.alert_rules').hide 'blind', {}, 500
@@ -73,8 +105,7 @@ window.pre_commit = ->
           $('#commit_label').html("commit")
           $("#commit-modal").modal('show')
         else
-          alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action")
-          window.location.reload()
+          AC.Bugs.buildStatusReportModal(json.import_report)
 
   # remove modal call if everything is unchecked
   else if ($(':checkbox[name="rule[id]"]').not(':checked').length > 0)
@@ -231,19 +262,15 @@ $ ->
           }
         when 'revert'
           if window.confirm("Revert " + sid_text + selected_sids.join() + "?")
-            headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-            $.ajax {
+            $.std_api_ajax {
+              type: 'PUT'
               url: "/api/v1/rules/revert"
-              headers: headers
               data:
                 rule_ids: selected
-              type: 'PUT'
-              dataType: 'json'
+              error_prefix: "Rules have not been reverted."
+              failure_reload: false
               success: (response) ->
                 $('.alert_rules').addClass('success').show().html('Rules has been reverted')
-              error: (response) ->
-                $('.alert_rules').addClass('error').show().html('Rules have not been reverted')
-              complete: ->
                 setTimeout (->
                   $('.alert_rules').hide 'blind', {}, 500
                   return
@@ -278,20 +305,19 @@ $ ->
             }
         when 'commit'
           bid = $('.bugzilla_id').text()
-          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
           $('#commit').prop('disabled', true)
-          $.ajax {
+          $.std_api_ajax {
+            type: 'PUT'
             url: "/api/v1/rules/commit"
-            headers: headers
             data:
               rule_ids: selected
               username: $('#username').text()
               bug_id: $('.bugzilla_id').text()
               bugzilla_comment: $('#bugzilla-comment-text').val()
               nodoc_override: $('#missing-doc-override')[0].checked
-            type: 'PUT'
-            dataType: 'json'
+            error_prefix: "Rules have not been committed."
+            failure_reload: true
             success: (response) ->
               $('.alert_rules').addClass('success').show().html('Rules has been committed')
               setTimeout (->
@@ -300,9 +326,6 @@ $ ->
               ), 5000
               $(document).ajaxStop ->
                 location.reload true
-            error: (response) ->
-              api_error(response, 'Rules have not been committed.', {failure_reload: true})
-            complete: ->
           }
         when 'tosmtp'
           rule_ids = selected

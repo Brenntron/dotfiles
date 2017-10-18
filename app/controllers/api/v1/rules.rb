@@ -162,30 +162,35 @@ module API
         end
 
 
-        #revert rules
+        desc "Revert rules by id"
         params do
           requires :rule_ids, type: Array[String]
         end
         put "revert", root: "rule" do
-          authorize! :update, Rule
-          rules = permitted_params[:rule_ids].map{|id| Rule.where(id: id).first}
-          Rule.revert_rules_action(rules)
+          std_api_v2 do
+            authorize! :update, Rule
+            rules = permitted_params[:rule_ids].map{|id| Rule.where(id: id).first}
+            Rule.revert_rules_action(rules)
+          end
         end
 
-        desc "Revert a rule"
+        desc "Revert a rule by sid"
         params do
           requires :gid, type: Integer, default: 1, desc: "gid of the rule"
           requires :sid, type: Integer, desc: "sid of the rule"
         end
         put "gids/:gid/sids/:sid/revert", root: "rule" do
-          authorize! :update, Rule
-          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
-          rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
-          Rule.revert_rules_action([rule])
+          std_api_v2 do
+            authorize! :update, Rule
+            ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+            rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+            Rule.revert_rules_action([rule])
+          end
         end
 
 
         #commit rules
+        desc "Commit rules by id"
         params do
           requires :rule_ids, type: Array[String]
           optional :username, type: String
@@ -194,20 +199,22 @@ module API
           optional :nodoc_override,     type: Boolean
         end
         put "commit", root: "rule" do
-          rules = Rule.where(id: permitted_params[:rule_ids]).where(state:['UPDATED','NEW']).all.to_a
+          std_api_v2 do
+            rules = Rule.where(id: permitted_params[:rule_ids]).where(state:['UPDATED','NEW']).all.to_a
 
-          raise "You must select a rule to commit!" if rules.empty?
-          raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
+            raise "You must select a rule to commit!" if rules.empty?
+            raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
 
-          Repo::RuleCommitter.commit_rules_action(rules,
-                                                  username: permitted_params[:username],
-                                                  bugzilla_id: permitted_params[:bug_id],
-                                                  bugzilla_comment: permitted_params[:bugzilla_comment],
-                                                  xmlrpc: bugzilla_session,
-                                                  nodoc_override: permitted_params[:nodoc_override])
+            Repo::RuleCommitter.commit_rules_action(rules,
+                                                    username: permitted_params[:username],
+                                                    bugzilla_id: permitted_params[:bug_id],
+                                                    bugzilla_comment: permitted_params[:bugzilla_comment],
+                                                    xmlrpc: bugzilla_session,
+                                                    nodoc_override: permitted_params[:nodoc_override])
+          end
         end
 
-        desc "Commit a rule"
+        desc "Commit a rule by sid"
         params do
           requires :gid, type: Integer, default: 1, desc: "gid of the rule"
           requires :sid, type: Integer, desc: "sid of the rule"
@@ -215,14 +222,16 @@ module API
           optional :bug_id,   type: Integer, desc: "Bugzilla id."
         end
         put "gids/:gid/sids/:sid/commit", root: "rule" do
-          rules = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).all.to_a
+          std_api_v2 do
+            rules = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).all.to_a
 
-          raise "You must select a rule to commit!" if rules.empty?
-          raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
+            raise "You must select a rule to commit!" if rules.empty?
+            raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
 
-          Repo::RuleCommitter.commit_rules_action(rules,
-                                                  username: permitted_params[:username],
-                                                  bugzilla_id: permitted_params[:bug_id])
+            Repo::RuleCommitter.commit_rules_action(rules,
+                                                    username: permitted_params[:username],
+                                                    bugzilla_id: permitted_params[:bug_id])
+          end
         end
 
 

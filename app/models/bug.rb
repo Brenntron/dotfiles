@@ -44,19 +44,25 @@ class Bug < ApplicationRecord
 
   def initialize_report
     @import_report = {}
-    @import_report[:new_rules] = 0
-    @import_report[:new_attachments] = 0
+    @import_report[:new_rules] = []
+    @import_report[:new_attachments] = []
     @import_report[:new_notes] = 0
-    @import_report[:new_tags] = 0
-    @import_report[:new_refs] = 0
+    @import_report[:new_tags] = []
+    @import_report[:new_refs] = []
   end
 
   def compile_import_report(initial_bug_state = nil)
     total_report = @import_report.clone
     if initial_bug_state.present?
-      total_report[:changed_bug_columns] = ((self.attributes.to_h.to_a) - (initial_bug_state.attributes.to_h.to_a))
+      after_hash = self.attributes.to_h
+      after_hash.delete("research_notes")
+
+      before_hash = initial_bug_state.attributes.to_h
+      before_hash.delete("research_notes")
+
+      total_report[:changed_bug_columns] = ((after_hash.to_a) - (before_hash.to_a))
     end
-    total_report[:total_changes] = total_report[:new_rules] + total_report[:new_attachments] + total_report[:new_notes] + total_report[:new_tags] + total_report[:new_refs] + total_report[:changed_bug_columns].size
+    total_report[:total_changes] = total_report[:new_rules].count + total_report[:new_attachments].count + total_report[:new_notes] + total_report[:new_tags].count + total_report[:new_refs].count + total_report[:changed_bug_columns].size
     total_report
   end
 
@@ -405,7 +411,7 @@ class Bug < ApplicationRecord
       gid = component == "SO Rules" ? 3 : 1
       rule = Rule.find_or_load(sid, gid)
       if rule
-        @import_report[:new_rules] += 1 unless self.rules.include? rule
+        @import_report[:new_rules] << rule.sid_colon_format unless self.rules.include? rule
         if import_type != "status"
           rules << rule unless self.rules.include? rule
         end
@@ -494,7 +500,7 @@ class Bug < ApplicationRecord
 
   def load_tags_from_summary(tags, import_type='import')
     tags.each do |tag|
-      @import_report[:new_tags] += 1 unless self.tags.include?(tag)
+      @import_report[:new_tags] << tag.name unless self.tags.include?(tag)
       if import_type != "status"
         self.tags << tag unless self.tags.include?(tag)
       end
@@ -503,7 +509,7 @@ class Bug < ApplicationRecord
 
   def load_refs_from_summary(refs, import_type='import_type')
     refs.each do |ref|
-      @import_report[:new_refs] += 1 unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+      @import_report[:new_refs] << ref.reference_data unless self.references.map {|r| r.reference_data}.include? ref.reference_data
       if import_type != "status"
         self.references << ref unless self.references.map {|r| r.reference_data}.include? ref.reference_data
       end
@@ -598,7 +604,7 @@ class Bug < ApplicationRecord
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
             local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
             if local_attachment.present?
-              if attachment['is_obsolete'] == true
+              if attachment['is_obsolete'] == 1
                 local_attachment.is_obsolete = true
                 local_attachment.save
               end
@@ -983,12 +989,11 @@ class Bug < ApplicationRecord
           new_attachments['bugs'][bug_id.to_s].each do |attachment|
             local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
             if local_attachment.present?
-              if attachment['is_obsolete'] == true
+              if attachment['is_obsolete'] == 1
                 local_attachment.is_obsolete = true
                 local_attachment.save
               end
             else
-              bug.import_report[:new_attachments] += 1
               local_attachment = Attachment.create do |new_attach_record|
                 new_attach_record.id = attachment['id']
                 new_attach_record.size = attachment['size']
@@ -1004,6 +1009,7 @@ class Bug < ApplicationRecord
                 new_attach_record.created_at = attachment['creation_time'].to_time
               end
             end
+            bug.import_report[:new_attachments] << attachment['file_name'] unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
             if import_type != "status"
               bug.attachments << local_attachment unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
             end

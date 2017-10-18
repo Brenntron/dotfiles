@@ -99,8 +99,7 @@ class UsersController < ApplicationController
       format.json {
         render :json => [@work_time_ave,
                          @rework_time_ave,
-                         @review_time_ave,
-                         @user.average_resolution_times]
+                         @review_time_ave]
       }
     end
   end

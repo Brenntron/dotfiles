@@ -1,23 +1,30 @@
 Rails.application.routes.draw do
 
-  devise_for :users, controllers: { sessions: 'sessions' }
+  devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
+    resources :scheduled_tasks do
+      collection do
+        post :run_job
+      end
+    end
+
+
   end
 
   resources :events do
-    collection {get :send_event}
+    collection { get :send_event }
   end
 
   namespace :api_test do
-    resources :jobs, :defaults => { :format => 'json' }
-    resources :pcaps, :defaults => { :format => 'json' }
-    resources :engines, :defaults => { :format => 'json' }
-    resources :engine_types, :defaults => { :format => 'json' }
-    resources :snort_configurations, :defaults => { :format => 'json' }
-    resources :rule_configurations, :defaults => { :format => 'json' }
+    resources :jobs, :defaults => {:format => 'json'}
+    resources :pcaps, :defaults => {:format => 'json'}
+    resources :engines, :defaults => {:format => 'json'}
+    resources :engine_types, :defaults => {:format => 'json'}
+    resources :snort_configurations, :defaults => {:format => 'json'}
+    resources :rule_configurations, :defaults => {:format => 'json'}
   end
 
   # some of these named routes need to be rethought to conform to rails conventions
@@ -35,8 +42,8 @@ Rails.application.routes.draw do
     collection do
       get :results
     end
-    get :status_metrics, defaults: { format: :json }
-    get :time_metrics, defaults: { format: :json }
+    get :status_metrics, defaults: {format: :json}
+    get :time_metrics, defaults: {format: :json}
     get :pending_team_metrics, defaults: {format: :json}
     get :resolved_team_metrics, defaults: {format: :json}
     get :time_team_metrics, defaults: {format: :json}
@@ -51,8 +58,8 @@ Rails.application.routes.draw do
   end
   resources :bugs do
     member do
-      post  :create_rules
-      post  :add_tag
+      post :create_rules
+      post :add_tag
       patch :remove_tag
     end
     resources :references

@@ -51,6 +51,8 @@ gem 'awesome_nested_set', '~> 3.1.3'
 
 gem 'will_paginate', '~> 3.1.5'
 
+gem 'delayed_job', '~> 4.1.3'
+gem 'delayed_job_active_record', '~> 4.1.2'
 group :development do
   gem 'thin', '~> 1.7.0'
   gem 'puma'
