@@ -129,7 +129,8 @@
                 </td>
                 <td><code><%= rule.message %></code></td>
                 <td class="center">
-                  <a id="rule_count_<%= rule.id %>" href="#" class="rulealert-toggle" data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= @bug.local_alerts.by_rule(rule).count %></a>
+                  <a id="rule_count_<%= rule.id %>" href="#" class="rulealert-toggle"
+                     data-rulealert="<%= "rulealert-#{rule.to_param}" %>"><%= rule.display_alerts_count(@bug) %></a>
                 </td>
                 <td id="tested_rule_<%= rule.id %>" class="center"><%= display_tested_status(@bug, rule) %></td>
                 <% if can? :publish, Rule %>
@@ -140,30 +141,16 @@
                 <td><%= test_rpt ? test_rpt.average_nonmatch : '-' %></td>
                 <td></td>
               </tr>
-              <% if rule.draft? %>
-                <% @bug.attachment_local_alerts(rule).each do |attachment| %>
-                  <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
-                    <td colspan="6"><%= attachment.file_name %>
-                    </td>
-                    <% if attachment.rule_id.nil? %>
-                      <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="no_alert">No Alert</td>
-                    <% else %>
-                      <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="alerted">Alerted</td>
-                    <% end %>
-                  </tr>
-                <% end %>
-              <% else %>
-                <% @bug.pcaps.left_pcap_test(rule).each do |attachment| %>
-                    <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
-                      <td colspan="6"><%= attachment.file_name %> <%= @bug.id %>
-                      </td>
-                      <% if attachment.rule_id.nil? %>
-                        <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="no_alert">No Alert</td>
-                      <% else %>
-                        <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="alerted">Alerted</td>
-                      <% end %>
-                    </tr>
-                <% end %>
+              <% rule.display_alerts(@bug).each do |display_alert| %>
+                <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
+                  <td colspan="6"><%= display_alert[:file_name] %> <%= @bug.id %>
+                  </td>
+                  <% if 'alerted' == display_alert[:alert_status] %>
+                      <td id="rule_<%= rule.id %>_att_<%= display_alert[:pcap_id] %>" colspan="2" class="alerted">Alerted</td>
+                  <% else %>
+                      <td id="rule_<%= rule.id %>_att_<%= display_alert[:pcap_id] %>" colspan="2" class="no_alert">No Alert</td>
+                  <% end %>
+                </tr>
               <% end %>
           <% end %>
           </tbody>

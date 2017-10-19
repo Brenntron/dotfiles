@@ -18,6 +18,7 @@ class Bug < ApplicationRecord
 
   has_many :alerts, through: :attachments
   has_many :local_alerts, through: :attachments
+  has_many :pcap_alerts, through: :attachments
 
   accepts_nested_attributes_for :rules
 
