@@ -656,10 +656,10 @@ namespace 'AC.Bugs', (exports) ->
           $("#rule_#{rule.id}_att_#{alert.pcap_id}").removeClass();
           if 'alerted' == alert.alert_status
             $("#rule_#{rule.id}_att_#{alert.pcap_id}").html("Alerted")
-            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('alerted')
+            $("#rule_#{rule.id}_att_#{alert.pcap_id}").addClass('alerted')
           else
             $("#rule_#{rule.id}_att_#{alert.pcap_id}").html("No Alert")
-            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('no_alert')
+            $("#rule_#{rule.id}_att_#{alert.pcap_id}").addClass('no_alert')
 
   #Rebuild Attachments Tab
   exports.rebuildAttachmentsTab = () ->
