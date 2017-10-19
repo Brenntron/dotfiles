@@ -140,16 +140,30 @@
                 <td><%= test_rpt ? test_rpt.average_nonmatch : '-' %></td>
                 <td></td>
               </tr>
+              <% if rule.draft? %>
                 <% @bug.attachment_local_alerts(rule).each do |attachment| %>
                   <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
                     <td colspan="6"><%= attachment.file_name %>
                     </td>
                     <% if attachment.rule_id.nil? %>
-                      <td id="rule_<%= rule.id %>_att_<%= attachment.id %>" colspan="2" class="no_alert">No Alert</td>
+                      <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="no_alert">No Alert</td>
                     <% else %>
-                      <td id="rule_<%= rule.id %>_att_<%= attachment.id %>" colspan="2" class="alerted">Alerted</td>
+                      <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="alerted">Alerted</td>
                     <% end %>
                   </tr>
+                <% end %>
+              <% else %>
+                <% @bug.pcaps.left_pcap_test(rule).each do |attachment| %>
+                    <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
+                      <td colspan="6"><%= attachment.file_name %> <%= @bug.id %>
+                      </td>
+                      <% if attachment.rule_id.nil? %>
+                        <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="no_alert">No Alert</td>
+                      <% else %>
+                        <td id="rule_<%= rule.id %>_attq_<%= attachment.id %>" colspan="2" class="alerted">Alerted</td>
+                      <% end %>
+                    </tr>
+                <% end %>
               <% end %>
           <% end %>
           </tbody>
