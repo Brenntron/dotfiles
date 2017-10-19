@@ -11,6 +11,7 @@ module API
       mount API::V1::Events
       mount API::V1::Tasks
       mount API::V1::References
+      mount API::V1::SavedSearches
 
     end
   end

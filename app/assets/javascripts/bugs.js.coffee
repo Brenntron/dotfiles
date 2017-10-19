@@ -506,6 +506,19 @@ $ ->
 
 namespace 'AC.Bugs', (exports) ->
 
+  exports.deleteSavedSearch = (saved_search_id) ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/saved_searches/' + saved_search_id
+      method: 'DELETE'
+      headers: headers
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.status == "success")
+        $("#saved_search_#{saved_search_id}").remove()
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
   exports.buildStatusReportModal = (status_report) ->
 
     if status_report.changed_bug_columns.length > 0
