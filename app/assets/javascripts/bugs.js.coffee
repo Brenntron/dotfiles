@@ -626,7 +626,7 @@ namespace 'AC.Bugs', (exports) ->
       rows = []
 
       for pcap_alert in data.pcap_alerts
-         rows.push "<tr><td class='sid-col'><a class='blue' onclick='ruleShow(this);' data-rule='#{pcap_alert.rule_id}'><strong>#{pcap_alert.sid_colon_format}</strong></a></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
+         rows.push "<tr><td class='sid-col'><a id='rule-link' class='blue' onclick='ruleShow(this);' data-rule='#{pcap_alert.rule_id}'><strong>#{pcap_alert.sid_colon_format}</strong></a></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
       content += rows.join("")
       content = content + "</table>"
     else
