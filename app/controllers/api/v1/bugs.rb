@@ -100,6 +100,7 @@ module API
                 new_pcap_alert = {}
                 new_pcap_alert[:sid_colon_format] = p_alert.rule.sid_colon_format
                 new_pcap_alert[:message] = p_alert.rule.message
+                new_pcap_alert[:rule_id] = p_alert.rule.id
                 alert[:pcap_alerts] << new_pcap_alert
               end
               response[:data][:alerts] << alert

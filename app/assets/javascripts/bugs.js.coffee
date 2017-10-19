@@ -82,6 +82,18 @@ window.add_bug_exploit_hide = ->
   $('#add-bug-exploit-show').show();
   $('#add-bug-exploit-hide').hide();
 
+window.ruleShow = (rule) ->
+  id = rule.attributes['data-rule'].value
+  #switch tabs
+  $('#bug_tab a[class= "rules-tab"]').tab 'show'
+  #uncheck checkboxes
+  $('.rule_check_box').prop 'checked', $('.rules_check_box').prop('checked')
+  #check appropriate checkbox
+  $('#rule_' + id).prop 'checked', true
+  $('.view').removeClass('hidden').addClass('active').show()
+  $('.rule_' + id).removeClass('hidden').addClass('active').show()
+  return
+
 
 $ ->
   $('#bugzilla_popover_state').popover();
@@ -614,7 +626,7 @@ namespace 'AC.Bugs', (exports) ->
       rows = []
 
       for pcap_alert in data.pcap_alerts
-         rows.push "<tr><td class='sid-col'><span class='blue'>#{pcap_alert.sid_colon_format}</span></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
+         rows.push "<tr><td class='sid-col'><a class='blue' onclick='ruleShow(this);' data-rule='#{pcap_alert.rule_id}'><strong>#{pcap_alert.sid_colon_format}</strong></a></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
       content += rows.join("")
       content = content + "</table>"
     else
