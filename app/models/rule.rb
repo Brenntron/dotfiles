@@ -238,7 +238,7 @@ class Rule < ApplicationRecord
     @anygid_regexp ||= /gid:\s*\d+\s*;/
   end
 
-  def self.grep_line_from_file(sid, gid, given_filepath = nil)
+  def self.grep_line_from_file!(sid, gid, given_filepath = nil)
     filepath = given_filepath || "#{Rails.root}/extras/snort/*/*.rules"
     rule_grep_output = `grep -Hn "sid:\\s*#{sid}\\s*;" #{filepath}`
     thisgid_regexp = gid_regexp(gid)
@@ -660,7 +660,7 @@ class Rule < ApplicationRecord
     `#{RuleFile.svn_cmd} up #{Repo::RuleContentCommitter.synch_root.to_s}/snort-rules/`
     #TODO: remove this check when SO Rules are added to the working directory.
     if gid == 1
-      Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file(sid, gid))
+      Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file!(sid, gid))
     end
   end
 
@@ -1000,7 +1000,7 @@ class Rule < ApplicationRecord
 
   def self.revert_rules_action(rules)
     rules.each do |rule|
-      rule.revert_grep(Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename))
+      rule.revert_grep(Rule.grep_line_from_file!(rule.sid, rule.gid, rule.filename))
       rule.rule_doc.revert_doc if rule.rule_doc
     end
 
