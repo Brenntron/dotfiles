@@ -419,7 +419,7 @@ class Bug < ApplicationRecord
   def load_rules_from_sids(sids, component = "Snort Rules", import_type = "import")
     sids.each do |sid|
       gid = component == "SO Rules" ? 3 : 1
-      rule = Rule.find_or_load(sid, gid)
+      rule = Rule.find_or_load(sid)
       if rule
         @import_report[:new_rules] << rule.sid_colon_format unless self.rules.include? rule
         if import_type != "status"
