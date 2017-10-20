@@ -370,7 +370,7 @@ Feature: Rules
 
   # ==== Deleted rules ===
 
-  @javascript @now
+  @javascript
   Scenario: A rule with a rule category of deleted should not be visible
     Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
