@@ -49,7 +49,7 @@ class BugsController < ApplicationController
 
     if @bug
       @show_resolve_button = ['NEW', 'OPEN', 'ASSIGNED', 'DUPLICATE', 'REOPENED'].include?(@bug.state)
-      @rules = @bug.rules.sort { |left, right| left <=> right }
+      @rules = @bug.rules.active.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.valid_reference_types
       @pcap_attachments = []
       @other_attachments = []

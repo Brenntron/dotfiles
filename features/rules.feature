@@ -370,8 +370,8 @@ Feature: Rules
 
   # ==== Deleted rules ===
 
-  @javascript
-  Scenario: Editing a deleted rule
+  @javascript @now
+  Scenario: A rule with a rule category of deleted should not be visible
     Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
     Given the following bugs exist:
@@ -380,52 +380,18 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | DELETED   |  1 |
+      | BLACKLIST |  2 |
     And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |    SYNCHED     |     message       |        1         |
+      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message                | rule_category_id |
+      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  | DELETED message test       |        1         |
+      | 12 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message          |        2         |
     And bug with id "2222" has rule with id "11"
-    When I goto "/bugs/2222"
-    And  I click the "Rules" tab
-    And  I click button "list all"
-    And  I uncheck "rule_11"
-    And  I click "edit"
-    Then I should not see div element with class "rule_11"
-    When I click the "Rules" tab
-    And  I check "rule_11"
-    And  I click "edit"
-    Then I should see div element with class "rule_11"
-    And  I fill in "rule_content_11" with "alert udp $HOME_NET any -> any 53 (msg:"DELETED msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
-    And  I click button "Save Changes"
-    And  I wait for "8" seconds
-    Then I should see rule "11" state "DELETED" version "1:22211:3"
-    And rule "11" is a current edit
-    And I should see a rule row with class "draft" and id "11"
-    And I should see a rule row with class "edited-rule" and id "11"
-    And I should see a rule row with class "current-edit" and id "11"
-    And I should see a rule row with class "deleted-rule" and id "11"
-
-  @javascript
-  Scenario: VC updating a deleted rule
-    Given a user with role "analyst" exists and is logged in
-    And I wait for "3" seconds
-    Given the following bugs exist:
-      |  id  | bugzilla_id | state  | user_id |
-      | 2222 |   222222    | OPEN   |    1    |
-    And the following rule categories exist:
-      | category  | id |
-      | DELETED   |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  |     message       |        1         |
-    And bug with id "2222" has rule with id "11"
-    When rule sid "22211" rev "4" is synched
+    And bug with id "2222" has rule with id "12"
     And  I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "list all"
-    And I should see a rule row with class "draft" and id "11"
-    And I should see a rule row with class "edited-rule" and id "11"
-    And I should see a rule row with class "stale-edit" and id "11"
-    And I should see a rule row with class "deleted-rule" and id "11"
+    And I should see "BLACKLIST message"
+    And I should not see "DELETED message test"
 
 
   # ==== Existing rule ===
