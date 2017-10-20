@@ -30,6 +30,8 @@ class Bug < ApplicationRecord
   LIBERTY_CLEAR                         = "CLEAR"
   LIBERTY_EMBARGO                       = "EMBARGO"
 
+  COMPONENTS                            = ["ClamAV Signatures", "Malware", "Malware FP", "Snort Rules", "SO Rules"]
+
   scope :open_bugs, -> { where('state in (?)', STATES_OPEN) }
   scope :closed, -> { where('state in (?)', STATES_CLOSED) }
   scope :pending, -> { where(state: STATE_PENDING) }
