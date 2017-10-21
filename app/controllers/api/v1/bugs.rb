@@ -467,7 +467,7 @@ module API
           new_bug = xmlrpc.create(options.to_h) #the bugzilla session is where we authenticate
 
           new_bug_id = new_bug["id"]
-          bug = Bug.create(
+          bug = Bug.create!(
               :id => new_bug_id,
               :bugzilla_id => new_bug_id,
               :product => permitted_params[:bug][:product],

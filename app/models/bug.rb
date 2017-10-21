@@ -20,6 +20,8 @@ class Bug < ApplicationRecord
   has_many :local_alerts, through: :attachments
   has_many :pcap_alerts, through: :attachments
 
+  validates :description, length: { maximum: 255 }
+
   accepts_nested_attributes_for :rules
 
   STATE_PENDING                         = 'PENDING'
