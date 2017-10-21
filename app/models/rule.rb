@@ -74,7 +74,8 @@ class Rule < ApplicationRecord
 
   # Pre-commit hook intercepted commit, failed it, and successfully checked in the rule
   SVN_SUCCESS_COMMIT_HOOK = 199
-
+  
+  # Scope that ensures no deleted rules show up in a query. This scope should be used whenever displaying rules.
   scope :active, -> { joins(:rule_category).where('rule_categories.category != ?', 'DELETED') }
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
