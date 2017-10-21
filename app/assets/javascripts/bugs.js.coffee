@@ -48,18 +48,23 @@ window.bug_resolve =(this_tag) ->
         AC.Bugs.buildStatusReportModal(json.import_report)
 
 window.toggle_liberty =(this_tag, bug_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
-    method: 'PATCH'
-    headers: headers
-    data: { }
-    success: (response) ->
-      if "CLEAR" == response
-        this_tag.className = "embargo_off"
-      else
-        this_tag.className = "embargo_on"
-  , this)
+  confirmed = true
+  if "embargo_on" == this_tag.className
+    confirmed = confirm("Are you sure?")
+
+  if (true == confirmed)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
+      method: 'PATCH'
+      headers: headers
+      data: { }
+      success: (response) ->
+        if "CLEAR" == response
+          this_tag.className = "embargo_off"
+        else
+          this_tag.className = "embargo_on"
+    , this)
 
 
 window.add_bug_ref_show = ->
