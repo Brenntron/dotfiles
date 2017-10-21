@@ -1145,10 +1145,9 @@ class Bug < ApplicationRecord
 
         progress_bar.update_attribute("progress", 90) unless progress_bar.blank?
 
-        #save the bug and clear all rule tests unless the import action is a status check
+        #save the bug unless the import action is a status check
         if import_type != "status"
           bug.save
-          bug.clear_rule_tested
         end
 
         progress_bar.update_attribute("progress", 100) unless progress_bar.blank?
