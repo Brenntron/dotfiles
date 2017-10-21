@@ -27,6 +27,14 @@
               <h6>last updated</h6><h5 class="top-space"><%= display_last_updated_date(@bug)%><br></h5><h6><%= display_last_updated_time(@bug)%></h6>
             </div>
           </div>
+          <div class="col-xs-1 liberty">
+            <div class="bug-details-columns">
+              <h6>Embargo</h6>
+              <h5 class="top-space">
+                <span onclick="toggle_liberty(this, <%= @bug.id %>)" class="<%= @bug.liberty_clear? ? "embargo_off" : "embargo_on" %>"></span>
+              </h5>
+            </div>
+          </div>
           <div class="col-xs-1 state">
             <div class="bug-details-columns">
               <h6>state</h6>
