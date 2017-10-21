@@ -100,6 +100,7 @@ module API
                 new_pcap_alert = {}
                 new_pcap_alert[:sid_colon_format] = p_alert.rule.sid_colon_format
                 new_pcap_alert[:message] = p_alert.rule.message
+                new_pcap_alert[:rule_id] = p_alert.rule.id
                 alert[:pcap_alerts] << new_pcap_alert
               end
               response[:data][:alerts] << alert
@@ -132,17 +133,12 @@ module API
             rules.each do |rule|
               rule_packet = {}
               rule_packet[:id] = rule.id
-              rule_packet[:alert_count] = @bug.local_alerts.by_rule(rule).count
-              rule_packet[:tested] = rule.tested_on_bug?(@bug)
+
               rule_packet[:svn_output] = rule.tested_on_bug?(@bug)? rule.svn_result_output : ""
-              rule_packet[:attachments] = []
-              @bug.attachment_local_alerts(rule).each do |att|
-                rule_att = {}
-                rule_att[:att_id] = att.id
-                rule_att[:file_name] = att.file_name
-                rule_att[:rule_id_nil] = att.rule_id.nil?
-                rule_packet[:attachments] << rule_att
-              end
+
+              rule_packet[:tested] = rule.tested_on_bug?(@bug)
+              rule_packet[:alert_count] = rule.display_alerts_count(@bug)
+              rule_packet[:alerts] = rule.display_alerts(@bug)
 
               response[:data] << rule_packet
             end
@@ -288,7 +284,7 @@ module API
                   end
                   progress_bar.update_attribute("progress", 10)
                   #create the bug from bugzilla
-                  bug = Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bug, progress_bar, import_type).first
+                  bug = Bug.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bug, progress_bar, import_type).first
 
                   if initial_bug_state.present?
                     report = bug.compile_import_report(initial_bug_state)
@@ -423,7 +419,12 @@ module API
         put ":id", root: "bug" do
           ActiveRecord::Base.transaction do
             bug = Bug.find(permitted_params[:id])
-            Bug.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
+            # Bug.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
+            bug.update_bug_action(current_user: current_user,
+                                  bugzilla_session: bugzilla_session,
+                                  assignee_id: permitted_params[:bug][:user_id],
+                                  committer_id: permitted_params[:bug][:committer_id],
+                                  permitted_params: permitted_params)
           end
         end
 
@@ -466,7 +467,7 @@ module API
           new_bug = xmlrpc.create(options.to_h) #the bugzilla session is where we authenticate
 
           new_bug_id = new_bug["id"]
-          bug = Bug.create(
+          bug = Bug.create!(
               :id => new_bug_id,
               :bugzilla_id => new_bug_id,
               :product => permitted_params[:bug][:product],

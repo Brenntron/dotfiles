@@ -7,6 +7,14 @@ class Attachment < ApplicationRecord
   has_many :exploits
 
   scope :pcap, -> { where("attachments.file_name like '%.pcap'").where.not(is_obsolete: true) }
+  scope :left_pcap_test, ->(rule) {
+    joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_PCAP}' and alerts.rule_id = #{rule.id}")
+        .select(:file_name, 'alerts.rule_id', 'id')
+  }
+  scope :left_local_test, ->(rule) {
+    joins("LEFT OUTER JOIN alerts ON alerts.attachment_id = attachments.id and alerts.test_group = '#{Alert::TEST_GROUP_LOCAL}' and alerts.rule_id = #{rule.id}")
+        .select(:file_name, 'alerts.rule_id', 'id')
+  }
 
   after_create { |attachment| attachment.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |attachment| attachment.record 'update' if Rails.configuration.websockets_enabled == 'true' }

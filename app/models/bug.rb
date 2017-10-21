@@ -18,21 +18,35 @@ class Bug < ApplicationRecord
 
   has_many :alerts, through: :attachments
   has_many :local_alerts, through: :attachments
+  has_many :pcap_alerts, through: :attachments
+
+  validates :description, length: { maximum: 255 }
 
   accepts_nested_attributes_for :rules
+
+  STATE_PENDING                         = 'PENDING'
+  STATES_OPEN                           = %w{OPEN ASSIGNED REOPENED}
+  STATES_CLOSED                         = %w{FIXED WONTFIX LATER INVALID DUPLICATE}
+  STATES                                = [STATE_PENDING] + STATES_OPEN + STATES_CLOSED
 
   LIBERTY_CLEAR                         = "CLEAR"
   LIBERTY_EMBARGO                       = "EMBARGO"
 
-  scope :open_bugs, -> { where('state in (?)', ['OPEN', 'ASSIGNED', 'REOPENED']) }
-  scope :closed, -> { where('state in (?)', ['FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE']) }
-  scope :pending, -> { where(state: "PENDING") }
-  scope :open_pending, -> {where('state in (?)', ['PENDING','OPEN', 'ASSIGNED', 'REOPENED'])}
+  COMPONENTS                            = ["ClamAV Signatures", "Malware", "Malware FP", "Snort Rules", "SO Rules"]
+
+  scope :open_bugs, -> { where('state in (?)', STATES_OPEN) }
+  scope :closed, -> { where('state in (?)', STATES_CLOSED) }
+  scope :pending, -> { where(state: STATE_PENDING) }
+  scope :open_pending, -> {where('state in (?)', [STATE_PENDING] + STATES_OPEN)}
   scope :by_component, ->(component) { where('component = ?', component) }
 
   scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
   attr_accessor :import_report
+
+  def pending?
+    STATE_PENDING == self.state
+  end
 
   def liberty_clear?
     LIBERTY_CLEAR == self.liberty
@@ -478,6 +492,10 @@ class Bug < ApplicationRecord
     end
   end
 
+  def metrics_available?
+    work_time || rework_time || review_time || resolution_time != 0
+  end
+
   def check_permission(current_user)
     User.class_levels[current_user.class_level] >= Bug.classifications[self.classification]
   end
@@ -757,28 +775,27 @@ class Bug < ApplicationRecord
 
   end
 
-  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
+  # TODO Why is this a Bug class method when it takes a required bug object as an argument?
+  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params, assignee:, committer:)
     bug.initialize_report
     bug_is_being_resolved = bug.state != "PENDING" ? false : true
 
     ###
     tags = permitted_params[:bug][:tag_names]
-    editor = User.find(permitted_params[:bug][:user_id])
-    reviewer = User.find(permitted_params[:bug][:committer_id])
-    updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], editor.email)
+    updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], assignee.email)
     ###
 
     ###
     options = {
         :ids => permitted_params[:id],
-        :assigned_to => editor.email,
+        :assigned_to => assignee.email,
         :status => updated_bug_state[:status],
         :resolution => updated_bug_state[:resolution],
         :comment => updated_bug_state[:comment],
-        :qa_contact => reviewer.email
+        :qa_contact => committer&.email
     }
     update_params = {
-        :user => editor,
+        :user => assignee,
         :state => updated_bug_state[:state],
         :status => updated_bug_state[:status],
         summary: updated_bug_state[:summary],
@@ -790,7 +807,7 @@ class Bug < ApplicationRecord
         :work_time => updated_bug_state[:work_time],
         :rework_time => updated_bug_state[:rework_time],
         :review_time => updated_bug_state[:review_time],
-        :committer => reviewer
+        :committer => committer
     }
 
     if permitted_params[:bug][:new_research_notes]
@@ -802,19 +819,7 @@ class Bug < ApplicationRecord
           :committer_notes => permitted_params[:bug][:new_committer_notes]
       }
     end
-    ###
 
-    ###
-    #if a comment is made about a state then add it to the history here.
-    if permitted_params[:bug][:state_comment]
-      note_options = {
-          :id => permitted_params[:id],
-          :comment => permitted_params[:bug][:state_comment],
-          :note_type => "research",
-          :author => current_user.email,
-      }
-      Note.process_note(note_options, bugzilla_session)
-    end
     # update the tags
     bug.tags.delete_all if bug.tags.exists?
     if tags
@@ -1421,5 +1426,39 @@ class Bug < ApplicationRecord
     ref = references.where(id: reference_id).first
     raise "Cannot find reference #{reference_id}" unless ref
     ref.exploits.create(exploit_type_id: exploit_type_id, attachment_id: attachment_id, data: exploit_data)
+  end
+
+  def has_draft_rules?
+    rules.any? { |rule| rule.draft? }
+  end
+
+  def no_committer_ok?(new_state)
+    (STATES_CLOSED.include?(new_state) && has_draft_rules?) ? false : true
+  end
+
+  def update_bug_action(current_user:,
+                        bugzilla_session:,
+                        assignee_id:,
+                        committer_id:,
+                        permitted_params:)
+
+    raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id.present?
+    assignee = User.where(id: assignee_id).first
+    Rails.logger.error("Cannot find bug assignee id = #{assignee_id.inspect} for bug #{self.bugzilla_id}")
+    raise "Cannot find bug assignee for bug #{self.bugzilla_id}." unless assignee
+
+    committer = committer_id.presence && User.where(id: committer_id).first
+
+    unless committer || no_committer_ok?(permitted_params[:bug][:state])
+      raise "Cannot update bug #{bugzilla_id} without committer identified"
+    end
+
+    Bug.process_bug_update(current_user,
+                           bugzilla_session,
+                           self,
+                           permitted_params,
+                           assignee: assignee,
+                           committer: committer)
+
   end
 end

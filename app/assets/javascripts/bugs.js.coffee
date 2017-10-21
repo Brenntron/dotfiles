@@ -48,18 +48,23 @@ window.bug_resolve =(this_tag) ->
         AC.Bugs.buildStatusReportModal(json.import_report)
 
 window.toggle_liberty =(this_tag, bug_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
-    method: 'PATCH'
-    headers: headers
-    data: { }
-    success: (response) ->
-      if "CLEAR" == response
-        this_tag.className = "embargo_off"
-      else
-        this_tag.className = "embargo_on"
-  , this)
+  confirmed = true
+  if "embargo_on" == this_tag.className
+    confirmed = confirm("Are you sure?")
+
+  if (true == confirmed)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
+      method: 'PATCH'
+      headers: headers
+      data: { }
+      success: (response) ->
+        if "CLEAR" == response
+          this_tag.className = "embargo_off"
+        else
+          this_tag.className = "embargo_on"
+    , this)
 
 
 window.add_bug_ref_show = ->
@@ -81,6 +86,18 @@ window.add_bug_exploit_hide = ->
   $('#add-bug-exploit-div').hide();
   $('#add-bug-exploit-show').show();
   $('#add-bug-exploit-hide').hide();
+
+window.ruleShow = (rule) ->
+  id = rule.attributes['data-rule'].value
+  #switch tabs
+  $('#bug_tab a[class= "rules-tab"]').tab 'show'
+  #uncheck checkboxes
+  $('.rule_check_box').prop 'checked', $('.rules_check_box').prop('checked')
+  #check appropriate checkbox
+  $('#rule_' + id).prop 'checked', true
+  $('.view').removeClass('hidden').addClass('active').show()
+  $('.rule_' + id).removeClass('hidden').addClass('active').show()
+  return
 
 
 $ ->
@@ -627,7 +644,7 @@ namespace 'AC.Bugs', (exports) ->
       rows = []
 
       for pcap_alert in data.pcap_alerts
-         rows.push "<tr><td class='sid-col'><span class='blue'>#{pcap_alert.sid_colon_format}</span></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
+         rows.push "<tr><td class='sid-col'><a id='rule-link' class='blue' onclick='ruleShow(this);' data-rule='#{pcap_alert.rule_id}'><strong>#{pcap_alert.sid_colon_format}</strong></a></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
       content += rows.join("")
       content = content + "</table>"
     else
@@ -665,16 +682,15 @@ namespace 'AC.Bugs', (exports) ->
           $('[data-toggle="tooltip"]').tooltip();
         else
           $("#tested_rule_#{rule.id}").html("<span class='glyphicon glyphicon-minus'></span>")
-        for att in rule.attachments
-          if att.rule_id_nil == true
-            $("#rule_#{rule.id}_att_#{att.att_id}").html("No Alert")
-            $("#rule_#{rule.id}_att_#{att.att_id}").removeClass();
-            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('no_alert')
-
+        for alert in rule.alerts
+          $("#rule_#{rule.id}_att_#{alert.pcap_id}").removeClass();
+          if 'alerted' == alert.alert_status
+            $("#rule_#{rule.id}_att_#{alert.pcap_id}").html("Alerted")
+            $("#rule_#{rule.id}_att_#{alert.pcap_id}").addClass('alerted')
           else
-            $("#rule_#{rule.id}_att_#{att.att_id}").html("Alerted")
-            $("#rule_#{rule.id}_att_#{att.att_id}").removeClass();
-            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('alerted')
+            $("#rule_#{rule.id}_att_#{alert.pcap_id}").html("No Alert")
+            $("#rule_#{rule.id}_att_#{alert.pcap_id}").addClass('no_alert')
+
   #Rebuild Attachments Tab
   exports.rebuildAttachmentsTab = () ->
     bid = $('.bugzilla_id').text()

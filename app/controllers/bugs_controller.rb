@@ -1,5 +1,5 @@
 class BugsController < ApplicationController
-  load_and_authorize_resource except: [:add_tag, :remove_tag, :show]
+  load_and_authorize_resource except: [:add_tag, :remove_tag, :show, :bug_metrics]
 
   before_action :require_login
   before_action :query_bugs
@@ -60,7 +60,7 @@ class BugsController < ApplicationController
 
     if @bug
       @show_resolve_button = ['NEW', 'OPEN', 'ASSIGNED', 'DUPLICATE', 'REOPENED'].include?(@bug.state)
-      @rules = @bug.rules.sort { |left, right| left <=> right }
+      @rules = @bug.rules.active.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.valid_reference_types
       @pcap_attachments = []
       @other_attachments = []
@@ -109,6 +109,19 @@ class BugsController < ApplicationController
     end
   end
 
+  def bug_metrics
+    @bug = Bug.find(params[:bug_id])
+
+    respond_to do |format|
+      format.json {
+        render :json => [@bug.work_time,
+                         @bug.rework_time,
+                         @bug.review_time,
+                         @bug.resolution_time]
+      }
+    end
+  end
+
   private
 
   def bug_params
@@ -118,7 +131,7 @@ class BugsController < ApplicationController
   end
 
   def query_params
-    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state)
+    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state, :component)
         .reject { |key, value| (value.blank? || value.is_a?(Array) || key =='tag_name') }
   end
 

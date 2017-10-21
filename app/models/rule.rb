@@ -74,7 +74,9 @@ class Rule < ApplicationRecord
 
   # Pre-commit hook intercepted commit, failed it, and successfully checked in the rule
   SVN_SUCCESS_COMMIT_HOOK = 199
-
+  
+  # Scope that ensures no deleted rules show up in a query. This scope should be used whenever displaying rules.
+  scope :active, -> { joins(:rule_category).where('rule_categories.category != ?', 'DELETED') }
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
   scope :order_by_sid, -> { order(:gid, :sid) }
@@ -156,8 +158,36 @@ class Rule < ApplicationRecord
     new_rule? || (cvs_rule_content != rule_content)
   end
 
+  def display_alerts_count(bug)
+    if synched_rule?
+      bug.pcap_alerts.by_rule(self).count
+    else
+      bug.local_alerts.by_rule(self).count
+    end
+  end
+
+  def display_alerts(bug)
+    if synched_rule?
+      bug.pcaps.left_pcap_test(self).map do |pcap|
+        {
+            pcap_id: pcap.id,
+            file_name: pcap.file_name,
+            alert_status: (pcap.rule_id ? 'alerted' : 'clear')
+        }
+      end
+    else
+      bug.pcaps.left_local_test(self).map do |pcap|
+        {
+            pcap_id: pcap.id,
+            file_name: pcap.file_name,
+            alert_status: (pcap.rule_id ? 'alerted' : 'clear')
+        }
+      end
+    end
+  end
+
   def tested_on_bug?(bug)
-    bugs_rules.where(bug_id: bug, rule_id: self, tested: true).exists?
+    self.synched_rule? || bugs_rules.where(bug_id: bug, rule_id: self, tested: true).exists?
   end
 
   def test_rule_content
@@ -760,6 +790,10 @@ class Rule < ApplicationRecord
       else
         self.id <=> rule.id
     end
+  end
+
+  def synched_rule?
+    EDIT_STATUS_SYNCHED == edit_status
   end
 
   # Tests if rule is the current version in VC

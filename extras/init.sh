@@ -15,6 +15,7 @@ declare -A processes
 processes["poller"]=${analyst_console_poller_num}
 processes["client_local"]=${analyst_console_client_local_num}
 processes["client_all"]=${analyst_console_client_all_num}
+processes["delayed_job"]=1
 
 cd ${RAILS_ROOT}
 
@@ -23,7 +24,12 @@ do
 	for x in $(seq 1 ${processes[$process]})
 	do
 		echo "$1ing: $process"
-		HOME=/var/log/analyst-console RAILS_ENV=${RAILS_ENV} GEM_HOME=${RAILS_ROOT}/vendor/bundle/ruby/2.3/gems ${PREFIX}/bin/bundle exec ${RAILS_ROOT}/vendor/bundle/ruby/2.3/bin/rails runner script/$process $1
+		if [ $process == "delayed_job" ]
+		then
+			HOME=/var/log/analyst-console RAILS_ENV=${RAILS_ENV} GEM_HOME=${RAILS_ROOT}/vendor/bundle/ruby/2.3/gems ${PREFIX}/bin/bundle exec bin/$process $1
+		else
+			HOME=/var/log/analyst-console RAILS_ENV=${RAILS_ENV} GEM_HOME=${RAILS_ROOT}/vendor/bundle/ruby/2.3/gems ${PREFIX}/bin/bundle exec ${RAILS_ROOT}/vendor/bundle/ruby/2.3/bin/rails runner script/$process $1
+		fi
 
 		if [ $1 == "start" ]
 		then
