@@ -71,6 +71,17 @@
                 </select>
               </div>
             </div>
+            <div class="form-group col-xs-12">
+              <label for="bug[component]" class="col-sm-2 control-label" >Component</label>
+              <div class="col-sm-10">
+                <select  class="form-control" name='bug[component]'>
+                  <option value= ""> -- </option>
+                  <% Bug::COMPONENTS.each do |component| %>
+                    <option><%= component %></option>
+                  <% end %>
+                </select>
+              </div>
+            </div>
             <div class="modal-footer col-xs-12 center" style="border-top:0px">
               <button class="btn btn-default" value="submit">submit</button>
               <button class="btn btn-default reset">reset</button>

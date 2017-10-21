@@ -120,7 +120,7 @@ class BugsController < ApplicationController
   end
 
   def query_params
-    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state)
+    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state, :component)
         .reject { |key, value| (value.blank? || value.is_a?(Array) || key =='tag_name') }
   end
 
