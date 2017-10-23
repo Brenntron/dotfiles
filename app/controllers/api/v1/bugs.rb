@@ -394,6 +394,7 @@ module API
         params do
           requires :id, type: Integer, desc: "The id of the bug to be updated."
           requires :bug, type: Hash do
+            optional :whiteboard, type: String, desc: "Whiteboard field from Bugzilla"
             optional :user_id, type: Integer, desc: "the user this bug is assigned to"
             optional :product, type: String, desc: "The name of the product the bug is being filed against."
             optional :component, type: String, desc: "The name of a component in the product above."
