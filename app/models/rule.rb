@@ -544,7 +544,7 @@ class Rule < ApplicationRecord
 
     rule_db = by_sid(parser.sid, parser.gid).first
 
-    if rule_db&.draft?
+    if rule_db&.draft? && parser.rev > rule_db.rev
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db.update(state: STALE_STATE)
       rule_db
