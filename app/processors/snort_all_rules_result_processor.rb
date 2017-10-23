@@ -92,7 +92,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
                 if rule.nil?
                   Rails.logger.info( "Rule was NIL")
-                  if alert['gid'].to_i == 1
+                  if alert['gid'].to_i == 1 || alert['gid'].to_i == 3
                     rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i),
                                     :gid => alert['gid'].to_i,
                                     :sid => alert['sid'].to_i,
