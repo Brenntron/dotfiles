@@ -548,8 +548,12 @@ class Rule < ApplicationRecord
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db.update(state: STALE_STATE)
       rule_db
+    elsif rule_db&.draft?
+      # do nothing
+      rule_db
     elsif rule_db&.deleted?
       rule_db.update(state: DELETED_STATE)
+      rule_db
     else
       rule = find_from_parser(parser)
       rule.load_rule_content(rule_content)
