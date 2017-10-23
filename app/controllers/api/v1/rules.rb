@@ -283,7 +283,7 @@ module API
         get "bulk_fetch/:sids", root: "rule" do
           authorize! :create, Rule
           permitted_params[:sids].map do |sid|
-            Rule.find_or_load(sid, 1)
+            Rule.find_or_load!(sid, 1)
           end
         end
 
