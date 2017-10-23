@@ -136,7 +136,7 @@ class BugsController < ApplicationController
   end
 
   def sync_summary
-    @bug.compose_summary
+    @bug.compose_summary(bugzilla_session)
   end
 
   def query_bugs
