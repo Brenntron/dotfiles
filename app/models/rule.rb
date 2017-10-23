@@ -544,14 +544,18 @@ class Rule < ApplicationRecord
 
     rule_db = by_sid(parser.sid, parser.gid).first
 
-    if rule_db&.draft? && parser.rev > rule_db.rev
+    if rule_db.nil?
+      rule = find_from_parser(parser)
+      rule.load_rule_content(rule_content)
+      rule
+    elsif rule_db.draft? && parser.rev > rule_db.rev
       rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
       rule_db.update(state: STALE_STATE)
       rule_db
-    elsif rule_db&.draft?
+    elsif rule_db.draft?
       # do nothing
       rule_db
-    elsif rule_db&.deleted?
+    elsif rule_db.deleted?
       rule_db.update(state: DELETED_STATE)
       rule_db
     else
