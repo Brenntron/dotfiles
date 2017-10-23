@@ -483,7 +483,7 @@ class Bug < ApplicationRecord
     summary_without_sids.scan(/\[.*?\]/)
   end
 
-  def compose_summary(bugzilla_session)
+  def compose_summary
     if tag_array.try(:sort) != summary_tag_array.try(:sort)
 
       #extract summary_tag_string and replace with tag_string
@@ -492,7 +492,6 @@ class Bug < ApplicationRecord
       tag_array.reverse.each{|ta| summary_string.prepend(ta) }
 
       self.update(summary: summary_string)
-      Bugzilla::Bug.new(bugzilla_session).update(ids: id, summary: summary_string)
     end
   end
 

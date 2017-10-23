@@ -136,7 +136,8 @@ class BugsController < ApplicationController
   end
 
   def sync_summary
-    @bug.compose_summary(bugzilla_session)
+    @bug.compose_summary
+    Bugzilla::Bug.new(bugzilla_session).update(ids: @bug.id, summary: @bug.summary)
   end
 
   def query_bugs
