@@ -878,3 +878,23 @@ Feature: Bug
     And I goto "/bugs/145359"
     And I click ".overview"
     Then I should see "2006-5745"
+
+
+  @javascript
+  Scenario: a bug that has attachments with alerts should provide a link to the rule view
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                                          | product  | component   | version |      description       |
+      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 CVE-2008-1434 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And the following rules exist belonging to bug "145359":
+      |id | message                 | rule_category_id | parsed | sid  |
+      |1  | BLACKLIST message       | 1                |  true  | 19001|
+    And an attachment exists that belongs to bug "145359" and alerts on rule "1"
+    And  I goto "/bugs/145359"
+    And  I click ".alerts-tab"
+    Then I should see "All Rules"
+    When I click "#rule-link"
+    Then I should see "alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any"
+    And  I should not see "All Rules"
+
+

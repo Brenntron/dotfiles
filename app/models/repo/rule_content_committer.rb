@@ -118,7 +118,7 @@ module Repo
 
     def check_rev(rule)
       return if rule.new_rule?
-      rule_grep_line = Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename)
+      rule_grep_line = Rule.grep_line_from_file!(rule.sid, rule.gid, rule.filename)
       filename, line_number, rule_content = rule_grep_line.partition(/:\d+:/)
       unless rule.rev_matches?(rule_content)
         rule.update(publish_status: Rule::PUBLISH_STATUS_STALE_EDIT, state: Rule::STALE_STATE)

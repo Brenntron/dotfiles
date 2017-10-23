@@ -74,7 +74,9 @@ class Rule < ApplicationRecord
 
   # Pre-commit hook intercepted commit, failed it, and successfully checked in the rule
   SVN_SUCCESS_COMMIT_HOOK = 199
-
+  
+  # Scope that ensures no deleted rules show up in a query. This scope should be used whenever displaying rules.
+  scope :active, -> { joins(:rule_category).where('rule_categories.category != ?', 'DELETED') }
 
   scope :by_sid, ->(sid, gid = 1) { where(sid: sid).where(gid: gid || 1) }
   scope :order_by_sid, -> { order(:gid, :sid) }
@@ -238,27 +240,67 @@ class Rule < ApplicationRecord
     @anygid_regexp ||= /gid:\s*\d+\s*;/
   end
 
-  def self.grep_line_from_file(sid, gid, given_filepath = nil)
+  # Greps the snort dir for rules
+  # Does a recursive grep
+  # which can find snort (text) rules (gid=1), so rules (gid=3) or preprocessor rules.
+  # This is only limited by what is on the file system and qualified by a gid argument.
+  #
+  # Returns nil if no matching rule is found.  Raises exception if more than one matching rule is found
+  #
+  # @param [Integer] sid
+  # @param [Integer|NilClass] gid or nil for either gid 1 or 3
+  # @param [String] given_filepath if not the default filepath
+  # @return [String|NilClass] grep output with filename colon linenumber colon rule content.
+  def self.grep_line_from_file(sid, gid = nil, given_filepath = nil)
     filepath = given_filepath || "#{Rails.root}/extras/snort/*/*.rules"
     rule_grep_output = `grep -Hn "sid:\\s*#{sid}\\s*;" #{filepath}`
-    thisgid_regexp = gid_regexp(gid)
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
-        when thisgid_regexp =~ grep_line
+        # asked for gid and found it
+        when gid && (gid_regexp(gid) =~ grep_line)
           true
-        when anygid_regexp =~ grep_line
+
+        # asked for gid 1 or 3, and found it
+        when gid.nil? && (gid_regexp('[13]') =~ grep_line)
+          true
+
+        # found some other gid
+        when gid && (anygid_regexp =~ grep_line)
           false
-        when 1 == gid
+
+        # no gid in line, and asked for gid 1
+        when (1 == gid) || gid.nil?
           true
+
+        # no gid in line, and wasn't asking for gid 1
         else
           false
       end
     end
 
-    raise "Rule doesn't exist." if 0 == rule_grep_lines.length
-    raise "Duplicate rules found for sid #{sid}." unless 1 == rule_grep_lines.length
+    raise "Duplicate rules found for sid #{sid}." if 1 < rule_grep_lines.length
 
-    rule_grep_lines[0]
+    if 0 == rule_grep_lines.length
+      nil
+    else
+      rule_grep_lines[0]
+    end
+  end
+
+  # Greps the snort dir for rules
+  # Does a recursive grep
+  # which can find snort (text) rules (gid=1), so rules (gid=3) or preprocessor rules.
+  # This is only limited by what is on the file system and qualified by a gid argument.
+  #
+  # Raises exception if no matching rule is found.
+  # Raises exception if more than one matching rule is found
+  #
+  # @param [Integer] sid
+  # @param [Integer|NilClass] gid or nil for either gid 1 or 3
+  # @param [String] given_filepath if not the default filepath
+  # @return [String] grep output with filename colon linenumber colon rule content.
+  def self.grep_line_from_file!(sid, gid = nil, given_filepath = nil)
+    grep_line_from_file(sid, gid, given_filepath) || raise("Rule #{sid} doesn't exist.")
   end
 
   def rule_classification
@@ -655,16 +697,45 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.find_or_load(sid, gid)
+  # Get a rule from the database or subversion if possible
+  # Returns nil if not found.
+  # Raises exception if more than one is found.
+  # @param [Integer] sid
+  # @param [Integer|NilClass] gid or nil for either gid 1 or 3
+  # @return [Rule|NilClass] the rule found.
+  def self.find_or_load(sid, gid = nil)
+    rule_db =
+        if gid
+          Rule.by_sid(sid, gid).first
+        else
+          Rule.by_sid(sid, 1).first || Rule.by_sid(sid, 3).first
+        end
+    return rule_db if rule_db
 
-    `#{RuleFile.svn_cmd} up #{Repo::RuleContentCommitter.synch_root.to_s}/snort-rules/`
-    #TODO: remove this check when SO Rules are added to the working directory.
-    if gid == 1
-      Rule.by_sid(sid, gid).first || load_grep(grep_line_from_file(sid, gid))
-    end
+    # commented to assume steady state of updated snort-rules directory
+    # `#{RuleFile.svn_cmd} up #{Repo::RuleContentCommitter.synch_root.to_s}/snort-rules/`
+    rule_grep_line = grep_line_from_file(sid, gid)
+    return nil unless rule_grep_line
+    load_grep(rule_grep_line)
   end
 
-  # A filename which will not be nil
+  # Get a rule from the database or subversion if possible
+  # Raises exception if not found.
+  # Raises exception if more than one is found.
+  # @param [Integer] sid
+  # @param [Integer|NilClass] gid or nil for either gid 1 or 3
+  # @return [Rule] the rule found.
+  def self.find_or_load!(sid, gid = nil)
+    rule_db =
+        if gid
+          Rule.by_sid(sid, gid).first
+        else
+          Rule.by_sid(sid, 1).first || Rule.by_sid(sid, 3).first
+        end
+    rule_db || load_grep(grep_line_from_file!(sid, gid))
+  end
+
+    # A filename which will not be nil
   # The filename field may be nil.  If so determine the path from rule_category
   # @return [Pathname] check this and related records for pathname
   def nonnil_pathname
@@ -1000,7 +1071,7 @@ class Rule < ApplicationRecord
 
   def self.revert_rules_action(rules)
     rules.each do |rule|
-      rule.revert_grep(Rule.grep_line_from_file(rule.sid, rule.gid, rule.filename))
+      rule.revert_grep(Rule.grep_line_from_file!(rule.sid, rule.gid, rule.filename))
       rule.rule_doc.revert_doc if rule.rule_doc
     end
 

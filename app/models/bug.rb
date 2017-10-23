@@ -20,6 +20,8 @@ class Bug < ApplicationRecord
   has_many :local_alerts, through: :attachments
   has_many :pcap_alerts, through: :attachments
 
+  validates :description, length: { maximum: 255 }
+
   accepts_nested_attributes_for :rules
 
   STATE_PENDING                         = 'PENDING'
@@ -29,6 +31,8 @@ class Bug < ApplicationRecord
 
   LIBERTY_CLEAR                         = "CLEAR"
   LIBERTY_EMBARGO                       = "EMBARGO"
+
+  COMPONENTS                            = ["ClamAV Signatures", "Malware", "Malware FP", "Snort Rules", "SO Rules"]
 
   scope :open_bugs, -> { where('state in (?)', STATES_OPEN) }
   scope :closed, -> { where('state in (?)', STATES_CLOSED) }
@@ -178,9 +182,32 @@ class Bug < ApplicationRecord
     case
       when query_params[:bugzilla_max].present?
         nil
-      when query_params[:summary].present?
-        summary_param = query_params.delete(:summary)
-        Bug.where(query_params).where('summary LIKE ?', "%#{summary_param}%")
+      when query_params[:summary].present? || query_params[:whiteboard].present?
+        summary_param = ""
+        whiteboard_param = ""
+
+        if query_params[:summary].present?
+          summary_param = query_params.delete(:summary)
+        end
+
+        if query_params[:whiteboard].present?
+          whiteboard_param = query_params.delete(:whiteboard)
+        end
+
+        query = Bug.where(query_params)
+
+        if summary_param.present?
+          query = query.where('summary LIKE ?', "%#{summary_param}%")
+        end
+
+        if whiteboard_param.present?
+          query = query.where('whiteboard LIKE ?', "%#{whiteboard_param}%")
+        end
+
+        #summary_param = query_params.delete(:summary)
+        #Bug.where(query_params).where('summary LIKE ?', "%#{summary_param}%")
+
+        query
       else
         Bug.where(query_params)
     end
@@ -419,7 +446,7 @@ class Bug < ApplicationRecord
   def load_rules_from_sids(sids, component = "Snort Rules", import_type = "import")
     sids.each do |sid|
       gid = component == "SO Rules" ? 3 : 1
-      rule = Rule.find_or_load(sid, gid)
+      rule = Rule.find_or_load(sid)
       if rule
         @import_report[:new_rules] << rule.sid_colon_format unless self.rules.include? rule
         if import_type != "status"
@@ -842,6 +869,7 @@ class Bug < ApplicationRecord
     options[:priority] = permitted_params[:bug][:priority]
     options[:severity] = permitted_params[:bug][:severity]
     options[:classification] = permitted_params[:bug][:classification]
+    options[:whiteboard] = permitted_params[:bug][:whiteboard]
 
     # update buzilla (if needed)
     options.reject! { |k, v| v.nil? } if options
@@ -857,6 +885,7 @@ class Bug < ApplicationRecord
     update_params[:priority] = permitted_params[:bug][:priority]
     update_params[:severity] = permitted_params[:bug][:severity]
     update_params[:classification] = permitted_params[:bug][:classification]
+    update_params[:whiteboard] = permitted_params[:bug][:whiteboard]
 
     # update the database
     update_params.reject! { |k, v| v.nil? }
@@ -928,7 +957,7 @@ class Bug < ApplicationRecord
         bug.priority  = item['priority']
         bug.component = item['component']
         bug.product   = item['product']
-
+        bug.whiteboard = item['whiteboard']
         bug.created_at = item['creation_time'].to_time
         last_change_time      = item['last_change_time'].to_time
 
@@ -1141,10 +1170,9 @@ class Bug < ApplicationRecord
 
         progress_bar.update_attribute("progress", 90) unless progress_bar.blank?
 
-        #save the bug and clear all rule tests unless the import action is a status check
+        #save the bug unless the import action is a status check
         if import_type != "status"
           bug.save
-          bug.clear_rule_tested
         end
 
         progress_bar.update_attribute("progress", 100) unless progress_bar.blank?
@@ -1191,6 +1219,7 @@ class Bug < ApplicationRecord
           new_record.priority  = item['priority']
           new_record.component = item['component']
           new_record.product   = item['product']
+          new_record.whiteboard = item['whiteboard']
 
           new_record.created_at = item['creation_time'].to_time
           last_change_time      = item['last_change_time'].to_time

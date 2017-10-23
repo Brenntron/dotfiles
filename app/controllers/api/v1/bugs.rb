@@ -100,6 +100,7 @@ module API
                 new_pcap_alert = {}
                 new_pcap_alert[:sid_colon_format] = p_alert.rule.sid_colon_format
                 new_pcap_alert[:message] = p_alert.rule.message
+                new_pcap_alert[:rule_id] = p_alert.rule.id
                 alert[:pcap_alerts] << new_pcap_alert
               end
               response[:data][:alerts] << alert
@@ -393,6 +394,7 @@ module API
         params do
           requires :id, type: Integer, desc: "The id of the bug to be updated."
           requires :bug, type: Hash do
+            optional :whiteboard, type: String, desc: "Whiteboard field from Bugzilla"
             optional :user_id, type: Integer, desc: "the user this bug is assigned to"
             optional :product, type: String, desc: "The name of the product the bug is being filed against."
             optional :component, type: String, desc: "The name of a component in the product above."
@@ -467,7 +469,7 @@ module API
           new_bug = xmlrpc.create(options.to_h) #the bugzilla session is where we authenticate
 
           new_bug_id = new_bug["id"]
-          bug = Bug.create(
+          bug = Bug.create!(
               :id => new_bug_id,
               :bugzilla_id => new_bug_id,
               :product => permitted_params[:bug][:product],
