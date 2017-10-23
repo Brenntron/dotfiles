@@ -115,12 +115,12 @@ class BugsController < ApplicationController
 
   def bug_params
     params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification, :searchID,
-                                :summary, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
+                                :summary, :whiteboard, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
                                                                                                               :metadata, :detection, :class_type, :reference], tag_ids: [])
   end
 
   def query_params
-    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state)
+    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state, :whiteboard)
         .reject { |key, value| (value.blank? || value.is_a?(Array) || key =='tag_name') }
   end
 

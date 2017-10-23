@@ -1,11 +1,25 @@
 <div class="row top-space">
   <div class="col-sm-12">
-    <h4 class="blue">Tags</h4>
+    <h4 class="blue">Whiteboard</h4>
   </div>
 
   <div class="col-sm-12 bug_summary">
     <div class="sandbox">
       <div id="alert_message" role="alert"></div>
+      <p>  <%= @bug.whiteboard.present? ? @bug.whiteboard : "MISSING" %></p>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="row top-space">
+  <div class="col-sm-12">
+    <h4 class="blue">Tags</h4>
+  </div>
+
+  <div class="col-sm-12 bug_summary">
+    <div class="sandbox">
       <select id="select-to-edit" bug_id="<%=@bug.id%>" name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">
         <% @bug.tags.each do |tag|%>
           <option value="<%=tag.name%>" selected="selected"></option>
