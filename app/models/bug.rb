@@ -20,6 +20,8 @@ class Bug < ApplicationRecord
   has_many :local_alerts, through: :attachments
   has_many :pcap_alerts, through: :attachments
 
+  validates :description, length: { maximum: 255 }
+
   accepts_nested_attributes_for :rules
 
   STATE_PENDING                         = 'PENDING'
@@ -29,6 +31,8 @@ class Bug < ApplicationRecord
 
   LIBERTY_CLEAR                         = "CLEAR"
   LIBERTY_EMBARGO                       = "EMBARGO"
+
+  COMPONENTS                            = ["ClamAV Signatures", "Malware", "Malware FP", "Snort Rules", "SO Rules"]
 
   scope :open_bugs, -> { where('state in (?)', STATES_OPEN) }
   scope :closed, -> { where('state in (?)', STATES_CLOSED) }
@@ -1166,10 +1170,9 @@ class Bug < ApplicationRecord
 
         progress_bar.update_attribute("progress", 90) unless progress_bar.blank?
 
-        #save the bug and clear all rule tests unless the import action is a status check
+        #save the bug unless the import action is a status check
         if import_type != "status"
           bug.save
-          bug.clear_rule_tested
         end
 
         progress_bar.update_attribute("progress", 100) unless progress_bar.blank?

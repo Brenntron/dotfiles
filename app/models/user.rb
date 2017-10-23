@@ -2,6 +2,7 @@ class User < ApplicationRecord
   acts_as_nested_set
 
   has_many :bugs
+  has_many :saved_searches
   has_and_belongs_to_many :roles, dependent: :destroy
   has_many :committed_bugs, class_name: 'Bug', foreign_key: :committer_id
 

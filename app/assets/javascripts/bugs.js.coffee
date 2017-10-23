@@ -48,18 +48,23 @@ window.bug_resolve =(this_tag) ->
         AC.Bugs.buildStatusReportModal(json.import_report)
 
 window.toggle_liberty =(this_tag, bug_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
-    method: 'PATCH'
-    headers: headers
-    data: { }
-    success: (response) ->
-      if "CLEAR" == response
-        this_tag.className = "embargo_off"
-      else
-        this_tag.className = "embargo_on"
-  , this)
+  confirmed = true
+  if "embargo_on" == this_tag.className
+    confirmed = confirm("Are you sure?")
+
+  if (true == confirmed)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/' + bug_id + '/toggle_liberty'
+      method: 'PATCH'
+      headers: headers
+      data: { }
+      success: (response) ->
+        if "CLEAR" == response
+          this_tag.className = "embargo_off"
+        else
+          this_tag.className = "embargo_on"
+    , this)
 
 
 window.add_bug_ref_show = ->
@@ -81,6 +86,18 @@ window.add_bug_exploit_hide = ->
   $('#add-bug-exploit-div').hide();
   $('#add-bug-exploit-show').show();
   $('#add-bug-exploit-hide').hide();
+
+window.ruleShow = (rule) ->
+  id = rule.attributes['data-rule'].value
+  #switch tabs
+  $('#bug_tab a[class= "rules-tab"]').tab 'show'
+  #uncheck checkboxes
+  $('.rule_check_box').prop 'checked', $('.rules_check_box').prop('checked')
+  #check appropriate checkbox
+  $('#rule_' + id).prop 'checked', true
+  $('.view').removeClass('hidden').addClass('active').show()
+  $('.rule_' + id).removeClass('hidden').addClass('active').show()
+  return
 
 
 $ ->
@@ -506,6 +523,19 @@ $ ->
 
 namespace 'AC.Bugs', (exports) ->
 
+  exports.deleteSavedSearch = (saved_search_id) ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/saved_searches/' + saved_search_id
+      method: 'DELETE'
+      headers: headers
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.status == "success")
+        $("#saved_search_#{saved_search_id}").remove()
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
   exports.buildStatusReportModal = (status_report) ->
 
     if status_report.changed_bug_columns.length > 0
@@ -614,7 +644,7 @@ namespace 'AC.Bugs', (exports) ->
       rows = []
 
       for pcap_alert in data.pcap_alerts
-         rows.push "<tr><td class='sid-col'><span class='blue'>#{pcap_alert.sid_colon_format}</span></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
+         rows.push "<tr><td class='sid-col'><a id='rule-link' class='blue' onclick='ruleShow(this);' data-rule='#{pcap_alert.rule_id}'><strong>#{pcap_alert.sid_colon_format}</strong></a></td><td class='content-col'><strong>#{pcap_alert.message}</strong></td></tr>"
       content += rows.join("")
       content = content + "</table>"
     else

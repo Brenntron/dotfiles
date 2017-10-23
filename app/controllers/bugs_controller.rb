@@ -9,8 +9,19 @@ class BugsController < ApplicationController
 
 
   def index
+
     session[:query] = session[:query].blank? ? current_user.default_bug_list : session[:query]
+    if params[:saved_search_id].present?
+      saved_search = SavedSearch.where({:id => params[:saved_search_id], :user_id => current_user.id}).first
+      if saved_search.present?
+        session[:query] = saved_search.session_query
+        session[:search] = JSON.parse(saved_search.session_search)
+      end
+    end
     @bug_query = Bug.query(current_user, session[:query], session[:search])
+    if params[:bug].present? && params[:bug][:saved_search].present?
+      SavedSearch.create({:user_id => current_user.id, :name => params[:bug][:saved_search], :session_query => session[:query], :session_search => session[:search].to_json})
+    end
 
     if @bug_query.any?
       @bugs = @bug_query.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
@@ -49,7 +60,7 @@ class BugsController < ApplicationController
 
     if @bug
       @show_resolve_button = ['NEW', 'OPEN', 'ASSIGNED', 'DUPLICATE', 'REOPENED'].include?(@bug.state)
-      @rules = @bug.rules.sort { |left, right| left <=> right }
+      @rules = @bug.rules.active.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.valid_reference_types
       @pcap_attachments = []
       @other_attachments = []
@@ -120,7 +131,7 @@ class BugsController < ApplicationController
   end
 
   def query_params
-    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state, :whiteboard)
+    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state, :whiteboard, :component)
         .reject { |key, value| (value.blank? || value.is_a?(Array) || key =='tag_name') }
   end
 
