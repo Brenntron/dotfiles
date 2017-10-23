@@ -127,7 +127,7 @@ class BugsController < ApplicationController
   def bug_params
     params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification, :searchID,
                                 :summary, :whiteboard, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
-                                                                                                              :metadata, :detection, :class_type, :reference], tag_ids: [])
+                                                                                                              :metadata, :detection, :class_type, :reference], tag_names: [])
   end
 
   def query_params

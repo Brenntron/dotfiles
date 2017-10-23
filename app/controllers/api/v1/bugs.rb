@@ -414,6 +414,7 @@ module API
             optional :new_committer_notes, type: String, desc: "Current working draft of committer notes"
             optional :editor_id, type: String, desc: "id of the new user to be assigned to the bug"
             optional :committer_id, type: String, desc: "id of the new committer to be assigned to the bug"
+            optional :tag_names, type: Array, desc: "array of tag names"
           end
 
         end
