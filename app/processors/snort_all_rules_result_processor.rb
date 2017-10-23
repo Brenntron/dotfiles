@@ -78,8 +78,9 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
         if attachments.any?
           Rails.logger.info ("Has alerts on attachments")
           attachments.each do |attachment_id, alerts|
-
             attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
+            bug = Bug.where(:id => attachment.bug_id).first
+            rules_in_test = []
             # give some kind of feedback about the alerts on the pcap test
             job.result << "Alerts on pcap: #{attachment.file_name}\n" if attachment.present?
             job.result << "===============================================\n"
@@ -91,7 +92,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
                 if rule.nil?
                   Rails.logger.info( "Rule was NIL")
-                  if alert['gid'].to_i == 1
+                  if alert['gid'].to_i == 1 || alert['gid'].to_i == 3
                     rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i),
                                     :gid => alert['gid'].to_i,
                                     :sid => alert['sid'].to_i,
@@ -108,7 +109,9 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                   rule.edit_status = Rule::EDIT_STATUS_NEW
                   rule.publish_status = Rule::PUBLISH_STATUS_SYNCHED
                 end
-
+                if alert['gid'].to_id == 1
+                  rules_in_test << rule
+                end
                 # The rule should have extracted if it was valid
                 if rule.valid?
                   Rails.logger.info( "Rule was valid")
@@ -140,6 +143,13 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
                 # Ignore these
               end
             end
+
+            if bug.present?
+              rules_in_test.each do |test_rule|
+                Bug.link_action(bug.id, test_rule.sid, test_rule.gid)
+              end
+            end
+
             job.result << "\n"
           end
 
