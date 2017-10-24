@@ -3,6 +3,7 @@ window.bug_resolve =(this_tag) ->
   user_id = $('#resolve-form').find("input[name='user_id']").val()
   committer_id = $('#resolve-form').find("input[name='committer_id']").val()
   summary = $('#resolve-form').find("input[name='summary']").val()
+  tag_names = $('#select-to-edit').val()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   bugzilla_id = $('.bugzilla_id').text()
   $('#resolve_bug_form_button').hide()
@@ -34,7 +35,8 @@ window.bug_resolve =(this_tag) ->
                   state_comment: "Resolved bug",
                   user_id: user_id,
                   committer_id: committer_id,
-                  summary: summary
+                  summary: summary,
+                  tag_names: tag_names
                 }
             }
           success: (response) ->
