@@ -589,7 +589,7 @@ namespace 'AC.Bugs', (exports) ->
       AC.Bugs.rebuildRulesTab()
       AC.Bugs.rebuildAttachmentsTab()
       AC.Bugs.rebuildAlertsTab()
-    , 8000
+    , 15000
 
 
   #Rebuild Alerts Tab

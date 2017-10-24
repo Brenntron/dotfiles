@@ -46,6 +46,69 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
   subscribes_to Rails.configuration.amq_snort_all_result
 
+  # Takes hash of alerts and populated rules and alerts tables
+  #
+  # Inserts records into alerts table.
+  # If rule is not in database, loads rule from subversion directory.
+  #
+  # @param [Hash] alerted_rules_hash mapping attachment ids to array of hashes to identify rules which alerted.
+  def populate_alerted_rules(alerted_rules_hash, job:)
+    if alerted_rules_hash.any?
+      rules_in_test = []
+
+      Rails.logger.info ("Has alerts on attachments")
+      alerted_rules_hash.each do |attachment_id, alerted_rules|
+
+        attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
+        bug = attachment.bug
+
+        # give some kind of feedback about the alerts on the pcap test
+        job.result << "Alerts on pcap: #{attachment.file_name}\n" if attachment.present?
+        job.result << "===============================================\n"
+        job.result << "NONE" if alerted_rules.count == 0
+
+        alerted_rules.each do |alerted|
+          begin
+            rule = Rule.find_or_load(alerted['sid'].to_i)
+
+            if rule
+              if [1, 3].include?(alerted['gid'].to_i)
+                rules_in_test << rule
+              end
+
+              Rails.logger.info( "Rule #{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} was found")
+              job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} #{alerted['message']}\n"
+              unless attachment.nil? || attachment.pcap_alerts.where(rule: rule).exists?
+                attachment.pcap_alerts.create(rule: rule)
+              end
+            else
+              job.failed = true
+              job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} not found\n"
+            end
+
+          rescue Exception => e
+            Rails.logger.info( "Rule failed #{e.message}")
+            job.result << "#{e.to_s} -> #{e.message} : for #{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']}\n"
+          rescue ActiveRecord::RecordNotUnique => e
+            # Ignore these
+          end
+        end
+
+        if bug.present?
+          rules_in_test.each do |test_rule|
+            bug.rules << test_rule unless bug.rules.include?(test_rule)
+          end
+        end
+
+        job.result << "\n"
+      end
+
+    else
+      Rails.logger.info " NO alerts"
+      job.result << "No alerts on any pcaps\n"
+      job.result << "======================\n"
+    end
+  end
 
   def on_message(message)
     Rails.logger.info( "============================")
@@ -75,89 +138,8 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
             job.result << "#{err}\n"
           end
         end
-        if attachments.any?
-          Rails.logger.info ("Has alerts on attachments")
-          attachments.each do |attachment_id, alerts|
-            attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
-            bug = Bug.where(:id => attachment.bug_id).first
-            rules_in_test = []
-            # give some kind of feedback about the alerts on the pcap test
-            job.result << "Alerts on pcap: #{attachment.file_name}\n" if attachment.present?
-            job.result << "===============================================\n"
-            job.result << "NONE" if alerts.count == 0
 
-            alerts.each do |alert|
-              begin
-                rule = Rule.by_sid(alert['sid'].to_i, alert['gid'].to_i).first
-
-                if rule.nil?
-                  Rails.logger.info( "Rule was NIL")
-                  if alert['gid'].to_i == 1 || alert['gid'].to_i == 3
-                    rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i),
-                                    :gid => alert['gid'].to_i,
-                                    :sid => alert['sid'].to_i,
-                                    :rev => alert['rev'].to_i,
-                                    :message => alert['message'])
-                  else
-                    rule = Rule.new(:gid => alert['gid'].to_i,
-                                    :sid => alert['sid'].to_i,
-                                    :rev => alert['rev'].to_i,
-                                    :message => alert['message'])
-                  end
-
-                  rule.state = Rule::UNCHANGED_STATE
-                  rule.edit_status = Rule::EDIT_STATUS_NEW
-                  rule.publish_status = Rule::PUBLISH_STATUS_SYNCHED
-                end
-                if alert['gid'].to_id == 1
-                  rules_in_test << rule
-                end
-                # The rule should have extracted if it was valid
-                if rule.valid?
-                  Rails.logger.info( "Rule was valid")
-                  job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
-                  rule.save(:validate => false)
-                  unless attachment.nil? || attachment.pcap_alerts.map {|p| p.rule}.include?(rule)
-                    attachment.pcap_alerts.create(rule: rule)
-                  end
-                else
-                  Rails.logger.info( "Rule was NOT valid")
-                  if rule.message.nil?
-                    job.failed = true
-                    rule.errors.each do |k, v|
-                      job.result << "#{rule.version} #{v}\n"
-                    end
-                  else
-                    job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
-                    rule.save(:validate => false)
-                    unless attachment.nil? || attachment.pcap_alerts.map {|p| p.rule}.include?(rule)
-                      attachment.pcap_alerts.create(rule: rule)
-                    end
-                  end
-                end
-
-              rescue Exception => e
-                Rails.logger.info( "Rule failed #{e.message}")
-                job.result << "#{e.to_s} -> #{e.message} : for sid #{alert['sid']}\n"
-              rescue ActiveRecord::RecordNotUnique => e
-                # Ignore these
-              end
-            end
-
-            if bug.present?
-              rules_in_test.each do |test_rule|
-                Bug.link_action(bug.id, test_rule.sid, test_rule.gid)
-              end
-            end
-
-            job.result << "\n"
-          end
-
-        else
-          Rails.logger.info " NO alerts"
-          job.result << "No alerts on any pcaps"
-          job.result << "======================\n"
-        end
+        populate_alerted_rules(attachments, job: job)
 
         job.completed = true
         job.save
