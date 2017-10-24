@@ -138,11 +138,6 @@ Feature: Bug
     Then I should see "[BP][NSS] fixed bug"
     And  I fill in selectized with "TELUS"
     Then the selectize field contains the text "TELUS"
-    And I should see "[TELUS] fixed bug"
-    Then I fill in selectized with "BP"
-    Then the selectize field contains the text "TELUSBP"
-    Then I should see "[TELUS][BP] fixed bug"
-    And I should not see "[BP][NSS] fixed bug"
 
 
   # ==== Deleting Bugs ===
