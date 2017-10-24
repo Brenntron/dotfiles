@@ -783,22 +783,6 @@ class Rule < ApplicationRecord
     true
   end
 
-  def self.find_current_rule(sid)
-    Dir.entries(Rails.configuration.snort_rule_path).each do |f|
-      # Don't include .stub.rules hidden rule files
-      if f =~ /^[^\.]/ && f =~ /\.rules$/
-        File.read("#{Rails.configuration.snort_rule_path}/#{f}").each_line do |line|
-          line = line.chomp.gsub(/^# /, '')
-
-          if line =~ /sid:\s*#{sid}\s*;/
-            return line
-          end
-        end
-      end
-    end
-    raise Exception.new("Unable to find sid #{sid}")
-  end
-
   def build_rule_params(rule_data)
     rule_params = {}
     rule_params['sid'] = sid

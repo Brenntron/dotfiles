@@ -88,57 +88,22 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
             alerts.each do |alert|
               begin
-                rule = Rule.by_sid(alert['sid'].to_i, alert['gid'].to_i).first
+                rule = Rule.find_or_load(alert['sid'].to_i)
 
-                if rule.nil?
-                  Rails.logger.info( "Rule was NIL")
-                  if alert['gid'].to_i == 1 || alert['gid'].to_i == 3
-                    rule = Rule.new(:rule_content => Rule.find_current_rule(alert['sid'].to_i),
-                                    :gid => alert['gid'].to_i,
-                                    :sid => alert['sid'].to_i,
-                                    :rev => alert['rev'].to_i,
-                                    :message => alert['message'])
-                  else
-                    rule = Rule.new(:gid => alert['gid'].to_i,
-                                    :sid => alert['sid'].to_i,
-                                    :rev => alert['rev'].to_i,
-                                    :message => alert['message'])
-                  end
-
-                  rule.state = Rule::UNCHANGED_STATE
-                  rule.edit_status = Rule::EDIT_STATUS_NEW
-                  rule.publish_status = Rule::PUBLISH_STATUS_SYNCHED
-                end
-                if alert['gid'].to_id == 1
-                  rules_in_test << rule
-                end
-                # The rule should have extracted if it was valid
-                if rule.valid?
-                  Rails.logger.info( "Rule was valid")
+                if rule
+                  Rails.logger.info( "Rule #{alert['gid']}:#{alert['sid']}:#{alert['rev']} was found")
                   job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
-                  rule.save(:validate => false)
                   unless attachment.nil? || attachment.pcap_alerts.map {|p| p.rule}.include?(rule)
                     attachment.pcap_alerts.create(rule: rule)
                   end
                 else
-                  Rails.logger.info( "Rule was NOT valid")
-                  if rule.message.nil?
-                    job.failed = true
-                    rule.errors.each do |k, v|
-                      job.result << "#{rule.version} #{v}\n"
-                    end
-                  else
-                    job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} #{alert['message']}\n"
-                    rule.save(:validate => false)
-                    unless attachment.nil? || attachment.pcap_alerts.map {|p| p.rule}.include?(rule)
-                      attachment.pcap_alerts.create(rule: rule)
-                    end
-                  end
+                  job.failed = true
+                  job.result << "#{alert['gid']}:#{alert['sid']}:#{alert['rev']} not found\n"
                 end
 
               rescue Exception => e
                 Rails.logger.info( "Rule failed #{e.message}")
-                job.result << "#{e.to_s} -> #{e.message} : for sid #{alert['sid']}\n"
+                job.result << "#{e.to_s} -> #{e.message} : for #{alert['gid']}:#{alert['sid']}:#{alert['rev']}\n"
               rescue ActiveRecord::RecordNotUnique => e
                 # Ignore these
               end
