@@ -54,10 +54,14 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
   # @param [Hash] alerted_rules_hash mapping attachment ids to array of hashes to identify rules which alerted.
   def populate_alerted_rules(alerted_rules_hash, job:)
     if alerted_rules_hash.any?
+      rules_in_test = []
+
       Rails.logger.info ("Has alerts on attachments")
       alerted_rules_hash.each do |attachment_id, alerted_rules|
 
         attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
+        bug = attachment.bug
+
         # give some kind of feedback about the alerts on the pcap test
         job.result << "Alerts on pcap: #{attachment.file_name}\n" if attachment.present?
         job.result << "===============================================\n"
@@ -68,6 +72,10 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
             rule = Rule.find_or_load(alerted['sid'].to_i)
 
             if rule
+              if [1, 3].include?(alerted['gid'].to_i)
+                rules_in_test << rule
+              end
+
               Rails.logger.info( "Rule #{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} was found")
               job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} #{alerted['message']}\n"
               unless attachment.nil? || attachment.pcap_alerts.where(rule: rule).exists?
@@ -85,6 +93,13 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
             # Ignore these
           end
         end
+
+        if bug.present?
+          rules_in_test.each do |test_rule|
+            bug.rules << test_rule unless bug.rules.include?(test_rule)
+          end
+        end
+
         job.result << "\n"
       end
 
