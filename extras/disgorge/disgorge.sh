@@ -34,6 +34,9 @@ fi
 if [ "" == "$RELBASE" ]; then
     RELBASE=~/disgorge
 fi
+if [ "" == "$RELTMP" ]; then
+    RELTMP=$RELBASE/releases/tmp
+fi
 if [ "" == "$RELPATH" ]; then
     RELPATH=$RELBASE/releases/$RELDIR
 fi
@@ -164,19 +167,21 @@ if [ "" != "$CURRDIR" ]; then
     rm $CURRDIR
     ln -s $RELPATH/$TAGDIR $CURRDIR
 
+    
     cd $CURRDIR
 
-    if [ ! -d tmp ]; then
-        mkdir tmp
+    if [ ! -d $RELTMP ]; then
+        mkdir $RELTMP
     fi
-    touch tmp/restart.txt
-
-    if [ ! -d tmp/cache ]; then
-        mkdir tmp/cache
+    if [ ! -d $RELTMP/cache ]; then
+        mkdir $RELTMP/cache
     fi
-    chmod 777 tmp/cache/
-    cd tmp/cache/
+    chmod 777 $RELTMP/cache/
+    cd $RELTMP/cache/
     umask 000
+    
+    ln -s $RELTMP $CURRDIR/tmp
+    touch $RELTMP/restart.txt
 fi
 
 if [ "" != "$VERSION" ]; then
