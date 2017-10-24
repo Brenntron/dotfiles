@@ -52,7 +52,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
   # If rule is not in database, loads rule from subversion directory.
   #
   # @param [Hash] alerted_rules_hash mapping attachment ids to array of hashes to identify rules which alerted.
-  def populated_alerted_rules(alerted_rules_hash, job:)
+  def populate_alerted_rules(alerted_rules_hash, job:)
     if alerted_rules_hash.any?
       Rails.logger.info ("Has alerts on attachments")
       alerted_rules_hash.each do |attachment_id, alerted_rules|
@@ -64,7 +64,6 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
         job.result << "NONE" if alerted_rules.count == 0
 
         alerted_rules.each do |alerted|
-          byebug
           begin
             rule = Rule.find_or_load(alerted['sid'].to_i)
 
@@ -125,7 +124,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
           end
         end
 
-        populated_alerted_rules(attachments, job: job)
+        populate_alerted_rules(attachments, job: job)
 
         job.completed = true
         job.save
