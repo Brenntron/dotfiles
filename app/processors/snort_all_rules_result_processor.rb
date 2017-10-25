@@ -68,7 +68,6 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
         job.result << "NONE" if alerted_rules.count == 0
 
         alerted_rules.each do |alerted|
-          byebug
           begin
             rule = Rule.find_or_load(alerted['sid'].to_i)
 
