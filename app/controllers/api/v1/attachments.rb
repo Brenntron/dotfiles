@@ -50,7 +50,7 @@ module API
             new_attach = Attachment.create(
                 :id => new_attachment_id,
                 :size => permitted_params[:attachment][:file_data][:tempfile].size,
-                :bugzilla_attachment_id => options[:ids],
+                :bugzilla_attachment_id => new_attachment_id,
                 :file_name => options[:file_name],
                 :summary => options[:file_name],
                 :content_type => options[:content_type],

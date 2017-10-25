@@ -654,7 +654,7 @@ class Bug < ApplicationRecord
                 new_attach_record.file_name = attachment['file_name']
                 new_attach_record.summary = attachment['summary']
                 new_attach_record.content_type = attachment['content_type']
-                new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
+                new_attach_record.direct_upload_url = "https://#{Rails.configuration.bugzilla_host}/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
                 new_attach_record.creator = attachment['attacher']
                 new_attach_record.is_private = attachment['is_private']
                 new_attach_record.is_obsolete = attachment['is_obsolete']
@@ -1027,7 +1027,7 @@ class Bug < ApplicationRecord
                 new_attach_record.file_name = attachment['file_name']
                 new_attach_record.summary = attachment['summary']
                 new_attach_record.content_type = attachment['content_type']
-                new_attach_record.direct_upload_url = "https://bugzilla.vrt.sourcefire.com/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
+                new_attach_record.direct_upload_url = "https://#{Rails.configuration.bugzilla_host}/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
                 new_attach_record.creator = attachment['attacher']
                 new_attach_record.is_private = attachment['is_private']
                 new_attach_record.is_obsolete = attachment['is_obsolete']

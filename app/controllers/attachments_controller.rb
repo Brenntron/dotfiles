@@ -20,7 +20,7 @@ class AttachmentsController < ApplicationController
       if new_attachment_id
         @attachment = Attachment.create(
             :size => params[:attachment][:file_data].tempfile.size,
-            :bugzilla_attachment_id => options[:ids],
+            :bugzilla_attachment_id => new_attachment_id,
             :file_name => options[:file_name],
             :summary => options[:summary],
             :content_type => options[:type],
