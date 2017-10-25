@@ -34,6 +34,9 @@ fi
 if [ "" == "$RELBASE" ]; then
     RELBASE=~/disgorge
 fi
+if [ "" == "$RELTMP" ]; then
+    RELTMP=$RELBASE/releases/tmp
+fi
 if [ "" == "$RELPATH" ]; then
     RELPATH=$RELBASE/releases/$RELDIR
 fi
@@ -158,25 +161,29 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
 
     svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ $RELPATH/$TAGDIR/extras/rulesdocs
 fi
+if [ "" != "$RELTMP" ]; then
+    echo "making and linking tmp directory"
+    echo $RELTMP
+    if [ ! -d $RELTMP ]; then
+        mkdir $RELTMP
+    fi
+    if [ ! -d $RELTMP/cache ]; then
+        mkdir $RELTMP/cache
+    fi
+    chmod 777 $RELTMP/cache/
+    cd $RELTMP/cache/
+    umask 000
+
+    ln -s $RELTMP $RELPATH/tmp
+
+fi
 
 if [ "" != "$CURRDIR" ]; then
     echo "* simlink $CURRDIR to $RELPATH/$TAGDIR"
     rm $CURRDIR
     ln -s $RELPATH/$TAGDIR $CURRDIR
 
-    cd $CURRDIR
-
-    if [ ! -d tmp ]; then
-        mkdir tmp
-    fi
-    touch tmp/restart.txt
-
-    if [ ! -d tmp/cache ]; then
-        mkdir tmp/cache
-    fi
-    chmod 777 tmp/cache/
-    cd tmp/cache/
-    umask 000
+    touch $RELTMP/restart.txt
 fi
 
 if [ "" != "$VERSION" ]; then
