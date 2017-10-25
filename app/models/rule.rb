@@ -15,24 +15,24 @@ require 'tempfile'
 # filename [String] the (relative or absolute) filename where the rule came from or is stored
 # linenumber [Integer] the line in the rule file where the rule was read from
 #
-#                           |sid|  state   |edit_status|publish_status|parsed|
+#                           |sid|  state  |edit_status|publish_status|parsed|
 # All Rules
 # * synched with CVS
-#   * valid                 |int|UNCHANGED |  SYNCHED  |    SYNCHED   | true | valid rule up to date with CVS
+#   * valid                 |int|UNCHANGED|  SYNCHED  |    SYNCHED   | true | valid rule up to date with CVS
 #   * failed visruleparse   .............................. rules which fail visruleparse are not loaded
 # * draft
 #   * new
-#     * valid               |nil|   NEW    |    NEW    | CURRENT_EDIT | true | new rule created from UI or web services
-#     * failed parse        |nil|INCOMPLETE|    NEW    | CURRENT_EDIT |false | new rule which failed visruleparse
-#     * committing          |nil|   NEW    |    NEW    |  PUBLISHING  | true | the rule is in the process of being commited.
+#     * valid               |nil|   NEW   |    NEW    | CURRENT_EDIT | true | new rule created from UI or web services
+#     * failed parse        |nil| FAILED  |    NEW    | CURRENT_EDIT |false | new rule which failed visruleparse
+#     * committing          |nil|   NEW   |    NEW    |  PUBLISHING  | true | the rule is in the process of being commited.
 #   * edit
 #     * current edit
-#       * valid             |int| UPDATED  |   EDIT    | CURRENT_EDIT | true | CVS rule edited in UI or web service
-#       * failed parse      |int|INCOMPLETE|   EDIT    | CURRENT_EDIT |false | edited rule which failed visruleparse
-#       * committing        |int| UPDATED  |   EDIT    |  PUBLISHING  | true | the rule is in the process of being commited.
+#       * valid             |int| UPDATED |   EDIT    | CURRENT_EDIT | true | CVS rule edited in UI or web service
+#       * failed parse      |int| FAILED  |   EDIT    | CURRENT_EDIT |false | edited rule which failed visruleparse
+#       * committing        |int| UPDATED |   EDIT    |  PUBLISHING  | true | the rule is in the process of being commited.
 #     * out of date
-#       * valid             |int| UPDATED  |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
-#       * failed parse      |int|INCOMPLETE|   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
+#       * valid             |int|  STALE  |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
+#       * failed parse      |int|  STALE  |   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
 #
 class Rule < ApplicationRecord
   has_paper_trail
@@ -85,6 +85,10 @@ class Rule < ApplicationRecord
   scope :with_pub_content, -> { where(publish_status: PUBLISH_STATUS_PUBLISHING) }
   scope :with_pub_doc, -> { where(publish_status: PUBLISH_STATUS_PUBDOC) }
   scope :with_pub_any, -> { where(publish_status: [PUBLISH_STATUS_PUBLISHING, PUBLISH_STATUS_PUBDOC]) }
+
+  unless Rails.env.production?
+    validates_with NewRuleValidator, EditedRuleValidator, SynchedRuleValidator, SnortRuleValidator
+  end
 
   def svn_success?
     SVN_SUCCESS_COMMIT_HOOK == self.svn_result_code
