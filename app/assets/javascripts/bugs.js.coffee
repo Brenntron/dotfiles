@@ -684,14 +684,16 @@ namespace 'AC.Bugs', (exports) ->
           $('[data-toggle="tooltip"]').tooltip();
         else
           $("#tested_rule_#{rule.id}").html("<span class='glyphicon glyphicon-minus'></span>")
-        for alert in rule.alerts
-          $("#rule_#{rule.id}_att_#{alert.pcap_id}").removeClass();
-          if 'alerted' == alert.alert_status
-            $("#rule_#{rule.id}_att_#{alert.pcap_id}").html("Alerted")
-            $("#rule_#{rule.id}_att_#{alert.pcap_id}").addClass('alerted')
+        for att in rule.attachments
+          if att.rule_id_nil == true
+            $("#rule_#{rule.id}_att_#{att.att_id}").html("No Alert")
+            $("#rule_#{rule.id}_att_#{att.att_id}").removeClass();
+            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('no_alert')
+
           else
-            $("#rule_#{rule.id}_att_#{alert.pcap_id}").html("No Alert")
-            $("#rule_#{rule.id}_att_#{alert.pcap_id}").addClass('no_alert')
+            $("#rule_#{rule.id}_att_#{att.att_id}").html("Alerted")
+            $("#rule_#{rule.id}_att_#{att.att_id}").removeClass();
+            $("#rule_#{rule.id}_att_#{att.att_id}").addClass('alerted')
 
   #Rebuild Attachments Tab
   exports.rebuildAttachmentsTab = () ->
