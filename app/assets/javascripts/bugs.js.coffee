@@ -585,7 +585,7 @@ namespace 'AC.Bugs', (exports) ->
     AC.Bugs.rebuildAttachmentsTab()
     AC.Bugs.rebuildAlertsTab()
     setInterval ->
-      AC.Bugs.rebuildJobQueue()
+      #AC.Bugs.rebuildJobQueue()
       AC.Bugs.rebuildRulesTab()
       AC.Bugs.rebuildAttachmentsTab()
       #AC.Bugs.rebuildAlertsTab()
