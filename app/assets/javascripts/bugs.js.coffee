@@ -753,7 +753,8 @@ namespace 'AC.Bugs', (exports) ->
   exports.buildRuleList = (data) ->
     return data['rule_list']
   exports.buildDetailsColumn = (data) ->
-    return "<td>#{AC.Bugs.buildRuleList(data)}<div><pre>#{data['result']}</pre></div></td>"
+    safe_result = $('<div/>').text(data['result']).html()
+    return "<td>#{AC.Bugs.buildRuleList(data)}<div><pre>#{safe_result}</pre></div></td>"
   exports.buildUserColumn = (data) ->
     return "<td class='user-col'>#{data['cvs_username']}</td>"
   exports.buildCreatedColumn = (data) ->
