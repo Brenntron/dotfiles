@@ -60,7 +60,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
       alerted_rules_hash.each do |attachment_id, alerted_rules|
 
         attachment = Attachment.find_by_bugzilla_attachment_id(attachment_id)
-        bug = attachment.bug
+        bug = attachment.bug  if attachment.present?
 
         # give some kind of feedback about the alerts on the pcap test
         job.result << "Alerts on pcap: #{attachment.file_name}\n" if attachment.present?
@@ -144,8 +144,15 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
         job.completed = true
         job.save
-        Rails.logger.info "Job was saved."
+        Rails.logger.info "Job was completed and saved"
       rescue Exception => e
+        if job
+          job.completed = true
+          job.result = e.message
+          job.failed = true
+          job.save
+          Rails.logger.info "Job has failed and saved."
+        end
         Rails.logger.info "there was an exception #{e.message}"
         puts e.to_s
         puts e.backtrace.join("\n")
