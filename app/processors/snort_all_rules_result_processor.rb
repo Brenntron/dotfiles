@@ -68,22 +68,24 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
         job.result << "NONE" if alerted_rules.count == 0
 
         alerted_rules.each do |alerted|
+          byebug
           begin
             rule = Rule.find_or_load(alerted['sid'].to_i)
 
-            if rule
-              if [1, 3].include?(alerted['gid'].to_i)
+            case
+              when !([1, 3].include?(alerted['gid'].to_i))
+                # do nothing
+              when rule
                 rules_in_test << rule
-              end
 
-              Rails.logger.info( "Rule #{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} was found")
-              job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} #{alerted['message']}\n"
-              unless attachment.nil? || attachment.pcap_alerts.where(rule: rule).exists?
-                attachment.pcap_alerts.create(rule: rule)
-              end
-            else
-              job.failed = true
-              job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} not found\n"
+                Rails.logger.info( "Rule #{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} was found")
+                job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} #{alerted['message']}\n"
+                unless attachment.nil? || attachment.pcap_alerts.where(rule: rule).exists?
+                  attachment.pcap_alerts.create(rule: rule)
+                end
+              else
+                job.failed = true
+                job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} not found\n"
             end
 
           rescue Exception => e
