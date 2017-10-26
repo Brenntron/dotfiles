@@ -36,9 +36,17 @@ class BugsController < ApplicationController
     if params[:bug].present?
       @bug_search_id = params[:bug][:id]
       if @bug_search_id.present?
-        @bugs =
-            Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").permit_class_level(current_user.class_level)
-                .paginate(:page => session[:page], :per_page => 32)
+        @bug_search_max = params[:bug][:bugzilla_max]
+        if @bug_search_max.present?
+          @bugs =
+              Bug.where("id BETWEEN ? AND ?", params[:bug][:id], params[:bug][:bugzilla_max]).permit_class_level(current_user.class_level)
+                  .paginate(:page => session[:page], :per_page => 32)
+          @bug_search_id = '' # otherwise the form will show the lower end of the range
+        else
+          @bugs =
+              Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").permit_class_level(current_user.class_level)
+                  .paginate(:page => session[:page], :per_page => 32)
+        end
       end
     end
   end
