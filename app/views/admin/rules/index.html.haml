@@ -1,0 +1,26 @@
+#hamburger-space
+
+.jumbotron
+  %h2 Rules
+
+%table.table.table-striped.table-responsive{data: {toggle: 'table', search: 'true', pagination: 'true', 'page-list': "[25, 50, 100, ALL]", 'page-size': '25' }}
+  %thead
+    %tr
+      %th{id: "sid", data: {field: "sid", sortable: "true"}} SID
+      %th{id: "message", data: {field: "message", sortable: "true"}} Message
+      %th{id: "state", data: {field: "state", sortable: "true"}} State
+      %th{id: "edit_status", data: {field: "edit_status", sortable: "true"}} Edit Status
+      %th{id: "publish_status", data: {field: "publish_status", sortable: "true"}} Publish Status
+      %th
+  %tbody
+    -@rules.each do |rule|
+      %tr
+        %td= rule.sid
+        %td= rule.message
+        %td= rule.state
+        %td= rule.edit_status
+        %td= rule.publish_status
+        %td
+          = link_to edit_admin_rule_path(rule.id), class: "btn btn-default" do
+            %i.glyphicon.glyphicon-pencil
+

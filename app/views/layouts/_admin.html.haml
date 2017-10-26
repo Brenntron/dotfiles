@@ -1,0 +1,28 @@
+.container-fluid.users-page
+  .col-xs-3.col-sm-3.col-md-2.col-lg-2.item-ids-column
+    %table.right.table.index-table
+      %thead
+        %tr
+          %td
+            %strong Admin's Only
+        %tr
+          %td
+            =link_to 'Schema Migrations', admin_migrations_path
+        %tr
+          %td
+            =link_to 'Scheduled Tasks', admin_scheduled_tasks_path
+        %tr
+          %td
+            =link_to 'Rule Commit Diagnostics', diagnostics_admin_rules_sync_index_path
+        %tr
+          %td
+            =link_to 'Rules', admin_rules_path
+      %tbody
+    .col-pagination
+  .col-xs-9.col-sm-9.col-md-10.col-lg-10.item-details-column
+    .row.header
+      / action links
+      .col-xs-12.actions-bar
+
+    = render partial: "shared/flash_messages", flash: flash
+    = yield

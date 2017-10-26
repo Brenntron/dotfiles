@@ -1,15 +1,6 @@
 #hamburger-space
 
-.admin-title
-  %h1 Admin Index
-
 #version-div
   %h3 Version
   %iframe{src: "/version", style: "display: block; height: 40px; width: 100%;"}
 
-#pages-div
-  %h3 Pages
-  %ul
-    %li= link_to 'Schema Migrations', admin_migrations_path
-    %li= link_to 'Scheduled Tasks', admin_scheduled_tasks_path
-    %li= link_to 'Rule Commit Diagnostics', rule_sync_diags_path

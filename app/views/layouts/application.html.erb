@@ -22,6 +22,9 @@
           <li><%= link_to 'BUG LIST', bugs_path %></li>
           <li><%= link_to 'USERS', users_path %></li>
           <li class="doc-link"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
+          <% if current_user.has_role?('admin') %>
+            <li><%= link_to 'ADMIN', admin_root_path %></li>
+          <% end %>
         </ul>
       </nav>
     </div>
@@ -52,6 +55,8 @@
               <%= render 'layouts/users_layout'%>
             <% elsif controller_name == "relationships" %>
               <%= render 'layouts/relationships_layout' %>
+            <% elsif controller_path.split('/').first == 'admin' %>
+              <%= render 'layouts/admin' %>
             <% end %>
 
         </div>
