@@ -9,6 +9,9 @@ Rails.application.routes.draw do
       collection do
         get :validations
       end
+      member do
+        get :related
+      end
     end
     resources :scheduled_tasks do
       collection do

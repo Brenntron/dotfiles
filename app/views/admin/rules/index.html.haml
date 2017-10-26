@@ -34,4 +34,6 @@
         %td.col-xs-1
           = link_to edit_admin_rule_path(rule.id), class: "btn btn-default" do
             %i.glyphicon.glyphicon-pencil
+          = link_to related_admin_rule_path(rule.id), class: "btn btn-default" do
+            %i.glyphicon.glyphicon-link
 
