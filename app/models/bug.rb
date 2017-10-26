@@ -119,6 +119,10 @@ class Bug < ApplicationRecord
     notes.published.exists?
   end
 
+  def current_committer_note
+    self.notes.where(note_type: "committer").last
+  end
+
   def rule_relevant_references
     self.references.select {|ref| ReferenceType.valid_reference_type_ids.include?(ref.reference_type_id) }
   end
@@ -841,6 +845,13 @@ class Bug < ApplicationRecord
       update_params = {
           :committer_notes => permitted_params[:bug][:new_committer_notes]
       }
+    end
+
+    #add a comment to the existing committer note. from issue 981
+    if permitted_params[:bug][:state_comment]
+      c_note = bug.current_committer_note
+      c_note.comment << "\n\n#{permitted_params[:bug][:state_comment]}"
+      c_note.save
     end
 
     # update the tags
