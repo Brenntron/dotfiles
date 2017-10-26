@@ -47,13 +47,12 @@ module RuleSyntax
                 raw_hash[key] << data
               else
                 raw_hash[:detection] ||= []
-                raw_hash[:detection] << option.downcase
+                raw_hash[:detection] << option
             end
           else
             raw_hash[:detection] ||= []
-            raw_hash[:detection] << option.downcase
+            raw_hash[:detection] << option
           end
-
           raw_hash
         end
       end
