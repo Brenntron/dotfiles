@@ -10,6 +10,16 @@ module RuleSyntax
       @rule_content = rule_content.chomp
     end
 
+    def match?(parser)
+      return false if self.msg != parser.msg
+      return false if self.classtype != parser.classtype
+      return false if self.connection != parser.connection
+      return false if self.flow != parser.flow
+      return false if self.detection != parser.detection
+      return false if self.metadata != parser.metadata
+      true
+    end
+
     def parse
       if /\A(?<connection>[^\(]*)\((?<options>.*)\)\s*\z/ =~ rule_content
         @connection = connection.strip

@@ -68,8 +68,13 @@ class RuleFile
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_add_line_rule(bug, rule_content)
     parser = RuleSyntax::RuleParser.new(rule_content)
-    msg = parser.attributes[:msg]
-    found_rule = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content.where(message: msg).first
+
+    new_publishing_rules = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
+
+    found_rule = new_publishing_rules.to_a.find do |rule|
+      parsed_rule = RuleSyntax::RuleParser.new(rule.rule_content)
+      parser.match?(parsed_rule)
+    end
 
     if found_rule
       found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
