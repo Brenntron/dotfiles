@@ -1,3 +1,6 @@
+<% content_for(:title) do %>Bug <%= @bug.bugzilla_id %> - Analyst Console<% end %>
+
+
     <div class="row <%= 'item-info' unless 'show' == action_name %> bugs-split-color">
       <div class="row subheading">
         <div class="col-xs-12">
