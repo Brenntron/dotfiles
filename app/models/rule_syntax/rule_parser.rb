@@ -36,6 +36,7 @@ module RuleSyntax
         @raw_hash ||= options.split(/\s*;\s*/).inject({}) do |raw_hash, option|
           if /\A\s*(?<type>\w+)\s*:\s?(?<data>.*)\z/ =~ option
             key = type.downcase.to_sym
+            raw_hash[:detection] ||= []
             case
               when %i(gid sid rev).include?(key)
                 raw_hash[key] = data.to_i
@@ -46,11 +47,9 @@ module RuleSyntax
                 raw_hash[key] ||= []
                 raw_hash[key] << data
               else
-                raw_hash[:detection] ||= []
                 raw_hash[:detection] << option
             end
           else
-            raw_hash[:detection] ||= []
             raw_hash[:detection] << option
           end
           raw_hash
@@ -60,11 +59,15 @@ module RuleSyntax
       @raw_hash
     end
 
+    def detection_array
+      @detection_array ||= raw_hash[:detection] || []
+    end
+
     def attributes
       @attributes ||= raw_hash.clone.tap do |attributes|
         attributes[:connection] = @connection
         attributes[:gid] ||= 1
-        attributes[:detection] = raw_hash[:detection].map{|det| "#{det};"}.join(" ")
+        attributes[:detection] = detection_array.map{|det| "#{det};"}.join(" ")
 
         msg = attributes[:msg]
         if msg
