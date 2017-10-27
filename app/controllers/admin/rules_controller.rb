@@ -1,7 +1,7 @@
 class Admin::RulesController < Admin::HomeController
 
   def index
-    @rules = Rule.all
+    @rules = Rule.left_joins(:bugs).group(:id).select("count(*) as bug_count, rules.*")
   end
 
   def edit
