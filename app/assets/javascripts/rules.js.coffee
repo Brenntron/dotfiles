@@ -397,6 +397,7 @@ $ ->
     $('#rule_' + id).prop('checked', true)
     $('.view').removeClass('hidden').addClass('active').show()
     $('.rule_' + id).removeClass('hidden').addClass('active').show()
+    $('.row.overview.active').addClass('hidden').removeClass 'active'
     return
 
   $('.diff').find('br').remove()
