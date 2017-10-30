@@ -5,13 +5,17 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
+    resources :rules, only: [:index, :edit, :update]
     resources :scheduled_tasks do
       collection do
         post :run_job
       end
     end
-
-
+    resources :rules_sync, only: [:index] do
+      collection do
+        get :diagnostics
+      end
+    end
   end
 
   resources :events do
@@ -64,10 +68,6 @@ Rails.application.routes.draw do
     end
     resources :references
     get :bug_metrics, defaults: { format: :json }
-  end
-
-  namespace :rule_sync do
-    resources :diags, only: [:index]
   end
 
 
