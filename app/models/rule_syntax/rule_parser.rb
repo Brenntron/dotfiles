@@ -10,6 +10,28 @@ module RuleSyntax
       @rule_content = rule_content.chomp
     end
 
+    def metadata_match?(parser)
+      metadata_array = attributes[:metadata].split(/ \s*,\s*/)
+      other_metadata_array = parser.attributes[:metadata].split(/ \s*,\s*/)
+
+      return false unless (metadata_array - other_metadata_array).empty?
+      return false unless (other_metadata_array - metadata_array).empty?
+      true
+    end
+
+    def match?(parser)
+      connection = attributes[:connection].sub(/\A\s*#\s*/, '')
+      other_connection = parser.attributes[:connection].sub(/\A\s*#\s*/, '')
+      return false unless connection == other_connection
+
+      return false unless attributes[:message] == parser.attributes[:message]
+      return false unless attributes[:detection] == parser.attributes[:detection]
+      return false unless attributes[:classtype] == parser.attributes[:classtype]
+      return false unless attributes[:flow] == parser.attributes[:flow]
+      return false unless metadata_match?(parser)
+      true
+    end
+
     def parse
       if /\A(?<connection>[^\(]*)\((?<options>.*)\)\s*\z/ =~ rule_content
         @connection = connection.strip

@@ -7,10 +7,10 @@ module API
         desc "test the websocket"
         get 'websocket' do
           bug = Bug.first
-          record = { resource: 'bug',
-                     action: 'update',
-                     id: bug.id,
-                     obj: bug }
+          record = {resource: 'bug',
+                    action: 'update',
+                    id: bug.id,
+                    obj: bug}
           PublishWebsocket.push_changes(record)
         end
 
@@ -135,7 +135,7 @@ module API
               rule_packet[:id] = rule.id
               rule_packet[:alert_count] = @bug.local_alerts.by_rule(rule).count
               rule_packet[:tested] = rule.tested_on_bug?(@bug)
-              rule_packet[:svn_output] = rule.tested_on_bug?(@bug)? rule.svn_result_output : ""
+              rule_packet[:svn_output] = rule.tested_on_bug?(@bug) ? rule.svn_result_output : ""
               rule_packet[:attachments] = []
               @bug.attachment_local_alerts(rule).each do |att|
                 rule_att = {}
@@ -178,7 +178,7 @@ module API
               task.reload
               response_task = {}
               response_task['id'] = task.id
-              response_task['rule_list'] = task.task_type == Task::TASK_TYPE_LOCAL_TEST ? task.rules.map {|rule| rule.new_rule? ? 'new-rule' : "#{rule.gid}:#{rule.sid}:#{rule.rev}" }.join('; ') : ""
+              response_task['rule_list'] = task.task_type == Task::TASK_TYPE_LOCAL_TEST ? task.rules.map { |rule| rule.new_rule? ? 'new-rule' : "#{rule.gid}:#{rule.sid}:#{rule.rev}" }.join('; ') : ""
               response_task['completed'] = task.completed
               response_task['failed'] = task.failed
               response_task['cvs_username'] = User.find(task.user_id).cvs_username
@@ -235,7 +235,7 @@ module API
             xmlrpc = Bugzilla::Bug.new(bugzilla_session)
             last_updated = Bug.get_last_import_all()
             new_bugs = xmlrpc.search(last_change_time: last_updated) #then we need to go over all new bugs and import them
-            Bug.bugzilla_import(current_user, xmlrpc,xmlrpc_token,new_bugs, import_type)
+            Bug.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs, import_type)
             "true"
           else
             "false"
@@ -254,10 +254,10 @@ module API
               xmlrpc = Bugzilla::Bug.new(bugzilla_session)
               new_bug = xmlrpc.get(permitted_params[:id])
               if permitted_params[:element] == 'attachments'
-                Bug.synch_attachments(xmlrpc,new_bug, current_user).to_s
+                Bug.synch_attachments(xmlrpc, new_bug, current_user).to_s
               else
                 # history
-                Bug.synch_history(xmlrpc,new_bug).to_s
+                Bug.synch_history(xmlrpc, new_bug).to_s
               end
             end
           else
@@ -277,7 +277,7 @@ module API
 
             if xmlrpc_token
               Rails.logger.debug("bugzilla: Importing bug: #{params[:id]}")
-              progress_bar = Event.create(user:current_user.display_name,action:"import_bug:#{params[:id]}",description:"#{request.headers["Token"]}",progress:10)
+              progress_bar = Event.create(user: current_user.display_name, action: "import_bug:#{params[:id]}", description: "#{request.headers["Token"]}", progress: 10)
 
               begin
                 ActiveRecord::Base.transaction do
@@ -318,7 +318,7 @@ module API
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
         end
         delete '/rules/:link' do
-          Bug.where(id:permitted_params[:link].split(':')[0]).first.rules.destroy(permitted_params[:link].split(':')[1]).first
+          Bug.where(id: permitted_params[:link].split(':')[0]).first.rules.destroy(permitted_params[:link].split(':')[1]).first
         end
 
         desc "unlink a rule with this bug"
@@ -340,15 +340,15 @@ module API
         end
         post '/search/' do
           terms = {
-              :bugzilla_id  => /-/.match(permitted_params[:id_range]) ? nil : permitted_params[:id_range],
-              :state        => permitted_params[:state] ? permitted_params[:state] : nil,
-              :user_id      => permitted_params[:user_id] ? permitted_params[:user_id] : nil,
+              :bugzilla_id => /-/.match(permitted_params[:id_range]) ? nil : permitted_params[:id_range],
+              :state => permitted_params[:state] ? permitted_params[:state] : nil,
+              :user_id => permitted_params[:user_id] ? permitted_params[:user_id] : nil,
               :committer_id => permitted_params[:committer] ? permitted_params[:committer] : nil
-          }.reject{|k,v| v.blank?}
+          }.reject { |k, v| v.blank? }
           range = {
-              :gte      => /-/.match(permitted_params[:id_range]) ? /(\d+)-/.match(permitted_params[:id_range])[1] : nil,
-              :lte   => /-/.match(permitted_params[:id_range]) ? /-(\d+)/.match(permitted_params[:id_range])[1] : nil,
-          }.reject{|k,v| v.blank?}
+              :gte => /-/.match(permitted_params[:id_range]) ? /(\d+)-/.match(permitted_params[:id_range])[1] : nil,
+              :lte => /-/.match(permitted_params[:id_range]) ? /-(\d+)/.match(permitted_params[:id_range])[1] : nil,
+          }.reject { |k, v| v.blank? }
 
           # search bugs and return the bugs current user is allowed to see
           hits = []
@@ -494,7 +494,7 @@ module API
 
           # pull in the first comment
           new_bug_history = xmlrpc.get(new_bug_id)
-          Bug.synch_history(xmlrpc,new_bug_history).to_s
+          Bug.synch_history(xmlrpc, new_bug_history).to_s
 
           tags = params[:bug][:tag_names]
           if tags
@@ -517,7 +517,7 @@ module API
             authorize! :destroy, Bug
             Bug.destroy(permitted_params[:id])
           rescue CanCan::AccessDenied => e
-            error!({error: "Access denied.",message: e.message}, 200)
+            error!({error: "Access denied.", message: e.message}, 200)
           end
         end
 
@@ -600,14 +600,14 @@ module API
                   Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                   current_user.bugs << bug
                   binding.pry
-                  Bug.update(permitted_params[:id], state:"ASSIGNED") unless ['PENDING','FIXED','WONTFIX','INVALID','LATER'].include? bug.state
+                  Bug.update(permitted_params[:id], state: "ASSIGNED") unless ['PENDING', 'FIXED', 'WONTFIX', 'INVALID', 'LATER'].include? bug.state
                 end
               end
               return true
             rescue XMLRPC::FaultException => e
-               throw :error,
-                     status: 400,
-                     message: "#{e.message}"
+              throw :error,
+                    status: 400,
+                    message: "#{e.message}"
             end
           end
           throw :error,
@@ -632,10 +632,10 @@ module API
                 Bug.update(permitted_params[:id], committer_id: vrt_qa.id)
               else
                 vrt_incoming = User.where(email: "vrt-incoming@sourcefire.com").first
-                options = {:ids => permitted_params[:id], :reset_assigned_to => true,:assigned_to => "vrt-incoming@sourcefire.com"}
+                options = {:ids => permitted_params[:id], :reset_assigned_to => true, :assigned_to => "vrt-incoming@sourcefire.com"}
                 Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                 current_user.bugs.delete(bug)
-                Bug.update(permitted_params[:id], state:"NEW")
+                Bug.update(permitted_params[:id], state: "NEW")
                 vrt_incoming.bugs << bug
               end
               return true
