@@ -22,6 +22,6 @@ class Admin::RulesController < Admin::HomeController
   private
 
   def rule_params
-    params.require(:rule).permit(:state, :edit_status, :publish_status)
+    params.require(:rule).permit(:state, :edit_status, :publish_status, :sid)
   end
 end
