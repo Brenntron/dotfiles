@@ -11,8 +11,8 @@ module RuleSyntax
     end
 
     def metadata_match?(parser)
-      metadata_array = attributes[:metadata].split(/ \s*,\s*/)
-      other_metadata_array = parser.attributes[:metadata].split(/ \s*,\s*/)
+      metadata_array = attributes[:metadata].split(/\s*,\s*/)
+      other_metadata_array = parser.attributes[:metadata].split(/\s*,\s*/)
 
       return false unless (metadata_array - other_metadata_array).empty?
       return false unless (other_metadata_array - metadata_array).empty?
