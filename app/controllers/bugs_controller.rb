@@ -73,7 +73,7 @@ class BugsController < ApplicationController
       @pcap_attachments = []
       @other_attachments = []
       @bug.attachments.where(is_obsolete: false).map do |att|
-        if att.file_name.include? '.pcap'
+        if File.extname(att.file_name.downcase) == ".pcap"
           @pcap_attachments << att
         else
           @other_attachments << att
