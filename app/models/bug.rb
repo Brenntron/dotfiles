@@ -864,8 +864,17 @@ class Bug < ApplicationRecord
     #add a comment to the existing committer note. from issue 981
     if permitted_params[:bug][:state_comment]
       c_note = bug.current_committer_note
-      c_note.comment << "\n\n#{permitted_params[:bug][:state_comment]}"
-      c_note.save
+      if c_note
+        c_note.comment << "\n\n#{permitted_params[:bug][:state_comment]}"
+        c_note.save
+      else
+        bug.notes << Note.create(
+            comment: permitted_params[:bug][:state_comment],
+            author: "#{bug.committer&.email || bug.user&.email}",
+            note_type: "committer",
+            bug_id: bug.bugzilla_id
+        )
+      end
     end
 
     # update the tags
