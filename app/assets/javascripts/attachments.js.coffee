@@ -183,6 +183,7 @@ $ ->
       )
     else
       alert("please select something")
+      $(this).attr('disabled', false)
 
 
 
