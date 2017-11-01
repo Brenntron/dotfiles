@@ -9,10 +9,8 @@
         <strong class="hidden-xs" id="test_attachments"> import rules </strong>
       </button>
       <% if can? :create, Attachment %>
-        <button class="select-sm btn btn-default right create_attachment">
-          <span id="showAddAttachsToggle"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs"> attachment</strong></span>
-          <span id="hideAddAttachsToggle" class="text-muted" style="display:none"><i class="glyphicon glyphicon-remove"></i><strong class="hidden-xs">cancel</strong></span>
-        </button>
+        <button id="showAddAttachsToggle" class="select-sm btn btn-default right create_attachment"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs"> attachment</strong></button>
+        <button id="hideAddAttachsToggle" class="select-sm btn btn-default right create_attachment" style="display:none"><i class="glyphicon glyphicon-remove text-muted"></i><strong class="hidden-xs text-muted">cancel</strong></button>
       <% end %>
       <button id="synch_attachments" class="select-sm btn btn-default right synch"> <i class="glyphicon glyphicon-refresh"></i> <strong class="hidden-xs" > synch &nbsp;&nbsp;</strong> </button>
       <button id="syncing_attachments" class="select-sm btn btn-default right synch disabled hidden"> <i class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></i> <strong class="hidden-xs" > synch &nbsp;&nbsp;</strong> </button>
