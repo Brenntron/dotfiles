@@ -145,7 +145,6 @@ $ ->
           location.reload()
 
   $(document).on 'click', '.test_attachments',  ->
-    $(this).attr('disabled', 'disabled')
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     bug_id = $('input[name="bug_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
@@ -156,6 +155,7 @@ $ ->
         isSelected = true
         selected.push($(this).val())
     if isSelected
+      $(this).attr('disabled', 'disabled')
       data = {task: {bugzilla_id: bug_id, attachment_array: selected, task_type: "attachment", created_by: user_id}}
       $.ajax(
         url: "/api/v1/tasks"
@@ -183,7 +183,6 @@ $ ->
       )
     else
       alert("please select something")
-      $(this).attr('disabled', false)
 
 
 
