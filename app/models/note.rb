@@ -1,6 +1,7 @@
 class Note < ApplicationRecord
   belongs_to :bug
-  validates :comment, presence: true
+  validates :comment, presence: true,
+                      uniqueness: {if: Proc.new { |n| n.author == "AC Admin"}, scope: :bug_id}
 
   TEMPLATE_RESEARCH =
       "THESIS:\r\n\r\nRESEARCH:\r\n\r\nDETECTION GUIDANCE:\r\n\r\nDETECTION BREAKDOWN:\r\n\r\nREFERENCES:\r\n"
@@ -13,6 +14,8 @@ class Note < ApplicationRecord
     order("created_at desc")
   }
   scope :last_committer_note, -> { committer_note.reverse_chron.limit(1) }
+
+  scope :error_notes, -> { where(author: 'AC Admin') }
 
   after_create { |note| note.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |note| note.record 'update' if Rails.configuration.websockets_enabled == 'true' }

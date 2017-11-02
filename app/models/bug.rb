@@ -972,8 +972,18 @@ class Bug < ApplicationRecord
         progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
 
         bug_id = item['id']
+
         new_attachments = xmlrpc.attachments(ids: [bug_id])
-        new_comments = xmlrpc.comments(ids: [bug_id])
+
+        begin
+          new_comments = xmlrpc.comments(ids: [bug_id])
+        rescue RuntimeError => e
+          new_comments = []
+          Note.create(author: 'AC Admin',
+                      comment: 'Sorry! The Bugzilla API can\'t even these comments.',
+                      bug_id: bug_id)
+        end
+
 
         #Update Bug record attributes from bugzilla############
         bug = Bug.find_or_create_by(bugzilla_id: bug_id)
