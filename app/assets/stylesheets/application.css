@@ -15,6 +15,9 @@
  *= require selectize
  *= require selectize.default
  *= require bootstrap-multiselect
+ *= require bootstrap-table.min
  *= require_tree .
  *= require_self
  */
+
+

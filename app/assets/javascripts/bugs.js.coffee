@@ -243,11 +243,11 @@ $ ->
         else
           window.location.replace '/bugs/' + bid
 
-  $('#resynch_bug').on 'click', ->
+  $('.resync_bug_button').on 'click', ->
     bid = $('.bugzilla_id').text()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $('.resynch_bug').hide()
-    $('#loading_image').removeClass('hidden').show()
+    $('.resync_bug_button').hide()
+    $('.loading_image').removeClass('hidden').show()
     $.ajax(
       url: '/api/v1/bugs/import/' + bid
       method: 'GET'
@@ -257,8 +257,8 @@ $ ->
       if (json.error)
         message = "There was a problem attempting to synch this bug:"
         message += json.error
-        $('.resynch_bug').show()
-        $('#loading_image').hide()
+        $('.resync_bug_button').show()
+        $('.loading_image').hide()
         $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
       else
         window.location.replace '/bugs/' + bid
@@ -540,37 +540,41 @@ namespace 'AC.Bugs', (exports) ->
         $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
   exports.buildStatusReportModal = (status_report) ->
 
-    if status_report.changed_bug_columns.length > 0
-      bug_change_content = "<h5><b>In Bugzilla:</b></h5>"
-      for bug_change in status_report.changed_bug_columns
-        bug_change_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{bug_change[0]} = #{bug_change[1]}<br />"
+    if Object.keys(status_report.changed_bug_columns).length > 0
+      bug_change_content = "<h5><b>These Bug attributes will be changed as a result of syncing:</b></h5>"
+      #for bug_change in status_report.changed_bug_columns
+      #  bug_change_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{bug_change[0]} = #{bug_change[1]}<br />"
+      bug_change_content += "<table style='width:100%;'><tr><th>attribute</th><th>before</th><th>after</th><tbody>"
+      for k,v of status_report.changed_bug_columns
+        bug_change_content += "<tr><td>#{k}</td><td><span style='color: green;'>#{v[0]}</span></td><td><span style='color: red;'>#{v[1]}</span></td></tr>"
       $("#status_bug_changes").html(bug_change_content)
-
+      bug_change_content += "</tbody></table>"
     if status_report.new_rules.length > 0
-      new_rules_content = "<h5><b>New Rules Detected:</b></h5>"
+      new_rules_content = "<h5><b>New Rules Detected in Bugzilla not found in Analyst Console:</b></h5>"
       for new_rule in status_report.new_rules
         new_rules_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_rule}<br />"
       $('#status_new_rules').html(new_rules_content)
 
     if status_report.new_attachments.length > 0
-      new_attachments_content = "<h5><b>New Attachments Detected:</b></h5>"
+      new_attachments_content = "<h5><b>New Attachments Detected in Bugzilla not found in Analyst Console:</b></h5>"
       for new_attachment in status_report.new_attachments
         new_attachments_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_attachment}<br />"
       $('#status_new_attachments').html(new_attachments_content)
 
     if status_report.new_notes > 0
-      new_notes_content = "<h5><b>New Entries in History</b></h5>"
+      new_notes_content = "<h5><b>New Comments under the History tab</b></h5>"
       new_notes_content += "&nbsp;&nbsp;&nbsp;&nbsp;There are #{status_report.new_notes} new notes/comments detected."
+      new_notes_content += "<br />&nbsp;&nbsp;&nbsp;&nbsp;<i>(content not shown for purposes of brevity, after syncing look under History tab to see new comments)</i>"
       $('#status_new_notes').html(new_notes_content)
 
     if status_report.new_tags.length > 0
-      new_tags_content = "<h5><b>New Tags Detected:</b></h5>"
+      new_tags_content = "<h5><b>New Tags in Bugzilla not found in Analyst Console:</b></h5>"
       for new_tag in status_report.new_tags
         new_tags_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_tag}<br />"
       $('#status_new_tags').html(new_tags_content)
 
     if status_report.new_refs.length > 0
-      new_refs_content = "<h5><b>New Refs Detected:</b></h5>"
+      new_refs_content = "<h5><b>New Refs in Bugzilla not found in Analyst Console:</b></h5>"
       for new_ref in status_report.new_refs
         new_refs_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{new_ref}<br />"
       $('#status_new_refs').html(new_refs_content)

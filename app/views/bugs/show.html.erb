@@ -1,3 +1,6 @@
+<% content_for(:title) do %>Bug <%= @bug.bugzilla_id %> - Analyst Console<% end %>
+
+
     <div class="row <%= 'item-info' unless 'show' == action_name %> bugs-split-color">
       <div class="row subheading">
         <div class="col-xs-12">
@@ -15,9 +18,9 @@
                     <%else%>
                       <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-share-alt return-bug" id="return-bug-<%= @bug.id %>" data-id="<%= @bug.id %>" data-toggle="tooltip" data-placement="bottom" title="Return this bug"></a>
                     <%end%>
-                    <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden" id="loading_image"> </span>
-                    <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-refresh resynch_bug" id="resynch_bug" data-toggle="tooltip" data-placement="bottom" title="resynch this bug with bugzilla"></a>
-                    <button class="select-sm btn btn-default hidden" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> synching</button>
+                    <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden loading_image" id="loading_image"> </span>
+                    <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-refresh resynch_bug resync_bug_button" id="resynch_bug" data-toggle="tooltip" data-placement="bottom" title="resynch this bug with bugzilla"></a>
+                    <!--<button class="select-sm btn btn-default hidden loading_image" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> synching</button>-->
                   </small>
                 </h3>
             </div>
@@ -170,13 +173,11 @@
         </h4>
       </div>
       <div class="modal-body">
-        <p><b>This is a diff report of this bug between Analyst Console and Bugzilla.  This bug has NOT been synced with Bugzilla as it has the potential to change the state of this bug on Analyst Console.  You must manually sync this bug to bring these changes to Analyst Console and continue.</b></p><hr />
+        <p><b>This is a diff report of this bug between Analyst Console and Bugzilla.  This bug has NOT been synced with Bugzilla as it has the potential to change the state of this bug on Analyst Console.</b></p><br /><p><b>You must manually sync this bug to bring these changes to Analyst Console and continue.</b></p><hr />
 
         <div id="status_new_rules">
         </div>
         <div id="status_new_attachments">
-        </div>
-        <div id="status_new_notes">
         </div>
         <div id="status_new_tags">
         </div>
@@ -184,7 +185,13 @@
         </div>
         <div id="status_bug_changes">
         </div>
+        <div id="status_new_notes">
+        </div>
+        <hr />
+        <div>
+          <button type="button" class="resync_bug_button btn btn-primary">Resync Bug Now</button><button class="loading_image btn btn-primary hidden"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> synching</button><button type="button" class="btn close-status-report" data-dismiss="modal" aria-label="Close">Close</button>
 
+        </div>
       </div>
     </div>
   </div>

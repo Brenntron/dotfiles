@@ -68,13 +68,27 @@ class Bug < ApplicationRecord
   def compile_import_report(initial_bug_state = nil)
     total_report = @import_report.clone
     if initial_bug_state.present?
-      after_hash = self.attributes.to_h
-      after_hash.delete("research_notes")
 
-      before_hash = initial_bug_state.attributes.to_h
-      before_hash.delete("research_notes")
+      bug_changes = self.changes
 
-      total_report[:changed_bug_columns] = ((after_hash.to_a) - (before_hash.to_a))
+      bug_changes.keys.each do |key|
+        if ['committer_id', 'user_id'].include?(key)
+          users = User.where(:id => bug_changes[key])
+          if users.present?
+            bug_changes[key] = [users.first.cvs_username, users.last.cvs_username]
+          end
+        end
+      end
+
+      bug_changes.delete("research_notes")
+
+      if bug_changes.has_key?("whiteboard")
+        if bug_changes["whiteboard"].first.blank? && bug_changes["whiteboard"].last.blank?
+          bug_changes.delete("whiteboard")
+        end
+      end
+
+      total_report[:changed_bug_columns] = bug_changes
     end
     total_report[:total_changes] = total_report[:new_rules].count + total_report[:new_attachments].count + total_report[:new_notes] + total_report[:new_tags].count + total_report[:new_refs].count + total_report[:changed_bug_columns].size
     total_report
@@ -117,6 +131,10 @@ class Bug < ApplicationRecord
 
   def has_published_notes?
     notes.published.exists?
+  end
+
+  def current_committer_note
+    self.notes.where(note_type: "committer").last
   end
 
   def rule_relevant_references
@@ -841,6 +859,22 @@ class Bug < ApplicationRecord
       update_params = {
           :committer_notes => permitted_params[:bug][:new_committer_notes]
       }
+    end
+
+    #add a comment to the existing committer note. from issue 981
+    if permitted_params[:bug][:state_comment]
+      c_note = bug.current_committer_note
+      if c_note
+        c_note.comment << "\n\n#{permitted_params[:bug][:state_comment]}"
+        c_note.save
+      else
+        bug.notes << Note.create(
+            comment: permitted_params[:bug][:state_comment],
+            author: "#{bug.committer&.email || bug.user&.email}",
+            note_type: "committer",
+            bug_id: bug.bugzilla_id
+        )
+      end
     end
 
     # update the tags

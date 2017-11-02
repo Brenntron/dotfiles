@@ -1,0 +1,31 @@
+%h4 Editing Rule
+= form_for @rule, url: {action: :update} do |f|
+  .row
+    .col-sm-4.form-group
+      %label Rule ID
+      =@rule.id
+  .row
+    .col-sm-4.form-group
+      %label Message
+      =@rule.message
+  .row
+    .col-sm-4.form-group
+      %label SID
+      = f.text_field :sid, class: 'form-control'
+  .row
+    .col-sm-4.form-group
+      %label State
+      = f.select :state, ['UNCHANGED', 'UPDATED', 'NEW', 'STALE', 'FAILED', 'DELETED'], {selected: @rule.state}, {class: 'form-control'}
+  .row
+    .col-sm-4.form-group
+      %label Edit Status
+      = f.select :edit_status, ['SYNCHED', 'NEW', 'EDIT'], {selected: @rule.edit_status}, {class: 'form-control'}
+  .row
+    .col-sm-4.form-group
+      %label Publish Status
+      = f.select :publish_status, ['CURRENT EDIT', 'STALE EDIT', 'PUBCONTENT', 'PUBDOC'], {selected: @rule.publish_status}, {class: 'form-control'}
+  .row
+    .col-sm-12.form-group
+      %button.btn.btn-success.edit-user{value: "submit", data: { confirm: 'Are you really really sure?? This might fuck shit up.'}} Save
+      = link_to  admin_rules_path, class:"btn btn-primary" do
+        %i.glyphicon.glyphicon-th-list{:title => "Back"} Back

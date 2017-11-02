@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Analyst Console</title>
+    <title><%= content_for?(:title) ? content_for(:title) : "Analyst Console" %></title>
+    <link rel="shortcut icon" href="<%= image_path('analyst-console-favicon.ico') %>">
     <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
     <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
     <%= csrf_meta_tags %>
@@ -12,7 +13,7 @@
   <% end %>
     <div class="sidebar">
       <div class="sidebar-header center">
-        <h1 class="logo"><%= link_to 'Analyst Console', root_url  %></h1>
+        <span class="ac_logo"><%= link_to '', root_url  %></span>
         <div class="sidebar-footer">
           <p>&copy; 2017 Cisco Systems, Inc</p>
         </div>
@@ -22,6 +23,9 @@
           <li><%= link_to 'BUG LIST', bugs_path %></li>
           <li><%= link_to 'USERS', users_path %></li>
           <li class="doc-link"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
+          <% if current_user&.has_role?('admin') %>
+            <li><%= link_to 'ADMIN', admin_root_path %></li>
+          <% end %>
         </ul>
       </nav>
     </div>
