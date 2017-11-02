@@ -1,7 +1,7 @@
 class Note < ApplicationRecord
   belongs_to :bug
   validates :comment, presence: true,
-                      uniqueness: {if: Proc.new { |n| n.author == "AC Admin"}, scope: :bug_id}
+                      uniqueness: {if: Proc.new { |n| n.note_type == "error"}, scope: :bug_id}
 
   TEMPLATE_RESEARCH =
       "THESIS:\r\n\r\nRESEARCH:\r\n\r\nDETECTION GUIDANCE:\r\n\r\nDETECTION BREAKDOWN:\r\n\r\nREFERENCES:\r\n"

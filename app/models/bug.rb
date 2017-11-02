@@ -584,6 +584,7 @@ class Bug < ApplicationRecord
           new_comments = []
           Note.create(author: 'AC Admin',
                       comment: "Sorry! The Bugzilla API can't even these comments.\nERROR: #{e}.",
+                      note_type: 'error',
                       bug_id: bug_id)
         end
         bug = Bug.where(bugzilla_id: bug_id).first
@@ -988,6 +989,7 @@ class Bug < ApplicationRecord
           new_comments = []
           Note.create(author: 'AC Admin',
                       comment: "Sorry! The Bugzilla API can't even these comments.\nERROR: #{e}.",
+                      note_type: 'error',
                       bug_id: bug_id)
         end
 
