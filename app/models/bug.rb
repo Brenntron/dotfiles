@@ -583,7 +583,7 @@ class Bug < ApplicationRecord
         rescue RuntimeError => e
           new_comments = []
           Note.create(author: 'AC Admin',
-                      comment: 'Sorry! The Bugzilla API can\'t even these comments.',
+                      comment: "Sorry! The Bugzilla API can't even these comments.\nERROR: #{e}.",
                       bug_id: bug_id)
         end
         bug = Bug.where(bugzilla_id: bug_id).first
@@ -987,7 +987,7 @@ class Bug < ApplicationRecord
         rescue RuntimeError => e
           new_comments = []
           Note.create(author: 'AC Admin',
-                      comment: 'Sorry! The Bugzilla API can\'t even these comments.',
+                      comment: "Sorry! The Bugzilla API can't even these comments.\nERROR: #{e}.",
                       bug_id: bug_id)
         end
 
