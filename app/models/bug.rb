@@ -578,7 +578,14 @@ class Bug < ApplicationRecord
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
-        new_comments = xmlrpc.comments(ids: [bug_id])
+        begin
+          new_comments = xmlrpc.comments(ids: [bug_id])
+        rescue RuntimeError => e
+          new_comments = []
+          Note.create(author: 'AC Admin',
+                      comment: 'Sorry! The Bugzilla API can\'t even these comments.',
+                      bug_id: bug_id)
+        end
         bug = Bug.where(bugzilla_id: bug_id).first
         unless new_comments.empty?
 
