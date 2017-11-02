@@ -262,70 +262,6 @@ Feature: Rules
 #    And rule "11" is a new rule
 
   @javascript
-  Scenario: New Rule: legacy form: Rule category drop down should sort by frequency of use
-    Given a user with role "analyst" exists and is logged in
-    And the current user has the following "open_bug":
-      |  id  |
-      | 2222 |
-    And the following rule categories exist:
-      |category       | id |
-      |BLACKLIST      |  1 |
-      |FILE-EXECUTABLE|  2 |
-      |OS-LINUX       |  3 |
-    And the following rules exist:
-      | message                 | rule_category_id |
-      | BLACKLIST message       | 1                |
-      | OS-LINUX message        | 3                |
-      | OS-LINUX second message | 3                |
-    And I wait for "3" seconds
-    When I goto "/bugs/2222"
-    And  I click the "Rules" tab
-    And  I click button "create"
-    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
-    And  I fill in "summary" with "some pig"
-    And  I click "Create Rule"
-    And  I wait for "2" seconds
-    When I click the "Rules" tab
-    And I click button "create"
-    And I click "use standard form"
-    Then "BLACKLIST" should be listed first
-
-  @javascript
-  Scenario: New Rule: standard form: Rule category drop down should sort by frequency of use
-    Given a user with role "analyst" exists and is logged in
-    And the current user has the following "open_bug":
-      |  id  |
-      | 2222 |
-    And the following rule categories exist:
-      |category       | id |
-      |OS-LINUX       |  1 |
-      |BLACKLIST      |  2 |
-      |FILE-EXECUTABLE|  3 |
-    And the following rules exist:
-      | message                        | rule_category_id |
-      | BLACKLIST message              | 2                |
-      | OS-LINUX message               | 1                |
-      | FILE-EXECUTABLE second message | 3                |
-    Then I wait for "3" seconds
-    And  I goto "/bugs/2222"
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
-    Then "BLACKLIST" should be listed first
-    And  I select "OS-LINUX" from "rule_category_id"
-    And  I fill in "rule[message]" with "test msg"
-    And  I fill in "rule[dst]" with "$HOME_NET"
-    And  I fill in "rule[detection]" with "|04|hola|03|org|00|"
-    And  I select "attempted-user" from "rule[class_type]"
-    And  I fill in "summary" with "some pig"
-    Then I click "Create Rule"
-    And  I wait for "3" seconds
-    Then I click the "Rules" tab
-    Then I click button "create"
-    Then I click "use standard form"
-    Then "OS-LINUX" should be listed first
-
-  @javascript
   # Scenario: New Rule: standard form: the rule doc impact should populate based on class type selection
   Scenario: When a new rule is created, the rule doc impact should populate based on class type selection
     Given a user with role "analyst" exists and is logged in
@@ -370,28 +306,30 @@ Feature: Rules
 
   # ==== Deleted rules ===
 
-  @javascript
-  Scenario: A rule with a rule category of deleted should not be visible
-    Given a user with role "analyst" exists and is logged in
-    And I wait for "3" seconds
-    Given the following bugs exist:
-      |  id  | bugzilla_id | state  | user_id |
-      | 2222 |   222222    | OPEN   |    1    |
-    And the following rule categories exist:
-      | category  | id |
-      | DELETED   |  1 |
-      | BLACKLIST |  2 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message                | rule_category_id |
-      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  | DELETED message test       |        1         |
-      | 12 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message          |        2         |
-    And bug with id "2222" has rule with id "11"
-    And bug with id "2222" has rule with id "12"
-    And  I goto "/bugs/2222"
-    And  I click the "Rules" tab
-    And  I click button "list all"
-    And I should see "BLACKLIST message"
-    And I should not see "DELETED message test"
+# We may implement this in the future...delete if not used after 5/2018
+
+#  @javascript
+#  Scenario: A rule with a rule category of deleted should not be visible
+#    Given a user with role "analyst" exists and is logged in
+#    And I wait for "3" seconds
+#    Given the following bugs exist:
+#      |  id  | bugzilla_id | state  | user_id |
+#      | 2222 |   222222    | OPEN   |    1    |
+#    And the following rule categories exist:
+#      | category  | id |
+#      | DELETED   |  1 |
+#      | BLACKLIST |  2 |
+#    And the following rules exist:
+#      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message                | rule_category_id |
+#      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  | DELETED message test       |        1         |
+#      | 12 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message          |        2         |
+#    And bug with id "2222" has rule with id "11"
+#    And bug with id "2222" has rule with id "12"
+#    And  I goto "/bugs/2222"
+#    And  I click the "Rules" tab
+#    And  I click button "list all"
+#    And I should see "BLACKLIST message"
+#    And I should not see "DELETED message test"
 
 
   # ==== Existing rule ===
