@@ -69,8 +69,8 @@ class Bug < ApplicationRecord
     total_report = @import_report.clone
     if initial_bug_state.present?
 
-      bug_changes = self.changes
 
+      bug_changes = self.changes
       bug_changes.keys.each do |key|
         if ['committer_id', 'user_id'].include?(key)
           users = User.where(:id => bug_changes[key])
@@ -87,6 +87,7 @@ class Bug < ApplicationRecord
           bug_changes.delete("whiteboard")
         end
       end
+
 
       total_report[:changed_bug_columns] = bug_changes
     end
@@ -308,6 +309,31 @@ class Bug < ApplicationRecord
     end
   end
 
+  def self.get_updated_time(bug, state, update_time)
+    last_changed_time={}
+    case state #if the state is the same as the bug state then dont do anything.
+      when 'ASSIGNED'
+        last_changed_time[:assigned_at] = update_time
+      when 'PENDING'
+        last_changed_time[:pending_at] = update_time
+        if bug.state == 'REOPENED'
+          last_changed_time[:rework_time] = bug.reopened_at? ? ((last_changed_time[:pending_at] - bug.reopened_at) / 86_400).ceil : nil
+        else
+          last_changed_time[:work_time] = bug.assigned_at? ? ((last_changed_time[:pending_at] - bug.assigned_at) / 86_400).ceil : nil
+        end
+      when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
+        last_changed_time[:resolved_at] = update_time
+        last_changed_time[:review_time] = bug.pending_at? ? ((last_changed_time[:resolved_at] - bug.pending_at) / 86_400).ceil : nil
+      when 'REOPENED'
+        last_changed_time[:reopened_at] = update_time
+      when 'OPEN'
+        last_changed_time[:reopened_at] = update_time
+    end
+
+    #return state params hash
+    last_changed_time
+  end
+
   def self.get_new_bug_state(bug, state, state_comment, editor_email)
     updated_state = state
     updated_state = 'NEW' if editor_email == 'vrt-incoming@sourcefire.com' && bug.resolution == 'OPEN' && state == 'NEW'
@@ -324,35 +350,24 @@ class Bug < ApplicationRecord
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
       state_params[:comment] = { comment: "#{state_comment} \nThis bug is now ASSIGNED to #{editor_email}." }
-      state_params[:assigned_at] = Time.now
     when 'PENDING'
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
       state_params[:comment] = { comment: "#{state_comment} \nThis bug is now RESOLVED - #{updated_state}." }
-      state_params[:pending_at] = Time.now
-      if bug.state == 'REOPENED'
-        state_params[:rework_time] = bug.reopened_at? ? ((state_params[:pending_at] - bug.reopened_at) / 86_400).ceil : nil
-      else
-        state_params[:work_time] = bug.assigned_at? ? ((state_params[:pending_at] - bug.assigned_at) / 86_400).ceil : nil
-      end
     when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
       state_params[:comment] = { comment: "#{state_comment} \nThis bug is now RESOLVED - #{updated_state}." }
-      state_params[:resolved_at] = Time.now
-      state_params[:review_time] = bug.pending_at? ? ((state_params[:resolved_at] - bug.pending_at) / 86_400).ceil : nil
     when 'REOPENED'
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
       state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{updated_state}." }
-      state_params[:reopened_at] = Time.now
+      state_params[:qa_contact] = User.where(email:"vrt-qa@vrt.sourcefire.com").first
     when 'OPEN'
       state_params[:status] = updated_state
       state_params[:resolution] = 'OPEN'
       state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{updated_state}." }
-      state_params[:reopened_at] = Time.now
     end
-
 
     #return state params hash
     state_params
@@ -716,7 +731,7 @@ class Bug < ApplicationRecord
 
   ####PROCESSING THE WORKFLOW OF A BUG UPDATE#########
 
-  def self.publish_research_notes(bugzilla_session, current_user, bug)
+  def self.publish_research_notes(xmlrpc, current_user, bug)
 
     note = bug.research_notes
 
@@ -820,54 +835,13 @@ class Bug < ApplicationRecord
     options[:note_type] = "research"
     options[:author] = current_user.email
 
-    Note.process_note(options, bugzilla_session)
+    Note.process_note(options, xmlrpc)
 
   end
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
-  def self.process_bug_update(current_user, bugzilla_session, bug, permitted_params, assignee:, committer:)
+  def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:)
     bug.initialize_report
-    bug_is_being_resolved = bug.state != "PENDING" ? false : true
-
-    ###
-    tags = permitted_params[:bug][:tag_names]
-    updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], assignee.email)
-    ###
-
-    ###
-    options = {
-        :ids => permitted_params[:id],
-        :assigned_to => assignee.email,
-        :status => updated_bug_state[:status],
-        :resolution => updated_bug_state[:resolution],
-        :comment => updated_bug_state[:comment],
-        :qa_contact => committer&.email
-    }
-    update_params = {
-        :user => assignee,
-        :state => updated_bug_state[:state],
-        :status => updated_bug_state[:status],
-        summary: updated_bug_state[:summary],
-        :resolution => updated_bug_state[:resolution],
-        :assigned_at => updated_bug_state[:assigned_at],
-        :pending_at => updated_bug_state[:pending_at],
-        :resolved_at => updated_bug_state[:resolved_at],
-        :reopened_at => updated_bug_state[:reopened_at],
-        :work_time => updated_bug_state[:work_time],
-        :rework_time => updated_bug_state[:rework_time],
-        :review_time => updated_bug_state[:review_time],
-        :committer => committer
-    }
-
-    if permitted_params[:bug][:new_research_notes]
-      update_params = {
-          :research_notes => permitted_params[:bug][:new_research_notes]
-      }
-    elsif permitted_params[:bug][:new_committer_notes]
-      update_params = {
-          :committer_notes => permitted_params[:bug][:new_committer_notes]
-      }
-    end
 
     #add a comment to the existing committer note. from issue 981
     if permitted_params[:bug][:state_comment]
@@ -885,6 +859,9 @@ class Bug < ApplicationRecord
       end
     end
 
+
+    tags = permitted_params[:bug][:tag_names]
+
     # update the tags
     bug.tags.delete_all if bug.tags.exists?
     if tags
@@ -893,7 +870,17 @@ class Bug < ApplicationRecord
         bug.tags << new_tag
       end
     end
-    ###
+
+
+    updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], assignee.email)
+    options = {
+        ids: permitted_params[:id],
+        assigned_to: assignee.email,
+        status: updated_bug_state[:status],
+        resolution: updated_bug_state[:resolution],
+        comment: updated_bug_state[:comment],
+        qa_contact: updated_bug_state[:qa_contact]&.email || committer&.email
+    }
 
     # update the summary
     # (do this first so we can compose the summary properly to send to bugzilla)
@@ -913,9 +900,44 @@ class Bug < ApplicationRecord
     options[:classification] = permitted_params[:bug][:classification]
     options[:whiteboard] = permitted_params[:bug][:whiteboard]
 
+
     # update buzilla (if needed)
     options.reject! { |k, v| v.nil? } if options
-    Bugzilla::Bug.new(bugzilla_session).update(options.to_h) unless options.blank?
+
+    updated_bug = xmlrpc.update(options.to_h) unless options.blank?
+    last_changed_time = updated_bug["bugs"][0]["last_change_time"].to_time
+
+    updated_bug_time = get_updated_time(bug, permitted_params[:bug][:state], last_changed_time)
+    update_params = {
+        user: assignee,
+        state: updated_bug_state[:state],
+        status: updated_bug_state[:status],
+        summary: updated_bug_state[:summary],
+        resolution: updated_bug_state[:resolution],
+        assigned_at: updated_bug_time[:assigned_at],
+        pending_at: updated_bug_time[:pending_at],
+        resolved_at: updated_bug_time[:resolved_at],
+        reopened_at: updated_bug_time[:reopened_at],
+        work_time: updated_bug_state[:work_time],
+        rework_time: updated_bug_state[:rework_time],
+        review_time: updated_bug_state[:review_time],
+        committer: updated_bug_state[:qa_contact] || committer
+    }
+
+    #not sure if this was intended but i noticed if there is a new_research_note or new_committer_note it blows away all
+    #update_params and fills it with just the resarch/committer note.
+    if permitted_params[:bug][:new_research_notes]
+      update_params = {
+          :research_notes => permitted_params[:bug][:new_research_notes]
+      }
+    elsif permitted_params[:bug][:new_committer_notes]
+      update_params = {
+          :committer_notes => permitted_params[:bug][:new_committer_notes]
+      }
+    end
+
+
+
 
     update_params[:product] = permitted_params[:bug][:product]
     update_params[:component] = permitted_params[:bug][:component]
@@ -929,17 +951,21 @@ class Bug < ApplicationRecord
     update_params[:classification] = permitted_params[:bug][:classification]
     update_params[:whiteboard] = permitted_params[:bug][:whiteboard]
 
+
     # update the database
     update_params.reject! { |k, v| v.nil? }
     Bug.update(permitted_params[:id], update_params)
 
     bug.reload
+
+    bug_is_being_resolved = bug.state != "PENDING" ? false : true
+
     if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
       bug_is_being_resolved = !bug_is_being_resolved
     end
 
     if bug_is_being_resolved
-     publish_research_notes(bugzilla_session, current_user, bug)
+     publish_research_notes(xmlrpc, current_user, bug)
     end
 
   end
@@ -1006,25 +1032,31 @@ class Bug < ApplicationRecord
         bug.resolution = item['resolution']
         bug.resolution = 'OPEN' if bug.resolution.empty?
 
-        bug.state     = bug.get_state(item['status'], item['resolution'], item['assigned_to'])
+        new_bug_state = bug.get_state(item['status'], item['resolution'], item['assigned_to'])
+        state_changed = bug.state != new_bug_state
+
+        bug.state     = new_bug_state if state_changed
         bug.priority  = item['priority']
         bug.component = item['component']
         bug.product   = item['product']
         bug.whiteboard = item['whiteboard']
         bug.created_at = item['creation_time'].to_time
-        last_change_time      = item['last_change_time'].to_time
-
-        if bug.state == 'NEW'
-          # do nothing
-        elsif bug.state == 'ASSIGNED'
-          bug.assigned_at = last_change_time
-        elsif bug.state == 'PENDING'
-          bug.pending_at = last_change_time
-        elsif bug.state == 'REOPENED'
-          bug.reopened_at = last_change_time
-        else
-          bug.resolved_at = last_change_time
+        if state_changed
+          last_change_time      = item['last_change_time'].to_time
+          if bug.state == 'NEW'
+            # do nothing
+          elsif bug.state == 'ASSIGNED'
+            bug.assigned_at = last_change_time
+          elsif bug.state == 'PENDING'
+            bug.pending_at = last_change_time
+          elsif bug.state == 'REOPENED'
+            bug.reopened_at = last_change_time
+          else
+            bug.resolved_at = last_change_time
+          end
         end
+
+
         if import_type != "status"
           bug.save
         end
@@ -1268,24 +1300,31 @@ class Bug < ApplicationRecord
           new_record.resolution = item['resolution']
           new_record.resolution = 'OPEN' if new_record.resolution.empty?
 
-          new_record.state     = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
+          new_bug_state = new_record.get_state(item['status'], item['resolution'], item['assigned_to'])
+          state_changed = new_record.state != new_bug_state
+          new_record.state     = new_bug_state if state_changed
+
           new_record.priority  = item['priority']
           new_record.component = item['component']
           new_record.product   = item['product']
           new_record.whiteboard = item['whiteboard']
 
           new_record.created_at = item['creation_time'].to_time
-          last_change_time      = item['last_change_time'].to_time
-          if new_record.state == 'NEW'
-            # do nothing
-          elsif new_record.state == 'ASSIGNED'
-            new_record.assigned_at = last_change_time
-          elsif new_record.state == 'PENDING'
-            new_record.pending_at = last_change_time
-          elsif new_record.state == 'REOPENED'
-            new_record.reopened_at = last_change_time
-          else
-            new_record.resolved_at = last_change_time
+          if state_changed
+            last_change_time      = item['last_change_time'].to_time
+            if new_record.state == 'NEW'
+              # do nothing
+            elsif new_record.state == 'ASSIGNED'
+              new_record.assigned_at = last_change_time
+            elsif new_record.state == 'PENDING'
+              if bug.committer&.cvs_username == "vrtqa"
+                new_record.pending_at = last_change_time
+              end
+            elsif new_record.state == 'REOPENED'
+              new_record.reopened_at = last_change_time
+            else
+              new_record.resolved_at = last_change_time
+            end
           end
           creator = User.where('email=?', item['creator']).first
           new_user = User.where('email=?', item['assigned_to']).first
@@ -1293,6 +1332,7 @@ class Bug < ApplicationRecord
           if creator.nil?
             User.create_by_email(item['creator'])
             new_creator = User.where(email: item['creator']).first
+
             new_record.creator = new_creator.id
           else
             new_record.creator = creator.id
@@ -1530,13 +1570,16 @@ class Bug < ApplicationRecord
     unless committer || no_committer_ok?(permitted_params[:bug][:state])
       raise "Cannot update bug #{bugzilla_id} without committer identified"
     end
-
+    xmlrpc = Bugzilla::Bug.new(bugzilla_session)
     Bug.process_bug_update(current_user,
-                           bugzilla_session,
+                           xmlrpc,
                            self,
                            permitted_params,
                            assignee: assignee,
                            committer: committer)
+
+    current_bug = xmlrpc.get(self.bugzilla_id)
+    Bug.synch_history(xmlrpc, current_bug).to_s
 
   end
 end
