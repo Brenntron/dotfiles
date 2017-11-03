@@ -64,6 +64,7 @@ class RuleFile
     end
   end
 
+  # TODO move to RuleContentCommitter
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_add_line_rule(bug, rule_content)
@@ -88,6 +89,7 @@ class RuleFile
     end
   end
 
+  # TODO move to RuleContentCommitter
   # read diffs from file to add new rules to bug
   def load_add_line(bugzilla_id)
     bug = Bug.where(bugzilla_id: bugzilla_id).first
@@ -101,6 +103,7 @@ class RuleFile
     end
   end
 
+  # TODO move to RuleContentCommitter
   # read diffs from file to add to svn output
   def build_additional_output
     output = "\n"
