@@ -202,7 +202,7 @@ module API
           std_api_v2 do
             rules = Rule.where(id: permitted_params[:rule_ids]).where(state:['UPDATED','NEW']).all.to_a
 
-            raise "You must select a rule to commit!" if rules.empty?
+            raise "There are no UPDATED or NEW rules in your selection!\nPlease select rules with a state of UPDATED or NEW." if rules.empty?
             raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
 
             Repo::RuleCommitter.commit_rules_action(rules,
