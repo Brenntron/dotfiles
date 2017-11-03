@@ -24,7 +24,7 @@ module RuleSyntax
       other_connection = parser.attributes[:connection].sub(/\A\s*#\s*/, '')
       return false unless connection == other_connection
 
-      return false unless attributes[:message] == parser.attributes[:message]
+      return false unless attributes[:msg] == parser.attributes[:msg]
       return false unless attributes[:detection] == parser.attributes[:detection]
       return false unless attributes[:classtype] == parser.attributes[:classtype]
       return false unless attributes[:flow] == parser.attributes[:flow]
@@ -85,6 +85,21 @@ module RuleSyntax
       @detection_array ||= raw_hash[:detection] || []
     end
 
+    # Hash of rule parts
+    # Keys are:
+    #    :connection = socket tuple and direction
+    #    :msg = rule category and message text
+    #    :message = message text (without rule category)
+    #    :rule_category = rule category [String]
+    #    :flow
+    #    :detection = [String]
+    #    :metadata
+    #    :reference = [Array<String>]
+    #    :classtype
+    #    :gid
+    #    :sid
+    #    :rev
+    # @return [Hash]
     def attributes
       @attributes ||= raw_hash.clone.tap do |attributes|
         attributes[:connection] = @connection
@@ -102,7 +117,7 @@ module RuleSyntax
 
           if /\A(?<category>[-\w]+)\s(?<message>.*)\z/ =~ msg
             attributes[:rule_category] = category
-            attributes[:message] = msg
+            attributes[:message] = message
           end
         end
       end
