@@ -188,7 +188,7 @@ class Rule < ApplicationRecord
   end
 
   def tested_on_bug?(bug)
-    self.synched_rule? || bugs_rules.where(bug_id: bug, rule_id: self, tested: true).exists?
+    self.synched_rule? || bugs_rules.select{|b| b.bug_id == bug.id && b.tested == true }.present?
   end
 
   def test_rule_content
@@ -579,22 +579,22 @@ class Rule < ApplicationRecord
     end
   end
 
-  def self.get_alert_css_class_for(rule, att)
+  def self.get_alert_css_class_for(has_untested_attachments, has_local_alerts)
     case
-      when !(att.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+      when has_untested_attachments
         'untested'
-      when att.local_alerts.by_rule(rule).exists?
+      when has_local_alerts
         'alerted'
       else
         'no-alert'
     end
   end
 
-  def self.get_alert_status_for(rule, att)
+  def self.get_alert_status_for(has_untested_attachments, has_local_alerts)
     case
-      when !(att.bug.bugs_rules.where(rule_id: rule, tested: true).exists?)
+      when has_untested_attachments
         'Untested'
-      when att.local_alerts.by_rule(rule).exists?
+      when has_local_alerts
         'Alerted'
       else
         'No alert'
