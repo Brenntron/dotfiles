@@ -273,7 +273,7 @@ class Bug < ApplicationRecord
 
     # Now fetch the bug attachments and create them if needed
     xmlrpc.attachments(ids: [bugzilla_id], include_fields: fields)['bugs'][bugzilla_id.to_s].each do |attachment|
-      next if attachment['file_name'] !~ /\.pcap$/
+      next if File.extname(attachment['file_name'].downcase) != ".pcap"
       attach = Attachment.find_by_bugzilla_attachment_id(attachment['id'])
 
       # We need to remove any obsoleted attachments
@@ -578,7 +578,15 @@ class Bug < ApplicationRecord
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
-        new_comments = xmlrpc.comments(ids: [bug_id])
+        begin
+          new_comments = xmlrpc.comments(ids: [bug_id])
+        rescue RuntimeError => e
+          new_comments = []
+          Note.create(author: 'AC Admin',
+                      comment: "Sorry! The Bugzilla API can't even these comments.\nERROR: #{e}.",
+                      note_type: 'error',
+                      bug_id: bug_id)
+        end
         bug = Bug.where(bugzilla_id: bug_id).first
         unless new_comments.empty?
 
@@ -760,7 +768,7 @@ class Bug < ApplicationRecord
     alert_base = "\nAlerts:\n--------------------------------------------------\n"
     pcap_attachments = []
     bug.attachments.where(is_obsolete: false).map do |att|
-      if att.file_name.include? '.pcap'
+      if File.extname(att.file_name.downcase) == ".pcap"
         pcap_attachments << att
       end
     end
@@ -972,8 +980,19 @@ class Bug < ApplicationRecord
         progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
 
         bug_id = item['id']
+
         new_attachments = xmlrpc.attachments(ids: [bug_id])
-        new_comments = xmlrpc.comments(ids: [bug_id])
+
+        begin
+          new_comments = xmlrpc.comments(ids: [bug_id])
+        rescue RuntimeError => e
+          new_comments = []
+          Note.create(author: 'AC Admin',
+                      comment: "Sorry! The Bugzilla API can't even these comments.\nERROR: #{e}.",
+                      note_type: 'error',
+                      bug_id: bug_id)
+        end
+
 
         #Update Bug record attributes from bugzilla############
         bug = Bug.find_or_create_by(bugzilla_id: bug_id)

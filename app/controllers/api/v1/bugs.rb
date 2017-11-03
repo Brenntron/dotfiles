@@ -31,7 +31,7 @@ module API
             rules = bug.rules.sort { |left, right| left <=> right }
             pcap_attachments = []
             bug.attachments.where(is_obsolete: false).map do |att|
-              if att.file_name.include? '.pcap'
+              if File.extname(att.file_name.downcase) == ".pcap"
                 pcap_attachments << att
               end
             end

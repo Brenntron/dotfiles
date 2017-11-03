@@ -6,8 +6,6 @@ class RuleCategory < ApplicationRecord
 
   validates :category, uniqueness: true
 
-  scope :ranked, ->{ left_joins(:rules).group(:id).order('count(rules.id) desc, category') }
-
   def deleted?
     CATEGORY_DELETED == self.category
   end

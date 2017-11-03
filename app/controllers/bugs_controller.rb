@@ -73,7 +73,7 @@ class BugsController < ApplicationController
       @pcap_attachments = []
       @other_attachments = []
       @bug.attachments.where(is_obsolete: false).map do |att|
-        if att.file_name.include? '.pcap'
+        if File.extname(att.file_name.downcase) == ".pcap"
           @pcap_attachments << att
         else
           @other_attachments << att
@@ -81,9 +81,8 @@ class BugsController < ApplicationController
       end
       @obsolete_attachments = @bug.attachments.where(is_obsolete: true)
       @tasks = @bug.tasks.order(created_at: :desc)
-      @notes = @bug.notes.published.order(created_at: :desc)
+      @notes = @bug.notes.published.order(created_at: :desc) + @bug.notes.error_notes
       @tags = Tag.all.map { |tag| tag.name }.join(',')
-      @categories = RuleCategory.ranked
       flash.now[:alert] = "Looks like this bug (#{@bug.id}) may be out of synch with bugzilla.
                        Please 'resynch' using the button below." if @bug.bugzilla_synch_needed?
     else
