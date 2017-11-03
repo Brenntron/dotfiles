@@ -47,7 +47,7 @@
         <div class="entry-type-switch">
         </div>
         <div class="col-xs-10"><div class="form-inline">
-          <%=select_tag :rule_category_id, options_for_select(@categories.map{|rc| [rc.category, rc.id]}), prompt: 'select a category', class: "form-control create-input select-sm code", required: "true"%>
+          <%=select_tag :rule_category_id, options_for_select(RuleCategory.all.sort.map{|rc| [rc.category, rc.id]}), prompt: 'select a category', class: "form-control create-input select-sm code", required: "true"%>
           <label for="message"></label>
           <input class="form-control create-input select-sm code" name="rule[message]" id="std-form-message" type="text" placeholder="enter a message" style="width:75%;" required="required" />
         </div>
@@ -269,7 +269,7 @@
         <div class="entry-type-switch">
         </div>
         <div class="col-xs-10">
-          <%=select_tag "rule[class_type]", options_for_select(RulesHelper::CLASSIFICATION.keys), prompt: 'select classification', id: "new-rule-classtype-form", class: "form-control select-sm code", required: "true"%>
+          <%=select_tag "rule[class_type]", options_for_select(RulesHelper::CLASSIFICATION.keys.sort()), prompt: 'select classification', id: "new-rule-classtype-form", class: "form-control select-sm code", required: "true"%>
         </div>
       </div>
     </div>
