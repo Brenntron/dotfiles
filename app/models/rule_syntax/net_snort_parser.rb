@@ -158,6 +158,9 @@ module RuleSyntax
       self_metadata_hash = parsed['metadata']
       other_metadata_hash = parser.parsed['metadata']
 
+      return true if self_metadata_hash.nil? && self_metadata_hash
+      return false if self_metadata_hash.nil? || self_metadata_hash
+
       return false unless (self_metadata_hash.keys - other_metadata_hash.keys).empty?
       return false unless (other_metadata_hash.keys - self_metadata_hash.keys).empty?
 
