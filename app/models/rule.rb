@@ -473,6 +473,7 @@ class Rule < ApplicationRecord
       when !content_changed?
         self.edit_status                = EDIT_STATUS_SYNCHED
         self.state                      = UNCHANGED_STATE
+        self.rule_parsed                = self.cvs_rule_parsed
       else
         self.edit_status                = EDIT_STATUS_EDIT
         self.state                      = UPDATED_STATE
