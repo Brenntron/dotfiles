@@ -17,7 +17,9 @@ Rails.configuration.cert_file           = env_config['cert']['vrt']
 raise "config.yml missing perl section" unless env_config['perl']
 Rails.configuration.perl_cmd            = env_config['perl']['cmd']
 Rails.configuration.canvas_root         = Rails.root.join(env_config['perl']['canvas_root'])
+Rails.configuration.extras_dir          = Rails.root.join(env_config['perl']['extras_dir'])
 Rails.configuration.visruleparser_path  = Rails.root.join(env_config['perl']['visruleparser_path'])
+Rails.configuration.snort_json_path     = Rails.root.join(env_config['perl']['snort_json_path'])
 Rails.configuration.cve2x_path          = Rails.root.join(env_config['perl']['cve2x_path'])
 Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['rule2yaml_path'])
 

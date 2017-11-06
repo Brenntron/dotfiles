@@ -10,28 +10,6 @@ module RuleSyntax
       @rule_content = rule_content.chomp
     end
 
-    def metadata_match?(parser)
-      metadata_array = attributes[:metadata].split(/\s*,\s*/)
-      other_metadata_array = parser.attributes[:metadata].split(/\s*,\s*/)
-
-      return false unless (metadata_array - other_metadata_array).empty?
-      return false unless (other_metadata_array - metadata_array).empty?
-      true
-    end
-
-    def match?(parser)
-      connection = attributes[:connection].sub(/\A\s*#\s*/, '')
-      other_connection = parser.attributes[:connection].sub(/\A\s*#\s*/, '')
-      return false unless connection == other_connection
-
-      return false unless attributes[:message] == parser.attributes[:message]
-      return false unless attributes[:detection] == parser.attributes[:detection]
-      return false unless attributes[:classtype] == parser.attributes[:classtype]
-      return false unless attributes[:flow] == parser.attributes[:flow]
-      return false unless metadata_match?(parser)
-      true
-    end
-
     def parse
       if /\A(?<connection>[^\(]*)\((?<options>.*)\)\s*\z/ =~ rule_content
         @connection = connection.strip
@@ -85,6 +63,21 @@ module RuleSyntax
       @detection_array ||= raw_hash[:detection] || []
     end
 
+    # Hash of rule parts
+    # Keys are:
+    #    :connection = socket tuple and direction
+    #    :msg = rule category and message text
+    #    :message = message text (without rule category)
+    #    :rule_category = rule category [String]
+    #    :flow
+    #    :detection = [String]
+    #    :metadata
+    #    :reference = [Array<String>]
+    #    :classtype
+    #    :gid
+    #    :sid
+    #    :rev
+    # @return [Hash]
     def attributes
       @attributes ||= raw_hash.clone.tap do |attributes|
         attributes[:connection] = @connection
@@ -102,7 +95,7 @@ module RuleSyntax
 
           if /\A(?<category>[-\w]+)\s(?<message>.*)\z/ =~ msg
             attributes[:rule_category] = category
-            attributes[:message] = msg
+            attributes[:message] = message
           end
         end
       end
