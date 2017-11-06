@@ -73,7 +73,6 @@ class RuleFile
     new_publishing_rules = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
 
     found_rules = new_publishing_rules.to_a.select do |rule|
-      byebug
       parsed_rule = RuleSyntax::NetSnortParser.new_from_rule_content(rule.rule_content)
       parser.match?(parsed_rule)
     end

@@ -39,6 +39,14 @@ module RuleSyntax
       new_from_json_lines(output)
     end
 
+    def error?
+      parsed.key?('error')
+    end
+
+    def error
+      error? && parsed['error']
+    end
+
     def connection
       "#{parsed['action']} #{parsed['protocol']}" +
           " #{parsed['src']} #{parsed['srcport']} #{parsed['direction']}" +
@@ -175,7 +183,8 @@ module RuleSyntax
     end
 
     def match?(parser)
-      byebug
+      return false if error?
+      return false if parser.error?
       return false unless attributes[:connection] == parser.attributes[:connection]
       return false unless attributes[:msg] == parser.attributes[:msg]
       return false unless detection_match?(parser)
@@ -183,6 +192,12 @@ module RuleSyntax
       return false unless attributes[:flow] == parser.attributes[:flow]
       return false unless metadata_match?(parser)
       true
+    end
+
+    def match!(parser)
+      raise error if error?
+      raise parser.error if parser.error?
+      match?(parser)
     end
   end
 end
