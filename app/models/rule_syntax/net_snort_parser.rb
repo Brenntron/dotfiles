@@ -158,8 +158,8 @@ module RuleSyntax
       self_metadata_hash = parsed['metadata']
       other_metadata_hash = parser.parsed['metadata']
 
-      return true if self_metadata_hash.nil? && self_metadata_hash
-      return false if self_metadata_hash.nil? || self_metadata_hash
+      return true if self_metadata_hash.nil? && self_metadata_hash.nil?
+      return false if self_metadata_hash.nil? || self_metadata_hash.nil?
 
       return false unless (self_metadata_hash.keys - other_metadata_hash.keys).empty?
       return false unless (other_metadata_hash.keys - self_metadata_hash.keys).empty?
@@ -175,6 +175,7 @@ module RuleSyntax
     end
 
     def match?(parser)
+      byebug
       return false unless attributes[:connection] == parser.attributes[:connection]
       return false unless attributes[:msg] == parser.attributes[:msg]
       return false unless detection_match?(parser)
