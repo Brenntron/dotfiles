@@ -26,6 +26,10 @@ while(<>) {
     $line =~ s/^\s+//;
     $line =~ s/\s+$//;
 
+    if ($line =~ /^\s*$/) {
+        next;
+    }
+
     my $parsed_rule = $parser->parse_rule($line);
 
     if (!$parsed_rule) {
