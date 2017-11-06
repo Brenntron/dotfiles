@@ -153,13 +153,16 @@ class RuleDoc < ApplicationRecord
   end
 
   def fetch_from_repo
-    `#{RuleFile.svn_cmd} up #{filepath}`
+    system("#{RuleFile.svn_cmd} up #{filepath}")
   end
 
   def revert_doc
-    fetch_from_repo
-    assign_from_json(read_from_file)
-    save!
+    if fetch_from_repo
+      assign_from_json(read_from_file)
+      save!
+    else
+      errors.add(:base, "Attempt at reverting Rule Doc for sid #{rule.sid} failed")
+    end
   end
 
   def copy_to_rule_ids(rule_ids)

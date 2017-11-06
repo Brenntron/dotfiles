@@ -270,9 +270,13 @@ $ ->
               error_prefix: "Rules have not been reverted."
               failure_reload: false
               success: (response) ->
-                $('.alert_rules').addClass('success').show().html('Rules have been reverted')
+                if response
+                  $('.alert_rules').addClass('success').show().html('Rules have been reverted but ' + response)
+                else
+                  $('.alert_rules').addClass('success').show().html('Rules have been reverted')
+
                 setTimeout (->
-                  $('.alert_rules').hide 'blind', {}, 500
+                  $('.alert_rules').hide 'blind', {}, 1000
                   return
                 ), 5000
                 $(document).ajaxStop ->

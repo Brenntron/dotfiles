@@ -171,6 +171,8 @@ module API
             authorize! :update, Rule
             rules = permitted_params[:rule_ids].map{|id| Rule.where(id: id).first}
             Rule.revert_rules_action(rules)
+            doc_errors = rules.flat_map{ |rule| rule&.rule_doc.errors.full_messages }.to_sentence
+            return doc_errors.to_json if !doc_errors.empty?
           end
         end
 
