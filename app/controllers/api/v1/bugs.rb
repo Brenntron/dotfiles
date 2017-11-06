@@ -14,65 +14,20 @@ module API
           PublishWebsocket.push_changes(record)
         end
 
-        desc "get attachments for attachments tab"
+        desc ""
         params do
           requires :id, type: Integer, desc: "Bugzilla id."
         end
-        get '/attachments/:id' do
+        get '/tabs/:id' do
           begin
-            bug = Bug.where(id: params[:id]).first
+            bug = Bug.where(:id => params[:id]).includes([:alerts, :pcaps => [:alerts]]).first
+
             response = {}
             response[:status] = "success"
+            response[:attachments_tab] = []
+            response[:alerts_tab] = {}
+            response[:alerts_tab][:alerts] = []
 
-            response[:data] = []
-
-            rules = bug.rules.sort { |left, right| left <=> right }
-            pcap_attachments = []
-            bug.attachments.where(is_obsolete: false).map do |att|
-              if File.extname(att.file_name.downcase) == ".pcap"
-                pcap_attachments << att
-              end
-            end
-
-            pcap_attachments.each do |att|
-              alert = {}
-              alert[:id] = att.id
-              alert[:alert_count] = att.pcap_alerts.count
-
-              alert[:pcap_alerts] = []
-
-              att.pcap_alerts.joins(:rule).where.not(rules: {sid: nil}).order('rules.gid, rules.sid').each do |p_alert|
-                new_pcap_alert = {}
-                new_pcap_alert[:sid_colon_format] = p_alert.rule.sid_colon_format
-                new_pcap_alert[:message] = p_alert.rule.message
-                alert[:pcap_alerts] << new_pcap_alert
-              end
-
-              response[:data] << alert
-            end
-
-            response.to_json
-          rescue
-            Rails.logger.error($!)
-            Rails.logger.error($!.backtrace.join("\n"))
-            response = {}
-            response[:status] = "fail"
-            response[:error] = "Something went wrong. The alerts have not been updated."
-            response.to_json
-          end
-        end
-
-        desc "get alerts for alerts tab"
-        params do
-          requires :id, type: Integer, desc: "Bugzilla id."
-        end
-        get '/alerts/:id' do
-          begin
-            bug = Bug.where(id: params[:id]).first
-            response = {}
-            response[:status] = "success"
-            response[:data] = {}
-            response[:data][:alerts] = []
             rules = bug.rules.sort { |left, right| left <=> right }
             pcap_attachments = []
             bug.attachments.where(is_obsolete: false).map do |att|
@@ -88,56 +43,48 @@ module API
               alert[:rules] = []
               alert[:pcap_alerts] = []
               rules.each do |rule|
+                has_untested_attachments = att.bug.bugs_rules.select{|b| b.rule_id == rule.id && b.tested == true }.blank?
+                has_local_alerts = att.alerts.select {|alert| alert.test_group == Alert::TEST_GROUP_LOCAL && alert.rule_id == rule.id}.present?
                 pcap_rule = {}
-                pcap_rule[:alert_css_class] = Rule.get_alert_css_class_for(rule, att)
-                pcap_rule[:alert_status] = Rule.get_alert_status_for(rule, att)
+                pcap_rule[:alert_css_class] = Rule.get_alert_css_class_for(has_untested_attachments, has_local_alerts)
+                pcap_rule[:alert_status] = Rule.get_alert_status_for(has_untested_attachments, has_local_alerts)
                 pcap_rule[:sid_colon_format] = rule.sid_colon_format
                 pcap_rule[:message] = rule.message
                 alert[:rules] << pcap_rule
               end
 
-              att.pcap_alerts.joins(:rule).where.not(rules: {sid: nil}).order('rules.gid, rules.sid').each do |p_alert|
+              pc_alert = {}
+              pc_alert[:id] = att.id
+              pc_alert[:alert_count] = att.alerts.select{|alert| alert.test_group == Alert::TEST_GROUP_PCAP}.size
+
+
+              pc_alert[:pcap_alerts] = []
+
+              att.pcap_alerts.includes(:rule).where.not(rules: {sid: nil}).order('rules.gid, rules.sid').each do |p_alert|
                 new_pcap_alert = {}
                 new_pcap_alert[:sid_colon_format] = p_alert.rule.sid_colon_format
                 new_pcap_alert[:message] = p_alert.rule.message
                 new_pcap_alert[:rule_id] = p_alert.rule.id
                 alert[:pcap_alerts] << new_pcap_alert
+                pc_alert[:pcap_alerts] << new_pcap_alert
               end
-              response[:data][:alerts] << alert
+              response[:alerts_tab][:alerts] << alert
+              response[:attachments_tab] << pc_alert
             end
-            response.to_json
-          rescue
-            Rails.logger.error($!)
-            Rails.logger.error($!.backtrace.join("\n"))
-            response = {}
-            response[:status] = "fail"
-            response[:error] = "Something went wrong. The alerts have not been updated."
-            response.to_json
-          end
-        end
-
-        desc "get rule for rules tab"
-        params do
-          requires :id, type: Integer, desc: "Bugzilla id."
-        end
-        get '/rules/:id' do
-          begin
-            @bug = Bug.find_by_id(params[:id])
-            response = {}
-            response[:status] = 'success'
-            response[:data] = []
 
 
-            rules = @bug.rules
+            response[:rules_tab] = []
 
             rules.each do |rule|
+              is_tested_on_bug = rule.tested_on_bug?(bug)
               rule_packet = {}
               rule_packet[:id] = rule.id
-              rule_packet[:alert_count] = @bug.local_alerts.by_rule(rule).count
-              rule_packet[:tested] = rule.tested_on_bug?(@bug)
-              rule_packet[:svn_output] = rule.tested_on_bug?(@bug) ? rule.svn_result_output : ""
+
+              rule_packet[:alert_count] = bug.alerts.select {|alert| alert.test_group == Alert::TEST_GROUP_LOCAL && alert.rule_id == rule.id}.size
+              rule_packet[:tested] = is_tested_on_bug
+              rule_packet[:svn_output] = is_tested_on_bug ? rule.svn_result_output : ""
               rule_packet[:attachments] = []
-              @bug.attachment_local_alerts(rule).each do |att|
+              bug.attachment_local_alerts(rule).each do |att|
                 rule_att = {}
                 rule_att[:att_id] = att.id
                 rule_att[:file_name] = att.file_name
@@ -145,33 +92,13 @@ module API
                 rule_packet[:attachments] << rule_att
               end
 
-              response[:data] << rule_packet
+              response[:rules_tab] << rule_packet
             end
 
-            response.to_json
-          rescue
-            Rails.logger.error($!)
-            Rails.logger.error($!.backtrace.join("\n"))
-            response = {}
-            response[:status] = "fail"
-            response[:error] = "Something went wrong. The rules tab has not been updated."
-            response.to_json
-          end
-        end
-
-        desc "get job queue for a bug"
-        params do
-          requires :id, type: Integer, desc: "Bugzilla id."
-        end
-        get '/queue/:id' do
-          begin
-            @bug = Bug.find_by_id(params[:id])
-            response = {}
-            response[:status] = 'success'
-            response[:data] = []
+            response[:jobs_tab] = []
             bug_queue = []
 
-            tasks = @bug.tasks.any_relations.reverse_chron
+            tasks = bug.tasks.any_relations.reverse_chron
 
             tasks.each do |task|
               task.check_timeout
@@ -187,14 +114,15 @@ module API
               response_task['created_at'] = task.created_at.strftime("%m/%d/%y %H:%M:%S")
               bug_queue << response_task
             end
-            response[:data] = bug_queue
+            response[:jobs_tab] = bug_queue
+
             response.to_json
           rescue
             Rails.logger.error($!)
             Rails.logger.error($!.backtrace.join("\n"))
             response = {}
             response[:status] = "fail"
-            response[:error] = "Something went wrong. The job queue has not been updated."
+            response[:error] = "Something went wrong. Tabs were not updated."
             response.to_json
           end
         end
@@ -599,7 +527,6 @@ module API
                   options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
                   Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                   current_user.bugs << bug
-                  binding.pry
                   Bug.update(permitted_params[:id], state: "ASSIGNED") unless ['PENDING', 'FIXED', 'WONTFIX', 'INVALID', 'LATER'].include? bug.state
                 end
               end

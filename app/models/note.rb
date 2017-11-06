@@ -61,8 +61,8 @@ class Note < ApplicationRecord
 
   end
 
-  def self.process_note(options,bugzilla_session)
-    new_note = Bugzilla::Bug.new(bugzilla_session).add_comment(options)
+  def self.process_note(options,xmlrpc)
+    new_note = xmlrpc.add_comment(options)
     if options[:note_id].blank?
       note = Note.create(id: new_note['id'],
                          comment: options[:comment],

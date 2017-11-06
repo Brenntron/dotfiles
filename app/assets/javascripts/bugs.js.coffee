@@ -584,37 +584,41 @@ namespace 'AC.Bugs', (exports) ->
 
 
   exports.monitorJobQueue = () ->
-    AC.Bugs.rebuildJobQueue()
-    AC.Bugs.rebuildRulesTab()
-    AC.Bugs.rebuildAttachmentsTab()
-    AC.Bugs.rebuildAlertsTab()
+    AC.Bugs.rebuildAllTabs()
     setInterval ->
-      #AC.Bugs.rebuildJobQueue()
-      AC.Bugs.rebuildRulesTab()
-      AC.Bugs.rebuildAttachmentsTab()
-      #AC.Bugs.rebuildAlertsTab()
-    , 60000
+      AC.Bugs.rebuildAllTabs()
+    , 40000
 
 
-  #Rebuild Alerts Tab
-  exports.rebuildAlertsTab = () ->
+  exports.rebuildAllTabs = () ->
     bid = $('.bugzilla_id').text()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/bugs/alerts/' + bid
+      url: '/api/v1/bugs/tabs/' + bid
       headers: headers
       method: 'GET'
-
     ).done (response) ->
       json = $.parseJSON(response)
       if (json.status == "success")
         $("#alert_message").addClass('alert alert-danger alert-dismissable').html("")
         $("#alert_message").removeClass('alert alert-danger alert-dismissable')
-        rows = AC.Bugs.buildAlertRows(json.data)
+        ##handle alerts tab
+        alerts_json = json.alerts_tab
+        rows = AC.Bugs.buildAlertRows(alerts_json)
         $("#alerts-table tbody").html(rows)
+        ##handle rules tab
+        rules_json = json.rules_tab
+        AC.Bugs.buildRulesRows(rules_json)
+        ##handle attachments tab
+        attachments_json = json.attachments_tab
+        AC.Bugs.buildAttachmentsRows(attachments_json)
+        ##handle job queue tab
+        job_queue_json = json.jobs_tab
+        rows = AC.Bugs.buildJobRows(job_queue_json)
+        $("#task-log-table tbody").html("")
+        $("#task-log-table tbody").html(rows)
       else
         $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
-
 
   exports.buildAlertRows = (data) ->
     rows = []
@@ -659,26 +663,6 @@ namespace 'AC.Bugs', (exports) ->
 
     return content
 
-
-
-  #Rebuild Rules Tab
-  exports.rebuildRulesTab = () ->
-    bid = $('.bugzilla_id').text()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/api/v1/bugs/rules/' + bid
-      headers: headers
-      method: 'GET'
-
-    ).done (response) ->
-      json = $.parseJSON(response)
-      if (json.status == "success")
-        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("")
-        $("#alert_message").removeClass('alert alert-danger alert-dismissable')
-        AC.Bugs.buildRulesRows(json.data)
-      else
-        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
-
   exports.buildRulesRows = (data) ->
     for rule in data
       if $("#rule_count_#{rule.id}").length != 0
@@ -698,24 +682,6 @@ namespace 'AC.Bugs', (exports) ->
             $("#rule_#{rule.id}_att_#{att.att_id}").html("Alerted")
             $("#rule_#{rule.id}_att_#{att.att_id}").removeClass();
             $("#rule_#{rule.id}_att_#{att.att_id}").addClass('alerted')
-
-  #Rebuild Attachments Tab
-  exports.rebuildAttachmentsTab = () ->
-    bid = $('.bugzilla_id').text()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/api/v1/bugs/attachments/' + bid
-      headers: headers
-      method: 'GET'
-
-    ).done (response) ->
-      json = $.parseJSON(response)
-      if (json.status == "success")
-        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("")
-        $("#alert_message").removeClass('alert alert-danger alert-dismissable')
-        AC.Bugs.buildAttachmentsRows(json.data)
-      else
-        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
 
   exports.buildAttachmentsRows = (data) ->
     for attachment in data
@@ -767,22 +733,3 @@ namespace 'AC.Bugs', (exports) ->
     return "<td>#{data['created_at']}</td>"
   exports.buildTypeColumn = (data) ->
     return "<td class='task-type-col'>#{data['task_type']}</td>"
-  exports.rebuildJobQueue = () ->
-    bid = $('.bugzilla_id').text()
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/api/v1/bugs/queue/' + bid
-      headers: headers
-      method: 'GET'
-
-    ).done (response) ->
-      json = $.parseJSON(response)
-      if (json.status == "success")
-        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("")
-        $("#alert_message").removeClass('alert alert-danger alert-dismissable')
-        rows = AC.Bugs.buildJobRows(json.data)
-
-        $("#task-log-table tbody").html("")
-        $("#task-log-table tbody").html(rows)
-      else
-        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
