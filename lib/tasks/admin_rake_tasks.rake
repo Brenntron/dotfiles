@@ -24,9 +24,9 @@ namespace :bugs do
     bug_ids_to_update.each do |id|
       task_result += "#{id}\n"
       Rails.logger.info  "importing bug #{id}"
-      xmlrpc_bug = Bugzilla::Bug.new(xmlrpc)
-      new_bug = xmlrpc_bug.get(id)
-      bug = Bug.bugzilla_import(current_user.id, xmlrpc_bug, xmlrpc_token, new_bug).first
+      # xmlrpc_bug = Bugzilla::Bug.new(xmlrpc)
+      # new_bug = xmlrpc_bug.get(id)
+      # bug = Bug.bugzilla_import(current_user.id, xmlrpc_bug, xmlrpc_token, new_bug).first
     end
 
     task.time_elapsed = (Time.now.to_f - task.created_at .to_f).round
