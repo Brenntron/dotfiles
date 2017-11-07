@@ -34,7 +34,9 @@ test:
   perl:
     cmd: "/usr/bin/env perl"
     canvas_root: "extras"
+    extras_dir: 'extras'
     visruleparser_path: "extras/visruleparser_dev.pl"
+    snort_json_path: 'extras/snort_json_parser.pl'
     cve2x_path: "extras/cve2x_dev.pl"
     rule2yaml_path: "extras/rule2yaml_dev.pl"
   ruletest:
@@ -56,7 +58,9 @@ staging:
   perl:
     cmd: "/usr/local/bin/perl"
     canvas_root: "extras"
+    extras_dir: 'extras'
     visruleparser_path: "extras/visruleparser.pl"
+    snort_json_path: 'extras/snort_json_parser.pl'
     cve2x_path: "extras/cve2x.pl"
     rule2yaml_path: "extras/rule2yaml.pl"
   ruletest:
