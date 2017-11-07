@@ -68,7 +68,7 @@ class Task < ApplicationRecord
     result.each_line.map do |line|
       line.lstrip!
       num, sid, gid, rev, cks, mch, alt, micsec, ave_check, ave_match, ave_nonmatch, dis = line.split(/\s+/)
-      if num =~ /^\d+$/
+      if (num =~ /^\d+$/).present?
         { gid: gid.to_i, sid: sid.to_i,
           average_check: ave_check, average_match: ave_match, average_nonmatch: ave_nonmatch }
       else
