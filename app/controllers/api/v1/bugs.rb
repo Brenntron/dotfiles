@@ -4,6 +4,53 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+
+        desc "import one bug from bugzilla"
+        params do
+          requires :id, type: Integer, desc: "Bugzilla id."
+          optional :import_type, type: String, desc: "Type of Import"
+        end
+        get 'import/:id' do
+          import_type = params[:import_type].present? ? params[:import_type] : "import"
+          xmlrpc_token = request.headers['Xmlrpc-Token']
+
+          if xmlrpc_token
+            Rails.logger.debug("Bugzilla: Importing Bug: #{params[:id]}")
+            progress_bar = Event.create(user: current_user.display_name, action: "import_bug:#{params[:id]}", description: "#{request.headers["Token"]}", progress: 10)
+
+            begin
+              ActiveRecord::Base.transaction do
+                xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+                new_bug = xmlrpc.get(permitted_params[:id])
+                initial_bug_state = Bug.where(id: permitted_params[:id]).first
+                if initial_bug_state
+                  initial_bug_state = initial_bug_state.clone
+                end
+                progress_bar.update_attribute("progress", 10)
+                #create the bug from bugzilla
+                bug = Bug.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bug, progress_bar, import_type).first
+
+                if initial_bug_state.present?
+                  report = bug.compile_import_report(initial_bug_state)
+                end
+
+                sleep(1)
+                {:status => "success", :import_report => report}.to_json
+              end
+
+            rescue Exception => e
+              Rails.logger.error "Bug failed to upload, backing out all DB changes."
+              Rails.logger.error $!
+              Rails.logger.error $!.backtrace.join("\n")
+              progress_bar.update_attribute("progress", -1)
+              error = "There was an error when attempting to upload bug, no bug was uploaded or synched as a result."
+              {:error => error}.to_json
+            end
+          else
+            false
+          end
+        end
+
         desc "test the websocket"
         get 'websocket' do
           bug = Bug.first
@@ -14,7 +61,7 @@ module API
           PublishWebsocket.push_changes(record)
         end
 
-        desc ""
+        desc "update all tabs"
         params do
           requires :id, type: Integer, desc: "Bugzilla id."
         end
@@ -193,53 +240,6 @@ module API
           end
         end
 
-        desc "import one bug from bugzilla"
-        params do
-          requires :id, type: Integer, desc: "Bugzilla id."
-          optional :import_type, type: String, desc: "Type of Import"
-        end
-        route_param "import/:id" do
-          get do
-            import_type = params[:import_type].present? ? params[:import_type] : "import"
-            xmlrpc_token = request.headers['Xmlrpc-Token']
-
-            if xmlrpc_token
-              Rails.logger.debug("bugzilla: Importing bug: #{params[:id]}")
-              progress_bar = Event.create(user: current_user.display_name, action: "import_bug:#{params[:id]}", description: "#{request.headers["Token"]}", progress: 10)
-
-              begin
-                ActiveRecord::Base.transaction do
-                  xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-                  new_bug = xmlrpc.get(permitted_params[:id])
-                  initial_bug_state = Bug.where(id: permitted_params[:id]).first
-                  if initial_bug_state
-                    initial_bug_state = initial_bug_state.clone
-                  end
-                  progress_bar.update_attribute("progress", 10)
-                  #create the bug from bugzilla
-                  bug = Bug.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bug, progress_bar, import_type).first
-
-                  if initial_bug_state.present?
-                    report = bug.compile_import_report(initial_bug_state)
-                  end
-
-                  sleep(1)
-                  {:status => "success", :import_report => report}.to_json
-                end
-
-              rescue Exception => e
-                Rails.logger.error "Bug failed to upload, backing out all DB changes."
-                Rails.logger.error $!
-                Rails.logger.error $!.backtrace.join("\n")
-                progress_bar.update_attribute("progress", -1)
-                error = "There was an error when attempting to upload bug, no bug was uploaded or synched as a result."
-                {:error => error}.to_json
-              end
-            else
-              false
-            end
-          end
-        end
 
         desc "delete a rule with this bug"
         params do
