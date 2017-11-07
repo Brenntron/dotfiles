@@ -585,9 +585,9 @@ namespace 'AC.Bugs', (exports) ->
 
   exports.monitorJobQueue = () ->
     AC.Bugs.rebuildAllTabs()
-#    setInterval ->
-#      AC.Bugs.rebuildAllTabs()
-#    , 40000
+    setInterval ->
+      AC.Bugs.rebuildAllTabs()
+    , 50000
 
 
   exports.rebuildAllTabs = () ->
