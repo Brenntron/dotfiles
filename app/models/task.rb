@@ -108,7 +108,7 @@ class Task < ApplicationRecord
     if new_scheduled_task.save
       case task_type
         when "Import all"
-          new_scheduled_task.delay(run_at: run_at).run_rake("bugs:import_all",run_at,re_run,current_user,bugzilla_session)
+          # new_scheduled_task.delay(run_at: run_at).run_rake("bugs:import_all",run_at,re_run,current_user,bugzilla_session)
       end
     else
       return false

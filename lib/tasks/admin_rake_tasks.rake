@@ -34,9 +34,9 @@ namespace :bugs do
     task.result = task_result
     task.save
 
-    if re_run
-      Task.schedule_task(task.task_type, run_at + 24.hours, re_run, current_user, xmlrpc)
-    end
+    # if re_run
+    #   Task.schedule_task(task.task_type, run_at + 24.hours, re_run, current_user, xmlrpc)
+    # end
   end
 
 
