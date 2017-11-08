@@ -842,6 +842,7 @@ class Bug < ApplicationRecord
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:)
     bug.initialize_report
+    bug_is_being_resolved = bug.state != "PENDING" ? false : true
 
     #add a comment to the existing committer note. from issue 981
     if permitted_params[:bug][:state_comment]
@@ -957,8 +958,7 @@ class Bug < ApplicationRecord
     Bug.update(permitted_params[:id], update_params)
 
     bug.reload
-
-    bug_is_being_resolved = bug.state != "PENDING" ? false : true
+    
 
     if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
       bug_is_being_resolved = !bug_is_being_resolved
