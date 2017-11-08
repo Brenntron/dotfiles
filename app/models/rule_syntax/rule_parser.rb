@@ -95,7 +95,7 @@ module RuleSyntax
 
           if /\A(?<category>[-\w]+)\s(?<message>.*)\z/ =~ msg
             attributes[:rule_category] = category
-            attributes[:message] = message
+            attributes[:message] = msg
           end
         end
       end
