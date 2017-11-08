@@ -127,11 +127,11 @@ module API
               rule_packet = {}
               rule_packet[:id] = rule.id
 
-              rule_packet[:svn_output] = rule.tested_on_bug?(@bug)? rule.svn_result_output : ""
+              rule_packet[:svn_output] = rule.tested_on_bug?(bug) ? rule.svn_result_output : ""
 
-              rule_packet[:tested] = rule.tested_on_bug?(@bug)
-              rule_packet[:alert_count] = rule.display_alerts_count(@bug)
-              rule_packet[:alerts] = rule.display_alerts(@bug)
+              rule_packet[:tested] = rule.tested_on_bug?(bug)
+              rule_packet[:alert_count] = rule.display_alerts_count(bug)
+              rule_packet[:alerts] = rule.display_alerts(bug)
 
               response[:rules_tab] << rule_packet
             end
