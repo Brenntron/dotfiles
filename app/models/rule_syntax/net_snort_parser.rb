@@ -53,20 +53,34 @@ module RuleSyntax
           " #{parsed['dst']} #{parsed['dstport']}"
     end
 
+    # Separates the flow and flowbits from the detection options
+    def separated_options
+      @options = parsed['options'].inject({}) do |options, (key, option)|
+        case option['type']
+          when 'flow'
+            options[:flow] = option['original']
+          when 'flowbits'
+            options[:flowbits] = option['args']
+          else
+            options[:detection_hash] ||= {}
+            options[:detection_hash][key.to_i] = option
+        end
+        options
+      end
+    end
+
+    # Orders the detection hash
+    def order_detection(detection_hash)
+      detection_hash.keys.sort.inject([]) do |option_array, key|
+        option_array << detection_hash[key]
+        option_array
+      end
+    end
+
     def options
       unless @options
-        @options = parsed['options'].values.inject({}) do |options, option|
-          case option['type']
-            when 'flow'
-              options[:flow] = option['original']
-            when 'flowbits'
-              options[:flowbits] = option['args']
-            else
-              options[:detection_options] ||= []
-              options[:detection_options] << option
-          end
-          options
-        end
+        @options = separated_options
+        @options[:detection_options] = order_detection(@options[:detection_hash])
       end
       @options
     end
@@ -162,14 +176,11 @@ module RuleSyntax
       # optimized fast return
       return false unless self_options.count == other_options.count
 
-      self_options.each do |self_option|
-        other_option = other_options.find{ |option| option_same?(self_option, option) }
-        return false unless other_option #match is false if self has option that other does not
-        other_options.delete(other_option)
+      self_options.each_with_index do |self_option, index|
+        return false unless option_same?(self_option, other_options[index])
       end
 
-      #match is false if other has option that self does not
-      other_options.empty?
+      true
     end
 
     def metadata_match?(parser)
