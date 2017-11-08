@@ -123,13 +123,17 @@ module API
             response[:rules_tab] = []
 
             rules.each do |rule|
-              is_tested_on_bug = rule.tested_on_bug?(bug)
               rule_packet = {}
               rule_packet[:id] = rule.id
 
-              rule_packet[:svn_output] = rule.tested_on_bug?(bug) ? rule.svn_result_output : ""
+              if rule.tested_on_bug?(bug)
+                rule_packet[:tested] = true
+                rule_packet[:svn_output] = rule.svn_result_output
+              else
+                rule_packet[:tested] = false
+                rule_packet[:svn_output] = ""
+              end
 
-              rule_packet[:tested] = rule.tested_on_bug?(bug)
               rule_packet[:alert_count] = rule.display_alerts_count(bug)
               rule_packet[:alerts] = rule.display_alerts(bug)
 

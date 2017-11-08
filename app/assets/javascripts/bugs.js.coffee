@@ -467,8 +467,12 @@ $ ->
   }
 
   $(".rulealert-toggle").on 'click', ->
-    which = $(this).data('rulealert');
-    $('.'+which).toggle();
+    text = this.textContent
+    which = $(this).data('rulealert')
+    if 'untested' == text
+      $('.'+which).hide()
+    else
+      $('.'+which).toggle()
 
   $("#add-bug-ref-btn").on 'click', ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -666,12 +670,13 @@ namespace 'AC.Bugs', (exports) ->
   exports.buildRulesRows = (data) ->
     for rule in data
       if $("#rule_count_#{rule.id}").length != 0
-        $("#rule_count_#{rule.id}").html(rule.alert_count)
         if rule.tested == true
           $("#tested_rule_#{rule.id}").html("<span class='glyphicon glyphicon-ok' title='#{rule.svn_output}'></span>")
           $('[data-toggle="tooltip"]').tooltip();
+          $("#rule_count_#{rule.id}").html(rule.alert_count)
         else
           $("#tested_rule_#{rule.id}").html("<span class='glyphicon glyphicon-minus'></span>")
+          $("#rule_count_#{rule.id}").html("untested")
         for alert in rule.alerts
           $("#rule_#{rule.id}_att_#{alert.pcap_id}").removeClass();
           if 'alerted' == alert.alert_status
