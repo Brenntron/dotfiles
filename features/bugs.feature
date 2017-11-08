@@ -456,7 +456,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And I can not select "FIXED" from "bug[state]"
+    And the "FIXED" option from "bug[state]" is disabled
     And the "REOPENED" option from "bug[state]" is not disabled
 
   @javascript

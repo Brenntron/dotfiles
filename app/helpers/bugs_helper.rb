@@ -27,11 +27,8 @@ def set_bug_color(bug)
       when "FIXED", "WONTFIX", "LATER", "INVALID"
         remove_list  << "ASSIGNED" << "OPEN" << "PENDING"
     end
-    unless bug.can_resolve?
+    if !bug.can_resolve? && bug.state != "PENDING"
       remove_list << "PENDING"
-    end
-    unless current_user.has_role?('committer')
-      remove_list << "FIXED" << "WONTFIX" << "LATER" << "INVALID"
     end
     STATE_OPTIONS.reject{ |so| remove_list.include? so }
   end
