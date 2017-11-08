@@ -53,20 +53,34 @@ module RuleSyntax
           " #{parsed['dst']} #{parsed['dstport']}"
     end
 
+    # Separates the flow and flowbits from the detection options
+    def separated_options
+      @options = parsed['options'].inject({}) do |options, (key, option)|
+        case option['type']
+          when 'flow'
+            options[:flow] = option['original']
+          when 'flowbits'
+            options[:flowbits] = option['args']
+          else
+            options[:detection_hash] ||= {}
+            options[:detection_hash][key.to_i] = option
+        end
+        options
+      end
+    end
+
+    # Orders the detection hash
+    def order_detection(detection_hash)
+      detection_hash.keys.sort.inject([]) do |option_array, key|
+        option_array << detection_hash[key]
+        option_array
+      end
+    end
+
     def options
       unless @options
-        @options = parsed['options'].values.inject({}) do |options, option|
-          case option['type']
-            when 'flow'
-              options[:flow] = option['original']
-            when 'flowbits'
-              options[:flowbits] = option['args']
-            else
-              options[:detection_options] ||= []
-              options[:detection_options] << option
-          end
-          options
-        end
+        @options = separated_options
+        @options[:detection_options] = order_detection(@options[:detection_hash])
       end
       @options
     end
