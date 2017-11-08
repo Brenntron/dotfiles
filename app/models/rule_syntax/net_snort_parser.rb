@@ -134,7 +134,17 @@ module RuleSyntax
       return false unless (option_left.keys - option_right.keys).empty?
       return false unless (option_right.keys - option_left.keys).empty?
 
-      option_left.all? {|key, value| value == option_right[key]}
+      option_left.all? do |key, value|
+
+        # optomized will normalize case of hex escape
+        # so if optomized is available, do not compare original, the optomized value will make the comparison
+        case
+          when %w{original string}.include?(key) && option_left.keys.include?('optomized')
+            true
+          else
+            value == option_right[key]
+        end
+      end
     end
 
     # Compares the detection options with the detection options of another parser.
