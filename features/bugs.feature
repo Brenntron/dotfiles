@@ -474,18 +474,6 @@ Feature: Bug
 
 
   @javascript
-  Scenario: a user can return to the index from viewing a bug
-    Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And I goto "/bugs/222222"
-    And I click "back_btn"
-    Then I should see "Summary"
-    And I should not see "Overview"
-
-  @javascript
   Scenario: a user can change the state of a bug
 #    Given a user exists and is logged in
 #    And the following bugs exist:

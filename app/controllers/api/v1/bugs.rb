@@ -127,17 +127,11 @@ module API
               rule_packet = {}
               rule_packet[:id] = rule.id
 
-              rule_packet[:alert_count] = bug.alerts.select {|alert| alert.test_group == Alert::TEST_GROUP_LOCAL && alert.rule_id == rule.id}.size
-              rule_packet[:tested] = is_tested_on_bug
-              rule_packet[:svn_output] = is_tested_on_bug ? rule.svn_result_output : ""
-              rule_packet[:attachments] = []
-              bug.attachment_local_alerts(rule).each do |att|
-                rule_att = {}
-                rule_att[:att_id] = att.id
-                rule_att[:file_name] = att.file_name
-                rule_att[:rule_id_nil] = att.rule_id.nil?
-                rule_packet[:attachments] << rule_att
-              end
+              rule_packet[:svn_output] = rule.tested_on_bug?(bug) ? rule.svn_result_output : ""
+
+              rule_packet[:tested] = rule.tested_on_bug?(bug)
+              rule_packet[:alert_count] = rule.display_alerts_count(bug)
+              rule_packet[:alerts] = rule.display_alerts(bug)
 
               response[:rules_tab] << rule_packet
             end
