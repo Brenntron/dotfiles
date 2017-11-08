@@ -958,7 +958,6 @@ class Bug < ApplicationRecord
     Bug.update(permitted_params[:id], update_params)
 
     bug.reload
-    
 
     if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
       bug_is_being_resolved = !bug_is_being_resolved
