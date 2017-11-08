@@ -166,14 +166,11 @@ module RuleSyntax
       # optimized fast return
       return false unless self_options.count == other_options.count
 
-      self_options.each do |self_option|
-        other_option = other_options.find{ |option| option_same?(self_option, option) }
-        return false unless other_option #match is false if self has option that other does not
-        other_options.delete(other_option)
+      self_options.each_with_index do |self_option, index|
+        return false unless option_same?(self_option, other_options[index])
       end
 
-      #match is false if other has option that self does not
-      other_options.empty?
+      true
     end
 
     def metadata_match?(parser)
