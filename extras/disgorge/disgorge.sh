@@ -201,7 +201,7 @@ if [ "" != "$VERSION" ]; then
        bash -c "cd $RELPATH; mv $TAGDIR $VERSION"
     fi
     echo "* tar file = $VERSION.tar.gz"
-    bash -c "cd $RELPATH; tar czf $VERSION.tar.gz $VERSION"
+    bash -c "cd $RELPATH; tar czhf $VERSION.tar.gz $VERSION"
 fi
 
 
