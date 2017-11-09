@@ -2,26 +2,31 @@ class NotesController < ApplicationController
   load_and_authorize_resource
 
   def create
-    if Note::TEMPLATE_RESEARCH == params[:note][:comment]
-      render json: 'Unchanged content', status: 422
-      return
-    end
-    if params[:is_research_notes].present?
-      @note = Bug.where("id=?", params[:note][:bugzilla_id]).first
-      @note.research_notes = params[:note][:comment]
-    else
-      if params[:note][:id]
-        @note = Note.where("id=?", params[:note][:id]).first
-        @note.comment = params[:note][:comment]
-      else
-        @note = Note.new(note_params.merge(author: current_user.email))
-        @note.bug_id ||= params[:note][:bugzilla_id]
+    begin
+      if Note::TEMPLATE_RESEARCH == params[:note][:comment]
+        render json: 'Unchanged content', status: 422
+        return
       end
-    end
-    if @note.save
-      render json: @note
-    else
-      render json: @note.errors.full_messages, status: 422
+      if params[:is_research_notes].present?
+        @note = Bug.where("id=?", params[:note][:bugzilla_id]).first
+        @note.research_notes = params[:note][:comment]
+      else
+        if params[:note][:id]
+          @note = Note.where("id=?", params[:note][:id]).first
+          @note.comment = params[:note][:comment]
+        else
+          @note = Note.new(note_params.merge(author: current_user.email))
+          @note.bug_id ||= params[:note][:bugzilla_id]
+        end
+      end
+
+      if @note.save
+        render json: @note
+      else
+        render json: @note.errors.full_messages, status: 422
+      end
+    rescue
+      render json: "There was an error, notes were NOT saved.", status: 422
     end
   end
 
