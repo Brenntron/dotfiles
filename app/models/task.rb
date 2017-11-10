@@ -88,12 +88,16 @@ class Task < ApplicationRecord
       rule = Rule.by_sid(stats[:sid], stats[:gid]).first
       if rule
         data = stats.slice(*%i(average_check average_match average_nonmatch))
-        test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
+        begin
+         tr = test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
+        rescue ActiveRecord::RecordNotUnique => e
+          TestReport.where(task_id: id).first.destroy
+          tr = test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
+        end
+        bug.test_reports << tr
       end
     end
-
     update(stats_updated_at: Time.now)
-
     true
   end
 
