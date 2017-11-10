@@ -44,6 +44,7 @@ class Task < ApplicationRecord
   def check_timeout
     if (Time.now - self.created_at) > 10.minutes  && self.completed.blank?
       self.failed = true
+      self.completed = true
       self.result = "Task timed-out.  Possible poller down or network error."
       save
     end

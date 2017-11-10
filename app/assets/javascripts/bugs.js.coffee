@@ -618,6 +618,11 @@ namespace 'AC.Bugs', (exports) ->
         AC.Bugs.buildAttachmentsRows(attachments_json)
         ##handle job queue tab
         job_queue_json = json.jobs_tab
+        open_jobs = json.open_jobs_count
+        if open_jobs == 0
+          $(".jobs-tab").html("Jobs")
+        else
+          $(".jobs-tab").html("Jobs (#{open_jobs})")
         rows = AC.Bugs.buildJobRows(job_queue_json)
         $("#task-log-table tbody").html("")
         $("#task-log-table tbody").html(rows)
