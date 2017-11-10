@@ -7,22 +7,22 @@
     = csrf_meta_tags
   %body{class: "rocket-layout #{controller_name}-controller #{action_name}-action"}
     #sidenav-icons-div.sidenav
-      .hamburger-icon-div
+      .hamburger-icon-div.menuheight
         %a#hamburger-icon
           %span.icon-bar
           %span.icon-bar
           %span.icon-bar
-          ICO
+      .more ICO
 
     #sidenav-menu-div.sidenav
-      .hamburger-menu-div
+      .hamburger-menu-div.menuheight
         %a#hamburger-menu
           %span.icon-bar
           %span.icon-bar
           %span.icon-bar
-          MENU
+      .more MENU
 
     #main-content.overall
       #yield-div
-        -#=yield
+        =yield
 
