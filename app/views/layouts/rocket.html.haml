@@ -1,0 +1,28 @@
+!!! html
+%html
+  %head
+    %title= content_for?(:title) ? content_for(:title) : 'Analyst Console'
+    = stylesheet_link_tag("application", media: "all", "data-turbolinks-track" => true)
+    = javascript_include_tag("application", "data-turbolinks-track" => true)
+    = csrf_meta_tags
+  %body{class: "rocket-layout #{controller_name}-controller #{action_name}-action"}
+    #sidenav-icons-div.sidenav
+      .hamburger-icon-div
+        %a#hamburger-icon
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
+          ICO
+
+    #sidenav-menu-div.sidenav
+      .hamburger-menu-div
+        %a#hamburger-menu
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
+          MENU
+
+    #main-content.overall
+      #yield-div
+        -#=yield
+

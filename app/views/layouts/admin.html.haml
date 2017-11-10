@@ -1,6 +1,9 @@
-!!!
-%html
+- content_for(:title) do
+  Admin - Analyst Console
+
+- content_for(:prior) do
   %head
+    %tada
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
     %title Analyst Console
     = stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true
@@ -63,3 +66,7 @@
                 .col-xs-12.actions-bar
               = render partial: "shared/flash_messages", flash: flash
               = yield
+
+
+= render template: "layouts/rocket"
+
