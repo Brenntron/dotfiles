@@ -37,7 +37,8 @@ class NotesController < ApplicationController
           :is_markdown => params[:note][:is_markdown],
           :minor_update => params[:note][:minor_update]
       }.reject() { |k, v| v.nil? }
-      if Note.process_note(options, bugzilla_session)
+      xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+      if Note.process_note(options, xmlrpc)
         render json: "Note Published!", status: 200
       else
         render json: "Published to bugzilla but not updated in local db", status: 422
