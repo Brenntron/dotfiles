@@ -7,7 +7,7 @@
     = csrf_meta_tags
 
   %body{class: "rocket-layout #{controller_name}-controller #{action_name}-action"}
-    #sidenav-icons-div
+    #sidenav-icons-div.nav-col
       .menuheight
         %a= image_tag('layout/ac_rocket.png', height: '40', width: '40')
       .menuheight
@@ -19,11 +19,11 @@
       .menuheight
         %a= image_tag('layout/wiki.png', height: '40', width: '40')
 
-    #sidenav-menu-div
+    #sidenav-menu-div.nav-col
       .menuheight.menutext
         %a
           = image_tag('layout/ac_rocket.png', height: '40', width: '40')
-          Analyst Console
+          Analyst Con
       .menuheight
         %a= image_tag('layout/menu-collapse.png', height: '40', width: '40')
       .menuheight.menutext
