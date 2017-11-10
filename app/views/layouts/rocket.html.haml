@@ -39,7 +39,16 @@
           = image_tag('layout/wiki.png', height: '40', width: '40')
           Wiki
 
-    #main-content
+    #main-col
+      #nav-banner
+        - if current_user
+          #login-div
+            %a{href: "/users/#{current_user[:id]}"}
+              %p.login-area
+                %span.login-label
+                  %strong.current_user= current_user[:display_name]
+          #username= current_user.cvs_username
+
       #yield-div
         =yield
 
