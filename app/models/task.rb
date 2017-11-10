@@ -89,10 +89,14 @@ class Task < ApplicationRecord
       if rule
         data = stats.slice(*%i(average_check average_match average_nonmatch))
         begin
-         tr = test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
-        rescue ActiveRecord::RecordNotUnique => e
-          TestReport.where(task_id: id).first.destroy
-          tr = test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
+          tr = test_reports.where(rule_id:rule.id).first
+          if tr
+            tr.update(data.merge(rule_id: rule.id, bug_id: bug.id))
+          else
+            tr = test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
+          end
+        rescue Exception => e
+          Rails.logger.info ("Test Report not created. #{e.message}")
         end
         bug.test_reports << tr
       end
