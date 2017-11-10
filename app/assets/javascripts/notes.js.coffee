@@ -17,8 +17,8 @@ $ ->
       type: 'POST'
       dataType: 'json'
       success: (response) ->
-        $('.alert_notes').removeClass('error')
-        $('.alert_notes').addClass('success').show().html('Notes saved')
+        $('.alert_notes_research').removeClass('error')
+        $('.alert_notes_research').addClass('success').show().html('Notes saved')
         $('#researchNotesCancelBtn, #researchNotesSaveBtn, #researchNotesPublishBtn, #researchNotesEditBtn').toggle()
         $('textarea[name="research_notes"]').attr("readonly", true)
         $('#researchNotesEditBtn').html('edit')
@@ -26,13 +26,13 @@ $ ->
         $('#researchNotesPublishBtn').attr('disabled', false)
         window.location.reload()
       error: (response) ->
-        $('.alert_notes').removeClass('success')
-        $('.alert_notes').addClass('error').show().html(response.responseText)
+        $('.alert_notes_reserach').removeClass('success')
+        $('.alert_notes_research').addClass('error').show().html("<h4>#{response.responseText}</h4>")
       complete: ->
         setTimeout (->
-          $('.alert_notes').hide 'blind', {}, 500
+          $('.alert_notes_research').hide 'blind', {}, 500
           return
-        ), 5000
+        ), 70000
     }
 
   $(document).on 'click', '#scratchpadNotesSaveBtn', (e) ->
@@ -51,21 +51,21 @@ $ ->
       type: 'POST'
       dataType: 'json'
       success: (response) ->
-        $('.alert_notes').removeClass('error')
-        $('.alert_notes').addClass('success').show().html('Notes saved')
+        $('.alert_notes_scratch').removeClass('error')
+        $('.alert_notes_scratch').addClass('success').show().html('Notes saved')
         $('#scratchpadNotesCancelBtn, #scratchpadNotesSaveBtn, #scratchpadNotesPublishBtn, #scratchpadNotesEditBtn').toggle()
         $('textarea[name="scratchpad_notes"]').attr("readonly", true)
         $('#scratchpadNotesEditBtn').html('edit')
         $('input[name="scratchpad_note_id"]').val(response.id)
         window.location.reload()
       error: (response) ->
-        $('.alert_notes').removeClass('success')
-        $('.alert_notes').addClass('error').show().html(response.responseText)
+        $('.alert_notes_scratch').removeClass('success')
+        $('.alert_notes_scratch').addClass('error').show().html("<h4>#{response.responseText}</h4>")
       complete: ->
         setTimeout (->
-          $('.alert_notes').hide 'blind', {}, 500
+          $('.alert_notes_scratch').hide 'blind', {}, 500
           return
-        ), 5000
+        ), 70000
     }
 
   $(document).on 'click', '#committerNotesSaveBtn', (e) ->
@@ -84,8 +84,8 @@ $ ->
       type: 'POST'
       dataType: 'json'
       success: (response) ->
-        $('.alert_notes').removeClass('error')
-        $('.alert_notes').addClass('success').show().html('Notes saved')
+        $('.alert_notes_commit').removeClass('error')
+        $('.alert_notes_commit').addClass('success').show().html('Notes saved')
         $('#committerNotesCancelBtn, #committerNotesSaveBtn, #committerNotesPublishBtn, #committerNotesEditBtn').toggle()
         $('#committerNotesEditBtn').html('edit')
         $('textarea[name="committer_notes"]').attr("readonly", true)
@@ -93,13 +93,13 @@ $ ->
         $('#committerNotesPublishBtn').attr('disabled', false)
         window.location.reload()
       error: (response) ->
-        $('.alert_notes').removeClass('success')
-        $('.alert_notes').addClass('error').show().html(response.responseText)
+        $('.alert_notes_commit').removeClass('success')
+        $('.alert_notes_commit').addClass('error').show().html("<h4>#{response.responseText}</h4>")
       complete: ->
         setTimeout (->
-          $('.alert_notes').hide 'blind', {}, 500
+          $('.alert_notes_commit').hide 'blind', {}, 500
           return
-        ), 5000
+        ), 70000
     }
 
   $(document).on 'click', '#researchNotesPublishBtn', (e) ->
