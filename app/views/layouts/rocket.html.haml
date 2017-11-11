@@ -49,6 +49,8 @@
                   %strong.current_user= current_user[:display_name]
           #username= current_user.cvs_username
 
+        = content_for(:nav_banner) if content_for?(:nav_banner)
+
       #yield-div
         =yield
 
