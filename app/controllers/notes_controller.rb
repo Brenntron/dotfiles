@@ -1,5 +1,5 @@
 class NotesController < ApplicationController
-  load_and_authorize_resource except: [:create]
+  load_and_authorize_resource
 
   def create
     begin
