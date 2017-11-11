@@ -13,11 +13,12 @@
       .menuheight
         %a= image_tag('layout/menu-expand.png', height: '40', width: '40')
       .menuheight
-        %a= image_tag('layout/bugs.png', height: '40', width: '40')
+        %a{href: bugs_path}= image_tag('layout/bugs.png', height: '40', width: '40')
       .menuheight
-        %a= image_tag('layout/users.png', height: '40', width: '40')
+        %a{href: users_path}= image_tag('layout/users.png', height: '40', width: '40')
       .menuheight
-        %a= image_tag('layout/wiki.png', height: '40', width: '40')
+        %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
+          = image_tag('layout/wiki.png', height: '40', width: '40')
 
     #sidenav-menu-div.nav-col
       .menuheight.menutext
@@ -27,15 +28,15 @@
       .menuheight
         %a= image_tag('layout/menu-collapse.png', height: '40', width: '40')
       .menuheight.menutext
-        %a
+        %a{href: bugs_path}
           = image_tag('layout/bugs.png', height: '40', width: '40')
           Bugs
       .menuheight.menutext
-        %a
+        %a{href: users_path}
           = image_tag('layout/users.png', height: '40', width: '40')
           Users
       .menuheight.menutext
-        %a
+        %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
           = image_tag('layout/wiki.png', height: '40', width: '40')
           Wiki
 
