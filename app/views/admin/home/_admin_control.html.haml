@@ -1,0 +1,27 @@
+.control-banner
+  .control-button-div
+    .control-button
+      %a{href: admin_root_path}
+        %i.glyphicon.glyphicon-pencil
+        .button-text Home
+    .control-button
+      %a{href: admin_migrations_path}
+        %i.glyphicon.glyphicon-pencil
+        .button-text DB
+    .control-button
+      %a{href: admin_scheduled_tasks_path}
+        %i.glyphicon.glyphicon-pencil
+        .button-text Tasks
+    .control-button
+      %a{href: diagnostics_admin_rules_sync_index_path}
+        %i.glyphicon.glyphicon-pencil
+        .button-text Diags
+    .control-button
+      %a{href: admin_rules_path}
+        %i.glyphicon.glyphicon-pencil
+        .button-text Rules
+
+  .control-banner-content
+    .message-div
+      Your Page Has Been Successfully Loaded
+

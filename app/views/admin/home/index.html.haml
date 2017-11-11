@@ -1,24 +1,7 @@
-.control-banner
-  .control-button-div
-    .control-button
-      %i.glyphicon.glyphicon-pencil
-      .button-text DB
-    .control-button
-      %i.glyphicon.glyphicon-pencil
-      .button-text Tasks
-    .control-button
-      %i.glyphicon.glyphicon-pencil
-      .button-text Diags
-    .control-button
-      %i.glyphicon.glyphicon-pencil
-      .button-text Rules
 
-  .control-banner-content
-    .message-div
-      Your Page Has Been Loaded
-
+= render partial: 'admin_control'
 
 #version-div
   %h3 Version
-  %iframe{src: "/version", style: "display: block; height: 40px; width: 100%;"}
+  %iframe.version-frame{src: "/version"}
 
