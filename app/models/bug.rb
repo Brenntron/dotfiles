@@ -2,6 +2,7 @@ class Bug < ApplicationRecord
 
   has_many :bugs_rules
   has_many :rules, through: :bugs_rules
+  # has_and_belongs_to_many :giblets
   has_and_belongs_to_many :tags, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
@@ -418,8 +419,8 @@ class Bug < ApplicationRecord
 
   def parse_summary
     parsed_summary = {}
-    parsed_summary[:tags] = summary_tags
     parsed_summary[:sids] = summary_sids
+    parsed_summary[:tags] = summary_tags
     parsed_summary[:refs] = summary_references
     parsed_summary
   end
@@ -492,18 +493,12 @@ class Bug < ApplicationRecord
   def summary_references
     references = []
     ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
-      summary.scan(/#{ref_type.bugzilla_format}/i).each do |match|
-        references << Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+      summary_without_sids_or_tags.scan(/#{ref_type.bugzilla_format}/i).each do |match|
+        ref = Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+        references << ref
       end
     end
     references.uniq
-  end
-
-  def load_references(summary_references)
-    summary_references.each do |ref|
-      references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
-      Exploit.find_exploits(ref)
-    end
   end
 
   def tag_array
@@ -518,12 +513,10 @@ class Bug < ApplicationRecord
 
   def compose_summary
     if tag_array.try(:sort) != summary_tag_array.try(:sort)
-
       #extract summary_tag_string and replace with tag_string
       summary_string = "#{summary}"
       summary_tag_array.each{|st| summary_string.slice! st } unless summary_tag_array.nil?
       tag_array.reverse.each{|ta| summary_string.prepend(ta) }
-
       self.update(summary: summary_string)
     end
   end
@@ -532,8 +525,8 @@ class Bug < ApplicationRecord
     update!(summary: summary_given)
 
     load_rules_from_sids(summary_sids)
+    load_refs_from_summary(summary_references)
     compose_summary
-    load_references(summary_references)
   end
 
   def bugzilla_synch_needed?
@@ -557,9 +550,15 @@ class Bug < ApplicationRecord
   end
 
   def create_tags_from_summary(summary_tags)
+    sum_tags=[]
     summary_tags.each do |tag|
-      Tag.find_or_create_by(name: tag)
+      found_tag = Tag.find_by_name(tag)
+      unless found_tag
+        found_tag = Tag.create(name: tag)
+      end
+      sum_tags << found_tag
     end
+    sum_tags
   end
 
   def add_attachment(xmlrpc, file)
@@ -572,7 +571,10 @@ class Bug < ApplicationRecord
     tags.each do |tag|
       @import_report[:new_tags] << tag.name unless self.tags.include?(tag)
       if import_type != "status"
-        self.tags << tag unless self.tags.include?(tag)
+        unless self.tags.include?(tag)
+          self.tags << tag
+          giblets << Giblets.create("tag",tag)
+        end
       end
     end
   end
@@ -581,7 +583,10 @@ class Bug < ApplicationRecord
     refs.each do |ref|
       @import_report[:new_refs] << ref.reference_data unless self.references.map {|r| r.reference_data}.include? ref.reference_data
       if import_type != "status"
-        self.references << ref unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+        unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+          self.references << ref
+          giblets << Giblets.create("reference",ref)
+        end
       end
       Exploit.find_exploits(ref)
     end
@@ -941,7 +946,7 @@ class Bug < ApplicationRecord
 
     update_params[:product] = permitted_params[:bug][:product]
     update_params[:component] = permitted_params[:bug][:component]
-    update_params[:summary] = permitted_params[:bug][:summary]
+    update_params[:summary] = bug.summary
     update_params[:version] = permitted_params[:bug][:version]
     update_params[:state] = permitted_params[:bug][:state]
     update_params[:opsys] = permitted_params[:bug][:opsys]
@@ -1226,13 +1231,6 @@ class Bug < ApplicationRecord
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
               if latest_research.present? && !(bug_has_notes)
                 new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
-                #new_note = Note.new({
-                #                        comment: new_draft,
-                #                        note_type: 'research',
-                #                        author: current_user.email,
-                #                        bug_id:     bug_id
-                #                    })
-                #new_note.save
                 bug.research_notes = new_draft
               end
             end
@@ -1471,6 +1469,18 @@ class Bug < ApplicationRecord
 
   def summary_without_sids
     summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
+  end
+
+  def summary_without_sids_or_tags
+    summary_without_sids.gsub(/(?:(?:\[.*?\])\s*)+/,'')
+  end
+
+  def summary_without_sids_or_tags_or_references
+    naked_summary = summary_without_sids_or_tags
+    summary_references.each do |ref|
+      naked_summary.gsub!(/#{ref[0]}\s*/,'')
+    end
+    naked_summary
   end
 
   def open_dependencies(xmlrpc)

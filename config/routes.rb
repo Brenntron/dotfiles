@@ -13,6 +13,7 @@ Rails.application.routes.draw do
         get :related
       end
     end
+    resources :reference_types, only: [:index, :edit, :update]
     resources :scheduled_tasks do
       collection do
         post :run_job
