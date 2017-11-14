@@ -44,6 +44,7 @@ class Task < ApplicationRecord
   def check_timeout
     if (Time.now - self.created_at) > 10.minutes  && self.completed.blank?
       self.failed = true
+      self.completed = true
       self.result = "Task timed-out.  Possible poller down or network error."
       save
     end
@@ -87,12 +88,20 @@ class Task < ApplicationRecord
       rule = Rule.by_sid(stats[:sid], stats[:gid]).first
       if rule
         data = stats.slice(*%i(average_check average_match average_nonmatch))
-        test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
+        begin
+          tr = test_reports.where(rule_id:rule.id).first
+          if tr
+            tr.update(data.merge(rule_id: rule.id, bug_id: bug.id))
+          else
+            tr = test_reports.create(data.merge(rule_id: rule.id, bug_id: bug.id))
+          end
+        rescue Exception => e
+          Rails.logger.info ("Test Report not created. #{e.message}")
+        end
+        bug.test_reports << tr
       end
     end
-
     update(stats_updated_at: Time.now)
-
     true
   end
 

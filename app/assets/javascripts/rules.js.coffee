@@ -256,9 +256,11 @@ $ ->
               $('.alert_rules').addClass('error').show().html('Task has not been created ')
             complete: ->
               setTimeout (->
-                $('.alert_rules').hide 'blind', {}, 5000
+                $('.alert_rules').hide 'blind', {}, 4000
+                location.reload true
                 return
               ), 5000
+
           }
         when 'revert'
           if window.confirm("Revert " + sid_text + selected_sids.join() + "?")

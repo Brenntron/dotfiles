@@ -2,13 +2,13 @@
   <div class="panel-group minimal-panel-group col-xs-12"  role="tablist" aria-multiselectable="true">
     <div class="panel panel-default">
       <div class="panel-heading" role="tab" id="research_notes_heading">
-        <div class="alert_notes"></div>
         <h4 class="panel-title">
           <a class="collapsed" data-toggle="collapse"  href="#research_notes_collapse" aria-expanded="false" aria-controls="collapseTwo">
             <span class="blue">Research notes</span>
           </a> <span class="caret"></span>
           &nbsp;&nbsp;
         </h4>
+        <div class="alert_notes_research"></div>
       </div>
       <%# note = get_last_notes 'research', current_user.email %>
       <div id="research_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingTwo">
@@ -43,6 +43,7 @@
           </a> <span class="caret"></span>
           &nbsp;&nbsp;
         </h4>
+        <div class="alert_notes_commit"></div>
       </div>
       <% committer_note = @bug.notes.last_committer_note.first %>
       <div id="comm_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingThree">
@@ -75,6 +76,7 @@
           </a> <span class="caret"></span>
           &nbsp;&nbsp;
         </h4>
+        <div class="alert_notes_scratch"></div>
       </div>
       <% scratchpad_note = @bug.notes.scratch_pad.first %>
       <div id="scratchpad_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingThree">

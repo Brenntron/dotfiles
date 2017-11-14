@@ -144,10 +144,11 @@ module API
             bug_queue = []
 
             tasks = bug.tasks.any_relations.reverse_chron
-
+            jobs_open = 0
             tasks.each do |task|
               task.check_timeout
               task.reload
+              jobs_open += 1 if !task.completed
               response_task = {}
               response_task['id'] = task.id
               response_task['rule_list'] = task.task_type == Task::TASK_TYPE_LOCAL_TEST ? task.rules.map { |rule| rule.new_rule? ? 'new-rule' : "#{rule.gid}:#{rule.sid}:#{rule.rev}" }.join('; ') : ""
@@ -160,6 +161,7 @@ module API
               bug_queue << response_task
             end
             response[:jobs_tab] = bug_queue
+            response[:open_jobs_count] = jobs_open
 
             response.to_json
           rescue

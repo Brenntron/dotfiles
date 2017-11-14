@@ -157,7 +157,7 @@ class RuleDoc < ApplicationRecord
   end
 
   def revert_doc
-    if fetch_from_repo
+    if fetch_from_repo && File.exists?(filepath)
       assign_from_json(read_from_file)
       save!
     else

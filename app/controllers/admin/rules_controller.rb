@@ -19,6 +19,14 @@ class Admin::RulesController < Admin::HomeController
     redirect_to admin_rules_path
   end
 
+  def validations
+    @invalid_rules = Rule.order("updated_at desc").all.to_a.reject{ |rule| rule.valid? }
+  end
+
+  def related
+    @rule = Rule.where(id: params[:id]).first || Rule.new
+  end
+
   private
 
   def rule_params
