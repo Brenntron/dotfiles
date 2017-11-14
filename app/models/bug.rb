@@ -2,7 +2,7 @@ class Bug < ApplicationRecord
 
   has_many :bugs_rules
   has_many :rules, through: :bugs_rules
-  has_and_belongs_to_many :searchables
+  # has_and_belongs_to_many :giblets
   has_and_belongs_to_many :tags, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
@@ -573,7 +573,7 @@ class Bug < ApplicationRecord
       if import_type != "status"
         unless self.tags.include?(tag)
           self.tags << tag
-          searchables << Searchable.create("tag",tag)
+          giblets << Giblets.create("tag",tag)
         end
       end
     end
@@ -585,7 +585,7 @@ class Bug < ApplicationRecord
       if import_type != "status"
         unless self.references.map {|r| r.reference_data}.include? ref.reference_data
           self.references << ref
-          searchables << Searchable.create("reference",ref)
+          giblets << Giblets.create("reference",ref)
         end
       end
       Exploit.find_exploits(ref)
