@@ -10,30 +10,16 @@
   %li
     %a{href: '/admin/rules/validations'} Validations
 
-%table.table.table-striped.table-responsive{data: {toggle: 'table', search: 'true', 'search-align': 'left', pagination: 'true', 'page-list': "[25, 50, 100, ALL]", 'page-size': '25' }}
+%table.table.table-striped.table-responsive{id: 'rules-table', 'data-source': "#{admin_rules_path(format: :json)}"}
   %thead
     %tr
-      %th{id: "id", data: {field: "id", sortable: "true"}} ID
-      %th{id: "sid", data: {field: "sid", sortable: "true"}} SID
-      %th{id: "message", data: {field: "message", sortable: "true"}} Message
-      %th{id: "bug_count", data: {field: "bug_count", sortable: "true"}} Bug Count
-      %th{id: "state", data: {field: "state", sortable: "true"}} State
-      %th{id: "edit_status", data: {field: "edit_status", sortable: "true"}} Edit Status
-      %th{id: "publish_status", data: {field: "publish_status", sortable: "true"}} Publish Status
+      %th ID
+      %th SID
+      %th Message
+      %th Bug Count
+      %th State
+      %th Edit Status
+      %th Publish Status
       %th
   %tbody
-    -@rules.each do |rule|
-      %tr
-        %td.col-xs-1= rule.id
-        %td.col-xs-1= rule.sid
-        %td.col-xs-3= rule.message
-        %td.col-xs-1= rule.bug_count
-        %td.col-xs-2= rule.state
-        %td.col-xs-1= rule.edit_status
-        %td.col-xs-2= rule.publish_status
-        %td.col-xs-1
-          = link_to edit_admin_rule_path(rule.id), class: "btn btn-default" do
-            %i.glyphicon.glyphicon-pencil
-          = link_to related_admin_rule_path(rule.id), class: "btn btn-default" do
-            %i.glyphicon.glyphicon-link
 

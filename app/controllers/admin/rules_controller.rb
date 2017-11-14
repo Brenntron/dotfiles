@@ -1,7 +1,10 @@
 class Admin::RulesController < Admin::HomeController
 
   def index
-    @rules = Rule.left_joins(:bugs).group(:id).select("count(*) as bug_count, rules.*")
+    respond_to do |format|
+      format.html
+      format.json { render json: RuleDatatable.new(view_context) }
+    end
   end
 
   def edit

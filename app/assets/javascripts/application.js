@@ -12,13 +12,13 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require dataTables/jquery.dataTables
 //= require jquery-ui
 //= require bootstrap-sprockets
 //= require selectize
 //= require Chart.bundle
 //= require chartkick
 //= require bootstrap-multiselect
-//= require bootstrap-table.min
 //= require tree-table
 //= require util
 //= require_tree .
