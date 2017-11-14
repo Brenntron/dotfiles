@@ -2,6 +2,7 @@ class Bug < ApplicationRecord
 
   has_many :bugs_rules
   has_many :rules, through: :bugs_rules
+  has_and_belongs_to_many :searchables
   has_and_belongs_to_many :tags, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
@@ -493,17 +494,11 @@ class Bug < ApplicationRecord
     references = []
     ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
       summary_without_sids_or_tags.scan(/#{ref_type.bugzilla_format}/i).each do |match|
-        references << Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+        ref = Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+        references << ref
       end
     end
     references.uniq
-  end
-
-  def load_references(summary_references)
-      summary_references.each do |ref|
-        references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
-        Exploit.find_exploits(ref)
-      end
   end
 
   def tag_array
@@ -530,7 +525,7 @@ class Bug < ApplicationRecord
     update!(summary: summary_given)
 
     load_rules_from_sids(summary_sids)
-    load_references(summary_references)
+    load_refs_from_summary(summary_references)
     compose_summary
   end
 
@@ -576,7 +571,10 @@ class Bug < ApplicationRecord
     tags.each do |tag|
       @import_report[:new_tags] << tag.name unless self.tags.include?(tag)
       if import_type != "status"
-        self.tags << tag unless self.tags.include?(tag)
+        unless self.tags.include?(tag)
+          self.tags << tag
+          searchables << Searchable.create("tag",tag)
+        end
       end
     end
   end
@@ -585,7 +583,10 @@ class Bug < ApplicationRecord
     refs.each do |ref|
       @import_report[:new_refs] << ref.reference_data unless self.references.map {|r| r.reference_data}.include? ref.reference_data
       if import_type != "status"
-        self.references << ref unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+        unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+          self.references << ref
+          searchables << Searchable.create("reference",ref)
+        end
       end
       Exploit.find_exploits(ref)
     end
