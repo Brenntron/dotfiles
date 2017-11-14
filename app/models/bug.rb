@@ -501,11 +501,6 @@ class Bug < ApplicationRecord
 
   def load_references(summary_references)
       summary_references.each do |ref|
-        #turn reference into tags
-        load_tags_from_summary(create_tags_from_summary([ref.reference_data]))
-        # remove reference from summary
-        update!(summary:summary.gsub!(/#{ref.reference_data}\s*/,''))
-        # add refernce to bug if it isnt already associated
         references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
         Exploit.find_exploits(ref)
       end
@@ -527,9 +522,6 @@ class Bug < ApplicationRecord
       summary_string = "#{summary}"
       summary_tag_array.each{|st| summary_string.slice! st } unless summary_tag_array.nil?
       tag_array.reverse.each{|ta| summary_string.prepend(ta) }
-
-      # TODO:Make sure sids are listed first whenever we compose a summary from tags
-
       self.update(summary: summary_string)
     end
   end
