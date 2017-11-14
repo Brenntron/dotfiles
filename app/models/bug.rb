@@ -418,8 +418,8 @@ class Bug < ApplicationRecord
 
   def parse_summary
     parsed_summary = {}
-    parsed_summary[:tags] = summary_tags
     parsed_summary[:sids] = summary_sids
+    parsed_summary[:tags] = summary_tags
     parsed_summary[:refs] = summary_references
     parsed_summary
   end
@@ -492,7 +492,7 @@ class Bug < ApplicationRecord
   def summary_references
     references = []
     ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
-      summary.scan(/#{ref_type.bugzilla_format}/i).each do |match|
+      summary_without_sids_or_tags.scan(/#{ref_type.bugzilla_format}/i).each do |match|
         references << Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
       end
     end
@@ -500,10 +500,15 @@ class Bug < ApplicationRecord
   end
 
   def load_references(summary_references)
-    summary_references.each do |ref|
-      references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
-      Exploit.find_exploits(ref)
-    end
+      summary_references.each do |ref|
+        #turn reference into tags
+        load_tags_from_summary(create_tags_from_summary([ref.reference_data]))
+        # remove reference from summary
+        update!(summary:summary.gsub!(/#{ref.reference_data}\s*/,''))
+        # add refernce to bug if it isnt already associated
+        references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
+        Exploit.find_exploits(ref)
+      end
   end
 
   def tag_array
@@ -518,7 +523,6 @@ class Bug < ApplicationRecord
 
   def compose_summary
     if tag_array.try(:sort) != summary_tag_array.try(:sort)
-
       #extract summary_tag_string and replace with tag_string
       summary_string = "#{summary}"
       summary_tag_array.each{|st| summary_string.slice! st } unless summary_tag_array.nil?
@@ -532,8 +536,8 @@ class Bug < ApplicationRecord
     update!(summary: summary_given)
 
     load_rules_from_sids(summary_sids)
-    compose_summary
     load_references(summary_references)
+    compose_summary
   end
 
   def bugzilla_synch_needed?
@@ -557,9 +561,15 @@ class Bug < ApplicationRecord
   end
 
   def create_tags_from_summary(summary_tags)
+    sum_tags=[]
     summary_tags.each do |tag|
-      Tag.find_or_create_by(name: tag)
+      found_tag = Tag.find_by_name(tag)
+      unless found_tag
+        found_tag = Tag.create(name: tag)
+      end
+      sum_tags << found_tag
     end
+    sum_tags
   end
 
   def add_attachment(xmlrpc, file)
@@ -942,7 +952,7 @@ class Bug < ApplicationRecord
 
     update_params[:product] = permitted_params[:bug][:product]
     update_params[:component] = permitted_params[:bug][:component]
-    update_params[:summary] = permitted_params[:bug][:summary]
+    update_params[:summary] = bug.summary
     update_params[:version] = permitted_params[:bug][:version]
     update_params[:state] = permitted_params[:bug][:state]
     update_params[:opsys] = permitted_params[:bug][:opsys]
@@ -1227,13 +1237,6 @@ class Bug < ApplicationRecord
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
               if latest_research.present? && !(bug_has_notes)
                 new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
-                #new_note = Note.new({
-                #                        comment: new_draft,
-                #                        note_type: 'research',
-                #                        author: current_user.email,
-                #                        bug_id:     bug_id
-                #                    })
-                #new_note.save
                 bug.research_notes = new_draft
               end
             end
@@ -1472,6 +1475,18 @@ class Bug < ApplicationRecord
 
   def summary_without_sids
     summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
+  end
+
+  def summary_without_sids_or_tags
+    summary_without_sids.gsub(/(?:(?:\[.*?\])\s*)+/,'')
+  end
+
+  def summary_without_sids_or_tags_or_references
+    naked_summary = summary_without_sids_or_tags
+    summary_references.each do |ref|
+      naked_summary.gsub!(/#{ref[0]}\s*/,'')
+    end
+    naked_summary
   end
 
   def open_dependencies(xmlrpc)

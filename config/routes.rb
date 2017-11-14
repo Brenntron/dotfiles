@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     root 'home#index'
     resources :migrations, only: [:index]
     resources :rules, only: [:index, :edit, :update]
+    resources :reference_types, only: [:index, :edit, :update]
     resources :scheduled_tasks do
       collection do
         post :run_job
