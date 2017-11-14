@@ -528,6 +528,8 @@ class Bug < ApplicationRecord
       summary_tag_array.each{|st| summary_string.slice! st } unless summary_tag_array.nil?
       tag_array.reverse.each{|ta| summary_string.prepend(ta) }
 
+      # TODO:Make sure sids are listed first whenever we compose a summary from tags
+
       self.update(summary: summary_string)
     end
   end
