@@ -58,9 +58,23 @@ module API
           puts response.body
         end
 
-        desc "post to bridge"
+        desc "post to catcher via peake-bridge"
         post '/peake_bridge/catcher' do
           conn = PeakeBridge::CatcherEvent.new
+          response = conn.post(bugzilla_id: 32000, new_state: 'Pending')
+          puts response.body
+        end
+
+        desc "post to analyst-console via peake-bridge"
+        post '/peake_bridge/analyst-console' do
+          conn = PeakeBridge::ConsoleEvent.new
+          response = conn.post(bugzilla_id: 32000, new_state: 'Pending')
+          puts response.body
+        end
+
+        desc "post to talos-intelligence via peake-bridge"
+        post '/peake_bridge/talos-intelligence' do
+          conn = PeakeBridge::BugStateChangeEvent.new
           response = conn.post(bugzilla_id: 32000, new_state: 'Pending')
           puts response.body
         end
