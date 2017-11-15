@@ -12,6 +12,21 @@ window.spaz = ->
   }
   alert("spazzed")
 
+window.peake =(peake_arg) ->
+  debugger
+  alert("peaking")
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax {
+    url: '/api/v1/bugs/peake_bridge/' + peake_arg
+    method: 'post'
+    headers: headers
+    success: (response) ->
+      alert("success")
+    error: (response) ->
+      alert("error")
+  }
+  alert("peaked")
+
 window.bug_resolve =(this_tag) ->
   user_id = $('#resolve-form').find("input[name='user_id']").val()
   committer_id = $('#resolve-form').find("input[name='committer_id']").val()
