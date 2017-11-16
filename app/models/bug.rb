@@ -1,5 +1,5 @@
 class Bug < ApplicationRecord
-
+  has_paper_trail
   has_many :bugs_rules
   has_many :rules, through: :bugs_rules
   has_and_belongs_to_many :tags, dependent: :destroy
