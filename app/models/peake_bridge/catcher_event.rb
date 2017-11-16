@@ -8,7 +8,7 @@ module PeakeBridge
     end
 
     def post(bugzilla_id: @bugzilla_id, new_state: @new_state)
-      super(body: {bugzilla_id: bugzilla_id, new_state: new_state})
+      super(message: {bugzilla_id: bugzilla_id, new_state: new_state})
     end
   end
 end

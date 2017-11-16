@@ -300,7 +300,7 @@ GEM
     paper_trail (6.0.2)
       activerecord (>= 4.0, < 5.2)
       request_store (~> 1.1)
-    peake-bridge (0.0.0.7)
+    peake-bridge (0.0.0.8)
     poltergeist (1.11.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
