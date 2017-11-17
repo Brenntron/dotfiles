@@ -1,0 +1,26 @@
+/* fira-mono-400 - latin */
+@font-face {
+  font-family: 'Fira Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Fira Mono Regular'), local('FiraMono-Regular'),
+  url('../fonts/FiraMono-Regular.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+/* fira-mono-500 - latin */
+@font-face {
+  font-family: 'Fira Mono';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Fira Mono Medium'), local('FiraMono-Medium'),
+  url('../fonts/FiraMono-Medium.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+/* fira-mono-700 - latin */
+@font-face {
+  font-family: 'Fira Mono';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Fira Mono Bold'), local('FiraMono-Bold'),
+  url('../fonts/FiraMono-Bold.ttf') format('truetype'); /* Safari, Android, iOS */
+}

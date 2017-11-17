@@ -1,0 +1,13 @@
+/*
+ * This is a manifest file that'll be compiled into admin_redesign.css, which will include all the files
+ * listed below.
+
+
+ *= require bootstrap-multiselect
+ *= require bootstrap-table.min
+ *= require jquery-ui
+ *= require reset
+ *= require font_import_opensans
+ *= require global
+
+*/

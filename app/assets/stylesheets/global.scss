@@ -1,0 +1,322 @@
+/***** Variables ******/
+
+/* Background Colors */
+$base-color:        #edf1f2;    /* Very pale blue  */
+$content-bg-color:  #fff;       /* White           */
+$nav-toolbar-color: #d7dadb;    /* Medium Grey     */
+$sidebar-nav-base:  #2c3e50;    /* Dark Navy       */
+$content-tab-color: #3e5a72;    /* Dark Navy shift */
+$ac-nav-bg-color:   #fff;       /* White           */
+
+/* Section Colors */
+$bug-section-color:  #6dbcdb;   /* Medium Blue    */
+$user-section-color: #fc4349;   /* Red            */
+$wiki-section-color: #8cc63f;   /* Bright Green   */
+
+/* Layout dimensions */
+$sidebar-width: 44px;
+
+/* Shadows */
+$dropshadow: 2px 0 10px 1px rgba(0,0,0,0.2);
+
+/* Typography Colors */
+$type-base-color:    #333;
+$type-lighter-color: #666;
+
+/* Additional Colors */
+/* for use on gridlines and other very subtle elements against the content bg color */
+$faint-color: #f2f2f2;
+
+/***** Mixins ******/
+@mixin box-shadow($shadow) {
+  -webkit-box-shadow: $shadow;
+     -moz-box-shadow: $shadow;
+          box-shadow: $shadow;
+}
+
+
+
+/************ Base Styles **************/
+
+body {
+  background: $base-color;
+  color: $type-base-color;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  position: relative;
+}
+
+#page-wrapper {
+  min-height: 100%;
+  align-content: center;
+  display: block;
+  margin-left: $sidebar-width;
+}
+
+#page-content-wrapper {
+  display: block;
+  height: 100%;
+  padding: 20px;
+}
+
+/**** Typography ****/
+
+h1 {
+  color: $type-lighter-color;
+  font-size: 20pt;
+  font-weight: 100;
+}
+
+.code-snippet {
+  background-color: $faint-color;
+  font-family: 'Fira Mono', monospace;
+  padding: 0 5px;
+}
+
+.emphasis {
+  font-weight: 700;
+  color: $type-lighter-color;
+}
+
+/**** Tables ****/
+table {
+  font-size: 9pt;
+  border: none;
+}
+
+th {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 8pt;
+  text-align: left;
+}
+
+/* Specifically overrides Bootstraps styles */
+.fixed-table-container {
+  border: none;
+}
+
+.fixed-table-container thead th, .fixed-table-container tbody td {
+  border-left: none;
+  border-bottom: 1px solid $faint-color;
+}
+
+.fixed-table-container thead th {padding: 0 !important;}
+.fixed-table-container tbody td {padding: 11px 8px !important;}
+
+.fixed-table-container thead th .th-inner {
+  line-height: 1em;
+}
+
+.fixed-table-container thead th .sortable {
+  padding-right: 20px;
+}
+
+/************ Side Nav **************/
+
+#sidenav-icons-div {
+  width: $sidebar-width;
+  height: 100%;
+  background: $sidebar-nav-base;
+  display: block;
+  position: absolute;
+  z-index: 100;
+  @include box-shadow($dropshadow);
+}
+
+#sidenav-icons-div .sidenav-icons {
+  background: $sidebar-nav-base;
+  height: 100%;
+}
+
+#sidenav-menu-div {
+  background-color: $sidebar-nav-base;
+  display: block;
+  position: absolute;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: $sidebar-width;
+  z-index: -1;
+  width: 200px;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
+  -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#sidenav-menu-div a {
+  color: #fff;
+  display: block;
+  width: 100%;
+  height:100%;
+  padding-left: 5px;
+}
+
+.nav-container {
+  -webkit-transform: translateX(-30%);
+  transform: translateX(-30%);
+  -webkit-transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  -webkit-transition-delay: 0;
+  transition-delay: 0;
+  opacity: 1;
+  height: 100%;
+  width: 100%;
+  @include box-shadow($dropshadow);
+}
+
+.nav-container span, .nav-container span a {
+  opacity: 0;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div {
+  -webkit-transform: none;
+  transform: none;
+  opacity: 1;
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .nav-container {
+  -webkit-transform: none;
+  transform: none;
+  opacity: 1;
+  -webkit-transition-delay: 0;
+  transition-delay: 0;
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .nav-container li span, #nav-trigger:checked ~ #sidenav-menu-div .nav-container li span a {
+  opacity: 1;
+  -webkit-transition-delay: 330ms;
+  transition-delay: 330ms;
+}
+
+.nav-container li, .sidenav-icons li {
+  border-bottom: 1px solid #fff;
+}
+
+.nav-container li {
+  height: $sidebar-width;
+  padding-left: $sidebar-width;
+}
+
+.nav-menu-spacer {height: $sidebar-width; }
+
+#nav-trigger-label {
+  height: 40px;
+  position: absolute;
+  top: 46px;
+  left: 2px;
+  width: 40px;
+}
+
+#nav-trigger-label img {
+  transform: rotate(-0.25turn);
+  -webkit-transform: rotate(-0.25turn);
+  cursor: pointer;
+  transition: transform 0.25s;
+  -webkit-transition: transform 0.25s ;
+}
+
+#nav-trigger:checked ~ #nav-trigger-label img {
+  transform: rotate(0turn);
+  -webkit-transform: rotate(0turn);
+}
+
+.nav-item {
+  padding: 4px 4px 2px 4px;
+}
+
+.nav-ac    {background-color: $ac-nav-bg-color;}
+.nav-bugs  {background-color: $bug-section-color;}
+.nav-users {background-color: $user-section-color;}
+.nav-wiki  {background-color: $wiki-section-color;}
+
+.ac-logo-text {
+  height: 44px;
+  width: auto;
+  margin-top: -1px;
+}
+
+/***** End of Side Nav *****/
+
+
+
+/****** Top Tool Bar ******/
+
+#nav-banner {
+  background-color: $nav-toolbar-color;
+  height: 44px;
+  display: block;
+  text-align: center;
+}
+
+#login-div {
+  display: inline-block;
+  position: absolute;
+  right: 20px;
+  top: 11px;
+}
+
+#login-div {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+}
+
+#login-div a {
+  color: $sidebar-nav-base;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 10pt;
+}
+
+.search-box {
+  background-color: $ac-nav-bg-color;
+  background-image: url('layout/search_icon.svg');
+  background-repeat: no-repeat;
+  background-size: 18px;
+  background-position: 3px center;
+  border: none;
+  border-radius: 2px;
+  margin-top: 10px;
+  height: 22px;
+  padding-left: 26px;
+
+}
+
+.search-box::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+.search-box::-moz-placeholder { /* Firefox 19+ */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+.search-box:-ms-input-placeholder { /* IE 10+ */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+.search-box:-moz-placeholder { /* Firefox 18- */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+
+
+/****** End Top Tool Bar ******/
+
+
+/****** Site Content Base ******/
+
+.content-wrapper {
+  background: $content-bg-color;
+  border-radius: 4px;
+  @include box-shadow($dropshadow);
+  padding: 30px 10px;
+}

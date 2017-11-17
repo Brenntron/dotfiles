@@ -2,8 +2,7 @@
   Admin - Analyst Console
 
 - content_for(:nav_banner) do
-  Search Rule:
-  %input
+  %input{type: 'text', name: 'search', placeholder: 'Search', class: 'search-box'}
 
 
 = render template: "layouts/rocket"

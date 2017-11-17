@@ -2,56 +2,67 @@
 %html
   %head
     %title= content_for?(:title) ? content_for(:title) : 'Analyst Console'
-    = stylesheet_link_tag("application", media: "all", "data-turbolinks-track" => true)
+    = stylesheet_link_tag("admin_redesign", media: "all", "data-turbolinks-track" => true)
     = javascript_include_tag("application", "data-turbolinks-track" => true)
     = csrf_meta_tags
 
   %body{class: "rocket-layout #{controller_path.gsub('/', '--')}-controller #{action_name}-action"}
-    #sidenav-icons-div.nav-col
-      .menuheight
-        %a= image_tag('layout/ac_rocket.png', height: '40', width: '40')
-      .menuheight
-        %a= image_tag('layout/menu-expand.png', height: '40', width: '40')
-      .menuheight
-        %a{href: bugs_path}= image_tag('layout/bugs.png', height: '40', width: '40')
-      .menuheight
-        %a{href: users_path}= image_tag('layout/users.png', height: '40', width: '40')
-      .menuheight
-        %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
-          = image_tag('layout/wiki.png', height: '40', width: '40')
 
-    #sidenav-menu-div.nav-col
-      .menuheight.menutext
-        %a
-          = image_tag('layout/ac_rocket.png', height: '40', width: '40')
-          Analyst Con
-      .menuheight
-        %a= image_tag('layout/menu-collapse.png', height: '40', width: '40')
-      .menuheight.menutext
-        %a{href: bugs_path}
-          = image_tag('layout/bugs.png', height: '40', width: '40')
-          Bugs
-      .menuheight.menutext
-        %a{href: users_path}
-          = image_tag('layout/users.png', height: '40', width: '40')
-          Users
-      .menuheight.menutext
-        %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
-          = image_tag('layout/wiki.png', height: '40', width: '40')
-          Wiki
+    #sidenav-icons-div
+      %input{id: 'nav-trigger', type: 'checkbox', hidden: 'hidden'}
+      %label{for: 'nav-trigger', id: 'nav-trigger-label'}
+        = image_tag('layout/ac_nav_icon.svg', class: 'sidenav-icon', alt: 'Menu')
+      %ul{class: 'sidenav-icons'}
+        %li{class: 'nav-item nav-ac'}
+          = image_tag('layout/analyst_console_icon.svg', class: 'sidenav-icon', alt: 'Analyst Console')
+        %li{class: 'nav-menu-spacer'}
+          -# Spacer for Menu Toggle
+        %li{class: 'nav-item nav-bugs'}
+          %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
+        %li{class: 'nav-item nav-users'}
+          %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
+        %li{class: 'nav-item nav-wiki'}
+          %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}= image_tag('layout/wiki_icon.svg', class: 'sidenav-icon', alt: 'Wiki')
 
-    #main-col
-      #nav-banner
+      #sidenav-menu-div
+        %ul{class: 'nav-container'}
+          %li{class: 'nav-ac'}
+            %span
+              = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
+          %li
+          %li{class: 'nav-bugs'}
+            %span
+              %a{href: bugs_path}
+                Bugs
+            -#%ul
+            -#  %li
+            -#    Snort
+            -#  %li
+            -#    Clam AV
+          %li{class: 'nav-users'}
+            %span
+              %a{href: users_path}
+                Users
+          %li{class: 'nav-wiki'}
+            %span
+              %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
+                Wiki
+
+
+    #page-wrapper
+
+      %nav{id: "nav-banner"}
+        = content_for(:nav_banner) if content_for?(:nav_banner)
+
         - if current_user
           #login-div
             %a{href: "/users/#{current_user[:id]}"}
-              %p.login-area
-                %span.login-label
-                  %strong.current_user= current_user[:display_name]
-          #username= current_user.cvs_username
+              = current_user[:display_name]
 
-        = content_for(:nav_banner) if content_for?(:nav_banner)
+          -##username= current_user.cvs_username
 
-      #yield-div
+
+
+      #page-content-wrapper
         =yield
 
