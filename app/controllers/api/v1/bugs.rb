@@ -4,6 +4,9 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+        before do
+          PaperTrail.whodunnit = current_user.id if current_user.present?
+        end
 
         desc "import one bug from bugzilla"
         params do
