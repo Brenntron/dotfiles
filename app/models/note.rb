@@ -1,4 +1,5 @@
 class Note < ApplicationRecord
+  has_paper_trail  
   belongs_to :bug
   validates :comment, presence: true,
                       uniqueness: {if: Proc.new { |n| n.note_type == "error"}, scope: :bug_id}
