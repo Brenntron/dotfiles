@@ -20,12 +20,14 @@ $sidebar-width: 44px;
 $dropshadow: 2px 0 10px 1px rgba(0,0,0,0.2);
 
 /* Typography Colors */
-$type-base-color:    #333;
-$type-lighter-color: #666;
+$type-base-color:    #333;  /* Dark Grey */
+$type-lighter-color: #666;  /* Medium Grey */
 
 /* Additional Colors */
-/* for use on gridlines and other very subtle elements against the content bg color */
-$faint-color: #f2f2f2;
+/* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
+$faint-neutral-color: #f2f2f2;
+$faint-accent-color:  #dff1f7;
+
 
 /***** Mixins ******/
 @mixin box-shadow($shadow) {
@@ -59,6 +61,16 @@ body {
   padding: 20px;
 }
 
+/****** Site Content Base ******/
+
+.content-wrapper {
+  background: $content-bg-color;
+  border-radius: 4px;
+  @include box-shadow($dropshadow);
+  padding: 30px 10px;
+}
+
+
 /**** Typography ****/
 
 h1 {
@@ -67,8 +79,12 @@ h1 {
   font-weight: 100;
 }
 
+h3 {
+  font-weight: 700;
+}
+
 .code-snippet {
-  background-color: $faint-color;
+  background-color: $faint-neutral-color;
   font-family: 'Fira Mono', monospace;
   padding: 0 5px;
 }
@@ -87,7 +103,7 @@ h1 {
 
 .fixed-table-container thead th, .fixed-table-container tbody td {
   border-left: none;
-  border-bottom: 1px solid $faint-color;
+  border-bottom: 1px solid $faint-neutral-color;
 }
 
 .fixed-table-container thead th {padding: 0 !important;}
@@ -184,6 +200,46 @@ th {
 }
 
 
+/************ Forms ***************/
+
+.form-wrapper {
+  margin: 20px;
+}
+
+fieldset {
+  border: 1px solid $faint-neutral-color;
+  padding: 4px;
+  margin: 32px 0;
+}
+
+.form-wrapper input {
+  background-color: $faint-accent-color;
+  border: none;
+  padding: 2px 5px;
+  font-size: 8.5pt;
+  width: 100%;
+}
+
+.form-wrapper label {
+  position: absolute;
+  margin-top: -18px;
+  font-size: 7pt;
+  color: $type-lighter-color;
+}
+
+.form-wrapper .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.form-wrapper .col-xs-2, .form-wrapper .col-xs-10 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.select {
+  border-radius: 2px;
+}
 
 /************ Side Nav **************/
 
@@ -386,11 +442,3 @@ th {
 /****** End Top Tool Bar ******/
 
 
-/****** Site Content Base ******/
-
-.content-wrapper {
-  background: $content-bg-color;
-  border-radius: 4px;
-  @include box-shadow($dropshadow);
-  padding: 30px 10px;
-}
