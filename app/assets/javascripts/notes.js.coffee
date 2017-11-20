@@ -27,7 +27,11 @@ $ ->
         window.location.reload()
       error: (response) ->
         $('.alert_notes_reserach').removeClass('success')
-        $('.alert_notes_research').addClass('error').show().html("<h4>#{response.responseText}</h4>")
+        if(response.status == '403')
+          $('.alert_notes_research').addClass('error').show().html("<h4>NOTE NOT SAVED: Your session has timed out. Please refresh your browser</h4>")
+        else
+          $('.alert_notes_research').addClass('error').show().html("<h4>NOTE NOT SAVED: #{response.responseText} - #{response.status} - #{response.statusText}</h4>")
+        return
       complete: ->
         setTimeout (->
           $('.alert_notes_research').hide 'blind', {}, 500
