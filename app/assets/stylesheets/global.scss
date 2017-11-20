@@ -79,17 +79,6 @@ h1 {
 }
 
 /**** Tables ****/
-table {
-  font-size: 9pt;
-  border: none;
-}
-
-th {
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 8pt;
-  text-align: left;
-}
 
 /* Specifically overrides Bootstraps styles */
 .fixed-table-container {
@@ -111,6 +100,90 @@ th {
 .fixed-table-container thead th .sortable {
   padding-right: 20px;
 }
+
+.fixed-table-container thead th .both {
+  background-image: url('layout/icon_sort.svg');
+  background-size: 10px;
+}
+
+.fixed-table-container thead th .desc {
+  background-image: url('layout/icon_sort_dec.svg');
+  background-size: 10px;
+}
+
+.fixed-table-container thead th .asc {
+  background-image: url('layout/icon_sort_asc.svg');
+  background-size: 10px;
+}
+
+.btn-default {
+  border: none;
+  background-color: transparent;
+  padding: 10px 12px;
+}
+
+.pagination-detail {
+  font-size: 10pt;
+}
+
+/**** Additional table styles ***/
+table {
+  font-size: 9pt;
+  border: none;
+}
+
+th {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 8pt;
+  text-align: left;
+}
+
+.fixed-table-container tbody td.td-tools {
+  text-align: right;
+  padding: 0 !important;
+}
+
+
+/******** Messages / Warnings ********/
+
+.message-div {
+  border: 2px solid $content-bg-color;
+  width: 100%;
+  text-align: center;
+  padding: 12px 20px;
+  margin: 20px auto;
+  display: block;
+  font-weight: 700;
+  font-size: 8.5pt;
+  color: $type-lighter-color;
+  text-transform: uppercase;
+}
+
+.message-div::before {
+  content: '';
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 22px;
+  margin-top: -24px;
+  margin-bottom: 3px;
+  background-repeat: no-repeat;
+  background-position: center;
+  text-align: center;
+}
+
+.success-msg::before {
+  background-image: url('icon_success.svg');
+}
+.warning-msg::before {
+  background-image: url('icon_warning.svg');
+}
+.fail-msg::before {
+  background-image: url('icon_fail.svg');
+}
+
+
 
 /************ Side Nav **************/
 

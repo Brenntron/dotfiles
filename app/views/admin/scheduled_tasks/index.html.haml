@@ -2,72 +2,53 @@
 = render partial: 'admin_control'
 
 
-.jumbotron
-  %h2 Scheduled Tasks
 
 #alert_message{:role => "alert"}
   = render "shared/flash_messages", flash: flash
 
-
-#content.index-table
-
-
+.content-wrapper
+  %h1 Scheduled Tasks
 
   .row
-    .col-xs-6
-      %h3 Scheduled Tasks
-      .row
-        .col-xs-2
-          %p created_at
-        .col-xs-2
-          %p updated_at
-        .col-xs-2
-          %p task_type
-        .col-xs-2
-          %p completed
-        .col-xs-2
-          %p result
-        .col-xs-2
-          %p actions
-    .col-xs-6
-      <h3>Pending Jobs <small>If there are jobs here then the worker is not running.</small></h3>
-      .row
-        .col-xs-4
-          %p run_at
-        .col-xs-2
-          %p attempts
-        .col-xs-2
-          %p priority
+    .col-sm-8
+      %h2 Scheduled Tasks
+      %table.table.table-responsive
+        %thead
+          %tr
+            %th created_at
+            %th updated_at
+            %th task_type
+            %th completed
+            %th result
+            %th
 
-  .row
-    .col-xs-6
-      #scheduled-tasks-div
         - @scheduled_tasks.each do |s_t|
-          .row
-            .col-xs-2
-              .created_at= s_t.created_at
-            .col-xs-2
-              .updated_at= s_t.updated_at
-            .col-xs-2
-              .task_type=  s_t.task_type
-            .col-xs-2
-              .completed=  s_t.completed
-            .col-xs-2
-              .completed=  s_t.result
-            .col-xs-2
-              = link_to admin_scheduled_task_path(s_t.id), :method => :delete, :data=> {confirm: 'Are you sure you want to Delete this?'},  "data-original-title" => "Delete", :class=>"btn btn-danger btn-xs"  do
-                %i.glyphicon.glyphicon-remove{:title => "Delete"}
+          %tbody
+            %tr
+              %td.created_at= s_t.created_at
+              %td.updated_at= s_t.updated_at
+              %td.task_type=  s_t.task_type
+              %td.completed=  s_t.completed
+              %td.completed=  s_t.result
+              %td
+                = link_to admin_scheduled_task_path(s_t.id), :method => :delete, :data=> {confirm: 'Are you sure you want to Delete this?'},  "data-original-title" => "Delete", :class=>"btn btn-danger btn-xs"  do
+                  %i.glyphicon.glyphicon-remove{:title => "Delete"}
 
+    .col-sm-4
+      %h2 Pending Jobs
+      %table.table.table-responsive
+        %thead
+          %tr
+            %th run_at
+            %th attempts
+            %th priority
 
-    .col-xs-6
-      #delayed_jobs-div
         - @delayed_jobs.each do |d_j|
-          .row
-
-            .col-xs-4
-              .run_at= d_j.run_at
-            .col-xs-2
-              .locked_by= d_j.attempts
-            .col-xs-2
-              .run_at= d_j.priority
-
+          %tbody
+            %tr
+              %td
+                .run_at= d_j.run_at
+              %td
+                .locked_by= d_j.attempts
+              %td
+                .run_at= d_j.priority
