@@ -305,6 +305,7 @@ th {
 
 .nav-item {
   padding: 4px 4px 2px 4px;
+  height: $sidebar-width;
 }
 
 .nav-ac    {background-color: $ac-nav-bg-color;}
@@ -313,7 +314,7 @@ th {
 .nav-wiki  {background-color: $wiki-section-color;}
 
 .ac-logo-text {
-  height: 44px;
+  height: $sidebar-width;;
   width: auto;
   margin-top: -1px;
 }
