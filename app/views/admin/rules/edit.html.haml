@@ -21,7 +21,18 @@
             %label Message
             %input{type: "text", id: "rule-message", value: @rule.message}
 
+      .row
+        .col-xs-4
+          %label State
+          = f.select :state, ['UNCHANGED', 'UPDATED', 'NEW', 'STALE', 'FAILED', 'DELETED'], {selected: @rule.state}, {class: 'form-control'}
 
+        .col-xs-4
+          %label Edit Status
+          = f.select :edit_status, ['SYNCHED', 'NEW', 'EDIT'], {selected: @rule.edit_status}, {class: 'form-control'}
+
+        .col-xs-4
+          %label Publish Status
+          = f.select :publish_status, ['CURRENT EDIT', 'STALE EDIT', 'PUBCONTENT', 'PUBDOC'], {selected: @rule.publish_status}, {class: 'form-control'}
 
       -#.row
       -#  .col-sm-2.form-group
@@ -31,18 +42,18 @@
       -#  .col-sm-4.form-group
       -#    %label SID
       -#    = f.text_field :sid, class: 'form-control'
-      .row
-        .col-sm-4.form-group
-          %label State
-          = f.select :state, ['UNCHANGED', 'UPDATED', 'NEW', 'STALE', 'FAILED', 'DELETED'], {selected: @rule.state}, {class: 'form-control'}
-      .row
-        .col-sm-4.form-group
-          %label Edit Status
-          = f.select :edit_status, ['SYNCHED', 'NEW', 'EDIT'], {selected: @rule.edit_status}, {class: 'form-control'}
-      .row
-        .col-sm-4.form-group
-          %label Publish Status
-          = f.select :publish_status, ['CURRENT EDIT', 'STALE EDIT', 'PUBCONTENT', 'PUBDOC'], {selected: @rule.publish_status}, {class: 'form-control'}
+      -#.row
+      -#  .col-sm-4.form-group
+      -#    %label State
+      -#    = f.select :state, ['UNCHANGED', 'UPDATED', 'NEW', 'STALE', 'FAILED', 'DELETED'], {selected: @rule.state}, {class: 'form-control'}
+      -#.row
+      -#  .col-sm-4.form-group
+      -#    %label Edit Status
+      -#    = f.select :edit_status, ['SYNCHED', 'NEW', 'EDIT'], {selected: @rule.edit_status}, {class: 'form-control'}
+      -#.row
+      -#  .col-sm-4.form-group
+      -#    %label Publish Status
+      -#    = f.select :publish_status, ['CURRENT EDIT', 'STALE EDIT', 'PUBCONTENT', 'PUBDOC'], {selected: @rule.publish_status}, {class: 'form-control'}
       .row
         .col-sm-12.form-group
           %button.btn.btn-success.edit-user{value: "submit", data: { confirm: 'Are you really really sure?? This might fuck shit up.'}} Save

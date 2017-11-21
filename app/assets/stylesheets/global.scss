@@ -96,51 +96,77 @@ h3 {
 
 /**** Tables ****/
 
-/* Specifically overrides Bootstraps styles */
-.fixed-table-container {
-  border: none;
-}
+/* Specifically overrides Bootstraps styles for data tables */
 
-.fixed-table-container thead th, .fixed-table-container tbody td {
-  border-left: none;
+.table > thead > tr > th, .table > tbody > tr > td {
   border-bottom: 1px solid $faint-neutral-color;
 }
 
-.fixed-table-container thead th {padding: 0 !important;}
-.fixed-table-container tbody td {padding: 11px 8px !important;}
-
-.fixed-table-container thead th .th-inner {
-  line-height: 1em;
+.table > thead > tr > th {
+  padding: 5px 8px;
 }
 
-.fixed-table-container thead th .sortable {
+.table > tbody > tr > td {
+  padding: 11px 8px;
+}
+
+table.dataTable {
+  width: 100% !important;
+}
+
+table.dataTable thead .sorting, table.dataTable thead .sorting_desc, table.dataTable thead .sorting_asc  {
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: right center;
   padding-right: 20px;
 }
 
-.fixed-table-container thead th .both {
+table.dataTable thead .sorting {
   background-image: url('layout/icon_sort.svg');
-  background-size: 10px;
 }
 
-.fixed-table-container thead th .desc {
-  background-image: url('layout/icon_sort_dec.svg');
-  background-size: 10px;
-}
-
-.fixed-table-container thead th .asc {
+table.dataTable thead .sorting_asc {
   background-image: url('layout/icon_sort_asc.svg');
-  background-size: 10px;
 }
 
-.btn-default {
-  border: none;
-  background-color: transparent;
-  padding: 10px 12px;
+table.dataTable thead .sorting_desc {
+  background-image: url('layout/icon_sort_dec.svg');
 }
 
-.pagination-detail {
-  font-size: 10pt;
-}
+//.fixed-table-container thead th {padding: 0 !important;}
+//.fixed-table-container tbody td
+//
+//.fixed-table-container thead th .th-inner {
+//  line-height: 1em;
+//}
+//
+//.fixed-table-container thead th .sortable {
+//  padding-right: 20px;
+//}
+//
+//.fixed-table-container thead th .both {
+//  background-image: url('layout/icon_sort.svg');
+//  background-size: 10px;
+//}
+//
+//.fixed-table-container thead th .desc {
+//  background-image: url('layout/icon_sort_dec.svg');
+//  background-size: 10px;
+//}
+//
+//.fixed-table-container thead th .asc {
+//  background-image: url('layout/icon_sort_asc.svg');
+//  background-size: 10px;
+//}
+//
+
+//
+//.pagination-detail {
+//  font-size: 10pt;
+//}
+
+
+
 
 /**** Additional table styles ***/
 table {
@@ -153,6 +179,7 @@ th {
   font-weight: 600;
   font-size: 8pt;
   text-align: left;
+  text-wrap: none;
 }
 
 .fixed-table-container tbody td.td-tools {
@@ -160,6 +187,39 @@ th {
   padding: 0 !important;
 }
 
+.td-tools {
+  padding: 0 !important;
+  text-align: right;
+}
+
+#rules-table .col-nowrap {
+  white-space: nowrap !important;
+}
+
+/********* Buttons ****************/
+
+.toolbar-row {
+  min-width: 60px;
+}
+
+.toolbar-row button {
+  display: inline-block;
+  background-color: $nav-toolbar-color;
+  border-radius: 2px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background-repeat: no-repeat;
+  margin: 9px 3px;
+}
+
+.edit-button {
+  background-image: url('icon_edit.svg');
+}
+
+.related-button {
+  background-image: url('icon_related.svg');
+}
 
 /******** Messages / Warnings ********/
 
@@ -206,6 +266,10 @@ th {
   margin: 20px;
 }
 
+.form-control {
+  border-radius: 2px;
+}
+
 fieldset {
   border: 1px solid $faint-neutral-color;
   padding: 4px;
@@ -232,14 +296,16 @@ fieldset {
   margin-right: 0;
 }
 
-.form-wrapper .col-xs-2, .form-wrapper .col-xs-10 {
+.form-wrapper .col-xs-2, .form-wrapper .col-xs-10, .form-wrapper .col-xs-4 {
   padding-left: 0;
   padding-right: 0;
 }
 
-.select {
-  border-radius: 2px;
+select {
+  border-radius: 2px !important;
 }
+
+
 
 /************ Side Nav **************/
 

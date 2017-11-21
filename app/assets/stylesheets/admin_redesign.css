@@ -6,6 +6,8 @@
  *= require bootstrap-switch
  *= require bootstrap-table.min
  *= require jquery-ui
+ *= require dataTables/extras/dataTables.responsive
+ *= require dataTables/jquery.dataTables
  *= require reset
  *= require font_import_opensans
  *= require global
