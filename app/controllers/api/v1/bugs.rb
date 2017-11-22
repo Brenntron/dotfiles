@@ -46,7 +46,7 @@ module API
               Rails.logger.error $!
               Rails.logger.error $!.backtrace.join("\n")
               progress_bar.update_attribute("progress", -1)
-              error = "There was an error when attempting to upload bug, no bug was uploaded or sinked as a result."
+              error = "There was an error when attempting to upload bug, no bug was uploaded or sunk as a result."
               {:error => error}.to_json
             end
           else
