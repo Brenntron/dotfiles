@@ -572,7 +572,7 @@ module API
             rescue XMLRPC::FaultException => e
               throw :error,
                     status: 400,
-                    message: "#{e.message}"
+                    message: e.message
             end
           end
           throw :error,

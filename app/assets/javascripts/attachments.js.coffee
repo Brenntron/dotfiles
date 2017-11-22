@@ -177,7 +177,7 @@ $ ->
           $('.alert_attachments').addClass('success').show().html('Task has been created to test the attachment')
           window.location.reload()
         error: (response) ->
-          $('.alert_attachments').addClass('error').show().html('Task has not been created')
+          $('.alert_attachments').addClass('error').show().html(response.responseJSON.error)
           $(this).attr('disabled', false)
           window.location.reload()
       )
