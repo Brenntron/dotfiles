@@ -18,7 +18,7 @@ window.bug_resolve =(this_tag) ->
     json = $.parseJSON(response)
 
     if (json.error)
-      message = "There was a problem attempting to synch this bug:"
+      message = "There was a problem attempting to sink this bug:"
       message += json.error
       $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
     else
@@ -255,7 +255,7 @@ $ ->
     ).done (response) ->
       json = $.parseJSON(response)
       if (json.error)
-        message = "There was a problem attempting to synch this bug:"
+        message = "There was a problem attempting to sink this bug:"
         message += json.error
         $('.resync_bug_button').show()
         $('.loading_image').hide()
@@ -336,7 +336,7 @@ $ ->
           json = $.parseJSON(response)
 
           if (json.error)
-            message = "There was a problem attempting to synch this bug:"
+            message = "There was a problem attempting to sink this bug:"
             message += json.error
             $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
           else
@@ -360,7 +360,7 @@ $ ->
                 , this)
             else
               AC.Bugs.buildStatusReportModal(json.import_report)
-              #alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action")
+              #alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should sink and review the changes before attempting this action")
               #window.location.reload()
     else
       state_comment = $("#state_comment").val()

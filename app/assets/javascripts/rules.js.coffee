@@ -95,7 +95,7 @@ window.pre_commit = ->
       json = $.parseJSON(response)
 
       if (json.error)
-        message = "There was a problem attempting to synch this bug:"
+        message = "There was a problem attempting to sink this bug:"
         message += json.error
         $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
       else
