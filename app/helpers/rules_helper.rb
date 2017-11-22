@@ -46,10 +46,8 @@ module RulesHelper
       :'inappropriate-content'          => 'Inappropriate Content was Detected',
       :'policy-violation'               => 'Potential Corporate Privacy Violation',
       :'default-login-attempt'          => 'Attempt to login by a default username and password',
-      :'sdf'                            => 'Senstive Data',
-      :'file-format'                    => 'Known malicious file or file based exploit',
-      :'malware-cnc'                    => 'Known malware command and control traffic',
-      :'client-side-exploit'            => 'Known client side exploit attempt'
+      :'sdf'                            => 'Senstive Data'
+
   )
 
   def sid_colon_format(rule)
