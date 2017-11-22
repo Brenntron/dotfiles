@@ -51,6 +51,14 @@ class BugsController < ApplicationController
         end
       end
     end
+
+    if params[:giblet_id].present?
+      giblet = Giblet.where(:id => params[:giblet_id]).first
+
+      @bugs = giblet.gib.bugs.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
+    end
+
+
   end
 
   def new

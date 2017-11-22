@@ -1,9 +1,14 @@
 class Bug < ApplicationRecord
 
+  has_many :giblets
+  has_many :tag_gibs, through: :giblets, source: :gib, source_type: 'Tag'
+  has_many :reference_gibs, through: :giblets, source: :gib, source_type: 'Reference'
+
   has_many :bugs_rules
   has_many :rules, through: :bugs_rules
   # has_and_belongs_to_many :giblets
   has_and_belongs_to_many :tags, dependent: :destroy
+  has_and_belongs_to_many :whiteboards, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
 
@@ -524,6 +529,8 @@ class Bug < ApplicationRecord
   def update_summary(summary_given)
     update!(summary: summary_given)
 
+    parsed = parse_summary
+    load_tags_from_summary(parsed[:tags] )
     load_rules_from_sids(summary_sids)
     load_refs_from_summary(summary_references)
     compose_summary
@@ -567,28 +574,66 @@ class Bug < ApplicationRecord
 
   ####methods for bug importing######
 
+  def load_whiteboard_values
+    if self.whiteboard.present?
+      tokens = self.whiteboard.split(" ")
+      tokens.each do |token|
+        unless token.blank?
+          w_board = Whiteboard.where(:name => token).first
+          if w_board.blank?
+            w_board = Whiteboard.create(:name => token)
+          end
+
+          unless self.whiteboards.include?(w_board)
+            self.whiteboards << w_board
+          end
+
+          if giblets.select {|giblet| giblet.gib == w_board}.blank?
+            Giblet.create(:bug_id => self.id, :gib_type => "Whiteboard", :gib_id => w_board.id)
+          end
+        end
+
+      end
+    end
+  end
+
   def load_tags_from_summary(tags, import_type='import')
     tags.each do |tag|
-      @import_report[:new_tags] << tag.name unless self.tags.include?(tag)
+      @import_report[:new_tags] << tag.name unless self.tags.include?(tag) if defined? @import_report
       if import_type != "status"
         unless self.tags.include?(tag)
           self.tags << tag
-          giblets << Giblets.create("tag",tag)
+
         end
+
+        if giblets.select {|giblet| giblet.gib == tag}.blank?
+          #giblets << Giblet.create(:gib, tag)
+          Giblet.create(:bug_id => self.id, :gib_type => "Tag", :gib_id => tag.id)
+        end
+
       end
     end
   end
 
   def load_refs_from_summary(refs, import_type='import_type')
     refs.each do |ref|
-      @import_report[:new_refs] << ref.reference_data unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+      @import_report[:new_refs] << ref.reference_data unless self.references.map {|r| r.reference_data}.include? ref.reference_data if defined? @import_report
       if import_type != "status"
         unless self.references.map {|r| r.reference_data}.include? ref.reference_data
           self.references << ref
-          giblets << Giblets.create("reference",ref)
+
+        end
+
+        if giblets.select {|giblet| giblet.gib == ref}.blank?
+          if ref.reference_type.name != "url"
+            #giblets << Giblet.create(:gib, ref)
+            Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => ref.id)
+          end
         end
       end
-      Exploit.find_exploits(ref)
+      unless import_type == 'shallow'
+        Exploit.find_exploits(ref)
+      end
     end
   end
 
@@ -963,6 +1008,8 @@ class Bug < ApplicationRecord
 
     bug.reload
 
+    bug.load_whiteboard_values
+
     if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
       bug_is_being_resolved = !bug_is_being_resolved
     end
@@ -1237,9 +1284,9 @@ class Bug < ApplicationRecord
 
           end
         end
-
+        progress_bar.update_attribute("progress", 20) unless progress_bar.blank?
+        bug.load_whiteboard_values
         progress_bar.update_attribute("progress", 30) unless progress_bar.blank?
-
         parsed = bug.parse_summary
         progress_bar.update_attribute("progress", 50) unless progress_bar.blank?
         bug.load_rules_from_sids(parsed[:sids], bug.component, import_type)

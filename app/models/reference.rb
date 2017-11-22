@@ -1,4 +1,7 @@
 class Reference < ApplicationRecord
+  has_many :giblets, as: :gib
+
+
   belongs_to :reference_type, optional: true
   has_and_belongs_to_many :exploits
 

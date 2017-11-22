@@ -15,7 +15,12 @@
   <tbody>
   <% @bugs.each do |bug| %>
       <tr id="bug_<%= bug.id %>" class="<%= set_bug_color(bug) %>">
-        <td><%= link_to bug.summary, bug_path(bug.id) %> </td>
+        <td><%= link_to bug.summary, bug_path(bug.id) %>
+              <br />
+              <% bug.giblets.each do |gib| %>
+              <a href="<%= bugs_path({:giblet_id => gib.id, :page => 1}) %>"><button class="btn btn-primary btn-sm"><%= gib.display_name %></button></a>
+              <% end %>
+        </td>
         <td><%= display_last_updated_date(bug)%> <%= display_last_updated_time(bug)%></td>
         <td><%= bug.component %></td>
         <td><span onclick="toggle_liberty(this, <%= bug.id %>)" class="<%= bug.liberty_clear? ? "embargo_off" : "embargo_on" %>"></span></td>
