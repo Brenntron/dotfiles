@@ -82,9 +82,9 @@ Feature: Bug
     Then I wait for "3" seconds
     And  I goto "/bugs/222222"
 
-    And  I should not see "Looks like this bug(222222) may be out of synch"
+    And  I should not see "Looks like this bug(222222) may be out of sink"
     Then I goto "/bugs/111111"
-    And  I should see "Looks like this bug (111111) may be out of synch"
+    And  I should see "Looks like this bug (111111) may be out of sink"
 
 
 # ==== Creating a Bug with Tags ===
@@ -131,11 +131,11 @@ Feature: Bug
   Scenario: The summary text should update with tag edits
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+      | id     | bugzilla_id | state  | user_id | summary                       | product  | component   | version | description       |
+      | 153354 | 153354      | FIXED  | 1       | [BP][NSS] Fake bug the second | Research | Snort Rules | 2.6.0   | test description3 |
     Then I wait for "3" seconds
-    And I goto "/bugs/222222"
-    Then I should see "[BP][NSS] fixed bug"
+    And I goto "/bugs/153354"
+    Then I should see "[BP][NSS] Fake bug the second"
     And  I fill in selectized with "TELUS"
     Then the selectize field contains the text "TELUS"
 

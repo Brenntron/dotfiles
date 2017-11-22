@@ -466,7 +466,6 @@ Feature: Rules
 
 
   # ==== Synching a rule from VC ===
-
   @javascript
   Scenario: VC updated for a valid edited rule
     Given a user with role "analyst" exists and is logged in
@@ -746,7 +745,6 @@ Feature: Rules
   @javascript
   Scenario: A duplicated rule should parse the message
             and populate the rule category and message fields correctly
-
     Given a user with role "committer" exists and is logged in
     Given the following bugs exist:
       |  id  | bugzilla_id | state  | user_id |
