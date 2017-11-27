@@ -160,7 +160,7 @@ module API
               response_task['cvs_username'] = User.find(task.user_id).cvs_username
               response_task['task_type'] = task.task_type
               response_task['result'] = task.result.present? ? task.result : "Please wait while task completes."
-              response_task['created_at'] = task.created_at.strftime("%m/%d/%y %H:%M:%S")
+              response_task['created_at'] = task.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%y %H:%M:%S") #TODO change in_time_zone to reflect the users timezone.(when we have configurations for this stuff)
               bug_queue << response_task
             end
             response[:jobs_tab] = bug_queue
