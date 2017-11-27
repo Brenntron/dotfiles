@@ -16,11 +16,11 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | BLACKLIST message |        1         |
+      | 14 |  1  | 22213 |  3  | BLACKLIST message |        1         |
+      | 15 |  1  | 22214 |  3  | BLACKLIST message |        1         |
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -52,11 +52,11 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | BLACKLIST message |        1         |
+      | 14 |  1  | 22213 |  3  | BLACKLIST message |        1         |
+      | 15 |  1  | 22214 |  3  | BLACKLIST message |        1         |
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -72,11 +72,11 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | BLACKLIST message |        1         |
+      | 14 |  1  | 22213 |  3  | BLACKLIST message |        1         |
+      | 15 |  1  | 22214 |  3  | BLACKLIST message |        1         |
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -344,9 +344,9 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status | doc_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    |   SYNCHED  | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
     Then rule "11" is synched
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
@@ -404,9 +404,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |    SYNCHED     | BLACKLIST message |        1         |
+    And the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -439,9 +439,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    And the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -476,9 +476,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  | BLACKLIST message |        1         |
+    And the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
