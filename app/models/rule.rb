@@ -921,7 +921,7 @@ class Rule < ApplicationRecord
   # @return [String] the CSS class name(s), space delimited if multiple
   def css_class
     [].tap do |css_classes|
-      css_classes << 'synched' if synched?
+      css_classes << 'synched' if synched_rule?
       css_classes << 'draft' if draft?
       css_classes << 'new-rule' if new_rule?
       css_classes << 'edited-rule' if edited_rule?
@@ -941,7 +941,7 @@ class Rule < ApplicationRecord
   def tool_tip
     tip_text = []
 
-    if synched?
+    if synched_rule?
       tip_text << ToolTip::SYNCHED
     end
     if draft?
