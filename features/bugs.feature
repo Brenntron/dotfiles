@@ -82,9 +82,9 @@ Feature: Bug
     Then I wait for "3" seconds
     And  I goto "/bugs/222222"
 
-    And  I should not see "Looks like this bug(222222) may be out of synch"
+    And  I should not see "Looks like this bug(222222) may be out of sink"
     Then I goto "/bugs/111111"
-    And  I should see "Looks like this bug (111111) may be out of synch"
+    And  I should see "Looks like this bug (111111) may be out of sink"
 
 
 # ==== Creating a Bug with Tags ===
@@ -131,11 +131,11 @@ Feature: Bug
   Scenario: The summary text should update with tag edits
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+      | id     | bugzilla_id | state  | user_id | summary                       | product  | component   | version | description       |
+      | 153354 | 153354      | FIXED  | 1       | [BP][NSS] Fake bug the second | Research | Snort Rules | 2.6.0   | test description3 |
     Then I wait for "3" seconds
-    And I goto "/bugs/222222"
-    Then I should see "[BP][NSS] fixed bug"
+    And I goto "/bugs/153354"
+    Then I should see "[BP][NSS] Fake bug the second"
     And  I fill in selectized with "TELUS"
     Then the selectize field contains the text "TELUS"
 
@@ -232,7 +232,7 @@ Feature: Bug
       | category      | id |
       | BLACKLIST     |  1 |
       | FILE-IDENTIFY |  2 |
-    And the following rules exist belonging to bug "222222":
+    And the following "synched_rule" rules exist belonging to bug "222222":
       |id | message               | rule_category_id | parsed |
       |1  | FILE-IDENTIFY message | 2                |  true  |
     And the following references exist:
@@ -298,7 +298,7 @@ Feature: Bug
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist belonging to bug "222222":
+    And the following "synched_rule" rules exist belonging to bug "222222":
       |id | message                 | rule_category_id | parsed |
       |1  | BLACKLIST message       | 1                |  true  |
     And the following references exist:
@@ -331,7 +331,7 @@ Feature: Bug
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist belonging to bug "222222":
+    And the following "synched_rule" rules exist belonging to bug "222222":
       |id | message                 | rule_category_id | parsed |
       |1  | BLACKLIST message       | 1                |  true  |
     And the following references exist:
@@ -360,7 +360,7 @@ Feature: Bug
     And the following rule categories exist:
       | category  | id |
       | DELETED   |  1 |
-    And the following rules exist belonging to bug "222222":
+    And the following "synched_rule" rules exist belonging to bug "222222":
       |id | message                 | rule_category_id | parsed |
       |1  | BLACKLIST message       | 1                |  true  |
     And the following references exist:
@@ -388,7 +388,7 @@ Feature: Bug
     And the following rule categories exist:
       | category      | id |
       | FILE-IDENTIFY |  1 |
-    And the following rules exist belonging to bug "222222":
+    And the following "synched_rule" rules exist belonging to bug "222222":
       |id | message                 | rule_category_id | parsed |
       |1  | BLACKLIST message       | 1                |  true  |
     And the following references exist:
@@ -417,7 +417,7 @@ Feature: Bug
       | category      | id |
       | BLACKLIST     |  1 |
       | FILE-IDENTIFY |  2 |
-    And the following rules exist belonging to bug "222222":
+    And the following "synched_rule" rules exist belonging to bug "222222":
       |id | message               | rule_category_id | parsed |
       |1  | FILE-IDENTIFY message | 2                | false  |
     And the following references exist:
@@ -653,7 +653,7 @@ Feature: Bug
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist belonging to bug "222222":
+    And the following "synched_rule" rules exist belonging to bug "222222":
       | message                 | rule_category_id |
       | BLACKLIST message       | 1                |
     Then I wait for "3" seconds
@@ -669,7 +669,7 @@ Feature: Bug
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist belonging to bug "145359":
+    And the following "synched_rule" rules exist belonging to bug "145359":
       |  id  | message                 | rule_category_id |
       | 3591 | BLACKLIST message       | 1                |
     And an attachment exists and belongs to bug "145359"
@@ -851,7 +851,7 @@ Feature: Bug
       | 2  | url     | just a thing | 222-222 |
       | 3  | bugtraq | just a thing | 222-222 |
       | 4  | telus   | just a thing | 222-222 |
-    And the following rules exist belonging to bug "145359":
+    And the following "synched_rule" rules exist belonging to bug "145359":
       |id | message                 | rule_category_id | parsed | sid  |
       |1  | BLACKLIST message       | 1                |  true  | 19001|
     And the following references exist belonging to rule with sid "19001":
@@ -869,7 +869,7 @@ Feature: Bug
     And the following bugs exist:
       | id     | bugzilla_id | state    | user_id | summary                                          | product  | component   | version |      description       |
       | 145359 | 145359      | REOPENED | 1       | [SID] 15539 CVE-2008-1434 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
-    And the following rules exist belonging to bug "145359":
+    And the following "synched_rule" rules exist belonging to bug "145359":
       |id | message                 | rule_category_id | parsed | sid  |
       |1  | BLACKLIST message       | 1                |  true  | 19001|
     And an attachment exists that belongs to bug "145359" and alerts on rule "1"

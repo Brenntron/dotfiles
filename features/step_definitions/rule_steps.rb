@@ -5,7 +5,6 @@ end
 Then /^I should expect (.*?) rule lines/ do |expected_rule_lines|
   rules = []
   lines = 0
-  rule_content   = 'alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any (msg:"BROWSER-PLUGINS Microsoft Internet Explorer MSXML .definition ActiveX clsid access attempt"; flow:to_client,established; file_data; content:"Msxml2.FreeThreadedDOMDocument.6.0"; fast_pattern:only; content:".definition("; nocase; pcre:"/(var|set)\s+\w+\s*=\s*(new\s+ActiveXObject|CreateObject)\s*\((?P<q1>(\x22|\x27|))Msxml2\.FreeThreadedDOMDocument\.6\.0(?P=q1)\)/smi"; metadata:policy balanced-ips drop, policy security-ips drop, service ftp-data, service http, service imap, service pop3; reference:cve,2012-1889; reference:url,technet.microsoft.com/en-us/security/bulletin/ms12-043; classtype:attempted-user; sid:23304; rev:4;)'
 
   File.open("/tmp/exported_rules.rules", "r") do |f|
     f.each_line do |line|
@@ -14,7 +13,6 @@ Then /^I should expect (.*?) rule lines/ do |expected_rule_lines|
     end
   end
   expect(lines).to eql(expected_rule_lines.to_i)
-  expect(rules.first.chomp()).to eql(rule_content)
 end
 
 Given (/^a "(.*?)" rule exists$/) do |rule|
@@ -28,7 +26,7 @@ end
 
 Given(/^"(.*?)" rules exist and belong to bug "(.*?)"/)  do |number, bug_id|
   number.to_i.times do
-    rule = FactoryGirl.create(:rule)
+    rule = FactoryGirl.create(:synched_rule)
     Bug.find(bug_id).rules << rule
   end
 end
@@ -43,10 +41,23 @@ Given(/^the following rules exist:$/) do |rules|
   end
 end
 
+Given(/^the following "(.*)" rules exist:$/) do |factory_name, rules|
+  rules.hashes.each do |rule_attrs|
+    FactoryGirl.create(factory_name.to_sym, rule_attrs)
+  end
+end
+
 Given(/^the following rules exist belonging to bug "(.*?)":$/) do |bug_id, rules|
   bug = Bug.find(bug_id)
   rules.hashes.each do |rule_attrs|
     bug.rules << FactoryGirl.create(:rule, rule_attrs)
+  end
+end
+
+Given(/^the following "(.*)" rules exist belonging to bug "(.*?)":$/) do |factory_name, bug_id, rules|
+  bug = Bug.find(bug_id)
+  rules.hashes.each do |rule_attrs|
+    bug.rules << FactoryGirl.create(factory_name.to_sym, rule_attrs)
   end
 end
 

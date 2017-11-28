@@ -18,7 +18,7 @@ window.bug_resolve =(this_tag) ->
     json = $.parseJSON(response)
 
     if (json.error)
-      message = "There was a problem attempting to synch this bug:"
+      message = "There was a problem attempting to sink this bug:"
       message += json.error
       $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
     else
@@ -255,7 +255,7 @@ $ ->
     ).done (response) ->
       json = $.parseJSON(response)
       if (json.error)
-        message = "There was a problem attempting to synch this bug:"
+        message = "There was a problem attempting to sink this bug:"
         message += json.error
         $('.resync_bug_button').show()
         $('.loading_image').hide()
@@ -336,7 +336,7 @@ $ ->
           json = $.parseJSON(response)
 
           if (json.error)
-            message = "There was a problem attempting to synch this bug:"
+            message = "There was a problem attempting to sink this bug:"
             message += json.error
             $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
           else
@@ -360,7 +360,7 @@ $ ->
                 , this)
             else
               AC.Bugs.buildStatusReportModal(json.import_report)
-              #alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should synch and review the changes before attempting this action")
+              #alert("There are #{json.import_report.total_changes} changes outstanding on this bug.  You should sink and review the changes before attempting this action")
               #window.location.reload()
     else
       state_comment = $("#state_comment").val()
@@ -545,7 +545,7 @@ namespace 'AC.Bugs', (exports) ->
   exports.buildStatusReportModal = (status_report) ->
 
     if Object.keys(status_report.changed_bug_columns).length > 0
-      bug_change_content = "<h5><b>These Bug attributes will be changed as a result of syncing:</b></h5>"
+      bug_change_content = "<h5><b>These Bug attributes will be changed as a result of sinking:</b></h5>"
       #for bug_change in status_report.changed_bug_columns
       #  bug_change_content += "&nbsp;&nbsp;&nbsp;&nbsp;#{bug_change[0]} = #{bug_change[1]}<br />"
       bug_change_content += "<table style='width:100%;'><tr><th>attribute</th><th>before</th><th>after</th><tbody>"
@@ -568,7 +568,7 @@ namespace 'AC.Bugs', (exports) ->
     if status_report.new_notes > 0
       new_notes_content = "<h5><b>New Comments under the History tab</b></h5>"
       new_notes_content += "&nbsp;&nbsp;&nbsp;&nbsp;There are #{status_report.new_notes} new notes/comments detected."
-      new_notes_content += "<br />&nbsp;&nbsp;&nbsp;&nbsp;<i>(content not shown for purposes of brevity, after syncing look under History tab to see new comments)</i>"
+      new_notes_content += "<br />&nbsp;&nbsp;&nbsp;&nbsp;<i>(content not shown for purposes of brevity, after sinking look under History tab to see new comments)</i>"
       $('#status_new_notes').html(new_notes_content)
 
     if status_report.new_tags.length > 0
