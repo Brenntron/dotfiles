@@ -96,10 +96,11 @@ h3 {
 
 /**** Tables ****/
 
-/* Specifically overrides Bootstraps styles for data tables */
+/* Specifically overrides Bootstraps / Datatables styles for data tables */
 
 .table > thead > tr > th, .table > tbody > tr > td {
   border-bottom: 1px solid $faint-neutral-color;
+  border-top: none;
 }
 
 .table > thead > tr > th {
@@ -133,40 +134,11 @@ table.dataTable thead .sorting_desc {
   background-image: url('layout/icon_sort_dec.svg');
 }
 
-//.fixed-table-container thead th {padding: 0 !important;}
-//.fixed-table-container tbody td
-//
-//.fixed-table-container thead th .th-inner {
-//  line-height: 1em;
-//}
-//
-//.fixed-table-container thead th .sortable {
-//  padding-right: 20px;
-//}
-//
-//.fixed-table-container thead th .both {
-//  background-image: url('layout/icon_sort.svg');
-//  background-size: 10px;
-//}
-//
-//.fixed-table-container thead th .desc {
-//  background-image: url('layout/icon_sort_dec.svg');
-//  background-size: 10px;
-//}
-//
-//.fixed-table-container thead th .asc {
-//  background-image: url('layout/icon_sort_asc.svg');
-//  background-size: 10px;
-//}
-//
-
-//
-//.pagination-detail {
-//  font-size: 10pt;
-//}
-
-
-
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
+  //margin: 12px 0;
+  float: none;
+  display: inline-block;
+}
 
 /**** Additional table styles ***/
 table {
@@ -179,12 +151,6 @@ th {
   font-weight: 600;
   font-size: 8pt;
   text-align: left;
-  text-wrap: none;
-}
-
-.fixed-table-container tbody td.td-tools {
-  text-align: right;
-  padding: 0 !important;
 }
 
 .td-tools {
@@ -192,8 +158,96 @@ th {
   text-align: right;
 }
 
-#rules-table .col-nowrap {
+.col-nowrap {
   white-space: nowrap !important;
+}
+
+.toolbar {
+  display: flex;
+  width: 100%;
+  font-size: 7pt;
+  margin: 20px 0;
+  position: relative;
+}
+
+.toolbar div {
+  border: 1px solid $faint-neutral-color;
+  padding: 4px;
+  height: 35px;
+  width: 200px;
+}
+
+.toolbar div:first-child {
+  margin-right: 3px;
+}
+
+.toolbar div:last-child {
+  width: 100%;
+}
+
+.toolbar input[type=search] {
+  display: inline-block;
+  background-color: transparent;
+  border-radius: 2px;
+  border: 1px solid $type-lighter-color;
+
+}
+
+.toolbar select {
+  display: inline-block;
+  background-color: transparent;
+  border-radius: 2px;
+  border: 1px solid $type-lighter-color;
+
+}
+
+/********* Tabs *************/
+
+.nav-tabs > li > a {
+  background-color: $content-tab-color;
+  text-transform: uppercase;
+  font-size: 9pt;
+  font-weight: 700;
+  margin-top: 1px;
+  margin-left: -5px;
+  padding-left: 38px;
+  padding-right: 38px;
+  color: $content-bg-color;
+  @include box-shadow($dropshadow);
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  background-repeat: no-repeat;
+  background-size: 26px;
+  background-position: 5px center;
+}
+
+.nav-tabs > li > a#admin-rule-tab-link {
+  background-image: url('icon_rules.svg');
+}
+
+.nav-tabs > li > a#admin-validations-tab-link {
+  background-image: url('icon_validations.svg');
+}
+
+.nav-tabs > li > a.active {
+  background-color: $content-bg-color;
+  color: $type-lighter-color;
+}
+
+.nav-tabs::before {
+  content: '';
+  width: 90%; /* this is not ideal, may have to come back and test other options, should not poke outside of the content wrapper though. */
+  height: 10px;
+  position: absolute;
+  background-color: white;
+  z-index: 900;
+  margin-top: 44px;
+  border-top-right-radius: 2px;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  background-color: $sidebar-nav-base;
+  border-color: transparent;
 }
 
 /********* Buttons ****************/

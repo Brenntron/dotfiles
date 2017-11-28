@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require bootstrap
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require jquery-ui
@@ -22,6 +23,7 @@
 //= require bootstrap-multiselect
 //= require tree-table
 //= require util
+//= require admin/bs-admin-tabs
 //= require_tree .
 
 

@@ -1,5 +1,6 @@
 $ ->
   $('#rules-table').dataTable(
+    'dom': '<<"toolbar" lf><t>ip>'
     processing: true
     serverSide: true
     pageLength: 25

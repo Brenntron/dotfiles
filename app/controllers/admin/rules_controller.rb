@@ -5,6 +5,7 @@ class Admin::RulesController < Admin::HomeController
       format.html
       format.json { render json: RuleDatatable.new(view_context) }
     end
+    @invalid_rules = Rule.order("updated_at desc").all.to_a.reject{ |rule| rule.valid? }
   end
 
   def edit
