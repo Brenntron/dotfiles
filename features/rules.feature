@@ -476,9 +476,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following "synched_rule" rules exist:
-      | id | gid |  sid  | rev |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
+    And the following "edited_rule" rules exist:
+      | id | gid |  sid  | rev |parsed|     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | true | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
