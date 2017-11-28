@@ -253,7 +253,7 @@ $ ->
               $('#jobs-tab table tbody').append(string)
               $('.alert_rules').addClass('success').show().html('Task has been created to test the rule ')
             error: (response) ->
-              $('.alert_rules').addClass('error').show().html('Task has not been created ')
+              $('.alert_rules').addClass('error').show().html(response.responseJSON.error)
             complete: ->
               setTimeout (->
                 $('.alert_rules').hide 'blind', {}, 4000
