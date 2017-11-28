@@ -54,6 +54,13 @@ Given(/^the following rules exist belonging to bug "(.*?)":$/) do |bug_id, rules
   end
 end
 
+Given(/^the following "(.*)" rules exist belonging to bug "(.*?)":$/) do |factory_name, bug_id, rules|
+  bug = Bug.find(bug_id)
+  rules.hashes.each do |rule_attrs|
+    bug.rules << FactoryGirl.create(factory_name.to_sym, rule_attrs)
+  end
+end
+
 Then(/^I click the "(.*?)" tab$/) do |value|
   tab = "#{value}".downcase
   find(:xpath, "//ul[@id='bug_tab']/li/a[@data-target='##{tab}-tab']").click()
