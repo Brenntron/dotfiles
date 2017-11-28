@@ -1,6 +1,9 @@
 $ ->
   $('#rules-table').dataTable(
     'dom': '<<"toolbar" lf><t>ip>'
+    language: {
+      searchPlaceholder: 'Search rules'
+    }
     processing: true
     serverSide: true
     pageLength: 25
