@@ -27,6 +27,7 @@ $type-lighter-color: #666;  /* Medium Grey */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
 $faint-neutral-color: #f2f2f2;
 $faint-accent-color:  #dff1f7;
+$faint-alt-highlight: #fff7cd; /* focus for form inputs */
 
 
 /***** Mixins ******/
@@ -264,7 +265,7 @@ th {
   padding: 2px 5px;
 }
 
-input:focus, select:focus {
+.toolbar input:focus, .toolbar select:focus {
   box-shadow: inset 0 0 5px $bug-section-color;
   outline: none;
   border: 1px solid $bug-section-color !important;
@@ -388,8 +389,8 @@ input:focus, select:focus {
 }
 
 .form-control {
+  font-family: 'Fira Mono', monospace;
   border-radius: 0 !important;
-  //-webkit-appearance: none;
   -webkit-border-radius: 0;
   outline: 1px solid $faint-accent-color;
   outline-offset: -1px;
@@ -401,18 +402,37 @@ input:focus, select:focus {
   height: 20px;
 }
 
+.form-control:focus {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  background-color: $faint-alt-highlight;
+  outline: 1px solid $faint-alt-highlight;
+}
+
 fieldset {
   border: 1px solid $faint-neutral-color;
   padding: 4px;
   margin: 32px 0;
 }
 
+fieldset:focus-within {
+  box-shadow: 0 0 3px $faint-accent-color;
+  -webkit-box-shadow: 0 0 3px $faint-accent-color;
+  border: 1px solid $faint-accent-color;
+}
+
 .form-wrapper input {
+  font-family: 'Fira Mono', monospace;
   background-color: $faint-accent-color;
   border: none;
   padding: 2px 5px;
   font-size: 8.5pt;
   width: 100%;
+}
+
+.form-wrapper input:focus {
+  outline: none;
+  background-color: $faint-alt-highlight;
 }
 
 .input-wrapper {
@@ -454,20 +474,56 @@ select {
   background-repeat: no-repeat;
   background-size: 22px;
   background-position: 2px center;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 button.call-to-action {
   background-color: $bug-section-color;
   color: $content-bg-color;
+  border: 1px solid $bug-section-color;
+}
+
+button.call-to-action:hover {
+  background-color: $content-tab-color;
+  border: 1px solid $content-tab-color;
+}
+
+button.call-to-action:focus {
+  box-shadow: inset 0 0 5px $bug-section-color;
+  outline: none;
+  border: 1px solid $bug-section-color;
+  background-color: $content-bg-color;
+  color: $bug-section-color;
 }
 
 button.secondary {
   background-color: $nav-toolbar-color;
+  border: 1px solid $nav-toolbar-color;
   color: $type-base-color;
 }
 
-button.save   {background-image: url('icon_save.svg');}
-button.cancel {background-image: url('icon_cancel.svg');}
+button.secondary:hover {
+  background-color: $type-lighter-color;
+  border: 1px solid $type-lighter-color;
+  color: $content-bg-color;
+}
+
+button.secondary:focus, a:focus button.secondary {
+  background-color: $nav-toolbar-color;
+  border: 1px solid $nav-toolbar-color;
+  color: $type-base-color;
+  box-shadow: inset 0 0 5px $type-lighter-color;
+  outline: none;
+}
+
+a:focus { outline: none;}
+
+button.save          {background-image: url('icon_save.svg');}
+button.save:focus    {background-image: url('icon_save_blue.svg');}
+button.cancel        {background-image: url('icon_cancel.svg');}
+button.cancel:hover  {background-image: url('icon_cancel_white.svg');}
+button.cancel:focus, a:focus button.cancel  {background-image: url('icon_cancel.svg');}
 
 /************ Side Nav **************/
 
