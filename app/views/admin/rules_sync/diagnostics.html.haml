@@ -6,10 +6,10 @@
   %h1 Diagnostics
 
   #rule-publishing
-    %h3 Publish Locks
-    %h4 Publish Lock PID
+    %h2 Publish Locks
+    %h3 Publish Lock PID
     %div= Repo::RuleCommitter.publish_lock_pid.inspect
-    %h4 Publishing Rules
+    %h3 Publishing Rules
     - if Rule.with_pub_any.exists?
       %table.table.table-responsive#publishing-rules-table
         %thead

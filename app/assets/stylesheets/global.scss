@@ -79,6 +79,15 @@ h1 {
   font-weight: 100;
 }
 
+h2 {
+  font-size: 11pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 36px;
+  margin-bottom: 12px;
+  color: $type-base-color;
+}
+
 h3 {
   font-weight: 700;
 }
@@ -100,20 +109,20 @@ h3 {
 
 /* Specifically overrides Bootstraps / Datatables styles for data tables */
 
-.table > thead > tr > th, .table > tbody > tr > td {
+.table > thead > tr > th, .table > tbody > tr > td, table > thead > tr > th, table > tbody > tr > td {
   border-bottom: 1px solid $faint-neutral-color;
   border-top: none;
 }
 
-.table > thead > tr > th {
+.table > thead > tr > th, table > thead > tr > th {
   padding: 5px 8px;
 }
 
-.table > tbody > tr > td {
+.table > tbody > tr > td, table > tbody > tr > td {
   padding: 11px 8px;
 }
 
-table.dataTable {
+table.dataTable, table {
   width: 100% !important;
 }
 
@@ -181,7 +190,7 @@ table {
 
 th {
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 8pt;
   text-align: left;
 }
@@ -370,12 +379,26 @@ input:focus, select:focus {
 
 /************ Forms ***************/
 
+.editing {
+  border: 1px solid $bug-section-color;
+}
+
 .form-wrapper {
   margin: 20px;
 }
 
 .form-control {
-  border-radius: 2px;
+  border-radius: 0 !important;
+  //-webkit-appearance: none;
+  -webkit-border-radius: 0;
+  outline: 1px solid $faint-accent-color;
+  outline-offset: -1px;
+  padding: 0;
+  background-color: $faint-accent-color;
+  font-size: 8.5pt;
+  border: none;
+  box-shadow: none;
+  height: 20px;
 }
 
 fieldset {
@@ -391,6 +414,14 @@ fieldset {
   font-size: 8.5pt;
   width: 100%;
 }
+
+.input-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.input-wrapper.left  {padding-right: 4px;}
+
 
 .form-wrapper label {
   position: absolute;
@@ -413,7 +444,30 @@ select {
   border-radius: 2px !important;
 }
 
+.button-group button {
+  font-size: 8pt;
+  border-radius: 2px;
+  text-align: center;
+  font-weight: 400;
+  border: none;
+  padding: 8px 28px;
+  background-repeat: no-repeat;
+  background-size: 22px;
+  background-position: 2px center;
+}
 
+button.call-to-action {
+  background-color: $bug-section-color;
+  color: $content-bg-color;
+}
+
+button.secondary {
+  background-color: $nav-toolbar-color;
+  color: $type-base-color;
+}
+
+button.save   {background-image: url('icon_save.svg');}
+button.cancel {background-image: url('icon_cancel.svg');}
 
 /************ Side Nav **************/
 

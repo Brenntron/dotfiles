@@ -28,8 +28,8 @@
 
   .tab-pane{id: 'admin-validations', role: 'tabpanel', 'aria-labelledby': 'admin-validations-tab'}
     %h1 Validations
+    %h3= "#{@invalid_rules.count} Invalid Rules"
     %table
-      %caption= "#{@invalid_rules.count} Invalid Rules"
       %thead
         %tr
           %th errors
