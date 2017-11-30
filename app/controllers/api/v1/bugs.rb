@@ -584,7 +584,17 @@ module API
         post ':bug_id/addref' do
           bug = Bug.where(id: params['bug_id']).first
           raise 'bug not found' unless bug
-          bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
+          new_ref = bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
+          if new_ref.present?
+            if bug.giblets.select {|giblet| giblet.gib == new_ref}.blank?
+              if new_ref.reference_type.name != "url"
+                new_gib = Giblet.create(:bug_id => bug.id, :gib_type => "Reference", :gib_id => new_ref.id)
+                new_gib.name = new_gib.display_name
+                new_gib.save
+              end
+            end
+          end
+
         end
 
         desc "add an exploit to a bug"

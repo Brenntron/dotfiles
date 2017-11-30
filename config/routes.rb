@@ -73,7 +73,9 @@ Rails.application.routes.draw do
     member do
       post :create_rules
       post :add_tag
+      post :add_whiteboard
       patch :remove_tag
+      patch :remove_whiteboard
     end
     resources :references
     get :bug_metrics, defaults: { format: :json }

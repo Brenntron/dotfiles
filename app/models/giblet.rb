@@ -3,10 +3,6 @@ class Giblet < ApplicationRecord
   belongs_to :gib, polymorphic: true
   #a giblet is either a tag, a stripped summary, a reference, or a sid/sidlist
 
-  #type tag reference whiteboard
-  #content
-
-
   def display_name
     displ = ""
     if gib_type == "Tag" || gib_type == "Whiteboard"

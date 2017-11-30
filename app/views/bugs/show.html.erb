@@ -135,6 +135,12 @@
 
         <div class="col-xs-12 hidden-xs bug_summary">
           <h5 class="edit-summary-field"><%= @bug.summary %></h5>
+
+          <p>
+            <% @bug.giblets.each do |gib| %>
+                <button class="btn"><%= gib.name %></button>
+            <% end %>
+          </p>
         </div>
       </div>
 

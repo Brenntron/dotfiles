@@ -207,9 +207,10 @@ class Bug < ApplicationRecord
     case
       when query_params[:bugzilla_max].present?
         nil
-      when query_params[:summary].present? || query_params[:whiteboard].present?
+      when query_params[:summary].present? || query_params[:whiteboard].present? || query_params[:giblets].present?
         summary_param = ""
         whiteboard_param = ""
+        giblets = []
 
         if query_params[:summary].present?
           summary_param = query_params.delete(:summary)
@@ -219,7 +220,23 @@ class Bug < ApplicationRecord
           whiteboard_param = query_params.delete(:whiteboard)
         end
 
-        query = Bug.where(query_params)
+        if query_params[:giblets].present?
+          giblets = query_params.delete(:giblets)
+          gibs = Giblet.where(:id => giblets)
+          join_types = gibs.all.map {|g| g.gib_type.downcase.pluralize.to_sym}.uniq
+          gibs_by_type = {}
+          join_types.each do |join_type|
+            gibs_by_type[join_type] = []
+          end
+          gibs.each do |gib|
+            gibs_by_type[gib.gib_type.downcase.pluralize.to_sym] << gib
+          end
+
+        end
+
+        query = Bug
+
+        query = query.where(query_params)
 
         if summary_param.present?
           query = query.where('summary LIKE ?', "%#{summary_param}%")
@@ -229,8 +246,30 @@ class Bug < ApplicationRecord
           query = query.where('whiteboard LIKE ?', "%#{whiteboard_param}%")
         end
 
-        #summary_param = query_params.delete(:summary)
-        #Bug.where(query_params).where('summary LIKE ?', "%#{summary_param}%")
+        ##Note:  If we ever want to try to create an 'AND' type search with multiple tags selected, we're going to need a query similar to this:
+        #  SELECT bug_id FROM `bugs` inner JOIN `bugs_tags` ON `bugs_tags`.`bug_id` = `bugs`.`id` inner JOIN `tags` ON `tags`.`id` = `bugs_tags`.`tag_id` WHERE `bugs_tags`.`tag_id` in (1, 5) group by bug_id having count(distinct tag_id) = 2;
+        #  the key is group by and having and matching up with the number of tags being searched on, this will require some really custom stuff rather than just stringing 'where' statements in an activerecord query.
+        if giblets.present?
+          join_types.each do |j_type|
+            query = query.joins(j_type)
+          end
+
+          gibs_by_type.each do |key, value|
+
+            if key == :tags && value.size > 0
+              ids = value.map{|g| g.gib.id}
+              query = query.where("bugs_tags.tag_id" => ids)
+            end
+            if key == :whiteboards && value.size > 0
+              ids = value.map{|g| g.gib.id}
+              query = query.where("bugs_whiteboards.whiteboard_id" => ids)
+            end
+            if key == :references && value.size > 0
+              ids = value.map{|g| g.gib.id}
+              query = query.where("bug_reference_rule_links.reference_id" => ids)
+            end
+          end
+        end
 
         query
       else
@@ -239,6 +278,7 @@ class Bug < ApplicationRecord
   end
 
   def self.query(current_user, named_query, search_options)
+
     case named_query
       when NilClass
         nil
@@ -589,7 +629,9 @@ class Bug < ApplicationRecord
           end
 
           if giblets.select {|giblet| giblet.gib == w_board}.blank?
-            Giblet.create(:bug_id => self.id, :gib_type => "Whiteboard", :gib_id => w_board.id)
+            new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Whiteboard", :gib_id => w_board.id)
+            new_gib.name = new_gib.display_name
+            new_gib.save
           end
         end
 
@@ -607,8 +649,9 @@ class Bug < ApplicationRecord
         end
 
         if giblets.select {|giblet| giblet.gib == tag}.blank?
-          #giblets << Giblet.create(:gib, tag)
-          Giblet.create(:bug_id => self.id, :gib_type => "Tag", :gib_id => tag.id)
+          new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Tag", :gib_id => tag.id)
+          new_gib.name = new_gib.display_name
+          new_gib.save
         end
 
       end
@@ -626,13 +669,26 @@ class Bug < ApplicationRecord
 
         if giblets.select {|giblet| giblet.gib == ref}.blank?
           if ref.reference_type.name != "url"
-            #giblets << Giblet.create(:gib, ref)
-            Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => ref.id)
+            new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => ref.id)
+            new_gib.name = new_gib.display_name
+            new_gib.save
           end
         end
       end
       unless import_type == 'shallow'
         Exploit.find_exploits(ref)
+      end
+    end
+  end
+
+  def load_giblets_from_refs
+    references.each do |ref|
+      if giblets.select {|giblet| giblet.gib == ref}.blank?
+        if ref.reference_type.name != "url"
+          new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => ref.id)
+          new_gib.name = new_gib.display_name
+          new_gib.save
+        end
       end
     end
   end
@@ -1591,8 +1647,10 @@ class Bug < ApplicationRecord
     ref_type = ReferenceType.where(name: ref_type_name).first
     raise 'Invalid reference type' unless ref_type
     unless references.where(reference_type_id: ref_type.id, reference_data: ref_data).exists?
-      references.create(reference_type_id: ref_type.id, reference_data: ref_data)
+      ref = references.create(reference_type_id: ref_type.id, reference_data: ref_data)
+      return ref
     end
+    nil
   end
 
   def add_exploit_action(reference_id:, exploit_type_id:, attachment_id:, exploit_data:)

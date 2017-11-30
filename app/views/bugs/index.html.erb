@@ -1,3 +1,11 @@
+
+<% if params[:giblet_id].present? %>
+<div>
+
+  <label>Results for:</label><input id="save_giblet_search_field" type="hidden" value="<%= @giblet.id %>" /><input class="" type="text" name="giblets" readonly value="<%= @giblet.display_name%>" /> <button id="save_giblet_search_button">Save Search</button>
+
+</div>
+<% end %>
 <table class="table index-table">
   <thead>
   <tr>
@@ -18,7 +26,7 @@
         <td><%= link_to bug.summary, bug_path(bug.id) %>
               <br />
               <% bug.giblets.each do |gib| %>
-              <a href="<%= bugs_path({:giblet_id => gib.id, :page => 1}) %>"><button class="btn btn-primary btn-sm"><%= gib.display_name %></button></a>
+              <a href="<%= bugs_path({:giblet_id => gib.id, :page => 1}) %>"><button class="btn btn-primary btn-sm"><%= gib.name %></button></a>
               <% end %>
         </td>
         <td><%= display_last_updated_date(bug)%> <%= display_last_updated_time(bug)%></td>

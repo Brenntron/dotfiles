@@ -1,5 +1,5 @@
 class BugsController < ApplicationController
-  load_and_authorize_resource except: [:add_tag, :remove_tag, :show, :bug_metrics]
+  load_and_authorize_resource except: [:add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :show, :bug_metrics]
 
   before_action :require_login
   before_action :query_bugs
@@ -9,8 +9,35 @@ class BugsController < ApplicationController
 
 
   def index
+    @tags = Tag.all.map { |tag| tag.name }.join(',')
+
+    @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
+
+    #params[:bug][:tag_names] == ['example', 'example2'] format of the tag multiselect
 
     session[:query] = session[:query].blank? ? current_user.default_bug_list : session[:query]
+
+    if params[:bug].present? && params[:bug][:tag_names].present?
+      giblets = []
+
+      distinct_gibs = Giblet.select('distinct name, gib_type').where(:name => params[:bug][:tag_names] )
+
+      final_gibs = []
+      distinct_gibs.each do |dgib|
+        final_gibs << Giblet.where(:name => dgib.name, :gib_type => dgib.gib_type).first
+      end
+      if final_gibs.present?
+        final_gibs.each do |gib|
+          giblets << gib
+        end
+      end
+
+      session[:search][:giblets] = []
+      giblets.each do |gib|
+        session[:search][:giblets] << gib.id
+      end
+    end
+
     if params[:saved_search_id].present?
       saved_search = SavedSearch.where({:id => params[:saved_search_id], :user_id => current_user.id}).first
       if saved_search.present?
@@ -53,9 +80,10 @@ class BugsController < ApplicationController
     end
 
     if params[:giblet_id].present?
-      giblet = Giblet.where(:id => params[:giblet_id]).first
+      giblet_id = params[:giblet_id]
+      @giblet = Giblet.where(:id => giblet_id).first
 
-      @bugs = giblet.gib.bugs.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
+      @bugs = @giblet.gib.bugs.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
     end
 
 
@@ -73,6 +101,8 @@ class BugsController < ApplicationController
   end
 
   def show
+
+    @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
     @bug = Bug.where(id: params[:id]).first
     @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
 
@@ -93,6 +123,7 @@ class BugsController < ApplicationController
       @tasks = @bug.tasks.order(created_at: :desc)
       @notes = @bug.notes.published.order(created_at: :desc) + @bug.notes.error_notes
       @tags = Tag.all.map { |tag| tag.name }.join(',')
+      @whiteboards = Whiteboard.all.map { |wb| wb.name }.join(',')
       flash.now[:alert] = "Looks like this bug (#{@bug.id}) may be out of synch with bugzilla.
                        Please 'resynch' using the button below." if @bug.bugzilla_synch_needed?
     else
@@ -112,6 +143,13 @@ class BugsController < ApplicationController
     @bug = Bug.find(params[:bug][:id])
     @tag = Tag.find_or_create_by(name: params[:bug][:tag_name].upcase)
     @bug.tags << @tag
+
+    if @bug.giblets.select {|giblet| giblet.gib == @tag}.blank?
+      new_gib = Giblet.create(:bug_id => @bug.id, :gib_type => "Tag", :gib_id => @tag.id)
+      new_gib.name = new_gib.display_name
+      new_gib.save
+    end
+
     respond_to do |format|
       format.json { head :no_content }
     end
@@ -121,10 +159,49 @@ class BugsController < ApplicationController
     @bug = Bug.find(params[:bug][:id])
     @tag = Tag.find_by(name: params[:bug][:tag_name])
     @bug.tags.destroy(@tag)
+
+    if @bug.giblets.select {|giblet| giblet.gib == @tag}.present?
+      gib = @bug.giblets.select {|giblet| giblet.gib == @tag}.first
+      @bug.giblets.destroy(gib)
+    end
+
     respond_to do |format|
       format.json { head :no_content }
     end
   end
+
+  def add_whiteboard
+    @bug = Bug.find(params[:bug][:id])
+    @whiteboard = Whiteboard.find_or_create_by(name: params[:bug][:whiteboard_name].upcase)
+    @bug.whiteboards << @whiteboard
+
+    if @bug.giblets.select {|giblet| giblet.gib == @whiteboard}.blank?
+      new_gib = Giblet.create(:bug_id => @bug.id, :gib_type => "Whiteboard", :gib_id => @whiteboard.id)
+      new_gib.name = new_gib.display_name
+      new_gib.save
+    end
+
+    respond_to do |format|
+      format.json { head :no_content }
+    end
+  end
+
+  def remove_whiteboard
+    @bug = Bug.find(params[:bug][:id])
+    @whiteboard = Whiteboard.find_by(name: params[:bug][:whiteboard_name])
+    @bug.whiteboards.destroy(@whiteboard)
+
+    if @bug.giblets.select {|giblet| giblet.gib == @whiteboard}.present?
+      gib = @bug.giblets.select {|giblet| giblet.gib == @whiteboard}.first
+      @bug.giblets.destroy(gib)
+    end
+
+    respond_to do |format|
+      format.json { head :no_content }
+    end
+  end
+
+
 
   def bug_metrics
     @bug = Bug.find(params[:bug_id])
