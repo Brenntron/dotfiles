@@ -1,7 +1,13 @@
-#hamburger-space
-.jumbotron
-  %h2 Schema Migrations
-#migrations-div
-  - @migrations.each do |migration|
-    .migration
-      = migration.first
+
+= render partial: 'admin_control'
+
+
+
+.content-wrapper
+  %h1 Schema Migrations
+
+  #migrations-div
+    %ul
+      - @migrations.each do |migration|
+        %li.code-snippet
+          = migration.first

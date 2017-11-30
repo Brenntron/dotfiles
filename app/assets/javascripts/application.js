@@ -10,9 +10,9 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require bootstrap
 //= require jquery
 //= require jquery_ujs
-//= require dataTables/jquery.dataTables
 //= require jquery-ui
 //= require bootstrap-sprockets
 //= require selectize
@@ -21,7 +21,7 @@
 //= require bootstrap-multiselect
 //= require tree-table
 //= require util
+//= require bootstrap-table.min
 //= require_tree .
-
-
-
+//= stub dataTables/jquery.dataTables
+//= stub dataTables/extras/dataTables.responsive
