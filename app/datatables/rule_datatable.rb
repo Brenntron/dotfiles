@@ -28,10 +28,9 @@ class RuleDatatable < AjaxDatatablesRails::Base
         edit_status:    record.edit_status,
         publish_status: record.publish_status,
         links:
-        content_tag(:div) do
-          concat(link_to "Edit", edit_admin_rule_path(record.id), class: 'btn btn-default')
-          concat " "
-          concat(link_to "Related Data", related_admin_rule_path(record.id), class: 'btn btn-default')
+        content_tag(:div, class: 'toolbar-row') do
+          concat(link_to "<button class='toolbar-button edit-button' alt='Edit Rule'></button>".html_safe, edit_admin_rule_path(record.id))
+          concat(link_to "<button class='toolbar-button related-button' alt='Related Data'></button>".html_safe, related_admin_rule_path(record.id))
         end
       }
     end

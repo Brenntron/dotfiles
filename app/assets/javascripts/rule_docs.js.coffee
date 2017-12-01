@@ -1,10 +1,15 @@
 $ ->
-  table = $('#rule-docs-table').dataTable
+  $('#rule-docs-table').dataTable
+    'dom': '<<"toolbar" lf><t>ip>'
+    language: {
+      searchPlaceholder: 'Search rules'
+    }
     processing: true
     serverSide: true
     pageLength: 10
     ajax: $('#rule-docs-table').data('source')
     pagingType: 'full_numbers'
+    responsive: true
     columns: [
       {"width": "2%",data: 'sid'}
       {"width": "45%",data: 'summary'}

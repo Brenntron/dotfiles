@@ -1,6 +1,8 @@
-#hamburger-space
 
-#version-div
-  %h3 Version
-  %iframe{src: "/version", style: "display: block; height: 40px; width: 100%;"}
+= render partial: 'admin_control'
+
+.content-wrapper
+  #version-div
+    %h3 Version
+    %iframe.version-frame{src: "/version"}
 

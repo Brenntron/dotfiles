@@ -10,14 +10,19 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
+ *= require custom-bootstrap
  *= require jquery-ui
  *= require bugs
  *= require selectize
  *= require selectize.default
  *= require bootstrap-multiselect
+ *= require bootstrap-table.min
  *= require_tree .
- *= require dataTables/jquery.dataTables
  *= require_self
+ *= stub dataTables/extras/dataTables.responsive
+ *= stub dataTables/jquery.dataTables
+ *= stub global
+ *= stub reset
  */
 
 
