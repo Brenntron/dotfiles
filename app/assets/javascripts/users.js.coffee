@@ -16,7 +16,7 @@ $ ->
     user_id = $(this).attr('value')
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     alert('This will import ALL of your bugs from Bugzilla. All bugs imported with ' +
-        'this method will need to be "resynched", as needed, in order to pull in attachments, rules and history.')
+        'this method will need to be "resunk", as needed, in order to pull in attachments, rules and history.')
     $('#user-bugs').hide()
     $('#importing_image').removeClass('hidden').show()
     $.ajax(

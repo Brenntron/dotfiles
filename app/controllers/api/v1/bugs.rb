@@ -4,6 +4,9 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+        before do
+          PaperTrail.whodunnit = current_user.id if current_user.present?
+        end
 
         desc "import one bug from bugzilla"
         params do
@@ -43,7 +46,7 @@ module API
               Rails.logger.error $!
               Rails.logger.error $!.backtrace.join("\n")
               progress_bar.update_attribute("progress", -1)
-              error = "There was an error when attempting to upload bug, no bug was uploaded or synched as a result."
+              error = "There was an error when attempting to upload bug, no bug was uploaded or sunk as a result."
               {:error => error}.to_json
             end
           else
@@ -157,7 +160,7 @@ module API
               response_task['cvs_username'] = User.find(task.user_id).cvs_username
               response_task['task_type'] = task.task_type
               response_task['result'] = task.result.present? ? task.result : "Please wait while task completes."
-              response_task['created_at'] = task.created_at.strftime("%m/%d/%y %H:%M:%S")
+              response_task['created_at'] = task.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%y %H:%M:%S") #TODO change in_time_zone to reflect the users timezone.(when we have configurations for this stuff)
               bug_queue << response_task
             end
             response[:jobs_tab] = bug_queue
@@ -569,7 +572,7 @@ module API
             rescue XMLRPC::FaultException => e
               throw :error,
                     status: 400,
-                    message: "#{e.message}"
+                    message: e.message
             end
           end
           throw :error,

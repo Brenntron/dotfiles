@@ -3,10 +3,10 @@ class Bug < ApplicationRecord
   has_many :giblets
   has_many :tag_gibs, through: :giblets, source: :gib, source_type: 'Tag'
   has_many :reference_gibs, through: :giblets, source: :gib, source_type: 'Reference'
+  has_paper_trail
 
   has_many :bugs_rules
   has_many :rules, through: :bugs_rules
-  # has_and_belongs_to_many :giblets
   has_and_belongs_to_many :tags, dependent: :destroy
   has_and_belongs_to_many :whiteboards, dependent: :destroy
   belongs_to :user, optional: true
@@ -25,8 +25,7 @@ class Bug < ApplicationRecord
   has_many :alerts, through: :attachments
   has_many :local_alerts, through: :attachments
   has_many :pcap_alerts, through: :attachments
-
-  validates :description, length: { maximum: 255 }
+  
 
   accepts_nested_attributes_for :rules
 

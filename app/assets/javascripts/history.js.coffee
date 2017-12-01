@@ -66,10 +66,10 @@ $ ->
       method: 'GET'
       headers: headers
       success: (response) ->
-        $('.alert_comment').addClass('success').show().html('History Synched.')
+        $('.alert_comment').addClass('success').show().html('History Sunk.')
         $('#synch_history, #synch_history_synching').toggle()
         window.location.reload()
       error: (response) ->
-        $('.alert_comment').addClass('error').show().html('There was a problem synching the history.')
+        $('.alert_comment').addClass('error').show().html('There was a problem sinking the history.')
         $(this).attr('disabled', false)
     , this)

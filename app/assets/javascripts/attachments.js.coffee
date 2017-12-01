@@ -83,10 +83,10 @@ $ ->
       method: 'GET'
       headers: headers
       success: (response) ->
-        $('.alert_attachments').addClass('success').show().html('Attachments Synched.')
+        $('.alert_attachments').addClass('success').show().html('Attachments sunk.')
         window.location.reload()
       error: (response) ->
-        $('.alert_attachments').addClass('error').show().html('There was a problem synching attachments.')
+        $('.alert_attachments').addClass('error').show().html('There was a problem sinking attachments.')
         $(this).attr('disabled', false)
     , this)
 
@@ -177,7 +177,7 @@ $ ->
           $('.alert_attachments').addClass('success').show().html('Task has been created to test the attachment')
           window.location.reload()
         error: (response) ->
-          $('.alert_attachments').addClass('error').show().html('Task has not been created')
+          $('.alert_attachments').addClass('error').show().html(response.responseJSON.error)
           $(this).attr('disabled', false)
           window.location.reload()
       )

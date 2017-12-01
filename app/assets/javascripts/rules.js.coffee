@@ -95,7 +95,7 @@ window.pre_commit = ->
       json = $.parseJSON(response)
 
       if (json.error)
-        message = "There was a problem attempting to synch this bug:"
+        message = "There was a problem attempting to sink this bug:"
         message += json.error
         $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
       else
@@ -253,7 +253,7 @@ $ ->
               $('#jobs-tab table tbody').append(string)
               $('.alert_rules').addClass('success').show().html('Task has been created to test the rule ')
             error: (response) ->
-              $('.alert_rules').addClass('error').show().html('Task has not been created ')
+              $('.alert_rules').addClass('error').show().html(response.responseJSON.error)
             complete: ->
               setTimeout (->
                 $('.alert_rules').hide 'blind', {}, 4000

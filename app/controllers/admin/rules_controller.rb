@@ -1,7 +1,11 @@
 class Admin::RulesController < Admin::HomeController
 
   def index
-    @rules = Rule.left_joins(:bugs).group(:id).select("count(*) as bug_count, rules.*")
+    respond_to do |format|
+      format.html
+      format.json { render json: RuleDatatable.new(view_context) }
+    end
+    @invalid_rules = Rule.order("updated_at desc").all.to_a.reject{ |rule| rule.valid? }
   end
 
   def edit
