@@ -10,6 +10,7 @@ class RuleDoc < ApplicationRecord
                  corrective_action contributors policies is_community}
 
 
+
   before_create :compose_impact, if: Proc.new { |doc| doc.impact.blank? }
   before_save :check_default_text
 

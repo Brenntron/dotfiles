@@ -68,6 +68,9 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  resources :rule_docs, only: [:index, :edit, :update, :destroy]
+
   resources :bugs do
     member do
       post :create_rules

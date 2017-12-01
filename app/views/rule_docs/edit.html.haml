@@ -1,0 +1,65 @@
+#hamburger-space
+
+.jumbotron
+  %h3 Editing Rule Document
+
+  .row
+    .col-sm-6
+      %h4 Rule: #{@rule_doc.rule.sid}
+      .code.wrapped_code
+        =@rule_doc.rule.rule_parsed
+    .col-sm-6
+      %h4 Bugs using this rule
+      %ul
+      - @rule_doc.rule.bugs.each do |bug|
+        %li
+          %a{href: "/bugs/#{bug.bugzilla_id}"}
+            =bug.bugzilla_id
+
+
+
+= form_for @rule_doc, url: {action: :update} do |f|
+  .row
+    .col-sm-6.form-group
+      %label Rule sid associated with this doc (dont fuck with this)
+      =f.text_field :sid, class: 'form-control',disabled:true
+    .col-sm-6.form-group
+      %label linking id for the rule associated with this doc (dont fuck with this)
+      =f.text_field :rule_id, class: 'form-control',disabled:true
+  .row
+    .col-sm-6.form-group
+      %label Summary
+      =f.text_area :summary, class: 'form-control'
+    .col-sm-6.form-group
+      %label Impact
+      =f.text_area :impact, class: 'form-control'
+  .row
+    .col-sm-6.form-group
+      %label Detailed Info
+      =f.text_area :details, class: 'form-control'
+    .col-sm-6.form-group
+      %label Affected Systems
+      =f.text_area :affected_sys, class: 'form-control'
+  .row
+    .col-sm-6.form-group
+      %label False Positives
+      =f.text_area :false_positives, class: 'form-control'
+    .col-sm-6.form-group
+      %label False Negatives
+      =f.text_area :false_negatives, class: 'form-control'
+  .row
+    .col-sm-6.form-group
+      %label contributors
+      =f.text_area :contributors, class: 'form-control'
+    .col-sm-6.form-group
+      %label policies
+      =f.text_area :policies, class: 'form-control'
+  .row
+    .col-sm-12.form-group
+      %label Is this a community rule?
+      =f.check_box :is_community, class: 'form-control'
+  .row
+    .col-sm-12.form-group
+      %button.btn.btn-success.edit-user{value: "submit"} Save
+      = link_to rule_docs_path, class:"btn btn-primary" do
+        %i.glyphicon.glyphicon-th-list{:title => "Back"} Back
