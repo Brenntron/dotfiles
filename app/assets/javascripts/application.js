@@ -27,3 +27,4 @@
 //= stub dataTables/extras/dataTables.responsive
 //= stub admin/rules
 //= stub admin/bs-admin-tabs
+//= stub rule_docs
