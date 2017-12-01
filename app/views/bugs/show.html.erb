@@ -137,8 +137,8 @@
           <h5 class="edit-summary-field"><%= @bug.summary %></h5>
 
           <p>
-            <% @bug.giblets.each do |gib| %>
-                <button class="btn"><%= gib.name %></button>
+            <% @unique_giblets.each do |gib| %>
+                <button class="btn"><%= gib %></button>
             <% end %>
           </p>
         </div>

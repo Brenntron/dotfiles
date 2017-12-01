@@ -25,8 +25,10 @@
       <tr id="bug_<%= bug.id %>" class="<%= set_bug_color(bug) %>">
         <td><%= link_to bug.summary, bug_path(bug.id) %>
               <br />
-              <% bug.giblets.each do |gib| %>
-              <a href="<%= bugs_path({:giblet_id => gib.id, :page => 1}) %>"><button class="btn btn-primary btn-sm"><%= gib.name %></button></a>
+
+              <% uniq_gibs = bug.giblets.map {|g| g.name}.uniq %>
+              <% uniq_gibs.each do |gib| %>
+              <a href="<%= bugs_path({:tag_names => [gib], :page => 1}) %>"><button class="btn btn-primary btn-sm"><%= gib %></button></a>
               <% end %>
         </td>
         <td><%= display_last_updated_date(bug)%> <%= display_last_updated_time(bug)%></td>

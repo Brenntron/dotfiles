@@ -591,6 +591,15 @@ module API
                 new_gib = Giblet.create(:bug_id => bug.id, :gib_type => "Reference", :gib_id => new_ref.id)
                 new_gib.name = new_gib.display_name
                 new_gib.save
+              else
+                if new_ref.reference_data.include?("microsoft.com")
+                  msb_val = new_ref.reference_data.split('/').last.split('.').first
+                  ref_type = ReferenceType.where(:name => 'msb').first
+                  alt_ref = bug.references.create(:reference_type_id => ref_type.id, :reference_data => msb_val)
+                  new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => alt_ref.id)
+                  new_gib.name = new_gib.display_name
+                  new_gib.save
+                end
               end
             end
           end

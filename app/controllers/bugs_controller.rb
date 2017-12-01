@@ -17,10 +17,11 @@ class BugsController < ApplicationController
 
     session[:query] = session[:query].blank? ? current_user.default_bug_list : session[:query]
 
-    if params[:bug].present? && params[:bug][:tag_names].present?
+    if (params[:bug].present? && params[:bug][:tag_names].present?) || params[:tag_names].present?
+      tag_names_array = params[:tag_names].present? ? params[:tag_names] : params[:bug][:tag_names]
       giblets = []
 
-      distinct_gibs = Giblet.select('distinct name, gib_type').where(:name => params[:bug][:tag_names] )
+      distinct_gibs = Giblet.select('distinct name, gib_type').where(:name => tag_names_array )
 
       final_gibs = []
       distinct_gibs.each do |dgib|
@@ -79,12 +80,12 @@ class BugsController < ApplicationController
       end
     end
 
-    if params[:giblet_id].present?
-      giblet_id = params[:giblet_id]
-      @giblet = Giblet.where(:id => giblet_id).first
+    #if params[:giblet_id].present?
+    #  giblet_id = params[:giblet_id]
+    #  @giblet = Giblet.where(:id => giblet_id).first
 
-      @bugs = @giblet.gib.bugs.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
-    end
+    #  @bugs = @giblet.gib.bugs.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
+    #end
 
 
   end
@@ -107,6 +108,7 @@ class BugsController < ApplicationController
     @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
 
     if @bug
+      @unique_giblets = @bug.giblets.map {|g| g.name}.uniq
       @show_resolve_button = ['NEW', 'OPEN', 'ASSIGNED', 'DUPLICATE', 'REOPENED'].include?(@bug.state)
       @rules = @bug.rules.sort { |left, right| left <=> right }
       @ref_types = ReferenceType.valid_reference_types
