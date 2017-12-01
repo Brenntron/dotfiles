@@ -7,6 +7,8 @@ class Tag < ApplicationRecord
   after_update { |tag| tag.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   after_destroy { |tag| tag.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
+  scope :vd, -> { where(name: 'VD') }
+
   def record(action)
     record = { resource: 'tag',
               action: action,
