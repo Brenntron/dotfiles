@@ -22,15 +22,14 @@ class RuleDocDatatable < AjaxDatatablesRails::Base
               content_tag(:div) do
                 concat(content_tag(:h4,record.summary,class:''))
                 concat "\n"
-                concat(content_tag(:p,truncate(record.rule.rule_content, :length => 100),class:''))
+                concat(content_tag(:span,truncate(record.rule.rule_content, :length => 100),class:'code-snippet'))
               end,
           details:        record.details,
           bugs:           record.rule.bugs.map{|b|b.bugzilla_id},
           links:
-              content_tag(:div) do
-                concat(link_to "Edit", edit_rule_doc_path(record.id), class: 'btn btn-default')
-                concat "\n"
-                concat(link_to "Delete", rule_doc_path(record.id), method: :delete, class: "btn btn-danger btn-xs", data: {confirm: 'Are you sure you want to annihilate this document?'} )
+              content_tag(:div, class: 'toolbar-row') do
+                concat(link_to "<button class='toolbar-button edit-button' alt='Edit Rule Doc'></button>".html_safe, edit_rule_doc_path(record.id))
+                concat(link_to "<button class='toolbar-button delete-button' alt='Delete Rule Doc'></button>".html_safe, rule_doc_path(record.id), method: :delete, data: {confirm: 'Are you sure you want to annihilate this document?'} )
               end
       }
     end

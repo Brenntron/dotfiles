@@ -1,17 +1,13 @@
-#hamburger-space
 
-.jumbotron
-  %h2 Rule Documentation
-
-
-
-%table.table.responsive.no-wrap{id: 'rule-docs-table', 'data-source': "#{rule_docs_path(format: :json)}"}
-  %thead
-    %tr
-      %th SID
-      %th Summary
-      %th Detailed Info
-      %th Bugs
-      %th
-  %tbody
+.content-wrapper
+  %h1 Rule Documentation
+  %table.table.responsive.no-wrap{id: 'rule-docs-table', 'data-source': "#{rule_docs_path(format: :json)}"}
+    %thead
+      %tr
+        %th.col-sm-1 SID
+        %th.col-sm-4 Summary
+        %th.col-sm-4 Detailed Info
+        %th.col-sm-2 Bugs
+        %th.col-sm-1
+    %tbody
 

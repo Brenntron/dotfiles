@@ -97,6 +97,7 @@ h3 {
   background-color: $faint-neutral-color;
   font-family: 'Fira Mono', monospace;
   padding: 0 5px;
+  display: block;
 }
 
 .emphasis {
@@ -104,7 +105,10 @@ h3 {
   color: $type-lighter-color;
 }
 
-
+h4 {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
 
 /**** Tables ****/
 
@@ -290,6 +294,7 @@ th {
 
 .edit-button    {background-image: url('icon_edit.svg');}
 .related-button {background-image: url('icon_related.svg');}
+.delete-button  {background-image: url('icon_delete.svg');}
 
 
 
