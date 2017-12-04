@@ -1,6 +1,6 @@
 class NoteDatatable < AjaxDatatablesRails::Base
 
-  def_delegators :@view, :link_to, :edit_admin_note_path, :content_tag, :concat
+  def_delegators :@view, :link_to, :edit_admin_note_path, :admin_note_path, :content_tag, :concat
 
   def view_columns
     # Declare strings in this format: ModelName.column_name
@@ -32,6 +32,7 @@ class NoteDatatable < AjaxDatatablesRails::Base
         links:
         content_tag(:div, class: 'toolbar-row') do
           concat(link_to "<button class='toolbar-button edit-button' alt='Edit Rule'></button>".html_safe, edit_admin_note_path(record.id))
+          concat(link_to "Delete", admin_note_path(record.id), method: :delete, class: "btn btn-danger btn-xs", data: {confirm: 'Are you sure you want to annihilate this note?'} )
         end
 
       }
