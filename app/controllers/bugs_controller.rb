@@ -35,7 +35,7 @@ class BugsController < ApplicationController
       if !session.has_key? :search
         session[:search] = {}
       end
-      session[:search] = {}
+
       session[:search][:giblets] = []
       giblets.each do |gib|
         session[:search][:giblets] << gib.id
