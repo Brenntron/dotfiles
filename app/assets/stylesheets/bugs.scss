@@ -207,3 +207,25 @@ div.progress{
     display: block;
     margin: auto;
 }
+
+
+/* Tags / Whiteboard Feature */
+
+.tag {
+  font-size: 8pt;
+  font-weight: 400;
+  padding: 2px 7px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.primary-tag {
+  background-color: #cce9ed;
+  color: #4c7e8e;
+}
+
+.tags-wrapper {
+  margin-top: 2px;
+  display: inline-block;
+}

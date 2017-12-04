@@ -23,13 +23,15 @@
   <tbody>
   <% @bugs.each do |bug| %>
       <tr id="bug_<%= bug.id %>" class="<%= set_bug_color(bug) %>">
-        <td><%= link_to bug.summary, bug_path(bug.id) %>
-              <br />
-
-              <% uniq_gibs = bug.giblets.map {|g| g.name}.uniq %>
-              <% uniq_gibs.each do |gib| %>
-              <a href="<%= bugs_path({:tag_names => [gib], :page => 1}) %>"><button class="btn btn-primary btn-sm"><%= gib %></button></a>
-              <% end %>
+        <td>
+          <%= link_to bug.summary, bug_path(bug.id) %>
+          <br/>
+          <span class="tags-wrapper">
+            <% uniq_gibs = bug.giblets.map {|g| g.name}.uniq %>
+            <% uniq_gibs.each do |gib| %>
+            <a href="<%= bugs_path({:tag_names => [gib], :page => 1}) %>"><button class="tag primary-tag"><%= gib %></button></a>
+            <% end %>
+          </span>
         </td>
         <td><%= display_last_updated_date(bug)%> <%= display_last_updated_time(bug)%></td>
         <td><%= bug.component %></td>
