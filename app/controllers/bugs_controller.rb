@@ -13,7 +13,6 @@ class BugsController < ApplicationController
 
     @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
 
-    #params[:bug][:tag_names] == ['example', 'example2'] format of the tag multiselect
 
     session[:query] = session[:query].blank? ? current_user.default_bug_list : session[:query]
 
@@ -33,10 +32,16 @@ class BugsController < ApplicationController
         end
       end
 
+      if !session.has_key? :search
+        session[:search] = {}
+      end
+
       session[:search][:giblets] = []
       giblets.each do |gib|
         session[:search][:giblets] << gib.id
       end
+      session[:query] = "advance-search"
+
     end
 
     if params[:saved_search_id].present?
