@@ -1,0 +1,23 @@
+
+= render partial: 'admin_control'
+
+.tab-content.content-wrapper{id: 'admin-rules-tab-content'}
+  .tab-pane.active{id: 'admin-rules', role: 'tabpanel', 'aria-labelledby': 'admin-rules-tab'}
+    %h1 Notes
+    %table.table.responsive.no-wrap{id: 'notes-table', 'data-source': "#{admin_notes_path(format: :json)}"}
+      %thead
+        %tr
+          %th ID
+          %th Bug ID
+          %th Note Type
+          %th Comment
+          %th Author
+          %th notes_bugzilla_id
+          %th created at
+          %th updated at
+          %th
+      %tbody
+
+
+
+
