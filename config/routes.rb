@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
+    resources :notes, only: [:index, :edit, :update, :destroy]
     resources :rules, only: [:index, :edit, :update] do
       collection do
         get :validations
@@ -70,6 +71,11 @@ Rails.application.routes.draw do
   end
 
   resources :rule_docs, only: [:index, :edit, :update, :destroy]
+  namespace :templates, only: [] do
+    resources :rules do
+      get ":action(.:format)"
+    end
+  end
 
   resources :bugs do
     member do

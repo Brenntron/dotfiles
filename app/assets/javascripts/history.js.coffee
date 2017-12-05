@@ -47,10 +47,10 @@ $ ->
         $('.alert_comment').addClass('error').show().html(response.responseText)
       complete: ->
         setTimeout (->
-          $('.alert_comment').hide 'blind', {}, 1000
+          $('.alert_comment').hide 'blind', {}, 8000
           window.location.reload()
           return
-        ), 1000
+        ), 8000
     }
 
   $('.synch_history').on 'click', ->

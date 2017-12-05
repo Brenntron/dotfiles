@@ -126,6 +126,21 @@ class Rule < ApplicationRecord
     DOC_STATUS_UPDATED == self.doc_status
   end
 
+  def doc_template_name
+    case
+      when RuleCategory.policy_categories.include?(rule_category)
+        'policy'
+      when RuleCategory.malware_categories.include?(rule_category)
+        'malware'
+      when bugs.joins(:tags).where(tags: {name: 'VD'}).exists?
+        'truffle'
+      when references.cves.exists?
+        'cve'
+      else
+        'general'
+    end
+  end
+
   # determines if the rule *should* be on (uncommented) or off (commented)
   # @return [Boolean] true if it should be on
   def should_be_on?
