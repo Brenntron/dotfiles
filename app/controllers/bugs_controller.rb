@@ -9,8 +9,9 @@ class BugsController < ApplicationController
 
 
   def index
+    @distinct_gibs = nil
     @tags = Tag.all.map { |tag| tag.name }.join(',')
-
+    @final_giblets = nil
     @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
 
 
@@ -18,26 +19,23 @@ class BugsController < ApplicationController
 
     if (params[:bug].present? && params[:bug][:tag_names].present?) || params[:tag_names].present?
       tag_names_array = params[:tag_names].present? ? params[:tag_names] : params[:bug][:tag_names]
-      giblets = []
+
 
       distinct_gibs = Giblet.select('distinct name, gib_type').where(:name => tag_names_array )
 
-      final_gibs = []
+
+      @final_giblets = []
       distinct_gibs.each do |dgib|
-        final_gibs << Giblet.where(:name => dgib.name, :gib_type => dgib.gib_type).first
+        @final_giblets << Giblet.where(:name => dgib.name, :gib_type => dgib.gib_type).first
       end
-      if final_gibs.present?
-        final_gibs.each do |gib|
-          giblets << gib
-        end
-      end
+
 
       if !session.has_key? :search
         session[:search] = {}
       end
 
       session[:search][:giblets] = []
-      giblets.each do |gib|
+      @final_giblets.each do |gib|
         session[:search][:giblets] << gib.id
       end
       session[:query] = "advance-search"
