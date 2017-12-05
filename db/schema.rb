@@ -113,7 +113,11 @@ ActiveRecord::Schema.define(version: 20171205164129) do
   create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+<<<<<<< HEAD
     t.string "year", null: false
+=======
+    t.integer "reference_id", null: false
+>>>>>>> CVE References in the database.
     t.string "cve_key", null: false
     t.text "description"
     t.string "severity"
@@ -129,6 +133,7 @@ ActiveRecord::Schema.define(version: 20171205164129) do
     t.string "authentication"
     t.text "affected_systems", limit: 4294967295
     t.index ["cve_key"], name: "index_cves_on_cve_key", unique: true
+    t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
 
   create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
