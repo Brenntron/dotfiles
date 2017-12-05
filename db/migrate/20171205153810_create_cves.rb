@@ -2,7 +2,6 @@ class CreateCves < ActiveRecord::Migration[5.1]
   def change
     create_table :cves do |t|
       t.timestamps
-      t.integer :reference_id, null: false
       t.string :year, null: false
       t.string :cve_key, null: false
       t.text :description
@@ -19,7 +18,6 @@ class CreateCves < ActiveRecord::Migration[5.1]
       t.string :authentication
       t.longtext :affected_systems
     end
-    add_index :cves, :reference_id, unique: true
     add_index :cves, :cve_key, unique: true
   end
 end
