@@ -1177,6 +1177,7 @@ class Bug < ApplicationRecord
 
                 if note.present?
                   unless import_type == "status"
+                    comment = "bugzilla comment is blank" if comment.blank?
                     note.update_attributes(author: c['author'],
                                            comment: comment,
                                            bug_id: bug_id,
@@ -1187,6 +1188,7 @@ class Bug < ApplicationRecord
                 else
                   bug.import_report[:new_notes] += 1
                   unless import_type == "status"
+                    comment = "bugzilla comment is blank" if comment.blank?
                     Note.create(id: c['id'],
                                 author: c['author'],
                                 comment: comment,

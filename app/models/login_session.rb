@@ -12,8 +12,8 @@ class LoginSession
   end
 
   def self.yet_active?(session, email)
-    session_timestamp = session[:session_timestamp]
-    session_timestamp = Time.parse(session_timestamp) if String === session_timestamp
+    # session_timestamp = session[:session_timestamp]
+    # session_timestamp = Time.parse(session_timestamp) if String === session_timestamp
     case
       when session[:email].nil?
         false
@@ -21,8 +21,8 @@ class LoginSession
         false
       when session_version != session[:session_version]
         false
-      when (Time.now - session_timestamp) > 24.hours
-        false
+      # when (Time.now - session_timestamp) > 24.hours
+      #   false
       else
         true
     end

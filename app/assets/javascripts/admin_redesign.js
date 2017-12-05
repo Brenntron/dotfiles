@@ -14,6 +14,7 @@
 //= require tree-table
 //= require admin/rules
 //= require rule_docs
+//= require admin/notes
 //= require admin/bs-admin-tabs
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive

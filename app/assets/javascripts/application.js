@@ -26,5 +26,6 @@
 //= stub dataTables/jquery.dataTables
 //= stub dataTables/extras/dataTables.responsive
 //= stub admin/rules
+//= stub admin/notes
 //= stub admin/bs-admin-tabs
 //= stub rule_docs
