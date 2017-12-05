@@ -1,5 +1,4 @@
 class RuleDocsController < ApplicationController
-  layout 'admin'
   before_action { authorize!(:manage, Admin) }
   load_and_authorize_resource
 
@@ -26,14 +25,10 @@ class RuleDocsController < ApplicationController
     redirect_to rule_docs_path
   end
 
-  def validations
-    @invalid_rule_docs = RuleDoc.order("updated_at desc").all.to_a.reject{ |doc| doc.valid? }
-  end
-
   def destroy
     @rule_doc.destroy
     respond_to do |format|
-      format.html { redirect_to rule_docs__url, notice: 'rule document was successfully destroyed.' }
+      format.html { redirect_to rule_docs_url, notice: 'rule document was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
