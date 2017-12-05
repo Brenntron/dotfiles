@@ -225,7 +225,50 @@ div.progress{
   color: #4c7e8e;
 }
 
+.primary-tag:hover {
+  background-color: #80a9ba;
+  color: #fff;
+}
+
 .tags-wrapper {
   margin-top: 2px;
   display: inline-block;
+}
+
+/* Index search bar / Search results */
+
+#search-results-wrapper {
+  margin-left: 30px;
+  margin-top: 10px;
+  margin-bottom: -35px;
+}
+
+.search-label {
+  font-weight: 400;
+}
+
+.searched-item {
+  color: #4c7e8e;
+  font-size: 8.5pt;
+  margin: 0 10px 0 5px;
+}
+
+#save_giblet_search_button {
+  background-color: #f2f2f2;
+  border-color: #ccc;
+  color: #767676;
+}
+
+#nav-saved-search table td {
+  border: none;
+}
+
+.button-valign {
+  margin-top: 10px;
+  display: block;
+}
+
+#saved-search .tag {
+  font-size: 10pt;
+  padding: 6px 15px;
 }

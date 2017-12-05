@@ -3,10 +3,8 @@
 <% if @final_giblets.present? %>
 <% gib_ids = @final_giblets.map {|gib| gib.id}.join(",") %>
 <% gib_names = @final_giblets.map {|gib| gib.name}.join(" ") %>
-<div>
-
-  <label>Results for:</label><input id="save_giblet_search_field" type="hidden" value="<%= gib_ids %>" /><input class="" type="text" name="giblets" readonly value="<%= gib_names %>" /> <button id="save_giblet_search_button">Save Search</button>
-
+<div id="search-results-wrapper">
+  <label class="search-label">Results for:</label><input id="save_giblet_search_field" type="hidden" value="<%= gib_ids %>" /><span class="searched-item"><%= gib_names %></span><button id="save_giblet_search_button">Save Search</button>
 </div>
 <% end %>
 <table class="table index-table">

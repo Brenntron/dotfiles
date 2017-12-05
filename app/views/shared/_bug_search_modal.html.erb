@@ -127,9 +127,18 @@
             <div class="row">
               <br />
               <div style="width: 85%; margin: 0 auto;">
-              <table class="table table-condensed small">
+              <table class="table table-condensed small" id="saved-search">
                 <% current_user.saved_searches.each do |saved_search| %>
-                <tr id="saved_search_<%= saved_search.id %>"><td><a href="/bugs?saved_search_id=<%= saved_search.id %>"><button class="btn"><%= saved_search.name %></button></a></td><td><a onclick="AC.Bugs.deleteSavedSearch(<%= saved_search.id %>)"><i class="glyphicon glyphicon-remove"></i></a></td></tr>
+                <tr id="saved_search_<%= saved_search.id %>">
+                  <td>
+                    <a href="/bugs?saved_search_id=<%= saved_search.id %>">
+                      <button class="tag primary-tag"><%= saved_search.name %></button>
+                    </a>
+                  </td>
+                  <td>
+                    <a class="button-valign" onclick="AC.Bugs.deleteSavedSearch(<%= saved_search.id %>)"><i class="glyphicon glyphicon-remove"></i></a>
+                  </td>
+                </tr>
                 <% end %>
               </table>
               </div>
