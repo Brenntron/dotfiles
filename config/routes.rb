@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
+    resources :notes, only: [:index, :edit, :update, :destroy]
     resources :rules, only: [:index, :edit, :update] do
       collection do
         get :validations
