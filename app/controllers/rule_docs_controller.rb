@@ -1,5 +1,6 @@
 class RuleDocsController < ApplicationController
   layout 'admin'
+  before_action { authorize!(:manage, Admin) }
   load_and_authorize_resource
 
   def index
