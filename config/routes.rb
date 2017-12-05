@@ -68,6 +68,13 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  namespace :templates, only: [] do
+    resources :rules do
+      get ":action(.:format)"
+    end
+  end
+
   resources :bugs do
     member do
       post :create_rules
