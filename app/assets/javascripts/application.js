@@ -28,3 +28,4 @@
 //= stub admin/rules
 //= stub admin/notes
 //= stub admin/bs-admin-tabs
+//= stub rule_docs
