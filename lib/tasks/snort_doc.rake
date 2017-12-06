@@ -16,6 +16,10 @@ namespace :snortdoc do
       undoc_refs.each do |ref_rec|
         cve_key = "CVE-#{ref_rec.reference_data}"
         nvd_cve_item = publisher.nvd_cve_item(cve_key)
+        unless nvd_cve_item
+          $stderr.puts "Cannot find NVD input data for #{cve_key.inspect}."
+          next
+        end
 
         cve_rec = ref_rec.build_cve(cve_key: cve_key, year: year)
         cve_rec.assign_attributes(nvd_cve_item.attributes)
@@ -23,7 +27,7 @@ namespace :snortdoc do
         cve_rec.save!
 
         nvd_cve_item.each_reference do |ref_type_name, ref_data|
-          ref_type = NvdCveItem.reference_types[ref_type_name]
+          ref_type = NvdCveItem.reference_type(ref_type_name)
 
           case
             when ref_type.blank?
@@ -37,12 +41,7 @@ namespace :snortdoc do
           end
         end
       end
+      exit
     end
-
-    # year_cves = SnortDocPublisher.undoc_cve_refs_by_year['2013']
-    # puts year_cves.inspect
-
-    # curr_cve = year_cves.first
-    # puts curr_cve
   end
 end

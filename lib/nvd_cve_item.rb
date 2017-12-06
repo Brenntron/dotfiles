@@ -130,6 +130,10 @@ class NvdCveItem
         }
   end
 
+  def self.reference_type(ref_type_name)
+    reference_types[ref_type_name]
+  end
+
   # @yield [String, String] Reference Type and Reference Data.
   def each_reference(&block)
     @nvd_cve_item_hash['cve']['references']['reference_data'].each do |reference_hash|
