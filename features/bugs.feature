@@ -794,7 +794,7 @@ Feature: Bug
     And I click "save"
     And I wait for "2" seconds
     Then I should see "Note Published"
-    And I wait for "1" seconds
+    And I wait for "10" seconds
     Then I should see "I love testing"
 
 @javascript
