@@ -5,8 +5,8 @@ class NvdCveItem
 
   def description
     summary_langs = @nvd_cve_item_hash['cve']['description']['description_data']
-    summary_en = summary_langs.find{ |desc_data| 'en' == desc_data['lang'] }
-    summary_en['value']
+    summary_en = summary_langs&.find{ |desc_data| 'en' == desc_data['lang'] }
+    summary_en['value'] if summary_en.present?
   end
 
   def cvss_base_metric
@@ -33,26 +33,32 @@ class NvdCveItem
         end
   end
 
+  # @return [String<decimal>]
   def base_score
     cvss_subsection['baseScore']
   end
 
+  # @return [String<decimal>]
   def impact_score
     cvss_base_metric['impactScore']
   end
 
+  # @return [String<decimal>]
   def exploit_score
     cvss_base_metric['exploitabilityScore']
   end
 
+  # @return [String]
   def confidentiality_impact
     cvss_subsection['confidentialityImpact']
   end
 
+  # @return [String]
   def integrity_impact
     cvss_subsection['integrityImpact']
   end
 
+  # @return [String]
   def availability_impact
     cvss_subsection['availabilityImpact']
   end
@@ -83,11 +89,23 @@ class NvdCveItem
     end
   end
 
+  # @return [Array<String>] Collection of string in vendor+product+version format.
   def affected_systems
     result = []
     each_affected_system do |vendor, product, version|
       result << "#{vendor} #{product} #{version}"
     end
     result
+  end
+
+  def reference_types
+    {}
+  end
+
+  # @yield [String, String] Reference Type and Reference Data.
+  def each_reference(&block)
+    @nvd_cve_item_hash['cve']['references']['reference_data'].each do |reference_hash|
+      reference_hash.each_pair(&block)
+    end
   end
 end
