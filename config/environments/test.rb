@@ -43,5 +43,5 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   config.assets.debug = true
-
+  config.assets.paths << Rails.root.join("app/assets/javascripts/application")
 end
