@@ -123,8 +123,11 @@ class NvdCveItem
     result
   end
 
-  def reference_types
-    {}
+  def self.reference_types
+    @reference_types ||=
+        {
+            'url' => ReferenceType.url
+        }
   end
 
   # @yield [String, String] Reference Type and Reference Data.
