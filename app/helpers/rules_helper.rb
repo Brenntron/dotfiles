@@ -101,7 +101,6 @@ module RulesHelper
       when !rule.doc_complete?
         content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
       when rule.doc_updated?
-        binding.pry
         if rule.rule_doc&.id
           link_to content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'ii want con-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
         else
