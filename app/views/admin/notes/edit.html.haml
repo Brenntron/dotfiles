@@ -6,13 +6,13 @@
   %h1 Editing Note
   .form-wrapper
     = form_for @note, url: {action: :update} do |f|
-      %h3= @note.sid
+      %h3= @note.bug_id
       %fieldset
         .row
           .col-xs-2
             %label note_type
             %span.input-wrapper.left
-              %input{type: "text", id: "rule-category", placeholder: 'note_type'}
+              %input{type: "text", id: "rule-category",value: @note.note_type, placeholder: 'note_type'}
           .col-xs-10
             %label Comment
             %span.input-wrapper
