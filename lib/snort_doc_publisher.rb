@@ -2,7 +2,7 @@ class SnortDocPublisher
   attr_reader :year, :nvd_cve_item
 
   def self.undoc_cve_refs
-    @undoc_cve_refs ||= Reference.cves.left_joins(:cves)
+    @undoc_cve_refs ||= Reference.cves.left_joins(:cve)
   end
 
   def self.undoc_cve_refs_by_year

@@ -6,7 +6,7 @@ class Reference < ApplicationRecord
   has_many :rules, through: :bug_reference_rule_links, source: :link, source_type: "Rule"
   has_many :bugs, through: :bug_reference_rule_links, source: :link, source_type: "Bug"
   has_many :references, through: :bug_reference_rule_links, source: :link, source_type: "Reference"
-  has_many :cves
+  has_one :cve
 
   validates :reference_data, uniqueness: { scope: :reference_type_id }
 

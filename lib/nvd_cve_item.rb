@@ -33,6 +33,11 @@ class NvdCveItem
         end
   end
 
+  # @return [String]
+  def severity
+    cvss_base_metric['severity']
+  end
+
   # @return [String<decimal>]
   def base_score
     cvss_subsection['baseScore']
@@ -61,6 +66,26 @@ class NvdCveItem
   # @return [String]
   def availability_impact
     cvss_subsection['availabilityImpact']
+  end
+
+  # @return [String]
+  def vector_string
+    cvss_subsection['vectorString']
+  end
+
+  # @return [String]
+  def access_vector
+    cvss_subsection['accessVector']
+  end
+
+  # @return [String]
+  def access_complexity
+    cvss_subsection['accessComplexity']
+  end
+
+  # @return [String]
+  def authentication
+    cvss_subsection['authentication']
   end
 
   def affected_data
@@ -107,5 +132,22 @@ class NvdCveItem
     @nvd_cve_item_hash['cve']['references']['reference_data'].each do |reference_hash|
       reference_hash.each_pair(&block)
     end
+  end
+
+  def attributes
+    {
+        description: description,
+        severity: severity,
+        base_score: base_score,
+        impact_score: impact_score,
+        exploit_score: exploit_score,
+        confidentiality_impact: confidentiality_impact,
+        integrity_impact: integrity_impact,
+        availability_impact: availability_impact,
+        vector_string: vector_string,
+        access_vector: access_vector,
+        access_complexity: access_complexity,
+        authentication: authentication,
+    }
   end
 end
