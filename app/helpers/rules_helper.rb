@@ -101,14 +101,15 @@ module RulesHelper
       when !rule.doc_complete?
         content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
       when rule.doc_updated?
-        if rule.rule_doc.id
-          link_to content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc.id}/edit"
+        binding.pry
+        if rule.rule_doc&.id
+          link_to content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'ii want con-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
         else
           content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs')
         end
       else
-        if rule.rule_doc.id
-          link_to content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc.id}/edit"
+        if rule.rule_doc&.id
+          link_to content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
         else
           content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs')
         end
