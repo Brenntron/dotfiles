@@ -30,17 +30,11 @@ namespace :snortdoc do
   end
 
   task :snortdoc => :environment do
-    ref = Reference.cves.first
-    puts "*** ref = #{ref.inspect}"
 
-    rule = ref.rules.first
-    puts "*** rule = #{rule.inspect}"
-    puts "*** rule_content = #{rule.rule_content.inspect}"
+    rule = Rule.find 301
 
-    cve_refs = rule.references.cves
-    puts "*** cves = #{cve_refs.inspect}"
+    cve_snort_docs = SnortDocPublisher.rule_snort_doc(rule)
 
-    # cve = Cve.first
-    # puts "*** cve = #{cve.inspect}"
+    puts JSON.pretty_generate(cve_snort_docs)
   end
 end

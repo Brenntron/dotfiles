@@ -21,6 +21,11 @@ class SnortDocPublisher
     end
   end
 
+  # @return [Array<String>] The years of the undocumented references
+  def self.years
+    undoc_cve_refs_by_year.keys
+  end
+
   # @yield [SnortDocPublisher] Publishers for cve references with missing cves records.
   def self.each_publisher
     SnortDocPublisher.undoc_cve_refs_by_year.each_pair do |year, undoc_refs|
@@ -28,6 +33,62 @@ class SnortDocPublisher
     end
   end
 
+  # @params [String] year the given year for the CVEs to be updated
+  def initialize(year:, references: [])
+    @year = year
+    @references = references
+  end
+
+  # @return [String] NIST NVD file name for the year
+  def filename
+    "nvdcve-1.0-#{@year}.json"
+  end
+
+  # @return [String] filepath to store NVD file from NIST
+  def filepath
+    Rails.root.join("lib/data/nvd/#{filename}")
+  end
+
+  # @return [Integer] this year right now
+  def self.current_year
+    @current_year ||= Time.now.year
+  end
+
+  # @return [Integer] this month right now
+  def self.current_month
+    @current_month ||= Time.now.month
+  end
+
+  # @return true if NVD data file for the year needs to be downloaded
+  def download?
+    case
+      when year.to_i >= self.class.current_year
+        true
+      when (year.to_i == self.class.current_year - 1) && (1 == current_month)
+        true
+      when File.exist?(filepath)
+        false
+      else
+        true
+    end
+  end
+
+  # Downloads the NVD data from NIST for the year
+  def download
+    if download?
+      cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{filepath}.gz"
+      puts cmd
+      # system(cmd)
+      cmd = "gunzip -f #{filepath}.gz"
+      puts cmd
+      # system(cmd)
+    end
+  end
+
+  # @yield [cve_key, ref_rec, nvd_cve_item]
+  # @yieldparam [String] cve_key CVE id as CVE-<year>-<index>
+  # @yieldparam [Reference] ref_rec CVE reference record
+  # @yieldparam [NvdCveItem] nvd_cve_item data read from a CVE from the NVD data file.
   def each_missing
     references.each do |ref_rec|
       cve_key = "CVE-#{ref_rec.reference_data}"
@@ -38,51 +99,6 @@ class SnortDocPublisher
       end
 
       yield cve_key, ref_rec, nvd_cve_item_curr
-    end
-  end
-
-  def self.years
-    undoc_cve_refs_by_year.keys
-  end
-
-  # @params [String] year the given year for the CVEs to be updated
-  def initialize(year:, references: [])
-    @year = year
-    @references = references
-  end
-
-  def filename
-    "nvdcve-1.0-#{@year}.json"
-  end
-
-  def filepath
-    Rails.root.join("lib/data/nvd/#{filename}")
-  end
-
-  def self.current_year
-    @current_year ||= Time.now.year
-  end
-
-  # @return true if NVD data file for the year needs to be downloaded
-  def download?
-    case
-      when year.to_i >= self.class.current_year
-        true
-      when File.exist?(filepath)
-        false
-      else
-        true
-    end
-  end
-
-  def download
-    if download?
-      cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{filepath}.gz"
-      puts cmd
-      # system(cmd)
-      cmd = "gunzip -f #{filepath}.gz"
-      puts cmd
-      # system(cmd)
     end
   end
 
@@ -101,6 +117,7 @@ class SnortDocPublisher
     NvdCveItem.new(nvd_cve_item_hash)
   end
 
+  # Save the given data to the cves table
   def save_cve(cve_key, ref_rec, nvd_cve_item)
     cve_rec = ref_rec.build_cve(cve_key: cve_key, year: year)
     cve_rec.assign_attributes(nvd_cve_item.attributes)
@@ -108,6 +125,7 @@ class SnortDocPublisher
     cve_rec.save!
   end
 
+  # Save the given reference data to the references table
   def save_references(ref_rec, nvd_cve_item)
     nvd_cve_item.each_reference do |ref_type_name, ref_data|
       ref_type = NvdCveItem.reference_type(ref_type_name)
@@ -125,6 +143,7 @@ class SnortDocPublisher
     end
   end
 
+  # Update the reference for this object to the database (cves and references tables)
   def update_cve_data
     each_missing do |cve_key, ref_rec, nvd_cve_item|
       save_cve(cve_key, ref_rec, nvd_cve_item)
@@ -132,9 +151,26 @@ class SnortDocPublisher
     end
   end
 
+  # Update all references without CVE data in the database (cves and references tables)
   def self.update_cve_data
     each_publisher do |publisher|
       publisher.update_cve_data
     end
+  end
+
+  # @return [Hash] Snort Doc hash for a given rule
+  def self.rule_snort_doc(rule)
+    snort_doc = rule.rule_doc.attributes.slice(*%w{summary impact details affected_sys attack_scenarios
+        ease_of_attack false_positives false_negatives corrective_action contributors})
+
+    snort_doc['message'] = rule.message
+
+    snort_doc['cves'] = rule.references.cves.map do |cve_ref|
+      cve_ref.cve.attributes.slice(*%w{description severity
+          base_score impact_score exploit_score confidentiality_impact integrity_impact availability_impact
+          vector_string access_vector access_complexity authentication affected_systems})
+    end
+
+    snort_doc
   end
 end
