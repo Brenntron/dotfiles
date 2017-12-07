@@ -23,7 +23,8 @@ class SnortDocPublisher
     undoc_cve_refs_by_year.keys
   end
 
-  def initialize(year)
+  # @params [String] year the given year for the CVEs to be updated
+  def initialize(year:)
     @year = year
   end
 
@@ -32,13 +33,37 @@ class SnortDocPublisher
   end
 
   def filepath
-    "lib/data/nvd/#{filename}"
+    Rails.root.join("lib/data/nvd/#{filename}")
+  end
+
+  def self.current_year
+    @current_year ||= Time.now.year
+  end
+
+  # @return true if NVD data file for the year needs to be downloaded
+  def download?
+    case
+      when year.to_i >= self.class.current_year
+        true
+      when File.exist?(filepath)
+        false
+      else
+        true
+    end
   end
 
   def download
-    puts "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{filepath}.gz"
+    if download?
+      cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{filepath}.gz"
+      puts cmd
+      system(cmd)
+      cmd = "gunzip -f #{filepath}.gz"
+      puts cmd
+      system(cmd)
+    end
   end
 
+  # @return [Array<Hash>] data read from the year of NVD data file.
   def nvd_cve_items
     @nvd_cve_items ||= File.open(filepath, 'r') do |file|
       filedata = JSON.parse(file.read)
@@ -46,6 +71,7 @@ class SnortDocPublisher
     end
   end
 
+  # @return [Hash] data for one CVE from NVD data file.
   def nvd_cve_item(cve_key)
     nvd_cve_item_hash = nvd_cve_items.find {|item| cve_key == item['cve']['CVE_data_meta']['ID']}
     return nil unless nvd_cve_item_hash
