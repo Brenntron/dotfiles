@@ -25,39 +25,22 @@ namespace :snortdoc do
   end
 
   desc "Update the cves table with all missing cve references."
-  task :update_nvd_cves => :environment do
+  task :update_cve_data => :environment do
+    SnortDocPublisher.update_cve_data
+  end
 
-    SnortDocPublisher.each_publisher do |publisher|
-      publisher.download
+  task :snortdoc => :environment do
+    ref = Reference.cves.first
+    puts "*** ref = #{ref.inspect}"
 
-      publisher.references.each do |ref_rec|
-        cve_key = "CVE-#{ref_rec.reference_data}"
-        nvd_cve_item = publisher.nvd_cve_item(cve_key)
-        unless nvd_cve_item
-          $stderr.puts "Cannot find NVD input data for #{cve_key.inspect}."
-          next
-        end
+    rule = ref.rules.first
+    puts "*** rule = #{rule.inspect}"
+    puts "*** rule_content = #{rule.rule_content.inspect}"
 
-        cve_rec = ref_rec.build_cve(cve_key: cve_key, year: publisher.year)
-        cve_rec.assign_attributes(nvd_cve_item.attributes)
-        cve_rec.affected_systems = nvd_cve_item.affected_systems.join("\n")
-        cve_rec.save!
+    cve_refs = rule.references.cves
+    puts "*** cves = #{cve_refs.inspect}"
 
-        nvd_cve_item.each_reference do |ref_type_name, ref_data|
-          ref_type = NvdCveItem.reference_type(ref_type_name)
-
-          case
-            when ref_type.blank?
-              $stderr.puts "Unknown reference type '#{ref_type_name}'."
-            when ref_rec.references.where(reference_type: ref_type, reference_data: ref_data).exists?
-              # do nothing
-            when Reference.where(reference_type: ref_type, reference_data: ref_data).exists?
-              ref_rec.references << Reference.where(reference_type: ref_type, reference_data: ref_data).first
-            else
-              ref_rec.references.create(reference_type: ref_type, reference_data: ref_data)
-          end
-        end
-      end
-    end
+    # cve = Cve.first
+    # puts "*** cve = #{cve.inspect}"
   end
 end
