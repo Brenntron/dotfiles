@@ -1,10 +1,12 @@
 class SnortDocPublisher
-  attr_reader :year, :nvd_cve_item
+  attr_reader :year, :references
 
+  # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
   def self.undoc_cve_refs
     @undoc_cve_refs ||= Reference.cves.left_joins(:cve)
   end
 
+  # @return [Hash<String => Array<Reference>>] cve references with missing cves records grouped by year.
   def self.undoc_cve_refs_by_year
     @undoc_cve_refs_by_year ||= undoc_cve_refs.inject({}) do |result, ref|
       year = ref.reference_data.sub(/\A(\d{4})-\d+\z/, '\\1')
@@ -19,13 +21,21 @@ class SnortDocPublisher
     end
   end
 
+  # @yield [SnortDocPublisher] Publishers for cve references with missing cves records.
+  def self.each_publisher
+    SnortDocPublisher.undoc_cve_refs_by_year.each_pair do |year, undoc_refs|
+      yield SnortDocPublisher.new(year: year, references: undoc_refs)
+    end
+  end
+
   def self.years
     undoc_cve_refs_by_year.keys
   end
 
   # @params [String] year the given year for the CVEs to be updated
-  def initialize(year:)
+  def initialize(year:, references: [])
     @year = year
+    @references = references
   end
 
   def filename

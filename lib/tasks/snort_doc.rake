@@ -27,11 +27,10 @@ namespace :snortdoc do
   desc "Update the cves table with all missing cve references."
   task :update_nvd_cves => :environment do
 
-    SnortDocPublisher.undoc_cve_refs_by_year.each_pair do |year, undoc_refs|
-      publisher = SnortDocPublisher.new(year)
+    SnortDocPublisher.each_publisher do |publisher|
       publisher.download
 
-      undoc_refs.each do |ref_rec|
+      publisher.references.each do |ref_rec|
         cve_key = "CVE-#{ref_rec.reference_data}"
         nvd_cve_item = publisher.nvd_cve_item(cve_key)
         unless nvd_cve_item
@@ -39,7 +38,7 @@ namespace :snortdoc do
           next
         end
 
-        cve_rec = ref_rec.build_cve(cve_key: cve_key, year: year)
+        cve_rec = ref_rec.build_cve(cve_key: cve_key, year: publisher.year)
         cve_rec.assign_attributes(nvd_cve_item.attributes)
         cve_rec.affected_systems = nvd_cve_item.affected_systems.join("\n")
         cve_rec.save!
@@ -59,7 +58,6 @@ namespace :snortdoc do
           end
         end
       end
-      exit
     end
   end
 end
