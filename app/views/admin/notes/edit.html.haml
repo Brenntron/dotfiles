@@ -1,0 +1,25 @@
+
+= render partial: 'admin_control'
+
+.content-wrapper.editing
+
+  %h1 Editing Note
+  .form-wrapper
+    = form_for @note, url: {action: :update} do |f|
+      %h3= @note.bug_id
+      %fieldset
+        .row
+          .col-xs-2
+            %label note_type
+            %span.input-wrapper.left
+              %input{type: "text", id: "rule-category",value: @note.note_type, placeholder: 'note_type'}
+          .col-xs-10
+            %label Comment
+            %span.input-wrapper
+              %input{type: "text", id: "rule-message", value: @note.comment, autofocus: "autofocus"}
+
+
+      .button-group
+        %button{value: "submit", class: "call-to-action save", data: { confirm: 'Are you really really sure?? This might fuck shit up.'}} Save
+        = link_to  admin_notes_path do
+          %button{title: "Cancel", class: "secondary cancel"} Cancel

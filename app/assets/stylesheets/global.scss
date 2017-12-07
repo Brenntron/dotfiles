@@ -91,12 +91,24 @@ h2 {
 
 h3 {
   font-weight: 700;
+  margin-bottom: 30px;
 }
 
 .code-snippet {
   background-color: $faint-neutral-color;
   font-family: 'Fira Mono', monospace;
-  padding: 0 5px;
+  padding: 2px 5px;
+  display: block;
+  font-size: 9pt;
+  line-height: 1.3em;
+}
+
+.code-snippet.code-block {
+  padding: 10px;
+}
+
+.form-col-list li {
+  margin-bottom:4px;
 }
 
 .emphasis {
@@ -104,7 +116,10 @@ h3 {
   color: $type-lighter-color;
 }
 
-
+h4 {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
 
 /**** Tables ****/
 
@@ -290,6 +305,7 @@ th {
 
 .edit-button    {background-image: url('icon_edit.svg');}
 .related-button {background-image: url('icon_related.svg');}
+.delete-button  {background-image: url('icon_delete.svg');}
 
 
 
@@ -421,16 +437,31 @@ fieldset:focus-within {
   border: 1px solid $faint-accent-color;
 }
 
-.form-wrapper input {
+.form-wrapper .row fieldset {
+  margin: 32px 0 0 0; /* Margin is different between fieldsets wrapped in rows versus fieldsets with rows within them */
+}
+
+.form-wrapper input, .form-wrapper textarea {
   font-family: 'Fira Mono', monospace;
   background-color: $faint-accent-color;
   border: none;
   padding: 2px 5px;
   font-size: 8.5pt;
+  line-height: 1.3em;
   width: 100%;
+  height: 100%;
 }
 
-.form-wrapper input:focus {
+.form-wrapper input[type="text"]:disabled {
+  background-color: $faint-neutral-color;
+  cursor: not-allowed;
+}
+
+textarea {
+  display: block;
+}
+
+.form-wrapper input:focus, .form-wrapper textarea:focus {
   outline: none;
   background-color: $faint-alt-highlight;
 }
@@ -450,18 +481,43 @@ fieldset:focus-within {
   color: $type-lighter-color;
 }
 
-.form-wrapper .row {
+.form-wrapper label.checkbox-label {
+  margin-top: 0;
+}
+
+fieldset .row {
   margin-left: 0;
   margin-right: 0;
 }
 
-.form-wrapper .col-xs-2, .form-wrapper .col-xs-10, .form-wrapper .col-xs-4 {
+fieldset .col-xs-2, fieldset .col-xs-10, fieldset .col-xs-4 {
   padding-left: 0;
   padding-right: 0;
 }
 
 select {
   border-radius: 2px !important;
+}
+
+.form-col-list {
+  -webkit-column-count:3;
+  -moz-column-count:3;
+  -ms-column-count:3;
+  -o-column-count:3;
+  column-count:3;
+  -webkit-column-gap:15px;
+  -moz-column-gap:15px;
+  -ms-column-gap:15px;
+  -o-column-gap:15px;
+  column-gap:15px;
+  columns:3;
+}
+
+.checkbox-row {
+  margin-top: 16px;
+  height: 32px;
+  padding-left: 5px;
+  margin-bottom: 32px;
 }
 
 .button-group button {

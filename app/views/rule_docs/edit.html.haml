@@ -1,0 +1,87 @@
+- content_for(:title) do
+  SID:#{@rule_doc.sid} - Analyst Console
+
+.content-wrapper
+  %h1 Editing Rule Document
+  .form-wrapper
+    = form_for @rule_doc, url: {action: :update} do |f|
+      .row
+        .col-sm-12
+          %h3= @rule_doc.rule.sid
+
+      .row
+        .col-sm-6
+          %label Content
+          .code-snippet.code-block
+            =@rule_doc.rule.rule_parsed
+        .col-sm-6
+          %label Bugs using this rule
+          .form-col-list
+            %ul
+              - @rule_doc.rule.bugs.each do |bug|
+                %li.code-snippet
+                  %a{href: "/bugs/#{bug.bugzilla_id}"}
+                    =bug.bugzilla_id
+
+      .row
+        .col-sm-6
+          %fieldset
+            %label Rule sid associated with this doc (dont fuck with this)
+            %span.input-wrapper
+              =f.text_field :sid, disabled:true
+        .col-sm-6
+          %fieldset
+            %label Linking id for the rule associated with this doc (dont fuck with this)
+            %span.input-wrapper
+              =f.text_field :rule_id, disabled:true
+
+      .row
+        .col-sm-6
+          %fieldset
+            %label Summary
+            =f.text_area :summary, rows: 5, autofocus: true
+        .col-sm-6
+          %fieldset
+            %label Impact
+            =f.text_area :impact, rows: 5
+      .row
+        .col-sm-6
+          %fieldset
+            %label Detailed Info
+            =f.text_area :details, rows: 5
+        .col-sm-6
+          %fieldset
+            %label Affected Systems
+            =f.text_area :affected_sys, rows: 5
+
+      .row
+        .col-sm-6
+          %fieldset
+            %label False Positives
+            =f.text_area :false_positives, rows: 5
+        .col-sm-6
+          %fieldset
+            %label False Negatives
+            =f.text_area :false_negatives, rows: 5
+
+      .row
+        .col-sm-6
+          %fieldset
+            %label Contributors
+            =f.text_area :contributors, rows: 2
+        .col-sm-6
+          %fieldset
+            %label Policies
+            =f.text_area :policies, rows: 2
+
+      .row.checkbox-row
+        .col-sm-12
+          %label.checkbox-label Is this a community rule?
+          =f.check_box :is_community
+
+      .row
+        .col-sm-12
+          .button-group
+            %button{value: "submit", class: "call-to-action save", data: { confirm: 'Are you really really sure?? This might fuck shit up.'}} Save
+            = link_to  rule_docs_path do
+              %button{title: "Cancel", class: "secondary cancel"} Cancel

@@ -16,14 +16,14 @@ class Ability
       end
     end
     if current_user.has_role?('committer')
-      can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
+      can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference, RuleDoc]
       can :publish, Rule
       can :publish_to_bugzilla, Note
       can :update_preferences, User, id: current_user.id
       can :toggle_liberty, Bug
     end
     if current_user.has_role?('analyst')
-      can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
+      can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference, RuleDoc]
       can :publish_to_bugzilla, Note
       can :update_preferences, User, id: current_user.id
       can :toggle_liberty, Bug do |bug|

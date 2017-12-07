@@ -16,7 +16,6 @@ FactoryGirl.define do
     edit_status         Rule::EDIT_STATUS_SYNCHED
     parsed              nil
     on                  true
-    tested              false
     committed           true
     task_id             nil
     rule_category_id    1
