@@ -24,9 +24,10 @@ Rails.application.routes.draw do
       root 'root#index'
       get :cves, to: 'cves#index'
       namespace :cves do
-        get :index
         get :nvd
         post :download
+        get :missing
+        post :update
       end
     end
 

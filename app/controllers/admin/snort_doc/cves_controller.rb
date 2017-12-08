@@ -3,9 +3,6 @@ require 'snort_doc_publisher'
 class Admin::SnortDoc::CvesController < ApplicationController
   layout 'admin/snort_doc/root'
 
-  def index
-  end
-
   def nvd
   end
 
@@ -13,6 +10,16 @@ class Admin::SnortDoc::CvesController < ApplicationController
     SnortDocPublisher.download(download_params['filename'])
 
     redirect_to admin_snort_doc_cves_nvd_path
+  end
+
+  def missing
+    @missing_references = Reference.cves.left_joins(:cve).where(cves: {id: nil}).order(:reference_data)
+  end
+
+  def update
+    SnortDocPublisher.update_cve_data
+
+    redirect_to admin_snort_doc_cves_missing_path
   end
 
   private
