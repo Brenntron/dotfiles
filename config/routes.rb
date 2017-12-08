@@ -20,6 +20,10 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :snort_doc do
+      root 'root#index'
+    end
+
     resources :rules_sync, only: [:index] do
       collection do
         get :diagnostics

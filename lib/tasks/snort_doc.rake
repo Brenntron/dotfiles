@@ -1,14 +1,6 @@
 require 'nvd_cve_item'
 require 'snort_doc_publisher'
 
-
-# Force a download of a given NVD year
-# Populate the cves table with all the CVEs we have references for, but have no record in the cves table.
-# Include or exclude a rule from the snort documentation set
-# Generate and upload an update to snort.org for a given list of rules.
-# Suppress or un-suppress a CVE from updating manually.
-# Auto-suppress a CVE after three failed attempts.
-
 namespace :snortdoc do
   desc "Download one given year file from NIST NVD."
   task :download_nvd_year, [:year] => :environment do |tt, args|
