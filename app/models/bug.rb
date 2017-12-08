@@ -218,7 +218,6 @@ class Bug < ApplicationRecord
         if query_params[:whiteboard].present?
           whiteboard_param = query_params.delete(:whiteboard)
         end
-
         if query_params[:giblets].present?
           giblets = query_params.delete(:giblets)
           gibs = Giblet.where(:id => giblets)
@@ -234,6 +233,9 @@ class Bug < ApplicationRecord
         end
 
         query = Bug
+        query_with_tags = nil
+        query_with_whiteboards = nil
+        query_with_references = nil
 
         query = query.where(query_params)
 
@@ -250,27 +252,46 @@ class Bug < ApplicationRecord
         #  the key is group by and having and matching up with the number of tags being searched on, this will require some really custom stuff rather than just stringing 'where' statements in an activerecord query.
         if giblets.present?
           join_types.each do |j_type|
-            query = query.joins(j_type)
+            case j_type
+              when :tags
+                query_with_tags = query.joins(:tags)
+              when :whiteboards
+                query_with_whiteboards = query.joins(:whiteboards)
+              when :references
+                query_with_references = query.joins(:references)
+            end
+
           end
 
           gibs_by_type.each do |key, value|
 
             if key == :tags && value.size > 0
               ids = value.map{|g| g.gib.id}
-              query = query.where("bugs_tags.tag_id" => ids)
+              query_with_tags = query_with_tags.where("bugs_tags.tag_id" => ids)
             end
             if key == :whiteboards && value.size > 0
               ids = value.map{|g| g.gib.id}
-              query = query.where("bugs_whiteboards.whiteboard_id" => ids)
+              query_with_whiteboards = query_with_whiteboards.where("bugs_whiteboards.whiteboard_id" => ids)
             end
             if key == :references && value.size > 0
               ids = value.map{|g| g.gib.id}
-              query = query.where("bug_reference_rule_links.reference_id" => ids)
+              query_with_references = query_with_references.where("bug_reference_rule_links.reference_id" => ids)
             end
           end
         end
+        final_query = []
+        if query_with_tags
+          final_query = final_query | (query_with_tags)
+        end
+        if query_with_whiteboards
+          final_query = final_query | (query_with_whiteboards)
+        end
+        if query_with_references
+          final_query = final_query | (query_with_references)
+        end
 
-        query
+        query = Bug.where(id: final_query.map{|b|b.id})
+
       else
         Bug.where(query_params)
     end
