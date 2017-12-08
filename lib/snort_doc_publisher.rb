@@ -44,9 +44,18 @@ class SnortDocPublisher
     "nvdcve-1.0-#{@year}.json"
   end
 
+  def self.basepath
+    'lib/data/nvd'
+  end
+
+  # @return [String] filepath to store NVD file from NIST
+  def self.filepath(filename)
+    Rails.root.join(basepath, filename)
+  end
+
   # @return [String] filepath to store NVD file from NIST
   def filepath
-    Rails.root.join("lib/data/nvd/#{filename}")
+    self.class.filepath(filename)
   end
 
   # @return [Integer] this year right now
@@ -73,15 +82,22 @@ class SnortDocPublisher
     end
   end
 
+  def self.download(filename)
+    download_path = filepath(filename)
+    cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{download_path}"
+    puts cmd
+    system(cmd)
+    if /\A(?<unzip_path>.*).gz\z/ =~ download_path.to_s
+      cmd = "gunzip -f #{unzip_path}.gz"
+      puts cmd
+      system(cmd)
+    end
+  end
+
   # Downloads the NVD data from NIST for the year
   def download
     if download?
-      cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{filepath}.gz"
-      puts cmd
-      # system(cmd)
-      cmd = "gunzip -f #{filepath}.gz"
-      puts cmd
-      # system(cmd)
+      self.class.download("#{filename}.gz")
     end
   end
 
