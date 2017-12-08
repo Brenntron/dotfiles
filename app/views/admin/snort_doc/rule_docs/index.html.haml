@@ -1,0 +1,12 @@
+%h1 Rule Doc Tool
+
+%h2 Unpublished Rules
+#rule-doc-unpublished-div
+  = @rules.count
+  Unpublished Rules
+  %ul
+    - @rules.each do |rule|
+      %li
+        = rule.sid_colon_format
+        = "(#{rule.id})"
+        = rule.snort_doc_status

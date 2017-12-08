@@ -22,13 +22,13 @@ Rails.application.routes.draw do
 
     namespace :snort_doc do
       root 'root#index'
-      get :cves, to: 'cves#index'
       namespace :cves do
         get :nvd
         post :download
         get :missing
         post :update
       end
+      get :rule_docs, to: 'rule_docs#index'
     end
 
     resources :rules_sync, only: [:index] do
