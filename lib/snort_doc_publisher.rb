@@ -6,6 +6,12 @@ class SnortDocPublisher
     attr_reader :errors
   end
 
+  # Clear cached class variables to allow garbage collection
+  def self.clear_instance_variables
+    @undoc_cve_refs = nil
+    @errors = nil
+  end
+
   # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
   def self.undoc_cve_refs
     @undoc_cve_refs ||= Reference.cves.left_joins(:cve).where(cves: {id: nil})
@@ -119,12 +125,17 @@ class SnortDocPublisher
   # @yieldparam [String] cve_key CVE id as CVE-<year>-<index>
   # @yieldparam [Reference] ref_rec CVE reference record
   # @yieldparam [NvdCveItem] nvd_cve_item data read from a CVE from the NVD data file.
-  def each_missing
+  def each_missing(max_fails: 3)
     references.each do |ref_rec|
+      next if max_fails <= ref_rec.fail_count
+
       cve_key = "CVE-#{ref_rec.reference_data}"
       nvd_cve_item_curr = nvd_cve_item(cve_key)
       unless nvd_cve_item_curr
         @errors << "Cannot find NVD input data for #{cve_key.inspect}."
+        ref_rec.fail_count ||= 0
+        ref_rec.fail_count += 1
+        ref_rec.save!
         next
       end
 
@@ -174,21 +185,27 @@ class SnortDocPublisher
   end
 
   # Update the reference for this object to the database (cves and references tables)
-  def update_cve_data
-    each_missing do |cve_key, ref_rec, nvd_cve_item|
+  def update_cve_data(max_fails: 3)
+    each_missing(max_fails: max_fails) do |cve_key, ref_rec, nvd_cve_item|
       save_cve(cve_key, ref_rec, nvd_cve_item)
       save_references(ref_rec, nvd_cve_item)
     end
   end
 
   # Update all references without CVE data in the database (cves and references tables)
-  def self.update_cve_data
+  def self.update_cve_data(max_fails: 3)
     clear_errors
     each_publisher do |publisher|
       publisher.clear_errors
-      publisher.update_cve_data
+      publisher.update_cve_data(max_fails: max_fails)
       @errors += publisher.errors
     end
+
+    if block_given?
+      yield @errors
+    end
+
+    clear_instance_variables
   end
 
   # @return [Hash] Snort Doc hash for a given rule

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171208175552) do
+ActiveRecord::Schema.define(version: 20171208192044) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -207,6 +207,7 @@ ActiveRecord::Schema.define(version: 20171208175552) do
     t.integer "reference_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "fail_count"
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 

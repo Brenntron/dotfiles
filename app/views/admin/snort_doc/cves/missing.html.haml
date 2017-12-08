@@ -24,7 +24,12 @@
 #missing-reference-div
   %ul
     - @missing_references.limit(@missing_limit).each do |reference|
-      %li= reference.reference_data
+      %li
+        = reference.reference_data
+        - if reference.fail_count && 0 < reference.fail_count
+          \:-
+          = reference.fail_count || 0
+          fail(s)
 
   - if @missing_limit < @missing_count
     \... listed first 500

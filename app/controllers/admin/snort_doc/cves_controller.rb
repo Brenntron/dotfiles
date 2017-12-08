@@ -21,14 +21,16 @@ class Admin::SnortDoc::CvesController < ApplicationController
   def update
     error_limit = 30
 
-    SnortDocPublisher.update_cve_data
-    if SnortDocPublisher.errors.empty?
-      flash[:info] += "No errors"
-    else
-      SnortDocPublisher.errors.each { |msg| Rails.logger.error(msg) }
-      flash[:error] = SnortDocPublisher.errors[0..error_limit].join("\n")
-      if error_limit < SnortDocPublisher.errors.count
-        flash[:error] += "\n... first #{error_limit}"
+    SnortDocPublisher.update_cve_data(max_fails: Rails.configuration.snort_doc_max_fails) do |errors|
+      if errors.empty?
+        flash[:info] = "No errors"
+      else
+        errors.each { |msg| Rails.logger.error(msg) }
+        flash[:error] = "#{errors.count} Errors:\n"
+        flash[:error] += errors[0..error_limit].join("\n")
+        if error_limit < errors.count
+          flash[:error] += "\n... first #{error_limit}"
+        end
       end
     end
 
