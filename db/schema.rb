@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171205164129) do
+ActiveRecord::Schema.define(version: 20171208175552) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -203,7 +203,7 @@ ActiveRecord::Schema.define(version: 20171205164129) do
   end
 
   create_table "references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "reference_data"
+    t.text "reference_data"
     t.integer "reference_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"

@@ -1,5 +1,10 @@
+require 'nvd_cve_item'
+
 class SnortDocPublisher
-  attr_reader :year, :references
+  attr_reader :year, :references, :errors
+  class << self
+    attr_reader :errors
+  end
 
   # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
   def self.undoc_cve_refs
@@ -33,10 +38,19 @@ class SnortDocPublisher
     end
   end
 
+  def self.clear_errors
+    @errors = []
+  end
+
+  def clear_errors
+    @errors = []
+  end
+
   # @params [String] year the given year for the CVEs to be updated
   def initialize(year:, references: [])
     @year = year
     @references = references
+    clear_errors
   end
 
   # @return [String] NIST NVD file name for the year
@@ -110,7 +124,7 @@ class SnortDocPublisher
       cve_key = "CVE-#{ref_rec.reference_data}"
       nvd_cve_item_curr = nvd_cve_item(cve_key)
       unless nvd_cve_item_curr
-        $stderr.puts "Cannot find NVD input data for #{cve_key.inspect}."
+        @errors << "Cannot find NVD input data for #{cve_key.inspect}."
         next
       end
 
@@ -148,7 +162,7 @@ class SnortDocPublisher
 
       case
         when ref_type.blank?
-          $stderr.puts "Unknown reference type '#{ref_type_name}'."
+          @errors << "Unknown reference type '#{ref_type_name}'."
         when ref_rec.references.where(reference_type: ref_type, reference_data: ref_data).exists?
           # do nothing
         when Reference.where(reference_type: ref_type, reference_data: ref_data).exists?
@@ -169,8 +183,11 @@ class SnortDocPublisher
 
   # Update all references without CVE data in the database (cves and references tables)
   def self.update_cve_data
+    clear_errors
     each_publisher do |publisher|
+      publisher.clear_errors
       publisher.update_cve_data
+      @errors += publisher.errors
     end
   end
 

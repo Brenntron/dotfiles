@@ -1,5 +1,12 @@
 %h1 Missing CVE Data Tool
 
+- if flash[:info].present?
+  .flash-info-div
+    = flash[:info]
+- if flash[:error].present?
+  .flash-error-div
+    = flash[:error]
+
 %h2 Update Data
 #cves-update-div
   = form_tag(admin_snort_doc_cves_update_path, id: 'snort-doc-cves-update-form') do
@@ -11,11 +18,13 @@
 
 %h2 References Missing CVE Data
 #missing-references-count-div
-  = @missing_references.count
+  = @missing_count
   References missing CVE data
 
 #missing-reference-div
   %ul
-    - @missing_references.limit(500).each do |reference|
+    - @missing_references.limit(@missing_limit).each do |reference|
       %li= reference.reference_data
 
+  - if @missing_limit < @missing_count
+    \... listed first 500
