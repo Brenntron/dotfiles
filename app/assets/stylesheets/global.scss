@@ -150,15 +150,15 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_desc, table.dataT
 }
 
 table.dataTable thead .sorting {
-  background-image: url('layout/icon_sort.svg');
+  background-image: url(image_path('layout/icon_sort.svg'));
 }
 
 table.dataTable thead .sorting_asc {
-  background-image: url('layout/icon_sort_asc.svg');
+  background-image: url(image_path('layout/icon_sort_asc.svg'));
 }
 
 table.dataTable thead .sorting_desc {
-  background-image: url('layout/icon_sort_dec.svg');
+  background-image: url(image_path('layout/icon_sort_dec.svg'));
 }
 
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
@@ -303,9 +303,9 @@ th {
   margin: 9px 3px;
 }
 
-.edit-button    {background-image: url('icon_edit.svg');}
-.related-button {background-image: url('icon_related.svg');}
-.delete-button  {background-image: url('icon_delete.svg');}
+.edit-button    {background-image: url(image_path('icon_edit.svg'));}
+.related-button {background-image: url(image_path('icon_related.svg'));}
+.delete-button  {background-image: url(image_path('icon_delete.svg'));}
 
 
 
@@ -329,8 +329,8 @@ th {
   background-position: 5px center;
 }
 
-.nav-tabs > li > a#admin-rule-tab-link        {background-image: url('icon_rules.svg');}
-.nav-tabs > li > a#admin-validations-tab-link {background-image: url('icon_validations.svg');}
+.nav-tabs > li > a#admin-rule-tab-link        {background-image: url(image_path('icon_rules.svg'));}
+.nav-tabs > li > a#admin-validations-tab-link {background-image: url(image_path('icon_validations.svg'));}
 
 .nav-tabs > li > a.active {
   background-color: $content-bg-color;
@@ -384,13 +384,13 @@ th {
 }
 
 .success-msg::before {
-  background-image: url('icon_success.svg');
+  background-image: url(image_path('icon_success.svg'));
 }
 .warning-msg::before {
-  background-image: url('icon_warning.svg');
+  background-image: url(image_path('icon_warning.svg'));
 }
 .fail-msg::before {
-  background-image: url('icon_fail.svg');
+  background-image: url(image_path('icon_fail.svg'));
 }
 
 
@@ -575,11 +575,11 @@ button.secondary:focus, a:focus button.secondary {
 
 a:focus { outline: none;}
 
-button.save          {background-image: url('icon_save.svg');}
-button.save:focus    {background-image: url('icon_save_blue.svg');}
-button.cancel        {background-image: url('icon_cancel.svg');}
-button.cancel:hover  {background-image: url('icon_cancel_white.svg');}
-button.cancel:focus, a:focus button.cancel  {background-image: url('icon_cancel.svg');}
+button.save          {background-image: url(image_path('icon_save.svg'));}
+button.save:focus    {background-image: url(image_path('icon_save_blue.svg'));}
+button.cancel        {background-image: url(image_path('icon_cancel.svg'));}
+button.cancel:hover  {background-image: url(image_path('icon_cancel_white.svg'));}
+button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('icon_cancel.svg'));}
 
 /************ Side Nav **************/
 
@@ -749,7 +749,7 @@ button.cancel:focus, a:focus button.cancel  {background-image: url('icon_cancel.
 
 .search-box {
   background-color: $ac-nav-bg-color;
-  background-image: url('layout/search_icon.svg');
+  background-image: url(image_path('layout/search_icon.svg'));
   background-repeat: no-repeat;
   background-size: 18px;
   background-position: 3px center;
