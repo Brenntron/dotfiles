@@ -310,6 +310,15 @@ module API
           RuleDoc.copy_doc_action(permitted_params[:rule_id],
                                   permitted_params[:rule_ids])
         end
+
+        params do
+          optional :rule_id, type: Integer
+          optional :snort_doc_status, type: String
+        end
+        patch ":rule_id/snort_doc_status", root: 'rule' do
+          byebug
+          Rails.logger.info(">>> snort_doc_status")
+        end
       end
     end
   end

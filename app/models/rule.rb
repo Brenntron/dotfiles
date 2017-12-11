@@ -83,6 +83,13 @@ class Rule < ApplicationRecord
   SNORT_DOC_STATUS_NOT_YET_PUB  = 'NOTYET'
   SNORT_DOC_STATUS_TO_BE_PUB    = 'TOBE'
   SNORT_DOC_STATUS_BEEN_PUB     = 'BEEN'
+  SNORT_DOC_STATUSES            =
+      [
+          SNORT_DOC_STATUS_SUPRESS,
+          SNORT_DOC_STATUS_NOT_YET_PUB,
+          SNORT_DOC_STATUS_TO_BE_PUB,
+          SNORT_DOC_STATUS_BEEN_PUB,
+      ]
 
   # Pre-commit hook intercepted commit, failed it, and successfully checked in the rule
   SVN_SUCCESS_COMMIT_HOOK = 199
