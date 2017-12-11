@@ -215,6 +215,14 @@ module API
                                                     bugzilla_comment: permitted_params[:bugzilla_comment],
                                                     xmlrpc: bugzilla_session,
                                                     nodoc_override: permitted_params[:nodoc_override])
+
+
+            if permitted_params[:bug_id].present?
+              main_committer = User.where(email: "vrt-qa@sourcefire.com").first
+              bug = Bug.where(:id => permitted_params[:bug_id]).first
+              bug.committer_id = main_committer.id
+              bug.save
+            end
           end
         end
 
@@ -235,6 +243,12 @@ module API
             Repo::RuleCommitter.commit_rules_action(rules,
                                                     username: permitted_params[:username],
                                                     bugzilla_id: permitted_params[:bug_id])
+            if permitted_params[:bug_id].present?
+              main_committer = User.where(email: "vrt-qa@sourcefire.com").first
+              bug = Bug.where(:id => permitted_params[:bug_id]).first
+              bug.committer_id = main_committer.id
+              bug.save
+            end
           end
         end
 
