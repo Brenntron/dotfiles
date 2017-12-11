@@ -498,11 +498,22 @@ class Bug < ApplicationRecord
     references.uniq
   end
 
-  def load_references(summary_references)
+  def load_references(summary_references, old_refs = nil)
+
+    if old_refs.present?
+      old_refs.each do |old_ref|
+        if references.include? (old_ref)
+          references.delete(old_ref)
+        end
+      end
+    end
+
     summary_references.each do |ref|
       references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
       Exploit.find_exploits(ref)
     end
+
+
   end
 
   def tag_array
@@ -527,12 +538,12 @@ class Bug < ApplicationRecord
     end
   end
 
-  def update_summary(summary_given)
+  def update_summary(summary_given, old_refs = nil)
     update!(summary: summary_given)
 
     load_rules_from_sids(summary_sids)
     compose_summary
-    load_references(summary_references)
+    load_references(summary_references, old_refs)
   end
 
   def bugzilla_synch_needed?
@@ -839,6 +850,13 @@ class Bug < ApplicationRecord
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:)
+
+
+    initial_bug_summary_info = bug.parse_summary
+    initial_refs_from_summary = initial_bug_summary_info[:refs]
+
+
+
     bug.initialize_report
     bug_is_being_resolved = bug.state != "PENDING" ? false : true
 
@@ -858,14 +876,17 @@ class Bug < ApplicationRecord
       end
     end
 
+    bug.summary = permitted_params[:bug][:summary]
+    new_summary = bug.parse_summary
+    bug.reload
 
-    tags = permitted_params[:bug][:tag_names]
 
     # update the tags
     bug.tags.delete_all if bug.tags.exists?
-    if tags
-      tags.each do |tag|
-        new_tag = Tag.find_or_create_by(name: tag)
+
+    if new_summary[:tags]
+      new_summary[:tags].each do |tag|
+        new_tag = Tag.find_or_create_by(name: tag.name)
         bug.tags << new_tag
       end
     end
@@ -883,7 +904,8 @@ class Bug < ApplicationRecord
 
     # update the summary
     # (do this first so we can compose the summary properly to send to bugzilla)
-    bug.update_summary(permitted_params[:bug][:summary])
+
+    bug.update_summary(permitted_params[:bug][:summary], initial_refs_from_summary)
 
     options[:ids] = permitted_params[:id]
     options[:product] = permitted_params[:bug][:product]
