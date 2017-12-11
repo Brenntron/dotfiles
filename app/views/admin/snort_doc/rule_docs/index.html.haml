@@ -9,7 +9,7 @@
   = @rules.count
   Unpublished Rules
   %ul
-    - @rules[0..20].each do |rule|
+    - @rules[0..1000].each do |rule|
       %li
         = select_tag(:snort_doc_status,
                      options_for_select(Rule::SNORT_DOC_STATUSES, rule.snort_doc_status),

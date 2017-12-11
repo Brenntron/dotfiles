@@ -312,12 +312,12 @@ module API
         end
 
         params do
-          optional :rule_id, type: Integer
-          optional :snort_doc_status, type: String
+          requires :rule_id, type: Integer
+          requires :snort_doc_status, type: String
         end
         patch ":rule_id/snort_doc_status", root: 'rule' do
-          byebug
-          Rails.logger.info(">>> snort_doc_status")
+          rule = Rule.find(permitted_params[:rule_id])
+          rule.update!(snort_doc_status: permitted_params[:snort_doc_status])
         end
       end
     end
