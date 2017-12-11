@@ -135,6 +135,12 @@
 
         <div class="col-xs-12 hidden-xs bug_summary">
           <h5 class="edit-summary-field"><%= @bug.summary %></h5>
+
+          <span class="tags-wrapper">
+            <% @unique_giblets.each do |gib| %>
+                <a href="<%= bugs_path({:tag_names => [gib], :page => 1}) %>"><button class="tag primary-tag"><%= gib %></button></a>
+            <% end %>
+          </span>
         </div>
       </div>
 

@@ -179,7 +179,7 @@ sub searchExploitdb
 	my $mech = mechInit("edb");
 
 	# Sometimes Exploit-DB can be a bit lazy
-	my $numtries = 3;
+	my $numtries = 2;
 	do {
 		$mech->get("https://www.exploit-db.com/search/?action=search&cve=$cve");
 		$numtries--;

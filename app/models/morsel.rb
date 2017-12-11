@@ -1,0 +1,2 @@
+class Morsel < ApplicationRecord
+end

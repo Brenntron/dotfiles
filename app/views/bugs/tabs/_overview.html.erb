@@ -5,8 +5,14 @@
 
   <div class="col-sm-12 bug_summary">
     <div class="sandbox">
-      <div id="alert_message" role="alert"></div>
-      <p>  <%= @bug.whiteboard.present? ? @bug.whiteboard : "MISSING" %></p>
+      <input id="whiteboard_list" class="hidden" value="<%=@whiteboards%>"/>
+
+      <select id="whiteboard-select-to-edit" bug_id="<%=@bug.id%>" name="bug[whiteboard_names][]" class="contacts selectized" placeholder="Add some whiteboards..." multiple="multiple" tabindex="-1" style="display: none;">
+        <% @bug.whiteboards.each do |whiteboard|%>
+            <option value="<%=whiteboard.name%>" selected="selected"></option>
+        <%end%>
+      </select>
+
     </div>
   </div>
 

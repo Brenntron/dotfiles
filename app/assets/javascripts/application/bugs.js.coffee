@@ -111,6 +111,22 @@ $ ->
     $("#state_comment_row").show()
     $("#state_comment").prop('required',true);
 
+
+  $("#save_giblet_search_button").on 'click', (e) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    giblets = $("#save_giblet_search_field").val()
+    $.ajax {
+      url: '/api/v1/saved_searches/'
+      data: {giblets: giblets}
+      method: 'post'
+      headers: headers
+      success: (response) ->
+        location.reload()
+      error: (response) ->
+        alert ("Sorry, you can not take this bug\n" + response.responseJSON.error)
+        location.reload()
+    }
+
   $(".take-bug").on 'click', (e) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     id = $(this).data("id")
@@ -412,6 +428,29 @@ $ ->
         options.push {name: x}
       return options
 
+  createGibletOptions = ->
+    tags = $('#giblet_list')[0]
+    if tags
+      tag_list = tags.value
+      array = tag_list.split(',')
+      options = []
+      for x in array
+        options.push {name: x}
+      return options
+
+
+  $('#selectize-giblets').selectize {
+    persist: false,
+    create: (input) ->
+      {name: input}
+    maxOptions: 10000
+    maxItmes: null
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: createGibletOptions()
+  }
+
   $('#select-to-new').selectize {
     persist: false,
     create: (input) ->
@@ -421,6 +460,56 @@ $ ->
     labelField: 'name'
     searchField: 'name'
     options: createSelectOptions()
+
+  }
+  createSelectOptionsForWhiteboard = ->
+    whiteboards = $('#whiteboard_list')[0]
+    if whiteboards
+      whiteboard_list = whiteboards.value
+      array = whiteboard_list.split(',')
+      options = []
+      for x in array
+        options.push {name: x}
+      return options
+
+  $('#whiteboard-select-to-edit').selectize {
+    create: (input) ->
+      {name: input}
+    persist: false
+    maxItmes: null
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: createSelectOptionsForWhiteboard()
+    onItemAdd: (item) ->
+      bug_id = $('#select-to-edit').attr('bug_id')
+      $.ajax(
+        url: bug_id + '/add_whiteboard'
+        method: 'POST'
+        data: {bug: {id: bug_id, whiteboard_name: item}}
+        success: (response) ->
+          notice_html = "<p>#{item} has been added.</p>"
+          $("#alert_message").addClass('alert alert-info alert-dismissable').append(notice_html)
+          window.location.reload()
+        error: (response) ->
+          notice_html = "<p>Something went wrong.</p>"
+          $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      , this)
+
+    onItemRemove: (item) ->
+      bug_id = $('#whiteboard-select-to-edit').attr('bug_id')
+      $.ajax(
+        url: bug_id + '/remove_whiteboard'
+        method: 'PATCH'
+        data: {bug: {id: bug_id, whiteboard_name: item}}
+        success: (response) ->
+          notice_html = "<p>#{item} has been removed.</p>"
+          $("#alert_message").addClass('alert alert-info alert-dismissable').append(notice_html)
+          window.location.reload()
+        error: (response) ->
+          notice_html = "<p>Something went wrong.</p>"
+          $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      , this)
 
   }
 
