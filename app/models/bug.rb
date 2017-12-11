@@ -233,24 +233,16 @@ class Bug < ApplicationRecord
         end
 
         query = Bug
-        query_with_tags = []
-        query_with_whiteboards = []
-        query_with_references = []
-        query_with_summary_param = []
-        query_with_whiteboard_param = []
-        query_with_query =[]
+        query_hash = {}
 
-
-
-
-        query_with_query = query.where(query_params)
+        query_hash['param_results'] = query.where(query_params)
 
         if summary_param.present?
-          query_with_summary_param = query_with_query.where('summary LIKE ?', "%#{summary_param}%")
+          query_hash['summary_param_results'] = query_hash['param_results'].where('summary LIKE ?', "%#{summary_param}%")
         end
 
         if whiteboard_param.present?
-          query_with_whiteboard_param = query_with_query.where('whiteboard LIKE ?', "%#{whiteboard_param}%")
+          query_hash['whiteboard_param_results'] = query_hash['param_results'].where('whiteboard LIKE ?', "%#{whiteboard_param}%")
         end
 
         ##Note:  If we ever want to try to create an 'AND' type search with multiple tags selected, we're going to need a query similar to this:
@@ -260,41 +252,34 @@ class Bug < ApplicationRecord
           join_types.each do |j_type|
             case j_type
               when :tags
-                query_with_tags = query_with_query.joins(:tags)
+                query_hash['gib_tag_results'] = query_hash['param_results'].joins(:tags)
               when :whiteboards
-                query_with_whiteboards = query_with_query.joins(:whiteboards)
+                query_hash['gib_whiteboard_results'] = query_hash['param_results'].joins(:whiteboards)
               when :references
-                query_with_references = query_with_query.joins(:references)
+                query_hash['gib_reference_results'] = query_hash['param_results'].joins(:references)
             end
-
           end
-
           gibs_by_type.each do |key, value|
-
-            if key == :tags && value.size > 0
+            if value.size > 0
               ids = value.map{|g| g.gib.id}
-              query_with_tags = query_with_tags.where("bugs_tags.tag_id" => ids)
-            end
-            if key == :whiteboards && value.size > 0
-              ids = value.map{|g| g.gib.id}
-              query_with_whiteboards = query_with_whiteboards.where("bugs_whiteboards.whiteboard_id" => ids)
-            end
-            if key == :references && value.size > 0
-              ids = value.map{|g| g.gib.id}
-              query_with_references = query_with_references.where("bug_reference_rule_links.reference_id" => ids)
+              case key
+                when :tags
+                  query_hash['gib_tag_results'] = query_hash['gib_tag_results'].where("bugs_tags.tag_id" => ids)
+                when :whiteboards
+                  query_hash['gib_whiteboard_results'] = query_hash['gib_whiteboard_results'].where("bugs_whiteboards.whiteboard_id" => ids)
+                when :references
+                  query_hash['gib_reference_results'] = query_hash['gib_reference_results'].where("bug_reference_rule_links.reference_id" => ids)
+              end
             end
           end
         end
-        final_query = query_with_whiteboard_param | query_with_summary_param
-
-        if query_with_tags
-          final_query = final_query | (query_with_tags)
+        final_query = []
+        if query_params.empty?
+          query_hash.delete('param_results')
         end
-        if query_with_whiteboards
-          final_query = final_query | (query_with_whiteboards)
-        end
-        if query_with_references
-          final_query = final_query | (query_with_references)
+        #combine all the queries together
+        query_hash.each do |key,result_set|
+          final_query = final_query | (result_set)
         end
 
         query = Bug.where(id: final_query.map{|b|b.id})
