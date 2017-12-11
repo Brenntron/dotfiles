@@ -23,7 +23,6 @@ class BugsController < ApplicationController
 
       distinct_gibs = Giblet.select('distinct name, gib_type').where(:name => tag_names_array )
 
-
       @final_giblets = []
       distinct_gibs.each do |dgib|
         @final_giblets << Giblet.where(:name => dgib.name, :gib_type => dgib.gib_type).first

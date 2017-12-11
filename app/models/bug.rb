@@ -233,18 +233,24 @@ class Bug < ApplicationRecord
         end
 
         query = Bug
-        query_with_tags = nil
-        query_with_whiteboards = nil
-        query_with_references = nil
+        query_with_tags = []
+        query_with_whiteboards = []
+        query_with_references = []
+        query_with_summary_param = []
+        query_with_whiteboard_param = []
+        query_with_query =[]
 
-        query = query.where(query_params)
+
+
+
+        query_with_query = query.where(query_params)
 
         if summary_param.present?
-          query = query.where('summary LIKE ?', "%#{summary_param}%")
+          query_with_summary_param = query_with_query.where('summary LIKE ?', "%#{summary_param}%")
         end
 
         if whiteboard_param.present?
-          query = query.where('whiteboard LIKE ?', "%#{whiteboard_param}%")
+          query_with_whiteboard_param = query_with_query.where('whiteboard LIKE ?', "%#{whiteboard_param}%")
         end
 
         ##Note:  If we ever want to try to create an 'AND' type search with multiple tags selected, we're going to need a query similar to this:
@@ -254,11 +260,11 @@ class Bug < ApplicationRecord
           join_types.each do |j_type|
             case j_type
               when :tags
-                query_with_tags = query.joins(:tags)
+                query_with_tags = query_with_query.joins(:tags)
               when :whiteboards
-                query_with_whiteboards = query.joins(:whiteboards)
+                query_with_whiteboards = query_with_query.joins(:whiteboards)
               when :references
-                query_with_references = query.joins(:references)
+                query_with_references = query_with_query.joins(:references)
             end
 
           end
@@ -279,7 +285,8 @@ class Bug < ApplicationRecord
             end
           end
         end
-        final_query = []
+        final_query = query_with_whiteboard_param | query_with_summary_param
+
         if query_with_tags
           final_query = final_query | (query_with_tags)
         end
