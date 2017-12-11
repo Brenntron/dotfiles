@@ -499,6 +499,15 @@ class Bug < ApplicationRecord
   end
 
   def load_references(summary_references, old_refs = nil)
+
+    if old_refs.present?
+      old_refs.each do |old_ref|
+        if references.include? (old_ref)
+          references.delete(old_ref)
+        end
+      end
+    end
+
     summary_references.each do |ref|
       references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
       Exploit.find_exploits(ref)
@@ -844,9 +853,6 @@ class Bug < ApplicationRecord
 
 
     initial_bug_summary_info = bug.parse_summary
-    #initial_refs_from_summary = bug.summary_references
-    #initial_tags_from_summary = bug.summary_tag_array.clone.map {|t| t.gsub("[", "").gsub("]","")}
-
     initial_refs_from_summary = initial_bug_summary_info[:refs]
 
 
