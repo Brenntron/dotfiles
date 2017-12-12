@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   private
 
   def require_login
+    session[:previous_url] = request.url
     redirect_to root_url unless current_user
   end
 
