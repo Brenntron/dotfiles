@@ -39,6 +39,30 @@ namespace :bugs do
     # end
   end
 
+  task :import_all_bugs => :environment do
+    current_user = User.where(:email => 'vrt-incoming@sourcefire.com').first
+
+
+    #test bug
+    test_id = 5068
+
+    #need bugzilla auth 
+    login_session = LoginSession.new(current_user).bugzilla_login
+    xmlrpc_token = login_session
+
+    xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+    xmlrpc.token = xmlrpc_token
+
+    bugz = Bugzilla::Bug.new(xmlrpc)
+
+    new_bug = bugz.get(test_id)
+
+    whole_bug = Bug.bugzilla_import(current_user, bugz, xmlrpc_token, new_bug).first
+
+    puts whole_bug.inspect
+    
+  end
+
   task :generate_giblets => :environment do
     successful_bug_count = 0
     failed_bug_count = 0
