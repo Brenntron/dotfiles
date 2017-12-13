@@ -2,10 +2,16 @@ class Reference < ApplicationRecord
   belongs_to :reference_type, optional: true
   has_and_belongs_to_many :exploits
 
+  # references that I reference
+  has_many :links, class_name: 'BugReferenceRuleLink', as: :link
+  has_many :reference_links, source: :reference, through: :links
+
+  # referrers that reference me
   has_many :bug_reference_rule_links
   has_many :rules, through: :bug_reference_rule_links, source: :link, source_type: "Rule"
   has_many :bugs, through: :bug_reference_rule_links, source: :link, source_type: "Bug"
   has_many :references, through: :bug_reference_rule_links, source: :link, source_type: "Reference"
+
   has_one :cve
 
   validates :reference_data, uniqueness: { scope: :reference_type_id }
