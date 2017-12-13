@@ -103,7 +103,7 @@ module RulesHelper
           content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
         when rule.doc_updated?
           if rule.rule_doc&.id
-            link_to content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'ii want con-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
+            link_to content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
           else
             content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs')
           end
