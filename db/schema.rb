@@ -113,6 +113,7 @@ ActiveRecord::Schema.define(version: 20171209120000) do
   create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "reference_id", null: false
     t.string "year", null: false
     t.string "cve_key", null: false
     t.text "description"

@@ -2,6 +2,7 @@ class CreateCves < ActiveRecord::Migration[5.1]
   def change
     create_table :cves do |t|
       t.timestamps
+      t.integer :reference_id, null: false
       t.string :year, null: false
       t.string :cve_key, null: false
       t.text :description
