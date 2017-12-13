@@ -208,32 +208,35 @@ class SnortDocPublisher
     clear_instance_variables
   end
 
-  def self.flatten_snort_doc_status(hashes)
+  def self.flatten_snort_doc_status(input_hash)
+    input_hash.slice(*%w{modules rules}).each do |key, diff_new_hash|
+      gid =
+          case key
+            when 'modules'
+              3
+            when 'rules'
+              1
+            else
+              next
+          end
 
-    modules_and_rules_array = [ {gid: 3, diff_new: hashes['modules']}, {gid: 1, diff_new: hashes['rules']} ]
+      diff_new_hash.each do |diff_new, rule_hash|
+        rule_hash.each do |sid, revs_hash|
+          rev = revs_hash.keys.max
 
-    diff_and_new_array = modules_and_rules_array.inject([]) do |array_curr, curr|
-      array_curr += curr[:diff_new].map do |diff_new_value, sid_hash|
-        { gid: curr[:gid], diff_new: diff_new_value, sid_hash: sid_hash }
+          yield( { gid: gid, sid: sid, rev: rev, diff_new: diff_new, on_off: revs_hash[rev] } )
+        end
       end
-      array_curr
     end
-
-    rule_array = diff_and_new_array.inject([]) do |array_curr, curr|
-      array_curr += curr[:sid_hash].map do |sid, revs_hash|
-        rev = revs_hash.keys.max
-        { gid: curr[:gid], diff_new: curr[:diff_new], sid: sid, rev: rev, on_off: revs_hash[rev] }
-      end
-      array_curr
-    end
-
-    rule_array
   end
 
-  def self.update_snort_doc_status(hashes)
-    rule_array = flatten_snort_doc_status(hashes)
-    rule_array.each do |rule_hash|
-      puts "*** - rule = #{rule_hash.inspect}"
+  def self.update_snort_doc_to_be(input_hash)
+    flatten_snort_doc_status(input_hash) do |rule_hash|
+      rule = Rule.by_sid(rule_hash[:sid], rule_hash[:gid])
+                 .where.not(snort_doc_status: Rule::SNORT_DOC_STATUS_SUPRESS).first
+      if rule
+        rule.update(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
+      end
     end
   end
 
@@ -248,13 +251,32 @@ class SnortDocPublisher
     snort_doc['message'] = rule.message
 
     snort_doc['cves'] = rule.references.cves.map do |cve_ref|
-      # links = cve_ref.bug_reference_rule_links
-
       cve_ref.cve.attributes.slice(*%w{cve_key description severity
           base_score impact_score exploit_score confidentiality_impact integrity_impact availability_impact
           vector_string access_vector access_complexity authentication affected_systems})
     end
 
     snort_doc
+  end
+
+  def self.rules_snort_doc(rules)
+    rules.map {|rule| rule_snort_doc(rule)}
+  end
+
+  # @return [Hash] Snort Doc of all rules which had been marked as TO BE
+  def self.to_be_snort_doc
+    rules_snort_doc(Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB))
+  end
+
+  def self.gen_snort_doc_to_be
+    to_be_snort_doc.tap do |doc|
+      Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
+          .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
+    end
+  end
+
+  def self.gen_snort_doc(filename = nil)
+    SnortDocPublisher.update_snort_doc_to_be(YAML.load_file(filename)) if filename
+    gen_snort_doc_to_be
   end
 end

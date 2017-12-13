@@ -24,25 +24,21 @@ namespace :snortdoc do
   desc 'Update TOBE publishes status on rules from input YML file from snort organization'
   task :update_snort_doc_status, [:filename] => :environment do |tt, args|
     raise 'requires [filename], example `rake update_snort_doc_status[Rule_Update.diff.yml]`' unless 0 < args.count
-    # contents = File.open(args[:filename], 'r') do |file|
-    #   file.read
-    # end
-    # # puts contents
-    # input = YAML.load(contents)
-    input = YAML.load_file(args[:filename])
-    # puts input.inspect
+    SnortDocPublisher.update_snort_doc_to_be(YAML.load_file(args[:filename]))
+  end
 
-    # puts input['modules'].inspect
-
-    SnortDocPublisher.update_snort_doc_status('modules' => input['modules'], 'rules' => input['modules'])
+  desc 'Generate Snort Rule Docs written to stdout from optional filename'
+  task :gen_snort_doc, [:filename] => :environment do |tt, args|
+    puts JSON.pretty_generate(SnortDocPublisher.gen_snort_doc(args[:filename]))
   end
 
   task :snortdoc => :environment do
 
-    rule = Rule.find 301
+    # rule = Rule.find 301
+    # cve_snort_docs = SnortDocPublisher.rule_snort_doc(rule)
 
-    cve_snort_docs = SnortDocPublisher.rule_snort_doc(rule)
+    cve_snort_docs = SnortDocPublisher.gen_snort_doc
 
-    puts JSON.pretty_generate([cve_snort_docs])
+    puts JSON.pretty_generate(cve_snort_docs)
   end
 end
