@@ -213,10 +213,15 @@ class SnortDocPublisher
     snort_doc = rule.rule_doc.attributes.slice(*%w{summary impact details affected_sys attack_scenarios
         ease_of_attack false_positives false_negatives corrective_action contributors})
 
+    snort_doc['gid'] = rule.gid
+    snort_doc['sid'] = rule.sid
+    snort_doc['rev'] = rule.rev
     snort_doc['message'] = rule.message
 
     snort_doc['cves'] = rule.references.cves.map do |cve_ref|
-      cve_ref.cve.attributes.slice(*%w{description severity
+      # links = cve_ref.bug_reference_rule_links
+
+      cve_ref.cve.attributes.slice(*%w{cve_key description severity
           base_score impact_score exploit_score confidentiality_impact integrity_impact availability_impact
           vector_string access_vector access_complexity authentication affected_systems})
     end

@@ -27,6 +27,6 @@ namespace :snortdoc do
 
     cve_snort_docs = SnortDocPublisher.rule_snort_doc(rule)
 
-    puts JSON.pretty_generate(cve_snort_docs)
+    puts JSON.pretty_generate([cve_snort_docs])
   end
 end
