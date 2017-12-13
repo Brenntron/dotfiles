@@ -27,8 +27,8 @@
 /extras/working/
 
 /ignore/
-/load_ruledoc/data
-/load_ruledoc/.idea
+/load_ruledoc/
+/lib/data/nvd/
 
 /net-snort-parser/
 
