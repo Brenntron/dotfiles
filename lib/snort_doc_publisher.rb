@@ -105,11 +105,11 @@ class SnortDocPublisher
   def self.download(filename)
     download_path = filepath(filename)
     cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{download_path}"
-    puts cmd
+    # puts cmd
     system(cmd)
     if /\A(?<unzip_path>.*).gz\z/ =~ download_path.to_s
       cmd = "gunzip -f #{unzip_path}.gz"
-      puts cmd
+      # puts cmd
       system(cmd)
     end
   end

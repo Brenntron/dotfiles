@@ -28,8 +28,13 @@ namespace :snortdoc do
   end
 
   desc 'Generate Snort Rule Docs written to stdout from optional filename'
-  task :gen_snort_doc, [:filename] => :environment do |tt, args|
+  task :gen_snort_doc_no_update, [:filename] => :environment do |tt, args|
     puts JSON.pretty_generate(SnortDocPublisher.gen_snort_doc(args[:filename]))
+  end
+
+  desc 'Update cves from NVD and generate Snort Rule Docs written to stdout from optional filename'
+  task :gen_snort_doc, [:filename] => [:environment, :update_cve_data] do |tt, args|
+    Rake::Task["snortdoc:gen_snort_doc_no_update"].invoke(args[:filename])
   end
 
   task :snortdoc => :environment do
