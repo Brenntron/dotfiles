@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171120155549) do
+ActiveRecord::Schema.define(version: 20171205164129) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 20171120155549) do
     t.string "link_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["link_id", "link_type"], name: "index_bug_reference_rule_links_on_link_id_and_link_type"
+    t.index ["link_type", "link_id"], name: "index_bug_reference_rule_links_on_link_type_and_link_id"
   end
 
   create_table "bugs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -108,6 +108,29 @@ ActiveRecord::Schema.define(version: 20171120155549) do
     t.index ["bug_id", "tag_id"], name: "index_bugs_tags_on_bug_id_and_tag_id", unique: true
     t.index ["bug_id"], name: "index_bugs_tags_on_bug_id"
     t.index ["tag_id"], name: "index_bugs_tags_on_tag_id"
+  end
+
+  create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "reference_id", null: false
+    t.string "year", null: false
+    t.string "cve_key", null: false
+    t.text "description"
+    t.string "severity"
+    t.float "base_score", limit: 24
+    t.float "impact_score", limit: 24
+    t.float "exploit_score", limit: 24
+    t.string "confidentiality_impact"
+    t.string "integrity_impact"
+    t.string "availability_impact"
+    t.string "vector_string"
+    t.string "access_vector"
+    t.string "access_complexity"
+    t.string "authentication"
+    t.text "affected_systems", limit: 4294967295
+    t.index ["cve_key"], name: "index_cves_on_cve_key", unique: true
+    t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
 
   create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
