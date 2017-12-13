@@ -208,6 +208,35 @@ class SnortDocPublisher
     clear_instance_variables
   end
 
+  def self.flatten_snort_doc_status(hashes)
+
+    modules_and_rules_array = [ {gid: 3, diff_new: hashes['modules']}, {gid: 1, diff_new: hashes['rules']} ]
+
+    diff_and_new_array = modules_and_rules_array.inject([]) do |array_curr, curr|
+      array_curr += curr[:diff_new].map do |diff_new_value, sid_hash|
+        { gid: curr[:gid], diff_new: diff_new_value, sid_hash: sid_hash }
+      end
+      array_curr
+    end
+
+    rule_array = diff_and_new_array.inject([]) do |array_curr, curr|
+      array_curr += curr[:sid_hash].map do |sid, revs_hash|
+        rev = revs_hash.keys.max
+        { gid: curr[:gid], diff_new: curr[:diff_new], sid: sid, rev: rev, on_off: revs_hash[rev] }
+      end
+      array_curr
+    end
+
+    rule_array
+  end
+
+  def self.update_snort_doc_status(hashes)
+    rule_array = flatten_snort_doc_status(hashes)
+    rule_array.each do |rule_hash|
+      puts "*** - rule = #{rule_hash.inspect}"
+    end
+  end
+
   # @return [Hash] Snort Doc hash for a given rule
   def self.rule_snort_doc(rule)
     snort_doc = rule.rule_doc.attributes.slice(*%w{summary impact details affected_sys attack_scenarios
