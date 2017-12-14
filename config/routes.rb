@@ -61,6 +61,9 @@ Rails.application.routes.draw do
 
   # resources :rules, param: :sid
   resources :roles
+
+  resources :tests
+
   resources :users do
 
     collection do

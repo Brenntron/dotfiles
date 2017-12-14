@@ -4,6 +4,7 @@ module API
 
       mount API::V1::Bugs
       mount API::V1::Rules
+      mount API::V1::RuleUpdates
       mount API::V1::Exploits
       mount API::V1::Attachments
       mount API::V1::Users

@@ -1,5 +1,5 @@
 module API
-  module V1
+  module V2
     module Defaults
       # if you're using Grape outside of Rails, you'll have to use Module#included hook
       extend ActiveSupport::Concern
