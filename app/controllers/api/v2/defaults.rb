@@ -6,7 +6,7 @@ module API
 
       included do
         # common Grape settings
-        version 'v1' # path-based versioning by default
+        version 'v2' # path-based versioning by default
         default_format :json
         format :json
         formatter :json, Grape::Formatter::ActiveModelSerializers

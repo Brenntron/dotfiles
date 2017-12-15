@@ -4,12 +4,12 @@ class API::V2::RuleUpdates < Grape::API
   resource :rule_updates do
 
     params do
-      optional :rule_update, type: File, desc: "TBD"
+      optional :rule_update, type: File, desc: "API to post a rule update file from the group publishing snort rules."
     end
     post "", root: :rule_updates do
       std_api_v2 do
         byebug
-        content = permitted_params['rule_update'].tempfile.read
+        file_content = permitted_params['rule_update'].tempfile.read
         "Hi curl!"
       end
     end
