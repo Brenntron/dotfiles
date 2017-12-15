@@ -27,6 +27,8 @@
 /extras/working/
 
 /ignore/
+
+#data directories
 /load_ruledoc/
 /lib/data/nvd/
 
