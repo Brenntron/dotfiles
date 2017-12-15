@@ -40,27 +40,152 @@ namespace :bugs do
   end
 
   task :import_all_bugs => :environment do
-    current_user = User.where(:email => 'vrt-incoming@sourcefire.com').first
+    require 'thread'
+    sema = Mutex.new
 
+    current_user = User.where(:email => 'vrt-incoming@sourcefire.com').first
+    puts "setting everything up.....\n"
+
+    #id_collect = [5068, 12171, 14781, 15319, 15841, 27822, 28079, 28082, 28778, 28909]
+
+    id_collect = Bug.first(50).map {|b| b.id}
+
+    #10 * 15 = 150 seconds
+    #85 seconds with 3 threads
+    #60 seconds with 5 threads
+
+
+    #30 * 15 = 450 seconds
+    #est for 3 threads 252 seconds   : #294   150 seconds
+    #est for 5 threads 180 seconds   : 66 seconds
+
+    #50 * 15 = 750 seconds
+    #est for 3 threads 420 seconds
+    #est for 5 threads 300 seconds    263 000
+    #binding.pry
+    time_start = Time.now
 
     #test bug
-    test_id = 5068
-
+    #test_id = 5068
+    #test2_id = 12171
     #need bugzilla auth 
-    login_session = LoginSession.new(current_user).bugzilla_login
-    xmlrpc_token = login_session
+    #login_session = LoginSession.new(current_user).bugzilla_login
+    #xmlrpc_token = login_session
 
-    xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-    xmlrpc.token = xmlrpc_token
+    #xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+    #xmlrpc.token = xmlrpc_token
 
-    bugz = Bugzilla::Bug.new(xmlrpc)
+    #bugz = Bugzilla::Bug.new(xmlrpc)
+    puts "ok now we're starting....\n"
+    #new_bug = bugz.get(test_id)
+    #new_bug2 = bugz.get(test2_id)
 
-    new_bug = bugz.get(test_id)
+    #login_session = login_to_bugzilla(current_user) #LoginSession.new(current_user).bugzilla_login
+    #xmlrpc_token = login_session
 
-    whole_bug = Bug.bugzilla_import(current_user, bugz, xmlrpc_token, new_bug).first
+    #xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+    #xmlrpc.token = xmlrpc_token
 
-    puts whole_bug.inspect
-    
+    #bugz = Bugzilla::Bug.new(xmlrpc)
+
+
+    threads = []
+
+    8.times do |i|
+      threads << Thread.new(i) do |tnum|
+
+        login_session = login_to_bugzilla(current_user) #LoginSession.new(current_user).bugzilla_login
+        xmlrpc_token = login_session
+
+        xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+        xmlrpc.token = xmlrpc_token
+
+        bugz = Bugzilla::Bug.new(xmlrpc)
+
+
+        while true do
+          new_bug = nil
+          tid = nil
+          if id_collect.blank?
+            break
+          else
+            sema.synchronize do
+              tid = id_collect.pop
+
+            end
+          end
+
+          next if tid.blank?
+
+          begin
+            puts "#{tnum}got one...starting on id: #{tid}....\n"
+            #new_bug = bugz.get(tid)
+            #sema.synchronize do
+            i = 0
+            while i < 200
+              begin
+                new_bug = bugz.get(tid)
+                break
+              rescue
+                login_session = login_to_bugzilla(current_user) #LoginSession.new(current_user).bugzilla_login
+                xmlrpc_token = login_session
+
+                xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+                xmlrpc.token = xmlrpc_token
+
+                bugz = Bugzilla::Bug.new(xmlrpc)
+                i = i + 1
+                next
+              end
+            end
+            #new_bug = bugz.get(tid)
+            #end
+            importer = BugzillaImport.new
+            whole_bug = importer.import(current_user, bugz, xmlrpc_token, new_bug).first if new_bug.present? #Bug.bugzilla_import(current_user, bugz, xmlrpc_token, new_bug).first
+            puts "\n#{tnum}------------------\nFinished bug with id: #{whole_bug.id}\n----------------\n\n"
+
+
+          rescue
+            puts "\n#{tnum}----------------\nsomething went wrong with id: #{tid}, so moving on.....\n-------------\n\n"
+            puts $!
+            puts $!.backtrace.join("\n")
+
+          end
+
+
+
+          #puts whole_bug.inspect
+
+        end
+
+        puts "#{tnum}Thread done"
+
+
+      end
+    end
+
+    threads.each { |t| t.join }
+
+
+    #t1.join
+    #t2.join
+    #t3.join
+    #t4.join
+    #t5.join
+
+    #t6.join
+    #t7.join
+    #t8.join
+    #t9.join
+    #t10.join
+
+    puts 'finished\n'
+
+    time_end = Time.now
+
+    time_total = time_end - time_start
+
+    puts "total time: #{time_total}"
   end
 
   task :generate_giblets => :environment do
@@ -117,6 +242,25 @@ namespace :bugs do
     Morsel.create(:output => report_blob)
 
 
+  end
+
+
+  def login_to_bugzilla(current_user)
+    bugzilla_username = Rails.configuration.bugzilla_username
+    bugzilla_password = Rails.configuration.bugzilla_password
+
+    Rails.logger.info("bugzilla: Using username: #{bugzilla_username}")
+    if bugzilla_username && bugzilla_password
+      @xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+      @xmlrpc.bugzilla_login(Bugzilla::User.new(@xmlrpc),
+                             bugzilla_username,
+                             bugzilla_password)
+      Rails.logger.debug("bugzilla: Received xmlrpc token: #{@xmlrpc.token}")
+      @xmlrpc_token = @xmlrpc.token
+    else
+      Rails.logger.error("bugzilla: Missing bugzilla_username or bugzilla_password.")
+      raise "Missing bugzilla_username or bugzilla_password."
+    end
   end
 
 end
