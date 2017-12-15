@@ -251,10 +251,10 @@ class SnortDocPublisher
     snort_doc['message'] = rule.message
 
     snort_doc['cves'] = rule.references.cves.map do |cve_ref|
-      cve_ref.cve.attributes.slice(*%w{cve_key description severity
+      cve_ref.cve&.attributes.slice(*%w{cve_key description severity
           base_score impact_score exploit_score confidentiality_impact integrity_impact availability_impact
           vector_string access_vector access_complexity authentication affected_systems})
-    end
+    end.compact
 
     snort_doc
   end
@@ -273,6 +273,14 @@ class SnortDocPublisher
       Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
           .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
     end
+  end
+
+  def self.gen_snort_doc_yaml(contents)
+    SnortDocPublisher.update_snort_doc_to_be(YAML.load(contents))
+    gen_snort_doc_to_be
+  rescue
+    byebug
+    puts $!
   end
 
   def self.gen_snort_doc(filename = nil)

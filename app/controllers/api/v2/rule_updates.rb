@@ -1,3 +1,5 @@
+require 'snort_doc_publisher'
+
 class API::V2::RuleUpdates < Grape::API
   include API::V2::Defaults
   # include API::WebAuthentication
@@ -10,10 +12,10 @@ class API::V2::RuleUpdates < Grape::API
     end
     post "", root: :rule_updates do
       std_api_v2 do
-        # byebug
-        file_content = permitted_params['rule_update'].tempfile.read
-        "Hi curl!"
+        file_contents = permitted_params['rule_update'].tempfile.read
+        JSON.pretty_generate(SnortDocPublisher.gen_snort_doc_yaml(file_contents))
       end
     end
+
   end
 end
