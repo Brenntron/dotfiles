@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20171209120000) do
+=======
+ActiveRecord::Schema.define(version: 20171122160533) do
+>>>>>>> master
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -133,6 +137,14 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
 
+  create_table "bugs_whiteboards", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "bug_id", null: false
+    t.bigint "whiteboard_id", null: false
+    t.index ["bug_id", "whiteboard_id"], name: "index_bugs_whiteboards_on_bug_id_and_whiteboard_id", unique: true
+    t.index ["bug_id"], name: "index_bugs_whiteboards_on_bug_id"
+    t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
+  end
+
   create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
@@ -180,6 +192,20 @@ ActiveRecord::Schema.define(version: 20171209120000) do
   create_table "exploits_references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "exploit_id"
     t.integer "reference_id"
+  end
+
+  create_table "giblets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "bug_id"
+    t.string "name"
+    t.string "gib_type"
+    t.bigint "gib_id"
+    t.index ["gib_type", "gib_id"], name: "index_giblets_on_gib_type_and_gib_id"
+  end
+
+  create_table "morsels", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.text "output"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -234,7 +260,7 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.text "summary"
     t.text "impact"
     t.text "details"
-    t.text "affected_sys", limit: 4294967295
+    t.text "affected_sys"
     t.text "attack_scenarios"
     t.text "ease_of_attack"
     t.text "false_positives"
@@ -390,6 +416,12 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.text "object_changes", limit: 4294967295
     t.datetime "created_at"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+  end
+
+  create_table "whiteboards", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

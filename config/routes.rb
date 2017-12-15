@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
+    resources :morsels, only: [:index, :show]
     resources :notes, only: [:index, :edit, :update, :destroy]
     resources :rules, only: [:index, :edit, :update] do
       collection do
@@ -14,6 +15,7 @@ Rails.application.routes.draw do
         get :related
       end
     end
+    resources :reference_types, only: [:index, :edit, :update]
     resources :scheduled_tasks do
       collection do
         post :run_job
@@ -95,7 +97,9 @@ Rails.application.routes.draw do
     member do
       post :create_rules
       post :add_tag
+      post :add_whiteboard
       patch :remove_tag
+      patch :remove_whiteboard
     end
     resources :references
     get :bug_metrics, defaults: { format: :json }

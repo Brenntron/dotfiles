@@ -39,6 +39,60 @@ namespace :bugs do
     # end
   end
 
+  task :generate_giblets => :environment do
+    successful_bug_count = 0
+    failed_bug_count = 0
+    failed_bugs = []
 
+    Bug.all.each do |bug|
+      puts "processing bug #{bug.id}....\n"
+      begin
+        parsed = bug.parse_summary #parsed sometimes fails...need to handle this
+      rescue
+        failed_bug_count += 1
+        failed_bugs << "Bug: #{bug.id} failed in parse_summary"
+        next
+      end
+      begin
+        bug.load_whiteboard_values
+      rescue
+        failed_bug_count += 1
+        failed_bugs << "Bug: #{bug.id} failed in load_whiteboard_values"
+        next
+      end
+
+      begin
+        bug.load_refs_from_summary(parsed[:refs], 'shallow')
+        bug.load_giblets_from_refs
+      rescue
+        failed_bug_count += 1
+        failed_bugs << "Bug: #{bug.id} failed in load_refs_from_summary"
+        next
+      end
+
+      begin
+        bug.load_tags_from_summary(parsed[:tags])
+      rescue
+        failed_bug_count += 1
+        failed_bugs << "Bug: #{bug.id} failed in load_tags_from_summary"
+        next
+      end
+      successful_bug_count += 1
+    end
+
+    report_blob = "Results of running Giblet Generation Backfill Task:\n\n"
+    report_blob += "# of bugs successfully backfilled: #{successful_bug_count}\n"
+    report_blob += "# of bugs that failed backfilling: #{failed_bug_count}\n"
+    report_blob += "----------------------------------\n"
+    report_blob += "Output Messages:\n"
+    failed_bugs.each do |message|
+      report_blob += "  #{message}\n"
+    end
+    report_blob += "----------------------------------\n"
+
+    Morsel.create(:output => report_blob)
+
+
+  end
 
 end

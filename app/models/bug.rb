@@ -1,8 +1,14 @@
 class Bug < ApplicationRecord
+
+  has_many :giblets
+  has_many :tag_gibs, through: :giblets, source: :gib, source_type: 'Tag'
+  has_many :reference_gibs, through: :giblets, source: :gib, source_type: 'Reference'
   has_paper_trail
+
   has_many :bugs_rules
   has_many :rules, through: :bugs_rules
   has_and_belongs_to_many :tags, dependent: :destroy
+  has_and_belongs_to_many :whiteboards, dependent: :destroy
   belongs_to :user, optional: true
   belongs_to :committer, class_name: 'User', optional: true
 
@@ -200,9 +206,10 @@ class Bug < ApplicationRecord
     case
       when query_params[:bugzilla_max].present?
         nil
-      when query_params[:summary].present? || query_params[:whiteboard].present?
+      when query_params[:summary].present? || query_params[:whiteboard].present? || query_params[:giblets].present?
         summary_param = ""
         whiteboard_param = ""
+        giblets = []
 
         if query_params[:summary].present?
           summary_param = query_params.delete(:summary)
@@ -211,27 +218,79 @@ class Bug < ApplicationRecord
         if query_params[:whiteboard].present?
           whiteboard_param = query_params.delete(:whiteboard)
         end
+        if query_params[:giblets].present?
+          giblets = query_params.delete(:giblets)
+          gibs = Giblet.where(:id => giblets)
+          join_types = gibs.all.map {|g| g.gib_type.downcase.pluralize.to_sym}.uniq
+          gibs_by_type = {}
+          join_types.each do |join_type|
+            gibs_by_type[join_type] = []
+          end
+          gibs.each do |gib|
+            gibs_by_type[gib.gib_type.downcase.pluralize.to_sym] << gib
+          end
 
-        query = Bug.where(query_params)
+        end
+
+        query = Bug
+        query_hash = {}
+
+        query_hash['param_results'] = query.where(query_params)
 
         if summary_param.present?
-          query = query.where('summary LIKE ?', "%#{summary_param}%")
+          query_hash['summary_param_results'] = query_hash['param_results'].where('summary LIKE ?', "%#{summary_param}%")
         end
 
         if whiteboard_param.present?
-          query = query.where('whiteboard LIKE ?', "%#{whiteboard_param}%")
+          query_hash['whiteboard_param_results'] = query_hash['param_results'].where('whiteboard LIKE ?', "%#{whiteboard_param}%")
         end
 
-        #summary_param = query_params.delete(:summary)
-        #Bug.where(query_params).where('summary LIKE ?', "%#{summary_param}%")
+        ##Note:  If we ever want to try to create an 'AND' type search with multiple tags selected, we're going to need a query similar to this:
+        #  SELECT bug_id FROM `bugs` inner JOIN `bugs_tags` ON `bugs_tags`.`bug_id` = `bugs`.`id` inner JOIN `tags` ON `tags`.`id` = `bugs_tags`.`tag_id` WHERE `bugs_tags`.`tag_id` in (1, 5) group by bug_id having count(distinct tag_id) = 2;
+        #  the key is group by and having and matching up with the number of tags being searched on, this will require some really custom stuff rather than just stringing 'where' statements in an activerecord query.
+        if giblets.present?
+          join_types.each do |j_type|
+            case j_type
+              when :tags
+                query_hash['gib_tag_results'] = query_hash['param_results'].joins(:tags)
+              when :whiteboards
+                query_hash['gib_whiteboard_results'] = query_hash['param_results'].joins(:whiteboards)
+              when :references
+                query_hash['gib_reference_results'] = query_hash['param_results'].joins(:references)
+            end
+          end
+          gibs_by_type.each do |key, value|
+            if value.size > 0
+              ids = value.map{|g| g.gib.id}
+              case key
+                when :tags
+                  query_hash['gib_tag_results'] = query_hash['gib_tag_results'].where("bugs_tags.tag_id" => ids)
+                when :whiteboards
+                  query_hash['gib_whiteboard_results'] = query_hash['gib_whiteboard_results'].where("bugs_whiteboards.whiteboard_id" => ids)
+                when :references
+                  query_hash['gib_reference_results'] = query_hash['gib_reference_results'].where("bug_reference_rule_links.reference_id" => ids)
+              end
+            end
+          end
+        end
+        final_query = []
+        if query_params.empty?
+          query_hash.delete('param_results')
+        end
+        #combine all the queries together
+        query_hash.each do |key,result_set|
+          final_query = final_query | (result_set)
+        end
 
-        query
+        query = Bug.where(id: final_query.map{|b|b.id})
+
       else
         Bug.where(query_params)
     end
   end
 
   def self.query(current_user, named_query, search_options)
+
     case named_query
       when NilClass
         nil
@@ -417,8 +476,8 @@ class Bug < ApplicationRecord
 
   def parse_summary
     parsed_summary = {}
-    parsed_summary[:tags] = summary_tags
     parsed_summary[:sids] = summary_sids
+    parsed_summary[:tags] = summary_tags
     parsed_summary[:refs] = summary_references
     parsed_summary
   end
@@ -491,18 +550,30 @@ class Bug < ApplicationRecord
   def summary_references
     references = []
     ReferenceType.where.not(bugzilla_format: nil).each do |ref_type|
-      summary.scan(/#{ref_type.bugzilla_format}/i).each do |match|
-        references << Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+      summary_without_sids_or_tags.scan(/#{ref_type.bugzilla_format}/i).each do |match|
+        ref = Reference.where(reference_type_id: ref_type.id, reference_data: match[0]).first_or_create
+        references << ref
       end
     end
     references.uniq
   end
 
-  def load_references(summary_references)
+  def load_references(summary_references, old_refs = nil)
+
+    if old_refs.present?
+      old_refs.each do |old_ref|
+        if references.include? (old_ref)
+          references.delete(old_ref)
+        end
+      end
+    end
+
     summary_references.each do |ref|
       references << ref unless references.map {|r| r.reference_data}.include? ref.reference_data
       Exploit.find_exploits(ref)
     end
+
+
   end
 
   def tag_array
@@ -517,22 +588,24 @@ class Bug < ApplicationRecord
 
   def compose_summary
     if tag_array.try(:sort) != summary_tag_array.try(:sort)
-
       #extract summary_tag_string and replace with tag_string
       summary_string = "#{summary}"
       summary_tag_array.each{|st| summary_string.slice! st } unless summary_tag_array.nil?
       tag_array.reverse.each{|ta| summary_string.prepend(ta) }
-
       self.update(summary: summary_string)
     end
   end
 
-  def update_summary(summary_given)
+  def update_summary(summary_given, old_refs = nil)
     update!(summary: summary_given)
 
+    parsed = parse_summary
+    load_tags_from_summary(parsed[:tags] )
     load_rules_from_sids(summary_sids)
+    load_refs_from_summary(summary_references)
     compose_summary
-    load_references(summary_references)
+    load_references(summary_references, old_refs)
+
   end
 
   def bugzilla_synch_needed?
@@ -556,9 +629,15 @@ class Bug < ApplicationRecord
   end
 
   def create_tags_from_summary(summary_tags)
+    sum_tags=[]
     summary_tags.each do |tag|
-      Tag.find_or_create_by(name: tag)
+      found_tag = Tag.find_by_name(tag)
+      unless found_tag
+        found_tag = Tag.create(name: tag)
+      end
+      sum_tags << found_tag
     end
+    sum_tags
   end
 
   def add_attachment(xmlrpc, file)
@@ -567,22 +646,102 @@ class Bug < ApplicationRecord
 
   ####methods for bug importing######
 
+  def load_whiteboard_values
+    if self.whiteboard.present?
+      tokens = self.whiteboard.split(" ")
+      tokens.each do |token|
+        unless token.blank?
+          w_board = Whiteboard.where(:name => token).first
+          if w_board.blank?
+            w_board = Whiteboard.create(:name => token)
+          end
+
+          unless self.whiteboards.include?(w_board)
+            self.whiteboards << w_board
+          end
+
+          if giblets.select {|giblet| giblet.gib == w_board}.blank?
+            new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Whiteboard", :gib_id => w_board.id)
+            new_gib.name = new_gib.display_name
+            new_gib.save
+          end
+        end
+
+      end
+    end
+  end
+
   def load_tags_from_summary(tags, import_type='import')
     tags.each do |tag|
-      @import_report[:new_tags] << tag.name unless self.tags.include?(tag)
+      @import_report[:new_tags] << tag.name unless self.tags.include?(tag) if defined? @import_report
       if import_type != "status"
-        self.tags << tag unless self.tags.include?(tag)
+        unless self.tags.include?(tag)
+          self.tags << tag
+
+        end
+
+        if giblets.select {|giblet| giblet.gib == tag}.blank?
+          new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Tag", :gib_id => tag.id)
+          new_gib.name = new_gib.display_name
+          new_gib.save
+        end
+
       end
     end
   end
 
   def load_refs_from_summary(refs, import_type='import_type')
     refs.each do |ref|
-      @import_report[:new_refs] << ref.reference_data unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+      @import_report[:new_refs] << ref.reference_data unless self.references.map {|r| r.reference_data}.include? ref.reference_data if defined? @import_report
       if import_type != "status"
-        self.references << ref unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+        unless self.references.map {|r| r.reference_data}.include? ref.reference_data
+          self.references << ref
+
+        end
+
+        if giblets.select {|giblet| giblet.gib == ref}.blank?
+          if ref.reference_type.name != "url"
+            new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => ref.id)
+            new_gib.name = new_gib.display_name
+            new_gib.save
+          else
+            if ref.reference_data.include?("microsoft.com")
+              msb_val = ref.reference_data.split('/').last.split('.').first.upcase
+              ref_type = ReferenceType.where(:name => 'msb').first
+              alt_ref = Reference.find_or_create_by(:reference_type_id => ref_type.id, :reference_data => msb_val)
+              references << alt_ref unless references.include?(alt_ref)
+              new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => alt_ref.id)
+              new_gib.name = new_gib.display_name
+              new_gib.save
+            end
+          end
+        end
       end
-      Exploit.find_exploits(ref)
+      unless import_type == 'shallow'
+        Exploit.find_exploits(ref)
+      end
+    end
+  end
+
+  def load_giblets_from_refs
+    references.each do |ref|
+      if giblets.select {|giblet| giblet.gib == ref}.blank?
+        if ref.reference_type.name != "url"
+          new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => ref.id)
+          new_gib.name = new_gib.display_name
+          new_gib.save
+        else
+          if ref.reference_data.include?("microsoft.com")
+            msb_val = ref.reference_data.split('/').last.split('.').first.upcase
+            ref_type = ReferenceType.where(:name => 'msb').first
+            alt_ref = Reference.find_or_create_by(:reference_type_id => ref_type.id, :reference_data => msb_val)
+            references << alt_ref unless references.include?(alt_ref)
+            new_gib = Giblet.create(:bug_id => self.id, :gib_type => "Reference", :gib_id => new_ref.id)
+            new_gib.name = new_gib.display_name
+            new_gib.save
+          end
+        end
+      end
     end
   end
 
@@ -839,6 +998,13 @@ class Bug < ApplicationRecord
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:)
+
+
+    initial_bug_summary_info = bug.parse_summary
+    initial_refs_from_summary = initial_bug_summary_info[:refs]
+
+
+
     bug.initialize_report
     bug_is_being_resolved = bug.state != "PENDING" ? false : true
 
@@ -858,14 +1024,17 @@ class Bug < ApplicationRecord
       end
     end
 
+    bug.summary = permitted_params[:bug][:summary]
+    new_summary = bug.parse_summary
+    bug.reload
 
-    tags = permitted_params[:bug][:tag_names]
 
     # update the tags
     bug.tags.delete_all if bug.tags.exists?
-    if tags
-      tags.each do |tag|
-        new_tag = Tag.find_or_create_by(name: tag)
+
+    if new_summary[:tags]
+      new_summary[:tags].each do |tag|
+        new_tag = Tag.find_or_create_by(name: tag.name)
         bug.tags << new_tag
       end
     end
@@ -883,7 +1052,8 @@ class Bug < ApplicationRecord
 
     # update the summary
     # (do this first so we can compose the summary properly to send to bugzilla)
-    bug.update_summary(permitted_params[:bug][:summary])
+
+    bug.update_summary(permitted_params[:bug][:summary], initial_refs_from_summary)
 
     options[:ids] = permitted_params[:id]
     options[:product] = permitted_params[:bug][:product]
@@ -940,7 +1110,7 @@ class Bug < ApplicationRecord
 
     update_params[:product] = permitted_params[:bug][:product]
     update_params[:component] = permitted_params[:bug][:component]
-    update_params[:summary] = permitted_params[:bug][:summary]
+    update_params[:summary] = bug.summary
     update_params[:version] = permitted_params[:bug][:version]
     update_params[:state] = permitted_params[:bug][:state]
     update_params[:opsys] = permitted_params[:bug][:opsys]
@@ -956,6 +1126,8 @@ class Bug < ApplicationRecord
     Bug.update(permitted_params[:id], update_params)
 
     bug.reload
+
+    bug.load_whiteboard_values
 
     if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
       bug_is_being_resolved = !bug_is_being_resolved
@@ -1227,22 +1399,15 @@ class Bug < ApplicationRecord
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
               if latest_research.present? && !(bug_has_notes)
                 new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
-                #new_note = Note.new({
-                #                        comment: new_draft,
-                #                        note_type: 'research',
-                #                        author: current_user.email,
-                #                        bug_id:     bug_id
-                #                    })
-                #new_note.save
                 bug.research_notes = new_draft
               end
             end
 
           end
         end
-
+        progress_bar.update_attribute("progress", 20) unless progress_bar.blank?
+        bug.load_whiteboard_values
         progress_bar.update_attribute("progress", 30) unless progress_bar.blank?
-
         parsed = bug.parse_summary
         progress_bar.update_attribute("progress", 50) unless progress_bar.blank?
         bug.load_rules_from_sids(parsed[:sids], bug.component, import_type)
@@ -1474,6 +1639,18 @@ class Bug < ApplicationRecord
     summary.gsub(/\[SID\]\s*?([\d\s,\-]+)(?:\s)?/, '')
   end
 
+  def summary_without_sids_or_tags
+    summary_without_sids.gsub(/(?:(?:\[.*?\])\s*)+/,'')
+  end
+
+  def summary_without_sids_or_tags_or_references
+    naked_summary = summary_without_sids_or_tags
+    summary_references.each do |ref|
+      naked_summary.gsub!(/#{ref[0]}\s*/,'')
+    end
+    naked_summary
+  end
+
   def open_dependencies(xmlrpc)
     raise Exception.new("Bugzilla xmlrpc session must be specified") if xmlrpc.nil?
 
@@ -1535,8 +1712,10 @@ class Bug < ApplicationRecord
     ref_type = ReferenceType.where(name: ref_type_name).first
     raise 'Invalid reference type' unless ref_type
     unless references.where(reference_type_id: ref_type.id, reference_data: ref_data).exists?
-      references.create(reference_type_id: ref_type.id, reference_data: ref_data)
+      ref = references.create(reference_type_id: ref_type.id, reference_data: ref_data)
+      return ref
     end
+    nil
   end
 
   def add_exploit_action(reference_id:, exploit_type_id:, attachment_id:, exploit_data:)
