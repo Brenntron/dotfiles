@@ -598,6 +598,16 @@ $ ->
   $('.commit').on "click",(e) ->
     alert("clicked commit")
 
+  $('.edit').on "click", '.cancel-rule-btn', (e) ->
+    e.preventDefault()
+    $('input:checkbox.rule_check_box').each ->
+      $('.rule_'+$(this).val()).removeClass('hidden').addClass('active')
+    $('.row.active').addClass('hidden').removeClass 'active'
+    $('.' + 'overview').addClass('active').removeClass 'hidden'
+    $('.active').show()
+    $('.hidden').hide()
+    $('.standard_form').hide()
+
   $('.edit').on "click", '.update-rule-btn', (e) ->
     e.preventDefault()
     form = $(this).parents('.edit_legacy_form')
