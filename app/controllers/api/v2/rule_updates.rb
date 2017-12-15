@@ -1,5 +1,7 @@
 class API::V2::RuleUpdates < Grape::API
   include API::V2::Defaults
+  # include API::WebAuthentication
+  # include API::BugzillaLogin
 
   resource :rule_updates do
 
@@ -8,7 +10,7 @@ class API::V2::RuleUpdates < Grape::API
     end
     post "", root: :rule_updates do
       std_api_v2 do
-        byebug
+        # byebug
         file_content = permitted_params['rule_update'].tempfile.read
         "Hi curl!"
       end

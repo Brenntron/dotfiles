@@ -12,9 +12,9 @@ module API
         formatter :json, Grape::Formatter::ActiveModelSerializers
 
 
-        # before do
-        #   error!("401 Unauthorized", 401) unless authenticated
-        # end
+        before do
+          error!("401 Unauthorized", 401) unless authenticated
+        end
 
         helpers do
           def warden

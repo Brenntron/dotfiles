@@ -12,27 +12,7 @@ module API
         formatter :json, Grape::Formatter::ActiveModelSerializers
 
 
-        # before do
-        #   error!("401 Unauthorized", 401) unless authenticated
-        # end
-
         helpers do
-          def warden
-            env['warden']
-          end
-
-          def authenticated
-            kerb_auth = request.env['REMOTE_USER'] ||  Rails.configuration.backend_auth[:default_remote_user]
-            access_token = request.headers['Token'] #we just want to use headers and not url parameters
-            return true if warden.authenticated?
-            @user = User.where("authentication_token = ?", access_token).first
-            return access_token && !(@user.nil?) && kerb_auth
-          end
-
-          def current_user
-            warden.user || @user
-          end
-
           def permitted_params
             @permitted_params ||= declared(params, include_missing: false)
           end
@@ -44,14 +24,6 @@ module API
 
           def logger
             Rails.logger
-          end
-
-          def bugzilla_session
-            xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-            if current_user
-              xmlrpc.token = request.headers['Xmlrpc-Token']
-            end
-            xmlrpc
           end
 
           # Standard (our standard) handling of an exception
