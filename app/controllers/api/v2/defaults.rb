@@ -33,8 +33,8 @@ module API::V2::Defaults
                   kerb_auth = request.env['REMOTE_USER']
                   access_token = request.headers['Token'] #we just want to use headers and not url parameters
                   kerb_auth && User.where("authentication_token = ?", access_token).first
-                when Rails.configuration.backend_auth[:default_remote_user] && !(Rails.env.production? || Rails.env.staging?)
-                  User.where(cvs_username: Rails.configuration.backend_auth[:default_remote_user]).first
+                # when Rails.configuration.backend_auth[:default_remote_user] && !(Rails.env.production? || Rails.env.staging?)
+                #   User.where(cvs_username: Rails.configuration.backend_auth[:default_remote_user]).first
                 else
                   nil
               end

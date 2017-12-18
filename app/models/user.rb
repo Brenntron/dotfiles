@@ -1,6 +1,9 @@
 class User < ApplicationRecord
   acts_as_nested_set
 
+  # example: user.create_user_api_key
+  has_one :user_api_key
+
   has_many :bugs
   has_many :saved_searches
   has_and_belongs_to_many :roles, dependent: :destroy
