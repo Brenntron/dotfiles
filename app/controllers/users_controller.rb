@@ -36,7 +36,6 @@ class UsersController < ApplicationController
   end
 
   def update
-    byebug
     @user = User.find(params[:id])
     @user.update(user_params)
     if user_api_key_params[:api_key].present?

@@ -232,6 +232,7 @@ module API
           requires :sid, type: Integer, desc: "sid of the rule"
           optional :username, type: String
           optional :bug_id,   type: Integer, desc: "Bugzilla id."
+          optional :bugzilla_comment,   type: String
         end
         put "gids/:gid/sids/:sid/commit", root: "rule" do
           std_api_v2 do
@@ -242,7 +243,9 @@ module API
 
             Repo::RuleCommitter.commit_rules_action(rules,
                                                     username: permitted_params[:username],
-                                                    bugzilla_id: permitted_params[:bug_id])
+                                                    bugzilla_id: permitted_params[:bug_id],
+                                                    bugzilla_comment: permitted_params[:bugzilla_comment],
+                                                    xmlrpc: bugzilla_session)
             if permitted_params[:bug_id].present?
               main_committer = User.where(email: "vrt-qa@sourcefire.com").first
               bug = Bug.where(:id => permitted_params[:bug_id]).first
@@ -325,6 +328,7 @@ module API
                                   permitted_params[:rule_ids])
         end
 
+        desc "Update the snort_doc_status on a given rules record."
         params do
           requires :rule_id, type: Integer
           requires :snort_doc_status, type: String
