@@ -180,9 +180,9 @@ class Rule < ApplicationRecord
 
   def display_alerts_count(bug)
     if synched_rule?
-      bug.pcap_alerts.by_rule(self).count
+      "#{bug.pcap_alerts.by_rule(self).count}"
     else
-      bug.local_alerts.by_rule(self).count
+      "<font style='color: red;'>#{bug.local_alerts.by_rule(self).count} LOCAL</font>"
     end
   end
 

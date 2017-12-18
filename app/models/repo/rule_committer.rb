@@ -230,7 +230,6 @@ module Repo
 
       Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
 
-
       committer = Repo::RuleCommitter.new(rules,
                                           xmlrpc: xmlrpc,
                                           bugzilla_id: bugzilla_id,
@@ -242,6 +241,13 @@ module Repo
         bugzilla_bug = Bugzilla::Bug.new(xmlrpc)
         bug = bugzilla_bug.get(bugzilla_id)
         Bug.synch_history(bugzilla_bug, bug)
+
+        attachments = bug.attachments.map{|a| a.id}
+
+        new_task = Task.create_pcap_test(bug.id, user.id)
+        TestAttachment.new(new_task,
+                           xmlrpc.token,
+                           attachments).send_work_msg
 
       end
 
