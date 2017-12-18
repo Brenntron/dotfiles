@@ -40,61 +40,52 @@ namespace :bugs do
   end
 
   task :import_all_bugs => :environment do
-    require 'thread'
-    sema = Mutex.new
 
-    current_user = User.where(:email => 'vrt-incoming@sourcefire.com').first
     puts "setting everything up.....\n"
 
-    #id_collect = [5068, 12171, 14781, 15319, 15841, 27822, 28079, 28082, 28778, 28909]
+    require 'thread'
+    sema = Mutex.new
+    current_user = User.where(:email => 'vrt-incoming@sourcefire.com').first
 
-    id_collect = Bug.first(50).map {|b| b.id}
+    #grab all the ids
+    total_ids = []
+    csv_text = File.read("public/bugzilla_snort_ids.csv")
+    csv = CSV.parse(csv_text, :headers => true)
+    csv.each do |row|
+      total_ids << row["bug_id"].to_i
+    end
 
-    #10 * 15 = 150 seconds
-    #85 seconds with 3 threads
-    #60 seconds with 5 threads
+    #filter out any that we already have
+    current_ids = Bug.select("id").map {|bug| bug.id}
 
+    total_ids = total_ids - current_ids
+    total_ids = total_ids.sort.reverse #.first(200)
+    #total_ids = total_ids.sort.first(200)
 
-    #30 * 15 = 450 seconds
-    #est for 3 threads 252 seconds   : #294   150 seconds
-    #est for 5 threads 180 seconds   : 66 seconds
+    #troublesome bugs
+    troubled_bugs = []
 
-    #50 * 15 = 750 seconds
-    #est for 3 threads 420 seconds
-    #est for 5 threads 300 seconds    263 000
-    #binding.pry
+    #create a morsel
+    global_morsel_added = Morsel.create
+    global_morsel_rejected = Morsel.create({:output => "Errors:\n"})
+    #some counters
+    global_added = 0
+    global_rejected = 0
+
+    #start the timer
     time_start = Time.now
 
-    #test bug
-    #test_id = 5068
-    #test2_id = 12171
-    #need bugzilla auth 
-    #login_session = LoginSession.new(current_user).bugzilla_login
-    #xmlrpc_token = login_session
-
-    #xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-    #xmlrpc.token = xmlrpc_token
-
-    #bugz = Bugzilla::Bug.new(xmlrpc)
-    puts "ok now we're starting....\n"
-    #new_bug = bugz.get(test_id)
-    #new_bug2 = bugz.get(test2_id)
-
-    #login_session = login_to_bugzilla(current_user) #LoginSession.new(current_user).bugzilla_login
-    #xmlrpc_token = login_session
-
-    #xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-    #xmlrpc.token = xmlrpc_token
-
-    #bugz = Bugzilla::Bug.new(xmlrpc)
-
+    puts "We have the bug ids, ok now we're starting....\n"
 
     threads = []
 
-    8.times do |i|
+    7.times do |i|
       threads << Thread.new(i) do |tnum|
 
-        login_session = login_to_bugzilla(current_user) #LoginSession.new(current_user).bugzilla_login
+        thread_name = "[Thread #{tnum}]"
+
+        #Couldn't use LoginSession here, was getting weird "circular load" errors
+        login_session = login_to_bugzilla(current_user)
         xmlrpc_token = login_session
 
         xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
@@ -106,11 +97,11 @@ namespace :bugs do
         while true do
           new_bug = nil
           tid = nil
-          if id_collect.blank?
+          if total_ids.blank?
             break
           else
             sema.synchronize do
-              tid = id_collect.pop
+              tid = total_ids.pop
 
             end
           end
@@ -118,9 +109,8 @@ namespace :bugs do
           next if tid.blank?
 
           begin
-            puts "#{tnum}got one...starting on id: #{tid}....\n"
-            #new_bug = bugz.get(tid)
-            #sema.synchronize do
+            puts "#{thread_name} starting on id: #{tid}....\n"
+
             i = 0
             while i < 200
               begin
@@ -138,53 +128,69 @@ namespace :bugs do
                 next
               end
             end
-            #new_bug = bugz.get(tid)
-            #end
+
             importer = BugzillaImport.new
             whole_bug = importer.import(current_user, bugz, xmlrpc_token, new_bug).first if new_bug.present? #Bug.bugzilla_import(current_user, bugz, xmlrpc_token, new_bug).first
             puts "\n#{tnum}------------------\nFinished bug with id: #{whole_bug.id}\n----------------\n\n"
-
+            sema.synchronize do
+              global_added += 1
+              output = "###########################\nFinished importing bug: #{tid}\nBugs added so far: #{global_added}\nBugs rejected so far: #{global_rejected}\nBugs left: #{total_ids.size}###########################"
+              global_morsel_added.output = output
+              global_morsel_added.save
+            end
 
           rescue
             puts "\n#{tnum}----------------\nsomething went wrong with id: #{tid}, so moving on.....\n-------------\n\n"
-            puts $!
-            puts $!.backtrace.join("\n")
+            sema.synchronize do
+              global_rejected += 1
+              output = "\n-----------------\nsomething went wrong with id: #{tid}, so moving on....\n"
+              output += "-----------------\nbugs rejected so far: #{global_rejected}\n"
+              error = ($!).to_s
+              error_msg = ($!.backtrace.join("\n")).to_s
+              output += error
+              output += error_msg
+              output += "\n-----------------\n"
+              global_morsel_rejected.output += output #= "test"
+              global_morsel_rejected.save
+
+              troubled_bugs << tid
+
+            end
+
+
 
           end
 
-
-
-          #puts whole_bug.inspect
-
         end
 
-        puts "#{tnum}Thread done"
-
+        puts "#{thread_name} done"
+        #sema.synchronize do
+        #  global_morsel_added.output += "#{thread_name} done"
+        #  global_morsel_added.save
+        #end
 
       end
     end
 
     threads.each { |t| t.join }
 
-
-    #t1.join
-    #t2.join
-    #t3.join
-    #t4.join
-    #t5.join
-
-    #t6.join
-    #t7.join
-    #t8.join
-    #t9.join
-    #t10.join
-
     puts 'finished\n'
-
     time_end = Time.now
 
     time_total = time_end - time_start
 
+    final_output = "\n\nFinished in #{time_total} seconds.\n"
+
+    global_morsel_added.output += final_output
+    global_morsel_added.save
+
+    bad_ids_string = troubled_bugs.join(',')
+    final_output_rejected = final_output
+    final_output_rejected += "Rejected IDs:\n"
+    final_output_rejected += "[#{bad_ids_string}]"
+    global_morsel_rejected.output += final_output_rejected
+    global_morsel_rejected.save
+    puts final_output_rejected
     puts "total time: #{time_total}"
   end
 
