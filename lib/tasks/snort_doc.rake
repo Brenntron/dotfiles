@@ -33,14 +33,4 @@ namespace :snortdoc do
   task :gen_snort_doc, [:filename] => [:environment, :update_cve_data] do |tt, args|
     Rake::Task["snortdoc:gen_snort_doc_no_update"].invoke(args[:filename])
   end
-
-  task :snortdoc => :environment do
-
-    # rule = Rule.find 301
-    # cve_snort_docs = SnortDocPublisher.rule_snort_doc(rule)
-
-    cve_snort_docs = SnortDocPublisher.gen_snort_doc
-
-    puts JSON.pretty_generate(cve_snort_docs)
-  end
 end
