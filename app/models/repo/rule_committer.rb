@@ -224,10 +224,11 @@ module Repo
     # param [FixNum] bugzilla_id The bugzilla id of the bug
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
     def self.commit_rules_action(rules, username:, bugzilla_id:, bugzilla_comment:, xmlrpc:, nodoc_override: false)
+
       user = User.where(cvs_username: username).first
       bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
-      Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
 
+      Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
 
       committer = Repo::RuleCommitter.new(rules,
                                           xmlrpc: xmlrpc,
@@ -240,6 +241,13 @@ module Repo
         bugzilla_bug = Bugzilla::Bug.new(xmlrpc)
         bug = bugzilla_bug.get(bugzilla_id)
         Bug.synch_history(bugzilla_bug, bug)
+
+        attachments = bug.attachments.map{|a| a.id}
+
+        new_task = Task.create_pcap_test(bug.id, user.id)
+        TestAttachment.new(new_task,
+                           xmlrpc.token,
+                           attachments).send_work_msg
 
       end
 
