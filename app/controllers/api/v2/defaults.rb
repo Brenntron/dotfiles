@@ -13,20 +13,21 @@ module API::V2::Defaults
 
     helpers do
       def current_user
+        byebug
         unless @current_user
           api_key =
               case
-                when request.headers['API-KEY'] #Preferred by RFC 6648
-                  request.headers['API-KEY']
-                when request.headers['X-API-KEY'] #Encouraged to not prohibit by RFC 6648
-                  request.headers['X-API-KEY']
-                when params['API-KEY']
-                  params['API-KEY']
+                when request.headers['Api-Key'] #Preferred by RFC 6648
+                  request.headers['Api-Key']
+                when request.headers['X-Api-Key'] #Encouraged to not prohibit by RFC 6648
+                  request.headers['X-Api-Key']
+                when params['Api-Key']
+                  params['Api-Key']
               end
           @current_user =
               case
                 when api_key
-                  key = UserApiKey.where(api_key: request.headers['API-KEY'])
+                  key = UserApiKey.where(api_key: request.headers['Api-Key'])
                   key.user if key
                 when request.headers['Token'] && request.env['REMOTE_USER']
                   kerb_auth = request.env['REMOTE_USER']
