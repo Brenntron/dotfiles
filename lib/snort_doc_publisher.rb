@@ -2,14 +2,16 @@ require 'nvd_cve_item'
 
 class SnortDocPublisher
   attr_reader :year, :references, :errors
+
+  @errors = []
   class << self
     attr_reader :errors
   end
 
   # Clear cached class variables to allow garbage collection
   def self.clear_instance_variables
+    clear_errors
     @undoc_cve_refs = nil
-    @errors = nil
   end
 
   # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
@@ -251,9 +253,13 @@ class SnortDocPublisher
     snort_doc['message'] = rule.message
 
     snort_doc['cves'] = rule.references.cves.map do |cve_ref|
-      cve_ref.cve&.attributes.slice(*%w{cve_key description severity
+      if cve_ref.cve
+        cve_ref.cve.attributes.slice(*%w{cve_key description severity
           base_score impact_score exploit_score confidentiality_impact integrity_impact availability_impact
           vector_string access_vector access_complexity authentication affected_systems})
+      else
+        errors << "No CVE record found for refernce #{cve_ref.id.inspect} #{cve_ref.reference_data.inspect}"
+      end
     end.compact
 
     snort_doc
