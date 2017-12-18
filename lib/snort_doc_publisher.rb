@@ -114,7 +114,7 @@ class SnortDocPublisher
 
   # Internal method to download a given file
   # @param [String] The NIST NVD filename to download
-  def self.download(filename)
+  def self.download_file(filename)
     download_path = filepath(filename)
     cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{download_path}"
     # puts cmd
@@ -129,7 +129,15 @@ class SnortDocPublisher
   # Downloads the NVD data from NIST for the year (of this object)
   def download
     if download?
-      self.class.download("#{filename}.gz")
+      self.class.download_file("#{filename}.gz")
+    end
+  end
+
+  # For all references without cves records, download the NIST NVD files
+  def self.download_all
+    years.each do |year|
+      publisher = SnortDocPublisher.new(year: year)
+      publisher.download
     end
   end
 
@@ -319,5 +327,18 @@ class SnortDocPublisher
   def self.gen_snort_doc(filename = nil)
     SnortDocPublisher.update_snort_doc_to_be(YAML.load_file(filename)) if filename
     gen_snort_doc_to_be
+  end
+
+  def self.publish_snort_doc_from_yaml(contents, do_download: true, do_publish: true)
+    SnortDocPublisher.download_all if do_download
+
+    SnortDocPublisher.update_snort_doc_to_be(YAML.load(contents))
+
+    to_be_snort_doc.tap do |doc|
+      if do_publish
+        Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
+            .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
+      end
+    end
   end
 end

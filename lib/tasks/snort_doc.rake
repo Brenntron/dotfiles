@@ -10,10 +10,7 @@ namespace :snortdoc do
 
   desc 'Download all the year files from NIST NVD for cve references we do not have cves records for.'
   task :download_missing_nvd => :environment do
-    SnortDocPublisher.years.each do |year|
-      publisher = SnortDocPublisher.new(year: year)
-      publisher.download
-    end
+    SnortDocPublisher.download_all
   end
 
   desc 'Update the cves table with all missing cve references.'
