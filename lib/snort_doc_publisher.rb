@@ -1,5 +1,7 @@
 require 'nvd_cve_item'
 
+# Utility class to manage publishing snort rule doc data to snort.org.
+# Object instantiations of this class handle a specific year of data.
 class SnortDocPublisher
   attr_reader :year, :references, :errors
 
@@ -46,15 +48,18 @@ class SnortDocPublisher
     end
   end
 
+  # Clear cached errors attribute to allow garbage collection
   def self.clear_errors
     @errors = []
   end
 
+  # Clear cached errors attribute to allow garbage collection
   def clear_errors
     @errors = []
   end
 
   # @params [String] year the given year for the CVEs to be updated
+  # @params [Array<Reference>] The Reference objects to publish (those missing cves records)
   def initialize(year:, references: [])
     @year = year
     @references = references
@@ -66,28 +71,31 @@ class SnortDocPublisher
     "nvdcve-1.0-#{@year}.json"
   end
 
+  # @return [String] Diretory for downloaded NVD files
   def self.basepath
     'lib/data/nvd'
   end
 
-  # @return [String] filepath to store NVD file from NIST
+  # Converts a given file name to a path where the downloaded NVD files are stored
+  # @param [String|Pathname] filename
+  # @return [Pathname] filepath to store NVD file from NIST
   def self.filepath(filename)
     Rails.root.join(basepath, filename)
   end
 
-  # @return [String] filepath to store NVD file from NIST
+  # @return [Pathname] filepath to store NVD file from NIST
   def filepath
     self.class.filepath(filename)
   end
 
   # @return [Integer] this year right now
   def self.current_year
-    @current_year ||= Time.now.year
+    @current_year ||= Time.now.year.to_i
   end
 
   # @return [Integer] this month right now
   def self.current_month
-    @current_month ||= Time.now.month
+    @current_month ||= Time.now.month.to_i
   end
 
   # @return true if NVD data file for the year needs to be downloaded
@@ -104,6 +112,8 @@ class SnortDocPublisher
     end
   end
 
+  # Internal method to download a given file
+  # @param [String] The NIST NVD filename to download
   def self.download(filename)
     download_path = filepath(filename)
     cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{download_path}"
@@ -116,7 +126,7 @@ class SnortDocPublisher
     end
   end
 
-  # Downloads the NVD data from NIST for the year
+  # Downloads the NVD data from NIST for the year (of this object)
   def download
     if download?
       self.class.download("#{filename}.gz")
@@ -210,6 +220,8 @@ class SnortDocPublisher
     clear_instance_variables
   end
 
+  # Takes the parsed structure from the rule update YAML file and iterates rule data
+  # @yeild [Hash] Hash of rule data
   def self.flatten_snort_doc_status(input_hash)
     input_hash.slice(*%w{modules rules}).each do |key, diff_new_hash|
       gid =
@@ -232,6 +244,7 @@ class SnortDocPublisher
     end
   end
 
+  # Sets To Be Published snort_doc_status attributes on rules from rule update YAML structure
   def self.update_snort_doc_to_be(input_hash)
     flatten_snort_doc_status(input_hash) do |rule_hash|
       rule = Rule.by_sid(rule_hash[:sid], rule_hash[:gid])
@@ -242,6 +255,7 @@ class SnortDocPublisher
     end
   end
 
+  # @param [Rule] rule
   # @return [Hash] Snort Doc hash for a given rule
   def self.rule_snort_doc(rule)
     snort_doc = rule.rule_doc.attributes.slice(*%w{summary impact details affected_sys attack_scenarios
@@ -265,15 +279,19 @@ class SnortDocPublisher
     snort_doc
   end
 
+  # @param [Array<Rule>] rules
+  # @return [Arrah<Hash>] Snort Doc hashes for a collection of rules
   def self.rules_snort_doc(rules)
     rules.map {|rule| rule_snort_doc(rule)}
   end
 
-  # @return [Hash] Snort Doc of all rules which had been marked as TO BE
+  # @return [Array<Hash>] Snort Doc of all rules which had been marked as TO BE
   def self.to_be_snort_doc
     rules_snort_doc(Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB))
   end
 
+  # Generate Snort Doc and mark rules as have been published
+  # @return [Array<Hash>] Snort Doc of all rules which had been marked as to be published
   def self.gen_snort_doc_to_be
     to_be_snort_doc.tap do |doc|
       Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
@@ -281,14 +299,23 @@ class SnortDocPublisher
     end
   end
 
-  def self.gen_snort_doc_yaml(contents)
+  # Generate snort rule doc structure from rule update file contents
+  # 1. Marks rules as to be published from input rule update data.
+  # 2. Generates Structure representation of snort rule doc of all rules to be published
+  # 3. Marks rules as have been published
+  # @param [String] contents YAML string from rule update file
+  # @return [Array<Hash>] Structure representation of snort rule doc, ready for upload
+  def self.gen_snort_doc_from_yaml(contents)
     SnortDocPublisher.update_snort_doc_to_be(YAML.load(contents))
     gen_snort_doc_to_be
-  rescue
-    byebug
-    puts $!
   end
 
+  # Generate snort rule doc structure from rule update file name
+  # 1. Marks rules as to be published from input rule update data.
+  # 2. Generates Structure representation of snort rule doc of all rules to be published
+  # 3. Marks rules as have been published
+  # @param [String] filename path to rule update file
+  # @return [Array<Hash>] Struture representation of snort rule doc, ready for upload
   def self.gen_snort_doc(filename = nil)
     SnortDocPublisher.update_snort_doc_to_be(YAML.load_file(filename)) if filename
     gen_snort_doc_to_be

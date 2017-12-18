@@ -18,7 +18,7 @@ class API::V2::RuleUpdates < Grape::API
       std_api_v2 do
         file_contents = permitted_params['rule_update'].tempfile.read
         # SnortDocPublisher.gen_snort_doc_yaml(file_contents)
-        JSON.pretty_generate(SnortDocPublisher.gen_snort_doc_yaml(file_contents))
+        JSON.pretty_generate(SnortDocPublisher.gen_snort_doc_from_yaml(file_contents))
       end
     end
 
