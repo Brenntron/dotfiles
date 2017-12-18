@@ -13,9 +13,8 @@ module API::V2::Defaults
 
     helpers do
       def current_user
-        byebug
         unless @current_user
-          api_key =
+          api_key_str =
               case
                 when request.headers['Api-Key'] #Preferred by RFC 6648
                   request.headers['Api-Key']
@@ -26,9 +25,9 @@ module API::V2::Defaults
               end
           @current_user =
               case
-                when api_key
-                  key = UserApiKey.where(api_key: request.headers['Api-Key'])
-                  key.user if key
+                when api_key_str
+                  user_api_key = UserApiKey.where(api_key: request.headers['Api-Key']).first
+                  user_api_key.user if user_api_key
                 when request.headers['Token'] && request.env['REMOTE_USER']
                   kerb_auth = request.env['REMOTE_USER']
                   access_token = request.headers['Token'] #we just want to use headers and not url parameters
