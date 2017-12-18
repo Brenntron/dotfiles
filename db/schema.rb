@@ -110,6 +110,14 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.index ["tag_id"], name: "index_bugs_tags_on_tag_id"
   end
 
+  create_table "bugs_whiteboards", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "bug_id", null: false
+    t.bigint "whiteboard_id", null: false
+    t.index ["bug_id", "whiteboard_id"], name: "index_bugs_whiteboards_on_bug_id_and_whiteboard_id", unique: true
+    t.index ["bug_id"], name: "index_bugs_whiteboards_on_bug_id"
+    t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
+  end
+
   create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -131,14 +139,6 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.text "affected_systems", limit: 4294967295
     t.index ["cve_key"], name: "index_cves_on_cve_key", unique: true
     t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
-  end
-
-  create_table "bugs_whiteboards", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "bug_id", null: false
-    t.bigint "whiteboard_id", null: false
-    t.index ["bug_id", "whiteboard_id"], name: "index_bugs_whiteboards_on_bug_id_and_whiteboard_id", unique: true
-    t.index ["bug_id"], name: "index_bugs_whiteboards_on_bug_id"
-    t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
   end
 
   create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -256,7 +256,7 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.text "summary"
     t.text "impact"
     t.text "details"
-    t.text "affected_sys"
+    t.text "affected_sys", limit: 4294967295
     t.text "attack_scenarios"
     t.text "ease_of_attack"
     t.text "false_positives"
