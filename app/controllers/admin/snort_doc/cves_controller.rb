@@ -31,7 +31,7 @@ class Admin::SnortDoc::CvesController < ApplicationController
   def update
     error_limit = 30
 
-    SnortDocPublisher.update_cve_data(max_fails: Rails.configuration.snort_doc_max_fails) do |errors|
+    SnortDocPublisher.update_cve_data do |errors|
       if errors.empty?
         flash[:info] = "No errors"
       else

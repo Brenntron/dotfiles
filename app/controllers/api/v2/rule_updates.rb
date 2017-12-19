@@ -35,9 +35,10 @@ class API::V2::RuleUpdates < Grape::API
     get "pretty", root: :rule_updates do
       std_api_v2 do
         file_contents = permitted_params['rule_update'].tempfile.read
-        output_struct = SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
-                                                                      do_download: permitted_params['do_download'],
-                                                                      do_publish: permitted_params['do_publish'])
+        output_struct =
+            SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
+                                                          do_download: permitted_params['do_download'],
+                                                          do_publish: permitted_params['do_publish'])
         JSON.pretty_generate(output_struct)
       end
     end
@@ -52,9 +53,10 @@ class API::V2::RuleUpdates < Grape::API
         file_contents = permitted_params['rule_update'].tempfile.read
         Thread.new do
           permitted_params['rule_update'].tempfile.close
-          output_struct = SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
-                                                                        do_download: permitted_params['do_download'],
-                                                                        do_publish: permitted_params['do_publish'])
+          output_struct =
+              SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
+                                                            do_download: permitted_params['do_download'],
+                                                            do_publish: permitted_params['do_publish'])
           File.open('output.json', 'w') do |file|
             file.write(output_struct.to_json)
           end

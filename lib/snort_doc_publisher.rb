@@ -103,7 +103,7 @@ class SnortDocPublisher
     case
       when year.to_i >= self.class.current_year
         true
-      when (year.to_i == self.class.current_year - 1) && (1 == current_month)
+      when (year.to_i == self.class.current_year - 1) && (1 == self.class.current_month)
         true
       when File.exist?(filepath)
         false
@@ -115,7 +115,7 @@ class SnortDocPublisher
   # Internal method to download a given file
   # @param [String] The NIST NVD filename to download
   def self.download_file(filename)
-    download_path = filepath(filename)
+    download_path = filepath("#{filename}.gz")
     cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{download_path}"
     # puts cmd
     system(cmd)
@@ -129,7 +129,7 @@ class SnortDocPublisher
   # Downloads the NVD data from NIST for the year (of this object)
   def download
     if download?
-      self.class.download_file("#{filename}.gz")
+      self.class.download_file(filename)
     end
   end
 
@@ -139,13 +139,17 @@ class SnortDocPublisher
       publisher = SnortDocPublisher.new(year: year)
       publisher.download
     end
+    download_file('nvdcve-1.0-modified.json')
+    download_file('nvdcve-1.0-recent.json')
   end
 
+  # Yields all references which have no cves record.
   # @yield [cve_key, ref_rec, nvd_cve_item]
   # @yieldparam [String] cve_key CVE id as CVE-<year>-<index>
   # @yieldparam [Reference] ref_rec CVE reference record
   # @yieldparam [NvdCveItem] nvd_cve_item data read from a CVE from the NVD data file.
-  def each_missing(max_fails: 3)
+  def each_missing
+    max_fails = Rails.configuration.snort_doc_max_fails
     references.each do |ref_rec|
       next if max_fails <= ref_rec.fail_count
 
@@ -163,17 +167,53 @@ class SnortDocPublisher
     end
   end
 
-  # @return [Array<Hash>] data read from the year of NVD data file.
-  def nvd_cve_items
-    @nvd_cve_items ||= File.open(filepath, 'r') do |file|
+  def self.modified_nvd_cve_items
+    @modified_nvd_cve_items ||= File.open(filepath('nvdcve-1.0-modified.json'), 'r') do |file|
       filedata = JSON.parse(file.read)
       filedata['CVE_Items']
     end
   end
 
+  def self.recent_nvd_cve_items
+    @recent_nvd_cve_items ||= File.open(filepath('nvdcve-1.0-recent.json'), 'r') do |file|
+      filedata = JSON.parse(file.read)
+      filedata['CVE_Items']
+    end
+  end
+
+  # @return [Hash] data read from the year of NVD data file.
+  def nvd_cve_lookup
+    unless @nvd_cve_lookup
+      nvd_cve_items = File.open(filepath, 'r') do |file|
+        puts filepath
+        filedata = JSON.parse(file.read)
+        filedata['CVE_Items']
+      end
+      pattern = Regexp.new("\\ACVE-#{year}-")
+      modified_nvd_cve_items =
+          SnortDocPublisher.modified_nvd_cve_items.select{|item| pattern =~ item['cve']['CVE_data_meta']['ID']}
+      recent_nvd_cve_items =
+          SnortDocPublisher.recent_nvd_cve_items.select{|item| pattern =~ item['cve']['CVE_data_meta']['ID']}
+
+      @nvd_cve_lookup = nvd_cve_items.inject({}) do |nvd_cve_lookup, item|
+        nvd_cve_lookup[item['cve']['CVE_data_meta']['ID']] = item
+        nvd_cve_lookup
+      end
+      @nvd_cve_lookup = modified_nvd_cve_items.inject(@nvd_cve_lookup) do |nvd_cve_lookup, item|
+        nvd_cve_lookup[item['cve']['CVE_data_meta']['ID']] = item
+        nvd_cve_lookup
+      end
+      @nvd_cve_lookup = recent_nvd_cve_items.inject(@nvd_cve_lookup) do |nvd_cve_lookup, item|
+        nvd_cve_lookup[item['cve']['CVE_data_meta']['ID']] = item
+        nvd_cve_lookup
+      end
+    end
+    @nvd_cve_lookup
+  end
+
   # @return [Hash] data for one CVE from NVD data file.
   def nvd_cve_item(cve_key)
-    nvd_cve_item_hash = nvd_cve_items.find {|item| cve_key == item['cve']['CVE_data_meta']['ID']}
+    nvd_cve_item_hash = nvd_cve_lookup[cve_key]
     return nil unless nvd_cve_item_hash
     NvdCveItem.new(nvd_cve_item_hash)
   end
@@ -205,19 +245,19 @@ class SnortDocPublisher
   end
 
   # Update the reference for this object to the database (cves and references tables)
-  def update_cve_data(max_fails: 3)
-    each_missing(max_fails: max_fails) do |cve_key, ref_rec, nvd_cve_item|
+  def update_cve_data
+    each_missing do |cve_key, ref_rec, nvd_cve_item|
       save_cve(cve_key, ref_rec, nvd_cve_item)
       save_references(ref_rec, nvd_cve_item)
     end
   end
 
   # Update all references without CVE data in the database (cves and references tables)
-  def self.update_cve_data(max_fails: 3)
+  def self.update_cve_data
     clear_errors
     each_publisher do |publisher|
       publisher.clear_errors
-      publisher.update_cve_data(max_fails: max_fails)
+      publisher.update_cve_data
       @errors += publisher.errors
     end
 
@@ -329,10 +369,20 @@ class SnortDocPublisher
     gen_snort_doc_to_be
   end
 
+  # End to end publish process
+  # @param [String] contents YAML formatted string from rule update file
+  # @param [Boolean] do_download false to skip NVD download
+  # @param [Boolean] do_publish false to skip update to snort.org web site
   def self.publish_snort_doc_from_yaml(contents, do_download: true, do_publish: true)
-    SnortDocPublisher.download_all if do_download
 
-    SnortDocPublisher.update_snort_doc_to_be(YAML.load(contents))
+    # Refresh NVD files
+    download_all if do_download
+
+    # Create any needed cves records for references missing cves records.
+    update_cve_data
+
+    # Mark rules as to be published from the rule update YAML file
+    update_snort_doc_to_be(YAML.load(contents))
 
     to_be_snort_doc.tap do |doc|
       if do_publish
