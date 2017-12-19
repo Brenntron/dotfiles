@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171218170458) do
+ActiveRecord::Schema.define(version: 20171219175018) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -304,6 +304,7 @@ ActiveRecord::Schema.define(version: 20171218170458) do
     t.integer "svn_result_code"
     t.boolean "svn_success"
     t.string "snort_doc_status", default: "NOTYET"
+    t.string "snort_on_off", default: "on"
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"

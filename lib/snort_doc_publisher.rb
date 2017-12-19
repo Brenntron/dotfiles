@@ -284,8 +284,17 @@ class SnortDocPublisher
       diff_new_hash.each do |diff_new, rule_hash|
         rule_hash.each do |sid, revs_hash|
           rev = revs_hash.keys.max
+          on_off =
+              case revs_hash[rev]
+                when String
+                  revs_hash[rev]
+                when TrueClass
+                  'on'
+                when FalseClass
+                  'off'
+              end
 
-          yield( { gid: gid, sid: sid, rev: rev, diff_new: diff_new, on_off: revs_hash[rev] } )
+          yield( { gid: gid, sid: sid, rev: rev, diff_new: diff_new, on_off: on_off } )
         end
       end
     end
@@ -297,7 +306,7 @@ class SnortDocPublisher
       rule = Rule.by_sid(rule_hash[:sid], rule_hash[:gid])
                  .where.not(snort_doc_status: Rule::SNORT_DOC_STATUS_SUPRESS).first
       if rule
-        rule.update(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
+        rule.update(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB, snort_on_off: rule_hash[:on_off])
       end
     end
   end
@@ -305,12 +314,20 @@ class SnortDocPublisher
   # @param [Rule] rule
   # @return [Hash] Snort Doc hash for a given rule
   def self.rule_snort_doc(rule)
-    snort_doc = rule.rule_doc.attributes.slice(*%w{summary impact details affected_sys attack_scenarios
-        ease_of_attack false_positives false_negatives corrective_action contributors})
+    # snort_doc = rule.rule_doc.attributes.slice(*%w{summary impact details affected_sys attack_scenarios
+    #     ease_of_attack false_positives false_negatives corrective_action contributors on_off})
+    snort_doc =
+        if rule.rule_doc
+          rule.rule_doc.attributes.slice(*%w{summary impact details affected_sys attack_scenarios
+              ease_of_attack false_positives false_negatives corrective_action contributors})
+        else
+          {}
+        end
 
     snort_doc['gid'] = rule.gid
     snort_doc['sid'] = rule.sid
     snort_doc['rev'] = rule.rev
+    snort_doc['on_off'] = rule.snort_on_off
     snort_doc['message'] = rule.message
 
     snort_doc['cves'] = rule.references.cves.map do |cve_ref|
