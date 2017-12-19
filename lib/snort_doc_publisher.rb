@@ -330,7 +330,11 @@ class SnortDocPublisher
     snort_doc['on_off'] = rule.snort_on_off
     snort_doc['message'] = rule.message
 
+    urls = rule.references.urls
+
     snort_doc['cves'] = rule.references.cves.map do |cve_ref|
+      urls += cve_ref.reference_links.urls
+
       if cve_ref.cve
         cve_ref.cve.attributes.slice(*%w{cve_key description severity
           base_score impact_score exploit_score confidentiality_impact integrity_impact availability_impact
@@ -339,6 +343,8 @@ class SnortDocPublisher
         errors << "No CVE record found for refernce #{cve_ref.id.inspect} #{cve_ref.reference_data.inspect}"
       end
     end.compact
+
+    snort_doc['urls'] = urls.pluck(:reference_data).uniq
 
     snort_doc
   end
