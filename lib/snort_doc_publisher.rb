@@ -185,7 +185,6 @@ class SnortDocPublisher
   def nvd_cve_lookup
     unless @nvd_cve_lookup
       nvd_cve_items = File.open(filepath, 'r') do |file|
-        puts filepath
         filedata = JSON.parse(file.read)
         filedata['CVE_Items']
       end
