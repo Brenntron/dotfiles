@@ -23,6 +23,8 @@ gem 'rmagick', '~> 2.13.2'
 gem 'ruby-bugzilla', '~> 0.6.4'
 
 gem 'libv8', '3.16.14.17'
+
+gem 'xmlrpc'
 gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her', '~> 0.8.6'
@@ -90,10 +92,10 @@ gem 'uglifier', '~> 3.2.0'
 gem 'jquery-rails', '~> 4.3.1'
 gem 'jquery-ui-rails', '~> 6.0.1'
 gem 'coffee-rails', '~> 4.2.1'
-gem 'less-rails', '~> 2.7.1'
+gem 'less-rails', '~> 3.0.0'
 gem 'bootstrap-sass', '~> 3.3.7'
 gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
-gem "sprockets", '~> 3.6.3' # removes deprecation warnings
+gem "sprockets", '~> 3.7.1'
 
