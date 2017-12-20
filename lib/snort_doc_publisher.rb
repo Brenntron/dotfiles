@@ -2,68 +2,35 @@ require 'nvd_cve_item'
 
 # Utility class to manage publishing snort rule doc data to snort.org.
 # Object instantiations of this class handle a specific year of data.
+#
+# This class is difficult to read and maintain, because it is not focused on a single purpose.
+# It does four or five steps which could be their own class.
+#
+# 1.  Download NIST NVD files.
+# 2.  Parse NVD files and store contents as cves records.
+# 3.  Read snort rules organization rule update file and create a documentation set.
+# 4.  Generate output JSON rule doc file.
+# 5.  Call snort.org api to upload the rule doc file.
+#
+# These could easily be broken into NVD input (1, and 2) and output (3, 4, and 5).
+#
+# The NvdCveItem class handles navigating the hash from the NVD JSON for one CVE.
+#
 class SnortDocPublisher
   attr_reader :year, :references, :errors
 
   @errors = []
   class << self
     attr_reader :errors
+    # readers by method: :undoc_cve_refs_by_year, :modified_nvd_cve_items, :recent_nvd_cve_items, :nvd_cve_lookup
   end
 
-  # Clear cached class variables to allow garbage collection
-  def self.clear_instance_variables
-    clear_errors
-    @undoc_cve_refs = nil
-  end
-
-  # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
-  def self.undoc_cve_refs
-    @undoc_cve_refs ||= Reference.cves.left_joins(:cve).where(cves: {id: nil})
-  end
-
-  # @return [Hash<String => Array<Reference>>] cve references with missing cves records grouped by year.
-  def self.undoc_cve_refs_by_year
-    @undoc_cve_refs_by_year ||= undoc_cve_refs.inject({}) do |result, ref|
-      year = ref.reference_data.sub(/\A(\d{4})-\d+\z/, '\\1')
-      if year < '2002'
-        year = '2002'
-      end
-      year
-
-      result[year] ||= []
-      result[year] << ref
-      result
-    end
-  end
+  ####################################################################################################
+  ### Download NIST NVD files                                                                      ###
 
   # @return [Array<String>] The years of the undocumented references
   def self.years
     undoc_cve_refs_by_year.keys
-  end
-
-  # @yield [SnortDocPublisher] Publishers for cve references with missing cves records.
-  def self.each_publisher
-    SnortDocPublisher.undoc_cve_refs_by_year.each_pair do |year, undoc_refs|
-      yield SnortDocPublisher.new(year: year, references: undoc_refs)
-    end
-  end
-
-  # Clear cached errors attribute to allow garbage collection
-  def self.clear_errors
-    @errors = []
-  end
-
-  # Clear cached errors attribute to allow garbage collection
-  def clear_errors
-    @errors = []
-  end
-
-  # @params [String] year the given year for the CVEs to be updated
-  # @params [Array<Reference>] The Reference objects to publish (those missing cves records)
-  def initialize(year:, references: [])
-    @year = year
-    @references = references
-    clear_errors
   end
 
   # @return [String] NIST NVD file name for the year
@@ -141,6 +108,61 @@ class SnortDocPublisher
     end
     download_file('nvdcve-1.0-modified.json')
     download_file('nvdcve-1.0-recent.json')
+  end
+
+
+  ####################################################################################################
+  ### Parse NVD files and store contents as cves records                                           ###
+
+  # Clear cached errors attribute to allow garbage collection
+  def self.clear_errors
+    @errors = []
+  end
+
+  # Clear cached errors attribute to allow garbage collection
+  def clear_errors
+    @errors = []
+  end
+
+  # Clear cached class variables to allow garbage collection
+  def self.clear_instance_variables
+    clear_errors
+    @undoc_cve_refs = nil
+  end
+
+  # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
+  def self.undoc_cve_refs
+    @undoc_cve_refs ||= Reference.cves.left_joins(:cve).where(cves: {id: nil})
+  end
+
+  # @return [Hash<String => Array<Reference>>] cve references with missing cves records grouped by year.
+  def self.undoc_cve_refs_by_year
+    @undoc_cve_refs_by_year ||= undoc_cve_refs.inject({}) do |result, ref|
+      year = ref.reference_data.sub(/\A(\d{4})-\d+\z/, '\\1')
+      if year < '2002'
+        year = '2002'
+      end
+      year
+
+      result[year] ||= []
+      result[year] << ref
+      result
+    end
+  end
+
+  # @yield [SnortDocPublisher] Publishers for cve references with missing cves records.
+  def self.each_publisher
+    SnortDocPublisher.undoc_cve_refs_by_year.each_pair do |year, undoc_refs|
+      yield SnortDocPublisher.new(year: year, references: undoc_refs)
+    end
+  end
+
+  # @params [String] year the given year for the CVEs to be updated
+  # @params [Array<Reference>] The Reference objects to publish (those missing cves records)
+  def initialize(year:, references: [])
+    @year = year
+    @references = references
+    clear_errors
   end
 
   # Yields all references which have no cves record.
@@ -226,6 +248,7 @@ class SnortDocPublisher
   end
 
   # Save the given reference data to the references table
+  # These might be saving URLs referenced (in the NVD data) by CVEs
   def save_references(ref_rec, nvd_cve_item)
     nvd_cve_item.each_reference do |ref_type_name, ref_data|
       ref_type = NvdCveItem.reference_type(ref_type_name)
@@ -266,6 +289,10 @@ class SnortDocPublisher
 
     clear_instance_variables
   end
+
+
+  ####################################################################################################
+  ### Read snort rules organization rule update file and create a documentation set                ###
 
   # Takes the parsed structure from the rule update YAML file and iterates rule data
   # @yeild [Hash] Hash of rule data
@@ -311,6 +338,11 @@ class SnortDocPublisher
     end
   end
 
+
+  ####################################################################################################
+  ### Generate output JSON rule doc file                                                           ###
+
+  # Generate hash for snort.org rule doc
   # @param [Rule] rule
   # @return [Hash] Snort Doc hash for a given rule
   def self.rule_snort_doc(rule)
@@ -349,6 +381,7 @@ class SnortDocPublisher
     snort_doc
   end
 
+  # Generate snort.org rule doc for a collection of rules
   # @param [Array<Rule>] rules
   # @return [Arrah<Hash>] Snort Doc hashes for a collection of rules
   def self.rules_snort_doc(rules)
@@ -368,6 +401,14 @@ class SnortDocPublisher
           .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
     end
   end
+
+
+  ####################################################################################################
+  ### Call snort.org api to upload the rule doc file                                               ###
+
+
+  ####################################################################################################
+  ### Manage the end to end process                                                                ###
 
   # Generate snort rule doc structure from rule update file contents
   # 1. Marks rules as to be published from input rule update data.
