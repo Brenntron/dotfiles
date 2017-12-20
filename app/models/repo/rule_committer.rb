@@ -19,10 +19,6 @@ module Repo
       self.class.log(message)
     end
 
-    def doc_committer(rules_given)
-      Repo::RuleDocCommitter.new(rules_given, username: username)
-    end
-
     # @return [Mutex] mutex to exclusively change publishing lock
     def self.publish_mutex
       @publish_mutex ||= Mutex.new
@@ -186,10 +182,6 @@ module Repo
         @rules = Rule.where(id: rules).all.to_a
 
 
-        # log("publishing rule docs for #{rules.count} rules")
-        # Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
-        #
-        # doc_committer(@rules).commit_docs
         Rule.set_synched_state(Rule.where(id: rules))
 
         event_success
