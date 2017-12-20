@@ -408,6 +408,7 @@ class SnortDocPublisher
 
   # curl --form rule_doc=@rule_doc.json --form api_key=... http://localhost:3000/admin/api/v1/rule_docs/upload
   def self.upload(rule_doc)
+    config = Rails.configuration.snort_org
 
     rule_doc_stream = Tempfile.new('rule_doc')
     rule_doc_stream.write(rule_doc)
@@ -415,14 +416,13 @@ class SnortDocPublisher
 
     request = Net::HTTP::Post.new('/admin/api/v1/rule_docs/upload')
     request.add_field('Content-Type', 'application/json')
-    # request.body = 'Hello snort.org.'
     request.set_form(
-        { "api_key" => "107216cd30bb6f7e209e698625525bb09be8bc3f", 'rule_doc' => rule_doc_stream },
+        { "api_key" => config.api_key, 'rule_doc' => rule_doc_stream },
         'multipart/form-data'
     )
 
     # @http = Net::HTTP.new(@host, @port)
-    http = Net::HTTP.new('localhost', 3000)
+    http = Net::HTTP.new(config.host, config.port)
     http.request(request)
 
     rule_doc_stream.unlink

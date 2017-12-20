@@ -17,6 +17,10 @@ development:
   ruletest:
     url: "https://localhost:3000/api_test"
   snort_doc_max_fails: 3
+  snort_org:
+    host: "localhost"
+    port: 3000
+    api_key: "107216cd30bb6f7e209e698625525bb09be8bc3f"
   svn:
     cmd: "/usr/bin/env svn"
     password: ""
@@ -43,6 +47,10 @@ test:
   ruletest:
     url: "https://localhost:3000/api_test"
   snort_doc_max_fails: 1
+  snort_org:
+    host: "localhost"
+    port: 3000
+    api_key: "107216cd30bb6f7e209e698625525bb09be8bc3f"
   svn:
     cmd: "/usr/bin/env svn"
     password: ""

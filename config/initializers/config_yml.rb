@@ -28,6 +28,11 @@ Rails.configuration.ruletest_server     = env_config['ruletest']['url']
 
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails']
 
+Rails.configuration.snort_org           = OpenStruct.new
+Rails.configuration.snort_org.host      = env_config['snort_org']['host']
+Rails.configuration.snort_org.port      = env_config['snort_org']['port']
+Rails.configuration.snort_org.api_key   = env_config['snort_org']['api_key']
+
 raise "config.yml missing svn section" unless env_config['svn']
 Rails.configuration.svn_cmd             = env_config['svn']['cmd']
 Rails.configuration.svn_pwd             = env_config['svn']['password']
