@@ -13,14 +13,15 @@ class API::V2::RuleUpdates < Grape::API
     params do
       requires :rule_update, type: File, desc: 'API to post a rule update file from the group publishing snort rules.'
       optional :do_download, type: Boolean, default: 'true', desc: 'True to download updates from NIST NVD'
-      optional :do_publish, type: Boolean, default: 'true', desc: 'True to mark rules as has been published'
+      optional :set_published, type: Boolean, default: 'true', desc: 'True to mark rules as has been published'
     end
     get "", root: :rule_updates do
       std_api_v2 do
         file_contents = permitted_params['rule_update'].tempfile.read
         SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
                                                       do_download: permitted_params['do_download'],
-                                                      do_publish: permitted_params['do_publish'])
+                                                      set_published: permitted_params['set_published'],
+                                                      do_upload: false)
       end
     end
 
@@ -28,7 +29,7 @@ class API::V2::RuleUpdates < Grape::API
     params do
       requires :rule_update, type: File, desc: 'API to post a rule update file from the group publishing snort rules.'
       optional :do_download, type: Boolean, default: 'true', desc: 'True to download updates from NIST NVD'
-      optional :do_publish, type: Boolean, default: 'true', desc: 'True to mark rules as has been published'
+      optional :set_published, type: Boolean, default: 'true', desc: 'True to mark rules as has been published'
     end
     content_type :txt, 'application/json'
     format :txt
@@ -38,7 +39,8 @@ class API::V2::RuleUpdates < Grape::API
         output_struct =
             SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
                                                           do_download: permitted_params['do_download'],
-                                                          do_publish: permitted_params['do_publish'])
+                                                          set_published: permitted_params['set_published'],
+                                                          do_upload: false)
         JSON.pretty_generate(output_struct)
       end
     end
@@ -46,7 +48,7 @@ class API::V2::RuleUpdates < Grape::API
     params do
       requires :rule_update, type: File, desc: 'API to post a rule update file from the group publishing snort rules.'
       optional :do_download, type: Boolean, default: 'true', desc: 'True to download updates from NIST NVD'
-      optional :do_publish, type: Boolean, default: 'true', desc: 'True to mark rules as has been published'
+      optional :set_published, type: Boolean, default: 'true', desc: 'True to mark rules as has been published'
     end
     post "", root: :rule_updates do
       std_api_v2 do
@@ -56,7 +58,7 @@ class API::V2::RuleUpdates < Grape::API
           output_struct =
               SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
                                                             do_download: permitted_params['do_download'],
-                                                            do_publish: permitted_params['do_publish'])
+                                                            set_published: permitted_params['set_published'])
           File.open('output.json', 'w') do |file|
             file.write(output_struct.to_json)
           end

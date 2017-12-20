@@ -406,6 +406,28 @@ class SnortDocPublisher
   ####################################################################################################
   ### Call snort.org api to upload the rule doc file                                               ###
 
+  # curl --form rule_doc=@rule_doc.json --form api_key=... http://localhost:3000/admin/api/v1/rule_docs/upload
+  def self.upload(rule_doc)
+
+    rule_doc_stream = Tempfile.new('rule_doc')
+    rule_doc_stream.write(rule_doc)
+    rule_doc_stream.rewind
+
+    request = Net::HTTP::Post.new('/admin/api/v1/rule_docs/upload')
+    request.add_field('Content-Type', 'application/json')
+    # request.body = 'Hello snort.org.'
+    request.set_form(
+        { "api_key" => "107216cd30bb6f7e209e698625525bb09be8bc3f", 'rule_doc' => rule_doc_stream },
+        'multipart/form-data'
+    )
+
+    # @http = Net::HTTP.new(@host, @port)
+    http = Net::HTTP.new('localhost', 3000)
+    http.request(request)
+
+    rule_doc_stream.unlink
+  end
+
 
   ####################################################################################################
   ### Manage the end to end process                                                                ###
@@ -435,8 +457,11 @@ class SnortDocPublisher
   # End to end publish process
   # @param [String] contents YAML formatted string from rule update file
   # @param [Boolean] do_download false to skip NVD download
-  # @param [Boolean] do_publish false to skip update to snort.org web site
-  def self.publish_snort_doc_from_yaml(contents, do_download: true, do_publish: true)
+  # @param [Boolean] set_published false to skip update to snort.org web site
+  def self.publish_snort_doc_from_yaml(contents,
+                                       do_download: true,
+                                       set_published: true,
+                                       do_upload: true)
 
     # Refresh NVD files
     download_all if do_download
@@ -448,9 +473,13 @@ class SnortDocPublisher
     update_snort_doc_to_be(YAML.load(contents))
 
     to_be_snort_doc.tap do |doc|
-      if do_publish
+      if set_published
         Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
             .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
+      end
+
+      if do_upload
+        upload(doc.to_json)
       end
     end
   end
