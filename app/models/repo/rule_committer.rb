@@ -178,10 +178,6 @@ module Repo
         end
 
 
-        # update revs and get sids of new rules
-        @rules = Rule.where(id: rules).all.to_a
-
-
         Rule.set_synched_state(Rule.where(id: rules))
 
         event_success
