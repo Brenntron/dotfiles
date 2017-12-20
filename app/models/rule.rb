@@ -536,10 +536,12 @@ class Rule < ApplicationRecord
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
     find_from_parser(parser, rule_id).tap do |rule|
-      rule.assign_from_user_edit(rule_content, parser: parser)
-      rule.bugs_rules.update_all(tested: false)
-      rule.save!
-      rule.clear_svn_result
+      unless rule_content == rule.cvs_rule_content
+        rule.assign_from_user_edit(rule_content, parser: parser)
+        rule.bugs_rules.update_all(tested: false)
+        rule.save!
+        rule.clear_svn_result
+      end
     end
   end
 
