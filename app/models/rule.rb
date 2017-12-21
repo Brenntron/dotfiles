@@ -1118,3 +1118,4 @@ class Rule < ApplicationRecord
     rule.update_parts(rule_data)
   end
 end
+
