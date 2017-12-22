@@ -57,12 +57,12 @@ module API::V2::Defaults
       # Standard (our standard) handling of an exception
       # @param [Exception, #read] exception is the exception to report
       # @param [Fixnum] status is the HTTP status code
-      def std_exception(exception, status: 500)
+      def std_exception(exception, status: 500, message_prefix: 'Internal server error: ')
         Rails.logger.error("exception: #{exception.message}")
         exception.backtrace[0..4].each_with_index do |traceline, index|
           Rails.logger.error("backtrace[#{index}] #{traceline}")
         end
-        error!(message: "Internal server error: '#{exception.message}'", status: status, success: false)
+        error!(message: "#{message_prefix}'#{exception.message}'", status: status, success: false)
       end
 
       # Transition to implement V2 API handling from the V1 API
@@ -86,19 +86,19 @@ module API::V2::Defaults
     end
 
     rescue_from CanCan::AccessDenied do |exception|
-      std_exception(exception, status: 403)
+      std_exception(exception, status: 403, message_prefix: 'Access Denied: ')
     end
 
     rescue_from ActiveRecord::RecordNotFound do |exception|
-      std_exception(exception, status: 404)
+      std_exception(exception, status: 404, message_prefix: 'Not Found: ')
     end
 
     rescue_from XMLRPC::FaultException do |exception|
-      std_exception(exception, status: 500)
+      std_exception(exception, status: 500, message_prefix: 'Bugzilla Access Denied: ')
     end
 
     rescue_from Grape::Exceptions::ValidationErrors do |exception|
-      std_exception(exception, status: 406)
+      std_exception(exception, status: 406, message_prefix: 'Invalid: ')
     end
 
   end
