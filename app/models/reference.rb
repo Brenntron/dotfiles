@@ -5,23 +5,31 @@ class Reference < ApplicationRecord
   belongs_to :reference_type, optional: true
   has_and_belongs_to_many :exploits
 
+  # references that I reference
+  has_many :links, class_name: 'BugReferenceRuleLink', as: :link
+  has_many :reference_links, source: :reference, through: :links
+
+  # referrers that reference me
   has_many :bug_reference_rule_links
   has_many :rules, through: :bug_reference_rule_links, source: :link, source_type: "Rule"
   has_many :bugs, through: :bug_reference_rule_links, source: :link, source_type: "Bug"
-  
+  has_many :references, through: :bug_reference_rule_links, source: :link, source_type: "Reference"
+
+  has_one :cve
+
   validates :reference_data, uniqueness: { scope: :reference_type_id }
 
   after_create { |reference| reference.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |reference| reference.record 'update' if Rails.configuration.websockets_enabled == 'true' }
   after_destroy { |reference| reference.record 'destroy' if Rails.configuration.websockets_enabled == 'true' }
 
-  scope :cves, ->     { where('reference_type_id=?', ReferenceType.find_by_name('cve').id) }
-  scope :bugtraqs, -> { where('reference_type_id=?', ReferenceType.find_by_name('bugtraq').id) }
-  scope :telus, ->    { where('reference_type_id=?', ReferenceType.find_by_name('telus').id) }
-  scope :apsb, ->     { where('reference_type_id=?', ReferenceType.find_by_name('apsb').id) }
-  scope :urls, ->     { where('reference_type_id=?', ReferenceType.find_by_name('url').id) }
-  scope :msb, ->      { where('reference_type_id=?', ReferenceType.find_by_name('msb').id) }
-  scope :osvdb, ->    { where('reference_type_id=?', ReferenceType.find_by_name('osvdb').id) }
+  scope :cves,          -> { where(reference_type: ReferenceType.cve) }
+  scope :bugtraqs,      -> { where(reference_type: ReferenceType.bugtraq) }
+  scope :telus,         -> { where(reference_type: ReferenceType.telus) }
+  scope :apsb,          -> { where(reference_type: ReferenceType.apsb) }
+  scope :urls,          -> { where(reference_type: ReferenceType.url) }
+  scope :msb,           -> { where(reference_type: ReferenceType.msb) }
+  scope :osvdb,         -> { where(reference_type: ReferenceType.osvdb) }
 
   delegate(:name, to: :reference_type, prefix: true, allow_nil: true)
 

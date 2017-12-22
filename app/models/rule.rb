@@ -34,6 +34,13 @@ require 'tempfile'
 #       * valid             |int|  STALE  |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
 #       * failed parse      |int|  STALE  |   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
 #
+# snort_doc_status
+#   Rules start in NOT_YET_PUB status.
+#   When rules are published to snort, they are marked as TO_BE_PUB.
+#   Except rules set as SUPRESS will not be set to TO_BE_PUB.
+#   Docs are generated from *all* TO_BE_PUB, including manually set.
+#   When generated docs are uploaded to snort.org the rules are set to BEEN_PUB.
+#
 class Rule < ApplicationRecord
   has_paper_trail
 
@@ -71,6 +78,18 @@ class Rule < ApplicationRecord
 
   DOC_STATUS_UPDATED            = 'UPDATED'
   DOC_STATUS_SYNCHED            = 'SYNCHED'
+
+  SNORT_DOC_STATUS_SUPRESS      = 'SUPRESS'
+  SNORT_DOC_STATUS_NOT_YET_PUB  = 'NOTYET'
+  SNORT_DOC_STATUS_TO_BE_PUB    = 'TOBE'
+  SNORT_DOC_STATUS_BEEN_PUB     = 'BEEN'
+  SNORT_DOC_STATUSES            =
+      [
+          SNORT_DOC_STATUS_SUPRESS,
+          SNORT_DOC_STATUS_NOT_YET_PUB,
+          SNORT_DOC_STATUS_TO_BE_PUB,
+          SNORT_DOC_STATUS_BEEN_PUB,
+      ]
 
   # Pre-commit hook intercepted commit, failed it, and successfully checked in the rule
   SVN_SUCCESS_COMMIT_HOOK = 199

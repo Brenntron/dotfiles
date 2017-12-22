@@ -21,11 +21,11 @@
       <nav class="navbar nav-stacked rules-ui-nav">
         <ul class="nav nav-stacked">
           <li><%= link_to 'BUG LIST', bugs_path %></li>
+          <li><%= link_to 'USERS', users_path %></li>
+          <li class="doc-link"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
           <% if current_user&.has_role?('admin') %>
               <li><%= link_to 'RULE DOCS', rule_docs_path %></li>
           <% end %>
-          <li><%= link_to 'USERS', users_path %></li>
-          <li class="doc-link"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
           <% if current_user&.has_role?('admin') %>
             <li><%= link_to 'ADMIN', admin_root_path %></li>
           <% end %>

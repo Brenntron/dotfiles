@@ -22,6 +22,17 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :snort_doc do
+      root 'root#index'
+      namespace :cves do
+        get :nvd
+        post :download
+        get :missing
+        post :update
+      end
+      get :rule_docs, to: 'rule_docs#index'
+    end
+
     resources :rules_sync, only: [:index] do
       collection do
         get :diagnostics
@@ -52,6 +63,9 @@ Rails.application.routes.draw do
 
   # resources :rules, param: :sid
   resources :roles
+
+  resources :tests
+
   resources :users do
 
     collection do
