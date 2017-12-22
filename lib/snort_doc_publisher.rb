@@ -173,7 +173,7 @@ class SnortDocPublisher
   def each_missing
     max_fails = Rails.configuration.snort_doc_max_fails
     references.each do |ref_rec|
-      next if max_fails <= ref_rec.fail_count
+      next if (max_fails || 0) <= (ref_rec.fail_count || 0)
 
       cve_key = "CVE-#{ref_rec.reference_data}"
       nvd_cve_item_curr = nvd_cve_item(cve_key)
