@@ -1,9 +1,7 @@
 class Templates::RulesController < ApplicationController
-  before_action :set_rule
-
-  private
-
-  def set_rule
-    @rule = Rule.find(params[:rule_id])
+  def show
+    @rule = Rule.find(params[:id])
+    @template = params[:template]
+    render action: @template
   end
 end
