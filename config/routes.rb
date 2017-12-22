@@ -87,10 +87,8 @@ Rails.application.routes.draw do
   end
 
   resources :rule_docs, only: [:index, :edit, :update, :destroy]
-  namespace :templates, only: [] do
-    resources :rules do
-      get ":action(.:format)"
-    end
+  namespace :templates do
+    resources :rules, only: [:show]
   end
 
   resources :bugs do
