@@ -238,10 +238,10 @@ module Repo
       committer.locked_commit(bugzilla_comment: bugzilla_comment).tap do
 
         #synch history to pick up new bugzilla commit note created by rulecommitter.
-        bugzilla_bug = Bugzilla::Bug.new(xmlrpc)
+        bugzilla_bug_proxy = Bugzilla::Bug.new(xmlrpc)
 
-        zillabug = bugzilla_bug.get(bugzilla_id)
-        Bug.synch_history(bugzilla_bug, zillabug)
+        zillabug_hash = bugzilla_bug_proxy.get(bugzilla_id)
+        Bug.synch_history(bugzilla_bug_proxy, zillabug_hash)
 
       end
 
