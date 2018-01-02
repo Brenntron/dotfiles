@@ -201,7 +201,7 @@ class Rule < ApplicationRecord
     if synched_rule?
       "#{bug.pcap_alerts.by_rule(self).count}"
     else
-      "<font style='color: red;'>#{bug.local_alerts.by_rule(self).count} LOCAL</font>"
+      "#{bug.local_alerts.by_rule(self).count}"
     end
   end
 
