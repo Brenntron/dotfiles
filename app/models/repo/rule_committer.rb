@@ -238,17 +238,20 @@ module Repo
       committer.locked_commit(bugzilla_comment: bugzilla_comment).tap do
 
         #synch history to pick up new bugzilla commit note created by rulecommitter.
-        bugzilla_bug = Bugzilla::Bug.new(xmlrpc)
-        bug = bugzilla_bug.get(bugzilla_id)
-        Bug.synch_history(bugzilla_bug, bug)
+        bugzilla_bug_proxy = Bugzilla::Bug.new(xmlrpc)
 
+        zillabug_hash = bugzilla_bug_proxy.get(bugzilla_id)
+        Bug.synch_history(bugzilla_bug_proxy, zillabug_hash)
+
+      end
+
+      if bug.present?
         attachments = bug.attachments.map{|a| a.id}
 
         new_task = Task.create_pcap_test(bug.id, user.id)
         TestAttachment.new(new_task,
                            xmlrpc.token,
                            attachments).send_work_msg
-
       end
 
     rescue
