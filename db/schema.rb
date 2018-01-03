@@ -230,7 +230,7 @@ ActiveRecord::Schema.define(version: 20171219175018) do
     t.integer "reference_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer "fail_count"
+    t.integer "fail_count", default: 0
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
