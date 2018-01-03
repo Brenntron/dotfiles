@@ -156,6 +156,6 @@ class UsersController < ApplicationController
   end
 
   def user_api_key_params
-    params.require(:user).require(:user_api_key).permit(:api_key)
+    params.require(:user).permit(:user_api_key).permit(:api_key)
   end
 end
