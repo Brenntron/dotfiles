@@ -1087,7 +1087,6 @@ class Rule < ApplicationRecord
   def self.revert_rules_action(rules)
     rules.each do |rule|
       rule.revert_grep(Rule.grep_line_from_file!(rule.sid, rule.gid, rule.filename))
-      rule.rule_doc.revert_doc if rule.rule_doc
     end
 
     true
