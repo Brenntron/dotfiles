@@ -26,7 +26,7 @@ module API::V2::Defaults
           @current_user =
               case
                 when api_key_str
-                  user_api_key = UserApiKey.where(api_key: request.headers['Api-Key']).first
+                  user_api_key = UserApiKey.where(api_key: api_key_str).first
                   user_api_key.user if user_api_key
                 when request.headers['Token'] && request.env['REMOTE_USER']
                   kerb_auth = request.env['REMOTE_USER']
