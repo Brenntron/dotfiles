@@ -4,7 +4,9 @@ module API
       include API::V1::Defaults
 
       resource :rules do
-
+        before do
+          PaperTrail.whodunnit = current_user.id if current_user.present?
+        end
         desc "Checks rule to convert to SMTP"
         params do
           requires :rule_id, type: Integer, desc: "the id for the rule to be checked"
@@ -93,7 +95,7 @@ module API
         end
         post "", root: "rule" do
           authorize! :create, Rule
-          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+
           Rule.create_action(permitted_params[:rule][:rule_content],
                              permitted_params[:rule][:rule_doc],
                              permitted_params[:rule][:bug_id])
@@ -139,7 +141,7 @@ module API
         end
         post "parts", root: "rule" do
           authorize! :create, Rule
-          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+
           Rule.create_parts_action(permitted_params[:rule],
                                    permitted_params[:rule][:rule_doc],
                                    permitted_params[:rule][:bug_id])
@@ -156,7 +158,7 @@ module API
         end
         put "gids/:gid/sids/:sid", root: "rule" do
           authorize! :update, Rule
-          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+
           rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
           Rule.update_action(rule, permitted_params[:rule][:rule_content])
         end
@@ -184,7 +186,7 @@ module API
         put "gids/:gid/sids/:sid/revert", root: "rule" do
           std_api_v2 do
             authorize! :update, Rule
-            ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+
             rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
             Rule.revert_rules_action([rule])
           end
@@ -213,6 +215,14 @@ module API
                                                     bugzilla_comment: permitted_params[:bugzilla_comment],
                                                     xmlrpc: bugzilla_session,
                                                     nodoc_override: permitted_params[:nodoc_override])
+
+
+            if permitted_params[:bug_id].present?
+              main_committer = User.where(email: "vrt-qa@sourcefire.com").first
+              bug = Bug.where(:id => permitted_params[:bug_id]).first
+              bug.committer_id = main_committer.id
+              bug.save
+            end
           end
         end
 
@@ -222,6 +232,7 @@ module API
           requires :sid, type: Integer, desc: "sid of the rule"
           optional :username, type: String
           optional :bug_id,   type: Integer, desc: "Bugzilla id."
+          optional :bugzilla_comment,   type: String
         end
         put "gids/:gid/sids/:sid/commit", root: "rule" do
           std_api_v2 do
@@ -232,7 +243,15 @@ module API
 
             Repo::RuleCommitter.commit_rules_action(rules,
                                                     username: permitted_params[:username],
-                                                    bugzilla_id: permitted_params[:bug_id])
+                                                    bugzilla_id: permitted_params[:bug_id],
+                                                    bugzilla_comment: permitted_params[:bugzilla_comment],
+                                                    xmlrpc: bugzilla_session)
+            if permitted_params[:bug_id].present?
+              main_committer = User.where(email: "vrt-qa@sourcefire.com").first
+              bug = Bug.where(:id => permitted_params[:bug_id]).first
+              bug.committer_id = main_committer.id
+              bug.save
+            end
           end
         end
 
@@ -261,7 +280,7 @@ module API
         end
         put ":id", root: "rule" do
           authorize! :update, Rule
-          ::PaperTrail.whodunnit = current_user.display_name ? current_user.display_name : current_user.cvs_username
+
           rule = Rule.where(id: permitted_params[:id]).first
           Rule.update_action(rule,
                              permitted_params[:rule][:rule_content],
@@ -296,7 +315,7 @@ module API
         end
         post "update", root: "rule" do
           authorize! :update, Rule
-          ::PaperTrail.whodunnit = current_user.cvs_username
+
           Rule.update(permitted_params[:id])
         end
 
@@ -307,6 +326,16 @@ module API
         patch ":rule_id/copy_doc", root: 'rule' do
           RuleDoc.copy_doc_action(permitted_params[:rule_id],
                                   permitted_params[:rule_ids])
+        end
+
+        desc "Update the snort_doc_status on a given rules record."
+        params do
+          requires :rule_id, type: Integer
+          requires :snort_doc_status, type: String
+        end
+        patch ":rule_id/snort_doc_status", root: 'rule' do
+          rule = Rule.find(permitted_params[:rule_id])
+          rule.update!(snort_doc_status: permitted_params[:snort_doc_status])
         end
       end
     end

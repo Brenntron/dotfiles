@@ -138,7 +138,10 @@ if [ "SKIP" != "$BUNDLE_INSTALL" ]; then
     fi
 fi
 
-
+if [ "SKIP" != "$VISRULEPARSER" ]; then
+    echo '* Visruleparser'
+    svn export --force https://repo.vrt.sourcefire.com/svn/rr-int/tools/commit-tools/visruleparser.pl $RELPATH/$TAGDIR/extras/
+fi
 
 if [ "SKIP" != "$MIGRATE" ]; then
     echo '* migrations'

@@ -20,10 +20,9 @@
   %li
     %a{href: '/admin/rules/validations'} Validations
 
-
+%caption= "#{@invalid_rules.count} Invalid Rules"
 #invalid-rules-div
   %table
-    %caption= "#{@invalid_rules.count} Invalid Rules"
     %thead
       %tr
         %th errors

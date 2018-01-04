@@ -42,6 +42,7 @@ gem 'pry-remote', '~> 0.1.8'
 
 gem 'foreman', '~> 0.84.0'
 
+gem 'simple_form', '~> 3.5.0'
 gem 'jbuilder', '~> 2.6.4'
 gem 'dotenv-rails', '~> 2.2.1'
 gem 'diffy', '~> 3.2.0'
@@ -56,6 +57,9 @@ gem 'will_paginate', '~> 3.1.5'
 
 gem 'delayed_job', '~> 4.1.3'
 gem 'delayed_job_active_record', '~> 4.1.2'
+gem 'jquery-datatables-rails', '~> 3.4.0'
+gem 'ajax-datatables-rails', '~> 0.4.0'
+
 group :development do
   gem 'thin', '~> 1.7.0'
   gem 'puma'

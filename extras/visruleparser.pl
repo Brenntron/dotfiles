@@ -30,7 +30,7 @@ use Net::Snort::Parser::File;
 use Data::Dumper;
 
 print "Parser version: " . $Net::Snort::Parser::Rule::VERSION . "\n";
-print "Visruleparser version: 2016.09.10\n";
+print "Visruleparser version: 2018.01.02\n";
 
 my $dumprulestruct = 0;  # for debug output, dump the rule structure for the first rule and exit
 my $speedtruffs = 0; # set to 1 to allow stream_reassemble rule option
@@ -201,6 +201,26 @@ sub process_line {
       }
    }
 
+   # http_* not in $HTTP_PORTS.  Only a warning, but important to note
+   if(($line =~ /http_[a-z]*\s*;/) && !($line =~ /\$(HTTP|FILE_DATA)_PORTS/)) {
+      push(@warnings, 'http_* buffer used but rule is not in $HTTP_PORTS or $FILE_DATA_PORTS');
+   }
+
+   # http_cookie is only split out in security-ips and max-detect-ips
+   if(($line =~ /http_cookie\s*;/) && (($line =~ /balanced-ips/) || ($line =~ /connectivity-ips/))) {
+      push(@failed, 'http_cookie present in rule specifying balanced-ips or connectivity-ips');
+   }
+
+   # modbus and dnp3 are not enabled by default in any policies, so rules should not use those options
+   if((($line =~ /[\s;]dnp3_[a-z]*\s*;/i) || ($line =~ /[\s;]modbus_[a-z]*\s*;/i)) && ($line =~ /metadata\s*:[^;]*policy/)) {
+      push(@failed, "Rules using modbus or dnp3 rule options must not be in any policies");
+   }
+
+   # sip preprocessor is only enabled in security-ips and max-detect-ips
+   if(($line =~ /[\s;]sip_[a-z]*\s*;/) && (($line =~ /balanced-ips/) || ($line =~ /connectivity-ips/))) {
+      push(@failed, 'Rules using sip options must not be in balanced-ips or connectivity-ips');
+   }
+
    # No from_client or from_server... Should only do to_server and to_client
    if($line =~ /flow\s*:\s*(established\s*,\s*)?from_(server|client)/) {
       $failure++;
@@ -244,13 +264,14 @@ sub process_line {
       }
    }
 
-   # flowbits:noalert should not be in any policies
-   if($line =~ /flowbits\s*:\s*noalert\s*;/) {
-      if(defined($rule->{'metadata'}->{'policy'}) && %{$rule->{'metadata'}->{'policy'}}) {  # 0 if hash is empty
-         $failure++;
-         push(@failed, "Rules with flowbits:noalert must not be in any policies");
-      }
-   }
+# Removing this for now because flowbit autoresolution is still broken
+#   # flowbits:noalert should not be in any policies
+#   if($line =~ /flowbits\s*:\s*noalert\s*;/) {
+#      if(defined($rule->{'metadata'}->{'policy'}) && %{$rule->{'metadata'}->{'policy'}}) {  # 0 if hash is empty
+#         $failure++;
+#         push(@failed, "Rules with flowbits:noalert must not be in any policies");
+#      }
+#   }
 
    # else we're a rule, lets get the info patrick needs
    my $r = $rule;
@@ -284,9 +305,8 @@ sub process_line {
       push @failed, "Rule category $category not valid";
    }
 
-   # Categories that are deprecated - updated 2012-10-31
-#   if($r->{name} =~ /^(BACKDOOR|BOTNET-CNC|POLICY|WEB-ISS|WEB-CLIENT|EXPLOIT|SPECIFIC-THREATS) /) {
-   if($r->{name} =~ /^(ATTACK-RESPONSES|BACKDOOR|BAD-TRAFFIC|BOTNET-CNC|CHAT|DDOS|EXPERIMENTAL|FINGER|FTP|ICMP|IMAP|INFO|LOCAL|MISC|MULTIMEDIA|MYSQL|ORACLE|OTHER-IDS|P2P|PHISHING-SPAM|POLICY|POP2|POP3|RSERVICES|SHELLCODE|SMTP|VIRUS|VOIP|WEB-ACTIVEX|WEB-ATTACKS|WEB-CGI|WEB-COLDFUSION|WEB-IIS|WEB-MISC|WEB-PHP|SPECIFIC-THREATS|EXPLOIT|WEB-CLIENT|SPYWARE-PUT) /) {
+   # Categories that are deprecated - updated 2018-01-02
+   if($r->{name} =~ /^(ATTACK-RESPONSES|BACKDOOR|BAD-TRAFFIC|BLACKLIST|BOTNET-CNC|CHAT|DDOS|EXPERIMENTAL|FINGER|FTP|ICMP|IMAP|INFO|LOCAL|MISC|MULTIMEDIA|MYSQL|ORACLE|OTHER-IDS|P2P|PHISHING-SPAM|POLICY|POP2|POP3|RSERVICES|SHELLCODE|SMTP|VIRUS|VOIP|WEB-ACTIVEX|WEB-ATTACKS|WEB-CGI|WEB-COLDFUSION|WEB-IIS|WEB-MISC|WEB-PHP|SPECIFIC-THREATS|EXPLOIT|WEB-CLIENT|SPYWARE-PUT) /) {
       $failure++;
       push @failed, "Rule category $category is deprecated";
    }
@@ -336,14 +356,22 @@ sub process_line {
    $detection =~ s/\s*#?\s*alert(.*?)\((.*)\)/$2/;
 
    foreach my $strippershoes (qw(reference metadata msg flow classtype sid rev)) {
-      $detection =~ s/(^|[\s;])$strippershoes:(.*?);//g;
+#      $detection =~ s/(^|[\s;])($strippershoes)\s*:(.*?);/<$2>/g;
+      # I made the ';' optional because someone didn't have a space and didn't
+      # bother to see why their rule didn't parse properly.
+      # I was little concerned about maybe "flow:" or "msg:" being improperly
+      # stripped from a rule with that change, so I made it required again
+      # in the hopes that people will pay just the slightest amount of attention
+      # and notice their errors, even though this tool was created to combat
+      # the problem of people not noticing their errors.
+      $detection =~ s/[\s;]($strippershoes)\s*:(.*?);//g;
    }
  
    $detection =~ s/^\s+//;
    $detection =~ s/\s+$//;
 
-   # split detection into separate rule option lines.  Current as of snort 2.9.3.5
-   foreach my $ruleoption (qw(content rawbytes uricontent urilen isdataat pcre file_data base64_decode base64_data byte_test byte_jump byte_extract ftpbounce asn1 cvs dce_iface dce_opnum dce_stub_data ssl_version ssl_state fragoffset ttl tos id ipopts fragbits dsize flags flowbits seq ack window itype icode icmp_id icmp_seq rpc ip_proto sameip stream_reassemble stream_size logto session resp react tag activates activated_by count replace detection_filter sip_header sip_body threshold uri_data raw_uri_data header_data raw_header_data method_data cookie_data raw_cookie_data stat_code_data stat_msg_data http_encode pkt_data sip_stat_code gtp_type gtp_info)) {
+   # split detection into separate rule option lines.  Current as of snort 2.9.9.0
+   foreach my $ruleoption (qw(content rawbytes uricontent urilen isdataat pcre file_data base64_decode base64_data byte_test byte_jump byte_extract byte_math ftpbounce asn1 cvs dce_iface dce_opnum dce_stub_data ssl_version ssl_state fragoffset ttl tos id ipopts fragbits dsize flags flowbits seq ack window itype icode icmp_id icmp_seq rpc ip_proto sameip stream_reassemble stream_size logto session resp react tag activates activated_by count replace detection_filter sip_header sip_body threshold uri_data raw_uri_data header_data raw_header_data method_data cookie_data raw_cookie_data stat_code_data stat_msg_data http_encode pkt_data sip_stat_code gtp_type gtp_info)) {
 
       $detection =~ s/[\s;]$ruleoption([:;])/\n\t$ruleoption$1/g;
    }
@@ -365,6 +393,30 @@ sub process_line {
 
    # Find some common mistakes
 
+   # Now, after all the other stuff that's done on the rule text, I'm finally going to use the rule structure
+   foreach my $opt (keys %{$r->{options}}){
+
+      # Stuff with content matches
+      if( $r->{options}{$opt}{type} eq "content" ){
+
+         # offset:0 specified, or distance:0 with within: also specified
+         if(defined($r->{options}{$opt}{'offset'}) && ($r->{options}{$opt}{'offset'} eq '0')) {
+            # the last part of the conditional above abuses perl's equation of numbers and strings.
+            # I check for "eq '0'" instead of "== 0" because the latter throws an error (correctly)
+            # when offset is a variable name instead of a number.  Doing a string comparison will
+            # always work as expected even if it looks weird.  Note in the structure, offset represents
+            # both "offset" and "distance" with the "relative" flag distinguishing between the two.
+
+            if($r->{options}{$opt}{'relative'} == 0) {
+               push(@failed, "offset:0 is implicit for non-relative matches when not otherwise set; remove. Did you mean to specify a depth instead?");
+            } elsif(defined($r->{options}{$opt}{'depth'})) {
+               push(@failed, "distance:0 is implicit for relative matches that specify a depth when not otherwise set; remove.");
+            }
+         }
+      }
+   }
+
+
    # No content match (meaning no fast_pattern)
    # Some options actually have hidden "content matches," like dce_iface
    if(!($detection =~ /([\s;]|^)(content|dce_iface)\s*:/)) {
@@ -381,7 +433,7 @@ sub process_line {
    my ($pcre) = $detection =~ m/pcre\s*:\s*"\s*(\/.*?)"\s*;/;
 
    if(defined $pcre) {
-      $pcre =~ s/(exec|exact|fixed)//gi;
+      $pcre =~ s/(exec|exact|fixed|except)//gi;
       if($pcre =~ /[^\\]x[0-9a-f]{2}/i) {
          push(@warnings, "Missing backslash for hex char in pcre? /x[0-9a-f]{2}/ detected");
       }
@@ -424,7 +476,7 @@ sub process_line {
    if( $r->{metadata} ){
       if( $r->{metadata}{policy} && keys %{$r->{metadata}{policy}} ){
 #print "POLICY: >>" . Dumper($r->{metadata}{policy}) . "<<\n";
-         print "\n" . " "x$indent . "Policy: " . join(', ', keys %{$r->{metadata}{policy}}) . "\n";
+         print "\n" . " "x$indent . "Policy: " . join(', ', sort {$a cmp $b} keys %{$r->{metadata}{policy}}) . "\n";
          # ZDNOTE I'd like to sort these in a specific order, but no time atm so at least it'll be consistent
          if( join(', ', sort {$a cmp $b} keys %{$r->{metadata}{policy}}) =~ m/balanced-ips/) {
             $balancedpolicy = 1;
@@ -484,15 +536,20 @@ sub process_line {
             if($key =~ /microsoft\.com.*ms..-.{1,3}/i) { # Looks vaguely like an MS Bulletin reference
                if(#!($key =~ /www\.microsoft\.com\/technet\/security\/bulletin\/(MS|ms)[0-9]{2}-[0-9]{3}.mspx($|\s)/) && # Old form no longer supported
                   !($key =~ /technet\.microsoft\.com\/en-us\/security\/bulletin\/(MS|ms)[0-9]{2}-[0-9]{3}($|\s)/) &&
-                  !($key =~ /technet\.microsoft\.com\/en-us\/security\/advisory\/[0-9]+($|\s)/)) {
+                  !($key =~ /technet\.microsoft\.com\/en-us\/security\/advisory\/[0-9]+($|\s)/) &&
+                  !($key =~ /technet\.microsoft\.com\/en-us\/library\/security\/(ms|MS)\d{2}-\d{3}\.aspx/)) {
                   if($key =~ /technet\.microsoft\.com\/en-us\/security\/bulletin\/(MS|ms)[0-9]{2}-XXX($|\s)/i) {
                      push(@warnings, 'MICROSOFT DUMMY BULLETIN REFERENCE IN USE');
                   } else {
-                     push(@failed, 'Reference: Improperly formatted Microsoft reference');
+                     push(@failed, 'Reference: Improperly formatted Microsoft reference (technet.microsoft.com/en-us/library/security/ms08-067.aspx)');
                   }
                }
+            } elsif($key =~ /microsoft\.com.*advisory/i) { # Looks vaguely like a new MS CVE reference
+               if(!($key =! /portal.msrc.microsoft.com\/en-US\/security-guidance\/advisory\/CVE-\d{4}-\d{4,}/)) {
+                  push(@failed, 'Reference: Improperly formatted Microsoft reference (portal.msrc.microsoft.com/en-us/security-guidance/advisory/CVE-YYYY-XXXX)');
+               }
             } elsif($key =~ /talosintel.*TALOS/i) {
-               if(!($key =~ /www.talosintelligence.com\/reports\/TALOS-(CAN|\d{4})-\d{4}/)) {
+               if(!($key =~ /www.talosintelligence.com\/(vulnerability_)?reports\/TALOS-(CAN|\d{4})-\d{4}/)) {
                   push(@warnings, 'Reference: Improperly formatted Talos Intelligence reference (www.talosintelligence.com/reports/TALOS-YYYY-NNNN)');     
                }
             } elsif($key =~ /osvdb\.org/) {
@@ -592,7 +649,7 @@ sub process_line {
    #print Dumper($rule);
 }
 
-# Return the option index of the option keywork requested
+# Return the option index of the option keyword requested
 sub get_option {
    my ($r,$type) = @_;
    foreach my $opt (keys %{$r->{options}}){

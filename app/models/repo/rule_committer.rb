@@ -19,10 +19,6 @@ module Repo
       self.class.log(message)
     end
 
-    def doc_committer(rules_given)
-      Repo::RuleDocCommitter.new(rules_given, username: username)
-    end
-
     # @return [Mutex] mutex to exclusively change publishing lock
     def self.publish_mutex
       @publish_mutex ||= Mutex.new
@@ -182,14 +178,7 @@ module Repo
         end
 
 
-        # update revs and get sids of new rules
-        @rules = Rule.where(id: rules).all.to_a
-
-
-        log("publishing rule docs for #{rules.count} rules")
-        Rule.set_pubdoc_state(Rule.where(id: content_committer.unchanged_rules))
-
-        doc_committer(@rules).commit_docs
+        Rule.set_synched_state(Rule.where(id: rules))
 
         event_success
 
@@ -224,10 +213,11 @@ module Repo
     # param [FixNum] bugzilla_id The bugzilla id of the bug
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
     def self.commit_rules_action(rules, username:, bugzilla_id:, bugzilla_comment:, xmlrpc:, nodoc_override: false)
+
       user = User.where(cvs_username: username).first
       bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
-      Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
 
+      Repo::RuleContentCommitter.prescreen!(rules, user, bug: bug, nodoc_override: nodoc_override)
 
       committer = Repo::RuleCommitter.new(rules,
                                           xmlrpc: xmlrpc,
@@ -237,10 +227,20 @@ module Repo
       committer.locked_commit(bugzilla_comment: bugzilla_comment).tap do
 
         #synch history to pick up new bugzilla commit note created by rulecommitter.
-        bugzilla_bug = Bugzilla::Bug.new(xmlrpc)
-        bug = bugzilla_bug.get(bugzilla_id)
-        Bug.synch_history(bugzilla_bug, bug)
+        bugzilla_bug_proxy = Bugzilla::Bug.new(xmlrpc)
 
+        zillabug_hash = bugzilla_bug_proxy.get(bugzilla_id)
+        Bug.synch_history(bugzilla_bug_proxy, zillabug_hash)
+
+      end
+
+      if bug.present?
+        attachments = bug.attachments.map{|a| a.id}
+
+        new_task = Task.create_pcap_test(bug.id, user.id)
+        TestAttachment.new(new_task,
+                           xmlrpc.token,
+                           attachments).send_work_msg
       end
 
     rescue

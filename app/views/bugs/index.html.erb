@@ -1,3 +1,12 @@
+
+
+<% if @final_giblets.present? %>
+<% gib_ids = @final_giblets.map {|gib| gib.id}.join(",") %>
+<% gib_names = @final_giblets.map {|gib| gib.name}.uniq.join(" ") %>
+<div id="search-results-wrapper">
+  <label class="search-label">Results for:</label><input id="save_giblet_search_field" type="hidden" value="<%= gib_ids %>" /><span class="searched-item"><%= gib_names %></span><button id="save_giblet_search_button">Save Search</button>
+</div>
+<% end %>
 <table class="table index-table">
   <thead>
   <tr>
@@ -15,7 +24,16 @@
   <tbody>
   <% @bugs.each do |bug| %>
       <tr id="bug_<%= bug.id %>" class="<%= set_bug_color(bug) %>">
-        <td><%= link_to bug.summary, bug_path(bug.id) %> </td>
+        <td>
+          <%= link_to bug.summary, bug_path(bug.id) %>
+          <br/>
+          <span class="tags-wrapper">
+            <% uniq_gibs = bug.giblets.map {|g| g.name}.uniq %>
+            <% uniq_gibs.each do |gib| %>
+            <a href="<%= bugs_path({:tag_names => [gib], :page => 1}) %>"><button class="tag primary-tag"><%= gib %></button></a>
+            <% end %>
+          </span>
+        </td>
         <td><%= display_last_updated_date(bug)%> <%= display_last_updated_time(bug)%></td>
         <td><%= bug.component %></td>
         <td><span onclick="toggle_liberty(this, <%= bug.id %>)" class="<%= bug.liberty_clear? ? "embargo_off" : "embargo_on" %>"></span></td>

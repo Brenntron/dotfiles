@@ -6,6 +6,9 @@ class RuleCategory < ApplicationRecord
 
   validates :category, uniqueness: true
 
+  scope :policy_categories, -> { where(%q{category like 'POLICY-%'}) }
+  scope :malware_categories, -> { where(%q{category like 'MALWARE-%'}) }
+
   def deleted?
     CATEGORY_DELETED == self.category
   end

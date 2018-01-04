@@ -16,11 +16,11 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | BLACKLIST message |        1         |
+      | 14 |  1  | 22213 |  3  | BLACKLIST message |        1         |
+      | 15 |  1  | 22214 |  3  | BLACKLIST message |        1         |
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -52,11 +52,11 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 13 |  1  | 22212 |  3  | BLACKLIST message |        1         |
+      | 14 |  1  | 22213 |  3  | BLACKLIST message |        1         |
+      | 15 |  1  | 22214 |  3  | BLACKLIST message |        1         |
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -72,11 +72,11 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message        | rule_category_id |          rule_content          |
+      | 13 |  1  | 22212 |  3  | BLACKLIST message1 |        1         |alert (msg:"BLACKLIST message1";)|
+      | 14 |  1  | 22213 |  3  | BLACKLIST message2 |        1         |alert (msg:"BLACKLIST message2";)|
+      | 15 |  1  | 22214 |  3  | BLACKLIST message3 |        1         |alert (msg:"BLACKLIST message3";)|
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -344,9 +344,9 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status | doc_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    |   SYNCHED  | BLACKLIST message |        1         |
+    When the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
     Then rule "11" is synched
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
@@ -404,9 +404,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |    SYNCHED     | BLACKLIST message |        1         |
+    And the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -439,9 +439,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+    And the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -466,7 +466,6 @@ Feature: Rules
 
 
   # ==== Synching a rule from VC ===
-
   @javascript
   Scenario: VC updated for a valid edited rule
     Given a user with role "analyst" exists and is logged in
@@ -477,9 +476,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  | BLACKLIST message |        1         |
+    And the following "edited_rule" rules exist:
+      | id | gid |  sid  | rev |parsed|     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  | true | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
@@ -501,9 +500,9 @@ Feature: Rules
     And the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    And the following rules exist:
-      | id | gid |  sid  | rev |   state   |edit_status| publish_status |parsed|     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |   FAILED  |   EDIT    |  CURRENT_EDIT  |false | BLACKLIST message |        1         |
+    And the following "edited_rule" rules exist:
+      | id | gid |  sid  | rev |   state   |parsed|     message       | rule_category_id |
+      | 11 |  1  | 22211 |  3  |   FAILED  |false | BLACKLIST message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
@@ -609,9 +608,9 @@ Feature: Rules
 #    And I should not see "This is the summary"
 
   Scenario: Editing Rule: A rule can revert_grep model test
-    Given the following rules exist:
-      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed| doc_status |
-      |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |  SYNCHED   |
+    Given the following "edited_rule" rules exist:
+      | id | gid |  sid  | rev |parsed|
+      |  7 |  1  | 22211 |  3  | true |
     When code calls revert_grep for rule gid "1" sid "22211" on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
@@ -619,9 +618,9 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has rev "4"
 
   Scenario: Editing Rule: A rule can revert model test
-    Given the following rules exist:
-      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|               rule_content               | doc_status |
-      |  7 |  1  | 19500 |  3  | UPDATED |   EDIT    | CURRENT_EDIT |false | alert (msg: "the promised one has come") |  SYNCHED   |
+    Given the following "edited_rule" rules exist:
+      | id | gid |  sid  | rev |parsed|               rule_content               |
+      |  7 |  1  | 19500 |  3  |false | alert (msg: "the promised one has come") |
     When code calls revert_rules_action for rule gid "1" sid "19500"
     Then a rule record for rule gid "1" sid "19500" will exist
     And  A rule gid "1" and sid "19500" has class "synched"
@@ -642,9 +641,9 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
 
   Scenario: Synch Rule: update an existing valid synched rule with new rev model test
-    Given the following rules exist:
-      | id | gid |  sid  | rev | state     |doc_status|
-      | 11 |  1  | 22211 |  3  | UNCHANGED | SYNCHED  |
+    Given the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |parsed|
+      | 11 |  1  | 22211 |  3  | true |
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
@@ -653,9 +652,9 @@ Feature: Rules
 
   @javascript
   Scenario: Synch Rule: update an existing valid synched rule with same rev model test
-    Given the following rules exist:
-      | id | gid |  sid  | rev | state     |doc_status|
-      | 11 |  1  | 22211 |  4  | UNCHANGED | SYNCHED  |
+    Given the following "synched_rule" rules exist:
+      | id | gid |  sid  | rev |parsed|
+      | 11 |  1  | 22211 |  4  | true |
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
@@ -663,9 +662,9 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has rev "4"
 
   Scenario: Synch Rule: VC updated for a valid edited rule do not load model test
-    Given the following rules exist:
-      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
-      |  7 |  1  | 22211 |  3  | UPDATED |   EDIT    | CURRENT_EDIT | true |
+    Given the following "edited_rule" rules exist:
+      | id | gid |  sid  | rev |parsed|
+      |  7 |  1  | 22211 |  3  | true |
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "draft"
@@ -676,9 +675,9 @@ Feature: Rules
     And  A rule id "7" should have state "STALE"
 
   Scenario: Synch Rule: VC updated for a failed edited rule do not load model test
-    Given the following rules exist:
-      | id | gid |  sid  | rev |  state  |edit_status|publish_status|parsed|
-      |  7 |  1  | 22211 |  3  | FAILED  |   EDIT    | CURRENT_EDIT | false|
+    Given the following "edited_rule" rules exist:
+      | id | gid |  sid  | rev |  state  |parsed|
+      |  7 |  1  | 22211 |  3  | FAILED  | false|
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "draft"
@@ -694,49 +693,49 @@ Feature: Rules
   ### Scenarios should_be_on method ###
 
   Scenario: should_be_on: should be off model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | id | gid |  sid  | metadata                                             | detection         |
       |  7 |  1  | 22211 | policy max-detect-ips drop, policy security-ips drop | flowbits:noalert; |
     Then a rule gid "1" and sid "22211" should be off
 
   Scenario: should_be_on: balanced-ips is on model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | id | gid |  sid  | metadata                                             | detection         |
       |  7 |  1  | 22211 | policy balanced-ips drop, policy security-ips drop   | flowbits:noalert; |
     Then a rule gid "1" and sid "22211" should be on
 
   Scenario: should_be_on: connectivity-ips is on model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | id | gid |  sid  | metadata                                                 | detection         |
       |  7 |  1  | 22211 | policy max-detect-ips drop, policy connectivity-ips drop | flowbits:noalert; |
     Then a rule gid "1" and sid "22211" should be on
 
   Scenario: should_be_on: flowbits set is on model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | id | gid |  sid  | metadata                                             | detection                           |
       |  7 |  1  | 22211 | policy max-detect-ips drop, policy security-ips drop | flowbits:set,sybase.tds.connection; |
     Then a rule gid "1" and sid "22211" should be on
 
   Scenario: Onoff: uncommented rule content should be on when it should be on model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | gid |  sid  | metadata                 | detection         | rule_content             |
       |  1  | 22211 | policy balanced-ips drop | flowbits:noalert; | alert (degenerate: yes;) |
     Then a rule gid "1" and sid "22211" is on
 
   Scenario: Onoff: uncommented rule content should be off when it should be off model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | gid |  sid  | metadata                 | detection         | rule_content             |
       |  1  | 22211 | policy security-ips drop | flowbits:noalert; | alert (degenerate: yes;) |
     Then a rule gid "1" and sid "22211" is off
 
   Scenario: Onoff: commented rule content should be on when it should be on model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | gid |  sid  | metadata                 | detection         | rule_content             |
       |  1  | 22211 | policy balanced-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
     Then a rule gid "1" and sid "22211" is on
 
   Scenario: Onoff: commented rule content should be off when it should be off model test
-    Given the following rules exist:
+    Given the following "edited_rule" rules exist:
       | gid |  sid  | metadata                 | detection         | rule_content             |
       |  1  | 22211 | policy security-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
     Then a rule gid "1" and sid "22211" is off
@@ -746,7 +745,6 @@ Feature: Rules
   @javascript
   Scenario: A duplicated rule should parse the message
             and populate the rule category and message fields correctly
-
     Given a user with role "committer" exists and is logged in
     Given the following bugs exist:
       |  id  | bugzilla_id | state  | user_id |
@@ -754,7 +752,7 @@ Feature: Rules
     Given the following rule categories exist:
       | category  | id |
       | BLACKLIST |  1 |
-    When the following rules exist:
+    When the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
       | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
 

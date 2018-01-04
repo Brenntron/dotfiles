@@ -1,0 +1,17 @@
+/*
+ * This is a manifest file that'll be compiled into admin_redesign.css, which will include all the files
+ * listed below.
+
+ *= require jquery-ui
+ *= require custom-bootstrap
+ *= require bootstrap-switch
+ *= require dataTables/extras/dataTables.responsive
+ *= require dataTables/jquery.dataTables
+ *= require reset
+ *= require font_import_opensans
+ *= require font_import_firamono
+ *= require global
+ *= require admin-snort-doc
+
+
+*/

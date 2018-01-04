@@ -14,7 +14,11 @@ class SessionsController < ApplicationController
           rescue Exception => e
             return invalid_login_attempt(e)
           end
-          redirect_to '/bugs'
+          if session[:previous_url].present?
+            redirect_to session[:previous_url]
+          else
+            redirect_to '/bugs'
+          end
         end
         format.json do
           begin

@@ -1,4 +1,5 @@
 class Note < ApplicationRecord
+  has_paper_trail  
   belongs_to :bug
   validates :comment, presence: true,
                       uniqueness: {if: Proc.new { |n| n.note_type == "error"}, scope: :bug_id}
@@ -62,7 +63,21 @@ class Note < ApplicationRecord
   end
 
   def self.process_note(options,xmlrpc)
+    begin
     new_note = xmlrpc.add_comment(options)
+    rescue RuntimeError => e
+      #here i want to remove the bad structure and retry the note processing.
+      #I thought about retrying it indefinately but i dont think i want to end up in an infinate loop
+      #so for now we just retry it once
+      if /wrong fault-structure:/.match(e.to_s)
+        if /line (\d+),/.match(e.to_s)
+          line_array = options[:comment].lines.to_a
+          line_array[$1.to_i - 1] = "\tThis line was removed due to some bad characters\n"
+          options[:comment] = line_array.join
+          new_note = xmlrpc.add_comment(options)
+        end
+      end
+    end
     if options[:note_id].blank?
       note = Note.create(id: new_note['id'],
                          comment: options[:comment],

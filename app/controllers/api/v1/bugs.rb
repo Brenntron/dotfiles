@@ -4,6 +4,9 @@ module API
       include API::V1::Defaults
 
       resource :bugs do
+        before do
+          PaperTrail.whodunnit = current_user.id if current_user.present?
+        end
 
         desc "import one bug from bugzilla"
         params do
@@ -43,7 +46,7 @@ module API
               Rails.logger.error $!
               Rails.logger.error $!.backtrace.join("\n")
               progress_bar.update_attribute("progress", -1)
-              error = "There was an error when attempting to upload bug, no bug was uploaded or synched as a result."
+              error = "There was an error when attempting to upload bug, no bug was uploaded or sunk as a result."
               {:error => error}.to_json
             end
           else
@@ -185,7 +188,7 @@ module API
               response_task['cvs_username'] = User.find(task.user_id).cvs_username
               response_task['task_type'] = task.task_type
               response_task['result'] = task.result.present? ? task.result : "Please wait while task completes."
-              response_task['created_at'] = task.created_at.strftime("%m/%d/%y %H:%M:%S")
+              response_task['created_at'] = task.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%y %H:%M:%S") #TODO change in_time_zone to reflect the users timezone.(when we have configurations for this stuff)
               bug_queue << response_task
             end
             response[:jobs_tab] = bug_queue
@@ -597,7 +600,7 @@ module API
             rescue XMLRPC::FaultException => e
               throw :error,
                     status: 400,
-                    message: "#{e.message}"
+                    message: e.message
             end
           end
           throw :error,
@@ -612,7 +615,27 @@ module API
         post ':bug_id/addref' do
           bug = Bug.where(id: params['bug_id']).first
           raise 'bug not found' unless bug
-          bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
+          new_ref = bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
+          if new_ref.present?
+            if bug.giblets.select {|giblet| giblet.gib == new_ref}.blank?
+              if new_ref.reference_type.name != "url"
+                new_gib = Giblet.create(:bug_id => bug.id, :gib_type => "Reference", :gib_id => new_ref.id)
+                new_gib.name = new_gib.display_name
+                new_gib.save
+              else
+                if new_ref.reference_data.include?("microsoft.com")
+                  msb_val = new_ref.reference_data.split('/').last.split('.').first.upcase
+                  ref_type = ReferenceType.where(:name => 'msb').first
+                  alt_ref = Reference.find_or_create_by(:reference_type_id => ref_type.id, :reference_data => msb_val)
+                  bug.references << alt_ref unless bug.references.include?(alt_ref)
+                  new_gib = Giblet.create(:bug_id => bug.id, :gib_type => "Reference", :gib_id => alt_ref.id)
+                  new_gib.name = new_gib.display_name
+                  new_gib.save
+                end
+              end
+            end
+          end
+
         end
 
         desc "add an exploit to a bug"

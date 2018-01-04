@@ -46,10 +46,8 @@ module RulesHelper
       :'inappropriate-content'          => 'Inappropriate Content was Detected',
       :'policy-violation'               => 'Potential Corporate Privacy Violation',
       :'default-login-attempt'          => 'Attempt to login by a default username and password',
-      :'sdf'                            => 'Senstive Data',
-      :'file-format'                    => 'Known malicious file or file based exploit',
-      :'malware-cnc'                    => 'Known malware command and control traffic',
-      :'client-side-exploit'            => 'Known client side exploit attempt'
+      :'sdf'                            => 'Senstive Data'
+
   )
 
   def sid_colon_format(rule)
@@ -99,13 +97,23 @@ module RulesHelper
   end
 
   def doc_status(rule)
-    case
-      when !rule.doc_complete?
-        content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
-      when rule.doc_updated?
-        content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs')
-      else
-        content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs')
+    if rule
+      case
+        when !rule.doc_complete?
+          content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
+        when rule.doc_updated?
+          if rule.rule_doc&.id
+            link_to content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
+          else
+            content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs')
+          end
+        else
+          if rule.rule_doc&.id
+            link_to content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
+          else
+            content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs')
+          end
+      end
     end
   end
 end

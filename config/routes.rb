@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]
+    resources :morsels, only: [:index, :show]
+    resources :notes, only: [:index, :edit, :update, :destroy]
     resources :rules, only: [:index, :edit, :update] do
       collection do
         get :validations
@@ -13,10 +15,22 @@ Rails.application.routes.draw do
         get :related
       end
     end
+    resources :reference_types, only: [:index, :edit, :update]
     resources :scheduled_tasks do
       collection do
         post :run_job
       end
+    end
+
+    namespace :snort_doc do
+      root 'root#index'
+      namespace :cves do
+        get :nvd
+        post :download
+        get :missing
+        post :update
+      end
+      get :rule_docs, to: 'rule_docs#index'
     end
 
     resources :rules_sync, only: [:index] do
@@ -49,6 +63,9 @@ Rails.application.routes.draw do
 
   # resources :rules, param: :sid
   resources :roles
+
+  resources :tests
+
   resources :users do
 
     collection do
@@ -68,11 +85,19 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  resources :rule_docs, only: [:index, :edit, :update, :destroy]
+  namespace :templates do
+    resources :rules, only: [:show]
+  end
+
   resources :bugs do
     member do
       post :create_rules
       post :add_tag
+      post :add_whiteboard
       patch :remove_tag
+      patch :remove_whiteboard
     end
     resources :references
     get :bug_metrics, defaults: { format: :json }

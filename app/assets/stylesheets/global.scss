@@ -1,0 +1,784 @@
+/***** Variables ******/
+
+/* Background Colors */
+$base-color:        #edf1f2;    /* Very pale blue  */
+$content-bg-color:  #fff;       /* White           */
+$nav-toolbar-color: #d7dadb;    /* Medium Grey     */
+$sidebar-nav-base:  #2c3e50;    /* Dark Navy       */
+$content-tab-color: #3e5a72;    /* Dark Navy shift */
+$ac-nav-bg-color:   #fff;       /* White           */
+
+/* Section Colors */
+$bug-section-color:  #6dbcdb;   /* Medium Blue    */
+$user-section-color: #fc4349;   /* Red            */
+$wiki-section-color: #8cc63f;   /* Bright Green   */
+
+/* Layout dimensions */
+$sidebar-width: 44px;
+
+/* Shadows */
+$dropshadow: 2px 0 10px 1px rgba(0,0,0,0.2);
+
+/* Typography Colors */
+$type-base-color:    #333;  /* Dark Grey */
+$type-lighter-color: #666;  /* Medium Grey */
+
+/* Additional Colors */
+/* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
+$faint-neutral-color: #f2f2f2;
+$faint-accent-color:  #dff1f7;
+$faint-alt-highlight: #fff7cd; /* focus for form inputs */
+
+
+/***** Mixins ******/
+@mixin box-shadow($shadow) {
+  -webkit-box-shadow: $shadow;
+     -moz-box-shadow: $shadow;
+          box-shadow: $shadow;
+}
+
+
+
+/************ Base Styles **************/
+
+body {
+  background: $base-color;
+  color: $type-base-color;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  position: relative;
+}
+
+#page-wrapper {
+  min-height: 100%;
+  align-content: center;
+  display: block;
+  margin-left: $sidebar-width;
+}
+
+#page-content-wrapper {
+  display: block;
+  height: 100%;
+  padding: 20px;
+}
+
+/****** Site Content Base ******/
+
+.content-wrapper {
+  background: $content-bg-color;
+  border-radius: 4px;
+  @include box-shadow($dropshadow);
+  padding: 30px 10px;
+}
+
+
+/**** Typography ****/
+
+h1 {
+  color: $type-lighter-color;
+  font-size: 20pt;
+  font-weight: 100;
+}
+
+h2 {
+  font-size: 11pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 36px;
+  margin-bottom: 12px;
+  color: $type-base-color;
+}
+
+h3 {
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.code-snippet {
+  background-color: $faint-neutral-color;
+  font-family: 'Fira Mono', monospace;
+  padding: 2px 5px;
+  display: block;
+  font-size: 9pt;
+  line-height: 1.3em;
+}
+
+.code-snippet.code-block {
+  padding: 10px;
+}
+
+.form-col-list li {
+  margin-bottom:4px;
+}
+
+.emphasis {
+  font-weight: 700;
+  color: $type-lighter-color;
+}
+
+h4 {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+/**** Tables ****/
+
+/* Specifically overrides Bootstraps / Datatables styles for data tables */
+
+.table > thead > tr > th, .table > tbody > tr > td, table > thead > tr > th, table > tbody > tr > td {
+  border-bottom: 1px solid $faint-neutral-color;
+  border-top: none;
+}
+
+.table > thead > tr > th, table > thead > tr > th {
+  padding: 5px 8px;
+}
+
+.table > tbody > tr > td, table > tbody > tr > td {
+  padding: 11px 8px;
+}
+
+table.dataTable, table {
+  width: 100% !important;
+}
+
+table.dataTable thead .sorting, table.dataTable thead .sorting_desc, table.dataTable thead .sorting_asc  {
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: right center;
+  padding-right: 20px;
+}
+
+table.dataTable thead .sorting {
+  background-image: url(image_path('layout/icon_sort.svg'));
+}
+
+table.dataTable thead .sorting_asc {
+  background-image: url(image_path('layout/icon_sort_asc.svg'));
+}
+
+table.dataTable thead .sorting_desc {
+  background-image: url(image_path('layout/icon_sort_dec.svg'));
+}
+
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
+  float: none;
+  display: inline-block;
+}
+
+table.dataTable.no-footer {
+  border-bottom: 1px solid $faint-neutral-color;
+}
+
+.dataTables_info, .dataTables_paginate {
+  font-size: 9pt;
+  margin: 20px 0;
+  color: $type-lighter-color !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: $bug-section-color !important;
+  color: $content-bg-color  !important;
+  border: 1px solid $bug-section-color !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  border-radius: 2px;
+  background: $content-bg-color;
+  border: 1px solid $faint-neutral-color !important;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: $type-lighter-color;
+  color: $content-bg-color;
+  border-radius: 2px;
+  border: 1px solid $type-lighter-color !important;
+}
+
+
+/**** Additional table styles ***/
+table {
+  font-size: 9pt;
+  border: none;
+}
+
+th {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 8pt;
+  text-align: left;
+}
+
+.td-tools {
+  padding: 0 !important;
+  text-align: right;
+}
+
+.col-nowrap {
+  white-space: nowrap !important;
+}
+
+
+
+/**** Content toolbar  *******/
+/*** Current toolbar is specifically generated on a datatables table         ***/
+/*** We will need to work around this for the other places where toolbars    ***/
+/*** need to interact with both table data and differently displayed data.   ***/
+
+.toolbar {
+  display: flex;
+  width: 100%;
+  font-size: 9pt;
+  margin: 20px 0;
+  position: relative;
+  color: $type-lighter-color;
+}
+
+.toolbar div {
+  border: 1px solid $faint-neutral-color;
+  padding: 3px;
+  height: 35px;
+  width: 200px;
+}
+
+.toolbar div:first-child {
+  margin-right: 3px;
+}
+
+.toolbar div:last-child {
+  width: 100%;
+}
+
+.toolbar label {
+  color: $type-lighter-color;
+}
+
+.toolbar input[type=search] {
+  display: inline-block;
+  background-color: transparent;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  padding: 4px 5px;
+}
+
+.toolbar select {
+  display: inline-block;
+  background-color: $content-bg-color;
+  border-radius: 0 !important;
+  border: 1px solid #ccc !important;
+  margin: 1px 2px;
+}
+
+.dataTables_length label {
+  background-color: $faint-neutral-color;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  display: block;
+  padding: 2px 5px;
+}
+
+.toolbar input:focus, .toolbar select:focus {
+  box-shadow: inset 0 0 5px $bug-section-color;
+  outline: none;
+  border: 1px solid $bug-section-color !important;
+}
+
+/********* Buttons ****************/
+/*** Buttons in Content Table ***/
+.toolbar-row {
+  min-width: 60px;
+}
+
+.toolbar-row button {
+  display: inline-block;
+  background-color: $nav-toolbar-color;
+  border-radius: 2px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background-repeat: no-repeat;
+  margin: 9px 3px;
+}
+
+.edit-button    {background-image: url(image_path('icon_edit.svg'));}
+.related-button {background-image: url(image_path('icon_related.svg'));}
+.delete-button  {background-image: url(image_path('icon_delete.svg'));}
+
+
+
+/********* Tabs *************/
+
+.nav-tabs > li > a {
+  background-color: $content-tab-color;
+  text-transform: uppercase;
+  font-size: 9pt;
+  font-weight: 700;
+  margin-top: 1px;
+  margin-left: -5px;
+  padding-left: 38px;
+  padding-right: 38px;
+  color: $content-bg-color;
+  @include box-shadow($dropshadow);
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  background-repeat: no-repeat;
+  background-size: 26px;
+  background-position: 5px center;
+}
+
+.nav-tabs > li > a#admin-rule-tab-link        {background-image: url(image_path('icon_rules.svg'));}
+.nav-tabs > li > a#admin-validations-tab-link {background-image: url(image_path('icon_validations.svg'));}
+
+.nav-tabs > li > a.active {
+  background-color: $content-bg-color;
+  color: $type-lighter-color;
+}
+
+.nav-tabs::before {
+  content: '';
+  width: 90%; /* this is not ideal, may have to come back and test other options, should not poke outside of the content wrapper though. */
+  height: 10px;
+  position: absolute;
+  background-color: white;
+  z-index: 50;
+  margin-top: 44px;
+  border-top-right-radius: 2px;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  background-color: $sidebar-nav-base;
+  border-color: transparent;
+}
+
+
+
+/******** Messages / Warnings ********/
+
+.message-div {
+  border: 2px solid $content-bg-color;
+  width: 100%;
+  text-align: center;
+  padding: 12px 20px;
+  margin: 20px auto;
+  display: block;
+  font-weight: 700;
+  font-size: 8.5pt;
+  color: $type-lighter-color;
+  text-transform: uppercase;
+}
+
+.message-div::before {
+  content: '';
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 22px;
+  margin-top: -24px;
+  margin-bottom: 3px;
+  background-repeat: no-repeat;
+  background-position: center;
+  text-align: center;
+}
+
+.success-msg::before {
+  background-image: url(image_path('icon_success.svg'));
+}
+.warning-msg::before {
+  background-image: url(image_path('icon_warning.svg'));
+}
+.fail-msg::before {
+  background-image: url(image_path('icon_fail.svg'));
+}
+
+
+/************ Forms ***************/
+
+.editing {
+  border: 1px solid $bug-section-color;
+}
+
+.form-wrapper {
+  margin: 20px;
+}
+
+.form-control {
+  font-family: 'Fira Mono', monospace;
+  border-radius: 0 !important;
+  -webkit-border-radius: 0;
+  outline: 1px solid $faint-accent-color;
+  outline-offset: -1px;
+  padding: 0;
+  background-color: $faint-accent-color;
+  font-size: 8.5pt;
+  border: none;
+  box-shadow: none;
+  height: 20px;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  background-color: $faint-alt-highlight;
+  outline: 1px solid $faint-alt-highlight;
+}
+
+fieldset {
+  border: 1px solid $faint-neutral-color;
+  padding: 4px;
+  margin: 32px 0;
+}
+
+fieldset:focus-within {
+  box-shadow: 0 0 3px $faint-accent-color;
+  -webkit-box-shadow: 0 0 3px $faint-accent-color;
+  border: 1px solid $faint-accent-color;
+}
+
+.form-wrapper .row fieldset {
+  margin: 32px 0 0 0; /* Margin is different between fieldsets wrapped in rows versus fieldsets with rows within them */
+}
+
+.form-wrapper input, .form-wrapper textarea {
+  font-family: 'Fira Mono', monospace;
+  background-color: $faint-accent-color;
+  border: none;
+  padding: 2px 5px;
+  font-size: 8.5pt;
+  line-height: 1.3em;
+  width: 100%;
+  height: 100%;
+}
+
+.form-wrapper input[type="text"]:disabled {
+  background-color: $faint-neutral-color;
+  cursor: not-allowed;
+}
+
+textarea {
+  display: block;
+}
+
+.form-wrapper input:focus, .form-wrapper textarea:focus {
+  outline: none;
+  background-color: $faint-alt-highlight;
+}
+
+.input-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.input-wrapper.left  {padding-right: 4px;}
+
+
+.form-wrapper label {
+  position: absolute;
+  margin-top: -18px;
+  font-size: 7pt;
+  color: $type-lighter-color;
+}
+
+.form-wrapper label.checkbox-label {
+  margin-top: 0;
+}
+
+fieldset .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+fieldset .col-xs-2, fieldset .col-xs-10, fieldset .col-xs-4 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+select {
+  border-radius: 2px !important;
+}
+
+.form-col-list {
+  -webkit-column-count:3;
+  -moz-column-count:3;
+  -ms-column-count:3;
+  -o-column-count:3;
+  column-count:3;
+  -webkit-column-gap:15px;
+  -moz-column-gap:15px;
+  -ms-column-gap:15px;
+  -o-column-gap:15px;
+  column-gap:15px;
+  columns:3;
+}
+
+.checkbox-row {
+  margin-top: 16px;
+  height: 32px;
+  padding-left: 5px;
+  margin-bottom: 32px;
+}
+
+.button-group button {
+  font-size: 8pt;
+  border-radius: 2px;
+  text-align: center;
+  font-weight: 400;
+  border: none;
+  padding: 8px 28px;
+  background-repeat: no-repeat;
+  background-size: 22px;
+  background-position: 2px center;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+button.call-to-action {
+  background-color: $bug-section-color;
+  color: $content-bg-color;
+  border: 1px solid $bug-section-color;
+}
+
+button.call-to-action:hover {
+  background-color: $content-tab-color;
+  border: 1px solid $content-tab-color;
+}
+
+button.call-to-action:focus {
+  box-shadow: inset 0 0 5px $bug-section-color;
+  outline: none;
+  border: 1px solid $bug-section-color;
+  background-color: $content-bg-color;
+  color: $bug-section-color;
+}
+
+button.secondary {
+  background-color: $nav-toolbar-color;
+  border: 1px solid $nav-toolbar-color;
+  color: $type-base-color;
+}
+
+button.secondary:hover {
+  background-color: $type-lighter-color;
+  border: 1px solid $type-lighter-color;
+  color: $content-bg-color;
+}
+
+button.secondary:focus, a:focus button.secondary {
+  background-color: $nav-toolbar-color;
+  border: 1px solid $nav-toolbar-color;
+  color: $type-base-color;
+  box-shadow: inset 0 0 5px $type-lighter-color;
+  outline: none;
+}
+
+a:focus { outline: none;}
+
+button.save          {background-image: url(image_path('icon_save.svg'));}
+button.save:focus    {background-image: url(image_path('icon_save_blue.svg'));}
+button.cancel        {background-image: url(image_path('icon_cancel.svg'));}
+button.cancel:hover  {background-image: url(image_path('icon_cancel_white.svg'));}
+button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('icon_cancel.svg'));}
+
+/************ Side Nav **************/
+
+#sidenav-icons-div {
+  width: $sidebar-width;
+  height: 100%;
+  background: $sidebar-nav-base;
+  display: block;
+  position: absolute;
+  z-index: 100;
+  @include box-shadow($dropshadow);
+}
+
+#sidenav-icons-div .sidenav-icons {
+  background: $sidebar-nav-base;
+  height: 100%;
+}
+
+#sidenav-menu-div {
+  background-color: $sidebar-nav-base;
+  display: block;
+  position: absolute;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: $sidebar-width;
+  z-index: -1;
+  width: 200px;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
+  -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#sidenav-menu-div a {
+  color: #fff;
+  display: block;
+  width: 100%;
+  height:100%;
+  padding-left: 5px;
+}
+
+.nav-container {
+  -webkit-transform: translateX(-30%);
+  transform: translateX(-30%);
+  -webkit-transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  -webkit-transition-delay: 0;
+  transition-delay: 0;
+  opacity: 1;
+  height: 100%;
+  width: 100%;
+  @include box-shadow($dropshadow);
+}
+
+.nav-container span, .nav-container span a {
+  opacity: 0;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div {
+  -webkit-transform: none;
+  transform: none;
+  opacity: 1;
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .nav-container {
+  -webkit-transform: none;
+  transform: none;
+  opacity: 1;
+  -webkit-transition-delay: 0;
+  transition-delay: 0;
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .nav-container li span, #nav-trigger:checked ~ #sidenav-menu-div .nav-container li span a {
+  opacity: 1;
+  -webkit-transition-delay: 330ms;
+  transition-delay: 330ms;
+}
+
+.nav-container li, .sidenav-icons li {
+  border-bottom: 1px solid #fff;
+}
+
+.nav-container li {
+  height: $sidebar-width;
+  padding-left: $sidebar-width;
+}
+
+.nav-menu-spacer {height: $sidebar-width; }
+
+#nav-trigger-label {
+  height: 40px;
+  position: absolute;
+  top: 46px;
+  left: 2px;
+  width: 40px;
+}
+
+#nav-trigger-label img {
+  transform: rotate(-0.25turn);
+  -webkit-transform: rotate(-0.25turn);
+  cursor: pointer;
+  transition: transform 0.25s;
+  -webkit-transition: transform 0.25s ;
+}
+
+#nav-trigger:checked ~ #nav-trigger-label img {
+  transform: rotate(0turn);
+  -webkit-transform: rotate(0turn);
+}
+
+.nav-item {
+  padding: 4px 4px 2px 4px;
+  height: $sidebar-width;
+}
+
+.nav-ac    {background-color: $ac-nav-bg-color;}
+.nav-bugs  {background-color: $bug-section-color;}
+.nav-users {background-color: $user-section-color;}
+.nav-wiki  {background-color: $wiki-section-color;}
+
+.ac-logo-text {
+  height: $sidebar-width;;
+  width: auto;
+  margin-top: -1px;
+}
+
+/***** End of Side Nav *****/
+
+
+
+/****** Top Tool Bar / Nav Bar area ******/
+
+#nav-banner {
+  background-color: $nav-toolbar-color;
+  height: 44px;
+  display: block;
+  text-align: center;
+}
+
+#login-div {
+  display: inline-block;
+  position: absolute;
+  right: 20px;
+  top: 11px;
+}
+
+#login-div {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+}
+
+#login-div a {
+  color: $sidebar-nav-base;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 10pt;
+}
+
+.search-box {
+  background-color: $ac-nav-bg-color;
+  background-image: url(image_path('layout/search_icon.svg'));
+  background-repeat: no-repeat;
+  background-size: 18px;
+  background-position: 3px center;
+  border: none;
+  border-radius: 2px;
+  margin-top: 10px;
+  height: 22px;
+  padding-left: 26px;
+
+}
+
+.search-box::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+.search-box::-moz-placeholder { /* Firefox 19+ */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+.search-box:-ms-input-placeholder { /* IE 10+ */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+.search-box:-moz-placeholder { /* Firefox 18- */
+  color: $content-tab-color;
+  font-size: 7pt;
+}
+
+
+/****** End Top Tool Bar ******/
+
+

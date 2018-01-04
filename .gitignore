@@ -28,6 +28,10 @@
 
 /ignore/
 
+#data directories
+/load_ruledoc/
+/lib/data/nvd/
+
 /net-snort-parser/
 
 coverage
