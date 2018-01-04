@@ -126,15 +126,15 @@ if [ "SKIP" != "$BUNDLE_PACKAGE" ]; then
     if [ -d vendor/gems ]; then
         cp `find vendor/gems -name '*.gem'` vendor/cache
     fi
-    bundle _1.14.6_ package --path vendor/bundle
+    bundle _1.16.1_ package --path vendor/bundle
 fi
 
 if [ "SKIP" != "$BUNDLE_INSTALL" ]; then
     echo '* bundle install'
     if [ "DEPLOYMENT" == "$DEPLOYMENT" ]; then
-        bundle _1.14.6_ install --deployment --clean --local --path vendor/bundle --without development test
+        bundle _1.16.1_ install --deployment --clean --local --path vendor/bundle --without development test
     else
-        bundle _1.14.6_ install --local --path vendor/bundle
+        bundle _1.16.1_ install --local --path vendor/bundle
     fi
 fi
 
