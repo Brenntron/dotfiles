@@ -1379,21 +1379,25 @@ class Bug < ApplicationRecord
 
               #prepopulating committer notes in notes tab
 
-              unless bug_has_published_notes
-                last_committer_note = bug.notes.last_committer_note.first
-                if last_committer_note.present?
-                  committer_note_text_area = ""
-                  if last_committer_note
-                    committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:", true) + "\n"
-                  end
-                  new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
-                  new_note.note_type = 'committer'
-                  new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
-                  new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
-                  new_note.created_at = Time.now.to_time
-                  new_note.save
+              last_committer_note = bug.notes.last_committer_note.first
+              if last_committer_note.present?
+                committer_note_text_area = ""
+                if last_committer_note
+                  committer_note_text_area = Note.parse_from_note(last_committer_note.comment, "Committer Notes:", true) + "\n"
                 end
               end
+              if bug_has_published_notes
+                bug.committer_notes = committer_note_text_area
+                bug.save
+              else
+                new_note = Note.where(notes_bugzilla_id: nil, bug_id: bug_id).committer_note.first_or_create
+                new_note.note_type = 'committer'
+                new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
+                new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
+                new_note.created_at = Time.now.to_time
+                new_note.save
+              end
+
 
               #prepopulating research notes in notes tab
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first

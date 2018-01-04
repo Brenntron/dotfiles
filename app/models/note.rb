@@ -31,6 +31,7 @@ class Note < ApplicationRecord
   end
 
   def self.parse_from_note(text, delimiter, include_delimiter = false)
+
     new_note_block = ""
     line_started = 0
     started = false

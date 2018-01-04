@@ -209,10 +209,15 @@ module API
             raise "There are no UPDATED or NEW rules in your selection!\nPlease select rules with a state of UPDATED or NEW." if rules.empty?
             raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
 
+            if permitted_params[:bug_id].present?
+              bug = Bug.where(:id => permitted_params[:bug_id]).first
+              bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment} #{permitted_params[:bugzilla_comment]}"
+            end
+
             Repo::RuleCommitter.commit_rules_action(rules,
                                                     username: permitted_params[:username],
                                                     bugzilla_id: permitted_params[:bug_id],
-                                                    bugzilla_comment: permitted_params[:bugzilla_comment],
+                                                    bugzilla_comment: bugzilla_comment,
                                                     xmlrpc: bugzilla_session,
                                                     nodoc_override: permitted_params[:nodoc_override])
 

@@ -45,12 +45,22 @@
         </h4>
         <div class="alert_notes_commit"></div>
       </div>
-      <% committer_note = @bug.notes.last_committer_note.first %>
+      <%if @bug.committer_notes %>
+        <% commit_note_pad = @bug.committer_notes %>
+      <%else%>
+        <% committer_note = @bug.notes.last_committer_note.first %>
+      <%end%>
       <div id="comm_notes_collapse" class="panel-collapse" role="tabpanel" aria-labelledby="headingThree">
         <div class="panel-body row">
           <form id="committer_notes_form">
             <div class="form-group col-xs-12 col-md-10 col-lg-11">
-              <textarea <% if current_user.has_role?('committer') %>id="committerNotesEditArea"<%end%>class="form-control disabled code wrapped_code select-sm autosize autoExpand" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly><%= committer_note ? committer_note.comment : "" %></textarea>
+              <textarea <% if current_user.has_role?('committer') %>id="committerNotesEditArea"<%end%>class="form-control disabled code wrapped_code select-sm autosize autoExpand" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly>
+                <%if commit_note_pad %>
+                  <%= commit_note_pad ? commit_note_pad : "" %>
+                <%else%>
+                  <%= committer_note ? committer_note : Note.parse_from_note(committer_note.comment,"Committer Notes:",true)%>
+                <%end%>
+              </textarea>
               <input type="hidden" name="committer_note_id" value="<%= committer_note ? committer_note.id : nil %>">
             </div>
             <input type="hidden" name="committer_type" value="committer">
