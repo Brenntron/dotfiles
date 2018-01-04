@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171122160533) do
+ActiveRecord::Schema.define(version: 20171219175018) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 20171122160533) do
     t.string "link_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["link_id", "link_type"], name: "index_bug_reference_rule_links_on_link_id_and_link_type"
+    t.index ["link_type", "link_id"], name: "index_bug_reference_rule_links_on_link_type_and_link_id"
   end
 
   create_table "bugs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -116,6 +116,29 @@ ActiveRecord::Schema.define(version: 20171122160533) do
     t.index ["bug_id", "whiteboard_id"], name: "index_bugs_whiteboards_on_bug_id_and_whiteboard_id", unique: true
     t.index ["bug_id"], name: "index_bugs_whiteboards_on_bug_id"
     t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
+  end
+
+  create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "reference_id", null: false
+    t.string "year", null: false
+    t.string "cve_key", null: false
+    t.text "description"
+    t.string "severity"
+    t.float "base_score", limit: 24
+    t.float "impact_score", limit: 24
+    t.float "exploit_score", limit: 24
+    t.string "confidentiality_impact"
+    t.string "integrity_impact"
+    t.string "availability_impact"
+    t.string "vector_string"
+    t.string "access_vector"
+    t.string "access_complexity"
+    t.string "authentication"
+    t.text "affected_systems", limit: 4294967295
+    t.index ["cve_key"], name: "index_cves_on_cve_key", unique: true
+    t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
 
   create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -203,10 +226,11 @@ ActiveRecord::Schema.define(version: 20171122160533) do
   end
 
   create_table "references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "reference_data"
+    t.text "reference_data"
     t.integer "reference_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "fail_count"
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
@@ -232,7 +256,7 @@ ActiveRecord::Schema.define(version: 20171122160533) do
     t.text "summary"
     t.text "impact"
     t.text "details"
-    t.text "affected_sys"
+    t.text "affected_sys", limit: 4294967295
     t.text "attack_scenarios"
     t.text "ease_of_attack"
     t.text "false_positives"
@@ -279,6 +303,8 @@ ActiveRecord::Schema.define(version: 20171122160533) do
     t.text "svn_result_output"
     t.integer "svn_result_code"
     t.boolean "svn_success"
+    t.string "snort_doc_status", default: "NOTYET"
+    t.string "snort_on_off", default: "on"
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
@@ -342,6 +368,14 @@ ActiveRecord::Schema.define(version: 20171122160533) do
     t.integer "rule_id"
     t.index ["reference_id"], name: "index_unused_references_rules_on_reference_id"
     t.index ["rule_id"], name: "index_unused_references_rules_on_rule_id"
+  end
+
+  create_table "user_api_keys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.string "api_key"
+    t.index ["api_key"], name: "index_user_api_keys_on_api_key", unique: true
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
