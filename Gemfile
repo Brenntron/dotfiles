@@ -22,6 +22,7 @@ gem 'mysql2', '0.3.21'
 gem 'rmagick', '~> 2.13.2'
 gem 'ruby-bugzilla', '~> 0.6.4'
 
+gem 'xmlrpc'
 gem 'libv8', '3.16.14.17'
 
 gem 'xmlrpc'
@@ -41,6 +42,7 @@ gem 'pry-remote', '~> 0.1.8'
 
 gem 'foreman', '~> 0.84.0'
 
+gem 'simple_form', '~> 3.5.0'
 gem 'jbuilder', '~> 2.6.4'
 gem 'dotenv-rails', '~> 2.2.1'
 gem 'diffy', '~> 3.2.0'

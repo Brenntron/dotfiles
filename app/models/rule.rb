@@ -34,6 +34,13 @@ require 'tempfile'
 #       * valid             |int|  STALE  |   EDIT    |  STALE_EDIT  | true | edited rule, but CVS has since been updated and cannot save
 #       * failed parse      |int|  STALE  |   EDIT    |  STALE_EDIT  |false | stale edit which failed visruleparse
 #
+# snort_doc_status
+#   Rules start in NOT_YET_PUB status.
+#   When rules are published to snort, they are marked as TO_BE_PUB.
+#   Except rules set as SUPRESS will not be set to TO_BE_PUB.
+#   Docs are generated from *all* TO_BE_PUB, including manually set.
+#   When generated docs are uploaded to snort.org the rules are set to BEEN_PUB.
+#
 class Rule < ApplicationRecord
   has_paper_trail
 
@@ -71,6 +78,18 @@ class Rule < ApplicationRecord
 
   DOC_STATUS_UPDATED            = 'UPDATED'
   DOC_STATUS_SYNCHED            = 'SYNCHED'
+
+  SNORT_DOC_STATUS_SUPRESS      = 'SUPRESS'
+  SNORT_DOC_STATUS_NOT_YET_PUB  = 'NOTYET'
+  SNORT_DOC_STATUS_TO_BE_PUB    = 'TOBE'
+  SNORT_DOC_STATUS_BEEN_PUB     = 'BEEN'
+  SNORT_DOC_STATUSES            =
+      [
+          SNORT_DOC_STATUS_SUPRESS,
+          SNORT_DOC_STATUS_NOT_YET_PUB,
+          SNORT_DOC_STATUS_TO_BE_PUB,
+          SNORT_DOC_STATUS_BEEN_PUB,
+      ]
 
   # Pre-commit hook intercepted commit, failed it, and successfully checked in the rule
   SVN_SUCCESS_COMMIT_HOOK = 199
@@ -182,7 +201,7 @@ class Rule < ApplicationRecord
     if synched_rule?
       "#{bug.pcap_alerts.by_rule(self).count}"
     else
-      "<font style='color: red;'>#{bug.local_alerts.by_rule(self).count} LOCAL</font>"
+      "#{bug.local_alerts.by_rule(self).count}"
     end
   end
 
@@ -536,10 +555,12 @@ class Rule < ApplicationRecord
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
     find_from_parser(parser, rule_id).tap do |rule|
-      rule.assign_from_user_edit(rule_content, parser: parser)
-      rule.bugs_rules.update_all(tested: false)
-      rule.save!
-      rule.clear_svn_result
+      unless rule_content == rule.cvs_rule_content
+        rule.assign_from_user_edit(rule_content, parser: parser)
+        rule.bugs_rules.update_all(tested: false)
+        rule.save!
+        rule.clear_svn_result
+      end
     end
   end
 
@@ -1085,7 +1106,6 @@ class Rule < ApplicationRecord
   def self.revert_rules_action(rules)
     rules.each do |rule|
       rule.revert_grep(Rule.grep_line_from_file!(rule.sid, rule.gid, rule.filename))
-      rule.rule_doc.revert_doc if rule.rule_doc
     end
 
     true
@@ -1116,3 +1136,4 @@ class Rule < ApplicationRecord
     rule.update_parts(rule_data)
   end
 end
+

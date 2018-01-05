@@ -1,39 +1,42 @@
-<%= form_for @user do |f| %>
+<%= simple_form_for @user do |user_form| %>
 
-    <div class="row">
-      <div class="col-sm-4 form-group">
-        <label for="priority">CVS_Username</label>
-          <%= f.text_field :cvs_username, class: "form-control create-input", required: true %>
-      </div>
-      <div class="col-sm-4 form-group">
-        <label for="priority">CEC_Username</label>
-        <%= f.text_field :cec_username, class: "form-control create-input", required: true %>
-      </div>
-      <div class="col-sm-4 form-group">
-        <label for="priority">Kerberos_Username</label>
-        <%= f.text_field :kerberos_login, class: "form-control create-input", required: true %>
-      </div>
+  <div class="row">
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :cvs_username, label: 'CVS Username', class: "form-control create-input",
+                          required: true, :input_html => {class: "form-control create-input", minlength: 1} %>
     </div>
-    <div class="row">
-      <div class="col-sm-6 form-group">
-        <label for="priority">Display_name</label>
-        <%= f.text_field :display_name, class: "form-control create-input", required: true %>
-      </div>
-      <div class="col-sm-6 form-group">
-        <label for="priority">email</label>
-        <%= f.text_field :email, class: "form-control create-input", required: true %>
-      </div>
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :cec_username, label: 'CEC Username', class: "form-control create-input",
+                          :input_html => {class: "form-control create-input", minlength: 1} %>
     </div>
-    <div class="row">
-      <div class="col-sm-6 form-group">
-        <label for="priority">committer</label>
-        <%= f.check_box :committer, class: "form-control create-input" %>
-      </div>
-      <div class="col-sm-6 form-group">
-        <label for="priority">confirmed</label>
-        <%= f.check_box :confirmed, class: "form-control create-input" %>
-      </div>
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :kerberos_login, class: "form-control create-input",
+                          :input_html => {class: "form-control create-input", minlength: 1} %>
     </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :display_name, class: "form-control create-input", required: true,
+                          :input_html => {class: "form-control create-input", minlength: 1}  %>
+    </div>
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :email, class: "form-control create-input", required: true,
+                          :input_html => {class: "form-control create-input", minlength: 1}  %>
+    </div>
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :committer %>
+      <%= user_form.input :confirmed %>
+    </div>
+  </div>
+  <%= user_form.simple_fields_for :user_api_key do |user_api_key_form| %>
+  <div class="row">
+    <div class="col-sm-4 form-group">
+      <%= user_api_key_form.input :api_key, label: 'API Key', required: false,
+                                  :input_html => {class: "create-input", size: 84, value: @user.user_api_key&.api_key} %>
+    </div>
+  </div>
+  <% end %>
+
     <div class="row">
       <div class="col-sm-12 form-group">
         <button class="btn btn-success edit-user" value="submit">Save</button>
@@ -41,4 +44,4 @@
         <button class="select-sm btn btn-default hidden" id="saving_user"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> saving</button>
       </div>
     </div>
-<%end%>
+<% end %>

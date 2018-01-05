@@ -747,12 +747,14 @@ class Bug < ApplicationRecord
 
   ####end method group###############
 
-  def self.synch_history(xmlrpc, new_bugs)
-    unless new_bugs.empty?
-      new_bugs['bugs'].each do |item|
+  # @param [Bugzilla::Bug] bugzilla_bug_proxy
+  # @param [Hash] new_bugs_hash
+  def self.synch_history(bugzilla_bug_proxy, new_bugs_hash)
+    unless new_bugs_hash.empty?
+      new_bugs_hash['bugs'].each do |item|
         bug_id = item['id']
         begin
-          new_comments = xmlrpc.comments(ids: [bug_id])
+          new_comments = bugzilla_bug_proxy.comments(ids: [bug_id])
         rescue RuntimeError => e
           new_comments = []
           Note.create(author: 'AC Admin',

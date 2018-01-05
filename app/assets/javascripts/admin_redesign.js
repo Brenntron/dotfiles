@@ -20,5 +20,6 @@
 //= require rule_docs
 //= require admin/notes
 //= require admin/bs-admin-tabs
+//= require admin/snort-docs
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive

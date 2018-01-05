@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171209120000) do
+ActiveRecord::Schema.define(version: 20171219175018) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -304,6 +304,7 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.integer "svn_result_code"
     t.boolean "svn_success"
     t.string "snort_doc_status", default: "NOTYET"
+    t.string "snort_on_off", default: "on"
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
@@ -367,6 +368,14 @@ ActiveRecord::Schema.define(version: 20171209120000) do
     t.integer "rule_id"
     t.index ["reference_id"], name: "index_unused_references_rules_on_reference_id"
     t.index ["rule_id"], name: "index_unused_references_rules_on_rule_id"
+  end
+
+  create_table "user_api_keys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.string "api_key"
+    t.index ["api_key"], name: "index_user_api_keys_on_api_key", unique: true
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
