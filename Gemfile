@@ -1,8 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'rake', '12.0.0'
-gem 'i18n', '0.8.6'
-
 gem 'rails', '5.1.0'
 gem 'haml', '~> 5.0.1'
 
