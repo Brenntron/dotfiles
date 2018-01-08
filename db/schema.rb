@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171219175018) do
+ActiveRecord::Schema.define(version: 20180105210205) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -70,7 +70,7 @@ ActiveRecord::Schema.define(version: 20171219175018) do
     t.string "priority"
     t.string "severity"
     t.text "research_notes"
-    t.string "committer_notes"
+    t.text "committer_notes"
     t.integer "classification", default: 0
     t.integer "unused_gid", default: 1
     t.integer "unused_sid"

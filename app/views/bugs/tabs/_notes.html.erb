@@ -58,7 +58,7 @@
                 <%if commit_note_pad %>
                   <%= commit_note_pad ? commit_note_pad : "" %>
                 <%else%>
-                  <%= committer_note ? committer_note : Note.parse_from_note(committer_note.comment,"Committer Notes:",true)%>
+                  <%= committer_note ? committer_note.comment : Note.parse_from_note(committer_note.comment,"Committer Notes:",true)%>
                 <%end%>
               </textarea>
               <input type="hidden" name="committer_note_id" value="<%= committer_note ? committer_note.id : nil %>">

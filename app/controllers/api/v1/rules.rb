@@ -211,7 +211,11 @@ module API
 
             if permitted_params[:bug_id].present?
               bug = Bug.where(:id => permitted_params[:bug_id]).first
-              bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment} #{permitted_params[:bugzilla_comment]}"
+              if bug.committer_notes
+                bugzilla_comment = "#{bug.committer_notes} #{permitted_params[:bugzilla_comment]}"
+              else
+                bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment} #{permitted_params[:bugzilla_comment]}"
+              end
             end
 
             Repo::RuleCommitter.commit_rules_action(rules,
@@ -246,10 +250,19 @@ module API
             raise "You must select a rule to commit!" if rules.empty?
             raise "You are unauthorized to commit those rules!" unless rules.all? {|rule| can?(:publish, rule)}
 
+            if permitted_params[:bug_id].present?
+              bug = Bug.where(:id => permitted_params[:bug_id]).first
+              if bug.committer_notes
+                bugzilla_comment = "#{bug.committer_notes} #{permitted_params[:bugzilla_comment]}"
+              else
+                bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment} #{permitted_params[:bugzilla_comment]}"
+              end
+            end
+
             Repo::RuleCommitter.commit_rules_action(rules,
                                                     username: permitted_params[:username],
                                                     bugzilla_id: permitted_params[:bug_id],
-                                                    bugzilla_comment: permitted_params[:bugzilla_comment],
+                                                    bugzilla_comment: bugzilla_comment,
                                                     xmlrpc: bugzilla_session)
             if permitted_params[:bug_id].present?
               main_committer = User.where(email: "vrt-qa@sourcefire.com").first
