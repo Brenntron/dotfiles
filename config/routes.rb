@@ -113,6 +113,9 @@ Rails.application.routes.draw do
 
   namespace :peake_bridge do
     resources :channels, only: [:index] do
+      collection do
+        post 'fp-create/messages', to: 'messages#fp_create'
+      end
       resources :messages, only: [:create]
     end
   end
