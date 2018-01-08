@@ -19,7 +19,7 @@ gem 'devise', '~> 4.3.0'
 gem 'net-ldap', '~> 0.16.0'
 
 gem 'mysql2', '0.3.21'
-gem 'rmagick', '~> 2.13.2'
+gem 'rmagick', '~> 2.16.0'
 gem 'ruby-bugzilla', '~> 0.6.4'
 
 gem 'xmlrpc'
