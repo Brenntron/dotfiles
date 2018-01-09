@@ -99,5 +99,5 @@ gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
 gem "sprockets", '~> 3.7.1'
 
-gem 'peake-bridge', '~> 0.0.0.1'
+gem 'peake-bridge-client', '>= 0.0.0.11'
 

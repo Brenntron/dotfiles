@@ -11,7 +11,7 @@ development:
       peakebridge:
         host: "localhost"
         port: 2966
-        ssl: false
+        ssl_mode: "no-ssl"
         uri_base: "/peakebridge/channels"
   perl:
     cmd: "/usr/bin/env perl"

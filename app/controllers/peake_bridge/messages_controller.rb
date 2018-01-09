@@ -11,7 +11,7 @@ module PeakeBridge
       addressee = envelope && envelope[:addressee]
       Rails.logger.debug("PeakeBridge addressee = #{addressee.inspect}")
 
-      sender = 'snort-org'
+      sender = envelope && envelope[:sender]
       Rails.logger.debug("PeakeBridge sender = #{sender.inspect}")
 
       message = params[:message]
@@ -22,15 +22,15 @@ module PeakeBridge
 
       Rails.logger.debug("Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect} from sender #{sender.inspect}")
 
-      source_key = "//#{sender}/#{false_positive['id']}"
+      source_key = false_positive['id']
       Rails.logger.debug("PeakeBridge source_key = #{source_key.inspect}")
 
-      conn = PeakeBridge::FpCreatedEvent.new(source_key: source_key)
+      conn = PeakeBridge::FpCreatedEvent.new(source_authority: sender, source_key: false_positive['id'])
       response = conn.post
       Rails.logger.debug("PeakeBridge response.body = #{response.body.inspect}")
 
       # render plain: "Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect}"
-      raise "Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect}"
+      raise "Analyst Console recieved message, on channel #{channel.inspect} from #{sender.inspect} to addressee #{addressee.inspect}"
     end
 
     # Add route for specific channels to their own action under the channels collection.
