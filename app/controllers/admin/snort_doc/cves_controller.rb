@@ -12,7 +12,7 @@ class Admin::SnortDoc::CvesController < ApplicationController
   # POST /admin/snort_doc/cves/download
   # Force a download of a given NVD file.
   def download
-    SnortDocPublisher.download(download_params['filename'])
+    SnortDocPublisher.download_file(download_params['filename'])
 
     redirect_to admin_snort_doc_cves_nvd_path
   end
