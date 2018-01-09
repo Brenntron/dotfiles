@@ -58,7 +58,7 @@ class HurlArgs
     @do_precompile_assets   = false
     @do_upload              = true
     @do_disgorge            = true
-    @bundler_version        = '_1.14.6_'
+    @bundler_version        = '_1.16.1_'
   end
 
   def scan_args(args)
@@ -86,7 +86,7 @@ class HurlArgs
           @do_precompile_assets  = false
           @do_create_tar      = true
           # @bundler_version    = '_1.15.1_'
-          @bundler_version    = '_1.14.6_'
+          @bundler_version    = '_1.16.1_'
         when "--development"
           @env                = 'development.env'
           @get_source         = true
@@ -94,7 +94,7 @@ class HurlArgs
           @do_precompile_assets  = false
           @do_create_tar      = true
           # @bundler_version    = '_1.15.1_'
-          @bundler_version    = '_1.14.6_'
+          @bundler_version    = '_1.16.1_'
         when /\A--version=(?<version>.*)\z/
           /\A--version=(?<version>.*)\z/ =~ arg
           @version = version
