@@ -1,55 +1,47 @@
-module PeakeBridge
-  class MessagesController < ApplicationController
-    def fp_create
+class PeakeBridge::MessagesController < ApplicationController
+  def fp_create
 
-      envelope = params[:envelope]
-      Rails.logger.debug("PeakeBridge envelope = #{envelope.inspect}")
+    sender = envelope_params[:sender]
 
-      channel = envelope && envelope[:channel]
-      Rails.logger.debug("PeakeBridge message recieved, on channel #{channel.inspect}")
+    false_positive = FalsePositive.create_from_params(false_positive_params,
+                                                      attachments_attrs: attachments_params,
+                                                      sender: sender)
+    byebug
 
-      addressee = envelope && envelope[:addressee]
-      Rails.logger.debug("PeakeBridge addressee = #{addressee.inspect}")
+    Rails.logger.debug("Analyst Console recieved message, on channel fp_create from sender #{sender.inspect}")
 
-      sender = envelope && envelope[:sender]
-      Rails.logger.debug("PeakeBridge sender = #{sender.inspect}")
+    conn = PeakeBridge::FpCreatedEvent.new(addressee: sender,
+                                           source_authority: false_positive.source_authority,
+                                           source_key: false_positive.source_key)
 
-      message = params[:message]
-      Rails.logger.debug("PeakeBridge message = #{message.inspect}")
+    response = conn.post(false_positive_id: false_positive.id)
+    Rails.logger.debug("PeakeBridge response.body = #{response.body.inspect}")
 
-      false_positive = message['false_positive']
-      Rails.logger.debug("PeakeBridge false_positive = #{false_positive.inspect}")
+    # render plain: "Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect}"
+    raise "Analyst Console recieved message, on channel #{channel.inspect} from #{sender.inspect} to addressee #{addressee.inspect}"
+  end
 
-      Rails.logger.debug("Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect} from sender #{sender.inspect}")
+  # Add route for specific channels to their own action under the channels collection.
+  # When there is no route, it defaults to the create action.
+  def create
+    channel = params[:channel_id]
 
-      source_key = false_positive['id']
-      Rails.logger.debug("PeakeBridge source_key = #{source_key.inspect}")
+    # render plain: "Analyst Console recieved unknown message, on channel #{channel.inspect}"
+    raise "Analyst Console recieved unknown message, on channel #{channel.inspect}"
+  end
 
-      conn = PeakeBridge::FpCreatedEvent.new(source_authority: sender, source_key: false_positive['id'])
-      response = conn.post
-      Rails.logger.debug("PeakeBridge response.body = #{response.body.inspect}")
+  private
 
-      # render plain: "Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect}"
-      raise "Analyst Console recieved message, on channel #{channel.inspect} from #{sender.inspect} to addressee #{addressee.inspect}"
-    end
+  def envelope_params
+    params.require(:envelope).permit(:channel, :sender, :addressee)
+  end
 
-    # Add route for specific channels to their own action under the channels collection.
-    # When there is no route, it defaults to the create action.
-    def create
+  def false_positive_params
+    params.require(:message).require(:false_positive)
+        .permit(:user_email, :sid, :description, :id, :os, :version, :built_from, :pcap_lib, :cmd_line_options)
+  end
 
-      channel = params[:channel_id]
-      Rails.logger.debug("PeakeBridge message recieved, on channel #{channel.inspect}")
-
-      envelope = params[:envelope]
-      Rails.logger.debug("PeakeBridge envelope = #{envelope.inspect}")
-
-      addressee = envelope && envelope[:addressee]
-      Rails.logger.debug("PeakeBridge addressee = #{addressee.inspect}")
-
-      Rails.logger.debug("PeakeBridge message = #{params[:message].inspect}")
-
-      # render plain: "Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect}"
-      raise "Analyst Console recieved message, on channel #{channel.inspect} to addressee #{addressee.inspect}"
-    end
+  def attachments_params
+    params.require(:message).require(:false_positive).require(:attachments)
   end
 end
