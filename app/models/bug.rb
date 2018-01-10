@@ -78,9 +78,11 @@ class Bug < ApplicationRecord
       bug_changes = self.changes
       bug_changes.keys.each do |key|
         if ['committer_id', 'user_id'].include?(key)
-          users = User.where(:id => bug_changes[key])
-          if users.present?
-            bug_changes[key] = [users.first.cvs_username, users.last.cvs_username]
+          before_user = User.where(:id => bug_changes[key].first).first
+          after_user = User.where(:id => bug_changes[key].last).first
+
+          if before_user.present? && after_user.present?
+            bug_changes[key] = [before_user.cvs_username, after_user.cvs_username]
           end
         end
       end
@@ -1004,7 +1006,7 @@ class Bug < ApplicationRecord
 
     initial_bug_summary_info = bug.parse_summary
     initial_refs_from_summary = initial_bug_summary_info[:refs]
-
+    initial_state = bug.state
 
 
     bug.initialize_report
@@ -1043,6 +1045,12 @@ class Bug < ApplicationRecord
 
 
     updated_bug_state = Bug.get_new_bug_state(bug, permitted_params[:bug][:state], permitted_params[:bug][:state_comment], assignee.email)
+
+    if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
+      updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
+    end
+
+
     options = {
         ids: permitted_params[:id],
         assigned_to: assignee.email,
