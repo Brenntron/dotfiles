@@ -1,5 +1,26 @@
 class Schema2017end < ActiveRecord::Migration[5.1]
   def change
+    create_table "attachments" do |t|
+      t.timestamps
+      t.integer "bugzilla_attachment_id"
+      t.string "file_name"
+      t.string "summary"
+      t.string "content_type"
+      t.string "direct_upload_url"
+      t.integer "size", default: 0
+      t.integer "creator"
+      t.boolean "is_obsolete", default: false
+      t.boolean "is_private", default: false
+      t.boolean "minor_update", default: false
+      t.integer "bug_id"
+      t.integer "rule_id"
+      t.integer "task_id"
+      t.index ["bug_id"], name: "index_attachments_on_bug_id"
+      t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id"
+      t.index ["rule_id"], name: "index_attachments_on_rule_id"
+      t.index ["task_id"], name: "index_attachments_on_task_id"
+    end
+
     create_table "bugs" do |t|
       t.timestamps
       t.integer "bugzilla_id"
