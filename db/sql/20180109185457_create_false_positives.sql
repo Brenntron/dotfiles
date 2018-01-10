@@ -1,0 +1,2 @@
+CREATE TABLE `false_positives` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, `user_email` varchar(255), `sid` varchar(255), `description` varchar(255), `source_authority` varchar(255), `source_key` varchar(255), `os` varchar(255), `version` varchar(255), `built_from` varchar(255), `pcap_lib` varchar(255), `cmd_line_options` varchar(255)) ENGINE=InnoDB;
+INSERT INTO `schema_migrations` (`version`) VALUES ('20180109185457');
