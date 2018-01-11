@@ -1,6 +1,6 @@
 module PeakeBridge
   class FpCreatedEvent < BaseMessage
-    def initialize(addressee:, source_authority:, source_key:)
+    def initialize(addressee:, source_authority: nil, source_key: nil)
       super(channel: 'fp-created-event',
             addressee: addressee)
       @source_authority = source_authority
