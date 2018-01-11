@@ -57,8 +57,10 @@
               <textarea <% if current_user.has_role?('committer') %>id="committerNotesEditArea"<%end%>class="form-control disabled code wrapped_code select-sm autosize autoExpand" name="committer_notes" rows="10" cols="100" style="background-color: #F0F0F0" readonly>
                 <%if commit_note_pad %>
                   <%= commit_note_pad ? commit_note_pad : "" %>
+                <%elsif committer_note%>
+                  <%= committer_note ? Note.parse_from_note(committer_note.comment,"Committer Notes:",true) : "" %>
                 <%else%>
-                  <%= committer_note ? committer_note.comment : Note.parse_from_note(committer_note.comment,"Committer Notes:",true)%>
+                  ""
                 <%end%>
               </textarea>
               <input type="hidden" name="committer_note_id" value="<%= committer_note ? committer_note.id : nil %>">
