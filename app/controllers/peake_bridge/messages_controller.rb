@@ -48,12 +48,17 @@ class PeakeBridge::MessagesController < ApplicationController
     params.require(:envelope).permit(:channel, :sender, :addressee)
   end
 
+  def message_params
+    params.require(:message)
+  end
+
   def false_positive_params
-    params.require(:message).require(:false_positive)
-        .permit(:user_email, :sid, :description, :id, :os, :version, :built_from, :pcap_lib, :cmd_line_options)
+    message_params.require(:false_positive)
+        .permit(:user_email, :sid, :description, :source_key, :os, :version, :built_from, :pcap_lib, :cmd_line_options)
   end
 
   def attachments_params
-    params.require(:message).require(:false_positive).require(:attachments)
+    # params.require(:message).require(:false_positive).require(:attachments)
+    message_params.require(:false_positive)['attachments']
   end
 end
