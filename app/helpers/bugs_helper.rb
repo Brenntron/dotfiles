@@ -25,7 +25,7 @@ def set_bug_color(bug)
       when "REOPENED", "PENDING"
         remove_list << "NEW" << "ASSIGNED" << "OPEN"
       when "FIXED", "WONTFIX", "LATER", "INVALID"
-        remove_list  << "ASSIGNED" << "OPEN" << "PENDING"
+        remove_list  << "ASSIGNED" << "OPEN"
     end
     if !bug.can_resolve? && bug.state != "PENDING"
       remove_list << "PENDING"

@@ -212,9 +212,10 @@ module API
             if permitted_params[:bug_id].present?
               bug = Bug.where(:id => permitted_params[:bug_id]).first
               if bug.committer_notes
-                bugzilla_comment = "#{bug.committer_notes} #{permitted_params[:bugzilla_comment]}"
+                bugzilla_comment = "#{bug.committer_notes}\n #{permitted_params[:bugzilla_comment]}"
+                bug.committer_notes = bugzilla_comment
               else
-                bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment} #{permitted_params[:bugzilla_comment]}"
+                bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment}\n #{permitted_params[:bugzilla_comment]}"
               end
             end
 
@@ -253,9 +254,10 @@ module API
             if permitted_params[:bug_id].present?
               bug = Bug.where(:id => permitted_params[:bug_id]).first
               if bug.committer_notes
-                bugzilla_comment = "#{bug.committer_notes} #{permitted_params[:bugzilla_comment]}"
+                bugzilla_comment = "#{bug.committer_notes}\n #{permitted_params[:bugzilla_comment]}"
+                bug.committer_notes = bugzilla_comment
               else
-                bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment} #{permitted_params[:bugzilla_comment]}"
+                bugzilla_comment = "#{bug.notes.last_committer_note.first&.comment}\n #{permitted_params[:bugzilla_comment]}"
               end
             end
 
