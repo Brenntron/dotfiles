@@ -13,5 +13,6 @@ class CreateFalsePositives < ActiveRecord::Migration[5.1]
       t.string :pcap_lib
       t.string :cmd_line_options
     end
+    add_index(:false_positives, [:source_authority, :source_key], unique: true)
   end
 end
