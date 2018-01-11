@@ -211,6 +211,7 @@ ActiveRecord::Schema.define(version: 20180109194224) do
     t.string "built_from"
     t.string "pcap_lib"
     t.string "cmd_line_options"
+    t.index ["source_authority", "source_key"], name: "index_false_positives_on_source_authority_and_source_key", unique: true
   end
 
   create_table "giblets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

@@ -12,6 +12,7 @@ class PeakeBridge::MessagesController < ApplicationController
     conn = PeakeBridge::FpCreatedEvent.new(addressee: sender,
                                            source_authority: false_positive.source_authority)
     response = conn.post(false_positive_id: false_positive.id,
+                         bug_id: 0,
                          source_key: false_positive.source_key)
     # Rails.logger.debug("PeakeBridge response.body = #{response.body.inspect}")
 
@@ -20,7 +21,7 @@ class PeakeBridge::MessagesController < ApplicationController
 
   rescue => except
     log_exception(except)
-    render plain: except.to_s, status: :internal_server_error
+    render plain: except.message, status: :internal_server_error
   end
 
   # Add route for specific channels to their own action under the channels collection.
@@ -40,7 +41,7 @@ class PeakeBridge::MessagesController < ApplicationController
   private
 
   def log_exception(except)
-    Rails.logger.error(except.to_s)
+    Rails.logger.error(except.message)
     except.backtrace[0..5].each {|line| Rails.logger.error(line)}
   end
 

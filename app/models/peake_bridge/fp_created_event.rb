@@ -7,10 +7,12 @@ module PeakeBridge
       @source_key = source_key
     end
 
-    def post(false_positive_id:, source_authority: @source_authority, source_key: @source_key)
-      super(message: {false_positive_id: false_positive_id,
-                      source_authority: source_authority,
-                      source_key: source_key})
+    def post(false_positive_id:, bug_id:, source_authority: @source_authority, source_key: @source_key)
+      super(message: {source_authority: source_authority,
+                      source_key: source_key,
+                      response: 'A false positive record was created.',
+                      false_positive_id: false_positive_id,
+                      bug_id: bug_id})
     end
   end
 end
