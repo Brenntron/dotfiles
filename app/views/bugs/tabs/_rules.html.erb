@@ -67,8 +67,19 @@
         <h4 class="modal-title" id="commit-modal-title">Commit Message</h4>
       </div>
       <div class="modal-body">
+        <h4>Current committer note:</h4>
+        <div class="bz-commit-inline" style="overflow-wrap: break-word;">
+          <p>
+            <%if @bug.committer_notes %>
+              <%= simple_format(@bug.committer_notes) %>
+            <%else%>
+              <%= simple_format(@bug.notes.last_committer_note.first&.comment) %>
+            <%end%>
+          </p>
+        </div>
+        <h4>Append the following to the note above</h4>
         <div class="bz-commit-inline">
-          <textarea id="bugzilla-comment-text" cols="68" rows="14"><%= @bug.notes.last_committer_note.first&.comment %></textarea>
+          <textarea id="bugzilla-comment-text" cols="68" rows="14"></textarea>
         </div>
       </div>
       <div class="modal-footer">

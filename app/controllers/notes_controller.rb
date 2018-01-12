@@ -10,6 +10,9 @@ class NotesController < ApplicationController
       if params[:is_research_notes].present?
         @note = Bug.where("id=?", params[:note][:bugzilla_id]).first
         @note.research_notes = params[:note][:comment]
+      elsif params[:note][:note_type] == "committer"
+        @note = Bug.where("id=?", params[:note][:bugzilla_id]).first
+        @note.committer_notes = params[:note][:comment].strip
       else
         if params[:note][:id]
           @note = Note.where("id=?", params[:note][:id]).first
@@ -19,7 +22,6 @@ class NotesController < ApplicationController
           @note.bug_id ||= params[:note][:bugzilla_id]
         end
       end
-
       if @note.save
         render json: @note
       else

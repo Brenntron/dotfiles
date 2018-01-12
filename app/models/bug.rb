@@ -1167,6 +1167,15 @@ class Bug < ApplicationRecord
   ####   An import_type = 'status' preventing persistence and test clearing should allow for any client side UI functionality
   ####   that checks for bug changes in Bugzilla before executing certain actions (like committing a rule or setting a bug to 'PENDING')
 
+  def append_committer_comment(new_comment)
+    if self.committer_notes
+      bugzilla_comment = "#{self.committer_notes}\n #{new_comment}"
+      update(committer_notes: bugzilla_comment)
+    else
+      bugzilla_comment = "#{self.notes.last_committer_note.first&.comment}\n #{new_comment}"
+    end
+    bugzilla_comment
+  end
 
   def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
     import_type = import_type.blank? ? "import" : import_type
@@ -1375,27 +1384,30 @@ class Bug < ApplicationRecord
               end
             end
             #end comment importing####
-
             ##Running note prepoluation logic here#########
             if import_type != "status"
 
               #prepopulating committer notes in notes tab
 
-              unless bug_has_published_notes
-                last_committer_note = bug.notes.last_committer_note.first
-                if last_committer_note.present?
-                  committer_note_text_area = ""
-                  if last_committer_note
-                    committer_note_text_area = Note.parse_from_note(last_committer_note.comment,"Committer Notes:", true) + "\n"
-                  end
-                  new_note = Note.where(notes_bugzilla_id: nil,bug_id: bug_id).committer_note.first_or_create
-                  new_note.note_type = 'committer'
-                  new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
-                  new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
-                  new_note.created_at = Time.now.to_time
-                  new_note.save
+              last_committer_note = bug.notes.last_committer_note.first
+              committer_note_text_area = ""
+              if last_committer_note.present?
+                if last_committer_note
+                  committer_note_text_area = Note.parse_from_note(last_committer_note.comment, "Committer Notes:", true) + "\n"
                 end
               end
+              if bug_has_published_notes
+                bug.committer_notes = committer_note_text_area
+                bug.save
+              else
+                new_note = Note.where(notes_bugzilla_id: nil, bug_id: bug_id).committer_note.first_or_create
+                new_note.note_type = 'committer'
+                new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
+                new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
+                new_note.created_at = Time.now.to_time
+                new_note.save
+              end
+
 
               #prepopulating research notes in notes tab
               latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
