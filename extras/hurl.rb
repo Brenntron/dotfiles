@@ -112,6 +112,10 @@ class HurlArgs
       end
       pos_args
     end
+    if @user.nil?
+      puts "No user specified using --user . Please provide a username to build the project"
+      exit
+    end
   end
 
   def initialize(args)
@@ -179,12 +183,7 @@ class HurlArgs
   end
 
   def release_base
-    if @user
-      "#{user_dir}/disgorge"
-    else
-      puts "No user specified using --user . Please provide a username to build the project"
-      exit
-    end
+    "#{user_dir}/disgorge"
   end
 
   def relative_dir
