@@ -1390,8 +1390,8 @@ class Bug < ApplicationRecord
               #prepopulating committer notes in notes tab
 
               last_committer_note = bug.notes.last_committer_note.first
+              committer_note_text_area = ""
               if last_committer_note.present?
-                committer_note_text_area = ""
                 if last_committer_note
                   committer_note_text_area = Note.parse_from_note(last_committer_note.comment, "Committer Notes:", true) + "\n"
                 end
