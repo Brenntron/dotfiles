@@ -1,4 +1,4 @@
-class S3Url < FileRef
+class S3Url < FileReference
   def url
     location
   end

@@ -1,10 +1,6 @@
 class FalsePositive < ApplicationRecord
-  has_many :false_positive_file_refs
-  has_many :s3_urls, through: :false_positive_file_refs, source: :file_ref, source_type: S3Url
-
-  def file_refs
-    false_positive_file_refs.map {|link| link.file_ref}
-  end
+  has_many :fp_file_refs
+  has_many :file_references, through: :fp_file_refs
 
   def sids_array
     sid_strs = sid.gsub(/\s*/, '').split(/[,;]/)
@@ -99,8 +95,10 @@ PCAP Utility: #{pcap_lib}
 
   def save_attachments_from_params(attachments_attrs:)
     attachments_attrs.each do |s3_params|
-      s3 = S3Url.create!(s3_params.permit("file_name", "url", "file_type_name"))
-      false_positive_file_refs.create(file_ref: s3)
+      attrs = s3_params.permit("file_name", "url", "file_type_name").to_h
+      attrs['location'] = attrs.delete('url')
+      s3 = S3Url.create!(attrs)
+      fp_file_refs.create(file_reference: s3)
     end
 
     self

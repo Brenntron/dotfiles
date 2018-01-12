@@ -190,14 +190,6 @@ ActiveRecord::Schema.define(version: 20180112171053) do
     t.integer "reference_id"
   end
 
-  create_table "false_positive_file_refs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "false_positive_id"
-    t.string "file_ref_type"
-    t.integer "file_ref_id"
-  end
-
   create_table "false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -215,13 +207,21 @@ ActiveRecord::Schema.define(version: 20180112171053) do
     t.index ["source_authority", "source_key"], name: "index_false_positives_on_source_authority_and_source_key", unique: true
   end
 
-  create_table "file_refs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "file_references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "type"
     t.string "file_name"
     t.text "location"
     t.string "file_type_name"
     t.integer "source_file_ref_id"
+  end
+
+  create_table "fp_file_refs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "false_positive_id"
+    t.integer "file_reference_id"
   end
 
   create_table "giblets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
