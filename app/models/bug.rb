@@ -1167,7 +1167,7 @@ class Bug < ApplicationRecord
   ####   An import_type = 'status' preventing persistence and test clearing should allow for any client side UI functionality
   ####   that checks for bug changes in Bugzilla before executing certain actions (like committing a rule or setting a bug to 'PENDING')
 
-  def build_bugzilla_comment(new_comment)
+  def append_committer_comment(new_comment)
     if self.committer_notes
       bugzilla_comment = "#{self.committer_notes}\n #{new_comment}"
       update(committer_notes: bugzilla_comment)

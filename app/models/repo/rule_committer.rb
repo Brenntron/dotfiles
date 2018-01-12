@@ -224,7 +224,7 @@ module Repo
                                           bugzilla_id: bugzilla_id,
                                           user: user,
                                           username: username)
-      committer.locked_commit(bugzilla_comment: bug.build_bugzilla_comment(new_bugzilla_comment)).tap do
+      committer.locked_commit(bugzilla_comment: bug.append_committer_comment(new_bugzilla_comment)).tap do
 
         #synch history to pick up new bugzilla commit note created by rulecommitter.
         bugzilla_bug_proxy = Bugzilla::Bug.new(xmlrpc)
