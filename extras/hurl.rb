@@ -166,6 +166,10 @@ class HurlArgs
         end
   end
 
+  def user_dir
+    "/usr/local/AC-TESTING/#{@user}"
+  end
+
   def build_path
     @build_path ||= File.join(build_base, base_dir)
   end
@@ -176,7 +180,7 @@ class HurlArgs
 
   def release_base
     if @user
-      "/usr/local/AC-TESTING/#{@user}/disgorge"
+      "#{user_dir}/disgorge"
     else
       puts "No user specified using --user . Please provide a username to build the project"
       exit
@@ -184,11 +188,11 @@ class HurlArgs
   end
 
   def relative_dir
-    "/usr/local/AC-TESTING/#{@user}/disgorge/releases"
+    "#{user_dir}/disgorge/releases"
   end
 
   def disgorge_tar_path
-    "/usr/local/AC-TESTING/#{@user}/#{scp_dir}/releases/#{base_dir}.tar.gz"
+    "#{user_dir}/#{scp_dir}/releases/#{base_dir}.tar.gz"
   end
 
   def gen_output_tar_path
