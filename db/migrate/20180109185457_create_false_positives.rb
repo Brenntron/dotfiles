@@ -2,6 +2,7 @@ class CreateFalsePositives < ActiveRecord::Migration[5.1]
   def change
     create_table :false_positives do |t|
       t.timestamps
+      t.integer :bug_id
       t.string :user_email
       t.string :sid
       t.string :description

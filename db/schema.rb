@@ -201,6 +201,7 @@ ActiveRecord::Schema.define(version: 20180109194224) do
   create_table "false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "bug_id"
     t.string "user_email"
     t.string "sid"
     t.string "description"

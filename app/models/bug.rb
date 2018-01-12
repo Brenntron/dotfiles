@@ -1734,6 +1734,54 @@ class Bug < ApplicationRecord
     (STATES_CLOSED.include?(new_state) && has_draft_rules?) ? false : true
   end
 
+  # Creates a new bug in bugzilla.
+  # @param [Bugzilla::Bug] bug_factory proxy interface to bugzilla.
+  # @param [Hash] bug_attrs values for active record attributes on bug model.
+  # @param [User] user assgined to bug.
+  def self.bugzilla_create(bug_factory, bug_attrs, user: nil)
+    options = bug_attrs.to_h.slice(*%w{product component summary version description state creator opsys
+                                       platform priority severity classification})
+    options = options.reject { |key, value| value.nil? }
+
+    # stub for distribted bug object
+    bugzilla_bug_options = options.merge('assigned_to' => user&.email || 'vrt-incoming@sourcefire.com')
+    bug_stub_hash = bug_factory.create(bugzilla_bug_options)
+
+    Bug.create!(options.merge(id: bug_stub_hash["id"],
+                              bugzilla_id: bug_stub_hash["id"],
+                              state: bug_attrs['state'] || 'OPEN',
+                              user_id: user&.id))
+  end
+
+  # Creates a new bug in bugzilla and related records and objects.
+  # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
+  # @param [Hash] bug_attrs values for active record attributes on bug model.
+  # @param [User] user assgined to bug.
+  def self.bugzilla_create_action(bugzilla_session, bug_attrs, user:)
+
+    # object for distributed interface for bug factory
+    bug_factory = Bugzilla::Bug.new(bugzilla_session)
+
+    # active record Bug model
+    bug = bugzilla_create(bug_factory, bug_attrs, user: user)
+
+    # pull in the first comment
+    new_bug_history = bug_factory.get(bug.bugzilla_id)
+    Bug.synch_history(bug_factory, new_bug_history)
+
+    tags = bug_attrs['tag_names']
+    if tags
+      tags.each do |tag|
+        new_tag = Tag.find_or_create_by(name: tag)
+        bug.tags << new_tag
+      end
+    end
+    # update the summary (regarding tags)
+    bug.compose_summary
+
+    bug
+  end
+
   def update_bug_action(current_user:,
                         bugzilla_session:,
                         assignee_id:,

@@ -9,13 +9,7 @@ class PeakeBridge::MessagesController < ApplicationController
                                                       sender: sender)
 
 
-    conn = PeakeBridge::FpCreatedEvent.new(addressee: sender,
-                                           source_authority: false_positive.source_authority)
-    response = conn.post(false_positive_id: false_positive.id,
-                         bug_id: 0,
-                         source_key: false_positive.source_key)
-    # Rails.logger.debug("PeakeBridge response.body = #{response.body.inspect}")
-
+    Thread.new { false_positive.create_bug_action(bugzilla_session) }
 
     render plain: "fp_create id: #{false_positive.id}", status: :ok
 
@@ -39,6 +33,22 @@ class PeakeBridge::MessagesController < ApplicationController
   end
 
   private
+
+  # @return [Bugzilla::XMLRPC] Authenticated bugzilla session
+  def bugzilla_session
+    begin
+      unless @bugzilla_session
+        bugzilla_proxy = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+        bugzilla_proxy.bugzilla_login(Bugzilla::User.new(bugzilla_proxy),
+                                      Rails.configuration.bugzilla_username,
+                                      Rails.configuration.bugzilla_password)
+        @bugzilla_session = bugzilla_proxy
+      end
+    rescue => except
+      Rails.logger.error(except.message)
+    end
+    @bugzilla_session
+  end
 
   def log_exception(except)
     Rails.logger.error(except.message)
