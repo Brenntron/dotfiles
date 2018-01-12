@@ -45,6 +45,7 @@ class HurlArgs
     puts "--no-upload        app will be built but they will be prevented from being sent to the server"
     puts "--no-disgorge      app will not be expanded on the server"
     puts "--version=<ver>    use ver as VERSION, for name of disgorged tar file"
+    puts "--user=<usr>       use the specified user directory to build AC"
     exit
   end
 
@@ -98,6 +99,9 @@ class HurlArgs
         when /\A--version=(?<version>.*)\z/
           /\A--version=(?<version>.*)\z/ =~ arg
           @version = version
+        when /\A--user=(?<user>.*)\z/
+          /\A--user=(?<user>.*)\z/ =~ arg
+          @user = user
         when /\A-/
           puts "One of your flags '#{arg}' is not valid. Ignored, use -h or --help"
           self.class.usage
@@ -171,15 +175,20 @@ class HurlArgs
   end
 
   def release_base
-    "~/disgorge"
+    if @user
+      "/usr/local/AC-TESTING/#{@user}/disgorge"
+    else
+      puts "No user specified using --user . Please provide a username to build the project"
+      exit
+    end
   end
 
   def relative_dir
-    "disgorge/releases"
+    "/usr/local/AC-TESTING/#{@user}/disgorge/releases"
   end
 
   def disgorge_tar_path
-    "~/#{scp_dir}/releases/#{base_dir}.tar.gz"
+    "/usr/local/AC-TESTING/#{@user}/#{scp_dir}/releases/#{base_dir}.tar.gz"
   end
 
   def gen_output_tar_path
