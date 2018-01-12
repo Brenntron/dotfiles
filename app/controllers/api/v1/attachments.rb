@@ -32,55 +32,16 @@ module API
         end
         post "", root: :attachments do
           authorize! :create, Attachment
-          file_content = permitted_params[:attachment][:file_data][:tempfile].read
-          options = {
-              :ids => permitted_params[:attachment][:bugzilla_attachment_id],
-              :data => XMLRPC::Base64.new(file_content),
-              :file_name => permitted_params[:attachment][:file_data][:filename],
-              :summary => permitted_params[:attachment][:file_data][:filename],
-              :content_type => permitted_params[:attachment][:file_data][:type],
-              :comment => permitted_params[:attachment][:comment],
-              :is_patch => permitted_params[:attachment][:is_patch],
-              :is_private => permitted_params[:attachment][:is_private],
-              :minor_update => permitted_params[:attachment][:minor_update]
-          }.reject() { |k, v| v.nil? } #remove any nil values in the hash(bugzilla doesnt like them)
-          new_attachment = Bugzilla::Bug.new(bugzilla_session).add_attachment(options.to_h) #the bugzilla session is where we authenticate
-          new_attachment_id = new_attachment["ids"][0]
-          if new_attachment_id
-            new_attach = Attachment.create(
-                :id => new_attachment_id,
-                :size => permitted_params[:attachment][:file_data][:tempfile].size,
-                :bugzilla_attachment_id => new_attachment_id,
-                :file_name => options[:file_name],
-                :summary => options[:file_name],
-                :content_type => options[:content_type],
-                :direct_upload_url => "https://"+ Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
-                :creator => current_user.email,
-                :is_private => options[:is_private],
-                :is_obsolete => false,
-                :minor_update => options[:minor_update]
-            )
-            bug = Bug.where(id: options[:ids]).first
-            bug.attachments << new_attach
-
-            bug.clear_rule_tested
-
-            user = User.where(cvs_username: current_user.cvs_username).first
-            attachments = bug.attachments.map{|a| a.id}
-            begin
-              if attachments.any?
-                new_task = Task.create_pcap_test(bug.id, user.id)
-                TestAttachment.new(new_task,
-                                   request.headers['Xmlrpc-Token'],
-                                   attachments).send_work_msg
-              end
-            rescue
-              #handle timeouts accordingly
-            end
-          else
-            return false
-          end
-          new_attach
+          bug = Bug.where(id: permitted_params[:attachment][:bugzilla_attachment_id]).first
+          bug.add_attachment_action(bugzilla_session,
+                                    permitted_params[:attachment][:file_data][:tempfile],
+                                    user: current_user,
+                                    filename: permitted_params[:attachment][:file_data][:filename],
+                                    content_type: permitted_params[:attachment][:file_data][:type],
+                                    comment: permitted_params[:attachment][:comment],
+                                    is_patch: permitted_params[:attachment][:is_patch],
+                                    is_private: permitted_params[:attachment][:is_private],
+                                    minor_update: permitted_params[:attachment][:minor_update])
         end
 
         #create multiple attachemnts

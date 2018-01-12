@@ -1810,4 +1810,66 @@ class Bug < ApplicationRecord
     Bug.synch_history(xmlrpc, current_bug).to_s
 
   end
+
+  # @param [IO] file
+  # @param [Hash] attachment_options
+  def add_attachment_action(bugzilla_session,
+                            file,
+                            user:,
+                            filename:,
+                            content_type:,
+                            comment:,
+                            is_patch:,
+                            is_private:,
+                            minor_update:)
+    file_content = file.read
+    options = {
+        ids: id,
+        data: XMLRPC::Base64.new(file_content),
+        file_name: filename,
+        summary: filename,
+        content_type: content_type,
+        comment: comment,
+        is_patch: is_patch,
+        is_private: is_private,
+        minor_update: minor_update
+    }.reject() { |key, value| value.nil? } #remove any nil values in the hash(bugzilla doesnt like them)
+    bug_stub = Bugzilla::Bug.new(bugzilla_session)
+    attachment_hash = bug_stub.add_attachment(options)
+    new_attachment_id = attachment_hash["ids"][0]
+    if new_attachment_id
+      new_attachment = Attachment.create(
+          id: new_attachment_id,
+          size: file_content.length,
+          bugzilla_attachment_id: new_attachment_id,
+          file_name: filename,
+          summary: filename,
+          content_type: content_type,
+          direct_upload_url:
+              "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
+          creator: user.email,
+          is_private: is_private,
+          is_obsolete: false,
+          minor_update: minor_update
+      )
+      attachments << new_attachment
+
+      clear_rule_tested
+
+      attachment_ids = [new_attachment.id]
+      begin
+        if attachment_ids.any?
+          new_task = Task.create_pcap_test(id, user.id)
+          TestAttachment.new(new_task,
+                             bugzilla_session.token,
+                             attachment_ids).send_work_msg
+        end
+      rescue
+        #handle timeouts accordingly
+        Rails.logger.error("Cannot add pcap test task: #{$!.message}")
+      end
+    else
+      false
+    end
+  end
 end
