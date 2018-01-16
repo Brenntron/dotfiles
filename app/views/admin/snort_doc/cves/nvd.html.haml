@@ -4,7 +4,9 @@
 %ul
   - Dir.foreach(SnortDocPublisher.basepath).sort.each do |entry|
     - unless ('.' == entry) || ('..' == entry)
-      %li= entry
+      - filepath = File.join(SnortDocPublisher.basepath, entry)
+      - contents = File.open(filepath, 'r') { |file| file.readpartial(80) }
+      %li{title: contents.inspect}= "#{entry} (#{File.size(filepath)})"
 
 
 %h2 Force Download

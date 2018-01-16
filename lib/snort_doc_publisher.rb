@@ -87,9 +87,11 @@ class SnortDocPublisher
     # puts cmd
     system(cmd)
     if /\A(?<unzip_path>.*).gz\z/ =~ download_path.to_s
-      cmd = "gunzip -f #{unzip_path}.gz"
-      # puts cmd
-      system(cmd)
+      File.open("#{unzip_path}.gz", 'r') do |in_file|
+        File.open("#{unzip_path}", 'w') do |out_file|
+          out_file.write(in_file.read.gunzip)
+        end
+      end
     end
   end
 
