@@ -16,6 +16,8 @@
 /public/assets/*
 /public/system/*
 
+config/config.yml
+
 
 /extras/snort
 /extras/snort_repo
