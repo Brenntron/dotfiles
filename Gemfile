@@ -52,6 +52,8 @@ gem 'chartkick', '~> 2.2.4'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'awesome_nested_set', '~> 3.1.3'
 
+gem 'aws-sdk', '~> 2.6'
+
 gem 'will_paginate', '~> 3.1.5'
 
 gem 'delayed_job', '~> 4.1.3'

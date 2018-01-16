@@ -6,7 +6,7 @@ class CreateFileReferences < ActiveRecord::Migration[5.1]
       t.string :file_name
       t.text :location
       t.string :file_type_name
-      t.integer :source_file_ref_id
+      t.string :source
     end
   end
 end

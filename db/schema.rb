@@ -214,7 +214,7 @@ ActiveRecord::Schema.define(version: 20180112171053) do
     t.string "file_name"
     t.text "location"
     t.string "file_type_name"
-    t.integer "source_file_ref_id"
+    t.string "source"
   end
 
   create_table "fp_file_refs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

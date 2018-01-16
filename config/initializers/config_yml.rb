@@ -6,6 +6,14 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
+raise "config.yml missing aws section" unless env_config['aws']
+Rails.configuration.aws_access_key_id                       = env_config['aws']['access_key_id']
+Rails.configuration.aws_secret_access_key                   = env_config['aws']['secret_access_key']
+Rails.configuration.aws_region                              = env_config['aws']['region']
+Rails.configuration.aws_buckets                             = env_config['aws']['buckets'] || {}
+Aws.config.update(credentials: Aws::Credentials.new(Rails.configuration.aws_access_key_id, Rails.configuration.aws_secret_access_key))
+
+
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
 Rails.configuration.bugzilla_host       = ENV['Bugzilla_host']   || env_config['bugzilla']['host']
 Rails.configuration.bugzilla_username   = ENV['Bugzilla_login']  || env_config['bugzilla']['login']
@@ -24,7 +32,8 @@ peakebridge.host                        = env_config['peakebridge']['addressees'
 peakebridge.port                        = env_config['peakebridge']['addressees']['peakebridge']['port']
 peakebridge.ssl                         = env_config['peakebridge']['addressees']['peakebridge']['ssl']
 peakebridge.uri_base                    = env_config['peakebridge']['addressees']['peakebridge']['uri_base']
-Rails.configuration.peakebridge['peakebridge'] = peakebridge
+peakebridge.sources                     = env_config['peakebridge']['sources'] || []
+Rails.configuration.peakebridge         = peakebridge
 
 raise "config.yml missing perl section" unless env_config['perl']
 Rails.configuration.perl_cmd            = env_config['perl']['cmd']
