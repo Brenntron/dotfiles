@@ -112,16 +112,16 @@ class HurlArgs
       end
       pos_args
     end
-    if @user.nil?
-      puts "No user specified using --user . Please provide a username to build the project"
-      exit
-    end
   end
 
   def initialize(args)
     @args = args
     set_defaults
     @args_pos = scan_args(args)
+    if @user.nil?
+      puts "No user specified using --user . Please provide a username to build the project"
+      exit
+    end
   end
 
   def rebuild?
