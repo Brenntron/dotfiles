@@ -93,11 +93,18 @@
                 </div>
 
                 <div class="form-group col-xs-12">
+                  <label for="bug[tag_names][]" class="col-sm-2 control-label">Tags</label>
                   <select id='selectize-giblets' name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">
 
                   </select>
                 </div>
 
+                <div class="form-group col-xs-12">
+                  <label for="snippet" class="col-sm-2 control-label" >String search on Bug notes</label>
+                  <div class="col-sm-10">
+                    <input class="form-control" type="text" name="bug[snippet]">
+                  </div>
+                </div>
 
                 <div class="form-group col-xs-12">
                   <label for="bug[component]" class="col-sm-2 control-label" >Component</label>
