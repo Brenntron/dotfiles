@@ -82,14 +82,12 @@ class SnortDocPublisher
   # Internal method to download a given file
   # @param [String] The NIST NVD filename to download
   def self.download_file(filename)
-    download_path = filepath("#{filename}.gz")
-    cmd = "curl https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz > #{download_path}"
-    # puts cmd
-    system(cmd)
-    if /\A(?<unzip_path>.*).gz\z/ =~ download_path.to_s
-      cmd = "gunzip -f #{unzip_path}.gz"
-      # puts cmd
-      system(cmd)
+    url = "https://static.nvd.nist.gov/feeds/json/cve/1.0/#{filename}.gz"
+    response = Curl.get(url)
+    if (200 <= response.status.to_i) && (300 > response.status.to_i)
+      File.open(filepath(filename), 'w') do |out_file|
+        out_file.write(response.body_str.gunzip)
+      end
     end
   end
 
