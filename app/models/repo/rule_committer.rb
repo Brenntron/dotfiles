@@ -212,7 +212,7 @@ module Repo
     # param [String] username The username to add to the svn comment (message)
     # param [FixNum] bugzilla_id The bugzilla id of the bug
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
-    def self.commit_rules_action(rules, username:, bugzilla_id:, bugzilla_comment:, xmlrpc:, nodoc_override: false)
+    def self.commit_rules_action(rules, username:, bugzilla_id:, new_bugzilla_comment:, xmlrpc:, nodoc_override: false)
 
       user = User.where(cvs_username: username).first
       bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
@@ -224,7 +224,7 @@ module Repo
                                           bugzilla_id: bugzilla_id,
                                           user: user,
                                           username: username)
-      committer.locked_commit(bugzilla_comment: bugzilla_comment).tap do
+      committer.locked_commit(bugzilla_comment: bug.append_committer_comment(new_bugzilla_comment)).tap do
 
         #synch history to pick up new bugzilla commit note created by rulecommitter.
         bugzilla_bug_proxy = Bugzilla::Bug.new(xmlrpc)

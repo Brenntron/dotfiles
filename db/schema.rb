@@ -70,7 +70,7 @@ ActiveRecord::Schema.define(version: 20180112171053) do
     t.string "priority"
     t.string "severity"
     t.text "research_notes"
-    t.string "committer_notes"
+    t.text "committer_notes"
     t.integer "classification", default: 0
     t.integer "unused_gid", default: 1
     t.integer "unused_sid"

@@ -31,6 +31,7 @@ class Note < ApplicationRecord
   end
 
   def self.parse_from_note(text, delimiter, include_delimiter = false)
+
     new_note_block = ""
     line_started = 0
     started = false
@@ -47,17 +48,16 @@ class Note < ApplicationRecord
           end
           next
         end
-
-        line_to_add = line.blank? ? line : line.lstrip
-        new_note_block += line_to_add
-
+        if (i > (line_started + 1) && !line.starts_with?("------")) # i dont want the delimiter or the dashed lines
+          line_to_add = line.blank? ? line : line.lstrip
+          new_note_block += line_to_add
+        end
       end
 
     end
     unless include_delimiter
       new_note_block.gsub!(delimiter, "")
     end
-
     new_note_block
 
   end
