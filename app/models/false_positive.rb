@@ -5,10 +5,30 @@ class FalsePositive < ApplicationRecord
   def sids_array
     sid_strs = sid.gsub(/\s*/, '').split(/[,;]/)
     sid_strs.map do |str|
-      if /([1,3][-:])?(?<sid>\d{1,6})/ =~ str
+      if /([1,3][-:])?(?<sid>\d{3,6})/ =~ str
         sid
       end
     end.compact
+  end
+
+  def download_s3_urls
+    fp_file_refs.each do |fp_file_ref|
+      if fp_file_ref.file_reference.kind_of?(S3Url)
+        # get the current parent
+        s3_url = fp_file_ref.file_reference
+
+        # get a new parent
+        local = s3_url.download
+        unless local.new_record? || local.changed? || !local.valid?
+          # have new parent adopt the child
+          fp_file_ref.update(file_reference: local)
+
+          # now the old parent can go away without orphaning the child.
+          # so, this is a little story
+          s3_url.delete
+        end
+      end
+    end
   end
 
   def component
@@ -53,9 +73,9 @@ PCAP Utility: #{pcap_lib}
   end
 
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
-  # @param [Bugzilla::Bug] bug_factory proxy interface to bugzilla.
-  def create_bug(bug_factory)
-    # @param [Bugzilla::XMLRPC] bugzilla_session proxy interface to bugzilla.
+  # @param [Bugzilla::XMLRPC] bugzilla_session proxy interface to bugzilla.
+  def create_bug(bugzilla_session)
+    bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     bug_attrs = {
         'product' => 'Research',
@@ -74,23 +94,12 @@ PCAP Utility: #{pcap_lib}
     bug
   end
 
-  # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
-  # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
-  def create_bug_action(bugzilla_session)
-    bug_factory = Bugzilla::Bug.new(bugzilla_session)
-
-    bug = create_bug(bug_factory)
-
+  def post_fp_created
     conn = PeakeBridge::FpCreatedEvent.new(addressee: self.source_authority,
                                            source_authority: self.source_authority)
     conn.post(false_positive_id: self.id,
               bug_id: bug&.id,
               source_key: self.source_key)
-    # Rails.logger.debug("PeakeBridge response.body = #{response.body.inspect}")
-
-    bug
-  rescue => except
-    Rails.logger.error(except.message)
   end
 
   def save_attachments_from_params(attachments_attrs:)
@@ -111,5 +120,16 @@ PCAP Utility: #{pcap_lib}
     create(attrs.merge(source_authority: sender)).tap do |false_positive|
       false_positive.save_attachments_from_params(attachments_attrs: attachments_attrs)
     end
+  end
+
+  # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
+  # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
+  def create_bug_action(bugzilla_session)
+    download_s3_urls
+    bug = create_bug(bugzilla_session)
+    post_fp_created
+    bug
+  rescue => except
+    Rails.logger.error(except.message)
   end
 end

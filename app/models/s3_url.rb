@@ -24,9 +24,6 @@ class S3Url < FileReference
     local = LocalFile.create(attributes.slice(*%w{file_name file_type_name source}))
     relative_path = "#{self.source}/#{local.id}-#{self.file_name}"
     local.copy_local(get_file, relative_path)
-    unless local.new_record? || local.changed? || !local.valid?
-      self.destroy
-    end
     local
   end
 end

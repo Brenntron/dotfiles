@@ -6,12 +6,6 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
-raise "config.yml missing aws section" unless env_config['aws']
-Rails.configuration.aws_access_key_id                       = env_config['aws']['access_key_id']
-Rails.configuration.aws_secret_access_key                   = env_config['aws']['secret_access_key']
-Rails.configuration.aws_region                              = env_config['aws']['region']
-Rails.configuration.aws_buckets                             = env_config['aws']['buckets'] || {}
-Aws.config.update(credentials: Aws::Credentials.new(Rails.configuration.aws_access_key_id, Rails.configuration.aws_secret_access_key))
 
 
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
