@@ -206,9 +206,10 @@ class Bug < ApplicationRecord
     case
       when query_params[:bugzilla_max].present?
         nil
-      when query_params[:summary].present? || query_params[:whiteboard].present? || query_params[:giblets].present?
+      when query_params[:summary].present? || query_params[:whiteboard].present? || query_params[:giblets].present? || query_params[:snippet]
         summary_param = ""
         whiteboard_param = ""
+        snippet_param = ""
         giblets = []
 
         if query_params[:summary].present?
@@ -218,6 +219,11 @@ class Bug < ApplicationRecord
         if query_params[:whiteboard].present?
           whiteboard_param = query_params.delete(:whiteboard)
         end
+
+        if query_params[:snippet].present?
+          snippet_param = query_params.delete(:snippet)
+        end
+
         if query_params[:giblets].present?
           giblets = query_params.delete(:giblets)
           gibs = Giblet.where(:id => giblets)
@@ -273,16 +279,27 @@ class Bug < ApplicationRecord
             end
           end
         end
+
+        if snippet_param.present?
+          notes = Note.where(:bug_id => query_hash['param_results'].map{|b| b.id})
+          notes = notes.where("comment like '%#{snippet_param}%'")
+          bug_ids = notes.map {|b| b.bug_id}
+          query_hash['snippet_param_results'] = query_hash['param_results'].where(:id => bug_ids)
+        end
+
         final_query = []
         if query_params.empty?
           query_hash.delete('param_results')
         end
+
         #combine all the queries together
         query_hash.each do |key,result_set|
           final_query = final_query | (result_set)
         end
 
-        query = Bug.where(id: final_query.map{|b|b.id})
+        bug_ids = final_query.map{|b| b.id}
+
+        query = Bug.where(id: bug_ids)
 
       else
         Bug.where(query_params)
