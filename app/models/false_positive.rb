@@ -100,7 +100,8 @@ PCAP Utility: #{pcap_lib}
         File.open(fp_file_ref.file_reference.location, 'r') do |file|
           bug.add_attachment_action(bugzilla_session,
                                     file,
-                                    filename: fp_file_ref.file_reference.file_name)
+                                    filename: fp_file_ref.file_reference.file_name,
+                                    content_type: 'application/octet-stream')
         end
       end
     end

@@ -1846,7 +1846,7 @@ class Bug < ApplicationRecord
                             file,
                             user: nil,
                             filename:,
-                            content_type: nil,
+                            content_type:,
                             comment: nil,
                             is_patch: nil,
                             is_private: nil,
@@ -1876,7 +1876,7 @@ class Bug < ApplicationRecord
           content_type: content_type,
           direct_upload_url:
               "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
-          creator: user.email,
+          creator: user&.email,
           is_private: is_private,
           is_obsolete: false,
           minor_update: minor_update
