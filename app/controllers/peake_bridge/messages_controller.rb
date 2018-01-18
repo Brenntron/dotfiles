@@ -9,7 +9,7 @@ class PeakeBridge::MessagesController < ApplicationController
                                                       sender: sender)
 
 
-    Thread.new { false_positive.create_bug_action(bugzilla_session, sender) }
+    Thread.new { false_positive.create_bug_action(bugzilla_session, s) }
 
     render plain: "fp_create id: #{false_positive.id}", status: :ok
 
@@ -26,8 +26,6 @@ class PeakeBridge::MessagesController < ApplicationController
 
     Rails.logger.warn(message)
 
-    # render plain: "Analyst Console recieved unknown message, on channel #{channel.inspect}"
-    # raise "Analyst Console recieved unknown message, on channel #{channel.inspect}"
     render plain: message,
            status: :internal_server_error
   end

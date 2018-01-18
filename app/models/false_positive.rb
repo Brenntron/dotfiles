@@ -106,6 +106,8 @@ PCAP Utility: #{pcap_lib}
         end
       end
     end
+  rescue => except
+    Rails.logger.error(except.message)
   end
 
   def post_fp_created(bug)
@@ -146,22 +148,24 @@ PCAP Utility: #{pcap_lib}
                         bug_stub,
                         bugzilla_session,
                         bug_hash)
-    puts "done"
   rescue => except
     Rails.logger.error(except.message)
   end
 
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
   # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
+  # @param [String] sender key for config.yml section for sources
   def create_bug_action(bugzilla_session, sender)
     sender_config = Rails.configuration.peakebridge.sources[sender]
     user = User.where(cvs_username: sender_config['username']).first
 
     download_s3_urls
     bug = create_bug(bugzilla_session, user: user)
-    add_attachments(bug, bugzilla_session, user: user)
-    import_bug(bugzilla_session, bug.bugzilla_id, user: user)
-    post_fp_created(bug)
+    if bug
+      add_attachments(bug, bugzilla_session, user: user)
+      import_bug(bugzilla_session, bug.bugzilla_id, user: user)
+      post_fp_created(bug)
+    end
     bug
   rescue => except
     Rails.logger.error(except.message)

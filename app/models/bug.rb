@@ -1840,8 +1840,8 @@ class Bug < ApplicationRecord
 
   end
 
+  # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
   # @param [IO] file
-  # @param [Hash] attachment_options
   def add_attachment_action(bugzilla_session,
                             file,
                             user: nil,
