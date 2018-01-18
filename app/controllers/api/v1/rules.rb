@@ -217,13 +217,19 @@ module API
                                                     xmlrpc: bugzilla_session,
                                                     nodoc_override: permitted_params[:nodoc_override])
 
-
             if permitted_params[:bug_id].present?
-              main_committer = User.where(email: "vrt-qa@sourcefire.com").first
-              bug = Bug.where(:id => permitted_params[:bug_id]).first
-              bug.committer_id = main_committer.id
-              bug.save
+              bug = Bug.find(permitted_params[:bug_id])
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+              if bug.committer_id != current_user.id || bug.committer_id.blank?
+                bugzilla_options = {}
+                bugzilla_options[:ids] = permitted_params[:bug_id]
+                bugzilla_options[:qa_contact] = current_user.email
+                xmlrpc.update(bugzilla_options.to_h)
+                bug.committer_id = current_user.id
+                bug.save
+              end
             end
+
           end
         end
 
@@ -248,12 +254,20 @@ module API
                                                     bugzilla_id: permitted_params[:bug_id],
                                                     new_bugzilla_comment: permitted_params[:bugzilla_comment],
                                                     xmlrpc: bugzilla_session)
+
             if permitted_params[:bug_id].present?
-              main_committer = User.where(email: "vrt-qa@sourcefire.com").first
-              bug = Bug.where(:id => permitted_params[:bug_id]).first
-              bug.committer_id = main_committer.id
-              bug.save
+              bug = Bug.find(permitted_params[:bug_id])
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+              if bug.committer_id != current_user.id || bug.committer_id.blank?
+                bugzilla_options = {}
+                bugzilla_options[:ids] = permitted_params[:bug_id]
+                bugzilla_options[:qa_contact] = current_user.email
+                xmlrpc.update(bugzilla_options.to_h)
+                bug.committer_id = current_user.id
+                bug.save
+              end
             end
+
           end
         end
 
