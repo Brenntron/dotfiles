@@ -94,6 +94,19 @@ PCAP Utility: #{pcap_lib}
     bug
   end
 
+  def add_attachments(bug, bugzilla_session)
+    byebug
+    fp_file_refs.each do |fp_file_ref|
+      if fp_file_ref.file_reference.kind_of?(LocalFile)
+        File.open(fp_file_ref.file_reference.location, 'r') do |file|
+          bug.add_attachment_action(bugzilla_session,
+                                    file,
+                                    filename: fp_file_ref.file_reference.file_name)
+        end
+      end
+    end
+  end
+
   def post_fp_created
     conn = PeakeBridge::FpCreatedEvent.new(addressee: self.source_authority,
                                            source_authority: self.source_authority)
@@ -104,10 +117,11 @@ PCAP Utility: #{pcap_lib}
 
   def save_attachments_from_params(attachments_attrs:)
     attachments_attrs.each do |s3_params|
-      attrs = s3_params.permit("file_name", "url", "file_type_name").to_h
+      attrs = s3_params.permit("file_name", "url", "file_type_name").to_h.clone
       attrs['location'] = attrs.delete('url')
-      s3 = S3Url.create!(attrs)
-      fp_file_refs.create(file_reference: s3)
+      attrs['source'] = self.source_authority
+      s3_url = S3Url.create!(attrs)
+      fp_file_refs.create(file_reference: s3_url)
     end
 
     self
@@ -127,6 +141,7 @@ PCAP Utility: #{pcap_lib}
   def create_bug_action(bugzilla_session)
     download_s3_urls
     bug = create_bug(bugzilla_session)
+    add_attachments(bug, bugzilla_session)
     post_fp_created
     bug
   rescue => except

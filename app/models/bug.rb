@@ -1844,13 +1844,13 @@ class Bug < ApplicationRecord
   # @param [Hash] attachment_options
   def add_attachment_action(bugzilla_session,
                             file,
-                            user:,
+                            user: nil,
                             filename:,
-                            content_type:,
-                            comment:,
-                            is_patch:,
-                            is_private:,
-                            minor_update:)
+                            content_type: nil,
+                            comment: nil,
+                            is_patch: nil,
+                            is_private: nil,
+                            minor_update: nil)
     file_content = file.read
     options = {
         ids: id,
