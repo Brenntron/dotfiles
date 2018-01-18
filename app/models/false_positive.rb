@@ -95,7 +95,6 @@ PCAP Utility: #{pcap_lib}
   end
 
   def add_attachments(bug, bugzilla_session)
-    byebug
     fp_file_refs.each do |fp_file_ref|
       if fp_file_ref.file_reference.kind_of?(LocalFile)
         File.open(fp_file_ref.file_reference.location, 'r') do |file|
@@ -117,8 +116,10 @@ PCAP Utility: #{pcap_lib}
 
   def save_attachments_from_params(attachments_attrs:)
     attachments_attrs.each do |s3_params|
-      attrs = s3_params.permit("file_name", "url", "file_type_name").to_h.clone
-      attrs['location'] = attrs.delete('url')
+      attrs = s3_params.permit("file_name", "location", "url", "file_type_name").to_h.clone
+      location = attrs.delete('location')
+      url = attrs.delete('url')
+      attrs['location'] = S3Url.sanitize_location(location || url)
       attrs['source'] = self.source_authority
       s3_url = S3Url.create!(attrs)
       fp_file_refs.create(file_reference: s3_url)

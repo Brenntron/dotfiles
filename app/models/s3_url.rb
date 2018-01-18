@@ -1,6 +1,10 @@
 class S3Url < FileReference
-  def url
-    location
+  def self.sanitize_location(location)
+    if /\A\w+:\/\/[-\.\w]+\/(?<encoded>[^\?]*)(\?.*)?\z/ =~ location
+      URI.unescape(encoded)
+    else
+      location
+    end
   end
 
   def config_values
