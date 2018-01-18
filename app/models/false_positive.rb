@@ -74,7 +74,7 @@ PCAP Utility: #{pcap_lib}
 
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
   # @param [Bugzilla::XMLRPC] bugzilla_session proxy interface to bugzilla.
-  def create_bug(bugzilla_session)
+  def create_bug(bugzilla_session, user: nil)
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     bug_attrs = {
@@ -88,18 +88,19 @@ PCAP Utility: #{pcap_lib}
         'classification' => 'unclassified',
     }
 
-    bug = Bug.bugzilla_create(bug_factory, bug_attrs, user: nil)
+    bug = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
     # bug = nil
     update(bug_id: bug.id) if bug
     bug
   end
 
-  def add_attachments(bug, bugzilla_session)
+  def add_attachments(bug, bugzilla_session, user:)
     fp_file_refs.each do |fp_file_ref|
       if fp_file_ref.file_reference.kind_of?(LocalFile)
         File.open(fp_file_ref.file_reference.location, 'r') do |file|
           bug.add_attachment_action(bugzilla_session,
                                     file,
+                                    user: user,
                                     filename: fp_file_ref.file_reference.file_name,
                                     content_type: 'application/octet-stream')
         end
@@ -107,7 +108,7 @@ PCAP Utility: #{pcap_lib}
     end
   end
 
-  def post_fp_created
+  def post_fp_created(bug)
     conn = PeakeBridge::FpCreatedEvent.new(addressee: self.source_authority,
                                            source_authority: self.source_authority)
     conn.post(false_positive_id: self.id,
@@ -138,13 +139,29 @@ PCAP Utility: #{pcap_lib}
     end
   end
 
+  def import_bug(bugzilla_session, bugzilla_id, user:)
+    bug_stub = Bugzilla::Bug.new(bugzilla_session)
+    bug_hash = bug_stub.get(bugzilla_id)
+    Bug.bugzilla_import(user,
+                        bug_stub,
+                        bugzilla_session,
+                        bug_hash)
+    puts "done"
+  rescue => except
+    Rails.logger.error(except.message)
+  end
+
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
   # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
-  def create_bug_action(bugzilla_session)
+  def create_bug_action(bugzilla_session, sender)
+    sender_config = Rails.configuration.peakebridge.sources[sender]
+    user = User.where(cvs_username: sender_config['username']).first
+
     download_s3_urls
-    bug = create_bug(bugzilla_session)
-    add_attachments(bug, bugzilla_session)
-    post_fp_created
+    bug = create_bug(bugzilla_session, user: user)
+    add_attachments(bug, bugzilla_session, user: user)
+    import_bug(bugzilla_session, bug.bugzilla_id, user: user)
+    post_fp_created(bug)
     bug
   rescue => except
     Rails.logger.error(except.message)

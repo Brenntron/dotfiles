@@ -9,7 +9,7 @@ class PeakeBridge::MessagesController < ApplicationController
                                                       sender: sender)
 
 
-    Thread.new { false_positive.create_bug_action(bugzilla_session) }
+    Thread.new { false_positive.create_bug_action(bugzilla_session, sender) }
 
     render plain: "fp_create id: #{false_positive.id}", status: :ok
 

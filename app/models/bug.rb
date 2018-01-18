@@ -1420,7 +1420,7 @@ class Bug < ApplicationRecord
                 new_note = Note.where(notes_bugzilla_id: nil, bug_id: bug_id).committer_note.first_or_create
                 new_note.note_type = 'committer'
                 new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
-                new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
+                new_note.author = last_committer_note.nil? ? current_user&.email : last_committer_note.author
                 new_note.created_at = Time.now.to_time
                 new_note.save
               end
