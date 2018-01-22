@@ -10,7 +10,11 @@ The original design was built for the following two purposes:
 
 
 ## System
-This is a system between hurl and disgorge.
+This is a system including hurl and disgorge.
+The hurl system installs a tar file onto the target system,
+and kicks off the disgorge system.
+The disgorge system expands the tar file and sets up the application,
+optionally re-tarring the app to deliver to OPS to use as their input to build the FreeBSD package.
 
 ### Hurl
 The hurl part is a ruby script which runs on the local development environment, such as a laptop.
@@ -50,36 +54,49 @@ for it to work in.
 
 Make sure to install the exact version of bundler 
 ```
-gem install bundler -v 1.14.6
+gem install bundler -v 1.16.1
 ```
 
 ### Disgorge Backend Setup
 To set up the remote dev web server do the following:
 
-  1.  Copy the contents of the extras/disgorge directory to ~/disgorge
+1.  First you will need a writable local directory.
 
-        cd extras
-        tar czvf disgorge.tar.gz extras/disgorge
-        scp disgorge.tar.gz rulesuitest.vrt.sourcefire.com:.
-        ssh rulesuitest.vrt.sourcefire.com
-        tar xvf disgorge.tar.gz
-        
-  2.  Rename database in database.yml
-
-        vi ~/disgorge/shared/config/database.yml
-
+    Rather than under your home (~) directory (which is an NFS mount and very slow),
+    a directory unser /usr/local/AC-TESTING has been provided for each developer.
+    There should be a disgorge directory under this named `disgorge`.
     
-  3.  Edit the shared/.env file with appropriate values
+        /usr/local/AC-TESTING/`whoami`/disgorge
 
-        vi ~/disgorge/shared/.env
-        
-  4.  Fill in secret_key_base
+    We will call this the $RELBASE, as in
+    
+        $ cd /usr/local/AC-TESTING/`whoami`
+        $ mkdir disgorge
+        $ export RELBASE=/usr/local/AC-TESTING/`whoami`/disgorge
 
-        vi ~/disgorge/shared/config/secrets.yml
+1.  Copy the contents of the extras/disgorge directory to ~/disgorge
 
-  5.  Put the ca.pem file in shared/ssh (you may need to scp it to the server first)
+    From laptop:
 
-        cp ca.pem ~/disgorge/shared/ssh
+        $ cd extras
+        $ tar czvf disgorge.tar.gz extras/disgorge
+        $ scp disgorge.tar.gz rulesuitest.vrt.sourcefire.com:/usr/local/AC-TESTING/`whoami`/disgorge
+        $ ssh rulesuitest.vrt.sourcefire.com
+        $ cd /usr/local/AC-TESTING/`whoami`/disgorge
+        $ tar xvf disgorge.tar.gz
+    
+1.  Rename database in database.yml
+
+        $ vi shared/config/database.yml
+
+1.  Edit the shared/.env file with appropriate values
+
+        $ vi shared/.env
+    
+1.  Fill in secret_key_base
+
+        $ vi shared/config/secrets.yml
+
 
 
 ### For Deployment
