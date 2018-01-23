@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'fileutils'
 require 'digest'
 
@@ -60,6 +62,7 @@ class HurlArgs
     @do_upload              = true
     @do_disgorge            = true
     @bundler_version        = '_1.16.1_'
+    @user                   = `whoami`.chomp
   end
 
   def scan_args(args)
