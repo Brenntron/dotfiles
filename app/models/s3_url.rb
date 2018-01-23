@@ -6,9 +6,11 @@ class S3Url < FileReference
     # Regexp to parse path out of an http(s) URL.
     # If S3 location is an http/https URL, we just want the path, so fix it.
     # URL is in format of protocol+colon+slash+slash+host+slash+path+question-mark+query-string
+    # Begining of string = \A (like ^, but ^ is for beginning of line which can occur within a string)
     # Protocol = \w+
     # Host = [-\.\w]+
     # Query String (optional) = \?.*
+    # End of string = \z (like $, but $ is for end of line which can occur within a string)
     if /\A\w+:\/\/[-\.\w]+\/(?<encoded>[^\?]*)(\?.*)?\z/ =~ location
       URI.unescape(encoded)
     else
