@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'fileutils'
 require 'digest'
 
@@ -33,6 +35,10 @@ class HurlArgs
   def self.usage
     puts "USAGE: ruby extras/hurl.rb [options] [tarfile | branch | tag]"
     puts "This script deploys all the content in the API directory and the UI directory up to the server"
+    puts
+    puts "Examples:"
+    puts "    ruby extras/hurl.rb --deployment --version=analyst-console-1.0.0 v1.0.0"
+    puts "    ruby extras/hurl.rb --development"
     puts "============"
     puts "Valid flags are"
     puts "--help             this message"
@@ -60,6 +66,7 @@ class HurlArgs
     @do_upload              = true
     @do_disgorge            = true
     @bundler_version        = '_1.16.1_'
+    @user                   = `whoami`.chomp
   end
 
   def scan_args(args)
