@@ -85,6 +85,8 @@ To set up the remote dev web server do the following:
         $ cd /usr/local/AC-TESTING/`whoami`
         $ tar xvf disgorge.tar.gz
         $ chmod go+w disgorge/shared/log disgorge/shared/tmp
+        $ umask 000 disgorge/shared/log/
+        $ umask 000 disgorge/shared/tmp/
     
 1.  Your directory should look like this.
 
