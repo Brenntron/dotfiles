@@ -79,12 +79,48 @@ To set up the remote dev web server do the following:
     From laptop:
 
         $ cd extras
-        $ tar czvf disgorge.tar.gz extras/disgorge
-        $ scp disgorge.tar.gz rulesuitest.vrt.sourcefire.com:/usr/local/AC-TESTING/`whoami`/disgorge
+        $ tar czvf disgorge.tar.gz disgorge
+        $ scp disgorge.tar.gz rulesuitest.vrt.sourcefire.com:/usr/local/AC-TESTING/`whoami`
         $ ssh rulesuitest.vrt.sourcefire.com
-        $ cd /usr/local/AC-TESTING/`whoami`/disgorge
+        $ cd /usr/local/AC-TESTING/`whoami`
         $ tar xvf disgorge.tar.gz
+        $ chmod go+w disgorge/shared/log disgorge/shared/tmp
     
+1.  Your directory should look like this.
+
+        $ find disgorge
+        disgorge
+        disgorge/releases
+        disgorge/releases/.keep
+        disgorge/deployment.env
+        disgorge/disgorge.sh
+        disgorge/shared
+        disgorge/shared/config
+        disgorge/shared/config/secrets.yml
+        disgorge/shared/config/database.yml
+        disgorge/shared/config/config.yml
+        disgorge/shared/.env
+        disgorge/shared/log
+        disgorge/shared/log/.keep
+        disgorge/shared/tmp
+        disgorge/shared/tmp/.keep
+        disgorge/shared/vendor
+        disgorge/shared/vendor/bundle
+        disgorge/shared/vendor/bundle/.keep
+        disgorge/shared/extras
+        disgorge/shared/extras/snort
+        disgorge/shared/extras/snort/.keep
+        disgorge/development.env
+        disgorge/disgorge.md
+
+        $ ls -l disgorge/shared/
+        total 20
+        drwxr-xr-x  2 marlpier  wheel  512 Jan 23 09:13 config
+        drwxr-xr-x  3 marlpier  wheel  512 Nov 10 12:35 extras
+        drwxrwxrwx  2 marlpier  wheel  512 Jan 23 08:48 log
+        drwxrwxrwx  3 marlpier  wheel  512 Jan 23 09:13 tmp
+        drwxr-xr-x  3 marlpier  wheel  512 Nov 10 12:35 vendor
+
 1.  Rename database in database.yml
 
         $ vi shared/config/database.yml

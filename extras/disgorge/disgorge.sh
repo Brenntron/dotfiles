@@ -34,11 +34,14 @@ fi
 if [ "" == "$RELBASE" ]; then
     RELBASE=~/disgorge
 fi
+if [ "" == "$RELEASEBASE" ]; then
+    RELEASEBASE=$RELBASE/releases
+fi
 if [ "" == "$RELTMP" ]; then
-    RELTMP=$RELBASE/releases/tmp
+    RELTMP=$RELEASEBASE/tmp
 fi
 if [ "" == "$RELPATH" ]; then
-    RELPATH=$RELBASE/releases/$RELDIR
+    RELPATH=$RELEASEBASE/$RELDIR
 fi
 echo $RELPATH
 
@@ -72,9 +75,9 @@ if [ "SKIP" != "$SHARED" ]; then
     echo '* using shared files and directories'
     echo $SHAREDDIR
 
-    if [ -d $SHAREDDIR/ssh ]; then
-        rm -rf extras/ssh
-        ln -s $SHAREDDIR/ssh extras/ssh
+    if [ -d $SHAREDDIR/tmp ]; then
+        rm -rf tmp
+        ln -s $SHAREDDIR/tmp .
     fi
 
     if [ -d $SHAREDDIR/log ]; then
