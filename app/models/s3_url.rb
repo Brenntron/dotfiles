@@ -3,6 +3,12 @@ class S3Url < FileReference
   # @param [String] location input which might be a full URL.
   # @return [String] Corrected location value.
   def self.sanitize_location(location)
+    # Regexp to parse path out of an http(s) URL.
+    # If S3 location is an http/https URL, we just want the path, so fix it.
+    # URL is in format of protocol+colon+slash+slash+host+slash+path+question-mark+query-string
+    # Protocol = \w+
+    # Host = [-\.\w]+
+    # Query String (optional) = \?.*
     if /\A\w+:\/\/[-\.\w]+\/(?<encoded>[^\?]*)(\?.*)?\z/ =~ location
       URI.unescape(encoded)
     else
