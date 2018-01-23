@@ -1428,7 +1428,7 @@ class Bug < ApplicationRecord
                 new_note = Note.where(notes_bugzilla_id: nil, bug_id: bug_id).committer_note.first_or_create
                 new_note.note_type = 'committer'
                 new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
-                new_note.author = last_committer_note.nil? ? current_user.email : last_committer_note.author
+                new_note.author = last_committer_note.nil? ? current_user&.email : last_committer_note.author
                 new_note.created_at = Time.now.to_time
                 new_note.save
               end
@@ -1771,6 +1771,54 @@ class Bug < ApplicationRecord
     (STATES_CLOSED.include?(new_state) && has_draft_rules?) ? false : true
   end
 
+  # Creates a new bug in bugzilla.
+  # @param [Bugzilla::Bug] bug_factory proxy interface to bugzilla.
+  # @param [Hash] bug_attrs values for active record attributes on bug model.
+  # @param [User] user assgined to bug.
+  def self.bugzilla_create(bug_factory, bug_attrs, user: nil)
+    options = bug_attrs.to_h.slice(*%w{product component summary version description state creator opsys
+                                       platform priority severity classification})
+    options = options.reject { |key, value| value.nil? }
+
+    # stub for distribted bug object
+    bugzilla_bug_options = options.merge('assigned_to' => user&.email || 'vrt-incoming@sourcefire.com')
+    bug_stub_hash = bug_factory.create(bugzilla_bug_options)
+
+    Bug.create!(options.merge(id: bug_stub_hash["id"],
+                              bugzilla_id: bug_stub_hash["id"],
+                              state: bug_attrs['state'] || 'OPEN',
+                              user_id: user&.id))
+  end
+
+  # Creates a new bug in bugzilla and related records and objects.
+  # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
+  # @param [Hash] bug_attrs values for active record attributes on bug model.
+  # @param [User] user assgined to bug.
+  def self.bugzilla_create_action(bugzilla_session, bug_attrs, user:)
+
+    # object for distributed interface for bug factory
+    bug_factory = Bugzilla::Bug.new(bugzilla_session)
+
+    # active record Bug model
+    bug = bugzilla_create(bug_factory, bug_attrs, user: user)
+
+    # pull in the first comment
+    new_bug_history = bug_factory.get(bug.bugzilla_id)
+    Bug.synch_history(bug_factory, new_bug_history)
+
+    tags = bug_attrs['tag_names']
+    if tags
+      tags.each do |tag|
+        new_tag = Tag.find_or_create_by(name: tag)
+        bug.tags << new_tag
+      end
+    end
+    # update the summary (regarding tags)
+    bug.compose_summary
+
+    bug
+  end
+
   def update_bug_action(current_user:,
                         bugzilla_session:,
                         assignee_id:,
@@ -1798,5 +1846,67 @@ class Bug < ApplicationRecord
     current_bug = xmlrpc.get(self.bugzilla_id)
     Bug.synch_history(xmlrpc, current_bug).to_s
 
+  end
+
+  # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
+  # @param [IO] file
+  def add_attachment_action(bugzilla_session,
+                            file,
+                            user: nil,
+                            filename:,
+                            content_type:,
+                            comment: nil,
+                            is_patch: nil,
+                            is_private: nil,
+                            minor_update: nil)
+    file_content = file.read
+    options = {
+        ids: id,
+        data: XMLRPC::Base64.new(file_content),
+        file_name: filename,
+        summary: filename,
+        content_type: content_type,
+        comment: comment,
+        is_patch: is_patch,
+        is_private: is_private,
+        minor_update: minor_update
+    }.reject() { |key, value| value.nil? } #remove any nil values in the hash(bugzilla doesnt like them)
+    bug_stub = Bugzilla::Bug.new(bugzilla_session)
+    attachment_hash = bug_stub.add_attachment(options)
+    new_attachment_id = attachment_hash["ids"][0]
+    if new_attachment_id
+      new_attachment = Attachment.create(
+          id: new_attachment_id,
+          size: file_content.length,
+          bugzilla_attachment_id: new_attachment_id,
+          file_name: filename,
+          summary: filename,
+          content_type: content_type,
+          direct_upload_url:
+              "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
+          creator: user&.email,
+          is_private: is_private,
+          is_obsolete: false,
+          minor_update: minor_update
+      )
+      attachments << new_attachment
+
+      clear_rule_tested
+
+      attachment_ids = [new_attachment.id]
+      begin
+        if attachment_ids.any?
+          new_task = Task.create_pcap_test(id, user.id)
+          TestAttachment.new(new_task,
+                             bugzilla_session.token,
+                             attachment_ids).send_work_msg
+        end
+      rescue
+        #handle timeouts accordingly
+        Rails.logger.error("Cannot add pcap test task: #{$!.message}")
+      end
+    else
+      false
+    end
   end
 end

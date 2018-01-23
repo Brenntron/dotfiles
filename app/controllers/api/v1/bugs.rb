@@ -385,58 +385,7 @@ module API
         end
         post "", root: "bug" do
           authorize! :create, Bug
-          options = {
-              :product => permitted_params[:bug][:product],
-              :component => permitted_params[:bug][:component],
-              :summary => permitted_params[:bug][:summary],
-              :version => permitted_params[:bug][:version],
-              :description => permitted_params[:bug][:description],
-              :state => permitted_params[:bug][:state],
-              :creator => permitted_params[:bug][:creator],
-              :opsys => permitted_params[:bug][:opsys],
-              :platform => permitted_params[:bug][:platform],
-              :priority => permitted_params[:bug][:priority],
-              :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification],
-              :assigned_to => current_user.email
-          }.reject() { |k, v| v.nil? } #remove any nil or empty values in the hash(bugzilla doesnt like them)
-
-          xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-          new_bug = xmlrpc.create(options.to_h) #the bugzilla session is where we authenticate
-
-          new_bug_id = new_bug["id"]
-          bug = Bug.create!(
-              :id => new_bug_id,
-              :bugzilla_id => new_bug_id,
-              :product => permitted_params[:bug][:product],
-              :component => permitted_params[:bug][:component],
-              :summary => permitted_params[:bug][:summary],
-              :version => permitted_params[:bug][:version],
-              :description => permitted_params[:bug][:description],
-              :state => permitted_params[:bug][:state] || 'OPEN',
-              :creator => permitted_params[:bug][:creator],
-              :opsys => permitted_params[:bug][:opsys],
-              :platform => permitted_params[:bug][:platform],
-              :priority => permitted_params[:bug][:priority],
-              :severity => permitted_params[:bug][:severity],
-              :classification => permitted_params[:bug][:classification],
-              :user_id => current_user.id
-          )
-
-          # pull in the first comment
-          new_bug_history = xmlrpc.get(new_bug_id)
-          Bug.synch_history(xmlrpc, new_bug_history).to_s
-
-          tags = params[:bug][:tag_names]
-          if tags
-            tags.each do |tag|
-              new_tag = Tag.find_or_create_by(name: tag)
-              bug.tags << new_tag
-            end
-          end
-          # update the summary (regarding tags)
-          bug.compose_summary
-          return bug
+          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: current_user)
         end
 
         desc "remove a bug from the db only"

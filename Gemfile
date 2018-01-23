@@ -52,6 +52,8 @@ gem 'chartkick', '~> 2.2.4'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'awesome_nested_set', '~> 3.1.3'
 
+gem 'aws-sdk', '~> 2.6'
+
 gem 'will_paginate', '~> 3.1.5'
 
 gem 'delayed_job', '~> 4.1.3'
@@ -101,4 +103,6 @@ gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
 gem "sprockets", '~> 3.7.1'
+
+gem 'peake-bridge-client', '>= 0.0.0.11'
 

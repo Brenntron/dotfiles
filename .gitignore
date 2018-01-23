@@ -6,7 +6,6 @@
 
 
 # Ignore all logfiles and tempfiles.
-.byebug_history
 /log/*.log
 /tmp
 /vendor/cache
@@ -16,6 +15,8 @@
 .byebug_history
 /public/assets/*
 /public/system/*
+
+config/config.yml
 
 
 /extras/snort
@@ -30,7 +31,7 @@
 
 #data directories
 /load_ruledoc/
-/lib/data/nvd/
+/lib/data/
 
 /net-snort-parser/
 
@@ -41,6 +42,7 @@ coverage
 .tags*
 gems.tags*
 .env*
+
 
 dump.rdb
 /websocket/node_modules

@@ -16,4 +16,4 @@ This is the home for the Analyst Console Project.
     Clicking this link will join you to that room.
 
 -   System documentation and developer setup for this project is found in this
-    [wiki](https://git.vrt.sourcefire.com/talosweb/analyst-console/wiki/System-Documentation).
+    [wiki](https://git.vrt.sourcefire.com/talosweb/analyst-console/wiki/Developer-and-System-Documentation).

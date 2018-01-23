@@ -1,4 +1,3 @@
-
 window.bug_resolve =(this_tag) ->
   user_id = $('#resolve-form').find("input[name='user_id']").val()
   committer_id = $('#resolve-form').find("input[name='committer_id']").val()
@@ -100,7 +99,6 @@ window.ruleShow = (rule) ->
   $('.view').removeClass('hidden').addClass('active').show()
   $('.rule_' + id).removeClass('hidden').addClass('active').show()
   return
-
 
 $ ->
   $('#bugzilla_popover_state').popover();

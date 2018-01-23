@@ -6,6 +6,8 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
+
+
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
 Rails.configuration.bugzilla_host       = ENV['Bugzilla_host']   || env_config['bugzilla']['host']
 Rails.configuration.bugzilla_username   = ENV['Bugzilla_login']  || env_config['bugzilla']['login']
@@ -13,6 +15,19 @@ Rails.configuration.bugzilla_password   = ENV['Bugzilla_secret'] || env_config['
 
 raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt']
+
+Rails.configuration.peakebridge         = {}
+
+raise "config.yml missing peakebridge section" unless env_config['peakebridge']
+raise "config.yml missing peakebridge section" unless env_config['peakebridge']['addressees']
+raise "config.yml missing peakebridge section" unless env_config['peakebridge']['addressees']['peakebridge']
+peakebridge                             = OpenStruct.new
+peakebridge.host                        = env_config['peakebridge']['addressees']['peakebridge']['host']
+peakebridge.port                        = env_config['peakebridge']['addressees']['peakebridge']['port']
+peakebridge.ssl                         = env_config['peakebridge']['addressees']['peakebridge']['ssl']
+peakebridge.uri_base                    = env_config['peakebridge']['addressees']['peakebridge']['uri_base']
+peakebridge.sources                     = env_config['peakebridge']['sources'] || []
+Rails.configuration.peakebridge         = peakebridge
 
 raise "config.yml missing perl section" unless env_config['perl']
 Rails.configuration.perl_cmd            = env_config['perl']['cmd']

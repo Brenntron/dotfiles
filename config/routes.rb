@@ -111,6 +111,16 @@ Rails.application.routes.draw do
   end
 
 
+  namespace :peake_bridge do
+    resources :channels, only: [] do
+      collection do
+        post 'fp-create/messages', to: 'messages#fp_create'
+      end
+      resources :messages, only: [:create]
+    end
+  end
+
+
   mount API::Base => '/api'
 
 end

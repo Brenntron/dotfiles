@@ -6,6 +6,19 @@ development:
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
     vrt: "extras/ssh/ca.pem"
+  peakebridge:
+    addressees:
+      peakebridge:
+        host: "localhost"
+        port: 2966
+        ssl_mode: "no-ssl"
+        uri_base: "/peakebridge/channels"
+    sources:
+      "snort-org":
+        aws_access_key_id: "redacted"
+        aws_secret_access_key: "redacted"
+        aws_region: "us-east-1"
+        aws_bucket: "snort-org-site"
   perl:
     cmd: "/usr/bin/env perl"
     canvas_root: "extras"
@@ -20,7 +33,7 @@ development:
   snort_org:
     host: "localhost"
     port: 3000
-    api_key: "107216cd30bb6f7e209e698625525bb09be8bc3f"
+    api_key: "redacted"
   svn:
     cmd: "/usr/bin/env svn"
     password: ""
@@ -50,7 +63,7 @@ test:
   snort_org:
     host: "localhost"
     port: 3000
-    api_key: "107216cd30bb6f7e209e698625525bb09be8bc3f"
+    api_key: "redacted"
   svn:
     cmd: "/usr/bin/env svn"
     password: ""
@@ -79,33 +92,10 @@ staging:
   snort_org:
     host: "localhost"
     port: 3000
-    api_key: "42f572ab7b08e390d4cd034991b621f47df14718"
+    api_key: "redacted"
   svn:
     cmd: "/usr/local/bin/svn"
     password: ""
     rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
     snort_rule_path: "extras/snort/snort-rules"
-
-#production:
-#  amq:
-#    host: "mq.vrt.sourcefire.com"
-#  bugzilla:
-#    host: "bugzilla.vrt.sourcefire.com"
-#  cert:
-#    vrt: "/usr/local/etc/trusted-certificates.pem"
-#  perl:
-#    cmd: "/usr/local/bin/perl"
-#    canvas_root: "extras"
-#    visruleparser_path: "extras/visruleparser.pl"
-#    cve2x_path: "extras/cve2x.pl"
-#    rule2yaml_path: "extras/rule2yaml.pl"
-#  ruletest:
-#    url: "https://ruletest.vrt.sourcefire.com"
-#  svn:
-#    cmd: "/usr/local/bin/svn"
-#    password: ""
-#    rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
-#    ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
-#    snort_rule_path: "extras/snort/snort-rules"
-
