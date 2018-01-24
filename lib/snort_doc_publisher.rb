@@ -169,9 +169,9 @@ class SnortDocPublisher
   # @yieldparam [Reference] ref_rec CVE reference record
   # @yieldparam [NvdCveItem] nvd_cve_item data read from a CVE from the NVD data file.
   def each_missing
-    max_fails = Rails.configuration.snort_doc_max_fails
+    max_fails = Rails.configuration.snort_doc_max_fails || 3
     references.each do |ref_rec|
-      next if (max_fails || 0) <= (ref_rec.fail_count || 0)
+      next if max_fails <= (ref_rec.fail_count || 0)
 
       cve_key = "CVE-#{ref_rec.reference_data}"
       nvd_cve_item_curr = nvd_cve_item(cve_key)
