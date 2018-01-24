@@ -53,7 +53,18 @@ module Api
         config.amq_snort_local_result = :snort_local_rules_test_result
 
         config.amq_snort_commit_result = :snort_commit_test_result
+      when "freebsd"
+        config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Stage.Result"
+        config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Stage.Result"
+        config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Stage.Work"
+        config.subscribe_all_work = "/queue/AnalystConsole.Snort.Run.All.Stage.Work"
 
+        config.amq_snort_local = :snort_local_rules_stage_work
+        config.amq_snort_all = :snort_all_rules_stage_work
+        config.amq_snort_all_result = :snort_all_rules_stage_result
+        config.amq_snort_local_result = :snort_local_rules_stage_result
+
+        config.amq_snort_commit_result = :snort_commit_stage_result
       when "staging"
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Stage.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Stage.Result"

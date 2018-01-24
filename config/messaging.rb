@@ -21,6 +21,15 @@ ActiveMessaging::Gateway.define do |s|
       s.destination :snort_commit_stage_work, '/queue/AnalystConsole.Snort.Commit.Stage.Work'
       s.destination :snort_commit_stage_result, '/queue/AnalystConsole.Snort.Commit.Stage.Result'
       s.destination :snort_commit_stage_reload, '/queue/AnalystConsole.Snort.Commit.Stage.Reload'
+    when Rails.env.freebsd?
+      s.destination :snort_all_rules_stage_work, '/queue/AnalystConsole.Snort.Run.All.Stage.Work'
+      s.destination :snort_all_rules_stage_result, '/queue/AnalystConsole.Snort.Run.All.Stage.Result'
+      s.destination :snort_local_rules_stage_work, '/queue/AnalystConsole.Snort.Run.Local.Stage.Work'
+      s.destination :snort_local_rules_stage_messages, '/queue/AnalystConsole.Snort.Run.Local.Stage.Messages'
+      s.destination :snort_local_rules_stage_result, '/queue/AnalystConsole.Snort.Run.Local.Stage.Result'
+      s.destination :snort_commit_stage_work, '/queue/AnalystConsole.Snort.Commit.Stage.Work'
+      s.destination :snort_commit_stage_result, '/queue/AnalystConsole.Snort.Commit.Stage.Result'
+      s.destination :snort_commit_stage_reload, '/queue/AnalystConsole.Snort.Commit.Stage.Reload'
     else
       s.destination :snort_all_rules_test_work, '/queue/AnalystConsole.Snort.Run.All.Test.Work'
       s.destination :snort_all_rules_test_result, '/queue/AnalystConsole.Snort.Run.All.Test.Result'
