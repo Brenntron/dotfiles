@@ -33,7 +33,7 @@ gem 'curb', '~> 0.9.3' #Libcurl bindings for Ruby
 
 gem 'net-ssh', '~> 4.1.0'
 gem 'daemons', '~> 1.2.4'
-gem 'activemessaging', '0.13.1.2'    #, path: './vendor/gems/activemessaging'
+gem 'activemessaging', '0.13.1.2'    , path: './vendor/gems/activemessaging'
 gem 'stomp', '~> 1.4.3'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '~> 0.9.12.4'
@@ -104,5 +104,5 @@ gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
 gem "sprockets", '~> 3.7.1'
 
-gem 'peake-bridge-client', '>= 0.0.0.14', :git => 'https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git'
+gem 'peake-bridge-client', '>= 0.0.1.0', path: './vendor/gems/peake-bridge-client'
 
