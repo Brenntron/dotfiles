@@ -27,7 +27,14 @@ development:
     # If error still occurs after retryMax, send message to specified dead letter queue
     # deadLetterQueue: '/queue/activemessaging/deadletter'
 
-
+freebsd:
+    adapter: stomp
+    login: "guest"
+    passcode: "guest"
+    host: fmd-actmq-01stg.vrt.sourcefire.com
+    port: 61613
+    reliable: true
+    reconnectDelay: 5
     
 test:
     adapter: test

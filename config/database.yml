@@ -17,6 +17,13 @@ test: &test
   username: root
   host: localhost
 
+freebsd:
+  adapter: mysql2
+  encoding: utf8
+  database: nherbert_ac_dev
+  username: root
+  password: Opensnort
+
 staging:
   adapter: mysql2
   encoding: utf8
