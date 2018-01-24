@@ -211,7 +211,8 @@ class Rule < ApplicationRecord
         {
             pcap_id: pcap.id,
             file_name: pcap.file_name,
-            alert_status: (pcap.rule_id ? 'alerted' : 'clear')
+            alert_status: (pcap.rule_id ? 'alerted' : 'clear'),
+            direct_upload_url: pcap.direct_upload_url
         }
       end
     else
@@ -219,7 +220,8 @@ class Rule < ApplicationRecord
         {
             pcap_id: pcap.id,
             file_name: pcap.file_name,
-            alert_status: (pcap.rule_id ? 'alerted' : 'clear')
+            alert_status: (pcap.rule_id ? 'alerted' : 'clear'),
+            direct_upload_url: pcap.direct_upload_url
         }
       end
     end

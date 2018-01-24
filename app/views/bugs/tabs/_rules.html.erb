@@ -154,7 +154,7 @@
               </tr>
               <% rule.display_alerts(@bug).each do |display_alert| %>
                 <tr class="rule-test-alert <%= "rulealert-#{rule.to_param}" %>">
-                  <td colspan="6"><%= display_alert[:file_name] %> <%= @bug.id %>
+                  <td colspan="6"><code><a href="<%= display_alert[:direct_upload_url] %>" target="_blank"><%= display_alert[:file_name] %></a></code> <%= @bug.id %>
                   </td>
                   <% if 'alerted' == display_alert[:alert_status] %>
                       <td id="rule_<%= rule.id %>_att_<%= display_alert[:pcap_id] %>" colspan="2" class="alerted">Alerted</td>
