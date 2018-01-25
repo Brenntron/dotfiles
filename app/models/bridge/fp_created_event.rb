@@ -1,4 +1,4 @@
-class PeakeBridge::FpCreatedEvent < BaseMessage
+class Bridge::FpCreatedEvent < Bridge::BaseMessage
   def initialize(addressee:, source_authority: nil, source_key: nil)
     super(channel: 'fp-created-event',
           addressee: addressee)

@@ -1,4 +1,4 @@
-class PeakeBridge::BaseMessage < BasicPeakeBridge
+class Bridge::BaseMessage < PeakeBridge::BasicPeakeBridge
   def initialize(channel:, addressee:)
     super(channel: channel,
           sender: 'analyst-console',
