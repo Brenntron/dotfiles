@@ -104,5 +104,5 @@ gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
 gem "sprockets", '~> 3.7.1'
 
-gem "peake-bridge-client", '0.0.1.0', path: './vendor/gems/peake-bridge-client/'
+ gem "peake_bridge_client", '>= 0.0.1.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 
