@@ -1272,16 +1272,23 @@ class Bug < ApplicationRecord
         creator = User.where('email=?', item['creator']).first
         new_user = User.where('email=?', item['assigned_to']).first
         new_committer = User.where('email=?', item['qa_contact']).first
+        default_role_type = (bug.product.present? && bug.product == 'Escalations') ? "escalator" : "analyst"
+        default_role = Role.where(role: default_role_type)
         if creator.nil?
           User.create_by_email(item['creator'])
           new_creator = User.where(email: item['creator']).first
+          creator.roles << default_role
+          creator.save
           bug.creator = new_creator.id
         else
           bug.creator = creator.id
         end
         if new_user.nil?
           User.create_by_email(item['assigned_to'])
+          creator.roles << default_role
           new_generated_user = User.where(email: item['assigned_to']).first
+          new_generated_user.roles << default_role
+          new_generated_user.save
           bug.user = new_generated_user
         else
           bug.user = new_user
@@ -1289,6 +1296,7 @@ class Bug < ApplicationRecord
         if new_committer.nil?
           User.create_by_email(item['qa_contact'])
           new_generated_committer = User.where(email: item['qa_contact']).first
+          new_generated_committer.roles << default_role
           new_generated_committer.roles << Role.where(role:"committer")
           bug.committer = new_generated_committer
         else

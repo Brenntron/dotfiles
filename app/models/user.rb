@@ -18,7 +18,7 @@ class User < ApplicationRecord
 
 
   before_save :ensure_authentication_token
-  after_create :add_role
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   # :registerable, :recoverable, :rememberable,
@@ -139,11 +139,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def add_role
-    analyst = Role.where(role: 'analyst')
-    roles << analyst unless roles.include?(analyst)
-  end
 
   def generate_authentication_token
     loop do
