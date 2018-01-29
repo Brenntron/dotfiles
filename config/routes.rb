@@ -31,6 +31,7 @@ Rails.application.routes.draw do
         post :update
       end
       get :rule_docs, to: 'rule_docs#index'
+      get :upload_docs, to: 'rule_docs#upload'
     end
 
     resources :rules_sync, only: [:index] do
