@@ -126,11 +126,12 @@ class SnortDocPublisher
   def self.clear_instance_variables
     clear_errors
     @undoc_cve_refs = nil
+    @undoc_cve_refs_by_year = nil
   end
 
   # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
   def self.undoc_cve_refs
-    @undoc_cve_refs ||= Reference.cves.left_joins(:cve).where(cves: {id: nil}).limit(1000)
+    @undoc_cve_refs ||= Reference.cves.left_joins(:cve).where(cves: {id: nil}).limit(2000)
   end
 
   # @return [Hash<String => Array<Reference>>] cve references with missing cves records grouped by year.

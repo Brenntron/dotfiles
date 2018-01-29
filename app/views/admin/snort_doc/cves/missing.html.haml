@@ -13,6 +13,12 @@
     %p
       Run update on all missing CVE data:
     .form-break
+      = radio_button_tag('wait', 'yes', true)
+      Wait for errors
+    .form-break
+      = radio_button_tag('wait', 'no')
+      Do not wait
+    .form-break
       = submit_tag('Update')
 
 
