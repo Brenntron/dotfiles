@@ -181,9 +181,9 @@ class SnortDocPublisher
       nvd_cve_item_curr = nvd_cve_item(cve_key)
       unless nvd_cve_item_curr
         @errors << "Cannot find NVD input data for #{cve_key.inspect}."
-        ref_rec.fail_count ||= 0
-        ref_rec.fail_count += 1
-        ref_rec.save!
+        fail_count = ref_rec.fail_count || 0
+        fail_count += 1
+        Reference.where(id: ref_rec.id).update_all(fail_count: fail_count)
         next
       end
 
@@ -255,6 +255,12 @@ class SnortDocPublisher
     cve_rec.assign_attributes(nvd_cve_item.attributes)
     cve_rec.affected_systems = nvd_cve_item.affected_systems.join("\n")
     cve_rec.save!
+  rescue ActiveRecord::RecordNotUnique
+    errors << "#{$!.message}"
+    fail_count = ref_rec.fail_count || 0
+    fail_count += 1
+    Reference.where(id: ref_rec.id).update_all(fail_count: fail_count)
+    false
   end
 
   # Save the given reference data to the references table
@@ -279,8 +285,9 @@ class SnortDocPublisher
   # Update the reference for this object to the database (cves and references tables)
   def update_cve_data
     each_missing do |cve_key, ref_rec, nvd_cve_item|
-      save_cve(cve_key, ref_rec, nvd_cve_item)
-      save_references(ref_rec, nvd_cve_item)
+      if save_cve(cve_key, ref_rec, nvd_cve_item)
+        save_references(ref_rec, nvd_cve_item)
+      end
     end
   end
 
