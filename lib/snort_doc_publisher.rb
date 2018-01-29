@@ -131,7 +131,10 @@ class SnortDocPublisher
 
   # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
   def self.undoc_cve_refs
-    @undoc_cve_refs ||= Reference.cves.left_joins(:cve).where(cves: {id: nil}).limit(2000)
+    @undoc_cve_refs ||=
+        Reference.cves
+            .where("fail_count is null or fail_count < :mf", mf: Rails.configuration.snort_doc_max_fails || 3)
+            .left_joins(:cve).where(cves: {id: nil}).limit(2000)
   end
 
   # @return [Hash<String => Array<Reference>>] cve references with missing cves records grouped by year.
