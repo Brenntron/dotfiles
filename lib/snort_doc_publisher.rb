@@ -274,7 +274,7 @@ class SnortDocPublisher
 
   # Update all references without CVE data in the database (cves and references tables)
   def self.update_cve_data
-    clear_errors
+    clear_instance_variables
     each_publisher do |publisher|
       publisher.clear_errors
       publisher.update_cve_data
@@ -285,6 +285,7 @@ class SnortDocPublisher
       yield @errors
     end
 
+  ensure
     clear_instance_variables
   end
 
