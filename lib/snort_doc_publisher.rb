@@ -243,6 +243,7 @@ class SnortDocPublisher
     cve_rec =
         case
           when ref_rec.cve
+            # if cve object exists, just use it
             ref_rec.cve.assign_attributes(cve_key: cve_key, year: year)
             ref_rec.cve
           else
