@@ -239,7 +239,13 @@ class SnortDocPublisher
 
   # Save the given data to the cves table
   def save_cve(cve_key, ref_rec, nvd_cve_item)
-    cve_rec = ref_rec.build_cve(cve_key: cve_key, year: year)
+    cve_rec =
+        case
+          when ref_rec.cve
+            ref_rec.cve.assign_attributes(cve_key: cve_key, year: year)
+          else
+            ref_rec.build_cve(cve_key: cve_key, year: year)
+        end
     cve_rec.assign_attributes(nvd_cve_item.attributes)
     cve_rec.affected_systems = nvd_cve_item.affected_systems.join("\n")
     cve_rec.save!
