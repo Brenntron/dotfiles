@@ -29,17 +29,27 @@ class Admin::SnortDoc::CvesController < ApplicationController
   # POST /admin/snort_doc/cves/update
   # Action to run the process to try to populate them from NVD files
   def update
-    error_limit = 30
+    if 'no' == update_params['wait']
+      Thread.new do
+        SnortDocPublisher.update_cve_data do |errors|
+          unless errors.empty?
+            errors.each { |msg| Rails.logger.error(msg) }
+          end
+        end
+      end
+    else
+      SnortDocPublisher.update_cve_data do |errors|
+        if errors.empty?
+          flash[:info] = "No errors"
+        else
+          errors.each { |msg| Rails.logger.error(msg) }
 
-    SnortDocPublisher.update_cve_data do |errors|
-      if errors.empty?
-        flash[:info] = "No errors"
-      else
-        errors.each { |msg| Rails.logger.error(msg) }
-        flash[:error] = "#{errors.count} Errors:\n"
-        flash[:error] += errors[0..error_limit].join("\n")
-        if error_limit < errors.count
-          flash[:error] += "\n... first #{error_limit}"
+          error_limit = 30
+          flash[:error] = "#{errors.count} Errors:\n"
+          flash[:error] += errors[0..error_limit].join("\n")
+          if error_limit < errors.count
+            flash[:error] += "\n... first #{error_limit}"
+          end
         end
       end
     end
@@ -51,5 +61,9 @@ class Admin::SnortDoc::CvesController < ApplicationController
 
   def download_params
     params.permit(:filename)
+  end
+
+  def update_params
+    params.permit(:wait)
   end
 end

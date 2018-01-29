@@ -126,11 +126,15 @@ class SnortDocPublisher
   def self.clear_instance_variables
     clear_errors
     @undoc_cve_refs = nil
+    @undoc_cve_refs_by_year = nil
   end
 
   # @return [ActiveRecord::Relation<Reference>] cve references with missing cves records.
   def self.undoc_cve_refs
-    @undoc_cve_refs ||= Reference.cves.left_joins(:cve).where(cves: {id: nil})
+    @undoc_cve_refs ||=
+        Reference.cves
+            .where("fail_count is null or fail_count < :mf", mf: Rails.configuration.snort_doc_max_fails || 3)
+            .left_joins(:cve).where(cves: {id: nil}).limit(2000)
   end
 
   # @return [Hash<String => Array<Reference>>] cve references with missing cves records grouped by year.
@@ -239,7 +243,15 @@ class SnortDocPublisher
 
   # Save the given data to the cves table
   def save_cve(cve_key, ref_rec, nvd_cve_item)
-    cve_rec = ref_rec.build_cve(cve_key: cve_key, year: year)
+    cve_rec =
+        case
+          when ref_rec.cve
+            # if cve object exists, just use it
+            ref_rec.cve.assign_attributes(cve_key: cve_key, year: year)
+            ref_rec.cve
+          else
+            ref_rec.build_cve(cve_key: cve_key, year: year)
+        end
     cve_rec.assign_attributes(nvd_cve_item.attributes)
     cve_rec.affected_systems = nvd_cve_item.affected_systems.join("\n")
     cve_rec.save!
@@ -274,7 +286,7 @@ class SnortDocPublisher
 
   # Update all references without CVE data in the database (cves and references tables)
   def self.update_cve_data
-    clear_errors
+    clear_instance_variables
     each_publisher do |publisher|
       publisher.clear_errors
       publisher.update_cve_data
@@ -285,6 +297,7 @@ class SnortDocPublisher
       yield @errors
     end
 
+  ensure
     clear_instance_variables
   end
 
