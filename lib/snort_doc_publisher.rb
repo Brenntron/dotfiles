@@ -243,6 +243,7 @@ class SnortDocPublisher
         case
           when ref_rec.cve
             ref_rec.cve.assign_attributes(cve_key: cve_key, year: year)
+            ref_rec.cve
           else
             ref_rec.build_cve(cve_key: cve_key, year: year)
         end
