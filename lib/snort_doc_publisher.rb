@@ -181,9 +181,9 @@ class SnortDocPublisher
       nvd_cve_item_curr = nvd_cve_item(cve_key)
       unless nvd_cve_item_curr
         @errors << "Cannot find NVD input data for #{cve_key.inspect}."
-        ref_rec.fail_count ||= 0
-        ref_rec.fail_count += 1
-        ref_rec.save!
+        fail_count = ref_rec.fail_count || 0
+        fail_count += 1
+        Reference.where(id: ref_rec.id).update_all(fail_count: fail_count)
         next
       end
 
