@@ -9,4 +9,6 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
                  .where(edit_status: [Rule::EDIT_STATUS_EDIT, Rule::EDIT_STATUS_SYNCHED])
                  .order(:gid, :sid)
   end
+  def upload
+  end
 end

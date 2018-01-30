@@ -1,0 +1,12 @@
+%input{type: 'hidden', name: 'token', value: current_user.authentication_token}
+%input{type: 'hidden', name: 'xml_token', value: xml_token}
+%input{type: 'hidden', name: 'current_user', value: current_user.id}
+
+%h1 Rule Doc Upload
+
+%h2 Upload YAML
+#snort-doc-download-form-div
+  = form_tag '#', onsubmit: 'event.preventDefault(); return submit_rule_doc_yaml(this);', :multipart => true  do
+    = file_field_tag 'yaml_file[]', multiple: true
+    %br
+    = submit_tag('Upload')
