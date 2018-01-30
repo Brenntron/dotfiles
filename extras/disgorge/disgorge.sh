@@ -6,16 +6,16 @@ if [[ $# -lt 1 ]]; then
     echo 'Script to uncompress web site source and install'
     echo ''
     echo 'Variables and Defaults:'
-    echo 'RAILS_ENV                                             Cannot be test or development from bundle install --without'
-    echo 'TARFILE                                               First ARG -- path to tar file'
-    echo 'RELDIR=<timestamp>                                    Second ARG -- subdir for this build'
-    echo 'RELBASE=/usr/local/AC-TESTING/$USERFOLDER/disgorge    Base dir with releases, shared, and current subdirs'
-    echo 'RELPATH=$RELBASE/releases/$RELDIR                     Dir for source files'
-    echo 'SHARED=SHARED                                         SHARED to use shared dir, SKIP to omit'
-    echo 'SHAREDDIR=$RELBASE/shared                             Location of Shared files and dirs'
-    echo 'CURRDIR=$RELBASE/current                              Path of sym link to source file directory'
-    echo 'VENDORDIR=$SHAREDDIR/vendor                           Shared vendor directory if exists'
-    echo 'BUNDLE_SHARE=CLEAN                                    CLEAN to not use shared, SHARE to use shared, COPY to copy from shared'
+    echo 'RAILS_ENV                             Cannot be test or development from bundle install --without'
+    echo 'TARFILE                               First ARG -- path to tar file'
+    echo 'RELDIR=<timestamp>                    Second ARG -- subdir for this build'
+    echo 'RELBASE=~/disgorge                    Base dir with releases, shared, and current subdirs'
+    echo 'RELPATH=$RELBASE/releases/$RELDIR     Dir for source files'
+    echo 'SHARED=SHARED                         SHARED to use shared dir, SKIP to omit'
+    echo 'SHAREDDIR=$RELBASE/shared             Location of Shared files and dirs'
+    echo 'CURRDIR=$RELBASE/current              Path of sym link to source file directory'
+    echo 'VENDORDIR=$SHAREDDIR/vendor           Shared vendor directory if exists'
+    echo 'BUNDLE_SHARE=CLEAN                    CLEAN to not use shared, SHARE to use shared, COPY to copy from shared'
     echo ''
     exit
 fi
@@ -36,9 +36,6 @@ if [ "" == "$RELBASE" ]; then
 fi
 if [ "" == "$RELEASEBASE" ]; then
     RELEASEBASE=$RELBASE/releases
-fi
-if [ "" == "$RELTMP" ]; then
-    RELTMP=$RELEASEBASE/tmp
 fi
 if [ "" == "$RELPATH" ]; then
     RELPATH=$RELEASEBASE/$RELDIR
@@ -69,20 +66,33 @@ echo ''
 echo '* installing'
 echo $RELPATH
 echo $TAGDIR
-cd $RELPATH/$TAGDIR
+RAILS_ROOT=$RELPATH/$TAGDIR
+echo RAILS_ROOT=$RAILS_ROOT
+cd $RAILS_ROOT
+
+if [ "" == "$RELTMP" ]; then
+    RELTMP=$RAILS_ROOT/tmp
+fi
 
 if [ "SKIP" != "$SHARED" ]; then
     echo '* using shared files and directories'
     echo $SHAREDDIR
 
-    if [ -d $SHAREDDIR/tmp ]; then
-        rm -rf tmp
-        ln -s $SHAREDDIR/tmp .
+    if [ ! -d $SHAREDDIR/tmp ]; then
+        mkdir $SHAREDDIR/tmp
     fi
+    rm -rf $RAILS_ROOT/tmp
+    ln -s $SHAREDDIR/tmp $RAILS_ROOT
+
+    if [ ! -d $SHAREDDIR/nvd ]; then
+        mkdir $SHAREDDIR/nvd
+    fi
+    rm -rf $RAILS_ROOT/lib/data/nvd
+    ln -s $SHAREDDIR/nvd $RAILS_ROOT/lib/data
 
     if [ -d $SHAREDDIR/log ]; then
         rm -rf log
-        ln -s $SHAREDDIR/log .
+        ln -s $SHAREDDIR/log $RAILS_ROOT
         if [ -f log/staging.log ]; then
             echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
         fi
@@ -94,17 +104,17 @@ if [ "SKIP" != "$SHARED" ]; then
     if [ -f $SHAREDDIR/config/database.yml ]; then
         echo $SHAREDDIR/config/database.yml
         rm config/database.yml
-        ln -s $SHAREDDIR/config/database.yml config
+        ln -s $SHAREDDIR/config/database.yml $RAILS_ROOT/config
     fi
     if [ -f $SHAREDDIR/config/secrets.yml ]; then
         echo $SHAREDDIR/config/secrets.yml
         rm config/secrets.yml
-        ln -s $SHAREDDIR/config/secrets.yml config
+        ln -s $SHAREDDIR/config/secrets.yml $RAILS_ROOT/config
     fi
     if [ -f $SHAREDDIR/config/config.yml ]; then
         echo $SHAREDDIR/config/config.yml
         rm config/config.yml
-        ln -s $SHAREDDIR/config/config.yml config
+        ln -s $SHAREDDIR/config/config.yml $RAILS_ROOT/config
     fi
 fi
 
@@ -151,9 +161,37 @@ if [ "SKIP" != "$MIGRATE" ]; then
     bundle exec rake db:migrate
 fi
 
+if [ "" != "$RELTMP" ]; then
+    echo "making and linking tmp directory"
+    echo $RELTMP
+    if [ ! -d $RELTMP ]; then
+        mkdir $RELTMP
+    fi
+    chmod 777 $RELTMP
+    umask 000 $RELTMP
+    if [ ! -d $RELTMP/cache ]; then
+        mkdir $RELTMP/cache
+    fi
+    chmod 777 $RELTMP/cache
+    umask 000 $RELTMP/cache
+
+    #ln -s $RELTMP $RELPATH/tmp
+
+fi
+
 if [ "SKIP" != "$PRECOMPILE" ]; then
     echo '* precompile assets'
     bundle exec rake assets:precompile
+
+    chmod 777 $RELTMP/cache/assets
+    umask 000 $RELTMP/cache/assets
+    chmod 777 $RELTMP/cache/assets/sprockets
+    umask 000 $RELTMP/cache/assets/sprockets
+    chmod 777 $RELTMP/cache/assets/sprockets/v3.0
+    umask 000 $RELTMP/cache/assets/sprockets/v3.0
+    chmod 777 $RELTMP/cache/assets/sprockets/v3.0/*
+    umask 000 $RELTMP/cache/assets/sprockets/v3.0/*
+    chmod 777 $RELTMP/cache/assets/sprockets/v3.0/*/*
 fi
 
 if [ "SKIP" != "$SVN_WORKING" ]; then
@@ -166,22 +204,6 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
     ln -s $SHAREDDIR/extras/snort extras/snort
 
     svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ $RELPATH/$TAGDIR/extras/rulesdocs
-fi
-if [ "" != "$RELTMP" ]; then
-    echo "making and linking tmp directory"
-    echo $RELTMP
-    if [ ! -d $RELTMP ]; then
-        mkdir $RELTMP
-    fi
-    if [ ! -d $RELTMP/cache ]; then
-        mkdir $RELTMP/cache
-    fi
-    chmod 777 $RELTMP/cache/
-    cd $RELTMP/cache/
-    umask 000
-
-    ln -s $RELTMP $RELPATH/tmp
-
 fi
 
 if [ "" != "$CURRDIR" ]; then
