@@ -15,10 +15,11 @@ deleted_category = RuleCategory.where(category: 'DELETED').first
 result_hash = {'modules' => {'diff' => {}}, 'rules' => {'diff' => {}}}
 
 
-Rule.where('sid >= 5100').where('sid < 5200').each do |rule|
+Rule.where('sid >= 100').where('sid < 250').each do |rule|
+  next if rule.rule_category_id.nil?
   on_off =
       case
-        when deleted_category.id == rule.rule_category.id
+        when deleted_category.id == rule.rule_category_id
           'deleted'
         when rule.on?
           'on'
