@@ -40,6 +40,7 @@
         It then downloads the year data for any necessary years.
         It then loads data from those files into a database table for any CVEs missing data from the database.
 
+
     %li
       %h3 Generate rule doc JSON
       %p
@@ -60,6 +61,8 @@
   %h3 Force a download of a given NVD year
   %p
     Admin tool to force a file download from NVD in case the file is out of data for analyst console's file store.
+    NVD files can be found here
+    %a{href: "https://nvd.nist.gov/vuln/data-feeds#JSON_FEED", target: "_blank"} NVD Data.
     The analyst console application will not update the file when it already has it,
     except for the current year, which it downloads every time the rules are published.
 

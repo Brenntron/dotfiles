@@ -434,9 +434,13 @@ class SnortDocPublisher
 
     # @http = Net::HTTP.new(@host, @port)
     http = Net::HTTP.new(config.host, config.port)
-    http.request(request)
+    response = http.request(request)
 
-    rule_doc_stream.unlink
+    if response.code == "200"
+      response.body
+    else
+      nil
+    end
   end
 
 
@@ -472,26 +476,35 @@ class SnortDocPublisher
   def self.publish_snort_doc_from_yaml(contents,
                                        do_download: true,
                                        set_published: true,
-                                       do_upload: true)
+                                       do_upload: false)
+    the_result = {}
+    begin
+       # Refresh NVD files
+      download_all if do_download
 
-    # Refresh NVD files
-    download_all if do_download
+      # Create any needed cves records for references missing cves records.
+      update_cve_data
 
-    # Create any needed cves records for references missing cves records.
-    update_cve_data
-
-    # Mark rules as to be published from the rule update YAML file
-    update_snort_doc_to_be(YAML.load(contents))
-
-    to_be_snort_doc.tap do |doc|
-      if set_published
-        Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
-            .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
+      # Mark rules as to be published from the rule update YAML file
+      update_snort_doc_to_be(YAML.load(contents))
+      the_json = to_be_snort_doc.tap do |doc|
+        if set_published
+          Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
+              .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
+        end
+        if do_upload
+          the_result = upload(doc.to_json)
+        end
       end
+    rescue Exception => e
+      the_errors = e.message
+    end
 
-      if do_upload
-        upload(doc.to_json)
-      end
+    if block_given?
+      yield the_json, the_errors, the_result
+    else
+      the_json
     end
   end
+
 end

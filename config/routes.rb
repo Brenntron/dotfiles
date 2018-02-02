@@ -32,7 +32,7 @@ Rails.application.routes.draw do
       end
       get :rule_docs, to: 'rule_docs#index'
       get :upload_docs, to: 'rule_docs#upload'
-      post :upload_docs, to: 'rule_docs#upload'
+      post :upload_docs, to: 'rule_docs#send_yaml'
     end
 
     resources :rules_sync, only: [:index] do

@@ -19,20 +19,3 @@ window.submit_rule_doc_status =(form_tag) ->
 
 
 
-window.upload_rule_doc_yaml =(yaml_file) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax {
-    url: "/api/v2/snort/rule_docs/pretty"
-    type: 'GET'
-    dataType: 'json'
-    headers: headers
-    data:
-      rule_update: yaml_file
-  }
-
-window.submit_rule_doc_yaml =(form_tag) ->
-  debugger
-  yaml_file = form_tag.querySelector("input[name=yaml_file]").value
-  upload_rule_doc_yaml(yaml_file)
-  location.reload true
-  true

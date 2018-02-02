@@ -1,4 +1,4 @@
-class PeakeBridge::MessagesController < ApplicationController
+class Bridge::MessagesController < ApplicationController
   def fp_create
 
     sender = envelope_params[:sender]
