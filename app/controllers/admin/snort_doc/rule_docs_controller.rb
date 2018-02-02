@@ -9,14 +9,15 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
                  .where(edit_status: [Rule::EDIT_STATUS_EDIT, Rule::EDIT_STATUS_SYNCHED])
                  .order(:gid, :sid)
   end
+
   def upload
   end
 
   def send_yaml
     file_contents = yaml_file.tempfile.read
     SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
-                                                  do_download: permitted_params['do_download'],
-                                                  set_published: permitted_params['set_published'],
+                                                  do_download: send_yaml_params['do_download'],
+                                                  set_published: send_yaml_params['set_published'],
                                                   do_upload: true) do |the_json, the_errors, the_result |
 
       parsed_output = JSON.parse(the_result) unless the_result.empty?
@@ -43,7 +44,10 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
   def yaml_file
     params.require('rule_update').require(:yaml_file)
   end
-  def permitted_params
+
+  private
+
+  def send_yaml_params
     params.permit(:do_download, :set_published, :do_upload)
   end
 end

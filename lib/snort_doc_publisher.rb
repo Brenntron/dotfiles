@@ -441,6 +441,8 @@ class SnortDocPublisher
     else
       nil
     end
+  ensure
+    rule_doc_stream.unlink
   end
 
 
@@ -473,10 +475,12 @@ class SnortDocPublisher
   # @param [String] contents YAML formatted string from rule update file
   # @param [Boolean] do_download false to skip NVD download
   # @param [Boolean] set_published false to skip update to snort.org web site
+  # @param [Boolean] do_update false to skip upload to snort.org.
   def self.publish_snort_doc_from_yaml(contents,
                                        do_download: true,
                                        set_published: true,
-                                       do_upload: false)
+                                       do_upload: true)
+    the_errors = nil
     the_result = {}
     begin
        # Refresh NVD files
@@ -502,9 +506,9 @@ class SnortDocPublisher
 
     if block_given?
       yield the_json, the_errors, the_result
-    else
-      the_json
     end
+
+    the_json
   end
 
 end
