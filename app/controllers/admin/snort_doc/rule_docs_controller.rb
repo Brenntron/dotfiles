@@ -9,24 +9,25 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
                  .where(edit_status: [Rule::EDIT_STATUS_EDIT, Rule::EDIT_STATUS_SYNCHED])
                  .order(:gid, :sid)
   end
+
   def upload
-    binding.pry
 
   end
 
   def send_yaml
     file_contents = yaml_file.tempfile.read
-    @json = SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
-                                                  do_download: permitted_params['do_download'],
-                                                  set_published: permitted_params['set_published'],
+    SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
+                                                  do_download: send_yaml_params['do_download'],
+                                                  update_cves: send_yaml_params['update_cves'],
+                                                  set_published: send_yaml_params['set_published'],
                                                   do_upload: true) do |the_json, the_errors, the_result |
-
+      @json = JSON.pretty_generate(the_json).to_s
       parsed_output = JSON.parse(the_result) unless the_result.empty?
       respond_to do |format|
         format.html {
           if the_errors.nil?
             if parsed_output
-              flash[:notice]= "The following rule docs were successfully uploaded.}"
+              flash[:notice]= "The following rule docs were successfully uploaded."
               @result = parsed_output['rule_docs'].join(", ")
             else
               flash[:notice]= "The script was successful but no rules were uploaded."
@@ -36,7 +37,7 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
             @errors = the_errors
           end
 
-          redirect_to admin_snort_doc_upload_docs_path , json: @json, result: @result, error: @errors
+          render 'admin/snort_doc/rule_docs/upload'
         }
         format.json { head json: JSON.pretty_generate(the_json)}
       end
@@ -47,7 +48,10 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
   def yaml_file
     params.require('rule_update').require(:yaml_file)
   end
-  def permitted_params
-    params.permit(:do_download, :set_published, :do_upload)
+
+  private
+
+  def send_yaml_params
+    params.permit(:do_download, :update_cves, :set_published, :do_upload)
   end
 end

@@ -14,39 +14,43 @@
 %h2 Upload YAML
 #snort-doc-download-form-div
   = form_tag 'upload_docs', :multipart => true  do
-    = file_field_tag 'rule_update[yaml_file]', multiple: true
-    %br
+    .row
+      .col-sm-12
+        = check_box_tag 'do_download', false, false
+        download NVD files
+        %br
+        = check_box_tag 'update_cves', false, false
+        update CVE data
+        %br
+        = check_box_tag 'set_published', true,true
+        Update Rule statuses
+        %br
+        = check_box_tag 'do_upload', true,true
+        Upload Yaml data
+        %br
+        %br
+    .row
+      .col-sm-12
+        = file_field_tag 'rule_update[yaml_file]', multiple: true
+        %br
     = submit_tag('Upload')
 
-
+%br
 .content-wrapper
   .row
     .col-sm-12
-      .btn.btn-primary{"aria-controls" => "multiCollapseExample1", "aria-expanded" => "false", "data-target" => "#multiCollapseExample1", "data-toggle" => "collapse", :type => "button"}
-        The Json
-      #multiCollapseExample1.collapse.show.multi-collapse
-        .card.card-body
-          %pre
-            //json
-            the json
+      %h3 The Errors
+      %pre
+        //errors
+        =@errors
   .row
-    .col-sm-12
-      .btn.btn-primary{"aria-controls" => "multiCollapseExample2", "aria-expanded" => "false", "data-target" => "#multiCollapseExample2", "data-toggle" => "collapse", :type => "button"}
-        The Errors
-      #multiCollapseExample2.collapse.multi-collapse
-        .card.card-body
-          %pre
-            //errors
-            the errors
-  .row
-    .col-sm-12
-      .btn.btn-primary{"aria-controls" => "multiCollapseExample3", "aria-expanded" => "false", "data-target" => "#multiCollapseExample3", "data-toggle" => "collapse", :type => "button"}
-        The Errors
-      -if @result.nil?
-        #multiCollapseExample3.collapse.multi-collapse
-      -else
-        #multiCollapseExample3.collapse.show.multi-collapse
-        .card.card-body
-          %pre
-            //result
-            the result
+    .col-sm-7
+      %h3 The Json
+      %pre
+        //json
+        =@json
+    .col-sm-5
+      %h3 The Result
+      %pre
+        //json
+        =@result

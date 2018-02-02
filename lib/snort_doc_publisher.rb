@@ -441,6 +441,8 @@ class SnortDocPublisher
     else
       nil
     end
+  ensure
+    rule_doc_stream.unlink
   end
 
 
@@ -472,18 +474,22 @@ class SnortDocPublisher
   # End to end publish process
   # @param [String] contents YAML formatted string from rule update file
   # @param [Boolean] do_download false to skip NVD download
+  # @param [Boolean] update_cves false to skip updating cves
   # @param [Boolean] set_published false to skip update to snort.org web site
+  # @param [Boolean] do_update false to skip upload to snort.org.
   def self.publish_snort_doc_from_yaml(contents,
                                        do_download: true,
+                                       update_cves: true,
                                        set_published: true,
                                        do_upload: true)
+    the_errors = nil
     the_result = {}
     begin
        # Refresh NVD files
       download_all if do_download
 
       # Create any needed cves records for references missing cves records.
-      update_cve_data
+      update_cve_data if update_cves
 
       # Mark rules as to be published from the rule update YAML file
       update_snort_doc_to_be(YAML.load(contents))
@@ -502,9 +508,9 @@ class SnortDocPublisher
 
     if block_given?
       yield the_json, the_errors, the_result
-    else
-      the_json
     end
+
+    the_json
   end
 
 end
