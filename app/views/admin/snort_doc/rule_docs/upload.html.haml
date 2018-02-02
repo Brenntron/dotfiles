@@ -17,3 +17,36 @@
     = file_field_tag 'rule_update[yaml_file]', multiple: true
     %br
     = submit_tag('Upload')
+
+
+.content-wrapper
+  .row
+    .col-sm-12
+      .btn.btn-primary{"aria-controls" => "multiCollapseExample1", "aria-expanded" => "false", "data-target" => "#multiCollapseExample1", "data-toggle" => "collapse", :type => "button"}
+        The Json
+      #multiCollapseExample1.collapse.show.multi-collapse
+        .card.card-body
+          %pre
+            //json
+            the json
+  .row
+    .col-sm-12
+      .btn.btn-primary{"aria-controls" => "multiCollapseExample2", "aria-expanded" => "false", "data-target" => "#multiCollapseExample2", "data-toggle" => "collapse", :type => "button"}
+        The Errors
+      #multiCollapseExample2.collapse.multi-collapse
+        .card.card-body
+          %pre
+            //errors
+            the errors
+  .row
+    .col-sm-12
+      .btn.btn-primary{"aria-controls" => "multiCollapseExample3", "aria-expanded" => "false", "data-target" => "#multiCollapseExample3", "data-toggle" => "collapse", :type => "button"}
+        The Errors
+      -if @result.nil?
+        #multiCollapseExample3.collapse.multi-collapse
+      -else
+        #multiCollapseExample3.collapse.show.multi-collapse
+        .card.card-body
+          %pre
+            //result
+            the result

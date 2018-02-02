@@ -476,7 +476,7 @@ class SnortDocPublisher
   def self.publish_snort_doc_from_yaml(contents,
                                        do_download: true,
                                        set_published: true,
-                                       do_upload: false)
+                                       do_upload: true)
     the_result = {}
     begin
        # Refresh NVD files

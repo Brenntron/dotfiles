@@ -10,11 +10,13 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
                  .order(:gid, :sid)
   end
   def upload
+    binding.pry
+
   end
 
   def send_yaml
     file_contents = yaml_file.tempfile.read
-    SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
+    @json = SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
                                                   do_download: permitted_params['do_download'],
                                                   set_published: permitted_params['set_published'],
                                                   do_upload: true) do |the_json, the_errors, the_result |
@@ -24,15 +26,17 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
         format.html {
           if the_errors.nil?
             if parsed_output
-              flash[:notice]= "The following rule docs were successfully uploaded. \n #{parsed_output['rule_docs'].join(", ")}"
+              flash[:notice]= "The following rule docs were successfully uploaded.}"
+              @result = parsed_output['rule_docs'].join(", ")
             else
               flash[:notice]= "The script was successful but no rules were uploaded."
             end
           else
             flash[:error]= "Rule documents were NOT uploaded because of ->  #{the_errors}"
+            @errors = the_errors
           end
 
-          redirect_to admin_snort_doc_upload_docs_path
+          redirect_to admin_snort_doc_upload_docs_path , json: @json, result: @result, error: @errors
         }
         format.json { head json: JSON.pretty_generate(the_json)}
       end
