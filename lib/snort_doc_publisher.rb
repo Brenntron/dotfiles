@@ -391,6 +391,7 @@ class SnortDocPublisher
           vector_string access_vector access_complexity authentication affected_systems})
       else
         errors << "No CVE record found for refernce #{cve_ref.id.inspect} #{cve_ref.reference_data.inspect}"
+        nil
       end
     end.compact
 
