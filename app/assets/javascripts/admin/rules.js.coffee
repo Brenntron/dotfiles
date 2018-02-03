@@ -12,6 +12,7 @@ $ ->
     responsive: true
     columns: [
       {data: 'id'}
+      {data: 'gid'}
       {data: 'sid'}
       {
         data: 'message'

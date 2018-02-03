@@ -6,6 +6,7 @@ class RuleDocDatatable < AjaxDatatablesRails::Base
     # Declare strings in this format: ModelName.column_name
     # or in aliased_join_table.column_name format
     @view_columns ||= {
+        gid:            {source: "Rule.gid", cond: :eq, searchable: true, orderable: true},
         sid:            {source: "Rule.sid", cond: :eq, searchable: true, orderable: true},
         summary:        {source: "RuleDoc.summary", cond: :like, searchable: true, orderable: false},
         details:        {source: "RuleDoc.details", cond: :like, searchable: true, orderable: false},
@@ -17,6 +18,7 @@ class RuleDocDatatable < AjaxDatatablesRails::Base
   def data
     records.reject { |s| s.rule.sid.nil? }.map do |record|
       {
+          gid:            record.rule.gid,
           sid:            record.rule.sid,
           summary:
               content_tag(:div) do

@@ -8,12 +8,22 @@
       .row
         .col-sm-12
           %h3= @rule_doc.rule.sid
+      -if RuleDoc.where(rule_id:@rule_doc.rule.id).count > 1
+        .row
+          .col-sm-12
+            .doc_error THIS IS A DUPLICATE RULE DOC
+            %br
+            %br
+
 
       .row
         .col-sm-6
           %label Content
           .code-snippet.code-block
-            =@rule_doc.rule.rule_parsed
+            -if @rule_doc.rule.rule_parsed.nil?
+              This is an Shared Object rule there should be no content here.
+            -else
+              =@rule_doc.rule.rule_parsed
         .col-sm-6
           %label Bugs using this rule
           .form-col-list
@@ -25,10 +35,16 @@
 
       .row
         .col-sm-6
-          %fieldset
-            %label Rule sid associated with this doc (dont fuck with this)
-            %span.input-wrapper
-              =f.text_field :sid, disabled:true
+          .col-sm-6
+            %fieldset
+              %label Rule gid associated with this doc (dont fuck with this)
+              %span.input-wrapper
+                =f.text_field :gid, disabled:true
+          .col-sm-6
+            %fieldset
+              %label Rule sid associated with this doc (dont fuck with this)
+              %span.input-wrapper
+                =f.text_field :sid, disabled:true
         .col-sm-6
           %fieldset
             %label Linking id for the rule associated with this doc (dont fuck with this)
