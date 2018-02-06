@@ -442,8 +442,14 @@ class SnortDocPublisher
 
     # @http = Net::HTTP.new(@host, @port)
     http = Net::HTTP.new(config.host, config.port)
-    http.request(request)
+    response = http.request(request)
 
+    if response.code == "200"
+      response.body
+    else
+      nil
+    end
+  ensure
     rule_doc_stream.unlink
   end
 
@@ -476,30 +482,43 @@ class SnortDocPublisher
   # End to end publish process
   # @param [String] contents YAML formatted string from rule update file
   # @param [Boolean] do_download false to skip NVD download
+  # @param [Boolean] update_cves false to skip updating cves
   # @param [Boolean] set_published false to skip update to snort.org web site
+  # @param [Boolean] do_update false to skip upload to snort.org.
   def self.publish_snort_doc_from_yaml(contents,
                                        do_download: true,
+                                       update_cves: true,
                                        set_published: true,
                                        do_upload: true)
+    the_errors = nil
+    the_result = {}
+    begin
+       # Refresh NVD files
+      download_all if do_download
 
-    # Refresh NVD files
-    download_all if do_download
+      # Create any needed cves records for references missing cves records.
+      update_cve_data if update_cves
 
-    # Create any needed cves records for references missing cves records.
-    update_cve_data
-
-    # Mark rules as to be published from the rule update YAML file
-    update_snort_doc_to_be(YAML.load(contents))
-
-    to_be_snort_doc.tap do |doc|
-      if set_published
-        Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
-            .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
+      # Mark rules as to be published from the rule update YAML file
+      update_snort_doc_to_be(YAML.load(contents))
+      the_json = to_be_snort_doc.tap do |doc|
+        if set_published
+          Rule.where(snort_doc_status: Rule::SNORT_DOC_STATUS_TO_BE_PUB)
+              .update_all(snort_doc_status: Rule::SNORT_DOC_STATUS_BEEN_PUB)
+        end
+        if do_upload
+          the_result = upload(doc.to_json)
+        end
       end
-
-      if do_upload
-        upload(doc.to_json)
-      end
+    rescue Exception => e
+      the_errors = e.message
     end
+
+    if block_given?
+      yield the_json, the_errors, the_result
+    end
+
+    the_json
   end
+
 end

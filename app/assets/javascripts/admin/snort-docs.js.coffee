@@ -16,3 +16,6 @@ window.submit_rule_doc_status =(form_tag) ->
   set_rule_doc_status(rule_id, snort_doc_status)
   location.reload true
   true
+
+
+
