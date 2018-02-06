@@ -341,7 +341,9 @@ class Rule < ApplicationRecord
   # @param [String] given_filepath if not the default filepath
   # @return [String] grep output with filename colon linenumber colon rule content.
   def self.grep_line_from_file!(sid, gid = nil, given_filepath = nil)
-    grep_line_from_file(sid, gid, given_filepath) || raise("Rule #{sid} doesn't exist.")
+    grep_line_from_file(sid, gid, given_filepath) ||
+        grep_line_from_file(sid, gid, nil) ||
+        raise("Rule #{sid} doesn't exist.")
   end
 
   def rule_classification
