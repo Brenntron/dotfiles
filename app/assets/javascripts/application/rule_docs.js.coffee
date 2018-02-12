@@ -12,6 +12,9 @@ $ ->
     responsive: true
     columns: [
       {
+        data: 'gid'
+      }
+      {
         data: 'sid'
       }
       {

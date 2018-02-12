@@ -8,6 +8,19 @@ class RuleDocsController < ApplicationController
       format.json { render json: RuleDocDatatable.new(view_context) }
     end
   end
+  def new
+    @rule_doc = RuleDoc.new
+  end
+  def create
+    @rule_doc = RuleDoc.new(rule_doc_params)
+    respond_to do |format|
+      if @rule_doc.save
+        format.html { redirect_to rule_docs_path, notice: 'Rule document was successfully created.' }
+      else
+        format.html { render :new }
+      end
+    end
+  end
   def edit
     @rule_doc = RuleDoc.find(params[:id])
   end
@@ -36,6 +49,7 @@ class RuleDocsController < ApplicationController
   private
 
   def rule_doc_params
-    params.require(:rule_doc).permit(:id, :summary, :details, :sid)
+    params.require(:rule_doc).permit(:id, :summary, :details, :sid, :rule_id, :impact, :affected_sys, :false_positives, :false_negatives, :contributors, :policies, :is_community)
+
   end
 end

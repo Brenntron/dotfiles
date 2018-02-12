@@ -7,6 +7,7 @@ class RuleDatatable < AjaxDatatablesRails::Base
     # or in aliased_join_table.column_name format
     @view_columns ||= {
       id:             {source: "Rule.id", cond: :eq, searchable: true, orderable: true},
+      gid:            {source: "Rule.gid", cond: :eq, searchable: true, orderable: true},
       sid:            {source: "Rule.sid", cond: :eq, searchable: true, orderable: true},
       message:        {source: "Rule.message", cond: :like, searchable: true, orderable: false},
       bug_count:      {source: "Rule.bugs.count", searchable: false, orderable: true},
@@ -21,6 +22,7 @@ class RuleDatatable < AjaxDatatablesRails::Base
     records.map do |record|
       {
         id:             record.id,
+        gid:            record.gid,
         sid:            record.sid,
         message:        record.message,
         bug_count:      record.bugs.count,
