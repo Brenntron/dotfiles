@@ -12,6 +12,9 @@ module API
       mount API::V1::Tasks
       mount API::V1::References
       mount API::V1::SavedSearches
+      mount API::V1::Escalations::Base
+      mount API::V1::Escalations::Attachments
+
 
     end
   end

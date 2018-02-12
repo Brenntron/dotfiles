@@ -8,8 +8,13 @@
     <%= csrf_meta_tags %>
   </head>
   <body>
+  <% ac_namespace = params[:controller].split('/').first %>
   <% if controller_name == 'bugs' %>
-    <%= render 'shared/bug_search_modal' %>
+    <% if ac_namespace == 'escalations' %>
+      <%= render 'escalations/shared/bug_search_modal' %>
+    <% else %>
+      <%= render 'shared/bug_search_modal' %>
+    <% end %>
   <% end %>
     <div class="sidebar">
       <div class="sidebar-header center">
@@ -20,7 +25,12 @@
       </div>
       <nav class="navbar nav-stacked rules-ui-nav">
         <ul class="nav nav-stacked">
-          <li><%= link_to 'BUG LIST', bugs_path %></li>
+          <% if current_user&.can_see_snort_bug_list %>
+            <li><%= link_to 'BUG LIST', bugs_path %></li>
+          <% end %>
+          <% if current_user&.can_see_escalations_list %>
+            <li><%= link_to 'ESCALATIONS', escalations_root_path %></li>
+          <% end %>
           <li><%= link_to 'USERS', users_path %></li>
           <li class="doc-link"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
           <% if current_user&.has_role?('admin') %>
@@ -29,6 +39,7 @@
           <% if current_user&.has_role?('admin') %>
             <li><%= link_to 'ADMIN', admin_root_path %></li>
           <% end %>
+
         </ul>
       </nav>
     </div>
@@ -52,7 +63,11 @@
               <div id="username" style="display:none;"><%= current_user.cvs_username %></div>
             <% end %>
             <% if controller_name == 'bugs' %>
-              <%= render 'layouts/bugs_layout'%>
+              <% if ac_namespace == 'escalations' %>
+                <%= render 'layouts/escalations_layout' %>
+              <% else %>
+                <%= render 'layouts/bugs_layout'%>
+              <% end %>
             <% elsif controller_name == "users" %>
               <%= render 'layouts/users_layout'%>
             <% elsif controller_name == "user_searches" %>
@@ -66,6 +81,7 @@
         </div>
       </div>
     </div>
+
     <% unless %w{bugs users user_searches relationships}.include?(controller_name) %>
       <%= yield %>
     <% end %>
