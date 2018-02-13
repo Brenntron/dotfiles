@@ -25,13 +25,24 @@
             -else
               =@rule_doc.rule.rule_parsed
         .col-sm-6
-          %label Bugs using this rule
-          .form-col-list
-            %ul
-              - @rule_doc.rule.bugs.each do |bug|
-                %li.code-snippet
-                  %a{href: "/bugs/#{bug.bugzilla_id}"}
-                    =bug.bugzilla_id
+          .row
+            .col-sm-12
+              %label Bugs using this rule
+              .form-col-list
+                %ul
+                  - @rule_doc.rule.bugs.each do |bug|
+                    %li.code-snippet
+                      %a{href: "/bugs/#{bug.bugzilla_id}"}
+                        =bug.bugzilla_id
+              %br
+              %br
+          .row
+            .col-sm-12
+              %label Rules referencing this doc
+              .form-col-list
+                %ul
+                  %a{href: "/admin/rules/#{@rule_doc.rule.id}/edit"}
+                    =@rule_doc.sid
 
       .row
         .col-sm-6
