@@ -1,6 +1,7 @@
 class Escalations::BugsController < ApplicationController
   load_and_authorize_resource except: [:add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :show, :bug_metrics]
 
+  before_action { authorize!(:manage, Admin) }
   before_action :require_login
   before_action :query_bugs
   before_action :check_bug_permission, only: [:show]
@@ -281,4 +282,5 @@ class Escalations::BugsController < ApplicationController
         flash[:error] = "You dont have permission to access bug: #{params[:id]}"
     end
   end
+
 end

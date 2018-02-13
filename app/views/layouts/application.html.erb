@@ -28,8 +28,10 @@
           <% if current_user&.can_see_snort_bug_list %>
             <li><%= link_to 'BUG LIST', bugs_path %></li>
           <% end %>
-          <% if current_user&.can_see_escalations_list %>
-            <li><%= link_to 'ESCALATIONS', escalations_root_path %></li>
+          <% if current_user&.has_role?('admin') %>
+            <% if current_user&.can_see_escalations_list %>
+              <li><%= link_to 'ESCALATIONS', escalations_root_path %></li>
+            <% end %>
           <% end %>
           <li><%= link_to 'USERS', users_path %></li>
           <li class="doc-link"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
