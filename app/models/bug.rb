@@ -47,6 +47,8 @@ class Bug < ApplicationRecord
 
   scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
+  scope :by_escalations, -> { where(:product => "escalations")}
+
   attr_accessor :import_report
 
   def pending?
@@ -204,7 +206,7 @@ class Bug < ApplicationRecord
     changed_bug
   end
 
-  def self.bugs_with_search(query_params)
+  def self.bugs_with_search(query_params, product = nil)
     case
       when query_params[:bugzilla_max].present?
         nil
@@ -239,8 +241,11 @@ class Bug < ApplicationRecord
           end
 
         end
-
-        query = Bug
+        if product == "escalations"
+          query = Bug.where(:product => "escalations")
+        else
+          query = Bug
+        end
         query_hash = {}
 
         query_hash['param_results'] = query.where(query_params)
@@ -304,39 +309,84 @@ class Bug < ApplicationRecord
         query = Bug.where(id: bug_ids)
 
       else
-        Bug.where(query_params)
+        if product == "escalations"
+          Bug.by_escalations.where(query_params)
+        else
+          Bug.where(query_params)
+        end
+
     end
   end
 
-  def self.query(current_user, named_query, search_options)
+  def self.query(current_user, named_query, search_options, product = nil)
 
     case named_query
       when NilClass
         nil
       when "all-bugs"
-        @bugs = Bug.all
+        if product == "escalations"
+          @bugs = Bug.by_escalations
+        else
+          @bugs = Bug.all
+        end
       when "open-bugs"
-        @bugs = Bug.open_bugs
+        if product == "escalations"
+          @bugs = Bug.open_bugs.by_escalations
+        else
+          @bugs = Bug.open_bugs
+        end
       when "pending-bugs"
-        @bugs = Bug.pending
+        if product == "escalations"
+          @bugs = Bug.pending.by_escalations
+        else
+          @bugs = Bug.pending
+        end
       when 'fixed-bugs'
-        Bug.closed
+        if product == "escalations"
+          Bug.closed.by_escalations
+        else
+          Bug.closed
+        end
       when "my-bugs"
-        current_user.bugs
-      when "my-open-bugs"
-        current_user.bugs.open_bugs
-      when "team-bugs"
-        if current_user.is_on_team?
-          if current_user.has_role?('manager')
-            Bug.where(user_id: [current_user.id] + current_user.siblings.map{ |cw| cw.id } + current_user.children.map{ |cw| cw.id }) || []
-          else
-            Bug.where(user_id: current_user.siblings.map{ |cw| cw.id } << current_user.id) || []
-          end
+        if product == "escalations"
+          current_user.bugs.by_escalations
         else
           current_user.bugs
         end
+      when "my-open-bugs"
+        if product == "escalations"
+          current_user.bugs.open_bugs.by_escalations
+        else
+          current_user.bugs.open_bugs
+        end
+      when "team-bugs"
+        if current_user.is_on_team?
+          if current_user.has_role?('manager')
+            if product == "escalations"
+              Bug.by_escalations.where(user_id: [current_user.id] + current_user.siblings.map{ |cw| cw.id } + current_user.children.map{ |cw| cw.id }) || []
+            else
+              Bug.where(user_id: [current_user.id] + current_user.siblings.map{ |cw| cw.id } + current_user.children.map{ |cw| cw.id }) || []
+            end
+          else
+            if product == "escalations"
+              Bug.by_escalations.where(user_id: current_user.siblings.map{ |cw| cw.id } << current_user.id) || []
+            else
+              Bug.where(user_id: current_user.siblings.map{ |cw| cw.id } << current_user.id) || []
+            end
+          end
+        else
+          if product == "escalations"
+            current_user.bugs.by_escalations
+          else
+            current_user.bugs
+          end
+        end
       when "advance-search"
-        Bug.bugs_with_search(search_options) || Bug.all
+        if product == "escalations"
+          Bug.bugs_with_search(search_options, product) || Bug.by_escalations
+        else
+          Bug.bugs_with_search(search_options) || Bug.all
+        end
       else
         nil
     end
@@ -1099,7 +1149,6 @@ class Bug < ApplicationRecord
 
     # update buzilla (if needed)
     options.reject! { |k, v| v.nil? } if options
-
     updated_bug = xmlrpc.update(options.to_h) unless options.blank?
     last_changed_time = updated_bug["bugs"][0]["last_change_time"].to_time
 
@@ -1167,6 +1216,7 @@ class Bug < ApplicationRecord
   end
 
   ####END BUG UPDATE PROCESS WORKFLOW#############
+
 
   ####BUGZILLA IMPORT PROCESS  (tbd: maybe move this into a dedicated process model, it will slim up the Bug class and
   ####                          allow the workflow of the import process to be better broken up while having all relevant
@@ -1272,16 +1322,20 @@ class Bug < ApplicationRecord
         creator = User.where('email=?', item['creator']).first
         new_user = User.where('email=?', item['assigned_to']).first
         new_committer = User.where('email=?', item['qa_contact']).first
+
         if creator.nil?
           User.create_by_email(item['creator'])
           new_creator = User.where(email: item['creator']).first
+          creator.save
           bug.creator = new_creator.id
         else
           bug.creator = creator.id
         end
         if new_user.nil?
           User.create_by_email(item['assigned_to'])
+          creator.roles << default_role
           new_generated_user = User.where(email: item['assigned_to']).first
+          new_generated_user.save
           bug.user = new_generated_user
         else
           bug.user = new_user
@@ -1478,6 +1532,299 @@ class Bug < ApplicationRecord
     end
     return total_bugs
   end
+
+
+
+
+
+
+
+
+
+
+
+
+
+  def self.bugzilla_import_escalation(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
+    import_type = import_type.blank? ? "import" : import_type
+    total_bugs = []
+    unless new_bugs['bugs'].empty?
+      new_bugs['bugs'].each do |item|
+
+        progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
+
+        bug_id = item['id']
+
+        new_attachments = xmlrpc.attachments(ids: [bug_id])
+
+        begin
+          new_comments = xmlrpc.comments(ids: [bug_id])
+        rescue RuntimeError => e
+          new_comments = []
+          Note.create(author: 'AC Admin',
+                      comment: "Sorry! The Bugzilla API can't even these comments.\nERROR: #{e}.",
+                      note_type: 'error',
+                      bug_id: bug_id)
+        end
+
+
+        #Update Bug record attributes from bugzilla############
+        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+
+        bug.initialize_report
+
+        bug.id = bug_id
+        bug.summary        = item['summary']
+        bug.classification = 'unclassified'
+        bug.status     = item['status']
+        bug.resolution = item['resolution']
+        bug.resolution = 'OPEN' if bug.resolution.empty?
+
+        new_bug_state = bug.get_state(item['status'], item['resolution'], item['assigned_to'])
+        state_changed = bug.state != new_bug_state
+
+        bug.state     = new_bug_state if state_changed
+        bug.priority  = item['priority']
+        bug.component = item['component']
+        bug.product   = item['product']
+        bug.whiteboard = item['whiteboard']
+        bug.created_at = item['creation_time'].to_time
+        if state_changed
+          last_change_time      = item['last_change_time'].to_time
+          if bug.state == 'NEW'
+            # do nothing
+          elsif bug.state == 'ASSIGNED'
+            bug.assigned_at = last_change_time
+          elsif bug.state == 'PENDING'
+            bug.pending_at = last_change_time
+          elsif bug.state == 'REOPENED'
+            bug.reopened_at = last_change_time
+          else
+            bug.resolved_at = last_change_time
+          end
+        end
+
+
+        if import_type != "status"
+          bug.save
+        end
+        #end Bug attributes update##################
+
+
+        #Create/update Bug User relationships
+        creator = User.where('email=?', item['creator']).first
+        new_user = User.where('email=?', item['assigned_to']).first
+        new_committer = User.where('email=?', item['qa_contact']).first
+        default_role_type = "analyst"
+        default_role = Role.where(role: default_role_type)
+        if creator.nil?
+          User.create_by_email(item['creator'])
+          new_creator = User.where(email: item['creator']).first
+          new_creator.roles << default_role
+          new_creator.save
+          bug.creator = new_creator.id
+        else
+          bug.creator = creator.id
+        end
+        if new_user.nil?
+          User.create_by_email(item['assigned_to'])
+          new_generated_user = User.where(email: item['assigned_to']).first
+          new_generated_user.roles << default_role
+          new_generated_user.save
+          bug.user = new_generated_user
+        else
+          bug.user = new_user
+        end
+        if new_committer.nil?
+          User.create_by_email(item['qa_contact'])
+          new_generated_committer = User.where(email: item['qa_contact']).first
+          new_generated_committer.roles << default_role
+          new_generated_committer.roles << Role.where(role:"committer")
+          bug.committer = new_generated_committer
+        else
+          bug.committer = new_committer
+        end
+        if import_type != "status"
+          bug.save
+        end
+
+
+        #Create/update Bug Attachments
+        unless new_attachments.empty?
+
+          new_attachments['bugs'][bug_id.to_s].each do |attachment|
+            local_attachment = Attachment.where(bugzilla_attachment_id: attachment['id']).first
+            if local_attachment.present?
+              if attachment['is_obsolete'] == 1
+                local_attachment.is_obsolete = true
+                local_attachment.save
+              end
+            else
+              local_attachment = Attachment.create do |new_attach_record|
+                new_attach_record.id = attachment['id']
+                new_attach_record.size = attachment['size']
+                new_attach_record.bugzilla_attachment_id = attachment['id'] #this is the id comming from bugzilla
+                new_attach_record.file_name = attachment['file_name']
+                new_attach_record.summary = attachment['summary']
+                new_attach_record.content_type = attachment['content_type']
+                new_attach_record.direct_upload_url = "https://#{Rails.configuration.bugzilla_host}/attachment.cgi?id=" + new_attach_record.id = attachment['id'].to_s
+                new_attach_record.creator = attachment['attacher']
+                new_attach_record.is_private = attachment['is_private']
+                new_attach_record.is_obsolete = attachment['is_obsolete']
+                new_attach_record.minor_update = false
+                new_attach_record.created_at = attachment['creation_time'].to_time
+              end
+            end
+            bug.import_report[:new_attachments] << attachment['file_name'] unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
+            if import_type != "status"
+              bug.attachments << local_attachment unless bug.attachments.pluck(:bugzilla_attachment_id).include?(local_attachment.bugzilla_attachment_id)
+            end
+          end
+        end
+
+
+        bug_has_published_notes = bug.has_published_notes?
+        bug_has_notes = bug.has_notes?
+
+        ###build any comments/notes (research and commit messages) from bugzilla####
+        ###prepolate running notes (for the Notes tab)
+        bug.research_notes ||= Note::TEMPLATE_RESEARCH
+        unless new_comments.empty?
+
+          ActiveRecord::Base.transaction do
+            #import any new comments from bugzilla
+            new_comments['bugs'].each do |comment|
+              bug_id = comment[0].to_i
+              comment[1]['comments'].each do |c|
+                if c['text'].downcase.strip.start_with?('commit')
+                  note_type = 'committer'
+                elsif c['text'].start_with?('Created attachment')
+                  note_type = 'attachment'
+                else
+                  note_type = 'research'
+                end
+                comment = c['text'].strip
+
+                creation_time = c['creation_time'].to_time
+
+                note = Note.where(id: c['id']).first
+
+                if note.present?
+                  unless import_type == "status"
+                    comment = "bugzilla comment is blank" if comment.blank?
+                    note.update_attributes(author: c['author'],
+                                           comment: comment,
+                                           bug_id: bug_id,
+                                           note_type: note_type,
+                                           notes_bugzilla_id: c['id'],
+                                           created_at: creation_time)
+                  end
+                else
+                  bug.import_report[:new_notes] += 1
+                  unless import_type == "status"
+                    comment = "bugzilla comment is blank" if comment.blank?
+                    Note.create(id: c['id'],
+                                author: c['author'],
+                                comment: comment,
+                                bug_id: bug_id,
+                                note_type: note_type,
+                                created_at: creation_time,
+                                notes_bugzilla_id: c['id']                     )
+                  end
+                end
+              end
+            end
+            #end comment importing####
+            ##Running note prepoluation logic here#########
+            if import_type != "status"
+
+              #prepopulating committer notes in notes tab
+
+              last_committer_note = bug.notes.last_committer_note.first
+              committer_note_text_area = ""
+              if last_committer_note.present?
+                if last_committer_note
+                  committer_note_text_area = Note.parse_from_note(last_committer_note.comment, "Committer Notes:", true) + "\n"
+                end
+              end
+              if bug_has_published_notes
+                bug.committer_notes = committer_note_text_area
+                bug.save
+              else
+                new_note = Note.where(notes_bugzilla_id: nil, bug_id: bug_id).committer_note.first_or_create
+                new_note.note_type = 'committer'
+                new_note.comment = new_note.comment.nil? ? committer_note_text_area : committer_note_text_area + "\n" + new_note.comment
+                new_note.author = last_committer_note.nil? ? current_user&.email : last_committer_note.author
+                new_note.created_at = Time.now.to_time
+                new_note.save
+              end
+
+
+              #prepopulating research notes in notes tab
+              latest_research = bug.notes.where("note_type=? and comment like 'Research Notes:%'", "research").reverse_chron.first
+              if latest_research.present? && !(bug_has_notes)
+                new_draft = Note.parse_from_note(latest_research.comment, "Research Notes:", false)
+                bug.research_notes = new_draft
+              end
+            end
+
+          end
+        end
+        progress_bar.update_attribute("progress", 20) unless progress_bar.blank?
+        bug.load_whiteboard_values
+        progress_bar.update_attribute("progress", 30) unless progress_bar.blank?
+        parsed = bug.parse_summary
+
+        progress_bar.update_attribute("progress", 60) unless progress_bar.blank?
+        bug.load_tags_from_summary(parsed[:tags], import_type)
+
+        progress_bar.update_attribute("progress", 90) unless progress_bar.blank?
+
+        #save the bug unless the import action is a status check
+        if import_type != "status"
+          bug.save
+        end
+
+        progress_bar.update_attribute("progress", 100) unless progress_bar.blank?
+
+        total_bugs << bug
+
+      end
+    else
+      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
+        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
+        raise message
+      else
+        raise "there was a problem importing from Bugzilla."
+      end
+    end
+    return total_bugs
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)
     unless new_bugs.empty?
@@ -1909,4 +2256,55 @@ class Bug < ApplicationRecord
       false
     end
   end
+
+  def add_escalation_attachment_action(bugzilla_session,
+                            file,
+                            user: nil,
+                            filename:,
+                            content_type:,
+                            comment: nil,
+                            is_patch: nil,
+                            is_private: nil,
+                            minor_update: nil)
+    file_content = file.read
+    options = {
+        ids: id,
+        data: XMLRPC::Base64.new(file_content),
+        file_name: filename,
+        summary: filename,
+        content_type: content_type,
+        comment: comment,
+        is_patch: is_patch,
+        is_private: is_private,
+        minor_update: minor_update
+    }.reject() { |key, value| value.nil? } #remove any nil values in the hash(bugzilla doesnt like them)
+    bug_stub = Bugzilla::Bug.new(bugzilla_session)
+    attachment_hash = bug_stub.add_attachment(options)
+    new_attachment_id = attachment_hash["ids"][0]
+    if new_attachment_id
+      new_attachment = Attachment.create(
+          id: new_attachment_id,
+          size: file_content.length,
+          bugzilla_attachment_id: new_attachment_id,
+          file_name: filename,
+          summary: filename,
+          content_type: content_type,
+          direct_upload_url:
+              "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
+          creator: user&.email,
+          is_private: is_private,
+          is_obsolete: false,
+          minor_update: minor_update
+      )
+      attachments << new_attachment
+
+
+    else
+      false
+    end
+  end
+
+
+
+
 end

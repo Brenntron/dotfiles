@@ -257,6 +257,88 @@ $ ->
         else
           window.location.replace '/bugs/' + bid
 
+  $('#button_import_escalation').on 'click', ->
+    bid = $('#import_escalation').val()
+    if (bid == "")
+      alert("Please enter a sid to import.")
+      return false
+    else if isNaN(bid)
+      alert("Your sid is not a number.")
+      return false
+    else
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      id = $('input[name="bug_name"]').val()
+      current_user = $(".current_user").html()
+      ### update the progress bar width ###
+      $('.progress_group').show()
+      $('.progress-bar').css('width', '1%')
+      ### and display the numeric value ###
+      $('.progress-bar').html('10%')
+      progresspump = setInterval(( ->
+        ### query the completion percentage from the server ###
+        $.ajax {
+          url: '/api/v1/events/update-progress'
+          method: 'get'
+          headers: headers
+          data:
+            description: $('input[name="token"]').val()
+            user: current_user
+            id: id
+          success: (response) ->
+            ### update the progress bar width ###
+            $('.progress-bar').css('width', response + '%')
+            ### and display the numeric value ###
+            $('.progress-bar').html(response + '%')
+            ### test to see if the job has completed ###
+            if response > 99.999
+              clearInterval(progresspump)
+              $('.progress_group').hide()
+              $('#progress').html 'Done'
+            if response < 0
+              clearInterval(progresspump)
+              $('.progress_group').hide()
+          error: (response) ->
+            clearInterval(progresspump)
+            $('.progress-bar').html 'Done'
+        }
+      ), 1000)
+      $.ajax(
+        url: '/api/v1/escalations/bugs/import/' + bid
+        method: 'GET'
+        headers: headers
+      ).done (response) ->
+        json = $.parseJSON(response)
+        if (json.error)
+
+          message = "There was a problem attempting to import this bug:"
+          message += json.error
+
+          $("#alert_message").addClass('alert alert-danger alert-dismissable').html(message)
+        else
+          window.location.replace '/escalations/bugs/' + bid
+
+
+  $('.resync_escalation_button').on 'click', ->
+    bid = $('.bugzilla_id').text()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $('.resync_escalation_button').hide()
+    $('.loading_image').removeClass('hidden').show()
+    $.ajax(
+      url: '/api/v1/escalations/bugs/import/' + bid
+      method: 'GET'
+      headers: headers
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.error)
+        message = "There was a problem attempting to sink this bug:"
+        message += json.error
+        $('.resync_escalation_button').show()
+        $('.loading_image').hide()
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
+      else
+        window.location.replace '/escalations/bugs/' + bid
+
+
   $('.resync_bug_button').on 'click', ->
     bid = $('.bugzilla_id').text()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -293,6 +375,22 @@ $ ->
     if (e.which == 13)
       $('button#button_import').click()
       return false
+
+
+  $('#import_escalation').keyup (e) ->
+    bid = $('#import_escalation').val()
+    if (bid != "")
+      $('#button_import_escalation').prop('disabled', false)
+      return false
+    else
+      $('#button_import_escalation').prop('disabled', true)
+      return false
+
+  $('#import_escalation').keypress (e) ->
+    if (e.which == 13)
+      $('button#button_import_escalation').click()
+      return false
+
 
 
   $('.delete_bug').on 'click', ->

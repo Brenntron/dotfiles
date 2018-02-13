@@ -1,0 +1,110 @@
+
+
+<div class="row top-space">
+  <div class="col-sm-12">
+    <h4 class="blue">Tags</h4>
+  </div>
+
+  <div class="col-sm-12 bug_summary">
+    <div class="sandbox">
+      <select id="select-to-edit" bug_id="<%=@bug.id%>" name="bug[tag_names][]" class="contacts selectized" placeholder="Add some tags..." multiple="multiple" tabindex="-1" style="display: none;">
+        <% @bug.tags.each do |tag|%>
+          <option value="<%=tag.name%>" selected="selected"></option>
+        <%end%>
+      </select>
+    </div>
+  </div>
+
+</div>
+
+
+<hr>
+<div class="row top-space">
+  <div class="col-xs-12">
+    <h4 class="blue">
+      References
+      <span id="add-bug-ref-show" class="glyphicon glyphicon-plus-sign" onclick="add_bug_ref_show();"></span>
+      <span id="add-bug-ref-hide" class="glyphicon glyphicon-collapse-up" onclick="add_bug_ref_hide();"></span>
+    </h4>
+  </div>
+  <div id="add-bug-ref-div" class="col-xs-10">
+    <%= form_for :bug, html: {class: "form-inline"} do |bug_form| %>
+        <%= bug_form.fields_for :references do |refs_fields| %>
+            <div class="form-group">
+              <%= refs_fields.select(:type_name, [[' - ', '']] + @ref_types.pluck(:name),
+                                     {selected: ''},
+                                     id: 'add-bug-ref-type-name',
+                                     class: 'form-control select-sm code') %>
+            </div>
+            <div class="form-group">
+              <%= refs_fields.text_field(:reference_data,
+                                         id: 'add-bug-ref-data',
+                                         class: 'form-control select-sm code',
+                                         required: 'required',
+                                         placeholder: 'reference data') %>
+            </div>
+            <div class="form-group">
+              <%= bug_form.button('Add Reference', type: 'button', id: 'add-bug-ref-btn',
+                                  class: 'select-sm btn btn-default') %>
+            </div>
+        <% end %>
+    <% end %>
+  </div>
+  <div class="col-xs-12 overview-code">
+    <% if (@bug_references | @bug.references).any? %>
+        <% if (@bug_references.cves | @bug.references.cves).any? %>
+            <p>cve:</p>
+            <% (@bug_references.cves.distinct | @bug.references.cves.distinct).each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
+        <% end %>
+        <% if (@bug_references.urls | @bug.references.urls).any? %>
+            <p>url:</p>
+            <% (@bug_references.urls.distinct | @bug.references.urls.distinct).each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "url") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
+        <% end %>
+        <% if (@bug_references.bugtraqs | @bug.references.bugtraqs).any? %>
+            <p>bugtraq:</p>
+            <% (@bug_references.bugtraqs.distinct | @bug.references.bugtraqs.distinct).each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "bugtraq") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
+        <% end %>
+        <% if (@bug_references.telus | @bug.references.telus).any? %>
+            <p>telus:</p>
+            <% (@bug_references.telus.distinct | @bug.references.telus.distinct).each do |ref| %>
+                <div class="col-xs-12">
+                  <code><a href="<%= get_ref_url(ref, "telus") %>" target="_blank"><%= ref.reference_data %></a></code>
+                </div>
+            <% end %>
+        <% end %>
+
+    <% else %>
+        <p>< MISSING ></p>
+    <% end %>
+  </div>
+  <input id="tag_list" class="hidden" value="<%=@tags%>"/>
+</div>
+
+
+
+<hr>
+<div class="row top-space">
+  <div class="col-xs-12">
+    <h4 class="blue"> Metrics</h4>
+    <% if @bug.metrics_available? %>
+      <div class="bug-metrics" id='<%=@bug.id%>'></div>
+      <div class="col-lg-5 col-md-6">
+        <p>Timeline</p>
+        <canvas id="bugChart" width="700" height="350"></canvas>
+      </div>
+    <% end %>
+  </div>
+</div>
+

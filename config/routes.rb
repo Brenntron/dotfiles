@@ -2,6 +2,22 @@ Rails.application.routes.draw do
 
   devise_for :users, controllers: {sessions: 'sessions'}
 
+  namespace :escalations do
+    root 'bugs#index'
+    resources :bugs do
+
+      member do
+        post :create_rules
+        post :add_tag
+        post :add_whiteboard
+        patch :remove_tag
+        patch :remove_whiteboard
+      end
+      resources :references
+
+    end
+  end
+
   namespace :admin do
     root 'home#index'
     resources :migrations, only: [:index]

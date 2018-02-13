@@ -38,6 +38,7 @@ class User < ApplicationRecord
 
   DEFAULT_METRICS_TIMEFRAME = 7
 
+
   scope :with_role, ->(role) { joins(:roles).where('roles.role = ?', role) }
 
   def self.search(conditions)
@@ -57,6 +58,14 @@ class User < ApplicationRecord
                id: self.id,
                obj: self }
     PublishWebsocket.push_changes(record)
+  end
+
+  def can_see_snort_bug_list
+    roles.any?{ |r| Role::SNORT_BUGS_ROLES.include?(r.role)}
+  end
+
+  def can_see_escalations_list
+    roles.any?{ |r| Role::ESCALATION_ROLES.include?(r.role)}
   end
 
   def has_role?(role)
@@ -144,7 +153,7 @@ class User < ApplicationRecord
     analyst = Role.where(role: 'analyst')
     roles << analyst unless roles.include?(analyst)
   end
-
+ 
   def generate_authentication_token
     loop do
       token = Devise.friendly_token
