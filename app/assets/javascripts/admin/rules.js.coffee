@@ -28,6 +28,8 @@ $ ->
       }
       {data: 'edit_status', class: 'col-nowrap'}
       {data: 'publish_status', class: 'col-nowrap'}
+      {data: 'snort_doc_status', class: 'col-nowrap'}
+      {data: 'snort_on_off', class: 'col-nowrap'}
       {
         data: 'links', class: 'td-tools'
         orderable: false

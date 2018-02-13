@@ -11,7 +11,21 @@
       -#    %label Rule ID
       -#    =@rule.id
 
-      %h3= @rule.sid
+      .row
+        .col-lg-4
+          %p SID
+        .col-lg-4
+          %p Snort Doc Status
+        .col-lg-4
+          %p Snort on off (is this rule on or off or deleted)
+      .row
+        .col-lg-4
+          %h3= @rule.sid
+        .col-lg-4
+          %h3= @rule.snort_doc_status
+        .col-sm-4
+          %h3= @rule.snort_on_off
+
       -if RuleDoc.where(rule_id:@rule.rule_doc&.rule_id).count > 1
         .doc_error THIS RULE HAS A DUPLICATE RULE DOC
         %a{href: rule_docs_path} FIX IT!
@@ -20,6 +34,19 @@
           View doc(no doc exists)
         -else
           %a{href: edit_rule_doc_path(@rule.rule_doc&.id)} View doc
+
+
+      %fieldset
+        .row
+          .col-xs-4
+            %label GID
+            %input{type: "text",id:"rule-gid",value: @rule.gid}
+          .col-xs-4
+            %label Snort Doc Status
+            = f.select :state, ['NOTYET','BEEN','SUPRESS','TOBE'], {selected: @rule.snort_doc_status}, {class: 'form-control'}
+          .col-xs-4
+            %label Rule on off
+            = f.select :state, ['on','off','deleted'], {selected: @rule.snort_on_off}, {class: 'form-control'}
 
       %fieldset
         .row
