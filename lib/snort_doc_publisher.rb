@@ -439,9 +439,12 @@ class SnortDocPublisher
         { "api_key" => config.api_key, 'rule_doc' => rule_doc_stream },
         'multipart/form-data'
     )
-
     # @http = Net::HTTP.new(@host, @port)
     http = Net::HTTP.new(config.host, config.port)
+    if config.port == 443
+      http.use_ssl = true
+    end
+
     response = http.request(request)
 
     if response.code == "200"
