@@ -68,16 +68,17 @@ class API::V2::Snort::RuleDocs < Grape::API
         file_contents = permitted_params['rule_update'].tempfile.read
         Thread.new do
           permitted_params['rule_update'].tempfile.close
+
           output_struct =
               SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
                                                             do_download: permitted_params['do_download'],
                                                             update_cves: permitted_params['update_cves'],
                                                             set_published: permitted_params['set_published'])
-          File.open('output.json', 'w') do |file|
+          File.open('tmp/output.json', 'w') do |file|
             file.write(output_struct.to_json)
           end
         end
-        'publish scheduled.'
+        'publish scheduled. tmp/output.json for details'
       end
     end
 

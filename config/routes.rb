@@ -40,6 +40,7 @@ Rails.application.routes.draw do
 
     namespace :snort_doc do
       root 'root#index'
+      get 'doc_output', to: 'rule_docs#doc_output'
       namespace :cves do
         get :nvd
         post :download
