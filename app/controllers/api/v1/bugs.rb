@@ -385,7 +385,16 @@ module API
         end
         post "", root: "bug" do
           authorize! :create, Bug
-          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: current_user)
+          case permitted_params[:bug][:product]
+            when "Escalations"
+              user = User.where(email: "vrt-incoming@sourcefire.com").first
+            when "Research"
+              user = current_user
+            else
+              error!({error: "Unknown Product", message: "bug not created"}, 200)
+          end
+
+          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: user)
         end
 
         desc "remove a bug from the db only"

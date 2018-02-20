@@ -1,4 +1,4 @@
-<%= form_for @bug, remote:true do |f| %>
+<%= form_for [:escalations, @bug],  remote:true do |f| %>
   <% unless @bug.new_record? %>
     <div class="row">
       <div class="col-sm-12 form-group">
@@ -30,7 +30,14 @@
         <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control" %>
       </div>
     </div>
-
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <label for="component">Component</label>
+        <%= f.select :component, ['TAC','ATA','CSOC','Sales'], {}, class: "form-control" %>
+      </div>
+    </div>
+    <%= f.hidden_field :product, value: 'Escalations' %>
+    <%= f.hidden_field :version, value: 'unspecified' %>
     <% unless @bug.new_record? %>
       <div class="row">
         <div class="col-sm-12 form-group">
