@@ -197,6 +197,61 @@ $ ->
         location.reload()
     }
 
+  $('#relate_by_bug_id_button').on 'click', ->
+    bugzilla_id = $('.bugzilla_id').text()
+    relate_id = $('#related_bug_id_field').val()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/relate_bug/' + bugzilla_id + '/' + relate_id
+      method: 'POST'
+      headers: headers
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.error)
+
+        message = "There was a problem attempting to relate this bug:"
+        message += json.error
+
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(message)
+      else
+        product = json.product
+        if product == 'Escalations'
+          window.location.replace '/escalations/bugs/' + bugzilla_id
+        else
+          window.location.replace '/bugs/' + bugzilla_id
+
+
+  $('#find_bugs_by_sid_button').on 'click', ->
+    bugzilla_id = $('.bugzilla_id').text()
+    sid = $('#search_by_sid_field').val()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/find_bugs_by_sid/' + sid
+      method: 'GET'
+      headers: headers
+    ).done (response) ->
+      $("#bugs_from_sid_table tbody").html(rows)
+      json = $.parseJSON(response)
+      if (json.status == "error")
+
+        message = "There was a problem attempting to find bugs:"
+        message += json.message
+
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(message)
+      else
+        rows = []
+        bugs = json.data
+        for bug in bugs
+          rows.push "<tr><td>#{bug.id}</td><td>#{bug.summary}</td><td><button class='btn' onclick='AC.Bugs.relateBug(#{bugzilla_id}, #{bug.id})'>Relate</button></td></tr>"
+
+        if rows.length > 0
+          content = rows.join()
+        else
+          content = "<tr><td class='center text-muted'><em>No bugs found with this SID</em></td></tr>"
+
+        $("#sid-search-results tbody").html(content)
+
+
   $('#button_import').on 'click', ->
     bid = $('#import_bug').val()
     if (bid == "")
@@ -713,6 +768,40 @@ $ ->
     window.location.reload()
 
 namespace 'AC.Bugs', (exports) ->
+
+  exports.removeRelatedBug = (bug_id, relate_id) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/remove_bug_relation/' + bug_id + '/' + relate_id
+      method: 'DELETE'
+      headers: headers
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.status == "success")
+        product = json.product
+        if product == 'Escalations'
+          window.location.replace '/escalations/bugs/' + bug_id
+        else
+          window.location.replace '/bugs/' + bug_id
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
+
+  exports.relateBug = (bug_id, relate_id) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/relate_bug/' + bug_id + '/' + relate_id
+      method: 'POST'
+      headers: headers
+    ).done (response) ->
+      json = $.parseJSON(response)
+      if (json.status == "success")
+        product = json.product
+        if product == 'Escalations'
+          window.location.replace '/escalations/bugs/' + bug_id
+        else
+          window.location.replace '/bugs/' + bug_id
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
 
   exports.deleteSavedSearch = (saved_search_id) ->
     bid = $('.bugzilla_id').text()

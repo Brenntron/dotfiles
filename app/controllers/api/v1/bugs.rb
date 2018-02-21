@@ -581,6 +581,73 @@ module API
           authorize!(:toggle_liberty, bug)
           bug.toggle_liberty
         end
+
+
+
+        desc "list bugs by SID"
+        params do
+          requires :sid, type: Integer, desc: "sid to search by"
+        end
+        get 'find_bugs_by_sid/:sid' do
+          response = {}
+          rule = Rule.where(sid: params['sid']).first
+          if rule.blank?
+            response[:status] = "error"
+            response[:message] = "No rule with this sid found"
+          else
+            response[:status] = "success"
+            response[:data] = []
+            rule.bugs.each do |bug|
+              bug_data = {}
+              bug_data[:id] = bug.id
+              bug_data[:summary] = bug.summary
+              response[:data] << bug_data
+            end
+
+            response.to_json
+          end
+        end
+
+
+        desc "associate a bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+          requires :relate_id, type: Integer, desc: "bugzilla id to relate to bug_id"
+        end
+        post 'relate_bug/:bug_id/:relate_id' do
+          bug = Bug.where(id: params['bug_id']).first
+          return {:error => 'bug not found'}.to_json unless bug
+          related_bug = Bug.where(id: params['relate_id']).first
+          return {:error => 'related bug not found'}.to_json unless related_bug
+          if related_bug.product == "Escalations"
+            bug.snort_escalation_bugs << related_bug  unless bug.snort_escalation_bugs.include? related_bug
+          end
+          if related_bug.product == "Research"
+            bug.snort_research_bugs << related_bug  unless bug.snort_research_bugs.include? related_bug
+          end
+          return {:status => "success", :product => bug.product}.to_json
+        end
+
+        desc "remove association of a bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+          requires :relate_id, type: Integer, desc: "related bugzilla id to remove"
+        end
+        delete 'remove_bug_relation/:bug_id/:relate_id' do
+          bug = Bug.where(id: params['bug_id']).first
+          return {:error => 'bug not found'}.to_json unless bug
+          related_bug = Bug.where(id: params['relate_id']).first
+          return {:error => 'related bug not found'}.to_json unless related_bug
+          if related_bug.product == "Escalations"
+            bug.snort_escalation_bugs.delete(related_bug)  unless !bug.snort_escalation_bugs.include? related_bug
+          end
+          if related_bug.product == "Research"
+            bug.snort_research_bugs.delete(related_bug)  unless !bug.snort_research_bugs.include? related_bug
+          end
+          return {:status => "success", :product => bug.product}.to_json
+        end
+
+
       end
     end
   end

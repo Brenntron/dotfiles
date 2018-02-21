@@ -1,6 +1,14 @@
 module BugsHelper
 
-def set_bug_color(bug)
+  def related_bug_link(bug)
+    if bug.product == "Escalations"
+      link_to bug.id, escalations_bug_path(bug)
+    else
+      link_to bug.id, bug_path(bug)
+    end
+  end
+
+  def set_bug_color(bug)
     if ["P1", "P2"].include?(bug.priority)
       if ["NEW", "ASSIGNED", "REOPENED"].include?(bug.state)
         'bg-danger'
