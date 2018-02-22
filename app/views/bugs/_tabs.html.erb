@@ -7,6 +7,7 @@
     <li><a data-target="#notes-tab" class="notes-tab" data-toggle="tab">Notes</a></li>
     <li><a data-target="#history-tab" class="history-tab" data-toggle="tab">History</a></li>
     <li><a data-target="#jobs-tab" class="jobs-tab" data-toggle="tab">Jobs</a></li>
+    <li><a data-target="#related-bugs-tab" class="related-bugs-tab" data-toggle="tab">Related Bugs</a></li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="overview">
@@ -29,6 +30,9 @@
     </div>
     <div class="tab-pane" id="jobs-tab">
       <%= render 'bugs/tabs/jobs' %>
+    </div>
+    <div class="tab-pane" id="related-bugs-tab">
+      <%= render 'bugs/tabs/related_bugs' %>
     </div>
   </div>
 </div>

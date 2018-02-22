@@ -242,7 +242,8 @@ $ ->
         rows = []
         bugs = json.data
         for bug in bugs
-          rows.push "<tr><td>#{bug.id}</td><td>#{bug.summary}</td><td><button class='btn' onclick='AC.Bugs.relateBug(#{bugzilla_id}, #{bug.id})'>Relate</button></td></tr>"
+          bug_summary = bug.summary.replace(/,/g, ', ')
+          rows.push "<tr><td>#{bug.id}</td><td>#{bug_summary}</td><td><button class='btn' onclick='AC.Bugs.relateBug(#{bugzilla_id}, #{bug.id})'>Relate</button></td></tr>"
 
         if rows.length > 0
           content = rows.join()

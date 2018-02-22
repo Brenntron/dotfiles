@@ -1,10 +1,11 @@
 module BugsHelper
 
-  def related_bug_link(bug)
+  def related_bug_link(bug, message)
+    message = message.to_s.gsub(",", ", ")
     if bug.product == "Escalations"
-      link_to bug.id, escalations_bug_path(bug)
+      link_to message, escalations_bug_path(bug), target: :_blank
     else
-      link_to bug.id, bug_path(bug)
+      link_to message, bug_path(bug), target: :_blank
     end
   end
 
