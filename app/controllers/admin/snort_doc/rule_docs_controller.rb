@@ -14,6 +14,15 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
 
   end
 
+  def doc_output
+    output_file = File.file?("tmp/output.json") ? File.read("tmp/output.json") : "No output file exists"
+    respond_to do |format|
+      format.html {render :plain => "#{output_file}"}
+      format.json { head json: JSON.pretty_generate(output_file)}
+    end
+
+  end
+
   def send_yaml
     file_contents = yaml_file.tempfile.read
     SnortDocPublisher.publish_snort_doc_from_yaml(file_contents,
@@ -22,7 +31,7 @@ class Admin::SnortDoc::RuleDocsController < ApplicationController
                                                   set_published: send_yaml_params['set_published'],
                                                   do_upload: send_yaml_params['do_upload']) do |the_json, the_errors, the_result |
       @json = JSON.pretty_generate(the_json).to_s
-      parsed_output = JSON.parse(the_result) unless the_result.nil?
+      parsed_output = JSON.parse(the_result) unless the_result.empty?
       respond_to do |format|
         format.html {
           if the_errors.nil?

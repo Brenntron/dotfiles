@@ -439,15 +439,22 @@ class SnortDocPublisher
         { "api_key" => config.api_key, 'rule_doc' => rule_doc_stream },
         'multipart/form-data'
     )
-
     # @http = Net::HTTP.new(@host, @port)
     http = Net::HTTP.new(config.host, config.port)
+    if config.port == 443
+      http.use_ssl = true
+    end
+
     response = http.request(request)
 
     if response.code == "200"
+      response_body = JSON.parse(response.body)
+      if response_body["errors"]
+        raise "Upload failed: #{response_body["errors"]}"
+      end
       response.body
     else
-      nil
+      raise "Upload failed: #{response.message}"
     end
   ensure
     rule_doc_stream.unlink
@@ -518,7 +525,11 @@ class SnortDocPublisher
       yield the_json, the_errors, the_result
     end
 
-    the_json
+    if the_errors
+      return the_errors
+    else
+      return the_json
+    end
   end
 
 end
