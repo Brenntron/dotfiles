@@ -390,8 +390,6 @@ module API
               user = User.where(email: "vrt-incoming@sourcefire.com").first
             when "Research"
               user = current_user
-            else
-              error!({error: "Unknown Product", message: "bug not created"}, 200)
           end
 
           Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: user)
@@ -590,6 +588,15 @@ module API
           authorize!(:toggle_liberty, bug)
           bug.toggle_liberty
         end
+
+
+
+
+        #TODO api endpoint for Bugzilla 5
+
+
+
+
       end
     end
   end
