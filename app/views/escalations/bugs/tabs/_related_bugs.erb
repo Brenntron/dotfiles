@@ -31,7 +31,7 @@
       </thead>
       <tbody>
       <% ( @bug.snort_escalation_bugs ).each do |related_bug| %>
-        <tr><td><%= related_bug_link(related_bug, related_bug.id) %></td><td><%= related_bug.product %></td><td><%= related_bug_link(related_bug, related_bug.summary) %></td><td><button class='btn' onclick="AC.Bugs.removeRelatedBug(<%= @bug.id %>, <%= related_bug.id %>)">Remove</button></td></tr>
+        <tr><td><%= related_bug_link(related_bug, related_bug.id) %></td><td><%= related_bug.product %></td><td class="breakall-wrap"><%= related_bug_link(related_bug, related_bug.summary) %></td><td><button class='btn' onclick="AC.Bugs.removeRelatedBug(<%= @bug.id %>, <%= related_bug.id %>)">Remove</button></td></tr>
       <% end %>
       </tbody>
     </table>
