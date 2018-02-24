@@ -619,11 +619,21 @@ module API
           return {:error => 'bug not found'}.to_json unless bug
           related_bug = Bug.where(id: params['relate_id']).first
           return {:error => 'related bug not found'}.to_json unless related_bug
-          if related_bug.product == "Escalations"
-            bug.snort_escalation_bugs << related_bug  unless bug.snort_escalation_bugs.include? related_bug
+          if bug.id == related_bug.id
+            return {:error => "cannot relate a bug to itself"}.to_json
           end
-          if related_bug.product == "Research"
-            bug.snort_research_bugs << related_bug  unless bug.snort_research_bugs.include? related_bug
+          if bug.product == "Escalations" && related_bug.product == "Escalations"
+            return {:error => 'cannot relate an escalation to another escalation'}.to_json
+          end
+          if bug.product == "Research" && related_bug.product == "Escalations"
+            bug.snort_escalation_research_bugs << related_bug  unless bug.snort_escalation_research_bugs.include? related_bug
+          end
+          if bug.product == "Escalations" && related_bug.product == "Research"
+            bug.snort_research_escalation_bugs << related_bug  unless bug.snort_research_escalation_bugs.include? related_bug
+          end
+          if bug.product == "Research" && related_bug.product == "Research"
+            bug.snort_research_to_research_bugs << related_bug unless bug.snort_research_to_research_bugs.include? related_bug
+            related_bug.snort_research_to_research_bugs << bug unless related_bug.snort_research_to_research_bugs.include? bug
           end
           return {:status => "success", :product => bug.product}.to_json
         end
@@ -638,11 +648,15 @@ module API
           return {:error => 'bug not found'}.to_json unless bug
           related_bug = Bug.where(id: params['relate_id']).first
           return {:error => 'related bug not found'}.to_json unless related_bug
-          if related_bug.product == "Escalations"
-            bug.snort_escalation_bugs.delete(related_bug)  unless !bug.snort_escalation_bugs.include? related_bug
+          if bug.product == "Research" && related_bug.product == "Escalations"
+            bug.snort_escalation_research_bugs.delete(related_bug)  unless !bug.snort_escalation_research_bugs.include? related_bug
           end
-          if related_bug.product == "Research"
-            bug.snort_research_bugs.delete(related_bug)  unless !bug.snort_research_bugs.include? related_bug
+          if bug.product == "Escalations" && related_bug.product == "Research"
+            bug.snort_research_escalations_bugs.delete(related_bug)  unless !bug.snort_research_bugs.include? related_bug
+          end
+          if bug.product == "Research" && related_bug.product == "Research"
+            bug.snort_research_to_research_bugs.delete(related_bug)  unless !bug.snort_research_to_research_bugs.include? related_bug
+            related_bug.snort_research_to_research_bugs.delete(bug)  unless !related_bug.snort_research_to_research_bugs.include? bug
           end
           return {:status => "success", :product => bug.product}.to_json
         end
