@@ -588,8 +588,55 @@ module API
           authorize!(:toggle_liberty, bug)
           bug.toggle_liberty
         end
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+        end
+        patch ':bug_id/acknowledge' do
 
+          bug = Bug.where(id: params['bug_id']).first
+          raise 'bug not found' unless bug
+          authorize!(:acknowledge_bug, bug)
+          bug.acknowledge_bug
+        end
 
+        desc "subscribe and acknowledge to a bug escalation"
+        params do
+          requires :id, type: String, desc: "id of the bug"
+          requires :committer, type: Boolean, desc: "is this a committer subscribe"
+        end
+        post ':id/subscribe-acknowledge' do
+          bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
+          unless bug.nil?
+            begin
+              if params[:committer]
+                if bug.committer == current_user
+                  return {error: 'already subscribed to this bug'}
+                else
+                  options = Rails.env.development? ? {:ids => permitted_params[:id], :qa_contact => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :qa_contact => current_user.email}
+                  Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                  Bug.update(permitted_params[:id], committer_id: current_user.id, acknowledged: true)
+                end
+              else
+                if current_user.bugs.exists?(bug.id)
+                  return {error: 'already subscribed to this bug'}
+                else
+                  options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                  Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                  current_user.bugs << bug
+                  Bug.update(permitted_params[:id], state: "ASSIGNED", acknowledged: true) unless ['PENDING', 'FIXED', 'WONTFIX', 'INVALID', 'LATER'].include? bug.state
+                end
+              end
+              return true
+            rescue XMLRPC::FaultException => e
+              throw :error,
+                    status: 400,
+                    message: "#{e.message}"
+            end
+          end
+          throw :error,
+                status: 404,
+                message: 'cannot find bug to subscribe'
+        end
 
 
         #TODO api endpoint for Bugzilla 5

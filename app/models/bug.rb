@@ -51,6 +51,10 @@ class Bug < ApplicationRecord
 
   attr_accessor :import_report
 
+  def acknowledged?
+    acknowledged
+  end
+
   def pending?
     STATE_PENDING == self.state
   end
@@ -196,6 +200,12 @@ class Bug < ApplicationRecord
       update(liberty: LIBERTY_CLEAR)
     end
     self.liberty
+  end
+
+  #this is an escalation bug method and should be moved
+  def acknowledge_bug
+    update(acknowledged: true)
+    self.acknowledged
   end
 
   def update_bug(xmlrpc, options)
