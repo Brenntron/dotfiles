@@ -40,3 +40,10 @@ window.take_escalation_acknowledge = (this_tag,bug_id) ->
       alert ("Sorry, you can not take this bug\n" + response.responseJSON.error)
       location.reload()
   }
+
+window.populate_bugid_in_modal = (bug_id) ->
+  $('#acknowledge_bug_id').val(bug_id)
+  $('#take_acknowledge_esc').modal('show')
+
+
+
