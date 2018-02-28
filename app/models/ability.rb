@@ -9,6 +9,7 @@ class Ability
     if current_user.has_role?('admin')
       can :manage, User
       can :manage, Admin
+      can :acknowledge_bug, Bug
     end
     if current_user.has_role?('manager')
       can :manage, User do |user|
@@ -21,6 +22,7 @@ class Ability
       can :publish_to_bugzilla, Note
       can :update_preferences, User, id: current_user.id
       can :toggle_liberty, Bug
+      can :acknowledge_bug, Bug
     end
     if current_user.has_role?('analyst')
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference, RuleDoc]
@@ -29,6 +31,7 @@ class Ability
       can :toggle_liberty, Bug do |bug|
         bug.liberty_clear?
       end
+      can :acknowledge_bug, Bug
     end
     if current_user.has_role?('build coordinator')
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]

@@ -136,7 +136,7 @@ class Escalations::BugsController < ApplicationController
       flash.now[:alert] = "Looks like this bug (#{@bug.id}) may be out of sink with bugzilla.
                        Please 'resink' using the button below." if @bug.bugzilla_synch_needed?
     else
-      redirect_to '/bugs'
+      redirect_to '/escalations/bugs'
       flash[:error] = "Could not find bug #{params[:id]}"
     end
   end
@@ -275,10 +275,10 @@ class Escalations::BugsController < ApplicationController
     bug = Bug.where(id: params[:id]).first
     case
       when bug.nil?
-        redirect_to '/bugs'
+        redirect_to '/escalations/bugs'
         flash[:error] = "Couldn't find Bug #{params[:id]}"
       when !bug.check_permission(current_user)
-        redirect_to '/bugs'
+        redirect_to '/escalations/bugs'
         flash[:error] = "You dont have permission to access bug: #{params[:id]}"
     end
   end

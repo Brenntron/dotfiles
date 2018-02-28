@@ -385,7 +385,14 @@ module API
         end
         post "", root: "bug" do
           authorize! :create, Bug
-          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: current_user)
+          case permitted_params[:bug][:product]
+            when "Escalations"
+              user = User.where(email: "vrt-incoming@sourcefire.com").first
+            when "Research"
+              user = current_user
+          end
+
+          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: user)
         end
 
         desc "remove a bug from the db only"
@@ -581,6 +588,67 @@ module API
           authorize!(:toggle_liberty, bug)
           bug.toggle_liberty
         end
+
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+          optional :comment, type: String, desc: "a comment about acknowledging the escalation"
+        end
+        patch ':bug_id/acknowledge' do
+          bug = Bug.where(id: permitted_params['bug_id']).first
+          raise 'bug not found' unless bug
+          xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+          authorize!(:acknowledge_bug, bug)
+          bug.acknowledge_bug(permitted_params['comment'].nil? ? "Escalation has been acknowledged by #{bug.user&.display_name}." : permitted_params['comment'], xmlrpc)
+        end
+
+        desc "subscribe and acknowledge to a bug escalation"
+        params do
+          requires :id, type: String, desc: "id of the bug"
+          requires :committer, type: Boolean, desc: "is this a committer subscribe"
+          optional :comment, type: String, desc: "a comment about acknowledgeing the escalation"
+        end
+        post ':id/subscribe-acknowledge' do
+          bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
+          unless bug.nil?
+            begin
+              if params[:committer]
+                if bug.committer == current_user
+                  return {error: 'already subscribed to this bug'}
+                else
+                  options = Rails.env.development? ? {:ids => permitted_params[:id], :qa_contact => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :qa_contact => current_user.email}
+                  Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                  Bug.update(permitted_params[:id], committer_id: current_user.id, acknowledged: true)
+                end
+              else
+                if current_user.bugs.exists?(bug.id)
+                  return {error: 'already subscribed to this bug'}
+                else
+                  options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                  Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
+                  current_user.bugs << bug
+                  Bug.update(permitted_params[:id], state: "ASSIGNED") unless ['PENDING', 'FIXED', 'WONTFIX', 'INVALID', 'LATER'].include? bug.state
+                  xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+                  bug.acknowledge_bug(permitted_params['comment'].nil? ? "This escalation has been taken and there by acknowledged by #{current_user&.display_name}" : permitted_params['comment'], xmlrpc)
+                end
+              end
+              return true
+            rescue XMLRPC::FaultException => e
+              throw :error,
+                    status: 400,
+                    message: "#{e.message}"
+            end
+          end
+          throw :error,
+                status: 404,
+                message: 'cannot find bug to subscribe'
+        end
+
+
+        #TODO api endpoint for Bugzilla 5
+
+
+
+
       end
     end
   end
