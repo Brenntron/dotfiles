@@ -588,21 +588,24 @@ module API
           authorize!(:toggle_liberty, bug)
           bug.toggle_liberty
         end
+
         params do
           requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+          optional :comment, type: String, desc: "a comment about acknowledging the escalation"
         end
         patch ':bug_id/acknowledge' do
-
-          bug = Bug.where(id: params['bug_id']).first
+          bug = Bug.where(id: permitted_params['bug_id']).first
           raise 'bug not found' unless bug
+          xmlrpc = Bugzilla::Bug.new(bugzilla_session)
           authorize!(:acknowledge_bug, bug)
-          bug.acknowledge_bug
+          bug.acknowledge_bug(permitted_params['comment'].nil? ? "Escalation has been acknowledged by #{bug.user&.display_name}." : permitted_params['comment'], xmlrpc)
         end
 
         desc "subscribe and acknowledge to a bug escalation"
         params do
           requires :id, type: String, desc: "id of the bug"
           requires :committer, type: Boolean, desc: "is this a committer subscribe"
+          optional :comment, type: String, desc: "a comment about acknowledgeing the escalation"
         end
         post ':id/subscribe-acknowledge' do
           bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
@@ -623,7 +626,9 @@ module API
                   options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
                   Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                   current_user.bugs << bug
-                  Bug.update(permitted_params[:id], state: "ASSIGNED", acknowledged: true) unless ['PENDING', 'FIXED', 'WONTFIX', 'INVALID', 'LATER'].include? bug.state
+                  Bug.update(permitted_params[:id], state: "ASSIGNED") unless ['PENDING', 'FIXED', 'WONTFIX', 'INVALID', 'LATER'].include? bug.state
+                  xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+                  bug.acknowledge_bug(permitted_params['comment'].nil? ? "This escalation has been taken and there by acknowledged by #{current_user&.display_name}" : permitted_params['comment'], xmlrpc)
                 end
               end
               return true

@@ -203,9 +203,14 @@ class Bug < ApplicationRecord
   end
 
   #this is an escalation bug method and should be moved
-  def acknowledge_bug
+  def acknowledge_bug(comment, xmlrpc)
+    options = {}
+    options[:comment] = comment.blank? ? "No comment given" : comment
+    options[:id] = id
+    Note.process_note(options, xmlrpc)
     update(acknowledged: true)
     self.acknowledged
+
   end
 
   def update_bug(xmlrpc, options)

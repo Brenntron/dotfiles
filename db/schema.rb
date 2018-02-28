@@ -44,6 +44,16 @@ ActiveRecord::Schema.define(version: 20180223212907) do
     t.index ["task_id"], name: "index_attachments_on_task_id"
   end
 
+  create_table "attachments_exploits", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "attachment_id"
+    t.integer "exploit_id"
+  end
+
+  create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "attachment_id"
+    t.integer "rule_id"
+  end
+
   create_table "bug_reference_rule_links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "reference_id"
     t.integer "link_id"
@@ -267,6 +277,13 @@ ActiveRecord::Schema.define(version: 20180223212907) do
     t.datetime "updated_at"
     t.integer "fail_count"
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
+  end
+
+  create_table "references_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "reference_id"
+    t.integer "rule_id"
+    t.index ["reference_id"], name: "index_references_rules_on_reference_id"
+    t.index ["rule_id"], name: "index_references_rules_on_rule_id"
   end
 
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
