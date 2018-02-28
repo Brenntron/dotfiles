@@ -61,6 +61,10 @@ class Bug < ApplicationRecord
 
   attr_accessor :import_report
 
+  def acknowledged?
+    acknowledged
+  end
+
   def pending?
     STATE_PENDING == self.state
   end
@@ -206,6 +210,17 @@ class Bug < ApplicationRecord
       update(liberty: LIBERTY_CLEAR)
     end
     self.liberty
+  end
+
+  #this is an escalation bug method and should be moved
+  def acknowledge_bug(comment, xmlrpc)
+    options = {}
+    options[:comment] = comment.blank? ? "No comment given" : comment
+    options[:id] = id
+    Note.process_note(options, xmlrpc)
+    update(acknowledged: true)
+    self.acknowledged
+
   end
 
   def update_bug(xmlrpc, options)
@@ -1343,9 +1358,7 @@ class Bug < ApplicationRecord
         end
         if new_user.nil?
           User.create_by_email(item['assigned_to'])
-          creator.roles << default_role
           new_generated_user = User.where(email: item['assigned_to']).first
-          new_generated_user.save
           bug.user = new_generated_user
         else
           bug.user = new_user
@@ -1630,7 +1643,6 @@ class Bug < ApplicationRecord
         if creator.nil?
           User.create_by_email(item['creator'])
           new_creator = User.where(email: item['creator']).first
-          new_creator.roles << default_role
           new_creator.save
           bug.creator = new_creator.id
         else
@@ -1639,7 +1651,6 @@ class Bug < ApplicationRecord
         if new_user.nil?
           User.create_by_email(item['assigned_to'])
           new_generated_user = User.where(email: item['assigned_to']).first
-          new_generated_user.roles << default_role
           new_generated_user.save
           bug.user = new_generated_user
         else
@@ -1648,7 +1659,6 @@ class Bug < ApplicationRecord
         if new_committer.nil?
           User.create_by_email(item['qa_contact'])
           new_generated_committer = User.where(email: item['qa_contact']).first
-          new_generated_committer.roles << default_role
           new_generated_committer.roles << Role.where(role:"committer")
           bug.committer = new_generated_committer
         else
