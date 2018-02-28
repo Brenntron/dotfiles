@@ -1,0 +1,98 @@
+<div class="row top-space">
+  <div class="col-xs-6">
+    <h4 class="blue">Related Bugs</h4>
+  </div>
+  <div class="col-xs-6 right">
+    <p><span data-toggle="modal" data-target="#relateABug">
+      <button id="showRelateBugs" class="select-sm btn btn-default right relate_bugs"><i class="glyphicon glyphicon-plus"></i> <strong class="hidden-xs"> related bug</strong></button>
+    </span></p>
+  </div>
+  <div class="col-xs-12 alert_attachments"></div>
+  <div class="col-xs-12">
+
+  </div>
+
+</div>
+<div class="row top-bar">
+
+
+  <div class="col-xs-6">
+    <div class="col-xs-6">
+      <h5 class="blue">Escalation Bugs</h5>
+    </div>
+    <table class='table responsive no-wrap' id='bug-blocks-table'>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Product</th>
+        <th>Summary</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% ( @bug.snort_escalation_research_bugs ).each do |related_bug| %>
+        <tr><td><%= related_bug_link(related_bug, related_bug.id) %></td><td><%= related_bug.product %></td><td><%= related_bug_link(related_bug, related_bug.summary) %></td><td><button class='btn' onclick="AC.Bugs.removeRelatedBug(<%= @bug.id %>, <%= related_bug.id %>)">Remove</button></td></tr>
+      <% end %>
+      </tbody>
+    </table>
+
+  </div>
+
+  <div class="col-xs-6">
+    <div class="col-xs-6">
+      <h5 class="blue">Research Bugs</h5>
+    </div>
+    <table class='table responsive no-wrap' id='bug-blocks-table'>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Product</th>
+        <th>Summary</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% ( @bug.snort_research_escalation_bugs | @bug.snort_research_to_research_bugs ).each do |related_bug| %>
+          <tr><td><%= related_bug_link(related_bug, related_bug.id) %></td><td><%= related_bug.product %></td><td><%= related_bug_link(related_bug, related_bug.summary) %></td><td><button class='btn' onclick="AC.Bugs.removeRelatedBug(<%= @bug.id %>, <%= related_bug.id %>)">Remove</button></td></tr>
+      <% end %>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+<input type="hidden" name="xml_token" value="<%= xml_token %>">
+<input type="hidden" name="current_user" value="<%= current_user.id%>">
+
+
+<div class="modal fade" id="relateABug" tabindex="-1" role="dialog" aria-labelledby="relateBug" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="relateBugHeader">Relate A Bug To <%=@bug.id%>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <table style="border-collapse: separate; border-spacing: 0 1em;">
+          <tr><td><label>Enter Bug ID:</label></td>
+            <td style="padding-left: 5px;"><input id='related_bug_id_field' name='bug_id' type="text" /></td><td style="padding-left: 20px;"><button class="btn btn-default" id="relate_by_bug_id_button">Relate This Bug</button></td></tr>
+
+          <tr><td><label>Enter SID:</label></td>
+            <td style="padding-left: 5px;"><input id='search_by_sid_field' name='SID' type="text" /></td><td style="padding-left: 20px;"><button class="btn btn-default" id="find_bugs_by_sid_button">Find Bugs By SID</button></td></tr>
+        </table>
+        <br />
+        <table style="width: 100%; word-wrap: break-word" class="table table-condensed small table-hover" id="sid-search-results">
+          <tbody>
+
+          </tbody>
+        </table>
+
+
+      </div>
+
+    </div>
+  </div>
+</div>
