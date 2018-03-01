@@ -5,6 +5,10 @@ window.bug_resolve =(this_tag) ->
   tag_names = $('#select-to-edit').val() || []
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   bugzilla_id = $('.bugzilla_id').text()
+
+  new_escalation_status = $("#new_escalation_status").val()
+  new_escalation_message = $("#new_escalation_message").val()
+
   $('#resolve_bug_form_button').hide()
   $('#synching_bug_form_button').hide()
   $('#resolving_bug_form_button').removeClass('hidden').show()
@@ -36,6 +40,11 @@ window.bug_resolve =(this_tag) ->
                   committer_id: committer_id,
                   summary: summary,
                   tag_names: tag_names
+                },
+              escalation:
+                {
+                  state: new_escalation_status,
+                  message: new_escalation_message
                 }
             }
           success: (response) ->

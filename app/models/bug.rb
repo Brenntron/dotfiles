@@ -36,6 +36,13 @@ class Bug < ApplicationRecord
   has_many :research_to_research_bugs, :class_name => 'SnortResearch', :foreign_key => 'bug_id'
   has_many :snort_research_to_research_bugs, :through => :research_to_research_bugs
 
+  #blocking logic stuff
+  has_many :snort_bug_blockees, :class_name => "BugBlocker", :foreign_key => 'snort_blocker_bug_id'
+  has_many :snort_blocked_bugs, :through => :snort_bug_blockees
+
+  has_many :snort_bug_blockers, :class_name => "BugBlocker", :foreign_key => 'snort_blocked_bug_id'
+  has_many :snort_blocker_bugs, :through => :snort_bug_blockers
+
 
   accepts_nested_attributes_for :rules
 
@@ -60,6 +67,16 @@ class Bug < ApplicationRecord
   scope :by_escalations, -> { where(:product => "escalations")}
 
   attr_accessor :import_report
+
+  def is_blocked?
+    #blocked_by.any?
+  end
+
+  def blocked_by
+    #if product == "Escalations"
+    #  snort_research_escalations.select { |bug| bug.pending? }
+    #end
+  end
 
   def pending?
     STATE_PENDING == self.state
@@ -1125,6 +1142,9 @@ class Bug < ApplicationRecord
 
     if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
       updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
+      bug.snort_escalation_research_bugs.each do |bug|
+        bug.snort_blocked_bugs << bug
+      end
     end
 
 
@@ -1220,6 +1240,7 @@ class Bug < ApplicationRecord
     end
 
     if bug_is_being_resolved
+     bug.snort_blocked_bugs.destroy_all
      publish_research_notes(xmlrpc, current_user, bug)
     end
 
