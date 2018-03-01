@@ -8,6 +8,7 @@
               <h6>bugzilla id</h6>
                 <h3>
                   <a class="top-space bugzilla_id" href="<%= get_bug_url %>" id="bugzilla_<%= @bug.id %>" target="_blank"><%=@bug.id%></a>
+                  <input type="hidden" name="bug_id" value="<%= @bug.id %>">
                   <small>
                     <span data-toggle="modal" data-target="#editBug">
                       <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-pencil edit_bug" id="edit_bug" data-toggle="tooltip" data-placement="bottom" title="edit bug"></a>
