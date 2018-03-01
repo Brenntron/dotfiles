@@ -13,7 +13,7 @@
                       <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-pencil edit_bug" id="edit_bug" data-toggle="tooltip" data-placement="bottom" title="edit bug"></a>
                     </span>
                     <% if @bug.user&.email != current_user.email %>
-                      <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-download-alt take-bug" id="take-bug-<%= @bug.id %>" data-id="<%= @bug.id %>" data-toggle="tooltip" data-placement="bottom" title="Take this bug"></a>
+                      <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-download-alt" id="take-bug-<%= @bug.id %>" data-id="<%= @bug.id %>" data-placement="bottom" data-toggle="modal" data-target="#take_acknowledge_esc" title="Take this bug"></a>
                     <%else%>
                       <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-share-alt return-bug" id="return-bug-<%= @bug.id %>" data-id="<%= @bug.id %>" data-toggle="tooltip" data-placement="bottom" title="Return this bug"></a>
                     <%end%>
@@ -22,6 +22,17 @@
                     <!--<button class="select-sm btn btn-default hidden loading_image" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> sinking</button>-->
                   </small>
                 </h3>
+              <% if @bug.user&.email != "vrt-incoming@sourcefire.com"%> <!--an escalation cannot be acknowledged unless its assigned first-->
+                <% unless @bug.acknowledged? %>
+                  <span data-toggle="modal" data-target="#acknowledge_esc">
+                    <button id="acknowledge_esc_form_button" type="button" class="select-sm btn btn-default">Acknowledge</button>
+                  </span>
+                <%end%>
+              <%else%>
+                <% if @bug.acknowledged? %>
+                  <h5><span class="btn-danger">Warning!!!</span> This bug has been acknowledged but is not assigned!</h5>
+                <%end%>
+              <%end%>
             </div>
           </div>
           <div class="col-xs-1">
@@ -77,7 +88,7 @@
               <br/><span class="small text-muted bug-wait" style="display: none" id="bug-wait-<%= @bug.id %>">please wait</span>
               <% if @bug.committer != current_user %>
                   <% if @bug.user && (@bug.user&.email != current_user.email) %>
-                      <button type=button class="small text-muted take-bug" id="take-bug-<%= @bug.id %>" data-id="<%= @bug.id %>">take</button>
+                      <button type=button class="small text-muted" id="take-ack-bug-<%= @bug.id %>" data-id="<%= @bug.id %>" data-toggle="modal" data-target="#take_acknowledge_esc">take</button>
                   <% else %>
                       <button type=button class="small text-muted return-bug" id="return-bug-<%= @bug.id %>" data-id="<%= @bug.id %>">dont want</button>
                   <% end %>
@@ -159,6 +170,48 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade" id="acknowledge_esc" tabindex="-1" role="dialog" aria-labelledby="acknowledge_esc" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="editBug">Acknowledge Escalation <%=@bug.id%>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <p>By Clicking OK you Acknowledge that this bug has been seen</p>
+        <br>
+        <%=render 'acknowledge_form' %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="take_acknowledge_esc" tabindex="-1" role="dialog" aria-labelledby="take_acknowledge_esc" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="editBug">Take and Acknowledge Escalation <%=@bug.id%>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <p>By Clicking OK you will take this bug and acknowledge that it has been seen</p>
+        <br>
+        <%=render 'subscribe_acknowledge_form' %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 <div class="modal fade" id="status_report" tabindex="-1" role="dialog" aria-labelledby="status_report" aria-hidden="true">
   <div class="modal-dialog" role="document">
