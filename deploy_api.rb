@@ -58,6 +58,7 @@ def self.build_api(include_snort)
     system "mkdir ../production/extras/snort"
     system "svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ ../production/extras/snort/snort-rules/"
     system "svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/so_rules/ ../production/extras/snort/so_rules/"
+    system "svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/preprocessor/ ../production/extras/snort/preprocessor/"
     system "rm ../production/extras/snort/so_rules/*.c ../production/extras/snort/so_rules/*.h"
   end
 
