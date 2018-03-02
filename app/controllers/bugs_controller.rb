@@ -38,6 +38,8 @@ class BugsController < ApplicationController
         session[:search][:giblets] << gib.id
       end
       session[:query] = "advance-search"
+      session[:search].delete(:tag_names)
+
 
     end
 
@@ -229,8 +231,8 @@ class BugsController < ApplicationController
   end
 
   def query_params
-    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state, :whiteboard, :component, :snippet)
-        .reject { |key, value| (value.blank? || value.is_a?(Array) || key =='tag_name') }
+    params.require(:bug).permit(:id, :bugzilla_max, :summary, :user_id, :committer_id, :state, :whiteboard, :component, :snippet, :saved_search, tag_names: [])
+        .reject { |key, value| (value.blank?) }
   end
 
   def sync_summary
