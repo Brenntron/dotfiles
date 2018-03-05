@@ -1,6 +1,24 @@
 require 'pry'
 require 'rake'
 namespace :bugs do
+  task :update_in_summary_flag => :environment do
+    bugs = Bug.all
+    total = bugs.count
+    puts "Starting update of #{total} bugs"
+    bugs.each do |bug|
+      total = total - 1
+      next if bug.bugs_rules.empty?
+      summary_sids = bug.summary_sids
+      # cherry picked from load_rules_from_sids
+      summary_sids.each do |ss|
+        rule = Rule.find_or_load(ss)
+        bug.rule_in_summary(rule) if rule
+      end
+      puts "#{bug.id} in summary flag updated, #{total} to go"
+    end
+  end
+
+
   task(:import_all).clear
   task :import_all, [:task_id, :run_at,:re_run, :current_user, :xmlrpc, :environment] do |t, args|
 

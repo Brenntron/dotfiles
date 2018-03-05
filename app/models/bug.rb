@@ -421,6 +421,11 @@ class Bug < ApplicationRecord
     bugs_rules.update_all(tested:false)
   end
 
+  def rule_in_summary(rule)
+    summary_rule = bugs_rules.where(rule_id: rule.id)
+    summary_rule.update(in_summary: true)
+  end
+
   def update_attachments(xmlrpc)
     fields = ['file_name', 'id', 'last_change_time', 'is_obsolete', 'size']
 
@@ -636,6 +641,7 @@ class Bug < ApplicationRecord
         @import_report[:new_rules] << rule.sid_colon_format unless self.rules.include? rule
         if import_type != "status"
           rules << rule unless self.rules.include? rule
+          rule_in_summary(rule)
         end
       end
     end
