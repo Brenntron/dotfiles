@@ -42,6 +42,16 @@ Given(/^the bug "(.*?)" has tag "(.*?)"$/) do |bug_id, tag |
   @bug.tags << @tag
 end
 
+And(/^bugs_rules with rule_id of "(.*?)" and "bug_id" of "(.*?)" should have the in_summary flag$/) do |rule_id, bug_id|
+  association = BugsRule.where(rule_id: rule_id, bug_id: bug_id).first
+  association.in_summary.should eq(1)
+end
+
+And(/^bugs_rules with rule_id of "(.*?)" and "bug_id" of "(.*?)" should not have the in_summary flag$/) do |rule_id, bug_id|
+  association = BugsRule.where(rule_id: rule_id, bug_id: bug_id).first
+  association.in_summary.should eq(0)
+end
+
 When(/^I send a GET request to "(.*)"$/) do |url|
   get(url)
 end
