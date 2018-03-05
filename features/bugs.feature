@@ -631,6 +631,31 @@ Feature: Bug
 # uncomment when connectivity to bugzilla test fixed
 # Then I should see "new summary"
 
+# uncomment when connectivity to bugzilla test fixed
+#  @javascript
+#  Scenario: a bug's rules that listed in the summary should have the in_summary flag set on bugs_rules
+#    Given a user with role "analyst" exists and is logged in
+#    And the following bugs exist:
+#      | id     | bugzilla_id | state | user_id | summary                         | product  | component   | version | description       | committer_id |
+#      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
+#    And the following rule categories exist:
+#      | category  | id |
+#      | BLACKLIST |  1 |
+#    And the following "synched_rule" rules exist belonging to bug "222222":
+#      |id | message                  | rule_category_id | parsed | sid   |
+#      |1  | BLACKLIST message        | 1                |  true  | 19500 |
+#      |2  | BLACKLIST message  2     | 1                |  true  | 19501 |
+#    Then I wait for "2" seconds
+#    And I goto "/bugs/222222"
+#    Then I click the span with data-target "#editBug"
+#    And I wait for "1" seconds
+#    And I fill in "bug[summary]" with "[SID] 19500 fixed bug"
+#    Then I click "Save"
+#    Then I wait for "5" seconds
+#    And bugs_rules with rule_id of "1" and "bug_id" of "222222" should have the in_summary flag
+#    And bugs_rules with rule_id of "2" and "bug_id" of "222222" should not have the in_summary flag
+
+
 
   @javascript
   Scenario: a user can import an existing rule to a bug
