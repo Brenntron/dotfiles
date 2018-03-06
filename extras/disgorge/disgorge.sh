@@ -198,10 +198,6 @@ if [ "SKIP" != "$SVN_WORKING" ]; then
     echo '* svn working folders'
     rm -rf $RELPATH/$TAGDIR/extras/working
     svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/working/snort-rules
-    svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/preprocessor/ $RELPATH/$TAGDIR/extras/working/preprocessor
-    #if [ ! -d "$RELPATH/$TAGDIR/extras/snort/snort-rules" ]; then
-    #    svn co --depth files https://repo-test.vrt.sourcefire.com/svn/rules/trunk/snort-rules/ $RELPATH/$TAGDIR/extras/snort/snort-rules
-    #fi
     ln -s $SHAREDDIR/extras/snort extras/snort
 
     svn co --depth empty https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/ $RELPATH/$TAGDIR/extras/rulesdocs
