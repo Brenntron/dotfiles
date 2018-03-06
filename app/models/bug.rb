@@ -283,30 +283,24 @@ class Bug < ApplicationRecord
           query_hash['whiteboard_param_results'] = query_hash['param_results'].where('whiteboard LIKE ?', "%#{whiteboard_param}%")
         end
 
-        ##Note:  If we ever want to try to create an 'AND' type search with multiple tags selected, we're going to need a query similar to this:
-        #  SELECT bug_id FROM `bugs` inner JOIN `bugs_tags` ON `bugs_tags`.`bug_id` = `bugs`.`id` inner JOIN `tags` ON `tags`.`id` = `bugs_tags`.`tag_id` WHERE `bugs_tags`.`tag_id` in (1, 5) group by bug_id having count(distinct tag_id) = 2;
-        #  the key is group by and having and matching up with the number of tags being searched on, this will require some really custom stuff rather than just stringing 'where' statements in an activerecord query.
         if giblets.present?
-          join_types.each do |j_type|
-            case j_type
-              when :tags
-                query_hash['gib_tag_results'] = query_hash['param_results'].joins(:tags)
-              when :whiteboards
-                query_hash['gib_whiteboard_results'] = query_hash['param_results'].joins(:whiteboards)
-              when :references
-                query_hash['gib_reference_results'] = query_hash['param_results'].joins(:references)
-            end
-          end
+          
           gibs_by_type.each do |key, value|
             if value.size > 0
               ids = value.map{|g| g.gib.id}
               case key
                 when :tags
-                  query_hash['gib_tag_results'] = query_hash['gib_tag_results'].where("bugs_tags.tag_id" => ids)
+                  query_hash['gib_tag_results'] = query_hash['param_results'].joins(:tags)
+                                                                             .where("bugs_tags.tag_id" => ids)
+                                                                             .group(:bug_id).having('count(bug_id) = ?', ids.count)
                 when :whiteboards
-                  query_hash['gib_whiteboard_results'] = query_hash['gib_whiteboard_results'].where("bugs_whiteboards.whiteboard_id" => ids)
+                  query_hash['gib_whiteboard_results'] = query_hash['param_results'].joins(:whiteboards)
+                                                                                    .where("bugs_whiteboards.whiteboard_id" => ids)
+                                                                                    .group(:bug_id).having('count(bug_id) = ?', ids.count)
                 when :references
-                  query_hash['gib_reference_results'] = query_hash['gib_reference_results'].where("bug_reference_rule_links.reference_id" => ids)
+                  query_hash['gib_reference_results'] = query_hash['param_results'].joins(:references)
+                                                                                   .where("bug_reference_rule_links.reference_id" => ids)
+                                                                                   .group(:bug_id).having('count(bug_id) = ?', ids.count)
               end
             end
           end
@@ -319,17 +313,17 @@ class Bug < ApplicationRecord
           query_hash['snippet_param_results'] = query_hash['param_results'].where(:id => bug_ids)
         end
 
-        final_query = []
         if query_params.empty?
           query_hash.delete('param_results')
         end
 
         #combine all the queries together
-        query_hash.each do |key,result_set|
-          final_query = final_query | (result_set)
-        end
+        final_query = query_hash.values
 
-        bug_ids = final_query.map{|b| b.id}
+        #find intersection of results
+        intersection = final_query.inject(:&)
+
+        bug_ids = intersection.pluck(:id)
 
         query = Bug.where(id: bug_ids)
 
