@@ -10,11 +10,11 @@ window.bug_resolve =(this_tag) ->
   bugzilla_id = $('.bugzilla_id').text()
 
   new_escalation_message = ""
-  switch $('input[name=new_escalation_message]:checked').val()
-    when 'esc1'
-      new_escalation_message = $('input[name=new_escalation_message]:checked').parent().text()
-    when 'esc2'
-      new_escalation_message = $('textarea#new_escalation_message_custom').val()
+  #switch $('input[name=new_escalation_message]:checked').val()
+  #  when 'esc1'
+  #    new_escalation_message = $('input[name=new_escalation_message]:checked').parent().text()
+  #  when 'esc2'
+  new_escalation_message = $('textarea#new_escalation_message_custom').val()
 
 
   new_escalation_status = ""
@@ -531,13 +531,13 @@ $ ->
           headers: headers
         ).done (response) ->
           json = $.parseJSON(response)
-          alert("one")
+
           if (json.error)
             message = "There was a problem attempting to sink this bug:"
             message += json.error
             $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
           else
-            alert('yeaaaah')
+
             if(json.import_report.total_changes == 0)
               state_comment = $("#state_comment").val()
               escalation_comment = $("#escalation_new_message_field").val()
@@ -551,7 +551,7 @@ $ ->
                 data = data + "&escalation%5Bstate%5D=" + encodeURIComponent(escalation_state)
               $('#synching_bug_form_button').hide()
               $('#saving_bug').removeClass('hidden').show()
-              alert(data)
+
               $.ajax(
                   url: '/api/v1/bugs/' + bid
                   method: 'PUT'

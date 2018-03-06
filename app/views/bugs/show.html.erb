@@ -20,6 +20,16 @@
                     <%end%>
                     <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden loading_image" id="loading_image"> </span>
                     <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-refresh resynch_bug resync_bug_button" id="resynch_bug" data-toggle="tooltip" data-placement="bottom" title="resynch this bug with bugzilla"></a>
+                    <% if @bug.snort_blocked_bugs.any? %>
+                    <span id="bugzilla_blocking_status" class="glyphicon glyphicon-refresh" rel="popover" data-placement="top" data-original-title="Bugs being blocked: <%= @bug.snort_blocked_bugs.pluck(:id).join(',') %>" data-trigger="hover" data-toggle="tooltip"></span>
+                    <% end %>
+                    <% if @bug.snort_blocker_bugs.any? %>
+                    <span id="bugzilla_blocked_status" class="glyphicon glyphicon-refresh" rel="popover" data-placement="top" data-original-title="Blocked by Bugs: <%= @bug.snort_blocker_bugs.pluck(:id).join(',') %>" data-trigger="hover" data-toggle="tooltip"></span>
+                    <% end %>
+
+
+<!--<h5 id="bugzilla_popover_state" class="top-space" data-content="<%= "#{@bug.status}, #{@bug.resolution}" %>" rel="popover" data-placement="top" data-original-title="Bugzilla status" data-trigger="hover"><strong><%= @bug.state %></strong></h5>-->
+
                     <!--<button class="select-sm btn btn-default hidden loading_image" id="loading_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> sinking</button>-->
                   </small>
                 </h3>

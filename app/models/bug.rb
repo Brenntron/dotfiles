@@ -552,28 +552,28 @@ class Bug < ApplicationRecord
 
     case state
       when 'NEW'
-        state_params[:status] = updated_state
+        state_params[:status] = state
         state_params[:resolution] = 'OPEN'
 
       when 'ASSIGNED'
-        state_params[:status] = updated_state
+        state_params[:status] = state
         state_params[:resolution] = 'OPEN'
 
       when 'PENDING'
         state_params[:status] = 'RESOLVED'
-        state_params[:resolution] = updated_state
+        state_params[:resolution] = state
 
       when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
         state_params[:status] = 'RESOLVED'
-        state_params[:resolution] = updated_state
+        state_params[:resolution] = state
 
       when 'REOPENED'
-        state_params[:status] = updated_state
+        state_params[:status] = state
         state_params[:resolution] = 'OPEN'
-        state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{updated_state}." }
+        state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{state}." }
 
       when 'OPEN'
-        state_params[:status] = updated_state
+        state_params[:status] = state
         state_params[:resolution] = 'OPEN'
 
     end
@@ -1308,15 +1308,24 @@ class Bug < ApplicationRecord
             :comment => new_escalation_message,
             :author => current_user.email,
             :note_type => 'research',
-            :bug_id => blocked_bug.id
+            :bug_id => blocked_bug.id,
+            :notes_bugzilla_id => new_note['id']
         )
 
         updated_bug_state = Bug.get_new_escalation_state(new_escalation_state)
         blocked_bug.state = new_escalation_state
         blocked_bug.status = updated_bug_state[:status]
         blocked_bug.resolution = updated_bug_state[:resolution]
+        blocked_bug.save
 
-        updated_bug = xmlrpc.update(options.to_h) unless options.blank?
+        updated_bug_options = {}
+
+        updated_bug_options[:ids] = blocked_bug.id
+        updated_bug_options[:comment] = { comment: new_escalation_message }
+        updated_bug_options[:status] = new_escalation_state
+
+
+        updated_bug = xmlrpc.update(updated_bug_options.to_h) unless updated_bug_options.blank?
 
       end
       bug.snort_blocked_bugs.destroy_all

@@ -23,6 +23,7 @@ module BugsHelper
 
   STATE_OPTIONS = ['NEW', 'OPEN', 'ASSIGNED', 'DUPLICATE', 'REOPENED', 'PENDING',
                    'FIXED', 'WONTFIX', 'LATER', 'INVALID']
+  ESCALATION_STATE_OPTIONS = ['NEW', 'UNCONFIRMED', 'REVIEWED', 'ASSIGNED', 'RESOLVED']
 
   def state_options(bug)
     remove_list = ['DUPLICATE'] 
@@ -52,7 +53,7 @@ module BugsHelper
 
   def state_options_for_escalation_close
     options = []
-    STATE_OPTIONS.each do |op|
+    ESCALATION_STATE_OPTIONS.each do |op|
       options << [op, op]
     end
     options
