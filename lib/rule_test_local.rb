@@ -99,9 +99,9 @@ begin
       else
         job = JSON.parse(resp.body)
 
-        if job['completed'] == "1"
+        if job['completed'] == 1
           puts
-          if job['failed'] == "1"
+          if job['failed'] == 1
             puts "Job failed: #{job}"
           else
             pcaps.each do |pcap_id, pcap_name|

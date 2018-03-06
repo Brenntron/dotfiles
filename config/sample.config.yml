@@ -5,14 +5,15 @@ development:
 #    host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
+#    vrt: "/System/Library/OpenSSL/certs/ca.pem"
     vrt: "extras/ssh/ca.pem"
   peakebridge:
-    addressees:
-      peakebridge:
-        host: "localhost"
-        port: 2966
-        ssl_mode: "no-ssl"
-        uri_base: "/peakebridge/channels"
+    host: "localhost"
+    port: 2966
+    # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    tls_mode: "verify-peer"
+    ca_file: "/usr/local/etc/trusted-certificates.pem"
+    uri_base: "/peakebridge/channels"
     sources:
       "snort-org":
         aws_access_key_id: "redacted"
@@ -48,7 +49,21 @@ test:
 #    host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
-    vrt: "/System/Library/OpenSSL/certs/ca.pem"
+#    vrt: "/System/Library/OpenSSL/certs/ca.pem"
+    vrt: "extras/ssh/ca.pem"
+  peakebridge:
+    host: "localhost"
+    port: 2966
+    # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    tls_mode: "verify-peer"
+    ca_file: "/usr/local/etc/trusted-certificates.pem"
+    uri_base: "/peakebridge/channels"
+    sources:
+      "snort-org":
+        aws_access_key_id: "redacted"
+        aws_secret_access_key: "redacted"
+        aws_region: "us-east-1"
+        aws_bucket: "snort-org-site"
   perl:
     cmd: "/usr/bin/env perl"
     canvas_root: "extras"

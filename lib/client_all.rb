@@ -233,9 +233,9 @@ while message = client.receive
               job = JSON.parse(resp.body)
               Rails.logger.info("Job is: #{job.inspect}")
 
-              if job['completed'] == "1"
+              if job['completed'] == 1
                 Rails.logger.info("Job Completed")
-                if job['failed'] == "1"
+                if job['failed'] == 1
                   Rails.logger.info( "Job failed: #{job}")
                 else
                   Rails.logger.info("Job Did Not Fail. getting pcaps...")

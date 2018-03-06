@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180223212907) do
+ActiveRecord::Schema.define(version: 20180305175716) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(version: 20180223212907) do
     t.text "unused_svn_result_output"
     t.integer "unused_svn_result_code"
     t.boolean "tested"
+    t.boolean "in_summary", default: false
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
   end
 
