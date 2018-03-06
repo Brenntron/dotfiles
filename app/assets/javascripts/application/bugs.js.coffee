@@ -1,3 +1,6 @@
+window.prepare_escalations =(this_tag) ->
+  $('#unlock_escalations_modal').modal('show')
+
 window.bug_resolve =(this_tag) ->
   user_id = $('#resolve-form').find("input[name='user_id']").val()
   committer_id = $('#resolve-form').find("input[name='committer_id']").val()
@@ -6,8 +9,16 @@ window.bug_resolve =(this_tag) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   bugzilla_id = $('.bugzilla_id').text()
 
+  new_escalation_message = ""
+  switch $('input[name=new_escalation_message]:checked').val()
+    when 'esc1'
+      new_escalation_message = $('input[name=new_escalation_message]:checked').parent().text()
+    when 'esc2'
+      new_escalation_message = $('textarea#new_escalation_message_custom').val()
+
+
+  new_escalation_status = ""
   new_escalation_status = $("#new_escalation_status").val()
-  new_escalation_message = $("#new_escalation_message").val()
 
   $('#resolve_bug_form_button').hide()
   $('#synching_bug_form_button').hide()
@@ -40,7 +51,7 @@ window.bug_resolve =(this_tag) ->
                   committer_id: committer_id,
                   summary: summary,
                   tag_names: tag_names
-                },
+                }
               escalation:
                 {
                   state: new_escalation_status,
@@ -117,6 +128,15 @@ $ ->
   $('#bug_state').change (e) ->
     $("#state_comment_row").show()
     $("#state_comment").prop('required',true);
+    new_state = $("#bug_state").val()
+    has_blockers = $("#edit_bug_has_blockers").val()
+
+    if new_state == "PENDING" && has_blockers == "true"
+      $("#edit_escalation_new_state").show()
+      $("#edit_escalation_new_state").prop('required', true);
+
+      $("#edit_escalation_new_message").show()
+      $("#edit_escalation_new_message").prop('required', true);
 
 
   $("#save_giblet_search_button").on 'click', (e) ->
@@ -511,19 +531,27 @@ $ ->
           headers: headers
         ).done (response) ->
           json = $.parseJSON(response)
-
+          alert("one")
           if (json.error)
             message = "There was a problem attempting to sink this bug:"
             message += json.error
             $("#alert_message").addClass('alert alert-danger alert-dismissable').append(message)
           else
+            alert('yeaaaah')
             if(json.import_report.total_changes == 0)
               state_comment = $("#state_comment").val()
+              escalation_comment = $("#escalation_new_message_field").val()
+              escalation_state = $("#escalation_new_state").val()
               data = $('.edit_bug').serialize()
               if state_comment
                 data = data + "&bug%5Bstate%5Fcomment%5D=" + encodeURIComponent(state_comment)
+              if escalation_comment
+                data = data + "&escalation%5Bmessage%5D=" + encodeURIComponent(escalation_comment)
+              if escalation_state
+                data = data + "&escalation%5Bstate%5D=" + encodeURIComponent(escalation_state)
               $('#synching_bug_form_button').hide()
               $('#saving_bug').removeClass('hidden').show()
+              alert(data)
               $.ajax(
                   url: '/api/v1/bugs/' + bid
                   method: 'PUT'

@@ -1,5 +1,6 @@
 <%= form_for @bug, remote:true do |f| %>
   <% unless @bug.new_record? %>
+    <input type="hidden" id="edit_bug_has_blockers" name="has_blockers" value=<%= @bug.snort_blocked_bugs.any? %> />
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="state">State</label>
@@ -24,6 +25,22 @@
                   placeholder="Please comment on why you are changing the state."></textarea>
       </div>
     </div>
+    <div id="edit_escalation_new_state" class="row hidden_comment">
+      <div class="col-sm-12 form-group">
+        <label for="comment">Set Blocked Escalation State To:</label>
+        <%= select_tag 'escalation_new_state', options_for_select(state_options_for_escalation_close) %>
+      </div>
+    </div>
+    <div id="edit_escalation_new_message" class="row hidden_comment">
+      <div class="col-sm-12 form-group">
+        <label for="comment">Set Comment for Blocked Escalation Bug(s) To:</label>
+        <textarea id="escalation_new_message_field" rows="10" data-min-rows="10"
+                  class="form-control create-input autoExpand"
+                  placeholder="Required.  Please comment any important information to the escalation bug here."></textarea>
+      </div>
+    </div>
+
+
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="priority">Priority</label>

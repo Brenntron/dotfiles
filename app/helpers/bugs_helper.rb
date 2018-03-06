@@ -50,6 +50,14 @@ module BugsHelper
 
   end
 
+  def state_options_for_escalation_close
+    options = []
+    STATE_OPTIONS.each do |op|
+      options << [op, op]
+    end
+    options
+  end
+
   def bug_filter_indicator(filter)
     'selected' if session[:query] == filter
   end

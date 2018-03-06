@@ -48,10 +48,18 @@
                 <input type="hidden" name="committer_id" value="<%= @bug.committer_id %>">
                 <input type="hidden" name="summary" value="<%= @bug.summary %>">
                 <% if @bug.can_resolve? %>
-                    <button id="resolve_bug_form_button" type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button>
+                    <% if @bug.snort_blocked_bugs.any? %>
+                      <button id="resolve_bug_form_button" type="button" onclick="prepare_escalations(this)" class="select-sm btn btn-default">Resolve</button>
+                    <% else %>
+                      <button id="resolve_bug_form_button" type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default">Resolve</button>
+                    <% end %>
                     <button class="select-sm btn btn-default hidden" id="resolving_bug_form_button" disabled="disabled"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Resolving</button>
                 <% else %>
-                    <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default" disabled="disabled">Resolve</button>
+                    <% if @bug.snort_blocked_bugs.any? %>
+                        <button type="button" onclick="prepare_escalations(this)" class="select-sm btn btn-default" disabled="disabled">Resolve</button>
+                    <% else %>
+                        <button type="button" onclick="bug_resolve(this)" class="select-sm btn btn-default" disabled="disabled">Resolve</button>
+                    <% end %>
                 <% end %>
               </form>
               <%end%>
@@ -246,6 +254,36 @@
     </div>
   </div>
 </div>
+
+
+
+<div class="modal fade" id="unlock_escalations_modal" tabindex="-1" role="dialog" aria-labelledby="unlock_escalations" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="editBug">This action will update Escalations associated with Bug <%=@bug.id%>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <p>Escalations Bug(s) this action will affect:</p>
+          <ul>
+          <% @bug.snort_blocked_bugs.each do |blocked_bug| %>
+            <li><%= blocked_bug.id %></li>
+          <% end %>
+          </ul>
+        <p>Select the Comment message and status that you would like to update the Escalations to:</p>
+        <br>
+        <%=render 'unlock_escalations_form' %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 
 

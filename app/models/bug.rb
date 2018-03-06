@@ -542,6 +542,42 @@ class Bug < ApplicationRecord
     state_params
   end
 
+  def self.get_new_escalation_state(state)
+    state_params = {}
+
+    case state
+      when 'NEW'
+        state_params[:status] = updated_state
+        state_params[:resolution] = 'OPEN'
+
+      when 'ASSIGNED'
+        state_params[:status] = updated_state
+        state_params[:resolution] = 'OPEN'
+
+      when 'PENDING'
+        state_params[:status] = 'RESOLVED'
+        state_params[:resolution] = updated_state
+
+      when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
+        state_params[:status] = 'RESOLVED'
+        state_params[:resolution] = updated_state
+
+      when 'REOPENED'
+        state_params[:status] = updated_state
+        state_params[:resolution] = 'OPEN'
+        state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{updated_state}." }
+
+      when 'OPEN'
+        state_params[:status] = updated_state
+        state_params[:resolution] = 'OPEN'
+
+    end
+
+
+    state_params
+
+  end
+
   def priority_sort
     if priority.nil?
       priority = 'Unspecified'
@@ -1110,7 +1146,7 @@ class Bug < ApplicationRecord
   end
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
-  def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:)
+  def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:, new_escalation_message: nil, new_escalation_state: nil)
 
 
     initial_bug_summary_info = bug.parse_summary
@@ -1255,8 +1291,30 @@ class Bug < ApplicationRecord
     end
 
     if bug_is_being_resolved
-     bug.snort_blocked_bugs.destroy_all
-     publish_research_notes(xmlrpc, current_user, bug)
+      bug.snort_blocked_bugs.each do |blocked_bug|
+        options = {
+            :id => blocked_bug.id,
+            :comment => new_escalation_message,
+        }.reject() { |k, v| v.nil? }
+        new_note = xmlrpc.add_comment(options)
+        Note.create(
+            :id => new_note['id'],
+            :comment => new_escalation_message,
+            :author => current_user.email,
+            :note_type => 'research',
+            :bug_id => blocked_bug.id
+        )
+
+        updated_bug_state = Bug.get_new_escalation_state(new_escalation_state)
+        blocked_bug.state = new_escalation_state
+        blocked_bug.status = updated_bug_state[:status]
+        blocked_bug.resolution = updated_bug_state[:resolution]
+
+        updated_bug = xmlrpc.update(options.to_h) unless options.blank?
+
+      end
+      bug.snort_blocked_bugs.destroy_all
+      publish_research_notes(xmlrpc, current_user, bug)
     end
 
   end
@@ -2211,7 +2269,9 @@ class Bug < ApplicationRecord
                         bugzilla_session:,
                         assignee_id:,
                         committer_id:,
-                        permitted_params:)
+                        permitted_params:,
+                        new_escalation_message: nil,
+                        new_escalation_state: nil)
 
     raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id.present?
     assignee = User.where(id: assignee_id).first
@@ -2229,7 +2289,9 @@ class Bug < ApplicationRecord
                            self,
                            permitted_params,
                            assignee: assignee,
-                           committer: committer)
+                           committer: committer,
+                           new_escalation_message: new_escalation_message,
+                           new_escalation_state: new_escalation_state)
 
     current_bug = xmlrpc.get(self.bugzilla_id)
     Bug.synch_history(xmlrpc, current_bug).to_s
