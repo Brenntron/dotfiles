@@ -106,8 +106,20 @@ $ ->
   $('.hidden').hide();
 
   $('#bug_state').change (e) ->
+    bug_state = $('#bug_state')[0].value
     $("#state_comment_row").show()
     $("#state_comment").prop('required',true);
+    if $('#bug_product')[0].value == "Escalations"
+      $('#state_comment')[0].value = canned_response(bug_state)
+
+  canned_response = (bug_state) ->
+    responses =
+      "FIXED": "Coverage has been updated."
+      "COMPLETED": "Coverage has not been updated."
+      "LATER": "There is currently not enough information to create coverage at this time. If more information becomes available we will evaluate updating coverage at that point."
+      "": ""
+    if responses[bug_state] then responses[bug_state] else ''
+
 
 
   $("#save_giblet_search_button").on 'click', (e) ->

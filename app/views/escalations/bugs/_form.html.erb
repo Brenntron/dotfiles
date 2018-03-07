@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="state">State</label>
-        <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control'%>
+        <%=f.select :state, options_for_select(esc_state_options(@bug), selected: @bug.state, disabled: esc_disabled_state_options(current_user)),{} , class: 'form-control'%>
 
         <% unless @bug.can_resolve? %>
         <span class="tiny text-muted">Can't set to pending.</span>
