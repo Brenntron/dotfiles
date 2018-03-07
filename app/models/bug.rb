@@ -1347,11 +1347,9 @@ class Bug < ApplicationRecord
         creator = User.where('email=?', item['creator']).first
         new_user = User.where('email=?', item['assigned_to']).first
         new_committer = User.where('email=?', item['qa_contact']).first
-
         if creator.nil?
           User.create_by_email(item['creator'])
           new_creator = User.where(email: item['creator']).first
-          creator.save
           bug.creator = new_creator.id
         else
           bug.creator = creator.id
