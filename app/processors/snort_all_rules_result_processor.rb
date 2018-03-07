@@ -69,7 +69,7 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
         alerted_rules.each do |alerted|
           begin
-            rule = Rule.find_or_load(alerted['sid'].to_i)
+            rule = Rule.find_or_load(alerted['sid'].to_i, alerted['gid'].to_i)
 
             if rule
               rules_in_test << rule
