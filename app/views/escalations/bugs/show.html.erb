@@ -21,11 +21,11 @@
                     <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate hidden loading_image" id="loading_image"> </span>
                     <a type="button" style="text-decoration:none;" class="glyphicon glyphicon-refresh resynch_bug resync_escalation_button" id="resynch_bug" data-toggle="tooltip" data-placement="bottom" title="resynch this bug with bugzilla"></a>
 
-                    <% if @bug.snort_blocked_bugs.any? %>
-                        <span id="bugzilla_blocking_status" class="glyphicon glyphicon-refresh" rel="popover" data-placement="top" data-original-title="Bugs being blocked: <%= @bug.snort_blocked_bugs.pluck(:id).join(',') %>" data-trigger="hover" data-toggle="tooltip"></span>
-                    <% end %>
                     <% if @bug.snort_blocker_bugs.any? %>
-                        <span id="bugzilla_blocked_status" class="glyphicon glyphicon-refresh" rel="popover" data-placement="top" data-original-title="Blocked by Bugs: <%= @bug.snort_blocker_bugs.pluck(:id).join(',') %>" data-trigger="hover" data-toggle="tooltip"></span>
+                        <span id="bugzilla_blocked_status" class="icon-blocks blocked-bug" rel="popover" data-placement="top" data-original-title="Blocked by Bugs: <%= @bug.snort_blocker_bugs.pluck(:id).join(',') %>" data-trigger="hover" data-toggle="tooltip"></span>
+                    <% end %>
+                    <% if @bug.snort_blocked_bugs.any? %>
+                        <span id="bugzilla_blocking_status" class="icon-blocks bug-blocker" rel="popover" data-placement="top" data-original-title="Bugs being blocked: <%= @bug.snort_blocked_bugs.pluck(:id).join(',') %>" data-trigger="hover" data-toggle="tooltip"></span>
                     <% end %>
 
 
