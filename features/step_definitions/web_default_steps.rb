@@ -251,6 +251,10 @@ Then(/^the textarea with id "(.*?)" should contain "(.*?)"$/) do |id, content|
   page.find(:xpath, "//textarea[@id='#{id}']").text.should == content
 end
 
+Then(/^the textarea with id "(.*?)" should have a value of "(.*?)"$/) do |id, content|
+  page.find(:xpath, "//textarea[@id='#{id}']").value.should == content
+end
+
 Then(/^I should be on "(.*?)"$/) do |path|
   raise "current_path is not \"#{path}\":  current_path = #{current_path} " unless current_path == path
 end
