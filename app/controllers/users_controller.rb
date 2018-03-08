@@ -38,7 +38,7 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
     @user.update(user_params)
-    if user_api_key_params[:api_key].present?
+    if user_api_key_params[:api_key]
       if @user.user_api_key
         @user.user_api_key.update(user_api_key_params)
       else
@@ -156,6 +156,6 @@ class UsersController < ApplicationController
   end
 
   def user_api_key_params
-    params.require(:user).require(:user_api_key).permit(:api_key)
+    params.require(:user).fetch(:user_api_key, {}).permit(:api_key)
   end
 end
