@@ -2,6 +2,8 @@ window.pop_up_reopen_modal = (this_tag) ->
   $("#reopen_research_bugs_modal").modal('show')
 
 window.reopen_research_bug = (this_tag) ->
+  $("#reopen_reserch_submit").hide()
+  $("#reopen_reserch_submit_wait").removeClass('hidden').show()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   comment = ""
   bid = $('.bugzilla_id').text()
@@ -33,6 +35,8 @@ window.reopen_research_bug = (this_tag) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
       $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      $("#reopen_reserch_submit_wait").addClass('hidden').hide()
+      $("#reopen_reserch_submit").show()
   , this)
 
 window.escalation_acknowledge = (this_tag,bug_id) ->
