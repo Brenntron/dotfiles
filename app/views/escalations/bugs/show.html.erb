@@ -43,6 +43,12 @@
                   <h5><span class="btn-danger">Warning!!!</span> This bug has been acknowledged but is not assigned!</h5>
                 <%end%>
               <%end%>
+              <% if @bug.has_any_reopenable_bugs %>
+              <br /><br />
+              <span data-toggle="modal" data-target="#reopen_research">
+                <button id="reopen_escalation_button" type="button" class="select-sm btn btn-default" onclick="pop_up_reopen_modal(this)">Reopen Research Bug(s)</button>
+              </span>
+              <% end %>
             </div>
           </div>
           <div class="col-xs-1">
@@ -215,6 +221,29 @@
         <p>By Clicking OK you will take this bug and acknowledge that it has been seen</p>
         <br>
         <%=render 'subscribe_acknowledge_form' %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="reopen_research_bugs_modal" tabindex="-1" role="dialog" aria-labelledby="reopen_research" aria-hidden="true" data-backdrop="static" data-keyboard='false'>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="reopenResearch">Reopen Research Bugs
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+
+        <p>Select the bug(s) you would like to Re-open:</p>
+        <br>
+        <%=render 'reopen_research_bug_form' %>
         <br>
       </div>
     </div>

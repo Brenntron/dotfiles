@@ -1908,30 +1908,6 @@ class Bug < ApplicationRecord
   end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
@@ -2073,6 +2049,7 @@ class Bug < ApplicationRecord
     end
   end
 
+
   def refresh_summary(xmlrpc)
     unless xmlrpc.nil?
       bug = Bugzilla::Bug.new(xmlrpc).get(bugzilla_id)['bugs'].first
@@ -2159,6 +2136,14 @@ class Bug < ApplicationRecord
     bug = Bugzilla::Bug.new(xmlrpc).get(bugzilla_id)['bugs'].first
     raise Exception.new("Unable to find bug #{record.bugzilla_id}") if bug.nil?
     bug['depends_on']
+  end
+
+  def has_any_reopenable_bugs
+    snort_research_escalation_bugs.any? {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
+  end
+
+  def reopenable_bugs
+    snort_research_escalation_bugs.select {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
   end
 
   def self.search(query_str, terms, range)
