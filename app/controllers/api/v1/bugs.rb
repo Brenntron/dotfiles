@@ -54,6 +54,7 @@ module API
           end
         end
 
+
         desc "test the websocket"
         get 'websocket' do
           bug = Bug.first
@@ -464,6 +465,126 @@ module API
             false
           end
         end
+
+
+
+
+        desc "reopen bugs from escalations"
+
+        post "/reopen_bugs" do
+          ids_to_reopen = params[:ids]
+          comment_when_reopening = params[:comment]
+          if comment_when_reopening.blank?
+            return {:error => "Need a comment to reopen a bug"}.to_json
+          end
+          if ids_to_reopen.blank?
+            return {:error => "Need a bug id to reopen a bug"}.to_json
+          end
+
+          bugs = Bug.where(:id => ids_to_reopen)
+
+          xmlrpc_token = request.headers['Xmlrpc-Token']
+          if xmlrpc_token
+            qa_contact = User.where(email: "vrt-qa@sourcefire.com").first
+            vrt_incoming = User.where(email: "vrt-incoming@sourcefire.com").first
+            bugs.each do |bug|
+
+              status = "REOPENED"
+              resolution = "REOPENED"
+
+              options = {ids: [bug.id],
+                         status: status,
+                         resolution: resolution,
+                         qa_contact: qa_contact.email,
+                         assigned_to: vrt_incoming.email,
+                         comment: {body: comment_when_reopening} }
+
+              bug.update_bugzilla_attributes(bugzilla_session, options)
+
+              bug.status = status
+              bug.state = resolution
+              bug.resolution = resolution
+              bug.committer_id = qa_contact.id
+              bug.user_id = vrt_incoming.id
+
+              bug.save
+
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+              reopened_bugzilla_bug = xmlrpc.get(bug.id)
+
+              reopened_bugzilla_bug['bugs'].each do |item|
+                bug_id = item['id']
+                new_comments = xmlrpc.comments(ids: [bug_id])
+                if new_comments.any?
+                  ActiveRecord::Base.transaction do
+                    new_comments['bugs'].each do |comment|
+                      bug_id = comment[0].to_i
+                      comment[1]['comments'].each do |c|
+                        if c['text'].downcase.strip.start_with?('commit')
+                          note_type = 'committer'
+                        elsif c['text'].start_with?('Created attachment')
+                          note_type = 'attachment'
+                        else
+                          note_type = 'research'
+                        end
+                        comment = c['text'].strip
+
+                        creation_time = c['creation_time'].to_time
+
+                        note = Note.where(id: c['id']).first
+
+                        if note.present?
+                          comment = "bugzilla comment is blank" if comment.blank?
+                          note.update_attributes(author: c['author'],
+                                                 comment: comment,
+                                                 bug_id: bug_id,
+                                                 note_type: note_type,
+                                                 notes_bugzilla_id: c['id'],
+                                                 created_at: creation_time)
+
+                        else
+                          comment = "bugzilla comment is blank" if comment.blank?
+                          Note.create(id: c['id'],
+                                      author: c['author'],
+                                      comment: comment,
+                                      bug_id: bug_id,
+                                      note_type: note_type,
+                                      created_at: creation_time,
+                                      notes_bugzilla_id: c['id']                     )
+
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+
+            end
+
+            urls_to_open = []
+            bugs.each do |bug|
+              urls_to_open << "/bugs/#{bug.id}"
+            end
+            return {:success => true, :urls_to_open => urls_to_open}.to_json
+
+
+          else
+            false
+          end
+
+        end
+
+
+
+
+
+
+
+
+
+
+
+
 
         desc "subscribe to a bug"
         params do
