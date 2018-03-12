@@ -472,6 +472,7 @@ module API
         desc "reopen bugs from escalations"
 
         post "/reopen_bugs" do
+          source_bug = Bug.find(params[:id])
           ids_to_reopen = params[:ids]
           comment_when_reopening = params[:comment]
           if comment_when_reopening.blank?
@@ -482,7 +483,9 @@ module API
           end
 
           bugs = Bug.where(:id => ids_to_reopen)
-
+          bugs.each do |bug|
+            source_bug.snort_blocker_bugs << bug
+          end
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             qa_contact = User.where(email: "vrt-qa@sourcefire.com").first

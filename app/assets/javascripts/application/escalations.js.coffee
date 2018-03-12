@@ -4,7 +4,7 @@ window.pop_up_reopen_modal = (this_tag) ->
 window.reopen_research_bug = (this_tag) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   comment = ""
-
+  bid = $('.bugzilla_id').text()
   comment = $('#reopen_bug_message').val()
 
   checked_boxes = $(".reopen_bug_checkbox:checked")
@@ -16,7 +16,7 @@ window.reopen_research_bug = (this_tag) ->
     url: '/api/v1/bugs/reopen_bugs'
     method: 'POST'
     headers: headers
-    data: { comment: comment, ids: checked_ids}
+    data: { comment: comment, ids: checked_ids, id: bid}
     success: (response) ->
 
       json = $.parseJSON(response)
