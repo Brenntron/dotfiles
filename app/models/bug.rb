@@ -36,6 +36,13 @@ class Bug < ApplicationRecord
   has_many :research_to_research_bugs, :class_name => 'SnortResearch', :foreign_key => 'bug_id'
   has_many :snort_research_to_research_bugs, :through => :research_to_research_bugs
 
+  #blocking logic stuff
+  has_many :snort_bug_blockees, :class_name => "BugBlocker", :foreign_key => 'snort_blocker_bug_id'
+  has_many :snort_blocked_bugs, :through => :snort_bug_blockees
+
+  has_many :snort_bug_blockers, :class_name => "BugBlocker", :foreign_key => 'snort_blocked_bug_id'
+  has_many :snort_blocker_bugs, :through => :snort_bug_blockers
+
 
   accepts_nested_attributes_for :rules
 
@@ -60,6 +67,16 @@ class Bug < ApplicationRecord
   scope :by_escalations, -> { where(:product => "escalations")}
 
   attr_accessor :import_report
+
+  def is_blocked?
+    #blocked_by.any?
+  end
+
+  def blocked_by
+    #if product == "Escalations"
+    #  snort_research_escalations.select { |bug| bug.pending? }
+    #end
+  end
 
   def acknowledged?
     acknowledged
@@ -283,30 +300,24 @@ class Bug < ApplicationRecord
           query_hash['whiteboard_param_results'] = query_hash['param_results'].where('whiteboard LIKE ?', "%#{whiteboard_param}%")
         end
 
-        ##Note:  If we ever want to try to create an 'AND' type search with multiple tags selected, we're going to need a query similar to this:
-        #  SELECT bug_id FROM `bugs` inner JOIN `bugs_tags` ON `bugs_tags`.`bug_id` = `bugs`.`id` inner JOIN `tags` ON `tags`.`id` = `bugs_tags`.`tag_id` WHERE `bugs_tags`.`tag_id` in (1, 5) group by bug_id having count(distinct tag_id) = 2;
-        #  the key is group by and having and matching up with the number of tags being searched on, this will require some really custom stuff rather than just stringing 'where' statements in an activerecord query.
         if giblets.present?
-          join_types.each do |j_type|
-            case j_type
-              when :tags
-                query_hash['gib_tag_results'] = query_hash['param_results'].joins(:tags)
-              when :whiteboards
-                query_hash['gib_whiteboard_results'] = query_hash['param_results'].joins(:whiteboards)
-              when :references
-                query_hash['gib_reference_results'] = query_hash['param_results'].joins(:references)
-            end
-          end
+          
           gibs_by_type.each do |key, value|
             if value.size > 0
               ids = value.map{|g| g.gib.id}
               case key
                 when :tags
-                  query_hash['gib_tag_results'] = query_hash['gib_tag_results'].where("bugs_tags.tag_id" => ids)
+                  query_hash['gib_tag_results'] = query_hash['param_results'].joins(:tags)
+                                                                             .where("bugs_tags.tag_id" => ids)
+                                                                             .group(:bug_id).having('count(bug_id) = ?', ids.count)
                 when :whiteboards
-                  query_hash['gib_whiteboard_results'] = query_hash['gib_whiteboard_results'].where("bugs_whiteboards.whiteboard_id" => ids)
+                  query_hash['gib_whiteboard_results'] = query_hash['param_results'].joins(:whiteboards)
+                                                                                    .where("bugs_whiteboards.whiteboard_id" => ids)
+                                                                                    .group(:bug_id).having('count(bug_id) = ?', ids.count)
                 when :references
-                  query_hash['gib_reference_results'] = query_hash['gib_reference_results'].where("bug_reference_rule_links.reference_id" => ids)
+                  query_hash['gib_reference_results'] = query_hash['param_results'].joins(:references)
+                                                                                   .where("bug_reference_rule_links.reference_id" => ids)
+                                                                                   .group(:bug_id).having('count(bug_id) = ?', ids.count)
               end
             end
           end
@@ -319,17 +330,17 @@ class Bug < ApplicationRecord
           query_hash['snippet_param_results'] = query_hash['param_results'].where(:id => bug_ids)
         end
 
-        final_query = []
         if query_params.empty?
           query_hash.delete('param_results')
         end
 
         #combine all the queries together
-        query_hash.each do |key,result_set|
-          final_query = final_query | (result_set)
-        end
+        final_query = query_hash.values
 
-        bug_ids = final_query.map{|b| b.id}
+        #find intersection of results
+        intersection = final_query.inject(:&)
+
+        bug_ids = intersection.pluck(:id)
 
         query = Bug.where(id: bug_ids)
 
@@ -528,6 +539,42 @@ class Bug < ApplicationRecord
 
     #return state params hash
     state_params
+  end
+
+  def self.get_new_escalation_state(state)
+    state_params = {}
+
+    case state
+      when 'NEW'
+        state_params[:status] = state
+        state_params[:resolution] = 'OPEN'
+
+      when 'ASSIGNED'
+        state_params[:status] = state
+        state_params[:resolution] = 'OPEN'
+
+      when 'PENDING'
+        state_params[:status] = 'RESOLVED'
+        state_params[:resolution] = state
+
+      when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
+        state_params[:status] = 'RESOLVED'
+        state_params[:resolution] = state
+
+      when 'REOPENED'
+        state_params[:status] = state
+        state_params[:resolution] = 'OPEN'
+        state_params[:comment] = { comment: "#{state_comment} \nThis bug is now #{state}." }
+
+      when 'OPEN'
+        state_params[:status] = state
+        state_params[:resolution] = 'OPEN'
+
+    end
+
+
+    state_params
+
   end
 
   def priority_sort
@@ -1099,7 +1146,7 @@ class Bug < ApplicationRecord
   end
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
-  def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:)
+  def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:, new_escalation_message: nil, new_escalation_state: nil)
 
 
     initial_bug_summary_info = bug.parse_summary
@@ -1146,6 +1193,9 @@ class Bug < ApplicationRecord
 
     if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
       updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
+      bug.snort_escalation_research_bugs.each do |bug|
+        bug.snort_blocked_bugs << bug
+      end
     end
 
 
@@ -1241,7 +1291,39 @@ class Bug < ApplicationRecord
     end
 
     if bug_is_being_resolved
-     publish_research_notes(xmlrpc, current_user, bug)
+      bug.snort_blocked_bugs.each do |blocked_bug|
+        options = {
+            :id => blocked_bug.id,
+            :comment => new_escalation_message,
+        }.reject() { |k, v| v.nil? }
+        new_note = xmlrpc.add_comment(options)
+        Note.create(
+            :id => new_note['id'],
+            :comment => new_escalation_message,
+            :author => current_user.email,
+            :note_type => 'research',
+            :bug_id => blocked_bug.id,
+            :notes_bugzilla_id => new_note['id']
+        )
+
+        updated_bug_state = Bug.get_new_escalation_state(new_escalation_state)
+        blocked_bug.state = new_escalation_state
+        blocked_bug.status = updated_bug_state[:status]
+        blocked_bug.resolution = updated_bug_state[:resolution]
+        blocked_bug.save
+
+        updated_bug_options = {}
+
+        updated_bug_options[:ids] = blocked_bug.id
+        updated_bug_options[:comment] = { comment: new_escalation_message }
+        updated_bug_options[:status] = new_escalation_state
+
+
+        updated_bug = xmlrpc.update(updated_bug_options.to_h) unless updated_bug_options.blank?
+
+      end
+      bug.snort_blocked_bugs.destroy_all
+      publish_research_notes(xmlrpc, current_user, bug)
     end
 
   end
@@ -1353,11 +1435,9 @@ class Bug < ApplicationRecord
         creator = User.where('email=?', item['creator']).first
         new_user = User.where('email=?', item['assigned_to']).first
         new_committer = User.where('email=?', item['qa_contact']).first
-
         if creator.nil?
           User.create_by_email(item['creator'])
           new_creator = User.where(email: item['creator']).first
-          creator.save
           bug.creator = new_creator.id
         else
           bug.creator = creator.id
@@ -2196,7 +2276,9 @@ class Bug < ApplicationRecord
                         bugzilla_session:,
                         assignee_id:,
                         committer_id:,
-                        permitted_params:)
+                        permitted_params:,
+                        new_escalation_message: nil,
+                        new_escalation_state: nil)
 
     raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id.present?
     assignee = User.where(id: assignee_id).first
@@ -2214,7 +2296,9 @@ class Bug < ApplicationRecord
                            self,
                            permitted_params,
                            assignee: assignee,
-                           committer: committer)
+                           committer: committer,
+                           new_escalation_message: new_escalation_message,
+                           new_escalation_state: new_escalation_state)
 
     current_bug = xmlrpc.get(self.bugzilla_id)
     Bug.synch_history(xmlrpc, current_bug).to_s

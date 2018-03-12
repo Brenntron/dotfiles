@@ -342,7 +342,7 @@ class Rule < ApplicationRecord
   # @return [String] grep output with filename colon linenumber colon rule content.
   def self.grep_line_from_file!(sid, gid = nil, given_filepath = nil)
     grep_line_from_file(sid, gid, given_filepath) ||
-        grep_line_from_file(sid, gid, nil) ||
+        grep_line_from_file(sid, nil, nil) ||
         raise("Rule #{sid} doesn't exist.")
   end
 

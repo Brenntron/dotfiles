@@ -69,20 +69,18 @@ class SnortAllRulesResultProcessor < ApplicationProcessor
 
         alerted_rules.each do |alerted|
           begin
-            rule = Rule.find_or_load(alerted['sid'].to_i)
+            rule = Rule.find_or_load(alerted['sid'].to_i, alerted['gid'].to_i)
 
-            case
-              when !([1, 3].include?(alerted['gid'].to_i))
-                # do nothing
-              when rule
-                rules_in_test << rule
+            if rule
+              rules_in_test << rule
 
-                Rails.logger.info( "Rule #{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} was found")
-                job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} #{alerted['message']}\n"
-                unless attachment.nil? || attachment.pcap_alerts.where(rule: rule).exists?
-                  attachment.pcap_alerts.create(rule: rule)
-                end
-              else
+              Rails.logger.info( "Rule #{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} was found")
+              job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} #{alerted['message']}\n"
+              unless attachment.nil? || attachment.pcap_alerts.where(rule: rule).exists?
+                attachment.pcap_alerts.create(rule: rule)
+              end
+
+            else
                 job.failed = true
                 job.result << "#{alerted['gid']}:#{alerted['sid']}:#{alerted['rev']} not found\n"
             end

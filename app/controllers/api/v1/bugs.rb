@@ -358,11 +358,14 @@ module API
           ActiveRecord::Base.transaction do
             bug = Bug.find(permitted_params[:id])
             # Bug.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
+
             bug.update_bug_action(current_user: current_user,
                                   bugzilla_session: bugzilla_session,
                                   assignee_id: permitted_params[:bug][:user_id],
                                   committer_id: permitted_params[:bug][:committer_id],
-                                  permitted_params: permitted_params)
+                                  permitted_params: permitted_params,
+                                  new_escalation_message: params[:escalation][:message],
+                                  new_escalation_state: params[:escalation][:state])
           end
         end
 
