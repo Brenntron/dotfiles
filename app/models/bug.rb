@@ -489,7 +489,7 @@ class Bug < ApplicationRecord
         else
           last_changed_time[:work_time] = bug.assigned_at? ? ((last_changed_time[:pending_at] - bug.assigned_at) / 86_400).ceil : nil
         end
-      when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
+      when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER', 'COMPLETED'
         last_changed_time[:resolved_at] = update_time
         last_changed_time[:review_time] = bug.pending_at? ? ((last_changed_time[:resolved_at] - bug.pending_at) / 86_400).ceil : nil
       when 'REOPENED'
@@ -505,7 +505,7 @@ class Bug < ApplicationRecord
   def self.get_new_bug_state(bug, state, state_comment, editor_email)
     updated_state = state
     updated_state = 'NEW' if editor_email == 'vrt-incoming@sourcefire.com' && bug.resolution == 'OPEN' && state == 'NEW'
-    updated_state = 'ASSIGNED' unless (editor_email == 'vrt-incoming@sourcefire.com') || (%w(RESOLVED REOPENED).include? bug.status) || ['PENDING','FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE'].include?(state)
+    updated_state = 'ASSIGNED' unless (editor_email == 'vrt-incoming@sourcefire.com') || (%w(RESOLVED REOPENED).include? bug.status) || ['PENDING','FIXED', 'WONTFIX', 'LATER', 'INVALID', 'DUPLICATE', 'COMPLETED'].include?(state)
     updated_state = nil if updated_state == bug.state
     state_params = {}
 
@@ -522,7 +522,7 @@ class Bug < ApplicationRecord
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
       state_params[:comment] = { comment: "#{state_comment} \nThis bug is now RESOLVED - #{updated_state}." }
-    when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER'
+    when 'FIXED', 'WONTFIX', 'INVALID', 'DUPLICATE', 'LATER', 'COMPLETED'
       state_params[:status] = 'RESOLVED'
       state_params[:resolution] = updated_state
       state_params[:comment] = { comment: "#{state_comment} \nThis bug is now RESOLVED - #{updated_state}." }
