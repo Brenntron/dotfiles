@@ -127,8 +127,14 @@
               data-gid="<%= rule.gid%>" data-sid="<%= rule.sid%>">
             <td><input type="checkbox" id="rule_<%= rule.id %>" class="rule_check_box rule_<%= rule.id %>"
                        name="rule[id]" value="<%= rule.id %>" data-sid="<%= rule.sid%>"></td>
-                <td class="rule_state_col"><div data-toggle="tooltip" data-placement="right" title="<%= raw rule.tool_tip %>"><%= rule.state %></div></td>
-            <td class="doc-status-col center"><%= doc_status(rule) %></td>
+            <td class="rule_state_col"><div data-toggle="tooltip" data-placement="right" title="<%= raw rule.tool_tip %>"><%= rule.state %></div></td>
+            <td class="doc-status-col center">
+              <% if can? :update, RuleDoc %>
+                <%= doc_status(rule) %>
+              <% else %>
+                <%= doc_status_nomanage(rule) %>
+              <% end %>
+            </td>
                 <td>
                   <a class="blue show_rule" href="#">
                     <% if rule.sid %>
