@@ -295,9 +295,13 @@ class SnortDocPublisher
   def self.update_cve_data
     clear_instance_variables
     each_publisher do |publisher|
-      publisher.clear_errors
-      publisher.update_cve_data
-      @errors += publisher.errors
+      if File.exists?(publisher.filepath)
+        publisher.clear_errors
+        publisher.update_cve_data
+        @errors += publisher.errors
+      else
+        @errors << "Missing file for #{publisher.year}, skipping data update."
+      end
     end
 
     if block_given?
