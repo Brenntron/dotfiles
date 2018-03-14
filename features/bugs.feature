@@ -792,22 +792,23 @@ Feature: Bug
     #When I click ".jobs-tab"
     #Then I should see "attachment"
 
-
+@now
   @javascript
   Scenario: a user can test an attachment
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
-      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
-    And an attachment exists and belongs to bug "145359"
+      | id     | bugzilla_id | state    | user_id | summary                                                    | product  | component   | version |      description       |
+      | 111116 | 111116      | REOPENED | 1       | [SID] 24397 Steam browser handler multiple vulnerabilities | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And an attachment exists and belongs to bug "111116"
     And I wait for "3" seconds
-    When I goto "/bugs/145359"
+    When I goto "/bugs/111116"
     And I click ".jobs-tab"
-    Then I should not see "attachment"
+    Then I should not see "all rules test"
     When I click ".attachments-tab"
     And I toggle checkbox ".attach_1"
     Then I should see "new.pcap"
     When I click button "test"
+    Then I do some debugging
     Then test should be created and I should see "Task has been created to test the attachment"
     When I click ".jobs-tab"
     Then I should see "all rules test"

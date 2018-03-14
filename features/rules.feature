@@ -15,12 +15,12 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     Given the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     When the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | BLACKLIST message |        1         |
+      | 13 |  1  | 22212 |  3  | APP-DETECT message |        1         |
+      | 14 |  1  | 22213 |  3  | APP-DETECT message |        1         |
+      | 15 |  1  | 22214 |  3  | APP-DETECT message |        1         |
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -51,12 +51,12 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     Given the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     When the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | BLACKLIST message |        1         |
-      | 14 |  1  | 22213 |  3  | BLACKLIST message |        1         |
-      | 15 |  1  | 22214 |  3  | BLACKLIST message |        1         |
+      | 13 |  1  | 22212 |  3  | APP-DETECT message |        1         |
+      | 14 |  1  | 22213 |  3  | APP-DETECT message |        1         |
+      | 15 |  1  | 22214 |  3  | APP-DETECT message |        1         |
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -71,12 +71,12 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     Given the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     When the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |     message        | rule_category_id |          rule_content          |
-      | 13 |  1  | 22212 |  3  | BLACKLIST message1 |        1         |alert (msg:"BLACKLIST message1";)|
-      | 14 |  1  | 22213 |  3  | BLACKLIST message2 |        1         |alert (msg:"BLACKLIST message2";)|
-      | 15 |  1  | 22214 |  3  | BLACKLIST message3 |        1         |alert (msg:"BLACKLIST message3";)|
+      | 13 |  1  | 22212 |  3  | APP-DETECT message1 |        1         |alert (msg:"APP-DETECT message1";)|
+      | 14 |  1  | 22213 |  3  | APP-DETECT message2 |        1         |alert (msg:"APP-DETECT message2";)|
+      | 15 |  1  | 22214 |  3  | APP-DETECT message3 |        1         |alert (msg:"APP-DETECT message3";)|
 
     And bug with id "2222" has rule with id "13"
     And bug with id "2222" has rule with id "14"
@@ -98,13 +98,13 @@ Feature: Rules
     And the current user has the following bugs:
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     And I wait for "3" seconds
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "create"
     And  I click "use standard form"
-    And  I select "BLACKLIST" from "rule_category_id"
+    And  I select "APP-DETECT" from "rule_category_id"
     And  I click "Create Rule"
     And  I wait for "2" seconds
     Then I should see "Please fill in required fields."
@@ -123,10 +123,10 @@ Feature: Rules
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "parsed" and version "new_rule"
     And  I should see a rule with state "NEW" version "new_rule"
-    And  I should see "BLACKLIST Test msg"
+    And  I should see "APP-DETECT Test msg"
 #    And rule "11" is a new rule
     When I click "new_rule"
-    Then I should see "BLACKLIST Test msg"
+    Then I should see "APP-DETECT Test msg"
     # default flow:
     And  I should see "to_client,established"
     And  I should see "content:"200""
@@ -148,7 +148,7 @@ Feature: Rules
     And the current user has the following "open_bug":
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     And I wait for "3" seconds
     When  I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -168,7 +168,7 @@ Feature: Rules
     And the current user has the following "open_bug":
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     And I wait for "3" seconds
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -177,7 +177,7 @@ Feature: Rules
     And  I click "other"
     And  I click "mysql"
     And  I click "kerberos"
-    And  I select "BLACKLIST" from "rule_category_id"
+    And  I select "APP-DETECT" from "rule_category_id"
     And  I fill in "rule[message]" with "Test Message the third"
     And  I fill in "rule[dst]" with "$HOME_NET"
     And  I fill in "rule[detection]" with "Detection test3"
@@ -200,7 +200,7 @@ Feature: Rules
     And the current user has the following "open_bug":
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     And I wait for "3" seconds
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -210,7 +210,7 @@ Feature: Rules
     And  I fill in "flow_src_ports" with "$SSH_PORTS"
     And  I fill in "flow_dst_server" with "$SSH_SERVERS"
     And  I fill in "flow_dst_ports" with "$SSH_PORTS"
-    And  I select "BLACKLIST" from "rule_category_id"
+    And  I select "APP-DETECT" from "rule_category_id"
     And  I fill in "std-form-message" with "Test msg"
     And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;"
     And  I select "attempted-user" from "rule[class_type]"
@@ -223,11 +223,11 @@ Feature: Rules
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "parsed" and version "new_rule"
     And  I should see a rule with state "NEW" version "new_rule"
-    And  I should see "BLACKLIST Test msg"
+    And  I should see "APP-DETECT Test msg"
 #    And rule "11" is a new rule
     When I check "rule[id]"
     And  I click "edit"
-    And  I fill in "rule_content_1" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
+    And  I fill in "rule_content_1" with "alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; rev:1;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see a rule row with class "draft" and version "new_rule"
@@ -235,7 +235,7 @@ Feature: Rules
     And  I should see a rule row with class "incomplete-unparsed" and version "new_rule"
     And  I should see a rule with state "FAILED" version "new_rule"
 #    And rule "11" is a new rule
-    And  I should see "BLACKLIST test *.msg"
+    And  I should see "APP-DETECT test *.msg"
 
   @javascript
   Scenario: New Rule: legacy form: rule state and css classes
@@ -243,12 +243,12 @@ Feature: Rules
     And the current user has the following "open_bug":
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     And I wait for "3" seconds
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "create"
-    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation;)"
+    And  I fill in "rule[rule_content]" with "alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation;)"
     And  I fill in "summary" with "some pig"
     And  I click "Create Rule"
     And  I wait for "2" seconds
@@ -258,7 +258,7 @@ Feature: Rules
     And  I should see a rule row with class "new-rule" and version "new_rule"
     And  I should see a rule row with class "parsed" and version "new_rule"
     And  I should see a rule with state "NEW" version "new_rule"
-    And  I should see "BLACKLIST test msg"
+    And  I should see "APP-DETECT test msg"
 #    And rule "11" is a new rule
 
   @javascript
@@ -268,13 +268,13 @@ Feature: Rules
     And the current user has the following "open_bug":
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     Then I wait for "3" seconds
     And  I goto "/bugs/2222"
     Then I click the "Rules" tab
     Then I click button "create"
     Then I click "use standard form"
-    And  I select "BLACKLIST" from "rule_category_id"
+    And  I select "APP-DETECT" from "rule_category_id"
     And  I fill in "rule[message]" with "Test Message the third"
     And  I fill in "rule[dst]" with "$HOME_NET"
     And  I fill in "rule[detection]" with "Detection test3"
@@ -318,17 +318,17 @@ Feature: Rules
 #    And the following rule categories exist:
 #      | category  | id |
 #      | DELETED   |  1 |
-#      | BLACKLIST |  2 |
+#      | APP-DETECT |  2 |
 #    And the following rules exist:
 #      | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message                | rule_category_id |
 #      | 11 |  1  | 22211 |  3  |  UPDATED  |   EDIT    |  CURRENT_EDIT  | DELETED message test       |        1         |
-#      | 12 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message          |        2         |
+#      | 12 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | APP-DETECT message          |        2         |
 #    And bug with id "2222" has rule with id "11"
 #    And bug with id "2222" has rule with id "12"
 #    And  I goto "/bugs/2222"
 #    And  I click the "Rules" tab
 #    And  I click button "list all"
-#    And I should see "BLACKLIST message"
+#    And I should see "APP-DETECT message"
 #    And I should not see "DELETED message test"
 
 
@@ -343,17 +343,17 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     Given the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     When the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
+      | 11 |  1  | 22211 |  3  | APP-DETECT message |        1         |
     Then rule "11" is synched
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And I click the "Rules" tab
     And I click button "list all"
     Then I should see rule "11" state "UNCHANGED" version "1:22211:3"
-    And I should see "BLACKLIST message"
+    And I should see "APP-DETECT message"
     And I should see a rule row with class "synched" and id "11"
 
 
@@ -403,10 +403,10 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     And the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     And the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
+      | 11 |  1  | 22211 |  3  | APP-DETECT message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -418,12 +418,12 @@ Feature: Rules
     And  I check "rule_11"
     And  I click "edit"
     Then I should see div element with class "rule_11"
-    And  I fill in "rule_content_11" with "alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
+    And  I fill in "rule_content_11" with "alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "UPDATED" version "1:22211:3"
     And rule "11" is a current edit
-    And I should see "BLACKLIST test msg"
+    And I should see "APP-DETECT test msg"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "current-edit" and id "11"
@@ -438,10 +438,10 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     And the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     And the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | BLACKLIST message |        1         |
+      | 11 |  1  | 22211 |  3  | APP-DETECT message |        1         |
     And bug with id "2222" has rule with id "11"
     When I goto "/bugs/2222"
     And  I click the "Rules" tab
@@ -453,12 +453,12 @@ Feature: Rules
     And  I check "rule_11"
     And  I click "edit"
     Then I should see div element with class "rule_11"
-    And  I fill in "rule_content_11" with "alert (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
+    And  I fill in "rule_content_11" with "alert (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
     Then I should see rule "11" state "FAILED" version "1:22211:3"
     And rule "11" is a current edit
-    And I should see "BLACKLIST test msg"
+    And I should see "APP-DETECT test msg"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "current-edit" and id "11"
@@ -475,16 +475,16 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     And the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     And the following "edited_rule" rules exist:
       | id | gid |  sid  | rev |parsed|     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  | true | BLACKLIST message |        1         |
+      | 11 |  1  | 22211 |  3  | true | APP-DETECT message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "list all"
-    Then I should see "BLACKLIST message"
+    Then I should see "APP-DETECT message"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "stale-edit" and id "11"
@@ -499,16 +499,16 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     And the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     And the following "edited_rule" rules exist:
       | id | gid |  sid  | rev |   state   |parsed|     message       | rule_category_id |
-      | 11 |  1  | 22211 |  3  |   FAILED  |false | BLACKLIST message |        1         |
+      | 11 |  1  | 22211 |  3  |   FAILED  |false | APP-DETECT message |        1         |
     And bug with id "2222" has rule with id "11"
     When rule sid "22211" rev "4" is synched
     And  I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "list all"
-    Then I should see "BLACKLIST message"
+    Then I should see "APP-DETECT message"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "stale-edit" and id "11"
@@ -520,13 +520,13 @@ Feature: Rules
     And the current user has the following "open_bug":
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     When I wait for "3" seconds
     And  I goto "/bugs/2222"
     When I click the "Rules" tab
     And  I click button "create"
     And  I click "use standard form"
-    And  I select "BLACKLIST" from "rule_category_id"
+    And  I select "APP-DETECT" from "rule_category_id"
     And  I fill in "rule[message]" with "Test Message the third"
     And  I fill in "rule[dst]" with "$HOME_NET"
     And  I fill in "rule[detection]" with "Detection test3"
@@ -548,14 +548,14 @@ Feature: Rules
     And the current user has the following "open_bug":
       |  id  |
       | 2222 |
-    And a "BLACKLIST" rule category exists
+    And a "APP-DETECT" rule category exists
     And I wait for "3" seconds
     When  I goto "/bugs/2222"
     And  I click the "Rules" tab
     And  I click button "create"
     And  I click "use standard form"
 
-    And  I select "BLACKLIST" from "rule_category_id"
+    And  I select "APP-DETECT" from "rule_category_id"
     When I fill in "std-form-message" with "Test msg"
     And  I fill in "std-form-detection" with "content:"200"; content:"Server: nginx/1.6.2"; content:"Transfer-Encoding: chunked"; content:"Content-Encoding: gzip"; content:"14"; fast_pattern:only; flowbits:isset,http.mokes;http_header;"
     And  I select "attempted-user" from "rule[class_type]"
@@ -576,7 +576,7 @@ Feature: Rules
   # ==== Editing rule docs ===
 
 # TODO: Fix test: textarea value is not being set correctly within test
-#  @javascript @now
+#  @javascript  
 #  Scenario: a user can edit rule docs for a new rule
 #    Given a user exists and is logged in
 #    And the following bugs exist:
@@ -611,7 +611,7 @@ Feature: Rules
     Given the following "edited_rule" rules exist:
       | id | gid |  sid  | rev |parsed|
       |  7 |  1  | 22211 |  3  | true |
-    When code calls revert_grep for rule gid "1" sid "22211" on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    When code calls revert_grep for rule gid "1" sid "22211" on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "parsed"
@@ -627,35 +627,35 @@ Feature: Rules
     And  A rule gid "1" and sid "19500" has class "parsed"
 
   ### Scenarios Synching a rule from VC ###
-  
+   
   Scenario: Synch Rule: create a valid rule from synching model test
-    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
 #    And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "parsed"
-
+   
   Scenario: Synch Rule: create a failed rule from synching model test
-    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
 #    And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
-
+   
   Scenario: Synch Rule: update an existing valid synched rule with new rev model test
     Given the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |parsed|
       | 11 |  1  | 22211 |  3  | true |
-    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
-
+   
   @javascript
   Scenario: Synch Rule: update an existing valid synched rule with same rev model test
     Given the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |parsed|
       | 11 |  1  | 22211 |  4  | true |
-    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
     And  A rule gid "1" and sid "22211" has class "parsed"
@@ -665,7 +665,7 @@ Feature: Rules
     Given the following "edited_rule" rules exist:
       | id | gid |  sid  | rev |parsed|
       |  7 |  1  | 22211 |  3  | true |
-    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "draft"
     And  A rule gid "1" and sid "22211" has class "edited-rule"
@@ -678,7 +678,7 @@ Feature: Rules
     Given the following "edited_rule" rules exist:
       | id | gid |  sid  | rev |  state  |parsed|
       |  7 |  1  | 22211 |  3  | FAILED  | false|
-    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"BLACKLIST test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
+    When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "draft"
     And  A rule gid "1" and sid "22211" has class "edited-rule"
@@ -751,10 +751,10 @@ Feature: Rules
       | 2222 |   222222    | OPEN   |    1    |
     Given the following rule categories exist:
       | category  | id |
-      | BLACKLIST |  1 |
+      | APP-DETECT |  1 |
     When the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |   state   |edit_status| publish_status |     message       | rule_category_id |
-      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | BLACKLIST message |        1         |
+      | 13 |  1  | 22212 |  3  | UNCHANGED |  SYNCHED  |     SYNCHED    | APP-DETECT message |        1         |
 
     And bug with id "2222" has rule with id "13"
 
@@ -767,6 +767,6 @@ Feature: Rules
     And  I wait for "3" seconds
     Then I should not see "select a category"
     And  the "std-form-message" field should be "message"
-    Then "BLACKLIST" should be selected in the "rule_category_id" dropdown
+    Then "APP-DETECT" should be selected in the "rule_category_id" dropdown
 
 
