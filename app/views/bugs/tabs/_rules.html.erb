@@ -129,11 +129,7 @@
                        name="rule[id]" value="<%= rule.id %>" data-sid="<%= rule.sid%>"></td>
             <td class="rule_state_col"><div data-toggle="tooltip" data-placement="right" title="<%= raw rule.tool_tip %>"><%= rule.state %></div></td>
             <td class="doc-status-col center">
-              <% if can? :update, RuleDoc %>
-                <%= doc_status(rule) %>
-              <% else %>
-                <%= doc_status_nomanage(rule) %>
-              <% end %>
+              <%= doc_status(rule) %>
             </td>
                 <td>
                   <a class="blue show_rule" href="#">

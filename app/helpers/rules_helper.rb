@@ -95,39 +95,24 @@ module RulesHelper
     end
   end
 
+  def doc_image_file(rule)
+    case
+      when !rule.doc_complete?
+        'icon_missing_document.svg'
+      # when !rule.doc_updated?
+      #   'icon_document.svg'
+      else
+        'icon_edit_document.svg'
+    end
+  end
+
   def doc_status(rule)
     if rule
-      case
-        when !rule.doc_complete?
-          content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
-        when rule.doc_updated?
-          if rule.rule_doc&.id
-            link_to content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
-          else
-            content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs')
-          end
-        else
-          if rule.rule_doc&.id
-            link_to content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
-          else
-            content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs')
-          end
+      if can?(:update, RuleDoc) && rule.rule_doc&.id
+        link_to content_tag(:img, '', src: image_path(doc_image_file(rule)), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
+      else
+        content_tag(:img, '', src: image_path(doc_image_file(rule)), class: 'icon-docs')
       end
     end
   end
-
-  def doc_status_nomanage(rule)
-    if rule
-      case
-        when !rule.doc_complete?
-          content_tag(:img, '', src: image_path('icon_missing_document.svg'), class: 'icon-docs')
-        when rule.doc_updated?
-          content_tag(:img, '', src: image_path('icon_edit_document.svg'), class: 'icon-docs')
-        else
-          content_tag(:img, '', src: image_path('icon_document.svg'), class: 'icon-docs')
-      end
-    end
-  end
-
-
 end
