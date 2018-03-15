@@ -779,10 +779,11 @@ Feature: Bug
     Then I should see "Newpcap.pcap"
     And the attachment with file name "Newpcap.pcap" summary should be saved as "Newpcap.pcap"
     Then I clean up attachments
-
+    
   @javascript
   Scenario: attachments should be tested after importing a bug
     Given a user with role "analyst" exists and is logged in
+    And a reference type exists
     And I wait for "3" seconds
     When I goto "/bugs"
     And I fill in "bug_name" with "145359"

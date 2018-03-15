@@ -21,7 +21,7 @@ module NotesHelper
 
   def get_ref_url(ref, name)
     rt = ReferenceType.find_by name: name
-    rt.url.gsub('DATA', ref.reference_data)
+    rt&.url&.gsub('DATA', ref.reference_data)
   end
 
 end
