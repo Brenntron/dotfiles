@@ -151,10 +151,11 @@ Feature: Bug
     And  I goto "/bugs/new"
     And  I fill in "bug[summary]" with "New Bug Summary"
     And  I fill in "bug[description]" with "This is my description."
-    And  I fill in selectized with "TELUS"
+    And  I fill in "bug[whiteboard]" with "TELUS"
 #    Then I click "Save"
 #    Then I wait for "3" seconds
 #    Then take a photo
+
 #    Then I should see "[TELUS]New Bug Summary"
 #    And  the selectize field contains the text "TELUS"
   # need connection to bugzilla for testing the above
@@ -188,7 +189,7 @@ Feature: Bug
     And I goto "/bugs/153354"
     Then I should see "[BP][NSS] Fake bug the second"
     And  I fill in selectized with "TELUS"
-    Then the selectize field contains the text "TELUS"
+    Then the selectize field with id "whiteboard-select-to-edit" contains the text "TELUS"
 
 
   # ==== Deleting Bugs ===
@@ -792,7 +793,6 @@ Feature: Bug
     #When I click ".jobs-tab"
     #Then I should see "attachment"
 
-@now
   @javascript
   Scenario: a user can test an attachment
     Given a user with role "analyst" exists and is logged in
@@ -808,7 +808,6 @@ Feature: Bug
     And I toggle checkbox ".attach_1"
     Then I should see "new.pcap"
     When I click button "test"
-    Then I do some debugging
     Then test should be created and I should see "Task has been created to test the attachment"
     When I click ".jobs-tab"
     Then I should see "all rules test"
