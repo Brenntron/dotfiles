@@ -589,10 +589,6 @@ class Bug < ApplicationRecord
     exploits.all? { |expl| expl.attachment.present? }
   end
 
-  def rules_parsed?
-    rules.all? { |rule| rule.parsed? }
-  end
-
   def docs_complete?
     rules.all? { |rule| rule.doc_complete? }
   end
@@ -603,7 +599,6 @@ class Bug < ApplicationRecord
 
       @resolve_errors << "Please assign attachments to exploits." unless exploits_complete?
       @resolve_errors << "Please complete the summary for rule docs." unless docs_complete?
-      @resolve_errors << "Rules must be valid." unless rules_parsed?
 
     end
     @resolve_errors
