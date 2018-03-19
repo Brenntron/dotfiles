@@ -27,7 +27,11 @@ Given(/^I fill in selectized with "(.*?)"$/) do |value|
   find('div.selectize-dropdown-content > div', match: :first).click
 end
 
-And(/^the selectize field contains the text "(.*?)"$/) do |text|
+And(/^the selectize field with id "(.*?)" contains the text "(.*?)"$/) do |element, text|
+  find("##{element}", visible: :all).value[0].should == "#{text}"
+end
+
+And(/^the selectize field contains the text "(.*?)"$/) do | text|
   find(:xpath, "//div[contains(@class, '#{'selectize-input'}')]").text.should == "#{text}"
 end
 
