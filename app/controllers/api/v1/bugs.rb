@@ -570,24 +570,53 @@ module API
             end
             return {:success => true, :urls_to_open => urls_to_open}.to_json
 
-
           else
             false
           end
 
         end
 
+        desc "duplicate/convert a bug from escalation to research"
+        params do
+          requires :id, type: Integer, desc: "id of escalation to base duplication on"
+          requires :summary, type: String, desc: "required new summary line to define research bug."
+          requires :description, type: String, desc: "required description of new bug"
+        end
+        post "/duplicate_bug" do
+
+          if params[:id].blank?
+            {:error => "must provide escalation id to convert to research bug."}.to_json
+          end
+          if params[:summary].blank?
+            {:error => "must provide a new summary line for the new research bug."}.to_json
+          end
+          if params[:description].blank?
+            {:error => "must provide a description for the new research bug."}.to_json
+          end
+          escalation_bug = Bug.find(params[:id])
+          new_summary_line = params[:summary]
+
+          if new_summary_line == escalation_bug.summary
+            {:error => "New research bug summary cannot be the same as its escalation bug."}.to_json
+          end
+          args = {}
+          args[:research_summary] = new_summary_line
+          args[:research_notes] = params[:research_notes]
+          args[:bugzilla_session] = bugzilla_session
+          args[:description] = params[:description]
+
+          new_research_bug = escalation_bug.convert_escalation_to_research(args)
 
 
 
+          escalation_bug.snort_research_escalation_bugs << new_research_bug
+          escalation_bug.snort_blocked_bugs << new_research_bug
 
+          research_bug_url = "/bugs/#{new_research_bug.id}"
 
-
-
-
-
-
-
+          {:success => true, :callback_url => research_bug_url}.to_json
+          
+        end
 
         desc "subscribe to a bug"
         params do
@@ -741,6 +770,14 @@ module API
         end
 
 
+
+
+
+
+
+
+
+
         desc "associate a bug"
         params do
           requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
@@ -784,7 +821,7 @@ module API
             bug.snort_escalation_research_bugs.delete(related_bug)  unless !bug.snort_escalation_research_bugs.include? related_bug
           end
           if bug.product == "Escalations" && related_bug.product == "Research"
-            bug.snort_research_escalations_bugs.delete(related_bug)  unless !bug.snort_research_bugs.include? related_bug
+            bug.snort_research_escalation_bugs.delete(related_bug)  unless !bug.snort_research_escalation_bugs.include? related_bug
           end
           if bug.product == "Research" && related_bug.product == "Research"
             bug.snort_research_to_research_bugs.delete(related_bug)  unless !bug.snort_research_to_research_bugs.include? related_bug

@@ -1,3 +1,44 @@
+window.pop_up_create_research_modal = (this_tag) ->
+  $("#create_research_bugs_modal").modal('show')
+
+window.create_research_bug = (this_tag) ->
+  $("#create_research_submit").hide()
+  $("#create_research_submit_wait").removeClass('hidden').show()
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  new_summary_line = ""
+  new_research_notes = ""
+  bid = $('.bugzilla_id').text()
+
+  new_summary_line = $('#new_summary_line').val()
+  new_research_notes = $('#new_research_notes').val()
+  new_research_description = $("#new_research_description").val()
+
+  $.ajax(
+    url: '/api/v1/bugs/duplicate_bug'
+    method: 'POST'
+    headers: headers
+    data: { id: bid, summary: new_summary_line, research_notes: new_research_notes, description: new_research_description}
+    success: (response) ->
+
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      else
+        url = json.callback_url
+
+        window.open(url, '_blank');
+        window.location.reload()
+
+
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      $("#reopen_reserch_submit_wait").addClass('hidden').hide()
+      $("#reopen_reserch_submit").show()
+  , this)
+
 window.pop_up_reopen_modal = (this_tag) ->
   $("#reopen_research_bugs_modal").modal('show')
 

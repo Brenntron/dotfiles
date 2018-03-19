@@ -49,6 +49,14 @@
                 <button id="reopen_escalation_button" type="button" class="select-sm btn btn-default" onclick="pop_up_reopen_modal(this)">Reopen Research Bug(s)</button>
               </span>
               <% end %>
+
+              <% if @bug.snort_research_escalation_bugs.blank? %>
+                <br /><br />
+                <span data-toggle="modal" data-target="#create_new_research">
+                  <button id="create_new_research_button" type="button" class="select-sm btn btn-default" onclick="pop_up_create_research_modal(this)">Create New Research Bug</button>
+                </span>
+              <% end %>
+
             </div>
           </div>
           <div class="col-xs-1">
@@ -300,6 +308,26 @@
   </div>
 </div>
 
+<div class="modal fade" id="create_research_bugs_modal" tabindex="-1" role="dialog" aria-labelledby="create_research" aria-hidden="true" data-backdrop="static" data-keyboard='false'>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="createResearch">Research Bug Generation
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+
+        <p>Generate new research bug:</p>
+        <br>
+        <%=render 'create_new_research_bug_form' %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 </script>
