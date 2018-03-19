@@ -593,12 +593,21 @@ class Bug < ApplicationRecord
     rules.all? { |rule| rule.doc_complete? }
   end
 
+  def rules_parsed?
+    rules.each do |rule|
+      if rule.gid == 1
+        return rule.parsed?
+      end
+    end
+  end
+
   def resolve_errors
     unless @resolve_errors
       @resolve_errors = []
 
       @resolve_errors << "Please assign attachments to exploits." unless exploits_complete?
       @resolve_errors << "Please complete the summary for rule docs." unless docs_complete?
+      @resolve_errors << "Rules must be valid." unless rules_parsed?
 
     end
     @resolve_errors
