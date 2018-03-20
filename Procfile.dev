@@ -1,7 +1,9 @@
-server: thin start --ssl --address localhost
+activeMessagingQueue: ~/apache-activemq-5.11.1/bin/activemq console
+server: rails s
 client_local: bundle exec rails runner lib/client_local.rb
 client_all: bundle exec rails runner lib/client_all.rb
 poller: bundle exec rails runner lib/poller.rb
+
 
 
 

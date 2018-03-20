@@ -54,6 +54,13 @@ ActiveRecord::Schema.define(version: 20180305175716) do
     t.integer "rule_id"
   end
 
+  create_table "bug_blockers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "snort_blocker_bug_id"
+    t.integer "snort_blocked_bug_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bug_reference_rule_links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "reference_id"
     t.integer "link_id"

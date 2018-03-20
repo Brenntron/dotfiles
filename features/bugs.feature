@@ -151,10 +151,11 @@ Feature: Bug
     And  I goto "/bugs/new"
     And  I fill in "bug[summary]" with "New Bug Summary"
     And  I fill in "bug[description]" with "This is my description."
-    And  I fill in selectized with "TELUS"
+    And  I fill in "bug[whiteboard]" with "TELUS"
 #    Then I click "Save"
 #    Then I wait for "3" seconds
 #    Then take a photo
+
 #    Then I should see "[TELUS]New Bug Summary"
 #    And  the selectize field contains the text "TELUS"
   # need connection to bugzilla for testing the above
@@ -188,7 +189,7 @@ Feature: Bug
     And I goto "/bugs/153354"
     Then I should see "[BP][NSS] Fake bug the second"
     And  I fill in selectized with "TELUS"
-    Then the selectize field contains the text "TELUS"
+    Then the selectize field with id "whiteboard-select-to-edit" contains the text "TELUS"
 
 
   # ==== Deleting Bugs ===
@@ -778,10 +779,11 @@ Feature: Bug
     Then I should see "Newpcap.pcap"
     And the attachment with file name "Newpcap.pcap" summary should be saved as "Newpcap.pcap"
     Then I clean up attachments
-
+    
   @javascript
   Scenario: attachments should be tested after importing a bug
     Given a user with role "analyst" exists and is logged in
+    And a reference type exists
     And I wait for "3" seconds
     When I goto "/bugs"
     And I fill in "bug_name" with "145359"
@@ -792,18 +794,17 @@ Feature: Bug
     #When I click ".jobs-tab"
     #Then I should see "attachment"
 
-
   @javascript
   Scenario: a user can test an attachment
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
-      | id     | bugzilla_id | state    | user_id | summary                            | product  | component   | version |      description       |
-      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
-    And an attachment exists and belongs to bug "145359"
+      | id     | bugzilla_id | state    | user_id | summary                                                    | product  | component   | version |      description       |
+      | 111116 | 111116      | REOPENED | 1       | [SID] 24397 Steam browser handler multiple vulnerabilities | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And an attachment exists and belongs to bug "111116"
     And I wait for "3" seconds
-    When I goto "/bugs/145359"
+    When I goto "/bugs/111116"
     And I click ".jobs-tab"
-    Then I should not see "attachment"
+    Then I should not see "all rules test"
     When I click ".attachments-tab"
     And I toggle checkbox ".attach_1"
     Then I should see "new.pcap"
