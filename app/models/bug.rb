@@ -2439,7 +2439,7 @@ class Bug < ApplicationRecord
 
     self.giblets.each do |gib|
       new_research_bug.send(gib.gib.class.to_s.downcase.pluralize) << gib.gib
-      new_gib = Giblet.create(:bug_id => new_research_bug.id, :gib_type => gib.class.to_s, :gib_id => gib.gib.id)
+      new_gib = Giblet.create(:bug_id => new_research_bug.id, :gib_type => gib.gib.class.to_s, :gib_id => gib.gib.id)
       new_gib.name = new_gib.display_name
       new_gib.save
     end
