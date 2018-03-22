@@ -1230,7 +1230,9 @@ class Bug < ApplicationRecord
 
     # update buzilla (if needed)
     options.reject! { |k, v| v.nil? } if options
+
     updated_bug = xmlrpc.update(options.to_h) unless options.blank?
+
     last_changed_time = updated_bug["bugs"][0]["last_change_time"].to_time
 
     updated_bug_time = get_updated_time(bug, permitted_params[:bug][:state], last_changed_time)
@@ -1398,6 +1400,17 @@ class Bug < ApplicationRecord
         bug.classification = 'unclassified'
         bug.status     = item['status']
         bug.resolution = item['resolution']
+
+        is_secure = false
+
+        item['groups'].each do |group_item|
+          if group_item == "Restriction:VRT Security Bugs"
+            is_secure = true
+          end
+        end
+
+        bug.snort_secure = is_secure
+
         bug.resolution = 'OPEN' if bug.resolution.empty?
 
         new_bug_state = bug.get_state(item['status'], item['resolution'], item['assigned_to'])

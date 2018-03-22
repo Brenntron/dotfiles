@@ -74,11 +74,20 @@
               <%end%>
             </div>
           </div>
+          
           <div class="col-xs-1">
             <div class="bug-details-columns">
-              <h6>classification</h6>
-              <h5 class="top-space"><%= @bug.classification %></h5>
+              <h6>Bug Visibility</h6>
+              <h5 class="top-space"><%= raw bug_security(@bug) %></h5>
             </div>
+            <br/><button class="small text-muted bug-wait" style="display: none" id="secure-wait">please wait</button>
+            <% if @bug.snort_secure.blank? && @current_user.is_secure? %>
+              <button id="secure_snort_bug_button" type="button" class="small text-muted">Secure</button>
+            <% end %>
+            <% if @bug.snort_secure.present? && @current_user.is_secure? %>
+              <button id="declassify_snort_bug_button"  type="button" class="small text-muted">Disclose</button>
+            <% end %>
+
           </div>
           <div class="col-xs-1">
             <div class="bug-details-columns">

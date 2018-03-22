@@ -745,6 +745,41 @@ module API
           bug.toggle_liberty
         end
 
+
+
+        desc "set security of bug"
+        params do
+          requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
+          requires :snort_secure, type: String, desc: "Value to set security to"
+        end
+        post "set_snort_security/:bug_id" do
+          snort_secure = params[:snort_secure]
+          begin
+            ActiveRecord::Base.transaction do
+              bug = Bug.find(params[:bug_id])
+              bug.snort_secure = params[:snort_secure]
+              bug.save
+
+              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
+
+              options = {}
+              options[:ids] = params[:bug_id]
+              if bug.snort_secure
+                options[:groups] = {:add => ["Restriction:VRT Security Bugs"]}
+              else
+                options[:groups] = {:remove => ["Restriction:VRT Security Bugs"]}
+              end
+              xmlrpc.update(options.to_h)
+              {:status => "success"}.to_json
+            end
+          rescue
+            {:status => "error", :message => "there was an error in setting the security flag"}.to_json
+          end
+        end
+
+
+
+
         desc "list bugs by SID"
         params do
           requires :sid, type: Integer, desc: "sid to search by"
