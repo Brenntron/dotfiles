@@ -66,6 +66,10 @@ class Bug < ApplicationRecord
 
   scope :by_escalations, -> { where(:product => "escalations")}
 
+  def snort_related_bugs(component)
+     "escalation"==component ? self.snort_escalation_research_bugs :  self.snort_research_escalation_bugs | self.snort_research_to_research_bugs
+  end
+
   attr_accessor :import_report
 
   def is_blocked?

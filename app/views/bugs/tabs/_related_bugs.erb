@@ -16,80 +16,12 @@
 <div class="row top-bar">
   <div class="col-xs-6">
     <h5 class="blue">Escalation Bugs</h5>
-    <% (@bug.snort_escalation_research_bugs).each do |related_bug| %>
-      <div class="row">
-        <div class="col-xs-1">
-          <% if related_bug.snort_blocker_bugs.pluck(:id).include?(@bug.id) %>
-            <span class="icon-blocks blocked-bug" rel="popover" data-placement="top" data-original-title="Bug <%= @bug.id %> is currently blocking this bug" data-trigger="hover" data-toggle="tooltip"></span>
-          <% elsif related_bug.snort_blocked_bugs.pluck(:id).include?(@bug.id) %>
-            <span class="icon-blocks bug-blocker" rel="popover" data-placement="top" data-original-title="Bug <%= @bug.id %> is currently being blocked by this bug" data-trigger="hover" data-toggle="tooltip"></span>
-          <% else %>
-            <span class="icon-blocks"> </span>
-          <% end %>
-        </div>
-        <div class="col-xs-11">
-          <div class="row">
-            <div class="col-xs-12">
-              <%= related_bug_link(related_bug, related_bug.id) %>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-9">
-              <%= related_bug_link(related_bug, related_bug.summary) %>
-              <br>
-              <%= related_bug.description %>
-            </div>
-            <div class="col-xs-3">
-              <div class="row">
-                <div class="col-xs-12">
-                  <button class='btn' onclick="AC.Bugs.removeRelatedBug(<%= @bug.id %>, <%= related_bug.id %>)">Remove</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <hr>
-    <% end %>
-
+    <%= render('shared/bug_related_bugs', related_type: "escalation")%>
   </div>
 
   <div class="col-xs-6">
     <h5 class="blue">Research Bugs</h5>
-    <% (@bug.snort_research_escalation_bugs | @bug.snort_research_to_research_bugs).each do |related_bug| %>
-      <div class="row">
-        <div class="col-xs-1">
-          <% if related_bug.snort_blocker_bugs.pluck(:id).include?(@bug.id) %>
-            <span class="icon-blocks blocked-bug" rel="popover" data-placement="top" data-original-title="Bug <%= @bug.id %> is currently blocking this bug" data-trigger="hover" data-toggle="tooltip"></span>
-          <% end %>
-          <% if related_bug.snort_blocked_bugs.pluck(:id).include?(@bug.id) %>
-            <span class="icon-blocks bug-blocker" rel="popover" data-placement="top" data-original-title="Bug <%= @bug.id %> is currently being blocked by this bug" data-trigger="hover" data-toggle="tooltip"></span>
-          <% end %>
-        </div>
-        <div class="col-xs-11">
-          <div class="row">
-            <div class="col-xs-12">
-              <%= related_bug_link(related_bug, related_bug.id) %>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-9">
-              <%= related_bug_link(related_bug, related_bug.summary) %>
-              <%= related_bug_link(related_bug, related_bug.description) %>
-            </div>
-            <div class="col-xs-3">
-              <div class="row">
-                <div class="col-xs-12">
-                  <button class='btn' onclick="AC.Bugs.removeRelatedBug(<%= @bug.id %>, <%= related_bug.id %>)">Remove</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <hr>
-    <% end %>
-
+    <%= render('shared/bug_related_bugs', related_type: "research")%>
   </div>
 </div>
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
