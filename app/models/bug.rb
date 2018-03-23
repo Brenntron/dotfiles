@@ -2005,7 +2005,8 @@ class Bug < ApplicationRecord
 
   def update_summary_sids(rules, xmlrpc:)
     sids = summary_sids + rules.pluck(:sid)
-    self.summary = "[SID] #{to_ranges_compact_string(sids)} #{summary_without_sids}"
+    compact_string = to_ranges_compact_string(sids)
+    self.summary = compact_string.blank? ? "#{summary_without_sids}" : "[SID] #{compact_string} #{summary_without_sids}"
     save!
     # update_bugzilla_attributes(xmlrpc, ids: [bugzilla_id], summary: self.summary )
     self.summary
@@ -2096,7 +2097,8 @@ class Bug < ApplicationRecord
     unless xmlrpc.nil?
       sids.delete_if { |sid| sid.zero? }
       unless sids.nil? || sids.empty?
-        self.summary = "[SID] #{to_ranges_compact_string(sids)} #{summary_without_sids}"
+        compact_string = to_ranges_compact_string(sids)
+        self.summary = compact_string.blank? ?  "#{summary_without_sids}" : "[SID] #{compact_string} #{summary_without_sids}"
       end
       options = { ids: [bugzilla_id],
                   summary: summary }
