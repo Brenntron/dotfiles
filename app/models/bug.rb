@@ -589,12 +589,17 @@ class Bug < ApplicationRecord
     exploits.all? { |expl| expl.attachment.present? }
   end
 
-  def rules_parsed?
-    rules.all? { |rule| rule.parsed? }
-  end
-
   def docs_complete?
     rules.all? { |rule| rule.doc_complete? }
+  end
+
+  def rules_parsed?
+    rules.each do |rule|
+      if rule.gid == 1 && !rule.parsed?
+        return false
+      end
+    end
+    true
   end
 
   def resolve_errors
