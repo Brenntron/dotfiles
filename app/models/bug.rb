@@ -598,8 +598,8 @@ class Bug < ApplicationRecord
       if rule.gid == 1 && !rule.parsed?
         return false
       end
-      true
     end
+    true
   end
 
   def resolve_errors
