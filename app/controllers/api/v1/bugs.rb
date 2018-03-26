@@ -585,19 +585,19 @@ module API
         post "/duplicate_bug" do
 
           if params[:id].blank?
-            {:error => "must provide escalation id to convert to research bug."}.to_json
+            return {:error => "must provide escalation id to convert to research bug."}.to_json
           end
           if params[:summary].blank?
-            {:error => "must provide a new summary line for the new research bug."}.to_json
+            return {:error => "must provide a new summary line for the new research bug."}.to_json
           end
           if params[:description].blank?
-            {:error => "must provide a description for the new research bug."}.to_json
+            return {:error => "must provide a description for the new research bug."}.to_json
           end
           escalation_bug = Bug.find(params[:id])
           new_summary_line = params[:summary]
 
           if new_summary_line == escalation_bug.summary
-            {:error => "New research bug summary cannot be the same as its escalation bug."}.to_json
+            return {:error => "New research bug summary cannot be the same as its escalation bug."}.to_json
           end
           args = {}
           args[:research_summary] = new_summary_line
@@ -853,14 +853,14 @@ module API
           related_bug = Bug.where(id: params['relate_id']).first
           return {:error => 'related bug not found'}.to_json unless related_bug
           if bug.product == "Research" && related_bug.product == "Escalations"
-            bug.snort_escalation_research_bugs.delete(related_bug)  unless !bug.snort_escalation_research_bugs.include? related_bug
+            bug.snort_escalation_research_bugs.delete(related_bug)  if bug.snort_escalation_research_bugs.include? related_bug
           end
           if bug.product == "Escalations" && related_bug.product == "Research"
-            bug.snort_research_escalation_bugs.delete(related_bug)  unless !bug.snort_research_escalation_bugs.include? related_bug
+            bug.snort_research_escalation_bugs.delete(related_bug)  if bug.snort_research_escalation_bugs.include? related_bug
           end
           if bug.product == "Research" && related_bug.product == "Research"
-            bug.snort_research_to_research_bugs.delete(related_bug)  unless !bug.snort_research_to_research_bugs.include? related_bug
-            related_bug.snort_research_to_research_bugs.delete(bug)  unless !related_bug.snort_research_to_research_bugs.include? bug
+            bug.snort_research_to_research_bugs.delete(related_bug)  if bug.snort_research_to_research_bugs.include? related_bug
+            related_bug.snort_research_to_research_bugs.delete(bug)  if related_bug.snort_research_to_research_bugs.include? bug
           end
           return {:status => "success", :product => bug.product}.to_json
         end
