@@ -25,3 +25,56 @@ Feature: Escalations
     And I wait for "2" seconds
     Then I should see "State Comment"
     And the textarea with id "state_comment" should have a value of "Coverage has not been updated."
+
+  @javascript
+  Scenario:
+    Given a user with commit permission exists and is logged in
+    And the following bugs exist:
+      | id | bugzilla_id | state | user_id | summary                                     | product  | component   | description       | committer_id |
+      | 111111 | 111111      | OPEN  | 1       | test escalation summary                     | Escalations | TAC | test description  | 1                   |
+    And the following roles exist:
+      | role           |
+      | admin          |
+
+    And a user with id "1" has a role of "admin"
+    Then I wait for "3" seconds
+    And  I goto "/escalations/bugs/111111"
+    When I click "create_new_research_button"
+    When I click "OK"
+    Then I should see "must provide a new summary line for the new research bug."
+
+  @javascript
+  Scenario:
+    Given a user with commit permission exists and is logged in
+    And the following bugs exist:
+      | id | bugzilla_id | state | user_id | summary                                     | product  | component   | description       | committer_id |
+      | 111111 | 111111      | OPEN  | 1       | test escalation summary                     | Escalations | TAC | test description  | 1                   |
+    And the following roles exist:
+      | role           |
+      | admin          |
+
+    And a user with id "1" has a role of "admin"
+    Then I wait for "3" seconds
+    And  I goto "/escalations/bugs/111111"
+    When I click "create_new_research_button"
+    And  I fill in "new_summary_line" with "New Bug Summary"
+    When I click "OK"
+    Then I wait for "1" seconds
+    Then I should see "must provide a description for the new research bug."
+
+  @javascript
+  Scenario:
+    Given a user with commit permission exists and is logged in
+    And the following bugs exist:
+      | id | bugzilla_id | state | user_id | summary                                     | product  | component   | description       | committer_id |
+      | 111111 | 111111      | OPEN  | 1       | test escalation summary                     | Escalations | TAC | test description  | 1                   |
+      | 222222 | 222222      | OPEN  | 1       | test escalation summary                     | Research | Snort Rules | test description  | 1                   |
+    And the following roles exist:
+      | role           |
+      | admin          |
+
+    And a user with id "1" has a role of "admin"
+    Then I wait for "3" seconds
+    Then I relate 111111 to 222222 with block
+    And  I goto "/escalations/bugs/111111"
+    And  I should not see "Create New Research Bug"

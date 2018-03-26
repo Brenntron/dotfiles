@@ -38,6 +38,7 @@ class User < ApplicationRecord
 
   DEFAULT_METRICS_TIMEFRAME = 7
 
+  SECURE_SNORT_RULE_ROLES = ['admin', 'analyst', 'committer', 'manager']
 
   scope :with_role, ->(role) { joins(:roles).where('roles.role = ?', role) }
 
@@ -71,6 +72,16 @@ class User < ApplicationRecord
   def has_role?(role)
     roles.where(role: role).any?
   end
+
+  def is_secure?
+    SECURE_SNORT_RULE_ROLES.each do |role|
+      if has_role?(role)
+        return true
+      end
+    end
+    return false
+  end
+
   def is_on_team?
     (parent.nil? && children.empty?) ? false : true
   end

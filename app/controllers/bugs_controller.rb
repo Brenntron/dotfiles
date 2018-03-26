@@ -107,8 +107,15 @@ class BugsController < ApplicationController
 
   def show
 
+
+
     @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
     @bug = Bug.where(id: params[:id]).first
+    if @bug.snort_secure and !@current_user.is_secure?
+      redirect_to bugs_path
+      flash[:error] = "You do not have access to this bug."
+    end
+
     @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
 
     if @bug

@@ -121,6 +121,61 @@ window.ruleShow = (rule) ->
   return
 
 $ ->
+
+  $("#secure_snort_bug_button").on 'click', (e) ->
+
+    bugzilla_id = $('.bugzilla_id').text()
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+    $("#secure_snort_bug_button").hide()
+    $("#secure-wait").show()
+
+    $.ajax(
+      url: '/api/v1/bugs/set_snort_security/' + bugzilla_id
+      method: 'POST'
+      data: {snort_secure: 'true'}
+      headers: headers
+    ).done (response) ->
+
+      json = $.parseJSON(response)
+      if (json.status == "error")
+
+        message = "There was a problem:"
+        message += json.message
+
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(message)
+      else
+        location.reload()
+
+
+  $("#declassify_snort_bug_button").on 'click', (e) ->
+    bugzilla_id = $('.bugzilla_id').text()
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+    $("#declassify_snort_bug_button").hide()
+    $("#secure-wait").show()
+
+    $.ajax(
+      url: '/api/v1/bugs/set_snort_security/' + bugzilla_id
+      method: 'POST'
+      data: {snort_secure: 'false'}
+      headers: headers
+    ).done (response) ->
+
+      json = $.parseJSON(response)
+      if (json.status == "error")
+
+        message = "There was a problem:"
+        message += json.message
+
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(message)
+      else
+        location.reload()
+
+
+
   $('#bugzilla_popover_state').popover();
   $('.active').show();
   $('.hidden').hide();

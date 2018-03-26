@@ -25,6 +25,8 @@ window.create_research_bug = (this_tag) ->
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+        $("#create_research_submit_wait").addClass('hidden').hide()
+        $("#create_research_submit").show()
       else
         url = json.callback_url
 
@@ -35,8 +37,8 @@ window.create_research_bug = (this_tag) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
       $("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-      $("#reopen_reserch_submit_wait").addClass('hidden').hide()
-      $("#reopen_reserch_submit").show()
+      $("#create_research_submit_wait").addClass('hidden').hide()
+      $("#create_research_submit").show()
   , this)
 
 window.pop_up_reopen_modal = (this_tag) ->
