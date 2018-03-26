@@ -15,7 +15,9 @@
         </div>
         <div class="col-xs-10 text-right">
           <button class='btn btn-sm btn-default' onclick="AC.Bugs.removeRelatedBug(<%= @bug.id %>, <%= related_bug.id %>)">Remove</button>
-          <button class='btn btn-sm btn-default' >Reopened</button>
+          <% if ['PENDING', 'FIXED', 'WONTFIX', 'LATER', 'RESOLVED'].include? related_bug.state %>
+            <button class='btn btn-sm btn-default' onclick="AC.Bugs.reopenBug(<%= @bug.id %>, <%= related_bug.id %>, <%=related_bug.user.id%>, <%=related_bug.committer.id%>, '<%=related_bug.summary%>' )" >Re-open</button>
+          <% end %>
           <!--<button class='btn btn-sm btn-default' >button3</button>-->
         </div>
       </div>

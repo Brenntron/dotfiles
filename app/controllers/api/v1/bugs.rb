@@ -330,6 +330,10 @@ module API
         desc "update a bug"
         params do
           requires :id, type: Integer, desc: "The id of the bug to be updated."
+          optional :escalation, type: Hash do
+            optional :message, type: String, desc: "message for escalation"
+            optional :state, type: String, desc: "state of the escalation bug"
+          end
           requires :bug, type: Hash do
             optional :whiteboard, type: String, desc: "Whiteboard field from Bugzilla"
             optional :user_id, type: Integer, desc: "the user this bug is assigned to"
@@ -365,8 +369,8 @@ module API
                                   assignee_id: permitted_params[:bug][:user_id],
                                   committer_id: permitted_params[:bug][:committer_id],
                                   permitted_params: permitted_params,
-                                  new_escalation_message: params[:escalation][:message],
-                                  new_escalation_state: params[:escalation][:state])
+                                  new_escalation_message: permitted_params[:escalation].nil? ? "" : permitted_params[:escalation][:message] ,
+                                  new_escalation_state:   permitted_params[:escalation].nil? ? "" : permitted_params[:escalation][:state] )
           end
         end
 
@@ -457,9 +461,9 @@ module API
         post "reopen/:id", root: "bug" do
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
-            bug = Bug.where(id: permitted_params[:id])
-            status = "reopened"
-            resolution = "reopened"
+            bug = Bug.where(id: permitted_params[:id]).first
+            status = "REOPENED"
+            resolution = "REOPENED"
             return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
           else
             false
