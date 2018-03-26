@@ -595,9 +595,10 @@ class Bug < ApplicationRecord
 
   def rules_parsed?
     rules.each do |rule|
-      if rule.gid == 1
-        return rule.parsed?
+      if rule.gid == 1 && !rule.parsed?
+        return false
       end
+      true
     end
   end
 
