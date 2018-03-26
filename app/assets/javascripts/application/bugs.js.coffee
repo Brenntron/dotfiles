@@ -877,6 +877,34 @@ $ ->
     window.location.reload()
 
 namespace 'AC.Bugs', (exports) ->
+  exports.reopenBug = (bug_id, relate_id, user_id, committer_id, summary) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/bugs/' + relate_id
+      method: 'put'
+      headers: headers
+      data:
+          {
+            bug:
+               {
+                 summary: summary,
+                 user_id: user_id,
+                 committer_id: committer_id,
+                 state:"REOPENED",
+                 state_comment:  "Reopened bug via related bug: "+ bug_id
+               }
+          }
+
+    ).done (response) ->
+      #NOTE: ok this is weird i know v1/bugs returns a bug not a json response and rather than fix it all over the code im going to use a regex to pick out the product
+      if (response)
+        product = /"product"=>"Escalations"/.exec(response)
+        if (product)
+          window.location.replace '/escalations/bugs/' + bug_id
+        else
+          window.location.replace '/bugs/' + bug_id
+      else
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("Could not reopen bug")
 
   exports.removeRelatedBug = (bug_id, relate_id) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}

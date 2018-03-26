@@ -66,6 +66,10 @@ class Bug < ApplicationRecord
 
   scope :by_escalations, -> { where(:product => "escalations")}
 
+  def snort_related_bugs(component)
+     "escalation"==component ? self.snort_escalation_research_bugs :  self.snort_research_escalation_bugs | self.snort_research_to_research_bugs
+  end
+
   attr_accessor :import_report
 
   def is_blocked?
@@ -1153,11 +1157,9 @@ class Bug < ApplicationRecord
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:, new_escalation_message: nil, new_escalation_state: nil)
 
-
     initial_bug_summary_info = bug.parse_summary
     initial_refs_from_summary = initial_bug_summary_info[:refs]
     initial_state = bug.state
-
 
     bug.initialize_report
     bug_is_being_resolved = bug.state != "PENDING" ? false : true
@@ -2035,7 +2037,7 @@ class Bug < ApplicationRecord
     if deps.size > 0
       return { error: "This bug currently has open dependencies: #{deps}" }
     else
-      self.bug_state = resolution
+      self.state = resolution
       if notes.nil?
         if committer_notes.nil? || committer_notes == ''
           notes = 'Closing bug'
