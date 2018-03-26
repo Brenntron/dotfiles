@@ -2395,13 +2395,65 @@ class Bug < ApplicationRecord
       )
       attachments << new_attachment
 
-
     else
       false
     end
   end
 
+  def convert_escalation_to_research(args)
+    new_summary_line = args[:research_summary]
+    new_research_notes = args[:research_notes]
+    bugzilla_session = args[:bugzilla_session]
+
+    new_research_description = args[:description]
+
+    new_bug_attrs = {}
+    new_bug_attrs['product'] = "Research"
+    new_bug_attrs['version'] = "No Version Specified"
+    new_bug_attrs['priority'] = "Unspecified"
+    new_bug_attrs['component'] = "Snort Rules"
+    new_bug_attrs['classification'] = "unclassified"
+    new_bug_attrs['summary'] = new_summary_line
+    new_bug_attrs['status'] = "NEW"
+    new_bug_attrs['assigned_to'] = "vrt-incoming@sourcefire.com"
+    new_bug_attrs['description'] = new_research_description
 
 
+    default_assigned_to_user = User.find_by_email("vrt-incoming@sourcefire.com")
+
+    bug_factory = Bugzilla::Bug.new(bugzilla_session)
+
+    bug_stub = bug_factory.create(new_bug_attrs)
+    new_bug_attrs.delete("assigned_to")
+    new_bug_attrs.delete("Bugzilla_token")
+
+    new_research_bug = Bug.create!(new_bug_attrs.merge(id: bug_stub["id"],
+                                                   bugzilla_id: bug_stub["id"],
+                                                   user_id: default_assigned_to_user.id,
+                                                   state: "NEW"
+                                  ))
+
+    if new_research_notes.present?
+      new_research_bug.research_notes = new_research_notes
+    end
+
+    new_research_bug.save
+
+    self.giblets.each do |gib|
+      new_research_bug.send(gib.gib.class.to_s.downcase.pluralize) << gib.gib
+      new_gib = Giblet.create(:bug_id => new_research_bug.id, :gib_type => gib.gib.class.to_s, :gib_id => gib.gib.id)
+      new_gib.name = new_gib.display_name
+      new_gib.save
+    end
+
+    self.attachments.each do |attachment|
+      new_attachment = attachment.dup
+      new_attachment.bug_id = new_research_bug.id
+      new_attachment.save
+    end
+
+    new_research_bug
+
+  end
 
 end
