@@ -849,7 +849,7 @@ namespace 'AC.Bugs', (exports) ->
         else
           window.location.replace '/bugs/' + bug_id
       else
-        $("#alert_message").addClass('alert alert-danger alert-dismissable').html(json.error)
+        $("#alert_message").addClass('alert alert-danger alert-dismissable').html("Could not reopen bug")
 
   exports.removeRelatedBug = (bug_id, relate_id) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
