@@ -25,10 +25,14 @@ module RuleSyntax
       cmd = "#{Rails.configuration.perl_cmd} #{Rails.configuration.visruleparser_path} #{temp_rule.path}"
       Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thru|
         text = stdout.read
+        error_msg = stderr.read
         unless text.empty?
           @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
           @errors = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
           @stderr = stderr.read
+        end
+        if error_msg
+          raise RuntimeError, error_msg
         end
       end
       temp_rule.close
