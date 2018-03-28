@@ -17,12 +17,43 @@
           = image_tag('layout/analyst_console_icon.svg', class: 'sidenav-icon', alt: 'Analyst Console')
         %li{class: 'nav-menu-spacer'}
           -# Spacer for Menu Toggle
-        %li{class: 'nav-item nav-bugs'}
-          %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
-        %li{class: 'nav-item nav-users'}
-          %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
+        - if can?(:read, Bug)
+          %li{class: 'nav-item nav-bugs'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Research')
+          %li{class: 'nav-item nav-bugs'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'IDS')
+          %li{class: 'nav-item nav-bugs'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'AMP')
+          %li{class: 'nav-item nav-bugs'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'ClamAV')
+          %li{class: 'nav-item nav-bugs'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Reputation')
+          %li{class: 'nav-item nav-bugs'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Web Categorization')
+        - if can?(:read, Bug)
+          %li{class: 'nav-item nav-escalations'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Escalations')
+          %li{class: 'nav-item nav-escalations'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'IDS')
+          %li{class: 'nav-item nav-escalations'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'AMP')
+          %li{class: 'nav-item nav-escalations'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'ClamAV')
+          %li{class: 'nav-item nav-escalations'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Reputation')
+          %li{class: 'nav-item nav-escalations'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Web Categorization')
+        - if can?(:update, RuleDoc)
+          %li{class: 'nav-item nav-ruledoc'}
+            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Rule Doc')
+        - if can?(:update, User)
+          %li{class: 'nav-item nav-users'}
+            %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
         %li{class: 'nav-item nav-wiki'}
-          %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}= image_tag('layout/wiki_icon.svg', class: 'sidenav-icon', alt: 'Wiki')
+          %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank'}= image_tag('layout/wiki_icon.svg', class: 'sidenav-icon', alt: 'Wiki')
+        - if can?(:update, Admin)
+          %li{class: 'nav-item nav-admin'}
+            %a{href: bugs_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Admin')
 
       #sidenav-menu-div
         %ul{class: 'nav-container'}
@@ -30,23 +61,80 @@
             %span
               = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
           %li
-          %li{class: 'nav-bugs'}
-            %span
-              %a{href: bugs_path}
-                Bugs
+          - if can?(:read, Bug)
+            %li{class: 'nav-bugs'}
+              %span
+                %a{href: bugs_path}
+                  Research
+            %li{class: 'nav-bugs'}
+              %span
+                %a{href: bugs_path}
+                  IDS
+            %li{class: 'nav-bugs'}
+              %span
+                %a{href: bugs_path}
+                  AMP
+            %li{class: 'nav-bugs'}
+              %span
+                %a{href: bugs_path}
+                  ClamAV
+            %li{class: 'nav-bugs'}
+              %span
+                %a{href: bugs_path}
+                  Reputation
+            %li{class: 'nav-bugs'}
+              %span
+                %a{href: bugs_path}
+                  Categorization
+          - if can?(:read, Bug)
+            %li{class: 'nav-escalations'}
+              %span
+                %a{href: escalations_root_path}
+                  Escalations
+            %li{class: 'nav-escalations'}
+              %span
+                %a{href: escalations_root_path}
+                  IDS
+            %li{class: 'nav-escalations'}
+              %span
+                %a{href: escalations_root_path}
+                  AMP
+            %li{class: 'nav-escalations'}
+              %span
+                %a{href: escalations_root_path}
+                  ClamAV
+            %li{class: 'nav-escalations'}
+              %span
+                %a{href: escalations_root_path}
+                  Reputation
+            %li{class: 'nav-escalations'}
+              %span
+                %a{href: escalations_root_path}
+                  Categorization
             -#%ul
             -#  %li
             -#    Snort
             -#  %li
             -#    Clam AV
-          %li{class: 'nav-users'}
-            %span
-              %a{href: users_path}
-                Users
+          - if can?(:update, RuleDoc)
+            %li{class: 'nav-ruledoc'}
+              %span
+                %a{href: rule_docs_path}
+                  Rule Doc
+          - if can?(:update, User)
+            %li{class: 'nav-users'}
+              %span
+                %a{href: users_path}
+                  Users
           %li{class: 'nav-wiki'}
             %span
               %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
                 Wiki
+          - if can?(:update, Admin)
+            %li{class: 'nav-admin'}
+              %span
+                %a{href: admin_root_path}
+                  Admin
 
 
     #page-wrapper

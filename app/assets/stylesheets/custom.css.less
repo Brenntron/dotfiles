@@ -16,9 +16,12 @@
 @bright-yellow:#fcee21;
 
 @bugs-primary:#80A9BA;
+@escalations-primary: lightcoral;
+@ruledoc-primary: palegoldenrod;
 @users-primary:#D29864;
 @rules-primary:#CF7160;
 @doc-primary:#8DEFDC;
+@admin-primary: slategray;
 @search-primary:#8DEFDC;
 
 html,body {
@@ -118,20 +121,14 @@ a {
     min-height:200px;
 ul li { border-left: 5px solid #ccc;}
 }
-.rules-ui-nav ul li {
-&:first-child {
-     border-left: 10px solid @bugs-primary;
-&:active {
-     background-color:#819499;
-a { color:#c4e7ed;}
-}
-}
-&:nth-child(2) { border-left: 10px solid @users-primary;}
-&:nth-child(3) { border-left: 10px solid @doc-primary;}
-&:nth-child(4) { border-left: 10px solid palegoldenrod;}
-&:nth-child(5) { border-left: 10px solid palegoldenrod;}
-}
-}
+.rules-ui-nav ul {
+  li.research-menu { border-left: 10px solid @bugs-primary; }
+  li.escalations-menu { border-left: 10px solid @escalations-primary; }
+  li.users-menu { border-left: 10px solid @users-primary; }
+  li.ruledoc-menu { border-left: 10px solid @ruledoc-primary; }
+  li.doc-menu { border-left: 10px solid @doc-primary; }
+  li.admin-menu { border-left: 10px solid @admin-primary; }
+}}
 .sidebar-footer {
     margin-bottom: 20px;
 p {

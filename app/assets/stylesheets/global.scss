@@ -10,8 +10,11 @@ $ac-nav-bg-color:   #fff;       /* White           */
 
 /* Section Colors */
 $bug-section-color:  #6dbcdb;   /* Medium Blue    */
+$escalations-section-color: firebrick;
+$ruledoc-section-color: goldenrod;
 $user-section-color: #fc4349;   /* Red            */
 $wiki-section-color: #8cc63f;   /* Bright Green   */
+$admin-section-color: slategray;
 
 /* Layout dimensions */
 $sidebar-width: 44px;
@@ -706,8 +709,11 @@ button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('i
 
 .nav-ac    {background-color: $ac-nav-bg-color;}
 .nav-bugs  {background-color: $bug-section-color;}
+.nav-escalations  {background-color: $escalations-section-color;}
+.nav-ruledoc  {background-color: $ruledoc-section-color;}
 .nav-users {background-color: $user-section-color;}
 .nav-wiki  {background-color: $wiki-section-color;}
+.nav-admin {background-color: $admin-section-color;}
 
 .ac-logo-text {
   height: $sidebar-width;;
