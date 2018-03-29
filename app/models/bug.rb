@@ -321,7 +321,7 @@ class Bug < ApplicationRecord
                 when :references
                   query_hash['gib_reference_results'] = query_hash['param_results'].joins(:references)
                                                                                    .where("bug_reference_rule_links.reference_id" => ids)
-                                                                                   .group(:bug_id).having('count(bug_id) = ?', ids.count)
+                                                                                   .group(:link_id).having('count(link_id) = ?', ids.count)
               end
             end
           end
