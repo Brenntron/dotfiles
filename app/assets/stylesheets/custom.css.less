@@ -16,7 +16,7 @@
 @bright-yellow:#fcee21;
 
 @bugs-primary:#80A9BA;
-@escalations-primary: lightcoral;
+@escalations-primary: #8ed08e;
 @ruledoc-primary: palegoldenrod;
 @users-primary:#D29864;
 @rules-primary:#CF7160;
@@ -202,6 +202,54 @@ td {
 
 .table-title { font-family:"Lane - Upper", Arial, Helvetica, sans-serif; font-size:40px; margin: 0 26px 0 28px;}
 .table-condensed th { font-size:14px;}
+
+/* Escalations Page */
+.escalations-page {
+  color:@charcoal; background-color:@paper; padding:0;
+  .item-ids-column {
+    background-color:@escalations-primary; height:auto !important; min-height: 1900px; padding:0;
+    .col-pagination {background:@escalations-primary;}
+    .pagination {
+      li a {
+        color:@charcoal; background:darken(@escalations-primary, 5%);border:none; border-bottom: 1px solid @escalations-primary;
+        :hover { color:@paper;}
+      }
+      li.active a { color:#fff6e9; background-color:@charcoal;}
+    }
+    .index-table {
+      margin-top: 93px;
+      border-bottom: 1px solid darken(@escalations-primary, 10%);
+      tbody {
+        tr {
+          &:hover { background-color:darken(@escalations-primary, 2%);}
+          td {
+            max-width: 100px; text-overflow:ellipsis; overflow: hidden; white-space: nowrap; border-top: 1px solid darken(@escalations-primary, 10%);
+            &.active { border-right:1px solid @paper; background-color: @paper; }
+          }
+        }
+      }
+    }
+  }
+  .item-details-column {
+    .index-table {
+      tbody {
+        tr {
+          height:40px;
+          &:hover { background-color:@extra-light-gray;}
+          td {
+            border-bottom: 1px solid @light-gray;
+          }
+        }
+      }
+    }
+  }
+  .back-btn:hover {
+    .back-triangle:after { background-color:@escalations-primary;}
+  }
+  .tabs-content { min-height: 100px;}
+  ul.nav-tabs { margin:12px;}
+}
+
 
 /* Bugs Page */
 .bugs-page {
