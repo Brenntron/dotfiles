@@ -30,7 +30,7 @@
             %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Reputation')
           %li{class: 'nav-item nav-bugs'}
             %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Web Categorization')
-        - if can?(:read, Bug)
+        - if can?(:read, Bug) && can?(:manage, Admin)
           %li{class: 'nav-item nav-escalations'}
             %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Escalations')
           %li{class: 'nav-item nav-escalations'}
