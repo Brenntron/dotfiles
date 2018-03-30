@@ -49,7 +49,7 @@ class RuleDocsController < ApplicationController
   private
 
   def rule_doc_params
-    params.require(:rule_doc).permit(:id, :summary, :details, :sid, :rule_id, :impact, :affected_sys, :false_positives, :false_negatives, :contributors, :policies, :is_community)
+    params.require(:rule_doc).permit(:id, :summary, :details, :gid, :sid, :rule_id, :impact, :affected_sys, :false_positives, :false_negatives, :contributors, :policies, :is_community)
 
   end
 end

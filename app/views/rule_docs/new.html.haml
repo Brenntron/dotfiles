@@ -9,9 +9,10 @@
       .row
         .col-sm-12
           %fieldset
-            %label Linking id for the rule associated with this doc (better get this right. Don't fuck around. You can find it in the admin/rules section)
+            %label Link this documentation to the rule by the gid and sid
             %span.input-wrapper
-              =f.text_field :rule_id, required: true
+              =f.text_field :gid, required: true,placeholder: "GID"
+              =f.text_field :sid, required: true,placeholder: "SID"
 
       .row
         .col-sm-6
