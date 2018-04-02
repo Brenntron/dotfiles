@@ -36,29 +36,30 @@
                         =bug.bugzilla_id
               %br
               %br
-          .row
-            .col-sm-12
-              %label Rules referencing this doc
-              .form-col-list
-                %ul
-                  %a{href: "/admin/rules/#{@rule_doc.rule.id}/edit"}
-                    =@rule_doc.sid
+          -if current_user&.has_role?('admin')
+            .row
+              .col-sm-12
+                %label Rules referencing this doc
+                .form-col-list
+                  %ul
+                    %a{href: "/admin/rules/#{@rule_doc.rule.id}/edit"}
+                      =@rule_doc.sid
 
       .row
         .col-sm-6
           .col-sm-6
             %fieldset
-              %label Rule gid associated with this doc (dont fuck with this)
+              %label Rule gid associated with this doc
               %span.input-wrapper
                 =f.text_field :gid, disabled:true
           .col-sm-6
             %fieldset
-              %label Rule sid associated with this doc (dont fuck with this)
+              %label Rule sid associated with this doc
               %span.input-wrapper
                 =f.text_field :sid, disabled:true
         .col-sm-6
           %fieldset
-            %label Linking id for the rule associated with this doc (dont fuck with this)
+            %label Linking id for the rule associated with this doc
             %span.input-wrapper
               =f.text_field :rule_id, disabled:true
 
@@ -109,6 +110,5 @@
       .row
         .col-sm-12
           .button-group
-            %button{value: "submit", class: "call-to-action save", data: { confirm: 'Are you really really sure?? This might fuck shit up.'}} Save
-            = link_to  rule_docs_path do
-              %button{title: "Cancel", class: "secondary cancel"} Cancel
+            %button{value: "submit", class: "call-to-action save", data: { confirm: 'Are you sure you wish to change this document?'}} Save
+            =link_to "Cancel", :back, {title: "Cancel", class: "secondary cancel"}

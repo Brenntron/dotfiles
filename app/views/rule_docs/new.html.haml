@@ -1,7 +1,10 @@
 - content_for(:title) do
   NEW Doc - Analyst Console
 
+
+
 .content-wrapper
+  = render partial: "shared/flash_messages", flash: flash
   %h1 Creating New Rule Document
   .form-wrapper
     = form_for @rule_doc, url: {action: :create} do |f|
@@ -11,8 +14,8 @@
           %fieldset
             %label Link this documentation to the rule by the gid and sid
             %span.input-wrapper
-              =f.text_field :gid, required: true,placeholder: "GID"
-              =f.text_field :sid, required: true,placeholder: "SID"
+              =f.text_field :gid, required: true, placeholder: "GID"
+              =f.text_field :sid, required: true, placeholder: "SID"
 
       .row
         .col-sm-6
@@ -61,6 +64,5 @@
       .row
         .col-sm-12
           .button-group
-            %button{value: "submit", class: "call-to-action save", data: { confirm: 'Are you really really sure?? Have you double checked your linking id to ensure this Rule Doc will link with the proper Rule?'}} Save
-            = link_to  rule_docs_path do
-              %button{title: "Cancel", class: "secondary cancel"} Cancel
+            %button{value: "submit", class: "call-to-action save", data: { confirm: 'Are you really really sure?? Have you double checked your GID and SID to ensure this Rule Doc will link with the proper Rule?'}} Save
+            =link_to "Cancel", :back, {title: "Cancel", class: "secondary cancel"}

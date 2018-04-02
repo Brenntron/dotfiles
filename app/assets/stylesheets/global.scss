@@ -11,6 +11,7 @@ $ac-nav-bg-color:   #fff;       /* White           */
 /* Section Colors */
 $bug-section-color:  #6dbcdb;   /* Medium Blue    */
 $user-section-color: #fc4349;   /* Red            */
+$rule-docs-section-color: #cfd347;   /* yellow            */
 $wiki-section-color: #8cc63f;   /* Bright Green   */
 
 /* Layout dimensions */
@@ -520,7 +521,7 @@ select {
   margin-bottom: 32px;
 }
 
-.button-group button {
+.button-group button, .button-group a.secondary {
   font-size: 8pt;
   border-radius: 2px;
   text-align: center;
@@ -553,19 +554,19 @@ button.call-to-action:focus {
   color: $bug-section-color;
 }
 
-button.secondary {
+a.secondary {
   background-color: $nav-toolbar-color;
   border: 1px solid $nav-toolbar-color;
   color: $type-base-color;
 }
 
-button.secondary:hover {
+a.secondary:hover {
   background-color: $type-lighter-color;
   border: 1px solid $type-lighter-color;
   color: $content-bg-color;
 }
 
-button.secondary:focus, a:focus button.secondary {
+a.secondary:focus, a:focus a.secondary {
   background-color: $nav-toolbar-color;
   border: 1px solid $nav-toolbar-color;
   color: $type-base-color;
@@ -577,9 +578,10 @@ a:focus { outline: none;}
 
 button.save          {background-image: url(image_path('icon_save.svg'));}
 button.save:focus    {background-image: url(image_path('icon_save_blue.svg'));}
-button.cancel        {background-image: url(image_path('icon_cancel.svg'));}
-button.cancel:hover  {background-image: url(image_path('icon_cancel_white.svg'));}
-button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('icon_cancel.svg'));}
+a.secondary.cancel        {background-image: url(image_path('icon_cancel.svg'));}
+a.secondary.cancel:hover  {background-image: url(image_path('icon_cancel_white.svg'));}
+a.secondary.cancel:focus, a:focus a.secondary.cancel  {background-image: url(image_path('icon_cancel.svg'));}
+
 
 /************ Side Nav **************/
 
@@ -704,10 +706,11 @@ button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('i
   height: $sidebar-width;
 }
 
-.nav-ac    {background-color: $ac-nav-bg-color;}
-.nav-bugs  {background-color: $bug-section-color;}
-.nav-users {background-color: $user-section-color;}
-.nav-wiki  {background-color: $wiki-section-color;}
+.nav-ac        {background-color: $ac-nav-bg-color;}
+.nav-bugs      {background-color: $bug-section-color;}
+.nav-users     {background-color: $user-section-color;}
+.nav-rule-docs {background-color: $rule-docs-section-color;}
+.nav-wiki      {background-color: $wiki-section-color;}
 
 .ac-logo-text {
   height: $sidebar-width;;
