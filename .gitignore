@@ -10,6 +10,7 @@
 /tmp
 /vendor/cache
 /vendor/bundle
+vendor/gems
 /bundle/
 .DS_Store
 .byebug_history

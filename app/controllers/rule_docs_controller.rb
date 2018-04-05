@@ -19,7 +19,7 @@ class RuleDocsController < ApplicationController
         format.html { redirect_to rule_docs_path, notice: 'Rule document was successfully created.' }
       else
         format.html {
-          flash[:error]=  @rule_doc.errors.full_messages.first
+          flash[:error]=  @rule_doc.errors.full_messages.to_sentence
           render :new }
       end
     end
