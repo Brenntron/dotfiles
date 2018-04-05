@@ -14,6 +14,8 @@ class RuleDoc < ApplicationRecord
   before_create :compose_impact, if: Proc.new { |doc| doc.impact.blank? }
   before_save :check_default_text
 
+  validates :rule_id, uniqueness: {message: -> (object, data) do "#{object.rule.gid}:#{object.rule.sid} already has a document." end}
+
   has_many :references, through: :rule
 
   delegate :sid, :gid, :new_rule?, to: :rule, allow_nil: true

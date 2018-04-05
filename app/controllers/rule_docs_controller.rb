@@ -13,21 +13,15 @@ class RuleDocsController < ApplicationController
   def create
     rule = Rule.where(gid:rule_params[:gid]).where(sid:rule_params[:sid]).first
     @rule_doc = RuleDoc.new(rule_doc_params)
-    begin
-      raise Exception.new("The rule (GID:#{rule.gid} SID:#{rule.sid}) already has a document. ") if rule.rule_doc.present?
-      @rule_doc.rule_id = rule.id
-      respond_to do |format|
-        if @rule_doc.save
-          format.html { redirect_to rule_docs_path, notice: 'Rule document was successfully created.' }
-        else
-          format.html {
-            flash[:error]=  'There was an error creating this rule doc'
-            render :new }
-        end
+    @rule_doc.rule_id = rule.id
+    respond_to do |format|
+      if @rule_doc.save
+        format.html { redirect_to rule_docs_path, notice: 'Rule document was successfully created.' }
+      else
+        format.html {
+          flash[:error]=  @rule_doc.errors.full_messages.first
+          render :new }
       end
-    rescue Exception => e
-      flash[:error]=  e.message
-      render :new
     end
   end
   def edit

@@ -17,7 +17,7 @@ Feature: Rule Documents
       | Rule doc summary is here      | just a few deets |    13   |
     When I goto "/rule_docs"
     Then I should see "Rule doc summary is here"
-    
+
 
   @javascript
   Scenario: A user can edit a rule document
