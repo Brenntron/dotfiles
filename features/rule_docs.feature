@@ -76,7 +76,7 @@ Feature: Rule Documents
     And I fill in "rule_doc[details]" with "These are teh details"
     When I click "Save"
     And I wait for "2" seconds
-    Then I should see "The rule (GID:1 SID:22212) already has a document."
+    Then I should see "Rule 1:22212 already has a document"
 
 
   @javascript
@@ -178,7 +178,6 @@ Feature: Rule Documents
     And I wait for "2" seconds
     Then I should see "Creating New Rule Document"
 
-
   @javascript
   Scenario: A document alerts if a document is a duplicate
     Given a user with role "analyst" exists and is logged in
@@ -188,9 +187,9 @@ Feature: Rule Documents
     And the following "synched_rule" rules exist:
       | id | gid |  sid  | rev |     message       | rule_category_id |
       | 13 |  1  | 22212 |  3  | APP-DETECT message |        1        |
+      | 12 |  1  | 22213 |  1  | APP-DETECT message |        1        |
     And the following rule docs exist:
       |          summary              |     details                    | rule_id |
       | Rule doc summary is here      | just a few deets               |    13   |
-      | The second summary is this    | woah now lets not get detailed |    13   |
-    When I goto "/rule_docs/1/edit"
-    Then I should see "THIS IS A DUPLICATE RULE DOC"
+      | The second summary is this    | woah now lets not get detailed |    12   |
+    Then I cannot programatically assign doc "2" with rule "13"
