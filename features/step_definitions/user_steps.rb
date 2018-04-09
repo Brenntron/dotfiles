@@ -17,6 +17,13 @@ Given(/^a user with commit permission exists and is logged in$/) do
   sign_in_user
 end
 
+Given(/^an admin user with role "(.*?)" exists and is logged in$/) do |role|
+  @user = FactoryGirl.create(:current_user, confirmed: true)
+  @user.roles << Role.create(role: 'admin')
+  @user.roles << Role.create(role: role)
+  sign_in_user
+end
+
 Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   @user = FactoryGirl.create(:current_user, confirmed: true)
   @role = Role.create(role: role)

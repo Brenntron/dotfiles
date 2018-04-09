@@ -59,6 +59,7 @@
                   =inline_svg 'icon_cat.svg'
         %li{class: 'nav-item nav-users'}
           %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
+
         - if can?(:manage, Admin)
           %li{class: 'nav-item nav-admin'}
             %a{href: admin_root_path}= image_tag('layout/icon_admin.svg', class: 'sidenav-icon', alt: 'Admin')
@@ -72,6 +73,7 @@
             %li{class: 'wiki-link'}
               %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
                 =inline_svg 'icon_wiki_grey.svg'
+
       #sidenav-menu-div
         %ul{class: 'nav-container'}
           %li{class: 'nav-ac static-nav-item'}
@@ -81,6 +83,7 @@
             %li{class: 'nav-bugs'}
               %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
                 Bugs
+
               %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav'}
                 %li{class: 'ips-link'}
                   %a{href: bugs_path} IPS
@@ -115,6 +118,7 @@
             %li{class: 'nav-admin static-nav-item'}
               %a{href: admin_root_path}
                 Admin
+
 
           %li{class: 'nav-docs'}
             %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}

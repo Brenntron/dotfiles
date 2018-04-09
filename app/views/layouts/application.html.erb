@@ -76,7 +76,7 @@
               <%= render 'layouts/users_layout'%>
             <% elsif controller_name == "relationships" %>
               <%= render 'layouts/relationships_layout' %>
-            <% elsif controller_name == "rule_docs" && current_user&.has_role?('admin') %>
+            <% elsif controller_name == "rule_docs" %>
               <%= render 'layouts/rule_docs_layout' %>
             <% end %>
 
