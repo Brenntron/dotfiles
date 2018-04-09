@@ -61,6 +61,9 @@ gem 'delayed_job_active_record', '~> 4.1.2'
 gem 'jquery-datatables-rails', '~> 3.4.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
 
+gem 'inline_svg'
+
+
 gem 'gzip', '1.0'
 
 group :development do

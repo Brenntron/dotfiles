@@ -9,7 +9,8 @@ class Ability
     if current_user.has_role?('admin')
       can :manage, User
       can :manage, Admin
-      can :acknowledge_bug, Bug
+      can [:read, :acknowledge_bug], Bug
+      can :manage, RuleDoc
     end
     if current_user.has_role?('manager')
       can :manage, User do |user|

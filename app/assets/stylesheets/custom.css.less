@@ -16,9 +16,12 @@
 @bright-yellow:#fcee21;
 
 @bugs-primary:#80A9BA;
+@escalations-primary: #8ed08e;
+@ruledoc-primary: palegoldenrod;
 @users-primary:#D29864;
 @rules-primary:#CF7160;
 @doc-primary:#8DEFDC;
+@admin-primary: slategray;
 @search-primary:#8DEFDC;
 
 html,body {
@@ -118,20 +121,14 @@ a {
     min-height:200px;
 ul li { border-left: 5px solid #ccc;}
 }
-.rules-ui-nav ul li {
-&:first-child {
-     border-left: 10px solid @bugs-primary;
-&:active {
-     background-color:#819499;
-a { color:#c4e7ed;}
-}
-}
-&:nth-child(2) { border-left: 10px solid @users-primary;}
-&:nth-child(3) { border-left: 10px solid @doc-primary;}
-&:nth-child(4) { border-left: 10px solid palegoldenrod;}
-&:nth-child(5) { border-left: 10px solid palegoldenrod;}
-}
-}
+.rules-ui-nav ul {
+  li.research-menu { border-left: 10px solid @bugs-primary; }
+  li.escalations-menu { border-left: 10px solid @escalations-primary; }
+  li.users-menu { border-left: 10px solid @users-primary; }
+  li.ruledoc-menu { border-left: 10px solid @ruledoc-primary; }
+  li.doc-menu { border-left: 10px solid @doc-primary; }
+  li.admin-menu { border-left: 10px solid @admin-primary; }
+}}
 .sidebar-footer {
     margin-bottom: 20px;
 p {
@@ -205,6 +202,54 @@ td {
 
 .table-title { font-family:"Lane - Upper", Arial, Helvetica, sans-serif; font-size:40px; margin: 0 26px 0 28px;}
 .table-condensed th { font-size:14px;}
+
+/* Escalations Page */
+.escalations-page {
+  color:@charcoal; background-color:@paper; padding:0;
+  .item-ids-column {
+    background-color:@escalations-primary; height:auto !important; min-height: 1900px; padding:0;
+    .col-pagination {background:@escalations-primary;}
+    .pagination {
+      li a {
+        color:@charcoal; background:darken(@escalations-primary, 5%);border:none; border-bottom: 1px solid @escalations-primary;
+        :hover { color:@paper;}
+      }
+      li.active a { color:#fff6e9; background-color:@charcoal;}
+    }
+    .index-table {
+      margin-top: 93px;
+      border-bottom: 1px solid darken(@escalations-primary, 10%);
+      tbody {
+        tr {
+          &:hover { background-color:darken(@escalations-primary, 2%);}
+          td {
+            max-width: 100px; text-overflow:ellipsis; overflow: hidden; white-space: nowrap; border-top: 1px solid darken(@escalations-primary, 10%);
+            &.active { border-right:1px solid @paper; background-color: @paper; }
+          }
+        }
+      }
+    }
+  }
+  .item-details-column {
+    .index-table {
+      tbody {
+        tr {
+          height:40px;
+          &:hover { background-color:@extra-light-gray;}
+          td {
+            border-bottom: 1px solid @light-gray;
+          }
+        }
+      }
+    }
+  }
+  .back-btn:hover {
+    .back-triangle:after { background-color:@escalations-primary;}
+  }
+  .tabs-content { min-height: 100px;}
+  ul.nav-tabs { margin:12px;}
+}
+
 
 /* Bugs Page */
 .bugs-page {
