@@ -13,129 +13,119 @@
       %label{for: 'nav-trigger', id: 'nav-trigger-label'}
         = image_tag('layout/ac_nav_icon.svg', class: 'sidenav-icon', alt: 'Menu')
       %ul{class: 'sidenav-icons'}
-        %li{class: 'nav-item nav-ac'}
+        %li{class: 'nav-item nav-ac static-nav-item'}
           = image_tag('layout/analyst_console_icon.svg', class: 'sidenav-icon', alt: 'Analyst Console')
-        %li{class: 'nav-menu-spacer'}
+        %li{class: 'nav-menu-spacer static-nav-item'}
           -# Spacer for Menu Toggle
         - if can?(:read, Bug)
-          %li{class: 'nav-item nav-bugs'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Research')
-          %li{class: 'nav-item nav-bugs'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'IDS')
-          %li{class: 'nav-item nav-bugs'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'AMP')
-          %li{class: 'nav-item nav-bugs'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'ClamAV')
-          %li{class: 'nav-item nav-bugs'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Reputation')
-          %li{class: 'nav-item nav-bugs'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Web Categorization')
+          %li{class: 'nav-bugs'}
+            %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
+              = image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
+            %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav-icons'}
+              %li{class: 'ips-link'}
+                %a{href: bugs_path}
+                  =inline_svg 'icon_snort.svg'
+              %li{class: 'clam-link'}
+                %a
+                  =inline_svg 'icon_clam.svg'
+              %li{class: 'amp-link'}
+                %a
+                  =inline_svg 'icon_amp.svg'
+              %li{class: 'rep-link'}
+                %a
+                  =inline_svg 'icon_rep.svg'
+              %li{class: 'cat-link'}
+                %a
+                  =inline_svg 'icon_cat.svg'
         - if can?(:read, Bug) && can?(:manage, Admin)
-          %li{class: 'nav-item nav-escalations'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Escalations')
-          %li{class: 'nav-item nav-escalations'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'IDS')
-          %li{class: 'nav-item nav-escalations'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'AMP')
-          %li{class: 'nav-item nav-escalations'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'ClamAV')
-          %li{class: 'nav-item nav-escalations'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Reputation')
-          %li{class: 'nav-item nav-escalations'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Web Categorization')
-        - if can?(:update, RuleDoc)
-          %li{class: 'nav-item nav-ruledoc'}
-            %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Rule Doc')
-        - if can?(:update, User)
-          %li{class: 'nav-item nav-users'}
-            %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
-        %li{class: 'nav-item nav-wiki'}
-          %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank'}= image_tag('layout/wiki_icon.svg', class: 'sidenav-icon', alt: 'Wiki')
-        - if can?(:update, Admin)
+          %li{class: 'nav-escalations'}
+            %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
+              = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
+            %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav-icons'}
+              %li{class: 'ips-link'}
+                %a{href: escalations_bugs_path}
+                  =inline_svg 'icon_snort.svg'
+              %li{class: 'clam-link'}
+                %a
+                  =inline_svg 'icon_clam.svg'
+              %li{class: 'amp-link'}
+                %a
+                  =inline_svg 'icon_amp.svg'
+              %li{class: 'rep-link'}
+                %a
+                  =inline_svg 'icon_rep.svg'
+              %li{class: 'cat-link'}
+                %a
+                  =inline_svg 'icon_cat.svg'
+        %li{class: 'nav-item nav-users'}
+          %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
+        - if can?(:manage, Admin)
           %li{class: 'nav-item nav-admin'}
-            %a{href: bugs_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Admin')
-
+            %a{href: admin_root_path}= image_tag('layout/icon_admin.svg', class: 'sidenav-icon', alt: 'Admin')
+        %li{class: 'nav-docs'}
+          %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
+            = image_tag('layout/icon_documentation.svg', class: 'sidenav-icon', alt: 'Docs')
+          %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav-icons'}
+            %li{class: 'doc-link'}
+              %a{href: rule_docs_path}
+                =inline_svg 'icon_snort.svg'
+            %li{class: 'wiki-link'}
+              %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
+                =inline_svg 'icon_wiki_grey.svg'
       #sidenav-menu-div
         %ul{class: 'nav-container'}
-          %li{class: 'nav-ac'}
-            %span
-              = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
-          %li
+          %li{class: 'nav-ac static-nav-item'}
+            = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
+          %li{class: 'static-nav-item'}
           - if can?(:read, Bug)
             %li{class: 'nav-bugs'}
-              %span
-                %a{href: bugs_path}
-                  Research
-            %li{class: 'nav-bugs'}
-              %span
-                %a{href: bugs_path}
-                  IDS
-            %li{class: 'nav-bugs'}
-              %span
-                %a{href: bugs_path}
-                  AMP
-            %li{class: 'nav-bugs'}
-              %span
-                %a{href: bugs_path}
-                  ClamAV
-            %li{class: 'nav-bugs'}
-              %span
-                %a{href: bugs_path}
-                  Reputation
-            %li{class: 'nav-bugs'}
-              %span
-                %a{href: bugs_path}
-                  Categorization
-          - if can?(:read, Bug)
-            %li{class: 'nav-escalations'}
-              %span
-                %a{href: escalations_root_path}
-                  Escalations
-            %li{class: 'nav-escalations'}
-              %span
-                %a{href: escalations_root_path}
-                  IDS
-            %li{class: 'nav-escalations'}
-              %span
-                %a{href: escalations_root_path}
-                  AMP
-            %li{class: 'nav-escalations'}
-              %span
-                %a{href: escalations_root_path}
-                  ClamAV
-            %li{class: 'nav-escalations'}
-              %span
-                %a{href: escalations_root_path}
-                  Reputation
-            %li{class: 'nav-escalations'}
-              %span
-                %a{href: escalations_root_path}
-                  Categorization
-            -#%ul
-            -#  %li
-            -#    Snort
-            -#  %li
-            -#    Clam AV
-          - if can?(:update, RuleDoc)
-            %li{class: 'nav-ruledoc'}
-              %span
-                %a{href: rule_docs_path}
-                  Rule Doc
-          - if can?(:update, User)
-            %li{class: 'nav-users'}
-              %span
-                %a{href: users_path}
-                  Users
-          %li{class: 'nav-wiki'}
-            %span
-              %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
-                Wiki
-          - if can?(:update, Admin)
-            %li{class: 'nav-admin'}
-              %span
-                %a{href: admin_root_path}
-                  Admin
+              %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
+                Bugs
+              %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav'}
+                %li{class: 'ips-link'}
+                  %a{href: bugs_path} IPS
+                %li{class: 'clam-link'}
+                  %a Clam
+                %li{class: 'amp-link'}
+                  %a AMP
+                %li{class: 'rep-link'}
+                  %a Reputation
+                %li{class: 'cat-link'}
+                  %a Categorization
 
+          - if can?(:read, Bug) && can?(:manage, Admin)
+            %li{class: 'nav-escalations'}
+              %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
+                Escalations
+              %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
+                %li{class: 'ips-link'}
+                  %a{href: escalations_bugs_path} IPS
+                %li{class: 'clam-link'}
+                  %a Clam
+                %li{class: 'amp-link'}
+                  %a AMP
+                %li{class: 'rep-link'}
+                  %a Reputation
+                %li{class: 'cat-link'}
+                  %a Categorization
+          %li{class: 'nav-users static-nav-item'}
+            %a{href: users_path}
+              Users
+          - if can?(:manage, Admin)
+            %li{class: 'nav-admin static-nav-item'}
+              %a{href: admin_root_path}
+                Admin
+
+          %li{class: 'nav-docs'}
+            %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
+              Docs
+            %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
+              %li{class: 'ruledocs-link'}
+                %a{href: rule_docs_path}
+                  IPS Rules
+              %li{class: 'wiki-link'}
+                %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
+                  Wiki
 
     #page-wrapper
 
