@@ -21,6 +21,8 @@
           %a{href: bugs_path}= image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
         %li{class: 'nav-item nav-users'}
           %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
+        %li{class: 'nav-item nav-rule-docs'}
+          %a{href: rule_docs_path}= image_tag('layout/icon_ruledocs.svg', class: 'sidenav-icon', alt: 'Rule Documents')
         %li{class: 'nav-item nav-wiki'}
           %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}= image_tag('layout/wiki_icon.svg', class: 'sidenav-icon', alt: 'Wiki')
 
@@ -43,6 +45,10 @@
             %span
               %a{href: users_path}
                 Users
+          %li{class: 'nav-rule-docs'}
+            %span
+              %a{href: rule_docs_path}
+                Rule Docs
           %li{class: 'nav-wiki'}
             %span
               %a{href: 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki'}
