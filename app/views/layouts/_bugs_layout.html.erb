@@ -3,7 +3,7 @@
     <div class="sidebar-search">
       <div class="input-group input-group-sm">
 
-        <%= form_tag('/bugs', method: :get) do -%>
+        <%= form_tag('/bugs', method: :get, id: 'search_form') do -%>
             <%= text_field_tag 'bug[id]', "#{@bug_search_id}", class: "searchID", placeholder: "BugID" %>
         <% end -%>
 
