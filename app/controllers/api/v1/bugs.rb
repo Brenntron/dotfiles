@@ -646,7 +646,7 @@ module API
                   options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
                   Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                   current_user.bugs << bug
-                  Bug.update(permitted_params[:id], state: "ASSIGNED") unless ['PENDING', 'FIXED', 'WONTFIX', 'INVALID', 'LATER'].include? bug.state
+                  Bug.update(permitted_params[:id], state: "ASSIGNED") if ['NEW', 'OPEN'].include? bug.state
                 end
               end
               return true
