@@ -77,3 +77,9 @@ Then(/^I relate (.*?) to (.*?) with block$/) do |from_id, to_id|
   bug1.snort_blocker_bugs << bug2
 
 end
+
+And(/^I should have (.*?) saved searches for user (.*?)$/) do |num_searches, user_id|
+  user = User.find(user_id)
+  user.saved_searches.size.should eq(num_searches.to_i)
+end
+
