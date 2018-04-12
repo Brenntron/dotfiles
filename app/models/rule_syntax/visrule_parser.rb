@@ -28,7 +28,10 @@ module RuleSyntax
         unless text.empty?
           @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
           @errors = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
-          @stderr = stderr.read
+        end
+        @stderr = stderr.read
+        if @stderr
+          @parsed_lines = "Failed: " + @stderr
         end
       end
       temp_rule.close

@@ -10,6 +10,8 @@
 /tmp
 /vendor/cache
 /vendor/bundle
+/vendor/gems/activemessaging
+
 /bundle/
 .DS_Store
 .byebug_history

@@ -9,9 +9,29 @@ $content-tab-color: #3e5a72;    /* Dark Navy shift */
 $ac-nav-bg-color:   #fff;       /* White           */
 
 /* Section Colors */
-$bug-section-color:  #6dbcdb;   /* Medium Blue    */
-$user-section-color: #fc4349;   /* Red            */
-$wiki-section-color: #8cc63f;   /* Bright Green   */
+$primary-section-color : #6dbcdb;   /* Medium Blue    */
+$second-section-color  : #fc4349;   /* Red            */
+$third-section-color   : #EFAF34;   /* Yellow Ochre   */
+$fourth-section-color  : #8cc63f;   /* Bright Green   */
+$fifth-section-color   : #65A1A1;   /* Dusty Teal     */
+
+
+$bug-section-color         : $primary-section-color;
+$escalations-section-color : $second-section-color;
+$user-section-color        : $third-section-color;
+$admin-section-color       : $fourth-section-color;
+$document-section-color    : $fifth-section-color;
+
+
+/* Section Accent Colors */
+$bug-accent-color: #65B3D1;
+$wiki-highlight-color: #D8E8AC;
+$wiki-med-color: #B9D864;
+$wiki-dark-color: #334C18;
+$user-highlight-color: #FFC5C2;
+$user-med-color: #FC9292;
+$user-dark-color: #560303;
+
 
 /* Layout dimensions */
 $sidebar-width: 44px;
@@ -520,7 +540,7 @@ select {
   margin-bottom: 32px;
 }
 
-.button-group button {
+.button-group button, .button-group a.secondary {
   font-size: 8pt;
   border-radius: 2px;
   text-align: center;
@@ -553,19 +573,19 @@ button.call-to-action:focus {
   color: $bug-section-color;
 }
 
-button.secondary {
+a.secondary {
   background-color: $nav-toolbar-color;
   border: 1px solid $nav-toolbar-color;
   color: $type-base-color;
 }
 
-button.secondary:hover {
+a.secondary:hover {
   background-color: $type-lighter-color;
   border: 1px solid $type-lighter-color;
   color: $content-bg-color;
 }
 
-button.secondary:focus, a:focus button.secondary {
+a.secondary:focus, a:focus a.secondary {
   background-color: $nav-toolbar-color;
   border: 1px solid $nav-toolbar-color;
   color: $type-base-color;
@@ -577,9 +597,10 @@ a:focus { outline: none;}
 
 button.save          {background-image: url(image_path('icon_save.svg'));}
 button.save:focus    {background-image: url(image_path('icon_save_blue.svg'));}
-button.cancel        {background-image: url(image_path('icon_cancel.svg'));}
-button.cancel:hover  {background-image: url(image_path('icon_cancel_white.svg'));}
-button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('icon_cancel.svg'));}
+a.secondary.cancel        {background-image: url(image_path('icon_cancel.svg'));}
+a.secondary.cancel:hover  {background-image: url(image_path('icon_cancel_white.svg'));}
+a.secondary.cancel:focus, a:focus a.secondary.cancel  {background-image: url(image_path('icon_cancel.svg'));}
+
 
 /************ Side Nav **************/
 
@@ -625,7 +646,51 @@ button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('i
   display: block;
   width: 100%;
   height:100%;
-  padding-left: 5px;
+  margin-left: 4px;
+}
+
+.sidenav-icon {
+
+}
+
+.nav-container li {
+  height: auto;
+  padding-left: $sidebar-width;
+}
+
+#sidenav-menu-div .sub-nav li a, .sidenav-icons .sub-nav li a {
+  color: $type-base-color;
+  font-size: 8pt;
+}
+
+.sub-nav.collapse.in {
+  height: auto;
+}
+
+.nav-container .sub-nav li, .sidenav-icons .sub-nav li {
+  height: 30px;
+  line-height: 30px;
+  padding-left: 0;
+  border: none;
+}
+
+#bugs-subnav, #bugs-subnav-icons {
+  background-color: lighten($bug-section-color, 28%)
+}
+
+#esc-subnav, #esc-subnav-icons {
+  background-color: #FFE1D4;
+}
+
+#doc-subnav, #doc-subnav-icons {
+  background-color: lighten($document-section-color, 33%)
+}
+
+.sub-nav svg {
+  width: 20px;
+  height: auto;
+  margin-left: 12px;
+  margin-top: 5px;
 }
 
 .nav-container {
@@ -641,7 +706,7 @@ button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('i
   @include box-shadow($dropshadow);
 }
 
-.nav-container span, .nav-container span a {
+.nav-container a {
   opacity: 0;
   -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -661,7 +726,7 @@ button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('i
   transition-delay: 0;
 }
 
-#nav-trigger:checked ~ #sidenav-menu-div .nav-container li span, #nav-trigger:checked ~ #sidenav-menu-div .nav-container li span a {
+#nav-trigger:checked ~ #sidenav-menu-div .nav-container li, #nav-trigger:checked ~ #sidenav-menu-div .nav-container li a {
   opacity: 1;
   -webkit-transition-delay: 330ms;
   transition-delay: 330ms;
@@ -671,9 +736,14 @@ button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('i
   border-bottom: 1px solid #fff;
 }
 
-.nav-container li {
+li.static-nav-item {
   height: $sidebar-width;
-  padding-left: $sidebar-width;
+}
+
+a.static-nav-item {
+  height: 44px !important;
+  width: 44px;
+  display: block;
 }
 
 .nav-menu-spacer {height: $sidebar-width; }
@@ -704,19 +774,22 @@ button.cancel:focus, a:focus button.cancel  {background-image: url(image_path('i
   height: $sidebar-width;
 }
 
-.nav-ac    {background-color: $ac-nav-bg-color;}
-.nav-bugs  {background-color: $bug-section-color;}
-.nav-users {background-color: $user-section-color;}
-.nav-wiki  {background-color: $wiki-section-color;}
+
+.nav-ac           {background-color: $ac-nav-bg-color;}
+.nav-bugs         {background-color: $bug-section-color;}
+.nav-escalations  {background-color: $escalations-section-color;}
+.nav-users        {background-color: $user-section-color;}
+.nav-admin        {background-color: $admin-section-color;}
+.nav-docs         {background-color: $document-section-color;}
+
 
 .ac-logo-text {
-  height: $sidebar-width;;
+  height: $sidebar-width;
   width: auto;
   margin-top: -1px;
 }
 
 /***** End of Side Nav *****/
-
 
 
 /****** Top Tool Bar / Nav Bar area ******/
