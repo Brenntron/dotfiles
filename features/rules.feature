@@ -769,4 +769,7 @@ Feature: Rules
     And  the "std-form-message" field should be "message"
     Then "APP-DETECT" should be selected in the "rule_category_id" dropdown
 
-
+  @javascript
+  Scenario: I need to ensure the local file grep regex works properly
+    When code calls grep_line_from_file with sid "1" and gid "139" the response should include "; sid: 1; gid: 139; rev: 1; metadata: rule-type preproc ; classtype:sdf; )"
+    And  code calls grep_line_from_file with sid "98" and gid "116" the response should include "; sid:98; gid:116; rev:1; metadata:rule-type decode; classtype:protocol-command-decode; )"
