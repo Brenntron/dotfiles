@@ -1285,6 +1285,27 @@ class Bug < ApplicationRecord
     update_params[:severity] = permitted_params[:bug][:severity]
     update_params[:classification] = permitted_params[:bug][:classification]
     update_params[:whiteboard] = permitted_params[:bug][:whiteboard]
+    update_params[:description] = permitted_params[:bug][:description]
+
+    if bug.description != update_params[:description]
+
+      new_description_message = "Bug Description has changed in Analyst Console, new bug description is as follows: \n"
+      new_description_message += update_params[:description]
+      options = {
+          :id => permitted_params[:id],
+          :comment => new_description_message,
+      }.reject() { |k, v| v.nil? }
+      new_note = xmlrpc.add_comment(options)
+      Note.create(
+          :id => new_note['id'],
+          :comment => new_description_message,
+          :author => current_user.email,
+          :note_type => 'research',
+          :bug_id => permitted_params[:id],
+          :notes_bugzilla_id => new_note['id']
+      )
+
+    end
 
 
     # update the database
@@ -1547,7 +1568,12 @@ class Bug < ApplicationRecord
         ###prepolate running notes (for the Notes tab)
         bug.research_notes ||= Note::TEMPLATE_RESEARCH
         unless new_comments.empty?
-
+          if bug.description.blank?
+            if import_type != "status"
+              bug.description = new_comments['bugs'].first[1]['comments'].first['text'].strip
+              bug.save
+            end
+          end
           ActiveRecord::Base.transaction do
             #import any new comments from bugzilla
             new_comments['bugs'].each do |comment|
