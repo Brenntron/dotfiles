@@ -115,4 +115,51 @@ module RulesHelper
       end
     end
   end
+
+  def diff_lines(left, right)
+    content_tag(:p, class: "code wrapped_code") do
+      content_tag(:p) do
+        content_tag(:div, class: "diff") do
+          content_tag(:ul) do
+            ary = Diffy::Diff.new(left, right).map do |diff_line|
+              line = diff_line.chomp[1..-1]
+              case diff_line[0]
+                when ' '
+                  content_tag(:li, class: 'unchanged') do
+                    content_tag(:span) do
+                      line
+                    end
+                  end
+                when '+'
+                  content_tag(:li, class: 'ins') do
+                    content_tag(:ins) do
+                      line
+                    end
+                  end
+                when '-'
+                  content_tag(:li, class: 'del') do
+                    content_tag(:del) do
+                      line
+                    end
+                  end
+                else
+                  ''
+              end
+            end
+            ary.join("\n").html_safe
+          end
+        end
+      end
+    end
+  end
+
+  def diff_visruleparser(rule)
+    if rule.rule_parsed && rule.cvs_rule_parsed
+      diff_lines(rule.cvs_rule_parsed, rule.rule_parsed).gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;').html_safe
+    else
+      content_tag(:div, class: 'code wrapped_code') do
+        rule.rule_parsed
+      end
+    end
+  end
 end
