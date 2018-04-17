@@ -156,7 +156,7 @@ module RulesHelper
   def diff_visruleparser(rule)
     if rule.rule_parsed && rule.cvs_rule_parsed
       diff_lines(rule.cvs_rule_parsed, rule.rule_parsed).gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;').html_safe
-    else
+    elsif rule.rule_parsed
       content_tag(:div, class: 'code wrapped_code') do
         rule.rule_parsed
       end
