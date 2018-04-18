@@ -23,7 +23,7 @@ gem 'rmagick', '~> 2.16.0'
 gem 'ruby-bugzilla', '~> 0.6.4'
 
 gem 'xmlrpc'
-gem 'libv8', '3.16.14.17'
+gem 'libv8', '3.16.14.17', path: './vendor/gems/libv8'
 
 gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
