@@ -294,7 +294,7 @@ class Rule < ApplicationRecord
   # @return [String|NilClass] grep output with filename colon linenumber colon rule content.
   def self.grep_line_from_file(sid, gid = nil, given_filepath = nil)
     filepath = given_filepath || "#{Rails.root}/extras/snort/*/*.rules"
-    rule_grep_output = `grep -Hn "sid:\\s*#{sid}\\s*;" #{filepath}`
+    rule_grep_output = `grep -Hn "sid:[ ]*#{sid}[ ]*;" #{filepath}`
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
         # asked for gid and found it
