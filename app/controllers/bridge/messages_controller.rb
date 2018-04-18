@@ -17,6 +17,56 @@ class Bridge::MessagesController < ApplicationController
     log_exception(except)
     render plain: except.message, status: :internal_server_error
   end
+  def get_from_bridge
+
+    return_message = {
+        "envelope":
+            {
+                "channel": "ping-from-bridge",
+                "addressee": "snort-org",
+                "sender": "analyst-console"
+            },
+        "message":
+            {
+                "source_authority": "snort-org",
+                "source_key": 1,
+                "response": "Get from AC was good.",
+                "false_positive_id": 1,
+                "bug_id": 1
+            },
+        "api_key": "8781a3ed7344e5174e4006fce10cf3b2e21568b5"
+    }
+
+    render json: return_message, status: :ok
+  rescue => except
+    log_exception(except)
+    render plain: except.message, status: :internal_server_error
+  end
+  def response_from_bridge
+
+    return_message = {
+        "envelope":
+            {
+                "channel": "ping-from-bridge",
+                "addressee": "snort-org",
+                "sender": "analyst-console"
+            },
+        "message":
+            {
+                "source_authority": "snort-org",
+                "source_key": 1,
+                "response": "A false positive record was created.",
+                "false_positive_id": 1,
+                "bug_id": 1
+            },
+        "api_key": "8781a3ed7344e5174e4006fce10cf3b2e21568b5"
+    }
+
+    render json: return_message, status: :ok
+  rescue => except
+    log_exception(except)
+    render plain: except.message, status: :internal_server_error
+  end
 
   # Add route for specific channels to their own action under the channels collection.
   # When there is no route, it defaults to the create action.
