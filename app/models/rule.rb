@@ -436,11 +436,15 @@ class Rule < ApplicationRecord
     self.parsed                         = vparser.valid?
     self.committed                      = !vparser.valid?
 
-    if parsed?
-      self.rule_failures                = nil
-    else
-      self.rule_failures                = vparser.parsed_lines
-    end
+    self.rule_failures =
+        case
+          when parsed?
+            nil
+          when self.fatal_errors.present?
+            'FAILED: visruleparser error.'
+          else
+            vparser.parsed_lines
+        end
 
     self
   end

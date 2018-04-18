@@ -27,6 +27,7 @@ module RuleSyntax
       Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
         puts wait_thr.value
         @exit_status = wait_thr.value.exitstatus
+        @stderr = stderr.read
         text = stdout.read
         if text.empty?
           @parsed_lines = ''
@@ -35,7 +36,6 @@ module RuleSyntax
           @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
           @errors = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
         end
-        @stderr = stderr.read
       end
       temp_rule.close
 
@@ -45,6 +45,9 @@ module RuleSyntax
     def parsed_lines
       unless @parsed_lines
         parse
+        if fatal_errors
+          @parsed_lines = 'FAILED: visruleparser error.'
+        end
       end
       @parsed_lines
     end
