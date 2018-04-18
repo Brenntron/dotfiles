@@ -198,3 +198,7 @@ Then(/^a rule doc column "(.*)" should equal "(.*)" in the database$/) do |colum
   rule = RuleDoc.all.first
   expect(rule.send(column.to_sym).to_s).to eql(value)
 end
+
+When(/^code calls grep_line_from_file with sid "(.*?)" and gid "(.*?)" the response should include "(.*?)"$/) do |sid, gid, text|
+  Rule.grep_line_from_file(sid, gid).should include(text)
+end
