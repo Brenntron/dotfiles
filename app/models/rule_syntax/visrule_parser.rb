@@ -23,13 +23,19 @@ module RuleSyntax
       temp_rule.write(@rule_content)
       temp_rule.rewind
       cmd = "#{Rails.configuration.perl_cmd} #{Rails.configuration.visruleparser_path} #{temp_rule.path}"
-      Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thru|
+      puts Rails.configuration.visruleparser_path
+      Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
+        puts wait_thr.value
+        @exit_status = wait_thr.value.exitstatus
         text = stdout.read
-        unless text.empty?
+        if text.empty?
+          @parsed_lines = ''
+          @errors = ''
+        else
           @parsed_lines = text.split(/%{80}|\*{80}/)[1].strip
           @errors = text.split(/%{80}|\*{80}/)[2] ? text.split(/%{80}|\*{80}/)[2].gsub('%', '').strip : ''
-          @stderr = stderr.read
         end
+        @stderr = stderr.read
       end
       temp_rule.close
 
@@ -55,6 +61,25 @@ module RuleSyntax
         parse
       end
       @stderr
+    end
+
+    # Positive integer for least significant 8 bits of UNIX process exit status.
+    # So, when visruleparser fails, as from a perl error (possibly syntax or some unexpected condition)
+    # the `exit -1` returns 255 from UNIX.
+    # When visruleparser deliberately indicates a failure, it uses exit status -2,
+    # which we get a 254 from UNIX.
+    def exit_status
+      unless @exit_status
+        parse
+      end
+      @exit_status
+    end
+
+    def fatal_errors
+      # We expected the exit status to be 8 bit unsigned,
+      # but just in case the input does not match our expectations,
+      # make sure our output does.
+      255 == (exit_status & 0x0FF) ? stderr : nil
     end
 
     # @return [Boolean] false if this class rejected the string as not even content
@@ -87,6 +112,10 @@ module RuleSyntax
             case
               # this ruby class rejected the rule content before even calling visrule parser
               when !has_rule_content?
+                false
+
+              # visruleparser had an error
+              when stderr.present?
                 false
 
               # visruleparser rejected the string as not enough like a snort rule to even parse
