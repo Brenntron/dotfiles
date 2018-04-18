@@ -431,6 +431,7 @@ class Rule < ApplicationRecord
 
     self.rule_parsed                    = vparser.parsed_lines
     self.rule_warnings                  = vparser.errors
+    self.fatal_errors                   = vparser.fatal_errors
 
     self.parsed                         = vparser.valid?
     self.committed                      = !vparser.valid?
