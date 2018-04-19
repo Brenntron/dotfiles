@@ -61,14 +61,6 @@ class User < ApplicationRecord
     PublishWebsocket.push_changes(record)
   end
 
-  def can_see_snort_bug_list
-    roles.any?{ |r| Role::SNORT_BUGS_ROLES.include?(r.role)}
-  end
-
-  def can_see_escalations_list
-    roles.any?{ |r| Role::ESCALATION_ROLES.include?(r.role)}
-  end
-
   def has_role?(role)
     roles.where(role: role).any?
   end

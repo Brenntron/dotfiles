@@ -4,20 +4,27 @@ class Ability
   def initialize(user_given)
     current_user = user_given || User.new
 
-    can :read, :all
 
     if current_user.has_role?('admin')
-      can :manage, User
-      can :manage, Admin
+      can :manage, [Admin, User]
       can [:read, :acknowledge_bug], Bug
       can :manage, RuleDoc
+      # can :list_escalations, Bug
+      can :list_research, Bug
+      can :list_escalations, Bug
     end
     if current_user.has_role?('manager')
+      # can :list_escalations, Bug
+      can :list_research, Bug
       can :manage, User do |user|
         user.ancestors.include?(current_user)
       end
     end
+    if current_user.has_role?('escalator')
+      can :list_escalations, Bug
+    end
     if current_user.has_role?('committer')
+      can :list_research, Bug
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference, RuleDoc]
       can :publish, Rule
       can :publish_to_bugzilla, Note
@@ -26,6 +33,7 @@ class Ability
       can :acknowledge_bug, Bug
     end
     if current_user.has_role?('analyst')
+      can :list_research, Bug
       can [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference, RuleDoc]
       can :publish_to_bugzilla, Note
       can :update_preferences, User, id: current_user.id
@@ -35,6 +43,7 @@ class Ability
       can :acknowledge_bug, Bug
     end
     if current_user.has_role?('build coordinator')
+      can :list_research, Bug
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
       can :update_preferences, User, id: current_user.id
     end
