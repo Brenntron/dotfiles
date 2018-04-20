@@ -133,8 +133,8 @@ Rails.application.routes.draw do
   namespace :bridge do
     resources :channels, only: [] do
       collection do
-        get 'ping-from-bridge/messages', to: 'messages#get_from_bridge'
-        post 'ping-from-bridge/messages', to: 'messages#response_from_bridge'
+        get 'poll-from-bridge/messages', to: 'messages#get_messages'
+        post 'poll-from-bridge/messages', to: 'messages#messages_from_bridge'
         post 'fp-create/messages', to: 'messages#fp_create'
       end
       resources :messages, only: [:create]
