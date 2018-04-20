@@ -6,6 +6,7 @@ class Ability
 
 
     if current_user.has_role?('admin')
+      can :read, :all
       can :manage, [Admin, User]
       can [:read, :acknowledge_bug, :list_research, :list_escalations], Bug
       can :manage, RuleDoc
