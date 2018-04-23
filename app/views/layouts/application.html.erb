@@ -32,6 +32,9 @@
             <% if current_user&.can_see_escalations_list %>
               <li class="escalations-menu"><%= link_to 'ESCALATIONS', escalations_root_path %></li>
             <% end %>
+            <% if current_user&.can_see_web_rep_disputes %>
+              <li class="escalations-menu"><%= link_to 'WEB REP DISPUTES', web_reps_root_path %></li>
+            <% end %>
           <% end %>
           <% if current_user&.has_role?('admin') %>
             <li class="ruledoc-menu"><%= link_to 'RULE DOCS', rule_docs_path %></li>

@@ -1,0 +1,2 @@
+class DisputeEntry < ApplicationRecord
+end
