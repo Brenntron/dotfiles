@@ -121,32 +121,42 @@ module RulesHelper
       content_tag(:p) do
         content_tag(:div, class: "diff") do
           content_tag(:ul) do
-            ary = Diffy::Diff.new(left, right).map do |diff_line|
-              line = diff_line.chomp[1..-1]
-              case diff_line[0]
-                when ' '
-                  content_tag(:li, class: 'unchanged') do
-                    content_tag(:span) do
-                      line
-                    end
+            if left == right
+              left.split("\n").map do |line|
+                content_tag(:li, class: 'unchanged') do
+                  content_tag(:span) do
+                    line
                   end
-                when '+'
-                  content_tag(:li, class: 'ins') do
-                    content_tag(:ins) do
-                      line
+                end
+              end.join("\n").html_safe
+            else
+              ary = Diffy::Diff.new(left, right).map do |diff_line|
+                line = diff_line.chomp[1..-1]
+                case diff_line[0]
+                  when ' '
+                    content_tag(:li, class: 'unchanged') do
+                      content_tag(:span) do
+                        line
+                      end
                     end
-                  end
-                when '-'
-                  content_tag(:li, class: 'del') do
-                    content_tag(:del) do
-                      line
+                  when '+'
+                    content_tag(:li, class: 'ins') do
+                      content_tag(:ins) do
+                        line
+                      end
                     end
-                  end
-                else
-                  ''
+                  when '-'
+                    content_tag(:li, class: 'del') do
+                      content_tag(:del) do
+                        line
+                      end
+                    end
+                  else
+                    ''
+                end
               end
+              ary.join("\n").html_safe
             end
-            ary.join("\n").html_safe
           end
         end
       end
