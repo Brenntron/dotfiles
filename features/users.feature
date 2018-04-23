@@ -547,7 +547,7 @@ Feature: User Accounts
     And  I should see "[TELUS] broken bug2"
     And  I should not see "[BP][NSS] fixed bug"
     Then I click "Next"
-    And  I should see "[TELUS] broken bug42"
+    And  I should see "[TELUS] broken bug32"
 
   ### Scenarios User search
 
