@@ -23,9 +23,7 @@ module RuleSyntax
       temp_rule.write(@rule_content)
       temp_rule.rewind
       cmd = "#{Rails.configuration.perl_cmd} #{Rails.configuration.visruleparser_path} #{temp_rule.path}"
-      puts Rails.configuration.visruleparser_path
       Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
-        puts wait_thr.value
         @exit_status = wait_thr.value.exitstatus
         @stderr = stderr.read
         text = stdout.read
