@@ -1,5 +1,7 @@
 class BugsController < ApplicationController
-  load_and_authorize_resource except: [:add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :show, :bug_metrics]
+  load_and_authorize_resource except: [:index, :show,
+                                       :add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
+  before_action only:[:index] { authorize!(:list_research, Bug) }
 
   before_action :require_login
   before_action :query_bugs
