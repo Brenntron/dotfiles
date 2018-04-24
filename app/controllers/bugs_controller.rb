@@ -78,8 +78,9 @@ class BugsController < ApplicationController
           @bug_search_id = '' # otherwise the form will show the lower end of the range
         else
           @bugs =
-              Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").permit_class_level(current_user.class_level)
+              Bug.where("id='#{params[:bug][:id]}%'").permit_class_level(current_user.class_level)
                   .paginate(:page => session[:page], :per_page => 32)
+          redirect_to bug_path(@bugs.first.id) unless @bugs.empty?
         end
       end
     end

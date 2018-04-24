@@ -1050,3 +1050,20 @@ Feature: Bug
     And  I should not see "All Rules"
 
 
+  @javascript
+  Scenario: A user can search by specific bug ID and is taken to that ID if a single match exists
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                                          | product  | component   | version |      description            |
+      | 111234 | 145359      | OPEN     | 1       | [SID] 15539 CVE-2008-1434 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!!      |
+      | 112345 | 145359      | OPEN     | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary      | Research | Snort Rules | 2.6.0   | some other helpful value    |
+      | 1234   | 145359      | REOPENED | 1       | [SID] 15531 CVE-2017-1434 Totally fake data      | Research | Snort Rules | 2.6.0   | None of this really matters |
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    Then I search for bug id "1234"
+    Then I wait for "10" seconds
+    Then I should see content "1234" within ".bugzilla_id"
+    And  I should not see "Zarro Boogs found, please try selecting any other filter."
+    Then I search for bug id "1010101"
+    Then I wait for "10" seconds
+    Then I should see "Zarro Boogs found, please try selecting any other filter."
