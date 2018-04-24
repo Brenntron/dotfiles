@@ -31,8 +31,12 @@ module RuleSyntax
       @options
     end
 
+    def well_formed?
+      connection && options
+    end
+
     def raw_hash
-      unless @raw_hash
+      if @raw_hash.nil? && options
         @raw_hash ||= options.split(/\s*;\s*/).inject({}) do |raw_hash, option|
           if /\A\s*(?<type>\w+)\s*:\s?(?<data>.*)\z/ =~ option
             key = type.downcase.to_sym
@@ -80,7 +84,7 @@ module RuleSyntax
     # @return [Hash]
     def attributes
       @attributes ||= raw_hash.clone.tap do |attributes|
-        attributes[:connection] = @connection
+        attributes[:connection] = connection
         attributes[:gid] ||= 1
         attributes[:detection] = detection_array.map{|det| "#{det};"}.join(" ")
 
