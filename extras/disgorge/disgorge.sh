@@ -319,3 +319,4 @@ if [ "" != "$VERSION" ]; then
 echo copying $RAILS_ROOT.tar.gz  to  /nfs/research/distfiles
 cp $RAILS_ROOT.tar.gz /nfs/research/distfiles
 fi
+
