@@ -18,6 +18,9 @@
         <% if rule.rule_warnings.present? %>
           <div class="alert alert-warning small"><%= simple_format rule.rule_warnings.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') if rule.rule_warnings %></div>
         <% end %>
+        <% if rule.fatal_errors.present? %>
+          <div class="alert alert-danger small rule_failures"><%= rule.fatal_errors %></div>
+        <% end %>
         </br>
         <div class="view-tab-alerts">
           <h4 class="blue">Alerts</h4>
