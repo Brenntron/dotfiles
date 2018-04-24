@@ -9,9 +9,6 @@ class Role < ApplicationRecord
 
   scope :exclude_admin, -> { where.not(role: 'admin') }
 
-  SNORT_BUGS_ROLES = ['admin', 'analyst', 'build coordinator', 'committer', 'manager']
-  ESCALATION_ROLES = ['admin', 'escalator', 'manager']
-
   def record(action)
     record = { resource: 'role',
                action: action,
