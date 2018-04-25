@@ -70,20 +70,19 @@ class RuleFile
   def link_add_line_rule(bug, rule_content)
     Rails.logger.info("<<< link_add_line_rule('#{rule_content.chomp}')")
     parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
+    Rails.logger.error("Net Snort Parser cannot parse rule_content = #{rule_content.chomp.inspect}") unless parser
 
-    unless parser
-      Rails.logger.error("Net Snort Parser cannot parse rule_content = #{rule_content.chomp.inspect}")
-      return nil
+    found_rules = []
+    if parser
+      new_publishing_rules = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
+
+      found_rules = new_publishing_rules.to_a.select do |rule|
+        parsed_rule = RuleSyntax::NetSnortParser.new_from_rule_content(rule.rule_content)
+        parser.match?(parsed_rule)
+      end
     end
 
-    new_publishing_rules = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
-
-    found_rules = new_publishing_rules.to_a.select do |rule|
-      parsed_rule = RuleSyntax::NetSnortParser.new_from_rule_content(rule.rule_content)
-      parser.match?(parsed_rule)
-    end
-
-    if 1 == found_rules.count
+    if parser && (1 == found_rules.count)
       found_rule = found_rules.first
       found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
       Rule.set_pubdoc_state(found_rule)
