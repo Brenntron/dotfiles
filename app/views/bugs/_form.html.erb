@@ -104,7 +104,7 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="description">Description</label>
-        <%= f.text_area :description, class: "form-control", required: true %>
+        <%= f.text_area :description, class: "form-control", required: @bug.new_record?, disabled: !@bug.new_record?%>
       </div>
     </div>
 
