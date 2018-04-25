@@ -72,7 +72,7 @@ class RuleFile
     parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
     Rails.logger.error("Net Snort Parser cannot parse rule_content = #{rule_content.chomp.inspect}") unless parser
 
-    found_rules = 0
+    found_rules = []
     if parser
       new_publishing_rules = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
 
