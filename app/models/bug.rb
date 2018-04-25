@@ -1286,25 +1286,28 @@ class Bug < ApplicationRecord
     update_params[:classification] = permitted_params[:bug][:classification]
     update_params[:whiteboard] = permitted_params[:bug][:whiteboard]
     update_params[:description] = permitted_params[:bug][:description]
+    update_params.reject! { |k, v| v.nil? } if update_params
 
-    if bug.description != update_params[:description]
+    if update_params[:description].present?
+      if bug.description != update_params[:description]
 
-      new_description_message = "Bug Description has changed in Analyst Console, new bug description is as follows: \n"
-      new_description_message += update_params[:description]
-      options = {
-          :id => permitted_params[:id],
-          :comment => new_description_message,
-      }.reject() { |k, v| v.nil? }
-      new_note = xmlrpc.add_comment(options)
-      Note.create(
-          :id => new_note['id'],
-          :comment => new_description_message,
-          :author => current_user.email,
-          :note_type => 'research',
-          :bug_id => permitted_params[:id],
-          :notes_bugzilla_id => new_note['id']
-      )
+        new_description_message = "Bug Description has changed in Analyst Console, new bug description is as follows: \n"
+        new_description_message += update_params[:description]
+        options = {
+            :id => permitted_params[:id],
+            :comment => new_description_message,
+        }.reject() { |k, v| v.nil? }
+        new_note = xmlrpc.add_comment(options)
+        Note.create(
+            :id => new_note['id'],
+            :comment => new_description_message,
+            :author => current_user.email,
+            :note_type => 'research',
+            :bug_id => permitted_params[:id],
+            :notes_bugzilla_id => new_note['id']
+        )
 
+      end
     end
 
 
