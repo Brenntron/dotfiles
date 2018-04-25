@@ -68,7 +68,13 @@ class RuleFile
   # links a new rule to the bug
   # calling code should check that this rule is not already a rule associated with this bug.
   def link_add_line_rule(bug, rule_content)
+    Rails.logger.info("<<< link_add_line_rule('#{rule_content.chomp}')")
     parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
+
+    unless parser
+      Rails.logger.error("Net Snort Parser cannot parse rule_content = #{rule_content.chomp.inspect}")
+      return nil
+    end
 
     new_publishing_rules = bug.rules.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
 
@@ -99,7 +105,9 @@ class RuleFile
     `#{self.class.svn_cmd} up #{synch_pathname}`
     self.class.log("svn diff -r PREV:BASE #{synch_pathname}")
     `#{self.class.svn_cmd} diff -r PREV:BASE #{synch_pathname}`.each_line do |line|
+      Rails.logger.info("*** diff line = '#{line}'")
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line) && (/sid:\s*\d+\s*;/ =~ line)
+        Rails.logger.info("*** diff line is an add")
         link_add_line_rule(bug, line[1..-1])
       end
     end
