@@ -1309,8 +1309,7 @@ class Bug < ApplicationRecord
 
       end
     end
-
-
+    
     # update the database
     update_params.reject! { |k, v| v.nil? }
     Bug.update(permitted_params[:id], update_params)
