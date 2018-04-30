@@ -116,7 +116,7 @@ module RuleSyntax
                 false
 
               # visruleparser had an error
-              when stderr.present?
+              when -1 == exit_status
                 false
 
               # visruleparser rejected the string as not enough like a snort rule to even parse
