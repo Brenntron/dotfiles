@@ -70,18 +70,24 @@ class BugsController < ApplicationController
       @bugs = Bug.none.paginate(:page => session[:page], :per_page => 32)
     end
     if params[:bug].present?
-      @bug_search_id = params[:bug][:id]
+      @bug_search_id = params[:bug][:id].gsub(/[^0-9]/,'')
       if @bug_search_id.present?
         @bug_search_max = params[:bug][:bugzilla_max]
         if @bug_search_max.present?
           @bugs =
-              Bug.where("id BETWEEN ? AND ?", params[:bug][:id], params[:bug][:bugzilla_max]).permit_class_level(current_user.class_level)
+              Bug.where("id BETWEEN ? AND ?", @bug_search_id, params[:bug][:bugzilla_max]).permit_class_level(current_user.class_level)
                   .paginate(:page => session[:page], :per_page => 32)
           @bug_search_id = '' # otherwise the form will show the lower end of the range
         else
           @bugs =
-              Bug.where("id LIKE ?", "%#{params[:bug][:id]}%").permit_class_level(current_user.class_level)
+            if 'advanced' == params['submit'] # if submit button is advanced, this is the advanced search
+              Bug.where("id LIKE ?", "%#{@bug_search_id}%").permit_class_level(current_user.class_level)
                   .paginate(:page => session[:page], :per_page => 32)
+            else # otherwise top left search, do exact match
+              Bug.where("id='#{@bug_search_id}%'").permit_class_level(current_user.class_level)
+                  .paginate(:page => session[:page], :per_page => 32)
+            end
+          redirect_to bug_path(@bugs.first.id) if @bugs.count == 1
         end
       end
     end
