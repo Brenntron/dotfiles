@@ -78,11 +78,11 @@ class BugsController < ApplicationController
           @bug_search_id = '' # otherwise the form will show the lower end of the range
         else
           @bugs =
-            if params[:bug][:summary].nil? # if nil, this is a "top left" search box, so go right to this number only
-              Bug.where("id='#{@bug_search_id}%'").permit_class_level(current_user.class_level)
-                  .paginate(:page => session[:page], :per_page => 32)
-            else # otherwise, perform the like with wildcards at the end only
+            if 'advanced' == params['submit'] # if submit button is advanced, this is the advanced search
               Bug.where("id LIKE ?", "%#{@bug_search_id}%").permit_class_level(current_user.class_level)
+                  .paginate(:page => session[:page], :per_page => 32)
+            else # otherwise top left search, do exact match
+              Bug.where("id='#{@bug_search_id}%'").permit_class_level(current_user.class_level)
                   .paginate(:page => session[:page], :per_page => 32)
             end
           redirect_to bug_path(@bugs.first.id) if @bugs.count == 1
