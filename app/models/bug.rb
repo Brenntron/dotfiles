@@ -212,7 +212,7 @@ class Bug < ApplicationRecord
     bug_state = 'OPEN'
     if status == 'REOPENED'
       bug_state = status
-    elsif status == 'RESOLVED'
+    elsif ['RESOLVED', 'CLOSED'].include? status
       bug_state = resolution
     else
       if user != ('vrt-incoming@sourcefire.com' || nil)
