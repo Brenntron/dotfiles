@@ -50,6 +50,7 @@ class Bug < ApplicationRecord
   STATES_OPEN                           = %w{OPEN ASSIGNED REOPENED}
   STATES_CLOSED                         = %w{FIXED WONTFIX LATER INVALID DUPLICATE}
   STATES                                = [STATE_PENDING] + STATES_OPEN + STATES_CLOSED
+  STATES_RESOLVED                       = %w{CLOSED RESOLVED VERIFIED}
 
   LIBERTY_CLEAR                         = "CLEAR"
   LIBERTY_EMBARGO                       = "EMBARGO"
@@ -212,7 +213,7 @@ class Bug < ApplicationRecord
     bug_state = 'OPEN'
     if status == 'REOPENED'
       bug_state = status
-    elsif ['RESOLVED', 'CLOSED'].include? status
+    elsif STATES_RESOLVED.include? status
       bug_state = resolution
     else
       if user != ('vrt-incoming@sourcefire.com' || nil)
