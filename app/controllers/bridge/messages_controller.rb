@@ -1,15 +1,15 @@
 class Bridge::MessagesController < ApplicationController
   def fp_create(params)
 
-    # sender = envelope_params[:sender]
-    # Rails.logger.debug("Analyst Console recieved message to create a false positive bug from sender #{sender}")
-    # false_positive = FalsePositive.where(source_key:false_positive_params['source_key']).first
-    # if false_positive
-    #   false_positive = FalsePositive.create_from_params(false_positive_params,
-    #                                                     attachments_attrs: attachments_params,
-    #                                                     sender: sender)
-    # end
-    # Thread.new { false_positive.create_bug_action(bugzilla_session, sender) }
+    sender = envelope_params[:sender]
+    Rails.logger.debug("Analyst Console recieved message to create a false positive bug from sender #{sender}")
+    false_positive = FalsePositive.where(source_key:false_positive_params['source_key']).first
+    if false_positive
+      false_positive = FalsePositive.create_from_params(false_positive_params,
+                                                        attachments_attrs: attachments_params,
+                                                        sender: sender)
+    end
+    Thread.new { false_positive.create_bug_action(bugzilla_session, sender) }
     return_message = {
         "envelope":
             {
