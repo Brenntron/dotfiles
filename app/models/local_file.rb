@@ -9,11 +9,13 @@ class LocalFile < FileReference
   # @param [Hash] attrs values to use for file_name, file_type_name, and any other attributes
   def self.copy_local(in_file, relative_path, attrs)
     local = LocalFile.create(attrs)
-    local.location = File.join('lib/data/local', relative_path)
-    File.open(location, 'w') do |out_file|
+    local.location = File.join('lib/data/local/', local.source)
+    file = File.join('lib/data/local', local.source, local.file_name)
+    FileUtils.mkdir_p(local.location) unless File.directory?(local.location)
+    File.open(file, 'w') do |out_file|
       out_file.write(in_file.read)
     end
-    save!
-    self
+    local.save!
+    local
   end
 end

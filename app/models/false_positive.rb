@@ -97,7 +97,9 @@ PCAP Utility: #{pcap_lib}
   def add_attachments(bug, bugzilla_session, user:)
     fp_file_refs.each do |fp_file_ref|
       if fp_file_ref.file_reference.kind_of?(LocalFile)
-        File.open(fp_file_ref.file_reference.location, 'r') do |file|
+        file = File.join(fp_file_ref.file_reference.location, fp_file_ref.file_reference.file_name)
+        File.open(file, 'r') do |file|
+
           bug.add_attachment_action(bugzilla_session,
                                     file,
                                     user: user,
@@ -111,7 +113,7 @@ PCAP Utility: #{pcap_lib}
   end
 
   def post_fp_created(bug)
-    conn = PeakeBridge::FpCreatedEvent.new(addressee: self.source_authority,
+    conn = Bridge::FpCreatedEvent.new(addressee: self.source_authority,
                                            source_authority: self.source_authority)
     conn.post(false_positive_id: self.id,
               bug_id: bug&.id,
@@ -136,8 +138,8 @@ PCAP Utility: #{pcap_lib}
     if where(source_authority: sender, source_key: attrs['source_key']).exists?
       where(source_authority: sender, source_key: attrs['source_key']).delete_all
     end
-    create(attrs.merge(source_authority: sender)).tap do |false_positive|
-      false_positive.save_attachments_from_params(attachments_attrs: attachments_attrs)
+    create(attrs["fp_attrs"].merge(source_authority: sender, user_email:attrs["user_email"], source_key: attrs['source_key'])).tap do |false_positive|
+      false_positive.save_attachments_from_params(attachments_attrs: attachments_attrs["attachments"])
     end
   end
 
@@ -157,8 +159,7 @@ PCAP Utility: #{pcap_lib}
   # @param [String] sender key for config.yml section for sources
   def create_bug_action(bugzilla_session, sender)
     sender_config = Rails.configuration.peakebridge.sources[sender]
-    user = User.where(cvs_username: sender_config['username']).first
-
+    user = User.where(cvs_username:"vrtincom").first
     download_s3_urls
     bug = create_bug(bugzilla_session, user: user)
     if bug
