@@ -26,8 +26,13 @@
       <% if current_user.has_role?('admin') %>
           <div class="col-xs-12 col-sm-8">
             <%= render 'form' %>
+            <hr />
           </div>
       <% end %>
+        <div class="col-xs-12 col-sm-8">
+          <p>Application Token: <pre><%= current_user.authentication_token %></pre></p>
+          <p>Bugzilla Token: <pre><%= xml_token %></pre></p>
+        </div>
     </div>
     <div class='row top-space'>
       <div class="col-xs-11">
