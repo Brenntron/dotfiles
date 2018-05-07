@@ -600,9 +600,10 @@ class Bug < ApplicationRecord
 
   def rules_parsed?
     rules.each do |rule|
-      if rule.gid == 1 && !rule.parsed?
-        return false
-      end
+      next unless 1 == rule.gid
+      next if Rule::EDIT_STATUS_SYNCHED == rule.edit_status
+
+      return false unless rule.parsed?
     end
     true
   end
