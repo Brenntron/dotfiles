@@ -50,6 +50,7 @@ class Bug < ApplicationRecord
   STATES_OPEN                           = %w{OPEN ASSIGNED REOPENED}
   STATES_CLOSED                         = %w{FIXED WONTFIX LATER INVALID DUPLICATE}
   STATES                                = [STATE_PENDING] + STATES_OPEN + STATES_CLOSED
+  STATES_RESOLVED                       = %w{CLOSED RESOLVED VERIFIED}
 
   LIBERTY_CLEAR                         = "CLEAR"
   LIBERTY_EMBARGO                       = "EMBARGO"
@@ -212,7 +213,7 @@ class Bug < ApplicationRecord
     bug_state = 'OPEN'
     if status == 'REOPENED'
       bug_state = status
-    elsif status == 'RESOLVED'
+    elsif STATES_RESOLVED.include? status
       bug_state = resolution
     else
       if user != ('vrt-incoming@sourcefire.com' || nil)
@@ -599,9 +600,10 @@ class Bug < ApplicationRecord
 
   def rules_parsed?
     rules.each do |rule|
-      if rule.gid == 1 && !rule.parsed?
-        return false
-      end
+      next unless 1 == rule.gid
+      next if Rule::EDIT_STATUS_SYNCHED == rule.edit_status
+
+      return false unless rule.parsed?
     end
     true
   end
@@ -1285,8 +1287,31 @@ class Bug < ApplicationRecord
     update_params[:severity] = permitted_params[:bug][:severity]
     update_params[:classification] = permitted_params[:bug][:classification]
     update_params[:whiteboard] = permitted_params[:bug][:whiteboard]
+    update_params[:description] = permitted_params[:bug][:description]
+    update_params.reject! { |k, v| v.nil? } if update_params
 
+    if update_params[:description].present?
+      if bug.description != update_params[:description]
 
+        new_description_message = "Bug Description has changed in Analyst Console, new bug description is as follows: \n"
+        new_description_message += update_params[:description]
+        options = {
+            :id => permitted_params[:id],
+            :comment => new_description_message,
+        }.reject() { |k, v| v.nil? }
+        new_note = xmlrpc.add_comment(options)
+        Note.create(
+            :id => new_note['id'],
+            :comment => new_description_message,
+            :author => current_user.email,
+            :note_type => 'research',
+            :bug_id => permitted_params[:id],
+            :notes_bugzilla_id => new_note['id']
+        )
+
+      end
+    end
+    
     # update the database
     update_params.reject! { |k, v| v.nil? }
     Bug.update(permitted_params[:id], update_params)
@@ -1547,7 +1572,12 @@ class Bug < ApplicationRecord
         ###prepolate running notes (for the Notes tab)
         bug.research_notes ||= Note::TEMPLATE_RESEARCH
         unless new_comments.empty?
-
+          if bug.description.blank?
+            if import_type != "status"
+              bug.description = new_comments['bugs'].first[1]['comments'].first['text'].strip
+              bug.save
+            end
+          end
           ActiveRecord::Base.transaction do
             #import any new comments from bugzilla
             new_comments['bugs'].each do |comment|

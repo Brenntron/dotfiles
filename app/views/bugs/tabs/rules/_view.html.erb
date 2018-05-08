@@ -13,14 +13,13 @@
           <div class="code alert alert-danger small rule_failures"><%= rule.rule_failures %></div>
           <pre><%= rule.rule_content %></pre>
         <% else %>
-          <% if rule.rule_parsed && Diffy::Diff.new(rule.cvs_rule_parsed, rule.rule_parsed).to_s != "" %>
-            <p class="code wrapped_code"><%= simple_format Diffy::Diff.new(rule.cvs_rule_parsed, rule.rule_parsed).to_s(:html).gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') %></p>
-          <% elsif rule.rule_parsed %>
-            <div class="code wrapped_code"><%= rule.rule_parsed %></div>
-          <% end %>
+          <%= diff_visruleparser(rule) %>
         <% end %>
         <% if rule.rule_warnings.present? %>
           <div class="alert alert-warning small"><%= simple_format rule.rule_warnings.gsub(/ *\t+/, '&nbsp;&nbsp;&nbsp;') if rule.rule_warnings %></div>
+        <% end %>
+        <% if rule.fatal_errors.present? %>
+          <div class="alert alert-danger small rule_failures"><%= rule.fatal_errors %></div>
         <% end %>
         </br>
         <div class="view-tab-alerts">

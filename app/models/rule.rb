@@ -294,7 +294,7 @@ class Rule < ApplicationRecord
   # @return [String|NilClass] grep output with filename colon linenumber colon rule content.
   def self.grep_line_from_file(sid, gid = nil, given_filepath = nil)
     filepath = given_filepath || "#{Rails.root}/extras/snort/*/*.rules"
-    rule_grep_output = `grep -Hn "sid:\\s*#{sid}\\s*;" #{filepath}`
+    rule_grep_output = `grep -Hn "sid:[ ]*#{sid}[ ]*;" #{filepath}`
     rule_grep_lines = rule_grep_output.split("\n").select do |grep_line|
       case
         # asked for gid and found it
@@ -431,15 +431,20 @@ class Rule < ApplicationRecord
 
     self.rule_parsed                    = vparser.parsed_lines
     self.rule_warnings                  = vparser.errors
+    self.fatal_errors                   = vparser.fatal_errors
 
     self.parsed                         = vparser.valid?
     self.committed                      = !vparser.valid?
 
-    if parsed?
-      self.rule_failures                = nil
-    else
-      self.rule_failures                = vparser.parsed_lines
-    end
+    self.rule_failures =
+        case
+          when parsed?
+            nil
+          when self.fatal_errors.present?
+            'FAILED: visruleparser error.'
+          else
+            vparser.parsed_lines
+        end
 
     self
   end
@@ -558,6 +563,7 @@ class Rule < ApplicationRecord
   # @param [Integer, #read] rule_id the rule id if known
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
+    raise "Cannot parser rule content '#{rule_content}'" unless parser.well_formed?
     find_from_parser(parser, rule_id).tap do |rule|
       unless rule_content == rule.cvs_rule_content
         rule.assign_from_user_edit(rule_content, parser: parser)

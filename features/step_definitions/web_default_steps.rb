@@ -294,6 +294,10 @@ Then(/^take a photo/)do
   save_and_open_screenshot
 end
 
+Then(/^I search for bug id "(.*?)"$/) do |value|
+  find('#bug_id').set(value)
+  page.execute_script("$('#search_form').submit()")
+end
 
 Then(/^take a screenshot$/) do 
   page.save_screenshot('/tmp/screenshot.png', :full => true)

@@ -356,6 +356,7 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.boolean "svn_success"
     t.string "snort_doc_status", default: "NOTYET"
     t.string "snort_on_off", default: "on"
+    t.string "fatal_errors"
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"

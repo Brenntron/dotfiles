@@ -100,14 +100,14 @@
       </div>
     </div>
 
-    <% if @bug.new_record? %>
-      <div class="row">
-        <div class="col-sm-12 form-group">
-          <label for="description">Description</label>
-          <%= f.text_area :description, class: "form-control", required: true %>
-        </div>
+
+    <div class="row">
+      <div class="col-sm-12 form-group">
+        <label for="description">Description</label>
+        <%= f.text_area :description, class: "form-control", required: @bug.new_record?, disabled: !@bug.new_record?%>
       </div>
-    <% end %>
+    </div>
+
     <%= f.hidden_field :product, value: 'Research' %>
     <%= f.hidden_field :version, value: 'No Version Specified' %>
 

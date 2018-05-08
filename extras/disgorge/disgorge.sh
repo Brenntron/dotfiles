@@ -67,8 +67,9 @@ echo '* installing'
 echo $RELPATH
 echo $TAGDIR
 RAILS_ROOT=$RELPATH/$TAGDIR
-echo RAILS_ROOT=$RAILS_ROOT
+echo RAILS_ROOT = $RAILS_ROOT
 cd $RAILS_ROOT
+echo `pwd`
 
 if [ "" == "$RELTMP" ]; then
     RELTMP=$RAILS_ROOT/tmp
@@ -77,11 +78,23 @@ fi
 if [ "SKIP" != "$SHARED" ]; then
     echo '* using shared files and directories'
     echo $SHAREDDIR
+    echo $RAILS_ROOT
+
+    cd $RAILS_ROOT
+
+    if [ -d $SHAREDDIR/tmp ]; then
+        rm -rf tmp
+        ln -s $SHAREDDIR/tmp .
+    fi
 
     if [ ! -d $SHAREDDIR/tmp ]; then
+        echo making shared directory - $SHAREDDIR/tmp
         mkdir $SHAREDDIR/tmp
     fi
-    rm -rf $RAILS_ROOT/tmp
+
+    if [ -d $RAILS_ROOT/tmp ]; then
+        rm -rf $RAILS_ROOT/tmp
+    fi
     ln -s $SHAREDDIR/tmp $RAILS_ROOT
 
     if [ ! -d $SHAREDDIR/nvd ]; then
@@ -91,7 +104,9 @@ if [ "SKIP" != "$SHARED" ]; then
     ln -s $SHAREDDIR/nvd $RAILS_ROOT/lib/data
 
     if [ -d $SHAREDDIR/log ]; then
-        rm -rf log
+        if [ -d $RAILS_ROOT/log ]; then
+            rm -rf $RAILS_ROOT/log
+        fi
         ln -s $SHAREDDIR/log $RAILS_ROOT
         if [ -f log/staging.log ]; then
             echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
@@ -102,23 +117,21 @@ if [ "SKIP" != "$SHARED" ]; then
     fi
 
     if [ -f $SHAREDDIR/config/database.yml ]; then
-        echo $SHAREDDIR/config/database.yml
+        echo linking $SHAREDDIR/config/database.yml to $RAILS_ROOT/config/database.yml
         rm config/database.yml
         ln -s $SHAREDDIR/config/database.yml $RAILS_ROOT/config
     fi
     if [ -f $SHAREDDIR/config/secrets.yml ]; then
-        echo $SHAREDDIR/config/secrets.yml
+        echo $SHAREDDIR/config/secrets.yml to $RAILS_ROOT/config/secrets.yml
         rm config/secrets.yml
         ln -s $SHAREDDIR/config/secrets.yml $RAILS_ROOT/config
     fi
     if [ -f $SHAREDDIR/config/config.yml ]; then
-        echo $SHAREDDIR/config/config.yml
+        echo $SHAREDDIR/config/config.yml to $RAILS_ROOT/config/config.yml
         rm config/config.yml
         ln -s $SHAREDDIR/config/config.yml $RAILS_ROOT/config
     fi
 fi
-
-
 
 if [ "SHARE" == "$BUNDLE_SHARE" ]; then
     ln -s $SHAREDDIR/vendor/bundle vendor/bundle
@@ -229,4 +242,81 @@ if [ "" != "$VERSION" ]; then
     bash -c "cd $RELPATH; tar czhf $VERSION.tar.gz $VERSION"
 fi
 
+if [ "" != "$VERSION" ]; then
+RAILS_ROOT=$RELPATH/$VERSION
+else
+RAILS_ROOT=$RELPATH/$TAGDIR
+fi
+
+
+echo '* using shared files and directories'
+echo $SHAREDDIR
+echo $RAILS_ROOT
+
+cd $RAILS_ROOT
+
+if [ -d $SHAREDDIR/tmp ]; then
+    rm -rf tmp
+    ln -s $SHAREDDIR/tmp .
+fi
+
+if [ ! -d $SHAREDDIR/tmp ]; then
+    echo making shared directory - $SHAREDDIR/tmp
+    mkdir $SHAREDDIR/tmp
+fi
+
+if [ -d $RAILS_ROOT/tmp ]; then
+    rm -rf $RAILS_ROOT/tmp
+fi
+ln -s $SHAREDDIR/tmp $RAILS_ROOT
+
+if [ ! -d $SHAREDDIR/nvd ]; then
+    mkdir $SHAREDDIR/nvd
+fi
+rm -rf $RAILS_ROOT/lib/data/nvd
+ln -s $SHAREDDIR/nvd $RAILS_ROOT/lib/data
+
+if [ -d $SHAREDDIR/log ]; then
+    if [ -d $RAILS_ROOT/log ]; then
+        rm -rf $RAILS_ROOT/log
+    fi
+    ln -s $SHAREDDIR/log $RAILS_ROOT
+    if [ -f log/staging.log ]; then
+        echo "--- Release $RELDIR $TAGDIR" >> log/staging.log
+    fi
+    if [ -f log/development.log ]; then
+        echo "--- Release $RELDIR $TAGDIR" >> log/development.log
+    fi
+fi
+
+if [ -f $SHAREDDIR/config/database.yml ]; then
+    echo linking $SHAREDDIR/config/database.yml to $RAILS_ROOT/config/database.yml
+    if [ -f config/database.yml ]; then
+        rm config/database.yml
+    fi
+    ln -s $SHAREDDIR/config/database.yml $RAILS_ROOT/config
+fi
+if [ -f $SHAREDDIR/config/secrets.yml ]; then
+    echo $SHAREDDIR/config/secrets.yml to $RAILS_ROOT/config/secrets.yml
+    if [ -f config/secrets.yml ]; then
+        rm config/secrets.yml
+    fi
+    ln -s $SHAREDDIR/config/secrets.yml $RAILS_ROOT/config
+fi
+if [ -f $SHAREDDIR/config/config.yml ]; then
+    echo $SHAREDDIR/config/config.yml to $RAILS_ROOT/config/config.yml
+    rm config/config.yml
+    ln -s $SHAREDDIR/config/config.yml $RAILS_ROOT/config
+fi
+echo *Linking new build to local server location
+cd /usr/local/AC-TESTING/$USERFOLDER/
+rm public_html
+ln -s $RAILS_ROOT public_html
+cd public_html
+touch tmp/restart.txt
+
+if [ "" != "$VERSION" ]; then
+echo copying $RAILS_ROOT.tar.gz  to  /nfs/research/distfiles
+cp $RAILS_ROOT.tar.gz /nfs/research/distfiles
+fi
 

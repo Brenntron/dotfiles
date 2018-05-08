@@ -111,6 +111,98 @@ Feature: Bug
     And I should not see "test summary"
 
   @javascript
+  Scenario: A user can perform an advanced search on bugs and save results
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id          | state | user_id | summary                                     | product  | component   | version | description       |
+      | 111111      | OPEN  | 1       | [TELUS][VULN][BP] [SID] 22078 test summary  | Research | Snort Rules | 2.6.0   | test description  |
+      | 222222      | OPEN  | 2       | No Tags in this one                         | Research | Snort Rules | 2.6.0   | test description2 |
+      | 333333      | FIXED | 2       | [BP][NSS] fixed bug                         | Research | Snort Rules | 2.6.0   | test description3 |
+    And the following tags exist:
+      | name  | id |
+      | TELUS | 1  |
+      | VULN  | 2  |
+      | BP    | 3  |
+      | NSS   | 4  |
+    And the following giblets exist:
+      | bug_id          | name     | gib_type | gib_id   |
+      | 111111          | TELUS    | Tag      | 1        |
+      | 111111          | BP       | Tag      | 3        |
+      | 111111          | VULN     | Tag      | 2        |
+      | 333333          | BP       | Tag      | 3        |
+      | 333333          | NSS      | Tag      | 4        |
+
+    And the bug "111111" has tag "BP"
+    And the bug "111111" has tag "TELUS"
+    And the bug "111111" has tag "VULN"
+    And the bug "333333" has tag "BP"
+    And the bug "333333" has tag "NSS"
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    And  I should see "Bugs"
+    And  I should see "test summary"
+    When I click "search-bugs-btn"
+    Then I wait for "3" seconds
+    And  I fill in selectized with "BP"
+    And  I fill in "bug[saved_search]" with "saved search test"
+    When I click "submit"
+    Then I wait for "5" seconds
+    And  I should see "test summary"
+    And  I should see "fixed bug"
+    And  I should not see "No Tags in this one"
+    And  I should have 1 saved searches for user 1
+
+  @javascript
+  Scenario: A user can perform an advanced search using a saved search
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id          | state | user_id | summary                                     | product  | component   | version | description       |
+      | 111111      | OPEN  | 1       | [TELUS][VULN][BP] [SID] 22078 test summary  | Research | Snort Rules | 2.6.0   | test description  |
+      | 222222      | OPEN  | 2       | No Tags in this one                         | Research | Snort Rules | 2.6.0   | test description2 |
+      | 333333      | FIXED | 2       | [BP][NSS] fixed bug                         | Research | Snort Rules | 2.6.0   | test description3 |
+    And the following tags exist:
+      | name  | id |
+      | TELUS | 1  |
+      | VULN  | 2  |
+      | BP    | 3  |
+      | NSS   | 4  |
+    And the following giblets exist:
+      | bug_id          | name     | gib_type | gib_id   |
+      | 111111          | TELUS    | Tag      | 1        |
+      | 111111          | BP       | Tag      | 3        |
+      | 111111          | VULN     | Tag      | 2        |
+      | 333333          | BP       | Tag      | 3        |
+      | 333333          | NSS      | Tag      | 4        |
+
+    And the bug "111111" has tag "BP"
+    And the bug "111111" has tag "TELUS"
+    And the bug "111111" has tag "VULN"
+    And the bug "333333" has tag "BP"
+    And the bug "333333" has tag "NSS"
+    Then I wait for "3" seconds
+    And  I goto "/bugs"
+    And  I should see "Bugs"
+    And  I should see "test summary"
+    When I click "search-bugs-btn"
+    Then I wait for "3" seconds
+    And  I fill in selectized with "BP"
+    And  I fill in "bug[saved_search]" with "saved search test"
+    When I click "submit"
+    Then I wait for "5" seconds
+    And  I should see "test summary"
+    And  I should see "fixed bug"
+    And  I should not see "No Tags in this one"
+    And  I should have 1 saved searches for user 1
+    Then I click "search-bugs-btn"
+    Then I click "nav-saved-search-tab"
+    And  I should see "saved search test"
+    When I click link "saved search test"
+    Then I wait for "5" seconds
+    And I should see "test summary"
+    And  I should see "fixed bug"
+    And  I should not see "No Tags in this one"
+
+  @javascript
   Scenario: A user will see a warning message if bug looks to be
             out of synch with bugzilla (probably from a light import).
             Out of synch is based on presence of notes on the bug.
@@ -958,3 +1050,21 @@ Feature: Bug
     And  I should not see "All Rules"
 
 
+  @javascript
+  Scenario: A user can search by specific bug ID and is taken to that ID if a single match exists
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id | state    | user_id | summary                                          | product  | component   | version |      description            |
+      | 35487  | 35487       | REOPENED | 1       | [SID] 15531 CVE-2017-1434 Totally fake data      | Research | Snort Rules | 2.6.0   | None of this really matters |
+      | 135487 | 135487      | OPEN     | 1       | [[TELUS][VULN][BP] [SID] 135487 test summary     | Research | Snort Rules | 2.6.0   | some other helpful value    |
+      | 354873 | 354873      | OPEN     | 1       | [[TELUS][VULN][BP] [SID] 354873 test summary     | Research | Snort Rules | 2.6.0   | some other helpful value    |
+      | 354875 | 354875      | OPEN     | 1       | [SID] 15539 CVE-2008-1434 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!!      |
+    And  I wait for "3" seconds
+    And  I goto "/bugs"
+    When I search for bug id "35487"
+    And  I wait for "10" seconds
+    Then I should see "35487"
+    And  I should not see "135487"
+    And  I should not see "354873"
+    And  I should not see "354875"
+    And  I should not see "Zarro Boogs found, please try selecting any other filter."
