@@ -89,17 +89,16 @@ PCAP Utility: #{pcap_lib}
     }
 
     bug = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
-    # bug = nil
     update(bug_id: bug.id) if bug
     bug
   end
 
   def add_attachments(bug, bugzilla_session, user:)
     fp_file_refs.each do |fp_file_ref|
+
       if fp_file_ref.file_reference.kind_of?(LocalFile)
         file = File.join(fp_file_ref.file_reference.location, fp_file_ref.file_reference.file_name)
         File.open(file, 'r') do |file|
-
           bug.add_attachment_action(bugzilla_session,
                                     file,
                                     user: user,
@@ -113,11 +112,8 @@ PCAP Utility: #{pcap_lib}
   end
 
   def post_fp_created(bug)
-    conn = Bridge::FpCreatedEvent.new(addressee: self.source_authority,
-                                           source_authority: self.source_authority)
-    conn.post(false_positive_id: self.id,
-              bug_id: bug&.id,
-              source_key: self.source_key)
+    conn = ::Bridge::FpCreatedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
+    conn.post(false_positive_id: self.id, bug_id: bug&.id, source_key: self.source_key)
   end
 
   def save_attachments_from_params(attachments_attrs:)
@@ -157,8 +153,7 @@ PCAP Utility: #{pcap_lib}
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
   # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
   # @param [String] sender key for config.yml section for sources
-  def create_bug_action(bugzilla_session, sender)
-    sender_config = Rails.configuration.peakebridge.sources[sender]
+  def create_bug_action(bugzilla_session)
     user = User.where(cvs_username:"vrtincom").first
     download_s3_urls
     bug = create_bug(bugzilla_session, user: user)
