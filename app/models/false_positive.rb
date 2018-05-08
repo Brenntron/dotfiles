@@ -78,10 +78,10 @@ PCAP Utility: #{pcap_lib}
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     bug_attrs = {
-        'product' => 'Research',
-        'component' => component,
+        'product' => 'Escalations',
+        'component' => 'TAC',
         'summary' => summary,
-        'version' => 'No Version Specified', #self.version,
+        'version' => 'unspecified', #self.version,
         'description' => full_description,
         # 'opsys' => self.os,
         'priority' => 'Unspecified',
@@ -153,7 +153,7 @@ PCAP Utility: #{pcap_lib}
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
   # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
   # @param [String] sender key for config.yml section for sources
-  def create_bug_action(bugzilla_session)
+  def create_escalation_action(bugzilla_session)
     user = User.where(cvs_username:"vrtincom").first
     download_s3_urls
     bug = create_bug(bugzilla_session, user: user)

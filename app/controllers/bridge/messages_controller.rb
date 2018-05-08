@@ -8,7 +8,7 @@ class Bridge::MessagesController < ApplicationController
                                                         attachments_attrs: attachments_params,
                                                         sender: sender)
     end
-    Thread.new { false_positive.create_bug_action(bugzilla_session) }
+    Thread.new { false_positive.create_escalation_action(bugzilla_session) }
     return_message = {
         "envelope":
             {
