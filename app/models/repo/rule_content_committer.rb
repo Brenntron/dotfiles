@@ -101,6 +101,43 @@ module Repo
       FileUtils.remove_file(working_pathname) rescue nil
     end
 
+    def self.repo_add_line_new_rule(rule_content, rules_rel: Rule.with_pub_content)
+      Rails.logger.debug("<<< repo_add_line_new_rule('#{rule_content.chomp}')")
+      parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
+      unless parser
+        Rails.logger.error("Net Snort Parser cannot parse rule_content = #{rule_content.chomp.inspect}")
+        return false
+      end
+
+      new_publishing_rules = rules_rel.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
+      found_rules = new_publishing_rules.to_a.select do |rule|
+        parsed_rule = RuleSyntax::NetSnortParser.new_from_rule_content(rule.rule_content)
+        parser.match?(parsed_rule)
+      end
+
+      byebug
+      if 1 == found_rules.count
+        found_rule = found_rules.first
+        found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
+        Rule.set_pubdoc_state(found_rule)
+        found_rule
+      else
+        # zero or more than one found
+        loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
+        bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
+        Rule.set_pubdoc_state(loaded_rule)
+        loaded_rule
+      end
+    end
+
+    def self.repo_add_line_new_rule_to_bug(rule_content, bug:)
+      unless repo_add_line_new_rule(rule_content, rules_rel: bug.rules)
+        loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
+        bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
+        Rule.set_pubdoc_state(loaded_rule)
+      end
+    end
+
     # gets file from svn prepared for later commit
     def checkout(relative_pathname)
       working_pathname = self.class.working_pathname_of(relative_pathname)
