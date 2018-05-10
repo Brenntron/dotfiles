@@ -115,18 +115,11 @@ module Repo
         parser.match?(parsed_rule)
       end
 
-      byebug
       if 1 == found_rules.count
         found_rule = found_rules.first
         found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
         Rule.set_pubdoc_state(found_rule)
         found_rule
-      else
-        # zero or more than one found
-        loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
-        bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
-        Rule.set_pubdoc_state(loaded_rule)
-        loaded_rule
       end
     end
 
