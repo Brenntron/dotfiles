@@ -41,6 +41,15 @@ class Bridge::MessagesController < ApplicationController
       when "snort-org"
         fp_create(false_positive_params)
       when "talos-ingelligence"
+        return_message = {
+
+        }
+        render json: return_message, status: :ok
+      else
+        return_message = {
+
+        }
+        render json: return_message, status: :ok
     end
 
   end
