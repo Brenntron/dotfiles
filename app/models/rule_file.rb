@@ -75,7 +75,7 @@ class RuleFile
       Rails.logger.info("*** diff line = '#{line}'")
       if (/^\+/ =~ line) && (/^\+\+\+/ !~ line) && (/sid:\s*\d+\s*;/ =~ line)
         Rails.logger.debug("*** diff line is an add")
-        Repo::RuleContentCommitter.repo_add_line_new_rule_to_bug(line[1..-1], bug: bug)
+        Repo::RuleContentCommitter.repo_add_line(line[1..-1], rules_rel: bug.rules, bug: bug)
       end
     end
   end

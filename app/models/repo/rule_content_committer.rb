@@ -101,32 +101,46 @@ module Repo
       FileUtils.remove_file(working_pathname) rescue nil
     end
 
-    def self.repo_add_line_new_rule(rule_content, rules_rel: Rule.with_pub_content)
-      Rails.logger.debug("<<< repo_add_line_new_rule('#{rule_content.chomp}')")
+    # Processes rule content from a subversion diff add line.
+    #
+    # Line should be qualified as an add from the diff which is a rule (with a sid).
+    #
+    # Compares rule to any matching new rules being published, and loads rule_content (e.g. the sid) onto that record.
+    # If no matching new rule is found, then it is a new rule it needs to be added to the database.
+    # If no matching new rule is found, it may be an edited rule, and should be loaded to a rule with the same sid.
+    # @param [String] rule_content line added in a subversion diff, which should be a rule_content string.
+    # @param [ActiveRecord::Relation] rules_rel collection of rules to match new rules to.
+    # @param [Bug] bug A bug object to add new rules to.
+    def self.repo_add_line(rule_content, rules_rel: Rule.with_pub_content, bug: nil)
+      byebug
+      # Get a parser to match the rule content to any new rules
       parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
       unless parser
         Rails.logger.error("Net Snort Parser cannot parse rule_content = #{rule_content.chomp.inspect}")
         return false
       end
 
+      # Looking only at new rules being published, find any that matches the rule content
       new_publishing_rules = rules_rel.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
       found_rules = new_publishing_rules.to_a.select do |rule|
         parsed_rule = RuleSyntax::NetSnortParser.new_from_rule_content(rule.rule_content)
         parser.match?(parsed_rule)
       end
 
+      # If found, load the rule content, in particular the sid, onto that record.
       if 1 == found_rules.count
         found_rule = found_rules.first
         found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
         Rule.set_pubdoc_state(found_rule)
         found_rule
-      end
-    end
 
-    def self.repo_add_line_new_rule_to_bug(rule_content, bug:)
-      unless repo_add_line_new_rule(rule_content, rules_rel: bug.rules)
+      # If not found, load the rule content which will us any record that already had the sid,
+      # or create a new rule.
+      else
         loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
-        bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
+        if bug
+          bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
+        end
         Rule.set_pubdoc_state(loaded_rule)
       end
     end
