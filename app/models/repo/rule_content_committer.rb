@@ -112,7 +112,6 @@ module Repo
     # @param [ActiveRecord::Relation] rules_rel collection of rules to match new rules to.
     # @param [Bug] bug A bug object to add new rules to.
     def self.repo_add_line(rule_content, rules_rel: Rule.with_pub_content, bug: nil)
-      byebug
       # Get a parser to match the rule content to any new rules
       parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
       unless parser
