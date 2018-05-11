@@ -38,19 +38,8 @@ class Bridge::MessagesController < ApplicationController
     end.compact
 
     Thread.new do
-      Rails.logger.info("svn up #{relative_filenames.join(" ")}")
-      # Rails.logger.debug "cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}"
-      `cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}`
-      Rails.logger.info("notify svn up is done")
+      Repo::RuleContentCommitter.svn_up(relative_filenames)
     end
-
-    # Thread.new do
-    #   # Rails.logger.info("svn up #{relative_filenames.join(" ")}")
-    #   # # Rails.logger.debug "cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}"
-    #   # `cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}`
-    #   # Rails.logger.info("notify svn up is done")
-    #   Repo::RuleContentCommitter.svn_up(relative_filenames)
-    # end
 
     Repo::RuleContentCommitter.repo_notify_filenames(relative_filenames)
 
