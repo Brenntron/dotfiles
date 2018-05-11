@@ -148,7 +148,7 @@ module Repo
       end
     end
 
-    def self.repo_notify_filenames(relative_filenames)
+    def self.repo_notify_relative_filenames(relative_filenames)
       relative_filenames.each do |relative_filepath|
 
         # unless /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
@@ -174,6 +174,20 @@ module Repo
           end
         end
       end
+    end
+
+    def self.repo_notify_given_filenames(given_filenames)
+      relative_filenames = given_filenames.map do |filepath_given|
+        if /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
+          filename
+        else
+          Rails.logger.error("Will not process #{filename.inspect}, skipping.")
+          nil
+        end
+      end.compact
+
+      svn_up(relative_filenames)
+      repo_notify_relative_filenames(relative_filenames)
     end
 
     def self.svn_up(relative_filenames)

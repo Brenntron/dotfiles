@@ -20,30 +20,17 @@ class Bridge::MessagesController < ApplicationController
 
   # Message to recieve notification from subversion when a rules file has been committed.
   def rule_file_notify
-    snort_dir = Rails.root.join('extras', 'snort')
-
     filenames = message_params.fetch(:filenames, [])
-    unless filenames
-      Rails.warn("No files names in notify message.")
-      return "No files given to process."
-    end
-
-    relative_filenames = filenames.map do |filepath_given|
-      if /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
-        filename
-      else
-        Rails.logger.error("Will not process #{filename.inspect}, skipping.")
-        nil
+    if filenames
+      Thread.new do
+        Repo::RuleContentCommitter.repo_notify_given_filenames(filenames)
       end
-    end.compact
 
-    Thread.new do
-      Repo::RuleContentCommitter.svn_up(relative_filenames)
+      "success"
+    else
+      Rails.warn("No files names in notify message.")
+      "No files given to process."
     end
-
-    Repo::RuleContentCommitter.repo_notify_filenames(relative_filenames)
-
-    "success"
   end
 
   # Add route for specific channels to their own action under the channels collection.
