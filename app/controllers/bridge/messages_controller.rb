@@ -20,9 +20,31 @@ class Bridge::MessagesController < ApplicationController
 
   # Message to recieve notification from subversion when a rules file has been committed.
   def rule_file_notify
+    snort_dir = Rails.root.join('extras', 'snort')
+
     filenames = message_params.fetch(:filenames, [])
-    filenames.each do |filepath_given|
-      snort_dir = Rails.root.join('extras', 'snort')
+    unless filenames
+      Rails.warn("No files names in notify message.")
+      return "No files given to process."
+    end
+
+    relative_filenames = filenames.map do |filepath_given|
+      if /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
+        filename
+      else
+        Rails.logger.error("Will not process #{filename.inspect}, skipping.")
+        nil
+      end
+    end.compact
+
+    Thread.new do
+      Rails.logger.info("svn up #{relative_filenames.join(" ")}")
+      # Rails.logger.debug "cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}"
+      `cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}`
+      Rails.logger.info("notify svn up is done")
+    end
+
+    relative_filenames.each do |filepath_given|
 
       unless /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
         Rails.logger.error("Will not process #{filename.inspect}, skipping.")
@@ -47,7 +69,8 @@ class Bridge::MessagesController < ApplicationController
         end
       end
     end
-    {}
+
+    "success"
   end
 
   # Add route for specific channels to their own action under the channels collection.
