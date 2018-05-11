@@ -18,6 +18,38 @@ class Bridge::MessagesController < ApplicationController
     render plain: except.message, status: :internal_server_error
   end
 
+  # Message to recieve notification from subversion when a rules file has been committed.
+  def rule_file_notify
+    filenames = message_params.fetch(:filenames, [])
+    filenames.each do |filepath_given|
+      snort_dir = Rails.root.join('extras', 'snort')
+
+      unless /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
+        Rails.logger.error("Will not process #{filename.inspect}, skipping.")
+        next
+      end
+
+      filepath = snort_dir.join(filename)
+      Rails.logger.debug("path #{filepath.inspect}")
+
+      unless File.directory?(filepath.dirname)
+        Rails.logger.error("SVN NOTIFY: No directory #{filepath.dirname}")
+        next
+      end
+
+      `svn diff -r PREV:BASE #{filepath}`.split("\n").each do |line|
+
+        next if /^\+\+\+/ =~ line
+        next unless /sid:\s*\d+\s*;/ =~ line
+
+        if /^\+(?<add_line>.*)$/ =~ line.chomp
+          Repo::RuleContentCommitter.repo_add_line(add_line)
+        end
+      end
+    end
+    {}
+  end
+
   # Add route for specific channels to their own action under the channels collection.
   # When there is no route, it defaults to the create action.
   def create

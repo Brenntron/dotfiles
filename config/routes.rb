@@ -134,6 +134,7 @@ Rails.application.routes.draw do
     resources :channels, only: [] do
       collection do
         post 'fp-create/messages', to: 'messages#fp_create'
+        post 'rule-file-notify/messages', to: 'messages#rule_file_notify'
       end
       resources :messages, only: [:create]
     end
