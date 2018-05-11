@@ -44,31 +44,15 @@ class Bridge::MessagesController < ApplicationController
       Rails.logger.info("notify svn up is done")
     end
 
-    relative_filenames.each do |filepath_given|
+    # Thread.new do
+    #   # Rails.logger.info("svn up #{relative_filenames.join(" ")}")
+    #   # # Rails.logger.debug "cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}"
+    #   # `cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}`
+    #   # Rails.logger.info("notify svn up is done")
+    #   Repo::RuleContentCommitter.svn_up(relative_filenames)
+    # end
 
-      unless /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
-        Rails.logger.error("Will not process #{filename.inspect}, skipping.")
-        next
-      end
-
-      filepath = snort_dir.join(filename)
-      Rails.logger.debug("path #{filepath.inspect}")
-
-      unless File.directory?(filepath.dirname)
-        Rails.logger.error("SVN NOTIFY: No directory #{filepath.dirname}")
-        next
-      end
-
-      `svn diff -r PREV:BASE #{filepath}`.split("\n").each do |line|
-
-        next if /^\+\+\+/ =~ line
-        next unless /sid:\s*\d+\s*;/ =~ line
-
-        if /^\+(?<add_line>.*)$/ =~ line.chomp
-          Repo::RuleContentCommitter.repo_add_line(add_line)
-        end
-      end
-    end
+    Repo::RuleContentCommitter.repo_notify_filenames(relative_filenames)
 
     "success"
   end

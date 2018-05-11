@@ -101,6 +101,10 @@ module Repo
       FileUtils.remove_file(working_pathname) rescue nil
     end
 
+    def self.snort_dir
+      @snort_dir ||= Rails.root.join('extras', 'snort')
+    end
+
     # Processes rule content from a subversion diff add line.
     #
     # Line should be qualified as an add from the diff which is a rule (with a sid).
@@ -142,6 +146,41 @@ module Repo
         end
         Rule.set_pubdoc_state(loaded_rule)
       end
+    end
+
+    def self.repo_notify_filenames(relative_filenames)
+      relative_filenames.each do |relative_filepath|
+
+        # unless /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
+        #   Rails.logger.error("Will not process #{filename.inspect}, skipping.")
+        #   next
+        # end
+
+        filepath = snort_dir.join(relative_filepath)
+        Rails.logger.debug("path #{filepath.inspect}")
+
+        unless File.directory?(filepath.dirname)
+          Rails.logger.error("SVN NOTIFY: No directory #{filepath.dirname}")
+          next
+        end
+
+        `svn diff -r PREV:BASE #{filepath}`.split("\n").each do |line|
+
+          next if /^\+\+\+/ =~ line
+          next unless /sid:\s*\d+\s*;/ =~ line
+
+          if /^\+(?<add_line>.*)$/ =~ line.chomp
+            repo_add_line(add_line)
+          end
+        end
+      end
+    end
+
+    def self.svn_up(relative_filenames)
+      Rails.logger.info("svn up #{relative_filenames.join(" ")}")
+      # Rails.logger.debug "cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}"
+      `cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}`
+      Rails.logger.info("notify svn up is done")
     end
 
     # gets file from svn prepared for later commit
