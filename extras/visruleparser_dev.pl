@@ -29,8 +29,6 @@ use Net::Snort::Parser::Rule;
 use Net::Snort::Parser::File;
 use Data::Dumper;
 
-die "faster pussy cat";
-
 print "Parser version: " . $Net::Snort::Parser::Rule::VERSION . "\n";
 print "Visruleparser version: 2018.03.23\n";
 

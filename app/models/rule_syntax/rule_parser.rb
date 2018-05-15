@@ -37,7 +37,7 @@ module RuleSyntax
 
     def raw_hash
       unless @raw_hash
-        raise "Cannot parser rule content '#{rule_content}'" unless options
+        raise "Cannot parse rule content '#{rule_content}'" unless options
         @raw_hash ||= options.split(/\s*;\s*/).inject({}) do |raw_hash, option|
           if /\A\s*(?<type>\w+)\s*:\s?(?<data>.*)\z/ =~ option
             key = type.downcase.to_sym
