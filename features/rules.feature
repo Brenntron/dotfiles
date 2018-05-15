@@ -121,8 +121,8 @@ Feature: Rules
     And  I click button "list all"
     Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
-    And  I should see a rule row with class "incomplete-unparsed" and version "new_rule"
-    And  I should see a rule with state "FAILED" version "new_rule"
+    And  I should see a rule row with class "parsed" and version "new_rule"
+    And  I should see a rule with state "NEW" version "new_rule"
     And  I should see "APP-DETECT Test msg"
 #    And rule "11" is a new rule
     When I click "new_rule"
@@ -221,8 +221,8 @@ Feature: Rules
     And  I click button "list all"
     Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
-    And  I should see a rule row with class "incomplete-unparsed" and version "new_rule"
-    And  I should see a rule with state "FAILED" version "new_rule"
+    And  I should see a rule row with class "parsed" and version "new_rule"
+    And  I should see a rule with state "NEW" version "new_rule"
     And  I should see "APP-DETECT Test msg"
 #    And rule "11" is a new rule
     When I check "rule[id]"
@@ -256,8 +256,8 @@ Feature: Rules
     And  I click button "list all"
     Then I should see a rule row with class "draft" and version "new_rule"
     And  I should see a rule row with class "new-rule" and version "new_rule"
-    And  I should see a rule row with class "incomplete-unparsed" and version "new_rule"
-    And  I should see a rule with state "FAILED" version "new_rule"
+    And  I should see a rule row with class "parsed" and version "new_rule"
+    And  I should see a rule with state "NEW" version "new_rule"
     And  I should see "APP-DETECT test msg"
 #    And rule "11" is a new rule
 
@@ -421,13 +421,13 @@ Feature: Rules
     And  I fill in "rule_content_11" with "alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:3;)"
     And  I click button "Save Changes"
     And  I wait for "8" seconds
-    Then I should see rule "11" state "FAILED" version "1:22211:3"
+    Then I should see rule "11" state "UPDATED" version "1:22211:3"
     And rule "11" is a current edit
     And I should see "APP-DETECT test msg"
     And I should see a rule row with class "draft" and id "11"
     And I should see a rule row with class "edited-rule" and id "11"
     And I should see a rule row with class "current-edit" and id "11"
-    And I should see a rule row with class "incomplete-unparsed" and id "11"
+    And I should see a rule row with class "parsed" and id "11"
 
   @javascript
   Scenario: Valid current edited rule should have CSS class
@@ -614,7 +614,7 @@ Feature: Rules
     When code calls revert_grep for rule gid "1" sid "22211" on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
-    And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
+    And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
 
   Scenario: Editing Rule: A rule can revert model test
@@ -624,7 +624,7 @@ Feature: Rules
     When code calls revert_rules_action for rule gid "1" sid "19500"
     Then a rule record for rule gid "1" sid "19500" will exist
     And  A rule gid "1" and sid "19500" has class "synched"
-    And  A rule gid "1" and sid "19500" has class "incomplete-unparsed"
+    And  A rule gid "1" and sid "19500" has class "parsed"
 
   ### Scenarios Synching a rule from VC ###
    
@@ -632,7 +632,7 @@ Feature: Rules
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
 #    And  A rule gid "1" and sid "22211" has class "synched"
-    And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
+    And  A rule gid "1" and sid "22211" has class "parsed"
    
   Scenario: Synch Rule: create a failed rule from synching model test
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test *.msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
@@ -647,7 +647,7 @@ Feature: Rules
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
-    And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
+    And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
    
   @javascript
@@ -658,7 +658,7 @@ Feature: Rules
     When code calls load_grep on "extras/snort/rules/app-detect.rules:33:# alert udp $HOME_NET any -> any 53 (msg:"APP-DETECT test msg"; flow:to_server; byte_test:1,!&,0xF8,2; content:"|04|hola|03|org|00|"; fast_pattern:only; metadata:service dns; classtype:policy-violation; sid:22211; rev:4;)"
     Then a rule record for rule gid "1" sid "22211" will exist
     And  A rule gid "1" and sid "22211" has class "synched"
-    And  A rule gid "1" and sid "22211" has class "incomplete-unparsed"
+    And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
 
   Scenario: Synch Rule: VC updated for a valid edited rule do not load model test

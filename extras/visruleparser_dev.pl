@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Name: phoo.pl
-#
+# 
 # Description: A rule parser to quickly help analyze rule files prior to commit.
 # Read in a rule file, parse and display several components of the rule listed below:
 #    NEEDS -->
@@ -19,7 +19,7 @@
 #    metadata
 #    references
 #    classtype
-#
+# 
 # Author: McLovin
 #
 use strict;
@@ -29,10 +29,8 @@ use Net::Snort::Parser::Rule;
 use Net::Snort::Parser::File;
 use Data::Dumper;
 
-die "faster pussy cat";
-
 print "Parser version: " . $Net::Snort::Parser::Rule::VERSION . "\n";
-print "Visruleparser version: 2018.03.23\n";
+print "Visruleparser version: 2018.01.02\n";
 
 my $dumprulestruct = 0;  # for debug output, dump the rule structure for the first rule and exit
 my $speedtruffs = 0; # set to 1 to allow stream_reassemble rule option
@@ -116,7 +114,7 @@ if($failure){
    print "*** THERE WERE FAILURES ***\n";
    print "*** THERE WERE FAILURES ***\n";
    print "\n";
-   exit -2; # return -2 because -1 is when the script dies in the ruleparse library or something
+   exit -1;
 }
 if($warning){
    exit 1;
@@ -143,7 +141,7 @@ sub process_line {
       print "$line_num: $line\n";
       return;
    }
-
+   
    # if line contains a failed rule
    if($rule->{'failed'}){
       print "$line_num: FAILED - $rule->{failed}\n   $line\n";
@@ -153,38 +151,33 @@ sub process_line {
       return;
    }
 
-   my ($gid) = $line =~ /gid\s*:\s*(\d+)\s*/;
-   $gid = 1 if(!defined($gid) || $gid eq "");
-
-   # Verify variables in connection information. Only text rules, SO, and sensitive-data have connection info
-   if($gid =~ /^(1|3|138)$/) {
-      my ($src_net, $src_port, $dst_net, $dst_port) = $line =~ /^\s*#?\s*alert\s+[^\s]+\s+([^\s]+)\s+([^\s]+)\s*(?:<-|<>|->)\s*([^\s]+)\s+([^\s]+)/;
-      #print "$src_net, $src_port, $dst_net, $dst_port\n";
-      foreach my $connvar ($src_net, $src_port, $dst_net, $dst_port) {
-         # If we have a ports list, split it into pieces.  This is to fix "ports list with variables" issue
-         $connvar =~ s/^\[?(.*)\]$/$1/; # Strip leading and trailing square brackets if present
-         my @mtoks = split(/,/, $connvar); # Marty tokens!
-         foreach my $mtok (@mtoks) {
-            if($mtok =~ /^\$/) {
-               $mtok =~ s/^\$//;
-               if(!grep(/^$mtok$/, @VALID_VARS)) {
-                  $failure++;
-                  push(@failed, "INVALID VARIABLE - $mtok");
-               }
-            } else {
-               # If not a variable, at least look somewhat like something valid
-               # This could be more robust.  It seems snort rule parser library
-               # doesn't validate this format so it seems this issue is deeper
-               # than just "library doesn't validate variable names because it
-               # has no way of knowing what's valid and what isn't."
-               if(!($mtok =~ /^any$/) && !($mtok =~ /^[\d,\[\]\.!:\/]+$/)) {
-                  $failure++;
-                  push(@failed, "INVALID CONNECTION INFO - $mtok");
-               }
+   # Verify variables in connection information
+   my ($src_net, $src_port, $dst_net, $dst_port) = $line =~ /^\s*#?\s*alert\s+[^\s]+\s+([^\s]+)\s+([^\s]+)\s*(?:<-|<>|->)\s*([^\s]+)\s+([^\s]+)/;
+   #print "$src_net, $src_port, $dst_net, $dst_port\n";
+   foreach my $connvar ($src_net, $src_port, $dst_net, $dst_port) {
+      # If we have a ports list, split it into pieces.  This is to fix "ports list with variables" issue
+      $connvar =~ s/^\[?(.*)\]$/$1/; # Strip leading and trailing square brackets if present
+      my @mtoks = split(/,/, $connvar); # Marty tokens!
+      foreach my $mtok (@mtoks) {
+         if($mtok =~ /^\$/) {
+            $mtok =~ s/^\$//;
+            if(!grep(/^$mtok$/, @VALID_VARS)) {
+               $failure++;
+               push(@failed, "INVALID VARIABLE - $mtok");
+            }
+         } else {
+            # If not a variable, at least look somewhat like something valid
+            # This could be more robust.  It seems snort rule parser library
+            # doesn't validate this format so it seems this issue is deeper
+            # than just "library doesn't validate variable names because it
+            # has no way of knowing what's valid and what isn't." 
+            if(!($mtok =~ /^any$/) && !($mtok =~ /^[\d,\[\]\.!:\/]+$/)) {
+               $failure++;
+               push(@failed, "INVALID CONNECTION INFO - $mtok");
             }
          }
       }
-   }
+   }   
 
    # Potential improvements to the rule
    find_fast_pattern_only($rule);
@@ -271,10 +264,6 @@ sub process_line {
       }
    }
 
-   if($line =~ /^\s*#?\s*(alert|drop)\s*tcp.*[\s;]dsize\s*:/) {
-      push(@failed, "TCP payloads need to use isdataat for size checks, dsize is for UDP");
-   }
-
 # Removing this for now because flowbit autoresolution is still broken
 #   # flowbits:noalert should not be in any policies
 #   if($line =~ /flowbits\s*:\s*noalert\s*;/) {
@@ -286,12 +275,8 @@ sub process_line {
 
    # else we're a rule, lets get the info patrick needs
    my $r = $rule;
-   # Connection information.  Only plaintext, SO, and sensitive-data include connection info
-   if($gid =~ /^(1|3|138)$/) {
-      print "Connection: $r->{action} $r->{protocol} $r->{src} $r->{srcport} $r->{direction} $r->{dst} $r->{dstport}\n";
-   } else {
-      print "Connection: n/a\n";
-   }
+   # Connection
+   print "Connection: $r->{action} $r->{protocol} $r->{src} $r->{srcport} $r->{direction} $r->{dst} $r->{dstport}\n";
 
    # Message
    print "Message   : $r->{name}\n";
@@ -311,11 +296,11 @@ sub process_line {
    # Extra VOIP stuff that is handled in textrules-commit.pl
    push(@rulecategories, qw(VOIP-SIP-TCP VOIP-SIP-UDP VOIP-SKINNY-TCP VOIP-SDP-TCP VOIP-SDP-UDP));
 
-   my ($category) = $r->{name} =~ /^([^\s]+)[\s"]/;
+   my ($category) = $r->{name} =~ /^([^\s]+)\s/;
 
    my $categorypcre = "^(" . join('|', @rulecategories). ") ";
 
-   if(!($r->{name} =~ /$categorypcre/) && ($gid =~ /^[13]$/)) {
+   if(!($r->{name} =~ /$categorypcre/)) {
       $failure++;
       push @failed, "Rule category $category not valid";
    }
@@ -330,7 +315,7 @@ sub process_line {
 #   if($r->{name} =~ /^(SPECIFIC-THREATS|WEB-CLIENT) /) {
 #      push(@warnings, "RULE CATEGORY $category should be avoided");
 #   }
-
+   
    # Category-specific checks
    if($r->{name} =~ /^(BOTNET-CNC|BLACKLIST|MALWARE-BACKDOOR|MALWARE-CNC|MALWARE-OTHER|MALWARE-TOOLS) /) {
       if(!$r->{metadata}{impact_flag}) {
@@ -345,7 +330,7 @@ sub process_line {
          }
       }
    }
-
+   
    # Flow
    my $flow = get_option($r, 'flow');
    if( $flow && $flow >=0 ){
@@ -360,13 +345,7 @@ sub process_line {
       }
       $flow = '<MISSING>';
    }
-
-   # Flow information.  Only plaintext rules include flow info
-   if($gid == 1) {
-      print "Flow      : $flow\n";
-   } else {
-      print "Flow      : n/a\n";
-   }
+   print "Flow      : $flow\n";
 
    # Detection: awful I know
    print "Detection :";
@@ -376,7 +355,7 @@ sub process_line {
    my $detection = $line;
    $detection =~ s/\s*#?\s*alert(.*?)\((.*)\)/$2/;
 
-   foreach my $strippershoes (qw(reference metadata msg flow classtype sid rev gid)) {
+   foreach my $strippershoes (qw(reference metadata msg flow classtype sid rev)) {
 #      $detection =~ s/(^|[\s;])($strippershoes)\s*:(.*?);/<$2>/g;
       # I made the ';' optional because someone didn't have a space and didn't
       # bother to see why their rule didn't parse properly.
@@ -385,9 +364,9 @@ sub process_line {
       # in the hopes that people will pay just the slightest amount of attention
       # and notice their errors, even though this tool was created to combat
       # the problem of people not noticing their errors.
-      $detection =~ s/(^|[\s;])($strippershoes)\s*:(.*?);//g;
+      $detection =~ s/[\s;]($strippershoes)\s*:(.*?);//g;
    }
-
+ 
    $detection =~ s/^\s+//;
    $detection =~ s/\s+$//;
 
@@ -410,11 +389,6 @@ sub process_line {
    }
 
    # Print out the detection content
-   if(!@detectionarray) {
-      push(@detectionarray, "<binary detection>") if($gid != 1);
-      push(@detectionarray, "<EMPTY>") if($gid == 1);
-   }
-
    print " "x$indent . join("\n" . " "x$indent, @detectionarray) . "\n";
 
    # Find some common mistakes
@@ -476,23 +450,13 @@ sub process_line {
       if(defined $pcreflags && $pcreflags ne "") {
          # Fail if invalid characters in flag or too many flags
          my $validpcreflags = "ismxAEGRUIPHDMCKSYBO";
-         my $invalidpcreflags = "[^$validpcreflags]";
+         my $invalidpcreflags = "[^$validpcreflags]"; 
          my $toomanypcreflags = "[$validpcreflags]{6}";
          if($pcreflags =~ /$invalidpcreflags/ || $pcreflags =~ /$toomanypcreflags/) {
             push(@failed, "Invalid pcreflag (or unescaped slash in regex) $pcreflags");
          }
       }
 
-   }
-
-   # Find improper operators for byte_test not caught by ruleparser library (or snort...)
-   if($detection =~ /byte_test\s*:\s*[0-9]+\s*,(?!\s*\!?(=|<|>|<=|>=|&|^)\s*,)/) {
-      push(@failed, "byte_test using invalid operator");
-   }
-
-   # Little endian numeric strings make no sense
-   if($detection =~ /byte_test\s*:[^;]*(little\s*,.*string|string\s*,.*little)/) {
-      push(@failed, "byte_test using \"little endian string\"");
    }
 
    # Here's a nice place to put errors for using rule options that shouldn't be used
@@ -517,22 +481,10 @@ sub process_line {
          if( join(', ', sort {$a cmp $b} keys %{$r->{metadata}{policy}}) =~ m/balanced-ips/) {
             $balancedpolicy = 1;
          }
-
-         # Enforce inheritance of policies: connectivity-ips -> balanced-ips -> security-ips -> max-detect-ips
-         # Yes, if you have connectivity-ips and security-ips, this will alert twice, but if you do that, you deserve it.
-         if(grep(/connectivity-ips/, keys %{$r->{metadata}{policy}})) {
-            push(@failed, 'Policies must be inherited: connectivity-ips -> balanced-ips -> security-ips -> max-detect-ips') if(!grep(/balanced-ips/, keys %{$r->{metadata}{policy}}));
-         }
-         if(grep(/balanced-ips/, keys %{$r->{metadata}{policy}})) {
-            push(@failed, 'Policies must be inherited: connectivity-ips -> balanced-ips -> security-ips -> max-detect-ips') if(!grep(/security-ips/, keys %{$r->{metadata}{policy}}));
-         }
-         if(grep(/security-ips/, keys %{$r->{metadata}{policy}})) {
-            push(@failed, 'Policies must be inherited: connectivity-ips -> balanced-ips -> security-ips -> max-detect-ips') if(!grep(/max-detect-ips/, keys %{$r->{metadata}{policy}}));
-         }
       } else {
 #         push(@warnings, "METADATA Policy");
          print "\n" . " "x$indent . "Policy: <MISSING>\n";
-      }
+      }   
       if( $r->{metadata}{service}){
          print " "x$indent . "Service: " . join(', ', sort {$a cmp $b} keys %{$r->{metadata}{service}}) . "\n";
          $servicemetadata = 1;
@@ -550,7 +502,7 @@ sub process_line {
 #      push(@warnings, "METADATA");
       print " <MISSING>\n";
    }
-
+   
    # References:
    print "References:";
    if(!$r->{references}){
@@ -576,48 +528,41 @@ sub process_line {
          print " "x$indent . "BUGTRAQ: " . join(", ", keys %{$r->{references}{bugtraq}}) . "\n";
 #      } else { # Don't really care if bugtraq is missing, tbh
 #         print " "x$indent . "BUGTRAQ: <MISSING>\n";
-      }
+      }      
       if( $r->{references}{url} ){
          #print "\tURL:\n\t\t" . join("\n\t\t", keys %{$r->{references}{url}}) . "\n";
          print " "x$indent . "URL:     " . join("\n" . " "x$indent . " "x9, keys %{$r->{references}{url}}) . "\n";
          foreach my $key (keys %{$r->{references}{url}}) {
-            # Really, it's probably time to get rid of this microsoft validation.  Sucks they're starting to retire old, valid links, though.
             if($key =~ /microsoft\.com.*ms..-.{1,3}/i) { # Looks vaguely like an MS Bulletin reference
                if(#!($key =~ /www\.microsoft\.com\/technet\/security\/bulletin\/(MS|ms)[0-9]{2}-[0-9]{3}.mspx($|\s)/) && # Old form no longer supported
                   !($key =~ /technet\.microsoft\.com\/en-us\/security\/bulletin\/(MS|ms)[0-9]{2}-[0-9]{3}($|\s)/) &&
                   !($key =~ /technet\.microsoft\.com\/en-us\/security\/advisory\/[0-9]+($|\s)/) &&
-                  !($key =~ /technet\.microsoft\.com\/en-us\/library\/security\/(ms|MS)\d{2}-\d{3}\.aspx/) &&
-                  !($key =~ /docs\.microsoft\.com\/en-us\/security-updates\/SecurityBulletins\/\d{4}\/ms\d{2}-\d{3}/i)) {
+                  !($key =~ /technet\.microsoft\.com\/en-us\/library\/security\/(ms|MS)\d{2}-\d{3}\.aspx/)) {
                   if($key =~ /technet\.microsoft\.com\/en-us\/security\/bulletin\/(MS|ms)[0-9]{2}-XXX($|\s)/i) {
                      push(@warnings, 'MICROSOFT DUMMY BULLETIN REFERENCE IN USE');
                   } else {
-                     push(@failed, 'Reference: Improperly formatted Microsoft reference (docs.microsoft.com/en-us/security-updates/SecurityBulletins/2008/ms08-067)');
+                     push(@failed, 'Reference: Improperly formatted Microsoft reference (technet.microsoft.com/en-us/library/security/ms08-067.aspx)');
                   }
                }
             } elsif($key =~ /microsoft\.com.*advisory/i) { # Looks vaguely like a new MS CVE reference
-               if(!($key =~ /portal.msrc.microsoft.com\/en-(US|us)\/security-guidance\/advisory\/CVE-\d{4}-\d{4,}/) &&
-                  !($key =~ /technet\.microsoft\.com\/(en-us\/)?security\/advisory\/[0-9]+($|\s)/)) {
-                  push(@failed, 'Reference: Improperly formatted Microsoft reference (portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-YYYY-XXXX)');
+               if(!($key =! /portal.msrc.microsoft.com\/en-US\/security-guidance\/advisory\/CVE-\d{4}-\d{4,}/)) {
+                  push(@failed, 'Reference: Improperly formatted Microsoft reference (portal.msrc.microsoft.com/en-us/security-guidance/advisory/CVE-YYYY-XXXX)');
                }
-            } elsif($key =~ /talosintel/i) {
+            } elsif($key =~ /talosintel.*TALOS/i) {
                if(!($key =~ /www.talosintelligence.com\/(vulnerability_)?reports\/TALOS-(CAN|\d{4})-\d{4}/)) {
-                  push(@warnings, 'Reference: Improperly formatted Talos Intelligence reference (www.talosintelligence.com/reports/TALOS-YYYY-NNNN)');
+                  push(@warnings, 'Reference: Improperly formatted Talos Intelligence reference (www.talosintelligence.com/reports/TALOS-YYYY-NNNN)');     
                }
             } elsif($key =~ /osvdb\.org/) {
                if(!($key =~ /osvdb\.org\/show\/osvdb\/\d+($|\s)/)) {
                   push(@failed, 'Reference: Improperly formatted OSVDB reference');
                }
-            } elsif($key =~ /nvd\.nist\.gov.*CVE-/i) {
-               push(@failed, 'Reference: Use cve reference type instead of NIST cve link');
-            } elsif($key =~ /cve\.mitre\.org\/.*CVE-/i) {
-               push(@failed, 'Reference: Use cve reference type instead of MITRE cve link');
             }
          }
       } else {
          print " "x$indent . "URL:     <MISSING>\n";
       }
    }
-
+   
    # Classtype:
    print "Classtype : ";
    if(!$r->{classification}){
@@ -628,12 +573,7 @@ sub process_line {
    } else {
       print "$r->{classification}\n";
    }
-
-   # GID:
-   if($gid != 1) {
-      print "Gid       : $gid\n";
-   }
-
+   
    # SID:
    print "Sid       : ";
    if(!$r->{sid}){
@@ -666,7 +606,7 @@ sub process_line {
    }
 
 
-   if( (@failed || @warnings || @improvements) && ($gid == 1) ){
+   if( @failed || @warnings || @improvements ){
       print "\n" . "%"x80 . "\n";
 
       my $line_info = $line_num;
@@ -717,7 +657,7 @@ sub get_option {
          return $opt;
       }
    }
-   return;
+   return;  
 }
 
 
@@ -805,7 +745,7 @@ sub is_valid_candidate {
    # to say that case probably doesn't matter even if there are
    # alphabetic characters because generally this is true
    if(!exists $rule->{'options'}{$opt}->{'nocase'}) {
-      return 0 if (($rule->{'options'}{$opt}->{'string'} =~ /[A-Za-z]/) &&
+      return 0 if (($rule->{'options'}{$opt}->{'string'} =~ /[A-Za-z]/) && 
                    (length($rule->{'options'}{$opt}->{'string'}) < 10));
    }
 
