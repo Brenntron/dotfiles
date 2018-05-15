@@ -11,26 +11,6 @@ class FalsePositive < ApplicationRecord
     end.compact
   end
 
-  def download_s3_urls
-    fp_file_refs.each do |fp_file_ref|
-      if fp_file_ref.file_reference.kind_of?(S3Url)
-        # get the current parent
-        s3_url = fp_file_ref.file_reference
-
-        # get a new parent
-        local = s3_url.download
-        unless local.new_record? || local.changed? || !local.valid?
-          # have new parent adopt the child
-          fp_file_ref.update(file_reference: local)
-
-          # now the old parent can go away without orphaning the child.
-          # so, this is a little story
-          s3_url.delete
-        end
-      end
-    end
-  end
-
   def component
     sid_strs = sid.gsub(/\s*/, '').split(/[,;]/)
 
@@ -95,16 +75,14 @@ PCAP Utility: #{pcap_lib}
 
   def add_attachments(bug, bugzilla_session, user:)
     fp_file_refs.each do |fp_file_ref|
-
-      if fp_file_ref.file_reference.kind_of?(LocalFile)
-        file = File.join(fp_file_ref.file_reference.location, fp_file_ref.file_reference.file_name)
-        File.open(file, 'r') do |file|
-          bug.add_attachment_action(bugzilla_session,
-                                    file,
-                                    user: user,
-                                    filename: fp_file_ref.file_reference.file_name,
-                                    content_type: 'application/octet-stream')
-        end
+      if fp_file_ref.file_reference.kind_of?(S3Url)
+        s3_url = fp_file_ref.file_reference
+        file = s3_url.get_file
+        bug.add_attachment_action(bugzilla_session,
+                                  file,
+                                  user: user,
+                                  filename: fp_file_ref.file_reference.file_name,
+                                  content_type: 'application/octet-stream')
       end
     end
   rescue => except
@@ -155,7 +133,6 @@ PCAP Utility: #{pcap_lib}
   # @param [String] sender key for config.yml section for sources
   def create_escalation_action(bugzilla_session)
     user = User.where(cvs_username:"vrtincom").first
-    download_s3_urls
     bug = create_bug(bugzilla_session, user: user)
     if bug
       add_attachments(bug, bugzilla_session, user: user)
