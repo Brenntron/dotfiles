@@ -74,6 +74,7 @@ PCAP Utility: #{pcap_lib}
   end
 
   def add_attachments(bug, bugzilla_session, user:)
+    Rails.logger.info("Gathering attachments for bug #{bug.id}")
     fp_file_refs.each do |fp_file_ref|
       if fp_file_ref.file_reference.kind_of?(S3Url)
         s3_url = fp_file_ref.file_reference
@@ -90,6 +91,7 @@ PCAP Utility: #{pcap_lib}
   end
 
   def post_fp_created(bug)
+    Rails.logger.info("Sending Confirmation to #{self.source_authority}")
     conn = ::Bridge::FpCreatedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
     conn.post(false_positive_id: self.id, bug_id: bug&.id, source_key: self.source_key)
   end
@@ -109,6 +111,7 @@ PCAP Utility: #{pcap_lib}
   end
 
   def self.create_from_params(attrs, attachments_attrs:, sender:)
+    Rails.logger.info("Creating False Positive from attributes")
     if where(source_authority: sender, source_key: attrs['source_key']).exists?
       where(source_authority: sender, source_key: attrs['source_key']).delete_all
     end
@@ -118,6 +121,7 @@ PCAP Utility: #{pcap_lib}
   end
 
   def import_bug(bugzilla_session, bugzilla_id, user:)
+    Rails.logger.info("Importing information from bug #{bugzilla_id}")
     bug_stub = Bugzilla::Bug.new(bugzilla_session)
     bug_hash = bug_stub.get(bugzilla_id)
     Bug.bugzilla_import(user,
@@ -132,6 +136,7 @@ PCAP Utility: #{pcap_lib}
   # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
   # @param [String] sender key for config.yml section for sources
   def create_escalation_action(bugzilla_session)
+    Rails.logger.info("Creating Escalation")
     user = User.where(cvs_username:"vrtincom").first
     bug = create_bug(bugzilla_session, user: user)
     if bug
