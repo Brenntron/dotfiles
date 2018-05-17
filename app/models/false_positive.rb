@@ -11,26 +11,6 @@ class FalsePositive < ApplicationRecord
     end.compact
   end
 
-  def download_s3_urls
-    fp_file_refs.each do |fp_file_ref|
-      if fp_file_ref.file_reference.kind_of?(S3Url)
-        # get the current parent
-        s3_url = fp_file_ref.file_reference
-
-        # get a new parent
-        local = s3_url.download
-        unless local.new_record? || local.changed? || !local.valid?
-          # have new parent adopt the child
-          fp_file_ref.update(file_reference: local)
-
-          # now the old parent can go away without orphaning the child.
-          # so, this is a little story
-          s3_url.delete
-        end
-      end
-    end
-  end
-
   def component
     sid_strs = sid.gsub(/\s*/, '').split(/[,;]/)
 
@@ -78,10 +58,10 @@ PCAP Utility: #{pcap_lib}
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     bug_attrs = {
-        'product' => 'Research',
-        'component' => component,
+        'product' => 'Escalations',
+        'component' => 'TAC',
         'summary' => summary,
-        'version' => 'No Version Specified', #self.version,
+        'version' => 'unspecified', #self.version,
         'description' => full_description,
         # 'opsys' => self.os,
         'priority' => 'Unspecified',
@@ -89,33 +69,40 @@ PCAP Utility: #{pcap_lib}
     }
 
     bug = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
-    # bug = nil
     update(bug_id: bug.id) if bug
     bug
+  rescue => except
+    post_fp_failed(except.message)
   end
 
   def add_attachments(bug, bugzilla_session, user:)
+    Rails.logger.info("Gathering attachments for bug #{bug.id}")
     fp_file_refs.each do |fp_file_ref|
-      if fp_file_ref.file_reference.kind_of?(LocalFile)
-        File.open(fp_file_ref.file_reference.location, 'r') do |file|
-          bug.add_attachment_action(bugzilla_session,
-                                    file,
-                                    user: user,
-                                    filename: fp_file_ref.file_reference.file_name,
-                                    content_type: 'application/octet-stream')
-        end
+      if fp_file_ref.file_reference.kind_of?(S3Url)
+        s3_url = fp_file_ref.file_reference
+        file = s3_url.get_file
+        bug.add_attachment_action(bugzilla_session,
+                                  file,
+                                  user: user,
+                                  filename: fp_file_ref.file_reference.file_name,
+                                  content_type: 'application/octet-stream')
       end
     end
   rescue => except
-    Rails.logger.error(except.message)
+    post_fp_failed(except.message)
   end
 
   def post_fp_created(bug)
-    conn = PeakeBridge::FpCreatedEvent.new(addressee: self.source_authority,
-                                           source_authority: self.source_authority)
-    conn.post(false_positive_id: self.id,
-              bug_id: bug&.id,
-              source_key: self.source_key)
+    Rails.logger.info("Sending Confirmation to #{self.source_authority}")
+    conn = ::Bridge::FpCreatedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
+    conn.post(false_positive_id: self.id, bug_id: bug&.id, source_key: self.source_key)
+    Rails.logger.info("Confirmation to #{self.source_authority} sent successfully")
+  end
+
+  def post_fp_failed(msg)
+    Rails.logger.error(msg)
+    conn = ::Bridge::FpFailedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
+    conn.post(source_key: self.source_key, ac_status: "UNSENT")
   end
 
   def save_attachments_from_params(attachments_attrs:)
@@ -128,20 +115,21 @@ PCAP Utility: #{pcap_lib}
       s3_url = S3Url.create!(attrs)
       fp_file_refs.create(file_reference: s3_url)
     end
-
     self
   end
 
   def self.create_from_params(attrs, attachments_attrs:, sender:)
+    Rails.logger.info("Creating False Positive from attributes")
     if where(source_authority: sender, source_key: attrs['source_key']).exists?
       where(source_authority: sender, source_key: attrs['source_key']).delete_all
     end
-    create(attrs.merge(source_authority: sender)).tap do |false_positive|
-      false_positive.save_attachments_from_params(attachments_attrs: attachments_attrs)
+    create(attrs["fp_attrs"].merge(source_authority: sender, user_email:attrs["user_email"], source_key: attrs['source_key'])).tap do |false_positive|
+      false_positive.save_attachments_from_params(attachments_attrs: attachments_attrs["attachments"])
     end
   end
 
   def import_bug(bugzilla_session, bugzilla_id, user:)
+    Rails.logger.info("Importing information from bug #{bugzilla_id}")
     bug_stub = Bugzilla::Bug.new(bugzilla_session)
     bug_hash = bug_stub.get(bugzilla_id)
     Bug.bugzilla_import(user,
@@ -149,17 +137,15 @@ PCAP Utility: #{pcap_lib}
                         bugzilla_session,
                         bug_hash)
   rescue => except
-    Rails.logger.error(except.message)
+    post_fp_failed(except.message)
   end
 
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
   # @param [Bugzilla::XMLRPC Token] bugzilla_session proxy interface to bugzilla.
   # @param [String] sender key for config.yml section for sources
-  def create_bug_action(bugzilla_session, sender)
-    sender_config = Rails.configuration.peakebridge.sources[sender]
-    user = User.where(cvs_username: sender_config['username']).first
-
-    download_s3_urls
+  def create_escalation_action(bugzilla_session)
+    Rails.logger.info("Creating Escalation")
+    user = User.where(cvs_username:"vrtincom").first
     bug = create_bug(bugzilla_session, user: user)
     if bug
       add_attachments(bug, bugzilla_session, user: user)
@@ -168,6 +154,6 @@ PCAP Utility: #{pcap_lib}
     end
     bug
   rescue => except
-    Rails.logger.error(except.message)
+    post_fp_failed(except.message)
   end
 end

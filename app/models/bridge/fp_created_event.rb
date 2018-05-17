@@ -9,8 +9,8 @@ class Bridge::FpCreatedEvent < Bridge::BaseMessage
   def post(false_positive_id:, bug_id:, source_authority: @source_authority, source_key: @source_key)
     super(message: {source_authority: source_authority,
                     source_key: source_key,
-                    response: 'A false positive record was created.',
-                    false_positive_id: false_positive_id,
-                    bug_id: bug_id})
+                    ac_response: 'A false positive record was created.',
+                    ac_false_positive_id: false_positive_id,
+                    ac_bug_id: bug_id})
   end
 end
