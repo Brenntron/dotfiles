@@ -71,6 +71,8 @@ PCAP Utility: #{pcap_lib}
     bug = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
     update(bug_id: bug.id) if bug
     bug
+  rescue => except
+    post_fp_failed(except.message)
   end
 
   def add_attachments(bug, bugzilla_session, user:)
@@ -87,7 +89,7 @@ PCAP Utility: #{pcap_lib}
       end
     end
   rescue => except
-    Rails.logger.error(except.message)
+    post_fp_failed(except.message)
   end
 
   def post_fp_created(bug)
@@ -95,6 +97,12 @@ PCAP Utility: #{pcap_lib}
     conn = ::Bridge::FpCreatedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
     conn.post(false_positive_id: self.id, bug_id: bug&.id, source_key: self.source_key)
     Rails.logger.info("Confirmation to #{self.source_authority} sent successfully")
+  end
+
+  def post_fp_failed(msg)
+    Rails.logger.error(msg)
+    conn = ::Bridge::FpFailedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
+    conn.post(source_key: self.source_key, ac_status: "UNSENT")
   end
 
   def save_attachments_from_params(attachments_attrs:)
@@ -107,7 +115,6 @@ PCAP Utility: #{pcap_lib}
       s3_url = S3Url.create!(attrs)
       fp_file_refs.create(file_reference: s3_url)
     end
-
     self
   end
 
@@ -130,7 +137,7 @@ PCAP Utility: #{pcap_lib}
                         bugzilla_session,
                         bug_hash)
   rescue => except
-    Rails.logger.error(except.message)
+    post_fp_failed(except.message)
   end
 
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
@@ -147,6 +154,6 @@ PCAP Utility: #{pcap_lib}
     end
     bug
   rescue => except
-    Rails.logger.error(except.message)
+    post_fp_failed(except.message)
   end
 end
