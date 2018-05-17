@@ -26,8 +26,7 @@ end
 
 Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   @user = FactoryGirl.create(:current_user, confirmed: true)
-  @role = Role.create(role: role)
-  @user.roles << @role
+  @user.roles << Role.create(role: role)
   sign_in_user
 end
 
