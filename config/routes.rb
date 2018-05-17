@@ -134,7 +134,7 @@ Rails.application.routes.draw do
     resources :channels, only: [] do
       collection do
         get 'poll-from-bridge/messages', to: 'messages#get_messages'
-        post 'poll-from-bridge/messages', to: 'messages#messages_from_bridge'
+        post 'fp-event/messages', to: 'messages#messages_from_bridge'
         post 'fp-create/messages', to: 'messages#fp_create'
       end
       resources :messages, only: [:create]

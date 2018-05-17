@@ -12,7 +12,7 @@ class Bridge::MessagesController < ApplicationController
     return_message = {
         "envelope":
             {
-                "channel": "poll-from-bridge",
+                "channel": "fp-event",
                 "addressee": "snort-org",
                 "sender": "analyst-console"
             },
