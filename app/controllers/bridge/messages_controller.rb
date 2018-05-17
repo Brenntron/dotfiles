@@ -16,7 +16,7 @@ class Bridge::MessagesController < ApplicationController
                 "addressee": "snort-org",
                 "sender": "analyst-console"
             },
-        "message": {"source_key":params["source_key"],"ac_status":"RECEIVED"},
+        "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK"},
     }
     render json: return_message, status: :ok
 
