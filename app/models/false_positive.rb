@@ -55,10 +55,8 @@ PCAP Utility: #{pcap_lib}
   # Create a bug in bugzilla, save it with an active record model, and post to the bug create channel
   # @param [Bugzilla::XMLRPC] bugzilla_session proxy interface to bugzilla.
   def create_bug(bugzilla_session, user: nil)
-    Rails.logger.info("started Creating a bug")
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
-    Rails.logger.info("bug_factory was created")
     bug_attrs = {
         'product' => 'Escalations',
         'component' => 'TAC',
@@ -69,11 +67,9 @@ PCAP Utility: #{pcap_lib}
         'priority' => 'Unspecified',
         'classification' => 'unclassified',
     }
-    Rails.logger.info("bug_attrs are: #{bug_attrs}\n")
+
     bug = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
-    Rails.logger.info("finished creating a buzilla bug. now updating")
     update(bug_id: bug.id) if bug
-    Rails.logger.info("finished creating the bug")
     bug
   end
 
@@ -142,11 +138,8 @@ PCAP Utility: #{pcap_lib}
   # @param [String] sender key for config.yml section for sources
   def create_escalation_action(bugzilla_session)
     Rails.logger.info("Creating Escalation")
-    Rails.logger.info("Getting user bug")
     user = User.where(cvs_username:"vrtincom").first
-    Rails.logger.info("Creating bug")
     bug = create_bug(bugzilla_session, user: user)
-    Rails.logger.info("bug was created")
     if bug
       add_attachments(bug, bugzilla_session, user: user)
       import_bug(bugzilla_session, bug.bugzilla_id, user: user)
