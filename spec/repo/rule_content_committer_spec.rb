@@ -9,6 +9,12 @@ describe Repo::RuleContentCommitter do
       FactoryGirl.create(:rule_doc, rule: @rule_complete)
       @bug_embargo = FactoryGirl.create(:bug, liberty: Bug::LIBERTY_EMBARGO)
       @bug = FactoryGirl.create(:bug)
+      @bug.rules << @rule_synched
+      @bug.rules << @rule_stale
+      @bug.rules << @rule_edited
+      @bug.rules << @rule_incomplete
+      @bug.rules << @rule_complete
+      @bug.attachments << FactoryGirl.create(:attachment)
       @user = FactoryGirl.create(:user)
     end
 
@@ -48,7 +54,6 @@ describe Repo::RuleContentCommitter do
     end
 
     it 'prescreens incomplete docs' do
-      @bug.rules << @rule_incomplete
       @rule_incomplete.bugs_rules.update_all(tested: true)
 
       expect do
@@ -57,7 +62,6 @@ describe Repo::RuleContentCommitter do
     end
 
     it 'prescreens good commits' do
-      @bug.rules << @rule_complete
       @rule_complete.bugs_rules.update_all(tested: true)
 
       expect do
