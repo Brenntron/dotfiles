@@ -105,6 +105,10 @@ module Repo
       @snort_dir ||= Rails.root.join('extras', 'snort')
     end
 
+    def self.svn_diff_output(filepath)
+      `#{Rails.configuration.svn_cmd} diff -r PREV:BASE #{filepath}`
+    end
+
     # Processes rule content from a subversion diff add line.
     #
     # Line should be qualified as an add from the diff which is a rule (with a sid).
@@ -164,8 +168,7 @@ module Repo
           next
         end
 
-        `svn diff -r PREV:BASE #{filepath}`.split("\n").each do |line|
-
+        svn_diff_output(relative_filepath).split("\n").each do |line|
           next if /^\+\+\+/ =~ line
           next unless /sid:\s*\d+\s*;/ =~ line
 

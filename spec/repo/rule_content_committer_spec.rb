@@ -166,3 +166,43 @@ describe 'a Repo::RuleContentCommitter with content' do
     it 'skips synch_failsafe when commit loads committed rule'
   end
 end
+
+describe 'a file diff' do
+  before(:context) do
+    @rule = FactoryGirl.create(:edited_rule, sid: 21978, gid: 1, rev: 5)
+    @filename = 'trunk/snort-rules/malware.rules'
+    @filenames = [ @filename ]
+    @svn_diff_output = <<eos
+Index: extras/snort/snort-rules/malware.rules
+===================================================================
+--- extras/snort/snort-rules/malware.rules     (revision 51896)
++++ extras/snort/snort-rules/malware.rules     (working copy)
+@@ -19,52 +19,52 @@
+ #-------------------
+ 
+-# alert tcp $HOME_NET any -> $EXTERNAL_NET 5447 (msg:"MALWARE-BACKDOOR Win.Backdoor.Nervos variant outbound connection"; flow:to_server,established; content:"|01 01|"; depth:2; content:"|00 00|"; depth:2; offset:62; pcre:"/^((\\x82\\x01)|(\\xe6\\x01)|(\\x4a\\x02)|(\\x98\\x08)|(\\xd8\\x21))\\x00\\x00/R"; flowbits:set,trojan.nervos; metadata:impact_flag red, policy security-ips drop; classtype:trojan-activity; sid:21978; rev:5;)
+-# alert tcp $HOME_NET any -> $EXTERNAL_NET 5447 (msg:"MALWARE-BACKDOOR Win.Backdoor.Nervos variant outbound connection"; flow:to_server,established; content:"|01 01|"; depth:2; content:"|00 00|"; depth:2; offset:62; pcre:"/^((\\x82\\x01)|(\\xe6\\x01)|(\\x4a\\x02)|(\\x98\\x08)|(\\xd8\\x21))\\x00\\x00/R"; flowbits:set,trojan.nervos; metadata:impact_flag red, policy security-ips drop; classtype:trojan-activity; sid:21978; rev:5;)
++# alert tcp $HOME_NET any -> $EXTERNAL_NET 5447 (msg:"MALWARE-BACKDOOR Win.Backdoor.Nervos variant outbound connection"; flow:to_server,established; content:"|01 01|"; depth:2; content:"|00 00|"; depth:2; offset:62; pcre:"/^((\\x82\\x01)|(\\xe6\\x01)|(\\x4a\\x02)|(\\x98\\x08)|(\\xd8\\x21))\\x00\\x00/R"; flowbits:set,trojan.nervos; metadata:impact_flag red; classtype:trojan-activity; sid:21978; rev:6;)
+ # alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS (msg:"MALWARE-BACKDOOR JSP webshell backdoor detected"; flow:to_server,established; content:"/zecmd/zecmd.jsp?"; fast_pattern:only; http_uri; metadata:impact_flag red, policy balanced-ips drop, policy security-ips drop, service http; classtype:trojan-activity; sid:38719; rev:1;)
+ # alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS (msg:"MALWARE-BACKDOOR JSP webshell backdoor detected"; flow:to_server,established; content:".jsp?ppp="; fast_pattern:only; http_uri; metadata:impact_flag red, policy balanced-ips drop, policy security-ips drop, service http; classtype:trojan-activity; sid:39058; rev:1;)
+eos
+  end
+
+  describe 'Commit to svn from outside analyst-console or from analyst-console after commit has completed' do
+    it 'works' do
+      expect(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
+      expect(File).to receive(:directory?).and_return(true)
+      allow(Rule).to receive(:find_from_parser).and_return(@rule)
+      allow(@rule).to receive(:load_rule_content)
+
+      Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
+
+      expect(@svn_diff_output).to eq(@svn_diff_output)
+    end
+  end
+
+  describe 'Notification from svn hook while analyst-console commit is in progress' do
+    it 'works'
+  end
+end
+

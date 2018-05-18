@@ -376,7 +376,7 @@ class Rule < ApplicationRecord
 
   def associate_references(rule_content)
     references_ary = []
-    rule_content.split(';').each { |r| references_ary << r.strip.gsub('reference:', '') if r.match(/reference\W*:/) }
+    rule_content.split(';').each { |option| references_ary << option.strip.gsub('reference:', '') if option.match(/reference\W*:/) }
 
     self.references.delete_all
     references_ary.each do |ref_str|
