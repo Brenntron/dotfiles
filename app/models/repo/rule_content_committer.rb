@@ -119,7 +119,7 @@ module Repo
     # @param [String] rule_content line added in a subversion diff, which should be a rule_content string.
     # @param [ActiveRecord::Relation] rules_rel collection of rules to match new rules to.
     # @param [Bug] bug A bug object to add new rules to.
-    def self.repo_add_line(rule_content, rules_rel: Rule.with_pub_content, bug: nil)
+    def self.repo_add_line(rule_content, rules_rel: Rule.all, bug: nil)
       # Get a parser to match the rule content to any new rules
       parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
       unless parser
@@ -135,21 +135,36 @@ module Repo
       end
 
       # If found, load the rule content, in particular the sid, onto that record.
-      if 1 == found_rules.count
-        found_rule = found_rules.first
-        found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
-        Rule.set_pubdoc_state(found_rule)
-        found_rule
+      rule =
+          case
+            when 1 == found_rules.count
+              # The rule matches a new rule in the collection of rules
+              found_rule = found_rules.first
+              found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
+              found_rule
 
-      # If not found, load the rule content which will us any record that already had the sid,
-      # or create a new rule.
-      else
-        loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
-        if bug
-          bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
-        end
-        Rule.set_pubdoc_state(loaded_rule)
+            when 1 < found_rules.count
+              # Do not create or update rule
+              # If not found, load the rule content which will us any record that already had the sid,
+              # or create a new rule.
+              nil
+
+            else
+              # loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
+              # parser = RuleSyntax::RuleParser.new(rule_content)
+              # rule = Rule.find_from_parser(parser)
+              loaded_rule = Rule.synch_rule_content(rule_content)
+              if bug
+                bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
+              end
+              loaded_rule
+          end
+
+      if rule&.publishing_content?
+        Rule.set_pubdoc_state(rule)
       end
+
+      rule
     end
 
     def self.repo_notify_relative_filenames(relative_filenames)

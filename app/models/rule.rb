@@ -601,8 +601,7 @@ class Rule < ApplicationRecord
       rule.load_rule_content(rule_content)
       rule
     elsif rule_db.draft? && parser.rev > rule_db.rev
-      rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
-      rule_db.update(state: STALE_STATE)
+      rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT, state: STALE_STATE)
       rule_db
     elsif rule_db.draft?
       # do nothing

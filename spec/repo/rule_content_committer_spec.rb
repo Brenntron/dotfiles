@@ -169,7 +169,6 @@ end
 
 describe 'a file diff' do
   before(:context) do
-    @rule = FactoryGirl.create(:edited_rule, sid: 21978, gid: 1, rev: 5)
     @filename = 'trunk/snort-rules/malware.rules'
     @filenames = [ @filename ]
     @svn_diff_output = <<eos
@@ -189,15 +188,35 @@ eos
   end
 
   describe 'Commit to svn from outside analyst-console or from analyst-console after commit has completed' do
-    it 'works' do
-      expect(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
-      expect(File).to receive(:directory?).and_return(true)
+    it 'loads new rule content' do
+      @rule = FactoryGirl.create(:synched_rule, sid: 21978, gid: 1, rev: 5)
+      allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
+      allow(File).to receive(:directory?).and_return(true)
       allow(Rule).to receive(:find_from_parser).and_return(@rule)
-      allow(@rule).to receive(:load_rule_content)
+      allow(@rule).to receive(:associate_references)
 
       Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
 
-      expect(@svn_diff_output).to eq(@svn_diff_output)
+      rule = Rule.by_sid(@rule.sid).first
+      expect(rule.rev).to eq(6)
+      expect(rule.publish_status).to eq(Rule::PUBLISH_STATUS_SYNCHED)
+    end
+  end
+
+  describe 'Commit to svn from outside analyst-console for edited rule' do
+    it 'marks rule as stale' do
+      @rule = FactoryGirl.create(:edited_rule, sid: 21978, gid: 1, rev: 5)
+      allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
+      allow(File).to receive(:directory?).and_return(true)
+      allow(Rule).to receive(:find_from_parser).and_return(@rule)
+      allow(@rule).to receive(:associate_references)
+
+      Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
+
+      rule = Rule.by_sid(@rule.sid).first
+      expect(rule.rev).to eq(5)
+      expect(rule.publish_status).to eq(Rule::PUBLISH_STATUS_STALE_EDIT)
+      expect(rule.rule_content).to eq(@rule.rule_content)
     end
   end
 
