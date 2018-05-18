@@ -26,10 +26,10 @@ class Bridge::MessagesController < ApplicationController
         Repo::RuleContentCommitter.repo_notify_given_filenames(filenames)
       end
 
-      "success"
+      render plain: "success", status: :accepted
     else
       Rails.warn("No files names in notify message.")
-      "No files given to process."
+      render plain: "No files given to process.", status: :no_content
     end
   end
 
