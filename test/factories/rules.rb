@@ -49,7 +49,8 @@ FactoryGirl.define do
               rule_content_out
             end
         parser = RuleSyntax::RuleParser.new(rule_content)
-        rule.assign_from_user_edit(rule_content, parser: parser)
+        rule.assign_from_visrule(rule_content)
+        rule.assign_from_parser(parser.attributes)
         rule.update(rule_content: rule.rule_content.gsub('->', '<->'))
         rule.update(parsed: parsed) unless parsed.nil?
       end

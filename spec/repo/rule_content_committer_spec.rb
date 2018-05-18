@@ -221,7 +221,19 @@ eos
   end
 
   describe 'Notification from svn hook while analyst-console commit is in progress' do
-    it 'works'
+    it 'updates rule' do
+      @rule = FactoryGirl.create(:edited_rule, sid: 21978, gid: 1, rev: 5, publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
+      allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
+      allow(File).to receive(:directory?).and_return(true)
+      allow(Rule).to receive(:find_from_parser).and_return(@rule)
+      allow(@rule).to receive(:associate_references)
+
+      Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
+
+      rule = Rule.by_sid(@rule.sid).first
+      expect(rule.rev).to eq(6)
+      expect(rule.publish_status).to eq(Rule::PUBLISH_STATUS_SYNCHED)
+    end
   end
 end
 
