@@ -133,10 +133,7 @@ describe 'a Repo::RuleContentCommitter with content' do
     @sid = 10011
     @rev = 10
     @rule_content = "alert (gid:#{@gid}; sid:#{@sid}; rev: #{@rev};)"
-    @rule = Rule.new(gid: @gid, sid: @sid, rev: @rev, filename: @relative_filename,
-                     edit_status: Rule::EDIT_STATUS_EDIT,
-                     rule_content: @rule_content)
-    @rule = FactoryGirl.create(:rule,
+    @rule = FactoryGirl.create(:edited_rule,
                                gid: @gid, sid: @sid, rev: @rev, filename: @relative_filename,
                                edit_status: Rule::EDIT_STATUS_EDIT,
                                rule_content: @rule_content)
