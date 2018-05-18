@@ -60,6 +60,8 @@ FactoryGirl.define do
       publish_status      Rule::PUBLISH_STATUS_STALE_EDIT
       edit_status         Rule::EDIT_STATUS_EDIT
       doc_status          Rule::DOC_STATUS_UPDATED
+      cvs_rule_content    { "alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any (msg:\"BROWSER-PLUGINS ActiveX clsid access attempt\"; sid:#{sid}; rev:#{rev};)" }
+      cvs_rule_parsed     "Connection: alert tcp $EXTERNAL_NET $FILE_DATA_PORTS -> $HOME_NET any"
 
       before(:create) do |rule, evaluator|
         rule_grep_line = Rule.grep_line_from_file(rule.sid, rule.gid)
