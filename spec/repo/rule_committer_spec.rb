@@ -59,14 +59,13 @@ eos
     allow(Repo::RuleContentCommitter).to receive(:collect_rule_files).and_return([@rule_file])
     @committer = Repo::RuleCommitter.new([@rule], xmlrpc: nil, user: @user)
     allow(@committer).to receive(:event_start)
-    @filenames = [ @relative_filename ]
     allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@relative_filename).and_return(@svn_diff_output)
     allow(File).to receive(:directory?).and_return(true)
     allow(Rule).to receive(:find_from_parser).and_return(@rule)
     allow(@rule).to receive(:associate_references)
     expect(@committer.content_committer).to receive(:commit_rule_content) do
       @committer.content_committer.instance_variable_set(:@success, true)
-      Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
+      Repo::RuleContentCommitter.repo_notify_relative_filenames([ @relative_filename ])
       @svn_result_output
     end
     expect(@rule_file).to_not receive(:synch_failsafe)
