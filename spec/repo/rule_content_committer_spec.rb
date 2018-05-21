@@ -160,10 +160,6 @@ describe 'a Repo::RuleContentCommitter with content' do
 
       expect {@rule_committer.check_all_revs}.to raise_error('Cannot commit; revisions do not match the repo')
     end
-
-    it 'calls synch_failsafe when commit does not load committed rule'
-
-    it 'skips synch_failsafe when commit loads committed rule'
   end
 end
 
