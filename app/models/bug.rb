@@ -183,6 +183,22 @@ class Bug < ApplicationRecord
     self.notes.where(note_type: "committer").last
   end
 
+  def publish_note_to_bugzilla(bug_factory, **options)
+    Note.process_note(options.merge(id: bugzilla_id), bug_factory)
+  end
+
+  def copy_notes_to_bug(bugzilla_id, bug_factory:)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+
+    if bug
+      self.notes.each do |note|
+        bug.publish_note_to_bugzilla(bug_factory, comment: note.comment, note_type: note.note_type, author: note.author)
+      end
+
+      true
+    end
+  end
+
   def rule_relevant_references
     self.references.select {|ref| ReferenceType.valid_reference_type_ids.include?(ref.reference_type_id) }
   end
@@ -2521,6 +2537,8 @@ class Bug < ApplicationRecord
       new_attachment.bug_id = new_research_bug.id
       new_attachment.save
     end
+
+    copy_notes_to_bug(new_research_bug.id, bug_factory: bug_factory)
 
     new_research_bug
 
