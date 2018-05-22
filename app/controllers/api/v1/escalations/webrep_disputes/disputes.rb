@@ -13,6 +13,25 @@ module API
 
             get "" do
 
+              json_packet = []
+
+              disputes = Dispute.all
+
+              disputes.each do |dispute|
+                dispute_packet = {}
+                dispute_packet[:id] = dispute.id
+                dispute_packet[:case_number] = dispute.case_number
+                dispute_packet[:dispute_type] = dispute.dispute_type
+                dispute_packet[:customer_name] = dispute.customer_name
+                dispute_packet[:customer_company_name] = dispute.status
+                dispute_packet[:status] = dispute.status
+                dispute_packet[:assigned_to] = dispute.assigned_to
+                dispute_packet[:actions] = "<a href='/escalations/webrep_disputes/#{dispute.id}'>edit</a>"
+
+                json_packet << dispute_packet
+              end
+              {:status => "success", :data => json_packet}.to_json
+
             end
 
             desc 'update a dispute'

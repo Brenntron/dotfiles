@@ -563,7 +563,7 @@ class Rule < ApplicationRecord
   # @param [Integer, #read] rule_id the rule id if known
   def self.save_rule_content(rule_content, rule_id = nil)
     parser = RuleSyntax::RuleParser.new(rule_content)
-    raise "Cannot parser rule content '#{rule_content}'" unless parser.well_formed?
+    raise "Cannot parse rule content '#{rule_content}'" unless parser.well_formed?
     find_from_parser(parser, rule_id).tap do |rule|
       unless rule_content == rule.cvs_rule_content
         rule.assign_from_user_edit(rule_content, parser: parser)
