@@ -13,7 +13,7 @@ Feature: User Accounts
     And I should see "Please sign in using your Talos credentials"
     When the user signs in
     Then I should not see "Please sign in using your Talos credentials"
-    And I should see "/bugs" in the current url
+    And I should see "/users/" in the current url
 
   @javascript
   Scenario: A user logging in not in the database should be added to the database

@@ -188,6 +188,7 @@ When(/^I can not select "(.*?)" from "(.*?)"$/) do |option, select|
 end
 
 Then(/^I should see "(.*?)"$/) do |content|
+  # binding.pry
   raise "content not found" unless page.has_content?(content)
 end
 

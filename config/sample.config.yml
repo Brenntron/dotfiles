@@ -18,6 +18,7 @@ development:
       "snort-org":
         aws_access_key_id: "redacted"
         aws_secret_access_key: "redacted"
+        aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
         aws_bucket: "snort-org-site"
   perl:

@@ -38,10 +38,4 @@ class S3Url < FileReference
     bucket.object(self.location).get.body
   end
 
-  # Downloads S3 file contents into local file
-  # @return [LocalFile] object referring to local file which has been downloaded
-  def download
-    relative_path = "#{self.source}/#{local.id}-#{self.file_name}"
-    LocalFile.copy_local(get_file, relative_path, attributes.slice(*%w{file_name file_type_name source}))
-  end
 end

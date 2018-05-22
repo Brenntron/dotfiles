@@ -2369,20 +2369,40 @@ class Bug < ApplicationRecord
     attachment_hash = bug_stub.add_attachment(options)
     new_attachment_id = attachment_hash["ids"][0]
     if new_attachment_id
-      new_attachment = Attachment.create(
-          id: new_attachment_id,
-          size: file_content.length,
-          bugzilla_attachment_id: new_attachment_id,
-          file_name: filename,
-          summary: filename,
-          content_type: content_type,
-          direct_upload_url:
-              "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
-          creator: user&.email,
-          is_private: is_private,
-          is_obsolete: false,
-          minor_update: minor_update
-      )
+      begin
+        new_attachment = Attachment.create(
+            id: new_attachment_id,
+            size: file_content.length,
+            bugzilla_attachment_id: new_attachment_id,
+            file_name: filename,
+            summary: filename,
+            content_type: content_type,
+            direct_upload_url:
+                "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
+            creator: user&.email,
+            is_private: is_private,
+            is_obsolete: false,
+            minor_update: minor_update
+        )
+
+      rescue Exception => e
+        # the attachment id was a duplicate so i want to try creating the record anyway with a different id
+         new_attachment = Attachment.create(
+            size: file_content.length,
+            bugzilla_attachment_id: new_attachment_id,
+            file_name: filename,
+            summary: filename,
+            content_type: content_type,
+            direct_upload_url:
+                "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s,
+            creator: user&.email,
+            is_private: is_private,
+            is_obsolete: false,
+            minor_update: minor_update
+        )
+
+      end
+
       attachments << new_attachment
 
       clear_rule_tested
