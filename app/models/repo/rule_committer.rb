@@ -234,16 +234,16 @@ module Repo
           zillabug_hash = bugzilla_bug_proxy.get(bugzilla_id)
           Bug.synch_history(bugzilla_bug_proxy, zillabug_hash)
 
-          if bug.committer_id.blank? || bug.committer_id != user.id
-            bugzilla_bug_proxy.update(ids: bugzilla_id, qa_contact: user.email)
-            bug.update!(committer_id: user.id)
-          end
-
           attachments = bug.attachments.map{|a| a.id}
           new_task = Task.create_pcap_test(bug.id, user.id)
           TestAttachment.new(new_task,
                              xmlrpc.token,
                              attachments).send_work_msg
+
+          if bug.committer_id != user.id || bug.committer_id.blank?
+            bugzilla_bug_proxy.update(ids: bugzilla_id, qa_contact: user.email)
+            bug.update!(committer_id: user.id)
+          end
         end
       end
 
