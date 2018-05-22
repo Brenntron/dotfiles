@@ -609,7 +609,7 @@ module API
           args[:bugzilla_session] = bugzilla_session
           args[:description] = params[:description]
 
-          new_research_bug = escalation_bug.convert_escalation_to_research(args)
+          new_research_bug = escalation_bug.convert_escalation_to_research(args, current_user: current_user)
 
 
 

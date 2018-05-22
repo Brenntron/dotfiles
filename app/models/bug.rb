@@ -2486,7 +2486,7 @@ class Bug < ApplicationRecord
     end
   end
 
-  def convert_escalation_to_research(args)
+  def convert_escalation_to_research(args, current_user:)
     new_summary_line = args[:research_summary]
     new_research_notes = args[:research_notes]
     bugzilla_session = args[:bugzilla_session]
@@ -2538,7 +2538,15 @@ class Bug < ApplicationRecord
       new_attachment.save
     end
 
+    byebug
     copy_notes_to_bug(new_research_bug.id, bug_factory: bug_factory)
+    Note.process_note({
+                          id: new_research_bug.id,
+                          comment: args[:research_notes],
+                          note_type: 'research',
+                          author: current_user.email
+                      },
+                      bug_factory)
 
     new_research_bug
 
