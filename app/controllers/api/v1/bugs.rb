@@ -598,7 +598,11 @@ module API
           if params[:description].blank?
             return {:error => "must provide a description for the new research bug."}.to_json
           end
-          escalation_bug = Bug.find(params[:id])
+
+          escalation_bug = Bug.by_escalations.where(id: params[:id]).first
+          return {:error => "Cannot find escalation bug #{params[:id]}."}.to_json unless escalation_bug
+
+
           new_summary_line = params[:summary]
 
           if new_summary_line == escalation_bug.summary
