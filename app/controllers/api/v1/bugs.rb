@@ -588,6 +588,7 @@ module API
         end
         post "/duplicate_bug" do
 
+
           if params[:id].blank?
             return {:error => "must provide escalation id to convert to research bug."}.to_json
           end
@@ -614,7 +615,7 @@ module API
 
 
           escalation_bug.snort_research_escalation_bugs << new_research_bug
-          escalation_bug.snort_blocked_bugs << new_research_bug
+          escalation_bug.snort_blocker_bugs << new_research_bug
 
           research_bug_url = "/bugs/#{new_research_bug.id}"
 
