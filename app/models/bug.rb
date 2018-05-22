@@ -2538,7 +2538,6 @@ class Bug < ApplicationRecord
       new_attachment.save
     end
 
-    byebug
     copy_notes_to_bug(new_research_bug.id, bug_factory: bug_factory)
     Note.process_note({
                           id: new_research_bug.id,
