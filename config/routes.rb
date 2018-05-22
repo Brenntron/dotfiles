@@ -14,12 +14,14 @@ Rails.application.routes.draw do
         patch :remove_whiteboard
       end
       resources :references
-      namespace :webrep_disputes do
-        root 'disputes#index'
-        resources :disputes
-        get 'dashboard', to: 'disputes#dashboard'
-      end
     end
+    namespace :webrep_disputes do
+      root 'disputes#index'
+      resources :disputes
+      get 'dashboard', to: 'disputes#dashboard'
+    end
+
+
   end
 
   namespace :admin do

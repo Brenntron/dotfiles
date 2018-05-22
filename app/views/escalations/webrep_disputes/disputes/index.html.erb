@@ -1,0 +1,47 @@
+<div style="position:relative">
+  <div style="width:600px;">
+    <div class="grid-header" style="width:100%">
+    </div>
+  </div>
+</div>
+<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+
+
+<table id="disputes-index" class="table responsive no-wrap">
+  <thead>
+    <th>ID</th>
+    <th>Case Number</th>
+    <th>Dispute Type</th>
+    <th>Customer Name</th>
+    <th>Customer Company Name</th>
+    <th>Status</th>
+    <th>Assigned To</th>
+    <th>Actions</th>
+  </thead>
+
+  <tbody>
+
+  </tbody>
+</table>
+
+
+<script>
+$(document).ready(function() {
+  $('#disputes-index').DataTable({
+      columns: [
+          {data: "id"},
+          {data: "case_number"},
+          {data: "dispute_type"},
+          {data: "customer_name"},
+          {data: "customer_company_name"},
+          {data: "status"},
+          {data: "assigned_to"},
+          {data: "actions"}
+      ]
+  });
+    populate_webrep_index_table();
+
+} );
+
+
+</script>

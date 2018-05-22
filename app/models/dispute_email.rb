@@ -1,2 +1,2 @@
-class DisputeHistory < ApplicationRecord
+class DisputeEmail < ApplicationRecord
 end
