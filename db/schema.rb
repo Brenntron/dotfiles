@@ -166,9 +166,9 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "escalations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "snort_research_escalation_bug_id"
-    t.integer "snort_escalation_research_bug_id"
+  create_table "escalation_links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "snort_research_bug_id"
+    t.integer "snort_escalation_bug_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

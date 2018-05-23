@@ -28,10 +28,10 @@ class Bug < ApplicationRecord
 
   #self referential relationships
   ## for snort escalation bugs
-  has_many :research_escalation_bugs, :class_name => 'Escalation', :foreign_key => 'snort_escalation_research_bug_id'
-  has_many :snort_research_escalation_bugs, :through => :research_escalation_bugs
-  has_many :escalation_research_bugs, :class_name => 'Escalation', :foreign_key => 'snort_research_escalation_bug_id'
-  has_many :snort_escalation_research_bugs, :through => :escalation_research_bugs
+  has_many :research_bug_links, :class_name => 'EscalationLink', :foreign_key => 'snort_escalation_bug_id'
+  has_many :snort_research_bugs, :through => :research_bug_links
+  has_many :escalation_bug_links, :class_name => 'EscalationLink', :foreign_key => 'snort_research_bug_id'
+  has_many :snort_escalation_bugs, :through => :escalation_bug_links
 
   has_many :research_to_research_bugs, :class_name => 'SnortResearch', :foreign_key => 'bug_id'
   has_many :snort_research_to_research_bugs, :through => :research_to_research_bugs
