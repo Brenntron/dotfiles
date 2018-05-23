@@ -56,7 +56,7 @@ And(/^bugs_rules with rule_id of "(.*?)" and "bug_id" of "(.*?)" should not have
   association.in_summary.should eq(0)
 end
 
-When(/^I send a GET request to "(.*)"$/) do |url|
+When(/^I make a GET request to "(.*)"$/) do |url|
   get(url)
 end
 

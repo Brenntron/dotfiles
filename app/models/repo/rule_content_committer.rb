@@ -101,6 +101,120 @@ module Repo
       FileUtils.remove_file(working_pathname) rescue nil
     end
 
+    def self.snort_dir
+      @snort_dir ||= Rails.root.join('extras', 'snort')
+    end
+
+    def self.svn_diff_output(filepath)
+      `#{Rails.configuration.svn_cmd} diff -r PREV:BASE #{filepath}`
+    end
+
+    # Processes rule content from a subversion diff add line.
+    #
+    # Line should be qualified as an add from the diff which is a rule (with a sid).
+    #
+    # Compares rule to any matching new rules being published, and loads rule_content (e.g. the sid) onto that record.
+    # If no matching new rule is found, then it is a new rule it needs to be added to the database.
+    # If no matching new rule is found, it may be an edited rule, and should be loaded to a rule with the same sid.
+    # @param [String] rule_content line added in a subversion diff, which should be a rule_content string.
+    # @param [ActiveRecord::Relation] rules_rel collection of rules to match new rules to.
+    # @param [Bug] bug A bug object to add new rules to.
+    def self.repo_add_line(rule_content, rules_rel: Rule.all, bug: nil)
+      # Get a parser to match the rule content to any new rules
+      parser = RuleSyntax::NetSnortParser.new_from_rule_content(rule_content)
+      unless parser
+        Rails.logger.error("Net Snort Parser cannot parse rule_content = #{rule_content.chomp.inspect}")
+        return false
+      end
+
+      # Looking only at new rules being published, find any that matches the rule content
+      new_publishing_rules = rules_rel.where(edit_status: Rule::EDIT_STATUS_NEW).with_pub_content
+      found_rules = new_publishing_rules.to_a.select do |rule|
+        parsed_rule = RuleSyntax::NetSnortParser.new_from_rule_content(rule.rule_content)
+        parser.match?(parsed_rule)
+      end
+
+      # If found, load the rule content, in particular the sid, onto that record.
+      rule =
+          case
+            when 1 == found_rules.count
+              # The rule matches a new rule in the collection of rules
+              found_rule = found_rules.first
+              found_rule.load_rule_content(rule_content, should_clear_svn_result: false)
+              found_rule
+
+            when 1 < found_rules.count
+              # Do not create or update rule
+              # If not found, load the rule content which will us any record that already had the sid,
+              # or create a new rule.
+              nil
+
+            else
+              # loaded_rule = Rule.find_and_load_rule_content(rule_content, should_clear_svn_result: false)
+              # parser = RuleSyntax::RuleParser.new(rule_content)
+              # rule = Rule.find_from_parser(parser)
+              loaded_rule = Rule.synch_rule_content(rule_content)
+              if bug
+                bug.rules << loaded_rule unless loaded_rule.new_record? || bug.rules.where(id: loaded_rule.id).exists?
+              end
+              loaded_rule
+          end
+
+      if rule&.publishing_content?
+        Rule.set_pubdoc_state(rule)
+      end
+
+      rule
+    end
+
+    def self.repo_notify_relative_filenames(relative_filenames)
+      relative_filenames.each do |relative_filepath|
+
+        # unless /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
+        #   Rails.logger.error("Will not process #{filename.inspect}, skipping.")
+        #   next
+        # end
+
+        filepath = snort_dir.join(relative_filepath)
+        Rails.logger.debug("path #{filepath.inspect}")
+
+        unless File.directory?(filepath.dirname)
+          Rails.logger.error("SVN NOTIFY: No directory #{filepath.dirname}")
+          next
+        end
+
+        svn_diff_output(relative_filepath).split("\n").each do |line|
+          next if /^\+\+\+/ =~ line
+          next unless /sid:\s*\d+\s*;/ =~ line
+
+          if /^\+(?<add_line>.*)$/ =~ line.chomp
+            repo_add_line(add_line)
+          end
+        end
+      end
+    end
+
+    def self.repo_notify_given_filenames(given_filenames)
+      relative_filenames = given_filenames.map do |filepath_given|
+        if /(?<filename>[-\w]+\/[-\w]+\.rules)\s*$/ =~ filepath_given
+          filename
+        else
+          Rails.logger.error("Will not process #{filename.inspect}, skipping.")
+          nil
+        end
+      end.compact
+
+      svn_up(relative_filenames)
+      repo_notify_relative_filenames(relative_filenames)
+    end
+
+    def self.svn_up(relative_filenames)
+      Rails.logger.info("svn up #{relative_filenames.join(" ")}")
+      # Rails.logger.debug "cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}"
+      `cd #{snort_dir}\\;svn up #{relative_filenames.join(' ')}`
+      Rails.logger.info("notify svn up is done")
+    end
+
     # gets file from svn prepared for later commit
     def checkout(relative_pathname)
       working_pathname = self.class.working_pathname_of(relative_pathname)
