@@ -214,20 +214,6 @@ module API
                                                     new_bugzilla_comment: permitted_params[:bugzilla_comment],
                                                     xmlrpc: bugzilla_session,
                                                     nodoc_override: permitted_params[:nodoc_override])
-
-            if permitted_params[:bug_id].present?
-              bug = Bug.find(permitted_params[:bug_id])
-              xmlrpc = Bugzilla::Bug.new(bugzilla_session)
-              if bug.committer_id != current_user.id || bug.committer_id.blank?
-                bugzilla_options = {}
-                bugzilla_options[:ids] = permitted_params[:bug_id]
-                bugzilla_options[:qa_contact] = current_user.email
-                xmlrpc.update(bugzilla_options.to_h)
-                bug.committer_id = current_user.id
-                bug.save
-              end
-            end
-
           end
         end
 
