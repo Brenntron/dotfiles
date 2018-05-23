@@ -80,5 +80,9 @@ Feature: Escalations
     And  I should not see "Create New Research Bug"
 
   @javascript
+  Scenario: A research bug should block an escalation bug
+    #TODO: write this test
+    
+  @javascript
   Scenario: Notes are copied from an escalation to a research bug
     #TODO: write this test

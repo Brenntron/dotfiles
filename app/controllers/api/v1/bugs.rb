@@ -588,6 +588,7 @@ module API
         end
         post "/duplicate_bug" do
 
+
           if params[:id].blank?
             return {:error => "must provide escalation id to convert to research bug."}.to_json
           end
@@ -597,7 +598,11 @@ module API
           if params[:description].blank?
             return {:error => "must provide a description for the new research bug."}.to_json
           end
-          escalation_bug = Bug.find(params[:id])
+
+          escalation_bug = Bug.by_escalations.where(id: params[:id]).first
+          return {:error => "Cannot find escalation bug #{params[:id]}."}.to_json unless escalation_bug
+
+
           new_summary_line = params[:summary]
 
           if new_summary_line == escalation_bug.summary
@@ -614,7 +619,7 @@ module API
 
 
           escalation_bug.snort_research_escalation_bugs << new_research_bug
-          escalation_bug.snort_blocked_bugs << new_research_bug
+          escalation_bug.snort_blocker_bugs << new_research_bug
 
           research_bug_url = "/bugs/#{new_research_bug.id}"
 
