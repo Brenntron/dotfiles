@@ -68,7 +68,7 @@ class Bug < ApplicationRecord
   scope :by_escalations, -> { where(:product => "escalations")}
 
   def snort_related_bugs(component)
-     "escalation"==component ? self.snort_escalation_research_bugs :  self.snort_research_escalation_bugs | self.snort_research_to_research_bugs
+     "escalation"==component ? self.snort_escalation_bugs :  self.snort_research_bugs | self.snort_research_to_research_bugs
   end
 
   attr_accessor :import_report
@@ -1202,7 +1202,7 @@ class Bug < ApplicationRecord
 
     if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
       updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
-      bug.snort_escalation_research_bugs.each do |bug|
+      bug.snort_escalation_bugs.each do |bug|
         bug.snort_blocked_bugs << bug
       end
     end
@@ -2191,11 +2191,11 @@ class Bug < ApplicationRecord
   end
 
   def has_any_reopenable_bugs
-    snort_research_escalation_bugs.any? {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
+    snort_research_bugs.any? {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
   end
 
   def reopenable_bugs
-    snort_research_escalation_bugs.select {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
+    snort_research_bugs.select {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
   end
 
   def self.search(query_str, terms, range)

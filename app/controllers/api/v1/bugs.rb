@@ -613,7 +613,7 @@ module API
 
 
 
-          escalation_bug.snort_research_escalation_bugs << new_research_bug
+          escalation_bug.snort_research_bugs << new_research_bug
           escalation_bug.snort_blocked_bugs << new_research_bug
 
           research_bug_url = "/bugs/#{new_research_bug.id}"
@@ -834,10 +834,10 @@ module API
             return {:error => 'cannot relate an escalation to another escalation'}.to_json
           end
           if bug.product == "Research" && related_bug.product == "Escalations"
-            bug.snort_escalation_research_bugs << related_bug  unless bug.snort_escalation_research_bugs.include? related_bug
+            bug.snort_escalation_bugs << related_bug  unless bug.snort_escalation_bugs.include? related_bug
           end
           if bug.product == "Escalations" && related_bug.product == "Research"
-            bug.snort_research_escalation_bugs << related_bug  unless bug.snort_research_escalation_bugs.include? related_bug
+            bug.snort_research_bugs << related_bug  unless bug.snort_research_bugs.include? related_bug
           end
           if bug.product == "Research" && related_bug.product == "Research"
             bug.snort_research_to_research_bugs << related_bug unless bug.snort_research_to_research_bugs.include? related_bug
@@ -857,10 +857,10 @@ module API
           related_bug = Bug.where(id: params['relate_id']).first
           return {:error => 'related bug not found'}.to_json unless related_bug
           if bug.product == "Research" && related_bug.product == "Escalations"
-            bug.snort_escalation_research_bugs.delete(related_bug)  if bug.snort_escalation_research_bugs.include? related_bug
+            bug.snort_escalation_bugs.delete(related_bug)  if bug.snort_escalation_bugs.include? related_bug
           end
           if bug.product == "Escalations" && related_bug.product == "Research"
-            bug.snort_research_escalation_bugs.delete(related_bug)  if bug.snort_research_escalation_bugs.include? related_bug
+            bug.snort_research_bugs.delete(related_bug)  if bug.snort_research_bugs.include? related_bug
           end
           if bug.product == "Research" && related_bug.product == "Research"
             bug.snort_research_to_research_bugs.delete(related_bug)  if bug.snort_research_to_research_bugs.include? related_bug
