@@ -561,9 +561,9 @@ Feature: Bug
       | category      | id |
       | APP-DETECT    |  1 |
       | FILE-IDENTIFY |  2 |
-    And the following "synched_rule" rules exist belonging to bug "222222":
-      |id | message               | rule_category_id | parsed | state  | edit_status |
-      |1  | FILE-IDENTIFY message | 2                | false  | FAILED |     EDIT    |
+    And the following "edited_rule" rules exist belonging to bug "222222":
+      |id | message               | rule_category_id | parsed |
+      |1  | FILE-IDENTIFY message | 2                | false  |
     And the following references exist:
       | id | reference_data | reference_type_id |
       | 1  | 2006-5745      | 1                 |
