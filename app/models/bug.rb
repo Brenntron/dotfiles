@@ -1157,6 +1157,7 @@ class Bug < ApplicationRecord
   end
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
+  # TODO Do we really have a method spanning 200 lines without an opportunity to break it into sub-methods?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:, new_escalation_message: nil, new_escalation_state: nil)
 
     initial_bug_summary_info = bug.parse_summary
@@ -1202,8 +1203,8 @@ class Bug < ApplicationRecord
 
     if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
       updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
-      bug.snort_escalation_research_bugs.each do |bug|
-        bug.snort_blocked_bugs << bug
+      bug.snort_escalation_research_bugs.each do |blocked_bug|
+        bug.snort_blocked_bugs << blocked_bug
       end
     end
 
