@@ -78,3 +78,7 @@ Feature: Escalations
     Then I relate 111111 to 222222 with block
     And  I goto "/escalations/bugs/111111"
     And  I should not see "Create New Research Bug"
+
+  @javascript
+  Scenario: A research bug should block an escalation bug
+    #TODO: write this test
