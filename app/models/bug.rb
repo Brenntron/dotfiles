@@ -183,6 +183,22 @@ class Bug < ApplicationRecord
     self.notes.where(note_type: "committer").last
   end
 
+  def publish_note_to_bugzilla(bug_factory, **options)
+    Note.process_note(options.merge(id: bugzilla_id), bug_factory)
+  end
+
+  def copy_notes_to_bug(bugzilla_id, bug_factory:)
+    bug = Bug.where(bugzilla_id: bugzilla_id).first
+
+    if bug
+      self.notes.each do |note|
+        bug.publish_note_to_bugzilla(bug_factory, comment: note.comment, note_type: note.note_type, author: note.author)
+      end
+
+      true
+    end
+  end
+
   def rule_relevant_references
     self.references.select {|ref| ReferenceType.valid_reference_type_ids.include?(ref.reference_type_id) }
   end
@@ -1157,6 +1173,7 @@ class Bug < ApplicationRecord
   end
 
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
+  # TODO Do we really have a method spanning 200 lines without an opportunity to break it into sub-methods?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:, new_escalation_message: nil, new_escalation_state: nil)
 
     initial_bug_summary_info = bug.parse_summary
@@ -1202,8 +1219,8 @@ class Bug < ApplicationRecord
 
     if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
       updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
-      bug.snort_escalation_bugs.each do |bug|
-        bug.snort_blocked_bugs << bug
+      bug.snort_escalation_bugs.each do |blocked_bug|
+        bug.snort_blocked_bugs << blocked_bug
       end
     end
 
@@ -2470,7 +2487,7 @@ class Bug < ApplicationRecord
     end
   end
 
-  def convert_escalation_to_research(args)
+  def convert_escalation_to_research(args, current_user:)
     new_summary_line = args[:research_summary]
     new_research_notes = args[:research_notes]
     bugzilla_session = args[:bugzilla_session]
@@ -2521,6 +2538,15 @@ class Bug < ApplicationRecord
       new_attachment.bug_id = new_research_bug.id
       new_attachment.save
     end
+
+    copy_notes_to_bug(new_research_bug.id, bug_factory: bug_factory)
+    Note.process_note({
+                          id: new_research_bug.id,
+                          comment: args[:research_notes],
+                          note_type: 'research',
+                          author: current_user.email
+                      },
+                      bug_factory)
 
     new_research_bug
 
