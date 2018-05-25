@@ -67,6 +67,29 @@ class Bug < ApplicationRecord
 
   scope :by_escalations, -> { where(:product => "escalations")}
 
+  scope :research_product, -> { where(:product => "Research")}
+  scope :escalation_product, -> { where(:product => "Escalations")}
+
+  #determines if this is a research bug by checking the bugzilla product in our database
+  def research_product?
+    "Research" == self.product
+  end
+
+  #determines if this is an escalation bug by checking the bugzilla product in our database
+  def escalation_product?
+    "Escalations" == self.product
+  end
+
+  #determines if this is a research bug by inherited method in ResearchBug which returns true
+  def research_bug?
+    false
+  end
+
+  #determines if this is an escalation bug by inherited method in ResearchBug which returns true
+  def escalation_bug?
+    false
+  end
+
   def snort_related_bugs(component)
      "escalation"==component ? self.snort_escalation_research_bugs :  self.snort_research_escalation_bugs | self.snort_research_to_research_bugs
   end
