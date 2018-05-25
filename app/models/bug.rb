@@ -2514,10 +2514,14 @@ class Bug < ApplicationRecord
     new_bug_attrs.delete("assigned_to")
     new_bug_attrs.delete("Bugzilla_token")
 
+    byebug
+    bugzilla_bugs = bug_factory.get(bug_stub["id"])
+
     # default values
     vrtqa = User.where(cvs_username: 'vrtqa').first
     new_bug_attrs[:committer_id]        = vrtqa.id if vrtqa
     new_bug_attrs[:resolution]          = 'OPEN'
+    new_bug_attrs[:created_at]          = bugzilla_bugs['bugs'].first['creation_time'].to_time
     new_bug_attrs[:creator]             = current_user.id.to_s
 
     new_research_bug = Bug.create!(new_bug_attrs.merge(id: bug_stub["id"],
