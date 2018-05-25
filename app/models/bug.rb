@@ -1066,9 +1066,8 @@ class Bug < ApplicationRecord
   ####PROCESSING THE WORKFLOW OF A BUG UPDATE#########
 
   def self.publish_research_notes(xmlrpc, current_user, bug)
-    note = bug.research_notes
 
-    notes_to_append = note + "\n\n--------------------------------------------------\n"
+    notes_to_append = "#{bug.research_notes}\n\n--------------------------------------------------\n"
 
     ###NEW AND/OR UPDATED RULES####
 
