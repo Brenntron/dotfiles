@@ -1,4 +1,53 @@
 class Bridge::MessagesController < ApplicationController
+
+  def get_messages
+    #if peake bridge ever asks for info from AC this is where you would return a response
+    return_message = {
+
+    }
+    render json: return_message, status: :ok
+  rescue => except
+    log_exception(except)
+    render plain: except.message, status: :internal_server_error
+  end
+  def messages_from_bridge
+
+    case envelope_params["sender"]
+      when "snort-org"
+        fp_create(false_positive_params)
+      when "talos-ingelligence"
+        if params[:message][:obj_type].present?
+          obj_type = params[:message][:obj_type]
+          return_message = obj_type.constantize.process_bridge_payload(talos_intelligence_params)
+        else
+          return_message = {
+
+          }
+        end
+        render json: return_message, status: :ok
+      else
+        return_message = {
+
+        }
+        render json: return_message, status: :ok
+    end
+
+  end
+
+  # Add route for specific channels to their own action under the channels collection.
+  # When there is no route, it defaults to the create action.
+  def create
+    channel = params[:channel_id]
+    message = "Analyst Console recieved unknown (unrouted) message, on channel #{channel.inspect}"
+
+    Rails.logger.warn(message)
+
+    render plain: message,
+           status: :internal_server_error
+  end
+
+  private
+
   def fp_create(params)
     sender = envelope_params[:sender]
     Rails.logger.debug("Analyst Console recieved message to create a false positive bug from sender #{sender}")
@@ -25,48 +74,8 @@ class Bridge::MessagesController < ApplicationController
     render plain: except.message, status: :internal_server_error
   end
 
-  def get_messages
-    #if peake bridge ever asks for info from AC this is where you would return a response
-    return_message = {
 
-    }
-    render json: return_message, status: :ok
-  rescue => except
-    log_exception(except)
-    render plain: except.message, status: :internal_server_error
-  end
-  def messages_from_bridge
 
-    case envelope_params["sender"]
-      when "snort-org"
-        fp_create(false_positive_params)
-      when "talos-ingelligence"
-        return_message = {
-
-        }
-        render json: return_message, status: :ok
-      else
-        return_message = {
-
-        }
-        render json: return_message, status: :ok
-    end
-
-  end
-
-  # Add route for specific channels to their own action under the channels collection.
-  # When there is no route, it defaults to the create action.
-  def create
-    channel = params[:channel_id]
-    message = "Analyst Console recieved unknown (unrouted) message, on channel #{channel.inspect}"
-
-    Rails.logger.warn(message)
-
-    render plain: message,
-           status: :internal_server_error
-  end
-
-  private
 
   # @return [Bugzilla::XMLRPC] Authenticated bugzilla session
   def bugzilla_session
@@ -99,6 +108,10 @@ class Bridge::MessagesController < ApplicationController
 
   def false_positive_params
     params.require(:message).permit(:user_email, :source_key, fp_attrs: {})
+  end
+
+  def talos_intelligence_params
+    params.require(:message)
   end
 
   def attachments_params
