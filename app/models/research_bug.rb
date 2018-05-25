@@ -11,3 +11,4 @@ class ResearchBug < Bug
     true
   end
 end
+
