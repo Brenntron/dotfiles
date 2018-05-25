@@ -2514,7 +2514,6 @@ class Bug < ApplicationRecord
     new_bug_attrs.delete("assigned_to")
     new_bug_attrs.delete("Bugzilla_token")
 
-    byebug
     bugzilla_bugs = bug_factory.get(bug_stub["id"])
 
     # default values
