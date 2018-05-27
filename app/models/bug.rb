@@ -2001,8 +2001,6 @@ class Bug < ApplicationRecord
 
 
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)
-    byebug
-    raise 'Bug creation not converted'
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
@@ -2016,7 +2014,13 @@ class Bug < ApplicationRecord
             bug.save!
           end
         else
-          new_record = Bug.new(bugzilla_id: bug_id)
+          new_record =
+              case item['product']
+                when 'Research'
+                  ResearchBug.new(bugzilla_id: bug_id)
+                when 'Escalations'
+                  EscalationBug.new(bugzilla_id: bug_id)
+              end
 
           new_record.id             = bug_id
           new_record.summary        = item['summary']
