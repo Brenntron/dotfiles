@@ -2522,8 +2522,6 @@ class Bug < ApplicationRecord
   end
 
   def convert_escalation_to_research(args, current_user:)
-    byebug
-    raise 'Bug creation not converted'
     new_summary_line = args[:research_summary]
     new_research_notes = args[:research_notes]
     bugzilla_session = args[:bugzilla_session]
@@ -2550,11 +2548,10 @@ class Bug < ApplicationRecord
     new_bug_attrs.delete("assigned_to")
     new_bug_attrs.delete("Bugzilla_token")
 
-    new_research_bug = Bug.create!(new_bug_attrs.merge(id: bug_stub["id"],
-                                                   bugzilla_id: bug_stub["id"],
-                                                   user_id: default_assigned_to_user.id,
-                                                   state: "NEW"
-                                  ))
+    new_research_bug = ResearchBug.create!(new_bug_attrs.merge(id: bug_stub["id"],
+                                                               bugzilla_id: bug_stub["id"],
+                                                               user_id: default_assigned_to_user.id,
+                                                               state: "NEW"))
 
     if new_research_notes.present?
       new_research_bug.research_notes = new_research_notes
