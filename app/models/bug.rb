@@ -1440,8 +1440,6 @@ class Bug < ApplicationRecord
   end
 
   def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
-    byebug
-    raise 'Bug creation not converted'
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []
     unless new_bugs['bugs'].empty?
@@ -1465,7 +1463,12 @@ class Bug < ApplicationRecord
 
 
         #Update Bug record attributes from bugzilla############
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
+        if bug
+          raise 'Cannot process non-escalation bug' unless bug.research_bug?
+        else
+          bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id)
+        end
 
         bug.initialize_report
 
@@ -1738,20 +1741,17 @@ class Bug < ApplicationRecord
 
 
 
-
-
-
-
-
-
-
-
   def self.bugzilla_import_escalation(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
-    byebug
-    raise 'Bug creation not converted'
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []
-    unless new_bugs['bugs'].empty?
+    if new_bugs['bugs'].empty?
+      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
+        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
+        raise message
+      else
+        raise "there was a problem importing from Bugzilla."
+      end
+    else
       new_bugs['bugs'].each do |item|
 
         progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
@@ -1772,7 +1772,12 @@ class Bug < ApplicationRecord
 
 
         #Update Bug record attributes from bugzilla############
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
+        if bug
+          raise 'Cannot process non-escalation bug' unless bug.escalation_bug?
+        else
+          bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id)
+        end
 
         bug.initialize_report
 
@@ -1989,13 +1994,6 @@ class Bug < ApplicationRecord
 
         total_bugs << bug
 
-      end
-    else
-      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
-        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
-        raise message
-      else
-        raise "there was a problem importing from Bugzilla."
       end
     end
     return total_bugs
