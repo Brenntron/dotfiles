@@ -225,6 +225,7 @@ class BugsController < ApplicationController
     end
   end
 
+  
   private
 
   def bug_params
