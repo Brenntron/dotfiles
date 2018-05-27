@@ -654,7 +654,29 @@ $ ->
         , this)
 
 
-  $('.new_bug').submit (e) ->
+  $('.new_research_bug').submit (e) ->
+    e.preventDefault()
+    $('.edit-bug').prop('disabled', true)
+    bug_type = $('input[id="bug_product"]').val();
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    data = $('.new_research_bug').serialize()
+    $('.edit-bug').hide()
+    $('#saving_bug').removeClass('hidden').show()
+    $.ajax(
+      url: '/api/v1/bugs/research'
+      method: 'POST'
+      headers: headers
+      data: data
+      success: (response) ->
+        location.replace('/bugs/' + response['id'])
+      error: (response) ->
+        alert(response.responseText)
+        location.reload()
+    , this)
+
+
+  $('.new_escalation_bug').submit (e) ->
+    debugger
     e.preventDefault()
     $('.edit-bug').prop('disabled', true)
     bug_type = $('input[id="bug_product"]').val();
@@ -663,7 +685,7 @@ $ ->
     $('.edit-bug').hide()
     $('#saving_bug').removeClass('hidden').show()
     $.ajax(
-      url: '/api/v1/bugs/'
+      url: '/api/v1/bugs/escalation'
       method: 'POST'
       headers: headers
       data: data

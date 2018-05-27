@@ -103,21 +103,17 @@ class BugsController < ApplicationController
   end
 
   def new
-    @bug = current_user.bugs.build
+    @bug = current_user.bugs.build(type: 'ResearchBug')
     @tags = Tag.all.map { |tag| tag.name }.join(',')
   end
 
   def create
-    # byebug
-    # raise 'Bug creation not converted'
     respond_to do |format|
       format.js { head :no_content }
     end
   end
 
   def show
-
-
 
     @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
     @bug = Bug.where(id: params[:id]).first
