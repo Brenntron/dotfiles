@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   namespace :escalations do
     root 'bugs#index'
+    resources :escalation_bugs, controller: 'bugs'
     resources :bugs do
 
       member do
@@ -110,6 +111,7 @@ Rails.application.routes.draw do
     resources :rules, only: [:show]
   end
 
+  resources :research_bugs, controller: 'bugs'
   resources :bugs do
     member do
       post :create_rules
