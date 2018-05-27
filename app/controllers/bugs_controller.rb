@@ -108,6 +108,8 @@ class BugsController < ApplicationController
   end
 
   def create
+    # byebug
+    # raise 'Bug creation not converted'
     respond_to do |format|
       format.js { head :no_content }
     end
@@ -240,9 +242,11 @@ class BugsController < ApplicationController
   private
 
   def bug_params
-    params.require(:bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :priority, :classification, :searchID,
-                                :summary, :whiteboard, :version, :description, :user_id, :committer_id, rules_attributes: [:connection, :flow, :message, :reference,
-                                                                                                              :metadata, :detection, :class_type, :reference], tag_names: [])
+    params.require(:research_bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :user_id,
+                                         :priority, :classification, :searchID, :summary, :whiteboard, :version, :flow,
+                                         :description, :committer_id, tag_names: [],
+                                         rules_attributes: [:connection, :message, :reference,
+                                                            :metadata, :detection, :class_type, :reference])
   end
 
   def query_params
