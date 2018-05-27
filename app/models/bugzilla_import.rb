@@ -1,6 +1,8 @@
 class BugzillaImport
 
   def import(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
+    byebug
+    raise 'Bug creation not converted'
 
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []

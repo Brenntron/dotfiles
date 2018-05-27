@@ -1440,6 +1440,8 @@ class Bug < ApplicationRecord
   end
 
   def self.bugzilla_import(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
+    byebug
+    raise 'Bug creation not converted'
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []
     unless new_bugs['bugs'].empty?
@@ -1745,6 +1747,8 @@ class Bug < ApplicationRecord
 
 
   def self.bugzilla_import_escalation(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
+    byebug
+    raise 'Bug creation not converted'
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []
     unless new_bugs['bugs'].empty?
@@ -1999,6 +2003,8 @@ class Bug < ApplicationRecord
 
 
   def self.bugzilla_light_import(new_bugs, xmlrpc, xmlrpc_token, user_email:, current_user: nil)
+    byebug
+    raise 'Bug creation not converted'
     unless new_bugs.empty?
       new_bugs['bugs'].each do |item|
         bug_id = item['id']
@@ -2306,6 +2312,8 @@ class Bug < ApplicationRecord
   # @param [Hash] bug_attrs values for active record attributes on bug model.
   # @param [User] user assgined to bug.
   def self.bugzilla_create(bug_factory, bug_attrs, user: nil)
+    byebug
+    raise 'Bug creation not converted'
     options = bug_attrs.to_h.slice(*%w{product component summary version description state creator opsys
                                        platform priority severity classification})
     options = options.reject { |key, value| value.nil? }
@@ -2511,6 +2519,8 @@ class Bug < ApplicationRecord
   end
 
   def convert_escalation_to_research(args, current_user:)
+    byebug
+    raise 'Bug creation not converted'
     new_summary_line = args[:research_summary]
     new_research_notes = args[:research_notes]
     bugzilla_session = args[:bugzilla_session]
