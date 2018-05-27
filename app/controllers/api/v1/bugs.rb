@@ -374,7 +374,7 @@ module API
           end
         end
 
-        desc "create a bug"
+        desc "create a reasearch bug"
         params do
           requires :research_bug, type: Hash do
             requires :product, type: String, desc: "The name of the product the bug is being filed against."
@@ -401,7 +401,7 @@ module API
           ResearchBug.bugzilla_create_action(bugzilla_session, permitted_params[:research_bug], user: current_user)
         end
 
-        desc "create a bug"
+        desc "create an escalation bug"
         params do
           requires :escalation_bug, type: Hash do
             requires :product, type: String, desc: "The name of the product the bug is being filed against."
@@ -419,17 +419,14 @@ module API
           end
         end
         post "escalation", root: "bug" do
-          byebug
-          raise 'raspberry'
+          # TODO change to EscalationBug
           authorize! :create, Bug
-          case permitted_params[:bug][:product]
-            when "Escalations"
-              user = User.where(email: "vrt-incoming@sourcefire.com").first
-            when "Research"
-              user = current_user
+          unless 'Escalations' == permitted_params[:escalation_bug][:product]
+            error!('This API entry point is only for escalation bugs.', 400)
           end
 
-          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: user)
+          user = User.where(email: "vrt-incoming@sourcefire.com").first
+          EscalationBug.bugzilla_create_action(bugzilla_session, permitted_params[:escalation_bug], user: user)
         end
 
         desc "remove a bug from the db only"

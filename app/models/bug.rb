@@ -2320,10 +2320,18 @@ class Bug < ApplicationRecord
     bugzilla_bug_options = options.merge('assigned_to' => user&.email || 'vrt-incoming@sourcefire.com')
     bug_stub_hash = bug_factory.create(bugzilla_bug_options)
 
-    ResearchBug.create!(options.merge(id: bug_stub_hash["id"],
-                                      bugzilla_id: bug_stub_hash["id"],
-                                      state: bug_attrs['state'] || 'OPEN',
-                                      user_id: user&.id))
+    case options['product']
+      when 'Research'
+        ResearchBug.create!(options.merge(id: bug_stub_hash["id"],
+                                          bugzilla_id: bug_stub_hash["id"],
+                                          state: bug_attrs['state'] || 'OPEN',
+                                          user_id: user&.id))
+      when 'Escalations'
+        EscalationBug.create!(options.merge(id: bug_stub_hash["id"],
+                                            bugzilla_id: bug_stub_hash["id"],
+                                            state: bug_attrs['state'] || 'OPEN',
+                                            user_id: user&.id))
+    end
   end
 
   # Creates a new bug in bugzilla and related records and objects.

@@ -99,7 +99,7 @@ class Escalations::BugsController < ApplicationController
   end
 
   def new
-    @bug = current_user.bugs.build
+    @bug = current_user.bugs.build(type: 'EscalationBug')
     @tags = Tag.all.map { |tag| tag.name }.join(',')
   end
 
