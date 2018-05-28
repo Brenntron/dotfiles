@@ -21,6 +21,7 @@ class CreateDisputes < ActiveRecord::Migration[5.1]
       t.string       :source_ip_address
       t.text         :problem_summary
       t.text         :research_notes
+      t.string       :channel
       t.timestamps
     end
   end
