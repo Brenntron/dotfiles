@@ -32,23 +32,23 @@ class Ability
     end
 
     if roles.include?('escalator')
-      can :manage, EscalationBug
-      can :manage, [Attachment, Note]
+      can [:manage, :import], EscalationBug
+      can :manage, [EscalationLink, Attachment, Note]
       can :publish_to_bugzilla, Note
       can :update_preferences, User, id: current_user.id
     end
 
     if roles.include?('committer')
-      can [:manage, :acknowledge_bug, :toggle_liberty], ResearchBug
-      can :manage, [Attachment, Note, Rule, RuleDoc, Exploit, Reference]
+      can [:manage, :acknowledge_bug, :import, :toggle_liberty], ResearchBug
+      can :manage, [EscalationLink, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
       can :publish, Rule
       can :publish_to_bugzilla, Note
       can :update_preferences, User, id: current_user.id
     end
 
     if roles.include?('analyst')
-      can [:manage, :acknowledge_bug], ResearchBug
-      can :manage, [Attachment, Note, Rule, RuleDoc, Exploit, Reference]
+      can [:manage, :acknowledge_bug, :import], ResearchBug
+      can :manage, [EscalationLink, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
       can :publish_to_bugzilla, Note
       can :toggle_liberty, ResearchBug do |bug|
         bug.liberty_clear?

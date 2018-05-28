@@ -1478,10 +1478,13 @@ class Bug < ApplicationRecord
 
         #Update Bug record attributes from bugzilla############
         bug = Bug.where(bugzilla_id: bug_id).first
-        if bug
-          raise 'Cannot process non-escalation bug' unless bug.research_bug?
-        else
-          bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id)
+        case
+          when bug
+            raise 'Can only process research bugs' unless bug.research_bug?
+          when 'Research' != item['product']
+            raise 'Can only import research bugs'
+          else
+            bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id)
         end
 
         bug.initialize_report
@@ -1772,11 +1775,15 @@ class Bug < ApplicationRecord
 
         #Update Bug record attributes from bugzilla############
         bug = Bug.where(bugzilla_id: bug_id).first
-        if bug
-          raise 'Cannot process non-escalation bug' unless bug.escalation_bug?
-        else
-          bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id)
+        case
+          when bug
+            raise 'Can only process escalation bugs' unless bug.escalation_bug?
+          when 'Escalations' != item['product']
+            raise 'Can only import escalation bugs'
+          else
+            bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id)
         end
+
 
         bug.initialize_report
 
