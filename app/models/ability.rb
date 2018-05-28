@@ -4,6 +4,13 @@ class Ability
   def initialize(user_given)
     current_user = user_given || User.new
 
+    can :read, ResearchBug do |bug|
+      if User.class_levels[current_user.class_level] < Bug.classifications[bug.classification]
+        cannot :all
+      end
+    end
+
+
     # Query database *once*
     roles = current_user.roles.pluck(:role)
 
