@@ -8,7 +8,7 @@
     <%= csrf_meta_tags %>
   </head>
   <body>
-  <% ac_namespace = params[:controller].split('/').first %>
+  <% ac_namespace = params[:controller].split('/')[0..-2].join("/") %>
   <% if controller_name == 'bugs' %>
     <% if ac_namespace == 'escalations' %>
       <%= render 'escalations/shared/bug_search_modal' %>
@@ -76,6 +76,8 @@
               <%= render 'layouts/relationships_layout' %>
             <% elsif controller_name == "rule_docs" %>
               <%= render 'layouts/rule_docs_layout' %>
+            <% elsif ac_namespace == "escalations/webrep_disputes" %>
+              <%= render 'layouts/webrep_disputes_layout' %>
             <% end %>
 
         </div>

@@ -1,0 +1,2 @@
+class DisputeRule < ApplicationRecord
+end
