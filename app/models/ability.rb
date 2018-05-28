@@ -15,6 +15,16 @@ class Ability
       can [:list_research, :list_escalations], Bug #legacy
     end
 
+    if roles.include?('api user')
+      # Must be authorized to read API, and read API for V version,
+      # and appropriate privileges defined elsewhere in this method,
+      # in order to call the API with an API key,
+      # Using a Rails session only the appropriate privileges elsewhere are required.
+      can :read, ::API
+      can :read, ::API::V1
+      can :read, ::API::V2
+    end
+
     if roles.include?('manager')
       can :manage, User do |user|
         user.ancestors.include?(current_user)
