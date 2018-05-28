@@ -35,6 +35,7 @@ class Ability
       can [:manage, :import], EscalationBug
       can :manage, [EscalationLink, Attachment, Note]
       can :publish_to_bugzilla, Note
+      can :read, User
       can :update_preferences, User, id: current_user.id
     end
 
@@ -43,6 +44,7 @@ class Ability
       can :manage, [EscalationLink, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
       can :publish, Rule
       can :publish_to_bugzilla, Note
+      can :read, User
       can :update_preferences, User, id: current_user.id
     end
 
@@ -53,12 +55,14 @@ class Ability
       can :toggle_liberty, ResearchBug do |bug|
         bug.liberty_clear?
       end
+      can :read, User
       can :update_preferences, User, id: current_user.id
     end
 
     if roles.include?('build coordinator')
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
       can :read, [ResearchBug, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
+      can :read, User
       can :update_preferences, User, id: current_user.id
     end
   end

@@ -1,5 +1,5 @@
 class Escalations::BugsController < ApplicationController
-  load_and_authorize_resource class: 'ResearchBug',
+  load_and_authorize_resource class: 'EscalationBug',
                               except: [:add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
   skip_load_resource only: [:index, :show]
 
