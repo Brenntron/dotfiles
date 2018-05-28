@@ -4,41 +4,51 @@ class Ability
   def initialize(user_given)
     current_user = user_given || User.new
 
+    # Query database *once*
+    roles = current_user.roles.pluck(:role)
 
-    if current_user.has_role?('admin')
+    if roles.include?('admin')
       can :read, :all
+      can [:acknowledge_bug], Bug
       can :manage, [Admin, User]
-      can [:read, :acknowledge_bug, :list_research, :list_escalations], Bug
-      can :manage, RuleDoc
+
+      can [:list_research, :list_escalations], Bug #legacy
     end
-    if current_user.has_role?('manager')
-      can [:list_research, :list_escalations], Bug
+
+    if roles.include?('manager')
       can :manage, User do |user|
         user.ancestors.include?(current_user)
       end
     end
-    if current_user.has_role?('escalator')
-      can :list_escalations, Bug
+
+    if roles.include?('escalator')
+      can :manage, EscalationBug
+      can :manage, [Attachment, Note]
+      can :publish_to_bugzilla, Note
+      can :update_preferences, User, id: current_user.id
     end
-    if current_user.has_role?('committer')
-      can [:read, :update, :destroy, :create, :list_research, :acknowledge_bug, :toggle_liberty], Bug
-      can :manage, [Rule, Attachment, Note, Exploit, Reference, RuleDoc]
+
+    if roles.include?('committer')
+      can [:manage, :acknowledge_bug, :toggle_liberty], ResearchBug
+      can :manage, [Attachment, Note, Rule, RuleDoc, Exploit, Reference]
       can :publish, Rule
       can :publish_to_bugzilla, Note
       can :update_preferences, User, id: current_user.id
     end
-    if current_user.has_role?('analyst')
-      can [:read, :update, :destroy, :create, :list_research, :acknowledge_bug], Bug
-      can :manage, [Rule, Attachment, Note, Exploit, Reference, RuleDoc]
+
+    if roles.include?('analyst')
+      can [:manage, :acknowledge_bug], ResearchBug
+      can :manage, [Attachment, Note, Rule, RuleDoc, Exploit, Reference]
       can :publish_to_bugzilla, Note
-      can :update_preferences, User, id: current_user.id
-      can :toggle_liberty, Bug do |bug|
+      can :toggle_liberty, ResearchBug do |bug|
         bug.liberty_clear?
       end
+      can :update_preferences, User, id: current_user.id
     end
-    if current_user.has_role?('build coordinator')
+
+    if roles.include?('build coordinator')
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
-      can :list_research, Bug
+      can :read, [ResearchBug, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
       can :update_preferences, User, id: current_user.id
     end
   end
