@@ -65,6 +65,7 @@ class Bug < ApplicationRecord
 
   scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
+  scope :research_bugs, -> { where(product: 'research') }
   scope :by_escalations, -> { where(:product => "escalations")}
 
   def snort_related_bugs(component)
@@ -97,6 +98,18 @@ class Bug < ApplicationRecord
 
   def liberty_embargo?
     LIBERTY_EMBARGO == self.liberty
+  end
+
+  def self.bug_result(search_mode, bug_search_id, bug_search_max)
+    case
+      when bug_search_max.present?
+        Bug.where("id BETWEEN ? AND ?", bug_search_id, bug_search_max)
+      when 'advanced' == search_mode
+        Bug.where("id LIKE ?", "%#{bug_search_id}%")
+      else
+        #return Bug object for redirect to that bug
+        Bug.where("id='#{bug_search_id}%'").first
+    end
   end
 
   def initialize_report
