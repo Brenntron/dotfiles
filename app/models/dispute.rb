@@ -61,7 +61,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, params:, search_name:, base_relation: Dispute)
+  def self.robust_search(search_type, params: nil, search_name: nil, base_relation: Dispute)
     case search_type
       when 'advanced'
         advanced_search(params, search_name: search_name, base_relation: base_relation)
@@ -70,7 +70,7 @@ class Dispute < ApplicationRecord
       when 'standard'
         standard_search(search_name, base_relation: base_relation)
       when 'contains'
-        contains_search(params[:value], base_relation: base_relation)
+        contains_search(params['value'], base_relation: base_relation)
       else
         base_relation.where({})
     end

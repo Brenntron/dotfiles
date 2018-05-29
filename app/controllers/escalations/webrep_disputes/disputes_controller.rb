@@ -3,6 +3,9 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   before_action :require_login
 
   def index
+    @disputes = Dispute.robust_search(params['dispute']['search_type'],
+                                      search_name: params['dispute']['search_name'],
+                                      params: index_params)
   end
 
   def show
@@ -16,5 +19,25 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
 
   end
 
+  def advanced_search
+    @dispute = Dispute.new
+  end
+
+  def named_search
+  end
+
+  def standard_search
+  end
+
+  def contains_search
+  end
+
+  private
+
+  def index_params
+    params.require(:dispute).permit(:customer_name, :customer_email, :customer_company_name,
+                                    :status, :resolution, :subject,
+                                    :value)
+  end
 
 end
