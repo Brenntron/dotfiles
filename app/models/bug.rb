@@ -1494,31 +1494,16 @@ class Bug < ApplicationRecord
 
 
         #Create/update Bug User relationships
-        creator = User.where('email=?', item['creator']).first
-        new_user = User.where('email=?', item['assigned_to']).first
-        new_committer = User.where('email=?', item['qa_contact']).first
-        if creator.nil?
-          User.create_by_email(item['creator'])
-          new_creator = User.where(email: item['creator']).first
-          bug.creator = new_creator.id
-        else
-          bug.creator = creator.id
-        end
-        if new_user.nil?
-          User.create_by_email(item['assigned_to'])
-          new_generated_user = User.where(email: item['assigned_to']).first
-          bug.user = new_generated_user
-        else
-          bug.user = new_user
-        end
-        if new_committer.nil?
-          User.create_by_email(item['qa_contact'])
-          new_generated_committer = User.where(email: item['qa_contact']).first
-          new_generated_committer.roles << Role.where(role:"committer")
-          bug.committer = new_generated_committer
-        else
-          bug.committer = new_committer
-        end
+
+        creator = User.user_by_email(item['creator'])
+        bug.creator = creator.id
+
+        new_user = User.user_by_email(item['assigned_to'])
+        bug.user = new_user
+
+        new_committer = User.user_by_email(item['qa_contact'])
+        bug.committer = new_committer
+
         if import_type != "status"
           bug.save
         end
@@ -1788,35 +1773,16 @@ class Bug < ApplicationRecord
 
 
         #Create/update Bug User relationships
-        creator = User.where('email=?', item['creator']).first
-        new_user = User.where('email=?', item['assigned_to']).first
-        new_committer = User.where('email=?', item['qa_contact']).first
-        default_role_type = "analyst"
-        default_role = Role.where(role: default_role_type)
-        if creator.nil?
-          User.create_by_email(item['creator'])
-          new_creator = User.where(email: item['creator']).first
-          new_creator.save
-          bug.creator = new_creator.id
-        else
-          bug.creator = creator.id
-        end
-        if new_user.nil?
-          User.create_by_email(item['assigned_to'])
-          new_generated_user = User.where(email: item['assigned_to']).first
-          new_generated_user.save
-          bug.user = new_generated_user
-        else
-          bug.user = new_user
-        end
-        if new_committer.nil?
-          User.create_by_email(item['qa_contact'])
-          new_generated_committer = User.where(email: item['qa_contact']).first
-          new_generated_committer.roles << Role.where(role:"committer")
-          bug.committer = new_generated_committer
-        else
-          bug.committer = new_committer
-        end
+
+        creator = User.user_by_email(item['creator'])
+        bug.creator = creator.id
+
+        new_user = User.user_by_email(item['assigned_to'])
+        bug.user = new_user
+
+        new_committer = User.user_by_email(item['qa_contact'])
+        bug.committer = new_committer
+
         if import_type != "status"
           bug.save
         end
@@ -2025,33 +1991,15 @@ class Bug < ApplicationRecord
               new_record.resolved_at = last_change_time
             end
           end
-          creator = User.where('email=?', item['creator']).first
-          new_user = User.where('email=?', item['assigned_to']).first
-          new_committer = User.where('email=?', item['qa_contact']).first
-          if creator.nil?
-            User.create_by_email(item['creator'])
-            new_creator = User.where(email: item['creator']).first
 
-            new_record.creator = new_creator.id
-          else
-            new_record.creator = creator.id
-          end
-          if new_user.nil?
-            User.create_by_email(item['assigned_to'])
-            new_generated_user = User.where(email: item['assigned_to']).first
-            new_generated_user.roles << Role.where(role:"analyst")
-            new_record.user = new_generated_user
-          else
-            new_record.user = new_user
-          end
-          if new_committer.nil?
-            User.create_by_email(item['qa_contact'])
-            new_generated_committer = User.where(email: item['qa_contact']).first
-            new_generated_committer.roles << Role.where(role:"committer")
-            new_record.committer = new_generated_committer
-          else
-            new_record.committer = new_committer
-          end
+          creator = User.user_by_email(item['creator'])
+          new_record.creator = creator.id
+
+          new_user = User.user_by_email(item['assigned_to'])
+          new_record.user = new_user
+
+          new_committer = User.user_by_email(item['qa_contact'])
+          new_record.committer = new_committer
 
           new_record.save!
         end
@@ -2540,13 +2488,15 @@ class Bug < ApplicationRecord
     end
 
     copy_notes_to_bug(new_research_bug.id, bug_factory: bug_factory)
-    Note.process_note({
-                          id: new_research_bug.id,
-                          comment: args[:research_notes],
-                          note_type: 'research',
-                          author: current_user.email
-                      },
-                      bug_factory)
+    if args[:research_notes].present?
+      Note.process_note({
+                            id: new_research_bug.id,
+                            comment: args[:research_notes],
+                            note_type: 'research',
+                            author: current_user.email
+                        },
+                        bug_factory)
+    end
 
     new_research_bug
 
