@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       resources :disputes do
         collection do
           get :advanced_search
+          get :named_search
           get :standard_search
           get :contains_search
         end

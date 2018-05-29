@@ -5,7 +5,8 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   def index
     @disputes = Dispute.robust_search(params['dispute']['search_type'],
                                       search_name: params['dispute']['search_name'],
-                                      params: index_params)
+                                      params: index_params,
+                                      user: current_user)
   end
 
   def show
