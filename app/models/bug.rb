@@ -1079,9 +1079,8 @@ class Bug < ApplicationRecord
   ####PROCESSING THE WORKFLOW OF A BUG UPDATE#########
 
   def self.publish_research_notes(xmlrpc, current_user, bug)
-    note = bug.research_notes
 
-    notes_to_append = note + "\n\n--------------------------------------------------\n"
+    notes_to_append = "#{bug.research_notes}\n\n--------------------------------------------------\n"
 
     ###NEW AND/OR UPDATED RULES####
 
@@ -2472,11 +2471,22 @@ class Bug < ApplicationRecord
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     bug_stub = bug_factory.create(new_bug_attrs)
+    bugzilla_id = bug_stub["id"]
     new_bug_attrs.delete("assigned_to")
     new_bug_attrs.delete("Bugzilla_token")
 
-    new_research_bug = Bug.create!(new_bug_attrs.merge(id: bug_stub["id"],
-                                                   bugzilla_id: bug_stub["id"],
+    bugzilla_bugs = bug_factory.get(bugzilla_id)
+
+
+    # default values
+    vrtqa = User.where(cvs_username: 'vrtqa').first
+    new_bug_attrs[:committer_id]        = vrtqa.id if vrtqa
+    new_bug_attrs[:resolution]          = 'OPEN'
+    new_bug_attrs[:created_at]          = bugzilla_bugs['bugs'].first['creation_time'].to_time
+    new_bug_attrs[:creator]             = current_user.id.to_s
+
+    new_research_bug = Bug.create!(new_bug_attrs.merge(id: bugzilla_id,
+                                                   bugzilla_id: bugzilla_id,
                                                    user_id: default_assigned_to_user.id,
                                                    state: "NEW"
                                   ))
@@ -2486,6 +2496,44 @@ class Bug < ApplicationRecord
     end
 
     new_research_bug.save
+
+    new_comments = bug_factory.comments(ids: [ bugzilla_id ])
+    new_comments['bugs'].each do |ignore_id, comment_hash|
+      comment_hash['comments'].each do |comment_curr|
+        next if Note.where(id: comment_curr['id']).first.present? #we already have this one
+        if comment_curr['text'].downcase.strip.start_with?('commit')
+          note_type = 'committer'
+        elsif comment_curr['text'].start_with?('Created attachment')
+          note_type = 'attachment'
+        else
+          note_type = 'research'
+        end
+        comment = comment_curr['text'].strip
+        creation_time = comment_curr['creation_time'].to_time
+        note = Note.where(id: comment_curr['id']).first
+        if note.present?
+          note.update_attributes({
+                                     author:     comment_curr['author'],
+                                     comment:    comment,
+                                     bug_id:     bugzilla_id,
+                                     note_type:  note_type,
+                                     notes_bugzilla_id: comment_curr['id'],
+                                     created_at: creation_time
+                                 })
+        else
+          Note.create({
+                          id:         comment_curr['id'],
+                          author:     comment_curr['author'],
+                          comment:    comment,
+                          bug_id:     bugzilla_id,
+                          note_type:  note_type,
+                          created_at: creation_time,
+                          notes_bugzilla_id: comment_curr['id']
+                      })
+        end
+      end
+    end
+
 
     self.giblets.each do |gib|
       new_research_bug.send(gib.gib.class.to_s.downcase.pluralize) << gib.gib
