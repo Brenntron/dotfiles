@@ -18,7 +18,9 @@ Rails.application.routes.draw do
     namespace :webrep_disputes do
       root 'disputes#index'
       resources :disputes
+      get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
+      get 'research', to: 'disputes#research'
     end
 
 

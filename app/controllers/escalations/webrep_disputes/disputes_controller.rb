@@ -13,8 +13,9 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   end
 
   def dashboard
-
   end
 
+  def tickets
+  end
 
 end
