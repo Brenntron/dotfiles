@@ -6,12 +6,13 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name to save this search as a saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.advanced_search(params, search_name:, user:, base_relation: Dispute)
+  def self.advanced_search(params, search_name:, user:)
     raise 'Search must use ActionController::Parameters!' unless params.kind_of?(ActionController::Parameters)
     raise 'Cannot search with unpermitted parameters!' unless params.permitted?
 
     present_params = params.select{ |key, value| value.present? }
 
+    # Save this search as a named search
     if present_params.present? && search_name.present?
       named_search =
           user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
@@ -21,45 +22,46 @@ class Dispute < ApplicationRecord
       end
     end
 
-    base_relation.where(present_params)
+    where(present_params)
   end
 
   # Searched based on saved search.
   # @param [String] search_name the name of the saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.named_search(search_name, user:, base_relation: Dispute)
+  def self.named_search(search_name, user:)
     named_search = user.named_searches.where(name: search_name).first
+    raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
       search_params[criterion.field_name] = criterion.value
       search_params
     end
-    base_relation.where(search_params)
+    where(search_params)
   end
 
   # Searches based on standard pre-determined filters.
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.standard_search(search_name, base_relation: Dispute)
+  def self.standard_search(search_name)
     case search_name
       when 'Open'
-        base_relation.where(status: 'Open')
+        where(status: 'Open')
       when 'Closed'
-        base_relation.where(status: 'Closed')
+        where(status: 'Closed')
       else
-        base_relation.where({})
+        raise "No search named '#{search_name}' known."
     end
   end
 
   # Searches many fields in the record for values containing a given value.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.contains_search(value, base_relation: Dispute)
-    base_relation.where("customer_name like :pattern" +
-                            " or resolution like :pattern" +
-                            " or customer_company_name like :pattern",
-                        pattern: "%#{value}%")
+  def self.contains_search(value)
+    where("customer_name like :pattern" +
+              " or resolution like :pattern" +
+              " or customer_company_name like :pattern",
+          pattern: "%#{value}%")
   end
 
   # Searches in a variety of ways.
@@ -73,18 +75,18 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, params: nil, search_name: nil, user:, base_relation: Dispute)
+  def self.robust_search(search_type, params: nil, search_name: nil, user:)
     case search_type
       when 'advanced'
-        advanced_search(params, search_name: search_name, user: user, base_relation: base_relation)
+        advanced_search(params, search_name: search_name, user: user)
       when 'named'
-        named_search(search_name, user: user, base_relation: base_relation)
+        named_search(search_name, user: user)
       when 'standard'
-        standard_search(search_name, base_relation: base_relation)
+        standard_search(search_name)
       when 'contains'
-        contains_search(params['value'], base_relation: base_relation)
+        contains_search(params['value'])
       else
-        base_relation.where({})
+        where({})
     end
   end
 end

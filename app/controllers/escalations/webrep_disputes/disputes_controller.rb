@@ -3,10 +3,11 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   before_action :require_login
 
   def index
-    @disputes = Dispute.robust_search(params['dispute']['search_type'],
-                                      search_name: params['dispute']['search_name'],
+    @disputes = Dispute.robust_search(params.fetch(:dispute, {})['search_type'],
+                                      search_name: params.fetch(:dispute, {})['search_name'],
                                       params: index_params,
                                       user: current_user)
+    byebug
   end
 
   def show
@@ -36,9 +37,9 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   private
 
   def index_params
-    params.require(:dispute).permit(:customer_name, :customer_email, :customer_company_name,
-                                    :status, :resolution, :subject,
-                                    :value)
+    params.fetch(:dispute, {}).permit(:customer_name, :customer_email, :customer_company_name,
+                                      :status, :resolution, :subject,
+                                      :value)
   end
 
 end
