@@ -1375,14 +1375,10 @@ class Bug < ApplicationRecord
         blocked_bug.resolution = updated_bug_state[:resolution]
         blocked_bug.save
 
-        updated_bug_options = {}
-
+        updated_bug_options =
+            Bug.get_new_bug_state(blocked_bug, new_escalation_state, new_escalation_message, current_user.email)
         updated_bug_options[:ids] = blocked_bug.id
-        updated_bug_options[:comment] = { comment: new_escalation_message }
-        updated_bug_options[:status] = new_escalation_state
-
-
-        updated_bug = xmlrpc.update(updated_bug_options.to_h) unless updated_bug_options.blank?
+        xmlrpc.update(updated_bug_options.to_h)
 
       end
       bug.snort_blocked_bugs.destroy_all
@@ -2293,11 +2289,12 @@ class Bug < ApplicationRecord
                         permitted_params:,
                         new_escalation_message: nil,
                         new_escalation_state: nil)
-
     raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id.present?
     assignee = User.where(id: assignee_id).first
-    Rails.logger.error("Cannot find bug assignee id = #{assignee_id.inspect} for bug #{self.bugzilla_id}")
-    raise "Cannot find bug assignee for bug #{self.bugzilla_id}." unless assignee
+    unless assignee
+      Rails.logger.error("Cannot find bug assignee id = #{assignee_id.inspect} for bug #{self.bugzilla_id}")
+      raise "Cannot find bug assignee for bug #{self.bugzilla_id}."
+    end
 
     committer = committer_id.presence && User.where(id: committer_id).first
 
