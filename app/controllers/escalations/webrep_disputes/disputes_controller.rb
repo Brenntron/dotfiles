@@ -7,7 +7,6 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
                                       search_name: params.fetch(:dispute, {})['search_name'],
                                       params: index_params,
                                       user: current_user)
-    byebug
   end
 
   def show
