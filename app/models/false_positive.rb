@@ -95,14 +95,24 @@ PCAP Utility: #{pcap_lib}
   def post_fp_created(bug)
     Rails.logger.info("Sending Confirmation to #{self.source_authority}")
     conn = ::Bridge::FpCreatedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
-    conn.post(false_positive_id: self.id, bug_id: bug&.id, source_key: self.source_key)
-    Rails.logger.info("Confirmation to #{self.source_authority} sent successfully")
+    response = conn.post(false_positive_id: self.id, bug_id: bug&.id, source_key: self.source_key)
+    if response.code == "200"
+      Rails.logger.info("Confirmation to #{self.source_authority} sent successfully")
+    else
+      post_fp_failed("CODE: #{response.code}. Confirmation to #{self.source_authority} Failed with the following message: #{response.body}")
+    end
+
   end
 
   def post_fp_failed(msg)
     Rails.logger.error(msg)
     conn = ::Bridge::FpFailedEvent.new(addressee: self.source_authority, source_authority: self.source_authority)
-    conn.post(source_key: self.source_key, ac_status: "UNSENT")
+    response = conn.post(source_key: self.source_key, ac_status: "UNSENT")
+    if response.code == "200"
+      Rails.logger.info("Failure message to #{self.source_authority} sent successfully")
+    else
+      Rails.logger.info("CODE: #{response.code}. This should never happen. If it does something isnt configured correctly. \n #{conn.to_json}")
+    end
   end
 
   def save_attachments_from_params(attachments_attrs:)
