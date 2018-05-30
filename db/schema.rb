@@ -197,6 +197,15 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.string "score_type"
     t.string "suggested_disposition"
     t.string "primary_category"
+    t.string "tag"
+    t.string "top_level_domain"
+    t.string "subdomain"
+    t.string "domain"
+    t.string "path"
+    t.string "channel"
+    t.string "status"
+    t.string "resolution"
+    t.text "resolution_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -242,6 +251,10 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.string "source_ip_address"
     t.text "problem_summary"
     t.text "research_notes"
+    t.string "channel"
+    t.integer "ticket_source_key"
+    t.string "ticket_source"
+    t.string "ticket_source_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
