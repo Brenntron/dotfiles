@@ -111,7 +111,7 @@ PCAP Utility: #{pcap_lib}
     if response.code == "200"
       Rails.logger.info("Failure message to #{self.source_authority} sent successfully")
     else
-      Rails.logger.info("CODE: #{response.code}. This should never happen. If it does something isnt configured correctly. \n #{conn.to_json}")
+      Rails.logger.error("CODE: #{response.code}. This should never happen. If it does something isnt configured correctly. \n #{conn.to_json}")
     end
   end
 
