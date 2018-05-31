@@ -4,6 +4,9 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
+require 'cucumber/api_steps'
+
+
 if ENV['COVERAGE'] && ("0" != ENV['COVERAGE'])
   require 'simplecov'
   SimpleCov.start do

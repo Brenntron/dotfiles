@@ -38,6 +38,7 @@ class Ability
     end
     if current_user.has_role?('build coordinator')
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
+      can :list_research, Bug
       can :update_preferences, User, id: current_user.id
     end
   end

@@ -559,9 +559,9 @@ Feature: Bug
       | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |     1        |
     And the following rule categories exist:
       | category      | id |
-      | BLACKLIST     |  1 |
+      | APP-DETECT    |  1 |
       | FILE-IDENTIFY |  2 |
-    And the following "synched_rule" rules exist belonging to bug "222222":
+    And the following "edited_rule" rules exist belonging to bug "222222":
       |id | message               | rule_category_id | parsed |
       |1  | FILE-IDENTIFY message | 2                | false  |
     And the following references exist:
@@ -1068,3 +1068,22 @@ Feature: Bug
     And  I should not see "354873"
     And  I should not see "354875"
     And  I should not see "Zarro Boogs found, please try selecting any other filter."
+
+  @javascript
+  Scenario: Notes are published when an analyst sets a bug to pending
+    Given a user with role "analyst" exists and is logged in
+    And  I goto "/bugs/new"
+    And  I fill in "bug[summary]" with "New Bug Summary"
+    And  I fill in "bug[description]" with "This is my description."
+    When I click button "Save"
+    And  I wait for "10" seconds
+    When I click ".history-tab"
+    Then I should not see "THESIS:"
+    Then I click "Resolve"
+    And  I wait for "10" seconds
+    And  I click "Resink Bug Now"
+    And  I wait for "10" seconds
+    When I click "Resolve"
+    And  I wait for "10" seconds
+    And  I click ".history-tab"
+    Then I should see "THESIS:"

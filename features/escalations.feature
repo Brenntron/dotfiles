@@ -27,7 +27,7 @@ Feature: Escalations
     And the textarea with id "state_comment" should have a value of "Coverage has not been updated."
 
   @javascript
-  Scenario:
+  Scenario:A summary must be provided to create a new research bug
     Given a user with commit permission exists and is logged in
     And the following bugs exist:
       | id | bugzilla_id | state | user_id | summary                                     | product  | component   | description       | committer_id |
@@ -44,7 +44,7 @@ Feature: Escalations
     Then I should see "must provide a new summary line for the new research bug."
 
   @javascript
-  Scenario:
+  Scenario: A description must be provided to create a new research bug
     Given a user with commit permission exists and is logged in
     And the following bugs exist:
       | id | bugzilla_id | state | user_id | summary                                     | product  | component   | description       | committer_id |
@@ -63,7 +63,7 @@ Feature: Escalations
     Then I should see "must provide a description for the new research bug."
 
   @javascript
-  Scenario:
+  Scenario: Cannot create a research bug when one bug blocks another
     Given a user with commit permission exists and is logged in
     And the following bugs exist:
       | id | bugzilla_id | state | user_id | summary                                     | product  | component   | description       | committer_id |
@@ -78,3 +78,11 @@ Feature: Escalations
     Then I relate 111111 to 222222 with block
     And  I goto "/escalations/bugs/111111"
     And  I should not see "Create New Research Bug"
+
+  @javascript
+  Scenario: A research bug should block an escalation bug
+    #TODO: write this test
+    
+  @javascript
+  Scenario: Notes are copied from an escalation to a research bug
+    #TODO: write this test

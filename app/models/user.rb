@@ -173,6 +173,13 @@ class User < ApplicationRecord
         committer: 'false')
   end
 
+  # Search by email, then search by cvs_username, then create
+  def self.user_by_email(email)
+    User.where(email: email).first ||
+        User.where(cvs_username: email.sub(/@.*$/, '')).first ||
+        User.create_by_email(email)
+  end
+
   # A user model from the db and or the http request.
   #
   # If there is no user in the database, a new User model is returned.

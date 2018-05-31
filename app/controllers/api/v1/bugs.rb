@@ -588,6 +588,7 @@ module API
         end
         post "/duplicate_bug" do
 
+
           if params[:id].blank?
             return {:error => "must provide escalation id to convert to research bug."}.to_json
           end
@@ -597,7 +598,11 @@ module API
           if params[:description].blank?
             return {:error => "must provide a description for the new research bug."}.to_json
           end
-          escalation_bug = Bug.find(params[:id])
+
+          escalation_bug = Bug.by_escalations.where(id: params[:id]).first
+          return {:error => "Cannot find escalation bug #{params[:id]}."}.to_json unless escalation_bug
+
+
           new_summary_line = params[:summary]
 
           if new_summary_line == escalation_bug.summary
@@ -609,12 +614,12 @@ module API
           args[:bugzilla_session] = bugzilla_session
           args[:description] = params[:description]
 
-          new_research_bug = escalation_bug.convert_escalation_to_research(args)
+          new_research_bug = escalation_bug.convert_escalation_to_research(args, current_user: current_user)
 
 
 
           escalation_bug.snort_research_escalation_bugs << new_research_bug
-          escalation_bug.snort_blocked_bugs << new_research_bug
+          escalation_bug.snort_blocker_bugs << new_research_bug
 
           research_bug_url = "/bugs/#{new_research_bug.id}"
 
@@ -866,6 +871,8 @@ module API
             bug.snort_research_to_research_bugs.delete(related_bug)  if bug.snort_research_to_research_bugs.include? related_bug
             related_bug.snort_research_to_research_bugs.delete(bug)  if related_bug.snort_research_to_research_bugs.include? bug
           end
+          BugBlocker.where(snort_blocked_bug: bug, snort_blocker_bug: related_bug).delete_all
+          BugBlocker.where(snort_blocker_bug: bug, snort_blocked_bug: related_bug).delete_all
           return {:status => "success", :product => bug.product}.to_json
         end
 

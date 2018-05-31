@@ -144,6 +144,7 @@ Rails.application.routes.draw do
         get 'poll-from-bridge/messages', to: 'messages#get_messages'
         post 'fp-event/messages', to: 'messages#messages_from_bridge'
         post 'fp-create/messages', to: 'messages#fp_create'
+        post 'rule-file-notify/messages', to: 'messages#rule_file_notify'
       end
       resources :messages, only: [:create]
     end
