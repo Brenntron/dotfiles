@@ -16,5 +16,8 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
 
   end
 
+  def single
+
+  end
 
 end

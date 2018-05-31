@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       root 'disputes#index'
       resources :disputes
       get 'dashboard', to: 'disputes#dashboard'
+      get 'single', to: 'disputes#single'
     end
 
 
