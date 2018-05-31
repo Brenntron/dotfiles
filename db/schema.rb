@@ -356,6 +356,21 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "named_search_criteria", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "named_search_id"
+    t.string "field_name"
+    t.string "value"
+  end
+
+  create_table "named_searches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.string "name"
+  end
+
   create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.text "comment"
     t.string "note_type"

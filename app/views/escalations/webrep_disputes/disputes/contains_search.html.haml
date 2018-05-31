@@ -1,0 +1,7 @@
+%h1 Contains Search
+
+= simple_form_for :dispute, url: escalations_webrep_disputes_disputes_path, method: :get do |dispute_form|
+  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'contains'}
+  = dispute_form.input :value, input_html: {value: ''}
+  = dispute_form.submit 'Search'
+
