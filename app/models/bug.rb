@@ -65,6 +65,7 @@ class Bug < ApplicationRecord
 
   scope :permit_class_level, ->(class_level) { where("classification <= ? ", Bug.classifications[class_level]) }
 
+  scope :research_bugs, -> { where(product: 'research') }
   scope :by_escalations, -> { where(:product => "escalations")}
 
   scope :research_product, -> { where(:product => "Research")}
@@ -120,6 +121,18 @@ class Bug < ApplicationRecord
 
   def liberty_embargo?
     LIBERTY_EMBARGO == self.liberty
+  end
+
+  def self.bug_result(search_mode, bug_search_id, bug_search_max)
+    case
+      when bug_search_max.present?
+        Bug.where("id BETWEEN ? AND ?", bug_search_id, bug_search_max)
+      when 'advanced' == search_mode
+        Bug.where("id LIKE ?", "%#{bug_search_id}%")
+      else
+        #return Bug object for redirect to that bug
+        Bug.where("id='#{bug_search_id}%'").first
+    end
   end
 
   def initialize_report
@@ -1089,9 +1102,8 @@ class Bug < ApplicationRecord
   ####PROCESSING THE WORKFLOW OF A BUG UPDATE#########
 
   def self.publish_research_notes(xmlrpc, current_user, bug)
-    note = bug.research_notes
 
-    notes_to_append = note + "\n\n--------------------------------------------------\n"
+    notes_to_append = "#{bug.research_notes}\n\n--------------------------------------------------\n"
 
     ###NEW AND/OR UPDATED RULES####
 
@@ -1386,14 +1398,10 @@ class Bug < ApplicationRecord
         blocked_bug.resolution = updated_bug_state[:resolution]
         blocked_bug.save
 
-        updated_bug_options = {}
-
+        updated_bug_options =
+            Bug.get_new_bug_state(blocked_bug, new_escalation_state, new_escalation_message, current_user.email)
         updated_bug_options[:ids] = blocked_bug.id
-        updated_bug_options[:comment] = { comment: new_escalation_message }
-        updated_bug_options[:status] = new_escalation_state
-
-
-        updated_bug = xmlrpc.update(updated_bug_options.to_h) unless updated_bug_options.blank?
+        xmlrpc.update(updated_bug_options.to_h)
 
       end
       bug.snort_blocked_bugs.destroy_all
@@ -1522,31 +1530,16 @@ class Bug < ApplicationRecord
 
 
         #Create/update Bug User relationships
-        creator = User.where('email=?', item['creator']).first
-        new_user = User.where('email=?', item['assigned_to']).first
-        new_committer = User.where('email=?', item['qa_contact']).first
-        if creator.nil?
-          User.create_by_email(item['creator'])
-          new_creator = User.where(email: item['creator']).first
-          bug.creator = new_creator.id
-        else
-          bug.creator = creator.id
-        end
-        if new_user.nil?
-          User.create_by_email(item['assigned_to'])
-          new_generated_user = User.where(email: item['assigned_to']).first
-          bug.user = new_generated_user
-        else
-          bug.user = new_user
-        end
-        if new_committer.nil?
-          User.create_by_email(item['qa_contact'])
-          new_generated_committer = User.where(email: item['qa_contact']).first
-          new_generated_committer.roles << Role.where(role:"committer")
-          bug.committer = new_generated_committer
-        else
-          bug.committer = new_committer
-        end
+
+        creator = User.user_by_email(item['creator'])
+        bug.creator = creator.id
+
+        new_user = User.user_by_email(item['assigned_to'])
+        bug.user = new_user
+
+        new_committer = User.user_by_email(item['qa_contact'])
+        bug.committer = new_committer
+
         if import_type != "status"
           bug.save
         end
@@ -1820,35 +1813,16 @@ class Bug < ApplicationRecord
 
 
         #Create/update Bug User relationships
-        creator = User.where('email=?', item['creator']).first
-        new_user = User.where('email=?', item['assigned_to']).first
-        new_committer = User.where('email=?', item['qa_contact']).first
-        default_role_type = "analyst"
-        default_role = Role.where(role: default_role_type)
-        if creator.nil?
-          User.create_by_email(item['creator'])
-          new_creator = User.where(email: item['creator']).first
-          new_creator.save
-          bug.creator = new_creator.id
-        else
-          bug.creator = creator.id
-        end
-        if new_user.nil?
-          User.create_by_email(item['assigned_to'])
-          new_generated_user = User.where(email: item['assigned_to']).first
-          new_generated_user.save
-          bug.user = new_generated_user
-        else
-          bug.user = new_user
-        end
-        if new_committer.nil?
-          User.create_by_email(item['qa_contact'])
-          new_generated_committer = User.where(email: item['qa_contact']).first
-          new_generated_committer.roles << Role.where(role:"committer")
-          bug.committer = new_generated_committer
-        else
-          bug.committer = new_committer
-        end
+
+        creator = User.user_by_email(item['creator'])
+        bug.creator = creator.id
+
+        new_user = User.user_by_email(item['assigned_to'])
+        bug.user = new_user
+
+        new_committer = User.user_by_email(item['qa_contact'])
+        bug.committer = new_committer
+
         if import_type != "status"
           bug.save
         end
@@ -2056,33 +2030,15 @@ class Bug < ApplicationRecord
               new_record.resolved_at = last_change_time
             end
           end
-          creator = User.where('email=?', item['creator']).first
-          new_user = User.where('email=?', item['assigned_to']).first
-          new_committer = User.where('email=?', item['qa_contact']).first
-          if creator.nil?
-            User.create_by_email(item['creator'])
-            new_creator = User.where(email: item['creator']).first
 
-            new_record.creator = new_creator.id
-          else
-            new_record.creator = creator.id
-          end
-          if new_user.nil?
-            User.create_by_email(item['assigned_to'])
-            new_generated_user = User.where(email: item['assigned_to']).first
-            new_generated_user.roles << Role.where(role:"analyst")
-            new_record.user = new_generated_user
-          else
-            new_record.user = new_user
-          end
-          if new_committer.nil?
-            User.create_by_email(item['qa_contact'])
-            new_generated_committer = User.where(email: item['qa_contact']).first
-            new_generated_committer.roles << Role.where(role:"committer")
-            new_record.committer = new_generated_committer
-          else
-            new_record.committer = new_committer
-          end
+          creator = User.user_by_email(item['creator'])
+          new_record.creator = creator.id
+
+          new_user = User.user_by_email(item['assigned_to'])
+          new_record.user = new_user
+
+          new_committer = User.user_by_email(item['qa_contact'])
+          new_record.committer = new_committer
 
           new_record.save!
         end
@@ -2371,11 +2327,12 @@ class Bug < ApplicationRecord
                         permitted_params:,
                         new_escalation_message: nil,
                         new_escalation_state: nil)
-
     raise "No assignee for bug #{self.bugzilla_id}." unless assignee_id.present?
     assignee = User.where(id: assignee_id).first
-    Rails.logger.error("Cannot find bug assignee id = #{assignee_id.inspect} for bug #{self.bugzilla_id}")
-    raise "Cannot find bug assignee for bug #{self.bugzilla_id}." unless assignee
+    unless assignee
+      Rails.logger.error("Cannot find bug assignee id = #{assignee_id.inspect} for bug #{self.bugzilla_id}")
+      raise "Cannot find bug assignee for bug #{self.bugzilla_id}."
+    end
 
     committer = committer_id.presence && User.where(id: committer_id).first
 
@@ -2549,11 +2506,22 @@ class Bug < ApplicationRecord
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     bug_stub = bug_factory.create(new_bug_attrs)
+    bugzilla_id = bug_stub["id"]
     new_bug_attrs.delete("assigned_to")
     new_bug_attrs.delete("Bugzilla_token")
 
-    new_research_bug = ResearchBug.create!(new_bug_attrs.merge(id: bug_stub["id"],
-                                                               bugzilla_id: bug_stub["id"],
+    bugzilla_bugs = bug_factory.get(bugzilla_id)
+
+
+    # default values
+    vrtqa = User.where(cvs_username: 'vrtqa').first
+    new_bug_attrs[:committer_id]        = vrtqa.id if vrtqa
+    new_bug_attrs[:resolution]          = 'OPEN'
+    new_bug_attrs[:created_at]          = bugzilla_bugs['bugs'].first['creation_time'].to_time
+    new_bug_attrs[:creator]             = current_user.id.to_s
+
+    new_research_bug = ResearchBug.create!(new_bug_attrs.merge(id: bugzilla_id,
+                                                               bugzilla_id: bugzilla_id,
                                                                user_id: default_assigned_to_user.id,
                                                                state: "NEW"))
 
@@ -2562,6 +2530,44 @@ class Bug < ApplicationRecord
     end
 
     new_research_bug.save
+
+    new_comments = bug_factory.comments(ids: [ bugzilla_id ])
+    new_comments['bugs'].each do |ignore_id, comment_hash|
+      comment_hash['comments'].each do |comment_curr|
+        next if Note.where(id: comment_curr['id']).first.present? #we already have this one
+        if comment_curr['text'].downcase.strip.start_with?('commit')
+          note_type = 'committer'
+        elsif comment_curr['text'].start_with?('Created attachment')
+          note_type = 'attachment'
+        else
+          note_type = 'research'
+        end
+        comment = comment_curr['text'].strip
+        creation_time = comment_curr['creation_time'].to_time
+        note = Note.where(id: comment_curr['id']).first
+        if note.present?
+          note.update_attributes({
+                                     author:     comment_curr['author'],
+                                     comment:    comment,
+                                     bug_id:     bugzilla_id,
+                                     note_type:  note_type,
+                                     notes_bugzilla_id: comment_curr['id'],
+                                     created_at: creation_time
+                                 })
+        else
+          Note.create({
+                          id:         comment_curr['id'],
+                          author:     comment_curr['author'],
+                          comment:    comment,
+                          bug_id:     bugzilla_id,
+                          note_type:  note_type,
+                          created_at: creation_time,
+                          notes_bugzilla_id: comment_curr['id']
+                      })
+        end
+      end
+    end
+
 
     self.giblets.each do |gib|
       new_research_bug.send(gib.gib.class.to_s.downcase.pluralize) << gib.gib
@@ -2577,13 +2583,15 @@ class Bug < ApplicationRecord
     end
 
     copy_notes_to_bug(new_research_bug.id, bug_factory: bug_factory)
-    Note.process_note({
-                          id: new_research_bug.id,
-                          comment: args[:research_notes],
-                          note_type: 'research',
-                          author: current_user.email
-                      },
-                      bug_factory)
+    if args[:research_notes].present?
+      Note.process_note({
+                            id: new_research_bug.id,
+                            comment: args[:research_notes],
+                            note_type: 'research',
+                            author: current_user.email
+                        },
+                        bug_factory)
+    end
 
     new_research_bug
 

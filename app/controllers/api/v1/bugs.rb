@@ -897,6 +897,8 @@ module API
             bug.snort_research_to_research_bugs.delete(related_bug)  if bug.snort_research_to_research_bugs.include? related_bug
             related_bug.snort_research_to_research_bugs.delete(bug)  if related_bug.snort_research_to_research_bugs.include? bug
           end
+          BugBlocker.where(snort_blocked_bug: bug, snort_blocker_bug: related_bug).delete_all
+          BugBlocker.where(snort_blocker_bug: bug, snort_blocked_bug: related_bug).delete_all
           return {:status => "success", :product => bug.product}.to_json
         end
 

@@ -1,7 +1,7 @@
 class BugsController < ApplicationController
   load_and_authorize_resource except: [:index, :show,
                                        :add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
-  before_action only:[:index] { authorize!(:list_research, Bug) }
+  before_action only: [:index] { authorize!(:list_research, Bug) }
 
   before_action :require_login
   before_action :query_bugs
@@ -57,40 +57,30 @@ class BugsController < ApplicationController
       SavedSearch.create({:user_id => current_user.id, :name => params[:bug][:saved_search], :session_query => session[:query], :session_search => session[:search].to_json})
     end
 
-    @bug_query = Bug.query(current_user, session[:query], session[:search])
-
-    if @bug_query.any?
-      @bugs = @bug_query.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
-    else
+    @bugs = Bug.query(current_user, session[:query], session[:search])
+    unless @bugs
       if flash.now[:alert]
         flash.now[:alert] += " Zarro Boogs found, please try selecting any other filter."
       else
         flash.now[:alert] = "Zarro Boogs found, please try selecting any other filter."
       end
-      @bugs = Bug.none.paginate(:page => session[:page], :per_page => 32)
+      @bugs = Bug.none
     end
-    if params[:bug].present?
-      @bug_search_id = params[:bug][:id].gsub(/[^0-9]/,'')
-      if @bug_search_id.present?
-        @bug_search_max = params[:bug][:bugzilla_max]
-        if @bug_search_max.present?
-          @bugs =
-              Bug.where("id BETWEEN ? AND ?", @bug_search_id, params[:bug][:bugzilla_max]).permit_class_level(current_user.class_level)
-                  .paginate(:page => session[:page], :per_page => 32)
-          @bug_search_id = '' # otherwise the form will show the lower end of the range
-        else
-          @bugs =
-            if 'advanced' == params['submit'] # if submit button is advanced, this is the advanced search
-              Bug.where("id LIKE ?", "%#{@bug_search_id}%").permit_class_level(current_user.class_level)
-                  .paginate(:page => session[:page], :per_page => 32)
-            else # otherwise top left search, do exact match
-              Bug.where("id='#{@bug_search_id}%'").permit_class_level(current_user.class_level)
-                  .paginate(:page => session[:page], :per_page => 32)
-            end
-          redirect_to bug_path(@bugs.first.id) if @bugs.count == 1
-        end
+
+    @bug_search_id = params[:bug].present? && params[:bug][:id].gsub(/[^0-9]/,'')
+    if @bug_search_id&.present?
+      @bug_search_max = params[:bug][:bugzilla_max]
+      bug_result = Bug.bug_result(params['submit'], params[:bug][:id].gsub(/[^0-9]/,''), params[:bug][:bugzilla_max])
+      if bug_result.kind_of?(Bug)
+        redirect_to bug_path(bug_result)
+      else
+        @bugs = bug_result
       end
     end
+
+    @bugs = @bugs.research_bugs.permit_class_level(current_user.class_level)
+                .paginate(:page => session[:page], :per_page => 32)
+    @bug_search_id = ''
 
     #if params[:giblet_id].present?
     #  giblet_id = params[:giblet_id]
@@ -98,8 +88,6 @@ class BugsController < ApplicationController
 
     #  @bugs = @giblet.gib.bugs.permit_class_level(current_user.class_level).paginate(:page => session[:page], :per_page => 32)
     #end
-
-
   end
 
   def new
@@ -238,10 +226,11 @@ class BugsController < ApplicationController
   private
 
   def bug_params
-    params.require(:research_bug).permit(:product, :component, :state, :creator, :opsys, :severity, :platform, :user_id,
-                                         :priority, :classification, :searchID, :summary, :whiteboard, :version, :flow,
-                                         :description, :committer_id, tag_names: [],
-                                         rules_attributes: [:connection, :message, :reference,
+    params.require(:research_bug).permit(:classification, :committer_id, :component, :creator,
+                                         :description, :opsys, :platform, :priority, :product,
+                                         :saved_search, :searchID, :severity, :state, :summary,
+                                         :user_id, :version, :whiteboard, tag_names: [],
+                                         rules_attributes: [:connection, :flow, :message, :reference,
                                                             :metadata, :detection, :class_type, :reference])
   end
 
