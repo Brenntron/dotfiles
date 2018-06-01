@@ -20,6 +20,9 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
 
   end
 
+  def single
+  end
+  
   def advanced_search
     @dispute = Dispute.new
   end
@@ -40,5 +43,4 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
                                       :status, :resolution, :subject,
                                       :value)
   end
-
 end
