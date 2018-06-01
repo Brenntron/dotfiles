@@ -2535,6 +2535,9 @@ class Bug < ApplicationRecord
                       })
         end
       end
+
+      bug_factory.update(ids: self.bugzilla_id,
+                         depends_on: {add: [new_research_bug.bugzilla_id]})
     end
 
 
