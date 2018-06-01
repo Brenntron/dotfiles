@@ -93,6 +93,7 @@ group :test do
   gem 'faker', '~> 1.7.3'
   gem 'json_spec'
   gem 'simplecov', :require => false
+  gem 'cucumber-api-steps', '~>0.14', require: false
 end
 
 gem 'httparty', '~> 0.15.3'

@@ -17,7 +17,14 @@ Rails.application.routes.draw do
     end
     namespace :webrep_disputes do
       root 'disputes#index'
-      resources :disputes
+      resources :disputes do
+        collection do
+          get :advanced_search
+          get :named_search
+          get :standard_search
+          get :contains_search
+        end
+      end
       get 'dashboard', to: 'disputes#dashboard'
     end
 
@@ -143,6 +150,7 @@ Rails.application.routes.draw do
         post 'fp-event/messages', to: 'messages#messages_from_bridge'
         post 'fp-create/messages', to: 'messages#fp_create'
         post 'ticket-event/messages', to: 'messages#messages_from_bridge'
+        post 'rule-file-notify/messages', to: 'messages#rule_file_notify'
       end
       resources :messages, only: [:create]
     end

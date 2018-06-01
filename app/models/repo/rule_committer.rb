@@ -212,7 +212,8 @@ module Repo
     # param [String] username The username to add to the svn comment (message)
     # param [FixNum] bugzilla_id The bugzilla id of the bug
     # param [Boolean] nodoc_override true if commit should skip check prohibiting missing rule docs
-    def self.commit_rules_action(rules, username:, bugzilla_id:, new_bugzilla_comment:, xmlrpc:, nodoc_override: false)
+    def self.commit_rules_action(rules,
+                                 username:, bugzilla_id:, new_bugzilla_comment:, xmlrpc:, nodoc_override: false)
 
       user = User.where(cvs_username: username).first
       bug = bugzilla_id ? Bug.where(bugzilla_id: bugzilla_id).first : nil
@@ -226,21 +227,24 @@ module Repo
                                           username: username)
       committer.locked_commit(bugzilla_comment: bug.append_committer_comment(new_bugzilla_comment)).tap do
 
-        #synch history to pick up new bugzilla commit note created by rulecommitter.
-        bugzilla_bug_proxy = Bugzilla::Bug.new(xmlrpc)
+        if bug.present?
+          #synch history to pick up new bugzilla commit note created by rulecommitter.
+          bugzilla_bug_proxy = Bugzilla::Bug.new(xmlrpc)
 
-        zillabug_hash = bugzilla_bug_proxy.get(bugzilla_id)
-        Bug.synch_history(bugzilla_bug_proxy, zillabug_hash)
+          zillabug_hash = bugzilla_bug_proxy.get(bugzilla_id)
+          Bug.synch_history(bugzilla_bug_proxy, zillabug_hash)
 
-      end
+          attachments = bug.attachments.map{|a| a.id}
+          new_task = Task.create_pcap_test(bug.id, user.id)
+          TestAttachment.new(new_task,
+                             xmlrpc.token,
+                             attachments).send_work_msg
 
-      if bug.present?
-        attachments = bug.attachments.map{|a| a.id}
-
-        new_task = Task.create_pcap_test(bug.id, user.id)
-        TestAttachment.new(new_task,
-                           xmlrpc.token,
-                           attachments).send_work_msg
+          if bug.committer_id != user.id || bug.committer_id.blank?
+            bugzilla_bug_proxy.update(ids: bugzilla_id, qa_contact: user.email)
+            bug.update!(committer_id: user.id)
+          end
+        end
       end
 
     rescue

@@ -376,7 +376,7 @@ class Rule < ApplicationRecord
 
   def associate_references(rule_content)
     references_ary = []
-    rule_content.split(';').each { |r| references_ary << r.strip.gsub('reference:', '') if r.match(/reference\W*:/) }
+    rule_content.split(';').each { |option| references_ary << option.strip.gsub('reference:', '') if option.match(/reference\W*:/) }
 
     self.references.delete_all
     references_ary.each do |ref_str|
@@ -596,24 +596,28 @@ class Rule < ApplicationRecord
 
     rule_db = by_sid(parser.sid, parser.gid).first
 
-    if rule_db.nil?
-      rule = find_from_parser(parser)
-      rule.load_rule_content(rule_content)
-      rule
-    elsif rule_db.draft? && parser.rev > rule_db.rev
-      rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT)
-      rule_db.update(state: STALE_STATE)
-      rule_db
-    elsif rule_db.draft?
-      # do nothing
-      rule_db
-    elsif rule_db.deleted?
-      rule_db.update(state: DELETED_STATE)
-      rule_db
-    else
-      rule = find_from_parser(parser)
-      rule.load_rule_content(rule_content)
-      rule
+    case
+      when rule_db.nil?
+        rule = find_from_parser(parser)
+        rule.load_rule_content(rule_content)
+        rule
+      when rule_db.publishing_content?
+        rule = find_from_parser(parser)
+        rule.load_rule_content(rule_content)
+        rule
+      when rule_db.draft? && parser.rev > rule_db.rev
+        rule_db.update(publish_status: PUBLISH_STATUS_STALE_EDIT, state: STALE_STATE)
+        rule_db
+      when rule_db.draft?
+        # do nothing
+        rule_db
+      when rule_db.deleted?
+        rule_db.update(state: DELETED_STATE)
+        rule_db
+      else
+        rule = find_from_parser(parser)
+        rule.load_rule_content(rule_content)
+        rule
     end
   end
 
