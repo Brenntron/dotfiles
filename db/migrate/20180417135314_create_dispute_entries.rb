@@ -10,6 +10,15 @@ class CreateDisputeEntries < ActiveRecord::Migration[5.1]
       t.string        :score_type
       t.string        :suggested_disposition
       t.string        :primary_category
+      t.string        :tag
+      t.string        :top_level_domain
+      t.string        :subdomain
+      t.string        :domain
+      t.string        :path
+      t.string        :channel
+      t.string        :status
+      t.string        :resolution
+      t.text          :resolution_comment
       t.timestamps
     end
   end
