@@ -16,9 +16,9 @@ class Bridge::MessagesController < ApplicationController
       when "snort-org"
         fp_create(false_positive_params)
       when "talos-ingelligence"
-        if params[:message][:obj_type].present?
-          obj_type = params[:message][:obj_type]
-          return_message = obj_type.constantize.process_bridge_payload(talos_intelligence_params)
+        if params[:message][:source_info][:source_type].present?
+          obj_type = params[:message][:source_info][:source_type]
+          return_message = obj_type.constantize.process_bridge_payload(params[:message][:source_info][obj_type.downcase.to_sym])
         else
           return_message = {
 
