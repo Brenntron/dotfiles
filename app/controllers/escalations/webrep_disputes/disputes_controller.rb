@@ -42,5 +42,5 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
     params.fetch(:dispute, {}).permit(:customer_name, :customer_email, :customer_company_name,
                                       :status, :resolution, :subject,
                                       :value)
-
+  end
 end
