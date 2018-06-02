@@ -1,5 +1,4 @@
-<h1> view single record </h1>
-
+<!--<h1> view single record </h1>-->
 <div class="content-wrapper">
   <div class="row">
     <div class="col-xs-1 col-with-divider">
@@ -8,15 +7,15 @@
     </div>
     <div class="col-xs-1 col-with-divider">
       <label class="content-label-sm">Case ID</label>
-      <div>
-        01402523
+      <div class="bug-top-id">
+        <a>01402523</a>
       </div>
     </div>
-    <div class="col-xs-1 col-with-divider">
-      <label class="content-label-sm">Status</label>
-      <div>
+    <div class="col-xs-1 bug-state-col">
+      <label class="content-label-sm">Status</label><br/>
+      <span class="bug-state-info bug-state">
         New
-      </div>
+      </span>
     </div>
     <div class="col-xs-1 col-with-divider">
       <label class="content-label-sm">Owner</label>
@@ -52,33 +51,29 @@
 <!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
 </div>
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-xs-12">
-      <div>
 
         <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active">
-            <a href="#communication" aria-controls="communication" role="tab" data-toggle="tab">Communication</a>
+        <ul class="nav nav-tabs" role="tablist" id="bug-tabs">
+          <li role="presentation" class="nav-item active">
+            <a href="#communication" class="nav-link" aria-controls="communication" role="tab" data-toggle="tab" id="communication-tab-link">Communication</a>
           </li>
           <li role="presentation">
-            <a href="#research" aria-controls="research" role="tab" data-toggle="tab">Research</a>
+            <a href="#research" class="nav-link" aria-controls="research" role="tab" data-toggle="tab" id="research-tab-link">Research</a>
           </li>
           <li role="presentation">
-            <a href="#related" aria-controls="related" role="tab" data-toggle="tab">Related Cases</a>
+            <a href="#related" class="nav-link" aria-controls="related" role="tab" data-toggle="tab" id="related-tab-link">Related Cases</a>
           </li>
         </ul>
 
         <!-- Tab panes -->
-        <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="communication">
+        <div class="tab-content content-wrapper" id="bug-tab-content">
+          <div class="tab-pane active"  id="communication" role="tabpanel">
             <div class="content-wrapper">
               <div class="row">
                 <div class="col-xs-4">
                   <h3>Case History</h3>
                   <div class="row">
-                    <div class="col-xs-6">Sorty By [DROPDOWN]</div>
+                    <div class="col-xs-6">Sort By [DROPDOWN]</div>
                     <div class="col-xs-6">Show [DROPDOWN]</div>
                   </div>
                   <div class="row">
