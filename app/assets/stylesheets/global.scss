@@ -3027,3 +3027,31 @@ fieldset.top-content {
   line-height: 1.4em;
   margin: 3px 0;
 }
+
+.case-history-icon {
+  width: 14px;
+  height: 20px;
+  background-repeat: no-repeat;
+  margin-bottom: -10px;
+  display: block;
+}
+
+.email-icon       {background-image: url(image_path('icon_message.svg'));}
+.note-icon        {background-image: url(image_path('icon_notepad.svg'));}
+.disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
+
+.highlighted-section-header {
+  background-color: #C14B92;
+  color: $content-bg-color;
+  margin-top: -15px;
+  padding: 12px;
+}
+
+.highlighted-section-header h1 {
+  color: $content-bg-color;
+}
+
+.email-header-information {
+  background-color: $faint-neutral-color;
+  padding: 12px;
+}
