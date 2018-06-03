@@ -92,19 +92,24 @@
   .col-sm-3
     %h1 Notes
     .row
-      .col-xs-12
-        .author-info
-          Written by melitayl 1 day ago
-        .note-datetime
+      .col-xs-6
+        %span.author-notation
+          Written by
+          %span.author-username
+            melitayl
+          1 day ago.
+      .col-xs-6.text-right
+        %span.time-stamp
           2017-10-24 15:35:24
         .note-tool-buttons
           [buttons]
 
     .row
-      .col-xs-12.note-content
-        This is a note regarding this ticket. I have looked into this information and it appears to be correct.
+      .col-xs-12
+        .note-block
+          This is a note regarding this ticket. I have looked into this information and it appears to be correct.
 
     .row
       .col-xs-12
-        %a.btn.btn-primary
+        %button.add-note-inline-button#new-comment-note-button
           Add Note

@@ -3014,3 +3014,16 @@ fieldset.top-content {
     transform: rotate(360deg);
   }
 }
+
+
+/**** Additional Styles for the Escalations section */
+
+.note-block {
+  background-color: $faint-neutral-color;
+  color: $type-lighter-color;
+  padding: 8px 12px;
+  display: inline-block;
+  font-size: 8pt;
+  line-height: 1.4em;
+  margin: 3px 0;
+}
