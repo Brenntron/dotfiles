@@ -10,7 +10,7 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   end
 
   def show
-    @dispute = Dispute.find(params[:id])
+    # @dispute = Dispute.find(params[:id])
   end
 
   def update
@@ -18,9 +18,6 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
 
   def dashboard
 
-  end
-
-  def single
   end
   
   def advanced_search

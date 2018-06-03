@@ -26,7 +26,6 @@ Rails.application.routes.draw do
         end
       end
       get 'dashboard', to: 'disputes#dashboard'
-      get 'single', to: 'disputes#single'
     end
 
 
