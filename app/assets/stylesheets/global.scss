@@ -3029,16 +3029,45 @@ fieldset.top-content {
 }
 
 .case-history-icon {
-  width: 14px;
+  width: 16px;
   height: 20px;
   background-repeat: no-repeat;
-  margin-bottom: -10px;
+  margin: auto 6px -16px 6px;
   display: block;
 }
 
 .email-icon       {background-image: url(image_path('icon_message.svg'));}
 .note-icon        {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
+
+.case-history-author, .case-history-preview {
+  display: block;
+  width: 100%;
+  font-size: 8pt;
+}
+
+.case-history-author {
+  font-weight: 700;
+}
+
+.case-history-preview {
+  color: $type-lighter-color;
+  margin-top: 5px;
+}
+
+.case-history-datetime {
+  font-size: 8pt;
+  color: $type-lighter-color;
+  line-height: 1.4em;
+}
+
+.emphasize {
+  font-weight: 700;
+}
+
+.icon-col {
+  padding: 0;
+}
 
 .highlighted-section-header {
   background-color: #C14B92;
