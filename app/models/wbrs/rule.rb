@@ -1,14 +1,10 @@
 class Wbrs::Rule < Wbrs::Base
   attr_accessor :category, :prefix
 
+  delegate :category_id, :desc_long, :descr, :mnem, to: :category, :allow_nil => true
+  delegate :prefix_id, :domain, :is_active, :path, :path_hashed, :port, :protocol, :subdomain, :truncated,
+           to: :prefix, :allow_nil => true
 
-  def category_id
-    category.id
-  end
-
-  def prefix_id
-    prefix.id
-  end
 
   def active?
     is_active
