@@ -3044,6 +3044,7 @@ fieldset.top-content {
   display: block;
   width: 100%;
   font-size: 8pt;
+  line-height: 1.3em;
 }
 
 .case-history-author {
@@ -3059,6 +3060,7 @@ fieldset.top-content {
   font-size: 8pt;
   color: $type-lighter-color;
   line-height: 1.4em;
+  min-width: 72px;
 }
 
 .emphasize {
@@ -3078,6 +3080,22 @@ fieldset.top-content {
 
 .highlighted-section-header h1 {
   color: $content-bg-color;
+  display: inline-block;
+}
+
+.customer-facing-notice {
+  display: inline-block;
+  float: right;
+}
+
+.customer-facing-notice::before {
+  content: '';
+  background-image: url(image_path('icon_warning_white.svg'));
+  background-repeat: no-repeat;
+  background-position-x: center;
+  height: 20px;
+  display: block;
+  margin-bottom: 3px;
 }
 
 .email-header-information {
@@ -3094,4 +3112,18 @@ fieldset.top-content {
   color: $type-lighter-color;
   line-height: 1.4em;
   margin-top: 12px;
+}
+
+.table-toolbar {
+  background-color: darken($faint-neutral-color, 4%);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 8pt;
+  padding: 5px;
+  margin-bottom: 3px;
+}
+
+.communication-subject {
+  color: $type-lighter-color;
+  line-height: 1.3em;
 }
