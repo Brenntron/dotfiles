@@ -2,6 +2,13 @@ class Wbrs::Base
   include ActiveModel::Model         # need ActiveModel::Model
   include ActiveModel::Associations  # include this
 
+  def self.stringkey_params(conditions = {})
+    conditions.inject({}) do |params, (key, value)|
+      params[key.to_s] = value if value
+      params
+    end
+  end
+
   def self.request(path:, body:)
     raise 'Path required' unless path.present?
     raise 'Path must start with slash (/)' unless '/' == path[0]

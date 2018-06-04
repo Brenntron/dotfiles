@@ -15,8 +15,18 @@ class Wbrs::Rule < Wbrs::Base
     new(datum)
   end
 
-  def self.get_where(categories: nil)
-    response = post_request(path: '/v1/cat/rules/get', body: {"categories": categories })
+  # Get the rules from given criteria.
+  # @param [Array<Integer>] prefix_ids: List of prefixes ids
+  # @param [Array<String>] urls: List of URLs
+  # @param [Array<Integer>] categories: List of prefixes categories
+  # @param [Boolean] active: prefixes active/disable status
+  # @param [Integer] limit: Max number of records to return
+  # @param [Integer] offset: Offset of the first record to return
+  # @return [Array<Wbrs::Rule>] Array of the results.
+  def self.get_where(conditions = {})
+    params = stringkey_params(conditions)
+    params['is_active'] = params.delete('active') ? 1 : 0
+    response = post_request(path: '/v1/cat/rules/get', body: params)
 
     response_body = JSON.parse(response.body)
     response_body['data'].map {|datum| new_from_datum(datum)}
