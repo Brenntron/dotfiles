@@ -1,4 +1,4 @@
-class Escalations::WebrepDisputes::DisputesController < ApplicationController
+class Escalations::Webrep::DisputesController < ApplicationController
 
   before_action :require_login
 

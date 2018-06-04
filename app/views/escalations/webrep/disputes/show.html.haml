@@ -26,8 +26,8 @@
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition
-        %span.disposition.disp-negative
-          Malicious: Phishing
+      %span.disposition.disp-negative
+        Malicious: Phishing
     .col-xs-3.col-with-divider
       %label.content-label-sm
         Dispute
@@ -60,7 +60,7 @@
 
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane.active#communication{role: 'tabpanel'}
-    = render 'escalations/webrep_disputes/disputes/communication_tab'
+    = render 'escalations/webrep/disputes/communication_tab'
   .tab-pane#research{role: 'tabpanel'}
     research
   .tab-pane#related{role: 'tabpanel'}
