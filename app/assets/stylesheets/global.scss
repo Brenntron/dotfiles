@@ -3059,3 +3059,10 @@ fieldset.top-content {
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_related_tab.svg'));}
+
+.email-msg-body pre {
+  background-color: $content-bg-color;
+  color: $type-lighter-color;
+  line-height: 1.4em;
+  margin-top: 12px;
+}
