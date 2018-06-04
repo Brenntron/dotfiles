@@ -3099,6 +3099,7 @@ fieldset.top-content {
   display: inline-block;
   float: right;
   text-transform: uppercase;
+  margin-top: 16px;
 }
 
 .customer-facing-notice::before {
@@ -3150,6 +3151,7 @@ fieldset.top-content {
   font-size: 8pt;
   padding: 5px;
   margin-bottom: 3px;
+  margin-top: 14px;
 }
 
 .communication-subject {
@@ -3249,4 +3251,23 @@ fieldset.top-content {
 
 .add-case-note-button:hover {
   background-color: #E47433;
+}
+
+.attachment-label {
+  background-image: url(image_path('icon_attachment.svg'));
+  background-repeat: no-repeat;
+  width: 25px;
+  margin: 2px 6px -3px 0;
+  height: 16px;
+  display: inline-block;
+}
+
+.email-attachments a {
+  color: $content-tab-color;
+  font-size: 8pt;
+}
+
+#communication h1 {
+  margin-top: 20px;
+  margin-bottom: 5px;
 }
