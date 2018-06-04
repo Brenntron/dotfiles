@@ -3055,3 +3055,7 @@ fieldset.top-content {
   background-color: $faint-neutral-color;
   padding: 12px;
 }
+
+.nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
+.nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
+.nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_related_tab.svg'));}
