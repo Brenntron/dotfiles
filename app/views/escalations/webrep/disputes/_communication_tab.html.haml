@@ -103,11 +103,12 @@
         .email-header-data
           .communication-subject
             RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us know what other...
-          %span.content-label-sm From:
-          %span.author-username Monica Taylor - mtaylor@paragon-downloads.com
-          %br
-          %span.content-label-sm To:
-          %span.receiver-email Senderbase Support - support@senderbase.org
+          .sender-receiver-info
+            %span.content-label-sm From
+            %span.author-username Monica Taylor - mtaylor@paragon-downloads.com
+            %br
+            %span.content-label-sm To
+            %span.receiver-email Senderbase Support - support@senderbase.org
         .email-response-button-wrapper
           .email-response-buttons
             %button.reply-button
@@ -173,6 +174,6 @@
           This is a note regarding this ticket. I have looked into this information and it appears to be correct.
 
     .row
-      .col-xs-12
-        %button.add-note-inline-button#new-comment-note-button
+      .col-xs-12.text-center
+        %button.add-case-note-button#new-case-note-button
           Add Note
