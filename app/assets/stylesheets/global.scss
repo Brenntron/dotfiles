@@ -3056,7 +3056,7 @@ fieldset.top-content {
   margin-top: 5px;
 }
 
-.case-history-datetime {
+.case-history-datetime, .email-datetime {
   font-size: 8pt;
   color: $type-lighter-color;
   line-height: 1.4em;
@@ -3083,9 +3083,22 @@ fieldset.top-content {
   display: inline-block;
 }
 
+.highlighted-section-header::before {
+  content: '';
+  display: block;
+  height: 10px;
+  position: absolute;
+  background-color: #C14B92;
+  z-index: 60;
+  width: 100%;
+  margin-left: -12px;
+  margin-top: -12px;
+}
+
 .customer-facing-notice {
   display: inline-block;
   float: right;
+  text-transform: uppercase;
 }
 
 .customer-facing-notice::before {
@@ -3101,6 +3114,21 @@ fieldset.top-content {
 .email-header-information {
   background-color: $faint-neutral-color;
   padding: 12px;
+  min-height: 80px;
+}
+
+.email-response-button-wrapper {
+  float: right;
+  border-left: solid 1px darken($faint-neutral-color, 10%);
+  margin-left: 12px;
+  padding-left: 12px;
+  position: absolute;
+  right: 12px;
+}
+
+.email-header-data {
+  float: left;
+  margin-right: 86px;
 }
 
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
@@ -3126,4 +3154,65 @@ fieldset.top-content {
 .communication-subject {
   color: $type-lighter-color;
   line-height: 1.3em;
+}
+
+.email-response-buttons {
+  margin-bottom: 5px;
+}
+
+.email-response-buttons button {
+  display: inline-block;
+  background-color: darken($faint-neutral-color, 20%);
+  border-radius: 2px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 18px 18px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  padding: 4px;
+  margin: auto 1px;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.email-response-buttons button:hover {
+  background-color: $bug-section-color;
+}
+
+.receiver-email {
+  font-size: 8pt;
+}
+
+.reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
+.forward-button {background-image: url(image_path('icon_forward_white.svg'));}
+
+.note-info-item {
+  display: inline-block;
+}
+
+.note-tool-buttons {
+  float: right;
+}
+
+.note-tool-buttons button {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border: none;
+  padding: 4px;
+  width: 20px;
+  height: 20px;
+}
+
+.note-edit-button {background-image: url(image_path('icon_edit.svg'));}
+.note-copy-button {background-image: url(image_path('icon_copy.svg'));}
+.note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+
+.email-button {
+  width: 20px;
+  height: 20px;
+  display: block;
+  margin-top: 33px;
+  margin-left: 2px;
 }

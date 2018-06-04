@@ -100,19 +100,21 @@
           ! Customer Facing Messages
     .row
       .col-xs-12.email-header-information
-        .row
-          .col-xs-10
-            .row
-              .col-xs-12.communication-subject
-                RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us know what other...
-            .row
-              .col-xs-12
-                From: Monica Taylor - mtaylor@paragon-downloads.com
-                %br
-                To: Senderbase Support - support@senderbase.org
-          .col-xs-2
-            [REPLY] [FORWARD]
+        .email-header-data
+          .communication-subject
+            RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us know what other...
+          %span.content-label-sm From:
+          %span.author-username Monica Taylor - mtaylor@paragon-downloads.com
+          %br
+          %span.content-label-sm To:
+          %span.receiver-email Senderbase Support - support@senderbase.org
+        .email-response-button-wrapper
+          .email-response-buttons
+            %button.reply-button
+            %button.forward-button
+          %span.email-datetime
             2017-10-24
+            %br
             15:35:24
     .row
       .col-xs-12.email-msg-body
@@ -152,17 +154,18 @@
   .col-sm-3
     %h1 Notes
     .row
-      .col-xs-6
-        %span.author-notation
+      .col-xs-12
+        .note-info-item.author-notation
           Written by
           %span.author-username
             melitayl
           1 day ago.
-      .col-xs-6.text-right
-        %span.time-stamp
+        .note-info-item.time-stamp
           2017-10-24 15:35:24
-        .note-tool-buttons
-          [buttons]
+        .note-info-item.note-tool-buttons
+          %button.note-edit-button
+          %button.note-copy-button
+          %button.note-delete-button
 
     .row
       .col-xs-12
