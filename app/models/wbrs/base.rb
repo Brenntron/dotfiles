@@ -20,7 +20,7 @@ class Wbrs::Base
     request
   end
 
-  def self.post(path:, body:)
+  def self.post_request(path:, body:)
     HTTPI.post(request(path: path, body: body))
   end
 end
