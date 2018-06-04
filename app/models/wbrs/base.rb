@@ -1,6 +1,6 @@
 class Wbrs::Base
-  include ActiveModel::Model         # need ActiveModel::Model
-  include ActiveModel::Associations  # include this
+  include ActiveModel::Model
+  include ActiveModel::Associations
 
   def self.stringkey_params(conditions = {})
     conditions.inject({}) do |params, (key, value)|
@@ -25,6 +25,10 @@ class Wbrs::Base
     request.headers = {"Content-Type" => "application/json" }
     request.body = body.to_json
     request
+  end
+
+  def self.get_request(path:, body:)
+    HTTPI.get(request(path: path, body: body))
   end
 
   def self.post_request(path:, body:)
