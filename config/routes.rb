@@ -16,6 +16,20 @@ Rails.application.routes.draw do
       resources :references
 
     end
+    namespace :webcat do
+      root 'complaints#index'
+      resources :complaints do
+        collection do
+          get :advanced_search
+          get :named_search
+          get :standard_search
+          get :contains_search
+        end
+      end
+      resources :clusters
+      resources :rules
+      resources :reports
+    end
   end
 
   namespace :admin do
