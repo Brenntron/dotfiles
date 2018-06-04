@@ -6,7 +6,7 @@ class CreateDisputeEntries < ActiveRecord::Migration[5.1]
       t.string        :uri
       t.string        :hostname
       t.string        :entry_type
-      t.integer       :score
+      t.float         :score
       t.string        :score_type
       t.string        :suggested_disposition
       t.string        :primary_category
