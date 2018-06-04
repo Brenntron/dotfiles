@@ -5,7 +5,7 @@ module API
         class Disputes < Grape::API
           include API::V1::Defaults
 
-          resource "escalations/webrep_disputes/disputes" do
+          resource "escalations/webrep/disputes" do
             
             desc 'get all disputes'
             params do
@@ -21,12 +21,11 @@ module API
                 dispute_packet = {}
                 dispute_packet[:id] = dispute.id
                 dispute_packet[:case_number] = dispute.case_number
-                dispute_packet[:dispute_type] = dispute.dispute_type
                 dispute_packet[:customer_name] = dispute.customer_name
                 dispute_packet[:customer_company_name] = dispute.status
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:assigned_to] = dispute.assigned_to
-                dispute_packet[:actions] = "<a href='/escalations/webrep_disputes/#{dispute.id}'>edit</a>"
+                dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
                 json_packet << dispute_packet
               end
