@@ -18,4 +18,25 @@ class Wbrs::Prefix < Wbrs::Base
   def self.find(id)
     @all_hash[id]
   end
+
+  def self.add_rule(attributes)
+    response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(attributes))
+
+    response_body = JSON.parse(response.body)
+    response_body['Created']
+  end
+
+  def self.edit_rule(attributes)
+    response = post_request(path: '/v1/cat/rules/edit', body: stringkey_params(attributes))
+
+    response_body = JSON.parse(response.body)
+    response_body['Updated']
+  end
+
+  def self.disable_rule(attributes)
+    response = post_request(path: '/v1/cat/rules/disable', body: stringkey_params(attributes))
+
+    response_body = JSON.parse(response.body)
+    response_body
+  end
 end
