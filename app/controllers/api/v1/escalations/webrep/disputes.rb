@@ -1,7 +1,7 @@
 module API
   module V1
     module Escalations
-      module WebrepDisputes
+      module Webrep
         class Disputes < Grape::API
           include API::V1::Defaults
 
