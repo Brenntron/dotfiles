@@ -9,6 +9,18 @@
     .row
       .col-xs-12
         %table
+          %tr.email-row.email-unread
+            %td.alt-col.icon-col
+              %span.case-history-icon.email-icon
+            %td
+              %span.case-history-author
+                melitayl
+              %span.case-history-preview
+                RE: [E][Paragon-downloads.com] Thanks for your great...
+            %td.alt-col.case-history-datetime
+              2017-10-24
+              %br
+              15:35:24
           %tr
             %td.alt-col.icon-col
               %span.case-history-icon.disp-status-icon
@@ -24,9 +36,9 @@
               2017-10-24
               %br
               15:35:24
-          %tr
+          %tr.email-row
             %td.alt-col.icon-col
-              %span.case-history-icon.email-icon
+              %span.case-history-icon.email-sent-icon
             %td
               %span.case-history-author
                 melitayl
@@ -78,9 +90,9 @@
               2017-10-24
               %br
               15:35:24
-          %tr
+          %tr.email-row.current-email-view
             %td.alt-col.icon-col
-              %span.case-history-icon.email-icon
+              %span.case-history-icon.email-read-icon
             %td
               %span.case-history-author
                 mtaylor@paragon-downloads.com
@@ -96,8 +108,11 @@
     .row
       .col-xs-12.highlighted-section-header
         %h1 Communication
+        // Only show Notice if email is to customer
         .customer-facing-notice
-          ! Customer Facing Messages
+          Customer Facing Message
+        %button.new-email-button
+          Compose New Email
     .row
       .col-xs-12.email-header-information
         .email-header-data

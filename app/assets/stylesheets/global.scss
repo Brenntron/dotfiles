@@ -3037,6 +3037,8 @@ fieldset.top-content {
 }
 
 .email-icon       {background-image: url(image_path('icon_message.svg'));}
+.email-sent-icon  {background-image: url(image_path('icon_email_sent.svg'));}
+.email-read-icon  {background-image: url(image_path('icon_email_read.svg'));}
 .note-icon        {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
 
@@ -3096,20 +3098,20 @@ fieldset.top-content {
 }
 
 .customer-facing-notice {
-  display: inline-block;
-  float: right;
-  text-transform: uppercase;
-  margin-top: 16px;
-}
-
-.customer-facing-notice::before {
-  content: '';
-  background-image: url(image_path('icon_warning_white.svg'));
-  background-repeat: no-repeat;
-  background-position-x: center;
-  height: 20px;
   display: block;
-  margin-bottom: 3px;
+  text-transform: uppercase;
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background-image: url(image_path('icon_warning_pink.svg'));
+  background-repeat: no-repeat;
+  background-position: 6px 2px;
+  background-size: 20px;
+  height: 20px;
+  padding: 6px 8px 18px 28px;
+  color: #C14B92;
+  background-color: #fff;
+  border-radius: 4px;
 }
 
 .email-header-information {
@@ -3189,6 +3191,24 @@ fieldset.top-content {
 
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
 .forward-button {background-image: url(image_path('icon_forward_white.svg'));}
+
+.new-email-button {
+  background-image: url(image_path('icon_email_new_white.svg'));
+  background-repeat: no-repeat;
+  background-position: 0 2px;
+  background-size: 18px 18px;
+  height: 24px;
+  display: inline-block;
+  float: right;
+  background-color: transparent;
+  border: none;
+  margin-top: 32px;
+  padding-left: 22px;
+  padding-right: 0;
+  font-weight: 300;
+  font-size: 9pt;
+}
+
 
 .note-info-item {
   display: inline-block;
