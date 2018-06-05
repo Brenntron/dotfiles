@@ -1,5 +1,5 @@
 describe Wbrs::Prefix do
-  let(:rule_links_json) do
+  let(:prefix_json) do
     {
         "data": [
             {
@@ -85,29 +85,64 @@ describe Wbrs::Prefix do
         }
     }.to_json
   end
-  let(:rule_links_error_json) {{'Error' => 'No search criteria provided.'}.to_json}
-  let(:rule_links_response) { double('HTTPI::Response', code: 200, body: rule_links_json) }
-  let(:rule_links_error) { double('HTTPI::Response', code: 400, body: rule_links_error_json) }
+  let(:no_rule_link_json) do
+    {
+        "data": [],
+        "errors": [],
+        "meta": {
+            "limit": "1",
+            "rows_found": 1
+        }
+    }.to_json
+  end
+  let(:prefix_error_json) {{'Error' => 'No search criteria provided.'}.to_json}
+  let(:prefix_response) { double('HTTPI::Response', code: 200, body: prefix_json) }
+  let(:prefix_error) { double('HTTPI::Response', code: 400, body: prefix_error_json) }
+  let(:one_rule_link_response) { double('HTTPI::Response', code: 200, body: one_rule_link_json) }
+  let(:no_rule_link_response) { double('HTTPI::Response', code: 200, body: no_rule_link_json) }
 
 
 
   ### TESTS ####################################################################
 
-  it 'should find a prefix'
+  it 'should find a prefix' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(one_rule_link_response)
+
+    prefix = Wbrs::Prefix.find(101)
+
+    expect(prefix).to be_a_kind_of(Wbrs::Prefix)
+    expect(prefix.id).to eq(101)
+  end
+
+  it 'should return nil from find no prefix' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(no_rule_link_response)
+
+    prefix = Wbrs::Prefix.find(101)
+
+    expect(prefix).to be_nil
+  end
+
+  it 'should handle errors finding a prefix' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(prefix_error)
+
+    expect {
+      prefix = Wbrs::Prefix.find(101)
+    }.to raise_error(RuntimeError)
+
+  end
 
   it 'should get a prefixes collection given conditions' do
-    expect(Wbrs::Base).to receive(:make_post_request).and_return(rule_links_response)
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(prefix_response)
 
     prefixes = Wbrs::Prefix.where(category_ids: [5, 6], active: true).sort_by{ |prefix| prefix.id }
 
-    # expect(prefixes).to eq(nil)
     expect(prefixes.count).to eq(2)
     expect(prefixes[0].id).to eq(101)
     expect(prefixes[1].id).to eq(102)
   end
 
   it 'should handle errors getting a prefixes collection given conditions' do
-    expect(Wbrs::Base).to receive(:make_post_request).and_return(rule_links_error)
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(prefix_error)
 
     expect {
       Wbrs::Prefix.where

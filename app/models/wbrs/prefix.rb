@@ -6,20 +6,44 @@ class Wbrs::Prefix < Wbrs::Base
   class << self
     attr_reader :all_hash
   end
-  @all_hash = {}
 
   alias_method(:id, :prefix_id)
 
   def self.new_from_attributes(attributes)
-    prefix_id = attributes['prefix_id'] || attributes['id']
-    @all_hash[prefix_id] = new(attributes)
+    new(attributes)
+  end
+
+  # Get the rules from given criteria.
+  # This is not a relation and cannot be chained with other relations.
+  # example: get_where(category_ids = [11], active: true)
+  # @param [Array<Integer>] prefix_ids: List of prefixes ids
+  # @param [Array<String>] urls: List of URLs
+  # @param [Array<Integer>] category_ids: List of prefixes categories
+  # @param [Boolean] active: prefixes active/disable status
+  # @param [Integer] limit: Max number of records to return
+  # @param [Integer] offset: Offset of the first record to return
+  # @return [Array<Wbrs::Prefix>] Array of the results.
+  def self.where(conditions = {})
+    params = stringkey_params(conditions)
+    params['categories'] = params.delete('category_ids') unless params['category_ids'].nil?
+    params['is_active'] = params.delete('active') ? 1 : 0 unless params['active'].nil?
+    response = post_request(path: '/v1/cat/rules/get', body: params)
+
+    response_body = JSON.parse(response.body)
+    response_body['data'].inject({}) do |prefix_hash, datum|
+      prefix_id = datum['prefix_id']
+      unless prefix_hash[prefix_id]
+        prefix_hash[prefix_id] = new(datum.slice(*FIELD_NAMES))
+      end
+      prefix_hash
+    end.values
   end
 
   # Get a prefix by id
   # @param [Integer] id the prefix id
   # @return [Wbrs::Prefix] the prefix
   def self.find(id)
-    @all_hash[id]
+    where(prefix_id: id, limit: 1).first
   end
 
   def self.add_rule(attributes)
@@ -41,21 +65,5 @@ class Wbrs::Prefix < Wbrs::Base
 
     response_body = JSON.parse(response.body)
     response_body
-  end
-
-  def self.where(conditions = {})
-    params = stringkey_params(conditions)
-    params['categories'] = params.delete('category_ids') unless params['category_ids'].nil?
-    params['is_active'] = params.delete('active') ? 1 : 0 unless params['active'].nil?
-    response = post_request(path: '/v1/cat/rules/get', body: params)
-
-    response_body = JSON.parse(response.body)
-    response_body['data'].inject({}) do |prefix_hash, datum|
-      prefix_id = datum['prefix_id']
-      unless prefix_hash[prefix_id]
-        prefix_hash[prefix_id] = new(datum.slice(*FIELD_NAMES))
-      end
-      prefix_hash
-    end.values
   end
 end

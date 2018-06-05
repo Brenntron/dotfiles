@@ -3,6 +3,22 @@ describe Wbrs::RuleLink do
     {
         "data": [
             {
+                "category": 5,
+                "desc_long": "Education-related sites and web pages such as schools, colleges, universities, teaching materials, teachers resources; technical and vocational training; online training; education issues and policies;  financial aid; school funding; standards and testing.",
+                "descr": "Education",
+                "mnem": "edu",
+
+                "prefix_id": 101,
+                "domain": "example.net",
+                "is_active": false,
+                "path": "",
+                "path_hashed": "",
+                "port": 0,
+                "protocol": "https",
+                "subdomain": "",
+                "truncated": false
+            },
+            {
                 "category": 6,
                 "desc_long": "Galleries and exhibitions; artists and art; photography; literature and books; performing arts and theater; musicals; ballet; museums; design; architecture.  Cinema and television are classified as Entertainment.",
                 "descr": "Arts",
@@ -39,7 +55,7 @@ describe Wbrs::RuleLink do
 
     rule_links = Wbrs::RuleLink.where(category_ids: [6], active: true)
 
-    expect(rule_links.count).to eq(1)
+    expect(rule_links.count).to eq(2)
     expect(rule_links.first.prefix_id).to eq(101)
   end
 

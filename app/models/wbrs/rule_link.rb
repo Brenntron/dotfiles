@@ -14,14 +14,8 @@ class Wbrs::RuleLink < Wbrs::Base
     truncated
   end
 
-  def self.new_from_datum(datum)
-    prefix = Wbrs::Prefix.find(datum['prefix_id'])
-    unless prefix
-      prefix = Wbrs::Prefix.new_from_attributes(datum.slice(*%w{prefix_id domain is_active path path_hashed port
-                                                                protocol subdomain truncated}))
-    end
-
-    category = Wbrs::Category.find(datum['category'])
+  def self.new_from_related_objects(category_id:, prefix:)
+    category = Wbrs::Category.find(category_id)
 
     new('category' => category, 'prefix' => prefix)
   end
@@ -43,6 +37,17 @@ class Wbrs::RuleLink < Wbrs::Base
     response = post_request(path: '/v1/cat/rules/get', body: params)
 
     response_body = JSON.parse(response.body)
-    response_body['data'].map {|datum| new_from_datum(datum)}
+    prefixes = {}
+    response_body['data'].map do |datum|
+      prefix_id = datum['prefix_id']
+      prefix =
+          case
+            when prefixes[prefix_id]
+              prefixes[prefix_id]
+            else
+              prefixes[prefix_id] = Wbrs::Prefix.new(datum.slice(*Wbrs::Prefix::FIELD_NAMES))
+          end
+      new_from_related_objects(category_id: datum['category'], prefix: prefix)
+    end
   end
 end
