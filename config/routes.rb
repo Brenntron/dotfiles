@@ -24,8 +24,8 @@ Rails.application.routes.draw do
           get :standard_search
           get :contains_search
         end
-        resources :dispute_emails
       end
+      resources :dispute_emails
       get 'dashboard', to: 'disputes#dashboard'
     end
 

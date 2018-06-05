@@ -24,19 +24,19 @@
               2017-10-24
               %br
               15:35:24
-        -@dispute.dispute_emails.each do |email|
-          %tr.email-row{href: "#{escalations_webrep_dispute_dispute_email_path(@dispute, email)}"}
-            %td.alt-col.icon-col
-              %span.case-history-icon.email-icon
-            %td
-              %span.case-history-author
-                =email.from
-              %span.case-history-preview
-                =email.subject
-            %td.alt-col.case-history-datetime
-              =email.created_at.strftime("%Y-%d-%m")
-              %br
-              =email.created_at.strftime("%H:%M:%S")
+          -@dispute.dispute_emails.each do |email|
+            %tr.email-row{email_id: "#{email.id}"}
+              %td.alt-col.icon-col
+                %span.case-history-icon.email-icon
+              %td
+                %span.case-history-author
+                  =email.from
+                %span.case-history-preview
+                  =email.subject
+              %td.alt-col.case-history-datetime
+                =email.created_at.strftime("%Y-%d-%m")
+                %br
+                =email.created_at.strftime("%H:%M:%S")
           %tr
             %td.alt-col.icon-col
               %span.case-history-icon.note-icon
@@ -100,16 +100,15 @@
         .customer-facing-notice
           ! Customer Facing Messages
     .row
-      .col-xs-12.email-header-information
+      .col-xs-12.email-header-information.hidden
         .email-header-data
           .communication-subject
-            RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us know what other...
           .sender-receiver-info
             %span.content-label-sm From
-            %span.author-username Monica Taylor - mtaylor@paragon-downloads.com
+            %span.author-username
             %br
             %span.content-label-sm To
-            %span.receiver-email Senderbase Support - support@senderbase.org
+            %span.receiver-email
             %br
             %span.attachment-label
             %span.email-attachments
@@ -121,42 +120,9 @@
             %button.reply-button
             %button.forward-button
           %span.email-datetime
-            2017-10-24
-            %br
-            15:35:24
     .row
       .col-xs-12.email-msg-body
-        %pre
-          :preserve
-            ———————— Original Message ——————————
-
-            From: Monica Taylor [mtaylor@paragon-downloads.com] Sent:
-            4/2/2018 1:16 PM
-            To: support@senderbase.org
-            Subject: RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us
-            know what other actions do we need to take....
-
-            Inquiry Type: email
-            Key Rules:
-            Problem Summary: Thanks for your great support. Can you please let us know what other actions do
-            we need to take. We send informational material of technical nature and conduct webinars. Please
-            call us at 949 825 6282, if you have any questions.
-
-            Thanks, Monica
-
-            IPs to be Investigated:
-            69.64.99.250
-            69.64.99.250
-            69.64.99.250
-            69.64.99.250
-            69.64.99.250
-            69.64.99.250
-            69.64.99.250
-            69.64.99.250
-
-            ———————— ———————— ————————
-
-            CAUTION: DO NOT DELETE THE REFERENCE ID BELOW Case No: 014
+        %pre.email-msg-content
 
 
   .col-sm-3
@@ -184,3 +150,5 @@
       .col-xs-12.text-center
         %button.add-case-note-button#new-case-note-button
           Add Note
+
+    %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
