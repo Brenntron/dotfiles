@@ -1,6 +1,5 @@
 class Wbrs::Base
   include ActiveModel::Model
-  include ActiveModel::Associations
 
   def self.stringkey_params(conditions = {})
     conditions.inject({}) do |params, (key, value)|
