@@ -70,7 +70,7 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [Array<Wbrs::Category | Integer>] category_ids: List of categories or category ids.
   # @param [String] user: The user for this action
   # @param [String] description: A description
-  # @return [Integer] id of created prefix.
+  # @return [Integer] id of updated prefix.
   def set_categories(category_array, user:, description: nil)
     category_ids = Wbrs::Category.category_ids(category_array)
     options = { 'prefix_id' => id, 'categories' => category_ids, 'user' => user, 'description' => description }
