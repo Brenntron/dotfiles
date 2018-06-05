@@ -6,7 +6,7 @@ module API
 
         mount API::V1::Escalations::Bugs
         mount API::V1::Escalations::Attachments
-        mount API::V1::Escalations::WebrepDisputes::Disputes
+        mount API::V1::Escalations::Webrep::Disputes
 
       end
     end

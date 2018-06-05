@@ -9,17 +9,17 @@
     .row
       .col-xs-12
         %table
-          %tr
-            %td.alt-col
-              %span.case-history-icon.email-icon
-            %td
-              %span.email-address
-                mtaylor@paragon-downloads.com
-              %span.email-subject
-                RE: [E][Paragon-downloads.com] Thanks for your great...
-            %td.alt-col.email-datetime
-              2017-10-24
-              15:35:24
+          -@dispute.dispute_emails.each do |email|
+            %tr.email-row{href: "#{escalations_webrep_dispute_dispute_email_path(@dispute, email)}"}
+              %td.alt-col
+                %span.case-history-icon.email-icon
+              %td
+                %span.email-address
+                  =email.from
+                %span.email-subject
+                  =email.subject
+              %td.alt-col.email-datetime
+                =email.created_at.strftime("%Y-%d-%m %H:%M:%S")
           %tr
             %td.alt-col
               %span.case-history-icon.note-icon
