@@ -27,21 +27,29 @@ class Wbrs::Base
     request
   end
 
-  def self.get_request(path:, body:)
-    response = HTTPI.get(request(path: path, body: body))
-    unless 300 > response.code
+  def self.make_get_request(path:, body:)
+    HTTPI.get(request(path: path, body: body))
+  end
+
+
+  def self.make_post_request(path:, body:)
+    HTTPI.post(request(path: path, body: body))
+  end
+
+  def self.request_error_handling(response)
+    if 300 > response.code
+      response
+    else
       body = JSON.parse(response.body)
       raise "HTTP response #{response.code} #{body['Error']}"
     end
-    response
+  end
+
+  def self.get_request(path:, body:)
+    request_error_handling(make_get_request(path: path, body: body))
   end
 
   def self.post_request(path:, body:)
-    response = HTTPI.post(request(path: path, body: body))
-    unless 300 > response.code
-      body = JSON.parse(response.body)
-      raise "HTTP response #{response.code} #{body['Error']}"
-    end
-    response
+    request_error_handling(make_post_request(path: path, body: body))
   end
 end
