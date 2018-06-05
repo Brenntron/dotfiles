@@ -1,4 +1,4 @@
-class Escalations::WebrepDisputes::DisputesController < ApplicationController
+class Escalations::Webrep::DisputesController < ApplicationController
 
   before_action :require_login
 
@@ -10,7 +10,7 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   end
 
   def show
-    @dispute = Dispute.find(params[:id])
+    # @dispute = Dispute.find(params[:id])
   end
 
   def update
@@ -19,7 +19,7 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
   def dashboard
 
   end
-
+  
   def advanced_search
     @dispute = Dispute.new
   end
@@ -40,5 +40,4 @@ class Escalations::WebrepDisputes::DisputesController < ApplicationController
                                       :status, :resolution, :subject,
                                       :value)
   end
-
 end

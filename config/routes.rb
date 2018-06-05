@@ -15,7 +15,7 @@ Rails.application.routes.draw do
       end
       resources :references
     end
-    namespace :webrep_disputes do
+    namespace :webrep do
       root 'disputes#index'
       resources :disputes do
         collection do

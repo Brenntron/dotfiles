@@ -1,0 +1,67 @@
+-#view single record
+.content-wrapper
+  .row
+    .col-xs-1.col-with-divider
+      %span.bug-state-info.bug-priority.p-P1
+      %span.email-button
+        Email Icon
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Case ID
+      .bug-top-id
+        %a
+          01402523
+    .col-xs-1.bug-state-col
+      %label.content-label-sm
+        Status
+      %span.bug-state-info.bug-state
+        New
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Owner
+      %div
+        Unassigned
+        %span.take-button
+          hand icon
+    .col-xs-2.col-with-divider
+      %label.content-label-sm
+        Suggested Disposition
+      %span.disposition.disp-negative
+        Malicious: Phishing
+    .col-xs-3.col-with-divider
+      %label.content-label-sm
+        Dispute
+      %div
+        paragon-downloads.com
+    .col-xs-2.col-with-divider
+      %label.content-label-sm
+        Date/Time Submitted
+      %div
+        2017-10-24 15:35:24
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Age
+      %div
+        35m 36s
+
+-     #<!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
+
+
+%ul.nav.nav-tabs#bug-tabs{role: 'tablist'}
+  %li.nav-item.active{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#research-tab-link{href: '#research', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+      Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#related-tab-link{href: '#related', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
+      Related Cases
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane.active#communication{role: 'tabpanel'}
+    = render 'escalations/webrep/disputes/communication_tab'
+  .tab-pane#research{role: 'tabpanel'}
+    = render 'escalations/webrep/disputes/research_tab'
+  .tab-pane#related{role: 'tabpanel'}
+    related cases
