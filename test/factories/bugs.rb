@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :bug do
     sequence :bugzilla_id do |nn|
       111000 + nn

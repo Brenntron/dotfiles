@@ -16,17 +16,17 @@ Then /^I should expect (.*?) rule lines/ do |expected_rule_lines|
 end
 
 Given (/^a "(.*?)" rule exists$/) do |rule|
-  @rule = FactoryGirl.create(:rule)
+  @rule = FactoryBot.create(:rule)
 end
 
 Given(/^a rule exists and belongs to bug "(.*?)"/)  do |bug_id|
-  rule = FactoryGirl.create(:rule)
+  rule = FactoryBot.create(:rule)
   Bug.find(bug_id).rules << rule
 end
 
 Given(/^"(.*?)" rules exist and belong to bug "(.*?)"/)  do |number, bug_id|
   number.to_i.times do
-    rule = FactoryGirl.create(:synched_rule)
+    rule = FactoryBot.create(:synched_rule)
     Bug.find(bug_id).rules << rule
   end
 end
@@ -37,27 +37,27 @@ end
 
 Given(/^the following rules exist:$/) do |rules|
   rules.hashes.each do |rule_attrs|
-    FactoryGirl.create(:rule, rule_attrs)
+    FactoryBot.create(:rule, rule_attrs)
   end
 end
 
 Given(/^the following "(.*)" rules exist:$/) do |factory_name, rules|
   rules.hashes.each do |rule_attrs|
-    FactoryGirl.create(factory_name.to_sym, rule_attrs)
+    FactoryBot.create(factory_name.to_sym, rule_attrs)
   end
 end
 
 Given(/^the following rules exist belonging to bug "(.*?)":$/) do |bug_id, rules|
   bug = Bug.find(bug_id)
   rules.hashes.each do |rule_attrs|
-    bug.rules << FactoryGirl.create(:rule, rule_attrs)
+    bug.rules << FactoryBot.create(:rule, rule_attrs)
   end
 end
 
 Given(/^the following "(.*)" rules exist belonging to bug "(.*?)":$/) do |factory_name, bug_id, rules|
   bug = Bug.find(bug_id)
   rules.hashes.each do |rule_attrs|
-    bug.rules << FactoryGirl.create(factory_name.to_sym, rule_attrs)
+    bug.rules << FactoryBot.create(factory_name.to_sym, rule_attrs)
   end
 end
 

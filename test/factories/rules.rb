@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :rule do
     gid                 1
     sequence(:sid)      {|n| 19500 + n }

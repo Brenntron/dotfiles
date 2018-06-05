@@ -1,24 +1,24 @@
 Given (/^a bug exists$/) do
-  @bug = FactoryGirl.create(:bug)
+  @bug = FactoryBot.create(:bug)
 end
 
 Given(/^the following bugs exist:$/) do |bugs|
   bugs.hashes.each do |bug|
-    FactoryGirl.create(:bug, bug)
+    FactoryBot.create(:bug, bug)
   end
 end
 
 Given(/^the current user has the following bugs:$/) do |given_bugs|
-  user = User.where(cvs_username: ENV['authenticate_cvs_username']).first || FactoryGirl.create(:current_user)
+  user = User.where(cvs_username: ENV['authenticate_cvs_username']).first || FactoryBot.create(:current_user)
   given_bugs.hashes.each do |bug_attrs|
-    FactoryGirl.create(:bug, bug_attrs.merge(user_id: user.id))
+    FactoryBot.create(:bug, bug_attrs.merge(user_id: user.id))
   end
 end
 
 Given(/^the current user has the following "(.*?)":$/) do |factory_name, given_bugs|
-  user = User.where(cvs_username: ENV['authenticate_cvs_username']).first || FactoryGirl.create(:current_user)
+  user = User.where(cvs_username: ENV['authenticate_cvs_username']).first || FactoryBot.create(:current_user)
   given_bugs.hashes.each do |bug_attrs|
-    FactoryGirl.create(factory_name.to_sym, bug_attrs.merge(user_id: user.id))
+    FactoryBot.create(factory_name.to_sym, bug_attrs.merge(user_id: user.id))
   end
 end
 

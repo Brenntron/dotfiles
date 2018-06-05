@@ -1,6 +1,6 @@
 Given(/^the following notes exist:$/) do |notes|
   notes.hashes.each do |note|
-    FactoryGirl.create(:note, note)
+    FactoryBot.create(:note, note)
   end
 end
 

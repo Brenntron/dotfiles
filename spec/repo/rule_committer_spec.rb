@@ -5,12 +5,12 @@ describe Repo::RuleCommitter do
     @sid = 10011
     @rev = 10
     @rule_content = "alert (gid:#{@gid}; sid:#{@sid}; rev: #{@rev};)"
-    @rule = FactoryGirl.create(:edited_rule,
+    @rule = FactoryBot.create(:edited_rule,
                                gid: @gid, sid: @sid, rev: @rev, filename: @relative_filename,
                                edit_status: Rule::EDIT_STATUS_EDIT,
                                rule_content: @rule_content)
     @rule_file = RuleFile.new(@relative_filename)
-    @user = FactoryGirl.create(:fake_user)
+    @user = FactoryBot.create(:fake_user)
     @svn_result_output = <<eos
 Sending        extras/working/snort-rules/malware.rules
 Transmitting file data .done
