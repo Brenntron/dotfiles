@@ -42,6 +42,7 @@ $success-color: #5FB766;
 $success-trans: rgba(95, 183, 102, 0.15);
 $disabled-bg: #E5E5E5;
 $disabled-txt: #A0A0A0;
+$communication-accent-color: #C14B92;
 
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
@@ -3036,7 +3037,9 @@ fieldset.top-content {
   display: block;
 }
 
-.email-icon       {background-image: url(image_path('icon_message.svg'));}
+.email-icon       {background-image: url(image_path('icon_message_white.svg'));}
+.email-sent-icon  {background-image: url(image_path('icon_email_sent.svg'));}
+.email-read-icon  {background-image: url(image_path('icon_email_read.svg'));}
 .note-icon        {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
 
@@ -3072,7 +3075,7 @@ fieldset.top-content {
 }
 
 .highlighted-section-header {
-  background-color: #C14B92;
+  background-color: $communication-accent-color;
   color: $content-bg-color;
   margin-top: -15px;
   padding: 12px;
@@ -3088,7 +3091,7 @@ fieldset.top-content {
   display: block;
   height: 10px;
   position: absolute;
-  background-color: #C14B92;
+  background-color: $communication-accent-color;
   z-index: 60;
   width: 100%;
   margin-left: -12px;
@@ -3096,20 +3099,20 @@ fieldset.top-content {
 }
 
 .customer-facing-notice {
-  display: inline-block;
-  float: right;
-  text-transform: uppercase;
-  margin-top: 16px;
-}
-
-.customer-facing-notice::before {
-  content: '';
-  background-image: url(image_path('icon_warning_white.svg'));
-  background-repeat: no-repeat;
-  background-position-x: center;
-  height: 20px;
   display: block;
-  margin-bottom: 3px;
+  text-transform: uppercase;
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background-image: url(image_path('icon_warning_pink.svg'));
+  background-repeat: no-repeat;
+  background-position: 6px 2px;
+  background-size: 20px;
+  height: 20px;
+  padding: 6px 8px 18px 28px;
+  color: $communication-accent-color;
+  background-color: #fff;
+  border-radius: 4px;
 }
 
 .email-header-information {
@@ -3190,6 +3193,24 @@ fieldset.top-content {
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
 .forward-button {background-image: url(image_path('icon_forward_white.svg'));}
 
+.new-email-button {
+  background-image: url(image_path('icon_email_new_white.svg'));
+  background-repeat: no-repeat;
+  background-position: 0 2px;
+  background-size: 18px 18px;
+  height: 24px;
+  display: inline-block;
+  float: right;
+  background-color: transparent;
+  border: none;
+  margin-top: 32px;
+  padding-left: 22px;
+  padding-right: 0;
+  font-weight: 300;
+  font-size: 9pt;
+}
+
+
 .note-info-item {
   display: inline-block;
 }
@@ -3218,6 +3239,28 @@ fieldset.top-content {
   display: block;
   margin-top: 33px;
   margin-left: 2px;
+}
+
+.email-row .alt-col {
+  background-color: lighten($communication-accent-color, 35%);
+}
+
+.email-row.email-unread .alt-col {
+  background-color: $communication-accent-color;
+  color: $content-bg-color;
+}
+
+.current-email-view {
+  position: absolute;
+  margin-right: 6px;
+  margin-left: 10px;
+  box-shadow: -2px 2px 10px 1px rgba(0, 0, 0, 0.1);
+}
+
+.duplicate-current-email-view td, .duplicate-current-email-view span {
+  color: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 .sender-receiver-info .content-label-sm {
