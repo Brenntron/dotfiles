@@ -29,4 +29,15 @@ class Wbrs::Category < Wbrs::Base
   def self.find(id)
     all&.find { |cat| cat.category_id == id }
   end
+
+  def self.category_ids(category_array)
+    category_array.map do |category|
+      case category
+        when Wbrs::Category
+          category.id
+        else
+          category
+      end
+    end
+  end
 end

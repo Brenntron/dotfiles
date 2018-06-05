@@ -52,23 +52,36 @@ class Wbrs::Prefix < Wbrs::Base
     Wbrs::HistoryRecord.where(prefix_id: id)
   end
 
-  # Get the rules from given criteria.
-  # This is not a relation and cannot be chained with other relations.
-  # example: get_where(category_ids = [11], active: true)
+  # Creates a new prefix from a given URL and a list of categories.
   # @param [String] url: An URL
   # @param [Array<Integer>] category_ids: List of prefixes categories
-  # @param [String] user: Max number of records to return
-  # @param [String] description: Offset of the first record to return
+  # @param [String] user: The user for this action
+  # @param [String] description: A description
   # @return [Integer] id of created prefix.
   def self.create_from_url(options)
+    options['categories'] = Wbrs::Category.category_ids(options['categories']) if options['categories'].present?
     response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(options))
 
     response_body = JSON.parse(response.body)
     response_body['Created']
   end
 
-  def self.edit_rule(attributes)
-    response = post_request(path: '/v1/cat/rules/edit', body: stringkey_params(attributes))
+  # def self.edit_rule(attributes)
+  #   response = post_request(path: '/v1/cat/rules/edit', body: stringkey_params(attributes))
+  #
+  #   response_body = JSON.parse(response.body)
+  #   response_body['Updated']
+  # end
+
+  # Sets the categories on a prefix to given list of categories.
+  # @param [Array<Wbrs::Category | Integer>] category_ids: List of categories or category ids.
+  # @param [String] user: The user for this action
+  # @param [String] description: A description
+  # @return [Integer] id of created prefix.
+  def set_categories(category_array, user:, description: nil)
+    category_ids = Wbrs::Category.category_ids(category_array)
+    options = { 'prefix_id' => id, 'categories' => category_ids, 'user' => user, 'description' => description }
+    response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/edit', body: Wbrs::Prefix.stringkey_params(options))
 
     response_body = JSON.parse(response.body)
     response_body['Updated']
