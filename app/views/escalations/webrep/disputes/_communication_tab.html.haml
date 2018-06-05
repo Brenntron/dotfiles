@@ -1,7 +1,7 @@
 .row
   .col-sm-3
     %h1 Case History
-    .row
+    .row.table-toolbar
       .col-xs-6
         Sort by [DROPDOWN]
       .col-xs-6
@@ -9,38 +9,87 @@
     .row
       .col-xs-12
         %table
-          -@dispute.dispute_emails.each do |email|
-            %tr.email-row{href: "#{escalations_webrep_dispute_dispute_email_path(@dispute, email)}"}
-              %td.alt-col
-                %span.case-history-icon.email-icon
-              %td
-                %span.email-address
-                  =email.from
-                %span.email-subject
-                  =email.subject
-              %td.alt-col.email-datetime
-                =email.created_at.strftime("%Y-%d-%m %H:%M:%S")
           %tr
-            %td.alt-col
-              %span.case-history-icon.note-icon
-            %td
-              %span.email-address
-                mtaylor@paragon-downloads.com
-              %span.email-subject
-                RE: [E][Paragon-downloads.com] Thanks for your great...
-            %td.alt-col.email-datetime
-              2017-10-24
-              15:35:24
-          %tr
-            %td.alt-col
+            %td.alt-col.icon-col
               %span.case-history-icon.disp-status-icon
             %td
-              %span.email-address
-                mtaylor@paragon-downloads.com
-              %span.email-subject
-                RE: [E][Paragon-downloads.com] Thanks for your great...
-            %td.alt-col.email-datetime
+              %span.case-history-author
+                Automated
+              %span.case-history-preview
+                Status changed from
+                %span.emphasize Researching
+                to
+                %span.emphasize Email Out.
+            %td.alt-col.case-history-datetime
               2017-10-24
+              %br
+              15:35:24
+        -@dispute.dispute_emails.each do |email|
+          %tr.email-row{href: "#{escalations_webrep_dispute_dispute_email_path(@dispute, email)}"}
+            %td.alt-col.icon-col
+              %span.case-history-icon.email-icon
+            %td
+              %span.case-history-author
+                =email.from
+              %span.case-history-preview
+                =email.subject
+            %td.alt-col.case-history-datetime
+              =email.created_at.strftime("%Y-%d-%m")
+              %br
+              =email.created_at.strftime("%H:%M:%S")
+          %tr
+            %td.alt-col.icon-col
+              %span.case-history-icon.note-icon
+            %td
+              %span.case-history-author
+                melitayl
+              %span.case-history-preview
+                This is a note regarding this ticket.
+            %td.alt-col.case-history-datetime
+              2017-10-24
+              %br
+              15:35:24
+          %tr
+            %td.alt-col.icon-col
+              %span.case-history-icon.disp-status-icon
+            %td
+              %span.case-history-author
+                melitayl
+              %span.case-history-preview
+                Status changed from
+                %span.emphasize Assigned
+                to
+                %span.emphasize Researching.
+            %td.alt-col.case-history-datetime
+              2017-10-24
+              %br
+              15:35:24
+          %tr
+            %td.alt-col.icon-col
+              %span.case-history-icon.disp-status-icon
+            %td
+              %span.case-history-author
+                melitayl
+              %span.case-history-preview
+                Status changed from
+                %span.emphasize New
+                to
+                %span.emphasize Assigned.
+            %td.alt-col.case-history-datetime
+              2017-10-24
+              %br
+              15:35:24
+          %tr
+            %td.alt-col.icon-col
+              %span.case-history-icon.email-icon
+            %td
+              %span.case-history-author
+                mtaylor@paragon-downloads.com
+              %span.case-history-preview
+                RE: [E][Paragon-downloads.com] Thanks for your great...
+            %td.alt-col.case-history-datetime
+              2017-10-24
+              %br
               15:35:24
 
 
@@ -48,66 +97,83 @@
     .row
       .col-xs-12.highlighted-section-header
         %h1 Communication
-        .customer-facing-notice.float-right
+        .customer-facing-notice
           ! Customer Facing Messages
     .row
       .col-xs-12.email-header-information
-        .row
-          .col-xs-10
+        .email-header-data
+          .communication-subject
             RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us know what other...
-            From: Monica Taylor - mtaylor@paragon-downloads.com
-            To: Senderbase Support - support@senderbase.org
-          .col-xs-2
-            [REPLY] [FORWARD]
+          .sender-receiver-info
+            %span.content-label-sm From
+            %span.author-username Monica Taylor - mtaylor@paragon-downloads.com
+            %br
+            %span.content-label-sm To
+            %span.receiver-email Senderbase Support - support@senderbase.org
+            %br
+            %span.attachment-label
+            %span.email-attachments
+              %a.email-attachment-name Attachment_name.png
+              ,
+              %a.email-attachment-name attachment_v2.png
+        .email-response-button-wrapper
+          .email-response-buttons
+            %button.reply-button
+            %button.forward-button
+          %span.email-datetime
             2017-10-24
+            %br
             15:35:24
     .row
       .col-xs-12.email-msg-body
-        ———————— Original Message ——————————
-        From: Monica Taylor [mtaylor@paragon-downloads.com] Sent:
-        4/2/2018 1:16 PM
-        To: support@senderbase.org
-        Subject: RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us
-        know what other actions do we need to take....
+        %pre
+          :preserve
+            ———————— Original Message ——————————
 
-        Inquiry Type: email
-        Key Rules:
-        Problem Summary: Thanks for your great support. Can you please let us know what other actions do
-        we need to take. We send informational material of technical nature and conduct webinars. Please
-        call us at 949 825 6282, if you have any questions.
+            From: Monica Taylor [mtaylor@paragon-downloads.com] Sent:
+            4/2/2018 1:16 PM
+            To: support@senderbase.org
+            Subject: RE: [E] [Paragon-downloads.com] Thanks for your great... support. Can you please let us
+            know what other actions do we need to take....
 
-        Thanks, Monica
+            Inquiry Type: email
+            Key Rules:
+            Problem Summary: Thanks for your great support. Can you please let us know what other actions do
+            we need to take. We send informational material of technical nature and conduct webinars. Please
+            call us at 949 825 6282, if you have any questions.
 
-        IPs to be Investigated:
-        69.64.99.250
-        69.64.99.250
-        69.64.99.250
-        69.64.99.250
-        69.64.99.250
-        69.64.99.250
-        69.64.99.250
-        69.64.99.250
+            Thanks, Monica
 
+            IPs to be Investigated:
+            69.64.99.250
+            69.64.99.250
+            69.64.99.250
+            69.64.99.250
+            69.64.99.250
+            69.64.99.250
+            69.64.99.250
+            69.64.99.250
 
-        ———————— ———————— ————————
+            ———————— ———————— ————————
 
-        CAUTION: DO NOT DELETE THE REFERENCE ID BELOW Case No: 014
+            CAUTION: DO NOT DELETE THE REFERENCE ID BELOW Case No: 014
 
 
   .col-sm-3
     %h1 Notes
     .row
-      .col-xs-6
-        %span.author-notation
+      .col-xs-12
+        .note-info-item.author-notation
           Written by
           %span.author-username
             melitayl
           1 day ago.
-      .col-xs-6.text-right
-        %span.time-stamp
+        .note-info-item.time-stamp
           2017-10-24 15:35:24
-        .note-tool-buttons
-          [buttons]
+        .note-info-item.note-tool-buttons
+          %button.note-edit-button
+          %button.note-copy-button
+          %button.note-delete-button
 
     .row
       .col-xs-12
@@ -115,6 +181,6 @@
           This is a note regarding this ticket. I have looked into this information and it appears to be correct.
 
     .row
-      .col-xs-12
-        %button.add-note-inline-button#new-comment-note-button
+      .col-xs-12.text-center
+        %button.add-case-note-button#new-case-note-button
           Add Note

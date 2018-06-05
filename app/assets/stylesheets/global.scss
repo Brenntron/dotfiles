@@ -3029,16 +3029,47 @@ fieldset.top-content {
 }
 
 .case-history-icon {
-  width: 14px;
+  width: 16px;
   height: 20px;
   background-repeat: no-repeat;
-  margin-bottom: -10px;
+  margin: auto 6px -16px 6px;
   display: block;
 }
 
 .email-icon       {background-image: url(image_path('icon_message.svg'));}
 .note-icon        {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
+
+.case-history-author, .case-history-preview {
+  display: block;
+  width: 100%;
+  font-size: 8pt;
+  line-height: 1.3em;
+}
+
+.case-history-author {
+  font-weight: 700;
+}
+
+.case-history-preview {
+  color: $type-lighter-color;
+  margin-top: 5px;
+}
+
+.case-history-datetime, .email-datetime {
+  font-size: 8pt;
+  color: $type-lighter-color;
+  line-height: 1.4em;
+  min-width: 72px;
+}
+
+.emphasize {
+  font-weight: 700;
+}
+
+.icon-col {
+  padding: 0;
+}
 
 .highlighted-section-header {
   background-color: #C14B92;
@@ -3049,9 +3080,194 @@ fieldset.top-content {
 
 .highlighted-section-header h1 {
   color: $content-bg-color;
+  display: inline-block;
+}
+
+.highlighted-section-header::before {
+  content: '';
+  display: block;
+  height: 10px;
+  position: absolute;
+  background-color: #C14B92;
+  z-index: 60;
+  width: 100%;
+  margin-left: -12px;
+  margin-top: -12px;
+}
+
+.customer-facing-notice {
+  display: inline-block;
+  float: right;
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+
+.customer-facing-notice::before {
+  content: '';
+  background-image: url(image_path('icon_warning_white.svg'));
+  background-repeat: no-repeat;
+  background-position-x: center;
+  height: 20px;
+  display: block;
+  margin-bottom: 3px;
 }
 
 .email-header-information {
   background-color: $faint-neutral-color;
   padding: 12px;
+  min-height: 80px;
+}
+
+.email-response-button-wrapper {
+  float: right;
+  border-left: solid 1px darken($faint-neutral-color, 10%);
+  margin-left: 12px;
+  padding-left: 12px;
+  position: absolute;
+  right: 12px;
+}
+
+.email-header-data {
+  float: left;
+  margin-right: 86px;
+}
+
+.nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
+.nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
+.nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_related_tab.svg'));}
+
+.email-msg-body pre {
+  background-color: $content-bg-color;
+  color: $type-lighter-color;
+  line-height: 1.4em;
+  margin-top: 12px;
+  font-size: 9pt;
+}
+
+.table-toolbar {
+  background-color: darken($faint-neutral-color, 4%);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 8pt;
+  padding: 5px;
+  margin-bottom: 3px;
+  margin-top: 14px;
+}
+
+.communication-subject {
+  color: $type-lighter-color;
+  line-height: 1.3em;
+}
+
+.email-response-buttons {
+  margin-bottom: 5px;
+}
+
+.email-response-buttons button {
+  display: inline-block;
+  background-color: darken($faint-neutral-color, 20%);
+  border-radius: 2px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 18px 18px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  padding: 4px;
+  margin: auto 1px;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.email-response-buttons button:hover {
+  background-color: $bug-section-color;
+}
+
+.receiver-email {
+  font-size: 8pt;
+}
+
+.reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
+.forward-button {background-image: url(image_path('icon_forward_white.svg'));}
+
+.note-info-item {
+  display: inline-block;
+}
+
+.note-tool-buttons {
+  float: right;
+}
+
+.note-tool-buttons button {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border: none;
+  padding: 4px;
+  width: 20px;
+  height: 20px;
+}
+
+.note-edit-button {background-image: url(image_path('icon_edit.svg'));}
+.note-copy-button {background-image: url(image_path('icon_copy.svg'));}
+.note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+
+.email-button {
+  width: 20px;
+  height: 20px;
+  display: block;
+  margin-top: 33px;
+  margin-left: 2px;
+}
+
+.sender-receiver-info .content-label-sm {
+  width: 25px;
+  color: $type-lighter-color;
+  line-height: 1.3em;
+  display: inline-block;
+  padding-bottom: 2px;
+  margin-bottom: 0;
+}
+.sender-receiver-info {
+  margin-top: 10px;
+}
+
+.add-case-note-button {
+  background-image: url(image_path('icon_add_note_white.svg'));
+  background-repeat: no-repeat;
+  padding: 8px 15px 8px 38px;
+  font-size: 9pt;
+  background-size: 20px 20px;
+  background-position: 18px center;
+  border-radius: 2px;
+  border: none;
+  background-color: $bug-section-color;
+  color: $content-bg-color;
+  width: 120px;
+  margin-top: 20px;
+  -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.add-case-note-button:hover {
+  background-color: #E47433;
+}
+
+.attachment-label {
+  background-image: url(image_path('icon_attachment.svg'));
+  background-repeat: no-repeat;
+  width: 25px;
+  margin: 2px 6px -3px 0;
+  height: 16px;
+  display: inline-block;
+}
+
+.email-attachments a {
+  color: $content-tab-color;
+  font-size: 8pt;
+}
+
+#communication h1 {
+  margin-top: 20px;
+  margin-bottom: 5px;
 }
