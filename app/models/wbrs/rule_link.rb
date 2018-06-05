@@ -27,6 +27,7 @@ class Wbrs::RuleLink < Wbrs::Base
   end
 
   # Get the rules from given criteria.
+  # This is not a relation and cannot be chained with other relations.
   # example: get_where(category_ids = [11], active: true)
   # @param [Array<Integer>] prefix_ids: List of prefixes ids
   # @param [Array<String>] urls: List of URLs
@@ -35,7 +36,7 @@ class Wbrs::RuleLink < Wbrs::Base
   # @param [Integer] limit: Max number of records to return
   # @param [Integer] offset: Offset of the first record to return
   # @return [Array<Wbrs::Rule>] Array of the results.
-  def self.get_where(conditions = {})
+  def self.where(conditions = {})
     params = stringkey_params(conditions)
     params['categories'] = params.delete('category_ids') unless params['category_ids'].nil?
     params['is_active'] = params.delete('active') ? 1 : 0 unless params['active'].nil?

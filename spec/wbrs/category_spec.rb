@@ -17,7 +17,7 @@ describe Wbrs::Category do
         ]
     }.to_json
   end
-  let(:all_cat_response) { double('Wbrs::Category', code: 200, body: all_cat_json) }
+  let(:all_cat_response) { double('HTTPI::Response', code: 200, body: all_cat_json) }
 
 
 
