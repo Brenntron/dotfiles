@@ -1,4 +1,4 @@
-class Wbrs::Rule < Wbrs::Base
+class Wbrs::RuleLink < Wbrs::Base
   attr_accessor :category, :prefix
 
   delegate :prefix_id, :domain, :is_active, :path, :path_hashed, :port, :protocol, :subdomain, :truncated,
