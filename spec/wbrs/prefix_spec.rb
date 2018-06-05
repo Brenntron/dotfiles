@@ -185,9 +185,13 @@ describe 'A prefix' do
         }
     }.to_json
   end
-  let(:history_records_error_json) {{'Error' => 'Prefix ID required.'}.to_json}
+  let(:create_prefix_json) { {"Created": 111}.to_json }
+  let(:create_prefix_error_json) {{'Error' => 'Prefix ID required.'}.to_json}
+  let(:history_records_error_json) {{'Error' => "'url', 'categories', 'user' are required."}.to_json}
   let(:history_records_response) { double('HTTPI::Response', code: 200, body: history_records_json) }
   let(:history_records_error) { double('HTTPI::Response', code: 400, body: history_records_error_json) }
+  let(:create_prefix_response) { double('HTTPI::Response', code: 200, body: create_prefix_json) }
+  let(:create_prefix_error) { double('HTTPI::Response', code: 400, body: history_records_error_json) }
   let(:prefix) do
     Wbrs::Prefix.new_from_attributes(
         "prefix_id": 101,
@@ -206,7 +210,29 @@ describe 'A prefix' do
 
   ### TESTS ####################################################################
 
-  it 'should add a prefix categorization'
+    it 'should add a prefix categorization' do
+      expect(Wbrs::Base).to receive(:make_post_request).and_return(create_prefix_response)
+
+      creation_prefix_id =
+          Wbrs::Prefix.create_from_url(url: "http://ukr12.net",
+                                       categories: [5, 6],
+                                       user: 'tester',
+                                       description: 'Testing /add route.')
+
+    expect(creation_prefix_id).to eq(111)
+  end
+
+
+    it 'should handle errors adding a prefix categorization' do
+      expect(Wbrs::Base).to receive(:make_post_request).and_return(create_prefix_error)
+
+      expect {
+        Wbrs::Prefix.create_from_url(url: "http://ukr12.net",
+                                     user: 'tester',
+                                     description: 'Testing /add route.')
+      }.to raise_error(RuntimeError)
+
+  end
 
   it 'should edit its categories'
 

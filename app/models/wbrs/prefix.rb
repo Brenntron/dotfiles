@@ -52,8 +52,16 @@ class Wbrs::Prefix < Wbrs::Base
     Wbrs::HistoryRecord.where(prefix_id: id)
   end
 
-  def self.add_rule(attributes)
-    response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(attributes))
+  # Get the rules from given criteria.
+  # This is not a relation and cannot be chained with other relations.
+  # example: get_where(category_ids = [11], active: true)
+  # @param [String] url: An URL
+  # @param [Array<Integer>] category_ids: List of prefixes categories
+  # @param [String] user: Max number of records to return
+  # @param [String] description: Offset of the first record to return
+  # @return [Integer] id of created prefix.
+  def self.create_from_url(options)
+    response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(options))
 
     response_body = JSON.parse(response.body)
     response_body['Created']
