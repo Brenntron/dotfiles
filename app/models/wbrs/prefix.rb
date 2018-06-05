@@ -46,6 +46,12 @@ class Wbrs::Prefix < Wbrs::Base
     where(prefix_id: id, limit: 1).first
   end
 
+  # Get the audit history
+  # @return [Array<Wbrs::HistoryRecord] the collection of audit history records.
+  def history_records
+    Wbrs::HistoryRecord.where(prefix_id: id)
+  end
+
   def self.add_rule(attributes)
     response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(attributes))
 
