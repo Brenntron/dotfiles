@@ -179,8 +179,6 @@ describe Wbrs::Prefix do
 
   end
 
-  it 'should disable a list of prefixes'
-
 end
 
 describe 'A prefix' do
@@ -216,11 +214,15 @@ describe 'A prefix' do
   end
   let(:edit_prefix_json) { {"Updated": 101}.to_json }
   let(:edit_prefix_error_json) {{'Error' => "'prefix_id', 'categories', 'user' are required."}.to_json}
+  let(:disable_json) { "Done!".to_json }
+  let(:disable_error_json) {{'Error' => "'prefix_ids' and 'user' are required."}.to_json}
   let(:history_records_error_json) {{'Error' => "'url', 'categories', 'user' are required."}.to_json}
   let(:history_records_response) { double('HTTPI::Response', code: 200, body: history_records_json) }
   let(:history_records_error) { double('HTTPI::Response', code: 400, body: history_records_error_json) }
   let(:edit_prefix_response) { double('HTTPI::Response', code: 200, body: edit_prefix_json) }
   let(:edit_prefix_error) { double('HTTPI::Response', code: 400, body: edit_prefix_error_json) }
+  let(:disable_response) { double('HTTPI::Response', code: 200, body: disable_json) }
+  let(:disable_error) { double('HTTPI::Response', code: 400, body: disable_error_json) }
   let(:prefix) do
     Wbrs::Prefix.new_from_attributes(
         "prefix_id": 101,
@@ -278,6 +280,22 @@ describe 'A prefix' do
     expect {
       prefix.history_records
     }.to raise_error(RuntimeError)
+  end
+
+  it 'should disable a list of prefixes' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(disable_response)
+
+    prefix.disable(user: 'tester')
+
+  end
+
+  it 'should handle errors disabling a list of prefixes' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(disable_error)
+
+    expect {
+      prefix.disable(user: nil)
+    }.to raise_error(RuntimeError)
+
   end
 
 end

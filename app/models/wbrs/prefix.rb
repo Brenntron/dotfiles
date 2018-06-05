@@ -66,13 +66,6 @@ class Wbrs::Prefix < Wbrs::Base
     response_body['Created']
   end
 
-  # def self.edit_rule(attributes)
-  #   response = post_request(path: '/v1/cat/rules/edit', body: stringkey_params(attributes))
-  #
-  #   response_body = JSON.parse(response.body)
-  #   response_body['Updated']
-  # end
-
   # Sets the categories on a prefix to given list of categories.
   # @param [Array<Wbrs::Category | Integer>] category_ids: List of categories or category ids.
   # @param [String] user: The user for this action
@@ -87,10 +80,10 @@ class Wbrs::Prefix < Wbrs::Base
     response_body['Updated']
   end
 
-  def self.disable_rule(attributes)
-    response = post_request(path: '/v1/cat/rules/disable', body: stringkey_params(attributes))
-
-    response_body = JSON.parse(response.body)
-    response_body
+  # Disables the rules on this prefix.
+  # @param [String] user: The user for this action
+  def disable(user:)
+    options = { 'prefix_id' => id, 'user' => user }
+    Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
   end
 end
