@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180418163111) do
+ActiveRecord::Schema.define(version: 20180531183731) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -175,6 +175,16 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "dispute_email_attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "dispute_email_id"
+    t.integer "bugzilla_attachment_id"
+    t.string "file_name"
+    t.text "direct_upload_url"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "dispute_emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "dispute_id"
     t.text "email_headers"
@@ -193,7 +203,7 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.string "uri"
     t.string "hostname"
     t.string "entry_type"
-    t.integer "score"
+    t.float "score", limit: 24
     t.string "score_type"
     t.string "suggested_disposition"
     t.string "primary_category"

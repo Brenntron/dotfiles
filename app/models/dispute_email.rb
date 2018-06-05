@@ -5,6 +5,8 @@ class DisputeEmail < ApplicationRecord
   READ     = "read"
   REPLIED  = "replied"
 
+  REFERENCE_TEMPLATE = "ref-CASEID-anco"
+
   def self.process_bridge_payload(message_payload, xmlrpc, user)
 
     #check envelope for case validity
@@ -46,6 +48,7 @@ class DisputeEmail < ApplicationRecord
     return_message
   end
 
+  ## FORMAT FOR AN EXTERNAL FACING CASE NUMBER IS:  ref-[dispute#id]-anco   example: ref-325302-anco wher 325302 is the ID of a record in disputes table
   def self.find_case_number_in_email(message_payload)
     email_address = message_payload['to']
     email_body = message_payload['text']
@@ -61,6 +64,20 @@ class DisputeEmail < ApplicationRecord
     end
 
     return nil
+
+  end
+
+  def self.create_email_and_send(params)
+    new_email = DisputeEmail.new
+    new_email.from = generate_case_email_address(params[:dispute_id])
+    new_email.to = ""
+    new_email.subject = ""
+    new_email.body = ""
+    new_email.status = ""
+    new_email.save
+
+
+
 
   end
 
