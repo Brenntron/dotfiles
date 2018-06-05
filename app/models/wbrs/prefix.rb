@@ -1,5 +1,8 @@
 class Wbrs::Prefix < Wbrs::Base
-  attr_accessor :prefix_id, :domain, :is_active, :path, :path_hashed, :port, :protocol, :subdomain, :truncated
+  FIELD_NAMES = %w{prefix_id domain is_active path path_hashed port protocol subdomain truncated}
+  FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
+
+  attr_accessor *FIELD_SYMS
   class << self
     attr_reader :all_hash
   end
@@ -38,5 +41,21 @@ class Wbrs::Prefix < Wbrs::Base
 
     response_body = JSON.parse(response.body)
     response_body
+  end
+
+  def self.where(conditions = {})
+    params = stringkey_params(conditions)
+    params['categories'] = params.delete('category_ids') unless params['category_ids'].nil?
+    params['is_active'] = params.delete('active') ? 1 : 0 unless params['active'].nil?
+    response = post_request(path: '/v1/cat/rules/get', body: params)
+
+    response_body = JSON.parse(response.body)
+    response_body['data'].inject({}) do |prefix_hash, datum|
+      prefix_id = datum['prefix_id']
+      unless prefix_hash[prefix_id]
+        prefix_hash[prefix_id] = new(datum.slice(*FIELD_NAMES))
+      end
+      prefix_hash
+    end.values
   end
 end
