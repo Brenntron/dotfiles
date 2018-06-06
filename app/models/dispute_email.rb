@@ -1,6 +1,8 @@
 class DisputeEmail < ApplicationRecord
   belongs_to :dispute
 
+  EMAIL_DOMAIN = "mail.talosintelligence.com"
+
   UNREAD   = "unread"
   READ     = "read"
   REPLIED  = "replied"
@@ -53,31 +55,94 @@ class DisputeEmail < ApplicationRecord
     email_address = message_payload['to']
     email_body = message_payload['text']
 
-    if (email_address =~ /ref\-[0-9]+\-anco/) != nil
-      case_id = email_address.scan( /ref\-([0-9]+)\-anco/ ).last.first
-      return case_id
+    email_case = ""
+    body_case = ""
+    if (email_address =~ /[0-9]+/) != nil
+      email_case = email_address.scan( /([0-9]+)/ ).last.first.to_i
     end
 
     if (email_body =~ /ref\-[0-9]+\-anco/) != nil
-      case_id = email_body.scan( /ref\-([0-9]+)\-anco/ ).last.first
-      return case_id
+      body_case = email_body.scan( /ref\-([0-9]+)\-anco/ ).last.first.to_i
+    end
+
+    if email_case == body_case
+      return email_case
+    end
+
+    if email_case != body_case
+      #### figure this out later
+      #### thinking possibly create a new dispute with a 'suggested' related case
+      return email_case
     end
 
     return nil
 
   end
 
-  def self.create_email_and_send(params)
+  def self.create_email_and_send(params, xmlrpc, user)
     new_email = DisputeEmail.new
     new_email.from = generate_case_email_address(params[:dispute_id])
-    new_email.to = ""
-    new_email.subject = ""
-    new_email.body = ""
+    new_email.to = params[:to]
+    new_email.subject = params[:subject]
+    new_email.body = append_case_number(params[:body])
     new_email.status = ""
     new_email.save
 
+    attachments = []
+    if params[:attachments].present?
+      params[:attachments].each do |attachment|
+
+        payload = {}
+        payload[:url] = ""
+        payload[:file_name] = ""
+        payload[:file_content] = ""
+        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email)
+        new_local_attachment.push_to_aws
+        new_attachment = {}
+        new_attachment[:file_name] = ""
+        new_attachment[:file_url] = ""
+      end
+    end
+
+    email_args = {}
+    email_args[:to] = new_email.to
+    email_args[:from] = new_email.from
+    email_args[:subject] = new_email.subject
+    email_args[:body] = new_email.body
+
+    conn = SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
+    conn.post(email_args, attachments)
 
 
+
+  end
+
+  def self.generate_case_email_address(dispute_id)
+    email_user = "rep_disputes_#{dispute_id}@#{EMAIL_DOMAIN}"
+
+    email_user
+  end
+
+  def self.append_case_number(body, case_number)
+    new_body = body
+    body_case = nil
+    if (email_body =~ /ref\-[0-9]+\-anco/) != nil
+      body_case = email_body.scan( /ref\-([0-9]+)\-anco/ ).last.first.to_i
+    end
+
+    if body_case.nil?
+      new_body += "\n\n"
+      new_body += "-------------------------------------------------------------------------------------------------\n"
+      new_body += "Please Do Not Remove This Reference Number.  Keep This Reference Number In The Email Chain:\n"
+      new_body += "#{case_number}"
+      new_body += "-------------------------------------------------------------------------------------------------\n"
+    end
+
+    if body_case != case_number
+      new_body.gsub(body_case.to_s, case_number.to_s)
+    end
+
+    return new_body
 
   end
 

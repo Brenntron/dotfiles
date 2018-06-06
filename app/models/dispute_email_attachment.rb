@@ -3,8 +3,12 @@ class DisputeEmailAttachment < ApplicationRecord
 
 
 
-  def self.build_and_push_to_bugzilla(bugzilla_session, payload, user, dispute_email)
-    file_content = open(payload[:url])
+  def self.build_and_push_to_bugzilla(bugzilla_session, payload, user, dispute_email, remote = true)
+    if remote == true
+      file_content = open(payload[:url])
+    else
+      file_content = payload[:file_content]
+    end
 
     bug_stub = Bugzilla::Bug.new(bugzilla_session)
 
@@ -33,6 +37,31 @@ class DisputeEmailAttachment < ApplicationRecord
       end
     end
 
+  end
+
+  def push_to_aws
+
+    s3           = Aws::S3::Resource.new
+    bucket       = s3.bucket("analyst-console")
+    prefix       = "#{Rails.env}/dispute_email_attachments/#{dispute_email.id}/"
+    s3_url       = []
+
+    key    = prefix + "#{file.original_filename}"
+    object = bucket.object(key)
+    object.upload_file(File.open(file.tempfile))
+    s3_url = {file.original_filename => [object.key, file] }
+
+
+    DisputeEmailAttachment.create(dispute_email_id: dispute_email.id,
+                                  file_file_name: s3_url.keys.first,
+                                  file_content_type: s3_url.values.flatten[1].content_type,
+                                  file_file_size: s3_url.values.flatten[1].size,
+                                  path:      s3_url.values.flatten[0])
+
+  end
+
+  def s3_url
+    Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'analyst-console', key: self.path).to_s
   end
 
 
