@@ -3,9 +3,6 @@ class Wbrs::Prefix < Wbrs::Base
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
-  class << self
-    attr_reader :all_hash
-  end
 
   alias_method(:id, :prefix_id)
 
