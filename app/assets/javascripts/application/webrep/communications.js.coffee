@@ -4,22 +4,19 @@ $ ->
     handle_current_email_row($(this))
 
     email_id = $(this).attr('email_id')
-    headers = {'Token': $('input[name="token"]').val()}
-    $.ajax {
-      headers: headers
+
+    std_msg_ajax(
+      method: 'PUT'
       url: "/api/v1/escalations/webrep/dispute_emails/#{email_id}"
-      type: 'PUT'
-      dataType: 'json'
-      data:
-        status: 'read'
+      data: {status: 'read'}
+      success_reload: false
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
         $('#email-reply').removeClass('hidden')
         populate_communication_details(response)
-
       error: (response) ->
-       alert("There was a problem retrieving email.")
-  }
+        std_api_error(response, "There was a problem retrieving email.", reload: false)
+    )
 
 
   populate_communication_details = (email) ->
@@ -51,17 +48,16 @@ $ ->
     dispute_id = $('input[name="dispute_id"]').val()
     to = $('.receiver-email')[1].textContent
     subject = $('.communication-subject')[1].textContent
-    headers = {'Token': $('input[name="token"]').val()}
     email_data = {body: email_body, dispute_id: dispute_id, to: to, subject: subject}
-    $.ajax {
-      headers: headers
-      url: "/api/v1/escalations/webrep/dispute_emails"
-      type: 'POST'
-      dataType: 'json'
+
+    std_msg_ajax(
+      method: 'POST'
+      url: '/api/v1/escalations/webrep/dispute_emails'
       data: email_data
+      success_reload: true
       success: (response) ->
-        alert('Email successfully sent')
+        std_msg_success('Email Sent.', [], reload: true)
       error: (response) ->
-        alert("There was a problem sending email.")
-    }
+        std_api_error(response, "Email was not sent", reload: false)
+    )
 

@@ -21,6 +21,8 @@
 //= require admin/notes
 //= require admin/bs-admin-tabs
 //= require admin/snort-docs
+//= require admin/std_api
+//= require admin/std_msg
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require application/webrep/disputes
