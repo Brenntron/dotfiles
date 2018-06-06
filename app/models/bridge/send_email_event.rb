@@ -4,7 +4,7 @@ class Bridge::SendEmailEvent < Bridge::BaseMessage
           addressee: addressee)
   end
 
-  def post(mail_params, attachments = [])
+  def post(mail_params, mail_attachments = [])
     super(message: {to: mail_params[:to],
                     from: mail_params[:from],
                     subject: mail_params[:subject],

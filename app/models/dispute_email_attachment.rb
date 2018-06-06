@@ -39,7 +39,7 @@ class DisputeEmailAttachment < ApplicationRecord
 
   end
 
-  def push_to_aws
+  def push_to_aws(file)
 
     s3           = Aws::S3::Resource.new
     bucket       = s3.bucket("analyst-console")

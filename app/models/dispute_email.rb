@@ -89,19 +89,20 @@ class DisputeEmail < ApplicationRecord
     new_email.status = SENT
     new_email.save
 
-    attachments = []
+    attachments_to_mail = []
+
     if params[:attachments].present?
-      params[:attachments].each do |attachment|
+      params[:attachments].each do |key, attachment|
 
         payload = {}
-        payload[:url] = ""
-        payload[:file_name] = ""
-        payload[:file_content] = ""
+        payload[:file_name] = attachment.original_filename
+        payload[:file_content] = File.open(attachment.tempfile)
         new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email)
-        new_local_attachment.push_to_aws
+        new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
-        new_attachment[:file_name] = ""
-        new_attachment[:file_url] = ""
+        new_attachment[:file_name] = attachment.original_filename
+        new_attachment[:file_url] = new_local_attachment.s3_url
+        attachments_to_mail << new_attachment
       end
     end
 
@@ -111,8 +112,13 @@ class DisputeEmail < ApplicationRecord
     email_args[:subject] = new_email.subject
     email_args[:body] = new_email.body
 
+    new_email.reload
+    if new_email.dispute_email_attachments.present?
+      email_args[:attachments]
+    end
+
     conn = SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
-    conn.post(email_args, attachments)
+    conn.post(email_args, attachments_to_mail)
 
 
 
