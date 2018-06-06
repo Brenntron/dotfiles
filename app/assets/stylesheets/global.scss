@@ -3314,3 +3314,62 @@ fieldset.top-content {
   margin-top: 20px;
   margin-bottom: 5px;
 }
+
+.table-nested-reputation th {
+  text-transform: none;
+  color: $type-lighter-color;
+  padding-right: 10px;
+}
+
+.table-nested-reputation {
+  font-size: 8pt;
+}
+
+.nested-data-row {
+  background-color: $faint-neutral-color;
+}
+
+.table-nested-rep-rules td {
+  padding: 2px 15px 2px 0;
+}
+
+.table-nested-rep-rules th {
+  text-transform: uppercase;
+  color: $type-base-color;
+}
+
+.table-nested-rep-rules .emphasis {
+  color: $type-base-color;
+}
+
+.data-small-emphasis {
+  font-weight: 600;
+}
+
+.warning-emphasis {
+  font-weight: 700;
+  color: $escalations-section-color;
+}
+
+th.wbrs-highlight {
+  background-color: lighten($fourth-section-color, 41%);
+}
+td.wbrs-highlight {
+  background-color: lighten($fourth-section-color, 43%);
+}
+
+th.wbrs-highlight, th.sbrs-highlight{
+  border-bottom: 1px solid $content-bg-color !important;
+}
+
+th.sbrs-highlight {
+  background-color: lighten($communication-accent-color, 41%);
+}
+
+td.sbrs-highlight {
+  background-color: lighten($communication-accent-color, 43%);
+}
+
+td.wbrs-highlight, td.sbrs-highlight {
+  font-weight: 600;
+}
