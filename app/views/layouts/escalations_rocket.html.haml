@@ -141,11 +141,7 @@
         = content_for(:nav_banner) if content_for?(:nav_banner)
         = render "escalations/webcat/shared/rocket_nav"
         %div
-        - if current_user
-          #login-div
-            %a{href: "/users/#{current_user[:id]}"}
-              %strong
-                =current_user[:display_name]
+
 
       #page-content-wrapper
         =yield

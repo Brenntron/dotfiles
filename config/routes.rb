@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     namespace :webcat do
       root 'complaints#index'
       resources :complaints do
+        get :show_multiple
         collection do
           get :advanced_search
           get :named_search

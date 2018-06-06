@@ -1,9 +1,12 @@
-class Escalations::Webcat::ComplaintsController < ApplicationController
+class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
 
-  before_action :require_login
+
 
   def index
-
+    respond_to do |format|
+      format.html
+      format.json { render json: ComplaintDatatable.new(view_context) }
+    end
   end
 
   def show
@@ -36,6 +39,7 @@ class Escalations::Webcat::ComplaintsController < ApplicationController
   end
 
   private
+
 
   def index_params
     params.fetch(:dispute, {}).permit(:customer_name, :customer_email, :customer_company_name,

@@ -1,7 +1,0 @@
-%h1 Standard Search
-
-= simple_form_for :dispute, url: escalations_webrep_disputes_disputes_path, method: :get do |dispute_form|
-  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'standard'}
-  = dispute_form.input :search_name, collection: ['Open', 'Closed', 'Unknown']
-  = dispute_form.submit 'Search'
-

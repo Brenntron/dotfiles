@@ -1,6 +1,4 @@
-class Escalations::Webcat::ReportsController < ApplicationController
-  before_action :require_login
-
+class Escalations::Webcat::ReportsController < Escalations::WebcatController
   def index
 
   end

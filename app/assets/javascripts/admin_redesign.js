@@ -3,7 +3,6 @@
 //
 //
 //
-
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
@@ -23,3 +22,4 @@
 //= require admin/snort-docs
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
+//= require application/webcat_complaints

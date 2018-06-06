@@ -1,5 +1,4 @@
-class Escalations::Webcat::RulesController < ApplicationController
-  before_action :require_login
+class Escalations::Webcat::RulesController < Escalations::WebcatController
 
   def index
 

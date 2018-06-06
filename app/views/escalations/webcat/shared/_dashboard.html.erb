@@ -1,34 +1,50 @@
-<div>
-  <div style="float: left; padding-bottom: 20px;">
-    <div>
-      <div><%= content_for :webcat_page%> [&#39;meter]</div>
-      <div><strong>USERNAME</strong></div>
-      <div><em>userlogi &middot; user-title</em></div>
+<div class="background container-fluid">
+
+  <div class="col-sm-3">
+    <div class="title"><%= content_for :webcat_page%> {icon}</div>
+    <div class="user_name">
+      <%= link_to "#{@current_user.display_name}", users_path(current_user[:id])%>
     </div>
-    <div>
-      <div>[6] Open Tickets</div>
-      <div>[1] In Progress Tickets</div>
-      <div>[11] Closed Tickets</div>
+    <div class="user_id">
+      <%=@current_user.cec_username%> - AC title
     </div>
-  </div><br style="clear: both;"/>
-  <div style="float: left; padding-bottom: 20px;">
-    <div style="float: left;">
-      [chart]
-    </div>
-    <div style="float: left;">
-      [ticket listing]
-    </div>
-  </div><br style="clear: both;"/>
-  <div style="float: left; padding-bottom: 20px;">
-    <div>
-      <div>My Team [people]</div>
-      <div><strong>USERNAME</strong></div>
-      <div><em>userlogi &middot; user-title</em></div>
-    </div>
-    <div>
-      <div>[6] Open Tickets</div>
-      <div>[1] In Progress Tickets</div>
-      <div>[11] Closed Tickets</div>
-    </div>
-  </div><br style="clear: both;"/>
+    <br>
+  </div>
+  <div class="col-sm-6 vl">
+  </div>
+  <div class="col-sm-3 text-center">
+    <table class="metrics table table-responsive-sm" >
+      <tbody>
+      <tr>
+        <td>
+          SecHub <%=@secHub_1%>  <%=@secHub_2%>
+        </td>
+        <td>
+          SS: <%=@ss%>
+        </td>
+        <td>
+          int <%=@int_1%> <%=@int_2%>
+        </td>
+        <td>
+          WBNP <%=@wbnp%>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <table class="metrics table table-responsive-sm">
+      <tbody>
+      <tr>
+        <td>
+          pending <%=@pending%>
+        </td>
+        <td>
+          new  <%=@new%>
+        </td>
+        <td>
+          overdue <%=@overdue%>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
