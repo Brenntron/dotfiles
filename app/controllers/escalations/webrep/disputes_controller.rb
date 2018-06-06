@@ -10,7 +10,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def show
-    # @dispute = Dispute.find(params[:id])
+    @dispute = Dispute.find(params[:id])
+    @entries = DisputeEntry.where(:dispute_id => @dispute.id)
   end
 
   def update

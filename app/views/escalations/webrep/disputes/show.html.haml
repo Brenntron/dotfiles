@@ -1,5 +1,6 @@
 -#view single record
 .content-wrapper
+
   .row
     .col-xs-1.col-with-divider
       %span.bug-state-info.bug-priority.p-P1
@@ -8,25 +9,24 @@
       %label.content-label-sm
         Case ID
       .bug-top-id
-        %a
-          01402523
+        %a= @dispute.id
     .col-xs-1.bug-state-col
       #bugzilla_popover_state.bug-state-info.bug-state
         %select#status.inpage-select{name: 'status'}
-          %option{value: 'New', selected: 'selected'} New
-          %option{value: 'Assigned'} Assigned
-          %option{value: 'Researching'} Researching
-          %option{value: 'On Hold'} On Hold
-          %option{value: 'Customer Pending'} Customer Pending
-          %option{value: 'Resolved'} Resolved
-          %option{value: 'Reopened'} Reopened
-
+          %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
+          -#%option{value: 'New', selected: 'selected'} New
+          -#%option{value: 'Assigned'} Assigned
+          -#%option{value: 'Researching'} Researching
+          -#%option{value: 'On Hold'} On Hold
+          -#%option{value: 'Customer Pending'} Customer Pending
+          -#%option{value: 'Resolved'} Resolved
+          -#%option{value: 'Reopened'} Reopened
 
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Owner
       %div
-        Unassigned
+        %span= @dispute.assigned_to || "None"
         %span.take-button
           hand icon
     .col-xs-2.col-with-divider
@@ -42,13 +42,11 @@
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Date/Time Submitted
-      %div
-        2017-10-24 15:35:24
+      %div= @dispute.case_opened_at
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Age
-      %div
-        35m 36s
+      %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
 
 -     #<!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
 

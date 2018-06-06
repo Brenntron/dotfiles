@@ -37,13 +37,14 @@
           </tr>
         </thead>
         <tbody>
+        <% @entries.each do |entry| %>
           <tr>
             <td>paragon-downloads.com</td>
             <td>Computer and Internet</td>
             <td class="text-center">5.6</td>
             <td class="text-center wbrs-highlight">8.7</td>
             <td class="text-center">6</td>
-            <td class="text-center sbrs-highlight">8.65</td>
+            <td class="text-center sbrs-highlight"><%= entry.score unless entry.score_type != "SBRS" %></td>
             <td class="text-center">0</td>
             <td>WL - Medium</td>
             <td></td>
@@ -57,7 +58,7 @@
                 </tr>
                 <tr>
                   <th>Hostname</th>
-                  <td>dsl247.tek.advisor.com</td>
+                  <td><%= entry.hostname %></td>
                 </tr>
                 <tr>
                   <th>WBRS Rules</th>
@@ -577,6 +578,7 @@
               </table>
             </td>
           </tr>
+        <% end %>
         </tbody>
       </table>
     </div>
