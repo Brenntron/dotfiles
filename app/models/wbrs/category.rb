@@ -1,5 +1,8 @@
 class Wbrs::Category < Wbrs::Base
-  attr_accessor :category_id, :desc_long, :descr, :mnem
+  FIELD_NAMES = %w{category_id desc_long descr mnem}
+  FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
+
+  attr_accessor *FIELD_SYMS
   class << self
     attr_reader :all
   end
@@ -7,7 +10,7 @@ class Wbrs::Category < Wbrs::Base
   alias_method(:id, :category_id)
 
   def self.new_from_datum(datum)
-    datum['category_id'] = datum.delete('category')
+    datum['category_id'] = datum.delete('category') if datum['category'].present?
     new(datum)
   end
 

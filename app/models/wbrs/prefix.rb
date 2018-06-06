@@ -33,10 +33,21 @@ class Wbrs::Prefix < Wbrs::Base
     response_body['data'].inject({}) do |prefix_hash, datum|
       prefix_id = datum['prefix_id']
       unless prefix_hash[prefix_id]
-        prefix_hash[prefix_id] = new(datum.slice(*FIELD_NAMES))
+        prefix_hash[prefix_id] = new_from_attributes(datum.slice(*FIELD_NAMES))
       end
       prefix_hash
     end.values
+  end
+
+  # @return [Array<Wbrs::Category>] array of categories related to this prefix.
+  def categories
+    response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_id: id })
+
+    response_body = JSON.parse(response.body)
+    response_body['data'].map do |datum|
+      datum['category_id'] = datum.delete('category')
+      Wbrs::Category.new_from_datum(datum.slice(*Wbrs::Category::FIELD_NAMES))
+    end
   end
 
   # Get a prefix by id

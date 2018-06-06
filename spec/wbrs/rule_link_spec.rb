@@ -22,7 +22,7 @@ describe Wbrs::RuleLink do
                 "category": 6,
                 "desc_long": "Galleries and exhibitions; artists and art; photography; literature and books; performing arts and theater; musicals; ballet; museums; design; architecture.  Cinema and television are classified as Entertainment.",
                 "descr": "Arts",
-                "mnem": "category",
+                "mnem": "art",
 
                 "prefix_id": 101,
                 "domain": "example.net",
