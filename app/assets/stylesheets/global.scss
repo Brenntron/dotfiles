@@ -3373,3 +3373,8 @@ td.sbrs-highlight {
 td.wbrs-highlight, td.sbrs-highlight {
   font-weight: 600;
 }
+
+.nested-info-highlight {
+  background-color: lighten($faint-neutral-color, 2%);
+  border-left: 1px solid $content-bg-color;
+}
