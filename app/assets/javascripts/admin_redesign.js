@@ -23,4 +23,6 @@
 //= require admin/snort-docs
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
-//= require application/webrep_disputes
+//= require application/webrep/disputes
+//= require application/webrep/communications
+//= require moment

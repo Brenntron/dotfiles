@@ -4,7 +4,6 @@
     .col-xs-1.col-with-divider
       %span.bug-state-info.bug-priority.p-P1
       %span.email-button
-        Email Icon
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Case ID
@@ -12,10 +11,17 @@
         %a
           01402523
     .col-xs-1.bug-state-col
-      %label.content-label-sm
-        Status
-      %span.bug-state-info.bug-state
-        New
+      #bugzilla_popover_state.bug-state-info.bug-state
+        %select#status.inpage-select{name: 'status'}
+          %option{value: 'New', selected: 'selected'} New
+          %option{value: 'Assigned'} Assigned
+          %option{value: 'Researching'} Researching
+          %option{value: 'On Hold'} On Hold
+          %option{value: 'Customer Pending'} Customer Pending
+          %option{value: 'Resolved'} Resolved
+          %option{value: 'Reopened'} Reopened
+
+
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Owner
@@ -26,7 +32,7 @@
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition
-      %span.disposition.disp-negative
+      .disposition.disp-negative
         Malicious: Phishing
     .col-xs-3.col-with-divider
       %label.content-label-sm
