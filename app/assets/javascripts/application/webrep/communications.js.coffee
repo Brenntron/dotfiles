@@ -48,7 +48,14 @@ $ ->
     dispute_id = $('input[name="dispute_id"]').val()
     to = $('.receiver-email')[1].textContent
     subject = $('.communication-subject')[1].textContent
-    email_data = {body: email_body, dispute_id: dispute_id, to: to, subject: subject}
+    dispute_email_id = $('.current-email-view').attr('email_id')
+    email_data = {
+      body: email_body,
+      dispute_id: dispute_id,
+      to: to,
+      subject: subject,
+      dispute_email_id: dispute_email_id
+    }
 
     std_msg_ajax(
       method: 'POST'

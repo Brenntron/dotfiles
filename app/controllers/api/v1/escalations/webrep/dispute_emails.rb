@@ -34,6 +34,7 @@ module API
               requires :to, type: String, desc: "The email address the email is send to"
               requires :body, type: String, desc: "The body of the email"
               requires :subject, type: String, desc: "The subject of the email"
+              requires :dispute_email_id, type: Integer, desc: "The ID of the dispute email being replied to"
               optional :from, type: String, desc: "The email address the email is from"
             end
 
