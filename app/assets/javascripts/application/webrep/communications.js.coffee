@@ -14,6 +14,7 @@ $ ->
         status: 'read'
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
+        $('#email-reply').removeClass('hidden')
         populate_communication_details(response)
 
       error: (response) ->
@@ -23,8 +24,10 @@ $ ->
 
   populate_communication_details = (email) ->
     $('.communication-subject')[0].innerHTML = email.subject
+    $('.communication-subject')[1].innerHTML = "Re:" + email.subject
     $('.author-username')[0].innerHTML = email.from
     $('.receiver-email')[0].innerHTML = email.to
+    $('.receiver-email')[1].innerHTML = email.from
     $('.email-msg-content')[0].innerHTML = email.body
 
     date = moment.utc(email.created_at)
@@ -40,3 +43,25 @@ $ ->
     row.addClass('current-email-view')
     row.removeClass('email-unread')
     row.addClass('email-read')
+
+
+
+  $('#reply').on 'click', ->
+    email_body = $('.email-reply-body').val() + "\n" + $('.email-msg-content')[0].textContent
+    dispute_id = $('input[name="dispute_id"]').val()
+    to = $('.receiver-email')[1].textContent
+    subject = $('.communication-subject')[1].textContent
+    headers = {'Token': $('input[name="token"]').val()}
+    email_data = {body: email_body, dispute_id: dispute_id, to: to, subject: subject}
+    $.ajax {
+      headers: headers
+      url: "/api/v1/escalations/webrep/dispute_emails"
+      type: 'POST'
+      dataType: 'json'
+      data: email_data
+      success: (response) ->
+        alert('Email successfully sent')
+      error: (response) ->
+        alert("There was a problem sending email.")
+    }
+
