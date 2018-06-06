@@ -3,9 +3,6 @@ class Wbrs::Category < Wbrs::Base
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
-  class << self
-    attr_reader :all
-  end
 
   alias_method(:id, :category_id)
 
