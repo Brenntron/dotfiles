@@ -42,28 +42,36 @@ $ ->
     row.addClass('email-read')
 
 
+  $('.attachment-button').on 'click', ->
+    $('#file-fields').before("<span><input class= 'file_attachment' name='attachment' type='file'/></span>");
+
+
 
   $('#reply').on 'click', ->
-    email_body = $('.email-reply-body').val() + "\n" + $('.email-msg-content')[0].textContent
-    dispute_id = $('input[name="dispute_id"]').val()
-    to = $('.receiver-email')[1].textContent
-    subject = $('.communication-subject')[1].textContent
-    dispute_email_id = $('.current-email-view').attr('email_id')
-    email_data = {
-      body: email_body,
-      dispute_id: dispute_id,
-      to: to,
-      subject: subject,
-      dispute_email_id: dispute_email_id
-    }
 
-    std_msg_ajax(
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+    form_data = new FormData()
+    $.each $('.file_attachment'), (attachment) ->
+      form_data.append("attachments[#{attachment}]", $('.file_attachment')[attachment].files[0])
+
+    form_data.append('body', $('.email-reply-body').val() + "\n" + $('.email-msg-content')[0].textContent)
+    form_data.append('dispute_id', $('input[name="dispute_id"]').val())
+    form_data.append('to', $('.receiver-email')[1].textContent)
+    form_data.append('subject', $('.communication-subject')[1].textContent)
+    form_data.append('dispute_email_id', $('.current-email-view').attr('email_id'))
+
+
+    $.ajax(
+      headers: headers
       method: 'POST'
       url: '/api/v1/escalations/webrep/dispute_emails'
-      data: email_data
+      data: form_data
+      contentType: false
+      processData: false
       success_reload: true
       success: (response) ->
-        std_msg_success('Email Sent.', [], reload: true)
+        std_msg_success('Email Sent.', ['hello'], reload: true)
       error: (response) ->
         std_api_error(response, "Email was not sent", reload: false)
     )
