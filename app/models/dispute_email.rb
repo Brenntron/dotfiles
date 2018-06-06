@@ -6,6 +6,7 @@ class DisputeEmail < ApplicationRecord
   UNREAD   = "unread"
   READ     = "read"
   REPLIED  = "replied"
+  SENT     = "sent"
 
   REFERENCE_TEMPLATE = "ref-CASEID-anco"
 
@@ -81,11 +82,11 @@ class DisputeEmail < ApplicationRecord
 
   def self.create_email_and_send(params, xmlrpc, user)
     new_email = DisputeEmail.new
-    new_email.from = generate_case_email_address(params[:dispute_id])
+    new_email.from = user.email
     new_email.to = params[:to]
     new_email.subject = params[:subject]
-    new_email.body = append_case_number(params[:body])
-    new_email.status = ""
+    new_email.body = append_case_number(params[:body], params[:dispute_id])
+    new_email.status = SENT
     new_email.save
 
     attachments = []
@@ -106,7 +107,7 @@ class DisputeEmail < ApplicationRecord
 
     email_args = {}
     email_args[:to] = new_email.to
-    email_args[:from] = new_email.from
+    email_args[:from] = generate_case_email_address(params[:dispute_id])
     email_args[:subject] = new_email.subject
     email_args[:body] = new_email.body
 

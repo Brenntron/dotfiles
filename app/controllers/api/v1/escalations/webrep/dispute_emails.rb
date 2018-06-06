@@ -39,6 +39,24 @@ module API
 
             post "", root: "dispute_email" do
 
+              begin
+                #temporary, for development, don't wanna be sending these to actual customers
+                params[:to] = "claclair@cisco.com"
+
+                new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
+
+                if params[:dispute_email_id].present?
+                  replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
+                  replied_email.status = DisputeEmail::REPLIED
+                  replied_email.save
+                end
+
+                return ""
+              rescue Exception => e
+                Rails.logger.info e
+                raise "There was an error in attempting to send an email."
+              end
+
             end
 
           end
