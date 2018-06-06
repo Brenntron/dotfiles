@@ -619,6 +619,8 @@ th {
 .import-bugs-button {background-image: url(image_path('icon_import_bugs.svg'));}
 .email-button {background-image: url(image_path('icon_message.svg'));}
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
+.show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
+.collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -3377,4 +3379,21 @@ td.wbrs-highlight, td.sbrs-highlight {
 .nested-info-highlight {
   background-color: lighten($faint-neutral-color, 2%);
   border-left: 1px solid $content-bg-color;
+}
+
+/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+
+h2 {
+  font-size: 14pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 24px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+
+#research .toolbar-button-text{
+  display: inline-block !important;
+  padding-left: 8px;
 }
