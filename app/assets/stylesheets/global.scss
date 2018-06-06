@@ -3318,9 +3318,13 @@ fieldset.top-content {
 }
 
 .table-nested-reputation th {
-  text-transform: none;
   color: $type-lighter-color;
-  padding-right: 10px;
+  padding: 0 10px 0 2px;
+}
+
+.table-nested-reputation td {
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .table-nested-reputation {
@@ -3329,6 +3333,10 @@ fieldset.top-content {
 
 .nested-data-row {
   background-color: $faint-neutral-color;
+}
+
+.table-nested-rep-rules {
+  font-size: 8pt;
 }
 
 .table-nested-rep-rules td {
@@ -3381,6 +3389,27 @@ td.wbrs-highlight, td.sbrs-highlight {
   border-left: 1px solid $content-bg-color;
 }
 
+.nested-related-datatable {
+  font-size: 8pt;
+  margin-bottom: 20px;
+}
+
+.nested-related-datatable td {
+  padding: 2px 8px;
+}
+
+#research .toolbar-button-text{
+  display: inline-block !important;
+  padding-left: 8px;
+}
+
+.nested-data-row h4 {
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  padding: 6px 0 0px 6px;
+  margin: 0;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
@@ -3393,7 +3422,4 @@ h2 {
 }
 
 
-#research .toolbar-button-text{
-  display: inline-block !important;
-  padding-left: 8px;
-}
+
