@@ -15,8 +15,8 @@ describe API::V1::Rules do
 
       data = JSON.parse(response.body)
       rule_attrs = data["rule"]
-      expect(rule_attrs["sid"]).to eq(rule.sid)
-      expect(rule_attrs["gid"]).to eq(rule.gid)
+      expect(rule_attrs["sid"]).to eql(rule.sid)
+      expect(rule_attrs["gid"]).to eql(rule.gid)
     end
 
     it "gets a rule from repo" do
@@ -28,8 +28,8 @@ describe API::V1::Rules do
 
       data = JSON.parse(response.body)
       rule_attrs = data["rule"]
-      expect(rule_attrs["sid"]).to eq(rule[:sid])
-      expect(rule_attrs["gid"]).to eq(rule[:gid])
+      expect(rule_attrs["sid"]).to eql(rule[:sid])
+      expect(rule_attrs["gid"]).to eql(rule[:gid])
     end
   end
 

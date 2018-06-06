@@ -37,4 +37,18 @@ class Wbrs::ManualWlbl < Wbrs::Base
     response_body['data'].map {|datum| new_from_attributes(datum)}
   end
 
+  # Add a WL/BL on the backend
+  # @param [Array<String>] url: URLs the WL/BL entries should be created for
+  # @param [String] trgt_list: Target manual list type
+  # @param [String] usr: User creating the WL/BL entries
+  # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
+  # @param [String] note: User’s note
+  # @return [Array<String>] warnings
+  def self.add_from_params(params = {})
+    response = post_request(path: '/v1/rep/wlbl/get', body: params)
+
+    response_body = JSON.parse(response.body)
+    response_body['Warnings']
+  end
+
 end

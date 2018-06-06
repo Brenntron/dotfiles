@@ -55,8 +55,8 @@ describe Wbrs::RuleLink do
 
     rule_links = Wbrs::RuleLink.where(category_ids: [6], active: true)
 
-    expect(rule_links.count).to eq(2)
-    expect(rule_links.first.prefix_id).to eq(101)
+    expect(rule_links.count).to eql(2)
+    expect(rule_links.first.prefix_id).to eql(101)
   end
 
   it 'should handle errors when getting rule links given conditions' do

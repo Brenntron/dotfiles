@@ -28,9 +28,9 @@ describe Wbrs::Category do
 
     categories = Wbrs::Category.all.sort_by{ |cat| cat.id }
 
-    expect(categories.count).to eq(2)
-    expect(categories[0].id).to eq(5)
-    expect(categories[1].id).to eq(6)
+    expect(categories.count).to eql(2)
+    expect(categories[0].id).to eql(5)
+    expect(categories[1].id).to eql(6)
   end
 
 end

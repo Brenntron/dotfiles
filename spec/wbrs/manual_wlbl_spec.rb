@@ -62,13 +62,24 @@ describe Wbrs::ManualWlbl do
         }
     }.to_json
   end
+  let(:add_wlbl_json) do
+    {
+        "Warnings": [
+            "URLs ['url'] are invalid.",
+            "URLs ['url1.com'] already exist in 'BL-weak' list."
+        ]
+    }.to_json
+  end
   let(:find_wlbl_error_json) {{'Error' => "WL/BL entry with ID '101' not found."}.to_json}
   let(:where_wlbl_error_json) {{'Error' => 'No search criteria provided.'}.to_json}
+  let(:add_wlbl_error_json) {{'Error' => 'Invalid data format.'}.to_json}
   let(:wlbl_types_response) { double('HTTPI::Response', code: 200, body: wlbl_types_json) }
   let(:find_wlbl_response) { double('HTTPI::Response', code: 200, body: find_wlbl_json) }
   let(:find_wlbl_error) { double('HTTPI::Response', code: 400, body: find_wlbl_error_json) }
   let(:where_wlbl_response) { double('HTTPI::Response', code: 200, body: where_wlbl_json) }
   let(:where_wlbl_error) { double('HTTPI::Response', code: 400, body: where_wlbl_error_json) }
+  let(:add_wlbl_response) { double('HTTPI::Response', code: 200, body: add_wlbl_json) }
+  let(:add_wlbl_error) { double('HTTPI::Response', code: 400, body: add_wlbl_error_json) }
 
 
 
@@ -81,7 +92,7 @@ describe Wbrs::ManualWlbl do
 
     expect(wlbl_types).to be_a_kind_of(Array)
     wlbl_types = wlbl_types.sort
-    expect(wlbl_types.count).to eq(6)
+    expect(wlbl_types.count).to eql(6)
     expect(wlbl_types[0]).to eq('BL-heavy')
     expect(wlbl_types[1]).to eq('BL-med')
     expect(wlbl_types[2]).to eq('BL-weak')
@@ -114,9 +125,9 @@ describe Wbrs::ManualWlbl do
 
     expect(manual_wlbls).to be_a_kind_of(Array)
     manual_wlbls = manual_wlbls.sort_by{ |wlbl| wlbl.id }
-    expect(manual_wlbls.count).to eq(2)
-    expect(manual_wlbls[0].id).to eq(1)
-    expect(manual_wlbls[1].id).to eq(2)
+    expect(manual_wlbls.count).to eql(2)
+    expect(manual_wlbls[0].id).to eql(1)
+    expect(manual_wlbls[1].id).to eql(2)
   end
 
   it 'should handle errors getting all the manual WL/BL entries' do
@@ -124,6 +135,25 @@ describe Wbrs::ManualWlbl do
 
     expect {
       Wbrs::ManualWlbl.where
+    }.to raise_error(RuntimeError)
+  end
+
+  it 'should add a WL/BL on the backend' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_response)
+
+    warnings = Wbrs::ManualWlbl.add_from_params
+
+    expect(warnings).to be_a_kind_of(Array)
+    expect(warnings.count).to eql(2)
+    expect(warnings[0]).to be_a_kind_of(String)
+    expect(warnings[1]).to be_a_kind_of(String)
+  end
+
+  it 'should handle errors adding a WL/BL on the backend' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_error)
+
+    expect {
+      Wbrs::ManualWlbl.add_from_params
     }.to raise_error(RuntimeError)
   end
 

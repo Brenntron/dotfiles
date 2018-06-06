@@ -36,10 +36,10 @@ describe Wbrs::Category do
 
     expect(categories).to be_a_kind_of(Array)
     categories = categories.sort_by{ |cat| cat.id }
-    expect(categories.count).to eq(3)
-    expect(categories[0].id).to eq(4)
-    expect(categories[1].id).to eq(5)
-    expect(categories[2].id).to eq(6)
+    expect(categories.count).to eql(3)
+    expect(categories[0].id).to eql(4)
+    expect(categories[1].id).to eql(5)
+    expect(categories[2].id).to eql(6)
   end
 
 end

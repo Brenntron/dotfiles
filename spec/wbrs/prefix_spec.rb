@@ -116,7 +116,7 @@ describe Wbrs::Prefix do
     prefix = Wbrs::Prefix.find(101)
 
     expect(prefix).to be_a_kind_of(Wbrs::Prefix)
-    expect(prefix.id).to eq(101)
+    expect(prefix.id).to eql(101)
   end
 
   it 'should return nil from find no prefix' do
@@ -141,9 +141,9 @@ describe Wbrs::Prefix do
 
     prefixes = Wbrs::Prefix.where(category_ids: [5, 6], active: true).sort_by{ |prefix| prefix.id }
 
-    expect(prefixes.count).to eq(2)
-    expect(prefixes[0].id).to eq(101)
-    expect(prefixes[1].id).to eq(102)
+    expect(prefixes.count).to eql(2)
+    expect(prefixes[0].id).to eql(101)
+    expect(prefixes[1].id).to eql(102)
   end
 
   it 'should handle errors getting a prefixes collection given conditions' do
@@ -164,7 +164,7 @@ describe Wbrs::Prefix do
                                      user: 'tester',
                                      description: 'Testing /add route.')
 
-    expect(creation_prefix_id).to eq(111)
+    expect(creation_prefix_id).to eql(111)
   end
 
 
@@ -306,12 +306,12 @@ describe 'A prefix' do
     categories = prefix.categories
 
     expect(categories).to be_a_kind_of(Array)
-    expect(categories.count).to eq(2)
+    expect(categories.count).to eql(2)
     categories = categories.sort_by{ |cat| cat.id }
     expect(categories[0]).to be_a_kind_of(Wbrs::Category)
-    expect(categories[0].id).to eq(5)
+    expect(categories[0].id).to eql(5)
     expect(categories[1]).to be_a_kind_of(Wbrs::Category)
-    expect(categories[1].id).to eq(6)
+    expect(categories[1].id).to eql(6)
   end
 
   it 'should handle errors listing its categories' do
@@ -329,7 +329,7 @@ describe 'A prefix' do
                                            user: 'tester',
                                            description: 'Testing /edit route.')
 
-    expect(edit_prefix_id).to eq(101)
+    expect(edit_prefix_id).to eql(101)
   end
 
   it 'should handle errors editing its categories' do
@@ -351,9 +351,9 @@ describe 'A prefix' do
     history_records = prefix.history_records
 
     expect(history_records).to be_a_kind_of(Array)
-    expect(history_records.count).to eq(2)
+    expect(history_records.count).to eql(2)
     history_record = history_records.first
-    expect(history_record.prefix_id).to eq(101)
+    expect(history_record.prefix_id).to eql(101)
   end
 
   it 'should handle errors getting a history' do
