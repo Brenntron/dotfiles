@@ -619,6 +619,8 @@ th {
 .import-bugs-button {background-image: url(image_path('icon_import_bugs.svg'));}
 .email-button {background-image: url(image_path('icon_message.svg'));}
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
+.show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
+.collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -3314,3 +3316,110 @@ fieldset.top-content {
   margin-top: 20px;
   margin-bottom: 5px;
 }
+
+.table-nested-reputation th {
+  color: $type-lighter-color;
+  padding: 0 10px 0 2px;
+}
+
+.table-nested-reputation td {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.table-nested-reputation {
+  font-size: 8pt;
+}
+
+.nested-data-row {
+  background-color: $faint-neutral-color;
+}
+
+.table-nested-rep-rules {
+  font-size: 8pt;
+}
+
+.table-nested-rep-rules td {
+  padding: 2px 15px 2px 0;
+}
+
+.table-nested-rep-rules th {
+  text-transform: uppercase;
+  color: $type-base-color;
+}
+
+.table-nested-rep-rules .emphasis {
+  color: $type-base-color;
+}
+
+.data-small-emphasis {
+  font-weight: 600;
+}
+
+.warning-emphasis {
+  font-weight: 700;
+  color: $escalations-section-color;
+}
+
+th.wbrs-highlight {
+  background-color: lighten($fourth-section-color, 41%);
+}
+td.wbrs-highlight {
+  background-color: lighten($fourth-section-color, 43%);
+}
+
+th.wbrs-highlight, th.sbrs-highlight{
+  border-bottom: 1px solid $content-bg-color !important;
+}
+
+th.sbrs-highlight {
+  background-color: lighten($communication-accent-color, 41%);
+}
+
+td.sbrs-highlight {
+  background-color: lighten($communication-accent-color, 43%);
+}
+
+td.wbrs-highlight, td.sbrs-highlight {
+  font-weight: 600;
+}
+
+.nested-info-highlight {
+  background-color: lighten($faint-neutral-color, 2%);
+  border-left: 1px solid $content-bg-color;
+}
+
+.nested-related-datatable {
+  font-size: 8pt;
+  margin-bottom: 20px;
+}
+
+.nested-related-datatable td {
+  padding: 2px 8px;
+}
+
+#research .toolbar-button-text{
+  display: inline-block !important;
+  padding-left: 8px;
+}
+
+.nested-data-row h4 {
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  padding: 6px 0 0px 6px;
+  margin: 0;
+}
+
+/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+
+h2 {
+  font-size: 14pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 24px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+
+

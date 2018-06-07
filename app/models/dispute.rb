@@ -1,6 +1,7 @@
 class Dispute < ApplicationRecord
   has_many :dispute_comments
   has_many :dispute_emails
+  has_many :dispute_entries
 
   def self.process_bridge_payload(message_payload)
     user = User.where(cvs_username:"vrtincom").first
@@ -117,6 +118,7 @@ class Dispute < ApplicationRecord
       "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK"}
     }
   end
+
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
   # @param [ActionController::Parameters] params supplied fields and values for search.
