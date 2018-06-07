@@ -2,7 +2,7 @@ class DisputeEmail < ApplicationRecord
   belongs_to :dispute
   has_many :dispute_email_attachments
 
-  EMAIL_DOMAIN = "mail.talosintelligence.com"
+  EMAIL_DOMAIN = "email.talosintelligence.com"
 
   UNREAD   = "unread"
   READ     = "read"
@@ -121,8 +121,6 @@ class DisputeEmail < ApplicationRecord
 
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
-
-
 
   end
 
