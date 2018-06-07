@@ -54,3 +54,12 @@ Rails.configuration.rules_repo_url      = env_config['svn']['rules_repo_url']
 Rails.configuration.ruledocs_repo_url   = env_config['svn']['ruledocs_repo_url']
 Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['snort_rule_path'])
 
+
+wbrs = env_config.fetch('wbrs', {})
+Rails.configuration.wbrs                = OpenStruct.new
+Rails.configuration.wbrs.host           = wbrs['host']
+Rails.configuration.wbrs.port           = wbrs['port']
+Rails.configuration.wbrs.tls_mode       = wbrs['tls_mode']
+Rails.configuration.wbrs.gssnegotiate   = wbrs['gssnegotiate']
+
+
