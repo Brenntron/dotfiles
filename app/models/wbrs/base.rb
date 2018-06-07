@@ -91,15 +91,6 @@ class Wbrs::Base
   end
 
   # TODO replace with new_request
-  def self.make_get_request(path:, body:)
-    if gssnegotiate?
-      HTTPI.get(request(path: path, body: body), :curb)
-    else
-      HTTPI.get(request(path: path, body: body))
-    end
-  end
-
-  # TODO replace with new_request
   def self.make_post_request(path:, body:)
     if gssnegotiate?
       HTTPI.post(request(path: path, body: body), :curb)
@@ -132,11 +123,6 @@ class Wbrs::Base
 
   def call_json_request(method, path, body:)
     Wbrs::Base.call_json_request(method, path, body: body)
-  end
-
-  # TODO replace with call_json_request
-  def self.get_request(path:, body:)
-    request_error_handling(make_get_request(path: path, body: body))
   end
 
   # TODO replace with call_json_request

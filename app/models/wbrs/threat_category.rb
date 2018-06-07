@@ -15,7 +15,7 @@ class Wbrs::ThreatCategory < Wbrs::Base
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.all(reload: false)
     unless @all || reload
-      response = get_request(path: '/v1/rep/thrtcats/get', body: '')
+      response = call_json_request(:get, '/v1/rep/thrtcats/get', body: '')
 
       response_body = JSON.parse(response.body)
       @all = response_body['data'].map {|datum| new_from_datum(datum)}

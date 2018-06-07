@@ -12,7 +12,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # Get all the manual WL/BL entries.
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.types
-    response = get_request(path: '/v1/rep/wlbl/types/get', body: {})
+    response = call_json_request(:get, '/v1/rep/wlbl/types/get', body: {})
 
     response_body = JSON.parse(response.body)
     response_body['data']
@@ -21,7 +21,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [Integer] id the WL/BL
   # @return [Wbrs::Prefix] the WL/BL
   def self.find(id)
-    response = get_request(path: "/v1/rep/wlbl/get/#{id}", body: {})
+    response = call_json_request(:get, "/v1/rep/wlbl/get/#{id}", body: {})
 
     response_body = JSON.parse(response.body)
     new_from_attributes(response_body)

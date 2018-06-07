@@ -86,7 +86,7 @@ describe Wbrs::ManualWlbl do
   ### TESTS ####################################################################
 
   it 'should get all the types' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(wlbl_types_response)
+    expect(Wbrs::Base).to receive(:call_request).and_return(wlbl_types_response)
 
     wlbl_types = Wbrs::ManualWlbl.types
 
@@ -102,7 +102,7 @@ describe Wbrs::ManualWlbl do
   end
 
   it 'should find a WL/BL by id' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(find_wlbl_response)
+    expect(Wbrs::Base).to receive(:call_request).and_return(find_wlbl_response)
 
     manual_wlbl = Wbrs::ManualWlbl.find(101)
 
@@ -111,7 +111,7 @@ describe Wbrs::ManualWlbl do
   end
 
   it 'should handle errors finding a WL/BL by id' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(find_wlbl_error)
+    expect(Wbrs::Base).to receive(:call_request).and_return(find_wlbl_error)
 
     expect {
       Wbrs::ManualWlbl.find(101)
