@@ -121,7 +121,7 @@ describe Wbrs::ManualWlbl do
   it 'should get all the manual WL/BL entries' do
     expect(Wbrs::Base).to receive(:make_post_request).and_return(where_wlbl_response)
 
-    manual_wlbls = Wbrs::ManualWlbl.where("list_type" => "BL-weak")
+    manual_wlbls = Wbrs::ManualWlbl.where("usr" => "aivaniuk")
 
     expect(manual_wlbls).to be_a_kind_of(Array)
     manual_wlbls = manual_wlbls.sort_by{ |wlbl| wlbl.id }

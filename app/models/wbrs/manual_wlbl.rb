@@ -45,7 +45,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [String] note: User’s note
   # @return [Array<String>] warnings
   def self.add_from_params(params = {})
-    response = post_request(path: '/v1/rep/wlbl/get', body: params)
+    response = post_request(path: '/v1/rep/wlbl/add', body: params)
 
     response_body = JSON.parse(response.body)
     response_body['Warnings']
