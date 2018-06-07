@@ -28,6 +28,10 @@ class Wbrs::Base
     end
   end
 
+  def stringkey_params(conditions = {})
+    Wbrs::Base.stringkey_params(conditions)
+  end
+
   def self.new_request(path)
     raise 'Path required' unless path.present?
     raise 'Path must start with slash (/)' unless '/' == path[0]
@@ -124,6 +128,10 @@ class Wbrs::Base
     request.body = body.to_json
 
     request_error_handling(call_request(method, request))
+  end
+
+  def call_json_request(method, path, body:)
+    Wbrs::Base.call_json_request(method, path, body: body)
   end
 
   # TODO replace with call_json_request

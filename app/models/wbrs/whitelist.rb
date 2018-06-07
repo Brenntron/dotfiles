@@ -4,13 +4,27 @@ class Wbrs::Whitelist < Wbrs::Base
 
   attr_accessor *FIELD_SYMS
 
-  def self.new_from_attributes(attributes)
-    new(attributes)
+  def initialize(attributes = {})
+    super
+    @new_record = true
+  end
+
+  def new_record?
+    @new_record
+  end
+
+  def self.load_from_attributes(attributes)
+    new(attributes).tap do |model|
+      model.instance_variable_set(:@new_record, false)
+    end
+  end
+
+  def attributes
+    { entry: entry, source: source, range: range, ident: ident, comment: comment }
   end
 
   def self.where(conditions = {})
-    # response = post_request(path: '/v1/cat/rules/get', body: stringkey_params(conditions))
-    response = call_json_request(:post, '/v1/cat/rules/get', body: stringkey_params(conditions))
+    response = call_json_request(:post, '/whitelist/get', body: stringkey_params(conditions))
 
     response_body = JSON.parse(response.body)
     response_body.inject({}) do |collection_hash, (entry, value)|
@@ -19,10 +33,25 @@ class Wbrs::Whitelist < Wbrs::Base
       end
 
       collection_hash
-    end.values.map{ |attributes| new_from_attributes(attributes) }
+    end.values.map{ |attributes| load_from_attributes(attributes) }
 
   rescue Wbrs::WbrsNotFoundError
     []
+  end
+
+  def save!
+    if new_record?
+      call_json_request(:post, '/whitelist/add', body: stringkey_params(attributes))
+      @new_record = false
+      true
+    else
+      raise Wbrs::WbrsError, 'Cannot add an existing entry!'
+    end
+  end
+
+  def delete(comment:)
+    call_json_request(:post, '/whitelist/delete', body: stringkey_params({ entry: self.entry, comment: comment }))
+    freeze
   end
 
 end
