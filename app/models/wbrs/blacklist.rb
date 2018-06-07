@@ -6,6 +6,8 @@ class Wbrs::Blacklist < Wbrs::Base
 
   attr_accessor *FIELD_SYMS
 
+  validates :entry, presence: true
+
   def initialize(attributes = {})
     super
     @new_record = true
@@ -21,6 +23,12 @@ class Wbrs::Blacklist < Wbrs::Base
 
   def excluded?
     excluded
+  end
+
+  def self.classifications
+    response = call_json_request(:get, '/blacklist/classifications', body: {})
+
+    JSON.parse(response.body)
   end
 
   def self.load_from_attributes(attributes)
@@ -54,18 +62,40 @@ class Wbrs::Blacklist < Wbrs::Base
   end
 
   def save!
+    raise "Validation failed: #{errors.full_messages.join(', ')}" unless valid?
+
     if new_record?
       call_json_request(:post, '/blacklist/add', body: stringkey_params(attributes))
       @new_record = false
       true
     else
-      raise Wbrs::WbrsError, 'Cannot add an existing entry!'
+      call_json_request(:post, '/blacklist/add', body: stringkey_params(attributes))
+      @new_record = false
+      true
+    end
+  end
+
+  def self.create!(attributes)
+    new(attributes).tap do |blacklist|
+      blacklist.save!
     end
   end
 
   def delete(comment:)
     call_json_request(:post, '/blacklist/delete', body: stringkey_params({ entry: self.entry, comment: comment }))
     freeze
+  end
+
+  def exclude
+    call_json_request(:post, '/blacklist/exclude', body: {entry: self.entry})
+  end
+
+  def renew
+    call_json_request(:post, '/blacklist/renew', body: {entry: self.entry})
+  end
+
+  def expire
+    call_json_request(:post, '/blacklist/expire', body: {entry: self.entry})
   end
 
 end

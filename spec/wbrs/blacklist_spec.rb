@@ -1,4 +1,8 @@
 describe Wbrs::Blacklist do
+  let(:classifications_json) do
+    %w(attackers bogon bots cnc dga exploitkit malware open_proxy open_relay
+       phishing response spam suspicious tor_exit_node).to_json
+  end
   let(:get_blacklist_json) do
     {
         "NOT_FOUND" => [
@@ -40,6 +44,7 @@ describe Wbrs::Blacklist do
   let(:get_blacklist_error_json) do
     {"MSG":"Bad Request"}.to_json
   end
+  let(:classifications_response) { double('HTTPI::Response', code: 200, body: classifications_json) }
   let(:get_blacklist_response) { double('HTTPI::Response', code: 200, body: get_blacklist_json) }
   let(:get_blacklist_not_found) { double('HTTPI::Response', code: 404, body: get_blacklist_not_found_json) }
   let(:get_blacklist_error) { double('HTTPI::Response', code: 400, body: get_blacklist_error_json) }
@@ -48,7 +53,15 @@ describe Wbrs::Blacklist do
 
   ### TESTS ####################################################################
 
-  it 'should list the classifications'
+  it 'should list the classifications' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(classifications_response)
+
+    classifications = Wbrs::Blacklist.classifications
+
+    expect(classifications).to be_a_kind_of(Array)
+    expect(classifications.count).to eql(14)
+    expect(classifications[0]).to be_a_kind_of(String)
+  end
 
   it 'should get blacklists from a query' do
     expect(Wbrs::Base).to receive(:call_request).and_return(get_blacklist_response)
@@ -91,12 +104,34 @@ describe 'A blacklist' do
                         excluded: false,
                         comment: 'keegy.com')
   end
-  let(:add_blacklist_json) { {"MSG": "Entry created"}.to_json }
-  let(:add_blacklist_error_json) { {"MSG": "Invalid IP or CIDR address: 256.0.0.1/900"}.to_json }
-  let(:delete_blacklist_json) { {"MSG": "Entry deleted"}.to_json }
-  let(:delete_blacklist_error_json) { {"MSG": "Entry not exists in blacklist"}.to_json }
+  let(:loaded_blacklist) do
+    Wbrs::Blacklist.load_from_attributes(entry: '75.125.228.68',
+                                         author: 'awalker',
+                                         public: false,
+                                         excluded: false,
+                                         comment: 'keegy.com')
+  end
+  let(:add_blacklist_json) { {"MSG" => "Entry created", "expiration" => "2013‐05‐08T10:05:02"}.to_json }
+  let(:add_blacklist_json) { {"MSG" => "Entry created", "expiration" => "2013‐05‐08T10:05:02"}.to_json }
+  let(:add_blacklist_error_json) { {"MSG" => "Invalid IP or CIDR address: 256.0.0.1/900"}.to_json }
+  let(:update_blacklist_json) { {"MSG" => "Entry updated", "expiration" => "2013‐05‐08T10:05:02"}.to_json }
+  let(:update_blacklist_error_json) { {"MSG" => "Invalid IP or CIDR address: 256.0.0.1/900"}.to_json }
+  let(:exlude_blacklist_error_json) { {"MSG" => "Entry is already excluded"}.to_json }
+  let(:renew_blacklist_error_json) { {"MSG" => "Entry is not excluded"}.to_json }
+  let(:expire_blacklist_error_json) { {"MSG" => "No matching entries found"}.to_json }
+  let(:delete_blacklist_json) { {"MSG" => "Entry deleted"}.to_json }
+  let(:delete_blacklist_error_json) { {"MSG" => "Entry not exists in blacklist"}.to_json }
+  let(:expire_blacklist_json) { {"MSG" => "Entry has been set to expired."}.to_json }
   let(:add_blacklist_response) { double('HTTPI::Response', code: 200, body: add_blacklist_json) }
   let(:add_blacklist_error) { double('HTTPI::Response', code: 400, body: add_blacklist_error_json) }
+  let(:update_blacklist_response) { double('HTTPI::Response', code: 200, body: update_blacklist_json) }
+  let(:update_blacklist_error) { double('HTTPI::Response', code: 400, body: update_blacklist_error_json) }
+  let(:exclude_blacklist_response) { double('HTTPI::Response', code: 200, body: {}.to_json) }
+  let(:exclude_blacklist_error) { double('HTTPI::Response', code: 400, body: exlude_blacklist_error_json) }
+  let(:renew_blacklist_response) { double('HTTPI::Response', code: 200, body: {}.to_json) }
+  let(:renew_blacklist_error) { double('HTTPI::Response', code: 400, body: renew_blacklist_error_json) }
+  let(:expire_blacklist_response) { double('HTTPI::Response', code: 200, body: expire_blacklist_json) }
+  let(:expire_blacklist_error) { double('HTTPI::Response', code: 400, body: expire_blacklist_error_json) }
   let(:delete_blacklist_response) { double('HTTPI::Response', code: 200, body: delete_blacklist_json) }
   let(:delete_blacklist_error) { double('HTTPI::Response', code: 400, body: delete_blacklist_error_json) }
 
@@ -109,32 +144,92 @@ describe 'A blacklist' do
 
     ret = nil
     expect {
-      ret = blacklist.save!
+      @blacklist = blacklist.clone
+      ret = @blacklist.save!
     }.to_not raise_error(Exception)
 
     expect(ret).to eql(true)
-    expect(blacklist.new_record?).to be_falsey
+    expect(@blacklist.new_record?).to be_falsey
   end
   
   it 'should handle errors adding a blacklist entry' do
     expect(Wbrs::Base).to receive(:call_request).and_return(add_blacklist_error)
 
     expect {
-      blacklist.save!
+      @blacklist = blacklist.clone
+      ret = @blacklist.save!
     }.to raise_error(Wbrs::WbrsError)
   end
 
-  it 'should update a blacklist entry'
-  it 'should handle errors updating a blacklist entry'
+  it 'should update a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(update_blacklist_response)
 
-  it 'should exclude a blacklist entry'
-  it 'should handle errors excluding a blacklist entry'
+    ret = nil
+    expect {
+      @blacklist = loaded_blacklist.clone
+      ret = @blacklist.save!
+    }.to_not raise_error(Exception)
 
-  it 'should renew a blacklist entry'
-  it 'should handle errors renewing a blacklist entry'
+    expect(ret).to eql(true)
+    expect(@blacklist.new_record?).to be_falsey
+  end
 
-  it 'should expire a blacklist entry'
-  it 'should handle errors expiring a blacklist entry'
+  it 'should handle errors updating a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(update_blacklist_error)
+
+    expect {
+      @blacklist = loaded_blacklist.clone
+      ret = @blacklist.save!
+    }.to raise_error(Wbrs::WbrsError)
+  end
+
+  it 'should exclude a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(exclude_blacklist_response)
+
+    expect {
+      blacklist.exclude
+    }.to_not raise_error(Exception)
+  end
+
+  it 'should handle errors excluding a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(exclude_blacklist_error)
+
+    expect {
+      blacklist.exclude
+    }.to raise_error(Wbrs::WbrsError)
+  end
+
+  it 'should renew a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(renew_blacklist_response)
+
+    expect {
+      blacklist.renew
+    }.to_not raise_error(Exception)
+  end
+
+  it 'should handle errors renewing a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(renew_blacklist_error)
+
+    expect {
+      blacklist.renew
+    }.to raise_error(Wbrs::WbrsError)
+  end
+
+  it 'should expire a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(expire_blacklist_response)
+
+    expect {
+      blacklist.expire
+    }.to_not raise_error(Exception)
+  end
+
+  it 'should handle errors expiring a blacklist entry' do
+    expect(Wbrs::Base).to receive(:call_request).and_return(expire_blacklist_error)
+
+    expect {
+      blacklist.expire
+    }.to raise_error(Wbrs::WbrsError)
+  end
 
   it 'should delete a blacklist entry' do
     expect(Wbrs::Base).to receive(:call_request).and_return(delete_blacklist_response)

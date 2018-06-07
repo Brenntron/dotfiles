@@ -4,6 +4,8 @@ class Wbrs::Whitelist < Wbrs::Base
 
   attr_accessor *FIELD_SYMS
 
+  validates :entry, presence: true
+
   def initialize(attributes = {})
     super
     @new_record = true
@@ -40,12 +42,20 @@ class Wbrs::Whitelist < Wbrs::Base
   end
 
   def save!
+    raise "Validation failed: #{errors.full_messages.join(', ')}" unless valid?
+
     if new_record?
       call_json_request(:post, '/whitelist/add', body: stringkey_params(attributes))
       @new_record = false
       true
     else
       raise Wbrs::WbrsError, 'Cannot add an existing entry!'
+    end
+  end
+
+  def self.create!(attributes)
+    new(attributes).tap do |whitelist|
+      whitelist.save!
     end
   end
 
