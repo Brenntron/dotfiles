@@ -133,8 +133,8 @@ class DisputeEmail < ApplicationRecord
   def self.append_case_number(body, case_number)
     new_body = body
     body_case = nil
-    if (email_body =~ /ref\-[0-9]+\-anco/) != nil
-      body_case = email_body.scan( /ref\-([0-9]+)\-anco/ ).last.first.to_i
+    if (body =~ /ref\-[0-9]+\-anco/) != nil
+      body_case = body.scan( /ref\-([0-9]+)\-anco/ ).last.first.to_i
     end
 
     if body_case.nil?
