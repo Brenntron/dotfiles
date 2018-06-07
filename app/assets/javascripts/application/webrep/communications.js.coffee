@@ -78,7 +78,7 @@ $ ->
       processData: false
       success_reload: true
       success: (response) ->
-        std_msg_success('Email Sent.', ['hello'], reload: true)
+        std_msg_success('Email Sent.', [], reload: true)
       error: (response) ->
         std_api_error(response, "Email was not sent", reload: false)
     )
