@@ -1,7 +1,8 @@
 class DisputeEmail < ApplicationRecord
   belongs_to :dispute
+  has_many :dispute_email_attachments
 
-  EMAIL_DOMAIN = "mail.talosintelligence.com"
+  EMAIL_DOMAIN = "email.talosintelligence.com"
 
   UNREAD   = "unread"
   READ     = "read"
@@ -82,6 +83,7 @@ class DisputeEmail < ApplicationRecord
 
   def self.create_email_and_send(params, xmlrpc, user)
     new_email = DisputeEmail.new
+    new_email.dispute_id = params[:dispute_id]
     new_email.from = user.email
     new_email.to = params[:to]
     new_email.subject = params[:subject]
@@ -117,10 +119,8 @@ class DisputeEmail < ApplicationRecord
       email_args[:attachments]
     end
 
-    conn = SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
+    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
-
-
 
   end
 
@@ -133,8 +133,8 @@ class DisputeEmail < ApplicationRecord
   def self.append_case_number(body, case_number)
     new_body = body
     body_case = nil
-    if (email_body =~ /ref\-[0-9]+\-anco/) != nil
-      body_case = email_body.scan( /ref\-([0-9]+)\-anco/ ).last.first.to_i
+    if (body =~ /ref\-[0-9]+\-anco/) != nil
+      body_case = body.scan( /ref\-([0-9]+)\-anco/ ).last.first.to_i
     end
 
     if body_case.nil?

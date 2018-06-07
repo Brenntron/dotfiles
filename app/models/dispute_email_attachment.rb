@@ -41,7 +41,12 @@ class DisputeEmailAttachment < ApplicationRecord
 
   def push_to_aws(file)
 
-    s3           = Aws::S3::Resource.new
+    config_values = Rails.configuration.peakebridge.sources["snort-org"]
+    Aws.config.update(
+        { credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key'])}
+    )
+
+    s3           = Aws::S3::Resource.new(region: config_values['aws_region'])
     bucket       = s3.bucket("analyst-console")
     prefix       = "#{Rails.env}/dispute_email_attachments/#{dispute_email.id}/"
     s3_url       = []
@@ -61,7 +66,13 @@ class DisputeEmailAttachment < ApplicationRecord
   end
 
   def s3_url
-    Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'analyst-console', key: self.path).to_s
+    config_values = Rails.configuration.peakebridge.sources["snort-org"]
+    Aws.config.update(
+        { credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key']) }
+    )
+    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'analyst-console', key: self.path, expires_in: 86400).to_s
+
+    url
   end
 
 

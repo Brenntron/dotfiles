@@ -20,7 +20,7 @@ peakebridge                             = OpenStruct.new
 if env_config['peakebridge']
   peakebridge.host                        = env_config['peakebridge']['host']
   peakebridge.port                        = env_config['peakebridge']['port']
-  peakebridge.ssl                         = env_config['peakebridge']['ssl']
+  peakebridge.ssl_mode                    = env_config['peakebridge']['ssl_mode']
   peakebridge.uri_base                    = env_config['peakebridge']['uri_base']
   peakebridge.sources                     = env_config['peakebridge']['sources'] || []
 end
