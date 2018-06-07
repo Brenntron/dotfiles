@@ -1,32 +1,38 @@
 -#view single record
 .content-wrapper
+
   .row
     .col-xs-1.col-with-divider
       %span.bug-state-info.bug-priority.p-P1
       %span.email-button
-        Email Icon
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Case ID
       .bug-top-id
-        %a
-          = @dispute.id
+        %a= @dispute.id
     .col-xs-1.bug-state-col
-      %label.content-label-sm
-        Status
-      %span.bug-state-info.bug-state
-        = @dispute.status # maybe map to better values?
+      #bugzilla_popover_state.bug-state-info.bug-state
+        %select#status.inpage-select{name: 'status'}
+          %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
+          -#%option{value: 'New', selected: 'selected'} New
+          -#%option{value: 'Assigned'} Assigned
+          -#%option{value: 'Researching'} Researching
+          -#%option{value: 'On Hold'} On Hold
+          -#%option{value: 'Customer Pending'} Customer Pending
+          -#%option{value: 'Resolved'} Resolved
+          -#%option{value: 'Reopened'} Reopened
+
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Owner
       %div
-        Unassigned
+        %span= @dispute.assigned_to || "None"
         %span.take-button
           hand icon
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition
-      %span.disposition.disp-negative
+      .disposition.disp-negative
         Malicious: Phishing
     .col-xs-3.col-with-divider
       %label.content-label-sm
@@ -36,16 +42,11 @@
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Date/Time Submitted
-      %div
-        -# 2017-10-24 15:35:24
-        = @dispute.created_at.strftime("%Y-%m-%d %H:%M")
-        %br
-        = DateTime.now.strftime("%Y-%m-%d %H:%M")
+      %div= @dispute.case_opened_at
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Age
-      %div
-        = (@dispute.created_at - DateTime.now)
+      %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
 
 -     #<!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
 

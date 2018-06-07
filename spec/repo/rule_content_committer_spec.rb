@@ -194,7 +194,7 @@ eos
       Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
 
       rule = Rule.by_sid(@rule.sid).first
-      expect(rule.rev).to eq(6)
+      expect(rule.rev).to eql(6)
       expect(rule.publish_status).to eq(Rule::PUBLISH_STATUS_SYNCHED)
     end
   end
@@ -210,7 +210,7 @@ eos
       Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
 
       rule = Rule.by_sid(@rule.sid).first
-      expect(rule.rev).to eq(5)
+      expect(rule.rev).to eql(5)
       expect(rule.publish_status).to eq(Rule::PUBLISH_STATUS_STALE_EDIT)
       expect(rule.rule_content).to eq(@rule.rule_content)
     end
@@ -227,7 +227,7 @@ eos
       Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
 
       rule = Rule.by_sid(@rule.sid).first
-      expect(rule.rev).to eq(6)
+      expect(rule.rev).to eql(6)
       expect(rule.publish_status).to eq(Rule::PUBLISH_STATUS_SYNCHED)
     end
   end

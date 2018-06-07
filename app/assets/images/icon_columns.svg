@@ -3,11 +3,11 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#4D4D4D;}
+	.st0{fill-rule:evenodd;clip-rule:evenodd;fill:#4D4E4E;}
 </style>
 <g>
-	<polygon class="st0" points="2.5,14.9 1.5,18.5 5,17.5 	"/>
-	<rect x="15.2" y="1.8" transform="matrix(0.7071 -0.7071 0.7071 0.7071 2.2355 12.6886)" class="st0" width="2.4" height="3.6"/>
-	<rect x="2.4" y="8.5" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.4892 9.8224)" class="st0" width="14.5" height="3.6"/>
+	<path class="st0" d="M1.1,18.7h5.1v-17H1.1V18.7z M3.1,16.7h1.2v-13H3.1V16.7z"/>
+	<path class="st0" d="M7.6,18.7h5.1v-17H7.6V18.7z M9.6,16.7h1.2v-13H9.6V16.7z"/>
+	<path class="st0" d="M14,18.7h5.1v-17H14V18.7z M16,16.7h1.2v-13H16V16.7z"/>
 </g>
 </svg>

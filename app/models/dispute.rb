@@ -1,5 +1,7 @@
 class Dispute < ApplicationRecord
 
+  has_many :dispute_entries
+
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
   # @param [ActionController::Parameters] params supplied fields and values for search.
