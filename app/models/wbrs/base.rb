@@ -2,11 +2,11 @@ class Wbrs::Base
   include ActiveModel::Model
 
   def self.host
-    @host ||= Rails.configuration.wbrs.host
+    @host ||= Rails.configuration.wbrs.host || 'localhost'
   end
 
   def self.port
-    @port ||= Rails.configuration.wbrs.port
+    @port ||= Rails.configuration.wbrs.port || 80
   end
 
   def self.tls_mode
@@ -28,7 +28,7 @@ class Wbrs::Base
     end
   end
 
-  def self.request(path:, body:)
+  def self.new_request(path)
     raise 'Path required' unless path.present?
     raise 'Path must start with slash (/)' unless '/' == path[0]
 
@@ -56,11 +56,37 @@ class Wbrs::Base
         request.ssl = false
     end
 
-    request.headers = {"Content-Type" => "application/json" }
-    request.body = body.to_json
     request
   end
 
+  # TODO replace with new_request
+  def self.request(path:, body:)
+    request = new_request(path)
+
+    request.headers = {"Content-Type" => "application/json" }
+    request.body = body.to_json
+
+    request
+  end
+
+  def self.call_request(method, request)
+    case method
+      when :post
+        if gssnegotiate?
+          HTTPI.post(request, :curb)
+        else
+          HTTPI.post(request)
+        end
+      else #:get
+        if gssnegotiate?
+          HTTPI.get(request, :curb)
+        else
+          HTTPI.get(request)
+        end
+    end
+  end
+
+  # TODO replace with new_request
   def self.make_get_request(path:, body:)
     if gssnegotiate?
       HTTPI.get(request(path: path, body: body), :curb)
@@ -69,6 +95,7 @@ class Wbrs::Base
     end
   end
 
+  # TODO replace with new_request
   def self.make_post_request(path:, body:)
     if gssnegotiate?
       HTTPI.post(request(path: path, body: body), :curb)
@@ -78,18 +105,33 @@ class Wbrs::Base
   end
 
   def self.request_error_handling(response)
-    if 300 > response.code
-      response
-    else
-      body = JSON.parse(response.body)
-      raise "HTTP response #{response.code} #{body['Error']}"
+    case
+      when 300 > response.code
+        response
+      when 404 == response.code
+        body = JSON.parse(response.body)
+        raise Wbrs::WbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
+      else
+        body = JSON.parse(response.body)
+        raise Wbrs::WbrsError, "HTTP response #{response.code} #{body['Error']}"
     end
   end
 
+  def self.call_json_request(method, path, body:)
+    request = new_request(path)
+
+    request.headers = {"Content-Type" => "application/json" }
+    request.body = body.to_json
+
+    request_error_handling(call_request(method, request))
+  end
+
+  # TODO replace with call_json_request
   def self.get_request(path:, body:)
     request_error_handling(make_get_request(path: path, body: body))
   end
 
+  # TODO replace with call_json_request
   def self.post_request(path:, body:)
     request_error_handling(make_post_request(path: path, body: body))
   end

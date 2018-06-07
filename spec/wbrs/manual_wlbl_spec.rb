@@ -115,7 +115,7 @@ describe Wbrs::ManualWlbl do
 
     expect {
       Wbrs::ManualWlbl.find(101)
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
   it 'should get all the manual WL/BL entries' do
@@ -135,7 +135,7 @@ describe Wbrs::ManualWlbl do
 
     expect {
       Wbrs::ManualWlbl.where
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
   it 'should add a WL/BL on the backend' do
@@ -154,7 +154,7 @@ describe Wbrs::ManualWlbl do
 
     expect {
       Wbrs::ManualWlbl.add_from_params
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
 end
