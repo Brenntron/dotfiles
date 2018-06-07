@@ -3,45 +3,70 @@
     <div style="float: left;">
       &nbsp;
     </div>
-    <div style="float: left; padding: 10px; border: 1px solid black;">
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
       <a href="/escalations/webrep/dashboard">[dashboard]</a>
     </div>
-    <div style="float: left; padding: 10px; border: 1px solid black;">
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
       <a href="/escalations/webrep/tickets">[tickets]</a>
     </div>
-    <div style="float: left; padding: 10px; border: 1px solid black;">
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
       <a href="/escalations/webrep/research">[research]</a>
     </div>
     <div style="float: left;">
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
-    <div style="float: left; padding: 10px; border: 1px solid black;">
-      <a>[&nbsp;|&nbsp;]</a>
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
+      <div style="float: left;">
+        <a class="tickets-toggle">[&nbsp;|&nbsp;]</a>
+      </div>
     </div>
     <div style="float: left;">
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
-    <div style="float: left; padding: 10px; border: 1px solid black; hover: ">
-      <a> &#8643;|&#8638; FILTER</a>
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
+      <div>
+        <a class="filter-toggle"> &#8643;|&#8638; FILTER</a>
+      </div>
+      <div id="filter-pane" style="display: none; position: absolute; z-index: 9999;">
+        <div style="margin: 0px; padding: 0px; border: 1px solid orange; background-color: white;">
+          <%= render 'escalations/webrep/disputes/filter_menu' %>
+        </div>
+      </div>
     </div>
     <div style="float: left;">
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
-    <div style="float: left; padding: 10px; border: 1px solid black;">
-      <a> &#43; NEW TICKET</a>
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
+      <div style="float: left;">
+        <a class="new-ticket-toggle"> &#43; NEW TICKET</a>
+      </div><br />
+      <div id="new-ticket-pane" style="display: none; position: absolute; z-index: 9999;">
+        <div style="margin: 0px; padding: 0px; border: 1px solid orange; background-color: white;">
+          make me a bicycle, clown
+        </div>
+      </div>
     </div>
     <div style="float: left;">
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
-    <div style="float: left; padding: 10px; border: 1px solid black;">
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
       <a> &#8615; IMPORT</a>
     </div>
     <div style="float: left;">
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
-    <div style="float: left; padding: 6px; border: 1px solid black;">
-      <input type="text">
-      <input type="button" value="ADVANCED" />
+    <div style="float: left; padding: 0px 5px; border: 1px solid black;">
+      <div style="float: left;">
+        <input type="text" style="height: 25px;">
+      </div>
+      <div style="float: left;">
+        <a class="advanced-toggle">ADVANCED</a>
+      </div><br style="clear: both;"/>
+      <div id="advanced-pane" style="display: none; position: absolute; z-index: 9999;">
+        <div style="margin: 0px; padding: 0px; border: 1px solid orange; background-color: white;">
+          <%= render 'escalations/webrep/disputes/advanced_search' %>
+        </div>
+      </div>
     </div>
   </div>
 </div>

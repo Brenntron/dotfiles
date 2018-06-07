@@ -10,12 +10,12 @@
         Case ID
       .bug-top-id
         %a
-          01402523
+          = @dispute.id
     .col-xs-1.bug-state-col
       %label.content-label-sm
         Status
       %span.bug-state-info.bug-state
-        New
+        = @dispute.status # maybe map to better values?
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Owner
@@ -37,12 +37,15 @@
       %label.content-label-sm
         Date/Time Submitted
       %div
-        2017-10-24 15:35:24
+        -# 2017-10-24 15:35:24
+        = @dispute.created_at.strftime("%Y-%m-%d %H:%M")
+        %br
+        = DateTime.now.strftime("%Y-%m-%d %H:%M")
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Age
       %div
-        35m 36s
+        = (@dispute.created_at - DateTime.now)
 
 -     #<!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
 

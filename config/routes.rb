@@ -28,7 +28,8 @@ Rails.application.routes.draw do
       get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
-      get 'single', to: 'disputes#single'
+      get 'single', to: 'disputes#show' # => http://localhost:3000/escalations/webrep/single?id=20635
+      # get 'show', to: 'disputes#show' => http://localhost:3000/escalations/webrep/show?id=20635
     end
 
   end
