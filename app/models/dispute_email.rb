@@ -1,5 +1,6 @@
 class DisputeEmail < ApplicationRecord
   belongs_to :dispute
+  has_many :dispute_email_attachments
 
   EMAIL_DOMAIN = "mail.talosintelligence.com"
 
@@ -82,6 +83,7 @@ class DisputeEmail < ApplicationRecord
 
   def self.create_email_and_send(params, xmlrpc, user)
     new_email = DisputeEmail.new
+    new_email.dispute_id = params[:dispute_id]
     new_email.from = user.email
     new_email.to = params[:to]
     new_email.subject = params[:subject]
@@ -117,7 +119,7 @@ class DisputeEmail < ApplicationRecord
       email_args[:attachments]
     end
 
-    conn = SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
+    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 
 
