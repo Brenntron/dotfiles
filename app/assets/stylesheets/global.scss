@@ -3079,7 +3079,7 @@ fieldset.top-content {
 }
 
 .highlighted-section-header {
-  background-color: $communication-accent-color;
+  background-color: #4E4E4E;
   color: $content-bg-color;
   margin-top: -15px;
   padding: 12px;
@@ -3095,7 +3095,7 @@ fieldset.top-content {
   display: block;
   height: 10px;
   position: absolute;
-  background-color: $communication-accent-color;
+  background-color: #4E4E4E;
   z-index: 60;
   width: 100%;
   margin-left: -12px;
@@ -3246,11 +3246,11 @@ fieldset.top-content {
 }
 
 .email-row .alt-col {
-  background-color: lighten($communication-accent-color, 35%);
+  background-color: lighten($bug-section-color, 25%);
 }
 
 .email-row.email-unread .alt-col {
-  background-color: $communication-accent-color;
+  background-color: $bug-section-color;
   color: $content-bg-color;
 }
 
@@ -3258,7 +3258,17 @@ fieldset.top-content {
   position: absolute;
   margin-right: 6px;
   margin-left: 10px;
+  width: auto;
   box-shadow: -2px 2px 10px 1px rgba(0, 0, 0, 0.1);
+}
+
+.current-email-view td:nth-child(2) {
+  width: 100%;
+  border-bottom: none;
+}
+
+.current-email-view td {
+  border-bottom: none;
 }
 
 .duplicate-current-email-view td, .duplicate-current-email-view span {
@@ -3408,7 +3418,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 .nested-data-row h4 {
   color: $type-lighter-color;
   text-transform: uppercase;
-  padding: 6px 0 0px 6px;
+  padding: 6px 0 0 6px;
   margin: 0;
 }
 
@@ -3423,15 +3433,56 @@ td.wbrs-highlight, td.sbrs-highlight {
 
 .escalations--webrep--disputes-controller .nav-tool-blocks {
   border: none;
-  //display: inline-block;
+}
+
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button {
+  display: inline-block;
+  width: 44px;
+}
+
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button.active {
+  background-color: $bug-section-color;
+}
+
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button:hover, .escalations--webrep--disputes-controller #nav-banner a:hover {
+  background-color: lighten(#4E4E4E, 10%);
+}
+
+.escalations--webrep--disputes-controller #advanced-search-button {
+  background-color: darken($faint-neutral-color, 5%);
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: -3px 0 0 0;
+  height: 28px;
+  border-radius: 0 4px 4px 0;
+  padding: 0 16px;
+  position: absolute;
+  right: 0;
+}
+
+.escalations--webrep--disputes-controller  #advanced-search-button::before {
+  display: none;
+}
+
+.escalations--webrep--disputes-controller .search-box {
+  background-image: url(image_path('layout/search_icon_lighter.svg'));
+}
+
+.search-group, .search-group form, .search-box {
+  width: 100%;
+}
+
+.nav-page-button-wrapper {
+  text-align: left !important;
+  padding-left: 25px !important;
 }
 
 .nav-toolbar-icon-large {
-  width: 35px;
-  height: 35px;
+  height: 44px;
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 35px;
+  background-size: 24px;
   display: block;
   text-align: center;
 }
@@ -3439,6 +3490,8 @@ td.wbrs-highlight, td.sbrs-highlight {
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
 .icon-queue     {background-image: url(image_path('icon_queue.svg'));}
 .icon-research  {background-image: url(image_path('icon_tools.svg'));}
+.icon-filter-white {background-image: url(image_path('icon_filter_white.svg'));}
+.icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
