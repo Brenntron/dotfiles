@@ -94,7 +94,7 @@
   .nav-tool-blocks.col-xs-4.col-lg-7.search-wrapper
     .input-group.search-group
       = form_tag('/bugs', method: :get) do
-        = text_field_tag 'bug[id]', "#{@bug_search_id}", class: 'search-box', placeholder: 'Search by bug ID'
+        = text_field_tag 'bug[id]', "#{}", class: 'search-box', placeholder: 'Search by Case ID'
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced
@@ -102,7 +102,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-          -##= render 'shared/bug_search_form'
+          = render 'advanced_search'
 
 
         -#%input{type: 'text', name: 'search', placeholder: 'Search', class: 'search-box'}
