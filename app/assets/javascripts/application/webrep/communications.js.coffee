@@ -130,3 +130,35 @@ $ ->
       )
 
 
+    # Notes (Comments) related communications stuff
+
+  $('.note-delete-button').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    current_user_id = $('input[name="current_user_id"]').val()
+
+    std_msg_ajax(
+      method: 'DELETE'
+      url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
+      data: {current_user_id: current_user_id}
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Note Deleted.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "Note could not be deleted.", reload: false)
+    )
+
+  $('.note-edit-button').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    current_user_id = $('input[name="current_user_id"]').val()
+
+    std_msg_ajax(
+      method: 'PUT'
+      url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
+      data: {current_user_id: current_user_id}
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Note Updated.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "Note could not be updated.", reload: false)
+    )
+

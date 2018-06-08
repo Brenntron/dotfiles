@@ -40,7 +40,6 @@ module API
             end
 
             post "", root: "dispute_email" do
-
               begin
                 #temporary, for development, don't wanna be sending these to actual customers
                 params[:to] = "claclair@cisco.com"

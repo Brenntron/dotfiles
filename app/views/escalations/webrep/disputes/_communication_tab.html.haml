@@ -37,18 +37,19 @@
               2017-10-24
               %br
               15:35:24
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.note-icon
-            %td
-              %span.case-history-author
-                melitayl
-              %span.case-history-preview
-                This is a note regarding this ticket.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
+          -@dispute.dispute_comments.recent_first.each do |comment|
+            %tr
+              %td.alt-col.icon-col
+                %span.case-history-icon.note-icon
+              %td
+                %span.case-history-author
+                  =comment.user.cec_username
+                %span.case-history-preview
+                  =comment.comment.truncate(75, omission: '...')
+              %td.alt-col.case-history-datetime
+                =comment.created_at.strftime("%Y-%d-%m")
+                %br
+                =comment.created_at.strftime("%H:%M:%S")
           %tr
             %td.alt-col.icon-col
               %span.case-history-icon.disp-status-icon
@@ -141,24 +142,25 @@
 
   .col-sm-3
     %h1 Notes
-    .row
-      .col-xs-12
-        .note-info-item.author-notation
-          Written by
-          %span.author-username
-            melitayl
-          1 day ago.
-        .note-info-item.time-stamp
-          2017-10-24 15:35:24
-        .note-info-item.note-tool-buttons
-          %button.note-edit-button
-          %button.note-copy-button
-          %button.note-delete-button
+    -@dispute.dispute_comments.recent_first.each do |comment|
+      .row
+        .col-xs-12
+          .note-info-item.author-notation
+            Written by
+            %span.author-username
+              =comment.user.cec_username
+            = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
+          .note-info-item.time-stamp
+            =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
+          .note-info-item.note-tool-buttons
+            %button.note-edit-button{comment_id: "#{comment.id}"}
+            %button.note-copy-button{comment_id: "#{comment.id}"}
+            %button.note-delete-button{comment_id: "#{comment.id}"}
 
-    .row
-      .col-xs-12
-        .note-block
-          This is a note regarding this ticket. I have looked into this information and it appears to be correct.
+      .row
+        .col-xs-12
+          %textarea.note-block
+            =comment.comment
 
     .row
       .col-xs-12.text-center
@@ -168,6 +170,7 @@
     %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
     %input{:name => "dispute_id", :type => "hidden", :value => "#{@dispute.id}"}
+    %input{:name => "current_user_id", :type => "hidden", :value => "#{current_user.id}"}
 
 
 #newEmail.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "editBug", :role => "dialog", :tabindex => "-1"}
