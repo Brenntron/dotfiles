@@ -44,8 +44,7 @@ module API
               #begin
                 #temporary, for development, don't wanna be sending these to actual customers
                 params[:to] = "claclair@cisco.com"
-                binding.pry
-                return
+
 
                 new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
 

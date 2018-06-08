@@ -15,7 +15,10 @@ class DisputeEmailAttachment < ApplicationRecord
     options = {
       ids: 375210, #dispute_email.dispute.id,
       data: XMLRPC::Base64.new(file_content),
-      file_name: payload[:file_name]
+      file_name: payload[:file_name],
+      content_type: payload[:content_type],
+      summary: payload[:file_name],
+      comment: "a file: #{payload[:filename]} for case: #{dispute_email.dispute_id} generated during a correspondence."
     }
 
     attachment_hash = bug_stub.add_attachment(options)
@@ -43,7 +46,10 @@ class DisputeEmailAttachment < ApplicationRecord
 
     config_values = Rails.configuration.peakebridge.sources["snort-org"]
     Aws.config.update(
-        { credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key'])}
+        {
+            credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key']),
+            region: config_values['aws_region']
+        }
     )
 
     s3           = Aws::S3::Resource.new(region: config_values['aws_region'])
@@ -51,26 +57,29 @@ class DisputeEmailAttachment < ApplicationRecord
     prefix       = "#{Rails.env}/dispute_email_attachments/#{dispute_email.id}/"
     s3_url       = []
 
-    key    = prefix + "#{file.original_filename}"
+    key    = prefix + "#{file.filename}"
     object = bucket.object(key)
     object.upload_file(File.open(file.tempfile))
-    s3_url = {file.original_filename => [object.key, file] }
+    s3_url = {file.filename => [object.key, file] }
 
-
-    DisputeEmailAttachment.create(dispute_email_id: dispute_email.id,
-                                  file_file_name: s3_url.keys.first,
-                                  file_content_type: s3_url.values.flatten[1].content_type,
-                                  file_file_size: s3_url.values.flatten[1].size,
-                                  path:      s3_url.values.flatten[0])
+    s3_url.values.flatten[0]
+    #DisputeEmailAttachment.create(dispute_email_id: dispute_email.id,
+    #                              file_file_name: s3_url.keys.first,
+    #                              file_content_type: s3_url.values.flatten[1].content_type,
+    #                              file_file_size: s3_url.values.flatten[1].size,
+    #                              path:      s3_url.values.flatten[0])
 
   end
 
-  def s3_url
+  def s3_url(s3_path)
     config_values = Rails.configuration.peakebridge.sources["snort-org"]
     Aws.config.update(
-        { credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key']) }
+        {
+            credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key']),
+            region: config_values['aws_region']
+        }
     )
-    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'analyst-console', key: self.path, expires_in: 86400).to_s
+    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'analyst-console', key: s3_path, expires_in: 86400).to_s
 
     url
   end
