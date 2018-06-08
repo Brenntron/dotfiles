@@ -3415,6 +3415,24 @@ td.wbrs-highlight, td.sbrs-highlight {
   color: $content-bg-color;
 }
 
+.escalations--webrep--disputes-controller #nav-banner a {
+  color: $content-bg-color;
+}
+
+.nav-toolbar-icon-large {
+  width: 35px;
+  height: 35px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 35px;
+  display: block;
+  text-align: center;
+}
+
+.icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
+.icon-queue     {background-image: url(image_path('icon_queue.svg'));}
+.icon-research  {background-image: url(image_path('icon_tools.svg'));}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
