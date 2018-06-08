@@ -72,7 +72,7 @@ Rails.application.routes.draw do
     resources :rule_configurations, :defaults => {:format => 'json'}
   end
 
-  # some of these named routes need to be rethought to conform to rails conventions
+  # TODO some of these named routes need to be rethought to conform to rails conventions
   get 'rules/get_impact' => 'rules#get_impact', format: 'js'
   get 'rules/export' => 'rules#export'
   post "sessions/create" => "sessions#create"
@@ -144,5 +144,10 @@ Rails.application.routes.draw do
 
 
   mount API::Base => '/api'
+
+  # Hack to test permissions to Admin page
+  if Rails.env.test?
+    get '/version', to: 'users#index'
+  end
 
 end

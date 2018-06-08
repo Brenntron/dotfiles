@@ -775,16 +775,15 @@ Feature: User Accounts
   Scenario: An Admin user should be able to get to the admin section
     Given a user with role "admin" exists and is logged in
     And I wait for "3" seconds
-    And I goto "/admin/migrations"
-    Then I should see "Schema Migrations"
-    And I should not see "You are not authorized."
+    And I go to "/admin"
+    Then I should see "Admin Page"
 
 
   @javascript
   Scenario: An non Admin user should not be able to get to the admin section
     Given a user with role "analyst" exists and is logged in
     And I wait for "3" seconds
-    And I goto "/admin/migrations"
-    Then I should not see "Schema Migrations"
-    And I should see "You are not authorized"
+    And I go to "/admin"
+    Then I should not see "Admin Page"
+    And I should see "You are not authorized to manage module"
 
