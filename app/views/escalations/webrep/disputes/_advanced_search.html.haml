@@ -1,28 +1,28 @@
 %form#search-webrep-cases-form{action: '/escalations/webrep/disputes', method: 'get', 'accept-charset': 'UTF-8'}
-  .form-group.col-xs-12
+  .form-group
     %label.content-label-sm
       Case IDs
     %input.form-control
-  .form-group.col-xs-12
+  .form-group
     %label.content-label-sm
       Dispute (URL/IP/Domain)
     %input.form-control
-  .form-group.col-xs-12
+  .form-group
     %label.content-label-sm
       Case Owner
     %input.form-control
-  .form-group.col-xs-12
+  .form-group
     %label.content-label-sm
       Status
     %input.form-control{name: 'dispute[status]'}
   %button.add-search-items-button
     Add Search Criteria
   %hr.thin
-  .form-group.col-xs-12
+  .form-group
     %label.content-label-sm
       Add Name to save this search criteria to My Saved Searches
     %input.form-control{name: 'dispute[status]'}
-  .col-xs-12.text-center
+  .form-group.text-center
     %button.primary{value: 'submit'}
       Submit Search
     %button.secondary.reset
