@@ -12,7 +12,6 @@ $ ->
       success_reload: false
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
-        $('#email-reply').removeClass('hidden')
         populate_communication_details(response)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email.", reload: false)
@@ -43,8 +42,16 @@ $ ->
 
 
   $('.attachment-button').on 'click', ->
-    $('#file-fields').before("<span><input class= 'file_attachment' name='attachment' type='file'/></span>");
+    $('#file-fields').before("<span><input class= 'file_attachment' name='attachment' type='file'/></span>")
+    $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
+    $('.file_attachment:last').click()
 
+  $('.reply-button').on 'click', ->
+    $('#email-reply').removeClass('hidden')
+
+
+  $('body').on 'click', '.delete_attachment', ->
+    $(this).parent().remove()
 
 
   $('#reply').on 'click', ->
@@ -71,7 +78,7 @@ $ ->
       processData: false
       success_reload: true
       success: (response) ->
-        std_msg_success('Email Sent.', ['hello'], reload: true)
+        std_msg_success('Email Sent.', [], reload: true)
       error: (response) ->
         std_api_error(response, "Email was not sent", reload: false)
     )
