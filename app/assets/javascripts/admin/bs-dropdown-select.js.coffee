@@ -2,6 +2,8 @@
 # Move this file to application folder after redesign is implemented
 $(document).ready ->
 
+  $('.dropdown-toggle').dropdown()
+
   $('.dropdown-menu').on 'click', (event) ->
     event.stopPropagation()
     return

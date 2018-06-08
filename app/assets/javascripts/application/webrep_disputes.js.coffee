@@ -22,13 +22,3 @@ window.populate_webrep_index_table = () ->
       #$("#create_research_submit_wait").addClass('hidden').hide()
       #$("#create_research_submit").show()
   , this)
-
-$ ->
-  $('.advanced-toggle').click ->
-    $('#advanced-pane').toggle();
-
-  $('.filter-toggle').click ->
-    $('#filter-pane').toggle();
-
-  $('.new-ticket-toggle').click ->
-    $('#new-ticket-pane').toggle();
