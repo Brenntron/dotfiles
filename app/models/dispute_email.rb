@@ -97,9 +97,9 @@ class DisputeEmail < ApplicationRecord
       params[:attachments].each do |key, attachment|
 
         payload = {}
-        payload[:file_name] = attachment.original_filename
-        payload[:file_content] = File.open(attachment.tempfile)
-        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email)
+        payload[:file_name] = attachment.filename
+        payload[:file_content] = attachment.tempfile
+        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email, false)
         new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
         new_attachment[:file_name] = attachment.original_filename
@@ -118,7 +118,8 @@ class DisputeEmail < ApplicationRecord
     if new_email.dispute_email_attachments.present?
       email_args[:attachments]
     end
-
+    binding.pry
+    return
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 

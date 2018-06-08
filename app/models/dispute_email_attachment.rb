@@ -7,13 +7,13 @@ class DisputeEmailAttachment < ApplicationRecord
     if remote == true
       file_content = open(payload[:url])
     else
-      file_content = payload[:file_content]
+      file_content = payload[:file_content].read
     end
 
     bug_stub = Bugzilla::Bug.new(bugzilla_session)
 
     options = {
-      ids: dispute_email.dispute.id,
+      ids: 375210, #dispute_email.dispute.id,
       data: XMLRPC::Base64.new(file_content),
       file_name: payload[:file_name]
     }
