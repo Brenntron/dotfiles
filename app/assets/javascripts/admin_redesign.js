@@ -13,7 +13,6 @@
 //= require Chart.bundle
 //= require chartkick
 //= require bootstrap-multiselect
-//= require bootstrap
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
 //= require admin/rules

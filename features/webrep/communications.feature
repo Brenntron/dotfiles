@@ -82,3 +82,22 @@ Feature: Webrep communications
 #    Then I click "Send"
 #    And I wait for "2" seconds
 #    And I should see "Email Sent"
+
+
+  @javascript
+  Scenario: a user can create a new email
+    Given a user with role "admin" exists and is logged in
+
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following dispute emails exist:
+      |id  | dispute_id           | status |
+      | 1  | 722                  | unread |
+      | 2  | 722                  | read   |
+    And I goto "/escalations/webrep/disputes/722"
+    Then I click "Compose New Email"
+    And I wait for "2" seconds
+    And I fill in "receiver" with "customer@gmail.com"
+    Then I click "Send"
+

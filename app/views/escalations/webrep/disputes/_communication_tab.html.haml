@@ -88,8 +88,9 @@
         // Only show Notice if email is to customer
         .customer-facing-notice
           Customer Facing Message
-        %button.new-email-button
+        %button.new-email-button{'data-toggle' => 'modal', 'data-target' => '#newEmail'}
           Compose New Email
+
     .row
       .col-xs-12.email-header-information.hidden
         .email-header-data
@@ -128,7 +129,7 @@
 
           .email-response-button-wrapper
             .email-response-buttons
-              %button.attachment-button.attachment-label
+              %button.attachment-button.attachment-label.attachment-reply
       .row
         %textarea.col-xs-12.email-reply-body
 
@@ -167,3 +168,36 @@
     %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
     %input{:name => "dispute_id", :type => "hidden", :value => "#{@dispute.id}"}
+
+
+#newEmail.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "editBug", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %h4#newMessage.modal-title
+          Compose New Email
+          %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+            %span{"aria-hidden" => "true"}
+      .modal-body
+        %form
+          .col-xs-12.email-header-information
+            .email-header-data
+              %span.content-label-sm Subject
+              %textarea.communication-subject.new-subject
+              .sender-receiver-info
+                %span.content-label-sm To
+                %input.receiver-email.new-receiver{required: true, type: 'email', name: 'receiver'}
+
+                #file-fields-new
+
+
+            .email-response-button-wrapper
+              .email-response-buttons
+                %button.attachment-button.attachment-label.new-attachment
+          %textarea.col-xs-12.email-reply-body.new-body
+
+          .modal-footer
+            .col-xs-12.text-center
+              %button.add-case-note-button#new-email{value: 'submit'}
+                Send
+

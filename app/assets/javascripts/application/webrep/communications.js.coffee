@@ -1,4 +1,6 @@
 $ ->
+
+  # Generic email show stuff
   $('.email-row').on 'click', ->
     clean_up_current_email_view()
     handle_current_email_row($(this))
@@ -41,14 +43,15 @@ $ ->
     row.addClass('email-read')
 
 
-  $('.attachment-button').on 'click', ->
-    $('#file-fields').before("<span><input class= 'file_attachment' name='attachment' type='file'/></span>")
-    $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
-    $('.file_attachment:last').click()
+  # Email reply creation and attachments
 
   $('.reply-button').on 'click', ->
     $('#email-reply').removeClass('hidden')
 
+  $('.attachment-reply').on 'click', ->
+    $('#file-fields').before("<span><input class= 'file_attachment' name='attachment' type='file'/></span>")
+    $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
+    $('.file_attachment:last').click()
 
   $('body').on 'click', '.delete_attachment', ->
     $(this).parent().remove()
@@ -82,4 +85,48 @@ $ ->
       error: (response) ->
         std_api_error(response, "Email was not sent", reload: false)
     )
+
+
+  # New email handlers
+
+  $('.new-attachment').on 'click', ->
+    $('#file-fields-new').before("<span><input class= 'file_attachment_new' name='attachment' type='file'/></span>")
+    $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
+    $('.file_attachment_new:last').click()
+
+  $('body').on 'click', '.delete_attachment_new', ->
+    $(this).parent().remove()
+
+
+  $('#new-email').on 'click', (e) ->
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+    form_data = new FormData()
+    $.each $('.file_attachment_new'), (attachment) ->
+      form_data.append("attachments[#{attachment}]", $('.file_attachment_new')[attachment].files[0])
+
+    form_data.append('body', $('.new-body').val())
+    form_data.append('dispute_id', $('input[name="dispute_id"]').val())
+    form_data.append('to', $('.new-receiver').val())
+    form_data.append('subject', $('.new-subject').val())
+
+    if $('form')[0].checkValidity() == true
+      e.preventDefault()
+      $.ajax(
+        headers: headers
+        method: 'POST'
+        url: '/api/v1/escalations/webrep/dispute_emails'
+        data: form_data
+        contentType: false
+        processData: false
+        success_reload: true
+        success: (response) ->
+          $('#newEmail').modal('hide');
+          std_msg_success('Email Sent.', [], reload: true)
+        error: (response) ->
+          $('#newEmail').modal('hide');
+          std_api_error(response, "Email was not sent", response, reload: false)
+      )
+
 
