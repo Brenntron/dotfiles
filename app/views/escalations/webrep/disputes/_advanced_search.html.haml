@@ -1,5 +1,3 @@
-%h1 Advanced Search
-
 = simple_form_for Dispute.new, url: escalations_webrep_disputes_path, method: :get do |dispute_form|
   = dispute_form.input :search_type, as: :hidden, input_html: {value: 'advanced'}
   = dispute_form.input :customer_name

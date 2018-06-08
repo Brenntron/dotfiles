@@ -148,6 +148,7 @@ h2 {
 h3 {
   font-weight: 700;
   margin-bottom: 30px;
+  color: $type-base-color;
 }
 
 h4 {
@@ -1756,15 +1757,15 @@ a.static-nav-item {
   line-height: 1em;
 }
 
-#filter-bugs-list {
+#filter-bugs-list, #filter-cases-list {
   display: inline-block;
 }
 
-#filter-bugs-list a {
+#filter-bugs-list a, #filter-cases-list a{
   color: $ac-nav-bg-color;
 }
 
-#filter-bugs-list li {
+#filter-bugs-list li, #filter-cases-list li {
   width: 170px;
 }
 
@@ -1803,7 +1804,7 @@ a.static-nav-item {
   margin: 9px 10px;;
 }
 
-#import_bug {
+#import_bug, #import_webrep {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;
   width: 100px;

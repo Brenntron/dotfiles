@@ -19,35 +19,35 @@
       %span{class: 'nav-toolbar-icon icon-filter'}
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
-      %ul#filter-bugs-list
-        -#%li{class: "#{bug_filter_indicator('my-bugs')}"}
-        -#  %a{href: '/bugs?q=my-bugs'}
-        -#    %span{class: 'nav-dropdown-icon icon-my-bugs'}
-        -#    My Bugs
-        -#%li{class: "#{bug_filter_indicator('my-open-bugs')}"}
-        -#  %a{href: '/bugs?q=my-open-bugs'}
-        -#    %span{class: 'nav-dropdown-icon icon-my-open-bugs'}
-        -#    My Open Bugs
-        -#%li{class: "#{bug_filter_indicator('team-bugs')}"}
-        -#  %a{href: '/bugs?q=team-bugs'}
-        -#    %span{class: 'nav-dropdown-icon icon-team-bugs'}
-        -#    My Team Bugs
-        -#%li{class: "#{bug_filter_indicator('open-bugs')}"}
-        -#  %a{href: '/bugs?q=open-bugs'}
-        -#    %span{class: 'nav-dropdown-icon icon-open-bugs'}
-        -#    Open Bugs
-        -#%li{class: "#{bug_filter_indicator('pending-bugs')}"}
-        -#  %a{href: '/bugs?q=pending-bugs'}
-        -#    %span{class: 'nav-dropdown-icon icon-pending-bugs'}
-        -#    Pending Bugs
-        -#%li{class: "#{bug_filter_indicator('fixed-bugs')}"}
-        -#  %a{href: '/bugs?q=fixed-bugs'}
-        -#    %span{class: 'nav-dropdown-icon icon-fixed-bugs'}
-        -#    Fixed Bugs
-        -#%li{class: "#{bug_filter_indicator('all-bugs')}"}
-        -#  %a{href: '/bugs?q=all-bugs'}
-        -#    %span{class: 'nav-dropdown-icon icon-all-bugs'}
-        -#    All Bugs
+      %ul#filter-cases-list
+        %li
+          %a
+            %span{class: 'nav-dropdown-icon icon-recently-viewed'}
+            Recently Viewed
+        %li
+          %a
+            %span{class: 'nav-dropdown-icon icon-my-open-bugs'}
+            My Tickets
+        %li
+          %a
+            %span{class: 'nav-dropdown-icon icon-team-bugs'}
+            My Open Tickets
+        %li
+          %a
+            %span{class: 'nav-dropdown-icon icon-open-bugs'}
+            My Team Tickets
+        %li
+          %a
+            %span{class: 'nav-dropdown-icon icon-pending-bugs'}
+            Open Tickets
+        %li
+          %a
+            %span{class: 'nav-dropdown-icon icon-fixed-bugs'}
+            Closed Tickets
+        %li
+          %a
+            %span{class: 'nav-dropdown-icon icon-all-tickets'}
+            All Tickets
 
       #saved-searches-wrapper.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
@@ -103,9 +103,6 @@
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
           = render 'advanced_search'
-
-
-        -#%input{type: 'text', name: 'search', placeholder: 'Search', class: 'search-box'}
 
 
 = render template: "layouts/rocket"
