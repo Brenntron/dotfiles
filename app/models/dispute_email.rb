@@ -119,8 +119,7 @@ class DisputeEmail < ApplicationRecord
     if new_email.dispute_email_attachments.present?
       email_args[:attachments]
     end
-    binding.pry
-    return
+
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 
