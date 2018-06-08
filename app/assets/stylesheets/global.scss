@@ -1665,8 +1665,9 @@ a.static-nav-item {
 .icon-open-bugs    {background-image: url(image_path('icon_openbugs.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
 .icon-all-bugs     {background-image: url(image_path('bugs_icon.svg'));}
-
+.icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
+.icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -3418,6 +3419,11 @@ td.wbrs-highlight, td.sbrs-highlight {
 
 .escalations--webrep--disputes-controller #nav-banner a {
   color: $content-bg-color;
+}
+
+.escalations--webrep--disputes-controller .nav-tool-blocks {
+  border: none;
+  //display: inline-block;
 }
 
 .nav-toolbar-icon-large {

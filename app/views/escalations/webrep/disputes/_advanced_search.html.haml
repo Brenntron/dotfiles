@@ -1,11 +1,42 @@
-= simple_form_for Dispute.new, url: escalations_webrep_disputes_path, method: :get do |dispute_form|
-  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'advanced'}
-  = dispute_form.input :customer_name
-  = dispute_form.input :customer_email
-  = dispute_form.input :customer_company_name
-  = dispute_form.input :status
-  = dispute_form.input :resolution
-  = dispute_form.input :subject
-  = dispute_form.input :search_name, input_html: {value: ''}
-  = dispute_form.submit 'Search'
+%form#search-webrep-cases-form{action: '/escalations/webrep/disputes', method: 'get', 'accept-charset': 'UTF-8'}
+  .form-group.col-xs-12
+    %label.content-label-sm
+      Case IDs
+    %input.form-control
+  .form-group.col-xs-12
+    %label.content-label-sm
+      Dispute (URL/IP/Domain)
+    %input.form-control
+  .form-group.col-xs-12
+    %label.content-label-sm
+      Case Owner
+    %input.form-control
+  .form-group.col-xs-12
+    %label.content-label-sm
+      Status
+    %input.form-control{name: 'dispute[status]'}
+  %button.add-search-items-button
+    Add Search Criteria
+  %hr.thin
+  .form-group.col-xs-12
+    %label.content-label-sm
+      Add Name to save this search criteria to My Saved Searches
+    %input.form-control{name: 'dispute[status]'}
+  .col-xs-12.text-center
+    %button.primary{value: 'submit'}
+      Submit Search
+    %button.secondary.reset
+      Reset Search
+
+
+-#= simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
+-#  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'advanced'}
+-#  = dispute_form.input :customer_name
+-#  = dispute_form.input :customer_email
+-#  = dispute_form.input :customer_company_name
+-#  = dispute_form.input :status
+-#  = dispute_form.input :resolution
+-#  = dispute_form.input :subject
+-#  = dispute_form.input :search_name, input_html: {value: ''}
+-#  = dispute_form.submit 'Search'
 
