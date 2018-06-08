@@ -3,82 +3,82 @@
 
 - content_for(:nav_banner) do
   .nav-tool-blocks.col-xs-1.col-lg-1
-    %a{href: '/escalations/webrep/dashboard', id: '#dashboard'}
+    %a{href: '/escalations/webrep/dashboard', id: 'dashboard'}
       %span{class: 'nav-toolbar-icon-large icon-dashboard'}
 
   .nav-tool-blocks.col-xs-1.col-lg-1
-    %a{href: '/escalations/webrep/tickets', id: '#queue'}
+    %a{href: '/escalations/webrep/tickets', id: 'queue'}
       %span{class: 'nav-toolbar-icon-large icon-queue'}
 
   .nav-tool-blocks.col-xs-1.col-lg-1
-    %a{href: '/escalations/webrep/research', id: '#research'}
+    %a{href: '/escalations/webrep/research', id: 'research'}
       %span{class: 'nav-toolbar-icon-large icon-research'}
 
   .nav-tool-blocks.col-xs-2.col-lg-1.dropdown
-    %a{href: '#', class: '.dropdown-toggle', id: '#filter-bugs', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter'}
       Filter
-    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-bugs'}
+    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-bugs-list
-        %li{class: "#{bug_filter_indicator('my-bugs')}"}
-          %a{href: '/bugs?q=my-bugs'}
-            %span{class: 'nav-dropdown-icon icon-my-bugs'}
-            My Bugs
-        %li{class: "#{bug_filter_indicator('my-open-bugs')}"}
-          %a{href: '/bugs?q=my-open-bugs'}
-            %span{class: 'nav-dropdown-icon icon-my-open-bugs'}
-            My Open Bugs
-        %li{class: "#{bug_filter_indicator('team-bugs')}"}
-          %a{href: '/bugs?q=team-bugs'}
-            %span{class: 'nav-dropdown-icon icon-team-bugs'}
-            My Team Bugs
-        %li{class: "#{bug_filter_indicator('open-bugs')}"}
-          %a{href: '/bugs?q=open-bugs'}
-            %span{class: 'nav-dropdown-icon icon-open-bugs'}
-            Open Bugs
-        %li{class: "#{bug_filter_indicator('pending-bugs')}"}
-          %a{href: '/bugs?q=pending-bugs'}
-            %span{class: 'nav-dropdown-icon icon-pending-bugs'}
-            Pending Bugs
-        %li{class: "#{bug_filter_indicator('fixed-bugs')}"}
-          %a{href: '/bugs?q=fixed-bugs'}
-            %span{class: 'nav-dropdown-icon icon-fixed-bugs'}
-            Fixed Bugs
-        %li{class: "#{bug_filter_indicator('all-bugs')}"}
-          %a{href: '/bugs?q=all-bugs'}
-            %span{class: 'nav-dropdown-icon icon-all-bugs'}
-            All Bugs
+        -#%li{class: "#{bug_filter_indicator('my-bugs')}"}
+        -#  %a{href: '/bugs?q=my-bugs'}
+        -#    %span{class: 'nav-dropdown-icon icon-my-bugs'}
+        -#    My Bugs
+        -#%li{class: "#{bug_filter_indicator('my-open-bugs')}"}
+        -#  %a{href: '/bugs?q=my-open-bugs'}
+        -#    %span{class: 'nav-dropdown-icon icon-my-open-bugs'}
+        -#    My Open Bugs
+        -#%li{class: "#{bug_filter_indicator('team-bugs')}"}
+        -#  %a{href: '/bugs?q=team-bugs'}
+        -#    %span{class: 'nav-dropdown-icon icon-team-bugs'}
+        -#    My Team Bugs
+        -#%li{class: "#{bug_filter_indicator('open-bugs')}"}
+        -#  %a{href: '/bugs?q=open-bugs'}
+        -#    %span{class: 'nav-dropdown-icon icon-open-bugs'}
+        -#    Open Bugs
+        -#%li{class: "#{bug_filter_indicator('pending-bugs')}"}
+        -#  %a{href: '/bugs?q=pending-bugs'}
+        -#    %span{class: 'nav-dropdown-icon icon-pending-bugs'}
+        -#    Pending Bugs
+        -#%li{class: "#{bug_filter_indicator('fixed-bugs')}"}
+        -#  %a{href: '/bugs?q=fixed-bugs'}
+        -#    %span{class: 'nav-dropdown-icon icon-fixed-bugs'}
+        -#    Fixed Bugs
+        -#%li{class: "#{bug_filter_indicator('all-bugs')}"}
+        -#  %a{href: '/bugs?q=all-bugs'}
+        -#    %span{class: 'nav-dropdown-icon icon-all-bugs'}
+        -#    All Bugs
 
-    #saved-searches-wrapper.nav-tool-content-wrapper
-      %h3.nav-tool-dropdown-header
-        %span.nav-dropdown-content-icon.icon-saved-search
-        My Saved Searches
-      %table{class: 'table table-condensed small', id: 'saved-search'}
-        - if @saved_search.present?
-          - current_user.saved_searches.each do |saved_search|
-            %tr
-              - if @saved_search.id == saved_search.id
-                %td{id: "saved_search_#{saved_search.id}", class: "selected_search"}
-                  = saved_search.name
-              - else
-                %td{id: "saved_search_#{saved_search.id}"}
-                  %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
-                    = saved_search.name
-                  %a{class: 'delete-search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
-                    = image_tag('icon_cancel_grey.svg')
-
-        - else
-          - current_user.saved_searches.each do |saved_search|
-            %tr{id: "saved_search_#{saved_search.id}"}
-              %td
-                %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
-                  = saved_search.name
-
-                %a{class: 'delete-search tooltipped', title: 'Delete Saved Search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
-                  = image_tag('icon_cancel_grey.svg')
+      #saved-searches-wrapper.nav-tool-content-wrapper
+        %h3.nav-tool-dropdown-header
+          %span.nav-dropdown-content-icon.icon-saved-search
+          My Saved Searches
+        %table{class: 'table table-condensed small', id: 'saved-search'}
+          -#- if @saved_search.present?
+          -#  - current_user.saved_searches.each do |saved_search|
+          -#    %tr
+          -#      - if @saved_search.id == saved_search.id
+          -#        %td{id: "saved_search_#{saved_search.id}", class: "selected_search"}
+          -#          = saved_search.name
+          -#      - else
+          -#        %td{id: "saved_search_#{saved_search.id}"}
+          -#          %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
+          -#            = saved_search.name
+          -#          %a{class: 'delete-search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
+          -#            = image_tag('icon_cancel_grey.svg')
+          -#
+          -#- else
+          -#  - current_user.saved_searches.each do |saved_search|
+          -#    %tr{id: "saved_search_#{saved_search.id}"}
+          -#      %td
+          -#        %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
+          -#          = saved_search.name
+          -#
+          -#        %a{class: 'delete-search tooltipped', title: 'Delete Saved Search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
+          -#          = image_tag('icon_cancel_grey.svg')
 
   .nav-tool-blocks.col-xs-2.col-lg-1.dropdown
-    %a{href: '#', class: '.dropdown-toggle', id: '#import-webrep', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', class: 'dropdown-toggle', id: 'import-webrep', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-import'}
       Import
     .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'import-webrep'}
@@ -91,10 +91,10 @@
         .load-bar-segment.hidden
         .load-bar-segment.hidden
 
-  .nav-tool-blocks.col-xs-4.col-lg-7.search-wrapper
+  .nav-tool-blocks.col-xs-4.col-lg-4.search-wrapper
     .input-group.search-group
-      = form_tag('/bugs', method: :get) do
-        = text_field_tag 'bug[id]', "#{}", class: 'search-box', placeholder: 'Search by Case ID'
+      = form_tag('/tickets', method: :get) do
+        = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Case ID'
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced
