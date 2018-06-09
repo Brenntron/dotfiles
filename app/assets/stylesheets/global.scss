@@ -3538,6 +3538,8 @@ button.tertiary {
 
 #advanced-search-dropdown {
   margin-left: 0;
+  left: auto;
+  right: 0;
 }
 
 #advanced-search-dropdown::before {
@@ -3554,19 +3556,27 @@ button.tertiary {
   background-color: $faint-alt-highlight;
 }
 
-.search-criteria-options {
+#search-criteria-options {
   color: $type-base-color;
   border: 1px solid $faint-neutral-color;
   padding: 6px 12px;
   font-weight: 300;
   font-size: 9pt;
+  position: absolute;
+  z-index: 5;
+  background-color: $content-bg-color;
+  margin-top: -23px;
+  margin-right: 20px;
+  display: none;
 }
 
-.search-criteria-options li {
+#search-criteria-options li {
   border-bottom: 1px solid $faint-neutral-color;
+  display: inline-block;
+  width: 100%;
 }
 
-.search-criteria-options input[type='checkbox'] {
+#search-criteria-options input[type='checkbox'] {
   box-shadow: none !important;
   outline: none !important;
   border: none !important;
