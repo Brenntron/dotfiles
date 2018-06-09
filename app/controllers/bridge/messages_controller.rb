@@ -15,7 +15,7 @@ class Bridge::MessagesController < ApplicationController
     case envelope_params["sender"]
       when "snort-org"
         fp_create(false_positive_params)
-      when "talos-ingelligence"
+      when "talos-intelligence"
         obj_type_key = params[:message].keys.first
         obj_type = obj_type_key.to_s.camelize
         params[:message][obj_type_key][:bugzilla_session] = bugzilla_session
