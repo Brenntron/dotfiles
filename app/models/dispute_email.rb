@@ -11,7 +11,10 @@ class DisputeEmail < ApplicationRecord
 
   REFERENCE_TEMPLATE = "ref-CASEID-anco"
 
-  def self.process_bridge_payload(message_payload, xmlrpc, user)
+  def self.process_bridge_payload(message_payload)
+
+    xmlrpc = message_payload[:bugzilla_session]
+    user = message_payload[:current_user] 
 
     #check envelope for case validity
     case_id = find_case_number_in_email(message_payload)
@@ -46,7 +49,7 @@ class DisputeEmail < ApplicationRecord
                 "addressee": "talos-intelligence",
                 "sender": "analyst-console"
             },
-        "message": {"source_key":params[:source_key],"ac_status":"CREATE_ACK"}
+        "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
     }
 
     return_message
@@ -142,7 +145,7 @@ class DisputeEmail < ApplicationRecord
       new_body += "\n\n"
       new_body += "-------------------------------------------------------------------------------------------------\n"
       new_body += "Please Do Not Remove This Reference Number.  Keep This Reference Number In The Email Chain:\n"
-      new_body += "#{case_number}"
+      new_body += "#{REFERENCE_TEMPLATE.gsub('CASEID', case_number)}"
       new_body += "-------------------------------------------------------------------------------------------------\n"
     end
 

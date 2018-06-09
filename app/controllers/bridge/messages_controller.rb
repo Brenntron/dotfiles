@@ -16,16 +16,12 @@ class Bridge::MessagesController < ApplicationController
       when "snort-org"
         fp_create(false_positive_params)
       when "talos-ingelligence"
-        if params[:message][:source_info][:source_type].present?
-          obj_type = params[:message][:source_info][:source_type]
-          params[:message][:source_info][obj_type.downcase.to_sym][:bugzilla_session] = bugzilla_session
-          params[:message][:source_info][obj_type.downcase.to_sym][:current_user] = current_user
-          return_message = obj_type.constantize.process_bridge_payload(params[:message][:source_info][obj_type.downcase.to_sym])
-        else
-          return_message = {
+        obj_type_key = params[:message].keys.first
+        obj_type = obj_type_key.to_s.camelize
+        params[:message][obj_type_key][:bugzilla_session] = bugzilla_session
+        params[:message][obj_type_key][:current_user] = current_user
+        return_message = obj_type.constantize.process_bridge_payload(params[:message][obj_type_key])
 
-          }
-        end
         render json: return_message, status: :ok
       else
         return_message = {
