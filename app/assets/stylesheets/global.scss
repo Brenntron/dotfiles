@@ -32,6 +32,7 @@ $wiki-dark-color: #334C18;
 $user-highlight-color: #FFC5C2;
 $user-med-color: #FC9292;
 $user-dark-color: #560303;
+$warning-accent-color: #E47433;
 
 /* Tab Icon Colors */
 $rule-accent-color: #FDBB2B;
@@ -3512,7 +3513,7 @@ td.wbrs-highlight, td.sbrs-highlight {
   text-align: center;
 }
 
-button.primary, button.secondary {
+button.primary, button.secondary, button.tertiary {
   text-transform: uppercase;
   border-radius: 2px;
   font-weight: 600;
@@ -3520,6 +3521,7 @@ button.primary, button.secondary {
   padding: 15px 30px;
   border: none;
   margin: 12px 6px 0 6px;
+  color: $content-bg-color;
 }
 
 button.primary {
@@ -3528,7 +3530,10 @@ button.primary {
 
 button.secondary {
   background-color: lighten($type-lighter-color, 10%);
-  color: $content-bg-color;
+}
+
+button.tertiary {
+  background-color: $warning-accent-color;
 }
 
 #advanced-search-dropdown {
@@ -3539,6 +3544,46 @@ button.secondary {
   right: 40px;
   left: auto;
 }
+
+#advanced-search-dropdown input {
+  border: 4px solid $content-bg-color;
+  outline: 1px solid $faint-neutral-color;
+}
+
+#advanced-search-dropdown input:focus {
+  background-color: $faint-alt-highlight;
+}
+
+.search-criteria-options {
+  color: $type-base-color;
+  border: 1px solid $faint-neutral-color;
+  padding: 6px 12px;
+  font-weight: 300;
+  font-size: 9pt;
+}
+
+.search-criteria-options li {
+  border-bottom: 1px solid $faint-neutral-color;
+}
+
+.search-criteria-options input[type='checkbox'] {
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  margin-right: 6px;
+}
+
+.search-criteria-label {
+  padding: 6px 0 1px 0;
+}
+
+.multicol-2 {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
+  column-gap: 10px;
+}
+
 
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
 .icon-queue     {background-image: url(image_path('icon_queue.svg'));}

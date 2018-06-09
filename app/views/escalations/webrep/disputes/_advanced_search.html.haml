@@ -17,15 +17,84 @@
     %input.form-control{name: 'dispute[status]'}
   %button.add-search-items-button
     Add Search Criteria
+  .search-criteria-options
+    .multicol-2
+      %ul
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#disposition-cb{type: 'checkbox', name: 'search-criteria',}
+            Suggested Disposition
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#regex-cb{type: 'checkbox', name: 'search-criteria',}
+            URL Regex
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#priority-cb{type: 'checkbox', name: 'search-criteria',}
+            Priority
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria',}
+            Resolution
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#dispute-type-cb{type: 'checkbox', name: 'search-criteria',}
+            Dispute Type
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#origin-cb{type: 'checkbox', name: 'search-criteria',}
+            Origin
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#origin-id-cb{type: 'checkbox', name: 'search-criteria',}
+            Origin ID
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submitter-cb{type: 'checkbox', name: 'search-criteria',}
+            Submitter Type
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#name-cb{type: 'checkbox', name: 'search-criteria',}
+            Contact Name
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#email-cb{type: 'checkbox', name: 'search-criteria',}
+            Contact Email
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria',}
+            Company
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria',}
+            Submitter Domain
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submitted-cb{type: 'checkbox', name: 'search-criteria',}
+            Date Submitted
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#age-cb{type: 'checkbox', name: 'search-criteria',}
+            Case Age
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#modified-cb{type: 'checkbox', name: 'search-criteria',}
+            Last Modified
+    .form-group.text-center
+      %button.primary#add-search-criteria
+        Add Search Criteria
+      %button.tertiary#cancel-add-criteria
+        Cancel
+
   %hr.thin
   .form-group
     %label.content-label-sm
       Add Name to save this search criteria to My Saved Searches
     %input.form-control{name: 'dispute[status]'}
   .form-group.text-center
-    %button.primary{value: 'submit'}
+    %button.primary#submit-advanced-search{value: 'submit'}
       Submit Search
-    %button.secondary.reset
+    %button.secondary#reset-advanced-search.reset
       Reset Search
 
 
