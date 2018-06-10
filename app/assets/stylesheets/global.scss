@@ -3549,7 +3549,7 @@ button.tertiary {
 
 #advanced-search-dropdown input {
   border: 4px solid $content-bg-color;
-  outline: 1px solid $faint-neutral-color;
+  outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
 #advanced-search-dropdown input:focus {
@@ -3594,12 +3594,27 @@ button.tertiary {
   column-gap: 10px;
 }
 
+.search-item {
+  padding-right: 20px;
+}
 
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
 .icon-queue     {background-image: url(image_path('icon_queue.svg'));}
 .icon-research  {background-image: url(image_path('icon_tools.svg'));}
 .icon-filter-white {background-image: url(image_path('icon_filter_white.svg'));}
 .icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
+
+.remove-input {
+  background-image: url(image_path('icon_minus_blue.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border: none;
+  float: right;
+  margin-top: 3px;
+  margin-right: -26px;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
