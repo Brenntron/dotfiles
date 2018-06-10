@@ -32,10 +32,16 @@ $(document).ready ->
     false
 
   $('.remove-input').click ->
+    field_name = $(this).parent().find('.content-label-sm').text()
+    $('.search-checkbox').each ->
+      if $(this).val() == field_name
+        $($(this).parent()).parent().removeClass('hidden')
     $($(this).parent()).remove()
 
-
-
   $('#search-webrep-cases-form').on 'click', '.remove-input', ->
+    field_name = $(this).parent().find('.content-label-sm').text()
+    $('.search-checkbox').each ->
+      if $(this).val() == field_name
+        $($(this).parent()).parent().removeClass('hidden')
     $($(this).parent()).remove()
     return
