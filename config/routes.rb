@@ -25,9 +25,10 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
+      get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
+      get 'research', to: 'disputes#research'
     end
-
 
   end
 

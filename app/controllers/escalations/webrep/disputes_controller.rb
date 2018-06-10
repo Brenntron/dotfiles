@@ -18,7 +18,9 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def dashboard
+  end
 
+  def tickets
   end
   
   def advanced_search
