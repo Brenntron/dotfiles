@@ -22,7 +22,9 @@ class Bridge::MessagesController < ApplicationController
         puts message_params.inspect
         puts "\n"
         puts message_params.keys.first
-        puts "\n"
+        puts "\n%%%%%%%%%%%%%\n"
+        puts message_params[:dispute_email].inspect
+        puts "\n%%%%%%%%%%%%%\n"
         obj_type_key = message_params.keys.first
         obj_type = obj_type_key.to_s.camelize
         puts obj_type_key
