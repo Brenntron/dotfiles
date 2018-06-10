@@ -21,7 +21,7 @@ class Bridge::MessagesController < ApplicationController
         puts "\n####################################################\n"
         puts message_params.inspect
         puts "\n"
-        puts message_params.key.first
+        puts message_params.keys.first
         puts "\n"
         obj_type_key = message_params.keys.first
         obj_type = obj_type_key.to_s.camelize
