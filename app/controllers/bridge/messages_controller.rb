@@ -128,7 +128,7 @@ class Bridge::MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message)
+    params.require(:message).permit!
   end
 
   def false_positive_params
