@@ -6,17 +6,73 @@
 </div>
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
 
-
-<table id="disputes-index" class="table responsive no-wrap">
+<!--
+MOCKUP:
+[checkbox] -- [P1/P2/P3] -- CASE ID -- STATUS -- DISPUTE [# replies] -- OWNER [grab icon] -- TIME SUBMITTED -- AGE -- SUGGESTED DISPOSITION -- ORIGIN -- ORIGIN ID -- SUBMITTER ORG -- SUBMITTER DOMAIN -- WBRS SCORE -- WBRS RULE HITS -- MALWARE PROBABILITY
   <thead>
     <th>ID</th>
     <th>Case Number</th>
-    <th>Dispute Type</th>
     <th>Customer Name</th>
     <th>Customer Company Name</th>
     <th>Status</th>
     <th>Assigned To</th>
     <th>Actions</th>
+  </thead>
+
+  create_table "disputes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "case_number"
+    t.string "case_guid"
+    t.string "customer_name"
+    t.string "customer_email"
+    t.string "customer_phone"
+    t.string "customer_company_name"
+    t.string "org_domain"
+    t.datetime "case_opened_at"
+    t.datetime "case_closed_at"
+    t.datetime "case_accepted_at"
+    t.datetime "case_resolved_at"
+    t.string "status"
+    t.string "resolution"
+    t.string "priority"
+    t.text "subject"
+    t.text "description"
+    t.integer "assigned_to"
+    t.string "source_ip_address"
+    t.text "problem_summary"
+    t.text "research_notes"
+    t.string "channel"
+    t.integer "ticket_source_key"
+    t.string "ticket_source"
+    t.string "ticket_source_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+                dispute_packet[:case_opened_at] = dispute.case_opened_at
+                dispute_packet[:priority] = dispute.priority
+                dispute_packet[:source] = dispute.ticket_source
+                dispute_packet[:source_id] = dispute.ticket_source_key
+
+-->
+<table id="disputes-index" class="table responsive no-wrap">
+  <thead>
+    <th>&nbsp;</th> <!-- checkbox -->
+    <th>&nbsp;</th> <!-- priority -->
+    <th>CASE ID</th>
+    <th>&nbsp;</th> <!-- type? email, URL, location -->
+    <th>STATUS</th>
+    <th>DISPUTE</th>
+    <th>OWNER</th>
+    <th>TIME SUBMITTED</th>
+    <th>AGE</th>
+    <th>SUGGESTED DISPOSITION</th>
+    <th>ORIGIN</th>
+    <th>ORIGIN ID</th>
+    <th>SUBMITTER ORG</th>
+    <th>SUBMITTER DOMAIN</th>
+    <th>WBRS SCORE</th>
+    <th>WBRS RULE HITS</th>
+    <th>MALWARE PROBABILITY</th>
   </thead>
 
   <tbody>
@@ -29,14 +85,23 @@
 $(document).ready(function() {
   $('#disputes-index').DataTable({
       columns: [
-          {data: "id"},
-          {data: "case_number"},
-          {data: "dispute_type"},
-          {data: "customer_name"},
-          {data: "customer_company_name"},
-          {data: "status"},
-          {data: "assigned_to"},
-          {data: "actions"}
+          {data: null, defaultContent: ''}, // checkbox
+          {data: "priority"},               // priority
+          {data: "case_number"},            // case ID
+          {data: null, defaultContent: ''}, // type?
+          {data: "status"},                 // status
+          {data: null, defaultContent: ''}, // dispute
+          {data: "assigned_to"},            // owner
+          {data: "case_opened_at"},         // time submitted
+          {data: "case_age"},               // age [ugly math?]
+          {data: "suggested_disposition"},  // suggested disposition
+          {data: "source"},                 // origin
+          {data: "source_id"},              // origin id
+          {data: "customer_name"},          // submitter org
+          {data: "customer_company_name"},  // submitter name
+          {data: null, defaultContent: ''}, // wbrs score
+          {data: null, defaultContent: ''}, // wbrs rule hits
+          {data: null, defaultContent: ''}  // malware probability
       ]
   });
     populate_webrep_index_table();
