@@ -18,9 +18,10 @@ if ENV['COVERAGE'] && ("0" != ENV['COVERAGE'])
     add_filter %r{^/app/processors}
 
     add_group "Controllers", %r{app/controllers(?!/api)}
-    add_group "API", "app/controllers/api"
     add_group "Models", "app/models"
+    add_group "API", "app/controllers/api"
     add_group "Helpers", "app/helpers"
+    add_group "Serializers", "app/serializers"
 
     merge_timeout 3600
   end
