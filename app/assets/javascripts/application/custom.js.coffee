@@ -58,8 +58,7 @@ $ ->
 #  Add a button to a page and give it the ID "export_csv". Clicking this button
 #  will select everything in the first <table> of class "csv_exportable", dump
 #  it to CSV, and download it.
-  document.querySelector('#export_csv').addEventListener 'click', ->
-
-    html = document.querySelector('.csv_exportable')[0].outerHTML
+  $('#export_csv').click ->
+    html = $('.csv_exportable')[0].outerHTML
     export_table_to_csv html, 'table.csv'
     return
