@@ -21,7 +21,7 @@ class DisputeEmail < ApplicationRecord
 
     if case_id.blank?
       #create email to instruct user to use TI form and send to bridge
-      return
+      return_message = {}
     end
 
     new_email = DisputeEmail.new
