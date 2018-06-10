@@ -20,6 +20,7 @@ module API
               disputes.each do |dispute|
                 dispute_packet = {}
                 dispute_packet[:id] = dispute.id
+
                 # dispute_packet[:case_number] = dispute.case_number
                 dispute_packet[:case_number] = sprintf '%08d', dispute.id
                 dispute_packet[:customer_name] = dispute.customer_name

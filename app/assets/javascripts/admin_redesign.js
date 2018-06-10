@@ -16,11 +16,14 @@
 //= require bootstrap
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
+//= require admin/bs-dropdown-select
 //= require admin/rules
 //= require rule_docs
 //= require admin/notes
 //= require admin/bs-admin-tabs
 //= require admin/snort-docs
+//= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require application/webrep_disputes
+

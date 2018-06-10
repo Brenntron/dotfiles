@@ -1,0 +1,106 @@
+- content_for(:title) do
+  Escalations - Analyst Console
+
+- content_for(:nav_banner) do
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
+    %a#dashboard.nav-page-button{href: '/escalations/webrep/dashboard'}
+      %span.nav-toolbar-icon-large.icon-dashboard
+
+    %a#queue.nav-page-button{href: '/escalations/webrep/tickets'}
+      %span.nav-toolbar-icon-large.icon-queue
+
+    %a#research.nav-page-button{href: '/escalations/webrep/research'}
+      %span.nav-toolbar-icon-large.icon-research
+
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-filter-white'}
+      Filter
+    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
+      %ul#filter-cases-list
+        %li
+          %a
+            %span.nav-dropdown-icon.icon-recently-viewed
+            Recently Viewed
+        %li
+          %a
+            %span.nav-dropdown-icon.icon-my-bugs
+            My Tickets
+        %li
+          %a
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Open Tickets
+        %li
+          %a
+            %span.nav-dropdown-icon.icon-team-bugs
+            My Team Tickets
+        %li
+          %a
+            %span.nav-dropdown-icon.icon-open-bugs
+            Open Tickets
+        %li
+          %a
+            %span.nav-dropdown-icon.icon-fixed-bugs
+            Closed Tickets
+        %li
+          %a
+            %span.nav-dropdown-icon.icon-all-tickets
+            All Tickets
+
+      #saved-searches-wrapper.nav-tool-content-wrapper
+        %h3.nav-tool-dropdown-header
+          %span.nav-dropdown-content-icon.icon-saved-search
+          My Saved Searches
+        %table{class: 'table table-condensed small', id: 'saved-search'}
+          -#- if @saved_search.present?
+          -#  - current_user.saved_searches.each do |saved_search|
+          -#    %tr
+          -#      - if @saved_search.id == saved_search.id
+          -#        %td{id: "saved_search_#{saved_search.id}", class: "selected_search"}
+          -#          = saved_search.name
+          -#      - else
+          -#        %td{id: "saved_search_#{saved_search.id}"}
+          -#          %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
+          -#            = saved_search.name
+          -#          %a{class: 'delete-search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
+          -#            = image_tag('icon_cancel_grey.svg')
+          -#
+          -#- else
+          -#  - current_user.saved_searches.each do |saved_search|
+          -#    %tr{id: "saved_search_#{saved_search.id}"}
+          -#      %td
+          -#        %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
+          -#          = saved_search.name
+          -#
+          -#        %a{class: 'delete-search tooltipped', title: 'Delete Saved Search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
+          -#          = image_tag('icon_cancel_grey.svg')
+
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'import-webrep', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-import-white'}
+      Import
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'import-webrep'}
+      .input-group.import-group
+        %input{id: 'import_webrep', name: 'webrep_name', class: 'form-control', placeholder: 'Case ID'}
+          %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_import'}
+            Submit
+      .loading-bar
+        .load-bar-segment.hidden
+        .load-bar-segment.hidden
+        .load-bar-segment.hidden
+
+  .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-4.search-wrapper
+    .input-group.search-group
+      = form_tag('/tickets', method: :get) do
+        = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Case ID'
+
+      %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        Advanced
+      .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
+        %h3.nav-tool-dropdown-header.inverse
+          Advanced Search
+        #advanced-search-wrapper.nav-tool-content-wrapper
+          = render 'advanced_search'
+
+
+= render template: "layouts/rocket"
