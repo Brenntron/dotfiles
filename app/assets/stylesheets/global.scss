@@ -3519,13 +3519,17 @@ button.primary, button.secondary, button.tertiary {
   font-weight: 600;
   font-size: 9.5pt;
   padding: 15px 30px;
-  border: none;
+  border: none !important;
   margin: 12px 6px 0 6px;
   color: $content-bg-color;
 }
 
 button.primary {
   background-color: $bug-section-color;
+}
+
+button.primary:hover {
+  background-color: darken($bug-section-color, 10%);
 }
 
 button.secondary {
@@ -3615,6 +3619,15 @@ button.tertiary {
   float: right;
   margin-top: 3px;
   margin-right: -26px;
+}
+
+#login-div a:hover {
+  background-color: transparent !important;
+}
+
+#filter-cases-list a:hover {
+  background-color: transparent !important;
+  text-decoration: underline;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
