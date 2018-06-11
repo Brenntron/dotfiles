@@ -1,38 +1,7 @@
 <div style="position:relative">
   <div>
     <div class="grid-header">
-      <div style="float: left;">
-        <h1>Open Tickets</h1>
-      </div>
-      <div style="float: left;">
-        <div>Table View</div>
-        <select>
-          <option>Show/Hide Columns</option>
-        </select>
-      </div>
-      <div style="float: left;">
-        <div>Edit Ticket</div>
-        <select>
-          <option>Edit Status</option>
-        </select>
-      </div>
-      <div style="float: left;">
-        <select>
-          <option>Adjust WL/BL</option>
-        </select>
-      </div>
-      <div style="float: left;">
-        <select>
-          <option>Adjust Reptool BL</option>
-        </select>
-      </div>
-      <div style="float: left;">
-        <div>File</div>
-        <select>
-          <option>Export to CSV</option>
-        </select>
-      </div>
-    </div>
+      <%= render('adjust_reptool') %>
   </div>
 </div>
 <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
@@ -87,7 +56,7 @@ $(document).ready(function() {
           {data: null, defaultContent: ''}  // malware probability
       ]
   });
-    populate_webrep_index_table();
+    // populate_webrep_index_table();
 
 } );
 

@@ -1,1 +1,24 @@
-%form#adjust-reptool{method: 'get', 'accept-charset': 'UTF-8'}
+%div{style: 'float: left;'}
+  %h1
+    Open Tickets
+%div{style: 'float: left;'}
+  %div
+    Table View
+  %select
+    %option Show/Hide Columns
+%div{style: 'float: left;'}
+  %div
+    Edit Ticket
+  %select
+    %option Edit Status
+%div{style: 'float: left;'}
+  %div
+    Edit Ticket
+  %select
+    %option Adjust WL/BL
+%div{style: 'float: left;'}
+  %button#adjust-reptool-bl.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    Adjust Reptool BL
+  %div#adjust-reptool-dropdown.dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'adjust-reptool-bl'}
+    #adjust-reptool-wrapper.nav-tool-content-wrapper
+      =# = render 'adjust_reptool'
