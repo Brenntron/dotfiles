@@ -119,7 +119,7 @@ class DisputeEmail < ApplicationRecord
       email_args[:attachments]
     end
 
-    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
+    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 
   end
