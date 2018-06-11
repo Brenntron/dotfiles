@@ -11,7 +11,13 @@ class Dispute < ApplicationRecord
   end
 
   def suggested_d
-    dispute.dispute_entries.first.suggested_disposition
+    # had this as an unless earlier ... also, the .first should be replaced by some sort
+    # of null coalesece
+    if dispute_entries.empty? or dispute_entries.first[:suggested_disposition].nil?
+      "None"
+    else
+      dispute_entries.first[:suggested_disposition]
+    end
   end
 
   def dispute_age
