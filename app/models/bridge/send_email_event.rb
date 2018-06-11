@@ -1,5 +1,5 @@
 class Bridge::SendEmailEvent < Bridge::BaseMessage
-  def initialize(addressee:, source_authority: nil, source_key: nil)
+  def initialize(addressee:)
     super(channel: 'email-sendgrid',
           addressee: addressee)
   end

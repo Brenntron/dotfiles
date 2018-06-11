@@ -22,7 +22,7 @@ module API
                 dispute_packet[:id] = dispute.id
                 dispute_packet[:case_number] = dispute.case_number
                 dispute_packet[:customer_name] = dispute.customer_name
-                dispute_packet[:customer_company_name] = dispute.status
+                dispute_packet[:customer_company_name] = dispute.customer_company_name
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:assigned_to] = dispute.assigned_to
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"

@@ -73,15 +73,15 @@ Feature: Webrep communications
       |id  | dispute_id           | status |
       | 1  | 722                  | unread |
       | 2  | 722                  | read   |
-    And I goto "/escalations/webrep/disputes/722"
+    When I goto "/escalations/webrep/disputes/722"
     And I click on row with email_id "1"
-    Then I wait for "2" seconds
-    Then I click ".reply-button"
+    And I wait for "2" seconds
+    When I click ".reply-button"
     And I fill in the reply textarea with "I'm replying to your email"
-  # fails because of lack of bridge
-#    Then I click "Send"
-#    And I wait for "2" seconds
-#    And I should see "Email Sent"
+    Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
+    When I click "Send"
+    And I wait for "2" seconds
+    And I should see "EMAIL SENT"
 
 
   @javascript
@@ -99,5 +99,8 @@ Feature: Webrep communications
     Then I click "Compose New Email"
     And I wait for "2" seconds
     And I fill in "receiver" with "customer@gmail.com"
+    Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
+    And I wait for "2" seconds
+    And I should see "EMAIL SENT"
 

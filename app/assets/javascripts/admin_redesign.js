@@ -15,6 +15,7 @@
 //= require bootstrap-multiselect
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
+//= require admin/bs-dropdown-select
 //= require admin/rules
 //= require rule_docs
 //= require admin/notes
@@ -29,3 +30,7 @@
 //= require application/helpers
 //= require clipboard
 //= require moment
+//= require application/webrep_advanced_search
+//= require moment
+//= require application/webrep_advanced_search
+
