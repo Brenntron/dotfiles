@@ -44,3 +44,22 @@ window.populate_webrep_my_table = () ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
+window.add_wlbl_button = ->
+  wlbl_form = $('#adjust-wlbl-form')
+  data = {
+    'urls': wlbl_form.find('#adjust-wlbl-urls').val()
+    'trgt_list': wlbl_form.find('#adjust-wlbl-trgt_list').val()
+    'thrt_cats': wlbl_form.find('#adjust-wlbl-thrt_cats-list').val()
+    'note': wlbl_form.find('#adjust-wlbl-note').val()
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep_disputes/disputes/wlbl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+  )
+
+
