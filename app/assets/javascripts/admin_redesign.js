@@ -27,6 +27,10 @@
 //= require dataTables/extras/dataTables.responsive
 //= require application/webrep/disputes
 //= require application/webrep/communications
+//= require application/helpers
+//= require clipboard
+//= require moment
+//= require application/webrep_advanced_search
 //= require moment
 //= require application/webrep_advanced_search
 

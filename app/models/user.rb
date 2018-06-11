@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_and_belongs_to_many :roles, dependent: :destroy
   has_many :committed_bugs, class_name: 'Bug', foreign_key: :committer_id
   has_many :named_searches
+  has_many :dispute_comments
 
   validates :cvs_username, presence: true, uniqueness: true
 
