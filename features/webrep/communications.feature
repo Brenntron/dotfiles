@@ -80,8 +80,8 @@ Feature: Webrep communications
     And I fill in the reply textarea with "I'm replying to your email"
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     When I click "Send"
-#    And I wait for "2" seconds
-#    And I should see "Email Sent"
+    And I wait for "2" seconds
+    And I should see "EMAIL SENT"
 
 
   @javascript
@@ -99,5 +99,8 @@ Feature: Webrep communications
     Then I click "Compose New Email"
     And I wait for "2" seconds
     And I fill in "receiver" with "customer@gmail.com"
+    Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
+    And I wait for "2" seconds
+    And I should see "EMAIL SENT"
 
