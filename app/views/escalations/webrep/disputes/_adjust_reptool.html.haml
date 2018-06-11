@@ -1,7 +1,4 @@
 %div{style: 'float: left;'}
-  %h1
-    Open Tickets
-%div{style: 'float: left;'}
   %div
     Table View
   %select
@@ -15,10 +12,14 @@
   %div
     Edit Ticket
   %select
-    %option Adjust WL/BL
+    %option Edit Status
 %div{style: 'float: left;'}
-  %button#adjust-reptool-bl.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-    Adjust Reptool BL
-  %div#adjust-reptool-dropdown.dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'adjust-reptool-bl'}
-    #adjust-reptool-wrapper.nav-tool-content-wrapper
-      =# = render 'adjust_reptool'
+  %select
+    %option Adjust  Rule UI WL/BL
+%div{style: 'float: left;'}
+  %select
+    %option Adjust Reptool BL
+%div{style: 'float: left;'}
+  %div
+    File
+  %button Export to CSV
