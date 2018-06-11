@@ -19,6 +19,7 @@ module API
             desc "edit a dispute comment"
             params do
               requires :id, type: Integer, desc: "The dispute comment's id in the database."
+              requires :current_user_id, type: Integer, desc: "The id of the user authoring the comment."
               requires :comment, type: String, desc: "The contents of the comment."
             end
 

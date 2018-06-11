@@ -142,6 +142,13 @@
 
   .col-sm-3
     %h1 Notes
+    %button.add-case-note-button#new-case-note-button
+      Add Note
+    .col-xs-12.new-case-note-row
+      %textarea.new-case-note-textarea
+      .note-info-item.note-tool-buttons
+        %button.new-case-note-save-button.save-button
+        %button.new-case-note-cancel-button x
     -@dispute.dispute_comments.recent_first.each do |comment|
       .row
         .col-xs-12
@@ -153,19 +160,18 @@
           .note-info-item.time-stamp
             =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
           .note-info-item.note-tool-buttons
-            %button.note-edit-button{comment_id: "#{comment.id}"}
+            %button.note-save-edit-button.save-button.hidden{comment_id: "#{comment.id}"}
+            %button.note-cancel-edit-button.hidden{comment_id: "#{comment.id}"} x
             %button.note-copy-button{comment_id: "#{comment.id}"}
             %button.note-delete-button{comment_id: "#{comment.id}"}
 
       .row
         .col-xs-12
-          %textarea.note-block
+          .note-block{comment_id: "#{comment.id}"}
+            =comment.comment
+          %textarea.editable-note-block{comment_id: "#{comment.id}"}
             =comment.comment
 
-    .row
-      .col-xs-12.text-center
-        %button.add-case-note-button#new-case-note-button
-          Add Note
 
     %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}

@@ -3031,6 +3031,16 @@ fieldset.top-content {
   margin: 3px 0;
 }
 
+.editable-note-block {
+  background-color: $faint-neutral-color;
+  color: $type-lighter-color;
+  padding: 8px 12px;
+  display: none;
+  font-size: 8pt;
+  line-height: 1.4em;
+  margin: 3px 0;
+}
+
 .case-history-icon {
   width: 16px;
   height: 20px;
@@ -3235,6 +3245,8 @@ fieldset.top-content {
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
 .note-delete-button {background-image: url(image_path('icon_delete.svg'));}
 
+
+
 .email-button {
   width: 20px;
   height: 20px;
@@ -3297,6 +3309,8 @@ fieldset.top-content {
 .add-case-note-button:hover {
   background-color: #E47433;
 }
+
+.new-case-note-row {display: none;}
 
 .attachment-label {
   background-image: url(image_path('icon_attachment.svg'));

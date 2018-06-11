@@ -170,7 +170,7 @@ ActiveRecord::Schema.define(version: 20180531183731) do
   create_table "dispute_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "dispute_id"
     t.text "comment"
-    t.string "state"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

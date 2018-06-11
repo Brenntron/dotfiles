@@ -147,18 +147,76 @@ $ ->
         std_api_error(response, "Note could not be deleted.", reload: false)
     )
 
-  $('.note-edit-button').on "click", ->
+  $('.note-save-edit-button').on "click", ->
     comment_id = $(this).attr('comment_id')
     current_user_id = $('input[name="current_user_id"]').val()
+    editable_note_block = $("textarea.editable-note-block[comment_id='#{comment_id}']")
+    updated_comment = editable_note_block.val()
 
     std_msg_ajax(
       method: 'PUT'
       url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
-      data: {current_user_id: current_user_id}
-      success_reload: false
+      data: {current_user_id: current_user_id, comment: updated_comment}
+      success_reload: true
       success: (response) ->
         std_msg_success('Note Updated.', [], reload: true)
       error: (response) ->
         std_api_error(response, "Note could not be updated.", reload: false)
     )
+
+  # related to showing and hiding of elements when editing a note
+
+  $('.note-cancel-edit-button').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    save_button = $(".note-save-edit-button[comment_id='#{comment_id}']")
+    note_block = $("div.note-block[comment_id='#{comment_id}']")
+    editable_note_block = $("textarea.editable-note-block[comment_id='#{comment_id}']")
+    save_button.addClass('hidden')
+    $(this).addClass('hidden')
+    editable_note_block.hide()
+    note_block.show()
+
+
+  $('.editable-note-block').on "keyup", ->
+    comment_id = $(this).attr('comment_id')
+    save_button = $(".note-save-edit-button[comment_id='#{comment_id}']")
+    save_button.removeClass('hidden')
+
+  $('.note-block').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    current_user_id = $('input[name="current_user_id"]').val()
+    note_block = $(this)
+    editable_note_block = $("textarea.editable-note-block[comment_id='#{comment_id}']")
+    cancel_button = $(".note-cancel-edit-button[comment_id='#{comment_id}']")
+    cancel_button.removeClass('hidden')
+    note_block.hide()
+    editable_note_block.show()
+
+
+  $('#new-case-note-button').on "click", ->
+    $('.new-case-note-row').show()
+    $(this).hide()
+
+  $('.new-case-note-cancel-button').on "click", ->
+    $('.new-case-note-row').hide()
+    $('#new-case-note-button').show()
+
+  $('.new-case-note-save-button').on "click", ->
+    debugger
+    comment = $('.new-case-note-textarea').val()
+    dispute_id = $('input[name="dispute_id"]').val()
+    user_id = $('input[name="current_user_id"]').val()
+
+    std_msg_ajax(
+      method: 'POST'
+      url: "/api/v1/escalations/webrep/dispute_comments"
+      data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
+      success_reload: true
+      success: (response) ->
+        std_msg_success('Note Created.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "Note could not created.", reload: false)
+    )
+
+
 
