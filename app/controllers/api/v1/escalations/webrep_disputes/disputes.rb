@@ -114,9 +114,9 @@ module API
               requires :note, type: String, desc: "note"
             end
             post "wlbl" do
-              byebug
               wlbl_params = permitted_params.to_h.merge('usr' => current_user.cvs_username)
               Wbrs::ManualWlbl.add_from_params(wlbl_params)
+              ''
             end
 
           end
