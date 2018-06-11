@@ -131,21 +131,26 @@ $ ->
 
 
     # Notes (Comments) related communications stuff
+    # Delete Note
 
   $('.note-delete-button').on "click", ->
     comment_id = $(this).attr('comment_id')
     current_user_id = $('input[name="current_user_id"]').val()
+    confirmation = confirm('Are you sure you want to delete this note?')
 
-    std_msg_ajax(
-      method: 'DELETE'
-      url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
-      data: {current_user_id: current_user_id}
-      success_reload: false
-      success: (response) ->
-        std_msg_success('Note Deleted.', [], reload: true)
-      error: (response) ->
-        std_api_error(response, "Note could not be deleted.", reload: false)
-    )
+    if confirmation
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
+        data: {current_user_id: current_user_id}
+        success_reload: false
+        success: (response) ->
+          std_msg_success('Note Deleted.', [], reload: true)
+        error: (response) ->
+          std_api_error(response, "Note could not be deleted.", reload: false)
+      )
+
+  # Editing a Note
 
   $('.note-save-edit-button').on "click", ->
     comment_id = $(this).attr('comment_id')
@@ -192,6 +197,7 @@ $ ->
     note_block.hide()
     editable_note_block.show()
 
+  # New Note
 
   $('#new-case-note-button').on "click", ->
     $('.new-case-note-row').show()
@@ -202,7 +208,6 @@ $ ->
     $('#new-case-note-button').show()
 
   $('.new-case-note-save-button').on "click", ->
-    debugger
     comment = $('.new-case-note-textarea').val()
     dispute_id = $('input[name="dispute_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
