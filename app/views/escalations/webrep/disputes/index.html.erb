@@ -35,11 +35,14 @@
       <th>SUGGESTED DISPOSITION</th>
       <th>ORIGIN</th>
       <th>ORIGIN ID</th>
+      <th>SUBMITTER</th>
       <th>SUBMITTER ORG</th>
       <th>SUBMITTER DOMAIN</th>
+      <!--
       <th>WBRS SCORE</th>
       <th>WBRS RULE HITS</th>
       <th>MALWARE PROBABILITY</th>
+      -->
     </thead>
 
     <tbody>
@@ -47,7 +50,6 @@
     </tbody>
   </table>
 </div>
-
 
 <script>
 $(document).ready(function() {
@@ -58,18 +60,21 @@ $(document).ready(function() {
             {data: "case_number"},            // case ID
             {data: null, defaultContent: ''}, // type?
             {data: "status"},                 // status
-            {data: null, defaultContent: ''}, // dispute
+            {data: "dispute_domain"},         // dispute
             {data: "assigned_to"},            // owner
             {data: "case_opened_at"},         // time submitted
             {data: "case_age"},               // age [ugly math?]
             {data: "suggested_disposition"},  // suggested disposition
             {data: "source"},                 // origin
             {data: "source_id"},              // origin id
-            {data: "customer_name"},          // submitter org
-            {data: "customer_company_name"},  // submitter name
-            {data: null, defaultContent: ''}, // wbrs score
+            {data: "submitter_name"},         // submitter
+            {data: "submitter_org"},          // submitter org
+            {data: "submitter_domain"}        // submitter domain
+            /*,
+            {data: "wbrs_score"},             // wbrs score
             {data: null, defaultContent: ''}, // wbrs rule hits
             {data: null, defaultContent: ''}  // malware probability
+            */
         ]
     });
     // some of these cells will be combinations (see _my_tickets.html.erb for more)

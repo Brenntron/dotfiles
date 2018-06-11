@@ -23,8 +23,15 @@ module API
 
                 # dispute_packet[:case_number] = dispute.case_number
                 # dispute_packet[:case_number] = sprintf '%08d', dispute.id
-                dispute_packet[:customer_name] = dispute.customer_name
-                dispute_packet[:customer_company_name] = dispute.org_domain # should be: dispute.customer_company_name
+                dispute_packet[:submitter_name] = dispute.customer_name
+                dispute_packet[:submitter_org] = dispute.org_domain # should be: dispute.customer_company_name
+                dispute_packet[:submitter_domain] = dispute.org_domain # should be: dispute.customer_company_name
+                dispute_packet[:dispute_domain] = dispute.org_domain
+                unless dispute.dispute_entries.empty?
+                  unless dispute.dispute_entries.first[:hostname].nil?
+                    dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
+                  end
+                end
                 dispute_packet[:status] = dispute.status.upcase
                 dispute_packet[:assigned_to] = dispute.assignee
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
@@ -34,9 +41,17 @@ module API
                 dispute_packet[:case_age] = dispute.dispute_age
                 # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
                 dispute_packet[:suggested_disposition] = dispute.suggested_d
-                dispute_packet[:priority] = dispute.priority
-                dispute_packet[:source] = dispute.ticket_source
+                dispute_packet[:priority] = "P" + (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
+                dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
                 dispute_packet[:source_id] = dispute.ticket_source_key
+                dispute_packet[:source_type] = dispute.ticket_source_type
+
+                dispute_packet[:wbrs_score] = ''
+                unless dispute.dispute_entries.empty?
+                  if dispute.dispute_entries.first[:score_type] == "WBRS"
+                    dispute_packet[:wbrs_score] = dispute.dispute_entries.first[:score].to_s
+                  end
+                end
 
                 json_packet << dispute_packet
               end
@@ -65,7 +80,7 @@ module API
                 dispute_packet[:case_age] = dispute.dispute_age
                 # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
                 dispute_packet[:suggested_disposition] = dispute.suggested_d
-                dispute_packet[:priority] = dispute.priority
+                dispute_packet[:priority] = "P" + (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
                 dispute_packet[:source] = dispute.ticket_source
                 dispute_packet[:source_id] = dispute.ticket_source_key
 
