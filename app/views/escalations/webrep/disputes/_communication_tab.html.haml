@@ -162,7 +162,7 @@
           .note-info-item.note-tool-buttons
             %button.note-save-edit-button.save-button.hidden{comment_id: "#{comment.id}"}
             %button.note-cancel-edit-button.hidden{comment_id: "#{comment.id}"} x
-            %button.note-copy-button{comment_id: "#{comment.id}"}
+            %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
             %button.note-delete-button{comment_id: "#{comment.id}"}
 
       .row
@@ -178,8 +178,11 @@
     %input{:name => "dispute_id", :type => "hidden", :value => "#{@dispute.id}"}
     %input{:name => "current_user_id", :type => "hidden", :value => "#{current_user.id}"}
 
+  :javascript
+    AC.Helpers.clipboard()
 
-#newEmail.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "editBug", :role => "dialog", :tabindex => "-1"}
+
+#newEmail.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "new_message", :role => "dialog", :tabindex => "-1"}
   .modal-dialog{:role => "document"}
     .modal-content
       .modal-header
@@ -209,4 +212,3 @@
             .col-xs-12.text-center
               %button.add-case-note-button#new-email{value: 'submit'}
                 Send
-
