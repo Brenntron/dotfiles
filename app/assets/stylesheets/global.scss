@@ -2398,7 +2398,7 @@ a.code-content:hover {
   display: inline-block;
 }
 
-.author-username {
+.author-username, #email-reply .receiver-email {
   font-size: 8pt;
   color: $type-base-color;
   font-weight: 700;
@@ -3136,6 +3136,22 @@ fieldset.top-content {
   min-height: 80px;
 }
 
+#email-reply .email-header-information {
+  min-height: 0;
+}
+
+.email-reply-content-wrapper {
+  border: 1px solid darken($faint-neutral-color, 5%);
+}
+
+.email-reply-body {
+  border: none;
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  padding-top: 10px;
+  }
+
 .email-response-button-wrapper {
   float: right;
   border-left: solid 1px darken($faint-neutral-color, 10%);
@@ -3159,6 +3175,7 @@ fieldset.top-content {
   color: $type-lighter-color;
   line-height: 1.4em;
   margin-top: 12px;
+  margin-bottom: 40px;
   font-size: 9pt;
 }
 
@@ -3175,6 +3192,11 @@ fieldset.top-content {
 .communication-subject {
   color: $type-lighter-color;
   line-height: 1.3em;
+}
+
+textarea.communication-subject {
+  border: none;
+  width: 100%;
 }
 
 .email-response-buttons {
@@ -3199,6 +3221,17 @@ fieldset.top-content {
 
 .email-response-buttons button:hover {
   background-color: $bug-section-color;
+}
+
+.reply-symbol {
+  background-image: url(image_path('icon_reply_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: top center;
+  width: 20px;
+  height: 20px;
+  display: block;
+  float: left;
+  margin-right: 8px;
 }
 
 .receiver-email {
@@ -3258,6 +3291,10 @@ fieldset.top-content {
   margin-left: 2px;
 }
 
+.email-row {
+  cursor: pointer;
+}
+
 .email-row .alt-col {
   background-color: lighten($bug-section-color, 25%);
 }
@@ -3300,6 +3337,10 @@ fieldset.top-content {
 }
 .sender-receiver-info {
   margin-top: 10px;
+}
+
+#email-reply .sender-receiver-info {
+  margin-top: 0;
 }
 
 .add-case-note-button {
