@@ -104,3 +104,112 @@ Feature: Webrep communications
     And I wait for "2" seconds
     And I should see "EMAIL SENT"
 
+
+
+  ##Notes
+
+  @javascript
+  Scenario: a user can create a new note
+    Given a user with role "admin" exists and is logged in
+
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And I goto "/escalations/webrep/disputes/722"
+    Then I click "Add Note"
+    And I fill in "new-case-note-textarea" with "I like jelly beans"
+    Then I click ".new-case-note-save-button"
+    And I wait for "2" seconds
+    Then I should see "NOTE CREATED"
+
+
+  @javascript
+  Scenario: a user cannot edit a note authored by another user
+    Given a user with role "admin" exists and is logged in
+    And the following users exist
+      |id  |cec_username|
+      |2   | snorty     |
+
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following dispute comments exist:
+      | id | dispute_id | comment                      |  user_id |
+      |  1 |  722       | purple pigs are cool         |  2       |
+      |  2 |  722       |  I prefer yellow pigs        |  1       |
+
+    And I goto "/escalations/webrep/disputes/722"
+    Then I click the note with text "purple pigs are cool"
+    And I fill in "editable-note-block" with "I am editing stuff"
+    When I click ".note-save-edit-button"
+    Then I wait for "2" seconds
+    Then I should see "NOTE COULD NOT BE UPDATED"
+
+
+  @javascript
+  Scenario: a user can edit their own note
+    Given a user with role "admin" exists and is logged in
+    And the following users exist
+      |id  |cec_username|
+      |2   | snorty     |
+
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following dispute comments exist:
+      | id | dispute_id | comment                      |  user_id |
+      |  1 |  722       | purple pigs are cool         |  2       |
+      |  2 |  722       |  I prefer yellow pigs        |  1       |
+
+    And I goto "/escalations/webrep/disputes/722"
+    Then I click the note with text "I prefer yellow pigs"
+    And I fill in "editable-note-block" with "I am editing stuff"
+    When I click ".note-save-edit-button"
+    Then I wait for "2" seconds
+    Then I should see "NOTE UPDATED"
+
+
+
+  @javascript
+  Scenario: a user cannot delete a note authored by another user
+    Given a user with role "admin" exists and is logged in
+    And the following users exist
+      |id  |cec_username|
+      |2   | snorty     |
+
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following dispute comments exist:
+      | id | dispute_id | comment                      |  user_id |
+      |  1 |  722       | purple pigs are cool         |  2       |
+      |  2 |  722       |  I prefer yellow pigs        |  1       |
+
+    And I goto "/escalations/webrep/disputes/722"
+    And I click the delete button of the first comment
+    Then I wait for "2" seconds
+    Then I should see "NOTE COULD NOT BE DELETED"
+
+
+
+  @javascript
+  Scenario: a user can delete a note authored by themselves
+    Given a user with role "admin" exists and is logged in
+    And the following users exist
+      |id  |cec_username|
+      |2   | snorty     |
+
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following dispute comments exist:
+      | id | dispute_id | comment                      |  user_id |
+      |  1 |  722       | purple pigs are cool         |  1       |
+      |  2 |  722       |  I prefer yellow pigs        |  2       |
+
+    And I goto "/escalations/webrep/disputes/722"
+    And I click the delete button of the first comment
+    Then I wait for "2" seconds
+    Then I should see "NOTE DELETED"
+
+

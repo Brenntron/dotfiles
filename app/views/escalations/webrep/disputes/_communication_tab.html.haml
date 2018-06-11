@@ -145,9 +145,9 @@
     %button.add-case-note-button#new-case-note-button
       Add Note
     .col-xs-12.new-case-note-row
-      %textarea.new-case-note-textarea
+      %textarea.new-case-note-textarea#new-case-note-textarea
       .note-info-item.note-tool-buttons
-        %button.new-case-note-save-button.save-button
+        %button.new-case-note-save-button save
         %button.new-case-note-cancel-button x
     -@dispute.dispute_comments.recent_first.each do |comment|
       .row
@@ -160,7 +160,7 @@
           .note-info-item.time-stamp
             =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
           .note-info-item.note-tool-buttons
-            %button.note-save-edit-button.save-button.hidden{comment_id: "#{comment.id}"}
+            %button.note-save-edit-button.hidden{comment_id: "#{comment.id}"} save
             %button.note-cancel-edit-button.hidden{comment_id: "#{comment.id}"} x
             %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
             %button.note-delete-button{comment_id: "#{comment.id}"}
@@ -169,7 +169,7 @@
         .col-xs-12
           .note-block{comment_id: "#{comment.id}"}
             =comment.comment
-          %textarea.editable-note-block{comment_id: "#{comment.id}"}
+          %textarea.editable-note-block#editable-note-block{comment_id: "#{comment.id}"}
             =comment.comment
 
 
