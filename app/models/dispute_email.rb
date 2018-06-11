@@ -17,7 +17,7 @@ class DisputeEmail < ApplicationRecord
     user = message_payload[:current_user] 
 
     #check envelope for case validity
-    case_id = find_case_number_in_email(message_payload)
+    case_id = find_case_number_in_email(message_payload["payload"])
 
     if case_id.blank?
       #create email to instruct user to use TI form and send to bridge
@@ -27,13 +27,13 @@ class DisputeEmail < ApplicationRecord
     new_email = DisputeEmail.new
     new_email.dispute_id = case_id
     new_email.email_headers = message_payload["payload"]["headers"]
-    new_email.from = message_payload["payload"]["headers"]
+    new_email.from = message_payload["payload"]["from"]
     new_email.to = message_payload["payload"]["to"]
     new_email.subject = message_payload["payload"]["subject"]
-    new_email.body = message_payload["payload"]["to"]
+    new_email.body = message_payload["payload"]["text"]
     new_email.status = UNREAD
     new_email.save
-
+    puts "\n#######"
     if message_payload["attachments"].present?
       message_payload["attachments"].each do |email_attachment|
         DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, email_attachment, user, new_email)
@@ -57,6 +57,7 @@ class DisputeEmail < ApplicationRecord
 
   ## FORMAT FOR AN EXTERNAL FACING CASE NUMBER IS:  ref-[dispute#id]-anco   example: ref-325302-anco wher 325302 is the ID of a record in disputes table
   def self.find_case_number_in_email(message_payload)
+
     email_address = message_payload['to']
     email_body = message_payload['text']
 
@@ -145,7 +146,7 @@ class DisputeEmail < ApplicationRecord
       new_body += "\n\n"
       new_body += "-------------------------------------------------------------------------------------------------\n"
       new_body += "Please Do Not Remove This Reference Number.  Keep This Reference Number In The Email Chain:\n"
-      new_body += "#{REFERENCE_TEMPLATE.gsub('CASEID', case_number)}"
+      new_body += "#{REFERENCE_TEMPLATE.gsub('CASEID', case_number.to_s)}\n"
       new_body += "-------------------------------------------------------------------------------------------------\n"
     end
 

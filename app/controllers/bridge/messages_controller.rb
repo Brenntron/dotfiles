@@ -11,25 +11,13 @@ class Bridge::MessagesController < ApplicationController
     render plain: except.message, status: :internal_server_error
   end
   def messages_from_bridge
-    puts "ONE\n"
+
     case envelope_params["sender"]
       when "snort-org"
-        puts "TWO\n"
         fp_create(false_positive_params)
       when "talos-intelligence"
-        puts "THREE\n"
-        puts "\n####################################################\n"
-        puts message_params.inspect
-        puts "\n"
-        puts message_params.keys.first
-        puts "\n%%%%%%%%%%%%%\n"
-        puts message_params[:dispute_email].inspect
-        puts "\n%%%%%%%%%%%%%\n"
         obj_type_key = message_params.keys.first
         obj_type = obj_type_key.to_s.camelize
-        puts obj_type_key
-        puts obj_type
-        puts "\n***********************************************\n"
         message_params[obj_type_key][:bugzilla_session] = bugzilla_session
         message_params[obj_type_key][:current_user] = current_user
         return_message = obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
