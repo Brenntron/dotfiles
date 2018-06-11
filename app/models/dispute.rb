@@ -5,8 +5,9 @@ class Dispute < ApplicationRecord
 
   def self.process_bridge_payload(message_payload)
     user = User.where(cvs_username:"vrtincom").first
-    new_entries_ips = message_payload["payload"]["investigate_ips"]
-    new_entries_urls = message_payload["payload"]["investigate_urls"]
+    message_payload["payload"] = message_payload["payload"].permit!.to_h
+    new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
+    new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
 
     #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
@@ -100,9 +101,9 @@ class Dispute < ApplicationRecord
     first_email = DisputeEmail.new
     first_email.dispute_id = new_dispute.id
     first_email.email_headers = nil
-    first_email.from = message_payload["payload"]["email_subject"]
+    first_email.from = message_payload["payload"]["email"]
     first_email.to = nil
-    first_email.subject = message_payload["payload"]["subject"]
+    first_email.subject = message_payload["payload"]["email_subject"]
     first_email.body = message_payload["payload"]["email_body"]
     first_email.status = DisputeEmail::UNREAD
     first_email.save
