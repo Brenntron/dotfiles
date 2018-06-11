@@ -1,5 +1,5 @@
 class Bridge::MessagesController < ApplicationController
-  def fp_create(params)
+  def fp_create
     sender = envelope_params[:sender]
     Rails.logger.debug("Analyst Console recieved message to create a false positive bug from sender #{sender}")
     false_positive = FalsePositive.where(source_key:false_positive_params['source_key']).first
@@ -35,11 +35,28 @@ class Bridge::MessagesController < ApplicationController
     log_exception(except)
     render plain: except.message, status: :internal_server_error
   end
+
   def messages_from_bridge
 
     case envelope_params["sender"]
       when "snort-org"
-        fp_create(false_positive_params)
+        false_positive = FalsePositive.where(source_key:false_positive_params['source_key']).first
+        unless false_positive
+          false_positive = FalsePositive.create_from_params(false_positive_params,
+                                                            attachments_attrs: attachments_params,
+                                                            sender: envelope_params["sender"])
+        end
+        Thread.new { false_positive.create_escalation_action(bugzilla_session) }
+        return_message = {
+            "envelope":
+                {
+                    "channel": "fp-event",
+                    "addressee": "snort-org",
+                    "sender": "analyst-console"
+                },
+            "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK"},
+        }
+        render json: return_message, status: :ok
       when "talos-ingelligence"
         return_message = {
 
