@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="state">State</label>
-        <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control', id: 'bug-form-state-input'%>
+        <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control', id: 'bug-form-state-input' %>
 
         <% unless @bug.can_resolve? %>
         <span class="tiny text-muted">Can't set to pending.</span>
