@@ -54,7 +54,8 @@ $ ->
     $('#email-reply').removeClass('hidden')
 
   $('.attachment-reply').on 'click', ->
-    $('#file-fields').before("<span><input class= 'file_attachment' name='attachment' type='file'/></span>")
+    $('.file-wrapper-reply').show()
+    $('#file-fields').append("<span class='file-attachment-wrapper'><input class= 'file_attachment' name='attachment' type='file'/></span>")
     $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
     $('.file_attachment:last').click()
 

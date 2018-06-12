@@ -3818,6 +3818,34 @@ input.receiver-email {
   padding: 10px;
 }
 
+.file-wrapper-reply {
+  margin-top: 5px;
+}
+
+.file-attachment-wrapper {
+  display: inline-block;
+  background-color: $bug-section-color;
+  border-radius: 2px;
+  margin: 2px;
+}
+
+.file-attachment-wrapper button {
+  background-color: transparent;
+  border: none;
+  color: $content-bg-color;
+}
+
+input.file_attachment {
+  display: inline-block;
+  background-image: none;
+  font-size: 8.5pt;
+  color: $content-bg-color !important;
+  content: 'what';
+  width: auto;
+  margin: 0;
+  padding: 2px;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
