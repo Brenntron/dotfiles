@@ -5,7 +5,7 @@ class DisputeEmailAttachment < ApplicationRecord
 
   def self.build_and_push_to_bugzilla(bugzilla_session, payload, user, dispute_email, remote = true)
     if remote == true
-      file_content = open(payload[:url])
+      file_content = open(payload[:url]).read
     else
       file_content = payload[:file_content].read
     end
@@ -16,7 +16,7 @@ class DisputeEmailAttachment < ApplicationRecord
       ids: 375210, #dispute_email.dispute.id,
       data: XMLRPC::Base64.new(file_content),
       file_name: payload[:file_name],
-      content_type: payload[:content_type],
+      content_type: payload[:file_type],
       summary: payload[:file_name],
       comment: "a file: #{payload[:filename]} for case: #{dispute_email.dispute_id} generated during a correspondence."
     }

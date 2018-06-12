@@ -16,6 +16,7 @@
 //= require bootstrap
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
+//= require admin/bs-dropdown-select
 //= require admin/rules
 //= require rule_docs
 //= require admin/notes
@@ -23,8 +24,9 @@
 //= require admin/snort-docs
 //= require admin/std_api
 //= require admin/std_msg
-//= require dataTables/jquery.dataTables
-//= require dataTables/extras/dataTables.responsive
 //= require application/webrep/disputes
 //= require application/webrep/communications
 //= require moment
+//= require application/webrep_advanced_search
+//= require dataTables/jquery.dataTables
+//= require dataTables/extras/dataTables.responsive

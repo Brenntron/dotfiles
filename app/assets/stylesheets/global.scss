@@ -32,6 +32,7 @@ $wiki-dark-color: #334C18;
 $user-highlight-color: #FFC5C2;
 $user-med-color: #FC9292;
 $user-dark-color: #560303;
+$warning-accent-color: #E47433;
 
 /* Tab Icon Colors */
 $rule-accent-color: #FDBB2B;
@@ -148,6 +149,7 @@ h2 {
 h3 {
   font-weight: 700;
   margin-bottom: 30px;
+  color: $type-base-color;
 }
 
 h4 {
@@ -1664,8 +1666,9 @@ a.static-nav-item {
 .icon-open-bugs    {background-image: url(image_path('icon_openbugs.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
 .icon-all-bugs     {background-image: url(image_path('bugs_icon.svg'));}
-
+.icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
+.icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -1756,15 +1759,15 @@ a.static-nav-item {
   line-height: 1em;
 }
 
-#filter-bugs-list {
+#filter-bugs-list, #filter-cases-list {
   display: inline-block;
 }
 
-#filter-bugs-list a {
+#filter-bugs-list a, #filter-cases-list a{
   color: $ac-nav-bg-color;
 }
 
-#filter-bugs-list li {
+#filter-bugs-list li, #filter-cases-list li {
   width: 170px;
 }
 
@@ -1803,7 +1806,7 @@ a.static-nav-item {
   margin: 9px 10px;;
 }
 
-#import_bug {
+#import_bug, #import_webrep {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;
   width: 100px;
@@ -3077,7 +3080,7 @@ fieldset.top-content {
 }
 
 .highlighted-section-header {
-  background-color: $communication-accent-color;
+  background-color: #4E4E4E;
   color: $content-bg-color;
   margin-top: -15px;
   padding: 12px;
@@ -3093,7 +3096,7 @@ fieldset.top-content {
   display: block;
   height: 10px;
   position: absolute;
-  background-color: $communication-accent-color;
+  background-color: #4E4E4E;
   z-index: 60;
   width: 100%;
   margin-left: -12px;
@@ -3244,11 +3247,11 @@ fieldset.top-content {
 }
 
 .email-row .alt-col {
-  background-color: lighten($communication-accent-color, 35%);
+  background-color: lighten($bug-section-color, 25%);
 }
 
 .email-row.email-unread .alt-col {
-  background-color: $communication-accent-color;
+  background-color: $bug-section-color;
   color: $content-bg-color;
 }
 
@@ -3256,7 +3259,17 @@ fieldset.top-content {
   position: absolute;
   margin-right: 6px;
   margin-left: 10px;
+  width: auto;
   box-shadow: -2px 2px 10px 1px rgba(0, 0, 0, 0.1);
+}
+
+.current-email-view td:nth-child(2) {
+  width: 100%;
+  border-bottom: none;
+}
+
+.current-email-view td {
+  border-bottom: none;
 }
 
 .duplicate-current-email-view td, .duplicate-current-email-view span {
@@ -3406,8 +3419,215 @@ td.wbrs-highlight, td.sbrs-highlight {
 .nested-data-row h4 {
   color: $type-lighter-color;
   text-transform: uppercase;
-  padding: 6px 0 0px 6px;
+  padding: 6px 0 0 6px;
   margin: 0;
+}
+
+.escalations--webrep--disputes-controller #nav-banner {
+  background-color: #4E4E4E;
+  color: $content-bg-color;
+}
+
+.escalations--webrep--disputes-controller #nav-banner a {
+  color: $content-bg-color;
+}
+
+.escalations--webrep--disputes-controller .nav-tool-blocks {
+  border: none;
+}
+
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button {
+  display: inline-block;
+  width: 44px;
+}
+
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button.active {
+  background-color: $bug-section-color;
+}
+
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button:hover, .escalations--webrep--disputes-controller #nav-banner a:hover, .escalations--webrep--disputes-controller .dropdown.open {
+  background-color: lighten(#4E4E4E, 10%);
+}
+
+.escalations--webrep--disputes-controller #advanced-search-button {
+  background-color: darken($faint-neutral-color, 5%);
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: -3px 0 0 0;
+  height: 28px;
+  border-radius: 0 4px 4px 0;
+  padding: 0 16px;
+  position: absolute;
+  right: 0;
+}
+
+.escalations--webrep--disputes-controller  #advanced-search-button::before {
+  display: none;
+}
+
+
+.escalations--webrep--disputes-controller .search-box {
+  background-image: url(image_path('layout/search_icon_lighter.svg'));
+}
+
+.search-group, .search-group form, .search-box {
+  width: 100%;
+}
+
+#advanced-search-wrapper input {
+  margin-bottom: 8px;
+  background-color: transparent;
+  border: 1px solid darken($faint-neutral-color, 5%);
+  border-radius: 1px;
+}
+#advanced-search-wrapper .content-label-sm {
+  margin-bottom: 0;
+}
+
+#add-search-items-button {
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_add_blue.svg'));
+  color: $bug-section-color;
+  border: none;
+  font-weight: 600;
+  font-size: 8pt;
+  padding-left: 26px;
+  height: 28px;
+  background-size: 20px;
+  background-position: left center;
+  line-height: 1em;
+}
+
+.nav-page-button-wrapper {
+  text-align: left !important;
+  padding-left: 25px !important;
+}
+
+.nav-toolbar-icon-large {
+  height: 44px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 24px;
+  display: block;
+  text-align: center;
+}
+
+button.primary, button.secondary, button.tertiary {
+  text-transform: uppercase;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 9.5pt;
+  padding: 15px 30px;
+  border: none !important;
+  margin: 12px 6px 0 6px;
+  color: $content-bg-color;
+}
+
+button.primary {
+  background-color: $bug-section-color;
+}
+
+button.primary:hover {
+  background-color: darken($bug-section-color, 10%);
+}
+
+button.secondary {
+  background-color: lighten($type-lighter-color, 10%);
+}
+
+button.tertiary {
+  background-color: $warning-accent-color;
+}
+
+#advanced-search-dropdown {
+  margin-left: 0;
+  left: auto;
+  right: 0;
+}
+
+#advanced-search-dropdown::before {
+  right: 40px;
+  left: auto;
+}
+
+#advanced-search-dropdown input {
+  border: 4px solid $content-bg-color;
+  outline: 1px solid darken($faint-neutral-color, 5%);
+}
+
+#advanced-search-dropdown input:focus {
+  background-color: $faint-alt-highlight;
+}
+
+#search-criteria-options {
+  color: $type-base-color;
+  border: 1px solid $faint-neutral-color;
+  padding: 6px 12px;
+  font-weight: 300;
+  font-size: 9pt;
+  position: absolute;
+  z-index: 5;
+  background-color: $content-bg-color;
+  margin-top: -23px;
+  margin-right: 20px;
+  display: none;
+}
+
+#search-criteria-options li {
+  border-bottom: 1px solid $faint-neutral-color;
+  display: inline-block;
+  width: 100%;
+}
+
+#search-criteria-options input[type='checkbox'] {
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  margin-right: 6px;
+}
+
+.search-criteria-label {
+  padding: 6px 0 1px 0;
+  width: 100%;
+}
+
+.multicol-2 {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
+  column-gap: 10px;
+}
+
+.search-item {
+  padding-right: 20px;
+}
+
+.icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
+.icon-queue     {background-image: url(image_path('icon_queue.svg'));}
+.icon-research  {background-image: url(image_path('icon_tools.svg'));}
+.icon-filter-white {background-image: url(image_path('icon_filter_white.svg'));}
+.icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
+
+.remove-input {
+  background-image: url(image_path('icon_minus_blue.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border: none;
+  float: right;
+  margin-top: 3px;
+  margin-right: -26px;
+}
+
+#login-div a:hover {
+  background-color: transparent !important;
+}
+
+#filter-cases-list a:hover {
+  background-color: transparent !important;
+  text-decoration: underline;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
