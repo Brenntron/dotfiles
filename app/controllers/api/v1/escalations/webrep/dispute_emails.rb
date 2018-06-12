@@ -25,7 +25,8 @@ module API
             put ":id", root: "dispute_email" do
               @dispute_email = DisputeEmail.find(permitted_params[:id])
               @dispute_email.update_attributes(status: permitted_params[:status])
-              @dispute_email
+
+              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments}
             end
 
             desc "create a dispute email"

@@ -14,13 +14,13 @@ $ ->
       success_reload: false
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
-        populate_communication_details(response)
+        populate_communication_details(response.email, response.attachments)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email.", reload: false)
     )
 
 
-  populate_communication_details = (email) ->
+  populate_communication_details = (email, attachments) ->
     $('.communication-subject')[0].innerHTML = email.subject
     $('.communication-subject')[1].innerHTML = "Re:" + email.subject
     $('.author-username')[0].innerHTML = email.from
@@ -30,6 +30,11 @@ $ ->
 
     date = moment.utc(email.created_at)
     $('.email-datetime')[0].innerHTML = moment(date).format('YYYY-MM-DD') + "<br>" + moment(date).format('HH:mm:ss')
+
+    for attachment in attachments
+      attachment_div = $('.email-attachments')
+      attachment_link = ("<a class=email-attachment-name, href=#{attachment.direct_upload_url}>#{attachment.file_name} </a>")
+      attachment_div.append(attachment_link)
 
 
   clean_up_current_email_view = ->
