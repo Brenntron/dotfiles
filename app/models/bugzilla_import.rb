@@ -27,7 +27,16 @@ class BugzillaImport
 
 
         #Update Bug record attributes from bugzilla############
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
+        bug ||=
+            case item['product']
+              when 'Research'
+                ResearchBug.create(bugzilla_id: bug_id)
+              when 'Escalations'
+                EscalationBug.create(bugzilla_id: bug_id)
+              else
+                Bug.create(bugzilla_id: bug_id)
+            end
 
         bug.initialize_report
 

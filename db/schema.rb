@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.string "whiteboard"
     t.boolean "acknowledged"
     t.boolean "snort_secure"
+    t.string "type", default: "ResearchBug"
     t.index ["user_id"], name: "index_bugs_on_user_id"
   end
 

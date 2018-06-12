@@ -8,6 +8,12 @@ Given(/^the following bugs exist:$/) do |bugs|
   end
 end
 
+Given(/^the following "(.*?)" bugs with trait "(.*?)" exist:$/) do |factory_name, trait_name, bug_table|
+  bug_table.hashes.each do |bug_attrs|
+    FactoryGirl.create(factory_name.to_sym, trait_name.to_sym, bug_attrs)
+  end
+end
+
 Given(/^the current user has the following bugs:$/) do |given_bugs|
   user = User.where(cvs_username: ENV['authenticate_cvs_username']).first || FactoryGirl.create(:current_user)
   given_bugs.hashes.each do |bug_attrs|
