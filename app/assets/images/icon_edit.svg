@@ -6,8 +6,8 @@
 	.st0{fill:#4D4D4D;}
 </style>
 <g>
-	<polygon class="st0" points="3.2,14.4 2.3,17.7 5.5,16.8 	"/>
-	<rect x="14.7" y="2.6" transform="matrix(0.7071 -0.7071 0.7071 0.7071 1.6554 12.4103)" class="st0" width="2.2" height="3.3"/>
-	<rect x="3.1" y="8.6" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.4191 9.8748)" class="st0" width="13.1" height="3.3"/>
+	<polygon class="st0" points="2.5,14.9 1.5,18.5 5,17.5 	"/>
+	<rect x="15.2" y="1.8" transform="matrix(0.7071 -0.7071 0.7071 0.7071 2.2355 12.6886)" class="st0" width="2.4" height="3.6"/>
+	<rect x="2.4" y="8.5" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.4892 9.8224)" class="st0" width="14.5" height="3.6"/>
 </g>
 </svg>

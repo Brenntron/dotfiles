@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180320143901) do
+ActiveRecord::Schema.define(version: 20180418163111) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -98,7 +98,8 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.string "liberty", default: "CLEAR"
     t.string "whiteboard"
     t.boolean "acknowledged"
-    t.boolean "snort_secure"
+    t.boolean "snort_secure", default: false
+    t.datetime "due_date"
     t.index ["user_id"], name: "index_bugs_on_user_id"
   end
 
@@ -164,6 +165,106 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
+  end
+
+  create_table "dispute_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "dispute_id"
+    t.text "comment"
+    t.string "state"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "dispute_emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "dispute_id"
+    t.text "email_headers"
+    t.string "from"
+    t.text "to"
+    t.text "subject"
+    t.text "body"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "dispute_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "dispute_id"
+    t.string "ip_address"
+    t.string "uri"
+    t.string "hostname"
+    t.string "entry_type"
+    t.integer "score"
+    t.string "score_type"
+    t.string "suggested_disposition"
+    t.string "primary_category"
+    t.string "tag"
+    t.string "top_level_domain"
+    t.string "subdomain"
+    t.string "domain"
+    t.string "path"
+    t.string "channel"
+    t.string "status"
+    t.string "resolution"
+    t.text "resolution_comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "dispute_rule_hits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "rule_number"
+    t.string "mnemonic"
+    t.string "name"
+    t.string "rule_type"
+    t.integer "dispute_entry_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "dispute_rules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.string "mnemonic"
+    t.text "description"
+    t.string "rule_type"
+    t.integer "rule_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "disputes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "case_number"
+    t.string "case_guid"
+    t.string "customer_name"
+    t.string "customer_email"
+    t.string "customer_phone"
+    t.string "customer_company_name"
+    t.string "org_domain"
+    t.datetime "case_opened_at"
+    t.datetime "case_closed_at"
+    t.datetime "case_accepted_at"
+    t.datetime "case_resolved_at"
+    t.string "status"
+    t.string "resolution"
+    t.string "priority"
+    t.text "subject"
+    t.text "description"
+    t.integer "assigned_to"
+    t.string "source_ip_address"
+    t.text "problem_summary"
+    t.text "research_notes"
+    t.string "channel"
+    t.integer "ticket_source_key"
+    t.string "ticket_source"
+    t.string "ticket_source_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "email_templates", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "user_id"
+    t.string "template_name"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "escalations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -253,6 +354,21 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.text "output"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "named_search_criteria", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "named_search_id"
+    t.string "field_name"
+    t.string "value"
+  end
+
+  create_table "named_searches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.string "name"
   end
 
   create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

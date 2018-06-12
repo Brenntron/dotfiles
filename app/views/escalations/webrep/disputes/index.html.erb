@@ -1,0 +1,92 @@
+<div id="my-tickets" style="float: left; border: 1px solid #cccc00;">
+<div>
+    <div style="display1: none;">
+      <div>
+        <h1>My Tickets</h1>
+      </div>
+      <div>
+        <%= render('my_tickets') %>
+      </div>
+    </div>
+  </div>
+</div>
+<div style="float: left; border: 1px orange dashed;">
+  <div>
+    <div class="grid-header">
+      <div style="float: left;">
+        <h1>Open Tickets</h1>
+      </div>
+      <%= render('adjust_reptool') %>
+    </div>
+  </div>
+  <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
+
+  <table id="disputes-index" class="table responsive no-wrap">
+    <thead>
+      <th>&nbsp;</th> <!-- checkbox -->
+      <th>&nbsp;</th> <!-- priority -->
+      <th>CASE ID</th>
+      <th>&nbsp;</th> <!-- type? email, URL, location -->
+      <th>STATUS</th>
+      <th>DISPUTE</th>
+      <th>OWNER</th>
+      <th>TIME SUBMITTED</th>
+      <th>AGE</th>
+      <th>SUGGESTED DISPOSITION</th>
+      <th>ORIGIN</th>
+      <th>ORIGIN ID</th>
+      <th>SUBMITTER</th>
+      <th>SUBMITTER ORG</th>
+      <th>SUBMITTER DOMAIN</th>
+      <!--
+      <th>WBRS SCORE</th>
+      <th>WBRS RULE HITS</th>
+      <th>MALWARE PROBABILITY</th>
+      -->
+    </thead>
+
+    <tbody>
+
+    </tbody>
+  </table>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#disputes-index').DataTable({
+        columns: [
+            {data: null, defaultContent: ''}, // checkbox
+            {data: "priority"},               // priority
+            {data: "case_number"},            // case ID
+            {data: null, defaultContent: ''}, // type?
+            {data: "status"},                 // status
+            {data: "dispute_domain"},         // dispute
+            {data: "assigned_to"},            // owner
+            {data: "case_opened_at"},         // time submitted
+            {data: "case_age"},               // age [ugly math?]
+            {data: "suggested_disposition"},  // suggested disposition
+            {data: "source"},                 // origin
+            {data: "source_id"},              // origin id
+            {data: "submitter_name"},         // submitter
+            {data: "submitter_org"},          // submitter org
+            {data: "submitter_domain"}        // submitter domain
+            /*,
+            {data: "wbrs_score"},             // wbrs score
+            {data: null, defaultContent: ''}, // wbrs rule hits
+            {data: null, defaultContent: ''}  // malware probability
+            */
+        ]
+    });
+    // some of these cells will be combinations (see _my_tickets.html.erb for more)
+    populate_webrep_index_table();
+    $('#my-disputes').DataTable({
+        columns: [
+            {data: null, defaultContent: ''},
+            {data: "priority"},               // priority
+            {data: "case_number"},
+            {data: "customer_company_name"}
+        ]
+    });
+    populate_webrep_my_table();
+} );
+</script>

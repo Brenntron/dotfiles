@@ -1,0 +1,225 @@
+  <div class="row">
+    <div class="col-xs-4">
+      <h1>Research Data</h1>
+    </div>
+    <div class="col-xs-8">
+      <div class="toolbar">
+        <div>
+          <label class="toolbar-section-label">Table View</label>
+          <button class="toolbar-button show-col-button">
+          <span class="toolbar-button-text">
+            Show / Hide Columns
+          </span>
+          </button>
+          <button class="toolbar-button collapse-button">
+          <span class="toolbar-button-text">
+            Expand/Collapse Rows
+          </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Dispute</th>
+            <th>Category</th>
+            <th class="text-center">Original WBRS Score</th>
+            <th class="text-center wbrs-highlight">Current WBRS Score</th>
+            <th class="text-center">WBRS Rule Hits Total</th>
+            <th class="text-center sbrs-highlight">SBRS Score</th>
+            <th class="text-center">SBRS Rule Hits Total</th>
+            <th>WL/BL Entries</th>
+            <th><!-- Edit buttons area --></th>
+          </tr>
+        </thead>
+        <tbody>
+        <% @entries.each do |entry| %>
+          <tr>
+            <td>paragon-downloads.com</td>
+            <td>Computer and Internet</td>
+            <td class="text-center">5.6</td>
+            <td class="text-center wbrs-highlight">8.7</td>
+            <td class="text-center">6</td>
+            <td class="text-center sbrs-highlight"><%= entry.score unless entry.score_type != "SBRS" %></td>
+            <td class="text-center">0</td>
+            <td>WL - Medium</td>
+            <td></td>
+          </tr>
+          <tr class="nested-data-row">
+            <td colspan="3">
+              <table class="table-nested-reputation">
+                <tr>
+                  <th>Category</th>
+                  <td>Computers & Technology</td>
+                </tr>
+                <tr>
+                  <th>Hostname</th>
+                  <td><%= entry.hostname %></td>
+                </tr>
+                <tr>
+                  <th>WBRS Rules</th>
+                  <td>
+                    <table class="table-nested-rep-rules">
+                      <tr>
+                        <th>Rule</th>
+                        <th>Rule Description</th>
+                        <th class="text-center">Malware Probability</th>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">vsvd</td>
+                        <td>Verisign Verified Domains</td>
+                        <td class="text-center data-small-emphasis">24.86%</td>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">wlh</td>
+                        <td>Heavy-weight manual whitelist</td>
+                        <td class="text-center data-small-emphasis">2.5%</td>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">wlm</td>
+                        <td>Medium-weight manual whitelist</td>
+                        <td class="text-center data-small-emphasis">22.50%</td>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">wuwl</td>
+                        <td>SURBL Whitelist</td>
+                        <td class="text-center data-small-emphasis">23.13%</td>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">tuse</td>
+                        <td>TRUSTe Site Seal</td>
+                        <td class="text-center data-small-emphasis">34.78%</td>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">alx_chn</td>
+                        <td>Clean URIs from Alexa top 1 million list</td>
+                        <td class="text-center warning-emphasis">65.00%</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <th>SBRS Rules</th>
+                  <td>
+                    <table class="table-nested-rep-rules">
+                      <tr>
+                        <th>Rule</th>
+                        <th>Rule Description</th>
+                        <th class="text-center">Malware Probability</th>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">wlm</td>
+                        <td>Medium-weight manual whitelist</td>
+                        <td class="text-center data-small-emphasis">22.50%</td>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">wuwl</td>
+                        <td>SURBL Whitelist</td>
+                        <td class="text-center data-small-emphasis">23.13%</td>
+                      </tr>
+                      <tr>
+                        <td class="emphasis">tuse</td>
+                        <td>TRUSTe Site Seal</td>
+                        <td class="text-center data-small-emphasis">34.78%</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td colspan="6" class="nested-info-highlight">
+              <h4>Cross-listed URLs</h4>
+              <table class="nested-related-datatable">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>URL</th>
+                    <th>List Type</th>
+                    <th class="text-center">Original Score</th>
+                    <th class="text-center">Current Score</th>
+                    <th>Username</th>
+                    <th>Last Update</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>138850</td>
+                    <td>paragon-downloads.com/k</td>
+                    <td>WL-med</td>
+                    <td class="text-center">5.6</td>
+                    <td class="text-center">8.7000</td>
+                    <td>jgrandia</td>
+                    <td>2014-10-13 15:14:08</td>
+                    <td>2014-10-13 15:14:08</td>
+                  </tr>
+                  <tr>
+                    <td>138850</td>
+                    <td>paragon-downloads.com/k</td>
+                    <td>WL-med</td>
+                    <td class="text-center">5.6</td>
+                    <td class="text-center">8.7000</td>
+                    <td>jgrandia</td>
+                    <td>2014-10-13 15:14:08</td>
+                    <td>2014-10-13 15:14:08</td>
+                  </tr>
+                  <tr>
+                    <td>138850</td>
+                    <td>paragon-downloads.com/k</td>
+                    <td>WL-med</td>
+                    <td class="text-center">5.6</td>
+                    <td class="text-center">8.7000</td>
+                    <td>jgrandia</td>
+                    <td>2014-10-13 15:14:08</td>
+                    <td>2014-10-13 15:14:08</td>
+                  </tr>
+                  <tr>
+                    <td>138850</td>
+                    <td>paragon-downloads.com/k</td>
+                    <td>WL-med</td>
+                    <td class="text-center">5.6</td>
+                    <td class="text-center">8.7000</td>
+                    <td>jgrandia</td>
+                    <td>2014-10-13 15:14:08</td>
+                    <td>2014-10-13 15:14:08</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h4>XBRS Hits</h4>
+              <table class="nested-related-datatable">
+                <thead>
+                  <tr>
+                    <th>Domain</th>
+                    <th>Subdomain</th>
+                    <th>Path</th>
+                    <th>XBRS Rule ID</th>
+                    <th>XBRS Mnemonic</th>
+                    <th>WBRS Rules</th>
+                    <th>Last Update</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>paragon-downloads.com</td>
+                    <td></td>
+                    <td>/k</td>
+                    <td>456</td>
+                    <td>truste_domains</td>
+                    <td>tuse</td>
+                    <td>2014-10-13 15:14:08</td>
+                    <td>2014-10-13 15:14:08</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>

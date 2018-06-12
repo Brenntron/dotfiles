@@ -1,0 +1,7 @@
+%h1 Named Search
+
+= simple_form_for :dispute, url: escalations_webrep_disputes_path, method: :get do |dispute_form|
+  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'named'}
+  = dispute_form.input :search_name
+  = dispute_form.submit 'Search'
+

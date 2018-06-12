@@ -1,0 +1,2 @@
+class DisputeEmail < ApplicationRecord
+end

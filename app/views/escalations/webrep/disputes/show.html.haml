@@ -1,0 +1,71 @@
+-#view single record
+.content-wrapper
+
+  .row
+    .col-xs-1.col-with-divider
+      %span.bug-state-info.bug-priority.p-P1
+      %span.email-button
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Case ID
+      .bug-top-id
+        %a= @dispute.id
+    .col-xs-1.bug-state-col
+      #bugzilla_popover_state.bug-state-info.bug-state
+        %select#status.inpage-select{name: 'status'}
+          %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
+          -#%option{value: 'New', selected: 'selected'} New
+          -#%option{value: 'Assigned'} Assigned
+          -#%option{value: 'Researching'} Researching
+          -#%option{value: 'On Hold'} On Hold
+          -#%option{value: 'Customer Pending'} Customer Pending
+          -#%option{value: 'Resolved'} Resolved
+          -#%option{value: 'Reopened'} Reopened
+
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Owner
+      %div
+        %span= @dispute.assigned_to || "None"
+        %span.take-button
+          hand icon
+    .col-xs-2.col-with-divider
+      %label.content-label-sm
+        Suggested Disposition
+      .disposition.disp-negative
+        Malicious: Phishing
+    .col-xs-3.col-with-divider
+      %label.content-label-sm
+        Dispute
+      %div
+        paragon-downloads.com
+    .col-xs-2.col-with-divider
+      %label.content-label-sm
+        Date/Time Submitted
+      %div= @dispute.case_opened_at
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Age
+      %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
+
+-     #<!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
+
+
+%ul.nav.nav-tabs#bug-tabs{role: 'tablist'}
+  %li.nav-item.active{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+      Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
+      Related Cases
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane.active#communication_tab{role: 'tabpanel'}
+    = render 'escalations/webrep/disputes/communication_tab'
+  .tab-pane#research_tab{role: 'tabpanel'}
+    = render 'escalations/webrep/disputes/research_tab'
+  .tab-pane#related_tab{role: 'tabpanel'}
+    related cases

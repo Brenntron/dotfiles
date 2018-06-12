@@ -14,4 +14,5 @@
 ActiveSupport::Inflector.inflections(:en) do |inflect|
   # inflect.acronym 'RESTful'
   inflect.irregular 'cve', 'cves'
+  inflect.irregular 'criterion', 'criteria'
 end

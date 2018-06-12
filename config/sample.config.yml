@@ -42,6 +42,12 @@ development:
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  wbrs:
+    host: "localhost"
+    port: 2944
+    # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    tls_mode: "no-tls"
+    gssnegotiate: false
 
 test:
   amq:

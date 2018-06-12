@@ -1,0 +1,2 @@
+class DisputeComment < ApplicationRecord
+end

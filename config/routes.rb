@@ -14,8 +14,8 @@ Rails.application.routes.draw do
         patch :remove_whiteboard
       end
       resources :references
-
     end
+
     namespace :webcat do
       root 'complaints#index'
       resources :complaints do
@@ -30,6 +30,21 @@ Rails.application.routes.draw do
       resources :clusters
       resources :rules
       resources :reports
+    end
+
+    namespace :webrep do
+      root 'disputes#index'
+      resources :disputes do
+        collection do
+          get :advanced_search
+          get :named_search
+          get :standard_search
+          get :contains_search
+        end
+      end
+      get 'tickets', to: 'disputes#index'
+      get 'dashboard', to: 'disputes#dashboard'
+      get 'research', to: 'disputes#research'
     end
   end
 
