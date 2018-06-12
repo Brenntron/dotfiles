@@ -24,7 +24,7 @@ describe Wbrs::Category do
   ### TESTS ####################################################################
 
   it 'should get all the categories' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(all_cat_response)
+    expect(Wbrs::Base).to receive(:call_request).and_return(all_cat_response)
 
     categories = Wbrs::Category.all.sort_by{ |cat| cat.id }
 
