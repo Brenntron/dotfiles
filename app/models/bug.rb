@@ -68,6 +68,29 @@ class Bug < ApplicationRecord
   scope :research_bugs, -> { where(product: 'research') }
   scope :by_escalations, -> { where(:product => "escalations")}
 
+  scope :research_product, -> { where(:product => "Research")}
+  scope :escalation_product, -> { where(:product => "Escalations")}
+
+  #determines if this is a research bug by checking the bugzilla product in our database
+  def research_product?
+    "Research" == self.product
+  end
+
+  #determines if this is an escalation bug by checking the bugzilla product in our database
+  def escalation_product?
+    "Escalations" == self.product
+  end
+
+  #determines if this is a research bug by inherited method in ResearchBug which returns true
+  def research_bug?
+    false
+  end
+
+  #determines if this is an escalation bug by inherited method in ResearchBug which returns true
+  def escalation_bug?
+    false
+  end
+
   def snort_related_bugs(component)
      "escalation"==component ? self.snort_escalation_research_bugs :  self.snort_research_escalation_bugs | self.snort_research_to_research_bugs
   end
@@ -1448,7 +1471,12 @@ class Bug < ApplicationRecord
 
 
         #Update Bug record attributes from bugzilla############
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
+        if bug
+          raise 'Cannot process non-escalation bug' unless bug.research_bug?
+        else
+          bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id)
+        end
 
         bug.initialize_report
 
@@ -1706,18 +1734,17 @@ class Bug < ApplicationRecord
 
 
 
-
-
-
-
-
-
-
-
   def self.bugzilla_import_escalation(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []
-    unless new_bugs['bugs'].empty?
+    if new_bugs['bugs'].empty?
+      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
+        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
+        raise message
+      else
+        raise "there was a problem importing from Bugzilla."
+      end
+    else
       new_bugs['bugs'].each do |item|
 
         progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
@@ -1738,7 +1765,12 @@ class Bug < ApplicationRecord
 
 
         #Update Bug record attributes from bugzilla############
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
+        if bug
+          raise 'Cannot process non-escalation bug' unless bug.escalation_bug?
+        else
+          bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id)
+        end
 
         bug.initialize_report
 
@@ -1937,13 +1969,6 @@ class Bug < ApplicationRecord
         total_bugs << bug
 
       end
-    else
-      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
-        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
-        raise message
-      else
-        raise "there was a problem importing from Bugzilla."
-      end
     end
     return total_bugs
   end
@@ -1963,7 +1988,13 @@ class Bug < ApplicationRecord
             bug.save!
           end
         else
-          new_record = Bug.new(bugzilla_id: bug_id)
+          new_record =
+              case item['product']
+                when 'Research'
+                  ResearchBug.new(bugzilla_id: bug_id)
+                when 'Escalations'
+                  EscalationBug.new(bugzilla_id: bug_id)
+              end
 
           new_record.id             = bug_id
           new_record.summary        = item['summary']
@@ -2247,10 +2278,18 @@ class Bug < ApplicationRecord
     bugzilla_bug_options = options.merge('assigned_to' => user&.email || 'vrt-incoming@sourcefire.com')
     bug_stub_hash = bug_factory.create(bugzilla_bug_options)
 
-    Bug.create!(options.merge(id: bug_stub_hash["id"],
-                              bugzilla_id: bug_stub_hash["id"],
-                              state: bug_attrs['state'] || 'OPEN',
-                              user_id: user&.id))
+    case options['product']
+      when 'Research'
+        ResearchBug.create!(options.merge(id: bug_stub_hash["id"],
+                                          bugzilla_id: bug_stub_hash["id"],
+                                          state: bug_attrs['state'] || 'OPEN',
+                                          user_id: user&.id))
+      when 'Escalations'
+        EscalationBug.create!(options.merge(id: bug_stub_hash["id"],
+                                            bugzilla_id: bug_stub_hash["id"],
+                                            state: bug_attrs['state'] || 'OPEN',
+                                            user_id: user&.id))
+    end
   end
 
   # Creates a new bug in bugzilla and related records and objects.
@@ -2258,7 +2297,6 @@ class Bug < ApplicationRecord
   # @param [Hash] bug_attrs values for active record attributes on bug model.
   # @param [User] user assgined to bug.
   def self.bugzilla_create_action(bugzilla_session, bug_attrs, user:)
-
     # object for distributed interface for bug factory
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
@@ -2482,11 +2520,10 @@ class Bug < ApplicationRecord
     new_bug_attrs[:created_at]          = bugzilla_bugs['bugs'].first['creation_time'].to_time
     new_bug_attrs[:creator]             = current_user.id.to_s
 
-    new_research_bug = Bug.create!(new_bug_attrs.merge(id: bugzilla_id,
-                                                   bugzilla_id: bugzilla_id,
-                                                   user_id: default_assigned_to_user.id,
-                                                   state: "NEW"
-                                  ))
+    new_research_bug = ResearchBug.create!(new_bug_attrs.merge(id: bugzilla_id,
+                                                               bugzilla_id: bugzilla_id,
+                                                               user_id: default_assigned_to_user.id,
+                                                               state: "NEW"))
 
     if new_research_notes.present?
       new_research_bug.research_notes = new_research_notes

@@ -241,9 +241,9 @@ Feature: Bug
       | BP    |
     Then I wait for "3" seconds
     And  I goto "/bugs/new"
-    And  I fill in "bug[summary]" with "New Bug Summary"
-    And  I fill in "bug[description]" with "This is my description."
-    And  I fill in "bug[whiteboard]" with "TELUS"
+    And  I fill in "bug-form-summary-input" with "New Bug Summary"
+    And  I fill in "bug-form-desc-input" with "This is my description."
+    And  I fill in "bug-form-whiteboard-input" with "TELUS"
 #    Then I click "Save"
 #    Then I wait for "3" seconds
 #    Then take a photo
@@ -259,8 +259,8 @@ Feature: Bug
     Given a user with role "analyst" exists and is logged in
     Then I wait for "3" seconds
     And  I goto "/bugs/new"
-    And  I fill in "bug[summary]" with "New Bug Summary"
-    And  I fill in "bug[description]" with "This is my description."
+    And  I fill in "bug-form-summary-input" with "New Bug Summary"
+    And  I fill in "bug-form-desc-input" with "This is my description."
 #    Then I click "Save"
 #    Then I wait for "3" seconds
 #    Then I should see "New Bug Summary"
@@ -387,7 +387,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     When I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    Then I select "PENDING" from "bug[state]"
+    Then I select "PENDING" from "bug-form-state-input"
 
 #  @now
 #  @wip
@@ -458,7 +458,7 @@ Feature: Bug
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
     Then I should see "Can't set to pending. Please complete the summary for rule docs."
-    And I can not select "PENDING" from "bug[state]"
+    And I can not select "PENDING" from "bug-form-state-input"
 
   @javascript
   Scenario: a user can not set the state of a bug to pending when rule doc summaries are missing
@@ -487,7 +487,7 @@ Feature: Bug
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
     Then I should see "Can't set to pending."
-    And I can not select "PENDING" from "bug[state]"
+    And I can not select "PENDING" from "bug-form-state-input"
 
   @javascript
   Scenario: a user can set the state of a bug to pending when deleted rule doc summaries are missing
@@ -515,7 +515,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    Then I select "PENDING" from "bug[state]"
+    Then I select "PENDING" from "bug-form-state-input"
 
   @javascript
   Scenario: a user can set the state of a bug to pending when file-identify rule doc summaries are missing
@@ -543,7 +543,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    Then I select "PENDING" from "bug[state]"
+    Then I select "PENDING" from "bug-form-state-input"
 
   @javascript
   Scenario: a user can not set the state of a bug to pending when a rule does not parse
@@ -573,7 +573,7 @@ Feature: Bug
     When I click the span with data-target "#editBug"
     And I wait for "2" seconds
     Then I should see "Can't set to pending."
-    And I can not select "PENDING" from "bug[state]"
+    And I can not select "PENDING" from "bug-form-state-input"
 
   @javascript
   Scenario: a user can add a comment when manually changing the state of a bug
@@ -586,7 +586,7 @@ Feature: Bug
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
     Then I should not see "State Comment"
-    Then I select "ASSIGNED" from "bug[state]"
+    Then I select "ASSIGNED" from "bug-form-state-input"
     Then I should see "State Comment"
 
 
@@ -600,8 +600,8 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And the "FIXED" option from "bug[state]" is disabled
-    And the "REOPENED" option from "bug[state]" is not disabled
+    And the "FIXED" option from "bug-form-state-input" is disabled
+    And the "REOPENED" option from "bug-form-state-input" is not disabled
 
   @javascript
   Scenario: a user can set the state of a bug to fixed, wontfix, later or invalid if they are a committer
@@ -613,8 +613,8 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And the "FIXED" option from "bug[state]" is not disabled
-    And the "REOPENED" option from "bug[state]" is not disabled
+    And the "FIXED" option from "bug-form-state-input" is not disabled
+    And the "REOPENED" option from "bug-form-state-input" is not disabled
 
 
   @javascript
@@ -666,9 +666,9 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And "rainbow_b" should be in the "bug[user_id]" dropdown list
-    And "t_bear" should not be in the "bug[user_id]" dropdown list
-    And I select "rainbow_b" from "bug[user_id]"
+    And "rainbow_b" should be in the "bug-form-user-input" dropdown list
+    And "t_bear" should not be in the "bug-form-user-input" dropdown list
+    And I select "rainbow_b" from "bug-form-user-input"
     Then I click button "Save"
     And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
@@ -704,9 +704,9 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And "t_bear" should be in the "bug[committer_id]" dropdown list
-    And "d_drumph" should not be in the "bug[committer_id]" dropdown list
-    And I select "t_bear" from "bug[committer_id]"
+    And "t_bear" should be in the "bug-form-committer-input" dropdown list
+    And "d_drumph" should not be in the "bug-form-committer-input" dropdown list
+    And I select "t_bear" from "bug-form-committer-input"
     Then I click button "Save"
     And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
@@ -722,7 +722,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And I select "P2" from "bug[priority]"
+    And I select "P2" from "bug-form-priority-input"
 #    Then I click button "Save"
 #    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
@@ -738,7 +738,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And I select "Malware" from "bug[component]"
+    And I select "Malware" from "bug-form-component-input"
 #    Then I click button "Save"
 #    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
@@ -754,7 +754,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And I select "Secret" from "bug[classification]"
+    And I select "Secret" from "bug-form-classification-input"
 #    Then I click button "Save"
 #    And I wait for "3" seconds
 # uncomment when connectivity to bugzilla test fixed
@@ -770,7 +770,7 @@ Feature: Bug
     And I goto "/bugs/222222"
     Then I click the span with data-target "#editBug"
     And I wait for "1" seconds
-    And I fill in "bug[summary]" with "new summary"
+    And I fill in "bug-form-summary-input" with "new summary"
 #    Then I click button "Save"
 # uncomment when connectivity to bugzilla test fixed
 # Then I should see "new summary"
@@ -793,7 +793,7 @@ Feature: Bug
 #    And I goto "/bugs/222222"
 #    Then I click the span with data-target "#editBug"
 #    And I wait for "1" seconds
-#    And I fill in "bug[summary]" with "[SID] 19500 fixed bug"
+#    And I fill in "bug-form-summary-input" with "[SID] 19500 fixed bug"
 #    Then I click "Save"
 #    Then I wait for "5" seconds
 #    And bugs_rules with rule_id of "1" and "bug_id" of "222222" should have the in_summary flag
@@ -1073,8 +1073,8 @@ Feature: Bug
   Scenario: Notes are published when an analyst sets a bug to pending
     Given a user with role "analyst" exists and is logged in
     And  I goto "/bugs/new"
-    And  I fill in "bug[summary]" with "New Bug Summary"
-    And  I fill in "bug[description]" with "This is my description."
+    And  I fill in "bug-form-summary-input" with "New Bug Summary"
+    And  I fill in "bug-form-desc-input" with "This is my description."
     When I click button "Save"
     And  I wait for "10" seconds
     When I click ".history-tab"

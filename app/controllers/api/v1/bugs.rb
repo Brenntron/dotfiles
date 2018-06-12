@@ -374,9 +374,9 @@ module API
           end
         end
 
-        desc "create a bug"
+        desc "create a reasearch bug"
         params do
-          requires :bug, type: Hash do
+          requires :research_bug, type: Hash do
             requires :product, type: String, desc: "The name of the product the bug is being filed against."
             requires :component, type: String, desc: "The name of a component in the product above."
             requires :summary, type: String, desc: "A brief description of the bug being filed."
@@ -391,16 +391,42 @@ module API
             optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
           end
         end
-        post "", root: "bug" do
+        post "research", root: "bug" do
+          # TODO change to ResearchBug
           authorize! :create, Bug
-          case permitted_params[:bug][:product]
-            when "Escalations"
-              user = User.where(email: "vrt-incoming@sourcefire.com").first
-            when "Research"
-              user = current_user
+          unless 'Research' == permitted_params[:research_bug][:product]
+            error!('This API entry point is only for research bugs.', 400)
           end
 
-          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: user)
+          ResearchBug.bugzilla_create_action(bugzilla_session, permitted_params[:research_bug], user: current_user)
+        end
+
+        desc "create an escalation bug"
+        params do
+          requires :escalation_bug, type: Hash do
+            requires :product, type: String, desc: "The name of the product the bug is being filed against."
+            requires :component, type: String, desc: "The name of a component in the product above."
+            requires :summary, type: String, desc: "A brief description of the bug being filed."
+            requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
+            requires :description, type: String, desc: "A full text description of the bug"
+            optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
+            optional :creator, type: String, desc: "The person who created the bug"
+            optional :opsys, type: String, desc: "The operating system that this bug affects"
+            optional :platform, type: String, desc: "What platform this bug runs on"
+            optional :priority, type: String, desc: "How soon should this bug get fixed"
+            optional :severity, type: String, desc: "How terrible is this bug"
+            optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+          end
+        end
+        post "escalation", root: "bug" do
+          # TODO change to EscalationBug
+          authorize! :create, Bug
+          unless 'Escalations' == permitted_params[:escalation_bug][:product]
+            error!('This API entry point is only for escalation bugs.', 400)
+          end
+
+          user = User.where(email: "vrt-incoming@sourcefire.com").first
+          EscalationBug.bugzilla_create_action(bugzilla_session, permitted_params[:escalation_bug], user: user)
         end
 
         desc "remove a bug from the db only"
