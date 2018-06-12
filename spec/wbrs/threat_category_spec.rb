@@ -30,7 +30,7 @@ describe Wbrs::Category do
   ### TESTS ####################################################################
 
   it 'should get all the threat categories' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(all_cat_response)
+    expect(Wbrs::Base).to receive(:call_request).and_return(all_cat_response)
 
     categories = Wbrs::ThreatCategory.all
 
