@@ -103,6 +103,14 @@ $ ->
     $(this).parent().remove()
 
 
+  $('#newEmailDialog').dialog
+    autoOpen: false
+  $('#opener').on 'click', ->
+    $('#newEmailDialog').dialog 'open'
+    return
+  return
+
+
   $('#new-email').on 'click', (e) ->
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}

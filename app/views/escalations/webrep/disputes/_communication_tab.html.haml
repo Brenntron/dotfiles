@@ -87,7 +87,7 @@
       .col-xs-12.highlighted-section-header
         %h1 Communication
         // Only show Notice if email is to customer
-        .customer-facing-notice
+        .customer-facing-notice#opener
           Customer Facing Message
         %button.new-email-button{'data-toggle' => 'modal', 'data-target' => '#newEmail'}
           Compose New Email
@@ -114,6 +114,12 @@
     .row
       .col-xs-12.email-msg-body
         %pre.email-msg-content
+
+    #newEmailDialog{title: 'New Email'}
+      %p
+        This is an animated dialog which is useful for displaying information.
+        The dialog window can be moved, resized and closed with the 'x' icon.
+
 
     .row
       .col-xs-12#email-reply.hidden
@@ -154,6 +160,7 @@
           .col-xs-12.text-center
             %button.primary#reply
               Send
+
 
 
   .col-sm-3
