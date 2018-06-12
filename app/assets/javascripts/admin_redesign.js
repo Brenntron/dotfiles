@@ -31,6 +31,4 @@
 //= require clipboard
 //= require moment
 //= require application/webrep_advanced_search
-//= require moment
-//= require application/webrep_advanced_search
 

@@ -115,27 +115,30 @@
       .col-xs-12.email-msg-body
         %pre.email-msg-content
 
-    #email-reply.hidden
-      .row
-        .col-xs-12.email-header-information
-          .email-header-data
-            %textarea.communication-subject
-            .sender-receiver-info
-              %span.content-label-sm To
-              %span.receiver-email
-              #file-fields
+    .row
+      .col-xs-12#email-reply.hidden
+        .row
+          .col-xs-12.email-reply-content-wrapper
 
+            .row
+              .col-xs-12.email-header-information
+                .email-header-data
+                  .sender-receiver-info
+                    %span.reply-symbol
+                    %span.receiver-email
+                    #file-fields
 
-          .email-response-button-wrapper
-            .email-response-buttons
-              %button.attachment-button.attachment-label.attachment-reply
-      .row
-        %textarea.col-xs-12.email-reply-body
+                .email-response-button-wrapper
+                  .email-response-buttons
+                    %button.attachment-button.attachment-label.attachment-reply
+            .row
+              .col-xs-12
+                %textarea.email-reply-body
 
-      .row
-        .col-xs-12.text-center
-          %button.add-case-note-button#reply
-            Send
+        .row
+          .col-xs-12.text-center
+            %button.add-case-note-button#reply
+              Send
 
 
   .col-sm-3
