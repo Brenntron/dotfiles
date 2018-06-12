@@ -14,6 +14,7 @@ class NewRuleValidator < ActiveModel::Validator
     rule.errors.add(:publish_status, 'cannot be blank') unless rule.publish_status.present?
     rule.errors.add(:gid, 'must be 1') unless 1 == rule.gid
     rule.errors.add(:sid, 'must be blank') if rule.sid.present?
+    rule.errors.add(:state, 'incorrect for edit_status NEW') unless %w{NEW FAILED}.include?(rule.state)
 
     # rule.errors.add(:rule_content, 'cannot be blank') unless rule.rule_content.present?
   end
