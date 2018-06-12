@@ -28,10 +28,10 @@ class Bug < ApplicationRecord
 
   #self referential relationships
   ## for snort escalation bugs
-  has_many :research_escalation_bugs, :class_name => 'Escalation', :foreign_key => 'snort_escalation_research_bug_id'
-  has_many :snort_research_escalation_bugs, :through => :research_escalation_bugs
-  has_many :escalation_research_bugs, :class_name => 'Escalation', :foreign_key => 'snort_research_escalation_bug_id'
-  has_many :snort_escalation_research_bugs, :through => :escalation_research_bugs
+  has_many :research_bug_links, :class_name => 'EscalationLink', :foreign_key => 'snort_escalation_bug_id'
+  has_many :snort_research_bugs, :through => :research_bug_links
+  has_many :escalation_bug_links, :class_name => 'EscalationLink', :foreign_key => 'snort_research_bug_id'
+  has_many :snort_escalation_bugs, :through => :escalation_bug_links
 
   has_many :research_to_research_bugs, :class_name => 'SnortResearch', :foreign_key => 'bug_id'
   has_many :snort_research_to_research_bugs, :through => :research_to_research_bugs
@@ -92,7 +92,7 @@ class Bug < ApplicationRecord
   end
 
   def snort_related_bugs(component)
-     "escalation"==component ? self.snort_escalation_research_bugs :  self.snort_research_escalation_bugs | self.snort_research_to_research_bugs
+     "escalation"==component ? self.snort_escalation_bugs :  self.snort_research_bugs | self.snort_research_to_research_bugs
   end
 
   attr_accessor :import_report
@@ -1254,7 +1254,7 @@ class Bug < ApplicationRecord
 
     if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
       updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
-      bug.snort_escalation_research_bugs.each do |blocked_bug|
+      bug.snort_escalation_bugs.each do |blocked_bug|
         bug.snort_blocked_bugs << blocked_bug
       end
     end
@@ -2195,11 +2195,11 @@ class Bug < ApplicationRecord
   end
 
   def has_any_reopenable_bugs
-    snort_research_escalation_bugs.any? {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
+    snort_research_bugs.any? {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
   end
 
   def reopenable_bugs
-    snort_research_escalation_bugs.select {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
+    snort_research_bugs.select {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
   end
 
   def self.search(query_str, terms, range)
