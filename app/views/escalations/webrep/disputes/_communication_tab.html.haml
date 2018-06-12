@@ -22,21 +22,7 @@
                 =email.created_at.strftime("%Y-%d-%m")
                 %br
                 =email.created_at.strftime("%H:%M:%S")
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.disp-status-icon
-            %td
-              %span.case-history-author
-                Automated
-              %span.case-history-preview
-                Status changed from
-                %span.emphasize Researching
-                to
-                %span.emphasize Email Out.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
+
           -@dispute.dispute_comments.recent_first.each do |comment|
             %tr
               %td.alt-col.icon-col
@@ -50,36 +36,25 @@
                 =comment.created_at.strftime("%Y-%d-%m")
                 %br
                 =comment.created_at.strftime("%H:%M:%S")
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.disp-status-icon
-            %td
-              %span.case-history-author
-                melitayl
-              %span.case-history-preview
-                Status changed from
-                %span.emphasize Assigned
-                to
-                %span.emphasize Researching.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.disp-status-icon
-            %td
-              %span.case-history-author
-                melitayl
-              %span.case-history-preview
-                Status changed from
-                %span.emphasize New
-                to
-                %span.emphasize Assigned.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
+
+          -@versioned_items.each do |item|
+            -item.versions.each do |version|
+              %tr
+                %td.alt-col.icon-col
+                  %span.case-history-icon.disp-status-icon
+                %td
+                  %span.case-history-author
+                    =whodunnit_helper(version)
+                  -version.changeset.each do |field, (changed_from, changed_to) |
+                    %span.case-history-preview
+                      =field_changeset_handler(field, changed_from)
+                      %span.emphasize #{changed_from}
+                      to
+                      %span.emphasize #{changed_to}.
+                %td.alt-col.case-history-datetime
+                  =version.created_at.strftime("%Y-%d-%m")
+                  %br
+                  =version.created_at.strftime("%H:%M:%S")
 
 
   .col-sm-6

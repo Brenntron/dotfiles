@@ -7,6 +7,10 @@ module API
 
           resource "escalations/webrep/dispute_comments" do
 
+            before do
+              PaperTrail.whodunnit = current_user.id if current_user.present?
+            end
+
             desc "get a dispute comment"
             params do
               requires :id, type: String, desc: "ID of the dispute comment"
