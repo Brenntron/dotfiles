@@ -54,7 +54,8 @@ $ ->
     $('#email-reply').removeClass('hidden')
 
   $('.attachment-reply').on 'click', ->
-    $('#file-fields').before("<span><input class= 'file_attachment' name='attachment' type='file'/></span>")
+    $('.file-wrapper-reply').show()
+    $('#file-fields').append("<span class='file-attachment-wrapper'><input class= 'file_attachment' name='attachment' type='file'/></span>")
     $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
     $('.file_attachment:last').click()
 
@@ -101,6 +102,16 @@ $ ->
 
   $('body').on 'click', '.delete_attachment_new', ->
     $(this).parent().remove()
+
+
+  $('#newEmailDialog').dialog
+    autoOpen: false
+    minWidth: 400
+    position: { my: "right bottom", at: "right bottom", of: window }
+  $('#opener').on 'click', ->
+    $('#newEmailDialog').dialog 'open'
+    return
+  return
 
 
   $('#new-email').on 'click', (e) ->
