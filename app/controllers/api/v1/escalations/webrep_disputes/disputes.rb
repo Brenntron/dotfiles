@@ -119,6 +119,19 @@ module API
               ''
             end
 
+            desc "Add a Reptool Bl entry"
+            params do
+              requires :entries, type: Array[String], desc: "urls"
+              requires :classifications, type: Array[String], desc: "classifications"
+              requires :comment, type: String, desc: "comment"
+            end
+            post "reptool_bl" do
+              reptool_bl_params = permitted_params.to_h.merge('author' => current_user.cvs_username)
+              blacklist = Wbrs::Blacklist.new(reptool_bl_params)
+              blacklist.save!
+              ''
+            end
+
           end
         end
       end

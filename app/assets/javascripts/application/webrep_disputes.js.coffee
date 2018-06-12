@@ -63,3 +63,20 @@ window.add_wlbl_button = ->
   )
 
 
+window.add_reptool_bl_button = ->
+  reptool_bl_form = $('#adjust-reptool-form')
+  data = {
+    'entries': reptool_bl_form.find('#adjust-reptool-bl-entries').val()
+    'classifications': reptool_bl_form.find('#adjust-reptool-bl-classifications').val()
+    'comment': reptool_bl_form.find('#adjust-reptool-bl-comment').val()
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep_disputes/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+  )
+
+
