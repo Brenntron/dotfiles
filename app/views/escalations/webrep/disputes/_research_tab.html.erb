@@ -38,6 +38,7 @@
             <th class="text-center">SBRS Rule Hits Total</th>
             <th>WL/BL Entries</th>
             <th><button type="button">Adjust WL/BL</button></th>
+            <th><button type="button">Adjust RepTool BL</button></th>
           </tr>
         </thead>
         <tbody>
@@ -59,6 +60,13 @@
                   <%= wlbl_form.input :thrt_cats, collection: Wbrs::ThreatCategory.all.map{|cat| cat.mnem}, input_html: { id: 'adjust-wlbl-thrt_cats-list',  multiple: true }  %>
                   <%= wlbl_form.input :note, input_html: { id: 'adjust-wlbl-note' } %>
                   <%= wlbl_form.button :button, 'Add WL/BL', type: :button, onclick: 'add_wlbl_button();' %>
+                <% end %>
+              </div>
+            </td>
+            <td>
+              <div id="adjust-reptool-bl-div">
+                <%= simple_form_for :reptool, html: {id: 'adjust-reptool-form'} do |reptool_form| %>
+                  <%= reptool_form.button :button, 'Add Reptool BL', type: :button, onclick: 'add_reptool_bl_button();' %>
                 <% end %>
               </div>
             </td>
