@@ -27,18 +27,15 @@ Feature: Escalations
     And the textarea with id "state_comment" should have a value of "Coverage has not been updated."
 
   @javascript
-  Scenario:A summary must be provided to create a new research bug
-    Given a user with commit permission exists and is logged in
-    And the following bugs exist:
-      | id | bugzilla_id | state | user_id | summary                                     | product  | component   | description       | committer_id |
-      | 111111 | 111111      | OPEN  | 1       | test escalation summary                     | Escalations | TAC | test description  | 1                   |
-    And the following roles exist:
-      | role           |
-      | admin          |
+  Scenario: A summary must be provided to create a new research bug
+    # TODO change role from admin
+    Given a user with role "admin" exists and is logged in
+    And the following "escalation_bug" bugs with trait "open_bug" exist:
+      | id  | bugzilla_id | user_id | summary                 | description       | committer_id |
+      | 111 | 111111      | 1       | test escalation summary | test description  | 1            |
 
-    And a user with id "1" has a role of "admin"
     Then I wait for "3" seconds
-    And  I goto "/escalations/bugs/111111"
+    And  I goto "/escalations/bugs/111"
     When I click "create_new_research_button"
     When I click "OK"
     Then I should see "must provide a new summary line for the new research bug."
@@ -82,7 +79,9 @@ Feature: Escalations
   @javascript
   Scenario: A research bug should block an escalation bug
     #TODO: write this test
-    
+    Then pending
+
   @javascript
   Scenario: Notes are copied from an escalation to a research bug
     #TODO: write this test
+    Then pending
