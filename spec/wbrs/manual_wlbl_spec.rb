@@ -86,7 +86,7 @@ describe Wbrs::ManualWlbl do
   ### TESTS ####################################################################
 
   it 'should get all the types' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(wlbl_types_response)
+    expect(Wbrs::Base).to receive(:call_request).and_return(wlbl_types_response)
 
     wlbl_types = Wbrs::ManualWlbl.types
 
@@ -102,7 +102,7 @@ describe Wbrs::ManualWlbl do
   end
 
   it 'should find a WL/BL by id' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(find_wlbl_response)
+    expect(Wbrs::Base).to receive(:call_request).and_return(find_wlbl_response)
 
     manual_wlbl = Wbrs::ManualWlbl.find(101)
 
@@ -111,17 +111,17 @@ describe Wbrs::ManualWlbl do
   end
 
   it 'should handle errors finding a WL/BL by id' do
-    expect(Wbrs::Base).to receive(:make_get_request).and_return(find_wlbl_error)
+    expect(Wbrs::Base).to receive(:call_request).and_return(find_wlbl_error)
 
     expect {
       Wbrs::ManualWlbl.find(101)
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
   it 'should get all the manual WL/BL entries' do
     expect(Wbrs::Base).to receive(:make_post_request).and_return(where_wlbl_response)
 
-    manual_wlbls = Wbrs::ManualWlbl.where("list_type" => "BL-weak")
+    manual_wlbls = Wbrs::ManualWlbl.where("usr" => "aivaniuk")
 
     expect(manual_wlbls).to be_a_kind_of(Array)
     manual_wlbls = manual_wlbls.sort_by{ |wlbl| wlbl.id }
@@ -135,7 +135,7 @@ describe Wbrs::ManualWlbl do
 
     expect {
       Wbrs::ManualWlbl.where
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
   it 'should add a WL/BL on the backend' do
@@ -154,7 +154,7 @@ describe Wbrs::ManualWlbl do
 
     expect {
       Wbrs::ManualWlbl.add_from_params
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
 end

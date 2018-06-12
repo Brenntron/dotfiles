@@ -53,19 +53,19 @@
 
 %ul.nav.nav-tabs#bug-tabs{role: 'tablist'}
   %li.nav-item.active{role:'presentation'}
-    %a.nav-link#communication-tab-link{href: '#communication', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
       Communication
   %li.nav-item{role:'presentation'}
-    %a.nav-link#research-tab-link{href: '#research', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+    %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
       Research
   %li.nav-item{role:'presentation'}
-    %a.nav-link#related-tab-link{href: '#related', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
+    %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
       Related Cases
 
 .tab-content.content-wrapper#bug-tab-content
-  .tab-pane.active#communication{role: 'tabpanel'}
+  .tab-pane.active#communication_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/communication_tab'
-  .tab-pane#research{role: 'tabpanel'}
+  .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'
-  .tab-pane#related{role: 'tabpanel'}
+  .tab-pane#related_tab{role: 'tabpanel'}
     related cases

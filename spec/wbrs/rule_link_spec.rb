@@ -64,7 +64,7 @@ describe Wbrs::RuleLink do
 
     expect {
       Wbrs::RuleLink.where
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
 
   end
 
