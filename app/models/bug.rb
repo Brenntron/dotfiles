@@ -1207,6 +1207,37 @@ class Bug < ApplicationRecord
 
   end
 
+  def resolve_blocked_bugs(bug_stub, current_user:, new_escalation_message:, new_escalation_state:)
+    snort_blocked_bugs.each do |blocked_bug|
+      options = {
+          :id => blocked_bug.bugzilla_id,
+          :comment => new_escalation_message,
+      }
+      new_note = bug_stub.add_comment(options)
+      Note.create(
+          :id => new_note['id'],
+          :comment => new_escalation_message,
+          :author => current_user.email,
+          :note_type => 'research',
+          :bug_id => blocked_bug.id,
+          :notes_bugzilla_id => new_note['id']
+      )
+
+      updated_bug_state = Bug.get_new_escalation_state(new_escalation_state)
+      blocked_bug.state = new_escalation_state
+      blocked_bug.status = updated_bug_state[:status]
+      blocked_bug.resolution = updated_bug_state[:resolution]
+      blocked_bug.save
+
+      updated_bug_options =
+          Bug.get_new_bug_state(blocked_bug, new_escalation_state, new_escalation_message, current_user.email)
+      updated_bug_options[:ids] = blocked_bug.id
+      bug_stub.update(updated_bug_options.to_h)
+
+    end
+    BugBlocker.where(snort_blocker_bug_id: self.id).delete_all
+  end
+
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
   # TODO Do we really have a method spanning 200 lines without an opportunity to break it into sub-methods?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:, new_escalation_message: nil, new_escalation_state: nil)
@@ -1216,7 +1247,18 @@ class Bug < ApplicationRecord
     initial_state = bug.state
 
     bug.initialize_report
-    bug_is_being_resolved = bug.state != "PENDING" ? false : true
+
+    is_becoming_resolved = ("PENDING" == permitted_params[:bug][:state]) && ("PENDING" != bug.state)
+
+    if is_becoming_resolved
+      bug.resolve_blocked_bugs(xmlrpc,
+                               current_user: current_user,
+                               new_escalation_message: new_escalation_message,
+                               new_escalation_state: new_escalation_state)
+      publish_research_notes(xmlrpc, current_user, bug)
+    end
+
+
 
     #add a comment to the existing committer note. from issue 981
     if permitted_params[:bug][:state_comment]
@@ -1371,42 +1413,6 @@ class Bug < ApplicationRecord
     bug.reload
 
     bug.load_whiteboard_values
-
-    if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
-      bug_is_being_resolved = !bug_is_being_resolved
-    end
-
-    if bug_is_being_resolved
-      bug.snort_blocked_bugs.each do |blocked_bug|
-        options = {
-            :id => blocked_bug.id,
-            :comment => new_escalation_message,
-        }.reject() { |k, v| v.nil? }
-        new_note = xmlrpc.add_comment(options)
-        Note.create(
-            :id => new_note['id'],
-            :comment => new_escalation_message,
-            :author => current_user.email,
-            :note_type => 'research',
-            :bug_id => blocked_bug.id,
-            :notes_bugzilla_id => new_note['id']
-        )
-
-        updated_bug_state = Bug.get_new_escalation_state(new_escalation_state)
-        blocked_bug.state = new_escalation_state
-        blocked_bug.status = updated_bug_state[:status]
-        blocked_bug.resolution = updated_bug_state[:resolution]
-        blocked_bug.save
-
-        updated_bug_options =
-            Bug.get_new_bug_state(blocked_bug, new_escalation_state, new_escalation_message, current_user.email)
-        updated_bug_options[:ids] = blocked_bug.id
-        xmlrpc.update(updated_bug_options.to_h)
-
-      end
-      bug.snort_blocked_bugs.destroy_all
-      publish_research_notes(xmlrpc, current_user, bug)
-    end
 
   end
 
@@ -2566,6 +2572,9 @@ class Bug < ApplicationRecord
                       })
         end
       end
+
+      bug_factory.update(ids: self.bugzilla_id,
+                         depends_on: {add: [new_research_bug.bugzilla_id]})
     end
 
 
