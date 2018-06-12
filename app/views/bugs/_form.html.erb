@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="state">State</label>
-        <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control'%>
+        <%=f.select :state, options_for_select(state_options(@bug), selected: @bug.state, disabled: disabled_state_options(current_user)),{} , class: 'form-control', id: 'bug-form-state-input'%>
 
         <% unless @bug.can_resolve? %>
         <span class="tiny text-muted">Can't set to pending.</span>
@@ -44,26 +44,26 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="priority">Priority</label>
-        <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control" %>
+        <%= f.select :priority, ['Unspecified', 'P1', 'P2', 'P3', 'P4', 'P5'], {}, class: "form-control", id: 'bug-form-priority-input' %>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="component">Component</label>
-        <%= f.select :component, ['Snort Rules', 'SO Rules', 'Malware'], {}, class: "form-control" %>
+        <%= f.select :component, ['Snort Rules', 'SO Rules', 'Malware'], {}, class: "form-control", id: 'bug-form-component-input' %>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="classification">Classification</label>
-        <%= f.select :classification, options_for_select(classification_selections(current_user.class_level), selected: Bug.classifications[@bug.classification]), {}, class: "form-control" %>
+        <%= f.select :classification, options_for_select(classification_selections(current_user.class_level), selected: Bug.classifications[@bug.classification]), {}, class: "form-control", id: 'bug-form-classification-input' %>
       </div>
     </div>
     <% unless @bug.new_record? %>
       <div class="row">
         <div class="col-sm-12 form-group">
           <label for="user_id">Assignee</label>
-          <%=f.select :user_id, options_for_select(@bug.allowed_assignees.sort, selected: @bug.user_id), {include_blank: true}, class: 'form-control', required: true%>
+          <%=f.select :user_id, options_for_select(@bug.allowed_assignees.sort, selected: @bug.user_id), {include_blank: true}, class: 'form-control', required: true, id: 'bug-form-user-input' %>
         </div>
       </div>
     <% end %>
@@ -71,7 +71,7 @@
       <div class="row">
         <div class="col-sm-12 form-group">
           <label for="committer_id">Committer</label>
-          <%=f.select :committer_id, options_for_select(@bug.allowed_committers.sort, selected: @bug.committer_id), {include_blank: true}, class: 'form-control', required: true%>
+          <%=f.select :committer_id, options_for_select(@bug.allowed_committers.sort, selected: @bug.committer_id), {include_blank: true}, class: 'form-control', required: true, id: 'bug-form-committer-input' %>
         </div>
       </div>
     <% end %>
@@ -90,13 +90,13 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="summary">Summary</label>
-        <%= f.text_field :summary, class: "form-control create-input", required: true %>
+        <%= f.text_field :summary, class: "form-control create-input", required: true, id: 'bug-form-summary-input' %>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-12 form-group">
-        <label for="summary">Whiteboard</label>
-        <%= f.text_field :whiteboard, class: "form-control create-input" %>
+        <label for="whiteboard">Whiteboard</label>
+        <%= f.text_field :whiteboard, class: "form-control create-input", id: 'bug-form-whiteboard-input' %>
       </div>
     </div>
 
@@ -104,7 +104,7 @@
     <div class="row">
       <div class="col-sm-12 form-group">
         <label for="description">Description</label>
-        <%= f.text_area :description, class: "form-control", required: @bug.new_record?, disabled: !@bug.new_record?%>
+        <%= f.text_area :description, class: "form-control", required: @bug.new_record?, disabled: !@bug.new_record?, id: 'bug-form-desc-input' %>
       </div>
     </div>
 
