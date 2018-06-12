@@ -132,7 +132,7 @@ describe Wbrs::Prefix do
 
     expect {
       prefix = Wbrs::Prefix.find(101)
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
 
   end
 
@@ -151,7 +151,7 @@ describe Wbrs::Prefix do
 
     expect {
       Wbrs::Prefix.where
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
 
   end
 
@@ -175,7 +175,7 @@ describe Wbrs::Prefix do
       Wbrs::Prefix.create_from_url(url: "http://ukr12.net",
                                    user: 'tester',
                                    description: 'Testing /add route.')
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
 
   end
 
@@ -319,7 +319,7 @@ describe 'A prefix' do
 
     expect {
       prefix.categories
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
   it 'should edit its categories' do
@@ -340,7 +340,7 @@ describe 'A prefix' do
       prefix.set_categories([],
                             user: 'tester',
                             description: 'Testing /edit route.')
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
 
   end
 
@@ -361,7 +361,7 @@ describe 'A prefix' do
 
     expect {
       prefix.history_records
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
   end
 
   it 'should disable a list of prefixes' do
@@ -376,7 +376,7 @@ describe 'A prefix' do
 
     expect {
       prefix.disable(user: nil)
-    }.to raise_error(RuntimeError)
+    }.to raise_error(Wbrs::WbrsError)
 
   end
 
