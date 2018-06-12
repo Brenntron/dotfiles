@@ -115,10 +115,40 @@
       .col-xs-12.email-msg-body
         %pre.email-msg-content
 
-    #newEmailDialog{title: 'New Email'}
-      %p
-        This is an animated dialog which is useful for displaying information.
-        The dialog window can be moved, resized and closed with the 'x' icon.
+    #newEmailDialog{title: 'Compose New Email'}
+      .email-reply-header-information
+        .sender-receiver-info
+          %span.content-label-sm.content-label-sm-to To
+          %input.receiver-email{autofocus: true}
+          %span.content-label-sm.content-label-sm-sub Subject
+          %input.communication-subject{type: 'text'}
+
+
+        .email-reply-button-wrapper
+          .email-reply-buttons
+            %button.attachment-button.attachment-label.attachment-reply
+
+        .template-select-wrapper
+          .template-label
+            Select a Template
+          %select#email-template-select
+            %option
+              Std email template
+            %option
+              Another template option
+            %option
+              Apology template
+            %option
+              Create new template
+
+        #file-fields
+
+      .email-reply-body-wrapper
+        %textarea.email-reply-body
+
+      .email-new-button-wrapper
+        %button.primary#reply
+          Send
 
 
     .row
@@ -143,6 +173,8 @@
                         Another template option
                       %option
                         Apology template
+                      %option
+                        Create new template
 
                     .email-reply-button-wrapper
                       .email-reply-buttons

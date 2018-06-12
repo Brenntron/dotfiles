@@ -105,6 +105,8 @@ $ ->
 
   $('#newEmailDialog').dialog
     autoOpen: false
+    minWidth: 400
+    position: { my: "right bottom", at: "right bottom", of: window }
   $('#opener').on 'click', ->
     $('#newEmailDialog').dialog 'open'
     return
