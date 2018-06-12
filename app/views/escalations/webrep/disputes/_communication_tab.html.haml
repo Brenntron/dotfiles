@@ -121,23 +121,38 @@
           .col-xs-12.email-reply-content-wrapper
 
             .row
-              .col-xs-12.email-header-information
-                .email-header-data
-                  .sender-receiver-info
-                    %span.reply-symbol
-                    %span.receiver-email
-                    #file-fields
+              .col-xs-12.email-reply-header-information
+                .row
+                  .col-xs-4
+                    .sender-receiver-info
+                      %span.reply-symbol
+                      %span.receiver-email
+                  .col-xs-8
+                    .template-label
+                      Select a Template
+                    %select#email-template-select
+                      %option
+                        Std email template
+                      %option
+                        Another template option
+                      %option
+                        Apology template
 
-                .email-response-button-wrapper
-                  .email-response-buttons
-                    %button.attachment-button.attachment-label.attachment-reply
+                    .email-reply-button-wrapper
+                      .email-reply-buttons
+                        %button.attachment-button.attachment-label.attachment-reply
+                        %button.delete-email
+                .row
+                  .col-xs-12
+                    %input.communication-subject{type: 'text'}
+                    #file-fields
             .row
-              .col-xs-12
-                %textarea.email-reply-body
+              .col-xs-12.email-reply-body-wrapper
+                %textarea.email-reply-body{autofocus: true}
 
         .row
           .col-xs-12.text-center
-            %button.add-case-note-button#reply
+            %button.primary#reply
               Send
 
 

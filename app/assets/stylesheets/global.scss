@@ -3147,9 +3147,12 @@ fieldset.top-content {
 .email-reply-body {
   border: none;
   width: 100%;
-  min-height: 100px;
+  min-height: 300px;
   resize: vertical;
-  padding-top: 10px;
+  padding: 15px 10px;
+  font-size: 9pt;
+  line-height: 1.4;
+  color: $type-lighter-color;
   }
 
 .email-response-button-wrapper {
@@ -3159,6 +3162,10 @@ fieldset.top-content {
   padding-left: 12px;
   position: absolute;
   right: 12px;
+}
+
+.email-reply-button-wrapper {
+  float: right;
 }
 
 .email-header-data {
@@ -3177,6 +3184,8 @@ fieldset.top-content {
   margin-top: 12px;
   margin-bottom: 40px;
   font-size: 9pt;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .table-toolbar {
@@ -3192,11 +3201,19 @@ fieldset.top-content {
 .communication-subject {
   color: $type-lighter-color;
   line-height: 1.3em;
-}
-
-textarea.communication-subject {
   border: none;
   width: 100%;
+}
+
+input.communication-subject {
+  margin-top: 5px;
+}
+
+.email-reply-body-wrapper {
+  margin-left: 0;
+  margin-right: 0;
+  padding-right: 0;
+  padding-left: 0;
 }
 
 .email-response-buttons {
@@ -3223,6 +3240,18 @@ textarea.communication-subject {
   background-color: $bug-section-color;
 }
 
+.email-reply-buttons button {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 18px 18px;
+  width: 18px;
+  height: 18px;
+  background-color: transparent;
+  border: none;
+  margin-top: 0;
+  margin-right: 0;
+}
+
 .reply-symbol {
   background-image: url(image_path('icon_reply_grey.svg'));
   background-repeat: no-repeat;
@@ -3232,6 +3261,12 @@ textarea.communication-subject {
   display: block;
   float: left;
   margin-right: 8px;
+}
+
+.delete-email {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url(image_path('icon_delete.svg'));
 }
 
 .receiver-email {
@@ -3375,9 +3410,37 @@ textarea.communication-subject {
   display: inline-block;
 }
 
+.email-reply-header-information {
+  padding: 5px;
+  background-color: $faint-neutral-color;
+}
+
 .email-attachments a {
   color: $content-tab-color;
   font-size: 8pt;
+}
+
+.template-label {
+  color: $type-base-color;
+  text-transform: uppercase;
+  background-image: url(image_path('icon_template.svg'));
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 16px 18px;
+  padding-left: 24px;
+  float: left;
+  display: block;
+  padding-top: 4px;
+  font-weight: 700;
+  font-size: 8pt;
+  height: 20px;
+}
+
+#email-template-select {
+  margin-left: 8px;
+  font-size: 8pt;
+  border-radius: 0;
+  border: 1px solid darken($faint-neutral-color, 5%);
 }
 
 #communication h1 {
