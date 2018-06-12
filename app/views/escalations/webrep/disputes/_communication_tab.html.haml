@@ -116,46 +116,44 @@
         %pre.email-msg-content
 
     #newEmailDialog{title: 'Compose New Email'}
-      .email-reply-header-information
-        .sender-receiver-info
-          %span.content-label-sm.content-label-sm-to To
-          %input.receiver-email{autofocus: true}
-          %span.content-label-sm.content-label-sm-sub Subject
-          %input.communication-subject{type: 'text'}
+      %form
+        .email-reply-header-information
+          .sender-receiver-info
+            %span.content-label-sm.content-label-sm-to To
+            %input.receiver-email.new-reciever{autofocus: true, required: true, type: 'email', name: 'receiver'}
+            %span.content-label-sm.content-label-sm-sub Subject
+            %input.communication-subject.new-subject{type: 'text'}
 
+          .email-reply-button-wrapper
+            .email-reply-buttons
+              %button.attachment-button.attachment-label.new-attachment
 
-        .email-reply-button-wrapper
-          .email-reply-buttons
-            %button.attachment-button.attachment-label.attachment-reply
+          .template-select-wrapper
+            .template-label
+              Select a Template
+            %select.email-template-select
+              %option
+                Std email template
+              %option
+                Another template option
+              %option
+                Apology template
+              %option
+                Create new template
 
-        .template-select-wrapper
-          .template-label
-            Select a Template
-          %select#email-template-select
-            %option
-              Std email template
-            %option
-              Another template option
-            %option
-              Apology template
-            %option
-              Create new template
+          #file-fields
 
-        #file-fields
+        .email-reply-body-wrapper
+          %textarea.email-reply-body.new-body
 
-      .email-reply-body-wrapper
-        %textarea.email-reply-body
-
-      .email-new-button-wrapper
-        %button.primary#reply
-          Send
-
+        .email-new-button-wrapper
+          %button.primary#new-email{value: 'submit'}
+            Send
 
     .row
       .col-xs-12#email-reply.hidden
         .row
           .col-xs-12.email-reply-content-wrapper
-
             .row
               .col-xs-12.email-reply-header-information
                 .row
@@ -166,7 +164,7 @@
                   .col-xs-8
                     .template-label
                       Select a Template
-                    %select#email-template-select
+                    %select.email-template-select
                       %option
                         Std email template
                       %option
@@ -235,35 +233,3 @@
 
   :javascript
     AC.Helpers.clipboard()
-
-
-#newEmail.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "new_message", :role => "dialog", :tabindex => "-1"}
-  .modal-dialog{:role => "document"}
-    .modal-content
-      .modal-header
-        %h4#newMessage.modal-title
-          Compose New Email
-          %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
-            %span{"aria-hidden" => "true"}
-      .modal-body
-        %form
-          .col-xs-12.email-header-information
-            .email-header-data
-              %span.content-label-sm Subject
-              %textarea.communication-subject.new-subject
-              .sender-receiver-info
-                %span.content-label-sm To
-                %input.receiver-email.new-receiver{required: true, type: 'email', name: 'receiver'}
-
-                #file-fields-new
-
-
-            .email-response-button-wrapper
-              .email-response-buttons
-                %button.attachment-button.attachment-label.new-attachment
-          %textarea.col-xs-12.email-reply-body.new-body
-
-          .modal-footer
-            .col-xs-12.text-center
-              %button.add-case-note-button#new-email{value: 'submit'}
-                Send
