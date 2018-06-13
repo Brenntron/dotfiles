@@ -69,6 +69,7 @@ class Ability
     if role_names.include?('ips escalator')
       can [:manage, :import], EscalationBug
       can :manage, [EscalationLink, Attachment, Note]
+      can :create, ResearchBug
       can :publish_to_bugzilla, Note
     end
 
@@ -103,8 +104,6 @@ class Ability
     if role_names.include?('build coordinator')
       cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
       can :read, [ResearchBug, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
-      can :read, User
-      can :update_preferences, User, id: current_user.id
     end
   end
 end
