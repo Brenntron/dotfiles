@@ -3032,6 +3032,7 @@ fieldset.top-content {
   font-size: 8pt;
   line-height: 1.4em;
   margin: 3px 0;
+  width: 100%;
 }
 
 .editable-note-block {
@@ -3389,9 +3390,11 @@ input.communication-subject {
   background-color: $bug-section-color;
   color: $content-bg-color;
   width: 120px;
-  margin-top: 20px;
   -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  float: right;
+  display: inline-block;
+  margin-top: 3px;
 }
 
 .add-case-note-button:hover {
@@ -3844,6 +3847,11 @@ input.file_attachment {
   width: auto;
   margin: 0;
   padding: 2px;
+}
+
+.notes-header {
+  display: inline-block;
+  margin-bottom: 20px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
