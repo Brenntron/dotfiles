@@ -3630,6 +3630,103 @@ button.tertiary {
   text-decoration: underline;
 }
 
+.dispute_rep_tools {
+  width: 70px;
+}
+
+.dispute_rep_tools .dropdown.open {
+  background-color: transparent;
+}
+
+.dispute_rep_tools .dropdown-menu {
+  top: 13px;
+  left: 1px;
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: $bug-section-color;
+  min-width: 250px;
+}
+
+.dispute-inline-buttons {
+  width: 20px;
+  height: 20px;
+  background-color: darken($nav-toolbar-color, 10%);
+  background-size: 16px 16px;
+  background-position: center center;
+  border-radius: 2px;
+  border: none;
+  background-repeat: no-repeat;
+  margin:0 1px;
+  display: inline-block;
+}
+
+.dropdown.open .dispute-inline-buttons {
+  background-color: $bug-section-color;
+  border-radius: 2px 2px 0 0 ;
+}
+
+.adjust-wlbl-button {
+  background-image: url(image_path('icon_wlbl_white.svg'));
+}
+
+.adjust-reptool-button {
+  background-image: url(image_path('icon_blacklist_white.svg'));
+}
+
+.dispute_rep_tools .dropdown-menu h3 {
+  color: $content-bg-color;
+  padding: 0 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  margin-bottom: 6px;
+}
+
+.inline-tool-content-wrapper {
+  background-color: $content-bg-color;
+  padding: 4px 10px;
+}
+
+.dispute_tool_current {
+  background-color: $faint-neutral-color;
+  font-size: 8pt;
+}
+
+.dispute_tool_current td {
+  border-right: 1px solid $content-bg-color;
+}
+
+.dispute_tool_current td:last-of-type {
+  border-right: none;
+}
+
+.dispute_tool_current .content-label-sm {
+  padding-bottom: 0;
+}
+
+.inline-tool-content-wrapper {
+  width: 100%;
+  background-color: $content-bg-color;
+  margin-bottom: -5px;
+  border-radius: 0 0 4px 4px;
+}
+
+.toolbar select.toolbar-select {
+  background-color: $faint-neutral-color;
+  border-radius: 2px !important;
+  padding: 0;
+  margin: 0;
+  border: none !important;
+  height: 27px;
+}
+
+.select-status {
+  min-width: 80px;
+}
+
+.select-rt-rule {
+  min-width: 130px;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
