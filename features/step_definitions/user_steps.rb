@@ -1,6 +1,6 @@
 Given (/^a "(.*?)" user exists$/) do |role|
   @user = FactoryGirl.create(:fake_user)
-  @role = Role.create(role: role)
+  @role = FactoryGirl.create(:role, role: role)
   @user.roles << @role
 end
 
@@ -12,21 +12,21 @@ end
 
 Given(/^a user with commit permission exists and is logged in$/) do
   @user = FactoryGirl.create(:current_user, confirmed: true)
-  @role = Role.create(role: 'committer')
+  @role = FactoryGirl.create(:role, role: 'committer')
   @user.roles << @role
   sign_in_user
 end
 
 Given(/^an admin user with role "(.*?)" exists and is logged in$/) do |role|
   @user = FactoryGirl.create(:current_user, confirmed: true)
-  @user.roles << Role.create(role: 'admin')
-  @user.roles << Role.create(role: role)
+  @user.roles << FactoryGirl.create(:role, role: 'admin')
+  @user.roles << FactoryGirl.create(:role, role: role)
   sign_in_user
 end
 
-Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
+Given(/^a user with role "(.*?)" exists and is logged in$/) do |role_name|
   @user = FactoryGirl.create(:current_user, confirmed: true)
-  @user.roles << Role.create(role: role)
+  @user.roles << FactoryGirl.create(:role, role: role_name)
   sign_in_user
 end
 
@@ -49,7 +49,7 @@ end
 
 Given(/^a manager exists and is logged in$/) do
   @user = FactoryGirl.create(:current_user, confirmed: true)
-  @role = Role.create(role: 'manager')
+  @role = FactoryGirl.create(:role, role: 'manager')
   @user.roles << @role
   sign_in_user
 end
