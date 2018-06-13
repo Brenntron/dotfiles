@@ -95,7 +95,7 @@
         .email-reply-header-information
           .sender-receiver-info
             %span.content-label-sm.content-label-sm-to To
-            %input.receiver-email.new-reciever{autofocus: true, required: true, type: 'email', name: 'receiver'}
+            %input.receiver-email.new-receiver{autofocus: true, required: true, type: 'email', name: 'receiver'}
             %span.content-label-sm.content-label-sm-sub Subject
             %input.communication-subject.new-subject{type: 'text'}
 
@@ -122,7 +122,7 @@
           %textarea.email-reply-body.new-body
 
         .email-new-button-wrapper
-          %button.primary#new-email{value: 'submit'}
+          %button.primary#send-new-email{value: 'submit'}
             Send
 
     .row
@@ -166,7 +166,7 @@
 
         .row
           .col-xs-12.text-center
-            %button.primary#reply
+            %button.primary#send-reply
               Send
 
 

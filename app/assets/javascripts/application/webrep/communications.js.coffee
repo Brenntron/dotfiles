@@ -64,7 +64,7 @@ $ ->
     $(this).parent().remove()
 
 
-  $('#reply').on 'click', ->
+  $('#send-reply').on 'click', ->
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
@@ -97,16 +97,17 @@ $ ->
   # New email handlers
 
   $('.new-attachment').on 'click', ->
-    $('#file-fields-new').before("<span><input class= 'file_attachment_new' name='attachment' type='file'/></span>")
+    $('#file-fields-new').before("<span class='file-attachment-wrapper'><input class= 'file_attachment_new' name='attachment' type='file'/></span>")
     $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
     $('.file_attachment_new:last').click()
+    false
 
   $('body').on 'click', '.delete_attachment_new', ->
     $(this).parent().remove()
 
 
 
-  $('#new-email').on 'click', (e) ->
+  $('#send-new-email').on 'click', (e) ->
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
@@ -237,7 +238,9 @@ $ ->
     autoOpen: false
     minWidth: 400
     position: { my: "right bottom", at: "right bottom", of: window }
-  $('#opener').on 'click', ->
+  $('.new-email-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
+
+
     return
   return
