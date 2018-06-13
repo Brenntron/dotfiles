@@ -1481,7 +1481,7 @@ class Bug < ApplicationRecord
         if bug
           raise 'Cannot process non-escalation bug' unless bug.research_bug?
         else
-          bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id)
+          bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id, product:"Research")
         end
 
         bug.initialize_report
@@ -1775,7 +1775,7 @@ class Bug < ApplicationRecord
         if bug
           raise 'Cannot process non-escalation bug' unless bug.escalation_bug?
         else
-          bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id)
+          bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id, product:"Escalations")
         end
 
         bug.initialize_report
@@ -2527,6 +2527,7 @@ class Bug < ApplicationRecord
     new_bug_attrs[:creator]             = current_user.id.to_s
 
     new_research_bug = ResearchBug.create!(new_bug_attrs.merge(id: bugzilla_id,
+                                                               product: "Research",
                                                                bugzilla_id: bugzilla_id,
                                                                user_id: default_assigned_to_user.id,
                                                                state: "NEW"))
