@@ -207,7 +207,6 @@ $ ->
   # New Note
 
   $('#new-case-note-button').on "click", ->
-    debugger
     $('.new-case-note-row').show()
     $(this).hide()
 

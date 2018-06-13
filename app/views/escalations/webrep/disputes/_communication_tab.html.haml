@@ -200,11 +200,7 @@
     %h1.notes-header Notes
     %button.add-case-note-button#new-case-note-button
       Add Note
-    .col-xs-12.new-case-note-row
-      %textarea.new-case-note-textarea#new-case-note-textarea
-      .note-info-item.note-tool-buttons
-        %button.new-case-note-save-button save
-        %button.new-case-note-cancel-button x
+
     -@dispute.dispute_comments.recent_first.each do |comment|
       .row
         .col-xs-12
@@ -216,17 +212,23 @@
           .note-info-item.time-stamp
             =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
           .note-info-item.note-tool-buttons
-            %button.note-save-edit-button.hidden{comment_id: "#{comment.id}"} save
-            %button.note-cancel-edit-button.hidden{comment_id: "#{comment.id}"} x
+            %button.note-save-edit-button.save-button.hidden{comment_id: "#{comment.id}"}
+            %button.note-cancel-edit-button.cancel-button.hidden{comment_id: "#{comment.id}"}
             %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
             %button.note-delete-button{comment_id: "#{comment.id}"}
 
       .row
         .col-xs-12
-          .note-block{comment_id: "#{comment.id}"}
+          .note-block.content-editable#editable-note-block{comment_id: "#{comment.id}"}
             =comment.comment
-          %textarea.editable-note-block#editable-note-block{comment_id: "#{comment.id}"}
-            =comment.comment
+
+
+    .col-xs-12.new-case-note-row
+      .note-info-item.note-tool-buttons.edit-button-wrapper
+        %button.new-case-note-save-button.save-button.panel-button
+        %button.new-case-note-cancel-button.cancel-button.panel-button
+      .note-block.content-editable#new-case-note-textarea
+
 
 
     %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
