@@ -104,15 +104,6 @@ $ ->
     $(this).parent().remove()
 
 
-  $('#newEmailDialog').dialog
-    autoOpen: false
-    minWidth: 400
-    position: { my: "right bottom", at: "right bottom", of: window }
-  $('#opener').on 'click', ->
-    $('#newEmailDialog').dialog 'open'
-    return
-  return
-
 
   $('#new-email').on 'click', (e) ->
 
@@ -216,6 +207,7 @@ $ ->
   # New Note
 
   $('#new-case-note-button').on "click", ->
+    debugger
     $('.new-case-note-row').show()
     $(this).hide()
 
@@ -241,3 +233,11 @@ $ ->
 
 
 
+  $('#newEmailDialog').dialog
+    autoOpen: false
+    minWidth: 400
+    position: { my: "right bottom", at: "right bottom", of: window }
+  $('#opener').on 'click', ->
+    $('#newEmailDialog').dialog 'open'
+    return
+  return
