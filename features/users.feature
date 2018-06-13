@@ -714,7 +714,7 @@ Feature: User Accounts
       |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
     Given I wait for "3" seconds
     And  I goto "/bugs/new"
-    Then I should see "You are not authorized to new bug."
+    Then I should see "You are not authorized to new research bug."
     And I goto "/bugs/333333"
     When I click ".rules-tab"
     Then I should not see content "edit" within ".top-bar"

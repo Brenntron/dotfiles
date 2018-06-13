@@ -79,7 +79,7 @@ Then(/^I relate (.*?) to (.*?) with block$/) do |from_id, to_id|
   bug1 = Bug.find(from_id)
   bug2 = Bug.find(to_id)
 
-  bug1.snort_research_escalation_bugs << bug2
+  bug1.snort_research_bugs << bug2
   bug1.snort_blocker_bugs << bug2
 
 end
