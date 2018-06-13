@@ -95,7 +95,7 @@
         .email-reply-header-information
           .sender-receiver-info
             %span.content-label-sm.content-label-sm-to To
-            %input.receiver-email.new-reciever{autofocus: true, required: true, type: 'email', name: 'receiver'}
+            %input.receiver-email.new-receiver{autofocus: true, required: true, type: 'email', name: 'receiver'}
             %span.content-label-sm.content-label-sm-sub Subject
             %input.communication-subject.new-subject{type: 'text'}
 
@@ -106,15 +106,9 @@
           .template-select-wrapper
             .template-label
               Select a Template
-            %select.email-template-select
+            %select.email-template-select.select-new-template
               %option
-                Std email template
-              %option
-                Another template option
-              %option
-                Apology template
-              %option
-                Create new template
+              =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
           #file-fields-new
 
@@ -139,15 +133,9 @@
                   .col-xs-8
                     .template-label
                       Select a Template
-                    %select.email-template-select
+                    %select.email-template-select.select-reply-template
                       %option
-                        Std email template
-                      %option
-                        Another template option
-                      %option
-                        Apology template
-                      %option
-                        Create new template
+                      =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
@@ -162,7 +150,7 @@
                     #file-fields
             .row
               .col-xs-12.email-reply-body-wrapper
-                %textarea.email-reply-body{autofocus: true}
+                %textarea.email-reply-body.reply-body{autofocus: true}
 
         .row
           .col-xs-12.text-center

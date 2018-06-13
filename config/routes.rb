@@ -27,6 +27,7 @@ Rails.application.routes.draw do
       end
       resources :dispute_emails
       resources :dispute_comments
+      resources :email_templates
 
       get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'

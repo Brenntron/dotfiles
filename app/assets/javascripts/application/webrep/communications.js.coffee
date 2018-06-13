@@ -54,6 +54,19 @@ $ ->
   $('.reply-button').on 'click', ->
     $('#email-reply').removeClass('hidden')
 
+  $('.select-reply-template').on 'change', ->
+    template_id = this.value
+
+    std_msg_ajax(
+      method: 'GET'
+      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $('.reply-body')[0].innerHTML = response[0].body
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+    )
+
   $('.attachment-reply').on 'click', ->
     $('.file-wrapper-reply').show()
     $('#file-fields').append("<span class='file-attachment-wrapper'><input class= 'file_attachment' name='attachment' type='file'/></span>")
@@ -96,10 +109,24 @@ $ ->
 
   # New email handlers
 
+  $('.select-new-template').on 'change', ->
+    template_id = this.value
+
+    std_msg_ajax(
+      method: 'GET'
+      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $('.new-body')[0].innerHTML = response[0].body
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+    )
+
   $('.new-attachment').on 'click', ->
     $('#file-fields-new').before("<span><input class= 'file_attachment_new' name='attachment' type='file'/></span>")
     $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
     $('.file_attachment_new:last').click()
+    false
 
   $('body').on 'click', '.delete_attachment_new', ->
     $(this).parent().remove()
