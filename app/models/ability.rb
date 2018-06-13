@@ -72,10 +72,11 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
-    if role_names.include?('ips rule manager')
+    if role_names.include?('manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
+      can :read, [ResearchBug, Rule]
     end
 
     if role_names.include?('committer')
