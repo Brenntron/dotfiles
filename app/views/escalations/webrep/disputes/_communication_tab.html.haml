@@ -62,9 +62,9 @@
       .col-xs-12.highlighted-section-header
         %h1 Communication
         // Only show Notice if email is to customer
-        .customer-facing-notice#opener
+        .customer-facing-notice
           Customer Facing Message
-        %button.new-email-button{'data-toggle' => 'modal', 'data-target' => '#newEmail'}
+        %button.new-email-button#opener
           Compose New Email
 
     .row

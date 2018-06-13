@@ -22,7 +22,7 @@ $ ->
 
   populate_communication_details = (email, attachments) ->
     $('.communication-subject')[0].innerHTML = email.subject
-    $('.communication-subject')[1].innerHTML = "Re:" + email.subject
+    $('input[type=text].communication-subject').val("Re: " + email.subject)
     $('.author-username')[0].innerHTML = email.from
     $('.receiver-email')[0].innerHTML = email.to
     $('.receiver-email')[1].innerHTML = email.from
@@ -38,7 +38,8 @@ $ ->
 
 
   clean_up_current_email_view = ->
-    $('.duplicate-current-email-view').remove();
+    $('.duplicate-current-email-view').remove()
+    $('.email-attachments').empty()
     former_element = $('.current-email-view').removeClass('current-email-view')
 
   handle_current_email_row = (row) ->
@@ -207,7 +208,6 @@ $ ->
   # New Note
 
   $('#new-case-note-button').on "click", ->
-    debugger
     $('.new-case-note-row').show()
     $(this).hide()
 
