@@ -30,7 +30,7 @@ module API
           end
 
           def current_user
-            return nil unless /^_api_session/ =~ @request.headers['Cookie']
+            return nil unless /_api_session=/ =~ @request.headers['Cookie']
             warden.user || @user
           end
 
