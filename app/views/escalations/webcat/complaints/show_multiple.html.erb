@@ -38,24 +38,23 @@
     <% end %>
   </div>
   <div class="col-xs-6">
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="embed-responsive embed-responsive-1by1">
-          <iframe class="preview-container embed-responsive-item" src="http://loweandbaik.com/" sandbox></iframe>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="embed-responsive embed-responsive-1by1">
+            <iframe class="embed-responsive-item webcat-iframe" src="http://loweandbaik.com/" sandbox></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-xs-12">
+          <%= text_field_tag "complaint_id_x_prefix", "somevalue" %><br>
+          <%= text_field_tag "complaint_id_x_categories", "somevalue" %><br>
+          <%= text_field_tag "complaint_id_x_comment", "somevalue" %><br>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+          <%= button_tag "set complete" %>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-sm-6 col-xs-12">
-        <%= text_field_tag "complaint_id_x_prefix", "somevalue" %><br>
-        <%= text_field_tag "complaint_id_x_categories", "somevalue" %><br>
-        <%= text_field_tag "complaint_id_x_comment", "somevalue" %><br>
-      </div>
-      <div class="col-sm-6 col-xs-12">
-        <%= button_tag "set complete" %>
-      </div>
-    </div>
-
-  </div>
 </div>
 

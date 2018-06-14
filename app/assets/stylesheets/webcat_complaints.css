@@ -22,6 +22,50 @@
     display: block;
 }
 
+/** This matches what is on the bootstrap website */
+.embed-responsive {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    /* Adding this */
+    height: auto;
+}
+
+.embed-responsive::before {
+    display: block;
+    content: "";
+    box-sizing: border-box;
+}
+
+.embed-responsive-1by1::before {
+    padding-top: 100%;
+}
+
+.webcat-iframe {
+    zoom: 0.71;
+    -moz-transform: scale(0.41);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.41);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.41);
+    -webkit-transform-origin: 0 0;
+    width: 240% !important;
+}
+
+@media (min-width: 1200px) {
+    .webcat-iframe {
+        zoom: 0.71;
+        -moz-transform: scale(0.71);
+        -moz-transform-origin: 0 0;
+        -o-transform: scale(0.71);
+        -o-transform-origin: 0 0;
+        -webkit-transform: scale(0.71);
+        -webkit-transform-origin: 0 0;
+        width: 140% !important;
+    }
+}
 
 .preview-container{
     width:100%;
@@ -32,3 +76,4 @@
     -webkit-transform:scale(.7);
     -moz-transform-scale(0.7);
 }
+
