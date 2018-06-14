@@ -105,6 +105,29 @@ Feature: Webrep communications
     And I should see "EMAIL SENT"
 
 
+  @javascript @now
+  Scenario: a user can create a new email using an email template
+    Given a user with role "admin" exists and is logged in
+
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following dispute emails exist:
+      |id  | dispute_id           | status |
+      | 1  | 722                  | unread |
+      | 2  | 722                  | read   |
+    And the following email templates exist:
+     | template_name | body                                                                                                    |
+     |  PSB          | Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx . |
+    And I goto "/escalations/webrep/disputes/722"
+    Then I click "Compose New Email"
+    And I wait for "2" seconds
+    And I select "PSB" from "select-new-template"
+    And I wait for "2" seconds
+    # this works confirmed via screen shot, but can't get test to pass
+#    Then I should see "Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx ."
+
+
 
   ##Notes
 

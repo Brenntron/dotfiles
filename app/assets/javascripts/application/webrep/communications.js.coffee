@@ -54,7 +54,7 @@ $ ->
   $('.reply-button').on 'click', ->
     $('#email-reply').removeClass('hidden')
 
-  $('.select-reply-template').on 'change', ->
+  $('#select-reply-template').on 'change', ->
     template_id = this.value
 
     std_msg_ajax(
@@ -109,7 +109,7 @@ $ ->
 
   # New email handlers
 
-  $('.select-new-template').on 'change', ->
+  $('#select-new-template').on 'change', ->
     template_id = this.value
 
     std_msg_ajax(

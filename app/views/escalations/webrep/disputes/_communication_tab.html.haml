@@ -106,7 +106,7 @@
           .template-select-wrapper
             .template-label
               Select a Template
-            %select.email-template-select.select-new-template
+            %select.email-template-select#select-new-template
               %option
               =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
@@ -133,7 +133,7 @@
                   .col-xs-8
                     .template-label
                       Select a Template
-                    %select.email-template-select.select-reply-template
+                    %select.email-template-select#select-reply-template
                       %option
                       =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 

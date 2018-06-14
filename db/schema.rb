@@ -270,7 +270,6 @@ ActiveRecord::Schema.define(version: 20180531183731) do
   end
 
   create_table "email_templates", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "user_id"
     t.string "template_name"
     t.text "body"
     t.datetime "created_at", null: false
