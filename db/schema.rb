@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180418163111) do
+ActiveRecord::Schema.define(version: 20180614145957) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -129,6 +129,39 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
   end
 
+  create_table "complaint_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "complaint_id"
+    t.string "tag"
+    t.string "subdomain"
+    t.string "domain"
+    t.string "path"
+    t.integer "wbrs_score"
+    t.string "url_primary_category"
+    t.string "resolution"
+    t.text "resolution_comment"
+    t.datetime "complaint_entry_resolved_at"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "complaints", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "tag"
+    t.string "channel"
+    t.string "status"
+    t.text "description"
+    t.string "added_through"
+    t.datetime "complaint_assigned_at"
+    t.datetime "complaint_closed_at"
+    t.string "resolution"
+    t.text "resolution_comment"
+    t.string "customer"
+    t.string "region"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -175,6 +208,16 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "dispute_email_attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "dispute_email_id"
+    t.integer "bugzilla_attachment_id"
+    t.string "file_name"
+    t.text "direct_upload_url"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "dispute_emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "dispute_id"
     t.text "email_headers"
@@ -193,7 +236,7 @@ ActiveRecord::Schema.define(version: 20180418163111) do
     t.string "uri"
     t.string "hostname"
     t.string "entry_type"
-    t.integer "score"
+    t.float "score", limit: 24
     t.string "score_type"
     t.string "suggested_disposition"
     t.string "primary_category"
