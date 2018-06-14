@@ -96,7 +96,6 @@ class BugsController < ApplicationController
   end
 
   def create
-    # byebug
     # raise 'Bug creation not converted'
     respond_to do |format|
       format.js { head :no_content }
