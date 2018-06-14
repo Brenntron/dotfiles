@@ -26,3 +26,13 @@ window.populate_webcat_index_table = () ->
 window.check_preview_windows = () ->
   #visit site and check X-Frame-Options if same origin then you cant display it in the preview
   #snort.org for instance does this
+
+window.display_preview_window = (id, subdomain, domain, path) ->
+  #when checkbox is clicked take the domain and path and try to open it in the iframe
+  if subdomain.length > 0
+    subdomain = subdomain + "."
+  loc = "http://" + subdomain + domain + path
+  $("." + id + "_checkbox")[0].checked = true;
+  document.getElementById('preview_window').src = loc
+  document.getElementById('preview_window_header').innerHTML = loc
+

@@ -8,9 +8,9 @@
 <div class="row">
   <div class="col-xs-6">
     <% @complaints.each do |complaint| %>
-      <div class="row">
+      <div class="row" onclick="display_preview_window('<%=complaint.id%>','<%=complaint.subdomain%>','<%=complaint.domain%>','<%=complaint.path%>')">
         <div class="col-xs-1">
-          <%= check_box_tag "#{complaint.id}_checkbox" %>
+          <%= radio_button_tag "complaint_radios","#{complaint.id}_checkbox",false, class: "#{complaint.id}_checkbox" %>
           <div>ID: <%= complaint.id %> </div>
         </div>
         <div class="col-xs-8">
@@ -20,16 +20,16 @@
         </div>
         <div class="col-xs-3">
           <div>
-            <%= radio_button_tag "#{complaint.id}_dont_fix", true %>
+            <%= radio_button_tag "complaint_resolution_#{complaint.id}", "#{complaint.id}_dont_fix", true %>
             <%= label_tag "Dont Fix" %><br>
 
-            <%= radio_button_tag "#{complaint.id}_fixed", true %>
+            <%= radio_button_tag "complaint_resolution_#{complaint.id}","#{complaint.id}_fixed", true %>
             <%= label_tag "Fixed" %><br>
 
-            <%= radio_button_tag "#{complaint.id}_unchanged", true %>
+            <%= radio_button_tag "complaint_resolution_#{complaint.id}","#{complaint.id}_unchanged", true %>
             <%= label_tag "unchanged" %><br>
 
-            <%= radio_button_tag "#{complaint.id}_invalid", true %>
+            <%= radio_button_tag "complaint_resolution_#{complaint.id}","#{complaint.id}_invalid", true %>
             <%= label_tag "Invalid" %><br>
           </div>
         </div>
@@ -41,7 +41,9 @@
     <div class="row">
       <div class="col-xs-12">
         <div class="embed-responsive embed-responsive-1by1">
-          <iframe class="preview-container embed-responsive-item" src="http://loweandbaik.com/" sandbox></iframe>
+          <h2>viewing</h2>
+          <p id="preview_window_header"> </p>
+          <iframe id="preview_window" class="preview-container embed-responsive-item" src="" sandbox></iframe>
         </div>
       </div>
     </div>
