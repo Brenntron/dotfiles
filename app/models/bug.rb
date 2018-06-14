@@ -994,7 +994,7 @@ class Bug < ApplicationRecord
                 note = Note.where(id: c['id']).first
                 if note.present?
                   note.update_attributes({
-                    author:     c['author'],
+                    author:     c['creator'],
 		                comment:    comment,
 		                bug_id:     bug_id,
                     note_type:  note_type,
@@ -1004,7 +1004,7 @@ class Bug < ApplicationRecord
                 else
                   Note.create({
 	                  id:         c['id'],
-                    author:     c['author'],
+                    author:     c['creator'],
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
@@ -1643,7 +1643,7 @@ class Bug < ApplicationRecord
                 if note.present?
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
-                    note.update_attributes(author: c['author'],
+                    note.update_attributes(author: c['creator'],
                                            comment: comment,
                                            bug_id: bug_id,
                                            note_type: note_type,
@@ -1655,7 +1655,7 @@ class Bug < ApplicationRecord
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
                     Note.create(id: c['id'],
-                                author: c['author'],
+                                author: c['creator'],
                                 comment: comment,
                                 bug_id: bug_id,
                                 note_type: note_type,
@@ -1897,7 +1897,7 @@ class Bug < ApplicationRecord
                 if note.present?
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
-                    note.update_attributes(author: c['author'],
+                    note.update_attributes(author: c['creator'],
                                            comment: comment,
                                            bug_id: bug_id,
                                            note_type: note_type,
@@ -1909,7 +1909,7 @@ class Bug < ApplicationRecord
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
                     Note.create(id: c['id'],
-                                author: c['author'],
+                                author: c['creator'],
                                 comment: comment,
                                 bug_id: bug_id,
                                 note_type: note_type,
@@ -2554,7 +2554,7 @@ class Bug < ApplicationRecord
         note = Note.where(id: comment_curr['id']).first
         if note.present?
           note.update_attributes({
-                                     author:     comment_curr['author'],
+                                     author:     comment_curr['creator'],
                                      comment:    comment,
                                      bug_id:     bugzilla_id,
                                      note_type:  note_type,
@@ -2564,7 +2564,7 @@ class Bug < ApplicationRecord
         else
           Note.create({
                           id:         comment_curr['id'],
-                          author:     comment_curr['author'],
+                          author:     comment_curr['creator'],
                           comment:    comment,
                           bug_id:     bugzilla_id,
                           note_type:  note_type,
