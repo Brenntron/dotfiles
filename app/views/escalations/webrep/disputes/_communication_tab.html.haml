@@ -108,7 +108,10 @@
               Select a Template
             %select.email-template-select#select-new-template
               %option
-              =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                - if options_for_select(EmailTemplate.all).empty?
+                  No templates created
+                - else
+                  =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
           #file-fields-new
 
@@ -135,7 +138,10 @@
                       Select a Template
                     %select.email-template-select#select-reply-template
                       %option
-                      =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                        - if options_for_select(EmailTemplate.all).empty?
+                          No templates created
+                        - else
+                          =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
