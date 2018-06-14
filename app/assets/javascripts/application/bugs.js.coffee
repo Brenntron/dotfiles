@@ -180,11 +180,10 @@ $ ->
   $('.active').show();
   $('.hidden').hide();
 
-  $('#bug_state').change (e) ->
-    bug_state = $('#bug_state')[0].value
+  $('#bug-form-state-input').change (e) ->
+    new_state = $("#bug-form-state-input").val()
     $("#state_comment_row").show()
     $("#state_comment").prop('required',true);
-    new_state = $("#bug_state").val()
     has_blockers = $("#edit_bug_has_blockers").val()
 
     if new_state == "PENDING" && has_blockers == "true"
@@ -193,9 +192,9 @@ $ ->
 
       $("#edit_escalation_new_message").show()
       $("#edit_escalation_new_message").prop('required', true);
-      
-    if $('#bug_product')[0].value == "Escalations"
-      $('#state_comment')[0].value = canned_response(bug_state)
+
+    if $('#bug-form-product-input').val() == "Escalations"
+      $('#state_comment')[0].value = canned_response(new_state)
 
   canned_response = (bug_state) ->
     responses =

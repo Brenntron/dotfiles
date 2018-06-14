@@ -36,7 +36,7 @@
         <%= f.select :component, ['TAC','ATA','CSOC','Sales'], {}, class: "form-control" %>
       </div>
     </div>
-    <%= f.hidden_field :product, value: 'Escalations' %>
+    <%= f.hidden_field :product, value: 'Escalations', id: 'bug-form-product-input' %>
     <%= f.hidden_field :version, value: 'unspecified' %>
     <% unless @bug.new_record? %>
       <div class="row">

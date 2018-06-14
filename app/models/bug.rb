@@ -1484,7 +1484,7 @@ class Bug < ApplicationRecord
           when 'Research' != item['product']
             raise 'Can only import research bugs'
           else
-            bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id)
+            bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id, product: item['product'])
         end
 
         bug.initialize_report
@@ -1781,7 +1781,7 @@ class Bug < ApplicationRecord
           when 'Escalations' != item['product']
             raise 'Can only import escalation bugs'
           else
-            bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id)
+            bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id, product: item['product'])
         end
 
 
@@ -2534,6 +2534,7 @@ class Bug < ApplicationRecord
     new_bug_attrs[:creator]             = current_user.id.to_s
 
     new_research_bug = ResearchBug.create!(new_bug_attrs.merge(id: bugzilla_id,
+                                                               product: "Research",
                                                                bugzilla_id: bugzilla_id,
                                                                user_id: default_assigned_to_user.id,
                                                                state: "NEW"))

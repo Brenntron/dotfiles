@@ -113,7 +113,7 @@ class Escalations::BugsController < ApplicationController
 
     @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
     @bug = EscalationBug.where(id: params[:id]).first
-    @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
+    @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug&.id })
 
     if @bug
       @unique_giblets = @bug.giblets.map {|g| g.name}.uniq
