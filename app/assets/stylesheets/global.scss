@@ -3665,12 +3665,20 @@ button.tertiary {
   border-radius: 2px 2px 0 0 ;
 }
 
-.adjust-wlbl-button {
-  background-image: url(image_path('icon_wlbl_white.svg'));
+.toolbar-button.adjust-wlbl-button    {
+  background-image: url(image_path('icon_wlbl_grey.svg'));
+  background-size: 18px 18px;
+}
+.toolbar-button.adjust-reptool-button {
+  background-image: url(image_path('icon_blacklist_grey.svg'));
+  background-size: 18px 18px;
 }
 
-.adjust-reptool-button {
-  background-image: url(image_path('icon_blacklist_white.svg'));
+.dispute-inline-buttons.adjust-wlbl-button    { background-image: url(image_path('icon_wlbl_white.svg')); }
+.dispute-inline-buttons.adjust-reptool-button { background-image: url(image_path('icon_blacklist_white.svg')); }
+
+.add-dispute-entry {
+  background-image: url(image_path('icon_add_grey.svg'))
 }
 
 .dispute_rep_tools .dropdown-menu h3 {

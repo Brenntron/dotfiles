@@ -2,324 +2,349 @@
 <input type="hidden" name="xml_token" value="<%= xml_token %>">
 <input type="hidden" name="current_user" value="<%= current_user.authentication_token %>">
 
-  <div class="row">
-    <div class="col-xs-4">
+
       <h1>Research Data</h1>
-    </div>
-    <div class="col-xs-8">
-      <div class="toolbar">
-        <div>
-          <label class="toolbar-section-label">Table View</label>
-          <button class="toolbar-button show-col-button">
-          <span class="toolbar-button-text">
-            Show / Hide Columns
-          </span>
-          </button>
-          <button class="toolbar-button collapse-button">
-          <span class="toolbar-button-text">
-            Expand/Collapse Rows
-          </span>
-          </button>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="toolbar">
+          <div>
+            <label class="toolbar-section-label">Table View</label>
+            <button class="toolbar-button show-col-button">
+            <span class="toolbar-button-text">
+              Show / Hide Columns
+            </span>
+            </button>
+            <button class="toolbar-button collapse-button">
+            <span class="toolbar-button-text">
+              Expand/Collapse Rows
+            </span>
+            </button>
+          </div>
+          <div>
+            <label class="toolbar-section-label">Edit</label>
+            <button class="toolbar-button edit-button">
+            <span class="toolbar-button-text">
+              Edit Dispute Entry
+            </span>
+            </button>
+            <button class="toolbar-button add-dispute-entry">
+            <span class="toolbar-button-text">
+              Add Dispute Entry
+            </span>
+            </button>
+          </div>
+          <div>
+            <label class="toolbar-section-label">Reputation</label>
+            <button class="toolbar-button adjust-wlbl-button">
+            <span class="toolbar-button-text">
+              Adjust WBRS WL/BL
+            </span>
+            </button>
+            <button class="toolbar-button adjust-reptool-button">
+            <span class="toolbar-button-text">
+              Adjust RepTool BL
+            </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-xs-12">
-      <table id="diputes-research-table" class="table table-sm">
-        <thead>
-          <tr>
-            <th><input id="disputes_check_box" type="checkbox"/></th>
-            <th><!-- tools --></th>
-            <th>Dispute</th>
-            <th>Category</th>
-            <th class="text-center">Original WBRS Score</th>
-            <th class="text-center wbrs-highlight">Current WBRS Score</th>
-            <th class="text-center">WBRS Rule Hits Total</th>
-            <th class="text-center sbrs-highlight">SBRS Score</th>
-            <th class="text-center">SBRS Rule Hits Total</th>
-            <th>WL/BL Entries</th>
-          </tr>
-        </thead>
-        <tbody>
-        <% @entries.each do |entry| %>
-          <tr>
-            <td><input class="dispute_check_box" type="checkbox"/></td>
-            <td class="dispute_rep_tools">
-              <span class="dropdown">
-                <button id="wlbl_button_<%= entry.id %>" class="dispute-inline-buttons adjust-wlbl-button dropdown-toggle" title="Adjust WL/BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                <div class="dropdown-menu" id="wlbl_adjust_<%= entry.id %>" aria-labelledby="wlbl_button_<%= entry.id %>">
-                  <h3>Adjust WL/BL</h3>
-                  <table class="dispute_tool_current">
-                    <tr>
-                      <td>
-                        <label class="content-label-sm">Original Score</label><br/>
-                        8.7 <!-- Put original score here if any -->
-                      </td>
-                      <td>
-                        <label class="content-label-sm">Current Score</label><br/>
-                        8.7 <!-- Put current score here -->
-                      </td>
-                      <td>
-                        <label class="content-label-sm">New Score</label>
-                        <span id="new_wbrs_score"></span>
-                      </td>
-                    </tr>
-                  </table>
-                  <div class="inline-tool-content-wrapper">
-                    <div class="toolbar">
-                      <div>
-                        <label class="toolbar-section-label">WL/BL List</label>
-                        <select class="toolbar-select select-status" title="RepTool Rule Status">
-                          <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
-                          <!-- Put all WL/BL options here  -->
-                        </select>
-                      </div>
-                    </div>
-                    <button class="secondary">Preview</button>
-                    <button class="primary">Submit Changes</button>
-                  </div>
-                </div>
-              </span>
-              <span class="dropdown">
-                <button id="reptool_button_<%= entry.id %>" class="dispute-inline-buttons adjust-reptool-button dropdown-toggle" title="Adjust RepTool BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                <div class="dropdown-menu" id="reptool_adjust_<%= entry.id %>" aria-labelledby="reptool_button_<%= entry.id %>">
-                  <h3>Adjust RepTool BL</h3>
-                  <table class="dispute_tool_current">
-                    <tr>
-                      <td>
-                        <label class="content-label-sm">Classification</label><br/>
-                        Spam <!-- Put entry classification here -->
-                      </td>
-                      <td>
-                        <label class="content-label-sm">Expiration</label><br/>
-                        2018-06-02T13:12:48 <!-- Put entry rule expiration of current rule -->
-                      </td>
-                    </tr>
-                  </table>
-                  <div class="inline-tool-content-wrapper">
-                    <div class="toolbar">
-                      <div>
-                        <label class="toolbar-section-label">Status</label>
-                        <select class="toolbar-select select-status" title="RepTool Rule Status">
-                          <option selected value="Active">Active</option><!-- Put current entry's status as the selected option -->
-                          <!-- Put all status options here (Active vs. Expired & if there are any others -->
-                        </select>
-                      </div>
-                      <div>
-                        <label class="toolbar-section-label">RepTool BL</label>
-                        <select class="toolbar-select select-rt-rule" title="RepTool BL Rules">
-                          <option selected value="trd_sus">trd_sus</option><!-- Put current entry's rule here as the selected option -->
-                          <!-- Put all other rule options here (trd_spam, trd_mal, etc.) -->
-                        </select>
-                      </div>
-                    </div>
-                    <button class="primary">Submit Changes</button>
-                  </div>
-                </div>
-              </span>
-            </td>
-            <td>paragon-downloads.com</td>
-            <td>Computer and Internet</td>
-            <td class="text-center">5.6</td>
-            <td class="text-center wbrs-highlight">8.7</td>
-            <td class="text-center">6</td>
-            <td class="text-center sbrs-highlight"><%= entry.score unless entry.score_type != "SBRS" %></td>
-            <td class="text-center">0</td>
-            <td>WL - Medium</td>
-            <!--<td>-->
-              <!--<div id="adjust-wlbl-div">-->
-                <!--<%= simple_form_for :wlbl, html: {id: 'adjust-wlbl-form'} do |wlbl_form| %>-->
-                  <!--<%= wlbl_form.input :urls, collection: [ 'paragon-downloads.com/j', 'paragon-downloads.com/k', 'paragon-downloads.com/m', 'paragon-downloads.com/n'  ], input_html: { id: 'adjust-wlbl-urls', multiple: true } %>-->
-                  <!--<%= wlbl_form.input :trgt_list, collection: Wbrs::ManualWlbl.types, input_html: { id: 'adjust-wlbl-trgt_list' } %>-->
-                  <!--<%= wlbl_form.input :note, input_html: { id: 'adjust-wlbl-note' } %>-->
-                  <!--<%= wlbl_form.button :button, 'Add WL/BL', type: :button, onclick: 'add_wlbl_button();' %>-->
-                <!--<% end %>-->
-              <!--</div>-->
-            <!--</td>-->
-            <!--<td>-->
-              <!--<div id="adjust-reptool-bl-div">-->
-                <!--<%= simple_form_for :reptool, html: {id: 'adjust-reptool-form'} do |reptool_form| %>-->
-                  <!--<%= reptool_form.input :entries, collection: [ 'paragon-downloads.com/j', 'paragon-downloads.com/k', 'paragon-downloads.com/m', 'paragon-downloads.com/n'  ], input_html: { id: 'adjust-reptool-bl-entries', multiple: true } %>-->
-                  <!--<%= reptool_form.input :classifications, collection: Wbrs::Blacklist.classifications, input_html: { id: 'adjust-reptool-bl-classifications', multiple: true } %>-->
-                  <!--<%= reptool_form.input :comment, input_html: { id: 'adjust-reptool-bl-comment' } %>-->
-                  <!--<%= reptool_form.button :button, 'Add Reptool BL', type: :button, onclick: 'add_reptool_bl_button();' %>-->
-                <!--<% end %>-->
-              <!--</div>-->
-            <!--</td>-->
-          </tr>
-          <tr class="nested-data-row">
-            <td colspan="2"><!-- Spacer for checkbox and tools --></td>
-            <td colspan="3">
-              <table class="table-nested-reputation">
-                <tr>
-                  <th>Category</th>
-                  <td>Computers & Technology</td>
-                </tr>
-                <tr>
-                  <th>Hostname</th>
-                  <td><%= entry.hostname %></td>
-                </tr>
-                <tr>
-                  <th>WBRS Rules</th>
-                  <td>
-                    <table class="table-nested-rep-rules">
+    <div class="row">
+      <div class="col-xs-12">
+        <table id="diputes-research-table" class="table table-sm">
+          <thead>
+            <tr>
+              <th><input id="disputes_check_box" type="checkbox"/></th>
+              <th><!-- tools --></th>
+              <th>Dispute</th>
+              <th>Category</th>
+              <th class="text-center">Original WBRS Score</th>
+              <th class="text-center wbrs-highlight">Current WBRS Score</th>
+              <th class="text-center">WBRS Rule Hits Total</th>
+              <th class="text-center sbrs-highlight">SBRS Score</th>
+              <th class="text-center">SBRS Rule Hits Total</th>
+              <th>WL/BL Entries</th>
+            </tr>
+          </thead>
+          <tbody>
+          <% @entries.each do |entry| %>
+            <tr>
+              <td><input class="dispute_check_box" type="checkbox"/></td>
+              <td class="dispute_rep_tools">
+                <span class="dropdown">
+                  <button id="wlbl_button_<%= entry.id %>" class="dispute-inline-buttons adjust-wlbl-button dropdown-toggle" title="Adjust WL/BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                  <div class="dropdown-menu" id="wlbl_adjust_<%= entry.id %>" aria-labelledby="wlbl_button_<%= entry.id %>">
+                    <h3>Adjust WL/BL</h3>
+                    <table class="dispute_tool_current">
                       <tr>
-                        <th>Rule</th>
-                        <th>Rule Description</th>
-                        <th class="text-center">Malware Probability</th>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">vsvd</td>
-                        <td>Verisign Verified Domains</td>
-                        <td class="text-center data-small-emphasis">24.86%</td>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">wlh</td>
-                        <td>Heavy-weight manual whitelist</td>
-                        <td class="text-center data-small-emphasis">2.5%</td>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">wlm</td>
-                        <td>Medium-weight manual whitelist</td>
-                        <td class="text-center data-small-emphasis">22.50%</td>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">wuwl</td>
-                        <td>SURBL Whitelist</td>
-                        <td class="text-center data-small-emphasis">23.13%</td>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">tuse</td>
-                        <td>TRUSTe Site Seal</td>
-                        <td class="text-center data-small-emphasis">34.78%</td>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">alx_chn</td>
-                        <td>Clean URIs from Alexa top 1 million list</td>
-                        <td class="text-center warning-emphasis">65.00%</td>
+                        <td>
+                          <label class="content-label-sm">Original Score</label><br/>
+                          8.7 <!-- Put original score here if any -->
+                        </td>
+                        <td>
+                          <label class="content-label-sm">Current Score</label><br/>
+                          8.7 <!-- Put current score here -->
+                        </td>
+                        <td>
+                          <label class="content-label-sm">New Score</label>
+                          <span id="new_wbrs_score"></span>
+                        </td>
                       </tr>
                     </table>
-                  </td>
-                </tr>
-                <tr>
-                  <th>SBRS Rules</th>
-                  <td>
-                    <table class="table-nested-rep-rules">
+                    <div class="inline-tool-content-wrapper">
+                      <div class="toolbar">
+                        <div>
+                          <label class="toolbar-section-label">WL/BL List</label>
+                          <select class="toolbar-select select-status" title="RepTool Rule Status">
+                            <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
+                            <!-- Put all WL/BL options here  -->
+                          </select>
+                        </div>
+                      </div>
+                      <button class="secondary">Preview</button>
+                      <button class="primary">Submit Changes</button>
+                    </div>
+                  </div>
+                </span>
+                <span class="dropdown">
+                  <button id="reptool_button_<%= entry.id %>" class="dispute-inline-buttons adjust-reptool-button dropdown-toggle" title="Adjust RepTool BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                  <div class="dropdown-menu" id="reptool_adjust_<%= entry.id %>" aria-labelledby="reptool_button_<%= entry.id %>">
+                    <h3>Adjust RepTool BL</h3>
+                    <table class="dispute_tool_current">
                       <tr>
-                        <th>Rule</th>
-                        <th>Rule Description</th>
-                        <th class="text-center">Malware Probability</th>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">wlm</td>
-                        <td>Medium-weight manual whitelist</td>
-                        <td class="text-center data-small-emphasis">22.50%</td>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">wuwl</td>
-                        <td>SURBL Whitelist</td>
-                        <td class="text-center data-small-emphasis">23.13%</td>
-                      </tr>
-                      <tr>
-                        <td class="emphasis">tuse</td>
-                        <td>TRUSTe Site Seal</td>
-                        <td class="text-center data-small-emphasis">34.78%</td>
+                        <td>
+                          <label class="content-label-sm">Classification</label><br/>
+                          Spam <!-- Put entry classification here -->
+                        </td>
+                        <td>
+                          <label class="content-label-sm">Expiration</label><br/>
+                          2018-06-02T13:12:48 <!-- Put entry rule expiration of current rule -->
+                        </td>
                       </tr>
                     </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-            <td colspan="5" class="nested-info-highlight">
-              <h4>Cross-listed URLs</h4>
-              <table class="nested-related-datatable">
-                <thead>
+                    <div class="inline-tool-content-wrapper">
+                      <div class="toolbar">
+                        <div>
+                          <label class="toolbar-section-label">Status</label>
+                          <select class="toolbar-select select-status" title="RepTool Rule Status">
+                            <option selected value="Active">Active</option><!-- Put current entry's status as the selected option -->
+                            <!-- Put all status options here (Active vs. Expired & if there are any others -->
+                          </select>
+                        </div>
+                        <div>
+                          <label class="toolbar-section-label">RepTool BL</label>
+                          <select class="toolbar-select select-rt-rule" title="RepTool BL Rules">
+                            <option selected value="trd_sus">trd_sus</option><!-- Put current entry's rule here as the selected option -->
+                            <!-- Put all other rule options here (trd_spam, trd_mal, etc.) -->
+                          </select>
+                        </div>
+                      </div>
+                      <button class="primary">Submit Changes</button>
+                    </div>
+                  </div>
+                </span>
+              </td>
+              <td>paragon-downloads.com</td>
+              <td>Computer and Internet</td>
+              <td class="text-center">5.6</td>
+              <td class="text-center wbrs-highlight">8.7</td>
+              <td class="text-center">6</td>
+              <td class="text-center sbrs-highlight"><%= entry.score unless entry.score_type != "SBRS" %></td>
+              <td class="text-center">0</td>
+              <td>WL - Medium</td>
+              <!--<td>-->
+                <!--<div id="adjust-wlbl-div">-->
+                  <!--<%= simple_form_for :wlbl, html: {id: 'adjust-wlbl-form'} do |wlbl_form| %>-->
+                    <!--<%= wlbl_form.input :urls, collection: [ 'paragon-downloads.com/j', 'paragon-downloads.com/k', 'paragon-downloads.com/m', 'paragon-downloads.com/n'  ], input_html: { id: 'adjust-wlbl-urls', multiple: true } %>-->
+                    <!--<%= wlbl_form.input :trgt_list, collection: Wbrs::ManualWlbl.types, input_html: { id: 'adjust-wlbl-trgt_list' } %>-->
+                    <!--<%= wlbl_form.input :note, input_html: { id: 'adjust-wlbl-note' } %>-->
+                    <!--<%= wlbl_form.button :button, 'Add WL/BL', type: :button, onclick: 'add_wlbl_button();' %>-->
+                  <!--<% end %>-->
+                <!--</div>-->
+              <!--</td>-->
+              <!--<td>-->
+                <!--<div id="adjust-reptool-bl-div">-->
+                  <!--<%= simple_form_for :reptool, html: {id: 'adjust-reptool-form'} do |reptool_form| %>-->
+                    <!--<%= reptool_form.input :entries, collection: [ 'paragon-downloads.com/j', 'paragon-downloads.com/k', 'paragon-downloads.com/m', 'paragon-downloads.com/n'  ], input_html: { id: 'adjust-reptool-bl-entries', multiple: true } %>-->
+                    <!--<%= reptool_form.input :classifications, collection: Wbrs::Blacklist.classifications, input_html: { id: 'adjust-reptool-bl-classifications', multiple: true } %>-->
+                    <!--<%= reptool_form.input :comment, input_html: { id: 'adjust-reptool-bl-comment' } %>-->
+                    <!--<%= reptool_form.button :button, 'Add Reptool BL', type: :button, onclick: 'add_reptool_bl_button();' %>-->
+                  <!--<% end %>-->
+                <!--</div>-->
+              <!--</td>-->
+            </tr>
+            <tr class="nested-data-row">
+              <td colspan="2"><!-- Spacer for checkbox and tools --></td>
+              <td colspan="3">
+                <table class="table-nested-reputation">
                   <tr>
-                    <th>ID</th>
-                    <th>URL</th>
-                    <th>List Type</th>
-                    <th class="text-center">Original Score</th>
-                    <th class="text-center">Current Score</th>
-                    <th>Username</th>
-                    <th>Last Update</th>
-                    <th>Created</th>
+                    <th>Category</th>
+                    <td>Computers & Technology</td>
                   </tr>
-                </thead>
-                <tbody>
                   <tr>
-                    <td>138850</td>
-                    <td>paragon-downloads.com/j</td>
-                    <td>WL-med</td>
-                    <td class="text-center">5.6</td>
-                    <td class="text-center">8.7000</td>
-                    <td>jgrandia</td>
-                    <td>2014-10-13 15:14:08</td>
-                    <td>2014-10-13 15:14:08</td>
+                    <th>Hostname</th>
+                    <td><%= entry.hostname %></td>
                   </tr>
                   <tr>
-                    <td>138850</td>
-                    <td>paragon-downloads.com/k</td>
-                    <td>WL-med</td>
-                    <td class="text-center">5.6</td>
-                    <td class="text-center">8.7000</td>
-                    <td>jgrandia</td>
-                    <td>2014-10-13 15:14:08</td>
-                    <td>2014-10-13 15:14:08</td>
-                  </tr>
-                  <tr>
-                    <td>138850</td>
-                    <td>paragon-downloads.com/m</td>
-                    <td>WL-med</td>
-                    <td class="text-center">5.6</td>
-                    <td class="text-center">8.7000</td>
-                    <td>jgrandia</td>
-                    <td>2014-10-13 15:14:08</td>
-                    <td>2014-10-13 15:14:08</td>
-                  </tr>
-                  <tr>
-                    <td>138850</td>
-                    <td>paragon-downloads.com/n</td>
-                    <td>WL-med</td>
-                    <td class="text-center">5.6</td>
-                    <td class="text-center">8.7000</td>
-                    <td>jgrandia</td>
-                    <td>2014-10-13 15:14:08</td>
-                    <td>2014-10-13 15:14:08</td>
-                  </tr>
-                </tbody>
-              </table>
-              <h4>XBRS Hits</h4>
-              <table class="nested-related-datatable">
-                <thead>
-                  <tr>
-                    <th>Domain</th>
-                    <th>Subdomain</th>
-                    <th>Path</th>
-                    <th>XBRS Rule ID</th>
-                    <th>XBRS Mnemonic</th>
                     <th>WBRS Rules</th>
-                    <th>Last Update</th>
-                    <th>Created</th>
+                    <td>
+                      <table class="table-nested-rep-rules">
+                        <tr>
+                          <th>Rule</th>
+                          <th>Rule Description</th>
+                          <th class="text-center">Malware Probability</th>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">vsvd</td>
+                          <td>Verisign Verified Domains</td>
+                          <td class="text-center data-small-emphasis">24.86%</td>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">wlh</td>
+                          <td>Heavy-weight manual whitelist</td>
+                          <td class="text-center data-small-emphasis">2.5%</td>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">wlm</td>
+                          <td>Medium-weight manual whitelist</td>
+                          <td class="text-center data-small-emphasis">22.50%</td>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">wuwl</td>
+                          <td>SURBL Whitelist</td>
+                          <td class="text-center data-small-emphasis">23.13%</td>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">tuse</td>
+                          <td>TRUSTe Site Seal</td>
+                          <td class="text-center data-small-emphasis">34.78%</td>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">alx_chn</td>
+                          <td>Clean URIs from Alexa top 1 million list</td>
+                          <td class="text-center warning-emphasis">65.00%</td>
+                        </tr>
+                      </table>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
                   <tr>
-                    <td>paragon-downloads.com</td>
-                    <td></td>
-                    <td>/k</td>
-                    <td>456</td>
-                    <td>truste_domains</td>
-                    <td>tuse</td>
-                    <td>2014-10-13 15:14:08</td>
-                    <td>2014-10-13 15:14:08</td>
+                    <th>SBRS Rules</th>
+                    <td>
+                      <table class="table-nested-rep-rules">
+                        <tr>
+                          <th>Rule</th>
+                          <th>Rule Description</th>
+                          <th class="text-center">Malware Probability</th>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">wlm</td>
+                          <td>Medium-weight manual whitelist</td>
+                          <td class="text-center data-small-emphasis">22.50%</td>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">wuwl</td>
+                          <td>SURBL Whitelist</td>
+                          <td class="text-center data-small-emphasis">23.13%</td>
+                        </tr>
+                        <tr>
+                          <td class="emphasis">tuse</td>
+                          <td>TRUSTe Site Seal</td>
+                          <td class="text-center data-small-emphasis">34.78%</td>
+                        </tr>
+                      </table>
+                    </td>
                   </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-        <% end %>
-        </tbody>
-      </table>
+                </table>
+              </td>
+              <td colspan="5" class="nested-info-highlight">
+                <h4>Cross-listed URLs</h4>
+                <table class="nested-related-datatable">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>URL</th>
+                      <th>List Type</th>
+                      <th class="text-center">Original Score</th>
+                      <th class="text-center">Current Score</th>
+                      <th>Username</th>
+                      <th>Last Update</th>
+                      <th>Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>138850</td>
+                      <td>paragon-downloads.com/j</td>
+                      <td>WL-med</td>
+                      <td class="text-center">5.6</td>
+                      <td class="text-center">8.7000</td>
+                      <td>jgrandia</td>
+                      <td>2014-10-13 15:14:08</td>
+                      <td>2014-10-13 15:14:08</td>
+                    </tr>
+                    <tr>
+                      <td>138850</td>
+                      <td>paragon-downloads.com/k</td>
+                      <td>WL-med</td>
+                      <td class="text-center">5.6</td>
+                      <td class="text-center">8.7000</td>
+                      <td>jgrandia</td>
+                      <td>2014-10-13 15:14:08</td>
+                      <td>2014-10-13 15:14:08</td>
+                    </tr>
+                    <tr>
+                      <td>138850</td>
+                      <td>paragon-downloads.com/m</td>
+                      <td>WL-med</td>
+                      <td class="text-center">5.6</td>
+                      <td class="text-center">8.7000</td>
+                      <td>jgrandia</td>
+                      <td>2014-10-13 15:14:08</td>
+                      <td>2014-10-13 15:14:08</td>
+                    </tr>
+                    <tr>
+                      <td>138850</td>
+                      <td>paragon-downloads.com/n</td>
+                      <td>WL-med</td>
+                      <td class="text-center">5.6</td>
+                      <td class="text-center">8.7000</td>
+                      <td>jgrandia</td>
+                      <td>2014-10-13 15:14:08</td>
+                      <td>2014-10-13 15:14:08</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <h4>XBRS Hits</h4>
+                <table class="nested-related-datatable">
+                  <thead>
+                    <tr>
+                      <th>Domain</th>
+                      <th>Subdomain</th>
+                      <th>Path</th>
+                      <th>XBRS Rule ID</th>
+                      <th>XBRS Mnemonic</th>
+                      <th>WBRS Rules</th>
+                      <th>Last Update</th>
+                      <th>Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>paragon-downloads.com</td>
+                      <td></td>
+                      <td>/k</td>
+                      <td>456</td>
+                      <td>truste_domains</td>
+                      <td>tuse</td>
+                      <td>2014-10-13 15:14:08</td>
+                      <td>2014-10-13 15:14:08</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
