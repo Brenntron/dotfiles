@@ -3674,8 +3674,13 @@ button.tertiary {
   background-size: 18px 18px;
 }
 
-.dispute-inline-buttons.adjust-wlbl-button    { background-image: url(image_path('icon_wlbl_white.svg')); }
-.dispute-inline-buttons.adjust-reptool-button { background-image: url(image_path('icon_blacklist_white.svg')); }
+.toolbar .dropdown.open .adjust-wlbl-button, .toolbar .dropdown.open .adjust-reptool-button {
+  background-color: $bug-section-color;
+  color: $content-bg-color;
+}
+
+.dispute-inline-buttons.adjust-wlbl-button, .toolbar .dropdown.open .adjust-wlbl-button  { background-image: url(image_path('icon_wlbl_white.svg')); }
+.dispute-inline-buttons.adjust-reptool-button, .toolbar .dropdown.open .adjust-reptool-button { background-image: url(image_path('icon_blacklist_white.svg')); }
 
 .add-dispute-entry {
   background-image: url(image_path('icon_add_grey.svg'))
@@ -3733,6 +3738,32 @@ button.tertiary {
 
 .select-rt-rule {
   min-width: 130px;
+}
+
+.toolbar .dropdown.open {
+  background-color: transparent;
+}
+
+.toolbar-dropdown {
+  background-color: $content-bg-color;
+  border: none !important;
+  height: auto !important;
+  border-radius: 0 4px 4px 4px;
+  min-width: 250px;
+  padding: 0 !important;
+}
+
+.toolbar-dropdown div {
+  height: auto;
+  border: none !important;
+}
+
+.dispute-name-wrapper {
+  background-color: lighten($bug-section-color, 20%);
+  font-size: 8pt;
+  margin: 0 !important;
+  padding: 4px 8px 10px !important;
+  border-radius: 0 4px 0 0;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
