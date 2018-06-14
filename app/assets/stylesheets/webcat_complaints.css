@@ -21,3 +21,14 @@
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
+
+.preview-container{
+    width:100%;
+    /*top:-76px;*/
+    /*margin-bottom:-140px;*/
+    /*left:-175px;*/
+    /*border:5px solid black;*/
+    -webkit-transform:scale(.7);
+    -moz-transform-scale(0.7);
+}

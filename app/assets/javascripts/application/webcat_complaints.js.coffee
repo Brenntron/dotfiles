@@ -22,3 +22,7 @@ window.populate_webcat_index_table = () ->
       #$("#create_research_submit_wait").addClass('hidden').hide()
       #$("#create_research_submit").show()
   , this)
+
+window.check_preview_windows = () ->
+  #visit site and check X-Frame-Options if same origin then you cant display it in the preview
+  #snort.org for instance does this

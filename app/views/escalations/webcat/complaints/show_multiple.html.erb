@@ -1,0 +1,61 @@
+<% content_for(:webcat_page) do %>
+  Complaints Show
+<% end %>
+
+<%= render "escalations/webcat/shared/telemetry" %>
+
+
+<div class="row">
+  <div class="col-xs-6">
+    <% @complaints.each do |complaint| %>
+      <div class="row">
+        <div class="col-xs-1">
+          <%= check_box_tag "#{complaint.id}_checkbox" %>
+          <div>ID: <%= complaint.id %> </div>
+        </div>
+        <div class="col-xs-8">
+          <div>Domain:<br> <%= complaint.domain %></div>
+          <div>Tag:<br> <%= complaint.tag %></div>
+          <div>Status: <%= complaint.status %></div>
+        </div>
+        <div class="col-xs-3">
+          <div>
+            <%= radio_button_tag "#{complaint.id}_dont_fix", true %>
+            <%= label_tag "Dont Fix" %><br>
+
+            <%= radio_button_tag "#{complaint.id}_fixed", true %>
+            <%= label_tag "Fixed" %><br>
+
+            <%= radio_button_tag "#{complaint.id}_unchanged", true %>
+            <%= label_tag "unchanged" %><br>
+
+            <%= radio_button_tag "#{complaint.id}_invalid", true %>
+            <%= label_tag "Invalid" %><br>
+          </div>
+        </div>
+      </div>
+      <hr>
+    <% end %>
+  </div>
+  <div class="col-xs-6">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="embed-responsive embed-responsive-1by1">
+          <iframe class="preview-container embed-responsive-item" src="http://loweandbaik.com/" sandbox></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 col-xs-12">
+        <%= text_field_tag "complaint_id_x_prefix", "somevalue" %><br>
+        <%= text_field_tag "complaint_id_x_categories", "somevalue" %><br>
+        <%= text_field_tag "complaint_id_x_comment", "somevalue" %><br>
+      </div>
+      <div class="col-sm-6 col-xs-12">
+        <%= button_tag "set complete" %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
