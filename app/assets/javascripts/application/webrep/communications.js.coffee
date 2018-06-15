@@ -187,11 +187,11 @@ $ ->
 
   # Editing a Note
 
-  $('.note-save-edit-button').on "click", ->
+  $('.note-save-button').on "click", ->
     comment_id = $(this).attr('comment_id')
     current_user_id = $('input[name="current_user_id"]').val()
-    editable_note_block = $("textarea.editable-note-block[comment_id='#{comment_id}']")
-    updated_comment = editable_note_block.val()
+    editable_note_block = $(".note-block" + comment_id)
+    updated_comment = editable_note_block[0].innerText
 
     std_msg_ajax(
       method: 'PUT'
@@ -205,32 +205,25 @@ $ ->
     )
 
   # related to showing and hiding of elements when editing a note
-
-  $('.note-cancel-edit-button').on "click", ->
+  # Also reverts note to initial state if editing has happened and then been canceled.
+  $('.note-block').focus ->
+    note_block = this
+    initial_content = $(this)[0].innerText
     comment_id = $(this).attr('comment_id')
-    save_button = $(".note-save-edit-button[comment_id='#{comment_id}']")
-    note_block = $("div.note-block[comment_id='#{comment_id}']")
-    editable_note_block = $("textarea.editable-note-block[comment_id='#{comment_id}']")
-    save_button.addClass('hidden')
-    $(this).addClass('hidden')
-    editable_note_block.hide()
-    note_block.show()
+    save_button = $(".note-save-button" + comment_id)
+    cancel_button = $(".note-cancel-button" + comment_id)
+    $(cancel_button).on "click", ->
+      $(note_block)[0].innerText = initial_content
+      save_button.addClass('hidden')
+      cancel_button.addClass('hidden')
 
-
-  $('.editable-note-block').on "keyup", ->
+  $('.note-block').on "keyup", ->
     comment_id = $(this).attr('comment_id')
-    save_button = $(".note-save-edit-button[comment_id='#{comment_id}']")
+    save_button = $(".note-save-button" + comment_id)
     save_button.removeClass('hidden')
-
-  $('.note-block').on "click", ->
-    comment_id = $(this).attr('comment_id')
-    current_user_id = $('input[name="current_user_id"]').val()
-    note_block = $(this)
-    editable_note_block = $("textarea.editable-note-block[comment_id='#{comment_id}']")
-    cancel_button = $(".note-cancel-edit-button[comment_id='#{comment_id}']")
+    cancel_button = $(".note-cancel-button" + comment_id)
     cancel_button.removeClass('hidden')
-    note_block.hide()
-    editable_note_block.show()
+
 
   # New Note
 
@@ -241,9 +234,10 @@ $ ->
   $('.new-case-note-cancel-button').on "click", ->
     $('.new-case-note-row').hide()
     $('#new-case-note-button').show()
+    $('.new-case-note-textarea').empty()
 
   $('.new-case-note-save-button').on "click", ->
-    comment = $('.new-case-note-textarea').val()
+    comment = $('.new-case-note-textarea').text()
     dispute_id = $('input[name="dispute_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
 

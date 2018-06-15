@@ -2425,6 +2425,11 @@ a.code-content:hover {
   margin-right: 10px;
 }
 
+@media (min-width: 1700px) {
+  .hidden-break {
+    display: none;
+  }
+}
 
 /* Layout chunks */
 
@@ -3033,16 +3038,11 @@ fieldset.top-content {
   line-height: 1.4em;
   margin: 3px 0;
   width: 100%;
+  min-height: 30px;
 }
 
-.editable-note-block {
-  background-color: $faint-neutral-color;
-  color: $type-lighter-color;
-  padding: 8px 12px;
-  display: none;
-  font-size: 8pt;
-  line-height: 1.4em;
-  margin: 3px 0;
+.note-block pre {
+  background-color: transparent;
 }
 
 .case-history-icon {
@@ -3301,6 +3301,7 @@ input.communication-subject {
 
 .note-tool-buttons {
   float: right;
+  margin-right: 2px;
 }
 
 .note-tool-buttons button {
@@ -3311,11 +3312,14 @@ input.communication-subject {
   padding: 4px;
   width: 20px;
   height: 20px;
+  border-radius: 2px;
 }
 
 .note-edit-button {background-image: url(image_path('icon_edit.svg'));}
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
 .note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+.note-save-button {background-image: url(image_path('icon_save_grey.svg'));}
+.note-cancel-button {background-image: url(image_path('icon_cancel.svg'));}
 
 
 
@@ -3851,6 +3855,10 @@ input.file_attachment {
 
 .notes-header {
   display: inline-block;
+  margin-bottom: 20px;
+}
+
+.note-wrapper {
   margin-bottom: 20px;
 }
 
