@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180614145957) do
+ActiveRecord::Schema.define(version: 20180615173923) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -129,6 +129,12 @@ ActiveRecord::Schema.define(version: 20180614145957) do
     t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
   end
 
+  create_table "companies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "complaint_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "complaint_id"
     t.string "tag"
@@ -155,11 +161,22 @@ ActiveRecord::Schema.define(version: 20180614145957) do
     t.datetime "complaint_closed_at"
     t.string "resolution"
     t.text "resolution_comment"
-    t.string "customer"
     t.string "region"
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "customer_id"
+    t.index ["customer_id"], name: "index_complaints_on_customer_id"
+  end
+
+  create_table "customers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "company_id"
+    t.string "name"
+    t.string "email"
+    t.string "phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_customers_on_company_id"
   end
 
   create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -276,10 +293,6 @@ ActiveRecord::Schema.define(version: 20180614145957) do
   create_table "disputes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "case_number"
     t.string "case_guid"
-    t.string "customer_name"
-    t.string "customer_email"
-    t.string "customer_phone"
-    t.string "customer_company_name"
     t.string "org_domain"
     t.datetime "case_opened_at"
     t.datetime "case_closed_at"
@@ -300,6 +313,8 @@ ActiveRecord::Schema.define(version: 20180614145957) do
     t.string "ticket_source_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "customer_id"
+    t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
 
   create_table "email_templates", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
