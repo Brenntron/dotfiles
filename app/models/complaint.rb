@@ -1,4 +1,7 @@
 class Complaint < ApplicationRecord
+  belongs_to :user
+  belongs_to :customer
+  has_many :complaint_entries
 
 
   def self.can_visit_url?(url)
@@ -14,7 +17,7 @@ class Complaint < ApplicationRecord
 
     return redirected || { status: "SUCCESS" }.to_json
   end
-
+  
 end
 
 
