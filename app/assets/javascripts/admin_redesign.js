@@ -3,7 +3,6 @@
 //
 //
 //
-
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
@@ -25,5 +24,7 @@
 //= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
+//= require application/webcat_complaints
 //= require application/webrep_disputes
+
 

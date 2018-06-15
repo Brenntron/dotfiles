@@ -15,6 +15,23 @@ Rails.application.routes.draw do
       end
       resources :references
     end
+
+    namespace :webcat do
+      root 'complaints#index'
+      resources :complaints do
+        get :show_multiple
+        collection do
+          get :advanced_search
+          get :named_search
+          get :standard_search
+          get :contains_search
+        end
+      end
+      resources :clusters
+      resources :rules
+      resources :reports
+    end
+
     namespace :webrep do
       root 'disputes#index'
       resources :disputes do
@@ -29,7 +46,6 @@ Rails.application.routes.draw do
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
     end
-
   end
 
   namespace :admin do

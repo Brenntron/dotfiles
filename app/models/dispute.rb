@@ -1,6 +1,7 @@
 class Dispute < ApplicationRecord
 
   has_many :dispute_entries
+  belongs_to :customer
 
   def is_assigned?
     (!self.assigned_to.nil? and !self.assigned_to.empty?)
