@@ -32,6 +32,7 @@ $ ->
     $('.email-datetime')[0].innerHTML = moment(date).format('YYYY-MM-DD') + "<br>" + moment(date).format('HH:mm:ss')
 
     for attachment in attachments
+      $('#incoming-attachment').removeClass('hidden')
       attachment_div = $('.email-attachments')
       attachment_link = ("<a class=email-attachment-name, href=#{attachment.direct_upload_url}>#{attachment.file_name} </a>")
       attachment_div.append(attachment_link)
@@ -40,6 +41,7 @@ $ ->
   clean_up_current_email_view = ->
     $('.duplicate-current-email-view').remove()
     $('.email-attachments').empty()
+    $('#incoming-attachment').addClass('hidden')
     former_element = $('.current-email-view').removeClass('current-email-view')
 
   handle_current_email_row = (row) ->
