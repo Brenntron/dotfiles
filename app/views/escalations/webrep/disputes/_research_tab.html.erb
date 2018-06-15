@@ -18,7 +18,7 @@
           </div>
           <div>
             <label class="toolbar-section-label">Edit</label>
-            <button class="toolbar-button edit-button">
+            <button class="toolbar-button edit-button" id="edit-dispute-entry-button">
                 <span class="toolbar-button-text">
                   Edit Dispute Entry
                 </span>
@@ -31,17 +31,16 @@
           </div>
           <div>
             <label class="toolbar-section-label">Reputation</label>
-              <button id="wlbl_entries_button" class="toolbar-button adjust-wlbl-button dropdown-toggle" title="Adjust WL/BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="toolbar-button-text">
-                  Adjust WBRS WL/BL
-                </span>
-              </button>
-              <button id="reptool_entries_button" class="toolbar-button adjust-reptool-button dropdown-toggle" title="Adjust RepTool BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="toolbar-button-text">
-                  Adjust RepTool BL
-                </span>
-              </button>
-            </div>
+            <button id="wlbl_entries_button" class="toolbar-button adjust-wlbl-button dropdown-toggle" title="Adjust WL/BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="toolbar-button-text">
+                Adjust WBRS WL/BL
+              </span>
+            </button>
+            <button id="reptool_entries_button" class="toolbar-button adjust-reptool-button dropdown-toggle" title="Adjust RepTool BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="toolbar-button-text">
+                Adjust RepTool BL
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -65,10 +64,13 @@
           </thead>
           <tbody>
           <% @entries.each do |entry| %>
-            <tr>
-              <td><input class="dispute_check_box" type="checkbox"/></td>
+            <tr id="entry_id_<%= entry.id %>">
+              <td><input class="dispute_check_box" type="checkbox" /></td>
               <td class="dispute_rep_tools"></td>
-              <td>paragon-downloads.com</td>
+              <td>
+                <span class="table-entry-display">paragon-downloads.com</span>
+                <input type="text" class="hidden table-entry-input" value="paragon-downloads.com">
+              </td>
               <td>Computer and Internet</td>
               <td class="text-center">5.6</td>
               <td class="text-center wbrs-highlight">8.7</td>
