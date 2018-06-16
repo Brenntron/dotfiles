@@ -5,7 +5,7 @@
 <%= render "escalations/webcat/shared/telemetry" %>
 
 <div class="tool-bar">
-  <%= render "show_toolbar"%>
+  <%= render "show_toolbar" %>
 </div>
 <br>
 
@@ -15,34 +15,41 @@
 <div class="row">
   <div class="col-xs-6">
     <% @complaints.each do |complaint| %>
-      <div id="complaint_row_<%=complaint.id%>" class="row" onclick="display_preview_window('<%=complaint.id%>','<%=complaint.subdomain%>','<%=complaint.domain%>','<%=complaint.path%>')">
-        <div class="col-xs-1">
-          <%= check_box_tag "#{complaint.id}_site_checkbox", '{"site": "'+complaint.domain.to_s+'", "viewable": "'+complaint.viewable.to_s+'" }'%>
-          <div>ID: <%= complaint.id %> </div>
-        </div>
-        <div class="col-xs-8">
-          <div>Domain:<br> <%= complaint.domain %></div>
-          <div>Tag:<br> <%= complaint.tag %></div>
-          <div>Status: <%= complaint.status %></div>
-        </div>
-        <div class="col-xs-3">
-          <div>
-            <%= radio_button_tag "complaint_resolution_#{complaint.id}", "#{complaint.id}_dont_fix", true %>
-            <%= label_tag "Dont Fix",nil, title:"Selecting Dont Fix indicates that you have no idea how to categorize the site." %><br>
+      <% complaint.complaint_entries.each do |entry| %>
+        <div id="complaint_entry_row_<%= entry.id %>" class="row" onclick="display_preview_window('<%=entry.id%>','<%=entry.subdomain%>','<%=entry.domain%>','<%=entry.path%>')">
+          <div class="col-xs-12"><p><%= complaint.customer.name%> from <%=complaint.customer.company.name %> | <%=complaint.tag%> </p></div>
+          <div class="col-xs-1">
+            <%= check_box_tag "#{entry.id}_site_checkbox", '{"site": "' + entry.domain.to_s + '", "viewable": "' + entry.viewable.to_s + '" }' %>
+            <div>ID: <%= entry.id %> </div>
+          </div>
+          <div class="col-xs-8">
+            <div>Domain:<br> <%= entry.domain %></div>
+            <div>Tag:<br> <%= entry.tag %></div>
+            <div>Status: <%= entry.status %></div>
+          </div>
+          <div class="col-xs-3">
+            <div>
+              <%= radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_dont_fix", true %>
+              <%= label_tag "Dont Fix", nil, title: "Selecting Dont Fix indicates that you have no idea how to categorize the site." %>
+              <br>
 
-            <%= radio_button_tag "complaint_resolution_#{complaint.id}", "#{complaint.id}_fixed", false %>
-            <%= label_tag "Fixed",nil, title:"Selecting fixed indicates the category of the site will be changed." %><br>
+              <%= radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_fixed", false %>
+              <%= label_tag "Fixed", nil, title: "Selecting fixed indicates the category of the site will be changed." %>
+              <br>
 
-            <%= radio_button_tag "complaint_resolution_#{complaint.id}", "#{complaint.id}_unchanged", false %>
-            <%= label_tag "unchanged",nil, title:"Selecting unchanged indicates that no change will be made to the category of the site." %><br>
+              <%= radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_unchanged", false %>
+              <%= label_tag "unchanged", nil, title: "Selecting unchanged indicates that no change will be made to the category of the site." %>
+              <br>
 
-            <%= radio_button_tag "complaint_resolution_#{complaint.id}", "#{complaint.id}_invalid", false %>
-            <%= label_tag "Invalid",nil, title:"Selecting Invalid indicates that currently there is no way to categorize the site at all." %><br>
+              <%= radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_invalid", false %>
+              <%= label_tag "Invalid", nil, title: "Selecting Invalid indicates that currently there is no way to categorize the site at all." %>
+              <br>
+            </div>
           </div>
         </div>
-      </div>
-      <br>
-  <% end %>
+        <br>
+      <% end %>
+    <% end %>
   </div>
   <div class="col-xs-6">
     <div class="row">
@@ -58,19 +65,20 @@
 
       <div class="col-sm-6 col-xs-12">
         <div class="form-group">
-          <%= label_tag "Prefix", nil, class:"h4" %><br>
-          <%= text_field_tag "complaint_id_x_prefix",nil, placeholder:"Prefix", class: "form-control" %>
-          <%= label_tag "Categories", nil,class:"h4" %><br>
-          <%= text_field_tag "complaint_id_x_categories",nil, placeholder:"cat1, cat2, cat3, etc...", class: "form-control" %>
+          <%= label_tag "Prefix", nil, class: "h4" %><br>
+          <%= text_field_tag "complaint_id_x_prefix", nil, placeholder: "Prefix", class: "form-control" %>
+          <%= label_tag "Categories", nil, class: "h4" %><br>
+          <%= text_field_tag "complaint_id_x_categories", nil, placeholder: "cat1, cat2, cat3, etc...", class: "form-control" %>
         </div>
       </div>
       <div class="col-sm-6 col-xs-12">
-        <%= button_tag "mark for commit", type:"submit", class:"btn-lg btn-primary"%>
+        <%= button_tag "mark for commit", type: "submit", class: "btn-lg btn-primary" %>
       </div>
       <div class="col-xs-12">
         <div class="form-group">
-          <%= label_tag "Comment", nil,class:"h4" %><br>
-          <%= text_field_tag "complaint_id_x_comment",nil,placeholder:"entry level comment", class: "form-control" %><br>
+          <%= label_tag "Comment", nil, class: "h4" %><br>
+          <%= text_field_tag "complaint_id_x_comment", nil, placeholder: "entry level comment", class: "form-control" %>
+          <br>
         </div>
       </div>
     </div>

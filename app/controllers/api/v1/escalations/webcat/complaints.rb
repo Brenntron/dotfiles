@@ -42,7 +42,7 @@ module API
             end
             get "test_url" do
               response = JSON.parse(Complaint.can_visit_url?(params[:url]))
-              throw :error, status: 403, message: "#{response["error"]}" if response["status"] == "FAILED"
+              throw :error, status: response["status"], message: "#{response["error"]}" if response["status"] != "SUCCESS"
               response
             end
 
