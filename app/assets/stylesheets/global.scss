@@ -3988,7 +3988,10 @@ input.file_attachment {
   border-radius: 2px 2px 0 0;
 }
 
-
+#new_template_button {
+  width: 215px;
+  text-align: left;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
