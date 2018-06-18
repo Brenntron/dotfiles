@@ -38,24 +38,24 @@ class Ability
       can :read, ::API::V2
     end
 
-    if role_names.include?('web cat manager')
+    if role_names.include?('webcat manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
     end
 
-    if role_names.include?('web rep user')
+    if role_names.include?('webrep user')
       can :manage, [Dispute, Attachment, Note]
       can :publish_to_bugzilla, Note
     end
 
-    if role_names.include?('web rep manager')
+    if role_names.include?('webrep manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
     end
 
-    if role_names.include?('web cat user')
+    if role_names.include?('webcat user')
       can :manage, [Complaint, Attachment, Note]
       can :publish_to_bugzilla, Note
     end

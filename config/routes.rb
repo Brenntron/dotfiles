@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    resources :roles
     root 'home#index'
     resources :migrations, only: [:index]
     resources :morsels, only: [:index, :show]
@@ -82,7 +83,6 @@ Rails.application.routes.draw do
 
 
   # resources :rules, param: :sid
-  resources :roles
 
   resources :tests
 
