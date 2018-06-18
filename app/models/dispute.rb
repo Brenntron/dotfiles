@@ -39,6 +39,7 @@ class Dispute < ApplicationRecord
 
   def self.process_bridge_payload(message_payload)
     user = User.where(cvs_username:"vrtincom").first
+    #TODO: this should be put in a params method
     message_payload["payload"] = message_payload["payload"].permit!.to_h
     new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
     new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
