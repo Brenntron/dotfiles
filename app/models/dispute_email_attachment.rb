@@ -13,7 +13,7 @@ class DisputeEmailAttachment < ApplicationRecord
     bug_stub = Bugzilla::Bug.new(bugzilla_session)
 
     options = {
-      ids: 375210, #dispute_email.dispute.id,
+      ids: dispute_email.dispute.id,
       data: XMLRPC::Base64.new(file_content),
       file_name: payload[:file_name],
       content_type: payload[:file_type],
@@ -26,18 +26,18 @@ class DisputeEmailAttachment < ApplicationRecord
     new_attachment_id = attachment_hash["ids"][0]
 
     if new_attachment_id.present?
-      begin
-        create(
-            id: new_attachment_id,
-            dispute_email_id: dispute_email.id,
-            size: file_content.length,
-            bugzilla_attachment_id: new_attachment_id,
-            file_name: payload[:file_name],
-            direct_upload_url: "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s
-        )
-      rescue Exception => e
 
-      end
+      new_local_attachment = new(
+          id: new_attachment_id,
+          dispute_email_id: dispute_email.id,
+          size: file_content.length,
+          bugzilla_attachment_id: new_attachment_id,
+          file_name: payload[:file_name],
+          direct_upload_url: "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s
+      )
+
+      new_local_attachment.save!
+
     end
 
   end
@@ -63,11 +63,7 @@ class DisputeEmailAttachment < ApplicationRecord
     s3_url = {file.filename => [object.key, file] }
 
     s3_url.values.flatten[0]
-    #DisputeEmailAttachment.create(dispute_email_id: dispute_email.id,
-    #                              file_file_name: s3_url.keys.first,
-    #                              file_content_type: s3_url.values.flatten[1].content_type,
-    #                              file_file_size: s3_url.values.flatten[1].size,
-    #                              path:      s3_url.values.flatten[0])
+
 
   end
 

@@ -3,6 +3,7 @@ class DisputeEmail < ApplicationRecord
   has_many :dispute_email_attachments
 
   EMAIL_DOMAIN = "email.talosintelligence.com"
+  NOREPLY      = "noreply"
 
   UNREAD   = "unread"
   READ     = "read"
@@ -22,6 +23,26 @@ class DisputeEmail < ApplicationRecord
     if case_id.blank?
       #create email to instruct user to use TI form and send to bridge
       return_message = {}
+
+      bad_email_args = {}
+      bad_email_args[:to] = message_payload["payload"]["from"]
+      bad_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+      bad_email_args[:subject] = bad_gateway_subject
+      bad_email_args[:body] = bad_gateway_body
+
+      attachments_to_mail = []
+      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
+      conn.post(bad_email_args, attachments_to_mail)
+
+      return {
+          "envelope":
+              {
+                  "channel": "email-acknowledge",
+                  "addressee": "talos-intelligence",
+                  "sender": "analyst-console"
+              },
+          "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
+      }
     end
 
     new_email = DisputeEmail.new
@@ -33,7 +54,7 @@ class DisputeEmail < ApplicationRecord
     new_email.body = message_payload["payload"]["text"]
     new_email.status = UNREAD
     new_email.save
-    puts "\n#######"
+
     if message_payload["attachments"].present?
       message_payload["attachments"].each do |email_attachment|
         DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, email_attachment, user, new_email)
@@ -78,7 +99,14 @@ class DisputeEmail < ApplicationRecord
     if email_case != body_case
       #### figure this out later
       #### thinking possibly create a new dispute with a 'suggested' related case
-      return email_case
+      if email_case.present?
+        return email_case
+      elsif body_case.present?
+        return body_case
+      else
+        return nil
+      end
+
     end
 
     return nil
@@ -118,11 +146,9 @@ class DisputeEmail < ApplicationRecord
     email_args[:from] = generate_case_email_address(params[:dispute_id])
     email_args[:subject] = new_email.subject
     email_args[:body] = new_email.body
+    email_args[:dispute_email_id] = new_email.id
 
     new_email.reload
-    if new_email.dispute_email_attachments.present?
-      email_args[:attachments]
-    end
 
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
@@ -157,5 +183,23 @@ class DisputeEmail < ApplicationRecord
     return new_body
 
   end
+
+
+  ## AUTO EMAIL MANAGEMENT
+
+  def self.bad_gateway_subject
+    "THINGS"
+  end
+
+  def self.bad_gateway_body
+    <<-BADGATEWAY
+
+      THIS IS THE BODY OF A BAD GATEWAY EMAIL THAT INSTRUCTS HOW TO USE TALOS INTELLIGENCE TO START A NEW CASE
+
+    BADGATEWAY
+  end
+
+
+
 
 end

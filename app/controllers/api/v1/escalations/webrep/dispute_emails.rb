@@ -41,7 +41,7 @@ module API
 
             post "", root: "dispute_email" do
 
-              #begin
+              begin
                 #temporary, for development, don't wanna be sending these to actual customers
                 params[:to] = "claclair@cisco.com"
 
@@ -55,10 +55,10 @@ module API
                 end
 
                 return ""
-              #rescue Exception => e
-              #  Rails.logger.info e
-              #  raise "There was an error in attempting to send an email."
-              #end
+              rescue Exception => e
+                Rails.logger.error e
+                raise "There was an error in attempting to send an email."
+              end
 
             end
 
