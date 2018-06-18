@@ -2,6 +2,40 @@ class Dispute < ApplicationRecord
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
+  belongs_to :customer
+
+  def is_assigned?
+    (!self.assigned_to.nil? and !self.assigned_to.empty?)
+  end
+
+  def assignee
+    is_assigned? ? assigned_to : "Unassigned"
+  end
+
+  def suggested_d
+    # had this as an unless earlier ... also, the .first should be replaced by some sort
+    # of null coalesece
+    if dispute_entries.empty? or dispute_entries.first[:suggested_disposition].nil?
+      "None"
+    else
+      dispute_entries.first[:suggested_disposition]
+    end
+  end
+
+  def dispute_age
+    age = case_opened_at - DateTime.now
+    age = age.abs # lazy
+    mm, ss = age.divmod(60)
+    hh, mm = mm.divmod(60)
+    dd, hh = hh.divmod(24)
+    if dd > 0
+      "%dd %dh" % [dd, hh]
+    elsif hh > 0
+      "%dh %dm" % [hh, mm]
+    else
+      "%dm %ds" % [mm, ss]
+    end
+  end
 
   def self.process_bridge_payload(message_payload)
     user = User.where(cvs_username:"vrtincom").first
