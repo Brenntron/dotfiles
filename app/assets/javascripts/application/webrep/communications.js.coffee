@@ -54,7 +54,9 @@ $ ->
   # Email reply creation and attachments
 
   $('.reply-button').on 'click', ->
+    email_reply = $('#email-reply')
     $('#email-reply').removeClass('hidden')
+    $('.email-reply-body').focus()
 
   $('#select-reply-template').on 'change', ->
     template_id = this.value

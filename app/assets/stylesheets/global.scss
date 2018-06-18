@@ -3207,7 +3207,13 @@ fieldset.top-content {
 }
 
 input.communication-subject {
-  margin-top: 5px;
+  margin-top: 4px;
+  font-size: 9pt;
+  margin-bottom: -4px;
+}
+
+#email-reply input.communication-subject {
+  padding: 6px;
 }
 
 .email-reply-body-wrapper {
@@ -3798,6 +3804,10 @@ input.receiver-email {
 }
 
 .template-select-wrapper {
+  display: inline-block;
+}
+
+#newEmailDialog .template-select-wrapper {
   margin-top: 8px;
 }
 
@@ -3860,6 +3870,39 @@ input.file_attachment {
 
 .note-wrapper {
   margin-bottom: 20px;
+}
+
+.dropdown-tool-button {
+  border-radius: 0;
+  border: none;
+  background-color: $content-bg-color;
+  color: $type-lighter-color;
+  font-weight: 300;
+  margin-left: 12px;
+  font-size: 8.5pt !important;
+  padding: 4px 6px;
+}
+
+.dropdown-tool-button::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid $type-lighter-color;
+  float: right;
+  margin: 1px 0 0 10px;
+}
+
+.template-select-wrapper .dropdown.open {
+  background-color: transparent !important;
+}
+
+.template-select-wrapper .dropdown-menu {
+  border: none;
+  left: 12px;
+  border-radius: 0 0 4px 4px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

@@ -106,12 +106,17 @@
           .template-select-wrapper
             .template-label
               Select a Template
-            %select.email-template-select#select-new-template
-              %option
+
+            %span.dropdown
+              %button.dropdown-tool-button#new_template_button.dropdown-toggle{title: 'Select Email Template', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                %span.missing-data No Template Selected
+              .dropdown-menu#new_templates{'aria-labelledby': 'new_template_button'}
                 - if options_for_select(EmailTemplate.all).empty?
                   No templates created
                 - else
                   =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+
+
 
           #file-fields-new
 
@@ -134,14 +139,18 @@
                       %span.reply-symbol
                       %span.receiver-email
                   .col-xs-8
-                    .template-label
-                      Select a Template
-                    %select.email-template-select#select-reply-template
-                      %option
-                        - if options_for_select(EmailTemplate.all).empty?
-                          No templates created
-                        - else
-                          =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                    .template-select-wrapper
+                      .template-label
+                        Select a Template
+
+                      %span.dropdown
+                        %button.dropdown-tool-button#reply_template_button.dropdown-toggle{title: 'Select Email Template', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %span.missing-data No Template Selected
+                        .dropdown-menu#reply_templates{'aria-labelledby': 'reply_template_button'}
+                          - if options_for_select(EmailTemplate.all).empty?
+                            No templates created
+                          - else
+                            =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
