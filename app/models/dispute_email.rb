@@ -121,6 +121,7 @@ class DisputeEmail < ApplicationRecord
     new_email.subject = params[:subject]
     new_email.body = append_case_number(params[:body], params[:dispute_id])
     new_email.status = SENT
+    new_email.email_sent_at = Time.now
     new_email.save
 
     attachments_to_mail = []
