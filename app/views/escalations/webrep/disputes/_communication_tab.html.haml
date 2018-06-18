@@ -64,8 +64,11 @@
         // Only show Notice if email is to customer
         .customer-facing-notice
           Customer Facing Message
-        %button.new-email-button#opener
+        %button.new-email-button
           Compose New Email
+        %button.mng-templates-button
+          Manage Email Templates
+
 
     .row
       .col-xs-12.email-header-information.hidden
@@ -112,10 +115,12 @@
                 %span.missing-data No Template Selected
               .dropdown-menu#new_templates{'aria-labelledby': 'new_template_button'}
                 - if options_for_select(EmailTemplate.all).empty?
-                  No templates created
+                  %span.missing-data No templates created
                 - else
                   =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
-
+                .dropdown-section-divider
+                  %button.secondary
+                    Manage Templates
 
 
           #file-fields-new
@@ -126,6 +131,35 @@
         .email-new-button-wrapper
           %button.primary#send-new-email{value: 'submit'}
             Send
+
+    #manageTemplatesDialog{title: 'Manage Email Templates'}
+      %table.table
+        %thead
+          %tr.table-header-highlight
+            %th Template Name
+            %th Description
+            %th.min70
+          %tr
+            %td Standard Template Response
+            %td For tickets submitted via Talos Intelligence form
+            %td
+              %button.table-button.edit-button
+              %button.table-button.delete-button
+          %tr
+            %td Recovery w/ Timeline
+            %td Friendly response with timeline estimate
+            %td
+              %button.table-button.edit-button
+              %button.table-button.delete-button
+          %tr
+            %td Forgotten IP
+            %td Prompt user for forgotten IP address
+            %td
+              %button.table-button.edit-button
+              %button.table-button.delete-button
+      .dialog-section-divider
+        %button.secondary
+          Create New Template
 
     .row
       .col-xs-12#email-reply.hidden
@@ -148,9 +182,12 @@
                           %span.missing-data No Template Selected
                         .dropdown-menu#reply_templates{'aria-labelledby': 'reply_template_button'}
                           - if options_for_select(EmailTemplate.all).empty?
-                            No templates created
+                            %span.missing-data No templates created
                           - else
                             =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                          .dropdown-section-divider
+                            %button.secondary
+                              Manage Templates
 
                     .email-reply-button-wrapper
                       .email-reply-buttons

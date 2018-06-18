@@ -257,14 +257,19 @@ $ ->
     )
 
 
-
   $('#newEmailDialog').dialog
     autoOpen: false
     minWidth: 400
     position: { my: "right bottom", at: "right bottom", of: window }
+  $('#manageTemplatesDialog').dialog
+    autoOpen: false
+    minWidth: 500
+    position: { my: "left bottom", at: "left bottom", of: window }
   $('.new-email-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
-
-
     return
+  $('.mng-templates-button').on 'click', ->
+    $('#manageTemplatesDialog').dialog 'open'
+    return
+
   return

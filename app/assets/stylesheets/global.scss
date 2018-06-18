@@ -3300,6 +3300,24 @@ input.communication-subject {
   font-size: 9pt;
 }
 
+.mng-templates-button {
+  background-image: url(image_path('icon_template_white.svg'));
+  background-repeat: no-repeat;
+  background-position: 0 2px;
+  background-size: 18px 18px;
+  height: 24px;
+  display: inline-block;
+  float: right;
+  background-color: transparent;
+  border: none;
+  margin-top: 32px;
+  margin-right: 16px;
+  padding-left: 22px;
+  padding-right: 0;
+  font-weight: 300;
+  font-size: 9pt;
+}
+
 
 .note-info-item {
   display: inline-block;
@@ -3904,6 +3922,47 @@ input.file_attachment {
   left: 12px;
   border-radius: 0 0 4px 4px;
 }
+
+.dropdown-section-divider, .dialog-section-divider {
+  width: 100%;
+  background-color: $faint-neutral-color;
+  text-align: center;
+  padding: 20px;
+  margin-top: 10px;
+  border-radius: 0 0 4px 4px;
+}
+
+.dropdown-section-divider {
+  margin-bottom: -5px;
+}
+
+.ui-dialog {
+  @include box-shadow($dropshadow);
+}
+
+.table-button {
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  dipsplay: inline-block;
+  border: none;
+  margin: 0 2px;
+}
+
+.table-button.edit-button {
+  background-image: url(image_path('icon_edit_blue.svg'));
+}
+
+.table-button.delete-button {
+  background-image: url(image_path('icon_delete_simple.svg'));
+}
+
+.table-header-highlight {
+  background-color: lighten($bug-section-color, 25%);
+}
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
