@@ -157,9 +157,24 @@
             %td
               %button.table-button.edit-button
               %button.table-button.delete-button
+
+      #new-template-form-wrapper
+        %h4.dialog-inset-header New Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input{required: true, type: 'text', name: 'template-description'}
+          .template-content-wrapper
+            %textarea.template-content
+
       .dialog-section-divider
-        %button.secondary
+        %button.primary#save-email-template.hidden
+          Save Template
+        %button.secondary#create-email-template
           Create New Template
+
 
     .row
       .col-xs-12#email-reply.hidden

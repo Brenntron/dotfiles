@@ -3145,16 +3145,24 @@ fieldset.top-content {
   border: 1px solid darken($faint-neutral-color, 5%);
 }
 
-.email-reply-body {
+.email-reply-body, .template-content {
   border: none;
   width: 100%;
-  min-height: 300px;
-  resize: vertical;
   padding: 15px 10px;
-  font-size: 9pt;
+  font-size: 9pt !important;
   line-height: 1.4;
   color: $type-lighter-color;
   }
+
+.email-reply-body {
+  min-height: 300px;
+  resize: vertical;
+}
+
+.template-content {
+  height: 100%;
+  min-height: 145px;
+}
 
 .email-response-button-wrapper {
   float: right;
@@ -3440,7 +3448,7 @@ input.communication-subject {
   display: inline-block;
 }
 
-.email-reply-header-information {
+.email-reply-header-information, .dialog-form-information {
   padding: 5px;
   background-color: $faint-neutral-color;
 }
@@ -3962,6 +3970,24 @@ input.file_attachment {
 .table-header-highlight {
   background-color: lighten($bug-section-color, 25%);
 }
+
+#new-template-form-wrapper {
+  display: none;
+  height: 0;
+  margin: 12px;
+  border: 1px solid $faint-neutral-color;
+}
+
+.dialog-inset-header {
+  background-color: $bug-section-color;
+  padding: 4px 10px;
+  font-weight: 300 !important;
+  font-size: 10pt;
+  color: $content-bg-color;
+  margin-bottom: 0;
+  border-radius: 2px 2px 0 0;
+}
+
 
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

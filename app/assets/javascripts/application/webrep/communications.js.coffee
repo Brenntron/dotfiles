@@ -264,12 +264,35 @@ $ ->
   $('#manageTemplatesDialog').dialog
     autoOpen: false
     minWidth: 500
-    position: { my: "left bottom", at: "left bottom", of: window }
+    position: { my: "left center", at: "left center", of: window }
   $('.new-email-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
     return
   $('.mng-templates-button').on 'click', ->
     $('#manageTemplatesDialog').dialog 'open'
+    return
+
+  state = true
+  $('#create-email-template').on 'click', ->
+    if state
+      $('#new-template-form-wrapper').show()
+      $('#new-template-form-wrapper').contents().show()
+      $('#create-email-template').text('Cancel')
+      $('#save-email-template').removeClass('hidden')
+      $('#new-template-form-wrapper').animate {
+        height: 200
+        borderWidth: '1px'
+      }, 300
+    else
+      $('#new-template-form-wrapper').contents().hide()
+      $('#create-email-template').text('Create New Template')
+      $('#save-email-template').addClass('hidden')
+      $('#new-template-form-wrapper').animate {
+        height: 0
+        borderWidth: 0
+      }, 300
+#      $('#new-template-form-wrapper').hide()
+    state = !state
     return
 
   return
