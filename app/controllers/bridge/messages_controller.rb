@@ -116,6 +116,7 @@ class Bridge::MessagesController < ApplicationController
   end
 
   def message_params
+    #TODO: use stronger permitting here eventually
     params.require(:message).permit!
   end
 
