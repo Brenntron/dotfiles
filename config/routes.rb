@@ -42,6 +42,7 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
+      resources :dispute_emails
       get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
@@ -166,6 +167,7 @@ Rails.application.routes.draw do
         get 'poll-from-bridge/messages', to: 'messages#get_messages'
         post 'fp-event/messages', to: 'messages#messages_from_bridge'
         post 'fp-create/messages', to: 'messages#fp_create'
+        post 'ticket-event/messages', to: 'messages#messages_from_bridge'
         post 'rule-file-notify/messages', to: 'messages#rule_file_notify'
       end
       resources :messages, only: [:create]
