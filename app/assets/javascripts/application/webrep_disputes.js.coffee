@@ -45,13 +45,13 @@ window.populate_webrep_my_table = () ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
-window.add_wlbl_button = ->
-  wlbl_form = $('#adjust-wlbl-form')
+window.row_add_wlbl_button =(button_tag) ->
+  wlbl_form = button_tag.form;
   data = {
-    'urls': wlbl_form.find('#adjust-wlbl-urls').val()
-    'trgt_list': wlbl_form.find('#adjust-wlbl-trgt_list').val()
-    'thrt_cats': wlbl_form.find('#adjust-wlbl-thrt_cats-list').val()
-    'note': wlbl_form.find('#adjust-wlbl-note').val()
+    'urls': [ wlbl_form.getElementsByClassName('adjust-wlbl-urls-input')[0].value ]
+    'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
+    #'thrt_cats': wlbl_form.find('.adjust-wlbl-thrt_cats-list-input').val()
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(

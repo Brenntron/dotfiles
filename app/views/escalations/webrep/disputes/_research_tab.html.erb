@@ -43,6 +43,7 @@
               </button>
               <div class="dropdown-menu toolbar-dropdown" id="wlbl_adjust_entries" aria-labelledby="wlbl_entries_button">
                 <!-- For each checked checkbox populate this information -->
+                <%= form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form| %>
                 <div class="dispute-name-wrapper">
                   <label class="content-label-sm">Dispute</label><br/>
                   paragon-downloads.com <!-- dispute name -->
@@ -70,6 +71,9 @@
                       <select class="toolbar-select select-status" title="RepTool Rule Status">
                         <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
                         <!-- Put all WL/BL options here  -->
+                        <%= Wbrs::ManualWlbl.types.each do |type_name| %>
+                          <option value="<%=type_name%>"><%=type_name%></option>
+                        <% end %>
                       </select>
                     </div>
                   </div>
@@ -78,8 +82,9 @@
                   <textarea class="dropdown-comment"></textarea>
                   <!--- End of per checked checkbox loop -->
                   <button class="secondary">Preview</button>
-                  <button class="primary">Submit Changes</button>
+                  <button type="button" class="primary" onclick="add_wlbl_button(this);">Submit Changes</button>
                 </div>
+                <% end %>
               </div>
             </span>
             <span class="dropdown">
@@ -159,6 +164,8 @@
                 <span class="dropdown">
                   <button id="wlbl_button_<%= entry.id %>" class="dispute-inline-buttons adjust-wlbl-button dropdown-toggle" title="Adjust WL/BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                   <div class="dropdown-menu" id="wlbl_adjust_<%= entry.id %>" aria-labelledby="wlbl_button_<%= entry.id %>">
+                    <%= form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form| %>
+                      <input type="hidden" value="paragon-downloads.com" class="adjust-wlbl-urls-input"/>
                     <h3>Adjust WL/BL</h3>
                     <table class="dispute_tool_current">
                       <tr>
@@ -180,17 +187,21 @@
                       <div class="toolbar">
                         <div>
                           <label class="toolbar-section-label">WL/BL List</label>
-                          <select class="toolbar-select select-status" title="RepTool Rule Status">
+                          <select class="toolbar-select select-status adjust-wlbl-trgt_list-input" title="RepTool Rule Status">
                             <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
                             <!-- Put all WL/BL options here  -->
+                            <%= Wbrs::ManualWlbl.types.each do |type_name| %>
+                              <option value="<%=type_name%>"><%=type_name%></option>
+                            <% end %>
                           </select>
                         </div>
                       </div>
                       <label class="content-label-sm">Comment</label>
-                      <textarea class="dropdown-comment"></textarea>
+                      <textarea class="dropdown-comment adjust-wlbl-note-input"></textarea>
                       <button class="secondary">Preview</button>
-                      <button class="primary">Submit Changes</button>
+                      <button type="button" class="primary" onclick="row_add_wlbl_button(this);">Submit Changes</button>
                     </div>
+                    <% end %>
                   </div>
                 </span>
                 <span class="dropdown">
@@ -241,16 +252,6 @@
               <td class="text-center sbrs-highlight"><%= entry.score unless entry.score_type != "SBRS" %></td>
               <td class="text-center">0</td>
               <td>WL - Medium</td>
-              <!--<td>-->
-                <!--<div id="adjust-wlbl-div">-->
-                  <!--<%= simple_form_for :wlbl, html: {id: 'adjust-wlbl-form'} do |wlbl_form| %>-->
-                    <!--<%= wlbl_form.input :urls, collection: [ 'paragon-downloads.com/j', 'paragon-downloads.com/k', 'paragon-downloads.com/m', 'paragon-downloads.com/n'  ], input_html: { id: 'adjust-wlbl-urls', multiple: true } %>-->
-                    <!--<%= wlbl_form.input :trgt_list, collection: Wbrs::ManualWlbl.types, input_html: { id: 'adjust-wlbl-trgt_list' } %>-->
-                    <!--<%= wlbl_form.input :note, input_html: { id: 'adjust-wlbl-note' } %>-->
-                    <!--<%= wlbl_form.button :button, 'Add WL/BL', type: :button, onclick: 'add_wlbl_button();' %>-->
-                  <!--<% end %>-->
-                <!--</div>-->
-              <!--</td>-->
               <!--<td>-->
                 <!--<div id="adjust-reptool-bl-div">-->
                   <!--<%= simple_form_for :reptool, html: {id: 'adjust-reptool-form'} do |reptool_form| %>-->
