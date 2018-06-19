@@ -109,37 +109,13 @@
           .template-select-wrapper
             .template-label
               Select a Template
-            -#  Show the selected template here after it has been chosen
 
-            %span.dropdown
-              %button.dropdown-tool-button#new_template_button.dropdown-toggle{title: 'Select Email Template', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                %span.missing-data No Template Selected
-
-              -# Keeping this here for reference. Adding in some example template names for styling.
-              -# Same will have to be done to the one on the reply email
-              -#- if options_for_select(EmailTemplate.all).empty?
-              -#  %span.missing-data No templates created
-              -#- else
-              -#  =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
-
-              .dropdown-menu#new_templates{'aria-labelledby': 'new_template_button'}
-                .form-check
-                  %input.form-check-input#templateID1{type: 'radio', name: 'email-templates', value: 'template_name1' }
-                  %label.form-check-label{for: 'templateID1'}
-                    Standard Template Response
-                .form-check
-                  %input.form-check-input#templateID2{type: 'radio', name: 'email-templates', value: 'template_name2' }
-                  %label.form-check-label{for: 'templateID2'}
-                    Recovery w/ Timeline
-                .form-check
-                  %input.form-check-input#templateID3{type: 'radio', name: 'email-templates', value: 'template_name3' }
-                  %label.form-check-label{for: 'templateID3'}
-                    Forgotten IP
-
-
-                .dropdown-section-divider
-                  %button.secondary
-                    Manage Templates
+            %select.dropdown.email-template-select#select-new-template
+              -if EmailTemplate.all.empty?
+                %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+              -else
+                %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
 
           #file-fields-new
@@ -211,17 +187,12 @@
                       .template-label
                         Select a Template
 
-                      %span.dropdown
-                        %button.dropdown-tool-button#reply_template_button.dropdown-toggle{title: 'Select Email Template', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                          %span.missing-data No Template Selected
-                        .dropdown-menu#reply_templates{'aria-labelledby': 'reply_template_button'}
-                          - if options_for_select(EmailTemplate.all).empty?
-                            %span.missing-data No templates created
-                          - else
-                            =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
-                          .dropdown-section-divider
-                            %button.secondary
-                              Manage Templates
+                    %select.dropdown.email-template-select#select-reply-template
+                      -if EmailTemplate.all.empty?
+                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                      -else
+                        %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                        =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
