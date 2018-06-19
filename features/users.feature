@@ -156,7 +156,6 @@ Feature: User Accounts
     And  I goto "/users/3"
     Then I should not see link with class "glyphicon-cloud-download"
 
-
   @javascript
   Scenario: A non-manager admin user can edit the role for any user.
     Given a user with role "admin" exists and is logged in
@@ -188,7 +187,6 @@ Feature: User Accounts
     Then I click "Save changes"
     And I should see "h_clinton updated successfully"
     And I should see "analyst"
-
 
 
   @javascript
@@ -714,7 +712,7 @@ Feature: User Accounts
       |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
     Given I wait for "3" seconds
     And  I goto "/bugs/new"
-    Then I should see "You are not authorized to new bug."
+    Then I should see "You are not authorized to new research bug."
     And I goto "/bugs/333333"
     When I click ".rules-tab"
     Then I should not see content "edit" within ".top-bar"
@@ -768,7 +766,6 @@ Feature: User Accounts
     And  I should see "[BP][NSS] fixed bug"
     And  I should not see "Pending bug I should see"
     And  I should not see "[[TELUS][VULN][BP] [SID] 22078 test summary"
-
 
 
   @javascript

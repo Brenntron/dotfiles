@@ -288,9 +288,9 @@ Feature: Bug
   @javascript
   Scenario: A bug can be deleted
     Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |
+    And the following "research_bug" bugs with trait "open_bug" exist:
+      | id     | bugzilla_id | user_id | summary             | version | description       |
+      | 222222 | 222222      | 1       | [BP][NSS] fixed bug | 2.6.0   | test description3 |
     Then I wait for "3" seconds
     And I goto "/bugs?q=my-bugs"
     Then I should see "[BP][NSS] fixed bug"
@@ -389,7 +389,6 @@ Feature: Bug
     And I wait for "1" seconds
     Then I select "PENDING" from "bug-form-state-input"
 
-#  @now
 #  @wip
 #  @javascript
 #  Scenario: a bug can be set to pending
@@ -655,9 +654,9 @@ Feature: Bug
       | committer      |
       | manager        |
 
-    And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | committer_id |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |  6           |
+    And the following "research_bug" bugs with trait "open_bug" exist:
+      | id     | bugzilla_id | user_id | summary             | version | description       | committer_id |
+      | 222222 | 222222      | 1       | [BP][NSS] fixed bug | 2.6.0   | test description3 |  6           |
 
     And a user with id "2" has a role of "manager"
     And a user with id "6" has a role of "committer"
@@ -693,9 +692,9 @@ Feature: Bug
       | committer      |
       | manager        |
 
-    And the following bugs exist:
-      | id     | bugzilla_id | state | user_id | summary             | product  | component   | version | description       | user_id |
-      | 222222 | 222222      | OPEN  | 1       | [BP][NSS] fixed bug | Research | Snort Rules | 2.6.0   | test description3 |  4      |
+    And the following "research_bug" bugs with trait "open_bug" exist:
+      | id     | bugzilla_id | user_id | summary             | version | description       | user_id |
+      | 222222 | 222222      | 1       | [BP][NSS] fixed bug | 2.6.0   | test description3 |  4      |
 
     And a user with id "4" has a role of "committer"
     And a user with id "6" has a role of "committer"
@@ -812,7 +811,6 @@ Feature: Bug
 #    And I click ".rules-tab"
 #    And  I fill in "sid" with "24397" <- this next step is broken
 
-
   @javascript
   Scenario: a user can remove a rule from a bug
     Given a user with role "analyst" exists and is logged in
@@ -889,9 +887,9 @@ Feature: Bug
   @javascript
   Scenario: a user can test an attachment
     Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id     | bugzilla_id | state    | user_id | summary                                                    | product  | component   | version |      description       |
-      | 111116 | 111116      | REOPENED | 1       | [SID] 24397 Steam browser handler multiple vulnerabilities | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And the following "research_bug" bugs with trait "reopened_bug" exist:
+      | id     | bugzilla_id | user_id | summary                                                    | version |      description       |
+      | 111116 | 111116      | 1       | [SID] 24397 Steam browser handler multiple vulnerabilities | 2.6.0   | This is a fake bug!!!! |
     And an attachment exists and belongs to bug "111116"
     And I wait for "3" seconds
     When I goto "/bugs/111116"
@@ -1035,9 +1033,9 @@ Feature: Bug
   @javascript
   Scenario: a bug that has attachments with alerts should provide a link to the rule view
     Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id     | bugzilla_id | state    | user_id | summary                                          | product  | component   | version |      description       |
-      | 145359 | 145359      | REOPENED | 1       | [SID] 15539 CVE-2008-1434 This is a fake bug!!!! | Research | Snort Rules | 2.6.0   | This is a fake bug!!!! |
+    And the following "research_bug" bugs with trait "reopened_bug" exist:
+      | id     | bugzilla_id | user_id | summary                                          | version |      description       |
+      | 145359 | 145359      | 1       | [SID] 15539 CVE-2008-1434 This is a fake bug!!!! | 2.6.0   | This is a fake bug!!!! |
     And the following "synched_rule" rules exist belonging to bug "145359":
       |id | message                 | rule_category_id | parsed | sid  |
       |1  | BLACKLIST message       | 1                |  true  | 19001|
