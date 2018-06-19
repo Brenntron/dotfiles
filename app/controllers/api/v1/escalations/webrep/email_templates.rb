@@ -29,8 +29,9 @@ module API
 
             desc "create an email template"
             params do
-              requires :template_name, type: Integer, desc: "The email templates template name."
-              requires :body, type: Integer, desc: "The contents of the template."
+              requires :template_name, type: String, desc: "The email templates template name."
+              requires :body, type: String, desc: "The contents of the template."
+              optional :description, type: String, desc: "The description of the template."
             end
 
             post "", root: "email_template" do

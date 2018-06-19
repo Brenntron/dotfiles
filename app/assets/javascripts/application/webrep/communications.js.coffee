@@ -169,6 +169,26 @@ $ ->
       )
 
 
+  # Email Template Create/Update/Delete
+
+  $('#save-email-template').on 'click', (e) ->
+    template_name = $('#new-template-name')[0].value
+    description = $('#new-template-desc')[0].value
+    body = $('#new-template-body')[0].value
+
+    std_msg_ajax(
+      method: 'POST'
+      url: "/api/v1/escalations/webrep/email_templates"
+      data: {template_name: template_name, description: description, body: body}
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Email Template Created.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There creating the email template.", reload: false)
+    )
+
+
+
     # Notes (Comments) related communications stuff
     # Delete Note
 
