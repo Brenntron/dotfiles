@@ -1,10 +1,10 @@
 describe SnortDocPublisher do
   let(:cve_year) { 2015 }
   let(:reference) do
-    FactoryGirl.create(:cve_reference, year: cve_year, index: 200, fail_count: 0)
+    FactoryBot.create(:cve_reference, year: cve_year, index: 200, fail_count: 0)
   end
   let(:url_reference_type) do
-    FactoryGirl.create(:url_reference_type)
+    FactoryBot.create(:url_reference_type)
   end
   let(:cve_file_content) do
     {

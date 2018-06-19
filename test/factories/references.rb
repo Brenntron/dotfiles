@@ -13,7 +13,7 @@ FactoryBot.define do
         index { 100 + generate(:cve_index_seq) }
       end
 
-      reference_type { ReferenceType.cve || FactoryGirl.create(:cve_reference_type) }
+      reference_type { ReferenceType.cve || FactoryBot.create(:cve_reference_type) }
       reference_data { "#{year}-#{'%04i' % index}" }
     end
   end
