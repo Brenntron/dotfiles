@@ -8,6 +8,12 @@ Given(/^the following bugs exist:$/) do |bugs|
   end
 end
 
+Given(/^the following "(.*?)" bugs with trait "(.*?)" exist:$/) do |factory_name, trait_name, bug_table|
+  bug_table.hashes.each do |bug_attrs|
+    FactoryBot.create(factory_name.to_sym, trait_name.to_sym, bug_attrs)
+  end
+end
+
 Given(/^the current user has the following bugs:$/) do |given_bugs|
   user = User.where(cvs_username: ENV['authenticate_cvs_username']).first || FactoryBot.create(:current_user)
   given_bugs.hashes.each do |bug_attrs|
@@ -73,7 +79,7 @@ Then(/^I relate (.*?) to (.*?) with block$/) do |from_id, to_id|
   bug1 = Bug.find(from_id)
   bug2 = Bug.find(to_id)
 
-  bug1.snort_research_escalation_bugs << bug2
+  bug1.snort_research_bugs << bug2
   bug1.snort_blocker_bugs << bug2
 
 end

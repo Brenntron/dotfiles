@@ -2,7 +2,7 @@ Given /^pending/i do
   pending
 end
 
-Given(/^I goto "(.*?)"$/) do |url|
+Given(/^I go ?to "(.*?)"$/) do |url|
   visit (url)
 end
 

@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   namespace :escalations do
     root 'bugs#index'
+    resources :escalation_bugs, controller: 'bugs'
     resources :bugs do
 
       member do
@@ -19,6 +20,8 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    resources :roles
+    resources :org_subsets
     root 'home#index'
     resources :migrations, only: [:index]
     resources :morsels, only: [:index, :show]
@@ -81,7 +84,6 @@ Rails.application.routes.draw do
 
 
   # resources :rules, param: :sid
-  resources :roles
 
   resources :tests
 
@@ -110,6 +112,7 @@ Rails.application.routes.draw do
     resources :rules, only: [:show]
   end
 
+  resources :research_bugs, controller: 'bugs'
   resources :bugs do
     member do
       post :create_rules

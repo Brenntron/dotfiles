@@ -1,7 +1,7 @@
 class Escalations::BugsController < ApplicationController
-  load_and_authorize_resource except: [:index, :show,
-                                       :add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
-  before_action only:[:index] { authorize!(:list_escalations, Bug) }
+  load_and_authorize_resource class: 'EscalationBug',
+                              except: [:add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
+  skip_load_resource only: [:index, :show]
 
   before_action :require_login
   before_action :query_bugs
@@ -99,7 +99,7 @@ class Escalations::BugsController < ApplicationController
   end
 
   def new
-    @bug = current_user.bugs.build
+    @bug = current_user.bugs.build(type: 'EscalationBug')
     @tags = Tag.all.map { |tag| tag.name }.join(',')
   end
 
@@ -112,8 +112,8 @@ class Escalations::BugsController < ApplicationController
   def show
 
     @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
-    @bug = Bug.where(id: params[:id]).first
-    @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
+    @bug = EscalationBug.where(id: params[:id]).first
+    @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug&.id })
 
     if @bug
       @unique_giblets = @bug.giblets.map {|g| g.name}.uniq

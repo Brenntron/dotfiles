@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.string "whiteboard"
     t.boolean "acknowledged"
     t.boolean "snort_secure"
+    t.string "type", default: "ResearchBug"
     t.index ["user_id"], name: "index_bugs_on_user_id"
   end
 
@@ -166,9 +167,9 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "escalations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "snort_research_escalation_bug_id"
-    t.integer "snort_escalation_research_bug_id"
+  create_table "escalation_links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "snort_research_bug_id"
+    t.integer "snort_escalation_bug_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -266,6 +267,12 @@ ActiveRecord::Schema.define(version: 20180320143901) do
     t.index ["bug_id"], name: "index_notes_on_bug_id"
   end
 
+  create_table "org_subsets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "reference_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.string "description"
@@ -287,6 +294,7 @@ ActiveRecord::Schema.define(version: 20180320143901) do
 
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "role"
+    t.integer "org_subset_id"
   end
 
   create_table "roles_users", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
