@@ -1,32 +1,32 @@
 Given (/^a "(.*?)" user exists$/) do |role|
-  @user = FactoryGirl.create(:fake_user)
-  @role = FactoryGirl.create(:role, role: role)
+  @user = FactoryBot.create(:fake_user)
+  @role = FactoryBot.create(:role, role: role)
   @user.roles << @role
 end
 
 Given(/^the following users exist$/) do |users|
   users.hashes.each do |user|
-    FactoryGirl.create(:user, user)
+    FactoryBot.create(:user, user)
   end
 end
 
 Given(/^a user with commit permission exists and is logged in$/) do
-  @user = FactoryGirl.create(:current_user, confirmed: true)
-  @role = FactoryGirl.create(:role, role: 'committer')
+  @user = FactoryBot.create(:current_user, confirmed: true)
+  @role = FactoryBot.create(:role, role: 'committer')
   @user.roles << @role
   sign_in_user
 end
 
 Given(/^an admin user with role "(.*?)" exists and is logged in$/) do |role|
-  @user = FactoryGirl.create(:current_user, confirmed: true)
-  @user.roles << FactoryGirl.create(:role, role: 'admin')
-  @user.roles << FactoryGirl.create(:role, role: role)
+  @user = FactoryBot.create(:current_user, confirmed: true)
+  @user.roles << FactoryBot.create(:role, role: 'admin')
+  @user.roles << FactoryBot.create(:role, role: role)
   sign_in_user
 end
 
-Given(/^a user with role "(.*?)" exists and is logged in$/) do |role_name|
-  @user = FactoryGirl.create(:current_user, confirmed: true)
-  @user.roles << FactoryGirl.create(:role, role: role_name)
+Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
+  @user = FactoryBot.create(:current_user, confirmed: true)
+  @user.roles << FactoryBot.create(:role, role: role)
   sign_in_user
 end
 
@@ -48,14 +48,14 @@ Given(/^a user with id "(.*?)" has a role of "(.*?)"$/) do |user_id, role|
 end
 
 Given(/^a manager exists and is logged in$/) do
-  @user = FactoryGirl.create(:current_user, confirmed: true)
-  @role = FactoryGirl.create(:role, role: 'manager')
+  @user = FactoryBot.create(:current_user, confirmed: true)
+  @role = FactoryBot.create(:role, role: 'manager')
   @user.roles << @role
   sign_in_user
 end
 
 Given(/^current user exists$/) do
-  @user = FactoryGirl.create(:current_user, confirmed: true)
+  @user = FactoryBot.create(:current_user, confirmed: true)
 end
 
 def fill_in_login_form
@@ -109,38 +109,38 @@ Then(/^I should see could not find user "(.*)" flash massage$/) do |user_id|
 end
 
 Then(/^current user not in database$/) do
-  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user_attrs = FactoryBot.attributes_for(:current_user)
   user = User.where(cvs_username: user_attrs[:cvs_username]).first
   user.should be_nil
 end
 
 Then(/^current user should be in database$/) do
-  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user_attrs = FactoryBot.attributes_for(:current_user)
   user = User.where(cvs_username: user_attrs[:cvs_username]).first
   user.should_not be_nil
 end
 
 Given(/^current user is a bug user$/) do
-  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user_attrs = FactoryBot.attributes_for(:current_user)
   user = User.create_by_email(user_attrs[:email])
   user.save
 end
 
 Given(/^I should see my username$/) do
-  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user_attrs = FactoryBot.attributes_for(:current_user)
   username  = User.where(cvs_username: user_attrs[:cvs_username]).first
   raise "content found when it should not have been found" if page.has_content?(username)
 end
 
 Then (/^current user should not have kerberos login$/) do
-  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user_attrs = FactoryBot.attributes_for(:current_user)
   User.where(cvs_username: user_attrs[:cvs_username]).count.should == 1
   user = User.where(cvs_username: user_attrs[:cvs_username]).first
   user.kerberos_login.should == nil
 end
 
 Then(/^current user should have kerberos login$/) do
-  user_attrs = FactoryGirl.attributes_for(:current_user)
+  user_attrs = FactoryBot.attributes_for(:current_user)
   User.where(cvs_username: user_attrs[:cvs_username]).count.should == 1
   user = User.where(cvs_username: user_attrs[:cvs_username]).first
   user.kerberos_login.should == user_attrs[:kerberos_login]
