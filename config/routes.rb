@@ -21,6 +21,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :roles
+    resources :org_subsets
     root 'home#index'
     resources :migrations, only: [:index]
     resources :morsels, only: [:index, :show]
