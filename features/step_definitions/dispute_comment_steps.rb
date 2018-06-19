@@ -12,3 +12,7 @@ end
 And(/^I click the delete button of the first comment$/) do
   first(".note-delete-button").click
 end
+
+And(/^I fill a content-editable field "(.*?)" with "(.*?)"$/) do |class_name, content|
+  find(class_name).base.send_keys(content)
+end

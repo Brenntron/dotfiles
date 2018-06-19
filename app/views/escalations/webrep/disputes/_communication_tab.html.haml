@@ -250,33 +250,6 @@
     %button.add-case-note-button#new-case-note-button
       Add Note
 
-    -@dispute.dispute_comments.each do |comment|
-      .note-wrapper
-        .row
-          .col-xs-12
-            .note-info-item.author-notation
-              Written by
-              %span.author-username
-                =comment.user.cec_username
-              = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
-            %br.hidden-break
-            .note-info-item.time-stamp
-              =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
-            .note-info-item.note-tool-buttons
-              %button.hidden.note-save-button{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
-              %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
-              %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
-              %button.note-delete-button{comment_id: "#{comment.id}"}
-
-        .row
-          .col-xs-12
-            - if comment.user.cec_username == current_user.cec_username
-              .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
-                %pre=comment.comment
-            - else
-              .note-block{comment_id: "#{comment.id}"}
-                %pre=comment.comment
-
 
     .note-wrapper.new-case-note-row
       .row
@@ -291,6 +264,33 @@
         .col-xs-12
           .note-block.content-editable.new-case-note-textarea{contenteditable: true}
             %pre
+
+    -@dispute.dispute_comments.recent_first.each do |comment|
+      .note-wrapper
+        .row
+          .col-xs-12
+            .note-info-item.author-notation
+              Written by
+              %span.author-username
+                =comment.user.cec_username
+              = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
+            %br.hidden-break
+            .note-info-item.time-stamp
+              =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
+            .note-info-item.note-tool-buttons
+              %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
+              %button.note-delete-button{comment_id: "#{comment.id}"}
+
+        .row
+          .col-xs-12
+            - if comment.user.cec_username == current_user.cec_username
+              .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
+                %pre=comment.comment
+            - else
+              .note-block{comment_id: "#{comment.id}"}
+                %pre=comment.comment
 
 
 

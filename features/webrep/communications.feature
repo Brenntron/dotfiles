@@ -105,7 +105,7 @@ Feature: Webrep communications
     And I should see "EMAIL SENT"
 
 
-  @javascript @now
+  @javascript
   Scenario: a user can create a new email using an email template
     Given a user with role "admin" exists and is logged in
 
@@ -140,33 +140,10 @@ Feature: Webrep communications
       | 722    |
     And I goto "/escalations/webrep/disputes/722"
     Then I click "Add Note"
-    And I fill in "new-case-note-textarea" with "I like jelly beans"
+    And I fill a content-editable field ".new-case-note-textarea" with "I like jelly beans"
     Then I click ".new-case-note-save-button"
     And I wait for "2" seconds
     Then I should see "NOTE CREATED"
-
-
-  @javascript
-  Scenario: a user cannot edit a note authored by another user
-    Given a user with role "admin" exists and is logged in
-    And the following users exist
-      |id  |cec_username|
-      |2   | snorty     |
-
-    And the following disputes exist:
-      | id     |
-      | 722    |
-    And the following dispute comments exist:
-      | id | dispute_id | comment                      |  user_id |
-      |  1 |  722       | purple pigs are cool         |  2       |
-      |  2 |  722       |  I prefer yellow pigs        |  1       |
-
-    And I goto "/escalations/webrep/disputes/722"
-    Then I click the note with text "purple pigs are cool"
-    And I fill in "editable-note-block" with "I am editing stuff"
-    When I click ".note-save-edit-button"
-    Then I wait for "2" seconds
-    Then I should see "NOTE COULD NOT BE UPDATED"
 
 
   @javascript
@@ -186,8 +163,8 @@ Feature: Webrep communications
 
     And I goto "/escalations/webrep/disputes/722"
     Then I click the note with text "I prefer yellow pigs"
-    And I fill in "editable-note-block" with "I am editing stuff"
-    When I click ".note-save-edit-button"
+    And I fill a content-editable field ".note-block2" with "I am editing stuff"
+    When I click ".update-note"
     Then I wait for "2" seconds
     Then I should see "NOTE UPDATED"
 
