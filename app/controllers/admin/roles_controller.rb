@@ -22,7 +22,7 @@ class Admin::RolesController < Admin::HomeController
     @role = Role.new(role_params)
     respond_to do |format|
       if @role.save
-        format.html { redirect_to roles_path, notice: 'role was successfully created.' }
+        format.html { redirect_to admin_roles_path, notice: 'role was successfully created.' }
       else
         format.html { render :new }
       end
@@ -35,7 +35,7 @@ class Admin::RolesController < Admin::HomeController
     @role = Role.find(params[:id])
     respond_to do |format|
       if @role.update(role_params)
-        format.html { redirect_to roles_path, notice: 'role was successfully updated.' }
+        format.html { redirect_to admin_roles_path, notice: 'role was successfully updated.' }
       else
         format.html { render :edit }
       end

@@ -156,7 +156,6 @@ Feature: User Accounts
     And  I goto "/users/3"
     Then I should not see link with class "glyphicon-cloud-download"
 
-
   @javascript
   Scenario: A non-manager admin user can edit the role for any user.
     Given a user with role "admin" exists and is logged in
@@ -188,7 +187,6 @@ Feature: User Accounts
     Then I click "Save changes"
     And I should see "h_clinton updated successfully"
     And I should see "analyst"
-
 
 
   @javascript
@@ -768,7 +766,6 @@ Feature: User Accounts
     And  I should see "[BP][NSS] fixed bug"
     And  I should not see "Pending bug I should see"
     And  I should not see "[[TELUS][VULN][BP] [SID] 22078 test summary"
-
 
 
   @javascript

@@ -389,7 +389,6 @@ Feature: Bug
     And I wait for "1" seconds
     Then I select "PENDING" from "bug-form-state-input"
 
-#  @now
 #  @wip
 #  @javascript
 #  Scenario: a bug can be set to pending
@@ -811,7 +810,6 @@ Feature: Bug
 #    And I goto "/bugs/222222"
 #    And I click ".rules-tab"
 #    And  I fill in "sid" with "24397" <- this next step is broken
-
 
   @javascript
   Scenario: a user can remove a rule from a bug
