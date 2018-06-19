@@ -1,8 +1,8 @@
-FactoryGirl.define do
+
+FactoryBot.define do
   sequence(:cve_index_seq) do |nn|
     nn
   end
-
   factory :reference do
     reference_data 'some data'
     reference_type_id '1'

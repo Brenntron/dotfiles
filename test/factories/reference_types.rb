@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :reference_type do
     name  'cve'
     description  'Common Vulnerabilities and Exposures'
