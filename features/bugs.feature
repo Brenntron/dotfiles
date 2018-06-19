@@ -1086,3 +1086,17 @@ Feature: Bug
     And  I wait for "10" seconds
     And  I click ".history-tab"
     Then I should see "THESIS:"
+
+  @javascript
+  Scenario: Add a comment from the history tab
+    Given a user with role "analyst" exists and is logged in
+    And the following bugs exist:
+      | id     | bugzilla_id |
+      | 145359 | 145359      |
+    When I goto "/bugs/145359"
+    And  I click the "History" tab
+    And  I click "add-notes-toggle-button"
+    And  I fill in "noteCommentField" with "note from history tab"
+    And  I click "submit_comment"
+    Then pending
+
