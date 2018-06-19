@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :alert do
     test_group "pcap"
     rule_id 1

@@ -14,6 +14,7 @@ module API
           optional :import_type, type: String, desc: "Type of Import"
         end
         get 'import/:id' do
+          authorize!(:import, ResearchBug)
           import_type = params[:import_type].present? ? params[:import_type] : "import"
           xmlrpc_token = request.headers['Xmlrpc-Token']
 
@@ -71,7 +72,9 @@ module API
         end
         get '/tabs/:id' do
           begin
+            authorize!(:read, ResearchBug)
             bug = Bug.where(:id => params[:id]).includes([:alerts, :pcaps => [:alerts]]).first
+            authorize!(:read, bug)
 
             response = {}
             response[:status] = "success"
@@ -183,6 +186,7 @@ module API
           requires :user_id, type: Integer, desc: "the id of the user whose bugs we want"
         end
         get '/by_user/:user_id' do
+          authorize!(:import, ResearchBug)
           xmlrpc_token = request.headers['Xmlrpc-Token']
           user_email = User.where(id: permitted_params[:user_id]).first.email
 
@@ -208,6 +212,7 @@ module API
 
         desc "get latest bugs from bugzilla"
         get 'import_all' do
+          authorize!(:import, ResearchBug)
           import_type = params[:import_type].present? ? params[:import_type] : "import"
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
@@ -227,6 +232,7 @@ module API
           requires :element, type: String, desc: "element of bug wanting to sync, options are attachments or history"
         end
         get "/synch_bug/:element/:id" do
+          authorize!(:import, ResearchBug)
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             begin
@@ -245,12 +251,16 @@ module API
         end
 
 
+        # TODO Move to rule API
         desc "delete a rule with this bug"
         params do
           requires :link, type: String, desc: "bug:bug_id&rule:rule_id"
         end
         delete '/rules/:link' do
-          Bug.where(id: permitted_params[:link].split(':')[0]).first.rules.destroy(permitted_params[:link].split(':')[1]).first
+          bug = Bug.where(id: permitted_params[:link].split(':')[0]).first
+          rule = bug.rules.where(id: permitted_params[:link].split(':')[1]).first
+          authorize!(:destroy, rule)
+          rule.destroy
         end
 
         desc "unlink a rule with this bug"
@@ -259,6 +269,9 @@ module API
           requires :rule_ids, type: Array[Integer]
         end
         delete '/:bugzilla_id/rules/unlink' do
+          authorize!(:update, ResearchBug)
+          bug = ResearchBug.find(permitted_params[:bugzilla_id])
+          authorize!(:update, bug)
           Bug.unlink_action(permitted_params[:bugzilla_id], permitted_params[:rule_ids])
         end
 
@@ -271,6 +284,7 @@ module API
           optional :committer, type: String, desc: "searching for a commiter"
         end
         post '/search/' do
+          authorize!(:index, ResearchBug)
           terms = {
               :bugzilla_id => /-/.match(permitted_params[:id_range]) ? nil : permitted_params[:id_range],
               :state => permitted_params[:state] ? permitted_params[:state] : nil,
@@ -285,6 +299,7 @@ module API
           # search bugs and return the bugs current user is allowed to see
           hits = []
           Bug.search(permitted_params[:summary], terms, range).each do |bug_hit|
+            authorize!(:read, bug_hit)
             hits << bug_hit.id if bug_hit.check_permission(current_user)
           end
           hits
@@ -297,6 +312,9 @@ module API
           requires :sid, type: Integer, desc: "sid of the rule"
         end
         post ':bug_id/rules/:gid~:sid/link' do
+          authorize!(:update, ResearchBug)
+          bug = ResearchBug.find(permitted_params[:bug_id])
+          authorize!(:update, bug)
           Bug.link_action(permitted_params[:bug_id], permitted_params[:sid], permitted_params[:gid])
         end
 
@@ -306,6 +324,9 @@ module API
           requires :attachment_array, type: Array[String], desc: "The attachments to test. this is a list of bugzilla attachment id's"
         end
         post 'attachments/link_rules' do
+          authorize!(:update, ResearchBug)
+          bug = ResearchBug.find(permitted_params[:bugzilla_id])
+          authorize!(:update, bug)
           Bug.link_alerts_action(permitted_params[:bugzilla_id], permitted_params[:attachment_array])
         end
 
@@ -314,8 +335,10 @@ module API
           requires :id, type: String, desc: "ID of the bug"
         end
         get ':id' do
+          authorize!(:read, ResearchBug)
           # Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
-          Bug.where(id: permitted_params[:id])
+          bug = Bug.where(id: permitted_params[:id])
+          authorize!(:read, bug)
         end
 
         desc "get all bugs"
@@ -323,7 +346,11 @@ module API
           use :pagination
         end
         get "", root: :bugs do
+          authorize!(:index, ResearchBug)
           bugs = Bug.all.where("classification <= ?", User.class_levels[current_user.class_level]).page(params[:page]).per(params[:per_page])
+          bugs.each do |bug|
+            authorize!(:read, bug)
+          end
           render bugs, {meta: {total_pages: bugs.total_pages}}
         end
 
@@ -360,8 +387,10 @@ module API
 
         end
         put ":id", root: "bug" do
+          authorize!(:update, ResearchBug)
           ActiveRecord::Base.transaction do
             bug = Bug.find(permitted_params[:id])
+            authorize!(:update, bug)
             # Bug.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
 
             bug.update_bug_action(current_user: current_user,
@@ -374,9 +403,9 @@ module API
           end
         end
 
-        desc "create a bug"
+        desc "create a reasearch bug"
         params do
-          requires :bug, type: Hash do
+          requires :research_bug, type: Hash do
             requires :product, type: String, desc: "The name of the product the bug is being filed against."
             requires :component, type: String, desc: "The name of a component in the product above."
             requires :summary, type: String, desc: "A brief description of the bug being filed."
@@ -391,16 +420,41 @@ module API
             optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
           end
         end
-        post "", root: "bug" do
-          authorize! :create, Bug
-          case permitted_params[:bug][:product]
-            when "Escalations"
-              user = User.where(email: "vrt-incoming@sourcefire.com").first
-            when "Research"
-              user = current_user
+        post "research", root: "bug" do
+          authorize! :create, ResearchBug
+          unless 'Research' == permitted_params[:research_bug][:product]
+            error!('This API entry point is only for research bugs.', 400)
           end
 
-          Bug.bugzilla_create_action(bugzilla_session, permitted_params[:bug], user: user)
+          ResearchBug.bugzilla_create_action(bugzilla_session, permitted_params[:research_bug], user: current_user)
+        end
+
+        # TODO move to escalation API
+        desc "create an escalation bug"
+        params do
+          requires :escalation_bug, type: Hash do
+            requires :product, type: String, desc: "The name of the product the bug is being filed against."
+            requires :component, type: String, desc: "The name of a component in the product above."
+            requires :summary, type: String, desc: "A brief description of the bug being filed."
+            requires :version, type: String, desc: "A version of the product above; the version the bug was found in."
+            requires :description, type: String, desc: "A full text description of the bug"
+            optional :state, type: String, desc: "The state of the bug, Open, Closed, ReOpened,etc"
+            optional :creator, type: String, desc: "The person who created the bug"
+            optional :opsys, type: String, desc: "The operating system that this bug affects"
+            optional :platform, type: String, desc: "What platform this bug runs on"
+            optional :priority, type: String, desc: "How soon should this bug get fixed"
+            optional :severity, type: String, desc: "How terrible is this bug"
+            optional :classification, type: String, desc: "Who should see this bug. Higher classification restricts more people from seeing it."
+          end
+        end
+        post "escalation", root: "bug" do
+          authorize! :create, EscalationBug
+          unless 'Escalations' == permitted_params[:escalation_bug][:product]
+            error!('This API entry point is only for escalation bugs.', 400)
+          end
+
+          user = User.where(email: "vrt-incoming@sourcefire.com").first
+          EscalationBug.bugzilla_create_action(bugzilla_session, permitted_params[:escalation_bug], user: user)
         end
 
         desc "remove a bug from the db only"
@@ -409,8 +463,10 @@ module API
         end
         delete ":id", root: "bug" do
           begin
-            authorize! :destroy, Bug
-            Bug.destroy(permitted_params[:id])
+            authorize!(:destroy, ResearchBug)
+            bug = ResearchBug.find(permitted_params[:id])
+            authorize!(:destroy, bug)
+            bug.destroy
           rescue CanCan::AccessDenied => e
             error!({error: "Access denied.", message: e.message}, 200)
           end
@@ -423,9 +479,11 @@ module API
           # all the params we need to permit must to go here
         end
         post "close/:id", root: "bug" do
+          authorize!(:update, ResearchBug)
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             bug = Bug.where(id: permitted_params[:id])
+            authorize!(:update, bug)
             status = "resolved"
             resolution = "Fixed"
             return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
@@ -441,9 +499,11 @@ module API
           # all the params we need to permit must to go here
         end
         post "wontfix/:id", root: "bug" do
+          authorize!(:update, ResearchBug)
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             bug = Bug.where(id: permitted_params[:id])
+            authorize!(:update, bug)
             status = "resolved"
             resolution = "WontFix"
             return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
@@ -459,9 +519,11 @@ module API
           # all the params we need to permit must to go here
         end
         post "reopen/:id", root: "bug" do
+          authorize!(:update, ResearchBug)
           xmlrpc_token = request.headers['Xmlrpc-Token']
           if xmlrpc_token
             bug = Bug.where(id: permitted_params[:id]).first
+            authorize!(:update, bug)
             status = "REOPENED"
             resolution = "REOPENED"
             return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
@@ -473,9 +535,11 @@ module API
 
 
 
+        # TODO If this is from escalations, should it be in the escalations API?
         desc "reopen bugs from escalations"
 
         post "/reopen_bugs" do
+          authorize!(:update, ResearchBug)
           source_bug = Bug.find(params[:id])
           ids_to_reopen = params[:ids]
           comment_when_reopening = params[:comment]
@@ -488,6 +552,7 @@ module API
 
           bugs = Bug.where(:id => ids_to_reopen)
           bugs.each do |bug|
+            authorize!(:update, bug)
             source_bug.snort_blocker_bugs << bug
           end
           xmlrpc_token = request.headers['Xmlrpc-Token']
@@ -587,6 +652,7 @@ module API
           requires :description, type: String, desc: "required description of new bug"
         end
         post "/duplicate_bug" do
+          authorize!(:create, ResearchBug)
 
 
           if params[:id].blank?
@@ -618,7 +684,7 @@ module API
 
 
 
-          escalation_bug.snort_research_escalation_bugs << new_research_bug
+          escalation_bug.snort_research_bugs << new_research_bug
           escalation_bug.snort_blocker_bugs << new_research_bug
 
           research_bug_url = "/bugs/#{new_research_bug.id}"
@@ -633,7 +699,9 @@ module API
           requires :committer, type: Boolean, desc: "is this a committer subscribe"
         end
         post ':id/subscribe' do
+          authorize!(:read, ResearchBug)
           bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
+          authorize!(:read, bug)
           unless bug.nil?
             begin
               if params[:committer]
@@ -748,6 +816,7 @@ module API
           requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
         end
         patch ':bug_id/toggle_liberty' do
+          authorize!(:toggle_liberty, ResearchBug)
           bug = Bug.where(id: params['bug_id']).first
           raise 'bug not found' unless bug
           authorize!(:toggle_liberty, bug)
@@ -764,8 +833,10 @@ module API
         post "set_snort_security/:bug_id" do
           snort_secure = params[:snort_secure]
           begin
+            authorize!(:update, ResearchBug)
             ActiveRecord::Base.transaction do
               bug = Bug.find(params[:bug_id])
+              authorize!(:update, bug)
               bug.snort_secure = params[:snort_secure]
               bug.save
 
@@ -794,6 +865,7 @@ module API
           requires :sid, type: Integer, desc: "sid to search by"
         end
         get 'find_bugs_by_sid/:sid' do
+          authorize!(:index, ResearchBug)
           response = {}
           rule = Rule.where(sid: params['sid']).first
           if rule.blank?
@@ -803,6 +875,7 @@ module API
             response[:status] = "success"
             response[:data] = []
             rule.bugs.each do |bug|
+              authorize!(:read, ResearchBug)
               bug_data = {}
               bug_data[:id] = bug.id
               bug_data[:summary] = bug.summary
@@ -828,6 +901,7 @@ module API
           requires :relate_id, type: Integer, desc: "bugzilla id to relate to bug_id"
         end
         post 'relate_bug/:bug_id/:relate_id' do
+          authorize!(:create, EscalationLink)
           bug = Bug.where(id: params['bug_id']).first
           return {:error => 'bug not found'}.to_json unless bug
           related_bug = Bug.where(id: params['relate_id']).first
@@ -839,10 +913,10 @@ module API
             return {:error => 'cannot relate an escalation to another escalation'}.to_json
           end
           if bug.product == "Research" && related_bug.product == "Escalations"
-            bug.snort_escalation_research_bugs << related_bug  unless bug.snort_escalation_research_bugs.include? related_bug
+            bug.snort_escalation_bugs << related_bug  unless bug.snort_escalation_bugs.include? related_bug
           end
           if bug.product == "Escalations" && related_bug.product == "Research"
-            bug.snort_research_escalation_bugs << related_bug  unless bug.snort_research_escalation_bugs.include? related_bug
+            bug.snort_research_bugs << related_bug  unless bug.snort_research_bugs.include? related_bug
           end
           if bug.product == "Research" && related_bug.product == "Research"
             bug.snort_research_to_research_bugs << related_bug unless bug.snort_research_to_research_bugs.include? related_bug
@@ -857,15 +931,16 @@ module API
           requires :relate_id, type: Integer, desc: "related bugzilla id to remove"
         end
         delete 'remove_bug_relation/:bug_id/:relate_id' do
+          authorize!(:destroy, EscalationLink)
           bug = Bug.where(id: params['bug_id']).first
           return {:error => 'bug not found'}.to_json unless bug
           related_bug = Bug.where(id: params['relate_id']).first
           return {:error => 'related bug not found'}.to_json unless related_bug
           if bug.product == "Research" && related_bug.product == "Escalations"
-            bug.snort_escalation_research_bugs.delete(related_bug)  if bug.snort_escalation_research_bugs.include? related_bug
+            bug.snort_escalation_bugs.delete(related_bug)  if bug.snort_escalation_bugs.include? related_bug
           end
           if bug.product == "Escalations" && related_bug.product == "Research"
-            bug.snort_research_escalation_bugs.delete(related_bug)  if bug.snort_research_escalation_bugs.include? related_bug
+            bug.snort_research_bugs.delete(related_bug)  if bug.snort_research_bugs.include? related_bug
           end
           if bug.product == "Research" && related_bug.product == "Research"
             bug.snort_research_to_research_bugs.delete(related_bug)  if bug.snort_research_to_research_bugs.include? related_bug
@@ -888,6 +963,7 @@ module API
           bug.acknowledge_bug(permitted_params['comment'].nil? ? "Escalation has been acknowledged by #{bug.user&.display_name}." : permitted_params['comment'], xmlrpc)
         end
 
+        # TODO If this is on escalations should it be in the escalation API?
         desc "subscribe and acknowledge to a bug escalation"
         params do
           requires :id, type: String, desc: "id of the bug"
@@ -895,7 +971,9 @@ module API
           optional :comment, type: String, desc: "a comment about acknowledgeing the escalation"
         end
         post ':id/subscribe-acknowledge' do
+          authorize!(:acknowledge_bug, EscalationBug)
           bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
+          authorize!(:acknowledge_bug, bug)
           unless bug.nil?
             begin
               if params[:committer]

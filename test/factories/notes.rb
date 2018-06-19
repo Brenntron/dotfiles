@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :note do
     comment  'Just an average comment'
     note_type  'research'
