@@ -1,6 +1,8 @@
 class Dispute < ApplicationRecord
-
+  has_many :dispute_comments
+  has_many :dispute_emails
   has_many :dispute_entries
+  belongs_to :customer
 
   def is_assigned?
     (!self.assigned_to.nil? and !self.assigned_to.empty?)
@@ -33,6 +35,124 @@ class Dispute < ApplicationRecord
     else
       "%dm %ds" % [mm, ss]
     end
+  end
+
+  def self.process_bridge_payload(message_payload)
+    user = User.where(cvs_username:"vrtincom").first
+    #TODO: this should be put in a params method
+    message_payload["payload"] = message_payload["payload"].permit!.to_h
+    new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
+    new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+
+    #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
+
+    bug_factory = Bugzilla::Bug.new(message_payload[:bugzilla_session])
+
+    summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+      IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
+      URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
+      Problem Summary: #{message_payload["payload"]["problem"]}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations',
+        'component' => 'IP/Domain',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        # 'opsys' => self.os,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+
+    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
+
+
+    new_dispute = Dispute.new
+    new_dispute.id = bug_stub_hash["id"]
+    new_dispute.customer_name = message_payload["payload"]["name"]
+    new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
+    new_dispute.customer_email = message_payload["payload"]["email"]
+    new_dispute.org_domain = message_payload["payload"]["domain"]
+    new_dispute.case_opened_at = Time.now
+    new_dispute.subject = message_payload["payload"]["email_subject"]
+    new_dispute.description = message_payload["payload"]["email_body"]
+    new_dispute.problem_summary = message_payload["payload"]["problem"]
+    new_dispute.ticket_source_key = message_payload["source_key"]
+    new_dispute.ticket_source = "talos-intelligence"
+    new_dispute.ticket_source_type = message_payload["source_type"]
+    new_dispute.save
+
+    new_entries_ips.each do |key, entry|
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = new_dispute.id
+      new_dispute_entry.ip_address = key
+      new_dispute_entry.entry_type = "IP"
+      new_dispute_entry.score_type = "SBRS"
+      new_dispute_entry.score = entry["SBRS_SCORE"].to_f
+      new_dispute_entry.suggested_disposition = entry["reg_sugg"]
+      new_dispute_entry.save
+
+      if entry["SBRS_Rule_Hits"].present?
+        all_hits = entry["SBRS_Rule_Hits"].split(",")
+        all_hits.each do |rule_hit|
+          new_rule_hit = DisputeRuleHit.new
+          new_rule_hit.dispute_entry_id = new_dispute_entry.id
+          new_rule_hit.name = rule_hit.strip
+          new_rule_hit.save
+        end
+      end
+
+    end
+
+    new_entries_urls.each do |entry|
+
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = new_dispute.id
+      new_dispute_entry.ip_address = key
+      new_dispute_entry.entry_type = "DOMAIN"
+      new_dispute_entry.score_type = "WBRS"
+      new_dispute_entry.score = entry["WBRS_SCORE"].to_f
+      new_dispute_entry.suggested_disposition = entry["reg_sugg"]
+      new_dispute_entry.save
+
+      if entry["WBRS_Rule_Hits"].present?
+        all_hits = entry["WBRS_Rule_Hits"].split(",")
+        all_hits.each do |rule_hit|
+          new_rule_hit = DisputeRuleHit.new
+          new_rule_hit.dispute_entry_id = new_dispute_entry.id
+          new_rule_hit.name = rule_hit.strip
+          new_rule_hit.save
+        end
+      end
+
+    end
+
+
+    #build first official email of the new case
+
+    first_email = DisputeEmail.new
+    first_email.dispute_id = new_dispute.id
+    first_email.email_headers = nil
+    first_email.from = message_payload["payload"]["email"]
+    first_email.to = nil
+    first_email.subject = message_payload["payload"]["email_subject"]
+    first_email.body = message_payload["payload"]["email_body"]
+    first_email.status = DisputeEmail::UNREAD
+    first_email.save
+
+    #change this
+    return_message = {
+      "envelope":
+          {
+              "channel": "ticket-acknowledge",
+              "addressee": "talos-intelligence",
+              "sender": "analyst-console"
+          },
+      "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK"}
+    }
   end
 
   # Searches based on supplied fields and values.

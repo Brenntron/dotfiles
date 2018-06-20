@@ -28,10 +28,10 @@ class Bug < ApplicationRecord
 
   #self referential relationships
   ## for snort escalation bugs
-  has_many :research_escalation_bugs, :class_name => 'Escalation', :foreign_key => 'snort_escalation_research_bug_id'
-  has_many :snort_research_escalation_bugs, :through => :research_escalation_bugs
-  has_many :escalation_research_bugs, :class_name => 'Escalation', :foreign_key => 'snort_research_escalation_bug_id'
-  has_many :snort_escalation_research_bugs, :through => :escalation_research_bugs
+  has_many :research_bug_links, :class_name => 'EscalationLink', :foreign_key => 'snort_escalation_bug_id'
+  has_many :snort_research_bugs, :through => :research_bug_links
+  has_many :escalation_bug_links, :class_name => 'EscalationLink', :foreign_key => 'snort_research_bug_id'
+  has_many :snort_escalation_bugs, :through => :escalation_bug_links
 
   has_many :research_to_research_bugs, :class_name => 'SnortResearch', :foreign_key => 'bug_id'
   has_many :snort_research_to_research_bugs, :through => :research_to_research_bugs
@@ -68,8 +68,31 @@ class Bug < ApplicationRecord
   scope :research_bugs, -> { where(product: 'research') }
   scope :by_escalations, -> { where(:product => "escalations")}
 
+  scope :research_product, -> { where(:product => "Research")}
+  scope :escalation_product, -> { where(:product => "Escalations")}
+
+  #determines if this is a research bug by checking the bugzilla product in our database
+  def research_product?
+    "Research" == self.product
+  end
+
+  #determines if this is an escalation bug by checking the bugzilla product in our database
+  def escalation_product?
+    "Escalations" == self.product
+  end
+
+  #determines if this is a research bug by inherited method in ResearchBug which returns true
+  def research_bug?
+    false
+  end
+
+  #determines if this is an escalation bug by inherited method in ResearchBug which returns true
+  def escalation_bug?
+    false
+  end
+
   def snort_related_bugs(component)
-     "escalation"==component ? self.snort_escalation_research_bugs :  self.snort_research_escalation_bugs | self.snort_research_to_research_bugs
+     "escalation"==component ? self.snort_escalation_bugs :  self.snort_research_bugs | self.snort_research_to_research_bugs
   end
 
   attr_accessor :import_report
@@ -971,7 +994,7 @@ class Bug < ApplicationRecord
                 note = Note.where(id: c['id']).first
                 if note.present?
                   note.update_attributes({
-                    author:     c['author'],
+                    author:     c['creator'],
 		                comment:    comment,
 		                bug_id:     bug_id,
                     note_type:  note_type,
@@ -981,7 +1004,7 @@ class Bug < ApplicationRecord
                 else
                   Note.create({
 	                  id:         c['id'],
-                    author:     c['author'],
+                    author:     c['creator'],
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
@@ -1184,6 +1207,37 @@ class Bug < ApplicationRecord
 
   end
 
+  def resolve_blocked_bugs(bug_stub, current_user:, new_escalation_message:, new_escalation_state:)
+    snort_blocked_bugs.each do |blocked_bug|
+      options = {
+          :id => blocked_bug.bugzilla_id,
+          :comment => new_escalation_message,
+      }
+      new_note = bug_stub.add_comment(options)
+      Note.create(
+          :id => new_note['id'],
+          :comment => new_escalation_message,
+          :author => current_user.email,
+          :note_type => 'research',
+          :bug_id => blocked_bug.id,
+          :notes_bugzilla_id => new_note['id']
+      )
+
+      updated_bug_state = Bug.get_new_escalation_state(new_escalation_state)
+      blocked_bug.state = new_escalation_state
+      blocked_bug.status = updated_bug_state[:status]
+      blocked_bug.resolution = updated_bug_state[:resolution]
+      blocked_bug.save
+
+      updated_bug_options =
+          Bug.get_new_bug_state(blocked_bug, new_escalation_state, new_escalation_message, current_user.email)
+      updated_bug_options[:ids] = blocked_bug.id
+      bug_stub.update(updated_bug_options.to_h)
+
+    end
+    BugBlocker.where(snort_blocker_bug_id: self.id).delete_all
+  end
+
   # TODO Why is this a Bug class method when it takes a required bug object as an argument?
   # TODO Do we really have a method spanning 200 lines without an opportunity to break it into sub-methods?
   def self.process_bug_update(current_user, xmlrpc, bug, permitted_params, assignee:, committer:, new_escalation_message: nil, new_escalation_state: nil)
@@ -1193,7 +1247,18 @@ class Bug < ApplicationRecord
     initial_state = bug.state
 
     bug.initialize_report
-    bug_is_being_resolved = bug.state != "PENDING" ? false : true
+
+    is_becoming_resolved = ("PENDING" == permitted_params[:bug][:state]) && ("PENDING" != bug.state)
+
+    if is_becoming_resolved
+      bug.resolve_blocked_bugs(xmlrpc,
+                               current_user: current_user,
+                               new_escalation_message: new_escalation_message,
+                               new_escalation_state: new_escalation_state)
+      publish_research_notes(xmlrpc, current_user, bug)
+    end
+
+
 
     #add a comment to the existing committer note. from issue 981
     if permitted_params[:bug][:state_comment]
@@ -1231,7 +1296,7 @@ class Bug < ApplicationRecord
 
     if initial_state != "REOPENED" && permitted_params[:bug][:state] == "REOPENED"
       updated_bug_state[:qa_contact] = User.where(email: "vrt-qa@sourcefire.com").first
-      bug.snort_escalation_research_bugs.each do |blocked_bug|
+      bug.snort_escalation_bugs.each do |blocked_bug|
         bug.snort_blocked_bugs << blocked_bug
       end
     end
@@ -1349,42 +1414,6 @@ class Bug < ApplicationRecord
 
     bug.load_whiteboard_values
 
-    if bug.state == "PENDING" || (bug_is_being_resolved == true && bug.state != "PENDING")
-      bug_is_being_resolved = !bug_is_being_resolved
-    end
-
-    if bug_is_being_resolved
-      bug.snort_blocked_bugs.each do |blocked_bug|
-        options = {
-            :id => blocked_bug.id,
-            :comment => new_escalation_message,
-        }.reject() { |k, v| v.nil? }
-        new_note = xmlrpc.add_comment(options)
-        Note.create(
-            :id => new_note['id'],
-            :comment => new_escalation_message,
-            :author => current_user.email,
-            :note_type => 'research',
-            :bug_id => blocked_bug.id,
-            :notes_bugzilla_id => new_note['id']
-        )
-
-        updated_bug_state = Bug.get_new_escalation_state(new_escalation_state)
-        blocked_bug.state = new_escalation_state
-        blocked_bug.status = updated_bug_state[:status]
-        blocked_bug.resolution = updated_bug_state[:resolution]
-        blocked_bug.save
-
-        updated_bug_options =
-            Bug.get_new_bug_state(blocked_bug, new_escalation_state, new_escalation_message, current_user.email)
-        updated_bug_options[:ids] = blocked_bug.id
-        xmlrpc.update(updated_bug_options.to_h)
-
-      end
-      bug.snort_blocked_bugs.destroy_all
-      publish_research_notes(xmlrpc, current_user, bug)
-    end
-
   end
 
   ####END BUG UPDATE PROCESS WORKFLOW#############
@@ -1448,7 +1477,15 @@ class Bug < ApplicationRecord
 
 
         #Update Bug record attributes from bugzilla############
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
+        case
+          when bug
+            raise 'Can only process research bugs' unless bug.research_bug?
+          when 'Research' != item['product']
+            raise 'Can only import research bugs'
+          else
+            bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id, product: item['product'])
+        end
 
         bug.initialize_report
 
@@ -1609,7 +1646,7 @@ class Bug < ApplicationRecord
                 if note.present?
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
-                    note.update_attributes(author: c['author'],
+                    note.update_attributes(author: c['creator'],
                                            comment: comment,
                                            bug_id: bug_id,
                                            note_type: note_type,
@@ -1621,7 +1658,7 @@ class Bug < ApplicationRecord
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
                     Note.create(id: c['id'],
-                                author: c['author'],
+                                author: c['creator'],
                                 comment: comment,
                                 bug_id: bug_id,
                                 note_type: note_type,
@@ -1706,18 +1743,17 @@ class Bug < ApplicationRecord
 
 
 
-
-
-
-
-
-
-
-
   def self.bugzilla_import_escalation(current_user, xmlrpc, xmlrpc_token, new_bugs, progress_bar = nil, import_type = "import")
     import_type = import_type.blank? ? "import" : import_type
     total_bugs = []
-    unless new_bugs['bugs'].empty?
+    if new_bugs['bugs'].empty?
+      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
+        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
+        raise message
+      else
+        raise "there was a problem importing from Bugzilla."
+      end
+    else
       new_bugs['bugs'].each do |item|
 
         progress_bar.update_attribute("progress", 10) unless progress_bar.blank?
@@ -1738,7 +1774,16 @@ class Bug < ApplicationRecord
 
 
         #Update Bug record attributes from bugzilla############
-        bug = Bug.find_or_create_by(bugzilla_id: bug_id)
+        bug = Bug.where(bugzilla_id: bug_id).first
+        case
+          when bug
+            raise 'Can only process escalation bugs' unless bug.escalation_bug?
+          when 'Escalations' != item['product']
+            raise 'Can only import escalation bugs'
+          else
+            bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id, product: item['product'])
+        end
+
 
         bug.initialize_report
 
@@ -1859,7 +1904,7 @@ class Bug < ApplicationRecord
                 if note.present?
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
-                    note.update_attributes(author: c['author'],
+                    note.update_attributes(author: c['creator'],
                                            comment: comment,
                                            bug_id: bug_id,
                                            note_type: note_type,
@@ -1871,7 +1916,7 @@ class Bug < ApplicationRecord
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
                     Note.create(id: c['id'],
-                                author: c['author'],
+                                author: c['creator'],
                                 comment: comment,
                                 bug_id: bug_id,
                                 note_type: note_type,
@@ -1937,13 +1982,6 @@ class Bug < ApplicationRecord
         total_bugs << bug
 
       end
-    else
-      if new_bugs.has_key?("faults") && !new_bugs["faults"].empty?
-        message = new_bugs["faults"].map {|f| f['faultString']}.join(',')
-        raise message
-      else
-        raise "there was a problem importing from Bugzilla."
-      end
     end
     return total_bugs
   end
@@ -1963,7 +2001,13 @@ class Bug < ApplicationRecord
             bug.save!
           end
         else
-          new_record = Bug.new(bugzilla_id: bug_id)
+          new_record =
+              case item['product']
+                when 'Research'
+                  ResearchBug.new(bugzilla_id: bug_id)
+                when 'Escalations'
+                  EscalationBug.new(bugzilla_id: bug_id)
+              end
 
           new_record.id             = bug_id
           new_record.summary        = item['summary']
@@ -2164,11 +2208,11 @@ class Bug < ApplicationRecord
   end
 
   def has_any_reopenable_bugs
-    snort_research_escalation_bugs.any? {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
+    snort_research_bugs.any? {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
   end
 
   def reopenable_bugs
-    snort_research_escalation_bugs.select {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
+    snort_research_bugs.select {|bug| ['PENDING', 'FIXED', 'WONTFIX', 'LATER'].include? bug.state}
   end
 
   def self.search(query_str, terms, range)
@@ -2247,10 +2291,18 @@ class Bug < ApplicationRecord
     bugzilla_bug_options = options.merge('assigned_to' => user&.email || 'vrt-incoming@sourcefire.com')
     bug_stub_hash = bug_factory.create(bugzilla_bug_options)
 
-    Bug.create!(options.merge(id: bug_stub_hash["id"],
-                              bugzilla_id: bug_stub_hash["id"],
-                              state: bug_attrs['state'] || 'OPEN',
-                              user_id: user&.id))
+    case options['product']
+      when 'Research'
+        ResearchBug.create!(options.merge(id: bug_stub_hash["id"],
+                                          bugzilla_id: bug_stub_hash["id"],
+                                          state: bug_attrs['state'] || 'OPEN',
+                                          user_id: user&.id))
+      when 'Escalations'
+        EscalationBug.create!(options.merge(id: bug_stub_hash["id"],
+                                            bugzilla_id: bug_stub_hash["id"],
+                                            state: bug_attrs['state'] || 'OPEN',
+                                            user_id: user&.id))
+    end
   end
 
   # Creates a new bug in bugzilla and related records and objects.
@@ -2258,7 +2310,6 @@ class Bug < ApplicationRecord
   # @param [Hash] bug_attrs values for active record attributes on bug model.
   # @param [User] user assgined to bug.
   def self.bugzilla_create_action(bugzilla_session, bug_attrs, user:)
-
     # object for distributed interface for bug factory
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
@@ -2482,11 +2533,11 @@ class Bug < ApplicationRecord
     new_bug_attrs[:created_at]          = bugzilla_bugs['bugs'].first['creation_time'].to_time
     new_bug_attrs[:creator]             = current_user.id.to_s
 
-    new_research_bug = Bug.create!(new_bug_attrs.merge(id: bugzilla_id,
-                                                   bugzilla_id: bugzilla_id,
-                                                   user_id: default_assigned_to_user.id,
-                                                   state: "NEW"
-                                  ))
+    new_research_bug = ResearchBug.create!(new_bug_attrs.merge(id: bugzilla_id,
+                                                               product: "Research",
+                                                               bugzilla_id: bugzilla_id,
+                                                               user_id: default_assigned_to_user.id,
+                                                               state: "NEW"))
 
     if new_research_notes.present?
       new_research_bug.research_notes = new_research_notes
@@ -2510,7 +2561,7 @@ class Bug < ApplicationRecord
         note = Note.where(id: comment_curr['id']).first
         if note.present?
           note.update_attributes({
-                                     author:     comment_curr['author'],
+                                     author:     comment_curr['creator'],
                                      comment:    comment,
                                      bug_id:     bugzilla_id,
                                      note_type:  note_type,
@@ -2520,7 +2571,7 @@ class Bug < ApplicationRecord
         else
           Note.create({
                           id:         comment_curr['id'],
-                          author:     comment_curr['author'],
+                          author:     comment_curr['creator'],
                           comment:    comment,
                           bug_id:     bugzilla_id,
                           note_type:  note_type,
@@ -2529,6 +2580,9 @@ class Bug < ApplicationRecord
                       })
         end
       end
+
+      bug_factory.update(ids: self.bugzilla_id,
+                         depends_on: {add: [new_research_bug.bugzilla_id]})
     end
 
 
