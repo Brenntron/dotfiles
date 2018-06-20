@@ -1,6 +1,6 @@
 Given(/^the following dispute comments exist:$/) do |dispute_comments|
   dispute_comments.hashes.each do |dispute_comment|
-    FactoryGirl.create(:dispute_comment, dispute_comment)
+    FactoryBot.create(:dispute_comment, dispute_comment)
   end
 end
 

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :email_template do
     template_name 'PSB'
     description 'describing a template'

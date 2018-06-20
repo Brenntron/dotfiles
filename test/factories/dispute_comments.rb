@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :dispute_comment do
     dispute_id 1
     comment "this is a test comment"
