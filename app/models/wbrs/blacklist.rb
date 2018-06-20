@@ -1,15 +1,16 @@
 class Wbrs::Blacklist < Wbrs::Base
-  FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
+  FIELD_NAMES = %w{entry entries disposition public excluded classifications manual_classifications class_id
                    expiration hostname author primary_source metadata seen_by comment
                    rev first_seen last_seen stale}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
 
-  validates :entry, presence: true
+  validates :entries, presence: true
 
   def initialize(attributes = {})
     super
+    self.entries ||= [ self.entry ]
     @new_record = true
   end
 
@@ -38,11 +39,18 @@ class Wbrs::Blacklist < Wbrs::Base
   end
 
   def attributes
-    { entry: author,
-      author: author,
-      public: public?,
-      excluded: excluded?,
-      comment: comment }
+    {
+        entry: entry,
+        author: author,
+        public: public?,
+        excluded: excluded?,
+        comment: comment,
+        classifications: classifications || []
+    }
+  end
+
+  def save_attributes
+    attributes.slice(*%w{entry comment author classifications})
   end
 
   def self.where(conditions = {})
@@ -65,11 +73,11 @@ class Wbrs::Blacklist < Wbrs::Base
     raise "Validation failed: #{errors.full_messages.join(', ')}" unless valid?
 
     if new_record?
-      call_json_request(:post, '/blacklist/add', body: stringkey_params(attributes))
+      call_json_request(:post, '/blacklist/add', body: stringkey_params(save_attributes))
       @new_record = false
       true
     else
-      call_json_request(:post, '/blacklist/add', body: stringkey_params(attributes))
+      call_json_request(:post, '/blacklist/add', body: stringkey_params(save_attributes))
       @new_record = false
       true
     end

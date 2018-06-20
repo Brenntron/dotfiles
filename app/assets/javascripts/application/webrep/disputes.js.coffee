@@ -44,3 +44,72 @@ window.populate_webrep_my_table = () ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
+window.row_add_wlbl_button =(button_tag) ->
+  wlbl_form = button_tag.form;
+  data = {
+    'urls': [ wlbl_form.getElementsByClassName('adjust-wlbl-urls-input')[0].value ]
+    'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
+    #'thrt_cats': wlbl_form.find('.adjust-wlbl-thrt_cats-list-input').val()
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep_disputes/disputes/wlbl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+  )
+
+window.toolbar_add_wlbl_button =(button_tag) ->
+  wlbl_form = button_tag.form
+  data = {
+    'urls': [ wlbl_form.getElementsByClassName('adjust-wlbl-urls-input')[0].value ]
+    'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
+    #'thrt_cats': wlbl_form.find('.adjust-wlbl-thrt_cats-list-input').val()
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep_disputes/disputes/wlbl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+  )
+
+
+window.row_add_reptool_bl_button =(button_tag) ->
+  reptool_bl_form = button_tag.form
+  data = {
+    'entries': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-entries-input')[0].value ]
+    'classifications': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('adjust-reptool-bl-comment-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep_disputes/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+  )
+
+window.toolbar_add_reptool_bl_button =(button_tag) ->
+  reptool_bl_form = button_tag.form
+  data = {
+    'entries': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-entries-input')[0].value ]
+    'classifications': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('adjust-reptool-bl-comment-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep_disputes/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+  )
+
+
