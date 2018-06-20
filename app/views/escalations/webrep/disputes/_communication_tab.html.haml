@@ -139,8 +139,8 @@
               %td=template.template_name
               %td=template.description
               %td
-                %button.table-button.edit-button
-                %button.table-button.delete-button
+                %button.table-button.edit-button.edit-template{template_id: template.id}
+                %button.table-button.delete-button.delete-template{template_id: template.id}
 
       #new-template-form-wrapper
         %h4.dialog-inset-header New Email Template
@@ -153,11 +153,27 @@
           .template-content-wrapper
             %textarea.template-content#new-template-body
 
+      #edit-template-form-wrapper
+        %h4.dialog-inset-header Edit Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#edit-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#edit-template-desc{required: true, type: 'text', name: 'template-description'}
+            %input.hidden#template-id
+          .template-content-wrapper
+            %textarea.template-content#edit-template-body
+
       .dialog-section-divider
         %button.primary#save-email-template.hidden
           Save Template
         %button.secondary#create-email-template
           Create New Template
+        %button.primary#edit-email-template.hidden
+          Update Template
+        %button.secondary.hidden#cancel-edit-email-template
+          Cancel
 
 
     .row

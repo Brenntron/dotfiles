@@ -169,25 +169,6 @@ $ ->
       )
 
 
-  # Email Template Create/Update/Delete
-
-  $('#save-email-template').on 'click', (e) ->
-    template_name = $('#new-template-name')[0].value
-    description = $('#new-template-desc')[0].value
-    body = $('#new-template-body')[0].value
-
-    std_msg_ajax(
-      method: 'POST'
-      url: "/api/v1/escalations/webrep/email_templates"
-      data: {template_name: template_name, description: description, body: body}
-      success_reload: false
-      success: (response) ->
-        std_msg_success('Email Template Created.', [], reload: true)
-      error: (response) ->
-        std_api_error(response, "There creating the email template.", reload: false)
-    )
-
-
 
     # Notes (Comments) related communications stuff
     # Delete Note
@@ -292,6 +273,96 @@ $ ->
     $('#manageTemplatesDialog').dialog 'open'
     return
 
+  ## Manage Email Templates
+
+  $('.edit-template').on 'click', ->
+    $('#edit-template-form-wrapper').show()
+    $('#edit-template-form-wrapper').contents().show()
+    $('#create-email-template').hide()
+    $('#edit-email-template').removeClass('hidden')
+    $('#cancel-edit-email-template').removeClass('hidden')
+    $('#edit-template-form-wrapper').animate {
+      height: 200
+      borderWidth: '1px'
+    }, 300
+     # get the template and display stuff
+    template_id = $(this).attr('template_id')
+    std_msg_ajax(
+      method: 'GET'
+      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $('#edit-template-name')[0].value = response[0].template_name
+        $('#edit-template-desc')[0].value = response[0].description
+        $('#edit-template-body')[0].value = response[0].body
+        $('#template-id')[0].value = response[0].id
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+    )
+
+
+  $('#cancel-edit-email-template').on 'click', ->
+    $('#edit-template-form-wrapper').contents().hide()
+    $('#create-email-template').hide()
+    $('#save-email-template').addClass('hidden')
+    $('#create-email-template').show()
+    $('#cancel-edit-email-template').addClass('hidden')
+    $('#edit-email-template').addClass('hidden')
+    $('#edit-template-form-wrapper').animate {
+      height: 0
+      borderWidth: 0
+    }
+
+  $('#edit-email-template').on 'click', ->
+    template_id = $('#template-id')[0].value
+    template_name = $('#edit-template-name')[0].value
+    description = $('#edit-template-desc')[0].value
+    body = $('#edit-template-body')[0].value
+
+    std_msg_ajax(
+      method: 'PUT'
+      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      data: {template_name: template_name, description: description, body: body}
+      success_reload: true
+      success: (response) ->
+        std_msg_success('Email Template Updated.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There was an error updating the email template.", reload: false)
+    )
+
+  $('.delete-template').on 'click', ->
+    template_id = $(this).attr('template_id')
+    confirmation = confirm('Are you sure you want to delete this template?')
+
+    if confirmation
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+        success_reload: true
+        success: (response) ->
+          std_msg_success('Email Templated Deleted.', [], reload: true)
+        error: (response) ->
+          std_api_error(response, "Email Template could not be deleted.", reload: false)
+      )
+
+
+  $('#save-email-template').on 'click', (e) ->
+    template_name = $('#new-template-name')[0].value
+    description = $('#new-template-desc')[0].value
+    body = $('#new-template-body')[0].value
+
+    std_msg_ajax(
+      method: 'POST'
+      url: "/api/v1/escalations/webrep/email_templates"
+      data: {template_name: template_name, description: description, body: body}
+      success_reload: false
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Email Template Created.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There was an error creating the email template.", reload: false)
+    )
+
   state = true
   $('#create-email-template').on 'click', ->
     if state
@@ -316,3 +387,4 @@ $ ->
     return
 
   return
+
