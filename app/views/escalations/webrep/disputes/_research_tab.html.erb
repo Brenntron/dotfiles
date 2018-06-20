@@ -265,16 +265,6 @@
               <td class="text-center sbrs-highlight"><%= entry.score unless entry.score_type != "SBRS" %></td>
               <td class="text-center">0</td>
               <td>WL - Medium</td>
-              <!--<td>-->
-                <!--<div id="adjust-reptool-bl-div">-->
-                  <!--<%= simple_form_for :reptool, html: {id: 'adjust-reptool-form'} do |reptool_form| %>-->
-                    <!--<%= reptool_form.input :entries, collection: [ 'paragon-downloads.com/j', 'paragon-downloads.com/k', 'paragon-downloads.com/m', 'paragon-downloads.com/n'  ], input_html: { id: 'adjust-reptool-bl-entries', multiple: true } %>-->
-                    <!--<%= reptool_form.input :classifications, collection: Wbrs::Blacklist.classifications, input_html: { id: 'adjust-reptool-bl-classifications', multiple: true } %>-->
-                    <!--<%= reptool_form.input :comment, input_html: { id: 'adjust-reptool-bl-comment' } %>-->
-                    <!--<%= reptool_form.button :button, 'Add Reptool BL', type: :button, onclick: 'add_reptool_bl_button();' %>-->
-                  <!--<% end %>-->
-                <!--</div>-->
-              <!--</td>-->
             </tr>
             <tr class="nested-data-row">
               <td colspan="2"><!-- Spacer for checkbox and tools --></td>
