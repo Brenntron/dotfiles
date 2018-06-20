@@ -13,6 +13,7 @@
  *= require global
  *= require admin-snort-doc
  *= require rule-docs
-
+ *= require webcat_dashboard
+ *= require webcat_complaints
 
 */

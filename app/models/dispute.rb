@@ -3,6 +3,40 @@ class Dispute < ApplicationRecord
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
+  belongs_to :customer
+
+  def is_assigned?
+    (!self.assigned_to.nil? and !self.assigned_to.empty?)
+  end
+
+  def assignee
+    is_assigned? ? assigned_to : "Unassigned"
+  end
+
+  def suggested_d
+    # had this as an unless earlier ... also, the .first should be replaced by some sort
+    # of null coalesece
+    if dispute_entries.empty? or dispute_entries.first[:suggested_disposition].nil?
+      "None"
+    else
+      dispute_entries.first[:suggested_disposition]
+    end
+  end
+
+  def dispute_age
+    age = case_opened_at - DateTime.now
+    age = age.abs # lazy
+    mm, ss = age.divmod(60)
+    hh, mm = mm.divmod(60)
+    dd, hh = hh.divmod(24)
+    if dd > 0
+      "%dd %dh" % [dd, hh]
+    elsif hh > 0
+      "%dh %dm" % [hh, mm]
+    else
+      "%dm %ds" % [mm, ss]
+    end
+  end
 
   def compose_versioned_items
     versioned_items = [self]
@@ -15,8 +49,10 @@ class Dispute < ApplicationRecord
 
   def self.process_bridge_payload(message_payload)
     user = User.where(cvs_username:"vrtincom").first
-    new_entries_ips = message_payload["payload"]["investigate_ips"]
-    new_entries_urls = message_payload["payload"]["investigate_urls"]
+    #TODO: this should be put in a params method
+    message_payload["payload"] = message_payload["payload"].permit!.to_h
+    new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
+    new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
 
     #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
@@ -110,9 +146,9 @@ class Dispute < ApplicationRecord
     first_email = DisputeEmail.new
     first_email.dispute_id = new_dispute.id
     first_email.email_headers = nil
-    first_email.from = message_payload["payload"]["email_subject"]
+    first_email.from = message_payload["payload"]["email"]
     first_email.to = nil
-    first_email.subject = message_payload["payload"]["subject"]
+    first_email.subject = message_payload["payload"]["email_subject"]
     first_email.body = message_payload["payload"]["email_body"]
     first_email.status = DisputeEmail::UNREAD
     first_email.save

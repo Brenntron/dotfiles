@@ -3,6 +3,7 @@ class DisputeEmail < ApplicationRecord
   has_many :dispute_email_attachments
 
   EMAIL_DOMAIN = "email.talosintelligence.com"
+  NOREPLY      = "noreply"
 
   UNREAD   = "unread"
   READ     = "read"
@@ -11,23 +12,46 @@ class DisputeEmail < ApplicationRecord
 
   REFERENCE_TEMPLATE = "ref-CASEID-anco"
 
-  def self.process_bridge_payload(message_payload, xmlrpc, user)
+  def self.process_bridge_payload(message_payload)
+
+    xmlrpc = message_payload[:bugzilla_session]
+    user = message_payload[:current_user] 
 
     #check envelope for case validity
-    case_id = find_case_number_in_email(message_payload)
+    case_id = find_case_number_in_email(message_payload["payload"])
 
     if case_id.blank?
       #create email to instruct user to use TI form and send to bridge
-      return
+      return_message = {}
+
+      bad_email_args = {}
+      bad_email_args[:to] = message_payload["payload"]["from"]
+      bad_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+      bad_email_args[:subject] = bad_gateway_subject
+      bad_email_args[:body] = bad_gateway_body
+
+      attachments_to_mail = []
+      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
+      conn.post(bad_email_args, attachments_to_mail)
+
+      return {
+          "envelope":
+              {
+                  "channel": "email-acknowledge",
+                  "addressee": "talos-intelligence",
+                  "sender": "analyst-console"
+              },
+          "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
+      }
     end
 
     new_email = DisputeEmail.new
     new_email.dispute_id = case_id
     new_email.email_headers = message_payload["payload"]["headers"]
-    new_email.from = message_payload["payload"]["headers"]
+    new_email.from = message_payload["payload"]["from"]
     new_email.to = message_payload["payload"]["to"]
     new_email.subject = message_payload["payload"]["subject"]
-    new_email.body = message_payload["payload"]["to"]
+    new_email.body = message_payload["payload"]["text"]
     new_email.status = UNREAD
     new_email.save
 
@@ -46,7 +70,7 @@ class DisputeEmail < ApplicationRecord
                 "addressee": "talos-intelligence",
                 "sender": "analyst-console"
             },
-        "message": {"source_key":params[:source_key],"ac_status":"CREATE_ACK"}
+        "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
     }
 
     return_message
@@ -54,6 +78,7 @@ class DisputeEmail < ApplicationRecord
 
   ## FORMAT FOR AN EXTERNAL FACING CASE NUMBER IS:  ref-[dispute#id]-anco   example: ref-325302-anco wher 325302 is the ID of a record in disputes table
   def self.find_case_number_in_email(message_payload)
+
     email_address = message_payload['to']
     email_body = message_payload['text']
 
@@ -74,7 +99,14 @@ class DisputeEmail < ApplicationRecord
     if email_case != body_case
       #### figure this out later
       #### thinking possibly create a new dispute with a 'suggested' related case
-      return email_case
+      if email_case.present?
+        return email_case
+      elsif body_case.present?
+        return body_case
+      else
+        return nil
+      end
+
     end
 
     return nil
@@ -89,6 +121,7 @@ class DisputeEmail < ApplicationRecord
     new_email.subject = params[:subject]
     new_email.body = append_case_number(params[:body], params[:dispute_id])
     new_email.status = SENT
+    new_email.email_sent_at = Time.now
     new_email.save
 
     attachments_to_mail = []
@@ -97,13 +130,14 @@ class DisputeEmail < ApplicationRecord
       params[:attachments].each do |key, attachment|
 
         payload = {}
-        payload[:file_name] = attachment.original_filename
-        payload[:file_content] = File.open(attachment.tempfile)
-        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email)
-        new_local_attachment.push_to_aws(attachment)
+        payload[:file_name] = attachment.filename
+        payload[:file_content] = attachment.tempfile
+        payload[:content_type] = attachment.type
+        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email, false)
+        s3_file_path = new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
         new_attachment[:file_name] = attachment.original_filename
-        new_attachment[:file_url] = new_local_attachment.s3_url
+        new_attachment[:file_url] = new_local_attachment.s3_url(s3_file_path)
         attachments_to_mail << new_attachment
       end
     end
@@ -113,11 +147,9 @@ class DisputeEmail < ApplicationRecord
     email_args[:from] = generate_case_email_address(params[:dispute_id])
     email_args[:subject] = new_email.subject
     email_args[:body] = new_email.body
+    email_args[:dispute_email_id] = new_email.id
 
     new_email.reload
-    if new_email.dispute_email_attachments.present?
-      email_args[:attachments]
-    end
 
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
@@ -141,7 +173,7 @@ class DisputeEmail < ApplicationRecord
       new_body += "\n\n"
       new_body += "-------------------------------------------------------------------------------------------------\n"
       new_body += "Please Do Not Remove This Reference Number.  Keep This Reference Number In The Email Chain:\n"
-      new_body += "#{case_number}"
+      new_body += "#{REFERENCE_TEMPLATE.gsub('CASEID', case_number.to_s)}\n"
       new_body += "-------------------------------------------------------------------------------------------------\n"
     end
 
@@ -152,5 +184,23 @@ class DisputeEmail < ApplicationRecord
     return new_body
 
   end
+
+
+  ## AUTO EMAIL MANAGEMENT
+
+  def self.bad_gateway_subject
+    "THINGS"
+  end
+
+  def self.bad_gateway_body
+    <<-BADGATEWAY
+
+      THIS IS THE BODY OF A BAD GATEWAY EMAIL THAT INSTRUCTS HOW TO USE TALOS INTELLIGENCE TO START A NEW CASE
+
+    BADGATEWAY
+  end
+
+
+
 
 end

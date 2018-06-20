@@ -45,6 +45,7 @@ module API
                 #temporary, for development, don't wanna be sending these to actual customers
                 params[:to] = "claclair@cisco.com"
 
+
                 new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
 
                 if params[:dispute_email_id].present?
@@ -55,7 +56,7 @@ module API
 
                 return ""
               rescue Exception => e
-                Rails.logger.info e
+                Rails.logger.error e
                 raise "There was an error in attempting to send an email."
               end
 

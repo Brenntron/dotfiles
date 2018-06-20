@@ -15,17 +15,13 @@ class Bridge::MessagesController < ApplicationController
     case envelope_params["sender"]
       when "snort-org"
         fp_create(false_positive_params)
-      when "talos-ingelligence"
-        if params[:message][:source_info][:source_type].present?
-          obj_type = params[:message][:source_info][:source_type]
-          params[:message][:source_info][obj_type.downcase.to_sym][:bugzilla_session] = bugzilla_session
-          params[:message][:source_info][obj_type.downcase.to_sym][:current_user] = current_user
-          return_message = obj_type.constantize.process_bridge_payload(params[:message][:source_info][obj_type.downcase.to_sym])
-        else
-          return_message = {
+      when "talos-intelligence"
+        obj_type_key = message_params.keys.first
+        obj_type = obj_type_key.to_s.camelize
+        message_params[obj_type_key][:bugzilla_session] = bugzilla_session
+        message_params[obj_type_key][:current_user] = current_user
+        return_message = obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
 
-          }
-        end
         render json: return_message, status: :ok
       else
         return_message = {
@@ -82,7 +78,7 @@ class Bridge::MessagesController < ApplicationController
                 "addressee": "snort-org",
                 "sender": "analyst-console"
             },
-        "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK"},
+        "message": {"source_key":message_params["source_key"],"ac_status":"CREATE_ACK"},
     }
     render json: return_message, status: :ok
 
@@ -120,7 +116,8 @@ class Bridge::MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message)
+    #TODO: use stronger permitting here eventually
+    params.require(:message).permit!
   end
 
   def false_positive_params
