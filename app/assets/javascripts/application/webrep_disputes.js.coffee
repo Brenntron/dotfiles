@@ -62,6 +62,24 @@ window.row_add_wlbl_button =(button_tag) ->
     dataType: 'json'
   )
 
+window.toolbar_add_wlbl_button =(button_tag) ->
+  debugger
+  wlbl_form = button_tag.form;
+  data = {
+    'urls': [ wlbl_form.getElementsByClassName('adjust-wlbl-urls-input')[0].value ]
+    'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
+    #'thrt_cats': wlbl_form.find('.adjust-wlbl-thrt_cats-list-input').val()
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep_disputes/disputes/wlbl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+  )
+
 
 window.add_reptool_bl_button = ->
   reptool_bl_form = $('#adjust-reptool-form')

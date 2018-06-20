@@ -44,6 +44,7 @@
               <div class="dropdown-menu toolbar-dropdown" id="wlbl_adjust_entries" aria-labelledby="wlbl_entries_button">
                 <!-- For each checked checkbox populate this information -->
                 <%= form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form| %>
+                  <input type="hidden" value="paragon-downloads.com" class="adjust-wlbl-urls-input"/>
                 <div class="dispute-name-wrapper">
                   <label class="content-label-sm">Dispute</label><br/>
                   paragon-downloads.com <!-- dispute name -->
@@ -68,7 +69,7 @@
                   <div class="toolbar">
                     <div>
                       <label class="toolbar-section-label">WL/BL List</label>
-                      <select class="toolbar-select select-status" title="RepTool Rule Status">
+                      <select class="toolbar-select select-status adjust-wlbl-trgt_list-input" title="RepTool Rule Status">
                         <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
                         <!-- Put all WL/BL options here  -->
                         <%= Wbrs::ManualWlbl.types.each do |type_name| %>
@@ -79,10 +80,10 @@
                   </div>
                   <label class="content-label-sm">Comment</label>
                   <!-- Comment boxes should only be shown after something other than the original settings is selected -->
-                  <textarea class="dropdown-comment"></textarea>
+                  <textarea class="dropdown-comment adjust-wlbl-note-input"></textarea>
                   <!--- End of per checked checkbox loop -->
                   <button class="secondary">Preview</button>
-                  <button type="button" class="primary" onclick="add_wlbl_button(this);">Submit Changes</button>
+                  <button type="button" class="primary" onclick="toolbar_add_wlbl_button(this);">Submit Changes</button>
                 </div>
                 <% end %>
               </div>
