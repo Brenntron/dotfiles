@@ -276,16 +276,8 @@ $ ->
   ## Manage Email Templates
 
   $('.edit-template').on 'click', ->
-    $('#edit-template-form-wrapper').show()
-    $('#edit-template-form-wrapper').contents().show()
-    $('#create-email-template').hide()
-    $('#edit-email-template').removeClass('hidden')
-    $('#cancel-edit-email-template').removeClass('hidden')
-    $('#edit-template-form-wrapper').animate {
-      height: 200
-      borderWidth: '1px'
-    }, 300
-     # get the template and display stuff
+    populate_template_details()
+
     template_id = $(this).attr('template_id')
     std_msg_ajax(
       method: 'GET'
@@ -299,6 +291,18 @@ $ ->
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
+
+  populate_template_details =  ->
+    $('#edit-template-form-wrapper').show()
+    $('#edit-template-form-wrapper').contents().show()
+    $('#create-email-template').hide()
+    $('#edit-email-template').removeClass('hidden')
+    $('#cancel-edit-email-template').removeClass('hidden')
+    $('#edit-template-form-wrapper').animate {
+      height: 200
+      borderWidth: '1px'
+    }, 300
+
 
 
   $('#cancel-edit-email-template').on 'click', ->
