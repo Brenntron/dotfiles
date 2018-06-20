@@ -6,8 +6,7 @@ Feature: Webrep communications
 
   @javascript
   Scenario: there should be a difference between read and unread emails
-  Given a user with role "admin" exists and is logged in
-
+    Given a user with role "admin" exists and is logged in
     And the following disputes exist:
       | id     |
       | 722    |

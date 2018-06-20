@@ -15,6 +15,7 @@ class EditedRuleValidator < ActiveModel::Validator
     rule.errors.add(:gid, 'must be 1') unless 1 == rule.gid
     rule.errors.add(:sid, 'cannot be blank') unless rule.sid.present?
     rule.errors.add(:rev, 'cannot be blank') unless rule.rev.present?
+    rule.errors.add(:state, 'incorrect for edit_status EDIT') if %w{NEW UNCHANGED}.include?(rule.state)
 
     # rule.errors.add(:rule_content, 'cannot be blank') unless rule.rule_content.present?
     rule.errors.add(:rule_parsed, 'cannot be blank') unless rule.rule_parsed.present?

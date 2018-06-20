@@ -16,6 +16,7 @@ class SynchedRuleValidator < ActiveModel::Validator
     rule.errors.add(:gid, 'cannot be blank') unless rule.gid.present?
     rule.errors.add(:sid, 'cannot be blank') unless rule.sid.present?
     rule.errors.add(:rev, 'cannot be blank') unless rule.rev.present?
+    rule.errors.add(:state, 'incorrect for edit_status SYNCHED') unless %w{UNCHANGED FAILED DELETED}.include?(rule.state)
 
     # rule.errors.add(:rule_content, 'cannot be blank') unless rule.rule_content.present?
     if 1 == rule.gid

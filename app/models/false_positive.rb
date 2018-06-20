@@ -133,8 +133,13 @@ PCAP Utility: #{pcap_lib}
     if where(source_authority: sender, source_key: attrs['source_key']).exists?
       where(source_authority: sender, source_key: attrs['source_key']).delete_all
     end
-    create(attrs["fp_attrs"].merge(source_authority: sender, user_email:attrs["user_email"], source_key: attrs['source_key'])).tap do |false_positive|
-      false_positive.save_attachments_from_params(attachments_attrs: attachments_attrs["attachments"])
+    fp_attrs = attrs.fetch('fp_attrs', {})
+    create_attrs =
+        fp_attrs.merge(source_authority: sender,
+                       user_email: attrs["user_email"],
+                       source_key: attrs['source_key'])
+    create(create_attrs).tap do |false_positive|
+      false_positive.save_attachments_from_params(attachments_attrs: attachments_attrs.fetch("attachments", []))
     end
   end
 
