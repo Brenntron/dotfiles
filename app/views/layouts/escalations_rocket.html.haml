@@ -7,8 +7,6 @@
     = csrf_meta_tags
 
   %body{class: "rocket-layout #{controller_path.gsub('/', '--')}-controller #{action_name}-action"}
-
-    = render '/shared/alert_modal'
  
     #sidenav-icons-div
       %input{id: 'nav-trigger', type: 'checkbox', hidden: 'hidden'}
@@ -138,18 +136,12 @@
 
     #page-wrapper
 
+      -# move/adjust this? especially since "My Dashboard" has name &c.
       %nav{id: "nav-banner"}
         = content_for(:nav_banner) if content_for?(:nav_banner)
-
-        - if current_user
-          #login-div.nav-tool-block.col-xs-1.col-sm-3.col-lg-4
-            %a{href: "/users/#{current_user[:id]}"}
-              = current_user[:display_name]
-
-          -##username= current_user.cvs_username
-
+        = render "escalations/webcat/shared/rocket_nav"
+        %div
 
 
       #page-content-wrapper
         =yield
-
