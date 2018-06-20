@@ -95,6 +95,8 @@
                 </span>
               </button>
               <div class="dropdown-menu toolbar-dropdown" id="reptool_adjust_entries" aria-labelledby="reptool_entries_button">
+                <%= form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form| %>
+                  <input type="hidden" value="paragon-downloads.com" class="adjust-reptool-bl-entries-input"/>
                 <!-- For each checked checkbox populate this information -->
                 <div class="dispute-name-wrapper">
                   <label class="content-label-sm">Dispute</label><br/>
@@ -123,17 +125,21 @@
                     </div>
                     <div>
                       <label class="toolbar-section-label">RepTool BL</label>
-                      <select class="toolbar-select select-rt-rule" title="RepTool BL Rules">
+                      <select class="toolbar-select select-rt-rule adjust-reptool-bl-classifications-input" title="RepTool BL Rules">
                         <option selected value="trd_sus">trd_sus</option><!-- Put current entry's rule here as the selected option -->
                         <!-- Put all other rule options here (trd_spam, trd_mal, etc.) -->
+                        <%= Wbrs::Blacklist.classifications.each do |classification| %>
+                          <option value="<%= classification %>"><%= classification %></option>
+                        <% end %>
                       </select>
                     </div>
                   </div>
                   <label class="content-label-sm">Comment</label>
-                  <textarea class="dropdown-comment"></textarea>
+                  <textarea class="dropdown-comment adjust-reptool-bl-comment-input"></textarea>
                   <!--- End of per checked checkbox loop -->
-                  <button class="primary">Submit Changes</button>
+                  <button type="button" class="primary" onclick="toolbar_add_reptool_bl_button(this)">Submit Changes</button>
                 </div>
+                <% end %>
               </div>
             </span>
           </div>
