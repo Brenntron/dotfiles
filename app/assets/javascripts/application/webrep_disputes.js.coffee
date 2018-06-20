@@ -63,7 +63,6 @@ window.row_add_wlbl_button =(button_tag) ->
   )
 
 window.toolbar_add_wlbl_button =(button_tag) ->
-  debugger
   wlbl_form = button_tag.form;
   data = {
     'urls': [ wlbl_form.getElementsByClassName('adjust-wlbl-urls-input')[0].value ]
