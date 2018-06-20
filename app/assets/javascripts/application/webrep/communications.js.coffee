@@ -340,7 +340,7 @@ $ ->
         url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
         success_reload: true
         success: (response) ->
-          std_msg_success('Email Templated Deleted.', [], reload: true)
+          std_msg_success('Email Template Deleted.', [], reload: true)
         error: (response) ->
           std_api_error(response, "Email Template could not be deleted.", reload: false)
       )

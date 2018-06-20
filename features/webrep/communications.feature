@@ -213,3 +213,58 @@ Feature: Webrep communications
     Then I should see "NOTE DELETED"
 
 
+  ## Email Templates
+
+  @javascript
+  Scenario: a user can create an email template
+    Given a user with role "admin" exists and is logged in
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And I goto "/escalations/webrep/disputes/722"
+    And I click "Manage Email Templates"
+    Then I click "Create New Template"
+    And I wait for "2" seconds
+    And I fill in "template-name" with "General Template"
+    And I fill in "template-description" with "This is a general template for all things"
+    And I fill in "new-template-body" with "This is everything I ever wanted in a template."
+    Then I click "Save Template"
+    When I wait for "3" seconds
+    Then I should see "EMAIL TEMPLATE CREATED"
+
+
+
+  @javascript
+  Scenario: a user can edit an email template
+    Given a user with role "admin" exists and is logged in
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following email templates exist:
+      | template_name | body                                                                                                    | description     |
+      |  PSB          | Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx . | PSB description |
+    And I goto "/escalations/webrep/disputes/722"
+    And I click "Manage Email Templates"
+    Then I click ".edit-template"
+    Then I wait for "2" seconds
+    Then I fill in "template-name" with "PSB alternate name"
+    When I click "Update Template"
+    And I wait for "3" seconds
+    Then I should see "EMAIL TEMPLATE UPDATED"
+
+
+  @javascript
+  Scenario: a user can delete an email template
+    Given a user with role "admin" exists and is logged in
+    And the following disputes exist:
+      | id     |
+      | 722    |
+    And the following email templates exist:
+      | template_name | body                                                                                                    | description     |
+      |  PSB          | Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx . | PSB description |
+    And I goto "/escalations/webrep/disputes/722"
+    And I click "Manage Email Templates"
+    Then I click ".delete-template"
+    And I wait for "3" seconds
+    Then I should see "EMAIL TEMPLATE DELETED"
+

@@ -139,8 +139,8 @@
               %td=template.template_name
               %td=template.description
               %td
-                %button.table-button.edit-button.edit-template{template_id: template.id}
-                %button.table-button.delete-button.delete-template{template_id: template.id}
+                %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
+                %button.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
 
       #new-template-form-wrapper
         %h4.dialog-inset-header New Email Template
