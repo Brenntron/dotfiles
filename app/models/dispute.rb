@@ -20,6 +20,10 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def entry_count
+    dispute_entries.length
+  end
+
   def dispute_age
     age = case_opened_at - DateTime.now
     age = age.abs # lazy

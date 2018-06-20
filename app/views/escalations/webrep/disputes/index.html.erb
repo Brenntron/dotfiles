@@ -1,16 +1,4 @@
-<div id="my-tickets" style="float: left; border: 1px solid #cccc00;">
-<div>
-    <div style="display1: none;">
-      <div>
-        <h1>My Tickets</h1>
-      </div>
-      <div>
-        <%= render('my_tickets') %>
-      </div>
-    </div>
-  </div>
-</div>
-<div style="float: left; border: 1px orange dashed;">
+<div style="float: left;">
   <div>
     <div class="grid-header">
       <div style="float: left;">
@@ -38,11 +26,9 @@
       <th>SUBMITTER</th>
       <th>SUBMITTER ORG</th>
       <th>SUBMITTER DOMAIN</th>
-      <!--
       <th>WBRS SCORE</th>
       <th>WBRS RULE HITS</th>
       <th>MALWARE PROBABILITY</th>
-      -->
     </thead>
 
     <tbody>
@@ -55,12 +41,31 @@
 $(document).ready(function() {
     $('#disputes-index').DataTable({
         columns: [
-            {data: null, defaultContent: ''}, // checkbox
-            {data: "priority"},               // priority
-            {data: "case_number"},            // case ID
+            /*
+                uses of 'render' below are not likely to be the final version of
+                generating display, just messing with DataTable options
+             */
+            {                                 // checkbox
+                data: 'case_number',
+                render: function ( data, type, row ) {
+                    return '<input type="checkbox" name="cbox" id="cbox' + data + '" value="' + data + '" />';
+                }
+            },
+            {
+                data: 'case_number',
+                render: function ( data, type, row ) {
+                    return '<a href="./disputes/' + data + '">' + data + '</a>';
+                }
+            },
+            {
+                data: 'priority',
+                render: function ( data, type, row ) {
+                    return 'P' + data;
+                }
+            },
             {data: null, defaultContent: ''}, // type?
             {data: "status"},                 // status
-            {data: "dispute_domain"},         // dispute
+            {data: "dispute_domain"},                 // dispute
             {data: "assigned_to"},            // owner
             {data: "case_opened_at"},         // time submitted
             {data: "case_age"},               // age [ugly math?]
@@ -69,12 +74,10 @@ $(document).ready(function() {
             {data: "source_id"},              // origin id
             {data: "submitter_name"},         // submitter
             {data: "submitter_org"},          // submitter org
-            {data: "submitter_domain"}        // submitter domain
-            /*,
+            {data: "submitter_domain"},       // submitter domain
             {data: "wbrs_score"},             // wbrs score
-            {data: null, defaultContent: ''}, // wbrs rule hits
+            {data: "wbrs_rule_hits"},         // wbrs rule hits
             {data: null, defaultContent: ''}  // malware probability
-            */
         ]
     });
     // some of these cells will be combinations (see _my_tickets.html.erb for more)
