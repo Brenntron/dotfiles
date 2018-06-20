@@ -208,6 +208,8 @@
                 <span class="dropdown">
                   <button id="reptool_button_<%= entry.id %>" class="dispute-inline-buttons adjust-reptool-button dropdown-toggle" title="Adjust RepTool BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                   <div class="dropdown-menu" id="reptool_adjust_<%= entry.id %>" aria-labelledby="reptool_button_<%= entry.id %>">
+                    <%= form_for :reputation, html: {class: 'adjust-reputation-form'} do |rep_form| %>
+                      <input type="hidden" value="paragon-downloads.com" class="adjust-reptool-bl-entries-input"/>
                     <h3>Adjust RepTool BL</h3>
                     <table class="dispute_tool_current">
                       <tr>
@@ -232,16 +234,20 @@
                         </div>
                         <div>
                           <label class="toolbar-section-label">RepTool BL</label>
-                          <select class="toolbar-select select-rt-rule" title="RepTool BL Rules">
+                          <select class="toolbar-select select-rt-rule adjust-reptool-bl-classifications-input" title="RepTool BL Rules">
                             <option selected value="trd_sus">trd_sus</option><!-- Put current entry's rule here as the selected option -->
                             <!-- Put all other rule options here (trd_spam, trd_mal, etc.) -->
+                            <%= Wbrs::Blacklist.classifications.each do |classification| %>
+                              <option value="<%= classification %>"><%= classification %></option>
+                            <% end %>
                           </select>
                         </div>
                       </div>
                       <label class="content-label-sm">Comment</label>
-                      <textarea class="dropdown-comment"></textarea>
-                      <button class="primary">Submit Changes</button>
+                      <textarea class="dropdown-comment adjust-reptool-bl-comment-input"></textarea>
+                      <button type="button" class="primary" onclick="row_add_reptool_bl_button(this)">Submit Changes</button>
                     </div>
+                    <% end %>
                   </div>
                 </span>
               </td>
