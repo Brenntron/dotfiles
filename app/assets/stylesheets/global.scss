@@ -3058,6 +3058,7 @@ fieldset.top-content {
 .email-read-icon  {background-image: url(image_path('icon_email_read.svg'));}
 .note-icon        {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
+.duplicate-ticket-icon {background-image: url(image_path('icon_mark_duplicate.svg'));}
 
 .case-history-author, .case-history-preview {
   display: block;
@@ -3479,12 +3480,15 @@ input.communication-subject {
   background-position: left top;
   background-size: 16px 18px;
   padding-left: 24px;
-  float: left;
   display: block;
   padding-top: 4px;
   font-weight: 700;
   font-size: 8pt;
   height: 20px;
+}
+
+#newEmailDialog .template-label {
+  float: left;
 }
 
 .email-template-select {
