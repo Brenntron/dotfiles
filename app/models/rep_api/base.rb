@@ -104,11 +104,9 @@ class RepApi::Base
       when 300 > response.code
         response
       when 404 == response.code
-        body = JSON.parse(response.body)
-        raise RepApi::RepApiNotFoundError, "HTTP response #{response.code} #{body['Error']}"
+        raise RepApi::RepApiNotFoundError, "HTTP response #{response.code}"
       else
-        body = JSON.parse(response.body)
-        raise RepApi::RepApiError, "HTTP response #{response.code} #{body['Error']}"
+        raise RepApi::RepApiError, "HTTP response #{response.code}"
     end
   end
 
