@@ -12,7 +12,7 @@ class Wbrs::Prefix < Wbrs::Base
 
   # Get the rules from given criteria.
   # This is not a relation and cannot be chained with other relations.
-  # example: get_where(category_ids = [11], active: true)
+  # example: get_where(category_ids: [11], active: true)
   # @param [Array<Integer>] prefix_ids: List of prefixes ids
   # @param [Array<String>] urls: List of URLs
   # @param [Array<Integer>] category_ids: List of prefixes categories

@@ -1,4 +1,4 @@
-class RepApi::Blacklist < Wbrs::Base
+class RepApi::Blacklist < RepApi::Base
   FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
                    expiration hostname author primary_source metadata seen_by comment
                    rev first_seen last_seen stale}
@@ -45,6 +45,10 @@ class RepApi::Blacklist < Wbrs::Base
       comment: comment }
   end
 
+  # Get the blacklist entries from the reputation API
+  # This is not a relation and cannot be chained with other relations.
+  # example: get_where(entries: [ 'http://dodgyweb.net/darkweb' ], active: true)
+  # @param [Array<String>] entries: List of ip addresses, domains or fully­qualified URLs
   def self.where(conditions = {})
     response = call_json_request(:post, '/blacklist/get', body: stringkey_params(conditions))
 
