@@ -1,4 +1,4 @@
-class Wbrs::Blacklist < Wbrs::Base
+class RepApi::Blacklist < Wbrs::Base
   FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
                    expiration hostname author primary_source metadata seen_by comment
                    rev first_seen last_seen stale}
@@ -57,7 +57,7 @@ class Wbrs::Blacklist < Wbrs::Base
       collection_hash
     end.values.map{ |attributes| load_from_attributes(attributes) }
 
-  rescue Wbrs::WbrsNotFoundError
+  rescue RepApi::RepApiNotFoundError
     []
   end
 

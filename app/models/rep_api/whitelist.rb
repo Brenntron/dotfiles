@@ -1,4 +1,4 @@
-class Wbrs::Whitelist < Wbrs::Base
+class RepApi::Whitelist < Wbrs::Base
   FIELD_NAMES = %w{entry source range ident comment}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
@@ -37,7 +37,7 @@ class Wbrs::Whitelist < Wbrs::Base
       collection_hash
     end.values.map{ |attributes| load_from_attributes(attributes) }
 
-  rescue Wbrs::WbrsNotFoundError
+  rescue RepApi::RepApiNotFoundError
     []
   end
 
@@ -49,7 +49,7 @@ class Wbrs::Whitelist < Wbrs::Base
       @new_record = false
       true
     else
-      raise Wbrs::WbrsError, 'Cannot add an existing entry!'
+      raise RepApi::RepApiError, 'Cannot add an existing entry!'
     end
   end
 
