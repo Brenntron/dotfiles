@@ -22,7 +22,8 @@ module API
               #                                  user: current_user).includes(:dispute_entries => [:dispute_rule_hits])  # [but inside]
 
               # disputes = Dispute.all.includes(:dispute_entries => [:dispute_rule_hits])
-              disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
+              # disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
+              disputes = Dispute.includes(:dispute_entries => [:dispute_rule_hits])
 
               disputes.each do |dispute|
                 dispute_packet = {}
