@@ -29,7 +29,7 @@ class Xbrs::Base
   end
 
   def stringkey_params(conditions = {})
-    xbrs::Base.stringkey_params(conditions)
+    Xbrs::Base.stringkey_params(conditions)
   end
 
   def self.new_request(path)
