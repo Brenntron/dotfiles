@@ -61,27 +61,9 @@ class RepApi::Base
         request.ssl = false
     end
 
-    # if gssnegotiate?
-    #   Curl::Easy.new(url) do |curl|
-    #     byebug
-    #     # curl.cacert = @http.auth.ssl.ca_cert_file
-    #     curl.ssl_verify_peer = false
-    #     curl.use_ssl = 1
-    #     curl.http_auth_types = "Negotiate"
-    #     curl.ssl_verify_host = 0
-    #   end
-    # end
-
-
-
-
-
-
-    request.auth.gssnegotiate
-
-
-
-
+    if gssnegotiate?
+      request.auth.gssnegotiate
+    end
 
     request
   end
@@ -134,8 +116,6 @@ class RepApi::Base
   end
 
   def self.call_json_request(method, path, body:)
-    byebug
-
     request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }
