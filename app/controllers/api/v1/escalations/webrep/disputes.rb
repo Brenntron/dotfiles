@@ -108,6 +108,32 @@ module API
 
             end
 
+            desc "Add a WL/BL entry"
+            params do
+              requires :urls, type: Array[String], desc: "urls"
+              requires :trgt_list, type: String, desc: "type of WL/BL"
+              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "wlbl" do
+              wlbl_params = permitted_params.to_h.merge('usr' => current_user.cvs_username)
+              Wbrs::ManualWlbl.add_from_params(wlbl_params)
+              ''
+            end
+
+            desc "Add a Reptool Bl entry"
+            params do
+              requires :entries, type: Array[String], desc: "urls"
+              requires :classifications, type: Array[String], desc: "classifications"
+              requires :comment, type: String, desc: "comment"
+            end
+            post "reptool_bl" do
+              reptool_bl_params = permitted_params.to_h.merge('author' => current_user.cvs_username)
+              blacklist = Wbrs::Blacklist.new(reptool_bl_params)
+              blacklist.save!
+              ''
+            end
+
           end
         end
       end
