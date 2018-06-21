@@ -1,7 +1,8 @@
 .content-wrapper
   %h1.index-table-header
+    Open Tickets
 
-  = render('adjust_reptool')
+  = render('index_toolbar')
 
   %input{type: 'hidden', name: 'token', value: "#{current_user.authentication_token}"}
 
@@ -58,6 +59,7 @@
         {data: "status"},                 // status
         {data: "resolution"},             // resolution
         // {data: "dispute_domain"},                 // dispute
+        {data: null, defaultContent: ''},  // dispute entry, first item
         {data: "assigned_to"},            // owner
         {data: "case_opened_at"},         // time submitted
         {data: "case_age"},               // age [ugly math?]
@@ -65,11 +67,11 @@
         {data: "source"},                 // origin
         {data: "source_id"},              // origin id
         {data: null, defaultContent: ''},  // submitter type (customer or guest)
-        {data: "submitter_name"},         // submitter
+        {data: "submitter_name"},         // submitter name
         {data: "submitter_org"},          // submitter org
         {data: "submitter_domain"},       // submitter domain
         {data: null, defaultContent: ''},  // contact name
-        {data: null, defaultContent: ''},  // contact email
+        // {data: null, defaultContent: ''},  // contact email
         // {data: "wbrs_score"},             // wbrs score
         // {data: "wbrs_rule_hits"},         // wbrs rule hits
         // {data: null, defaultContent: ''}  // malware probability
