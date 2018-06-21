@@ -16,14 +16,17 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [Array<Integer>] prefix_ids: List of prefixes ids
   # @param [Array<String>] urls: List of URLs
   # @param [Array<Integer>] category_ids: List of prefixes categories
+  # @param [Array<Wbrs::Category>] categories: List of prefixes category objects
   # @param [Boolean] active: prefixes active/disable status
   # @param [Integer] limit: Max number of records to return
   # @param [Integer] offset: Offset of the first record to return
   # @return [Array<Wbrs::Prefix>] Array of the results.
   def self.where(conditions = {})
     params = stringkey_params(conditions)
-    params['categories'] = params.delete('category_ids') unless params['category_ids'].nil?
-    params['is_active'] = params.delete('active') ? 1 : 0 unless params['active'].nil?
+    category_ids = Wbrs::Category.category_ids_from_params(params)
+    params['categories'] = category_ids if category_ids.present?
+    params['is_active'] = params.delete('active') ? 1 : 0 if params['active'].present?
+
     response = post_request(path: '/v1/cat/rules/get', body: params)
 
     response_body = JSON.parse(response.body)
@@ -38,7 +41,7 @@ class Wbrs::Prefix < Wbrs::Base
 
   # @return [Array<Wbrs::Category>] array of categories related to this prefix.
   def categories
-    response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_id: id })
+    response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [ id ] })
 
     response_body = JSON.parse(response.body)
     response_body['data'].map do |datum|
@@ -66,9 +69,10 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [String] user: The user for this action
   # @param [String] description: A description
   # @return [Integer] id of created prefix.
-  def self.create_from_url(options)
-    options['categories'] = Wbrs::Category.category_ids(options['categories']) if options['categories'].present?
-    response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(options))
+  def self.create_from_url(params)
+    category_ids = Wbrs::Category.category_ids_from_params(params)
+    params['categories'] = category_ids if category_ids.present?
+    response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(params))
 
     response_body = JSON.parse(response.body)
     response_body['Created']
@@ -91,7 +95,7 @@ class Wbrs::Prefix < Wbrs::Base
   # Disables the rules on this prefix.
   # @param [String] user: The user for this action
   def disable(user:)
-    options = { 'prefix_id' => id, 'user' => user }
+    options = { 'prefix_ids' => [ id ], 'user' => user }
     Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
   end
 end
