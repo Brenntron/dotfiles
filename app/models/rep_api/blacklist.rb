@@ -59,7 +59,7 @@ class RepApi::Blacklist < RepApi::Base
 
     response_body = JSON.parse(response.body)
     response_body.inject({}) do |collection_hash, (entry, value)|
-      unless 'NOT_FOUND' == entry
+      unless 'NOT_FOUND' == value
         collection_hash[entry] = value.merge('entry' => entry)
       end
 
