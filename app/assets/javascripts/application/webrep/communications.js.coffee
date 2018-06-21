@@ -21,8 +21,7 @@ $ ->
 
 
   populate_communication_details = (email, attachments) ->
-    $('.communication-subject')[0].innerHTML = email.subject
-    $('input[type=text].communication-subject').val("Re: " + email.subject)
+    $('input[type=text].reply-subject').val("Re: " + email.subject)
     $('.author-username')[0].innerHTML = email.from
     $('.receiver-email')[0].innerHTML = email.to
     $('.receiver-email')[1].innerHTML = email.from
@@ -96,7 +95,7 @@ $ ->
     form_data.append('body', $('.email-reply-body').val() + "\n" + $('.email-msg-content')[0].textContent)
     form_data.append('dispute_id', $('input[name="dispute_id"]').val())
     form_data.append('to', $('.receiver-email')[1].textContent)
-    form_data.append('subject', $('input[type=text].new-subject').val())
+    form_data.append('subject', $('input[type=text].reply-subject').val())
     form_data.append('dispute_email_id', $('.current-email-view').attr('email_id'))
 
 
