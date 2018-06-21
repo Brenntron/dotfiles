@@ -49,36 +49,7 @@ class RepApi::Base
     url = "#{protocol}://#{host}:#{port}#{path}"
     request = HTTPI::Request.new(url)
 
-    # case tls_mode
-    #   when 'verify-peer'
-    #     request.ssl = true
-    #     request.auth.ssl.verify_mode = :peer
-    #     request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
-    #   when 'verify-none'
-    #     request.ssl = true
-    #     request.auth.ssl.verify_mode = :none
-    #   else #no-tls
-    #     request.ssl = false
-    # end
-    #
-    # if gssnegotiate?
-    #   Curl::Easy.new(url) do |curl|
-    #     byebug
-    #     # curl.cacert = @http.auth.ssl.ca_cert_file
-    #     curl.ssl_verify_peer = false
-    #     curl.use_ssl = 1
-    #     curl.http_auth_types = "Negotiate"
-    #     curl.ssl_verify_host = 0
-    #   end
-    # end
-    # request.auth.basic('marlpier', '')
-
-
-
-
-
-
-    case 'verify-none'
+    case tls_mode
       when 'verify-peer'
         request.ssl = true
         request.auth.ssl.verify_mode = :peer
@@ -89,6 +60,23 @@ class RepApi::Base
       else #no-tls
         request.ssl = false
     end
+
+    # if gssnegotiate?
+    #   Curl::Easy.new(url) do |curl|
+    #     byebug
+    #     # curl.cacert = @http.auth.ssl.ca_cert_file
+    #     curl.ssl_verify_peer = false
+    #     curl.use_ssl = 1
+    #     curl.http_auth_types = "Negotiate"
+    #     curl.ssl_verify_host = 0
+    #   end
+    # end
+
+
+
+
+
+
     request.auth.gssnegotiate
 
 
@@ -109,7 +97,6 @@ class RepApi::Base
   end
 
   def self.call_request(method, request)
-    byebug
     case method
       when :post
         if gssnegotiate?
