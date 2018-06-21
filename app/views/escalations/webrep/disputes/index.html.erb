@@ -51,12 +51,7 @@ $(document).ready(function() {
                     return '<input type="checkbox" name="cbox" id="cbox' + data + '" value="' + data + '" />';
                 }
             },
-            {
-                data: 'case_number',
-                render: function ( data, type, row ) {
-                    return '<a href="./disputes/' + data + '">' + data + '</a>';
-                }
-            },
+            {data: 'case_link'},
             {
                 data: 'priority',
                 render: function ( data, type, row ) {
@@ -80,16 +75,7 @@ $(document).ready(function() {
             {data: null, defaultContent: ''}  // malware probability
         ]
     });
-    // some of these cells will be combinations (see _my_tickets.html.erb for more)
     populate_webrep_index_table();
-    $('#my-disputes').DataTable({
-        columns: [
-            {data: null, defaultContent: ''},
-            {data: "priority"},               // priority
-            {data: "case_number"},
-            {data: "customer_company_name"}
-        ]
-    });
-    populate_webrep_my_table();
+    // removed "My Tickets" logic
 } );
 </script>
