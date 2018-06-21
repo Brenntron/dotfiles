@@ -4,6 +4,10 @@ class Dispute < ApplicationRecord
   has_many :dispute_entries
   belongs_to :customer
 
+  NEW = 'new'
+  RESOLVED = 'resolved'
+  ASSIGNED = 'assigned'
+
   def is_assigned?
     (!self.assigned_to.nil? and !self.assigned_to.empty?)
   end
@@ -44,6 +48,15 @@ class Dispute < ApplicationRecord
     new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
     new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
 
+
+    #BIG TO DO:  RESEARCH!!!
+    #auto rep dispute resolution
+    #apparently there is logic we need to employ where cross referencing a URL
+    #with virustotal and umbrella/opendns for negative malicious based rulehits
+    #will be grounds for creating a new dispute case, resolving it, automated resolution message
+    #and setting appropriate entries into RepTool to adjust the reptuation...possibly RuleUI WL/BL as well?
+    #need to ask
+
     #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
     bug_factory = Bugzilla::Bug.new(message_payload[:bugzilla_session])
@@ -69,9 +82,10 @@ class Dispute < ApplicationRecord
 
     bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
 
-
     new_dispute = Dispute.new
+    new_dispute.submission_type = message_payload["payload"]["submission_type"]
     new_dispute.id = bug_stub_hash["id"]
+    new_dispute.user_id = user.id
     new_dispute.customer_name = message_payload["payload"]["name"]
     new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
     new_dispute.customer_email = message_payload["payload"]["email"]
@@ -83,6 +97,9 @@ class Dispute < ApplicationRecord
     new_dispute.ticket_source_key = message_payload["source_key"]
     new_dispute.ticket_source = "talos-intelligence"
     new_dispute.ticket_source_type = message_payload["source_type"]
+
+    new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
+
     new_dispute.save
 
     new_entries_ips.each do |key, entry|
@@ -107,15 +124,17 @@ class Dispute < ApplicationRecord
 
     end
 
-    new_entries_urls.each do |entry|
-
+    new_entries_urls.each do |key, entry|
+      url_parts = Complaint.parse_url(key)
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = new_dispute.id
-      new_dispute_entry.ip_address = key
-      new_dispute_entry.entry_type = "DOMAIN"
-      new_dispute_entry.score_type = "WBRS"
-      new_dispute_entry.score = entry["WBRS_SCORE"].to_f
+      new_dispute_entry.uri = key
+      new_dispute_entry.wbrs_score = entry["wbrs_score"]
+      new_dispute_entry.sbrs_score = entry["sbrs_score"]
       new_dispute_entry.suggested_disposition = entry["reg_sugg"]
+      new_dispute_entry.subdomain = url_parts[:subdomain]
+      new_dispute_entry.domain = url_parts[:domain]
+      new_dispute_entry.path = url_parts[:path]
       new_dispute_entry.save
 
       if entry["WBRS_Rule_Hits"].present?
