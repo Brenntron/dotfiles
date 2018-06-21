@@ -68,16 +68,6 @@ class RepApi::Base
     request
   end
 
-  # TODO replace with new_request
-  def self.request(path:, body:)
-    request = new_request(path)
-
-    request.headers = {"Content-Type" => "application/json" }
-    request.body = body.to_json
-
-    request
-  end
-
   def self.call_request(method, request)
     case method
       when :post
@@ -95,15 +85,6 @@ class RepApi::Base
     end
   end
 
-  # TODO replace with new_request
-  def self.make_post_request(path:, body:)
-    if gssnegotiate?
-      HTTPI.post(request(path: path, body: body), :curb)
-    else
-      HTTPI.post(request(path: path, body: body))
-    end
-  end
-
   def self.request_error_handling(response)
     case
       when 300 > response.code
@@ -118,18 +99,21 @@ class RepApi::Base
   def self.call_json_request(method, path, body:)
     request = new_request(path)
 
-    request.headers = {"Content-Type" => "application/json" }
-    request.body = body.to_json
+    request.headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
+    request.body =
+        case body
+          when Hash
+            body.map{ |key, value| "#{key}=#{value}" }.join('&')
+          when Array
+            body.join('&')
+          else
+            body
+        end
 
     request_error_handling(call_request(method, request))
   end
 
   def call_json_request(method, path, body:)
     Wbrs::Base.call_json_request(method, path, body: body)
-  end
-
-  # TODO replace with call_json_request
-  def self.post_request(path:, body:)
-    request_error_handling(make_post_request(path: path, body: body))
   end
 end

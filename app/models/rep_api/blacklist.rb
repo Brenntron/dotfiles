@@ -50,7 +50,12 @@ class RepApi::Blacklist < RepApi::Base
   # example: get_where(entries: [ 'http://dodgyweb.net/darkweb' ], active: true)
   # @param [Array<String>] entries: List of ip addresses, domains or fully­qualified URLs
   def self.where(conditions = {})
-    response = call_json_request(:post, '/blacklist/get', body: stringkey_params(conditions))
+    params = stringkey_params(conditions)
+    entries = params.delete('entries')
+    raise 'Missing required entries condition' unless entries.present?
+    body = entries.map {|entry| "entry=#{entry}"}.join('&')
+
+    response = call_json_request(:post, '/blacklist/get', body: body)
 
     response_body = JSON.parse(response.body)
     response_body.inject({}) do |collection_hash, (entry, value)|
