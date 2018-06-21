@@ -19,7 +19,7 @@
           = image_tag('layout/analyst_console_icon.svg', class: 'sidenav-icon', alt: 'Analyst Console')
         %li{class: 'nav-menu-spacer static-nav-item'}
           -# Spacer for Menu Toggle
-        - if can?(:list_research, Bug)
+        - if can?(:index, ResearchBug)
           %li{class: 'nav-bugs'}
             %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
               = image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
@@ -39,7 +39,7 @@
               %li{class: 'cat-link'}
                 %a
                   =inline_svg 'icon_cat.svg'
-        - if can?(:list_escalations, Bug)
+        - if can?(:index, EscalationBug)
           %li{class: 'nav-escalations'}
             %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
               = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
@@ -83,7 +83,7 @@
           %li{class: 'nav-ac static-nav-item'}
             = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
           %li{class: 'static-nav-item'}
-          - if can?(:list_research, Bug)
+          - if can?(:index, ResearchBug)
             %li{class: 'nav-bugs'}
               %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
                 Bugs
@@ -100,7 +100,7 @@
                 %li{class: 'cat-link'}
                   %a Categorization
 
-          - if can?(:list_escalations, Bug)
+          - if can?(:index, EscalationBug)
             %li{class: 'nav-escalations'}
               %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
                 Escalations

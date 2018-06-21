@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   namespace :escalations do
     root 'bugs#index'
+    resources :escalation_bugs, controller: 'bugs'
     resources :bugs do
 
       member do
@@ -50,6 +51,8 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    resources :roles
+    resources :org_subsets
     root 'home#index'
     resources :migrations, only: [:index]
     resources :morsels, only: [:index, :show]
@@ -103,7 +106,7 @@ Rails.application.routes.draw do
     resources :rule_configurations, :defaults => {:format => 'json'}
   end
 
-  # some of these named routes need to be rethought to conform to rails conventions
+  # TODO some of these named routes need to be rethought to conform to rails conventions
   get 'rules/get_impact' => 'rules#get_impact', format: 'js'
   get 'rules/export' => 'rules#export'
   post "sessions/create" => "sessions#create"
@@ -112,7 +115,6 @@ Rails.application.routes.draw do
 
 
   # resources :rules, param: :sid
-  resources :roles
 
   resources :tests
 
@@ -141,6 +143,7 @@ Rails.application.routes.draw do
     resources :rules, only: [:show]
   end
 
+  resources :research_bugs, controller: 'bugs'
   resources :bugs do
     member do
       post :create_rules
@@ -176,5 +179,10 @@ Rails.application.routes.draw do
 
 
   mount API::Base => '/api'
+
+  # Hack to test permissions to Admin page
+  if Rails.env.test?
+    get '/version', to: 'users#index'
+  end
 
 end

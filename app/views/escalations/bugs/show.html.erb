@@ -50,7 +50,7 @@
               </span>
               <% end %>
 
-              <% if @bug.snort_research_escalation_bugs.blank? %>
+              <% if @bug.snort_research_bugs.blank? %>
                 <br /><br />
                 <span data-toggle="modal" data-target="#create_new_research">
                   <button id="create_new_research_button" type="button" class="select-sm btn btn-default" onclick="pop_up_create_research_modal(this)">Create New Research Bug</button>

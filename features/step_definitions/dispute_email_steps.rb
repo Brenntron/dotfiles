@@ -1,6 +1,6 @@
 Given(/^the following dispute emails exist:$/) do |dispute_emails|
   dispute_emails.hashes.each do |dispute_email|
-    FactoryGirl.create(:dispute_email, dispute_email)
+    FactoryBot.create(:dispute_email, dispute_email)
   end
 end
 

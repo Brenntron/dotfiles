@@ -88,43 +88,35 @@ module API
 
             end
 
-          end
+            desc "Add a WL/BL entry"
+            params do
+              requires :urls, type: Array[String], desc: "urls"
+              requires :trgt_list, type: String, desc: "type of WL/BL"
+              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "wlbl" do
+              wlbl_params = permitted_params.to_h.merge('usr' => current_user.cvs_username)
+              Wbrs::ManualWlbl.add_from_params(wlbl_params)
+              ''
+            end
 
+            desc "Add a Reptool Bl entry"
+            params do
+              requires :entries, type: Array[String], desc: "urls"
+              requires :classifications, type: Array[String], desc: "classifications"
+              requires :comment, type: String, desc: "comment"
+            end
+            post "reptool_bl" do
+              reptool_bl_params = permitted_params.to_h.merge('author' => current_user.cvs_username)
+              blacklist = Wbrs::Blacklist.new(reptool_bl_params)
+              blacklist.save!
+              ''
+            end
+
+          end
         end
       end
     end
   end
 end
-
-=begin
-            get "my" do
-
-              json_packet = []
-
-              disputes = Dispute.where("id like '20%18'") # random subset, for now
-
-              disputes.each do |dispute|
-                dispute_packet = {}
-                dispute_packet[:id] = dispute.id
-
-                dispute_packet[:customer_name] = '' #dispute.customer_name
-                dispute_packet[:customer_company_name] = '' #dispute.org_domain # should be: dispute.customer_company_name
-                dispute_packet[:status] = dispute.status.upcase
-                dispute_packet[:assigned_to] = dispute.assignee
-                dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
-                dispute_packet[:case_number] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + ( sprintf '%08d', dispute.id ).to_s + "</a>"
-
-                dispute_packet[:case_opened_at] = dispute.case_opened_at.strftime('%Y-%m-%d %H:%M:%S')
-                dispute_packet[:case_age] = dispute.dispute_age
-                # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
-                dispute_packet[:suggested_disposition] = dispute.suggested_d
-                dispute_packet[:priority] = "P" + (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
-                dispute_packet[:source] = dispute.ticket_source
-                dispute_packet[:source_id] = dispute.ticket_source_key
-
-                json_packet << dispute_packet
-              end
-              {:status => "success", :data => json_packet}.to_json
-
-            end
-=end

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :dispute_email do
     dispute_id 1
     from 'customer@customer.com'
