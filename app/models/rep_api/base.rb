@@ -61,6 +61,18 @@ class RepApi::Base
         request.ssl = false
     end
 
+    if gssnegotiate?
+      Curl::Easy.new(url) do |curl|
+        byebug
+        # curl.cacert = @http.auth.ssl.ca_cert_file
+        curl.ssl_verify_peer = false
+        curl.use_ssl = 1
+        curl.http_auth_types = "Negotiate"
+        curl.ssl_verify_host = 0
+      end
+    end
+    request.auth.basic('marlpier', '')
+
     request
   end
 
@@ -75,20 +87,22 @@ class RepApi::Base
   end
 
   def self.call_request(method, request)
-    case method
-      when :post
-        if gssnegotiate?
-          HTTPI.post(request, :curb)
-        else
-          HTTPI.post(request)
-        end
-      else #:get
-        if gssnegotiate?
-          HTTPI.get(request, :curb)
-        else
-          HTTPI.get(request)
-        end
-    end
+    byebug
+    # case method
+    #   when :post
+    #     if gssnegotiate?
+    #       HTTPI.post(request, :curb)
+    #     else
+    #       HTTPI.post(request)
+    #     end
+    #   else #:get
+    #     if gssnegotiate?
+    #       HTTPI.get(request, :curb)
+    #     else
+    #       HTTPI.get(request)
+    #     end
+    # end
+    HTTPI.get(request, :curb)
   end
 
   # TODO replace with new_request
@@ -112,12 +126,35 @@ class RepApi::Base
   end
 
   def self.call_json_request(method, path, body:)
-    request = new_request(path)
+    byebug
+    url = "https://#{host}:#{port}#{path}"
+    request = HTTPI::Request.new(url)
+
+    case 'verify-none'
+      when 'verify-peer'
+        request.ssl = true
+        request.auth.ssl.verify_mode = :peer
+        request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
+      when 'verify-none'
+        request.ssl = true
+        request.auth.ssl.verify_mode = :none
+      else #no-tls
+        request.ssl = false
+    end
+    request.auth.gssnegotiate
+
+    # request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }
-    request.body = body.to_json
+    # request.body = body.to_json
+    request.body = '[]'
 
-    request_error_handling(call_request(method, request))
+
+    response = HTTPI.get(request, :curb)
+    byebug
+
+    # request_error_handling(call_request(method, request))
+    request_error_handling(response)
   end
 
   def call_json_request(method, path, body:)
