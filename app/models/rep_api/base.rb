@@ -146,15 +146,10 @@ class RepApi::Base
     # request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }
-    # request.body = body.to_json
-    request.body = '[]'
+    request.body = body.to_json
 
 
-    response = HTTPI.get(request, :curb)
-    byebug
-
-    # request_error_handling(call_request(method, request))
-    request_error_handling(response)
+    request_error_handling(call_request(method, request))
   end
 
   def call_json_request(method, path, body:)
