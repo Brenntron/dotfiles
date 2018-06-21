@@ -21,8 +21,8 @@ module API
               #                                  params: index_params,
               #                                  user: current_user).includes(:dispute_entries => [:dispute_rule_hits])  # [but inside]
 
-              # disputes = Dispute.all.includes(:dispute_entries => [:dispute_rule_hits])
-              disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
+              disputes = Dispute.all.includes(:dispute_entries => [:dispute_rule_hits])
+              #disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
 
               disputes.each do |dispute|
                 dispute_packet = {}
@@ -41,8 +41,9 @@ module API
                 end
                 # dispute_packet[:dispute_count] = dispute.dispute_entries.count.to_s
                 dispute_packet[:dispute_count] = dispute.entry_count.to_s
-                dispute_packet[:status] = dispute.status.upcase
-                dispute_packet[:assigned_to] = dispute.assignee
+                dispute_packet[:status] = dispute.status
+                dispute_packet[:resolution] = dispute.resolution
+                dispute_packet[:assigned_to] = ''#dispute.user.email
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
                 dispute_packet[:case_opened_at] = dispute.case_opened_at.strftime('%Y-%m-%d %H:%M:%S')
