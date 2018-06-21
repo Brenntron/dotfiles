@@ -36,20 +36,52 @@ class RepApi::Base
     raise 'Path required' unless path.present?
     raise 'Path must start with slash (/)' unless '/' == path[0]
 
-    protocol =
-        case tls_mode
-          when 'verify-peer'
-            'https'
-          when 'verify-none'
-            'https'
-          else #no-tls
-            'http'
-        end
+    # protocol =
+    #     case tls_mode
+    #       when 'verify-peer'
+    #         'https'
+    #       when 'verify-none'
+    #         'https'
+    #       else #no-tls
+    #         'http'
+    #     end
+    #
+    # url = "#{protocol}://#{host}:#{port}#{path}"
+    # request = HTTPI::Request.new(url)
+    #
+    # case tls_mode
+    #   when 'verify-peer'
+    #     request.ssl = true
+    #     request.auth.ssl.verify_mode = :peer
+    #     request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
+    #   when 'verify-none'
+    #     request.ssl = true
+    #     request.auth.ssl.verify_mode = :none
+    #   else #no-tls
+    #     request.ssl = false
+    # end
+    #
+    # if gssnegotiate?
+    #   Curl::Easy.new(url) do |curl|
+    #     byebug
+    #     # curl.cacert = @http.auth.ssl.ca_cert_file
+    #     curl.ssl_verify_peer = false
+    #     curl.use_ssl = 1
+    #     curl.http_auth_types = "Negotiate"
+    #     curl.ssl_verify_host = 0
+    #   end
+    # end
+    # request.auth.basic('marlpier', '')
 
-    url = "#{protocol}://#{host}:#{port}#{path}"
+
+
+
+
+
+    url = "https://#{host}:#{port}#{path}"
     request = HTTPI::Request.new(url)
 
-    case tls_mode
+    case 'verify-none'
       when 'verify-peer'
         request.ssl = true
         request.auth.ssl.verify_mode = :peer
@@ -60,18 +92,11 @@ class RepApi::Base
       else #no-tls
         request.ssl = false
     end
+    request.auth.gssnegotiate
 
-    if gssnegotiate?
-      Curl::Easy.new(url) do |curl|
-        byebug
-        # curl.cacert = @http.auth.ssl.ca_cert_file
-        curl.ssl_verify_peer = false
-        curl.use_ssl = 1
-        curl.http_auth_types = "Negotiate"
-        curl.ssl_verify_host = 0
-      end
-    end
-    request.auth.basic('marlpier', '')
+
+
+
 
     request
   end
@@ -127,27 +152,11 @@ class RepApi::Base
 
   def self.call_json_request(method, path, body:)
     byebug
-    url = "https://#{host}:#{port}#{path}"
-    request = HTTPI::Request.new(url)
 
-    case 'verify-none'
-      when 'verify-peer'
-        request.ssl = true
-        request.auth.ssl.verify_mode = :peer
-        request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
-      when 'verify-none'
-        request.ssl = true
-        request.auth.ssl.verify_mode = :none
-      else #no-tls
-        request.ssl = false
-    end
-    request.auth.gssnegotiate
-
-    # request = new_request(path)
+    request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }
     request.body = body.to_json
-
 
     request_error_handling(call_request(method, request))
   end
