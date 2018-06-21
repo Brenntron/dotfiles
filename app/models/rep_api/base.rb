@@ -36,19 +36,19 @@ class RepApi::Base
     raise 'Path required' unless path.present?
     raise 'Path must start with slash (/)' unless '/' == path[0]
 
-    # protocol =
-    #     case tls_mode
-    #       when 'verify-peer'
-    #         'https'
-    #       when 'verify-none'
-    #         'https'
-    #       else #no-tls
-    #         'http'
-    #     end
-    #
-    # url = "#{protocol}://#{host}:#{port}#{path}"
-    # request = HTTPI::Request.new(url)
-    #
+    protocol =
+        case tls_mode
+          when 'verify-peer'
+            'https'
+          when 'verify-none'
+            'https'
+          else #no-tls
+            'http'
+        end
+
+    url = "#{protocol}://#{host}:#{port}#{path}"
+    request = HTTPI::Request.new(url)
+
     # case tls_mode
     #   when 'verify-peer'
     #     request.ssl = true
@@ -77,9 +77,6 @@ class RepApi::Base
 
 
 
-
-    url = "https://#{host}:#{port}#{path}"
-    request = HTTPI::Request.new(url)
 
     case 'verify-none'
       when 'verify-peer'
@@ -113,21 +110,20 @@ class RepApi::Base
 
   def self.call_request(method, request)
     byebug
-    # case method
-    #   when :post
-    #     if gssnegotiate?
-    #       HTTPI.post(request, :curb)
-    #     else
-    #       HTTPI.post(request)
-    #     end
-    #   else #:get
-    #     if gssnegotiate?
-    #       HTTPI.get(request, :curb)
-    #     else
-    #       HTTPI.get(request)
-    #     end
-    # end
-    HTTPI.get(request, :curb)
+    case method
+      when :post
+        if gssnegotiate?
+          HTTPI.post(request, :curb)
+        else
+          HTTPI.post(request)
+        end
+      else #:get
+        if gssnegotiate?
+          HTTPI.get(request, :curb)
+        else
+          HTTPI.get(request)
+        end
+    end
   end
 
   # TODO replace with new_request
