@@ -3094,12 +3094,17 @@ fieldset.top-content {
   background-color: #4E4E4E;
   color: $content-bg-color;
   margin-top: -15px;
-  padding: 12px;
+  padding-top: 12px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .highlighted-section-header h1 {
   color: $content-bg-color;
   display: inline-block;
+  padding-left: 15px;
+  margin-top: 5px;
+  margin-bottom: 12px;
 }
 
 .highlighted-section-header::before {
@@ -3110,26 +3115,38 @@ fieldset.top-content {
   background-color: #4E4E4E;
   z-index: 60;
   width: 100%;
-  margin-left: -12px;
   margin-top: -12px;
 }
 
-.customer-facing-notice {
-  display: block;
+.email-notice-block {
+  display: inline-block;
   text-transform: uppercase;
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background-image: url(image_path('icon_warning_pink.svg'));
-  background-repeat: no-repeat;
-  background-position: 6px 2px;
-  background-size: 20px;
+  color: $content-bg-color;
+  float: right;
   height: 20px;
-  padding: 6px 8px 18px 28px;
-  color: $communication-accent-color;
-  background-color: #fff;
-  border-radius: 4px;
+  padding: 0 20px;
 }
+
+.customer-facing-notice::before, .duplicate-email-notice::before {
+  content: '';
+  display: block;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto 6px auto;
+}
+
+.customer-facing-notice::before {
+  background-image: url(image_path('icon_warning_orange.svg'));
+}
+
+.duplicate-email-notice::before {
+  background-image: url(image_path('icon_mark_duplicate_orange.svg'));
+}
+
+
 
 .email-header-information {
   background-color: $faint-neutral-color;
@@ -3298,10 +3315,8 @@ input.communication-subject {
   background-size: 18px 18px;
   height: 24px;
   display: inline-block;
-  float: right;
   background-color: transparent;
   border: none;
-  margin-top: 32px;
   padding-left: 22px;
   padding-right: 0;
   font-weight: 300;
@@ -3315,13 +3330,11 @@ input.communication-subject {
   background-size: 18px 18px;
   height: 24px;
   display: inline-block;
-  float: right;
   background-color: transparent;
   border: none;
-  margin-top: 32px;
-  margin-right: 16px;
   padding-left: 22px;
   padding-right: 0;
+  margin-left: 20px;
   font-weight: 300;
   font-size: 9pt;
 }
@@ -4144,6 +4157,18 @@ input.file_attachment {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+}
+
+.border-section {
+  border-right: 1px solid $faint-neutral-color;
+  border-left: 1px solid $faint-neutral-color;
+}
+
+.communication-toolbar {
+  background-color: $type-lighter-color;
+  width: 100%;
+  display: block;
+  padding: 6px 12px;
 }
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 

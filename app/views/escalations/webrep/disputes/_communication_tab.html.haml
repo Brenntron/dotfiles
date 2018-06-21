@@ -57,17 +57,22 @@
                   =version.created_at.strftime("%H:%M:%S")
 
 
-  .col-sm-6
+  .col-sm-6.border-section
     .row
       .col-xs-12.highlighted-section-header
         %h1 Communication
-        // Only show Notice if email is to customer
-        .customer-facing-notice
+        // Only show Notice if email selected is a duplicate
+        .email-notice-block.duplicate-email-notice
+          Duplicate Email
+        // Only show Notice if email selected is to customer
+        .email-notice-block.customer-facing-notice
           Customer Facing Message
-        %button.new-email-button
-          Compose New Email
-        %button.mng-templates-button
-          Manage Email Templates
+
+        .communication-toolbar
+          %button.new-email-button
+            Compose New Email
+          %button.mng-templates-button
+            Manage Email Templates
 
 
     .row
