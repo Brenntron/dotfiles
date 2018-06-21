@@ -3053,12 +3053,13 @@ fieldset.top-content {
   display: block;
 }
 
-.email-icon       {background-image: url(image_path('icon_message_white.svg'));}
-.email-sent .email-icon  {background-image: url(image_path('icon_email_sent.svg'));}
-.email-read .email-icon  {background-image: url(image_path('icon_email_read.svg'));}
-.note-icon        {background-image: url(image_path('icon_notepad.svg'));}
-.disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
-.duplicate-ticket-icon {background-image: url(image_path('icon_mark_duplicate.svg'));}
+.email-icon               {background-image: url(image_path('icon_message_white.svg'));}
+.email-read .email-icon   {background-image: url(image_path('icon_email_read.svg'));}
+.email-sent .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
+.email-read.email-sent .email-icon  {background-image: url(image_path('icon_email_sent.svg'));}
+.note-icon                {background-image: url(image_path('icon_notepad.svg'));}
+.disp-status-icon         {background-image: url(image_path('icon_status2.svg'));}
+.duplicate-ticket-icon    {background-image: url(image_path('icon_mark_duplicate.svg'));}
 
 .case-history-author, .case-history-preview {
   display: block;
