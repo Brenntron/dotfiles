@@ -3054,8 +3054,8 @@ fieldset.top-content {
 }
 
 .email-icon       {background-image: url(image_path('icon_message_white.svg'));}
-.email-sent-icon  {background-image: url(image_path('icon_email_sent.svg'));}
-.email-read-icon  {background-image: url(image_path('icon_email_read.svg'));}
+.email-sent .email-icon  {background-image: url(image_path('icon_email_sent.svg'));}
+.email-read .email-icon  {background-image: url(image_path('icon_email_read.svg'));}
 .note-icon        {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
 .duplicate-ticket-icon {background-image: url(image_path('icon_mark_duplicate.svg'));}
