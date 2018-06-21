@@ -6,7 +6,7 @@ class RepApi::Base
   end
 
   def self.port
-    @port ||= Rails.configuration.rep_api.port || 80
+    @port ||= Rails.configuration.rep_api.port || 443
   end
 
   def self.tls_mode
@@ -46,7 +46,8 @@ class RepApi::Base
             'http'
         end
 
-    request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}")
+    url = "#{protocol}://#{host}:#{port}#{path}"
+    request = HTTPI::Request.new(url)
 
     case tls_mode
       when 'verify-peer'
