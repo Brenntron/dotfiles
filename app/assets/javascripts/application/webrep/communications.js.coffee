@@ -58,6 +58,10 @@ $ ->
     $('#email-reply').removeClass('hidden')
     $('.email-reply-body').focus()
 
+  $('.delete-email').on 'click', ->
+    $('.reply-body').val('')
+    $('#email-reply').addClass('hidden')
+
   $('#select-reply-template').on 'change', ->
     template_id = this.value
 
