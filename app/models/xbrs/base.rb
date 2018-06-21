@@ -105,10 +105,10 @@ class Xbrs::Base
         response
       when 404 == response.code
         body = JSON.parse(response.body)
-        raise xbrs::xbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
+        raise Xbrs::XbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
       else
         body = JSON.parse(response.body)
-        raise xbrs::xbrsError, "HTTP response #{response.code} #{body['Error']}"
+        raise Xbrs::XbrsError, "HTTP response #{response.code} #{body['Error']}"
     end
   end
 
@@ -122,7 +122,7 @@ class Xbrs::Base
   end
 
   def call_json_request(method, path, body:)
-    xbrs::Base.call_json_request(method, path, body: body)
+    Xbrs::Base.call_json_request(method, path, body: body)
   end
 
   # TODO replace with call_json_request
