@@ -19,6 +19,7 @@
             %th Case ID
             %th Status
             %th Resolution
+            %th Ticket Type
             %th Dispute
             %th Owner
             %th Time Submitted
@@ -36,6 +37,7 @@
 :javascript
   $(document).ready(function() {
     $('#disputes-index').DataTable({
+      dom: '<"datatable-top-tools"lf>t<ip>',
       columns: [
         /*
             uses of 'render' below are not likely to be the final version of
@@ -57,6 +59,7 @@
         {data: 'case_link'},
         {data: "status"},                 // status
         {data: "resolution"},             // resolution
+        {data: null, defaultContent: ''},  // dispute ticket type - email vs. web etc.
         // {data: "dispute_domain"},                 // dispute
         {data: null, defaultContent: ''},  // dispute entry, first item
         {data: "assigned_to"},            // owner
