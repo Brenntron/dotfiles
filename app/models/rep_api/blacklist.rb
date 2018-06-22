@@ -76,7 +76,8 @@ class RepApi::Blacklist < RepApi::Base
   # Save the blacklist object.
   # To add or update a blacklist entry, set the entry and classifications fields on a Blacklist object,
   # and call this method.
-  # The entry field may be an array.
+  # The entry field is required and may be an array.
+  # The classifications field is required and must be an array.
   # @param [String] author moniker of who is adding or updating this entry.
   # @param [String] comment
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
@@ -128,10 +129,16 @@ class RepApi::Blacklist < RepApi::Base
     end
   end
 
-  def delete
+  # deletes a blacklist
+  # The entry field is required and may be an array.
+  def delete!
     expire
+    freeze
+    true
   end
 
+  # excludes a blacklist
+  # The entry field is required and may be an array.
   def exclude
     entries = entry.kind_of?(Array) ? entry : [entry]
     input = entries.map{ |entry_curr| "entry=#{entry_curr}" }
@@ -140,6 +147,8 @@ class RepApi::Blacklist < RepApi::Base
     true
   end
 
+  # renews a blacklist
+  # The entry field is required and may be an array.
   def renew
     entries = entry.kind_of?(Array) ? entry : [entry]
     input = entries.map{ |entry_curr| "entry=#{entry_curr}" }
@@ -148,6 +157,8 @@ class RepApi::Blacklist < RepApi::Base
     true
   end
 
+  # expires a blacklist
+  # The entry field is required and may be an array.
   def expire
     entries = entry.kind_of?(Array) ? entry : [entry]
     input = entries.map{ |entry_curr| "entry=#{entry_curr}" }
