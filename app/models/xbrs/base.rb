@@ -5,12 +5,16 @@ class Xbrs::Base
     @host ||= Rails.configuration.xbrs.host || 'localhost'
   end
 
+  def self.consumer_key
+    @consumer_key ||= Rails.configuration.xbrs.consumer_key || 'TEST'
+  end
+
   def self.port
     @port ||= Rails.configuration.xbrs.port || 80
   end
 
   def self.tls_mode
-    @tls_mode ||= Rails.configuration.xbrs.tls_mode
+    @tls_mode ||= Rails.configuration.xbrs.tls_mode || 'no-tls'
   end
 
   def self.gssnegotiate?
@@ -46,7 +50,7 @@ class Xbrs::Base
             'http'
         end
 
-    request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}")
+    request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}?consumer=#{consumer_key}")
 
     case tls_mode
       when 'verify-peer'
