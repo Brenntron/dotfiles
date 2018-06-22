@@ -116,21 +116,22 @@ class Xbrs::Base
     end
   end
 
-  def self.call_json_request(method, path, body:)
+  def self.call_xbrs_request(method, path, body:)
     request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }
     request.body = body.to_json
 
-    request_error_handling(call_request(method, request))
+    response = request_error_handling(call_request(method, request))
+    # transform the response body into valid JSON, from the YAML provided by the API
+    response_body = response.body.gsub("\n---\n",",")
+    response_body = response_body.gsub("---\n", "")
+    response_body = response_body.prepend("[").concat("]")
+    response_body = JSON.parse(response_body)
   end
 
-  def call_json_request(method, path, body:)
-    Xbrs::Base.call_json_request(method, path, body: body)
+  def call_xbrs_request(method, path, body:)
+    Xbrs::Base.call_xbrs_request(method, path, body: body)
   end
 
-  # TODO replace with call_json_request
-  def self.post_request(path:, body:)
-    request_error_handling(make_post_request(path: path, body: body))
-  end
 end
