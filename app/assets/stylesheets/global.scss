@@ -597,7 +597,7 @@ th {
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
 .export-button    {background-image: url(image_path('icon_export.svg'));}
 .expand-button    {background-image: url(image_path('icon_expand.svg'));}
-.expand-row-button    {background-image: url(image_path('icon_expand2.svg'));}
+.expand-row-button {background-image: url(image_path('icon_expand2.svg'));}
 .add-file-button  {background-image: url(image_path('icon_add_file.svg'));}
 .addnote-button   {background-image: url(image_path('icon_add_note.svg'));}
 .order-button     {background-image: url(image_path('icon_order.svg'));}
@@ -670,6 +670,19 @@ th {
   float: right;
   display: inline-block;
   border: none;
+}
+
+.expand-row-button-inline {
+  background-image: url(image_path('icon_expand_lt_grey.svg'));
+  background-repeat: no-repeat;
+  border: none;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+td.expandable-row-column {
+  padding: 8px 0 !important;
 }
 
 .task-result {

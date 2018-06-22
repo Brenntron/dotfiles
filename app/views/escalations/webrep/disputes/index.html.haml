@@ -13,7 +13,7 @@
             %th
             -# Expand / Collapse Button
             %th
-            -# Checkbox
+              %input#disputes_check_box{type: 'checkbox'}
             %th
             -# Priority
             %th Case ID
@@ -40,14 +40,15 @@
       order: [[ 9, "asc" ]],
       dom: '<"datatable-top-tools"lf>t<ip>',
       columnDefs: [
-        {targets: [0, 1], orderable: false}
+        {targets: [0, 1], orderable: false},
+        {targets: [0], className:'expandable-row-column'}
       ],
       columns: [
         /*
             uses of 'render' below are not likely to be the final version of
             generating display, just messing with DataTable options
          */
-        {data: null, defaultContent: ''}, // expansion button
+        {data: null, defaultContent: '<button class="expand-row-button-inline"></button>'}, // expansion button
         {                                 // checkbox
           data: 'case_number',
           render: function ( data, type, row ) {
