@@ -3697,11 +3697,13 @@ button.tertiary {
 .toolbar-button.adjust-wlbl-button    {
   background-image: url(image_path('icon_wlbl_grey.svg'));
   background-size: 18px 18px;
-  height: 27px;
 }
 .toolbar-button.adjust-reptool-button {
   background-image: url(image_path('icon_blacklist_grey.svg'));
   background-size: 18px 18px;
+}
+
+.dropdown button.toolbar-button {
   height: 27px;
 }
 

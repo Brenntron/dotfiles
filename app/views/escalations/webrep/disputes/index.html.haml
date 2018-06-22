@@ -38,7 +38,7 @@
 
 :javascript
   $(document).ready(function() {
-    $('#disputes-index').DataTable({
+    var dispute_table = $('#disputes-index').DataTable({
       order: [[ 9, "desc" ]],
       dom: '<"datatable-top-tools"lf>t<ip>',
       columnDefs: [
@@ -90,4 +90,14 @@
     });
       populate_webrep_index_table();
       // removed "My Tickets" logic
+
+      $('.toggle-vis').on( 'click', function (e) {
+        e.preventDefault();
+
+        // Get the column API object
+        var column = dispute_table.column( $(this).attr('data-column') );
+
+        // Toggle the visibility
+        column.visible( ! column.visible() );
+    } );
   } );

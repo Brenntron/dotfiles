@@ -2,9 +2,21 @@
   %div
     %label.toolbar-section-label
       Table View
-    %button.toolbar-button.show-col-button{title: 'Show/Hide Columns'}
-      %span.toolbar-button-text
-        Show/Hide Columns
+    %span.dropdown
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Show/Hide Columns
+      .dropdown-menu.toolbar-dropdown#table-show-columns{'aria-labelledby': 'table-show-columns-button'}
+        .row
+          .col-sm-6.col-xs-12
+            %label Ticket Details
+            %ul
+              %li
+                %input.toggle-vis{type: 'checkbox', 'data-column':'2'} Priority
+              %li
+                %input.toggle-vis{type: 'checkbox', 'data-column':'3'} Case ID
+
+
     %button.toolbar-button.expand-row-button{title: 'Expand All Rows'}
       %span.toolbar-button-text
         Expand All Rows
