@@ -597,6 +597,7 @@ th {
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
 .export-button    {background-image: url(image_path('icon_export.svg'));}
 .expand-button    {background-image: url(image_path('icon_expand.svg'));}
+.expand-row-button    {background-image: url(image_path('icon_expand2.svg'));}
 .add-file-button  {background-image: url(image_path('icon_add_file.svg'));}
 .addnote-button   {background-image: url(image_path('icon_add_note.svg'));}
 .order-button     {background-image: url(image_path('icon_order.svg'));}
@@ -623,6 +624,9 @@ th {
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
 .show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
+.ticket-status-button {background-image: url(image_path('icon_status.svg'));}
+.mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
+.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -3668,10 +3672,12 @@ button.tertiary {
 .toolbar-button.adjust-wlbl-button    {
   background-image: url(image_path('icon_wlbl_grey.svg'));
   background-size: 18px 18px;
+  height: 27px;
 }
 .toolbar-button.adjust-reptool-button {
   background-image: url(image_path('icon_blacklist_grey.svg'));
   background-size: 18px 18px;
+  height: 27px;
 }
 
 .toolbar .dropdown.open .adjust-wlbl-button, .toolbar .dropdown.open .adjust-reptool-button {
