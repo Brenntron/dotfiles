@@ -25,6 +25,7 @@ class RepApi::Whitelist < RepApi::Base
     { entry: entry, source: source, range: range, ident: ident, comment: comment }
   end
 
+  # TODO: look into wonkiness issues.
   # Get the whitelist entries from the reputation API
   # This is not a relation and cannot be chained with other relations.
   # example: get_where(entries: [ 'http://dodgyweb.net/darkweb' ], active: true)
