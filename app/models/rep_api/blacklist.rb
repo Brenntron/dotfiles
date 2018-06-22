@@ -128,21 +128,31 @@ class RepApi::Blacklist < RepApi::Base
     end
   end
 
-  def delete(comment:)
-    call_json_request(:post, '/blacklist/delete', body: stringkey_params({ entry: self.entry, comment: comment }))
-    freeze
+  def delete
+    expire
   end
 
   def exclude
-    call_json_request(:post, '/blacklist/exclude', body: {entry: self.entry})
+    entries = entry.kind_of?(Array) ? entry : [entry]
+    input = entries.map{ |entry_curr| "entry=#{entry_curr}" }
+
+    response = call_json_request(:post, '/blacklist/exclude', body: build_request_body(input))
+    true
   end
 
   def renew
-    call_json_request(:post, '/blacklist/renew', body: {entry: self.entry})
+    entries = entry.kind_of?(Array) ? entry : [entry]
+    input = entries.map{ |entry_curr| "entry=#{entry_curr}" }
+
+    response = call_json_request(:post, '/blacklist/renew', body: build_request_body(input))
+    true
   end
 
   def expire
-    call_json_request(:post, '/blacklist/expire', body: {entry: self.entry})
-  end
+    entries = entry.kind_of?(Array) ? entry : [entry]
+    input = entries.map{ |entry_curr| "entry=#{entry_curr}" }
 
+    response = call_json_request(:post, '/blacklist/expire', body: build_request_body(input))
+    true
+  end
 end
