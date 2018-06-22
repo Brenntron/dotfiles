@@ -52,7 +52,8 @@ class RepApi::Blacklist < RepApi::Base
   def self.where(conditions = {})
     params = stringkey_params(conditions)
     entries = params.delete('entries')
-    raise 'Missing required entries condition' unless entries.present?
+    raise 'Missing required entries condition' unless entries
+    return [] unless entries.present?
     body = entries.map {|entry| "entry=#{entry}"}.join('&')
 
     response = call_json_request(:post, '/blacklist/get', body: body)
