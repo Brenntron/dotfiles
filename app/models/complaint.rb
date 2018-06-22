@@ -83,15 +83,6 @@ class Complaint < ApplicationRecord
       new_complaint_entry.suggested_disposition = entry["reg_sugg"]
       new_complaint_entry.save
 
-      #if entry["SBRS_Rule_Hits"].present?
-      #  all_hits = entry["SBRS_Rule_Hits"].split(",")
-      #  all_hits.each do |rule_hit|
-      #    new_rule_hit = DisputeRuleHit.new
-      #    new_rule_hit.dispute_entry_id = new_dispute_entry.id
-      #    new_rule_hit.name = rule_hit.strip
-      #    new_rule_hit.save
-      #  end
-      #end
 
     end
 
@@ -105,16 +96,6 @@ class Complaint < ApplicationRecord
       new_complaint_entry.score = entry["WBRS_SCORE"].to_f
       new_complaint_entry.suggested_disposition = entry["reg_sugg"]
       new_complaint_entry.save
-
-      #if entry["WBRS_Rule_Hits"].present?
-      #  all_hits = entry["WBRS_Rule_Hits"].split(",")
-      #  all_hits.each do |rule_hit|
-      #    new_rule_hit = DisputeRuleHit.new
-      #    new_rule_hit.dispute_entry_id = new_dispute_entry.id
-      #    new_rule_hit.name = rule_hit.strip
-      #    new_rule_hit.save
-      #  end
-      #end
 
     end
 
