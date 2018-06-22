@@ -14,12 +14,11 @@
             -# Expand / Collapse Button
             %th
               %input#disputes_check_box{type: 'checkbox'}
-            %th
+            %th.center
             -# Priority
             %th Case ID
             %th Status
             %th Resolution
-            %th Ticket Type
             %th Dispute
             %th Owner
             %th Time Submitted
@@ -40,8 +39,10 @@
       order: [[ 9, "asc" ]],
       dom: '<"datatable-top-tools"lf>t<ip>',
       columnDefs: [
-        {targets: [0, 1], orderable: false},
-        {targets: [0], className:'expandable-row-column'}
+        {targets: [0, 1], orderable: false, searchable: false},
+        {targets: [0], className:'expandable-row-column'},
+        {targets: [3], className:'id-col'},
+        {targets: [4], className:'state-col'}
       ],
       columns: [
         /*
@@ -58,13 +59,12 @@
         {
           data: 'priority',
           render: function ( data, type, row ) {
-              return 'P' + data;
+              return '<span class="bug-priority p-P' + data + '"></span>';
           }
         },
         {data: 'case_link'},
         {data: "status"},                 // status
         {data: "resolution"},             // resolution
-        {data: null, defaultContent: ''},  // dispute ticket type - email vs. web etc.
         // {data: "dispute_domain"},                 // dispute
         {data: null, defaultContent: ''},  // dispute entry, first item
         {data: "assigned_to"},            // owner

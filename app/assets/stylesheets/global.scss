@@ -272,7 +272,7 @@ table.dataTable tbody tr {
 table.dataTable thead .sorting, table.dataTable thead .sorting_desc, table.dataTable thead .sorting_asc  {
   background-repeat: no-repeat;
   background-size: 10px;
-  background-position: right center;
+  background-position: right bottom 5px;
   padding-right: 20px;
 }
 
@@ -683,6 +683,10 @@ th {
 
 td.expandable-row-column {
   padding: 8px 0 !important;
+}
+
+thead th.sorting.center {
+  background-position: center bottom 5px !important;
 }
 
 .task-result {
@@ -2084,6 +2088,10 @@ table .bug-priority {
 
 .rule-state-col, .state-col, .user-group {
   font-weight: 700;
+}
+
+.state-col {
+  text-transform: uppercase;
 }
 
 .task-type-col {
