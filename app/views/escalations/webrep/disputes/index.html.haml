@@ -37,7 +37,11 @@
 :javascript
   $(document).ready(function() {
     $('#disputes-index').DataTable({
+      order: [[ 9, "asc" ]],
       dom: '<"datatable-top-tools"lf>t<ip>',
+      columnDefs: [
+        {targets: [0, 1], orderable: false}
+      ],
       columns: [
         /*
             uses of 'render' below are not likely to be the final version of
