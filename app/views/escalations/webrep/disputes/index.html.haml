@@ -19,6 +19,8 @@
             %th Case ID
             %th Status
             %th Resolution
+            %th.center
+              -#Ticket Type
             %th Dispute
             %th Owner
             %th Time Submitted
@@ -42,7 +44,8 @@
         {targets: [0, 1], orderable: false, searchable: false},
         {targets: [0], className:'expandable-row-column'},
         {targets: [3], className:'id-col'},
-        {targets: [4], className:'state-col'}
+        {targets: [4], className:'state-col'},
+        {targets: [8], className:'alt-col'}
       ],
       columns: [
         /*
@@ -65,8 +68,13 @@
         {data: 'case_link'},
         {data: "status"},                 // status
         {data: "resolution"},             // resolution
-        // {data: "dispute_domain"},                 // dispute
-        {data: null, defaultContent: ''},  // dispute entry, first item
+        {data: null, defaultContent: ''},  // ticket / submission type
+        {
+          data: 'dispute_count',
+          render: function(data){
+            return '<span class="dispute-count">' + data + '</span>';
+          }
+        },  // dispute entry, first item, total entry count
         {data: "assigned_to"},            // owner
         {data: "case_opened_at"},         // time submitted
         {data: "case_age"},               // age [ugly math?]

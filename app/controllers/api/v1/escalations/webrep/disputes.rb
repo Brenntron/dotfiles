@@ -39,7 +39,6 @@ module API
                     dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
                   end
                 end
-                # dispute_packet[:dispute_count] = dispute.dispute_entries.count.to_s
                 dispute_packet[:dispute_count] = dispute.entry_count.to_s
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
@@ -50,7 +49,6 @@ module API
                 dispute_packet[:case_age] = dispute.dispute_age
                 # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
                 dispute_packet[:suggested_disposition] = dispute.suggested_d
-                #dispute_packet[:priority] = "P" + (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
                 dispute_packet[:priority] = (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
                 dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
                 dispute_packet[:source_id] = dispute.ticket_source_key
