@@ -58,6 +58,9 @@ module API
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
+                if dispute.assigned_to.nil?
+                  dispute_packet[:assigned_to] = "<span class='missing-data'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me'></button>"
+                end
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
                 dispute_packet[:case_opened_at] = dispute.case_opened_at.strftime('%Y-%m-%d %H:%M:%S')

@@ -3830,6 +3830,17 @@ button.tertiary {
   display: inline-block;
 }
 
+.take-ticket-button {
+  background-image: url(image_path('icon_take_light2.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  float: right;
+  border: none;
+  background-color: transparent;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
