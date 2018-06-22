@@ -89,3 +89,8 @@ window.toolbar_add_reptool_bl_button =(button_tag) ->
     data: data
     dataType: 'json'
   )
+
+$ ->
+  $('#disputes_check_box').change ->
+    $('.dispute_check_box').prop 'checked', @checked
+    return

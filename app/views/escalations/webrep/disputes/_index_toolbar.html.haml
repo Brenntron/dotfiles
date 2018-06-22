@@ -1,0 +1,52 @@
+.toolbar
+  %div
+    %label.toolbar-section-label
+      Table View
+    %span.dropdown
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Show/Hide Columns
+      .dropdown-menu.toolbar-dropdown#table-show-columns{'aria-labelledby': 'table-show-columns-button'}
+        .row
+          .col-sm-6.col-xs-12
+            %label Ticket Details
+            %ul
+              %li
+                %input.toggle-vis{type: 'checkbox', 'data-column':'2'} Priority
+              %li
+                %input.toggle-vis{type: 'checkbox', 'data-column':'3'} Case ID
+
+
+    %button.toolbar-button.expand-row-button{title: 'Expand All Rows'}
+      %span.toolbar-button-text
+        Expand All Rows
+  %div
+    %label.toolbar-section-label
+      Edit Ticket
+    %button.toolbar-button.ticket-status-button{title: 'Edit Ticket Status'}
+      %span.toolbar-button-text
+        Edit Ticket Status
+    %button.toolbar-button.ticket-owner-button{title: 'Change Assignee'}
+      %span.toolbar-button-text
+        Change Assignee
+    %button.toolbar-button.mark-duplicate-button{title: 'Mark as Duplicate'}
+      %span.toolbar-button-text
+        Mark as Duplicate
+  %div
+    %label.toolbar-section-label
+      Edit Dispute Entry
+    %button.toolbar-button.ticket-status-button{title: 'Edit Entry Status'}
+      %span.toolbar-button-text
+        Edit Entry Status
+    %button.toolbar-button.adjust-wlbl-button{title: 'Adjust WL/BL'}
+      %span.toolbar-button-text
+        Adjust WL/BL
+    %button.toolbar-button.adjust-reptool-button#reptool_entries_button{title: 'Adjust RepTool BL'}
+      %span.toolbar-button-text
+        Adjust RepTool BL
+  %div
+    %label.toolbar-section-label
+      File
+    %button.toolbar-button.export-button{title: 'Export to CSV'}
+      %span.toolbar-button-text
+        Export to CSV

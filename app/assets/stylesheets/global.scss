@@ -272,7 +272,7 @@ table.dataTable tbody tr {
 table.dataTable thead .sorting, table.dataTable thead .sorting_desc, table.dataTable thead .sorting_asc  {
   background-repeat: no-repeat;
   background-size: 10px;
-  background-position: right center;
+  background-position: right bottom 5px;
   padding-right: 20px;
 }
 
@@ -423,6 +423,10 @@ th {
 
 .alt-col {
   background-color: lighten( $faint-neutral-color, 2% );
+}
+
+th.alt-col {
+  background-color: transparent;
 }
 
 .user-col-divider {
@@ -597,6 +601,7 @@ th {
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
 .export-button    {background-image: url(image_path('icon_export.svg'));}
 .expand-button    {background-image: url(image_path('icon_expand.svg'));}
+.expand-row-button {background-image: url(image_path('icon_expand2.svg'));}
 .add-file-button  {background-image: url(image_path('icon_add_file.svg'));}
 .addnote-button   {background-image: url(image_path('icon_add_note.svg'));}
 .order-button     {background-image: url(image_path('icon_order.svg'));}
@@ -623,6 +628,9 @@ th {
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
 .show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
+.ticket-status-button {background-image: url(image_path('icon_status.svg'));}
+.mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
+.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -666,6 +674,23 @@ th {
   float: right;
   display: inline-block;
   border: none;
+}
+
+.expand-row-button-inline {
+  background-image: url(image_path('icon_expand_lt_grey.svg'));
+  background-repeat: no-repeat;
+  border: none;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+td.expandable-row-column {
+  padding: 8px 0 !important;
+}
+
+thead th.sorting.center {
+  background-position: center bottom 5px !important;
 }
 
 .task-result {
@@ -2067,6 +2092,10 @@ table .bug-priority {
 
 .rule-state-col, .state-col, .user-group {
   font-weight: 700;
+}
+
+.state-col {
+  text-transform: uppercase;
 }
 
 .task-type-col {
@@ -3674,6 +3703,10 @@ button.tertiary {
   background-size: 18px 18px;
 }
 
+.dropdown button.toolbar-button {
+  height: 27px;
+}
+
 .toolbar .dropdown.open .adjust-wlbl-button, .toolbar .dropdown.open .adjust-reptool-button {
   background-color: $bug-section-color;
   color: $content-bg-color;
@@ -3775,6 +3808,41 @@ button.tertiary {
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
 }
+
+.datatable-top-tools {
+  float: right;
+  margin-top: -55px;
+  border: 1px solid $faint-neutral-color;
+  height: 35px;
+  padding: 3px;
+}
+
+.dispute-count {
+  background-color: darken($nav-toolbar-color, 8%);
+  display: inline-block;
+  border-radius: 2px;
+  font-weight: bold;
+  padding: 1px 6px;
+  color: $content-bg-color;
+  margin-top: -1px;
+  float: right;
+}
+
+.dispute-count, .dispute_entry_content_first {
+  display: inline-block;
+}
+
+.take-ticket-button {
+  background-image: url(image_path('icon_take_light2.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  float: right;
+  border: none;
+  background-color: transparent;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {

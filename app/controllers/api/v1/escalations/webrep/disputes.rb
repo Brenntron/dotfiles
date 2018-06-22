@@ -39,18 +39,34 @@ module API
                     dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
                   end
                 end
-                # dispute_packet[:dispute_count] = dispute.dispute_entries.count.to_s
                 dispute_packet[:dispute_count] = dispute.entry_count.to_s
+                dispute_packet[:dispute_entries] = []
+                unless dispute.dispute_entries.empty?
+                  dispute.dispute_entries.each do |entry|
+                    unless entry[:ip_address].nil?
+                      dispute_packet[:dispute_entries].push(entry[:ip_address])
+                    end
+                    unless entry[:uri].nil?
+                      dispute_packet[:dispute_entries].push(entry[:uri])
+                    end
+                    unless entry[:hostname].nil?
+                      dispute_packet[:dispute_entries].push(entry[:hostname])
+                    end
+                  end
+                end
+                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entries].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
+                if dispute.assigned_to.nil?
+                  dispute_packet[:assigned_to] = "<span class='missing-data'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me'></button>"
+                end
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
                 dispute_packet[:case_opened_at] = dispute.case_opened_at.strftime('%Y-%m-%d %H:%M:%S')
                 dispute_packet[:case_age] = dispute.dispute_age
                 # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
                 dispute_packet[:suggested_disposition] = dispute.suggested_d
-                #dispute_packet[:priority] = "P" + (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
                 dispute_packet[:priority] = (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
                 dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
                 dispute_packet[:source_id] = dispute.ticket_source_key
@@ -58,6 +74,7 @@ module API
 
                 dispute_packet[:wbrs_score] = ''
                 dispute_packet[:wbrs_rule_hits] = []
+
                 dispute.dispute_entries.each do |d_entry|
                   if dispute_packet[:wbrs_score].empty? and d_entry[:score_type] == "WBRS"
                     dispute_packet[:wbrs_score] = d_entry[:score].to_s unless d_entry[:score].nil?
