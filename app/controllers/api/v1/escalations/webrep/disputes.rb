@@ -40,6 +40,21 @@ module API
                   end
                 end
                 dispute_packet[:dispute_count] = dispute.entry_count.to_s
+                dispute_packet[:dispute_entries] = []
+                unless dispute.dispute_entries.empty?
+                  dispute.dispute_entries.each do |entry|
+                    unless entry[:ip_address].nil?
+                      dispute_packet[:dispute_entries].push(entry[:ip_address])
+                    end
+                    unless entry[:uri].nil?
+                      dispute_packet[:dispute_entries].push(entry[:uri])
+                    end
+                    unless entry[:hostname].nil?
+                      dispute_packet[:dispute_entries].push(entry[:hostname])
+                    end
+                  end
+                end
+                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entries].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
@@ -56,6 +71,7 @@ module API
 
                 dispute_packet[:wbrs_score] = ''
                 dispute_packet[:wbrs_rule_hits] = []
+
                 dispute.dispute_entries.each do |d_entry|
                   if dispute_packet[:wbrs_score].empty? and d_entry[:score_type] == "WBRS"
                     dispute_packet[:wbrs_score] = d_entry[:score].to_s unless d_entry[:score].nil?

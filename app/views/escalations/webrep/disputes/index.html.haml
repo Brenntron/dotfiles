@@ -33,6 +33,7 @@
             %th Submitter Domain
             %th Contact Name
             %th Contact Email
+            %th
 
 
 :javascript
@@ -69,12 +70,7 @@
         {data: "status"},                 // status
         {data: "resolution"},             // resolution
         {data: null, defaultContent: ''},  // ticket / submission type
-        {
-          data: 'dispute_count',
-          render: function(data){
-            return '<span class="dispute-count">' + data + '</span>';
-          }
-        },  // dispute entry, first item, total entry count
+        {data: "d_entry_preview"},        // entry content of first entry, followed by count of number of entries submitted
         {data: "assigned_to"},            // owner
         {data: "case_opened_at"},         // time submitted
         {data: "case_age"},               // age [ugly math?]
