@@ -29,7 +29,30 @@ class RepApi::Base
   end
 
   def stringkey_params(conditions = {})
-    Wbrs::Base.stringkey_params(conditions)
+    RepApi::Base.stringkey_params(conditions)
+  end
+
+  def self.build_request_body(input)
+    case input
+      when Array
+        string_array = input.map do |element|
+          case
+            when element.kind_of?(Array) && 1 == element.count
+              element.first.to_s
+            when element.kind_of?(Array) && 2 == element.count
+              "#{element[0]}=#{element[1]}"
+            else
+              element.to_s
+          end
+        end
+        string_array.join('&')
+      else #when String
+        input
+    end
+  end
+
+  def build_request_body(input)
+    RepApi::Base.build_request_body(input)
   end
 
   def self.new_request(path)
@@ -114,6 +137,6 @@ class RepApi::Base
   end
 
   def call_json_request(method, path, body:)
-    Wbrs::Base.call_json_request(method, path, body: body)
+    RepApi::Base.call_json_request(method, path, body: body)
   end
 end
