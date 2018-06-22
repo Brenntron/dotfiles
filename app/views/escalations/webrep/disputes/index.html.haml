@@ -39,7 +39,7 @@
 :javascript
   $(document).ready(function() {
     $('#disputes-index').DataTable({
-      order: [[ 9, "asc" ]],
+      order: [[ 9, "desc" ]],
       dom: '<"datatable-top-tools"lf>t<ip>',
       columnDefs: [
         {targets: [0, 1], orderable: false, searchable: false},
@@ -57,7 +57,7 @@
         {                                 // checkbox
           data: 'case_number',
           render: function ( data, type, row ) {
-              return '<input type="checkbox" name="cbox" id="cbox' + data + '" value="' + data + '" />';
+              return '<input type="checkbox" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />';
           }
         },
         {
