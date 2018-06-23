@@ -10,10 +10,44 @@
         .dropdown-menu-content-block
           .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Details
           %ul
-            %li
-              %input.toggle-vis{type: 'checkbox', 'data-column':'2'} Priority
-            %li
-              %input.toggle-vis{type: 'checkbox', 'data-column':'3'} Case ID
+            %li.toggle-vis{'data-column':'2'}
+              %input{type: 'checkbox', checked: true} Priority
+            %li.toggle-vis{'data-column':'3'}
+              %input{type: 'checkbox', checked: true} Case ID
+            %li.toggle-vis{'data-column':'4'}
+              %input{type: 'checkbox', checked: true} Status
+            %li.toggle-vis{'data-column':'5'}
+              %input{type: 'checkbox'} Resolution
+            %li.toggle-vis{'data-column':'6'}
+              %input{type: 'checkbox', checked: true} Ticket Type
+            %li.toggle-vis{'data-column':'7'}
+              %input{type: 'checkbox', checked: true} Dispute
+            %li.toggle-vis{'data-column':'8'}
+              %input{type: 'checkbox', checked: true} Owner
+            %li.toggle-vis{'data-column':'9'}
+              %input{type: 'checkbox', checked: true} Time Submitted
+            %li.toggle-vis{'data-column':'10'}
+              %input{type: 'checkbox', checked: true} Age
+            %li.toggle-vis{'data-column':'11'}
+              %input{type: 'checkbox', checked: true} Suggested Disposition
+            %li.toggle-vis{'data-column':'12'}
+              %input{type: 'checkbox'} Case Origin
+            %li.toggle-vis{'data-column':'13'}
+              %input{type: 'checkbox'} Origin ID
+            %li.toggle-vis{'data-column':'14'}
+              %input{type: 'checkbox'} Submitter Type
+            %li.toggle-vis{'data-column':'15'}
+              %input{type: 'checkbox'} Submitter Org
+            %li.toggle-vis{'data-column':'16'}
+              %input{type: 'checkbox'} Submitter Domain
+            %li.toggle-vis{'data-column':'17'}
+              %input{type: 'checkbox'} Contact Name
+            %li.toggle-vis{'data-column':'18'}
+              %input{type: 'checkbox'} Contact Email
+
+
+
+
         .dropdown-menu-content-block
           .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
           %ul

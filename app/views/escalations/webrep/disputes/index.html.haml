@@ -91,13 +91,25 @@
       populate_webrep_index_table();
       // removed "My Tickets" logic
 
-      $('.toggle-vis').on( 'click', function (e) {
-        e.preventDefault();
+      // Hide unchecked columns <- need to somehow save this 'view'
+      $('.toggle-vis').each(function() {
+        var column = dispute_table.column( $(this).attr('data-column') );
+        var checkbox = $(this).find("input");
+        if ($(checkbox).prop("checked")) {
+          column.visible(true);
+        }
+        else   {
+          column.visible(false);
+        }
+      } );
 
-        // Get the column API object
+     $('.toggle-vis').on( 'click', function (e) {
+        e.preventDefault();
+        var checkbox = $(this).find("input");
         var column = dispute_table.column( $(this).attr('data-column') );
 
-        // Toggle the visibility
+        $(checkbox).prop("checked", !checkbox.prop("checked"));
         column.visible( ! column.visible() );
+
     } );
   } );
