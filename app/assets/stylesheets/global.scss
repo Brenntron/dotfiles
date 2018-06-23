@@ -3883,11 +3883,16 @@ button.tertiary {
 }
 
 #table-show-columns-dropdown {
-  min-width: 400px;
+  min-width: 600px;
 }
 
 .dropdown-menu-content-block ul {
   padding: 10px;
+  display: inline-block;
+}
+
+.dropdown-menu-content-block ul:first-of-type {
+  float: left;
 }
 
 .dropdown-menu-content-block li {

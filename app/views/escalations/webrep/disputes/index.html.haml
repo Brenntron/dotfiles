@@ -101,15 +101,14 @@
         else   {
           column.visible(false);
         }
+
+        $(this).on( 'click', function () {
+          $(checkbox).prop("checked", !checkbox.prop("checked"));
+          column.visible( ! column.visible() );
+        } );
+
+        $(checkbox).on( 'click', function () {
+          $(checkbox).prop("checked", !checkbox.prop("checked"));
+        } );
       } );
-
-     $('.toggle-vis').on( 'click', function (e) {
-        e.preventDefault();
-        var checkbox = $(this).find("input");
-        var column = dispute_table.column( $(this).attr('data-column') );
-
-        $(checkbox).prop("checked", !checkbox.prop("checked"));
-        column.visible( ! column.visible() );
-
-    } );
   } );
