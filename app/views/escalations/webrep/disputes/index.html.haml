@@ -34,31 +34,10 @@
             %th Contact Name
             %th Contact Email
 
-      .hidden
-        %table.table.responsive.dispute-entry-table
-          %thead
-            %tr
-              %th
-                %input{type: 'checkbox'}
-              %th Dispute Entry
-              %th Dispute Entry Status
-              %th Category
-              %th Original WBRS Score
-              %th Current WBRS Score
-              %th WBRS Total Rule Hits
-              %th WBRS Rules
-              %th SBRS Total Rule Hits
-              %th SBRS Score
-              %th SBRS Rules
-              %th WL/BL Entries
-              %th RepTool Classification
-              %th RepTool Rule Status
-
 :javascript
   $(document).ready(function() {
     function format ( dispute ) {
-    // `d` is the original data object for the row
-      return '<table class="table dispute-entry-table">'+
+      var table_head = '<table class="table dispute-entry-table">'+
         '<thead>' +
           '<tr>'+
               '<th><input type="checkbox"></th>' +
@@ -75,10 +54,14 @@
               '<th>WL/BL Entries</th>' +
               '<th>RepTool Classification</th>' +
               '<th>RepTool Rule Status</th>' +
-          '</tr>'+
-          '<tr>'+
+          '</tr>';
+      debugger
+      var entry = dispute.dispute_entries
+      var entry_rows = []
+      $(entry).each(function() {
+        var entry_row = '<tr>'+
               '<td><input type="checkbox"></td>'+
-              '<td>' + dispute.case_number + '</td>'+
+              '<td>' + this + '</td>'+
               '<td></td>'+
               '<td></td>'+
               '<td></td>'+
@@ -91,8 +74,12 @@
               '<td></td>'+
               '<td></td>'+
               '<td></td>'+
-          '</tr>'+
-      '</table>';
+            '</tr>';
+        entry_rows.push(entry_row);
+      });
+
+    // `d` is the original data object for the row
+      return table_head + entry_rows + '</table>'
       }
 
     var dispute_table = $('#disputes-index').DataTable({
@@ -149,7 +136,6 @@
       // removed "My Tickets" logic
 
     $('#disputes-index tbody').on('click', 'td.expandable-row-column', function () {
-        debugger
         var tr = $(this).closest('tr');
         var row = dispute_table.row( tr );
 
@@ -180,10 +166,10 @@
         $(this).on( 'click', function () {
           $(checkbox).prop("checked", !checkbox.prop("checked"));
           column.visible( ! column.visible() );
-        } );
+        });
 
         $(checkbox).on( 'click', function () {
           $(checkbox).prop("checked", !checkbox.prop("checked"));
-        } );
-      } );
-  } );
+        });
+      });
+  });
