@@ -6,15 +6,19 @@
       %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Columns
-      .dropdown-menu.toolbar-dropdown#table-show-columns{'aria-labelledby': 'table-show-columns-button'}
-        .row
-          .col-sm-6.col-xs-12
-            %label Ticket Details
-            %ul
-              %li
-                %input.toggle-vis{type: 'checkbox', 'data-column':'2'} Priority
-              %li
-                %input.toggle-vis{type: 'checkbox', 'data-column':'3'} Case ID
+      .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
+        .dropdown-menu-content-block
+          .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Details
+          %ul
+            %li
+              %input.toggle-vis{type: 'checkbox', 'data-column':'2'} Priority
+            %li
+              %input.toggle-vis{type: 'checkbox', 'data-column':'3'} Case ID
+        .dropdown-menu-content-block
+          .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
+          %ul
+            %li Stuff
+            %li More Stuff
 
 
     %button.toolbar-button.expand-row-button{title: 'Expand All Rows'}
