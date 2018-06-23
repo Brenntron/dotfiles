@@ -33,11 +33,68 @@
             %th Submitter Domain
             %th Contact Name
             %th Contact Email
-            %th
 
+      .hidden
+        %table.table.responsive.dispute-entry-table
+          %thead
+            %tr
+              %th
+                %input{type: 'checkbox'}
+              %th Dispute Entry
+              %th Dispute Entry Status
+              %th Category
+              %th Original WBRS Score
+              %th Current WBRS Score
+              %th WBRS Total Rule Hits
+              %th WBRS Rules
+              %th SBRS Total Rule Hits
+              %th SBRS Score
+              %th SBRS Rules
+              %th WL/BL Entries
+              %th RepTool Classification
+              %th RepTool Rule Status
 
 :javascript
   $(document).ready(function() {
+    function format ( dispute ) {
+    // `d` is the original data object for the row
+      return '<table class="table dispute-entry-table">'+
+        '<thead>' +
+          '<tr>'+
+              '<th><input type="checkbox"></th>' +
+              '<th>Dispute Entry</th>'+
+              '<th>Dispute Entry Status</th>' +
+              '<th>Category</th>' +
+              '<th>Original WBRS Score</th>' +
+              '<th>Current WBBRS Scrore</th>' +
+              '<th>WBRS Total Rule Hits</th>' +
+              '<th>WBRS Rules</th>' +
+              '<th>SBRS Total Rule Hits</th>' +
+              '<th>SBRS Score</th>' +
+              '<th>SBRS Rules</th>' +
+              '<th>WL/BL Entries</th>' +
+              '<th>RepTool Classification</th>' +
+              '<th>RepTool Rule Status</th>' +
+          '</tr>'+
+          '<tr>'+
+              '<td><input type="checkbox"></td>'+
+              '<td>' + dispute.case_number + '</td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+              '<td></td>'+
+          '</tr>'+
+      '</table>';
+      }
+
     var dispute_table = $('#disputes-index').DataTable({
       order: [[ 9, "desc" ]],
       dom: '<"datatable-top-tools"lf>t<ip>',
@@ -82,7 +139,7 @@
         {data: "submitter_org"},          // submitter org
         {data: "submitter_domain"},       // submitter domain
         {data: null, defaultContent: ''},  // contact name
-        // {data: null, defaultContent: ''},  // contact email
+        // {data: null, defaultContent: ''}   // contact email
         // {data: "wbrs_score"},             // wbrs score
         // {data: "wbrs_rule_hits"},         // wbrs rule hits
         // {data: null, defaultContent: ''}  // malware probability
@@ -90,6 +147,24 @@
     });
       populate_webrep_index_table();
       // removed "My Tickets" logic
+
+    $('#disputes-index tbody').on('click', 'td.expandable-row-column', function () {
+        debugger
+        var tr = $(this).closest('tr');
+        var row = dispute_table.row( tr );
+
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
+    });
+
 
       // Hide unchecked columns <- need to somehow save this 'view'
       $('.toggle-vis').each(function() {
