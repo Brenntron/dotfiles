@@ -40,19 +40,22 @@ module API
                   end
                 end
                 dispute_packet[:dispute_count] = dispute.entry_count.to_s
-                dispute_packet[:dispute_entries] = []
+
+                dispute_packet[:dispute_entry_content] = []
                 unless dispute.dispute_entries.empty?
                   dispute.dispute_entries.each do |entry|
                     unless entry[:ip_address].nil?
-                      dispute_packet[:dispute_entries].push(entry[:ip_address])
+                      dispute_packet[:dispute_entry_content].push(entry[:ip_address])
                     end
                     unless entry[:uri].nil?
-                      dispute_packet[:dispute_entries].push(entry[:uri])
+                      dispute_packet[:dispute_entry_content].push(entry[:uri])
                     end
                   end
                 end
 
-                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entries].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+                dispute_packet[:dispute_entries] = dispute.dispute_entries
+
+                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email

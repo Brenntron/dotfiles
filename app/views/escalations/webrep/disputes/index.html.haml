@@ -45,7 +45,7 @@
               '<th>Dispute Entry Status</th>' +
               '<th>Category</th>' +
               '<th>Original WBRS Score</th>' +
-              '<th>Current WBBRS Scrore</th>' +
+              '<th>Current WBRS Scrore</th>' +
               '<th>WBRS Total Rule Hits</th>' +
               '<th>WBRS Rules</th>' +
               '<th>SBRS Total Rule Hits</th>' +
@@ -59,14 +59,27 @@
           '<tbody>'
       var entry = dispute.dispute_entries
       var entry_rows = []
-      $(entry).each(function() {
+      $(entry).each(function(i) {
+
+        var entry_content = ''
+        if (this.ip_address != null) {
+          entry_content = this.ip_address
+        }
+        else if (this.uri != null) {
+          entry_content = this.uri
+        }
+        else {
+          entry_content = 'Missing Data'
+        }
+
+
         var entry_row = '<tr>'+
               '<td><input type="checkbox"></td>'+
-              '<td>' + this + '</td>'+
+              '<td>' + entry_content + '</td>'+
+              '<td>' + this.status + '</td>'+
+              '<td>' + this.primary_category + '</td>'+
               '<td></td>'+
-              '<td></td>'+
-              '<td></td>'+
-              '<td></td>'+
+              '<td>' + this.score + '</td>'+
               '<td></td>'+
               '<td></td>'+
               '<td></td>'+
