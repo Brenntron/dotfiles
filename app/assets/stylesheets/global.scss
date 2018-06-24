@@ -685,6 +685,10 @@ th.alt-col {
   height: 20px;
 }
 
+.shown .expand-row-button-inline {
+  background-image: url(image_path('icon_collapse_blue.svg'));
+}
+
 td.expandable-row-column {
   padding: 8px 0 !important;
 }
@@ -3902,6 +3906,43 @@ button.tertiary {
 
 .dropdown-menu-content-block li input {
   margin-right: 8px;
+}
+
+.dispute-entry-table {
+  margin: 0;
+}
+
+.dispute-entry-table tbody{
+  background-color: #4E4E4E;;
+  color: $content-bg-color;
+}
+
+.dispute-entry-table tbody tr td, .dispute-entry-table thead tr th {
+  border-color: #413D3D;
+}
+
+.dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child {
+  padding-left: 30px;
+}
+
+.dispute-entry-table thead {
+  background-color: #413D3D;
+  color: $content-bg-color;
+}
+
+.dispute-entry-table-wrapper {
+  padding: 0 0 0 20px !important;
+  background-color: $bug-section-color;
+}
+
+.dispute-entry-table-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  margin-top: -1px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid $content-bg-color;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

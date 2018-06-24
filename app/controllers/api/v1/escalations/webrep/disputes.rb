@@ -49,11 +49,9 @@ module API
                     unless entry[:uri].nil?
                       dispute_packet[:dispute_entries].push(entry[:uri])
                     end
-                    unless entry[:hostname].nil?
-                      dispute_packet[:dispute_entries].push(entry[:hostname])
-                    end
                   end
                 end
+
                 dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entries].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution

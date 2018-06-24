@@ -54,8 +54,9 @@
               '<th>WL/BL Entries</th>' +
               '<th>RepTool Classification</th>' +
               '<th>RepTool Rule Status</th>' +
-          '</tr>';
-      debugger
+          '</tr>' +
+          '</thead>' +
+          '<tbody>'
       var entry = dispute.dispute_entries
       var entry_rows = []
       $(entry).each(function() {
@@ -74,12 +75,12 @@
               '<td></td>'+
               '<td></td>'+
               '<td></td>'+
-            '</tr>';
+            '</tr>'
         entry_rows.push(entry_row);
       });
 
     // `d` is the original data object for the row
-      return table_head + entry_rows + '</table>'
+      return table_head + entry_rows + '</tbody></table>'
       }
 
     var dispute_table = $('#disputes-index').DataTable({
@@ -125,7 +126,7 @@
         {data: "submitter_name"},         // submitter name
         {data: "submitter_org"},          // submitter org
         {data: "submitter_domain"},       // submitter domain
-        {data: null, defaultContent: ''},  // contact name
+        {data: null, defaultContent: ''}  // contact name
         // {data: null, defaultContent: ''}   // contact email
         // {data: "wbrs_score"},             // wbrs score
         // {data: "wbrs_rule_hits"},         // wbrs rule hits
@@ -148,6 +149,8 @@
             // Open this row
             row.child( format(row.data()) ).show();
             tr.addClass('shown');
+            var td = $(tr).next("tr").find("td:first");
+            $(td).addClass('dispute-entry-table-wrapper');
         }
     });
 
