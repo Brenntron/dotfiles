@@ -1,0 +1,67 @@
+- content_for(:title) do
+  Escalations WebCat - Analyst Console
+
+- content_for(:nav_banner) do
+  %div
+    %div{:style => "float: left;"}
+      %div{:style => "float: left;"}
+         
+      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
+        %a{:href => "/escalations/webcat/complaints"} [Complaints]
+      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
+        %a{:href => "/escalations/webcat/rules"} [Rules]
+      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
+        %a{:href => "/escalations/webcat/reports"} [Reports]
+      %div{:style => "float: left;"}
+             
+      %div{:style => "float: left;"}
+             
+      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
+        %a ⇃|↾ GroupBy
+      %div{:style => "float: left;"}
+             
+      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
+        %a + NEW Complaint
+      %div{:style => "float: left;"}
+             
+      %div{:style => "float: left;"}
+             
+      %div{:style => "float: left; padding: 6px; border: 1px solid black;"}
+        %input{:type => "text"}/
+        .dropdown
+          %button Advanced Search
+          .dropdown-content
+            = label_tag 'advanced_query_complaints', 'Complaint IDs'
+            %br/
+            = text_area_tag 'complaint_ids', nil, placeholder: 'Add some complaint IDs...'
+            = label_tag 'advanced_query_urls', 'URLs/IPs/Domains'
+            %br/
+            = text_area_tag 'urls_ids', nil, placeholder: 'Add some urls/ips/domains...'
+            = label_tag 'advanced_query_regex', 'URL regex'
+            %br/
+            = text_field_tag 'regex_text', nil, placeholder: 'Add a URL regex...'
+            = label_tag 'advanced_query_status', 'Status'
+            = select_tag "Status", options_for_select([ "New", "Assigned", "Resolved"], "Assigned")
+            %br/
+            = label_tag 'advanced_query_resolution', 'Resolution'
+            = select_tag "Resolution", options_for_select([ "Fixed", "Invalid", "WontFix"], "Fixed")
+            %br/
+            = label_tag 'advanced_query_tag', 'Tag'
+            = text_field_tag 'tag_text', nil, placeholder: 'Add tag...'
+            %br/
+            = label_tag 'advanced_query_channel', 'Added Through Channel'
+            %br/
+            .checkbox
+              %label
+                %input{:type => "checkbox"}/
+                WBNP
+            .checkbox
+              %label
+                %input{:type => "checkbox"}/
+                Submit URLS
+            .checkbox
+              %label
+                %input{:type => "checkbox"}/
+                that other way
+
+= render template: "layouts/rocket"
