@@ -69,4 +69,11 @@ Rails.configuration.wbrs.port           = wbrs['port']
 Rails.configuration.wbrs.tls_mode       = wbrs['tls_mode']
 Rails.configuration.wbrs.gssnegotiate   = wbrs['gssnegotiate']
 
+xbrs = env_config.fetch('xbrs', {})
+Rails.configuration.xbrs                = OpenStruct.new
+Rails.configuration.xbrs.host           = xbrs['host']
+Rails.configuration.xbrs.port           = xbrs['port']
+Rails.configuration.xbrs.tls_mode       = xbrs['tls_mode']
+Rails.configuration.xbrs.gssnegotiate   = xbrs['gssnegotiate']
+
 

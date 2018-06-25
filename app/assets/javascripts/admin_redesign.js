@@ -31,4 +31,6 @@
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require application/webcat_complaints
+//= require application/webrep/disputes
+//= require application/webrep_research_tab
 

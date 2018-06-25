@@ -4164,6 +4164,16 @@ input.file_attachment {
   border: 1px solid darken($faint-neutral-color, 5%);
 }
 
+.table-entry-input {
+  width: 100%;
+  border: 4px solid $content-bg-color;
+  outline: 1px solid darken($faint-neutral-color, 5%);
+}
+
+input.table-entry-input:focus {
+  background-color: $faint-alt-highlight;
+}
+
 .border-section {
   border-right: 1px solid $faint-neutral-color;
   border-left: 1px solid $faint-neutral-color;
@@ -4175,6 +4185,7 @@ input.file_attachment {
   display: block;
   padding: 6px 12px;
 }
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
