@@ -107,17 +107,30 @@ class Dispute < ApplicationRecord
       new_dispute_entry.dispute_id = new_dispute.id
       new_dispute_entry.ip_address = key
       new_dispute_entry.entry_type = "IP"
-      new_dispute_entry.score_type = "SBRS"
-      new_dispute_entry.score = entry["SBRS_SCORE"].to_f
-      new_dispute_entry.suggested_disposition = entry["reg_sugg"]
+      #new_dispute_entry.score_type = "SBRS"
+      #new_dispute_entry.score = entry["SBRS_SCORE"].to_f
+      new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"]
+      new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] 
+      new_dispute_entry.suggested_disposition = entry["rep_sugg"]
       new_dispute_entry.save
 
-      if entry["SBRS_Rule_Hits"].present?
+      if entry[:sbrs]["SBRS_Rule_Hits"].present?
         all_hits = entry["SBRS_Rule_Hits"].split(",")
         all_hits.each do |rule_hit|
           new_rule_hit = DisputeRuleHit.new
           new_rule_hit.dispute_entry_id = new_dispute_entry.id
           new_rule_hit.name = rule_hit.strip
+          new_rule_hit.rule_type = "sbrs"
+          new_rule_hit.save
+        end
+      end
+      if entry[:sbrs]["WBRS_Rule_Hits"].present?
+        all_hits = entry["WBRS_Rule_Hits"].split(",")
+        all_hits.each do |rule_hit|
+          new_rule_hit = DisputeRuleHit.new
+          new_rule_hit.dispute_entry_id = new_dispute_entry.id
+          new_rule_hit.name = rule_hit.strip
+          new_rule_hit.rule_type = "wbrs"
           new_rule_hit.save
         end
       end
@@ -131,10 +144,11 @@ class Dispute < ApplicationRecord
       new_dispute_entry.uri = key
       new_dispute_entry.wbrs_score = entry["wbrs_score"]
       new_dispute_entry.sbrs_score = entry["sbrs_score"]
-      new_dispute_entry.suggested_disposition = entry["reg_sugg"]
+      new_dispute_entry.suggested_disposition = entry["rep_sugg"]
       new_dispute_entry.subdomain = url_parts[:subdomain]
       new_dispute_entry.domain = url_parts[:domain]
       new_dispute_entry.path = url_parts[:path]
+      new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
       new_dispute_entry.save
 
       if entry["WBRS_Rule_Hits"].present?
