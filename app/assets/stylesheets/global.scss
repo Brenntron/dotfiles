@@ -3887,7 +3887,7 @@ button.tertiary {
 }
 
 #table-show-columns-dropdown {
-  min-width: 600px;
+  min-width: 700px;
 }
 
 .dropdown-menu-content-block ul {
@@ -3912,9 +3912,14 @@ button.tertiary {
   margin: 0;
 }
 
+.dispute-entry-table .missing-data {
+  color: $faint-neutral-color;
+}
+
 .dispute-entry-table tbody{
   background-color: #4E4E4E;;
   color: $content-bg-color;
+  font-weight: 300;
 }
 
 .dispute-entry-table tbody tr td, .dispute-entry-table thead tr th {
@@ -3928,6 +3933,10 @@ button.tertiary {
 .dispute-entry-table thead {
   background-color: #413D3D;
   color: $content-bg-color;
+}
+
+.dispute-entry-table th {
+  font-weight: 600 !important;
 }
 
 .dispute-entry-table-wrapper {

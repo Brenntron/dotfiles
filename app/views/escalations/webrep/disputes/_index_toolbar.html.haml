@@ -51,19 +51,36 @@
         .dropdown-menu-content-block
           .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
           %ul
-            %li Dispute Entry
-            %li Dispute Entry Status
-            %li Category
-            %li Original WBRS Score
-            %li Current WBRS Score
-            %li WBRS Total Rule Hits
-            %li WBRS Rules
-            %li SBRS Score
-            %li SBRS Total Rule Hits
-            %li SBRS Rules
-            %li WL/BL Entries
-            %li RepTool Classification
-            %li RepTool Rule Status
+            %li.toggle-vis-nested{'data-column': 'entry-col-content'}
+              %input{type: 'checkbox', checked: true} Dispute Entry
+            %li.toggle-vis-nested{'data-column': 'entry-col-status'}
+              %input{type: 'checkbox', checked: true} Dispute Entry Status
+            %li.toggle-vis-nested{'data-column': 'entry-col-disp'}
+              %input{type: 'checkbox', checked: true} Suggested Disposition
+            %li.toggle-vis-nested{'data-column': 'entry-col-cat'}
+              %input{type: 'checkbox', checked: true} Category
+            %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-orig'}
+              %input{type: 'checkbox'} Original WBRS Score
+            %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-score'}
+              %input{type: 'checkbox', checked: true} Current WBRS Score
+            %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-hits'}
+              %input{type: 'checkbox', checked: true} WBRS Total Rule Hits
+            %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-rules'}
+              %input{type: 'checkbox'} WBRS Rules
+
+          %ul
+            %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-score'}
+              %input{type: 'checkbox', checked: true} SBRS Score
+            %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-hits'}
+              %input{type: 'checkbox', checked: true} SBRS Total Rule Hits
+            %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-rules'}
+              %input{type: 'checkbox'} SBRS Rules
+            %li.toggle-vis-nested{'data-column': 'entry-col-wlbl'}
+              %input{type: 'checkbox', checked: true} WL/BL Entries
+            %li.toggle-vis-nested{'data-column': 'entry-col-reptool-class'}
+              %input{type: 'checkbox', checked: true} RepTool Classification
+            %li.toggle-vis-nested{'data-column': 'entry-col-reptool-stat'}
+              %input{type: 'checkbox'} RepTool Rule Status
 
 
     %button.toolbar-button.expand-row-button{title: 'Expand All Rows'}
