@@ -25,7 +25,6 @@
             %th Owner
             %th Time Submitted
             %th Age
-            %th Suggested Disposition
             %th Case Origin
             %th Origin ID
             %th Submitter Type
@@ -37,7 +36,8 @@
 :javascript
   $(document).ready(function() {
     function format ( dispute ) {
-      var table_head = '<table class="table dispute-entry-table">'+
+      var table_head =
+      '<table class="table dispute-entry-table">'+
         '<thead>' +
           '<tr>'+
               '<th><input type="checkbox"></th>' +
@@ -45,8 +45,7 @@
               '<th class="entry-col-status">Dispute Entry Status</th>' +
               '<th class="entry-col-disp">Suggested Disposition</th>' +
               '<th class="entry-col-cat">Category</th>' +
-              '<th class="entry-col-wbrs-orig">Original WBRS Score</th>' +
-              '<th class="entry-col-wbrs-score">Current WBRS Score</th>' +
+              '<th class="entry-col-wbrs-score">WBRS Score</th>' +
               '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' +
               '<th class="entry-col-wbrs-rules">WBRS Rules</th>' +
               '<th class="entry-col-sbrs-score">SBRS Score</th>' +
@@ -54,7 +53,6 @@
               '<th class="entry-col-sbrs-rules">SBRS Rules</th>' +
               '<th class="entry-col-wlbl">WL/BL Entries</th>' +
               '<th class="entry-col-reptool-class">RepTool Classification</th>' +
-              '<th class="entry-col-reptool-stat">RepTool Rule Status</th>' +
           '</tr>' +
           '</thead>' +
           '<tbody>'
@@ -99,13 +97,13 @@
           suggested_disposition = missing_data;
         }
 
-        var entry_row = '<tr>'+
+        var entry_row =
+        '<tr>'+
           '<td><input type="checkbox"></td>'+
           '<td class="entry-col-content">' + entry_content + '</td>'+
           '<td class="entry-col-status">' + status + '</td>'+
           '<td class="entry-col-disp">' + suggested_disposition + '</td>'+
           '<td class="entry-col-cat">' + category + '</td>' +
-          '<td class="entry-col-wbrs-orig"></td>' +
           '<td class="entry-col-wbrs-score">' + this.score + '</td>'+
           '<td class="entry-col-wbrs-hits"></td>'+
           '<td class="entry-col-wbrs-rules"></td>'+
@@ -114,7 +112,6 @@
           '<td class="entry-col-sbrs-rules"></td>'+
           '<td class="entry-col-wlbl"></td>'+
           '<td class="entry-col-reptool-class"></td>'+
-          '<td class="entry-col-reptool-stat"></td>'+
         '</tr>'
         entry_rows.push(entry_row);
       });
@@ -122,6 +119,7 @@
     // `d` is the original data object for the row
       return table_head + entry_rows + '</tbody></table>';
       }
+
 
     var dispute_table = $('#disputes-index').DataTable({
       order: [[ 9, "desc" ]],
@@ -141,13 +139,13 @@
         {data: null, defaultContent: '<button class="expand-row-button-inline"></button>'}, // expansion button
         {                                 // checkbox
           data: 'case_number',
-          render: function ( data, type, row ) {
+          render: function ( data ) {
               return '<input type="checkbox" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />';
           }
         },
         {
           data: 'priority',
-          render: function ( data, type, row ) {
+          render: function ( data ) {
               return '<span class="bug-priority p-P' + data + '"></span>';
           }
         },
@@ -159,18 +157,14 @@
         {data: "assigned_to"},            // owner
         {data: "case_opened_at"},         // time submitted
         {data: "case_age"},               // age [ugly math?]
-        {data: "suggested_disposition"},  // suggested disposition
         {data: "source"},                 // origin
         {data: "source_id"},              // origin id
         {data: null, defaultContent: ''},  // submitter type (customer or guest)
         {data: "submitter_name"},         // submitter name
         {data: "submitter_org"},          // submitter org
         {data: "submitter_domain"},       // submitter domain
-        {data: null, defaultContent: ''}  // contact name
+        {data: null, defaultContent: ''},  // contact name
         // {data: null, defaultContent: ''}   // contact email
-        // {data: "wbrs_score"},             // wbrs score
-        // {data: "wbrs_rule_hits"},         // wbrs rule hits
-        // {data: null, defaultContent: ''}  // malware probability
       ]
     });
       populate_webrep_index_table();
@@ -191,7 +185,6 @@
           tr.addClass('shown');
           var td = $(tr).next("tr").find("td:first");
           $(td).addClass('dispute-entry-table-wrapper');
-
           // Check to see which columns should be displayed
           $('.toggle-vis-nested').each(function() {
             var checkbox_trigger = $(this).attr('data-column');
