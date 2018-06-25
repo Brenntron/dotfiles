@@ -55,6 +55,13 @@ Rails.configuration.ruledocs_repo_url   = env_config['svn']['ruledocs_repo_url']
 Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['snort_rule_path'])
 
 
+rep_api = env_config.fetch('rep_api', {})
+Rails.configuration.rep_api                = OpenStruct.new
+Rails.configuration.rep_api.host           = rep_api['host']
+Rails.configuration.rep_api.port           = rep_api['port']
+Rails.configuration.rep_api.tls_mode       = rep_api['tls_mode']
+Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
+
 wbrs = env_config.fetch('wbrs', {})
 Rails.configuration.wbrs                = OpenStruct.new
 Rails.configuration.wbrs.host           = wbrs['host']
