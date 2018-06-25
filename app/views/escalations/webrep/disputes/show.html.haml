@@ -47,8 +47,84 @@
       %label.content-label-sm
         Age
       %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
-
--     #<!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
+    .row#top_bar_extended_info
+      .col-xs-12
+        %h3 Submitter Information
+        .row
+          .col-xs-1
+            Submitter
+            %br
+            Guest
+          .col-xs-2
+            Submitter Organization
+            %br
+            Paragon Downloads
+          .col-xs-4
+            Submitter Domain
+            %br
+            paragon-downloads.com
+          .col-xs-1
+            Contact Name
+            %br
+            Monica Taylor
+          .col-xs-2
+            Contact Email
+            %br
+            person@paragon-downloads.com
+          .col-xs-1
+            Origin
+            %br
+            SenderBase
+          .col-xs-1
+            Origin ID
+            %br
+            227566
+        %h3 Case Management Information
+        .row
+          .col-xs-1
+            First Accept Date
+            %br
+            2017-10-24 15:35:55
+          .col-xs-1
+            First Repsonse Date
+            %br
+            2017-10-24 15:36:55
+          .col-xs-1
+            Minutes to Accept
+            %br
+            848.9
+          .col-xs-1
+            Minutes to Respond
+            %br
+            853.4
+          .col-xs-1
+            Days to Close
+            %br
+          .col-xs-5
+            Minutes to Close
+            %br
+          .col-xs-1
+            Email Count
+            %br
+            3
+          .col-xs-1
+            Last Updated By
+            %br
+            Melissa Taylor
+        %h3 Duplicate Cases
+        .row
+          .col-xs-2
+            Case ID
+            %p= @dispute.id
+          .col-xs-2
+            Date/Time Submitted
+            %p = @dispute.case_opened_at
+          .col-xs-8
+            Time Marked Duplicate
+    .row
+      .col-xs-12.text-center
+        %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).toggle()'}
+          [x]
 
 
 %ul.nav.nav-tabs#bug-tabs{role: 'tablist'}
