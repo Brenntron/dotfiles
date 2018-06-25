@@ -80,7 +80,7 @@ class Complaint < ApplicationRecord
       new_complaint_entry.ip_address = key
       new_complaint_entry.wbrs_score = entry["wbrs_score"]
       new_complaint_entry.sbrs_score = entry["sbrs_score"]
-      new_complaint_entry.suggested_disposition = entry["reg_sugg"]
+      new_complaint_entry.suggested_disposition = entry["cat_sugg"]
       new_complaint_entry.save
 
 
