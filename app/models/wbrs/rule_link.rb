@@ -26,14 +26,17 @@ class Wbrs::RuleLink < Wbrs::Base
   # @param [Array<Integer>] prefix_ids: List of prefixes ids
   # @param [Array<String>] urls: List of URLs
   # @param [Array<Integer>] category_ids: List of prefixes categories
+  # @param [Array<Wbrs::Category>] categories: List of prefixes category objects
   # @param [Boolean] active: prefixes active/disable status
   # @param [Integer] limit: Max number of records to return
   # @param [Integer] offset: Offset of the first record to return
   # @return [Array<Wbrs::Rule>] Array of the results.
   def self.where(conditions = {})
     params = stringkey_params(conditions)
-    params['categories'] = params.delete('category_ids') unless params['category_ids'].nil?
+    category_ids = Wbrs::Category.category_ids_from_params(params)
+    params['categories'] = category_ids if category_ids.present?
     params['is_active'] = params.delete('active') ? 1 : 0 unless params['active'].nil?
+
     response = post_request(path: '/v1/cat/rules/get', body: params)
 
     response_body = JSON.parse(response.body)

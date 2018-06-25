@@ -6,7 +6,9 @@ module API
           include API::V1::Defaults
 
           resource "escalations/webrep/disputes" do
-            
+            before do
+              PaperTrail.whodunnit = current_user.id if current_user.present?
+            end
             desc 'get all disputes'
             params do
             end

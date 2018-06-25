@@ -25,7 +25,8 @@ module API
             put ":id", root: "dispute_email" do
               @dispute_email = DisputeEmail.find(permitted_params[:id])
               @dispute_email.update_attributes(status: permitted_params[:status])
-              @dispute_email
+
+              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments}
             end
 
             desc "create a dispute email"
@@ -40,7 +41,6 @@ module API
             end
 
             post "", root: "dispute_email" do
-
               begin
                 #temporary, for development, don't wanna be sending these to actual customers
                 params[:to] = "claclair@cisco.com"
