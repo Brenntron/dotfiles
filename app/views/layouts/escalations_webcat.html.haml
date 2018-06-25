@@ -2,66 +2,71 @@
   Escalations WebCat - Analyst Console
 
 - content_for(:nav_banner) do
-  %div
-    %div{:style => "float: left;"}
-      %div{:style => "float: left;"}
-         
-      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
-        %a{:href => "/escalations/webcat/complaints"} [Complaints]
-      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
-        %a{:href => "/escalations/webcat/rules"} [Rules]
-      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
-        %a{:href => "/escalations/webcat/reports"} [Reports]
-      %div{:style => "float: left;"}
-             
-      %div{:style => "float: left;"}
-             
-      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
-        %a ⇃|↾ GroupBy
-      %div{:style => "float: left;"}
-             
-      %div{:style => "float: left; padding: 10px; border: 1px solid black;"}
-        %a + NEW Complaint
-      %div{:style => "float: left;"}
-             
-      %div{:style => "float: left;"}
-             
-      %div{:style => "float: left; padding: 6px; border: 1px solid black;"}
-        %input{:type => "text"}/
-        .dropdown
-          %button Advanced Search
-          .dropdown-content
-            = label_tag 'advanced_query_complaints', 'Complaint IDs'
-            %br/
-            = text_area_tag 'complaint_ids', nil, placeholder: 'Add some complaint IDs...'
-            = label_tag 'advanced_query_urls', 'URLs/IPs/Domains'
-            %br/
-            = text_area_tag 'urls_ids', nil, placeholder: 'Add some urls/ips/domains...'
-            = label_tag 'advanced_query_regex', 'URL regex'
-            %br/
-            = text_field_tag 'regex_text', nil, placeholder: 'Add a URL regex...'
-            = label_tag 'advanced_query_status', 'Status'
-            = select_tag "Status", options_for_select([ "New", "Assigned", "Resolved"], "Assigned")
-            %br/
-            = label_tag 'advanced_query_resolution', 'Resolution'
-            = select_tag "Resolution", options_for_select([ "Fixed", "Invalid", "WontFix"], "Fixed")
-            %br/
-            = label_tag 'advanced_query_tag', 'Tag'
-            = text_field_tag 'tag_text', nil, placeholder: 'Add tag...'
-            %br/
-            = label_tag 'advanced_query_channel', 'Added Through Channel'
-            %br/
-            .checkbox
-              %label
-                %input{:type => "checkbox"}/
-                WBNP
-            .checkbox
-              %label
-                %input{:type => "checkbox"}/
-                Submit URLS
-            .checkbox
-              %label
-                %input{:type => "checkbox"}/
-                that other way
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
+    %a#complaints.nav-page-button{href: '/escalations/webcat/complaints'}
+      %span.nav-toolbar-icon-large.icon-queue
+
+    %a#rules.nav-page-button{href: '/escalations/webcat/rules'}
+      %span.nav-toolbar-icon-large.icon-queue
+
+    %a#reports.nav-page-button{href: '/escalations/webcat/reports'}
+      %span.nav-toolbar-icon-large.icon-queue
+
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'group-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    -#  %span{class: 'nav-toolbar-icon icon-filter-white'}
+    -#  Group By
+    .dropdown-menu.nav-tools-dropdown#group-dropdown{'aria-labelledby': 'group-cases'}
+      Group By
+
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'new-complaint', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-import-white'}
+      New Complaint
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-complaint'} New   
+
+  .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-4.search-wrapper
+    .input-group.search-group
+      = form_tag('/tickets', method: :get) do
+        = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search'
+
+      %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        Advanced
+      .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
+        %h3.nav-tool-dropdown-header.inverse
+          Advanced Search
+        #advanced-search-wrapper.nav-tool-content-wrapper
+          = label_tag 'advanced_query_complaints', 'Complaint IDs'
+          %br/
+          = text_area_tag 'complaint_ids', nil, placeholder: 'Add some complaint IDs...'
+          = label_tag 'advanced_query_urls', 'URLs/IPs/Domains'
+          %br/
+          = text_area_tag 'urls_ids', nil, placeholder: 'Add some urls/ips/domains...'
+          = label_tag 'advanced_query_regex', 'URL regex'
+          %br/
+          = text_field_tag 'regex_text', nil, placeholder: 'Add a URL regex...'
+          = label_tag 'advanced_query_status', 'Status'
+          = select_tag "Status", options_for_select([ "New", "Assigned", "Resolved"], "Assigned")
+          %br/
+          = label_tag 'advanced_query_resolution', 'Resolution'
+          = select_tag "Resolution", options_for_select([ "Fixed", "Invalid", "WontFix"], "Fixed")
+          %br/
+          = label_tag 'advanced_query_tag', 'Tag'
+          = text_field_tag 'tag_text', nil, placeholder: 'Add tag...'
+          %br/
+          = label_tag 'advanced_query_channel', 'Added Through Channel'
+          %br/
+          .checkbox
+            %label
+              %input{:type => "checkbox"}/
+              WBNP
+          .checkbox
+            %label
+              %input{:type => "checkbox"}/
+              Submit URLS
+          .checkbox
+            %label
+              %input{:type => "checkbox"}/
+              that other way
 
 = render template: "layouts/rocket"
