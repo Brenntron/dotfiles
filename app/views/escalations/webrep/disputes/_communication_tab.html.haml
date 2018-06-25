@@ -22,74 +22,59 @@
                 =email.created_at.strftime("%Y-%d-%m")
                 %br
                 =email.created_at.strftime("%H:%M:%S")
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.disp-status-icon
-            %td
-              %span.case-history-author
-                Automated
-              %span.case-history-preview
-                Status changed from
-                %span.emphasize Researching
-                to
-                %span.emphasize Email Out.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.note-icon
-            %td
-              %span.case-history-author
-                melitayl
-              %span.case-history-preview
-                This is a note regarding this ticket.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.disp-status-icon
-            %td
-              %span.case-history-author
-                melitayl
-              %span.case-history-preview
-                Status changed from
-                %span.emphasize Assigned
-                to
-                %span.emphasize Researching.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
-          %tr
-            %td.alt-col.icon-col
-              %span.case-history-icon.disp-status-icon
-            %td
-              %span.case-history-author
-                melitayl
-              %span.case-history-preview
-                Status changed from
-                %span.emphasize New
-                to
-                %span.emphasize Assigned.
-            %td.alt-col.case-history-datetime
-              2017-10-24
-              %br
-              15:35:24
+
+          -@dispute.dispute_comments.recent_first.each do |comment|
+            %tr
+              %td.alt-col.icon-col
+                %span.case-history-icon.note-icon
+              %td
+                %span.case-history-author
+                  =comment.user.cec_username
+                %span.case-history-preview
+                  =comment.comment.truncate(75, omission: '...')
+              %td.alt-col.case-history-datetime
+                =comment.created_at.strftime("%Y-%d-%m")
+                %br
+                =comment.created_at.strftime("%H:%M:%S")
+
+          -@versioned_items.each do |item|
+            -item.versions.each do |version|
+              %tr
+                %td.alt-col.icon-col
+                  %span.case-history-icon.disp-status-icon
+                %td
+                  %span.case-history-author
+                    =whodunnit_helper(version)
+                  -version.changeset.each do |field, (changed_from, changed_to) |
+                    %span.case-history-preview
+                      =field_changeset_handler(field, changed_from)
+                      %span.emphasize #{changed_from}
+                      to
+                      %span.emphasize #{changed_to}.
+                %td.alt-col.case-history-datetime
+                  =version.created_at.strftime("%Y-%d-%m")
+                  %br
+                  =version.created_at.strftime("%H:%M:%S")
 
 
-  .col-sm-6
+  .col-sm-6.border-section
     .row
       .col-xs-12.highlighted-section-header
         %h1 Communication
-        // Only show Notice if email is to customer
-        .customer-facing-notice
+        // Only show Notice if email selected is a duplicate
+        .email-notice-block.duplicate-email-notice
+          Duplicate Ticket Email
+        // Only show Notice if email selected is to customer
+        .email-notice-block.customer-facing-notice
           Customer Facing Message
-        %button.new-email-button
-          Compose New Email
+
+        .communication-toolbar
+          %button.new-email-button
+            Compose New Email
+          %button.mng-templates-button
+            Manage Email Templates
+
+
     .row
       .col-xs-12.email-header-information.hidden
         .email-header-data
@@ -101,11 +86,9 @@
             %span.content-label-sm To
             %span.receiver-email
             %br
-            %span.attachment-label
+            %span.attachment-label#incoming-attachment.hidden
             %span.email-attachments
-              %a.email-attachment-name Attachment_name.png
-              ,
-              %a.email-attachment-name attachment_v2.png
+
         .email-response-button-wrapper
           .email-response-buttons
             %button.reply-button
@@ -115,55 +98,187 @@
       .col-xs-12.email-msg-body
         %pre.email-msg-content
 
-    #email-reply.hidden
-      .row
-        .col-xs-12.email-header-information
-          .email-header-data
-            %textarea.communication-subject
-            .sender-receiver-info
-              %span.content-label-sm To
-              %span.receiver-email
-              #file-fields
+    #newEmailDialog{title: 'Compose New Email'}
+      %form
+        .email-reply-header-information
+          .sender-receiver-info
+            %span.content-label-sm.content-label-sm-to To
+            %input.receiver-email.new-receiver{autofocus: true, required: true, type: 'email', name: 'receiver'}
+            %span.content-label-sm.content-label-sm-sub Subject
+            %input.communication-subject.new-subject{type: 'text'}
+
+          .email-reply-button-wrapper
+            .email-reply-buttons
+              %button.attachment-button.attachment-label.new-attachment
+
+          .template-select-wrapper
+            .template-label
+              Select a Template
+
+            %select.dropdown.email-template-select#select-new-template
+              -if EmailTemplate.all.empty?
+                %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+              -else
+                %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
 
-          .email-response-button-wrapper
-            .email-response-buttons
-              %button.attachment-button.attachment-label
-      .row
-        %textarea.col-xs-12.email-reply-body
+          #file-fields-new
 
-      .row
-        .col-xs-12.text-center
-          %button.add-case-note-button#reply
+        .email-reply-body-wrapper
+          %textarea.email-reply-body.new-body
+
+        .email-new-button-wrapper
+          %button.primary#send-new-email{value: 'submit'}
             Send
+
+    #manageTemplatesDialog{title: 'Manage Email Templates'}
+      %table.table
+        %thead
+          %tr.table-header-highlight
+            %th Template Name
+            %th Description
+            %th.min70
+          -EmailTemplate.all.each do |template|
+            %tr
+              %td=template.template_name
+              %td=template.description
+              %td
+                %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
+                %button.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
+
+      #new-template-form-wrapper
+        %h4.dialog-inset-header New Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#new-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#new-template-desc{required: true, type: 'text', name: 'template-description'}
+          .template-content-wrapper
+            %textarea.template-content#new-template-body
+
+      #edit-template-form-wrapper
+        %h4.dialog-inset-header Edit Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#edit-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#edit-template-desc{required: true, type: 'text', name: 'template-description'}
+            %input.hidden#template-id
+          .template-content-wrapper
+            %textarea.template-content#edit-template-body
+
+      .dialog-section-divider
+        %button.primary#save-email-template.hidden
+          Save Template
+        %button.secondary#create-email-template
+          Create New Template
+        %button.primary#edit-email-template.hidden
+          Update Template
+        %button.secondary.hidden#cancel-edit-email-template
+          Cancel
+
+
+    .row
+      .col-xs-12#email-reply.hidden
+        .row
+          .col-xs-12.email-reply-content-wrapper
+            .row
+              .col-xs-12.email-reply-header-information
+                .row
+                  .col-xs-4
+                    .sender-receiver-info
+                      %span.reply-symbol
+                      %span.receiver-email
+                  .col-xs-8
+                    .template-select-wrapper
+                      .template-label
+                        Select a Template
+
+                    %select.dropdown.email-template-select#select-reply-template
+                      -if EmailTemplate.all.empty?
+                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                      -else
+                        %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                        =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+
+                    .email-reply-button-wrapper
+                      .email-reply-buttons
+                        %button.attachment-button.attachment-label.attachment-reply
+                        %button.delete-email
+                .row
+                  .col-xs-12
+                    %input.communication-subject.reply-subject{type: 'text'}
+
+                .row
+                  .col-xs-12.file-wrapper-reply
+                    #file-fields
+            .row
+              .col-xs-12.email-reply-body-wrapper
+                %textarea.email-reply-body.reply-body{autofocus: true}
+
+        .row
+          .col-xs-12.text-center
+            %button.primary#send-reply
+              Send
+
 
 
   .col-sm-3
-    %h1 Notes
-    .row
-      .col-xs-12
-        .note-info-item.author-notation
-          Written by
-          %span.author-username
-            melitayl
-          1 day ago.
-        .note-info-item.time-stamp
-          2017-10-24 15:35:24
-        .note-info-item.note-tool-buttons
-          %button.note-edit-button
-          %button.note-copy-button
-          %button.note-delete-button
+    %h1.notes-header Notes
+    %button.add-case-note-button#new-case-note-button
+      Add Note
 
-    .row
-      .col-xs-12
-        .note-block
-          This is a note regarding this ticket. I have looked into this information and it appears to be correct.
 
-    .row
-      .col-xs-12.text-center
-        %button.add-case-note-button#new-case-note-button
-          Add Note
+    .note-wrapper.new-case-note-row
+      .row
+        .col-xs-12
+          .note-info-item.author-notation
+            Creating new note
+          .note-info-item.note-tool-buttons
+            %button.note-save-button.new-case-note-save-button
+            %button.note-cancel-button.new-case-note-cancel-button
+            %button.note-copy-button
+      .row
+        .col-xs-12
+          .note-block.content-editable.new-case-note-textarea{contenteditable: true}
+            %pre
+
+    -@dispute.dispute_comments.recent_first.each do |comment|
+      .note-wrapper
+        .row
+          .col-xs-12
+            .note-info-item.author-notation
+              Written by
+              %span.author-username
+                =comment.user.cec_username
+              = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
+            %br.hidden-break
+            .note-info-item.time-stamp
+              =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
+            .note-info-item.note-tool-buttons
+              %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
+              %button.note-delete-button{comment_id: "#{comment.id}"}
+
+        .row
+          .col-xs-12
+            - if comment.user.cec_username == current_user.cec_username
+              .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
+                %pre=comment.comment
+            - else
+              .note-block{comment_id: "#{comment.id}"}
+                %pre=comment.comment
+
+
 
     %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
     %input{:name => "dispute_id", :type => "hidden", :value => "#{@dispute.id}"}
+    %input{:name => "current_user_id", :type => "hidden", :value => "#{current_user.id}"}
+
+  :javascript
+    AC.Helpers.clipboard()

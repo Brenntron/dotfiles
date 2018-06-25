@@ -12,6 +12,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def show
     @dispute = Dispute.find(params[:id])
     @entries = @dispute.dispute_entries
+    @versioned_items = @dispute.compose_versioned_items
   end
 
   def update

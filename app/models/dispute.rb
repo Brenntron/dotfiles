@@ -1,4 +1,5 @@
 class Dispute < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at]
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
@@ -35,6 +36,15 @@ class Dispute < ApplicationRecord
     else
       "%dm %ds" % [mm, ss]
     end
+  end
+
+  def compose_versioned_items
+    versioned_items = [self]
+
+    dispute_comments.map{ |dc| versioned_items << dc}
+    dispute_entries.map{ |de| versioned_items << de}
+
+    versioned_items
   end
 
   def self.process_bridge_payload(message_payload)
