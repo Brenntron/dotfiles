@@ -33,7 +33,7 @@ gem 'curb', '~> 0.9.3' #Libcurl bindings for Ruby
 
 gem 'net-ssh', '~> 4.1.0'
 gem 'daemons', '~> 1.2.4'
-gem 'activemessaging', '0.13.1.2'  # , path: './vendor/gems/activemessaging'
+# gem 'activemessaging', '0.13.1.2'  # , path: './vendor/gems/activemessaging'
 gem 'stomp', '~> 1.4.3'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '~> 0.9.12.4'
@@ -60,6 +60,8 @@ gem 'delayed_job', '~> 4.1.3'
 gem 'delayed_job_active_record', '~> 4.1.2'
 gem 'jquery-datatables-rails', '~> 3.4.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
+gem 'clipboard-rails', '1.7.1'
+
 
 gem 'inline_svg'
 
