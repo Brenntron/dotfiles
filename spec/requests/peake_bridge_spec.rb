@@ -33,7 +33,7 @@ RSpec.describe "Widget management", :type => :request do
   it 'receives fp_create' do
     allow(Thread).to receive(:new)
 
-    post '/bridge/channels/fp-create/messages', params: {
+    post '/bridge/channels/fp-event/messages', params: {
         envelope: {
             channel: "fp-create",
             addressee: "analyst-console",

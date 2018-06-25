@@ -130,7 +130,7 @@ module API
             end
             post "reptool_bl" do
               reptool_bl_params = permitted_params.to_h.merge('author' => current_user.cvs_username)
-              blacklist = Wbrs::Blacklist.new(reptool_bl_params)
+              blacklist = RepApi::Blacklist.new(reptool_bl_params)
               blacklist.save!
               ''
             end

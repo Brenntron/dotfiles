@@ -3,12 +3,8 @@
 #
 # The code below loads those classes to correct for this.
 
-describe Admin::HomeController
-describe Admin::MigrationsController
-
 describe EventsController
 describe ReferencesController
-describe RolesController
 
 describe ApiTest::EngineTypesController
 describe ApiTest::EnginesController
