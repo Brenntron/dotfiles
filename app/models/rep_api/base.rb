@@ -77,9 +77,11 @@ class RepApi::Base
         request.ssl = true
         request.auth.ssl.verify_mode = :peer
         request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
+        request.auth.ssl.ssl_version = :TLSv1_2
       when 'verify-none'
         request.ssl = true
         request.auth.ssl.verify_mode = :none
+        request.auth.ssl.ssl_version = :TLSv1_2
       else #no-tls
         request.ssl = false
     end
