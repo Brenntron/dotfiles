@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.index ["tag_id"], name: "index_bugs_tags_on_tag_id"
   end
 
-  create_table "bugs_whiteboards", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "bugs_whiteboards", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "bug_id", null: false
     t.bigint "whiteboard_id", null: false
     t.index ["bug_id", "whiteboard_id"], name: "index_bugs_whiteboards_on_bug_id_and_whiteboard_id", unique: true
@@ -190,7 +190,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.index ["company_id"], name: "index_customers_on_company_id"
   end
 
-  create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "cves", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "reference_id", null: false
@@ -231,7 +231,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
   create_table "dispute_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "dispute_id"
     t.text "comment"
-    t.string "state"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -334,14 +334,14 @@ ActiveRecord::Schema.define(version: 20180621231320) do
   end
 
   create_table "email_templates", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.text "description"
     t.string "template_name"
+    t.text "description"
     t.text "body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "escalation_links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "escalation_links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "snort_research_bug_id"
     t.integer "snort_escalation_bug_id"
     t.datetime "created_at", null: false
@@ -382,7 +382,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.integer "reference_id"
   end
 
-  create_table "false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "bug_id"
@@ -504,7 +504,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.text "summary"
     t.text "impact"
     t.text "details"
-    t.text "affected_sys"
+    t.text "affected_sys", limit: 4294967295
     t.text "attack_scenarios"
     t.text "ease_of_attack"
     t.text "false_positives"
@@ -569,7 +569,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.string "product"
   end
 
-  create_table "snort_researches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "snort_researches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "bug_id"
     t.integer "snort_research_to_research_bug_id"
     t.datetime "created_at", null: false
