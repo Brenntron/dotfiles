@@ -220,32 +220,36 @@
                       <tr>
                         <td>
                           <label class="content-label-sm">Classification</label><br/>
-                          Spam <!-- Put entry classification here -->
+                          <%= entry.classifications.first %>
                         </td>
                         <td>
                           <label class="content-label-sm">Expiration</label><br/>
-                          2018-06-02T13:12:48 <!-- Put entry rule expiration of current rule -->
+                          <%= entry.blacklist&.expiration %>
                         </td>
                       </tr>
                     </table>
                     <div class="inline-tool-content-wrapper">
                       <div class="toolbar">
                         <div>
-                          <label class="toolbar-section-label">Status</label>
-                          <select class="toolbar-select select-status" title="RepTool Rule Status">
-                            <option selected value="Active">Active</option><!-- Put current entry's status as the selected option -->
-                            <!-- Put all status options here (Active vs. Expired & if there are any others -->
-                          </select>
+                          <label class="toolbar-section-label" for="entry-<%= entry.id %>-blacklist-action-select">Status</label>
+                          <%= rep_form.select(:action, ['Active', 'Expired'],
+                                              {
+                                                  selected: entry.blacklist ? 'Active' : 'Expired'
+                                              },
+                                              class: 'toolbar-select select-status',
+                                              title: 'RepTool Rule Status',
+                                              id: "entry-#{entry.id}-blacklist-action-select") %>
                         </div>
                         <div>
-                          <label class="toolbar-section-label">RepTool BL</label>
-                          <select class="toolbar-select select-rt-rule adjust-reptool-bl-classifications-input" title="RepTool BL Rules">
-                            <option selected value="trd_sus">trd_sus</option><!-- Put current entry's rule here as the selected option -->
-                            <!-- Put all other rule options here (trd_spam, trd_mal, etc.) -->
-                            <%= RepApi::Blacklist.classifications.each do |classification| %>
-                              <option value="<%= classification %>"><%= classification %></option>
-                            <% end %>
-                          </select>
+                          <label class="toolbar-section-label" for="entry-<%= entry.id %>-blacklist-classifications-select">RepTool BL</label>
+                          <%= rep_form.select(:classification, RepApi::Blacklist.classifications,
+                                              {
+                                                  selected: entry.classifications&.first,
+                                                  include_blank: !entry.blacklist
+                                              },
+                                              class: 'toolbar-select select-rt-rule adjust-reptool-bl-classifications-input',
+                                              title: "RepTool BL Rules",
+                                              id: "entry-#{entry.id}-blacklist-classifications-select") %>
                         </div>
                       </div>
                       <label class="content-label-sm">Comment</label>
