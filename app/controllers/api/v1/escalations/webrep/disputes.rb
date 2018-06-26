@@ -112,7 +112,6 @@ module API
             desc "Add a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
-              optional :urls, type: Array[String], desc: "urls"
               requires :trgt_list, type: String, desc: "type of WL/BL"
               optional :thrt_cats, type: Array[String], desc: "threat categories"
               requires :note, type: String, desc: "note"
@@ -124,15 +123,14 @@ module API
 
             desc "Add a Reptool Bl entry"
             params do
-              requires :entries, type: Array[String], desc: "urls"
+              requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+              #requires :entries, type: Array[String], desc: "urls"
               requires :classifications, type: Array[String], desc: "classifications"
               requires :comment, type: String, desc: "comment"
             end
             post "reptool_bl" do
-              reptool_bl_params = permitted_params.to_h.merge('author' => current_user.cvs_username)
-              blacklist = RepApi::Blacklist.new(reptool_bl_params)
-              blacklist.save!
-              ''
+              RepApi::Blacklist.add_from_params(permitted_params, username: current_user.cvs_username)
+              true
             end
 
           end

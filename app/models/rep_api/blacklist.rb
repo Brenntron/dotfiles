@@ -166,4 +166,15 @@ class RepApi::Blacklist < RepApi::Base
     response = call_json_request(:post, '/blacklist/expire', body: build_request_body(input))
     true
   end
+
+  def self.add_from_params(params, username:)
+    dispute_entry_ids = params['dispute_entry_ids']
+    raise 'Must provide dispute entry ids' unless dispute_entry_ids
+    dispute_entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
+    reptool_entries = dispute_entries.map {|entry| entry.wbrs_url}
+
+    blacklist = RepApi::Blacklist.new(entry: reptool_entries,
+                                      classifications: params['classifications'])
+    blacklists = blacklist.save!(author: username, comment: params['comment'])
+  end
 end
