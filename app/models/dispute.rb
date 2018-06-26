@@ -3,6 +3,7 @@ class Dispute < ApplicationRecord
   has_many :dispute_emails
   has_many :dispute_entries
   belongs_to :customer
+  belongs_to :user
 
   NEW = 'new'
   RESOLVED = 'resolved'
@@ -41,12 +42,61 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def self.parse_url(url)
+    pre_url = url.gsub("http://", "").gsub("https://", "")
+    url = "http://" + pre_url
+
+    uri_parts = {}
+
+    uri_object = URI(url)
+
+    domain_parts = uri_object.host.split(".")
+    if domain_parts > 2
+      uri_parts[:subdomain] = domain_parts.first
+      uri_parts[:domain] = domain_parts - [domain_parts.first]
+      uri_parts[:path] = uri_object.path
+    else
+      uri_parts[:subdomain] = ""
+      uri_parts[:domain] = uri_object.host
+      uri_parts[:path] = uri_object.path
+    end
+
+
+    uri_parts
+  end
+
+  def self.is_possible_company_duplicate(dispute, entry, entry_type)
+    company_id = dispute.customer.company.id
+
+    candidates = Dispute.includes(:customer).includes(:dispute_entries).where(:status != RESOLVED, :customers => {:company_id => company_id}, :dispute_entries => {:entry_type => entry_type})
+
+    if candidates.blank?
+      return false
+    end
+
+    candidates.each do |candidate|
+      if entry_type == "IP"
+        possible_duplicates = candidate.dispute_entries.any? {|entry| entry.ip_address == entry}
+      end
+
+      if entry_type == "URI/DOMAIN"
+        possible_duplicates = candidate.dispute_entries.any? {|entry| entry.hostname == entry}
+      end
+
+    end
+
+    return possible_duplicates.present?
+
+  end
+
   def self.process_bridge_payload(message_payload)
     user = User.where(cvs_username:"vrtincom").first
     #TODO: this should be put in a params method
     message_payload["payload"] = message_payload["payload"].permit!.to_h
     new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
     new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+
+    return_payload = {}
 
 
     #BIG TO DO:  RESEARCH!!!
@@ -97,12 +147,23 @@ class Dispute < ApplicationRecord
     new_dispute.ticket_source_key = message_payload["source_key"]
     new_dispute.ticket_source = "talos-intelligence"
     new_dispute.ticket_source_type = message_payload["source_type"]
+    new_dispute.submission_type = message_payload["submission_type"]  # email, web, both  [e|w|ew]
 
     new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
 
     new_dispute.save
 
     new_entries_ips.each do |key, entry|
+
+      #this is for return back to TI to populate its ticket show pages
+      new_payload_item = {}
+      new_payload_item[:sugg_type] = entry["rep_sugg"]
+      new_payload_item[:status] = "pending"
+      new_payload_item[:resolution_message] = ""
+      new_payload_item[:resolution] = ""
+      new_payload_item[:company_dup] = is_possible_company_duplicate(new_dispute, key, "IP")
+      return_payload[key] = new_payload_item
+
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = new_dispute.id
       new_dispute_entry.ip_address = key
@@ -112,6 +173,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"]
       new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] 
       new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+      new_dispute_entry.entry_type = "IP"
       new_dispute_entry.save
 
       if entry[:sbrs]["SBRS_Rule_Hits"].present?
@@ -138,7 +200,12 @@ class Dispute < ApplicationRecord
     end
 
     new_entries_urls.each do |key, entry|
-      url_parts = Complaint.parse_url(key)
+
+      #this is for return back to TI to populate its ticket show pages
+
+
+
+      url_parts = Dispute.parse_url(key)
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = new_dispute.id
       new_dispute_entry.uri = key
@@ -149,7 +216,16 @@ class Dispute < ApplicationRecord
       new_dispute_entry.domain = url_parts[:domain]
       new_dispute_entry.path = url_parts[:path]
       new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
+      new_dispute_entry.entry_type = "URI/DOMAIN"
       new_dispute_entry.save
+
+      new_payload_item = {}
+      new_payload_item[:sugg_type] = entry["rep_sugg"]
+      new_payload_item[:status] = "pending"
+      new_payload_item[:resolution_message] = ""
+      new_payload_item[:resolution] = ""
+      new_payload_item[:company_dup] = is_possible_company_duplicate(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
+      return_payload[key] = new_payload_item
 
       if entry["WBRS_Rule_Hits"].present?
         all_hits = entry["WBRS_Rule_Hits"].split(",")
@@ -176,6 +252,8 @@ class Dispute < ApplicationRecord
     first_email.status = DisputeEmail::UNREAD
     first_email.save
 
+
+    case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
     #change this
     return_message = {
       "envelope":
@@ -184,7 +262,7 @@ class Dispute < ApplicationRecord
               "addressee": "talos-intelligence",
               "sender": "analyst-console"
           },
-      "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK"}
+      "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": case_email}
     }
   end
 
