@@ -258,7 +258,7 @@
                   </div>
                 </span>
               </td>
-              <td>paragon-downloads.com</td>
+              <td><%= entry.hostname %></td>
               <td>Computer and Internet</td>
               <td class="text-center">5.6</td>
               <td class="text-center wbrs-highlight">8.7</td>
@@ -366,60 +366,21 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/j</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/k</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/m</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/n</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
+                    <!-- TODO: Populate this from wbrs ruleui api, when they finish the feature -->
                   </tbody>
                 </table>
                 <h4>XBRS Hits</h4>
                 <table class="nested-related-datatable">
                   <thead>
                     <tr>
-                      <% Xbrs::GetXbrs.by_domain("paragon-downloads.com")[1]['legend'].each do |header| %>
+                      <% Xbrs::GetXbrs.by_domain(entry.hostname)[1]['legend'].each do |header| %>
                         <th><%= header %></th>
                       <% end %>
                     </tr>
                   </thead>
 
                   <tbody>
-                      <% Xbrs::GetXbrs.by_domain("paragon-downloads.com")[1]['data'].each do |data| %>
+                      <% Xbrs::GetXbrs.by_domain(entry.hostname)[1]['data'].each do |data| %>
                         <tr>
                           <% data.each do |datapoint| %>
                             <td><%= datapoint %></td>
