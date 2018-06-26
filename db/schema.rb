@@ -49,10 +49,10 @@ ActiveRecord::Schema.define(version: 20180621224342) do
     t.integer "exploit_id"
   end
 
-   create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-     t.integer "attachment_id"
-     t.integer "rule_id"
-   end
+  create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "attachment_id"
+    t.integer "rule_id"
+  end
 
   create_table "bug_blockers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "snort_blocker_bug_id"
