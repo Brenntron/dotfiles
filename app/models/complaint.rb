@@ -26,12 +26,41 @@ class Complaint < ApplicationRecord
     uri_parts
   end
 
+
+  def self.is_possible_company_duplicate(dispute, entry, entry_type)
+    company_id = dispute.customer.company.id
+
+    candidates = Complaint.includes(:customer).includes(:complaint_entries).where(:status != RESOLVED, :customers => {:company_id => company_id}, :complaint_entries => {:entry_type => entry_type})
+
+    if candidates.blank?
+      return false
+    end
+
+    candidates.each do |candidate|
+      if entry_type == "IP"
+        possible_duplicates = candidate.dispute_entries.any? {|entry| entry.ip_address == entry}
+      end
+
+      if entry_type == "URI"
+        possible_duplicates = candidate.dispute_entries.any? {|entry| entry.hostname == entry}
+      end
+
+    end
+
+    return possible_duplicates.present?
+
+  end
+
+
+
   def self.process_bridge_payload(message_payload)
     user = User.where(cvs_username:"vrtincom").first
     #TODO: this should be put in a params method
     message_payload["payload"] = message_payload["payload"].permit!.to_h
     new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
     new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+
+    return_payload = {}
 
     #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
@@ -71,15 +100,21 @@ class Complaint < ApplicationRecord
     new_complaint.save
 
     new_entries_ips.each do |key, entry|
-      url_parts = parse_url(key)
+
+      new_payload_item = {}
+      new_payload_item[:sugg_type] = entry["cat_sugg"]
+      new_payload_item[:status] = "pending"
+      new_payload_item[:resolution_message] = ""
+      new_payload_item[:resolution] = ""
+      new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, key, "IP")
+      return_payload[key] = new_payload_item
+
       new_complaint_entry = ComplaintEntry.new
-      new_complaint_entry.subdomain = url_parts[:subdomain]
-      new_complaint_entry.domain = url_parts[:domain]
-      new_complaint_entry.path = url_parts[:path]
       new_complaint_entry.complaint_id = new_complaint.id
       new_complaint_entry.ip_address = key
-      new_complaint_entry.wbrs_score = entry["wbrs_score"]
-      new_complaint_entry.sbrs_score = entry["sbrs_score"]
+      #new_complaint_entry.wbrs_score = entry["wbrs_score"]
+      #new_complaint_entry.sbrs_score = entry["sbrs_score"]
+      new_complaint_entry.entry_type = "IP"
       new_complaint_entry.suggested_disposition = entry["cat_sugg"]
       new_complaint_entry.save
 
@@ -87,15 +122,26 @@ class Complaint < ApplicationRecord
     end
 
     new_entries_urls.each do |entry|
-
+      url_parts = parse_url(key)
       new_complaint_entry = ComplaintEntry.new
       new_complaint_entry.complaint_id = new_complaint.id
-      new_complaint_entry.ip_address = key
-      new_complaint_entry.entry_type = "DOMAIN"
-      new_complaint_entry.score_type = "WBRS"
-      new_complaint_entry.score = entry["WBRS_SCORE"].to_f
-      new_complaint_entry.suggested_disposition = entry["reg_sugg"]
+      new_complaint_entry.uri = key
+      new_complaint_entry.entry_type = "URI/DOMAIN"
+      #new_complaint_entry.score_type = "WBRS"
+      #new_complaint_entry.score = entry["WBRS_SCORE"].to_f
+      new_complaint_entry.suggested_disposition = entry["cat_sugg"]
+      new_complaint_entry.subdomain = url_parts[:subdomain]
+      new_complaint_entry.domain = url_parts[:domain]
+      new_complaint_entry.path = url_parts[:path]
       new_complaint_entry.save
+
+      new_payload_item = {}
+      new_payload_item[:sugg_type] = entry["cat_sugg"]
+      new_payload_item[:status] = "pending"
+      new_payload_item[:resolution_message] = ""
+      new_payload_item[:resolution] = ""
+      new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, new_complaint_entry.hostname, "URI/DOMAIN")
+      return_payload[key] = new_payload_item
 
     end
 
@@ -107,7 +153,7 @@ class Complaint < ApplicationRecord
                 "addressee": "talos-intelligence",
                 "sender": "analyst-console"
             },
-        "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK"}
+        "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": nil}
     }
   end
 
