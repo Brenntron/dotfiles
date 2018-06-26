@@ -70,7 +70,7 @@ class Dispute < ApplicationRecord
     uri_parts
   end
 
-  def self.is_possible_company_duplicate(dispute, entry, entry_type)
+  def self.is_possible_company_duplicate?(dispute, entry, entry_type)
     company_id = dispute.customer.company.id
 
     candidates = Dispute.includes(:customer).includes(:dispute_entries).where(:status != RESOLVED, :customers => {:company_id => company_id}, :dispute_entries => {:entry_type => entry_type})
@@ -166,6 +166,9 @@ class Dispute < ApplicationRecord
 
     new_dispute.save
 
+    #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
+    #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
+
     new_entries_ips.each do |key, entry|
 
       #this is for return back to TI to populate its ticket show pages
@@ -174,7 +177,7 @@ class Dispute < ApplicationRecord
       new_payload_item[:status] = "pending"
       new_payload_item[:resolution_message] = ""
       new_payload_item[:resolution] = ""
-      new_payload_item[:company_dup] = is_possible_company_duplicate(new_dispute, key, "IP")
+      new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
       return_payload[key] = new_payload_item
 
       new_dispute_entry = DisputeEntry.new
@@ -186,7 +189,6 @@ class Dispute < ApplicationRecord
       new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"]
       new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] 
       new_dispute_entry.suggested_disposition = entry["rep_sugg"]
-      new_dispute_entry.entry_type = "IP"
       new_dispute_entry.save
 
       if entry[:sbrs]["SBRS_Rule_Hits"].present?
