@@ -1,7 +1,7 @@
 <%= form_for user do |f| %>
     <% if current_user.has_role?('admin') %>
         <div class="col-xs-12 text-right">
-          <%=link_to 'Edit Roles', roles_path %>
+          <%=link_to 'Edit Roles', admin_roles_path %>
         </div>
     <% end %>
     </br>

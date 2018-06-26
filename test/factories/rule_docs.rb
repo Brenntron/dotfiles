@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :rule_doc do
     summary                             'some pig'
     impact                              'boom'

@@ -994,7 +994,7 @@ class Bug < ApplicationRecord
                 note = Note.where(id: c['id']).first
                 if note.present?
                   note.update_attributes({
-                    author:     c['author'],
+                    author:     c['creator'],
 		                comment:    comment,
 		                bug_id:     bug_id,
                     note_type:  note_type,
@@ -1004,7 +1004,7 @@ class Bug < ApplicationRecord
                 else
                   Note.create({
 	                  id:         c['id'],
-                    author:     c['author'],
+                    author:     c['creator'],
                     comment:    comment,
                     bug_id:     bug_id,
                     note_type:  note_type,
@@ -1478,10 +1478,13 @@ class Bug < ApplicationRecord
 
         #Update Bug record attributes from bugzilla############
         bug = Bug.where(bugzilla_id: bug_id).first
-        if bug
-          raise 'Cannot process non-escalation bug' unless bug.research_bug?
-        else
-          bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id, product:"Research")
+        case
+          when bug
+            raise 'Can only process research bugs' unless bug.research_bug?
+          when 'Research' != item['product']
+            raise 'Can only import research bugs'
+          else
+            bug = ResearchBug.create(id: bug_id, bugzilla_id: bug_id, product: item['product'])
         end
 
         bug.initialize_report
@@ -1643,7 +1646,7 @@ class Bug < ApplicationRecord
                 if note.present?
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
-                    note.update_attributes(author: c['author'],
+                    note.update_attributes(author: c['creator'],
                                            comment: comment,
                                            bug_id: bug_id,
                                            note_type: note_type,
@@ -1655,7 +1658,7 @@ class Bug < ApplicationRecord
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
                     Note.create(id: c['id'],
-                                author: c['author'],
+                                author: c['creator'],
                                 comment: comment,
                                 bug_id: bug_id,
                                 note_type: note_type,
@@ -1772,11 +1775,15 @@ class Bug < ApplicationRecord
 
         #Update Bug record attributes from bugzilla############
         bug = Bug.where(bugzilla_id: bug_id).first
-        if bug
-          raise 'Cannot process non-escalation bug' unless bug.escalation_bug?
-        else
-          bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id, product:"Escalations")
+        case
+          when bug
+            raise 'Can only process escalation bugs' unless bug.escalation_bug?
+          when 'Escalations' != item['product']
+            raise 'Can only import escalation bugs'
+          else
+            bug = EscalationBug.create(id: bug_id, bugzilla_id: bug_id, product: item['product'])
         end
+
 
         bug.initialize_report
 
@@ -1897,7 +1904,7 @@ class Bug < ApplicationRecord
                 if note.present?
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
-                    note.update_attributes(author: c['author'],
+                    note.update_attributes(author: c['creator'],
                                            comment: comment,
                                            bug_id: bug_id,
                                            note_type: note_type,
@@ -1909,7 +1916,7 @@ class Bug < ApplicationRecord
                   unless import_type == "status"
                     comment = "bugzilla comment is blank" if comment.blank?
                     Note.create(id: c['id'],
-                                author: c['author'],
+                                author: c['creator'],
                                 comment: comment,
                                 bug_id: bug_id,
                                 note_type: note_type,
@@ -2554,7 +2561,7 @@ class Bug < ApplicationRecord
         note = Note.where(id: comment_curr['id']).first
         if note.present?
           note.update_attributes({
-                                     author:     comment_curr['author'],
+                                     author:     comment_curr['creator'],
                                      comment:    comment,
                                      bug_id:     bugzilla_id,
                                      note_type:  note_type,
@@ -2564,7 +2571,7 @@ class Bug < ApplicationRecord
         else
           Note.create({
                           id:         comment_curr['id'],
-                          author:     comment_curr['author'],
+                          author:     comment_curr['creator'],
                           comment:    comment,
                           bug_id:     bugzilla_id,
                           note_type:  note_type,

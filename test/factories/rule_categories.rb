@@ -1,5 +1,5 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :rule_category do
-    category 'BLACKLIST'
+    category 'APP_DETECT'
   end
 end

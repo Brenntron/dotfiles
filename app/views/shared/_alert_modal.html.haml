@@ -1,0 +1,9 @@
+.modal.fade#msg-modal
+  .modal-dialog{role: 'document'}
+    .modal-content
+      #api-msg.message-div{class: 'hidden-msg'}
+        %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
+        #message-text= 'message'
+        .confirmation-buttons.hidden
+          %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Confirm'} Confirm
+          %button.panel-button.secondary.cancel.wide{'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel

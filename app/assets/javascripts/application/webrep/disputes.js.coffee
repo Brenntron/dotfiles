@@ -1,7 +1,7 @@
 window.populate_webrep_index_table = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep_disputes/disputes'
+    url: '/api/v1/escalations/webrep/disputes'
     method: 'GET'
     headers: headers
     success: (response) ->

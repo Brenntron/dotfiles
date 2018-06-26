@@ -28,8 +28,7 @@ Feature: Escalations
 
   @javascript
   Scenario: A summary must be provided to create a new research bug
-    # TODO change role from admin
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "ips escalator" exists and is logged in
     And the following "escalation_bug" bugs with trait "open_bug" exist:
       | id  | bugzilla_id | user_id | summary                 | description       | committer_id |
       | 111 | 111111      | 1       | test escalation summary | test description  | 1            |

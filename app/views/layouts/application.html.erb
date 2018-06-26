@@ -25,10 +25,10 @@
       </div>
       <nav class="navbar nav-stacked rules-ui-nav">
         <ul class="nav nav-stacked">
-          <% if can?(:list_research, Bug) %>
+          <% if can?(:index, ResearchBug) %>
             <li class="research-menu"><%= link_to 'BUG LIST', bugs_path %></li>
           <% end %>
-          <% if can?(:list_escalations, Bug) %>
+          <% if can?(:index, EscalationBug) %>
             <li class="escalations-menu"><%= link_to 'ESCALATIONS', escalations_root_path %></li>
           <% end %>
           <% if can?(:read, RuleDoc) %>
@@ -76,7 +76,7 @@
               <%= render 'layouts/relationships_layout' %>
             <% elsif controller_name == "rule_docs" %>
               <%= render 'layouts/rule_docs_layout' %>
-            <% elsif ac_namespace == "escalations/webrep_disputes" %>
+            <% elsif ac_namespace == "escalations/webrep" %>
               <%= render 'layouts/webrep_disputes_layout' %>
             <% end %>
 

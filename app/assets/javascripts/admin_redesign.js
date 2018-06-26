@@ -21,10 +21,13 @@
 //= require admin/notes
 //= require admin/bs-admin-tabs
 //= require admin/snort-docs
+//= require admin/std_api
+//= require admin/std_msg
+//= require application/webrep/disputes
+//= require application/webrep/communications
+//= require moment
 //= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require application/webcat_complaints
-//= require application/webrep_disputes
-
 
