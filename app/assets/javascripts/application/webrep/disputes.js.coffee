@@ -27,9 +27,7 @@ window.row_add_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form;
   data = {
     'dispute_entry_ids': [ wlbl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    #'urls': [ wlbl_form.getElementsByClassName('adjust-wlbl-urls-input')[0].value ]
     'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
-    #'thrt_cats': wlbl_form.find('.adjust-wlbl-thrt_cats-list-input').val()
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -44,16 +42,20 @@ window.row_add_wlbl_button =(button_tag) ->
   )
 
 window.toolbar_add_wlbl_button =(button_tag) ->
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.dataset['entryId']
+  ).toArray()
+
   wlbl_form = button_tag.form
   data = {
-    'urls': [ wlbl_form.getElementsByClassName('adjust-wlbl-urls-input')[0].value ]
+    'dispute_entry_ids': entry_ids
     'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
-    #'thrt_cats': wlbl_form.find('.adjust-wlbl-thrt_cats-list-input').val()
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
   }
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep_disputes/disputes/wlbl'
+    url: '/api/v1/escalations/webrep/disputes/wlbl'
     method: 'POST'
     headers: headers
     data: data

@@ -165,15 +165,14 @@
           </thead>
           <tbody>
           <% @entries.each do |entry| %>
-            <tr>
-              <td><input class="dispute_check_box" type="checkbox"/></td>
+            <tr data-entry-id="<%= entry.id %>">
+              <td><input class="dispute_check_box" type="checkbox" data-entry-id="<%= entry.id %>"/></td>
               <td class="dispute_rep_tools">
                 <span class="dropdown">
                   <button id="wlbl_button_<%= entry.id %>" class="dispute-inline-buttons adjust-wlbl-button dropdown-toggle" title="Adjust WL/BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                   <div class="dropdown-menu" id="wlbl_adjust_<%= entry.id %>" aria-labelledby="wlbl_button_<%= entry.id %>">
                     <%= form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form| %>
                       <input type="hidden" value="<%= entry.id %>" class="adjust-wlbl-input dispute-entry-id"/>
-                      <input type="hidden" value="<%= entry.hostname %>" class="adjust-wlbl-urls-input"/>
                     <h3>Adjust WL/BL</h3>
                     <table class="dispute_tool_current">
                       <tr>
@@ -258,7 +257,7 @@
                   </div>
                 </span>
               </td>
-              <td><%= entry.hostname %></td>
+              <td><%= entry.wbrs_url %></td>
               <td>Computer and Internet</td>
               <td class="text-center">5.6</td>
               <td class="text-center wbrs-highlight">8.7</td>
