@@ -23,28 +23,6 @@ window.populate_webrep_index_table = () ->
       #$("#create_research_submit").show()
   , this)
 
-window.populate_webrep_my_table = () ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep_disputes/disputes/my'
-    method: 'GET'
-    headers: headers
-    success: (response) ->
-
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
-      else
-        datatable = $('#my-disputes').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
-
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
-
 window.row_add_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form;
   data = {
@@ -112,4 +90,7 @@ window.toolbar_add_reptool_bl_button =(button_tag) ->
     dataType: 'json'
   )
 
-
+$ ->
+  $('#disputes_check_box').change ->
+    $('.dispute_check_box').prop 'checked', @checked
+    return
