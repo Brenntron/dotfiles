@@ -208,24 +208,23 @@ class SnortDocPublisher
   # @return [Hash] data read from the year of NVD data file.
   def nvd_cve_lookup
     unless @nvd_cve_lookup
-      nvd_cve_items = File.open(filepath, 'r') do |file|
-        filedata = JSON.parse(file.read)
-        filedata['CVE_Items']
-      end
-      pattern = Regexp.new("\\ACVE-#{year}-")
-      modified_nvd_cve_items =
-          SnortDocPublisher.modified_nvd_cve_items.select{|item| pattern =~ item['cve']['CVE_data_meta']['ID']}
-      recent_nvd_cve_items =
-          SnortDocPublisher.recent_nvd_cve_items.select{|item| pattern =~ item['cve']['CVE_data_meta']['ID']}
+      file_contents = File.open(filepath, 'r') {|file| file.read}
+      nvd_cve_items = JSON.parse(file_contents)['CVE_Items']
 
       @nvd_cve_lookup = nvd_cve_items.inject({}) do |nvd_cve_lookup, item|
         nvd_cve_lookup[item['cve']['CVE_data_meta']['ID']] = item
         nvd_cve_lookup
       end
+
+      pattern = Regexp.new("\\ACVE-#{year}-")
+      modified_nvd_cve_items =
+          SnortDocPublisher.modified_nvd_cve_items.select{|item| pattern =~ item['cve']['CVE_data_meta']['ID']}
       @nvd_cve_lookup = modified_nvd_cve_items.inject(@nvd_cve_lookup) do |nvd_cve_lookup, item|
         nvd_cve_lookup[item['cve']['CVE_data_meta']['ID']] = item
         nvd_cve_lookup
       end
+      recent_nvd_cve_items =
+          SnortDocPublisher.recent_nvd_cve_items.select{|item| pattern =~ item['cve']['CVE_data_meta']['ID']}
       @nvd_cve_lookup = recent_nvd_cve_items.inject(@nvd_cve_lookup) do |nvd_cve_lookup, item|
         nvd_cve_lookup[item['cve']['CVE_data_meta']['ID']] = item
         nvd_cve_lookup
@@ -271,7 +270,8 @@ class SnortDocPublisher
 
       case
         when ref_type.blank?
-          @errors << "Unknown reference type '#{ref_type_name}'."
+          # @errors << "Unknown reference type '#{ref_type_name}'."
+          # do nothing
         when ref_rec.references.where(reference_type: ref_type, reference_data: ref_data).exists?
           # do nothing
         when Reference.where(reference_type: ref_type, reference_data: ref_data).exists?
@@ -508,7 +508,11 @@ class SnortDocPublisher
       download_all if do_download
 
       # Create any needed cves records for references missing cves records.
-      update_cve_data if update_cves
+      if update_cves
+        update_cve_data do |errors|
+          the_errors = errors
+        end
+      end
 
       # Mark rules as to be published from the rule update YAML file
       update_snort_doc_to_be(YAML.load(contents))

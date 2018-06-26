@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :reference_type do
     name  'cve'
     description  'Common Vulnerabilities and Exposures'
@@ -7,5 +7,13 @@ FactoryGirl.define do
     example  '1999-1234'
     rule_format  'cve,<reference>'
     url  'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-DATA'
+
+    factory :cve_reference_type do
+      name 'cve'
+    end
+
+    factory :url_reference_type do
+      name 'url'
+    end
   end
 end

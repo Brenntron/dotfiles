@@ -129,5 +129,3 @@ window.populate_bugid_in_modal = (bug_id) ->
   $('#acknowledge_bug_id').val(bug_id)
   $('#take_acknowledge_esc').modal('show')
 
-
-

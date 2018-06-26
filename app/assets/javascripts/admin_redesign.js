@@ -12,7 +12,6 @@
 //= require Chart.bundle
 //= require chartkick
 //= require bootstrap-multiselect
-//= require bootstrap
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
 //= require admin/bs-dropdown-select
@@ -25,9 +24,12 @@
 //= require admin/std_msg
 //= require application/webrep/disputes
 //= require application/webrep/communications
+//= require application/helpers
+//= require clipboard
 //= require moment
 //= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require application/webcat_complaints
-//= require application/webrep_disputes
+//= require application/webrep/disputes
+//= require application/webrep_research_tab

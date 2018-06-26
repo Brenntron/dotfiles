@@ -60,6 +60,8 @@ gem 'delayed_job', '~> 4.1.3'
 gem 'delayed_job_active_record', '~> 4.1.2'
 gem 'jquery-datatables-rails', '~> 3.4.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
+gem 'clipboard-rails', '1.7.1'
+
 
 gem 'inline_svg'
 
@@ -80,8 +82,8 @@ group :development, :test do
 end
 
 group :test do
-  gem 'factory_girl', '~> 4.8.0'
-  gem 'factory_girl_rails', '~> 4.8.0'
+  gem 'factory_bot', '~> 4.10'
+  gem 'factory_bot_rails', '~> 4.10'
   gem 'capybara', '~> 2.11.0'
   gem 'poltergeist', '~> 1.11.0'
   gem 'cucumber-rails', '~> 1.5.0', :require => false

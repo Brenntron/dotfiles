@@ -15,6 +15,7 @@ module API
             optional :import_type, type: String, desc: "Type of Import"
           end
           get 'import/:id' do
+            authorize!(:import, EscalationBug)
             import_type = params[:import_type].present? ? params[:import_type] : "import"
             xmlrpc_token = request.headers['Xmlrpc-Token']
 
@@ -34,7 +35,6 @@ module API
                   progress_bar.update_attribute("progress", 10)
                   #create the bug from bugzilla
                   bug = Bug.bugzilla_import_escalation(current_user, xmlrpc, xmlrpc_token, new_bug, progress_bar, import_type).first
-
                   if initial_bug_state.present?
                     report = bug.compile_import_report(initial_bug_state)
                   end
@@ -72,7 +72,9 @@ module API
           end
           get '/tabs/:id' do
             begin
+              authorize!(:read, EscalationBug)
               bug = Bug.where(:id => params[:id]).includes([:alerts, :pcaps => [:alerts]]).first
+              authorize!(:read, bug)
 
               response = {}
 
@@ -93,6 +95,7 @@ module API
             requires :user_id, type: Integer, desc: "the id of the user whose bugs we want"
           end
           get '/by_user/:user_id' do
+            authorize!(:import, EscalationBug)
             xmlrpc_token = request.headers['Xmlrpc-Token']
             user_email = User.where(id: permitted_params[:user_id]).first.email
 
@@ -118,6 +121,7 @@ module API
 
           desc "get latest bugs from bugzilla"
           get 'import_all' do
+            authorize!(:import, EscalationBug)
             import_type = params[:import_type].present? ? params[:import_type] : "import"
             xmlrpc_token = request.headers['Xmlrpc-Token']
             if xmlrpc_token
@@ -137,6 +141,7 @@ module API
             requires :element, type: String, desc: "element of bug wanting to sync, options are attachments or history"
           end
           get "/synch_bug/:element/:id" do
+            authorize!(:import, EscalationBug)
             xmlrpc_token = request.headers['Xmlrpc-Token']
             if xmlrpc_token
               begin
@@ -163,6 +168,7 @@ module API
             optional :committer, type: String, desc: "searching for a commiter"
           end
           post '/search/' do
+            authorize!(:index, EscalationBug)
             terms = {
                 :bugzilla_id => /-/.match(permitted_params[:id_range]) ? nil : permitted_params[:id_range],
                 :state => permitted_params[:state] ? permitted_params[:state] : nil,
@@ -177,6 +183,7 @@ module API
             # search bugs and return the bugs current user is allowed to see
             hits = []
             Bug.search(permitted_params[:summary], terms, range).each do |bug_hit|
+              authorize!(:read, bug_hit)
               hits << bug_hit.id if bug_hit.check_permission(current_user)
             end
             hits
@@ -187,8 +194,10 @@ module API
             requires :id, type: String, desc: "ID of the bug"
           end
           get ':id' do
+            authorize!(:read, EscalationBug)
             # Bug.where(id: permitted_params[:id]).page(params[:page]).per(params[:per_page]).where("classification <= ?", User.class_levels[current_user.class_level])
-            Bug.where(id: permitted_params[:id])
+            bug = Bug.where(id: permitted_params[:id])
+            authorize!(:read, bug)
           end
 
           desc "get all bugs"
@@ -196,7 +205,11 @@ module API
             use :pagination
           end
           get "", root: :bugs do
+            authorize!(:read, EscalationBug)
             bugs = Bug.all.where("classification <= ?", User.class_levels[current_user.class_level]).page(params[:page]).per(params[:per_page])
+            bugs.each do |bug|
+              authorize!(:read, bug)
+            end
             render bugs, {meta: {total_pages: bugs.total_pages}}
           end
 
@@ -229,8 +242,10 @@ module API
 
           end
           put ":id", root: "bug" do
+            authorize!(:update, EscalationBug)
             ActiveRecord::Base.transaction do
               bug = Bug.find(permitted_params[:id])
+              authorize!(:update, bug)
               # Bug.process_bug_update(current_user, bugzilla_session, bug, permitted_params)
               bug.update_bug_action(current_user: current_user,
                                     bugzilla_session: bugzilla_session,
@@ -258,8 +273,9 @@ module API
             end
           end
           post "", root: "bug" do
-            authorize! :create, Bug
-            Bug.bugzilla_create_escalation_action(bugzilla_session, permitted_params[:bug], user: current_user)
+            authorize!(:create, EscalationBug)
+            bug = Bug.bugzilla_create_escalation_action(bugzilla_session, permitted_params[:bug], user: current_user)
+            authorize!(:create, bug)
           end
 
           desc "remove a bug from the db only"
@@ -268,8 +284,10 @@ module API
           end
           delete ":id", root: "bug" do
             begin
-              authorize! :destroy, Bug
-              Bug.destroy(permitted_params[:id])
+              authorize!(:destroy, EscalationBug)
+              bug = EscalationBug.where(id: permitted_params[:id])
+              authorize!(:destroy, bug)
+              bug.destroy
             rescue CanCan::AccessDenied => e
               error!({error: "Access denied.", message: e.message}, 200)
             end
@@ -282,9 +300,11 @@ module API
             # all the params we need to permit must to go here
           end
           post "close/:id", root: "bug" do
+            authorize!(:update, EscalationBug)
             xmlrpc_token = request.headers['Xmlrpc-Token']
             if xmlrpc_token
               bug = Bug.where(id: permitted_params[:id])
+              authorize!(:update, bug)
               status = "resolved"
               resolution = "Fixed"
               return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
@@ -300,9 +320,11 @@ module API
             # all the params we need to permit must to go here
           end
           post "wontfix/:id", root: "bug" do
+            authorize!(:update, EscalationBug)
             xmlrpc_token = request.headers['Xmlrpc-Token']
             if xmlrpc_token
               bug = Bug.where(id: permitted_params[:id])
+              authorize!(:update, bug)
               status = "resolved"
               resolution = "WontFix"
               return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
@@ -318,9 +340,11 @@ module API
             # all the params we need to permit must to go here
           end
           post "reopen/:id", root: "bug" do
+            authorize!(:update, EscalationBug)
             xmlrpc_token = request.headers['Xmlrpc-Token']
             if xmlrpc_token
               bug = Bug.where(id: permitted_params[:id])
+              authorize!(:update, bug)
               status = "reopened"
               resolution = "reopened"
               return bug.bug_state(bugzilla_session, permitted_params[:notes], status, resolution)
@@ -335,7 +359,9 @@ module API
             requires :committer, type: Boolean, desc: "is this a committer subscribe"
           end
           post ':id/subscribe' do
+            authorize!(:read, EscalationBug)
             bug = Bug.where(id: permitted_params[:id]).where("classification <= ?", User.class_levels[current_user.class_level]).first
+            authorize!(:read, bug)
             unless bug.nil?
               begin
                 if params[:committer]
@@ -430,9 +456,7 @@ module API
                 end
               end
             end
-
           end
-
         end
       end
     end

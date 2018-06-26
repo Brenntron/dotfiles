@@ -1,6 +1,8 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :role do
     role 'analyst'
+
+    org_subset_id { OrgSubset.find_or_create_by(name: 'everyone').id }
 
     factory :analyst_role do
       role 'analyst'

@@ -2,7 +2,7 @@ Given /^pending/i do
   pending
 end
 
-Given(/^I goto "(.*?)"$/) do |url|
+Given(/^I go ?to "(.*?)"$/) do |url|
   visit (url)
 end
 
@@ -78,7 +78,7 @@ end
 When(/^I "(.*?)" the url "(.*?)" with "(.*?)" data$/) do |method, url, model|
   case model
   when "Release"
-    data = FactoryGirl.create(:release)
+    data = FactoryBot.create(:release)
   end
 
   case method

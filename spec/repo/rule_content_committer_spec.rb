@@ -1,21 +1,21 @@
 describe Repo::RuleContentCommitter do
   describe 'prescreening' do
     before(:context) do
-      @rule_synched = FactoryGirl.create(:synched_rule)
-      @rule_stale = FactoryGirl.create(:stale_rule)
-      @rule_edited = FactoryGirl.create(:edited_rule)
-      @rule_incomplete = FactoryGirl.create(:edited_rule)
-      @rule_complete = FactoryGirl.create(:edited_rule)
-      FactoryGirl.create(:rule_doc, rule: @rule_complete)
-      @bug_embargo = FactoryGirl.create(:bug, liberty: Bug::LIBERTY_EMBARGO)
-      @bug = FactoryGirl.create(:bug)
+      @rule_synched = FactoryBot.create(:synched_rule)
+      @rule_stale = FactoryBot.create(:stale_rule)
+      @rule_edited = FactoryBot.create(:edited_rule)
+      @rule_incomplete = FactoryBot.create(:edited_rule)
+      @rule_complete = FactoryBot.create(:edited_rule)
+      FactoryBot.create(:rule_doc, rule: @rule_complete)
+      @bug_embargo = FactoryBot.create(:bug, liberty: Bug::LIBERTY_EMBARGO)
+      @bug = FactoryBot.create(:bug)
       @bug.rules << @rule_synched
       @bug.rules << @rule_stale
       @bug.rules << @rule_edited
       @bug.rules << @rule_incomplete
       @bug.rules << @rule_complete
-      @bug.attachments << FactoryGirl.create(:attachment)
-      @user = FactoryGirl.create(:user)
+      @bug.attachments << FactoryBot.create(:attachment)
+      @user = FactoryBot.create(:user)
     end
 
     it 'prescreens bug embargo state' do
@@ -133,7 +133,7 @@ describe 'a Repo::RuleContentCommitter with content' do
     @sid = 10011
     @rev = 10
     @rule_content = "alert (gid:#{@gid}; sid:#{@sid}; rev: #{@rev};)"
-    @rule = FactoryGirl.create(:edited_rule,
+    @rule = FactoryBot.create(:edited_rule,
                                gid: @gid, sid: @sid, rev: @rev, filename: @relative_filename,
                                edit_status: Rule::EDIT_STATUS_EDIT,
                                rule_content: @rule_content)
@@ -185,7 +185,7 @@ eos
 
   describe 'Commit to svn from outside analyst-console or from analyst-console after commit has completed' do
     it 'loads new rule content' do
-      @rule = FactoryGirl.create(:synched_rule, sid: 21978, gid: 1, rev: 5)
+      @rule = FactoryBot.create(:synched_rule, sid: 21978, gid: 1, rev: 5)
       allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
       allow(File).to receive(:directory?).and_return(true)
       allow(Rule).to receive(:find_from_parser).and_return(@rule)
@@ -201,7 +201,7 @@ eos
 
   describe 'Commit to svn from outside analyst-console for edited rule' do
     it 'marks rule as stale' do
-      @rule = FactoryGirl.create(:edited_rule, sid: 21978, gid: 1, rev: 5)
+      @rule = FactoryBot.create(:edited_rule, sid: 21978, gid: 1, rev: 5)
       allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
       allow(File).to receive(:directory?).and_return(true)
       allow(Rule).to receive(:find_from_parser).and_return(@rule)
@@ -218,7 +218,7 @@ eos
 
   describe 'Notification from svn hook while analyst-console commit is in progress' do
     it 'updates rule' do
-      @rule = FactoryGirl.create(:edited_rule, sid: 21978, gid: 1, rev: 5, publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
+      @rule = FactoryBot.create(:edited_rule, sid: 21978, gid: 1, rev: 5, publish_status: Rule::PUBLISH_STATUS_PUBLISHING)
       allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
       allow(File).to receive(:directory?).and_return(true)
       allow(Rule).to receive(:find_from_parser).and_return(@rule)

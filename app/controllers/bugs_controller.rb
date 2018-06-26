@@ -1,7 +1,7 @@
 class BugsController < ApplicationController
-  load_and_authorize_resource except: [:index, :show,
-                                       :add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
-  before_action only: [:index] { authorize!(:list_research, Bug) }
+  load_and_authorize_resource class: 'ResearchBug',
+                              except: [:add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
+  skip_load_resource only: [:index, :show]
 
   before_action :require_login
   before_action :query_bugs
@@ -91,19 +91,18 @@ class BugsController < ApplicationController
   end
 
   def new
-    @bug = current_user.bugs.build
+    @bug = current_user.bugs.build(type: 'ResearchBug')
     @tags = Tag.all.map { |tag| tag.name }.join(',')
   end
 
   def create
+    # raise 'Bug creation not converted'
     respond_to do |format|
       format.js { head :no_content }
     end
   end
 
   def show
-
-
 
     @giblets = Giblet.all.map { |gib| "#{gib.name}"}.uniq.sort.join(',')
     @bug = Bug.where(id: params[:id]).first
@@ -225,14 +224,16 @@ class BugsController < ApplicationController
     end
   end
 
+  
   private
 
   def bug_params
-    params.require(:bug).permit(:product, :state, :creator, :opsys, :severity, :platform, :priority, :user_id, :summary,
-                                :classification, :searchID, :saved_search, :whiteboard, :committer_id, :description,
-                                :version, :component,
-                                rules_attributes: [:connection, :flow, :message, :reference,
-                                                   :metadata, :detection, :class_type, :reference], tag_names: [])
+    params.require(:research_bug).permit(:classification, :committer_id, :component, :creator,
+                                         :description, :opsys, :platform, :priority, :product,
+                                         :saved_search, :searchID, :severity, :state, :summary,
+                                         :user_id, :version, :whiteboard, tag_names: [],
+                                         rules_attributes: [:connection, :flow, :message, :reference,
+                                                            :metadata, :detection, :class_type, :reference])
   end
 
   def query_params

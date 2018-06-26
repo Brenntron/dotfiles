@@ -1,4 +1,5 @@
 class Dispute < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at]
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
@@ -10,11 +11,11 @@ class Dispute < ApplicationRecord
   ASSIGNED = 'assigned'
 
   def is_assigned?
-    (!self.assigned_to.nil? and !self.assigned_to.empty?)
+    (!self.user.nil? and !self.user.empty?)
   end
 
   def assignee
-    is_assigned? ? assigned_to : "Unassigned"
+    is_assigned? ? user.email : "Unassigned"
   end
 
   def suggested_d
@@ -25,6 +26,10 @@ class Dispute < ApplicationRecord
     else
       dispute_entries.first[:suggested_disposition]
     end
+  end
+
+  def entry_count
+    dispute_entries.length
   end
 
   def dispute_age
@@ -86,7 +91,15 @@ class Dispute < ApplicationRecord
     end
 
     return possible_duplicates.present?
+  end
 
+  def compose_versioned_items
+    versioned_items = [self]
+
+    dispute_comments.map{ |dc| versioned_items << dc}
+    dispute_entries.map{ |de| versioned_items << de}
+
+    versioned_items
   end
 
   def self.process_bridge_payload(message_payload)
