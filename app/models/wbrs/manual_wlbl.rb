@@ -28,6 +28,9 @@ class Wbrs::ManualWlbl < Wbrs::Base
   end
 
   # Get all the manual WL/BL entries.
+  # @param [String] url URL pattern the WL/BL entry is added for (optional)
+  # @param [String] usr Pattern of username who added or modified WL/BL entry (optional)
+  # @param [Array<String>] list_types The WL/BL entry’s type (optional)
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.where(conditions = {})
     params = stringkey_params(conditions)
