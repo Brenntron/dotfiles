@@ -97,9 +97,9 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.integer "unused_attachment_id"
     t.string "liberty", default: "CLEAR"
     t.string "whiteboard"
-    t.boolean "acknowledged"
-    t.boolean "snort_secure", default: false
+    t.boolean "acknowledged", default: false
     t.datetime "due_date"
+    t.boolean "snort_secure", default: false
     t.string "type", default: "ResearchBug"
     t.index ["user_id"], name: "index_bugs_on_user_id"
   end
@@ -477,7 +477,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.integer "reference_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer "fail_count", default: 0
+    t.integer "fail_count"
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
