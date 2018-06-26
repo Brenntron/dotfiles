@@ -16,6 +16,12 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   def update
   end
 
+  def rules
+  end
+
+  def reports
+  end
+
   def dashboard
   end
 
@@ -27,7 +33,7 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
 
   def show_multiple
     # ids = params["selected_ids"]
-    ids = [1,2]
+    ids = [1,2,3]
     @complaints = Complaint.where(id:ids)
   end
   def advanced_search
