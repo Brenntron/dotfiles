@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180618170132) do
+ActiveRecord::Schema.define(version: 20180621224342) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -152,7 +152,7 @@ ActiveRecord::Schema.define(version: 20180618170132) do
     t.string "subdomain"
     t.string "domain"
     t.string "path"
-    t.integer "wbrs_score"
+    t.float "wbrs_score", limit: 24
     t.string "url_primary_category"
     t.string "resolution"
     t.text "resolution_comment"
@@ -160,7 +160,11 @@ ActiveRecord::Schema.define(version: 20180618170132) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "viewable", default: true, null: false
+    t.float "sbrs_score", limit: 24
+    t.text "uri"
+    t.string "suggested_disposition"
+    t.string "ip_address"
+    t.string "entry_type"
   end
 
   create_table "complaints", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -178,6 +182,11 @@ ActiveRecord::Schema.define(version: 20180618170132) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "customer_id"
+    t.integer "ticket_source_key"
+    t.string "ticket_source"
+    t.string "ticket_source_type"
+    t.string "submission_type"
+    t.string "submitter_type"
     t.index ["customer_id"], name: "index_complaints_on_customer_id"
   end
 
@@ -263,7 +272,7 @@ ActiveRecord::Schema.define(version: 20180618170132) do
   create_table "dispute_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "dispute_id"
     t.string "ip_address"
-    t.string "uri"
+    t.text "uri"
     t.string "hostname"
     t.string "entry_type"
     t.float "score", limit: 24
@@ -316,7 +325,6 @@ ActiveRecord::Schema.define(version: 20180618170132) do
     t.string "priority"
     t.text "subject"
     t.text "description"
-    t.integer "assigned_to"
     t.string "source_ip_address"
     t.text "problem_summary"
     t.text "research_notes"
@@ -327,6 +335,8 @@ ActiveRecord::Schema.define(version: 20180618170132) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "customer_id"
+    t.integer "user_id"
+    t.string "submission_type"
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
 
