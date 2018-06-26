@@ -38,17 +38,21 @@ class Wbrs::ManualWlbl < Wbrs::Base
   end
 
   # Add a WL/BL on the backend
-  # @param [Array<String>] url: URLs the WL/BL entries should be created for
+  # @param [Array<Integer>] dispute_entry_ids pkey for dispute_entries database table.
   # @param [String] trgt_list: Target manual list type
-  # @param [String] usr: User creating the WL/BL entries
+  # @param [String] username: User creating the WL/BL entries
   # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
   # @param [String] note: User’s note
   # @return [Array<String>] warnings
   def self.add_from_params(params = {})
-    response = post_request(path: '/v1/rep/wlbl/add', body: params)
+    wlbl_params = stringkey_params(params)
+    wlbl_params['usr'] = wlbl_params.delete('username') if wlbl_params['username']
 
-    response_body = JSON.parse(response.body)
-    response_body['Warnings']
+    dispute_entry_ids = wlbl_params.delete('dispute_entry_ids')
+    wlbl_params['url'] = dispute_entry_ids.map {|id| DisputeEntry.find(id).wbrs_url} if dispute_entry_ids
+
+    response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
+
+    response.body
   end
-
 end
