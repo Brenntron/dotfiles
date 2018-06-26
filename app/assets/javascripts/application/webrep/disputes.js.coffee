@@ -64,7 +64,6 @@ window.toolbar_add_wlbl_button =(button_tag) ->
 
 
 window.row_add_reptool_bl_button =(button_tag) ->
-  debugger
   reptool_bl_form = button_tag.form
   data = {
     'dispute_entry_ids': [ reptool_bl_form.getElementsByClassName('dispute-entry-id')[0].value ]
@@ -81,15 +80,19 @@ window.row_add_reptool_bl_button =(button_tag) ->
   )
 
 window.toolbar_add_reptool_bl_button =(button_tag) ->
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.dataset['entryId']
+  ).toArray()
+
   reptool_bl_form = button_tag.form
   data = {
-    'entries': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-entries-input')[0].value ]
+    'dispute_entry_ids': entry_ids
     'classifications': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('adjust-reptool-bl-comment-input')[0].value
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep_disputes/disputes/reptool_bl'
+    url: '/api/v1/escalations/webrep/disputes/reptool_bl'
     method: 'POST'
     headers: headers
     data: data

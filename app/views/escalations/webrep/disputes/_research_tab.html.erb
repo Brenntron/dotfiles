@@ -44,7 +44,6 @@
               <div class="dropdown-menu toolbar-dropdown" id="wlbl_adjust_entries" aria-labelledby="wlbl_entries_button">
                 <!-- For each checked checkbox populate this information -->
                 <%= form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form| %>
-                  <input type="hidden" value="paragon-downloads.com" class="adjust-wlbl-urls-input"/>
                 <div class="dispute-name-wrapper">
                   <label class="content-label-sm">Dispute</label><br/>
                   paragon-downloads.com <!-- dispute name -->
@@ -96,7 +95,6 @@
               </button>
               <div class="dropdown-menu toolbar-dropdown" id="reptool_adjust_entries" aria-labelledby="reptool_entries_button">
                 <%= form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form| %>
-                  <input type="hidden" value="paragon-downloads.com" class="adjust-reptool-bl-entries-input"/>
                 <!-- For each checked checkbox populate this information -->
                 <div class="dispute-name-wrapper">
                   <label class="content-label-sm">Dispute</label><br/>
