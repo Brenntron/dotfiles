@@ -10,6 +10,7 @@ class Bridge::MessagesController < ApplicationController
     log_exception(except)
     render plain: except.message, status: :internal_server_error
   end
+
   def messages_from_bridge
 
     case envelope_params["sender"]
@@ -21,7 +22,6 @@ class Bridge::MessagesController < ApplicationController
         message_params[obj_type_key][:bugzilla_session] = bugzilla_session
         message_params[obj_type_key][:current_user] = current_user
         return_message = obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
-
         render json: return_message, status: :ok
       else
         return_message = {
