@@ -99,6 +99,9 @@ class Complaint < ApplicationRecord
 
     new_complaint.save
 
+    #IP based and DOMAIN based entry creation is similar enough that it might be worth investigating refactoring into a common method
+    #TODO: investigate above to see if its worth refactoring, and refactor it if so.
+
     new_entries_ips.each do |key, entry|
 
       new_payload_item = {}
