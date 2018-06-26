@@ -67,14 +67,14 @@
                 <div class="inline-tool-content-wrapper">
                   <div class="toolbar">
                     <div>
-                      <label class="toolbar-section-label">WL/BL List</label>
-                      <select class="toolbar-select select-status adjust-wlbl-trgt_list-input" title="RepTool Rule Status">
-                        <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
-                        <!-- Put all WL/BL options here  -->
-                        <%= Wbrs::ManualWlbl.types.each do |type_name| %>
-                          <option value="<%=type_name%>"><%=type_name%></option>
-                        <% end %>
-                      </select>
+                      <label class="toolbar-section-label" for="wlbl-list-type-select">WL/BL List</label>
+                      <%= wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                                           {
+                                               include_blank: 'Not on a List Currently'
+                                           },
+                                           class: 'toolbar-select select-status adjust-wlbl-trgt_list-input',
+                                           title: 'RepTool Rule Status',
+                                           id: "wlbl-list-type-select" %>
                     </div>
                   </div>
                   <label class="content-label-sm">Comment</label>
