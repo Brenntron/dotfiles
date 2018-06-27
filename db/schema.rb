@@ -282,6 +282,8 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.datetime "updated_at", null: false
     t.float "sbrs_score", limit: 24
     t.float "wbrs_score", limit: 24
+    t.integer "webrep_wlbl_key"
+    t.integer "reptool_key"
   end
 
   create_table "dispute_rule_hits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

@@ -117,11 +117,10 @@ module API
               requires :note, type: String, desc: "note"
             end
             post "wlbl" do
-              entry_params = permitted_params.to_h.merge(username: current_user.cvs_username)
-              Wbrs::ManualWlbl.add_from_params(entry_params)
+              Wbrs::ManualWlbl.adjust_from_params(permitted_params, username: current_user.cvs_username)
             end
 
-            desc "Add a Reptool Bl entry"
+            desc "Adjust a Reptool Bl entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
               #requires :entries, type: Array[String], desc: "urls"

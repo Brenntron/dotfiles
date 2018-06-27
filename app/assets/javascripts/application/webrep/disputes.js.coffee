@@ -23,12 +23,12 @@ window.populate_webrep_index_table = () ->
       #$("#create_research_submit").show()
   , this)
 
-window.row_add_wlbl_button =(button_tag) ->
+window.row_adust_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form;
   data = {
     'dispute_entry_ids': [ wlbl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
+    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
+    'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -37,11 +37,13 @@ window.row_add_wlbl_button =(button_tag) ->
     headers: headers
     data: data
     dataType: 'json'
+    success: (response) ->
+      window.reload
     error: (response) ->
       debugger
   )
 
-window.toolbar_add_wlbl_button =(button_tag) ->
+window.toolbar_adust_wlbl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
@@ -49,8 +51,8 @@ window.toolbar_add_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form
   data = {
     'dispute_entry_ids': entry_ids
-    'trgt_list': wlbl_form.getElementsByClassName('adjust-wlbl-trgt_list-input')[0].value
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-note-input')[0].value
+    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
+    'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -63,12 +65,12 @@ window.toolbar_add_wlbl_button =(button_tag) ->
   )
 
 
-window.row_add_reptool_bl_button =(button_tag) ->
+window.row_adust_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
     'dispute_entry_ids': [ reptool_bl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('adjust-reptool-bl-comment-input')[0].value
+    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -79,7 +81,7 @@ window.row_add_reptool_bl_button =(button_tag) ->
     dataType: 'json'
   )
 
-window.toolbar_add_reptool_bl_button =(button_tag) ->
+window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
@@ -87,8 +89,8 @@ window.toolbar_add_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
     'dispute_entry_ids': entry_ids
-    'classifications': [ reptool_bl_form.getElementsByClassName('adjust-reptool-bl-classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('adjust-reptool-bl-comment-input')[0].value
+    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('-comment-input')[0].value
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
