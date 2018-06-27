@@ -372,20 +372,26 @@
                 <table class="nested-related-datatable">
                   <thead>
                     <tr>
-                      <% Xbrs::GetXbrs.by_domain(entry.hostname)[1]['legend'].each do |header| %>
+                      <%
+                        unless entry.hostname.nil?
+                           Xbrs::GetXbrs.by_domain(entry.hostname)[1]['legend'].each do |header| %>
                         <th><%= header %></th>
-                      <% end %>
+                      <% end
+                      end%>
                     </tr>
                   </thead>
 
                   <tbody>
-                      <% Xbrs::GetXbrs.by_domain(entry.hostname)[1]['data'].each do |data| %>
+                      <%
+                        unless entry.hostname.nil?
+                          Xbrs::GetXbrs.by_domain(entry.hostname)[1]['data'].each do |data| %>
                         <tr>
                           <% data.each do |datapoint| %>
                             <td><%= datapoint %></td>
                           <% end %>
                         </tr>
-                      <% end %>
+                      <% end
+                      end %>
                     </tr>
                   </tbody>
                 </table>
