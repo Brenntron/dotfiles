@@ -60,6 +60,8 @@ gem 'delayed_job', '~> 4.1.3'
 gem 'delayed_job_active_record', '~> 4.1.2'
 gem 'jquery-datatables-rails', '~> 3.4.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
+gem 'clipboard-rails', '1.7.1'
+
 
 gem 'inline_svg'
 

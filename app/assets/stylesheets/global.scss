@@ -272,7 +272,7 @@ table.dataTable tbody tr {
 table.dataTable thead .sorting, table.dataTable thead .sorting_desc, table.dataTable thead .sorting_asc  {
   background-repeat: no-repeat;
   background-size: 10px;
-  background-position: right center;
+  background-position: right bottom 5px;
   padding-right: 20px;
 }
 
@@ -423,6 +423,10 @@ th {
 
 .alt-col {
   background-color: lighten( $faint-neutral-color, 2% );
+}
+
+th.alt-col {
+  background-color: transparent;
 }
 
 .user-col-divider {
@@ -597,6 +601,7 @@ th {
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
 .export-button    {background-image: url(image_path('icon_export.svg'));}
 .expand-button    {background-image: url(image_path('icon_expand.svg'));}
+.expand-row-button {background-image: url(image_path('icon_expand2.svg'));}
 .add-file-button  {background-image: url(image_path('icon_add_file.svg'));}
 .addnote-button   {background-image: url(image_path('icon_add_note.svg'));}
 .order-button     {background-image: url(image_path('icon_order.svg'));}
@@ -623,6 +628,9 @@ th {
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
 .show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
+.ticket-status-button {background-image: url(image_path('icon_status.svg'));}
+.mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
+.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -666,6 +674,27 @@ th {
   float: right;
   display: inline-block;
   border: none;
+}
+
+.expand-row-button-inline {
+  background-image: url(image_path('icon_expand_lt_grey.svg'));
+  background-repeat: no-repeat;
+  border: none;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.shown .expand-row-button-inline {
+  background-image: url(image_path('icon_collapse_blue.svg'));
+}
+
+td.expandable-row-column {
+  padding: 8px 0 !important;
+}
+
+thead th.sorting.center {
+  background-position: center bottom 5px !important;
 }
 
 .task-result {
@@ -2069,6 +2098,10 @@ table .bug-priority {
   font-weight: 700;
 }
 
+.state-col {
+  text-transform: uppercase;
+}
+
 .task-type-col {
   min-width: 100px;
   text-transform: capitalize;
@@ -2398,7 +2431,7 @@ a.code-content:hover {
   display: inline-block;
 }
 
-.author-username {
+.author-username, #email-reply .receiver-email {
   font-size: 8pt;
   color: $type-base-color;
   font-weight: 700;
@@ -2425,6 +2458,11 @@ a.code-content:hover {
   margin-right: 10px;
 }
 
+@media (min-width: 1700px) {
+  .hidden-break {
+    display: none;
+  }
+}
 
 /* Layout chunks */
 
@@ -3032,6 +3070,12 @@ fieldset.top-content {
   font-size: 8pt;
   line-height: 1.4em;
   margin: 3px 0;
+  width: 100%;
+  min-height: 30px;
+}
+
+.note-block pre {
+  background-color: transparent;
 }
 
 .case-history-icon {
@@ -3042,11 +3086,13 @@ fieldset.top-content {
   display: block;
 }
 
-.email-icon       {background-image: url(image_path('icon_message_white.svg'));}
-.email-sent-icon  {background-image: url(image_path('icon_email_sent.svg'));}
-.email-read-icon  {background-image: url(image_path('icon_email_read.svg'));}
-.note-icon        {background-image: url(image_path('icon_notepad.svg'));}
-.disp-status-icon {background-image: url(image_path('icon_status2.svg'));}
+.email-icon               {background-image: url(image_path('icon_message_white.svg'));}
+.email-read .email-icon   {background-image: url(image_path('icon_email_read.svg'));}
+.email-sent .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
+.email-read.email-sent .email-icon  {background-image: url(image_path('icon_email_sent.svg'));}
+.note-icon                {background-image: url(image_path('icon_notepad.svg'));}
+.disp-status-icon         {background-image: url(image_path('icon_status2.svg'));}
+.duplicate-ticket-icon    {background-image: url(image_path('icon_mark_duplicate.svg'));}
 
 .case-history-author, .case-history-preview {
   display: block;
@@ -3083,12 +3129,17 @@ fieldset.top-content {
   background-color: #4E4E4E;
   color: $content-bg-color;
   margin-top: -15px;
-  padding: 12px;
+  padding-top: 12px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .highlighted-section-header h1 {
   color: $content-bg-color;
   display: inline-block;
+  padding-left: 15px;
+  margin-top: 5px;
+  margin-bottom: 12px;
 }
 
 .highlighted-section-header::before {
@@ -3099,31 +3150,70 @@ fieldset.top-content {
   background-color: #4E4E4E;
   z-index: 60;
   width: 100%;
-  margin-left: -12px;
   margin-top: -12px;
 }
 
-.customer-facing-notice {
-  display: block;
+.email-notice-block {
+  display: inline-block;
   text-transform: uppercase;
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background-image: url(image_path('icon_warning_pink.svg'));
-  background-repeat: no-repeat;
-  background-position: 6px 2px;
-  background-size: 20px;
+  color: $content-bg-color;
+  float: right;
   height: 20px;
-  padding: 6px 8px 18px 28px;
-  color: $communication-accent-color;
-  background-color: #fff;
-  border-radius: 4px;
+  padding: 0 20px;
 }
+
+.customer-facing-notice::before, .duplicate-email-notice::before {
+  content: '';
+  display: block;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto 6px auto;
+}
+
+.customer-facing-notice::before {
+  background-image: url(image_path('icon_warning_orange.svg'));
+}
+
+.duplicate-email-notice::before {
+  background-image: url(image_path('icon_mark_duplicate_orange.svg'));
+}
+
+
 
 .email-header-information {
   background-color: $faint-neutral-color;
   padding: 12px;
   min-height: 80px;
+}
+
+#email-reply .email-header-information {
+  min-height: 0;
+}
+
+.email-reply-content-wrapper {
+  border: 1px solid darken($faint-neutral-color, 5%);
+}
+
+.email-reply-body, .template-content {
+  border: none;
+  width: 100%;
+  padding: 15px 10px;
+  font-size: 9pt !important;
+  line-height: 1.4;
+  color: $type-lighter-color;
+  }
+
+.email-reply-body {
+  min-height: 300px;
+  resize: vertical;
+}
+
+.template-content {
+  height: 100%;
+  min-height: 145px;
 }
 
 .email-response-button-wrapper {
@@ -3133,6 +3223,10 @@ fieldset.top-content {
   padding-left: 12px;
   position: absolute;
   right: 12px;
+}
+
+.email-reply-button-wrapper {
+  float: right;
 }
 
 .email-header-data {
@@ -3149,7 +3243,10 @@ fieldset.top-content {
   color: $type-lighter-color;
   line-height: 1.4em;
   margin-top: 12px;
+  margin-bottom: 40px;
   font-size: 9pt;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .table-toolbar {
@@ -3165,6 +3262,25 @@ fieldset.top-content {
 .communication-subject {
   color: $type-lighter-color;
   line-height: 1.3em;
+  border: none;
+  width: 100%;
+}
+
+input.communication-subject {
+  margin-top: 4px;
+  font-size: 9pt;
+  margin-bottom: -4px;
+}
+
+#email-reply input.communication-subject {
+  padding: 6px;
+}
+
+.email-reply-body-wrapper {
+  margin-left: 0;
+  margin-right: 0;
+  padding-right: 0;
+  padding-left: 0;
 }
 
 .email-response-buttons {
@@ -3191,6 +3307,35 @@ fieldset.top-content {
   background-color: $bug-section-color;
 }
 
+.email-reply-buttons button {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 18px 18px;
+  width: 18px;
+  height: 18px;
+  background-color: transparent;
+  border: none;
+  margin-top: 0;
+  margin-right: 0;
+}
+
+.reply-symbol {
+  background-image: url(image_path('icon_reply_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: top center;
+  width: 20px;
+  height: 20px;
+  display: block;
+  float: left;
+  margin-right: 8px;
+}
+
+.delete-email {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url(image_path('icon_delete.svg'));
+}
+
 .receiver-email {
   font-size: 8pt;
 }
@@ -3205,12 +3350,26 @@ fieldset.top-content {
   background-size: 18px 18px;
   height: 24px;
   display: inline-block;
-  float: right;
   background-color: transparent;
   border: none;
-  margin-top: 32px;
   padding-left: 22px;
   padding-right: 0;
+  font-weight: 300;
+  font-size: 9pt;
+}
+
+.mng-templates-button {
+  background-image: url(image_path('icon_template_white.svg'));
+  background-repeat: no-repeat;
+  background-position: 0 2px;
+  background-size: 18px 18px;
+  height: 24px;
+  display: inline-block;
+  background-color: transparent;
+  border: none;
+  padding-left: 22px;
+  padding-right: 0;
+  margin-left: 20px;
   font-weight: 300;
   font-size: 9pt;
 }
@@ -3222,6 +3381,7 @@ fieldset.top-content {
 
 .note-tool-buttons {
   float: right;
+  margin-right: 2px;
 }
 
 .note-tool-buttons button {
@@ -3232,11 +3392,16 @@ fieldset.top-content {
   padding: 4px;
   width: 20px;
   height: 20px;
+  border-radius: 2px;
 }
 
 .note-edit-button {background-image: url(image_path('icon_edit.svg'));}
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
 .note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+.note-save-button {background-image: url(image_path('icon_save_grey.svg'));}
+.note-cancel-button {background-image: url(image_path('icon_cancel.svg'));}
+
+
 
 .email-button {
   width: 20px;
@@ -3244,6 +3409,10 @@ fieldset.top-content {
   display: block;
   margin-top: 33px;
   margin-left: 2px;
+}
+
+.email-row {
+  cursor: pointer;
 }
 
 .email-row .alt-col {
@@ -3280,7 +3449,6 @@ fieldset.top-content {
 
 .sender-receiver-info .content-label-sm {
   width: 25px;
-  color: $type-lighter-color;
   line-height: 1.3em;
   display: inline-block;
   padding-bottom: 2px;
@@ -3288,6 +3456,10 @@ fieldset.top-content {
 }
 .sender-receiver-info {
   margin-top: 10px;
+}
+
+#email-reply .sender-receiver-info {
+  margin-top: 0;
 }
 
 .add-case-note-button {
@@ -3302,14 +3474,18 @@ fieldset.top-content {
   background-color: $bug-section-color;
   color: $content-bg-color;
   width: 120px;
-  margin-top: 20px;
   -webkit-transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  float: right;
+  display: inline-block;
+  margin-top: 3px;
 }
 
 .add-case-note-button:hover {
   background-color: #E47433;
 }
+
+.new-case-note-row {display: none;}
 
 .attachment-label {
   background-image: url(image_path('icon_attachment.svg'));
@@ -3320,9 +3496,40 @@ fieldset.top-content {
   display: inline-block;
 }
 
+.email-reply-header-information, .dialog-form-information {
+  padding: 5px;
+  background-color: $faint-neutral-color;
+}
+
 .email-attachments a {
   color: $content-tab-color;
   font-size: 8pt;
+}
+
+.template-label {
+  color: $type-base-color;
+  text-transform: uppercase;
+  background-image: url(image_path('icon_template.svg'));
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 16px 18px;
+  padding-left: 24px;
+  display: block;
+  padding-top: 4px;
+  font-weight: 700;
+  font-size: 8pt;
+  height: 20px;
+}
+
+#newEmailDialog .template-label {
+  float: left;
+}
+
+.email-template-select {
+  margin-left: 8px;
+  font-size: 8pt;
+  border-radius: 0;
+  border: 1px solid darken($faint-neutral-color, 5%);
 }
 
 #communication h1 {
@@ -3635,6 +3842,220 @@ button.tertiary {
   text-decoration: underline;
 }
 
+/** Below for the new email dialog box **/
+
+input.receiver-email {
+  border: none;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+  background-color: #4E4E4E;
+  color: $content-bg-color;
+  margin: 0 !important;
+  font-weight: 300;
+  padding: 10px;
+}
+
+.ui-dialog .ui-dialog-content {
+  padding: 0;
+}
+
+.ui-dialog {
+  padding: 0;
+}
+
+.ui-widget-header {
+  border: none;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0  !important;
+}
+
+.ui-dialog .ui-dialog-titlebar-close {
+  background-color: transparent;
+  background-image: url(image_path('icon_delete_white.svg'));
+  border: none;
+  margin-right: 3px;
+}
+
+#newEmailDialog .sender-receiver-info {
+  margin-top: 0;
+}
+
+#newEmailDialog .sender-receiver-info .content-label-sm {
+  width: 30px;
+}
+
+.template-select-wrapper {
+  display: inline-block;
+}
+
+#newEmailDialog .template-select-wrapper {
+  margin-top: 8px;
+}
+
+#newEmailDialog .email-reply-button-wrapper {
+  float: left;
+  margin-top: 8px;
+  margin-right: 4px;
+}
+
+#newEmailDialog .communication-subject {
+  width: 170px;
+}
+
+.content-label-sm-to {
+  width: 10px !important;
+}
+
+.content-label-sm-sub {
+  margin-left: 5px;
+}
+
+.email-new-button-wrapper {
+  text-align: center;
+  background-color: $faint-neutral-color;
+  padding: 10px;
+}
+
+.file-wrapper-reply {
+  margin-top: 5px;
+}
+
+.file-attachment-wrapper {
+  display: inline-block;
+  background-color: $bug-section-color;
+  border-radius: 2px;
+  margin: 2px;
+}
+
+.file-attachment-wrapper button {
+  background-color: transparent;
+  border: none;
+  color: $content-bg-color;
+}
+
+input.file_attachment {
+  display: inline-block;
+  background-image: none;
+  font-size: 8.5pt;
+  color: $content-bg-color !important;
+  content: 'what';
+  width: auto;
+  margin: 0;
+  padding: 2px;
+}
+
+.notes-header {
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.note-wrapper {
+  margin-bottom: 20px;
+}
+
+.dropdown-tool-button {
+  border-radius: 0;
+  border: none;
+  background-color: $content-bg-color;
+  color: $type-lighter-color;
+  font-weight: 300;
+  margin-left: 12px;
+  font-size: 8.5pt !important;
+  padding: 4px 6px;
+}
+
+.dropdown-tool-button::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid $type-lighter-color;
+  float: right;
+  margin: 1px 0 0 10px;
+}
+
+.template-select-wrapper .dropdown.open {
+  background-color: transparent !important;
+}
+
+.template-select-wrapper .dropdown-menu {
+  border: none;
+  left: 12px;
+  border-radius: 0 0 4px 4px;
+}
+
+.dropdown-section-divider, .dialog-section-divider {
+  width: 100%;
+  background-color: $faint-neutral-color;
+  text-align: center;
+  padding: 20px;
+  margin-top: 10px;
+  border-radius: 0 0 4px 4px;
+}
+
+.dropdown-section-divider {
+  margin-bottom: -5px;
+}
+
+.ui-dialog {
+  @include box-shadow($dropshadow);
+}
+
+.table-button {
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  dipsplay: inline-block;
+  border: none;
+  margin: 0 2px;
+}
+
+.table-button.edit-button {
+  background-image: url(image_path('icon_edit_blue.svg'));
+}
+
+.table-button.delete-button {
+  background-image: url(image_path('icon_delete_simple.svg'));
+}
+
+.table-header-highlight {
+  background-color: lighten($bug-section-color, 25%);
+}
+
+#new-template-form-wrapper {
+  display: none;
+  height: 0;
+  margin: 12px;
+  border: 1px solid $faint-neutral-color;
+}
+
+#edit-template-form-wrapper {
+  display: none;
+  height: 0;
+  margin: 12px;
+  border: 1px solid $faint-neutral-color;
+}
+
+.dialog-inset-header {
+  background-color: $bug-section-color;
+  padding: 4px 10px;
+  font-weight: 300 !important;
+  font-size: 10pt;
+  color: $content-bg-color;
+  margin-bottom: 0;
+  border-radius: 2px 2px 0 0;
+}
+
+#new_template_button {
+  width: 215px;
+  text-align: left;
+}
+
 .dispute_rep_tools {
   width: 70px;
 }
@@ -3677,6 +4098,10 @@ button.tertiary {
 .toolbar-button.adjust-reptool-button {
   background-image: url(image_path('icon_blacklist_grey.svg'));
   background-size: 18px 18px;
+}
+
+.dropdown button.toolbar-button {
+  height: 27px;
 }
 
 .toolbar .dropdown.open .adjust-wlbl-button, .toolbar .dropdown.open .adjust-reptool-button {
@@ -3780,6 +4205,170 @@ button.tertiary {
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
 }
+
+.datatable-top-tools {
+  float: right;
+  margin-top: -55px;
+  border: 1px solid $faint-neutral-color;
+  height: 35px;
+  padding: 3px;
+}
+
+.dispute-count {
+  background-color: darken($nav-toolbar-color, 8%);
+  display: inline-block;
+  border-radius: 2px;
+  font-weight: bold;
+  padding: 1px 6px;
+  color: $content-bg-color;
+  margin-top: -1px;
+  float: right;
+}
+
+.dispute-count, .dispute_entry_content_first {
+  display: inline-block;
+}
+
+.take-ticket-button {
+  background-image: url(image_path('icon_take_light2.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  float: right;
+  border: none;
+  background-color: transparent;
+}
+
+.dropdown-menu-content-block {
+  display: inline-block;
+  width: 50%;
+  padding: 0 !important;
+}
+
+.dropdown-menu-content-block:first-of-type {
+  float: left;
+  margin-right: 0 !important;
+}
+
+.dropdown-menu-toolbar-header {
+  color: $type-lighter-color;
+  font-size: 9pt;
+  width: 100%;
+  background-color: $faint-neutral-color;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  padding: 8px 12px 8px 34px !important;
+}
+
+.dropdown-menu-toolbar-header.ticket-showcol-header {
+  border-right: 1px solid white !important;
+}
+
+.dropdown-menu-toolbar-header.entry-showcol-header {
+  border-left: 1px solid white !important;
+}
+
+.ticket-showcol-header {
+  background-image: url(image_path('icon_ticket_grey.svg'));
+  background-position: 6px 3px;
+}
+
+.entry-showcol-header {
+  background-image: url(image_path('icon_dispute_entry.svg'));
+  background-position: 6px 4px;
+}
+
+#table-show-columns-dropdown {
+  min-width: 700px;
+}
+
+.dropdown-menu-content-block ul {
+  padding: 10px;
+  display: inline-block;
+}
+
+.dropdown-menu-content-block ul:first-of-type {
+  float: left;
+}
+
+.dropdown-menu-content-block li {
+  font-size: 9pt;
+  padding: 2px 0;
+}
+
+.dropdown-menu-content-block li input {
+  margin-right: 8px;
+}
+
+.dispute-entry-table {
+  margin: 0;
+}
+
+.dispute-entry-table .missing-data {
+  color: $faint-neutral-color;
+}
+
+.dispute-entry-table tbody{
+  background-color: #4E4E4E;;
+  color: $content-bg-color;
+  font-weight: 300;
+}
+
+.dispute-entry-table tbody tr td, .dispute-entry-table thead tr th {
+  border-color: #413D3D;
+}
+
+.dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child {
+  padding-left: 30px;
+}
+
+.dispute-entry-table thead {
+  background-color: #413D3D;
+  color: $content-bg-color;
+}
+
+.dispute-entry-table th {
+  font-weight: 600 !important;
+}
+
+.dispute-entry-table-wrapper {
+  padding: 0 0 0 20px !important;
+  background-color: $bug-section-color;
+}
+
+.dispute-entry-table-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  margin-top: -1px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid $content-bg-color;
+}
+
+.table-entry-input {
+  width: 100%;
+  border: 4px solid $content-bg-color;
+  outline: 1px solid darken($faint-neutral-color, 5%);
+}
+
+input.table-entry-input:focus {
+  background-color: $faint-alt-highlight;
+}
+
+.border-section {
+  border-right: 1px solid $faint-neutral-color;
+  border-left: 1px solid $faint-neutral-color;
+}
+
+.communication-toolbar {
+  background-color: $type-lighter-color;
+  width: 100%;
+  display: block;
+  padding: 6px 12px;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {

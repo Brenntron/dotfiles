@@ -1,0 +1,112 @@
+.toolbar
+  %div
+    %label.toolbar-section-label
+      Table View
+    %span.dropdown
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Show/Hide Columns
+      .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
+        .dropdown-menu-content-block
+          .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Details
+          %ul
+            %li.toggle-vis{'data-column':'2'}
+              %input{type: 'checkbox', checked: true} Priority
+            %li.toggle-vis{'data-column':'3'}
+              %input{type: 'checkbox', checked: true} Case ID
+            %li.toggle-vis{'data-column':'4'}
+              %input{type: 'checkbox', checked: true} Status
+            %li.toggle-vis{'data-column':'5'}
+              %input{type: 'checkbox'} Resolution
+            %li.toggle-vis{'data-column':'6'}
+              %input{type: 'checkbox', checked: true} Ticket Type
+            %li.toggle-vis{'data-column':'7'}
+              %input{type: 'checkbox', checked: true} Dispute
+            %li.toggle-vis{'data-column':'8'}
+              %input{type: 'checkbox', checked: true} Owner
+            %li.toggle-vis{'data-column':'9'}
+              %input{type: 'checkbox', checked: true} Time Submitted
+
+          %ul
+            %li.toggle-vis{'data-column':'10'}
+              %input{type: 'checkbox', checked: true} Age
+            %li.toggle-vis{'data-column':'11'}
+              %input{type: 'checkbox'} Case Origin
+            %li.toggle-vis{'data-column':'12'}
+              %input{type: 'checkbox'} Origin ID
+            %li.toggle-vis{'data-column':'13'}
+              %input{type: 'checkbox'} Submitter Type
+            %li.toggle-vis{'data-column':'14'}
+              %input{type: 'checkbox'} Submitter Org
+            %li.toggle-vis{'data-column':'15'}
+              %input{type: 'checkbox'} Submitter Domain
+            %li.toggle-vis{'data-column':'16'}
+              %input{type: 'checkbox'} Contact Name
+            %li.toggle-vis{'data-column':'17'}
+              %input{type: 'checkbox'} Contact Email
+
+
+        .dropdown-menu-content-block
+          .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
+          %ul
+            %li.toggle-vis-nested{'data-column': 'entry-col-content'}
+              %input{type: 'checkbox', checked: true} Dispute Entry
+            %li.toggle-vis-nested{'data-column': 'entry-col-status'}
+              %input{type: 'checkbox', checked: true} Dispute Entry Status
+            %li.toggle-vis-nested{'data-column': 'entry-col-disp'}
+              %input{type: 'checkbox', checked: true} Suggested Disposition
+            %li.toggle-vis-nested{'data-column': 'entry-col-cat'}
+              %input{type: 'checkbox', checked: true} Category
+            %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-score'}
+              %input{type: 'checkbox'} WBRS Score
+            %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-hits'}
+              %input{type: 'checkbox', checked: true} WBRS Total Rule Hits
+            %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-rules'}
+              %input{type: 'checkbox'} WBRS Rules
+
+          %ul
+            %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-score'}
+              %input{type: 'checkbox', checked: true} SBRS Score
+            %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-hits'}
+              %input{type: 'checkbox', checked: true} SBRS Total Rule Hits
+            %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-rules'}
+              %input{type: 'checkbox'} SBRS Rules
+            %li.toggle-vis-nested{'data-column': 'entry-col-wlbl'}
+              %input{type: 'checkbox', checked: true} WL/BL Entries
+            %li.toggle-vis-nested{'data-column': 'entry-col-reptool-class'}
+              %input{type: 'checkbox', checked: true} RepTool Classification
+
+
+    %button.toolbar-button.expand-row-button{title: 'Expand All Rows'}
+      %span.toolbar-button-text
+        Expand All Rows
+  %div
+    %label.toolbar-section-label
+      Edit Ticket
+    %button.toolbar-button.ticket-status-button{title: 'Edit Ticket Status'}
+      %span.toolbar-button-text
+        Edit Ticket Status
+    %button.toolbar-button.ticket-owner-button{title: 'Change Assignee'}
+      %span.toolbar-button-text
+        Change Assignee
+    %button.toolbar-button.mark-duplicate-button{title: 'Mark as Duplicate'}
+      %span.toolbar-button-text
+        Mark as Duplicate
+  %div
+    %label.toolbar-section-label
+      Edit Dispute Entry
+    %button.toolbar-button.ticket-status-button{title: 'Edit Entry Status'}
+      %span.toolbar-button-text
+        Edit Entry Status
+    %button.toolbar-button.adjust-wlbl-button{title: 'Adjust WL/BL'}
+      %span.toolbar-button-text
+        Adjust WL/BL
+    %button.toolbar-button.adjust-reptool-button#reptool_entries_button{title: 'Adjust RepTool BL'}
+      %span.toolbar-button-text
+        Adjust RepTool BL
+  %div
+    %label.toolbar-section-label
+      File
+    %button.toolbar-button.export-button{title: 'Export to CSV'}
+      %span.toolbar-button-text
+        Export to CSV

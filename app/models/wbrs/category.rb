@@ -30,14 +30,25 @@ class Wbrs::Category < Wbrs::Base
     all&.find { |cat| cat.category_id == id }
   end
 
-  def self.category_ids(category_array)
-    category_array.map do |category|
-      case category
-        when Wbrs::Category
-          category.id
-        else
-          category
-      end
+  def self.category_ids(categories_given)
+    case categories_given
+      when Wbrs::Category
+        [ categories_given.id ]
+      when Array
+        categories_given.map do |category|
+          case category
+            when Wbrs::Category
+              category.id
+            else
+              category
+          end
+        end
+      else #integer
+        [ categories_given ]
     end
+  end
+
+  def self.category_ids_from_params(params)
+    category_ids(params.delete('categories') || params.delete('category_ids') || params.delete('category_id'))
   end
 end
