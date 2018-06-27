@@ -21,13 +21,28 @@ module API
                   complaint_packet = {}
                   complaint_packet[:id] = complaint.id
                   complaint_packet[:tag] = complaint.tag
-                  complaint_packet[:subdomain] = complaint.subdomain
-                  complaint_packet[:domain] = complaint.domain
-                  complaint_packet[:path] = complaint.path
+                  complaint_packet[:description] = complaint.description
+                  complaint_packet[:submission_type] = complaint.submission_type
+                  complaint_packet[:submitter_type] = complaint.submitter_type
+                  complaint_packet[:assigned_to] = complaint.user_id
                   complaint_packet[:status] = complaint.status
-                  complaint_packet[:age] = complaint.age
-                  complaint_packet[:customer] = complaint.wbrs_score
-                  complaint_packet[:url_primary_cat] = complaint.url_primary_cat
+                  complaint_packet[:created_at] = complaint.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                  complaint_packet[:customer] = complaint.customer_id # Customer name
+                  complaint_packet[:complaint_entries] = complaint.complaint_entries
+                  complaint_packet[:complaint_entries_count] = complaint.complaint_entries.count
+
+                  complaint_packet[:complaint_entry_content] = []
+                  unless complaint.complaint_entries.empty?
+                    complaint.complaint_entries.each do |entry|
+                      unless entry[:ip_address].nil?
+                        complaint_packet[:complaint_entry_content].push(entry[:ip_address])
+                      end
+                      unless entry[:uri].nil?
+                        complaint_packet[:complaint_entry_content].push(entry[:uri])
+                      end
+                    end
+                  end
+                  complaint_packet[:complaint_entry_preview] = complaint_packet[:complaint_entry_content].first.to_s
 
                   json_packet << complaint_packet
                 end
