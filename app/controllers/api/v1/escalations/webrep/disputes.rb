@@ -61,7 +61,7 @@ module API
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
-                if dispute.user_id.nil?
+                if dispute.assignee == 'Unassigned'
                   dispute_packet[:assigned_to] = "<span class='missing-data'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me'></button>"
                 end
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
