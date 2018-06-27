@@ -189,7 +189,6 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.adjust_from_params(params, username:)
-    byebug
     case params['action']
       when 'Active'
         add_from_params(params, username: username)
