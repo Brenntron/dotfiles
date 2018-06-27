@@ -108,7 +108,5 @@ class Wbrs::ManualWlbl < Wbrs::Base
         drop_from_params(existing_entries, wlbl_params)
       end
     end
-
-
   end
 end

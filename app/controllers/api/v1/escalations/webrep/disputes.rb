@@ -109,7 +109,7 @@ module API
 
             end
 
-            desc "Add a WL/BL entry"
+            desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
               requires :trgt_list, type: String, desc: "type of WL/BL"
@@ -122,13 +122,14 @@ module API
 
             desc "Adjust a Reptool Bl entry"
             params do
+              requires :action, type: String, desc: 'activate or expire'
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
               #requires :entries, type: Array[String], desc: "urls"
               requires :classifications, type: Array[String], desc: "classifications"
               requires :comment, type: String, desc: "comment"
             end
             post "reptool_bl" do
-              RepApi::Blacklist.add_from_params(permitted_params, username: current_user.cvs_username)
+              RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
               true
             end
 

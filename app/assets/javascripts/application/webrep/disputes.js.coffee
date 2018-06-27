@@ -38,7 +38,7 @@ window.row_adust_wlbl_button =(button_tag) ->
     data: data
     dataType: 'json'
     success: (response) ->
-      window.reload
+      window.location.reload()
     error: (response) ->
       debugger
   )
@@ -62,12 +62,15 @@ window.toolbar_adust_wlbl_button =(button_tag) ->
     headers: headers
     data: data
     dataType: 'json'
+    success: (response) ->
+      window.location.reload()
   )
 
 
 window.row_adust_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
+    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
     'dispute_entry_ids': [ reptool_bl_form.getElementsByClassName('dispute-entry-id')[0].value ]
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
@@ -79,6 +82,8 @@ window.row_adust_reptool_bl_button =(button_tag) ->
     headers: headers
     data: data
     dataType: 'json'
+    success: (response) ->
+      window.location.reload()
   )
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
@@ -88,6 +93,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
 
   reptool_bl_form = button_tag.form
   data = {
+    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
     'dispute_entry_ids': entry_ids
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('-comment-input')[0].value
@@ -99,6 +105,8 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     headers: headers
     data: data
     dataType: 'json'
+    success: (response) ->
+      window.location.reload()
   )
 
 $ ->

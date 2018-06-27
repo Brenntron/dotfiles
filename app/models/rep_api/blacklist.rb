@@ -170,11 +170,33 @@ class RepApi::Blacklist < RepApi::Base
   def self.add_from_params(params, username:)
     dispute_entry_ids = params['dispute_entry_ids']
     raise 'Must provide dispute entry ids' unless dispute_entry_ids
-    dispute_entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
-    reptool_entries = dispute_entries.map {|entry| entry.wbrs_url}
+    entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
+    reptool_entries = entries.map {|entry| entry.wbrs_url}
 
     blacklist = RepApi::Blacklist.new(entry: reptool_entries,
                                       classifications: params['classifications'])
-    blacklists = blacklist.save!(author: username, comment: params['comment'])
+    blacklist.save!(author: username, comment: params['comment'])
+  end
+
+  def self.delete_from_params(params)
+    dispute_entry_ids = params['dispute_entry_ids']
+    raise 'Must provide dispute entry ids' unless dispute_entry_ids
+    entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
+    reptool_entries = entries.map {|entry| entry.wbrs_url}
+
+    blacklist = RepApi::Blacklist.new(entry: reptool_entries)
+    blacklist.delete!
+  end
+
+  def self.adjust_from_params(params, username:)
+    byebug
+    case params['action']
+      when 'Active'
+        add_from_params(params, username: username)
+      when 'Expired'
+        delete_from_params(params)
+      else
+        raise "No known action '#{params['action']}'."
+    end
   end
 end
