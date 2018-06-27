@@ -23,6 +23,20 @@ window.populate_webrep_index_table = () ->
       #$("#create_research_submit").show()
   , this)
 
+window.popup_response_error =(response, prefix) ->
+  if response.responseJSON == undefined
+    response_lines = response.responseText.split("\n")
+    if 2 < response_lines.length
+      errormsg = response_lines[0] + "\n" + response_lines[1]
+    else
+      errormsg = response.responseText
+  else if response.responseJSON.error != undefined
+    errormsg = response.responseJSON.error
+  else
+    errormsg = response.responseText
+
+  alert(prefix + "\n" + errormsg)
+
 window.row_adust_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form;
   data = {
@@ -40,7 +54,7 @@ window.row_adust_wlbl_button =(button_tag) ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      debugger
+      popup_response_error(response, 'Error adjusting WL/BL')
   )
 
 window.toolbar_adust_wlbl_button =(button_tag) ->
@@ -64,6 +78,8 @@ window.toolbar_adust_wlbl_button =(button_tag) ->
     dataType: 'json'
     success: (response) ->
       window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
   )
 
 
@@ -84,6 +100,8 @@ window.row_adust_reptool_bl_button =(button_tag) ->
     dataType: 'json'
     success: (response) ->
       window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
   )
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
@@ -96,7 +114,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
     'dispute_entry_ids': entry_ids
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('-comment-input')[0].value
+    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -107,6 +125,8 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     dataType: 'json'
     success: (response) ->
       window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
   )
 
 $ ->
