@@ -381,8 +381,8 @@
                   <thead>
                     <tr>
                       <%
-                        unless entry.uri.nil?
-                           Xbrs::GetXbrs.by_domain(entry.uri)[1]['legend'].each do |header| %>
+                        unless entry.hostname.nil?
+                           Xbrs::GetXbrs.by_domain(entry.hostname)[1]['legend'].each do |header| %>
                         <th><%= header %></th>
                       <% end
                       end%>
@@ -391,8 +391,8 @@
 
                   <tbody>
                       <%
-                        unless entry.uri.nil?
-                          Xbrs::GetXbrs.by_domain(entry.uri)[1]['data'].each do |data| %>
+                        unless entry.hostname.nil?
+                          Xbrs::GetXbrs.by_domain(entry.hostname)[1]['data'].each do |data| %>
                         <tr>
                           <% data.each do |datapoint| %>
                             <td><%= datapoint %></td>
