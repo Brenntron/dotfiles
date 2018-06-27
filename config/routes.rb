@@ -28,9 +28,9 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :clusters
-      resources :rules
-      resources :reports
+      get 'clusters', to: 'complaints#clusters'
+      get 'rules', to: 'complaints#rules'
+      get 'reports', to: 'complaints#reports'
     end
 
     namespace :webrep do
