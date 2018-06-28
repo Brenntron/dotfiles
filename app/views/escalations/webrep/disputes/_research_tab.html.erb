@@ -260,9 +260,9 @@
               <td><%= entry.hostlookup %></td>
               <td>Computer and Internet</td>
               <td class="text-center">5.6</td>
-              <td class="text-center wbrs-highlight">8.7</td>
+              <td class="text-center wbrs-highlight"><%= entry.wbrs_score %></td>
               <td class="text-center">6</td>
-              <td class="text-center sbrs-highlight"><%= entry.score unless entry.score_type != "SBRS" %></td>
+              <td class="text-center sbrs-highlight"><%= entry.sbrs_score %></td>
               <td class="text-center">0</td>
               <td>WL - Medium</td>
             </tr>
