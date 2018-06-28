@@ -1,10 +1,9 @@
 -#view single record
-.content-wrapper
+.content-wrapper.top-case-info
 
   .row
     .col-xs-1.col-with-divider
       %span.bug-state-info.bug-priority.p-P1
-      %span.email-button
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Case ID
@@ -47,84 +46,87 @@
       %label.content-label-sm
         Age
       %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
-    .row#top_bar_extended_info
-      .col-xs-12
-        %h3 Submitter Information
-        .row
-          .col-xs-1
+
+  .row#top_bar_extended_info
+    .col-xs-12
+      %h3 Submitter Information
+      .row
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Submitter
-            %br
-            Guest
-          .col-xs-2
+          %p Guest
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
             Submitter Organization
-            %br
-            Paragon Downloads
-          .col-xs-4
+          %p Paragon Downloads
+        .col-xs-3.col-with-divider
+          %label.content-label-sm
             Submitter Domain
-            %br
-            paragon-downloads.com
-          .col-xs-1
+          %p paragon-downloads.com
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Contact Name
-            %br
-            Monica Taylor
-          .col-xs-2
+          %p Monica Taylor
+        .col-xs-3.col-with-divider
+          %label.content-label-sm
             Contact Email
-            %br
-            person@paragon-downloads.com
-          .col-xs-1
+          %p person@paragon-downloads.com
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Origin
-            %br
-            SenderBase
-          .col-xs-1
+          %p SenderBase
+        .col-xs-1
+          %label.content-label-sm
             Origin ID
-            %br
-            227566
-        %h3 Case Management Information
-        .row
-          .col-xs-1
+          %p 227566
+      %h3 Case Management Information
+      .row
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
             First Accept Date
-            %br
-            2017-10-24 15:35:55
-          .col-xs-1
+          %p 2017-10-24 15:35:55
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
             First Repsonse Date
-            %br
-            2017-10-24 15:36:55
-          .col-xs-1
+          %p 2017-10-24 15:36:55
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Minutes to Accept
-            %br
-            848.9
-          .col-xs-1
+          %p 848.9
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Minutes to Respond
-            %br
-            853.4
-          .col-xs-1
+          %p 853.4
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Days to Close
-            %br
-          .col-xs-5
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Minutes to Close
-            %br
-          .col-xs-1
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
             Email Count
-            %br
-            3
-          .col-xs-1
+          %p 3
+        .col-xs-3
+          %label.content-label-sm
             Last Updated By
-            %br
-            Melissa Taylor
-        %h3 Duplicate Cases
-        .row
-          .col-xs-2
+          %p Melissa Taylor
+      %h3 Duplicate Cases
+      .row
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
             Case ID
-            %p= @dispute.id
-          .col-xs-2
+          %p= @dispute.id
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
             Date/Time Submitted
-            %p = @dispute.case_opened_at
-          .col-xs-8
+          %p= @dispute.case_opened_at
+        .col-xs-8
+          %label.content-label-sm
             Time Marked Duplicate
-    .row
-      .col-xs-12.text-center
-        %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).toggle()'}
-          [x]
+  .row
+    .col-xs-12.text-center
+      %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
 
 
 %ul.nav.nav-tabs#bug-tabs{role: 'tablist'}
