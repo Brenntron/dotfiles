@@ -1,14 +1,12 @@
-describe Wbrs::Blacklist do
+describe RepApi::Blacklist do
   let(:classifications_json) do
     %w(attackers bogon bots cnc dga exploitkit malware open_proxy open_relay
        phishing response spam suspicious tor_exit_node).to_json
   end
   let(:get_blacklist_json) do
     {
-        "NOT_FOUND" => [
-            "1.1.1.1",
-            "unknownhost.com"
-        ],
+        "1.1.1.1" => "NOT_FOUND",
+        "unknownhost.com" => "NOT_FOUND",
         "badbadsite.com" => {
             "public" => "false",
             "classifications" => [
@@ -17,7 +15,7 @@ describe Wbrs::Blacklist do
             "class_id" => 1,
             "expiration" => "2016‐05‐31 15:07:02.321397‐04",
             "hostname" => "badbadsite.com",
-            "rev" => 18,
+            "_rev" => 18,
             "stale" => "false",
             "last_seen" => "2016‐05‐02 14:25:44.271465‐04",
             "primary_source" => "VRT",
@@ -54,9 +52,9 @@ describe Wbrs::Blacklist do
   ### TESTS ####################################################################
 
   it 'should list the classifications' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(classifications_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(classifications_response)
 
-    classifications = Wbrs::Blacklist.classifications
+    classifications = RepApi::Blacklist.classifications
 
     expect(classifications).to be_a_kind_of(Array)
     expect(classifications.count).to eql(14)
@@ -64,21 +62,21 @@ describe Wbrs::Blacklist do
   end
 
   it 'should get blacklists from a query' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(get_blacklist_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(get_blacklist_response)
 
-    blacklists = Wbrs::Blacklist.where(entry: ['A Blacklist Entry', 'Another Entry'])
+    blacklists = RepApi::Blacklist.where(entries: ['A Blacklist Entry', 'Another Entry'])
 
     expect(blacklists).to be_a_kind_of(Array)
     expect(blacklists.count).to eql(1)
-    expect(blacklists[0]).to be_a_kind_of(Wbrs::Blacklist)
+    expect(blacklists[0]).to be_a_kind_of(RepApi::Blacklist)
   end
 
   it 'should handle not found from a query' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(get_blacklist_not_found)
+    expect(RepApi::Base).to receive(:call_request).and_return(get_blacklist_not_found)
 
     blacklists = nil
     expect {
-      blacklists = Wbrs::Blacklist.where(entry: ['A Blacklist Entry', 'Another Entry'])
+      blacklists = RepApi::Blacklist.where(entries: ['A Blacklist Entry', 'Another Entry'])
     }.to_not raise_error(Exception)
 
 
@@ -87,34 +85,33 @@ describe Wbrs::Blacklist do
   end
   
   it 'should handle errors getting blacklists from a query' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(get_blacklist_error)
+    expect(RepApi::Base).to receive(:call_request).and_return(get_blacklist_error)
 
     expect {
-      Wbrs::Blacklist.where(entry: ['A Blacklist Entry', 'Another Entry'])
-    }.to raise_error(Wbrs::WbrsError)
+      RepApi::Blacklist.where(entries: ['A Blacklist Entry', 'Another Entry'])
+    }.to raise_error(RepApi::RepApiError)
   end
 
 end
 
 describe 'A blacklist' do
+  let(:blacklist_entry) { '75.125.228.68' }
   let(:blacklist) do
-    Wbrs::Blacklist.new(entry: '75.125.228.68',
-                        author: 'awalker',
-                        public: false,
-                        excluded: false,
-                        comment: 'keegy.com')
+    RepApi::Blacklist.new(entry: blacklist_entry,
+                          author: 'awalker',
+                          public: false,
+                          excluded: false)
   end
   let(:loaded_blacklist) do
-    Wbrs::Blacklist.load_from_attributes(entry: '75.125.228.68',
-                                         author: 'awalker',
-                                         public: false,
-                                         excluded: false,
-                                         comment: 'keegy.com')
+    RepApi::Blacklist.load_from_attributes(entry: blacklist_entry,
+                                           author: 'awalker',
+                                           public: false,
+                                           excluded: false)
   end
-  let(:add_blacklist_json) { {"MSG" => "Entry created", "expiration" => "2013‐05‐08T10:05:02"}.to_json }
-  let(:add_blacklist_json) { {"MSG" => "Entry created", "expiration" => "2013‐05‐08T10:05:02"}.to_json }
+  let(:add_blacklist_json) { [{"MSG" => "Entry created", "entry" => blacklist_entry, "expiration" => "2013‐05‐08T10:05:02"}].to_json }
+  let(:add_blacklist_json) { [{"MSG" => "Entry created", "entry" => blacklist_entry, "expiration" => "2013‐05‐08T10:05:02"}].to_json }
   let(:add_blacklist_error_json) { {"MSG" => "Invalid IP or CIDR address: 256.0.0.1/900"}.to_json }
-  let(:update_blacklist_json) { {"MSG" => "Entry updated", "expiration" => "2013‐05‐08T10:05:02"}.to_json }
+  let(:update_blacklist_json) { [{"MSG" => "Entry updated", "entry" => blacklist_entry, "expiration" => "2013‐05‐08T10:05:02"}].to_json }
   let(:update_blacklist_error_json) { {"MSG" => "Invalid IP or CIDR address: 256.0.0.1/900"}.to_json }
   let(:exlude_blacklist_error_json) { {"MSG" => "Entry is already excluded"}.to_json }
   let(:renew_blacklist_error_json) { {"MSG" => "Entry is not excluded"}.to_json }
@@ -140,51 +137,59 @@ describe 'A blacklist' do
   ### TESTS ####################################################################
 
   it 'should add a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(add_blacklist_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(add_blacklist_response)
 
     ret = nil
     expect {
-      @blacklist = blacklist.clone
-      ret = @blacklist.save!
+      @blacklist = RepApi::Blacklist.new(entry: [blacklist_entry], classifications: [ 'bots', 'spam' ])
+      ret = @blacklist.save!(author: 'dtrump', comment: 'blah')
     }.to_not raise_error(Exception)
 
-    expect(ret).to eql(true)
     expect(@blacklist.new_record?).to be_falsey
+    expect(ret).to be_a_kind_of(Array)
+    expect(ret.count).to eq(1)
+    blacklist = ret.first
+    expect(blacklist).to be_a_kind_of(RepApi::Blacklist)
+    expect(blacklist.entry).to eq(blacklist_entry)
   end
   
   it 'should handle errors adding a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(add_blacklist_error)
+    expect(RepApi::Base).to receive(:call_request).and_return(add_blacklist_error)
 
     expect {
-      @blacklist = blacklist.clone
-      ret = @blacklist.save!
-    }.to raise_error(Wbrs::WbrsError)
+      @blacklist = RepApi::Blacklist.new(entry: [blacklist_entry], classifications: [ 'bots', 'spam' ])
+      ret = @blacklist.save!(author: 'dtrump', comment: 'blah')
+    }.to raise_error(RepApi::RepApiError)
   end
 
   it 'should update a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(update_blacklist_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(update_blacklist_response)
 
     ret = nil
     expect {
-      @blacklist = loaded_blacklist.clone
-      ret = @blacklist.save!
+      @blacklist = RepApi::Blacklist.new(entry: [blacklist_entry], classifications: [ 'bots', 'spam' ])
+      ret = @blacklist.save!(author: 'dtrump', comment: 'blah')
     }.to_not raise_error(Exception)
 
-    expect(ret).to eql(true)
     expect(@blacklist.new_record?).to be_falsey
+    expect(ret).to be_a_kind_of(Array)
+    expect(ret.count).to eq(1)
+    blacklist = ret.first
+    expect(blacklist).to be_a_kind_of(RepApi::Blacklist)
+    expect(blacklist.entry).to eq(blacklist_entry)
   end
 
   it 'should handle errors updating a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(update_blacklist_error)
+    expect(RepApi::Base).to receive(:call_request).and_return(update_blacklist_error)
 
     expect {
-      @blacklist = loaded_blacklist.clone
-      ret = @blacklist.save!
-    }.to raise_error(Wbrs::WbrsError)
+      @blacklist = RepApi::Blacklist.new(entry: [blacklist_entry], classifications: [ 'bots', 'spam' ])
+      ret = @blacklist.save!(author: 'dtrump', comment: 'blah')
+    }.to raise_error(RepApi::RepApiError)
   end
 
   it 'should exclude a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(exclude_blacklist_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(exclude_blacklist_response)
 
     expect {
       blacklist.exclude
@@ -192,15 +197,15 @@ describe 'A blacklist' do
   end
 
   it 'should handle errors excluding a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(exclude_blacklist_error)
+    expect(RepApi::Base).to receive(:call_request).and_return(exclude_blacklist_error)
 
     expect {
       blacklist.exclude
-    }.to raise_error(Wbrs::WbrsError)
+    }.to raise_error(RepApi::RepApiError)
   end
 
   it 'should renew a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(renew_blacklist_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(renew_blacklist_response)
 
     expect {
       blacklist.renew
@@ -208,15 +213,15 @@ describe 'A blacklist' do
   end
 
   it 'should handle errors renewing a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(renew_blacklist_error)
+    expect(RepApi::Base).to receive(:call_request).and_return(renew_blacklist_error)
 
     expect {
       blacklist.renew
-    }.to raise_error(Wbrs::WbrsError)
+    }.to raise_error(RepApi::RepApiError)
   end
 
   it 'should expire a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(expire_blacklist_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(expire_blacklist_response)
 
     expect {
       blacklist.expire
@@ -224,28 +229,28 @@ describe 'A blacklist' do
   end
 
   it 'should handle errors expiring a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(expire_blacklist_error)
+    expect(RepApi::Base).to receive(:call_request).and_return(expire_blacklist_error)
 
     expect {
       blacklist.expire
-    }.to raise_error(Wbrs::WbrsError)
+    }.to raise_error(RepApi::RepApiError)
   end
 
   it 'should delete a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(delete_blacklist_response)
+    expect(RepApi::Base).to receive(:call_request).and_return(delete_blacklist_response)
 
     expect {
-      blacklist.delete(comment: 'Just for the thrill.')
+      blacklist.delete!
     }.to_not raise_error(Exception)
 
   end
   
   it 'should handle errors deleting a blacklist entry' do
-    expect(Wbrs::Base).to receive(:call_request).and_return(delete_blacklist_error)
+    expect(RepApi::Base).to receive(:call_request).and_return(delete_blacklist_error)
 
     expect {
-      blacklist.delete(comment: 'Just for the thrill.')
-    }.to raise_error(Wbrs::WbrsError)
+      blacklist.delete!
+    }.to raise_error(RepApi::RepApiError)
 
   end
 

@@ -9,8 +9,8 @@ class Wbrs::Base
     @port ||= Rails.configuration.wbrs.port || 80
   end
 
-  def self.tls_mode
-    @tls_mode ||= Rails.configuration.wbrs.tls_mode
+  def self.verify_mode
+    @verify_mode ||= Rails.configuration.wbrs.verify_mode
   end
 
   def self.gssnegotiate?
@@ -37,7 +37,7 @@ class Wbrs::Base
     raise 'Path must start with slash (/)' unless '/' == path[0]
 
     protocol =
-        case tls_mode
+        case verify_mode
           when 'verify-peer'
             'https'
           when 'verify-none'
@@ -48,7 +48,7 @@ class Wbrs::Base
 
     request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}")
 
-    case tls_mode
+    case verify_mode
       when 'verify-peer'
         request.ssl = true
         request.auth.ssl.verify_mode = :peer

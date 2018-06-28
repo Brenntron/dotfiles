@@ -59,14 +59,16 @@ rep_api = env_config.fetch('rep_api', {})
 Rails.configuration.rep_api                = OpenStruct.new
 Rails.configuration.rep_api.host           = rep_api['host']
 Rails.configuration.rep_api.port           = rep_api['port']
-Rails.configuration.rep_api.tls_mode       = rep_api['tls_mode']
+Rails.configuration.rep_api.verify_mode    = rep_api['verify_mode']
+Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
 Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
 
 wbrs = env_config.fetch('wbrs', {})
 Rails.configuration.wbrs                = OpenStruct.new
 Rails.configuration.wbrs.host           = wbrs['host']
 Rails.configuration.wbrs.port           = wbrs['port']
-Rails.configuration.wbrs.tls_mode       = wbrs['tls_mode']
+Rails.configuration.wbrs.verify_mode    = wbrs['verify_mode']
+Rails.configuration.wbrs.ca_cert_file   = wbrs['ca_cert_file']
 Rails.configuration.wbrs.gssnegotiate   = wbrs['gssnegotiate']
 
 xbrs = env_config.fetch('xbrs', {})
