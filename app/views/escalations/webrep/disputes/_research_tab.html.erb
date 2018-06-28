@@ -276,7 +276,7 @@
                   </tr>
                   <tr>
                     <th>Hostname</th>
-                    <td><%= entry.hostname %></td>
+                    <td><%= entry.hostlookup %></td>
                   </tr>
                   <tr>
                     <th>WBRS Rules</th>
@@ -371,19 +371,16 @@
                 <table class="nested-related-datatable">
                   <thead>
                     <tr>
-                      <%
-                        unless entry.uri.nil?
-                           Xbrs::GetXbrs.by_domain(entry.uri)[1]['legend'].each do |header| %>
+                      <% entry.find_xbrs[1]['legend'].each do |header| %>
                         <th><%= header %></th>
-                      <% end
-                      end%>
+                      <% end %>
                     </tr>
                   </thead>
 
                   <tbody>
                       <%
                         unless entry.uri.nil?
-                          Xbrs::GetXbrs.by_domain(entry.uri)[1]['data'].each do |data| %>
+                          entry.find_xbrs[1]['data'].each do |data| %>
                         <tr>
                           <% data.each do |datapoint| %>
                             <td><%= datapoint %></td>
