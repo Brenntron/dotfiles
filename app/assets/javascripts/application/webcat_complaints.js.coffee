@@ -40,7 +40,6 @@ window.display_preview_window = (id, subdomain, domain, path) ->
       #yay you can visit the site
     error: (response) ->
       #that page wont load. lets display someting else
-      debugger
       switch response["status"]
         when 404
           document.getElementById('preview_window').src = "/unknown_url.html"
