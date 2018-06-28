@@ -36,6 +36,17 @@ module API
 
             end
 
+            desc 'test a url'
+            params do
+              requires :url, type: String, desc: "URL to be visited"
+            end
+            get "test_url" do
+              response = JSON.parse(Complaint.can_visit_url?(params[:url]))
+              throw :error, status: response["status"], message: "#{response["error"]}" if response["status"] != "SUCCESS"
+              response
+            end
+
+
             desc 'update a complaint'
             params do
             end
