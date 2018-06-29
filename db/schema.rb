@@ -159,6 +159,7 @@ ActiveRecord::Schema.define(version: 20180621231320) do
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
+    t.boolean "marked_for_commit", default: false
   end
 
   create_table "complaints", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

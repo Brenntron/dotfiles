@@ -79,3 +79,21 @@ window.open_all = () ->
   $('[id$=_site_checkbox]').each (site)->
     value = JSON.parse(this.value)
     window.open("http://www."+value.site)
+
+window.mark_for_commit = () ->
+  debugger
+  entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
+    this.dataset['entryId']
+  ).toArray()
+  data = { 'complaint_entry_ids': entry_ids }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaints/mark_for_commit'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    error: (response) ->
+      popup_response_error(response, 'Error marking for commit')
+  )

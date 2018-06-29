@@ -63,6 +63,14 @@ module API
 
             end
 
+            desc 'mark for commit'
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: "ComplaintEntry ids"
+            end
+            post 'mark_for_commit' do
+              byebug
+              ComplaintEntry.mark_for_commit(permitted_params['complaint_entry_ids'])
+            end
           end
         end
       end
