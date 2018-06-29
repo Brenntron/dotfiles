@@ -5,7 +5,7 @@ class CreateComplaintMarkedCommits < ActiveRecord::Migration[5.1]
       t.integer :user_id
       t.integer :complaint_entry_id
       t.string :comment
-      t.string :threat_category_list
+      t.string :category_list
     end
   end
 end
