@@ -16,6 +16,7 @@ class ComplaintMarkedCommit < ApplicationRecord
 
       Wbrs::Prefix.create_from_url(url: entry.location_url, category_ids: category_ids, user: user,
                                    description: marked_commit.comment)
+      marked_commit.delete!
     end
   end
 end
