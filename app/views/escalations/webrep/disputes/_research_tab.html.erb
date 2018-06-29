@@ -287,36 +287,13 @@
                           <th>Rule Description</th>
                           <th class="text-center">Malware Probability</th>
                         </tr>
+                        <% entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit| %>
                         <tr>
-                          <td class="emphasis">vsvd</td>
-                          <td>Verisign Verified Domains</td>
+                          <td class="emphasis"><%= wbrs_hit.name %></td>
+                          <td><%= wbrs_hit.mnemonic %></td>
                           <td class="text-center data-small-emphasis">-</td>
                         </tr>
-                        <tr>
-                          <td class="emphasis">wlh</td>
-                          <td>Heavy-weight manual whitelist</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
-                        <tr>
-                          <td class="emphasis">wlm</td>
-                          <td>Medium-weight manual whitelist</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
-                        <tr>
-                          <td class="emphasis">wuwl</td>
-                          <td>SURBL Whitelist</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
-                        <tr>
-                          <td class="emphasis">tuse</td>
-                          <td>TRUSTe Site Seal</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
-                        <tr>
-                          <td class="emphasis">alx_chn</td>
-                          <td>Clean URIs from Alexa top 1 million list</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
+                        <% end %>
                       </table>
                     </td>
                   </tr>
@@ -329,21 +306,13 @@
                           <th>Rule Description</th>
                           <th class="text-center">Malware Probability</th>
                         </tr>
-                        <tr>
-                          <td class="emphasis">wlm</td>
-                          <td>Medium-weight manual whitelist</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
-                        <tr>
-                          <td class="emphasis">wuwl</td>
-                          <td>SURBL Whitelist</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
-                        <tr>
-                          <td class="emphasis">tuse</td>
-                          <td>TRUSTe Site Seal</td>
-                          <td class="text-center data-small-emphasis">-</td>
-                        </tr>
+                        <% entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit| %>
+                          <tr>
+                            <td class="emphasis"><%= sbrs_hit.name %></td>
+                            <td><%= sbrs_hit.mnemonic %></td>
+                            <td class="text-center data-small-emphasis">-</td>
+                          </tr>
+                        <% end %>
                       </table>
                     </td>
                   </tr>
@@ -364,7 +333,17 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- TODO: Populate this from wbrs ruleui api, when they finish the feature -->
+                    <% entry.wbrs_xlist.each do |cross_listed| %>
+                      <tr>
+                        <td><%= cross_listed.id %></td>
+                        <td><%= cross_listed.url %></td>
+                        <td><%= cross_listed.list_type %></td>
+                        <td>-</td>
+                        <td><%= cross_listed.username %></td>
+                        <td><%= cross_listed.mtime %></td>
+                        <td><%= cross_listed.ctime %></td>
+                      </tr>
+                    <% end %>
                   </tbody>
                 </table>
                 <h4>XBRS Hits</h4>
