@@ -37,4 +37,8 @@ class DisputeEntry < ApplicationRecord
   def wbrs_list_type
     Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
   end
+
+  def wbrs_xlist
+    Wbrs::ManualWlbl.where(url: hostlookup)
+  end
 end
