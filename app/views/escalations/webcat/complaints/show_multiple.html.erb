@@ -23,6 +23,7 @@
                               '{"site": "' + entry.domain.to_s + '", "viewable": "' + entry.viewable.to_s + '" }',
                               false,
                               class: 'complaint-entry-checkbox',
+                              'data-complaint-id' => complaint.id,
                               'data-entry-id' => entry.id %>
             <div>ID: <%= entry.id %> </div>
           </div>

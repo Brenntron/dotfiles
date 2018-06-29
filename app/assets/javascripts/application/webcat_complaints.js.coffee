@@ -85,7 +85,11 @@ window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
-  data = { 'complaint_entry_ids': entry_ids }
+  data = {
+    'complaint_entry_ids': entry_ids
+    'threat_category_list': $('#complaint_id_x_categories').val()
+    'comment': $('#complaint_id_x_comment').val()
+  }
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(

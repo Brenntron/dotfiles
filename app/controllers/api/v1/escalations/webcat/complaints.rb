@@ -63,13 +63,21 @@ module API
 
             end
 
+            # 'complaint_entry_ids': entry_ids
+            # 'threat_category_list': $('#complaint_id_x_categories').val()
+            # 'comment': $('#complaint_id_x_comment').val()
             desc 'mark for commit'
             params do
-              requires :complaint_entry_ids, type: Array[Integer], desc: "ComplaintEntry ids"
+              requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
+              requires :threat_category_list, type: String, desc: 'Comma separated list of threat category names'
+              requires :comment, type: String
             end
             post 'mark_for_commit' do
-              byebug
-              ComplaintEntry.mark_for_commit(permitted_params['complaint_entry_ids'])
+              ComplaintMarkedCommit.mark_for_commit(permitted_params['complaint_entry_ids'],
+                                                    permitted_params['threat_category_list'],
+                                                    user: current_user,
+                                                    comment: permitted_params['comment'])
+              true
             end
           end
         end
