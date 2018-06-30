@@ -4052,7 +4052,9 @@ input.file_attachment {
 }
 
 .dispute_rep_tools {
-  width: 70px;
+  width: 90px;
+  padding: 0 !important;
+  text-align: right;
 }
 
 .dispute_rep_tools .dropdown.open {
@@ -4362,6 +4364,64 @@ input.table-entry-input:focus {
   width: 100%;
   display: block;
   padding: 6px 12px;
+}
+
+#disputes-research-table label {
+  font-weight: 700;
+  text-transform: uppercase;
+  padding-right: 10px;
+}
+
+#disputes-research-table .expand-row-button-inline {
+  margin-bottom: -5px;
+}
+
+#disputes-research-table td.expandable-row-column {
+  padding: 0 !important;
+}
+
+.research-table-row-wrapper, .research-table-details-wrapper {
+  padding: 0 !important;
+}
+
+.research-table-details-wrapper table td {
+  background-color: $faint-neutral-color;
+  padding: 0 !important;
+}
+
+.research-table-details-wrapper table tr:first-of-type td {
+  border-bottom: 1px solid $content-bg-color;
+}
+
+.research-table-input-wrapper {
+  padding: 7px 10px;
+  display: inline-block;
+  width: 33px;
+  height: 33px;
+}
+
+.research-overview-row td:first-of-type, .research-table-details-wrapper, .research-table-row-wrapper {
+  border-bottom: none;
+}
+
+.research-table-input-wrapper.wbrs-input-wrapper {
+  background-color: $bug-section-color;
+}
+
+.research-table-input-wrapper.sbrs-input-wrapper {
+  background-color: $success-color;
+}
+
+.research-table-input-wrapper.xbrs-input-wrapper {
+  background-color: $communication-accent-color;
+}
+
+.research-table-input-wrapper.crosslisted-input-wrapper {
+  background-color: $warning-accent-color;
+}
+
+.research-table-input-wrapper.virus-total-input-wrapper {
+  background-color: $rule-accent-color;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
