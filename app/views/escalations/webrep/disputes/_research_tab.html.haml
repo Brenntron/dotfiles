@@ -124,10 +124,12 @@
                   %td
                     %span.entry-data
                       - unless entry[:ip_address].nil?
-                        = entry[:ip_address]
+                        - entry_content = entry[:ip_address]
                       - unless entry[:uri].nil?
-                        = entry[:uri]
-                    %input.table-entry-input.wide{value: "#{entry.ip_address}"}
+                        - entry_content = entry[:uri]
+                      = entry_content
+
+                    %input.table-entry-input.wide{value: "#{entry_content}"}
                   %td
                     %label Category
                     - unless entry[:primary_category].nil?
