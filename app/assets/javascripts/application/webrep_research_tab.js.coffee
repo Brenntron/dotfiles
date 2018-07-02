@@ -19,11 +19,26 @@ $ ->
       alert ('Select at least one entry to edit.')
 
 #  $('.cancel-changes').click ->
-
+#   Need to add save function and cancel function after editing.
 
 #        After this is edited the user has to hit save, add a placeholder button for now above the table.
 #        When they hit save it should send the update to the ticket, populate everywhere / reload the page, and set the entry span to match
-#        the content of the input
+#
+  #
+  #   the content of the input
+
+# Inline Edit Button
+  $('.inline-edit-entry-button').click ->
+    edit_button = $(this)
+    entry_row = $(this).parents('.research-table-row')[0]
+    editable_data = $(entry_row).find('.entry-data')
+    $(editable_data).each ->
+      $(this).hide()
+      data_input = $(this).next('.table-entry-input')
+      $(data_input).show()
+      $(data_input).parent().addClass('col-editing')
+    first_item = $(editable_data)[0]
+    $(first_item).next('.table-entry-input')[0].focus()
 
 # Expand All Rows
   $('#expand-all-rows').click ->
@@ -43,7 +58,7 @@ $ ->
       expandable_row = $(this).find('.nested-data-row')[0]
       $(expandable_row).hide()
 
-#  Expand / Collapse the expandable row
+#  Expand / Collapse the expandable row (inline button)
   $('.expand-row-button-inline').click ->
     expand_button = $(this)
     entry_id = $(this).attr('data-entry-id')

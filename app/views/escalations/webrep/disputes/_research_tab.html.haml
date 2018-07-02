@@ -161,7 +161,7 @@
                     %input.table-entry-input{value: "#{entry.status}"}
                   %td.dispute_rep_tools
                     %span.dispute_rep_tools_wrapper
-                      %button.dispute-inline-buttons.edit-button
+                      %button.dispute-inline-buttons.edit-button.inline-edit-entry-button{'data-entry-id': "#{entry.id}"}
                       %span.dropdown
                         %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}

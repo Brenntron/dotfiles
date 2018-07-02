@@ -4550,6 +4550,7 @@ h5.entry-details-table-header {
 .toolbar .edit-entries-buttons {
   border: none;
   right: 0;
+  margin-top: 0;
 }
 @media (min-width: 1100px) {
   #research-tab-toolbar .toolbar-button-text {
@@ -4558,6 +4559,9 @@ h5.entry-details-table-header {
   }
 }
 
+.col-editing {
+  padding: 0 8px !important;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
