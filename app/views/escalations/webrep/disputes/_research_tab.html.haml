@@ -6,13 +6,15 @@
 %h1 Research Data
 .row
   .col-xs-12
-    .toolbar
+    #research-tab-toolbar.toolbar
       %div
         %label.toolbar-section-label Table View
-        %button.toolbar-button.show-col-button
-          %span.toolbar-button-text Show / Hide Columns
-        %button.toolbar-button.collapse-button
-          %span.toolbar-button-text Expand/Collapse Rows
+        %button.toolbar-button.expand-row-button#expand-all-rows
+          %span.toolbar-button-text Expand All Rows
+        %button.toolbar-button.collapse-button#collapse-all-rows
+          %span.toolbar-button-text Collapse All Rows
+        %button.toolbar-button.sort-by-button
+          %span.toolbar-button-text Sort By
       %div
         %label.toolbar-section-label Edit
         %button.toolbar-button.edit-button#edit-dispute-entry-button

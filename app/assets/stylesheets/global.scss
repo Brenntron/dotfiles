@@ -633,6 +633,7 @@ th.alt-col {
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
+.sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -4531,6 +4532,13 @@ h5.entry-details-table-header {
   border: none;
   right: 0;
 }
+@media (min-width: 1100px) {
+  #research-tab-toolbar .toolbar-button-text {
+    display: block;
+    margin-left: 8px;
+  }
+}
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 

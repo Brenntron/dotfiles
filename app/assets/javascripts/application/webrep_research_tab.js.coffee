@@ -25,7 +25,23 @@ $ ->
 #        When they hit save it should send the update to the ticket, populate everywhere / reload the page, and set the entry span to match
 #        the content of the input
 
+# Expand All Rows
+  $('#expand-all-rows').click ->
+    $('.research-table-row-wrapper').each ->
+      expand_inline_toggle = $(this).find('.expand-row-button-inline')
+      unless $(expand_inline_toggle[0]).hasClass('shown')
+        $(expand_inline_toggle).addClass('shown')
+      expandable_row = $(this).find('.nested-data-row')[0]
+      $(expandable_row).show()
 
+# Collapse All Rows
+  $('#collapse-all-rows').click ->
+    $('.research-table-row-wrapper').each ->
+      expand_inline_toggle = $(this).find('.expand-row-button-inline')
+      if $(expand_inline_toggle[0]).hasClass('shown')
+        $(expand_inline_toggle).removeClass('shown')
+      expandable_row = $(this).find('.nested-data-row')[0]
+      $(expandable_row).hide()
 
 #  Expand / Collapse the expandable row
   $('.expand-row-button-inline').click ->
