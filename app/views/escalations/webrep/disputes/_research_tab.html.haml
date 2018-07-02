@@ -109,21 +109,6 @@
 .row
   .col-xs-12
     %table#disputes-research-table.table.table-sm
-      -#%thead
-      -#  %tr
-      -#    %th
-      -#      %input#disputes_check_box{type: 'checkbox'}
-      -#    %th
-      -#      -#<!-- tools -->
-      -#    %th Dispute
-      -#    %th Category
-      -#    %th.text-center WBRS Score
-      -#    %th.text-center WBRS Rule Hits Total
-      -#    %th.text-center SBRS Score
-      -#    %th.text-center SBRS Rule Hits Total
-      -#    %th WL/BL Entries
-
-
       %tbody
         - @entries.each do |entry|
           %tr{'data-entry-id': "#{entry.id}"}
@@ -252,25 +237,25 @@
                         %td.text-center
                           -#Number of xbrs results
                           1
-                        %td
+                        %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true'}
                           %label Virus Total
                         %td.text-center
                           -#Total hits on Virus Total
                           1
-                        %td
+                        %td.left-bordered
                           %label WL/BL
                         %td
                           -#WL/BL List
                           WL Medium
-                        %td
+                        %td.left-bordered
                           %label Referenced on
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
                           12 Tickets
                       %tr
-                        %td
+                        %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper
                             %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true'}
                           %label SBRS
@@ -284,26 +269,26 @@
                         %td.rule-hits-col-list
                           - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
                             = sbrs_hit.name + ', '
-                        %td
+                        %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true'}
                           %label Crosslisted URLs
                         %td.text-center
                           -#Number of url results
                           1
-                        %td
+                        %td.input-offset.left-bordered
                           %label Umbrella
                         %td.text-center
                           -#Disposition on Umbrella
                           Clean
-                        %td
+                        %td.left-bordered
                           %label RepTool Class
                         %td
                           -#WL/BL List
                           %span.inline-col-breakup Spam
                           %span.inline-col-breakup ACTIVE
                           %span.inline-col-breakup Juno Spam Monitor
-                        %td
+                        %td.left-bordered
                           %label Last Submitted
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
