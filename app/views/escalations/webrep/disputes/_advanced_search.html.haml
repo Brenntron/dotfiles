@@ -1,4 +1,6 @@
-%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
+-#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
+-#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
+= form_for NamedSearch.new, url: escalations_webrep_dashboard_path, method: 'get', 'accept-charset': 'UTF-8' do |named_form|
   .form-group.search-item
     %label.content-label-sm Case IDs
     %input.form-control
