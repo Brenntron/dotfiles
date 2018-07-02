@@ -77,10 +77,10 @@ test:
   amq: #active message queue
     host: "localhost"
   bugzilla:
-#    host: "bugzillaTest02.vrt.sourcefire.com"
+    #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
-#    vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
+    #vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
     vrt: "extras/ssh/ca.pem"
   peakebridge:
     host: "localhost"
