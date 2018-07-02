@@ -143,73 +143,74 @@
                       - unless entry[:status].nil?
                         = entry[:status]
                   %td.dispute_rep_tools
-                    %button.dispute-inline-buttons.edit-button
-                    %span.dropdown
-                      %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                      .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
-                        = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
-                          %input.adjust-wlbl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}"}
-                          %h3 Adjust WL/BL
-                          %table.dispute_tool_current
-                            %tr
-                              %td
-                                %label.content-label-sm Current Score
-                                -#<!-- Put current WBRS score here -->
-                                8.7
-                              %td
-                                %label.content-label-sm New Score
-                                %span#new_wbrs_score
-                          .inline-tool-content-wrapper
-                            .toolbar
-                              %div
-                                %label.toolbar-section-label{for: "entry-#{entry.id}-wlbl-list-type-select"} WL/BL List
-                                = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                                 {selected: entry.wbrs_list_type,
-                                   include_blank: 'Not on a List Currently'},
-                                 class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                                 title: 'RepTool Rule Status',
-                                 id: "entry-#{entry.id}-wlbl-list-type-select"
+                    %span.dispute_rep_tools_wrapper
+                      %button.dispute-inline-buttons.edit-button
+                      %span.dropdown
+                        %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                        .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
+                          = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+                            %input.adjust-wlbl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}"}
+                            %h3 Adjust WL/BL
+                            %table.dispute_tool_current
+                              %tr
+                                %td
+                                  %label.content-label-sm Current Score
+                                  -#<!-- Put current WBRS score here -->
+                                  8.7
+                                %td
+                                  %label.content-label-sm New Score
+                                  %span#new_wbrs_score
+                            .inline-tool-content-wrapper
+                              .toolbar
+                                %div
+                                  %label.toolbar-section-label{for: "entry-#{entry.id}-wlbl-list-type-select"} WL/BL List
+                                  = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                                   {selected: entry.wbrs_list_type,
+                                     include_blank: 'Not on a List Currently'},
+                                   class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
+                                   title: 'RepTool Rule Status',
+                                   id: "entry-#{entry.id}-wlbl-list-type-select"
 
 
-                            %label.content-label-sm Comment
-                            %textarea.dropdown-comment.adjust-wlbl-input.note-input
-                            %button.secondary Preview
-                            %button.primary{type:'button', onclick:'row_adust_wlbl_button(this);'} Submit Changes
-                    %span.dropdown
-                      %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                      .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
-                        = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
-                          %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
-                          %h3 Adjust RepTool BL
-                          %table.dispute_tool_current
-                            %tr
-                              %td
-                                %label.content-label-sm Classification
-                                = entry.classifications.first
-                              %td
-                                %label.content-label-sm Expiration
-                                = entry.blacklist&.expiration
-                          .inline-tool-content-wrapper
-                            .toolbar
-                              %div
-                                %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
-                                = rep_form.select(:action, ['Active', 'Expired'],
-                                  {selected: entry.blacklist ? 'Active' : 'Expired'},
-                                  class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                                  title: 'RepTool Rule Status',
-                                  id: "entry-#{entry.id}-blacklist-action-select")
-                              %div
-                                %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool BL
-                                = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                                  {selected: entry.classifications&.first,
-                                    include_blank: !entry.blacklist},
-                                  class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                                  title: "RepTool BL Rules",
-                                  id: "entry-#{entry.id}-blacklist-classifications-select")
+                              %label.content-label-sm Comment
+                              %textarea.dropdown-comment.adjust-wlbl-input.note-input
+                              %button.secondary Preview
+                              %button.primary{type:'button', onclick:'row_adust_wlbl_button(this);'} Submit Changes
+                      %span.dropdown
+                        %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                        .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
+                          = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
+                            %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
+                            %h3 Adjust RepTool BL
+                            %table.dispute_tool_current
+                              %tr
+                                %td
+                                  %label.content-label-sm Classification
+                                  = entry.classifications.first
+                                %td
+                                  %label.content-label-sm Expiration
+                                  = entry.blacklist&.expiration
+                            .inline-tool-content-wrapper
+                              .toolbar
+                                %div
+                                  %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
+                                  = rep_form.select(:action, ['Active', 'Expired'],
+                                    {selected: entry.blacklist ? 'Active' : 'Expired'},
+                                    class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                                    title: 'RepTool Rule Status',
+                                    id: "entry-#{entry.id}-blacklist-action-select")
+                                %div
+                                  %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool BL
+                                  = rep_form.select(:classification, RepApi::Blacklist.classifications,
+                                    {selected: entry.classifications&.first,
+                                      include_blank: !entry.blacklist},
+                                    class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                                    title: "RepTool BL Rules",
+                                    id: "entry-#{entry.id}-blacklist-classifications-select")
 
-                            %label.content-label-sm Comment
-                            %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                            %button.primary{type: 'button', onclick: 'row_adust_reptool_bl_button(this)'} Submit Changes
+                              %label.content-label-sm Comment
+                              %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                              %button.primary{type: 'button', onclick: 'row_adust_reptool_bl_button(this)'} Submit Changes
                 %tr.research-overview-row
                   %td
                     -#Expander area
