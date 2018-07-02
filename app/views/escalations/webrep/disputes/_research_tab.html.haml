@@ -19,8 +19,19 @@
         %label.toolbar-section-label Edit
         %button.toolbar-button.edit-button#edit-dispute-entry-button
           %span.toolbar-button-text Edit Dispute Entry
-        %button.toolbar-button.add-dispute-entry
-          %span.toolbar-button-text Add Dispute Entry
+        %span.dropdown
+          %button.toolbar-button.add-dispute-entry#add-entries-button.dropdown-toggle{title: 'Add Dispute Entry', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %span.toolbar-button-text Add Dispute Entry
+          .dropdown-menu.toolbar-dropdown#add_entries_dropdown{'aria-labelledby': 'add-entries-button'}
+            .input-group.add-entry-group
+              %input{id: 'add_dispute_entry', name: 'dispute_entry_content', class: 'form-control', placeholder: 'Entry Content'}
+                %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_import'}
+                  Submit
+            .loading-bar
+              .load-bar-segment.hidden
+              .load-bar-segment.hidden
+              .load-bar-segment.hidden
+
       %div
         %label.toolbar-section-label Reputation
         %span.dropdown

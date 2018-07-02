@@ -1821,7 +1821,7 @@ a.static-nav-item {
   width: 500px;
 }
 
-.input-group.import-group {
+.input-group.import-group, .input-group.add-entry-group {
   width: 100%;
   min-width: 200px;
   background-color: $ac-nav-bg-color;
@@ -1838,13 +1838,21 @@ a.static-nav-item {
   margin: 9px 10px;;
 }
 
-#import_bug, #import_webrep {
+#import_bug, #import_webrep, #add_dispute_entry {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;
   width: 100px;
   background-color: transparent;
   outline: none;
   font-weight: 400;
+}
+
+#add_dispute_entry {
+  margin-top: 0;
+  width: 155px;
+}
+#add_dispute_entry:focus {
+  border: none !important;
 }
 
 #button_import {
@@ -4116,7 +4124,7 @@ table > tbody > tr > td.dispute_rep_tools {
   height: 27px;
 }
 
-.toolbar .dropdown.open .adjust-wlbl-button, .toolbar .dropdown.open .adjust-reptool-button {
+.toolbar .dropdown.open .toolbar-button {
   background-color: $bug-section-color;
   color: $content-bg-color;
 }
@@ -4125,7 +4133,12 @@ table > tbody > tr > td.dispute_rep_tools {
 .dispute-inline-buttons.adjust-reptool-button, .toolbar .dropdown.open .adjust-reptool-button { background-image: url(image_path('icon_blacklist_white.svg')); }
 
 .add-dispute-entry {
-  background-image: url(image_path('icon_add_grey.svg'))
+  background-image: url(image_path('icon_add_grey.svg'));
+}
+
+.toolbar .dropdown.open .add-dispute-entry {
+  background-image: url(image_path('icon_add_white.svg'));
+  border-radius: 2px 2px 0 0 ;
 }
 
 .dispute_rep_tools .dropdown-menu h3 {
@@ -4134,6 +4147,12 @@ table > tbody > tr > td.dispute_rep_tools {
   font-weight: 400;
   font-size: 9pt;
   margin-bottom: 6px;
+}
+
+#add_entries_dropdown {
+  padding: 12px 12px 0 12px !important;
+  background-color: $bug-section-color;
+  margin-top: 0;
 }
 
 .inline-tool-content-wrapper {
