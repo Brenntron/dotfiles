@@ -4387,6 +4387,7 @@ input.table-entry-input:focus {
 .research-table-details-wrapper table td {
   background-color: $faint-neutral-color;
   padding: 0 !important;
+  font-size: 8pt;
 }
 
 .research-table-details-wrapper table tr:first-of-type td {
@@ -4423,6 +4424,16 @@ input.table-entry-input:focus {
 .research-table-input-wrapper.virus-total-input-wrapper {
   background-color: $rule-accent-color;
 }
+
+.expanded-row {
+  background-color: $content-tab-color;
+  padding: 0 0 0 20px !important;
+}
+
+.expanded-row-data-wrapper {
+  background-color: $type-lighter-color;
+}
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
