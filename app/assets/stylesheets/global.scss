@@ -687,7 +687,7 @@ th.alt-col {
   height: 20px;
 }
 
-.shown .expand-row-button-inline {
+.shown .expand-row-button-inline, .shown.expand-row-button-inline {
   background-image: url(image_path('icon_collapse_blue.svg'));
 }
 
@@ -4516,6 +4516,10 @@ h5.entry-details-table-header {
   font-size: 9.5pt;
   padding: 3px 12px;
   font-weight: 600;
+}
+
+.inline-col-breakup {
+  padding: 0 2px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

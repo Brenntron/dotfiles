@@ -111,7 +111,7 @@
     %table#disputes-research-table.table.table-sm
       %tbody
         - @entries.each do |entry|
-          %tr{'data-entry-id': "#{entry.id}"}
+          %tr.research-table-row{'data-entry-id': "#{entry.id}"}
             %td.research-table-row-wrapper
               %table
                 %tr
@@ -219,7 +219,7 @@
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.wbrs-input-wrapper
-                            %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true'}
+                            %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label WBRS
                         %td.text-center= entry.wbrs_score
                         %td
@@ -233,14 +233,14 @@
                             = wbrs_hit.name + ', '
                         %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
-                            %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true'}
+                            %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label XBRS History
                         %td.text-center
                           -#Number of xbrs results
                           1
                         %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
-                            %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true'}
+                            %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label Virus Total
                         %td.text-center
                           -#Total hits on Virus Total
@@ -258,7 +258,7 @@
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper
-                            %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true'}
+                            %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label SBRS
                         %td.text-center= entry.sbrs_score
                         %td
@@ -272,7 +272,7 @@
                             = sbrs_hit.name + ', '
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
-                            %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true'}
+                            %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label Crosslisted URLs
                         %td.text-center
                           -#Number of url results
@@ -299,7 +299,7 @@
                     .expanded-row-data-wrapper
                       .row
                         .col-sm-3
-                          .entry-details-table.wbrs-details-table
+                          .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header WBRS Rule Hit Details
                             %table
                               %thead
@@ -314,7 +314,7 @@
                                     %td= wbrs_hit.mnemonic
                                     %td
                                       -#Put weight of rule here
-                          .entry-details-table.sbrs-details-table
+                          .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header SBRS Rule Hit Details
                             %table
                               %thead
@@ -329,7 +329,7 @@
                                     %td= sbrs_hit.mnemonic
                                     %td
                                       -#Put weight of rule here
-                          .entry-details-table.virustotal-details-table
+                          .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Virus Total Details
                             %table
                               %thead
@@ -342,7 +342,21 @@
                                   %td Clean or not
                         -#Put weight of rule here
                         .col-sm-9
-                          .entry-details-table.crosslisted-details-table
+                          .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
+                            %h5.entry-details-table-header XBRS History
+                            %table
+                              %thead
+                                %tr
+                                  - entry.find_xbrs[1]['legend'].each do |header|
+                                    %th= header
+                              %tbody
+                                - unless entry.uri.nil?
+                                  - entry.find_xbrs[1]['data'].each do |data|
+                                    %tr
+                                      - data.each do |datapoint|
+                                        %td= datapoint
+
+                          .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Cross-listed URLs
                             %table
                               %thead
@@ -364,17 +378,3 @@
                                     %td= cross_listed.username
                                     %td= cross_listed.mtime
                                     %td= cross_listed.ctime
-
-                          .entry-details-table.xbrs-details-table
-                            %h5.entry-details-table-header XBRS History
-                            %table
-                              %thead
-                                %tr
-                                  - entry.find_xbrs[1]['legend'].each do |header|
-                                    %th= header
-                              %tbody
-                                - unless entry.uri.nil?
-                                  - entry.find_xbrs[1]['data'].each do |data|
-                                    %tr
-                                      - data.each do |datapoint|
-                                        %td= datapoint
