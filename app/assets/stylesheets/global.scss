@@ -4053,10 +4053,21 @@ input.file_attachment {
   text-align: left;
 }
 
-.dispute_rep_tools {
+table > tbody > tr > td.dispute_rep_tools {
   width: 90px;
   padding: 0 !important;
   text-align: right;
+}
+
+.dispute_rep_tools_wrapper {
+  display: block;
+  position: absolute;
+  margin-top: 7px;
+  width: 90px
+}
+
+.dispute_rep_tools_wrapper .edit-button {
+  background-image: url(image_path('icon_edit_white.svg'));
 }
 
 .dispute_rep_tools .dropdown.open {
@@ -4064,9 +4075,10 @@ input.file_attachment {
 }
 
 .dispute_rep_tools .dropdown-menu {
-  top: 13px;
-  left: 1px;
-  border-radius: 0 4px 4px 4px;
+  top: 16px;
+  right: 1px;
+  left: auto;
+  border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
   min-width: 250px;
