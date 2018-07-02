@@ -4388,19 +4388,32 @@ input.table-entry-input:focus {
 
 .research-table-details-wrapper table td {
   background-color: $faint-neutral-color;
-  padding: 0 !important;
   font-size: 8pt;
+  padding: 6px;
 }
 
 .research-table-details-wrapper table tr:first-of-type td {
   border-bottom: 1px solid $content-bg-color;
 }
 
+.input-col {
+  padding: 0 !important;
+}
+
+td.left-bordered {
+  border-left: 1px solid $content-bg-color;
+}
+
+.research-table-details-wrapper table td.input-offset {
+  padding-left: 36px;
+}
+
 .research-table-input-wrapper {
-  padding: 7px 10px;
+  padding: 4px 8px;
   display: inline-block;
-  width: 33px;
-  height: 33px;
+  width: 28px;
+  height: 28px;
+  margin-right: 6px;
 }
 
 .research-overview-row td:first-of-type, .research-table-details-wrapper, .research-table-row-wrapper {
@@ -4430,6 +4443,16 @@ input.table-entry-input:focus {
 .expanded-row {
   background-color: $content-tab-color;
   padding: 0 0 0 20px !important;
+}
+
+.expanded-row::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  margin-top: -1px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid #fff;
 }
 
 .expanded-row-data-wrapper {
@@ -4462,17 +4485,20 @@ input.table-entry-input:focus {
 
 .entry-details-table table > thead > tr > th {
   border-bottom: 1px solid $table-dark-header;
+  font-weight: 600;
 }
 
 .entry-details-table table > tbody > tr > td {
   border-bottom: none;
+  font-size: 8pt;
+  font-weight: 300;
 }
 
 h5.entry-details-table-header {
   background-color: $table-dark-header;
   color: $content-bg-color;
   font-size: 9.5pt;
-  padding-left: 10px;
+  padding: 3px 12px;
   font-weight: 600;
 }
 
