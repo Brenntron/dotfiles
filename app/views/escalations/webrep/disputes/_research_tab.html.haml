@@ -231,7 +231,7 @@
                   %td.research-table-details-wrapper{colspan: '7'}
                     %table
                       %tr
-                        %td
+                        %td.input-col
                           %span.research-table-input-wrapper.wbrs-input-wrapper
                             %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true'}
                           %label WBRS
@@ -239,14 +239,13 @@
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
-                          -#Count of rule hits
-                          6
+                          = entry.dispute_rule_hits.where(:rule_type => "WBRS").count
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
                           - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
                             = wbrs_hit.name + ', '
-                        %td
+                        %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true'}
                           %label XBRS History
@@ -279,8 +278,7 @@
                         %td
                           %label SBRS Rule Hits
                         %td.text-center
-                          -#Count of rule hits
-                          2
+                          = entry.dispute_rule_hits.where(:rule_type => "SBRS").count
                         %td
                           %label SBRS Rules
                         %td.rule-hits-col-list
@@ -310,82 +308,75 @@
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
                           2016-02-24 15:11:22
+                %tr.nested-data-row
+                  %td.expanded-row{colspan: '8'}
+                    .expanded-row-data-wrapper
+                      .row
+                        .col-sm-3
+                          .entry-details-table.wbrs-details-table
+                            %h5.entry-details-table-header WBRS Rule Hit Details
+                            %table
+                              %thead
+                                %tr
+                                  %th Rule
+                                  %th Rule Description
+                                  %th Weight
+                              %tbody
+                                - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                                  %tr
+                                    %td= wbrs_hit.name
+                                    %td= wbrs_hit.mnemonic
+                                    %td
+                                      -#Put weight of rule here
+                          .entry-details-table.sbrs-details-table
+                            %h5.entry-details-table-header SBRS Rule Hit Details
+                            %table
+                              %thead
+                                %tr
+                                  %th Rule
+                                  %th Rule Description
+                                  %th Weight
+                              %tbody
+                                - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                                  %tr
+                                    %td= sbrs_hit.name
+                                    %td= sbrs_hit.mnemonic
+                                    %td
+                                      -#Put weight of rule here
+                        .col-sm-9
+                          .entry-details-table.crosslisted-details-table
+                            %h5.entry-details-table-header Cross-listed URLs
+                            %table
+                              %thead
+                                %tr
+                                  %th ID
+                                  %th URL
+                                  %th List Type
+                                  %th.text-center Current Score
+                                  %th Username
+                                  %th Last Update
+                                  %th Created
+                              %tbody
+                                - entry.wbrs_xlist.each do |cross_listed|
+                                  %tr
+                                    %td= cross_listed.id
+                                    %td= cross_listed.url
+                                    %td= cross_listed.list_type
+                                    %td -
+                                    %td= cross_listed.username
+                                    %td= cross_listed.mtime
+                                    %td= cross_listed.ctime
 
-
-
-
-
-          -#%tr.nested-data-row
-          -#  %td{colspan: '2'}
-          -#    -#<!-- Spacer for checkbox and tools -->
-          -#  %td{colspan: '7'}
-          -#    %table.table-nested-reputation
-          -#      %tr
-          -#        %th Category
-          -#        %td Computers & Technology
-          -#      %tr
-          -#        %th Hostname
-          -#        %td= entry.hostlookup
-          -#      %tr
-          -#        %th WBRS Rules
-          -#        %td
-          -#          %table.table-nested-rep-rules
-          -#            %tr
-          -#              %th Rule
-          -#              %th Rule Description
-          -#              %th.text-center Malware Probability
-          -#            - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-          -#              %tr
-          -#                %td.emphasis= wbrs_hit.name
-          -#                %td= wbrs_hit.mnemonic
-          -#                %td.text-center.data-small-emphasis
-          -#                  -
-          -#            %tr
-          -#              %th SBRS Rules
-          -#              %td
-          -#                %table.table-nested-rep-rules
-          -#                  %tr
-          -#                    %th Rule
-          -#                    %th Rule Description
-          -#                    %th.text-center Malware Probability
-          -#                  - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
-          -#                    %tr
-          -#                      %td.emphasis= sbrs_hit.name
-          -#                      %td= sbrs_hit.mnemonic
-          -#                      %td.text-center.data-small-emphasis
-          -#                        -
-          -#        %td.nested-info-highlight{colspan: '4'}
-          -#          %h4 Cross-listed URLs
-          -#          %table.nested-related-datatable
-          -#            %thead
-          -#              %tr
-          -#                %th ID
-          -#                %th URL
-          -#                %th List Type
-          -#                %th.text-center Current Score
-          -#                %th Username
-          -#                %th Last Update
-          -#                %th Created
-          -#            %tbody
-          -#              - entry.wbrs_xlist.each do |cross_listed|
-          -#                %tr
-          -#                  %td= cross_listed.id
-          -#                  %td= cross_listed.url
-          -#                  %td= cross_listed.list_type
-          -#                  %td -
-          -#                  %td= cross_listed.username
-          -#                  %td= cross_listed.mtime
-          -#                  %td= cross_listed.ctime
-          -#
-          -#          %h4 XBRS Hits
-          -#          %table.nested-related-datatable
-          -#            %thead
-          -#              %tr
-          -#                - entry.find_xbrs[1]['legend'].each do |header|
-          -#                  %th= header
-          -#            %tbody
-          -#              - unless entry.uri.nil?
-          -#                - entry.find_xbrs[1]['data'].each do |data|
-          -#                  %tr
-          -#                    - data.each do |datapoint|
-          -#                      %td= datapoint
+                          .entry-details-table.xbrs-details-table
+                            %h5.entry-details-table-header XBRS History
+                            %table
+                              %thead
+                                %tr
+                                  - entry.find_xbrs[1]['legend'].each do |header|
+                                    %th= header
+                              %tbody
+                                - unless entry.uri.nil?
+                                  - entry.find_xbrs[1]['data'].each do |data|
+                                    %tr
+                                      - data.each do |datapoint|
+                                        %td= datapoint
