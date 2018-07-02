@@ -27,19 +27,20 @@ module API
                   complaint_packet[:assigned_to] = complaint.user_id
                   complaint_packet[:status] = complaint.status
                   complaint_packet[:created_at] = complaint.created_at.strftime('%Y-%m-%d %H:%M:%S')
-                  complaint_packet[:customer] = complaint.customer_id # Customer name
+                  complaint_packet[:customer_name] = complaint.customer.name # Customer name
                   complaint_packet[:complaint_entries] = complaint.complaint_entries
                   complaint_packet[:complaint_entries_count] = complaint.complaint_entries.count
 
                   complaint_packet[:complaint_entry_content] = []
                   unless complaint.complaint_entries.empty?
                     complaint.complaint_entries.each do |entry|
-                      unless entry[:ip_address].nil?
-                        complaint_packet[:complaint_entry_content].push(entry[:ip_address])
-                      end
-                      unless entry[:uri].nil?
-                        complaint_packet[:complaint_entry_content].push(entry[:uri])
-                      end
+
+                      complaint_packet[:complaint_entry_content].push(entry[:subdomain]) unless entry[:subdomain].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:domain]) unless entry[:domain].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:path]) unless entry[:path].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:resolution]) unless entry[:resolution].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:ip_address]) unless entry[:ip_address].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:uri]) unless entry[:uri].nil?
                     end
                   end
                   complaint_packet[:complaint_entry_preview] = complaint_packet[:complaint_entry_content].first.to_s

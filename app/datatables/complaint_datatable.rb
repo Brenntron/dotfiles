@@ -7,15 +7,9 @@ class ComplaintDatatable < AjaxDatatablesRails::Base
     # or in aliased_join_table.column_name format
     @view_columns ||={
       id:       {source: "Complaint.id", cond: :eq, searchable: true, orderable: true},
-      tag:      {source: "Complaint.tag", cond: :eq, searchable: true, orderable: true},
-      subdomain:{source: "Complaint.subdomain", cond: :eq, searchable: true, orderable: true},
-      domain:   {source: "Complaint.domain", cond: :eq, searchable: true, orderable: true},
-      path:     {source: "Complaint.path", cond: :eq, searchable: true, orderable: true},
       status:   {source: "Complaint.status", cond: :eq, searchable: true, orderable: true},
-      age:      {source: "Complaint.age", cond: :eq, searchable: true, orderable: true},
-      customer: {source: "Complaint.customer", cond: :eq, searchable: true, orderable: true},
-      wbrs_core:{source: "Complaint.wbrs_core", cond: :eq, searchable: true, orderable: true},
-      links:    {searchable: false}
+      complaint_entries_count: {source: "Complaint.entry_count", cond: :eq, searchable: false, orderable: true},
+      customer_name: {source: "Complaint.customer_name", cond: :eq, searchable: true, orderable: true},
     }
   end
 
@@ -23,19 +17,9 @@ class ComplaintDatatable < AjaxDatatablesRails::Base
     records.map do |record|
       {
           id:         record.id,
-          tag:        record.tag,
-          subdomain:  record.subdomain,
-          domain:     record.domain,
-          path:       record.path,
           status:     record.status,
-          age:        record.age,
-          customer:   record.customer,
-          wbrs_core:  record.wbrs_score,
-          links:
-          content_tag(:div, class: 'toolbar-row') do
-            concat(link_to "<button class='toolbar-button edit-button' alt='Edit complaint'></button>".html_safe, edit_escalations_webcat_complaint_path(record.id))
-            concat(link_to "Delete", escalations_webcat_complaints_path(record.id), method: :delete, class: "btn btn-danger btn-xs", data: {confirm: 'Are you sure you want to annihilate this complaint?'} )
-          end
+          entry_count: record.entries.count,
+          customer_name:   record.customer.name,
       }
     end
   end

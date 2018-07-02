@@ -1,3 +1,14 @@
+window.edit_selected_complaints = () ->
+  selected_ids = []
+  $('[class$=complaint_entry_check_box]').each (checkbox_id)->
+    if this.checked == true
+      selected_ids.push(this.value)
+
+  $('[class$=complaint_check_box]').each (checkbox_id)->
+    if this.checked == true
+      selected_ids.push(this.value)
+  window.location = 'show_multiple?selected_ids=' + selected_ids;
+
 window.populate_webcat_index_table = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -40,7 +51,6 @@ window.display_preview_window = (id, subdomain, domain, path) ->
       #yay you can visit the site
     error: (response) ->
       #that page wont load. lets display someting else
-      debugger
       switch response["status"]
         when 404
           document.getElementById('preview_window').src = "/unknown_url.html"
@@ -64,18 +74,15 @@ window.open_viewable = () ->
     value = JSON.parse(this.value)
     if value.viewable == "true"
       window.open("http://www."+value.site)
-
 window.open_nonviewable = () ->
   $('[id$=_site_checkbox]').each (site)->
     value = JSON.parse(this.value)
     if value.viewable == "false"
       window.open("http://www."+value.site)
-
 window.open_selected = () ->
   $('[id$=_site_checkbox]:checked').each (site)->
     value = JSON.parse(this.value)
     window.open("http://www."+value.site)
-
 window.open_all = () ->
   $('[id$=_site_checkbox]').each (site)->
     value = JSON.parse(this.value)

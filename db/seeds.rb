@@ -366,3 +366,10 @@ end
 # n4 = Note.create(comment: "More notes to test multiple notes on a bug",note_type: "research",author: "nicherbe@cisco.com")
 # b1.notes << n4
 # b1.save
+Company.create(name:"Cisco")
+Customer.create(name:"Nick Herbert",company:Company.first)
+Complaint.create(channel:"somechannel", status:"NEW", description:"THis needs a description",added_through:"Admin Portal",complaint_assigned_at:Time.now,user:User.find(4), customer:Customer.first)
+ComplaintEntry.create(complaint:Complaint.first,subdomain:"www",domain:"snort.org",path:"/downloads",wbrs_score:2,status:"NEW")
+Complaint.create(channel:"somechannel", status:"NEW", description:"Here is a description",added_through:"Admin Portal",complaint_assigned_at:Time.now,user:User.find(4), customer:Customer.first)
+ComplaintEntry.create(complaint:Complaint.last,subdomain:"www",domain:"talosintelligence.com",path:nil, wbrs_score:8,status:"NEW")
+ComplaintEntry.create(complaint:Complaint.last,subdomain:"www",domain:"hbo.com",path:nil, wbrs_score:4,status:"NEW")

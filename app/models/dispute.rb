@@ -11,7 +11,7 @@ class Dispute < ApplicationRecord
   ASSIGNED = 'assigned'
 
   def is_assigned?
-    (!self.user.nil? and !self.user.empty?)
+    !self&.user.disputes.empty?
   end
 
   def assignee

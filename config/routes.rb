@@ -28,6 +28,7 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
+      get 'show_multiple', to: 'complaints#show_multiple'
       get 'clusters', to: 'complaints#clusters'
       get 'rules', to: 'complaints#rules'
       get 'reports', to: 'complaints#reports'

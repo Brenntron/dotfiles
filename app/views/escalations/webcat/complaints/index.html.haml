@@ -7,73 +7,188 @@
 .content-wrapper
   .tool-bar
     = render "toolbar"
-  %p rule builder should be included here
 
   %div{:style => "position:relative"}
     %div{:style => "width:600px;"}
       .grid-header{:style => "width:100%"}
   %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
-  -#
-  -#.tab-content.content-wrapper{id: 'complaints-tab-content'}
-  -#  .tab-pane.active{id: 'complaints', role: 'tabpanel', 'aria-labelledby': 'admin-complaints-tab'}
-  -#    %h1 Notes
-  -#    %table#complaints-index.table.responsive.no-wrap.compact{'data-source': "#{escalations_webcat_complaints_path(format: :json)}"}
-  -#      %thead
-  -#        %tr
-  -#          %th ID
-  -#          %th Tag
-  -#          %th Subdomain
-  -#          %th Domain
-  -#          %th Path
-  -#          %th Status
-  -#          %th Age
-  -#          %th Customer
-  -#          %th WBRS Score
-  -#          %th
-  -#      %tbody
 
-
-  %table#complaints-index.table.responsive
-    %thead
-      %th
-        %input#complaints_check_box{type: 'checkbox'}
-      %th Case ID
-      %th Status
-      -# Put complaint entry content (first of array) below. Will also have total number of entries in the complaint
-      %th Complaint
-      %th Complaint Entries Count
-      %th Time Submitted
-      -#%th Age
-      -#%th Submitter Type
-      %th Submitter Name
-      -#%th Submitter Org
-      -#%th Submitter Domain
-
-
-    %tbody
+  .row
+    .col-xs-12
+      %table.table.responsive#complaints-index
+        %thead
+          %tr
+            %th
+            -# Expand / Collapse Button
+            %th
+              %input#complaints_check_box{type: 'checkbox'}
+            %th Complaint ID
+            %th Status
+            %th Complaint Entries Count
+            %th Time Submitted
+            %th Submitter Name
 
 :javascript
   $(document).ready(function() {
-    $('#complaints-index').DataTable({
-      // order: [[3, 'desc']],
+    function format ( complaint ) {
+      var table_head =
+      '<table class="table complaint-entry-table">'+
+        '<thead>' +
+          '<tr>'+
+              '<th><input type="checkbox"></th>' +
+              '<th class="entry-col-content">Complaint Entry id</th>'+
+              '<th class="entry-col-status">Complaint Entry Status</th>' +
+              '<th class="entry-col-cat">URL</th>' +
+              '<th class="entry-col-cat">Domain</th>' +
+              '<th class="entry-col-wbrs-score">WBRS Score</th>' +
+              '<th class="entry-col-cat">Category</th>' +
+          '</tr>' +
+          '</thead>' +
+          '<tbody>'
+
+      var entry = complaint.complaint_entries;
+      var missing_data = '<span class="missing-data">Missing Data</span>';
+      var entry_rows = [];
+      $(entry).each(function() {
+
+        var entry_id = ''
+        if (this.id != null) {
+          entry_id = this.id;
+        }
+        else {
+          entry_id = missing_data;
+        }
+
+        var status = ''
+        if (this.status != null) {
+          status = this.status;
+        }
+        else {
+          status = missing_data;
+        }
+
+        var uri = ''
+        if(this.uri != null){
+          uri = '<a href="http://'+this.uri+'">'+ this.uri +'</a>'
+        }
+        else if(this.domain != null){
+          if(this.subdomain != null){
+            url = this.subdomain + "."
+          }
+          url = url + this.domain
+          if(this.path != null){
+            url = url + this.path
+          }
+          uri = '<a href="http://'+url+'" target="_blank">'+ url +'</a>'
+        }
+        else{
+          uri = missing_data;
+        }
+
+        var domain =''
+        if(this.domain != null){
+          domain = this.domain
+        }
+        else {
+          domain = missing_data;
+        }
+
+        var suggested_disposition = ''
+        if (this.suggested_disposition != null) {
+          suggested_disposition = this.suggested_disposition;
+        }
+        else {
+          suggested_disposition = missing_data;
+        }
+
+        var entry_row =
+        '<tr>'+
+          '<td><input type="checkbox" name="cbox" class="complaint_entry_check_box" id="cbox' + this.complaint_id + '" value="' + this.complaint_id + '" /></td>'+
+          '<td class="entry-col-id">' + entry_id + '</td>'+
+          '<td class="entry-col-status">' + status + '</td>'+
+          '<td class="entry-col-uri">' + uri +'</td>'+
+          '<td class="entry-col-domain">' + domain + '</td>'+
+          '<td class="entry-col-wbrs-score">' + this.wbrs_score + '</td>'+
+          '<td class="entry-col-category"><input type="text" onclick="this.select()"/></td>'+
+
+        '</tr>'
+        entry_rows.push(entry_row);
+      });
+
+    // `d` is the original data object for the row
+      return table_head + entry_rows.join("") + '</tbody></table>';
+      }
+
+
+  var complaint_table = $('#complaints-index').DataTable({
+      // order: [[ 9, "desc" ]],
+      // dom: '<"datatable-top-tools"lf>t<ip>',
+      columnDefs: [
+        {targets: [0, 1], orderable: false, searchable: false},
+        {targets: [0], className:'expandable-row-column'},
+        {targets: [2], className:'id-col'}
+      ],
       columns: [
+        {data: null, defaultContent: '<button class="expand-row-button-inline"></button>'}, // expansion button
         {                                 // checkbox
           data: 'id',
           render: function ( data ) {
               return '<input type="checkbox" name="cbox" class="complaint_check_box" id="cbox' + data + '" value="' + data + '" />';
           }
         },
-        {data: "id"},
-        // {data: null, defaultContent: ''}, //Priority
-
-        {data: "status"},
-        {data: "complaint_entries_count"},
-        {data: "complaint_entry_preview"},
+        {data: 'id'},
+        {data: "status"},                 // status
+        {
+          data: "complaint_entries_count",
+          render: function(data){
+            return data;
+          }
+        },
         {data: "created_at"},
-        {data: "customer"},
-
-      ]
+        {data: "customer_name"}
+      ],
+      'responsive': true
     });
     populate_webcat_index_table();
+  $('.okgothere').on('click', function (){
+    debugger
+  });
+
+  $('#complaints-index tbody').on('click', 'td.expandable-row-column', function () {
+      var tr = $(this).closest('tr');
+      var row = complaint_table.row( tr );
+
+      if ( row.child.isShown() ) {
+        // This row is already open - close it
+        row.child.hide();
+        tr.removeClass('shown');
+      }
+      else {
+        // Open this row
+        row.child( format(row.data()) ).show();
+        tr.addClass('shown');
+        var td = $(tr).next("tr").find("td:first");
+        $(td).addClass('complaint-entry-table-wrapper');
+        // Check to see which columns should be displayed
+        $('.toggle-vis-nested').each(function() {
+          var checkbox_trigger = $(this).attr('data-column');
+          var checkbox = $(this).find("input");
+          if ($(checkbox).prop("checked")) {
+            $('.complaint-entry-table td, .complaint-entry-table th').each(function() {
+              if ($(this).hasClass(checkbox_trigger)) {
+                $(this).show();
+              }
+            });
+          }
+          else if ($(checkbox).prop("checked") == false) {
+            $('.complaint-entry-table td, .complaint-entry-table th' ).each(function() {
+              if ($(this).hasClass(checkbox_trigger)) {
+                $(this).hide();
+              }
+            });
+          }
+        });
+      }
+    });
 
   } );
