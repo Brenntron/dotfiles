@@ -15,7 +15,7 @@
           %span.toolbar-button-text Expand/Collapse Rows
       %div
         %label.toolbar-section-label Edit
-        %button.toolbar-button.edit-button
+        %button.toolbar-button.edit-button#edit-dispute-entry-button
           %span.toolbar-button-text Edit Dispute Entry
         %button.toolbar-button.add-dispute-entry
           %span.toolbar-button-text Add Dispute Entry
@@ -104,7 +104,9 @@
                 %button.primary{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)'}
                   Submit Changes
 
-
+      .edit-button-wrapper.edit-entries-buttons.hidden
+        %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes'}
+        %button.cancel-changes.panel-button.cancel-button.tooltipped{title: 'Cancel'}
 
 .row
   .col-xs-12
@@ -120,28 +122,28 @@
                   %td
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td
-                    -#  Dispute Entry
-                    - unless entry[:ip_address].nil?
-                      = entry[:ip_address]
-                    - unless entry[:uri].nil?
-                      = entry[:uri]
+                    %span.entry-data
+                      - unless entry[:ip_address].nil?
+                        = entry[:ip_address]
+                      - unless entry[:uri].nil?
+                        = entry[:uri]
+                    %input.table-entry-input.wide{value: "#{entry.ip_address}"}
                   %td
                     %label Category
-                    %span.entry-data
-                      - unless entry[:primary_category].nil?
-                        = entry[:primary_category]
-                      - else
-                        %span.missing-data No Data
+                    - unless entry[:primary_category].nil?
+                      = entry[:primary_category]
+                    - else
+                      %span.missing-data No Data
                   %td
                     %label Hostname
-                    %span.entry-data
-                      - unless entry[:hostname].nil?
-                        = entry[:hostname]
+                    - unless entry[:hostname].nil?
+                      = entry[:hostname]
                   %td
                     %label Status
                     %span.entry-data
                       - unless entry[:status].nil?
                         = entry[:status]
+                    %input.table-entry-input{value: "#{entry.status}"}
                   %td.dispute_rep_tools
                     %span.dispute_rep_tools_wrapper
                       %button.dispute-inline-buttons.edit-button
