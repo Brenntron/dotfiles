@@ -66,6 +66,8 @@ $super-faint-neutral: #f9f9f9;
 $faint-accent-color:  #dff1f7;
 $faint-alt-highlight: #fff7cd; /* focus for form inputs */
 $medium-neutral-color: #EAEAEA;
+$table-dark-body: #4E4E4E;
+$table-dark-header: #413D3D;
 
 /***** Mixins ******/
 @mixin box-shadow($shadow) {
@@ -4307,13 +4309,13 @@ input.file_attachment {
 }
 
 .dispute-entry-table tbody{
-  background-color: #4E4E4E;;
+  background-color: $table-dark-body;
   color: $content-bg-color;
   font-weight: 300;
 }
 
 .dispute-entry-table tbody tr td, .dispute-entry-table thead tr th {
-  border-color: #413D3D;
+  border-color: $table-dark-header;
 }
 
 .dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child {
@@ -4321,7 +4323,7 @@ input.file_attachment {
 }
 
 .dispute-entry-table thead {
-  background-color: #413D3D;
+  background-color: $table-dark-header;
   color: $content-bg-color;
 }
 
@@ -4434,6 +4436,45 @@ input.table-entry-input:focus {
   background-color: $type-lighter-color;
 }
 
+.entry-details-table {
+  margin: 20px;
+  padding-left: 7px;
+}
+
+.col-sm-3 .entry-details-table {
+  margin: 20px 0 20px 20px;
+}
+
+.col-sm-9 .entry-details-table {
+  margin: 20px 20px 20px 0;
+}
+
+.wbrs-details-table { background-color: $bug-section-color;}
+.sbrs-details-table { background-color: $success-color;}
+.xbrs-details-table { background-color: $communication-accent-color;}
+.crosslisted-details-table { background-color: $warning-accent-color;}
+.virustotal-details-table { background-color: $rule-accent-color;}
+
+.entry-details-table table {
+  background-color: $table-dark-body;
+  color: $content-bg-color;
+}
+
+.entry-details-table table > thead > tr > th {
+  border-bottom: 1px solid $table-dark-header;
+}
+
+.entry-details-table table > tbody > tr > td {
+  border-bottom: none;
+}
+
+h5.entry-details-table-header {
+  background-color: $table-dark-header;
+  color: $content-bg-color;
+  font-size: 9.5pt;
+  padding-left: 10px;
+  font-weight: 600;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
