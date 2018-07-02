@@ -44,7 +44,6 @@
               <div class="dropdown-menu toolbar-dropdown" id="wlbl_adjust_entries" aria-labelledby="wlbl_entries_button">
                 <!-- For each checked checkbox populate this information -->
                 <%= form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form| %>
-                  <input type="hidden" value="paragon-downloads.com" class="adjust-wlbl-urls-input"/>
                 <div class="dispute-name-wrapper">
                   <label class="content-label-sm">Dispute</label><br/>
                   paragon-downloads.com <!-- dispute name -->
@@ -68,22 +67,22 @@
                 <div class="inline-tool-content-wrapper">
                   <div class="toolbar">
                     <div>
-                      <label class="toolbar-section-label">WL/BL List</label>
-                      <select class="toolbar-select select-status adjust-wlbl-trgt_list-input" title="RepTool Rule Status">
-                        <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
-                        <!-- Put all WL/BL options here  -->
-                        <%= Wbrs::ManualWlbl.types.each do |type_name| %>
-                          <option value="<%=type_name%>"><%=type_name%></option>
-                        <% end %>
-                      </select>
+                      <label class="toolbar-section-label" for="wlbl-list-type-select">WL/BL List</label>
+                      <%= wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                                           {
+                                               include_blank: 'Not on a List Currently'
+                                           },
+                                           class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
+                                           title: 'RepTool Rule Status',
+                                           id: "wlbl-list-type-select" %>
                     </div>
                   </div>
                   <label class="content-label-sm">Comment</label>
                   <!-- Comment boxes should only be shown after something other than the original settings is selected -->
-                  <textarea class="dropdown-comment adjust-wlbl-note-input"></textarea>
+                  <textarea class="dropdown-comment adjust-wlbl-input note-input"></textarea>
                   <!--- End of per checked checkbox loop -->
                   <button class="secondary">Preview</button>
-                  <button type="button" class="primary" onclick="toolbar_add_wlbl_button(this);">Submit Changes</button>
+                  <button type="button" class="primary" onclick="toolbar_adust_wlbl_button(this);">Submit Changes</button>
                 </div>
                 <% end %>
               </div>
@@ -96,7 +95,6 @@
               </button>
               <div class="dropdown-menu toolbar-dropdown" id="reptool_adjust_entries" aria-labelledby="reptool_entries_button">
                 <%= form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form| %>
-                  <input type="hidden" value="paragon-downloads.com" class="adjust-reptool-bl-entries-input"/>
                 <!-- For each checked checkbox populate this information -->
                 <div class="dispute-name-wrapper">
                   <label class="content-label-sm">Dispute</label><br/>
@@ -107,37 +105,42 @@
                     <td>
                       <label class="content-label-sm">Classification</label><br/>
                       Spam <!-- Put entry classification here -->
+                      <!-- marlpier: classification of what? -->
                     </td>
                     <td>
                       <label class="content-label-sm">Expiration</label><br/>
                       2018-06-02T13:12:48 <!-- Put entry rule expiration of current rule -->
+                      <!-- marlpier: expiration of what? -->
                     </td>
                   </tr>
                 </table>
                 <div class="inline-tool-content-wrapper">
                   <div class="toolbar">
                     <div>
-                      <label class="toolbar-section-label">Status</label>
-                      <select class="toolbar-select select-status" title="RepTool Rule Status">
-                        <option selected value="Active">Active</option><!-- Put current entry's status as the selected option -->
-                        <!-- Put all status options here (Active vs. Expired & if there are any others -->
-                      </select>
+                      <label class="toolbar-section-label" for="blacklist-action-select">Status</label>
+                      <%= rep_form.select(:action, ['Active', 'Expired'],
+                                          {
+                                              include_blank: true
+                                          },
+                                          class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                                          title: 'RepTool Rule Status',
+                                          id: "blacklist-action-select") %>
                     </div>
                     <div>
-                      <label class="toolbar-section-label">RepTool BL</label>
-                      <select class="toolbar-select select-rt-rule adjust-reptool-bl-classifications-input" title="RepTool BL Rules">
-                        <option selected value="trd_sus">trd_sus</option><!-- Put current entry's rule here as the selected option -->
-                         <!--Put all other rule options here (trd_spam, trd_mal, etc.) -->
-                        <%= RepApi::Blacklist.classifications.each do |classification| %>
-                          <option value="<%= classification %>"><%= classification %></option>
-                        <% end %>
-                      </select>
+                      <label class="toolbar-section-label" for="blacklist-classifications-select">RepTool BL</label>
+                      <%= rep_form.select(:classification, RepApi::Blacklist.classifications,
+                                          {
+                                              include_blank: true
+                                          },
+                                          class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                                          title: "RepTool BL Rules",
+                                          id: "blacklist-classifications-select") %>
                     </div>
                   </div>
                   <label class="content-label-sm">Comment</label>
-                  <textarea class="dropdown-comment adjust-reptool-bl-comment-input"></textarea>
+                  <textarea class="dropdown-comment adjust-reptool-bl-input comment-input"></textarea>
                   <!--- End of per checked checkbox loop -->
-                  <button type="button" class="primary" onclick="toolbar_add_reptool_bl_button(this)">Submit Changes</button>
+                  <button type="button" class="primary" onclick="toolbar_adjust_reptool_bl_button(this)">Submit Changes</button>
                 </div>
                 <% end %>
               </div>
@@ -165,14 +168,14 @@
           </thead>
           <tbody>
           <% @entries.each do |entry| %>
-            <tr>
-              <td><input class="dispute_check_box" type="checkbox"/></td>
+            <tr data-entry-id="<%= entry.id %>">
+              <td><input class="dispute_check_box" type="checkbox" data-entry-id="<%= entry.id %>"/></td>
               <td class="dispute_rep_tools">
                 <span class="dropdown">
                   <button id="wlbl_button_<%= entry.id %>" class="dispute-inline-buttons adjust-wlbl-button dropdown-toggle" title="Adjust WL/BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                   <div class="dropdown-menu" id="wlbl_adjust_<%= entry.id %>" aria-labelledby="wlbl_button_<%= entry.id %>">
                     <%= form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form| %>
-                      <input type="hidden" value="paragon-downloads.com" class="adjust-wlbl-urls-input"/>
+                      <input type="hidden" value="<%= entry.id %>" class="adjust-wlbl-input dispute-entry-id"/>
                     <h3>Adjust WL/BL</h3>
                     <table class="dispute_tool_current">
                       <tr>
@@ -193,20 +196,21 @@
                     <div class="inline-tool-content-wrapper">
                       <div class="toolbar">
                         <div>
-                          <label class="toolbar-section-label">WL/BL List</label>
-                          <select class="toolbar-select select-status adjust-wlbl-trgt_list-input" title="RepTool Rule Status">
-                            <option selected value="Not on a List Currently">Not on a List Currently</option><!-- Put current entry's WL or BL as the selected option -->
-                            <!-- Put all WL/BL options here  -->
-                            <%= Wbrs::ManualWlbl.types.each do |type_name| %>
-                              <option value="<%=type_name%>"><%=type_name%></option>
-                            <% end %>
-                          </select>
+                          <label class="toolbar-section-label" for="entry-<%= entry.id %>-wlbl-list-type-select">WL/BL List</label>
+                          <%= wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                                               {
+                                                   selected: entry.wbrs_list_type,
+                                                   include_blank: 'Not on a List Currently'
+                                               },
+                                               class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
+                                               title: 'RepTool Rule Status',
+                                               id: "entry-#{entry.id}-wlbl-list-type-select" %>
                         </div>
                       </div>
                       <label class="content-label-sm">Comment</label>
-                      <textarea class="dropdown-comment adjust-wlbl-note-input"></textarea>
+                      <textarea class="dropdown-comment adjust-wlbl-input note-input"></textarea>
                       <button class="secondary">Preview</button>
-                      <button type="button" class="primary" onclick="row_add_wlbl_button(this);">Submit Changes</button>
+                      <button type="button" class="primary" onclick="row_adust_wlbl_button(this);">Submit Changes</button>
                     </div>
                     <% end %>
                   </div>
@@ -215,49 +219,53 @@
                   <button id="reptool_button_<%= entry.id %>" class="dispute-inline-buttons adjust-reptool-button dropdown-toggle" title="Adjust RepTool BL" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                   <div class="dropdown-menu" id="reptool_adjust_<%= entry.id %>" aria-labelledby="reptool_button_<%= entry.id %>">
                     <%= form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form| %>
-                      <input type="hidden" value="paragon-downloads.com" class="adjust-reptool-bl-entries-input"/>
+                      <input type="hidden" value="<%= entry.id %>" class="adjust-reptool-bl-input dispute-entry-id"/>
                     <h3>Adjust RepTool BL</h3>
                     <table class="dispute_tool_current">
                       <tr>
                         <td>
                           <label class="content-label-sm">Classification</label><br/>
-                          Spam <!-- Put entry classification here -->
+                          <%= entry.classifications.first %>
                         </td>
                         <td>
                           <label class="content-label-sm">Expiration</label><br/>
-                          2018-06-02T13:12:48 <!-- Put entry rule expiration of current rule -->
+                          <%= entry.blacklist&.expiration %>
                         </td>
                       </tr>
                     </table>
                     <div class="inline-tool-content-wrapper">
                       <div class="toolbar">
                         <div>
-                          <label class="toolbar-section-label">Status</label>
-                          <select class="toolbar-select select-status" title="RepTool Rule Status">
-                            <option selected value="Active">Active</option><!-- Put current entry's status as the selected option -->
-                            <!-- Put all status options here (Active vs. Expired & if there are any others -->
-                          </select>
+                          <label class="toolbar-section-label" for="entry-<%= entry.id %>-blacklist-action-select">Status</label>
+                          <%= rep_form.select(:action, ['Active', 'Expired'],
+                                              {
+                                                  selected: entry.blacklist ? 'Active' : 'Expired'
+                                              },
+                                              class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                                              title: 'RepTool Rule Status',
+                                              id: "entry-#{entry.id}-blacklist-action-select") %>
                         </div>
                         <div>
-                          <label class="toolbar-section-label">RepTool BL</label>
-                          <select class="toolbar-select select-rt-rule adjust-reptool-bl-classifications-input" title="RepTool BL Rules">
-                            <option selected value="trd_sus">trd_sus</option><!-- Put current entry's rule here as the selected option -->
-                            <!-- Put all other rule options here (trd_spam, trd_mal, etc.) -->
-                            <%= RepApi::Blacklist.classifications.each do |classification| %>
-                              <option value="<%= classification %>"><%= classification %></option>
-                            <% end %>
-                          </select>
+                          <label class="toolbar-section-label" for="entry-<%= entry.id %>-blacklist-classifications-select">RepTool BL</label>
+                          <%= rep_form.select(:classification, RepApi::Blacklist.classifications,
+                                              {
+                                                  selected: entry.classifications&.first,
+                                                  include_blank: !entry.blacklist
+                                              },
+                                              class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                                              title: "RepTool BL Rules",
+                                              id: "entry-#{entry.id}-blacklist-classifications-select") %>
                         </div>
                       </div>
                       <label class="content-label-sm">Comment</label>
-                      <textarea class="dropdown-comment adjust-reptool-bl-comment-input"></textarea>
-                      <button type="button" class="primary" onclick="row_add_reptool_bl_button(this)">Submit Changes</button>
+                      <textarea class="dropdown-comment adjust-reptool-bl-input comment-input"></textarea>
+                      <button type="button" class="primary" onclick="row_adust_reptool_bl_button(this)">Submit Changes</button>
                     </div>
                     <% end %>
                   </div>
                 </span>
               </td>
-              <td>paragon-downloads.com</td>
+              <td><%= entry.hostlookup %></td>
               <td>Computer and Internet</td>
               <td class="text-center">5.6</td>
               <td class="text-center wbrs-highlight">8.7</td>
@@ -365,60 +373,21 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/j</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/k</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/m</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
-                    <tr>
-                      <td>138850</td>
-                      <td>paragon-downloads.com/n</td>
-                      <td>WL-med</td>
-                      <td class="text-center">5.6</td>
-                      <td class="text-center">8.7000</td>
-                      <td>jgrandia</td>
-                      <td>2014-10-13 15:14:08</td>
-                      <td>2014-10-13 15:14:08</td>
-                    </tr>
+                    <!-- TODO: Populate this from wbrs ruleui api, when they finish the feature -->
                   </tbody>
                 </table>
                 <h4>XBRS Hits</h4>
                 <table class="nested-related-datatable">
                   <thead>
                     <tr>
-                      <% Xbrs::GetXbrs.by_domain("paragon-downloads.com")[1]['legend'].each do |header| %>
+                      <% Xbrs::GetXbrs.by_domain(entry.hostname)[1]['legend'].each do |header| %>
                         <th><%= header %></th>
                       <% end %>
                     </tr>
                   </thead>
 
                   <tbody>
-                      <% Xbrs::GetXbrs.by_domain("paragon-downloads.com")[1]['data'].each do |data| %>
+                      <% Xbrs::GetXbrs.by_domain(entry.hostname)[1]['data'].each do |data| %>
                         <tr>
                           <% data.each do |datapoint| %>
                             <td><%= datapoint %></td>

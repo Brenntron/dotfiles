@@ -22,3 +22,60 @@ window.populate_webcat_index_table = () ->
       #$("#create_research_submit_wait").addClass('hidden').hide()
       #$("#create_research_submit").show()
   , this)
+
+window.display_preview_window = (id, subdomain, domain, path) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  #when checkbox is clicked take the domain and path and try to open it in the iframe
+  if subdomain.length > 0
+    subdomain = subdomain + "."
+  loc = "http://" + subdomain + domain + path
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaints/test_url'
+    method: 'GET'
+    headers: headers
+    data: {
+      url:loc
+    }
+    success: (response) ->
+      #yay you can visit the site
+    error: (response) ->
+      #that page wont load. lets display someting else
+      switch response["status"]
+        when 404
+          document.getElementById('preview_window').src = "/unknown_url.html"
+        when 403
+          document.getElementById('preview_window').src = "/same_origin_url.html"
+
+  , this)
+
+  $(".complaint_selected" ).removeClass("complaint_selected")
+  $("#complaint_entry_row_"+ id ).addClass("complaint_selected")
+  document.getElementById('preview_window').src = loc
+  document.getElementById('preview_window_header_p').innerHTML = loc
+  document.getElementById('preview_window_header_a').href = loc
+
+window.select_all_pages = () ->
+  $('[id$=_site_checkbox]').prop('checked', true);
+window.unselect_all_pages = () ->
+  $('[id$=_site_checkbox]').prop('checked', false);
+window.open_viewable = () ->
+  $('[id$=_site_checkbox]').each (site)->
+    value = JSON.parse(this.value)
+    if value.viewable == "true"
+      window.open("http://www."+value.site)
+
+window.open_nonviewable = () ->
+  $('[id$=_site_checkbox]').each (site)->
+    value = JSON.parse(this.value)
+    if value.viewable == "false"
+      window.open("http://www."+value.site)
+
+window.open_selected = () ->
+  $('[id$=_site_checkbox]:checked').each (site)->
+    value = JSON.parse(this.value)
+    window.open("http://www."+value.site)
+
+window.open_all = () ->
+  $('[id$=_site_checkbox]').each (site)->
+    value = JSON.parse(this.value)
+    window.open("http://www."+value.site)
