@@ -1,44 +1,43 @@
 $ ->
   $('#edit-dispute-entry-button').click ->
 
-    $('.edit-entries-buttons').toggleClass('hidden')
-    $('.dispute_check_box').each ->
-      
-      if $(this).prop('checked')
-        entry_id = $(this).attr('data-entry-id')
+    if ($('.dispute_check_box:checked').length > 0)
+      $('.edit-entries-buttons').toggleClass('hidden')
+      $('.dispute_check_box').each ->
+        if $(this).prop('checked')
+          entry_id = $(this).attr('data-entry-id')
 
-        entry_content_wrapper = $(this).parent().parent()[0]
-        editable_data = $(entry_content_wrapper).find('.entry-data')
-        $(editable_data).each ->
-          $(this).hide()
-          data_input = $(this).next('.table-entry-input').show()
+          entry_content_wrapper = $(this).parent().parent()[0]
+          editable_data = $(entry_content_wrapper).find('.entry-data')
+          $(editable_data).each ->
+            $(this).hide()
+            data_input = $(this).next('.table-entry-input').show()
 
-        first_item = $(editable_data)[0]
-        $(first_item).next('.table-entry-input')[0].focus()
+          first_item = $(editable_data)[0]
+          $(first_item).next('.table-entry-input')[0].focus()
+    else
+      alert ('Select at least one entry to edit.')
 
-
-
+#  $('.cancel-changes').click ->
 
 
 #        After this is edited the user has to hit save, add a placeholder button for now above the table.
 #        When they hit save it should send the update to the ticket, populate everywhere / reload the page, and set the entry span to match
 #        the content of the input
-      else
-        false
 
-#         if no checkboxes are checked alert 'Select at least one dispute entry to edit.'
 
+
+#  Expand / Collapse the expandable row
   $('.expand-row-button-inline').click ->
     expand_button = $(this)
     entry_id = $(this).attr('data-entry-id')
     entry_row = $(this).parents('.research-table-row')[0]
     nested_row = $(entry_row).find('.nested-data-row')[0]
-
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
 
 
-
+# Show / hide the different research tables in the expanded row
   $('.research-row-checkbox').click ->
     entry_id = $(this).val()
     entry_row = $(this).parents('.research-table-row')[0]
