@@ -116,7 +116,7 @@
               %table
                 %tr
                   %td.expandable-row-column
-                    %button.expand-row-button-inline
+                    %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
                   %td
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td
@@ -293,7 +293,7 @@
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
                           2016-02-24 15:11:22
-                %tr.nested-data-row
+                %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                   %td.expanded-row{colspan: '8'}
                     .expanded-row-data-wrapper
                       .row

@@ -22,3 +22,9 @@ $ ->
 
 #         if no checkboxes are checked alert 'Select at least one dispute entry to edit.'
 
+  $('.expand-row-button-inline').click ->
+    entry_id = $(this).attr('data-entry-id')
+    $('.nested-data-row').each ->
+      if $(this).attr('data-entry-id') == entry_id
+        $(this).toggle()
+
