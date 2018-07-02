@@ -85,13 +85,8 @@ test:
   peakebridge:
     host: "localhost"
     port: 2966
-<<<<<<< Updated upstream
-    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-peer"
-=======
     # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    tls_mode: "no-tls"
->>>>>>> Stashed changes
+    verify_mode: "no-tls"
     ca_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
@@ -132,12 +127,6 @@ test:
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
   wbrs:
-<<<<<<< Updated upstream
-    host: "localhost"
-    port: 2944
-    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "no-tls"
-=======
     #host: "localhost"
     #port: 2944                          #default wbrs_stub port
     #verify_mode: "no-tls"
@@ -145,8 +134,7 @@ test:
     host: "stage-wbrsruleapi-vip.vega.ironport.com"
     port: 80
     # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    tls_mode: "no-tls"
->>>>>>> Stashed changes
+    verify_mode: "no-tls"
     gssnegotiate: false
   xbrs:
     #host: "localhost"
