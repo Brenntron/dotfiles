@@ -20,7 +20,7 @@ peakebridge                             = OpenStruct.new
 if env_config['peakebridge']
   peakebridge.host                        = env_config['peakebridge']['host']
   peakebridge.port                        = env_config['peakebridge']['port']
-  peakebridge.ssl_mode                    = env_config['peakebridge']['ssl_mode']
+  peakebridge.verify_mode                 = env_config['peakebridge']['ssl_mode']
   peakebridge.uri_base                    = env_config['peakebridge']['uri_base']
   peakebridge.sources                     = env_config['peakebridge']['sources'] || []
 end
@@ -75,7 +75,7 @@ xbrs = env_config.fetch('xbrs', {})
 Rails.configuration.xbrs                = OpenStruct.new
 Rails.configuration.xbrs.host           = xbrs['host']
 Rails.configuration.xbrs.port           = xbrs['port']
-Rails.configuration.xbrs.tls_mode       = xbrs['tls_mode']
+Rails.configuration.xbrs.verify_mode    = xbrs['verify_mode']
 Rails.configuration.xbrs.gssnegotiate   = xbrs['gssnegotiate']
 
 

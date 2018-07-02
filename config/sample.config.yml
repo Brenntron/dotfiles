@@ -10,8 +10,8 @@ development:
   peakebridge:
     host: "localhost"
     port: 2966
-    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-peer"
+    # ssl_mod { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    ssl_mode: "verify-peer"
     ca_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
@@ -32,7 +32,7 @@ development:
   rep_api:
     #host: "localhost"
     #port: 2944                          #default port for wbrs_stub
-    #tls_mode: "no-tls"
+    #verify_mode: "no-tls"
     #gssnegotiate: true
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
@@ -85,8 +85,8 @@ test:
   peakebridge:
     host: "localhost"
     port: 2966
-    # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "no-tls"
+    # ssl_mod { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    ssl_mode: "no-tls"
     ca_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
@@ -106,11 +106,11 @@ test:
   rep_api:
     #host: "localhost"
     #port: 2944                          #default port for wbrs_stub
-    #tls_mode: "no-tls"
+    #verify_mode: "no-tls"
     #gssnegotiate: true
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
-    # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-none"
     gssnegotiate: true
   ruletest:
@@ -133,7 +133,7 @@ test:
     #gssnegotiate: false
     host: "stage-wbrsruleapi-vip.vega.ironport.com"
     port: 80
-    # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
   xbrs:
@@ -157,7 +157,7 @@ staging:
   peakebridge:
     host: "stevensville-test.vrt.sourcefire.com"
     port: 443
-    tls_mode: "verify-peer"
+    ssl_mode: "verify-peer"
     ca_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
@@ -217,7 +217,7 @@ production:
   peakebridge:
     host: "stevensville.vrt.sourcefire.com"
     port: 443
-    tls_mode: "verify-peer"
+    ssl_mode: "verify-peer"
     ca_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
@@ -257,8 +257,8 @@ production:
   wbrs:
     host: "prod-wbrsruleapi-vip.vega.ironport.com"
     port: 443
-    # tls_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    tls_mode: "verify-peer"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: false
   xbrs:
