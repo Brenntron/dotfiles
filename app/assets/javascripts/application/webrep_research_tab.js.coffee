@@ -2,23 +2,33 @@ $ ->
   $('#edit-dispute-entry-button').click ->
 
     if ($('.dispute_check_box:checked').length > 0)
-      $('.edit-entries-buttons').toggleClass('hidden')
+      $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
-          entry_id = $(this).attr('data-entry-id')
-
-          entry_content_wrapper = $(this).parent().parent()[0]
-          editable_data = $(entry_content_wrapper).find('.entry-data')
+          entry_row = $(this).parents('.research-table-row')[0]
+          editable_data = $(entry_row).find('.entry-data')
+          input =  $(entry_row).find('.table-entry-input')
           $(editable_data).each ->
             $(this).hide()
-            data_input = $(this).next('.table-entry-input').show()
-
+          $(input).each ->
+            $(this).show()
           first_item = $(editable_data)[0]
           $(first_item).next('.table-entry-input')[0].focus()
     else
       alert ('Select at least one entry to edit.')
 
-#  $('.cancel-changes').click ->
+
+  $('.cancel-changes').click ->
+    $('.table-entry-input').each ->
+      entry_wrapper = $(this).prev('.entry-data')
+      entry_data = $(entry_wrapper[0]).text()
+      unless $(this).val() == entry_data
+        $(this).val(entry_data)
+
+      $(entry_wrapper[0]).show()
+      $(this).hide()
+
+
 #   Need to add save function and cancel function after editing.
 
 #        After this is edited the user has to hit save, add a placeholder button for now above the table.
@@ -33,7 +43,6 @@ $ ->
     entry_row = $(this).parents('.research-table-row')[0]
     editable_data = $(entry_row).find('.entry-data')
     input =  $(entry_row).find('.table-entry-input')
-    $(entry_row).addClass('row-editing')
     $(editable_data).each ->
       $(this).hide()
     $(input).each ->
@@ -47,9 +56,14 @@ $ ->
   $('.radio-label').click ->
     radio_button = $(this).prev('input[type="radio"')
     $(radio_button[0]).trigger('click')
+    dropdown_wrapper = $(this).parents('.inline-dropdown-menu')
+    active_status = $(dropdown_wrapper[0]).prev('.inline-select-dropdown')
+    if $(radio_button[0]).hasClass('entry-status-radio')
+      selected_status = $(radio_button[0]).attr('id')
+      $(active_status[0]).text(selected_status)
+
     li = $(this).parent('.status-radio-wrapper')
     parent = li[0]
-
     $('.status-radio-wrapper').each ->
       if $(this).hasClass('selected')
         $(this).removeClass('selected')
@@ -61,9 +75,6 @@ $ ->
       return false
     else
       $('.ticket-resolution-submenu').hide()
-
-
-
 
 
 # Expand All Rows
