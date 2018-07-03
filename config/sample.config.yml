@@ -1,6 +1,10 @@
 development:
   amq: #active message queue
     host: "localhost"
+  auto_resolve:
+    check_complaints: true
+    check_virus_total: true
+    check_umbrella: true
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
@@ -76,6 +80,10 @@ development:
 test:
   amq: #active message queue
     host: "localhost"
+  auto_resolve:
+    complaint_check: true
+    virus_total_check: true
+    umbrella_check: true
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
@@ -150,6 +158,10 @@ test:
 staging:
   amq: #active message queue
     host: "fmd-actmq-01stg.vrt.sourcefire.com"
+  auto_resolve:
+    complaint_check: true
+    virus_total_check: true
+    umbrella_check: true
   bugzilla:
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
@@ -200,6 +212,7 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+<<<<<<< HEAD
   xbrs:
     host: "prod-xbrs.vega.ironport.com"
     port: 80
@@ -267,3 +280,9 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+
+production:
+  auto_resolve:
+    complaint_check: true
+    virus_total_check: true
+    umbrella_check: true

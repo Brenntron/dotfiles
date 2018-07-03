@@ -1,9 +1,12 @@
 class AutoResolve < ActiveModel
-  attr_accessor :address_type, :address
+  attr_accessor :address_type, :address, :status
 
   ADDRESS_TYPE_IP           = 'IP'
   ADDRESS_TYPE_URI          = 'URI'
   ADDRESS_TYPE_DOMAIN       = 'DOMAIN'
+
+  STATUS_NEW                = 'NEW'
+  STATUS_MALICIOUS          = 'MALICIOUS'
 
   def ip?
     ADDRESS_TYPE_IP == self.address_type
@@ -17,8 +20,43 @@ class AutoResolve < ActiveModel
     ADDRESS_TYPE_DOMAIN == self.address_type
   end
 
-  def check_sources
+  def new?
+    STATUS_NEW == self.status
+  end
 
+  def malicious?
+    STATUS_MALICIOUS == self.status
+  end
+
+  def check_complaints
+
+  end
+
+  def check_virus_total
+
+  end
+
+  def check_umbrella
+
+  end
+
+  def check_sources
+    if Rails.configuration.check_complaints
+      check_complaints
+      return if self.status
+    end
+
+    if Rails.configuration.check_virus_total
+      check_virus_total
+      return if self.status
+    end
+
+    if Rails.configuration.check_umbrella
+      check_umbrella
+      return if self.status
+    end
+
+    self.status = STATUS_NEW
   end
 
   # @param [String] address_type: 'IP' or 'URI/DOMAIN'
