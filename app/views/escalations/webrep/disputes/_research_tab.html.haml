@@ -186,27 +186,35 @@
                             %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'Resolved-Closed'}
                             %label.radio-label{for: 'Resolved-Closed'} Resolved / Closed
                             .dropdown-menu.ticket-resolution-submenu
-                              .submenu-header
-                                Ticket Resolution
-                              %ul
-                                %li
-                                  %input{type: 'radio', name: 'entry-resolution', id: 'Fixed-FP'}
-                                  %label.radio-label{for: 'Fixed-FP'} Fixed - FP
-                                %li
-                                  %input{type: 'radio', name: 'entry-resolution', id: 'Fixed-FN'}
-                                  %label.radio-label{for: 'Fixed-FN'} Fixed - FN
-                                %li
-                                  %input{type: 'radio', name: 'entry-resolution', id: 'Unchanged'}
-                                  %label.radio-label{for: 'Unchanged'} Unchanged
-                                %li
-                                  %input{type: 'radio', name: 'entry-resolution', id: 'Invalid'}
-                                  %label.radio-label{for: 'Invalid'} Invalid / Junk Mail
-                                %li
-                                  %input{type: 'radio', name: 'entry-resolution', id: 'Test-Training'}
-                                  %label.radio-label{for: 'Test-Training'} Test / Training
-                                %li
-                                  %input{type: 'radio', name: 'entry-resolution', id: 'Other'}
-                                  %label.radio-label{for: 'Other'} Other
+                              .col-xs-6.submenu-left-wrapper
+                                .submenu-header
+                                  Ticket Resolution
+                                %ul
+                                  %li
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FP'}
+                                    %label.radio-label{for: 'Fixed-FP'} Fixed - FP
+                                  %li
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FN'}
+                                    %label.radio-label{for: 'Fixed-FN'} Fixed - FN
+                                  %li
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Unchanged'}
+                                    %label.radio-label{for: 'Unchanged'} Unchanged
+                                  %li
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Invalid'}
+                                    %label.radio-label{for: 'Invalid'} Invalid / Junk Mail
+                                  %li
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Test-Training'}
+                                    %label.radio-label{for: 'Test-Training'} Test / Training
+                                  %li
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Other'}
+                                    %label.radio-label{for: 'Other'} Other
+                              .col-xs-6.submenu-right-wrapper
+                                .resolution-comment-wrapper
+                                  %label.content-label-sm
+                                    Comment
+                                  %textarea
+                                  %button.primary
+                                    Submit
 
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Re-Opened'}

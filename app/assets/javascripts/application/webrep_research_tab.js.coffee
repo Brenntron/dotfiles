@@ -45,7 +45,7 @@ $ ->
 
 # Inline Edit Status
   $('.radio-label').click ->
-    radio_button = $(this).prev('.entry-status-radio')
+    radio_button = $(this).prev('input[type="radio"')
     $(radio_button[0]).trigger('click')
     li = $(this).parent('.status-radio-wrapper')
     parent = li[0]
@@ -55,10 +55,14 @@ $ ->
         $(this).removeClass('selected')
     $(parent).addClass('selected')
 
-# Status Resolution (inline)
-  $('.resolution-drodown-menu').click ->
-    submenu = $(this).siblings('.dropdown-menu')
-    $(submenu[0]).show()
+    if radio_button.hasClass('resolution-drodown-menu') or radio_button.hasClass('entry-resolution-radio')
+      submenu = $(this).siblings('.dropdown-menu')
+      $(submenu[0]).show()
+      return false
+    else
+      $('.ticket-resolution-submenu').hide()
+
+
 
 
 
