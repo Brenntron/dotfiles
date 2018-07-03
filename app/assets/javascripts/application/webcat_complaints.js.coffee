@@ -81,7 +81,6 @@ window.open_all = () ->
     window.open("http://www."+value.site)
 
 window.mark_for_commit = () ->
-  debugger
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
