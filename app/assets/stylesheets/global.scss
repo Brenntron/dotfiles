@@ -4589,13 +4589,15 @@ h5.entry-details-table-header {
 
 .inline-dropdown-menu {
   font-size: 9pt;
-  margin-top: 0;
+  margin-top: -2px;
+  margin-left: 2px;
   border-radius: 0 4px 4px 4px;
   border: none;
+  padding: 0 0;
 }
 
 .inline-select-dropdown {
-  min-width: 160px;
+  min-width: 164px;
   text-align: left;
 }
 
@@ -4604,6 +4606,10 @@ h5.entry-details-table-header {
 }
 
 .inline-dropdown-menu ul li:hover {
+  background-color: $faint-accent-color;
+}
+
+.inline-dropdown-menu ul li.selected {
   background-color: #90d8f594;
 }
 
@@ -4614,11 +4620,11 @@ h5.entry-details-table-header {
 }
 
 .inline-dropdown-menu .radio-label {
-  margin-left: 20px;
   width: auto;
   cursor: pointer;
   display: block;
   margin-top: 1px;
+  padding: 0 12px 2px 22px;
 }
 
 .inline-dropdown-menu input[type='radio'] {

@@ -43,6 +43,25 @@ $ ->
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
 
+# Inline Edit Status
+  $('.radio-label').click ->
+    radio_button = $(this).prev('.entry-status-radio')
+    $(radio_button[0]).trigger('click')
+    li = $(this).parent('.status-radio-wrapper')
+    parent = li[0]
+
+    $('.status-radio-wrapper').each ->
+      if $(this).hasClass('selected')
+        $(this).removeClass('selected')
+    $(parent).addClass('selected')
+
+# Status Resolution (inline)
+  $('.resolution-drodown-menu').click ->
+    submenu = $(this).siblings('.dropdown-menu')
+    $(submenu[0]).show()
+
+
+
 # Expand All Rows
   $('#expand-all-rows').click ->
     $('.research-table-row-wrapper').each ->
