@@ -11,6 +11,7 @@ auto_resolve = env_config.fetch('auto_resolve', {})
 Rails.configuration.complaint_check     = auto_resolve['complaint_check'] || false
 Rails.configuration.virus_total_check   = auto_resolve['virus_total_check'] || false
 Rails.configuration.umbrella_check      = auto_resolve['umbrella_check'] || false
+Rails.configuration.virus_total_api_key = auto_resolve['virus_total_api_key']
 
 
 

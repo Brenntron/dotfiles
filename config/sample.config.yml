@@ -5,6 +5,7 @@ development:
     check_complaints: true
     check_virus_total: true
     check_umbrella: true
+    virus_total_api_key: "redacted"
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"

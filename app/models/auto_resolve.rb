@@ -1,4 +1,6 @@
-class AutoResolve < ActiveModel
+class AutoResolve
+  include ActiveModel
+
   attr_accessor :address_type, :address, :status, :rule_hits
 
   ADDRESS_TYPE_IP           = 'IP'
@@ -38,8 +40,38 @@ class AutoResolve < ActiveModel
     end
   end
 
-  def check_virus_total
+  def virus_total_api_key
+    Rails.configuration.virus_total_api_key
+  end
 
+  def virus_total_query_string(url_input)
+    "apikey=#{virus_total_api_key}&resource=#{url_input}"
+  end
+
+  def virus_total_request(url_input)
+    virus_total_url = 'https://www.virustotal.com/vtapi/v2/url/report'
+    @request = HTTPI::Request.new("#{virus_total_url}?#{virus_total_query_string(url_input)}")
+    @request.ssl = true
+    @request.auth.ssl.verify_mode = :peer
+    @request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    @request
+  end
+
+  def call_virus_total(url_input)
+    request = virus_total_request(url_input)
+    response = HTTPI.get(request)
+    JSON.parse(response.body)
+  end
+
+  def virus_total_scans
+    %w{Kaspersky Sophos Avira Google\ Safebrowsing BitDefender}
+  end
+
+  def check_virus_total(url_input)
+    scans = call_virus_total(url_input)
+    if virus_total_scans.find {|scan_key| scans[scan_key]['detected']}
+      self.status = STATUS_MALICIOUS
+    end
   end
 
   def check_umbrella
@@ -53,7 +85,7 @@ class AutoResolve < ActiveModel
     end
 
     if Rails.configuration.check_virus_total
-      check_virus_total
+      check_virus_total(self.address)
       return if self.status
     end
 
