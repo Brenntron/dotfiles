@@ -212,7 +212,6 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   xbrs:
     host: "prod-xbrs.vega.ironport.com"
     port: 80
