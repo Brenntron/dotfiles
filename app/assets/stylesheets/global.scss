@@ -4563,6 +4563,69 @@ h5.entry-details-table-header {
   padding: 0 8px !important;
 }
 
+.inline-select-dropdown {
+  padding-right: 20px;
+  background-image: url(image_path('icon_dropdown_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 16px;
+  padding-bottom: 1px;
+  border: 2px solid #fff;
+  outline: 1px solid #e5e5e5;
+}
+
+.dropdown.open .inline-select-dropdown {
+  background-color: $bug-section-color;
+  color: $content-bg-color;
+  background-image: url(image_path('icon_dropdown_white.svg'));
+  border: 2px solid #fff;
+  outline: 1px solid #e5e5e5;
+}
+
+.dropdown .inline-select-dropdown {
+  border: 2px solid #fff;
+  outline: 1px solid #e5e5e5;
+}
+
+.inline-dropdown-menu {
+  font-size: 9pt;
+  margin-top: 0;
+  border-radius: 0 4px 4px 4px;
+  border: none;
+}
+
+.inline-select-dropdown {
+  min-width: 160px;
+  text-align: left;
+}
+
+.inline-dropdown-menu ul li {
+  padding: 4px 12px;
+}
+
+.inline-dropdown-menu ul li:hover {
+  background-color: #90d8f594;
+}
+
+.radio-label {
+  text-transform: none !important;
+  font-weight: 400 !important;
+  color: $type-lighter-color;
+}
+
+.inline-dropdown-menu .radio-label {
+  margin-left: 20px;
+  width: auto;
+  cursor: pointer;
+  display: block;
+  margin-top: 1px;
+}
+
+.inline-dropdown-menu input[type='radio'] {
+  box-shadow: none;
+  float: left;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {

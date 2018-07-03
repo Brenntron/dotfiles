@@ -32,11 +32,12 @@ $ ->
     edit_button = $(this)
     entry_row = $(this).parents('.research-table-row')[0]
     editable_data = $(entry_row).find('.entry-data')
+    input =  $(entry_row).find('.table-entry-input')
+    $(entry_row).addClass('row-editing')
     $(editable_data).each ->
       $(this).hide()
-      data_input = $(this).next('.table-entry-input')
-      $(data_input).show()
-      $(data_input).parent().addClass('col-editing')
+    $(input).each ->
+      $(this).show()
     first_item = $(editable_data)[0]
     $(first_item).next('.table-entry-input')[0].focus()
     if $('.edit-entries-buttons').hasClass('hidden')
