@@ -18,6 +18,7 @@
             %span.toolbar-button-text Sort By
           .dropdown-menu.toolbar-dropdown#sort_by_dropdown{'aria-labelledby': 'sort-table-by'}
             Options to sort by go here.
+      -#      Add list of useful fields to sort by, category, entry content, reptool class, WL/BL, WBRS Score, SBRS Score
       %div
         %label.toolbar-section-label Edit
         %button.toolbar-button.edit-button#edit-dispute-entry-button
@@ -34,6 +35,7 @@
               .load-bar-segment.hidden
               .load-bar-segment.hidden
               .load-bar-segment.hidden
+      -#          After submit add new row at the bottom of entries, may take a while to retrieve all data to populate the information
 
       %div
         %label.toolbar-section-label Reputation
@@ -51,11 +53,10 @@
                 %tr
                   %td
                     %label.content-label-sm Current Score
-                    -#Put current dispute entry WBRS score here
-                    8.7
+                    -#= entry.wbrs_score
                   %td
                     %label.content-label-sm New Score
-                    %span#new_wbrs_score
+                    %span.new_wbrs_score
               .inline-tool-content-wrapper
                 .toolbar
                   %div
@@ -175,11 +176,10 @@
                               %tr
                                 %td
                                   %label.content-label-sm Current Score
-                                  -#<!-- Put current WBRS score here -->
-                                  8.7
+                                  = entry.wbrs_score
                                 %td
                                   %label.content-label-sm New Score
-                                  %span#new_wbrs_score
+                                  %span.new_wbrs_score
                             .inline-tool-content-wrapper
                               .toolbar
                                 %div

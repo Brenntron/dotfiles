@@ -39,6 +39,8 @@ $ ->
       $(data_input).parent().addClass('col-editing')
     first_item = $(editable_data)[0]
     $(first_item).next('.table-entry-input')[0].focus()
+    if $('.edit-entries-buttons').hasClass('hidden')
+      $('.edit-entries-buttons').removeClass('hidden')
 
 # Expand All Rows
   $('#expand-all-rows').click ->
