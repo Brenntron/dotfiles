@@ -341,9 +341,10 @@
                                   %th AV Vendor
                                   %th Results
                               %tbody
-                                %tr
-                                  %td Vendor Name
-                                  %td Clean or not
+                                - entry.virustotals.each do |virustotal|
+                                  %tr
+                                    %td= virustotal[:name]
+                                    %td= virustotal[:result]
                         -#Put weight of rule here
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
