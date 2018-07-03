@@ -13,8 +13,11 @@
           %span.toolbar-button-text Expand All Rows
         %button.toolbar-button.collapse-button#collapse-all-rows
           %span.toolbar-button-text Collapse All Rows
-        %button.toolbar-button.sort-by-button
-          %span.toolbar-button-text Sort By
+        %span.dropdown
+          %button.toolbar-button.sort-by-button#sort-table-by{title: 'Sort Table By', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %span.toolbar-button-text Sort By
+          .dropdown-menu.toolbar-dropdown#sort_by_dropdown{'aria-labelledby': 'sort-table-by'}
+            Options to sort by go here.
       %div
         %label.toolbar-section-label Edit
         %button.toolbar-button.edit-button#edit-dispute-entry-button
