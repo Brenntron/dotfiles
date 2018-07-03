@@ -63,13 +63,13 @@ class AutoResolve
     JSON.parse(response.body)
   end
 
-  def virus_total_scans
+  def virus_total_scan_names
     %w{Kaspersky Sophos Avira Google\ Safebrowsing BitDefender}
   end
 
   def check_virus_total(url_input)
-    scans = call_virus_total(url_input)
-    if virus_total_scans.find {|scan_key| scans[scan_key]['detected']}
+    scans = call_virus_total(url_input)['scans']
+    if virus_total_scan_names.find {|scan_key| scans[scan_key]['detected']}
       self.status = STATUS_MALICIOUS
     end
   end
