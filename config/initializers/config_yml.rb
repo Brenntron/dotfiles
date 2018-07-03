@@ -20,7 +20,7 @@ peakebridge                             = OpenStruct.new
 if env_config['peakebridge']
   peakebridge.host                        = env_config['peakebridge']['host']
   peakebridge.port                        = env_config['peakebridge']['port']
-  peakebridge.ssl_mode                    = env_config['peakebridge']['ssl_mode']
+  peakebridge.verify_mode                 = env_config['peakebridge']['ssl_mode']
   peakebridge.uri_base                    = env_config['peakebridge']['uri_base']
   peakebridge.sources                     = env_config['peakebridge']['sources'] || []
 end
@@ -59,21 +59,23 @@ rep_api = env_config.fetch('rep_api', {})
 Rails.configuration.rep_api                = OpenStruct.new
 Rails.configuration.rep_api.host           = rep_api['host']
 Rails.configuration.rep_api.port           = rep_api['port']
-Rails.configuration.rep_api.tls_mode       = rep_api['tls_mode']
+Rails.configuration.rep_api.verify_mode    = rep_api['verify_mode']
+Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
 Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
 
 wbrs = env_config.fetch('wbrs', {})
 Rails.configuration.wbrs                = OpenStruct.new
 Rails.configuration.wbrs.host           = wbrs['host']
 Rails.configuration.wbrs.port           = wbrs['port']
-Rails.configuration.wbrs.tls_mode       = wbrs['tls_mode']
+Rails.configuration.wbrs.verify_mode    = wbrs['verify_mode']
+Rails.configuration.wbrs.ca_cert_file   = wbrs['ca_cert_file']
 Rails.configuration.wbrs.gssnegotiate   = wbrs['gssnegotiate']
 
 xbrs = env_config.fetch('xbrs', {})
 Rails.configuration.xbrs                = OpenStruct.new
 Rails.configuration.xbrs.host           = xbrs['host']
 Rails.configuration.xbrs.port           = xbrs['port']
-Rails.configuration.xbrs.tls_mode       = xbrs['tls_mode']
+Rails.configuration.xbrs.verify_mode    = xbrs['verify_mode']
 Rails.configuration.xbrs.gssnegotiate   = xbrs['gssnegotiate']
 
 
