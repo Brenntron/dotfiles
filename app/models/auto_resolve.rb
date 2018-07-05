@@ -129,4 +129,17 @@ class AutoResolve
     auto_resolve.check_sources(rule_hits: rule_hits)
     auto_resolve
   end
+
+  def entry_attributes
+    {
+        status: self.status,
+        resolution: '',
+        resolution_message: ''
+    }
+  end
+
+  def ti_status
+    {
+    }
+  end
 end
