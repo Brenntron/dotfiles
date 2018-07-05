@@ -1,7 +1,7 @@
 class AutoResolve
   include ActiveModel::Model
 
-  attr_accessor :address_type, :address, :status, :rule_hits
+  attr_accessor :address_type, :address, :status, :rule_hits, :internal_comment
 
   ADDRESS_TYPE_IP           = 'IP'
   ADDRESS_TYPE_URI          = 'URI'
@@ -35,6 +35,11 @@ class AutoResolve
     STATUS_MALICIOUS == self.status
   end
 
+  def append_comment(str)
+    @internal_comment ||= ''
+    @internal_comment += str
+  end
+
   def good_mnem?(rule_hit)
     %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit.mnem)
   end
@@ -42,8 +47,14 @@ class AutoResolve
   # Checks our complaints system.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_complaints(rule_hits:)
-    if rule_hits&.any? && rule_hits.find{|rule_hit| good_mnem?(rule_hit)}
+    return unless rule_hits&.any?
+
+    good_mnems = rule_hits.select{|rule_hit| good_mnem?(rule_hit)}
+    if good_mnems.any?
       self.status = STATUS_NEW
+      append_comment("BLS positive hit(s): #{good_mnems.join(', ')}; ")
+    else
+      append_comment('BLS: -; ')
     end
   end
 
@@ -82,9 +93,17 @@ class AutoResolve
   def check_virus_total(address: self.address)
     result = call_virus_total(address: address)
     if result && result['scans']
-      scans = result['scans']
-      if virus_total_scan_names.find {|scan_key| scans[scan_key]['detected']}
+      all_scans = result['scans']
+      scan_results = virus_total_scan_names.map do |scan_key|
+        all_scans[scan_key].merge('name' => scan_key)
+      end
+      scan_hits = scan_results.select{|scan| scan[['detected']]}
+      if scan_hits.any?
         self.status = STATUS_MALICIOUS
+        hit_messages = scan_hits.map {|scan| "#{scan['name']}: #{scan['result']}"}
+        append_comment("#{hit_messages.join(', ')}; ")
+      else
+        append_comment('VT: -; ')
       end
     end
   end
@@ -120,6 +139,9 @@ class AutoResolve
       verdict = result[address]
       if 0 > verdict['status']
         self.status = STATUS_MALICIOUS
+        append_comment('Umbrella: malicious domain.; ')
+      else
+        append_comment('Umbrella: -; ')
       end
     end
   end
