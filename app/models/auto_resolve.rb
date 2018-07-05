@@ -63,6 +63,13 @@ class AutoResolve
   def call_virus_total(address: self.address)
     request = virus_total_request(address)
     response = HTTPI.get(request)
+    case
+      when 300 <= response.code
+        Rails.logger.error("Virus Total http response #{response.code}")
+        return nil
+      when 200 != response.code
+        Rails.logger.warning("Virus Total http response #{response.code}")
+    end
     JSON.parse(response.body)
   end
 
@@ -74,9 +81,11 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_virus_total(address: self.address)
     result = call_virus_total(address: address)
-    scans = result['scans']
-    if virus_total_scan_names.find {|scan_key| scans[scan_key]['detected']}
-      self.status = STATUS_MALICIOUS
+    if result && result['scans']
+      scans = result['scans']
+      if virus_total_scan_names.find {|scan_key| scans[scan_key]['detected']}
+        self.status = STATUS_MALICIOUS
+      end
     end
   end
 
@@ -93,6 +102,13 @@ class AutoResolve
   def call_umbrella(address: self.address)
     request = umbrella_request(address)
     response = HTTPI.post(request)
+    case
+      when 300 <= response.code
+        Rails.logger.error("Umbrella http response #{response.code}")
+        return nil
+      when 200 != response.code
+        Rails.logger.warning("Umbrella http response #{response.code}")
+    end
     JSON.parse(response.body)
   end
 
@@ -100,9 +116,11 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_umbrella(address: self.address)
     result = call_umbrella(address: address)
-    verdict = result[address]
-    if 0 > verdict['status']
-      self.status = STATUS_MALICIOUS
+    if result && result[address]
+      verdict = result[address]
+      if 0 > verdict['status']
+        self.status = STATUS_MALICIOUS
+      end
     end
   end
 
