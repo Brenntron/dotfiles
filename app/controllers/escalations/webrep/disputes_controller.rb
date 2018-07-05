@@ -23,6 +23,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def dashboard
   end
 
+  def research
+    @entries = DisputeEntry.all
+  end
+
   def tickets
   end
   
