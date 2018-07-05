@@ -51,13 +51,13 @@ class AutoResolve
     Rails.configuration.virus_total_api_key
   end
 
-  def virus_total_query_string(url_input)
-    "apikey=#{virus_total_api_key}&resource=#{url_input}"
+  def virus_total_query_string(address)
+    "apikey=#{virus_total_api_key}&resource=#{address}"
   end
 
-  def virus_total_request(url_input)
+  def virus_total_request(address)
     virus_total_url = 'https://www.virustotal.com/vtapi/v2/url/report'
-    @request = HTTPI::Request.new("#{virus_total_url}?#{virus_total_query_string(url_input)}")
+    @request = HTTPI::Request.new("#{virus_total_url}?#{virus_total_query_string(address)}")
     @request.ssl = true
     @request.auth.ssl.verify_mode = :peer
     @request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -84,10 +84,30 @@ class AutoResolve
     end
   end
 
+  def umbrella_request(address)
+    @request = HTTPI::Request.new('https://investigate.api.umbrella.com/domains/categorization/')
+    @request.ssl = true
+    @request.auth.ssl.verify_mode = :peer
+    @request.headers['Authorization'] = "Bearer redacted"
+    @request.headers['Content-Type'] = 'application/json'
+    @request.body = [ address ].to_json
+    @request
+  end
+
+  def call_umbrella(address: self.address)
+    request = umbrella_request(address)
+    response = HTTPI.post(request)
+    JSON.parse(response.body)
+  end
+
   # Checks the Umbrella system.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_umbrella
-
+  def check_umbrella(address: self.address)
+    result = call_umbrella(address: address)
+    verdict = result[address]
+    if 0 > verdict['status']
+      self.status = STATUS_MALICIOUS
+    end
   end
 
   # Checks the remote systems.
