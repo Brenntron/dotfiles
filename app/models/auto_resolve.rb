@@ -10,22 +10,27 @@ class AutoResolve
   STATUS_NEW                = 'NEW'
   STATUS_MALICIOUS          = 'MALICIOUS'
 
+  # @return (Boolean) true if address type is IP.
   def ip?
     ADDRESS_TYPE_IP == self.address_type
   end
 
+  # @return (Boolean) true if address type is a URL.
   def url?
     ADDRESS_TYPE_URI == self.address_type
   end
 
+  # @return (Boolean) true if address type is a DNS domain name.
   def domain?
     ADDRESS_TYPE_DOMAIN == self.address_type
   end
 
+  # @return [Boolean] true if auto resolve check is good and human needs to be in the loop.
   def new?
     STATUS_NEW == self.status
   end
 
+  # @return [Boolean] true if auto resolve check is bad and entry auto resolves to malicious.
   def malicious?
     STATUS_MALICIOUS == self.status
   end
@@ -34,6 +39,8 @@ class AutoResolve
     %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit.mnem)
   end
 
+  # Checks our complaints system.
+  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_complaints(rule_hits:)
     if rule_hits&.any? && rule_hits.find{|rule_hit| good_mnem?(rule_hit)}
       self.status = STATUS_NEW
@@ -67,6 +74,8 @@ class AutoResolve
     %w{Kaspersky Sophos Avira Google\ Safebrowsing BitDefender}
   end
 
+  # Checks the Virus Total system.
+  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_virus_total(url_input)
     scans = call_virus_total(url_input)['scans']
     if virus_total_scan_names.find {|scan_key| scans[scan_key]['detected']}
@@ -74,10 +83,14 @@ class AutoResolve
     end
   end
 
+  # Checks the Umbrella system.
+  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_umbrella
 
   end
 
+  # Checks the remote systems.
+  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_sources
     if Rails.configuration.check_complaints
       check_complaints(rule_hits: self.rule_hits)
