@@ -130,7 +130,7 @@ $ ->
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-          wlbl = $(entry_row).find('.entry-data-wlbl').text()
+
 
           show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
           show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
@@ -139,12 +139,19 @@ $ ->
           $(show_content[0]).text(entry_content)
           $(show_wbrs[0]).text(wbrs)
           wlbl_options = $(select_wlbl).find('option')
+
           $(wlbl_options).each ->
-            if $(this).val() == wlbl
-              console.log 'true'
+            debugger
+            option_value = $(this).val()
+            wlbl = $(entry_row).find('.entry-data-wlbl').text()
+            console.log(option_value)
+            console.log wlbl
+            if option_value == wlbl
+              console.log 'match'
+
             else
-              console.log $(this).val()
-#              $(this).attr('selected' true)
+              console.log 'false'
+#            wtf is going on 
 
     else
       alert ('No rows selected')
