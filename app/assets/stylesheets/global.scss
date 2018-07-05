@@ -4223,7 +4223,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: lighten($bug-section-color, 20%);
   font-size: 8pt;
   margin: 0 !important;
-  padding: 4px 8px 10px !important;
+  padding: 8px 8px 6px !important;
   border-radius: 0 4px 0 0;
 }
 
@@ -4672,6 +4672,10 @@ h5.entry-details-table-header {
 .resolution-comment-wrapper input[type='text'] {
   width: 100%;
   min-height: 40px;
+}
+
+#wlbl_adjust_entries {
+  margin-top: 0;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

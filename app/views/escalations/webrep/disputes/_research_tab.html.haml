@@ -13,12 +13,12 @@
           %span.toolbar-button-text Expand All Rows
         %button.toolbar-button.collapse-button#collapse-all-rows
           %span.toolbar-button-text Collapse All Rows
-        %span.dropdown
-          %button.toolbar-button.sort-by-button#sort-table-by{title: 'Sort Table By', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-            %span.toolbar-button-text Sort By
-          .dropdown-menu.toolbar-dropdown#sort_by_dropdown{'aria-labelledby': 'sort-table-by'}
-            Options to sort by go here.
-      -#      Add list of useful fields to sort by, category, entry content, reptool class, WL/BL, WBRS Score, SBRS Score
+        -#%span.dropdown
+        -#  %button.toolbar-button.sort-by-button#sort-table-by{title: 'Sort Table By', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        -#    %span.toolbar-button-text Sort By
+        -#  .dropdown-menu.toolbar-dropdown#sort_by_dropdown{'aria-labelledby': 'sort-table-by'}
+        -#    Options to sort by go here.
+        -#      Add this later: list of useful fields to sort by, category, entry content, reptool class, WL/BL, WBRS Score, SBRS Score
       %div
         %label.toolbar-section-label Edit
         %button.toolbar-button.edit-button#edit-dispute-entry-button
@@ -41,31 +41,32 @@
         %label.toolbar-section-label Reputation
         %span.dropdown
           %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-            %span.toolbar-button-text Adjust WBRS WL/BL
+            %span.toolbar-button-text Adjust WL/BL
           .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
             -#For each checked checkbox populate this information
             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
-              .dispute-name-wrapper
-                %label.content-label-sm Dispute
-                -#dispute name
-                paragon-downloads.com
-              %table.dispute_tool_current
-                %tr
-                  %td
-                    %label.content-label-sm Current Score
-                    -#= entry.wbrs_score
-                  %td
-                    %label.content-label-sm New Score
-                    %span.new_wbrs_score
-              .inline-tool-content-wrapper
-                .toolbar
-                  %div
-                    %label.toolbar-section-label{for:'wlbl-list-type-select'} WL/BL List
-                    = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                      {include_blank: 'Not on a List Currently'},
-                      class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                      title: 'RepTool Rule Status',
-                      id: "wlbl-list-type-select"
+              .dispute-wlbl-adjust-wrapper
+                .dispute-name-wrapper
+                  %label.content-label-sm Dispute
+                  %span.entry-dispute-name
+                %table.dispute_tool_current
+                  %tr
+                    %td
+                      %label.content-label-sm Current Score
+                      %span.current-wbrs-score
+                      -#= entry.wbrs_score
+                    %td
+                      %label.content-label-sm New Score
+                      %span.new_wbrs_score
+                .inline-tool-content-wrapper
+                  .toolbar
+                    %div
+                      %label.toolbar-section-label{for:'wlbl-list-type-select'} WL/BL List
+                      = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                        {include_blank: 'Not on a List Currently'},
+                        class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
+                        title: 'RepTool Rule Status',
+                        id: "wlbl-list-type-select"
 
                 %label.content-label-sm Comment
                 -#Comment boxes should only be shown after something other than the original settings is selected
@@ -139,7 +140,7 @@
                   %td
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td
-                    %span.entry-data
+                    %span.entry-data.entry-data-content
                       - unless entry[:ip_address].nil?
                         - entry_content = entry[:ip_address]
                       - unless entry[:uri].nil?
@@ -299,7 +300,8 @@
                           %span.research-table-input-wrapper.wbrs-input-wrapper
                             %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label WBRS
-                        %td.text-center= entry.wbrs_score
+                        %td.text-center.entry-data-wbrs-score
+                          = entry.wbrs_score
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
@@ -325,9 +327,9 @@
                           1
                         %td.left-bordered
                           %label WL/BL
-                        %td
+                        %td.entry-data-wlbl
                           -#WL/BL List
-                          WL Medium
+                          WL-med
                         %td.left-bordered
                           %label Referenced on
                         %td

@@ -122,6 +122,37 @@ $ ->
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
 
+#  Populating the Adjust WL/BL Button
+  $('#wlbl_entries_button').click ->
+    if ($('.dispute_check_box:checked').length > 0)
+      $('.dispute_check_box').each ->
+        if $(this).prop('checked')
+          entry_row = $(this).parents('.research-table-row')[0]
+          entry_content = $(entry_row).find('.entry-data-content').text()
+          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+          wlbl = $(entry_row).find('.entry-data-wlbl').text()
+
+          show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
+          show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
+          select_wlbl =  $('#wlbl_adjust_entries').find('#wlbl-list-type-select')
+
+          $(show_content[0]).text(entry_content)
+          $(show_wbrs[0]).text(wbrs)
+          wlbl_options = $(select_wlbl).find('option')
+          $(wlbl_options).each ->
+            if $(this).val() == wlbl
+              console.log 'true'
+            else
+              console.log $(this).val()
+#              $(this).attr('selected' true)
+
+    else
+      alert ('No rows selected')
+#      return false
+#        get values
+#        populate dropdown form
+
+
 
 # Show / hide the different research tables in the expanded row
   $('.research-row-checkbox').click ->
@@ -161,5 +192,3 @@ $ ->
         $(cl_table).show()
       else
         $(cl_table).hide()
-
-
