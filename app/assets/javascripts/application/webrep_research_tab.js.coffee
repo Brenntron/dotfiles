@@ -6,6 +6,7 @@ $ ->
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
+          $(entry_row).addClass('editing-row')
           editable_data = $(entry_row).find('.entry-data')
           input =  $(entry_row).find('.table-entry-input')
           $(editable_data).each ->
@@ -19,28 +20,45 @@ $ ->
 
 
   $('.cancel-changes').click ->
-    $('.table-entry-input').each ->
-      entry_wrapper = $(this).prev('.entry-data')
-      entry_data = $(entry_wrapper[0]).text()
-      unless $(this).val() == entry_data
-        $(this).val(entry_data)
+    $('.editing-row').each ->
+      editing_inputs = $(this).find('.table-entry-input')
+      $(editing_inputs).each ->
+        if $(this).attr('type') == 'text'
+          entry_wrapper = $(this).prev('.entry-data')
+          entry_data = $(entry_wrapper[0]).text()
+          new_data = $(this).val()
+          unless new_data == entry_data
+            new_data = entry_data
+          $(this).val(new_data)
+          $(entry_wrapper[0]).show()
+          $(this).hide()
 
-      $(entry_wrapper[0]).show()
-      $(this).hide()
+        else if $(this).is('button')
+          entry_parent = $(this).parent('.dropdown')
+          entry_wrapper = $(entry_parent).prev('.entry-data')
+          entry_data = $(entry_wrapper).text()
+          new_data = $(this).text()
+          unless new_data == entry_data
+            new_data = entry_data
+          $(this).text(new_data)
+          $(entry_wrapper[0]).show()
+          $(this).hide()
+      $(this).removeClass('editing-row')
+      $('.edit-entries-buttons').addClass('hidden')
 
-
-#   Need to add save function and cancel function after editing.
+#   Need to add save function after editing.
 
 #        After this is edited the user has to hit save, add a placeholder button for now above the table.
-#        When they hit save it should send the update to the ticket, populate everywhere / reload the page, and set the entry span to match
+#        When they hit save it should send the update to the ticket, populate everywhere / reload the page,
+#        and set the entry span to match the content of the input
 #
-  #
-  #   the content of the input
+
 
 # Inline Edit Button
   $('.inline-edit-entry-button').click ->
     edit_button = $(this)
     entry_row = $(this).parents('.research-table-row')[0]
+    $(entry_row).addClass('editing-row')
     editable_data = $(entry_row).find('.entry-data')
     input =  $(entry_row).find('.table-entry-input')
     $(editable_data).each ->

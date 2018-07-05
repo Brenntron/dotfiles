@@ -146,7 +146,7 @@
                         - entry_content = entry[:uri]
                       = entry_content
 
-                    %input.table-entry-input.wide{value: "#{entry_content}"}
+                    %input.table-entry-input.wide{type:'text', value: "#{entry_content}"}
                   %td
                     %label Category
                     - unless entry[:primary_category].nil?
