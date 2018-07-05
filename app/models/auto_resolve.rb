@@ -64,8 +64,8 @@ class AutoResolve
     @request
   end
 
-  def call_virus_total(url_input)
-    request = virus_total_request(url_input)
+  def call_virus_total(address: self.address)
+    request = virus_total_request(address)
     response = HTTPI.get(request)
     JSON.parse(response.body)
   end
@@ -76,8 +76,9 @@ class AutoResolve
 
   # Checks the Virus Total system.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_virus_total(url_input)
-    scans = call_virus_total(url_input)['scans']
+  def check_virus_total(address: self.address)
+    result = call_virus_total(address)
+    scans = result['scans']
     if virus_total_scan_names.find {|scan_key| scans[scan_key]['detected']}
       self.status = STATUS_MALICIOUS
     end
@@ -91,14 +92,14 @@ class AutoResolve
 
   # Checks the remote systems.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_sources
+  def check_sources(rule_hits:)
     if Rails.configuration.check_complaints
-      check_complaints(rule_hits: self.rule_hits)
+      check_complaints(rule_hits: rule_hits)
       return if self.status
     end
 
     if Rails.configuration.check_virus_total
-      check_virus_total(self.address)
+      check_virus_total
       return if self.status
     end
 
@@ -125,7 +126,7 @@ class AutoResolve
         end
 
     auto_resolve = new(address_type: address_type_attr, address: address, rule_hits: rule_hits)
-    auto_resolve.check_sources
+    auto_resolve.check_sources(rule_hits: rule_hits)
     auto_resolve
   end
 end
