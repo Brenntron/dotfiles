@@ -79,7 +79,7 @@ class AutoResolve
         Rails.logger.error("Virus Total http response #{response.code}")
         return nil
       when 200 != response.code
-        Rails.logger.warning("Virus Total http response #{response.code}")
+        Rails.logger.warn("Virus Total http response #{response.code}")
     end
     JSON.parse(response.body)
   end
@@ -128,7 +128,7 @@ class AutoResolve
         Rails.logger.error("Umbrella http response #{response.code}")
         return nil
       when 200 != response.code
-        Rails.logger.warning("Umbrella http response #{response.code}")
+        Rails.logger.warn("Umbrella http response #{response.code}")
     end
     JSON.parse(response.body)
   end
