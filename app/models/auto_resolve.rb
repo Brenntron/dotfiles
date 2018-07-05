@@ -31,7 +31,7 @@ class AutoResolve
   end
 
   def good_mnem?(rule_hit)
-    %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include(rule_hit.mnem)
+    %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit.mnem)
   end
 
   def check_complaints(rule_hits:)
