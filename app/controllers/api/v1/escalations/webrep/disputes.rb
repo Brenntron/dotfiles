@@ -61,7 +61,7 @@ module API
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
-                if dispute.assigned_to.nil?
+                if dispute.assignee == 'Unassigned'
                   dispute_packet[:assigned_to] = "<span class='missing-data'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me'></button>"
                 end
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
@@ -109,30 +109,28 @@ module API
 
             end
 
-            desc "Add a WL/BL entry"
+            desc "Adjust a WL/BL entry"
             params do
-              requires :urls, type: Array[String], desc: "urls"
+              requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
               requires :trgt_list, type: String, desc: "type of WL/BL"
               optional :thrt_cats, type: Array[String], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
             post "wlbl" do
-              wlbl_params = permitted_params.to_h.merge('usr' => current_user.cvs_username)
-              Wbrs::ManualWlbl.add_from_params(wlbl_params)
-              ''
+              Wbrs::ManualWlbl.adjust_from_params(permitted_params, username: current_user.cvs_username)
             end
 
-            desc "Add a Reptool Bl entry"
+            desc "Adjust a Reptool Bl entry"
             params do
-              requires :entries, type: Array[String], desc: "urls"
+              requires :action, type: String, desc: 'activate or expire'
+              requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+              #requires :entries, type: Array[String], desc: "urls"
               requires :classifications, type: Array[String], desc: "classifications"
               requires :comment, type: String, desc: "comment"
             end
             post "reptool_bl" do
-              reptool_bl_params = permitted_params.to_h.merge('author' => current_user.cvs_username)
-              blacklist = Wbrs::Blacklist.new(reptool_bl_params)
-              blacklist.save!
-              ''
+              RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+              true
             end
 
           end

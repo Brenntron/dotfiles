@@ -21,3 +21,67 @@
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
+/** This matches what is on the bootstrap website */
+.embed-responsive {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    /* Adding this */
+    height: auto;
+    /*margin-bottom: -25%;*/
+}
+
+.embed-responsive::before {
+    display: block;
+    content: "";
+    box-sizing: border-box;
+}
+
+.embed-responsive-1by1::before {
+    padding-top: 100%;
+}
+
+.webcat-iframe {
+    zoom: 0.71;
+    -moz-transform: scale(0.41);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.41);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.41);
+    -webkit-transform-origin: 0 0;
+    width: 240% !important;
+    height: 240% !important;
+}
+
+@media (min-width: 1226px) {
+    .webcat-iframe {
+        zoom: 0.71;
+        -moz-transform: scale(0.71);
+        -moz-transform-origin: 0 0;
+        -o-transform: scale(0.71);
+        -o-transform-origin: 0 0;
+        -webkit-transform: scale(0.71);
+        -webkit-transform-origin: 0 0;
+        width: 140% !important;
+    }
+}
+
+.preview-url{
+    text-align: center;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+#preview_window_header_p{
+    text-align: center;
+    font-size: .9em;
+    font-weight: 300;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.complaint_selected{
+    background-color: rgba(150, 220, 247, 0.39);
+}

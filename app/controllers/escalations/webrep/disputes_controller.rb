@@ -11,8 +11,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def show
     @dispute = Dispute.find(params[:id])
-    @entries = @dispute.dispute_entries
     @versioned_items = @dispute.compose_versioned_items
+
+    @entries = @dispute.dispute_entries
+    @entries.each { |entry| entry.blacklist(reload: true) }
   end
 
   def update
