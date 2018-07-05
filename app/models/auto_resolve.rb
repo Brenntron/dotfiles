@@ -41,7 +41,7 @@ class AutoResolve
   end
 
   def good_mnem?(rule_hit)
-    %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit.mnem)
+    %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit)
   end
 
   # Checks our complaints system.
@@ -191,13 +191,8 @@ class AutoResolve
   def entry_attributes
     {
         status: self.status,
-        resolution: '',
-        resolution_message: ''
-    }
-  end
-
-  def ti_status
-    {
+        resolution: malicious? ? 'Fixed -FN' : '',
+        resolution_message: malicious? ? 'This URI/IP has been deemed malicious, and has been blacklisted.' : ''
     }
   end
 end
