@@ -10,8 +10,11 @@ class Dispute < ApplicationRecord
   RESOLVED = 'resolved'
   ASSIGNED = 'assigned'
 
+  TI_NEW = 'pending'
+  TI_RESOLVED = 'resolved'
+
   def is_assigned?
-    (!self.user.nil? and !self.user.empty?)
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 
   def assignee
@@ -103,182 +106,217 @@ class Dispute < ApplicationRecord
   end
 
   def self.process_bridge_payload(message_payload)
-    user = User.where(cvs_username:"vrtincom").first
-    #TODO: this should be put in a params method
-    message_payload["payload"] = message_payload["payload"].permit!.to_h
-    new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
-    new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+    begin
+      ActiveRecord::Base.transaction do
 
-    return_payload = {}
+        user = User.where(cvs_username:"vrtincom").first
+        #TODO: this should be put in a params method
+        message_payload["payload"] = message_payload["payload"].permit!.to_h
+        new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
+        new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
 
+        return_payload = {}
 
-    #BIG TO DO:  RESEARCH!!!
-    #auto rep dispute resolution
-    #apparently there is logic we need to employ where cross referencing a URL
-    #with virustotal and umbrella/opendns for negative malicious based rulehits
-    #will be grounds for creating a new dispute case, resolving it, automated resolution message
-    #and setting appropriate entries into RepTool to adjust the reptuation...possibly RuleUI WL/BL as well?
-    #need to ask
+        #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
-    #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
+        bug_factory = Bugzilla::Bug.new(message_payload[:bugzilla_session])
 
-    bug_factory = Bugzilla::Bug.new(message_payload[:bugzilla_session])
+        summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-    summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+        full_description = %Q{
+          IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
+          URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
+          Problem Summary: #{message_payload["payload"]["problem"]}
+        }
 
-    full_description = %Q{
-      IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
-      URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
-      Problem Summary: #{message_payload["payload"]["problem"]}
-    }
+        bug_attrs = {
+            'product' => 'Escalations',
+            'component' => 'IP/Domain',
+            'summary' => summary,
+            'version' => 'unspecified', #self.version,
+            'description' => full_description,
+            # 'opsys' => self.os,
+            'priority' => 'Unspecified',
+            'classification' => 'unclassified',
+        }
 
-    bug_attrs = {
-        'product' => 'Escalations',
-        'component' => 'IP/Domain',
-        'summary' => summary,
-        'version' => 'unspecified', #self.version,
-        'description' => full_description,
-        # 'opsys' => self.os,
-        'priority' => 'Unspecified',
-        'classification' => 'unclassified',
-    }
+        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
 
-    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
+        new_dispute = Dispute.new
+        new_dispute.submission_type = message_payload["payload"]["submission_type"]
+        new_dispute.id = bug_stub_hash["id"]
+        new_dispute.user_id = user.id
+        new_dispute.customer_name = message_payload["payload"]["name"]
+        new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
+        new_dispute.customer_email = message_payload["payload"]["email"]
+        new_dispute.org_domain = message_payload["payload"]["domain"]
+        new_dispute.case_opened_at = Time.now
+        new_dispute.subject = message_payload["payload"]["email_subject"]
+        new_dispute.description = message_payload["payload"]["email_body"]
+        new_dispute.problem_summary = message_payload["payload"]["problem"]
+        new_dispute.ticket_source_key = message_payload["source_key"]
+        new_dispute.ticket_source = "talos-intelligence"
+        new_dispute.ticket_source_type = message_payload["source_type"]
+        new_dispute.submission_type = message_payload["submission_type"]  # email, web, both  [e|w|ew]
 
-    new_dispute = Dispute.new
-    new_dispute.submission_type = message_payload["payload"]["submission_type"]
-    new_dispute.id = bug_stub_hash["id"]
-    new_dispute.user_id = user.id
-    new_dispute.customer_name = message_payload["payload"]["name"]
-    new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
-    new_dispute.customer_email = message_payload["payload"]["email"]
-    new_dispute.org_domain = message_payload["payload"]["domain"]
-    new_dispute.case_opened_at = Time.now
-    new_dispute.subject = message_payload["payload"]["email_subject"]
-    new_dispute.description = message_payload["payload"]["email_body"]
-    new_dispute.problem_summary = message_payload["payload"]["problem"]
-    new_dispute.ticket_source_key = message_payload["source_key"]
-    new_dispute.ticket_source = "talos-intelligence"
-    new_dispute.ticket_source_type = message_payload["source_type"]
-    new_dispute.submission_type = message_payload["submission_type"]  # email, web, both  [e|w|ew]
+        new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
 
-    new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
+        new_dispute.save
 
-    new_dispute.save
+        #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
+        #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
 
-    #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
-    #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
+        new_entries_ips.each do |key, entry|
 
-    new_entries_ips.each do |key, entry|
+          wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          sbrs_hits = entry["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
 
-      #this is for return back to TI to populate its ticket show pages
-      new_payload_item = {}
-      new_payload_item[:sugg_type] = entry["rep_sugg"]
-      new_payload_item[:status] = "pending"
-      new_payload_item[:resolution_message] = ""
-      new_payload_item[:resolution] = ""
-      new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
-      return_payload[key] = new_payload_item
+          total_hits = (wbrs_hits + sbrs_hits).uniq
+          resolve_args = {}
+          resolve_args[:url] = key
+          resolve_args[:rules] = total_hits
 
-      new_dispute_entry = DisputeEntry.new
-      new_dispute_entry.dispute_id = new_dispute.id
-      new_dispute_entry.ip_address = key
-      new_dispute_entry.entry_type = "IP"
-      #new_dispute_entry.score_type = "SBRS"
-      #new_dispute_entry.score = entry["SBRS_SCORE"].to_f
-      new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"]
-      new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] 
-      new_dispute_entry.suggested_disposition = entry["rep_sugg"]
-      new_dispute_entry.save
+          #auto_resolve_verdict = AutoResolve.new(resolve_args)
 
-      if entry[:sbrs]["SBRS_Rule_Hits"].present?
-        all_hits = entry["SBRS_Rule_Hits"].split(",")
-        all_hits.each do |rule_hit|
-          new_rule_hit = DisputeRuleHit.new
-          new_rule_hit.dispute_entry_id = new_dispute_entry.id
-          new_rule_hit.name = rule_hit.strip
-          new_rule_hit.rule_type = "sbrs"
-          new_rule_hit.save
+          #this is for return back to TI to populate its ticket show pages
+          new_payload_item = {}
+          new_payload_item[:sugg_type] = entry["rep_sugg"]
+          new_payload_item[:status] = auto_resolve_verdict.ti_status
+          #new_payload_item[:resolution_message] = auto_resolve_verdict.resolution_message
+          #new_payload_item[:resolution] = auto_resolve_verdict.resolution
+          #new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
+          return_payload[key] = new_payload_item
+
+          new_dispute_entry = DisputeEntry.new
+          new_dispute_entry.dispute_id = new_dispute.id
+          new_dispute_entry.ip_address = key
+          new_dispute_entry.entry_type = "IP"
+          new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"]
+          new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
+          new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+
+          #new_dispute_entry.status = auto_resolve_verdict.status
+          #new_dispute_entry.resolution = auto_resolve_verdict.resolution
+          #new_dispute_entry.resolution = auto_resolve_verdict.resolution_message
+
+          new_dispute_entry.save
+
+          if entry[:sbrs]["SBRS_Rule_Hits"].present?
+            all_hits = entry["SBRS_Rule_Hits"].split(",")
+            all_hits.each do |rule_hit|
+              new_rule_hit = DisputeRuleHit.new
+              new_rule_hit.dispute_entry_id = new_dispute_entry.id
+              new_rule_hit.name = rule_hit.strip
+              new_rule_hit.rule_type = "sbrs"
+              new_rule_hit.save
+            end
+          end
+          if entry[:sbrs]["WBRS_Rule_Hits"].present?
+            all_hits = entry["WBRS_Rule_Hits"].split(",")
+            all_hits.each do |rule_hit|
+              new_rule_hit = DisputeRuleHit.new
+              new_rule_hit.dispute_entry_id = new_dispute_entry.id
+              new_rule_hit.name = rule_hit.strip
+              new_rule_hit.rule_type = "wbrs"
+              new_rule_hit.save
+            end
+          end
+
         end
-      end
-      if entry[:sbrs]["WBRS_Rule_Hits"].present?
-        all_hits = entry["WBRS_Rule_Hits"].split(",")
-        all_hits.each do |rule_hit|
-          new_rule_hit = DisputeRuleHit.new
-          new_rule_hit.dispute_entry_id = new_dispute_entry.id
-          new_rule_hit.name = rule_hit.strip
-          new_rule_hit.rule_type = "wbrs"
-          new_rule_hit.save
-        end
-      end
 
+        new_entries_urls.each do |key, entry|
+
+          #this is for return back to TI to populate its ticket show pages
+
+          wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          sbrs_hits = entry["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+
+          total_hits = (wbrs_hits + sbrs_hits).uniq
+          resolve_args = {}
+          resolve_args[:url] = key
+          resolve_args[:rules] = total_hits
+
+          #auto_resolve_verdict = AutoResolve.new(resolve_args)
+
+          url_parts = Dispute.parse_url(key)
+          new_dispute_entry = DisputeEntry.new
+          new_dispute_entry.dispute_id = new_dispute.id
+          new_dispute_entry.uri = key
+          new_dispute_entry.wbrs_score = entry["wbrs_score"]
+          new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+          new_dispute_entry.subdomain = url_parts[:subdomain]
+          new_dispute_entry.domain = url_parts[:domain]
+          new_dispute_entry.path = url_parts[:path]
+          new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
+          new_dispute_entry.entry_type = "URI/DOMAIN"
+
+          #new_dispute_entry.status = auto_resolve_verdict.status
+          #new_dispute_entry.resolution = auto_resolve_verdict.resolution
+          #new_dispute_entry.resolution = auto_resolve_verdict.resolution_message
+
+          new_dispute_entry.save
+
+          new_payload_item = {}
+          new_payload_item[:sugg_type] = entry["rep_sugg"]
+          #new_payload_item[:status] = auto_resolve_verdict.ti_status
+          #new_payload_item[:resolution_message] = auto_resolve_verdict.resolution_message
+          #new_payload_item[:resolution] = auto_resolve_verdict.resolution
+          new_payload_item[:company_dup] = is_possible_company_duplicate(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
+          return_payload[key] = new_payload_item
+
+          if entry["WBRS_Rule_Hits"].present?
+            all_hits = entry["WBRS_Rule_Hits"].split(",")
+            all_hits.each do |rule_hit|
+              new_rule_hit = DisputeRuleHit.new
+              new_rule_hit.dispute_entry_id = new_dispute_entry.id
+              new_rule_hit.name = rule_hit.strip
+              new_rule_hit.save
+            end
+          end
+
+        end
+
+
+        #build first official email of the new case
+
+        first_email = DisputeEmail.new
+        first_email.dispute_id = new_dispute.id
+        first_email.email_headers = nil
+        first_email.from = message_payload["payload"]["email"]
+        first_email.to = nil
+        first_email.subject = message_payload["payload"]["email_subject"]
+        first_email.body = message_payload["payload"]["email_body"]
+        first_email.status = DisputeEmail::UNREAD
+        first_email.save
+
+
+        case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
+        #change this
+        return {
+          "envelope":
+              {
+                  "channel": "ticket-acknowledge",
+                  "addressee": "talos-intelligence",
+                  "sender": "analyst-console"
+              },
+          "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": case_email}
+        }
+      end
+    rescue Exception => e
+
+      Rails.logger.error "Dispute failed to save, backing out all DB changes."
+      Rails.logger.error $!
+      Rails.logger.error $!.backtrace.join("\n")
+      return {
+          "envelope":
+              {
+                  "channel": "ticket-acknowledge",
+                  "addressee": "talos-intelligence",
+                  "sender": "analyst-console"
+              },
+          "message": {"source_key":params["source_key"],"ac_status":"SEND_FAILED" }
+      }
     end
-
-    new_entries_urls.each do |key, entry|
-
-      #this is for return back to TI to populate its ticket show pages
-
-
-
-      url_parts = Dispute.parse_url(key)
-      new_dispute_entry = DisputeEntry.new
-      new_dispute_entry.dispute_id = new_dispute.id
-      new_dispute_entry.uri = key
-      new_dispute_entry.wbrs_score = entry["wbrs_score"]
-      new_dispute_entry.sbrs_score = entry["sbrs_score"]
-      new_dispute_entry.suggested_disposition = entry["rep_sugg"]
-      new_dispute_entry.subdomain = url_parts[:subdomain]
-      new_dispute_entry.domain = url_parts[:domain]
-      new_dispute_entry.path = url_parts[:path]
-      new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
-      new_dispute_entry.entry_type = "URI/DOMAIN"
-      new_dispute_entry.save
-
-      new_payload_item = {}
-      new_payload_item[:sugg_type] = entry["rep_sugg"]
-      new_payload_item[:status] = "pending"
-      new_payload_item[:resolution_message] = ""
-      new_payload_item[:resolution] = ""
-      new_payload_item[:company_dup] = is_possible_company_duplicate(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
-      return_payload[key] = new_payload_item
-
-      if entry["WBRS_Rule_Hits"].present?
-        all_hits = entry["WBRS_Rule_Hits"].split(",")
-        all_hits.each do |rule_hit|
-          new_rule_hit = DisputeRuleHit.new
-          new_rule_hit.dispute_entry_id = new_dispute_entry.id
-          new_rule_hit.name = rule_hit.strip
-          new_rule_hit.save
-        end
-      end
-
-    end
-
-
-    #build first official email of the new case
-
-    first_email = DisputeEmail.new
-    first_email.dispute_id = new_dispute.id
-    first_email.email_headers = nil
-    first_email.from = message_payload["payload"]["email"]
-    first_email.to = nil
-    first_email.subject = message_payload["payload"]["email_subject"]
-    first_email.body = message_payload["payload"]["email_body"]
-    first_email.status = DisputeEmail::UNREAD
-    first_email.save
-
-
-    case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
-    #change this
-    return_message = {
-      "envelope":
-          {
-              "channel": "ticket-acknowledge",
-              "addressee": "talos-intelligence",
-              "sender": "analyst-console"
-          },
-      "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": case_email}
-    }
   end
 
   # Searches based on supplied fields and values.
