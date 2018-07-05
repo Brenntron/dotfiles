@@ -1,5 +1,5 @@
 class AutoResolve
-  include ActiveModel
+  include ActiveModel::Model
 
   attr_accessor :address_type, :address, :status, :rule_hits
 
@@ -47,21 +47,17 @@ class AutoResolve
     end
   end
 
-  def virus_total_api_key
-    Rails.configuration.virus_total_api_key
-  end
-
   def virus_total_query_string(address)
-    "apikey=#{virus_total_api_key}&resource=#{address}"
+    "apikey=#{Rails.configuration.virus_total.api_key}&resource=#{address}"
   end
 
   def virus_total_request(address)
-    virus_total_url = 'https://www.virustotal.com/vtapi/v2/url/report'
-    @request = HTTPI::Request.new("#{virus_total_url}?#{virus_total_query_string(address)}")
-    @request.ssl = true
-    @request.auth.ssl.verify_mode = :peer
-    @request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    @request
+    full_url = "#{Rails.configuration.virus_total.url}?#{virus_total_query_string(address)}"
+    request = HTTPI::Request.new(full_url)
+    request.ssl = true
+    request.auth.ssl.verify_mode = :peer
+    request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    request
   end
 
   def call_virus_total(address: self.address)
@@ -77,7 +73,7 @@ class AutoResolve
   # Checks the Virus Total system.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_virus_total(address: self.address)
-    result = call_virus_total(address)
+    result = call_virus_total(address: address)
     scans = result['scans']
     if virus_total_scan_names.find {|scan_key| scans[scan_key]['detected']}
       self.status = STATUS_MALICIOUS
@@ -85,13 +81,13 @@ class AutoResolve
   end
 
   def umbrella_request(address)
-    @request = HTTPI::Request.new('https://investigate.api.umbrella.com/domains/categorization/')
-    @request.ssl = true
-    @request.auth.ssl.verify_mode = :peer
-    @request.headers['Authorization'] = "Bearer redacted"
-    @request.headers['Content-Type'] = 'application/json'
-    @request.body = [ address ].to_json
-    @request
+    request = HTTPI::Request.new(Rails.configuration.umbrella.url)
+    request.ssl = true
+    request.auth.ssl.verify_mode = :peer
+    request.headers['Authorization'] = "Bearer #{Rails.configuration.umbrella.api_key}"
+    request.headers['Content-Type'] = 'application/json'
+    request.body = [ address ].to_json
+    request
   end
 
   def call_umbrella(address: self.address)
@@ -113,17 +109,17 @@ class AutoResolve
   # Checks the remote systems.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_sources(rule_hits:)
-    if Rails.configuration.check_complaints
+    if Rails.configuration.complaints.check
       check_complaints(rule_hits: rule_hits)
       return if self.status
     end
 
-    if Rails.configuration.check_virus_total
+    if Rails.configuration.virus_total.check
       check_virus_total
       return if self.status
     end
 
-    if Rails.configuration.check_umbrella
+    if Rails.configuration.umbrella.check
       check_umbrella
       return if self.status
     end

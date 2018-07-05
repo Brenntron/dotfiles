@@ -2,10 +2,16 @@ development:
   amq: #active message queue
     host: "localhost"
   auto_resolve:
-    check_complaints: true
-    check_virus_total: true
-    check_umbrella: true
-    virus_total_api_key: "redacted"
+    complaints:
+      check: true
+    virus_total:
+      check: true
+      url: "https://www.virustotal.com/vtapi/v2/url/report"
+      api_key: "redacted"
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
@@ -82,9 +88,16 @@ test:
   amq: #active message queue
     host: "localhost"
   auto_resolve:
-    complaint_check: true
-    virus_total_check: true
-    umbrella_check: true
+    complaints:
+      check: true
+    virus_total:
+      check: true
+      url: "https://www.virustotal.com/vtapi/v2/url/report"
+      api_key: "redacted"
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
@@ -160,9 +173,16 @@ staging:
   amq: #active message queue
     host: "fmd-actmq-01stg.vrt.sourcefire.com"
   auto_resolve:
-    complaint_check: true
-    virus_total_check: true
-    umbrella_check: true
+    complaints:
+      check: true
+    virus_total:
+      check: true
+      url: "https://www.virustotal.com/vtapi/v2/url/report"
+      api_key: "redacted"
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
@@ -224,9 +244,16 @@ production:
   amq: #active message queue
     host: "mq.vrt.sourcefire.com"
   auto_resolve:
-    complaint_check: true
-    virus_total_check: true
-    umbrella_check: true
+    complaints:
+      check: true
+    virus_total:
+      check: true
+      url: "https://www.virustotal.com/vtapi/v2/url/report"
+      api_key: "redacted"
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
   cert:
