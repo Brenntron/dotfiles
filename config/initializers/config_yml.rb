@@ -7,6 +7,37 @@ raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
 
+auto_resolve = env_config.fetch('auto_resolve', {})
+
+complaints                              = OpenStruct.new
+if auto_resolve['complaints']
+  complaints.check                      = auto_resolve['complaints']['check']
+else
+  complaints.check                      = false
+end
+Rails.configuration.complaints          = complaints
+
+virus_total                             = OpenStruct.new
+if auto_resolve['virus_total']
+  virus_total.check                     = auto_resolve['virus_total']['check']
+  virus_total.url                       = auto_resolve['virus_total']['url']
+  virus_total.api_key                   = auto_resolve['virus_total']['api_key']
+else
+  virus_total.check                     = false
+end
+Rails.configuration.virus_total         = virus_total
+
+umbrella                                = OpenStruct.new
+if auto_resolve['umbrella']
+  umbrella.check                        = auto_resolve['umbrella']['check']
+  umbrella.url                          = auto_resolve['umbrella']['url']
+  umbrella.api_key                      = auto_resolve['umbrella']['api_key']
+else
+  umbrella.check                        = false
+end
+Rails.configuration.umbrella            = umbrella
+
+
 
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
 Rails.configuration.bugzilla_host       = ENV['Bugzilla_host']   || env_config['bugzilla']['host']
