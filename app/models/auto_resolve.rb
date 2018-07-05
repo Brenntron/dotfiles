@@ -16,7 +16,7 @@ class AutoResolve
   end
 
   # @return (Boolean) true if address type is a URL.
-  def url?
+  def uri?
     ADDRESS_TYPE_URI == self.address_type
   end
 
@@ -95,9 +95,11 @@ class AutoResolve
     if result && result['scans']
       all_scans = result['scans']
       scan_results = virus_total_scan_names.map do |scan_key|
-        all_scans[scan_key].merge('name' => scan_key)
+        all_scans[scan_key]&.merge('name' => scan_key)
       end
-      scan_hits = scan_results.select{|scan| scan[['detected']]}
+      scan_hits = scan_results.select do |scan|
+        scan && scan['detected']
+      end
       if scan_hits.any?
         self.status = STATUS_MALICIOUS
         hit_messages = scan_hits.map {|scan| "#{scan['name']}: #{scan['result']}"}
@@ -172,10 +174,10 @@ class AutoResolve
   # @param [Array<TBD>] rule_hits: collection of our rule hits
   def self.create_from_payload(address_type:, address:, rule_hits: nil)
     address_type_attr =
-        case address_type
-          when 'IP'
+        case
+          when 'IP' == address_type
             ADDRESS_TYPE_IP
-          when /\A[[:alpha:]]+:/
+          when /\A[[:alpha:]]+:/ =~ address
             ADDRESS_TYPE_URI
           else
             ADDRESS_TYPE_DOMAIN
