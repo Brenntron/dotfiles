@@ -241,14 +241,15 @@
                           %label XBRS History
                         %td.text-center
                           -#Number of xbrs results
-                          1
+                          - unless entry.hostlookup.nil?
+                            = entry.find_xbrs[1]['data'].count
                         %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label Virus Total
                         %td.text-center
                           -#Total hits on Virus Total
-                          1
+                          = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                         %td.left-bordered
                           %label WL/BL
                         %td
@@ -280,7 +281,7 @@
                           %label Crosslisted URLs
                         %td.text-center
                           -#Number of url results
-                          1
+                          = entry.wbrs_xlist.count
                         %td.input-offset.left-bordered
                           %label Umbrella
                         %td.text-center
@@ -368,7 +369,7 @@
                                   - entry.find_xbrs[1]['legend'].each do |header|
                                     %th= header
                               %tbody
-                                - unless entry.uri.nil?
+                                - unless entry.hostlookup.nil?
                                   - entry.find_xbrs[1]['data'].each do |data|
                                     %tr
                                       - data.each do |datapoint|
