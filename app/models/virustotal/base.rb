@@ -31,7 +31,7 @@ class Virustotal::Base
     request = HTTPI::Request.new("https://#{host}:#{port}#{path}&apikey=#{api_key}")
 
     request.ssl = true
-    request.auth.ssl.verify_mode = :none
+    request.auth.ssl.verify_mode = :peer
 
     request
   end
