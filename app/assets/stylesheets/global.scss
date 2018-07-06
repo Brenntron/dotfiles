@@ -4507,12 +4507,14 @@ td.left-bordered {
 .entry-details-table table > thead > tr > th {
   border-bottom: 1px solid $table-dark-header;
   font-weight: 600;
+  padding: 8px;
 }
 
 .entry-details-table table > tbody > tr > td {
   border-bottom: none;
   font-size: 8pt;
   font-weight: 300;
+  padding: 6px 8px;
 }
 
 h5.entry-details-table-header {
@@ -4540,11 +4542,18 @@ td.data-table-emph {
   width: 100% !important;
 }
 
-.expanded-row-data-wrapper .missing-data {
+.entry-details-table .missing-data {
   color: $faint-neutral-color;
   font-weight: 300;
   text-transform: none;
 }
+
+.dataTables_scrollBody th {
+  padding: 0 !important;
+  height: 0 !important;
+}
+
+.entry-details-table
 
 .clean-site-result {
   width: 45%;

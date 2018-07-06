@@ -363,17 +363,25 @@
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header XBRS History
-                            %table
-                              %thead
-                                %tr
-                                  - entry.find_xbrs[1]['legend'].each do |header|
-                                    %th= header
-                              %tbody
-                                - unless entry.hostlookup.nil?
-                                  - entry.find_xbrs[1]['data'].each do |data|
-                                    %tr
-                                      - data.each do |datapoint|
-                                        %td= datapoint
+                            - if entry.find_xbrs[1]['legend'].empty?
+                              %table
+                                %thead
+                                  %tr
+                                    %th
+                                      %span.missing-data
+                                        No XBRS data available.
+                            - else
+                              %table.table-scrollable
+                                %thead
+                                  %tr
+                                    - entry.find_xbrs[1]['legend'].each do |header|
+                                      %th= header
+                                %tbody
+                                  - unless entry.hostlookup.nil?
+                                    - entry.find_xbrs[1]['data'].each do |data|
+                                      %tr
+                                        - data.each do |datapoint|
+                                          %td= datapoint
 
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Cross-listed URLs
