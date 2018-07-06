@@ -134,7 +134,7 @@ class RepApi::Base
   def self.call_json_request(method, path, body:)
     request = new_request(path)
 
-    request.headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
+    request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     request.body =
         case body
           when Hash

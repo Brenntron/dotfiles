@@ -4527,12 +4527,14 @@ td.left-bordered {
 .entry-details-table table > thead > tr > th {
   border-bottom: 1px solid $table-dark-header;
   font-weight: 600;
+  padding: 8px;
 }
 
 .entry-details-table table > tbody > tr > td {
   border-bottom: none;
   font-size: 8pt;
   font-weight: 300;
+  padding: 6px 8px;
 }
 
 h5.entry-details-table-header {
@@ -4677,6 +4679,51 @@ h5.entry-details-table-header {
 #wlbl_adjust_entries {
   margin-top: 0;
 }
+
+td.data-table-emph {
+  font-weight: 500 !important;
+}
+
+.dataTables_scrollHeadInner {
+  width: 100% !important;
+}
+
+.entry-details-table .missing-data {
+  color: $faint-neutral-color;
+  font-weight: 300;
+  text-transform: none;
+}
+
+.dataTables_scrollBody th {
+  padding: 0 !important;
+  height: 0 !important;
+}
+
+.entry-details-table
+
+.clean-site-result {
+  width: 45%;
+}
+
+.clean-site-result::before, .unrated-site-result::before, .unclean-site-result::before  {
+  content: '';
+  display: block;
+  float: left;
+  margin-right: 8px;
+  width: 14px;
+  height: 14px;
+  background-color: $table-dark-header;
+  border-radius: 7px;
+  background-repeat: no-repeat;
+  background-size: 14px;
+  background-position: center center;
+}
+
+.clean-site-result::before   { background-image: url(image_path('icon_success_check.svg'));}
+.unrated-site-result::before { background-image: url(image_path('icon_unrated.svg'));}
+.unclean-site-result::before { background-image: url(image_path('icon_unclean.svg'));}
+
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 

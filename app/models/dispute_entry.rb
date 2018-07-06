@@ -41,4 +41,16 @@ class DisputeEntry < ApplicationRecord
   def wbrs_xlist
     Wbrs::ManualWlbl.where(url: hostlookup)
   end
+
+  def virustotals
+    scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
+    cleandata = Array.new
+    unless scans.nil?
+      scans.each do |s|
+        item = {:name => s[0], :result => s[1]["result"]}
+        cleandata << item
+      end
+    end
+    cleandata
+  end
 end
