@@ -2,7 +2,7 @@
   .reputation-research-search-wrapper
     %h1 Reputation Research
     = form_tag('/tickets', method: :get) do
-      = text_field_tag 'result[id]', "#{}", class: 'search-box', placeholder: 'Reputation Entry Search'
+      = text_field_tag 'result[id]', "#{}", class: 'search-box', placeholder: 'Reputation Entry Search', autofocus: 'true'
 
 
   .row

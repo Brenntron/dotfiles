@@ -24,6 +24,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def research
+    # This is temporary till we get the searched hooked up
     @entries = DisputeEntry.all
   end
 
