@@ -363,7 +363,7 @@
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header XBRS History
-                            - if entry.find_xbrs[1]['legend'].empty?
+                            - if entry.find_xbrs[1]['data'].empty?
                               %table
                                 %thead
                                   %tr
