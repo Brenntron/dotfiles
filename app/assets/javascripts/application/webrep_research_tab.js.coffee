@@ -76,4 +76,12 @@ $ ->
       else
         $(cl_table).hide()
 
-
+# Scrollable tables in the expanded rows
+  $('.table-scrollable').DataTable({
+    scrollY: 200,
+#    scrollCollapse: true,
+    paging: false,
+    searching: false,
+    ordering: false,
+    info: false
+  });

@@ -335,16 +335,29 @@
                                       -#Put weight of rule here
                           .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Virus Total Details
-                            %table
-                              %thead
-                                %tr
-                                  %th AV Vendor
-                                  %th Results
-                              %tbody
-                                - entry.virustotals.each do |virustotal|
+                            - if entry.virustotals.empty?
+                              %table
+                                %thead
                                   %tr
-                                    %td= virustotal[:name]
-                                    %td= virustotal[:result]
+                                    %th
+                                      %span.missing-data
+                                        No Virus Total data available.
+                            - else
+                              %table.table-scrollable
+                                %thead
+                                  %tr
+                                    %th AV Vendor
+                                    %th Results
+                                %tbody
+                                  - entry.virustotals.each do |virustotal|
+                                    %tr
+                                      %td.data-table-emph= virustotal[:name]
+                                      - if virustotal[:result] == 'clean site'
+                                        %td.clean-site-result Clean
+                                      - elsif virustotal[:result] == 'unrated site'
+                                        %td.unrated-site-result Unrated
+                                      - else
+                                        %td.unclean-site-result= virustotal[:result]
                         -#Put weight of rule here
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
