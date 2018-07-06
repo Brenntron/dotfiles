@@ -121,4 +121,11 @@ Rails.configuration.xbrs.port           = xbrs_config['port']
 Rails.configuration.xbrs.verify_mode    = xbrs_config['verify_mode']
 Rails.configuration.xbrs.gssnegotiate   = xbrs_config['gssnegotiate']
 
+virustotal = env_config.fetch('virustotal', {})
+Rails.configuration.virustotal          = OpenStruct.new
+Rails.configuration.virustotal.host     = virustotal['host']
+Rails.configuration.virustotal.port     = virustotal['port']
+Rails.configuration.virustotal.api_key  = virustotal['api_key']
+
+
 
