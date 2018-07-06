@@ -10,10 +10,15 @@
       %h4 Entry Results
       #research-page-toolbar.toolbar
         %div
+          %label.toolbar-section-label Table View
+          %button.toolbar-button.expand-row-button#expand-all-rows
+            %span.toolbar-button-text Expand All Rows
+          %button.toolbar-button.collapse-button#collapse-all-rows
+            %span.toolbar-button-text Collapse All Rows
+        %div
           %label.toolbar-section-label Edit
           %button.toolbar-button.edit-button#add-entry-to-ticket
             %span.toolbar-button-text Add to Ticket
-
           %span.dropdown
             %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust WBRS WL/BL
@@ -41,8 +46,6 @@
                         - unless entry[:uri].nil?
                           - entry_content = entry[:uri]
                         = entry_content
-
-                      %input.table-entry-input.wide{value: "#{entry_content}"}
                     %td
                       %label Category
                       - unless entry[:primary_category].nil?
@@ -53,73 +56,9 @@
                       %label Hostname
                       - unless entry[:hostname].nil?
                         = entry[:hostname]
-                    %td
-                      %label Status
-                      %span.entry-data
-                        -#- unless entry[:status].nil?
-                        -#  = entry[:status]
-                        New
-                      -# Temporarily putting manual status entries in here
-                      %span.dropdown
-                        %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                          -#Current entry status here
-                          New
-                        .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
-                          %ul
-                            %li.status-radio-wrapper
-                              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Researching'}
-                              %label.radio-label{for: 'Researching'} Researching
-                            %li.status-radio-wrapper
-                              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Escalated'}
-                              %label.radio-label{for: 'Escalated'} Escalated
-                            %li.status-radio-wrapper
-                              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Customer-Pending'}
-                              %label.radio-label{for: 'Customer-Pending'} Customer Pending
-                            %li.status-radio-wrapper
-                              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'On-Hold'}
-                              %label.radio-label{for: 'On-Hold'} On Hold
-                            %li.status-radio-wrapper
-                              %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'Resolved-Closed'}
-                              %label.radio-label{for: 'Resolved-Closed'} Resolved / Closed
-                              .dropdown-menu.ticket-resolution-submenu
-                                .col-xs-6.submenu-left-wrapper
-                                  .submenu-header
-                                    Ticket Resolution
-                                  %ul
-                                    %li
-                                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FP'}
-                                      %label.radio-label{for: 'Fixed-FP'} Fixed - FP
-                                    %li
-                                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FN'}
-                                      %label.radio-label{for: 'Fixed-FN'} Fixed - FN
-                                    %li
-                                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Unchanged'}
-                                      %label.radio-label{for: 'Unchanged'} Unchanged
-                                    %li
-                                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Invalid'}
-                                      %label.radio-label{for: 'Invalid'} Invalid / Junk Mail
-                                    %li
-                                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Test-Training'}
-                                      %label.radio-label{for: 'Test-Training'} Test / Training
-                                    %li
-                                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Other'}
-                                      %label.radio-label{for: 'Other'} Other
-                                .col-xs-6.submenu-right-wrapper
-                                  .resolution-comment-wrapper
-                                    %label.content-label-sm
-                                      Comment
-                                    %textarea
-                                    %button.primary
-                                      Submit
-
-                            %li.status-radio-wrapper
-                              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Re-Opened'}
-                              %label.radio-label{for: 'Re-Opened'} Re-Opened
-
 
                     %td.dispute_rep_tools
                       %span.dispute_rep_tools_wrapper
-                        %button.dispute-inline-buttons.edit-button.inline-edit-entry-button{'data-entry-id': "#{entry.id}"}
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                           .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
@@ -138,12 +77,12 @@
                                 .toolbar
                                   %div
                                     %label.toolbar-section-label{for: "entry-#{entry.id}-wlbl-list-type-select"} WL/BL List
-                                    -#= wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                                    -#   {selected: entry.wbrs_list_type,
-                                    -#     include_blank: 'Not on a List Currently'},
-                                    -#   class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                                    -#   title: 'RepTool Rule Status',
-                                    -#   id: "entry-#{entry.id}-wlbl-list-type-select"
+                                    = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                                       {selected: entry.wbrs_list_type,
+                                         include_blank: 'Not on a List Currently'},
+                                       class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
+                                       title: 'RepTool Rule Status',
+                                       id: "entry-#{entry.id}-wlbl-list-type-select"
 
 
                                 %label.content-label-sm Comment
@@ -154,33 +93,33 @@
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                           .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                             -#= form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
-                            -#  %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
-                            -#  %h3 Adjust RepTool BL
-                            -#  %table.dispute_tool_current
-                            -#    %tr
-                            -#      %td
-                            -#        %label.content-label-sm Classification
-                            -#        = entry.classifications.first
-                            -#      %td
-                            -#        %label.content-label-sm Expiration
-                            -#        = entry.blacklist&.expiration
-                            -#  .inline-tool-content-wrapper
-                            -#    .toolbar
-                            -#      %div
-                                  -#  %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
-                                  -#  = rep_form.select(:action, ['Active', 'Expired'],
-                                  -#      {selected: entry.blacklist ? 'Active' : 'Expired'},
-                                  -#      class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                                  -#      title: 'RepTool Rule Status',
-                                  -#      id: "entry-#{entry.id}-blacklist-action-select")
-                                  -#%div
-                                  -#  %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool BL
-                                  -#  = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                                  -#      {selected: entry.classifications&.first,
-                                  -#        include_blank: !entry.blacklist},
-                                  -#      class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                                  -#      title: "RepTool BL Rules",
-                                  -#      id: "entry-#{entry.id}-blacklist-classifications-select")
+                              %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
+                              %h3 Adjust RepTool BL
+                              -#%table.dispute_tool_current
+                              -#  %tr
+                              -#    %td
+                              -#      %label.content-label-sm Classification
+                              -#      = entry.classifications.first
+                              -#    %td
+                              -#      %label.content-label-sm Expiration
+                              -#      = entry.blacklist&.expiration
+                              -#.inline-tool-content-wrapper
+                              -#  .toolbar
+                              -#    %div
+                              -#      %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
+                              -#      = rep_form.select(:action, ['Active', 'Expired'],
+                              -#          {selected: entry.blacklist ? 'Active' : 'Expired'},
+                              -#          class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                              -#          title: 'RepTool Rule Status',
+                              -#          id: "entry-#{entry.id}-blacklist-action-select")
+                              -#    %div
+                                    -#%label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool BL
+                                    -#= rep_form.select(:classification, RepApi::Blacklist.classifications,
+                                    -#    {selected: entry.classifications&.first,
+                                    -#      include_blank: !entry.blacklist},
+                                    -#    class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                                    -#    title: "RepTool BL Rules",
+                                    -#    id: "entry-#{entry.id}-blacklist-classifications-select")
 
                                 %label.content-label-sm Comment
                                 %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
@@ -189,85 +128,85 @@
                     %td
                     -#Expander area
                     %td.research-table-details-wrapper{colspan: '7'}
-                      -#%table
-                      -#  %tr
-                      -#    %td.input-col
-                      -#      %span.research-table-input-wrapper.wbrs-input-wrapper
-                      -#        %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                      -#      %label WBRS
-                      -#    %td.text-center= entry.wbrs_score
-                      -#    %td
-                      -#      %label WBRS Rule Hits
-                      -#    %td.text-center
-                      -#      = entry.dispute_rule_hits.where(:rule_type => "WBRS").count
-                      -#    %td
-                      -#      %label WBRS Rules
-                      -#    %td.rule-hits-col-list
-                      -#      - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-                      -#        = wbrs_hit.name + ', '
-                      -#    %td.input-col
-                      -#      %span.research-table-input-wrapper.xbrs-input-wrapper
-                      -#        %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                      -#      %label XBRS History
-                      -#    %td.text-center
-                      -#      -#Number of xbrs results
-                      -#      1
-                      -#    %td.input-col
-                      -#      %span.research-table-input-wrapper.virus-total-input-wrapper
-                      -#        %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                      -#      %label Virus Total
-                      -#    %td.text-center
-                      -#      -#Total hits on Virus Total
-                      -#      1
-                      -#    %td.left-bordered
-                      -#      %label WL/BL
-                      -#    %td
-                      -#      -#WL/BL List
-                      -#      WL Medium
-                      -#    %td.left-bordered
-                      -#      %label Referenced on
-                      -#    %td
-                      -#      -#Add dropdown with links to all cases / tickets with this entry on them
-                      -#      12 Tickets
-                      -#  %tr
-                      -#    %td.input-col
-                      -#      %span.research-table-input-wrapper.sbrs-input-wrapper
-                      -#        %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                      -#      %label SBRS
-                      -#    %td.text-center= entry.sbrs_score
-                      -#    %td
-                      -#      %label SBRS Rule Hits
-                      -#    %td.text-center
-                      -#      = entry.dispute_rule_hits.where(:rule_type => "SBRS").count
-                      -#    %td
-                      -#      %label SBRS Rules
-                      -#    %td.rule-hits-col-list
-                      -#      - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
-                      -#        = sbrs_hit.name + ', '
-                      -#    %td.input-col
-                      -#      %span.research-table-input-wrapper.crosslisted-input-wrapper
-                      -#        %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                      -#      %label Crosslisted URLs
-                      -#    %td.text-center
-                      -#      -#Number of url results
-                      -#      1
-                      -#    %td.input-offset.left-bordered
-                      -#      %label Umbrella
-                      -#    %td.text-center
-                      -#      -#Disposition on Umbrella
-                      -#      Clean
-                      -#    %td.left-bordered
-                      -#      %label RepTool Class
-                      -#    %td
-                      -#      -#WL/BL List
-                      -#      %span.inline-col-breakup Spam
-                      -#      %span.inline-col-breakup ACTIVE
-                      -#      %span.inline-col-breakup Juno Spam Monitor
-                      -#    %td.left-bordered
-                      -#      %label Last Submitted
-                      -#    %td
-                      -#      -#Add dropdown with links to all cases / tickets with this entry on them
-                      -#      2016-02-24 15:11:22
+                      %table
+                        %tr
+                          %td.input-col
+                            %span.research-table-input-wrapper.wbrs-input-wrapper
+                              %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                            %label WBRS
+                          %td.text-center= entry.wbrs_score
+                          %td
+                            %label WBRS Rule Hits
+                          %td.text-center
+                            = entry.dispute_rule_hits.where(:rule_type => "WBRS").count
+                          %td
+                            %label WBRS Rules
+                          %td.rule-hits-col-list
+                            - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                              = wbrs_hit.name + ', '
+                          %td.input-col
+                            %span.research-table-input-wrapper.xbrs-input-wrapper
+                              %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                            %label XBRS History
+                          %td.text-center
+                            -#Number of xbrs results
+                            1
+                          %td.input-col
+                            %span.research-table-input-wrapper.virus-total-input-wrapper
+                              %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                            %label Virus Total
+                          %td.text-center
+                            -#Total hits on Virus Total
+                            1
+                          %td.left-bordered
+                            %label WL/BL
+                          %td
+                            -#WL/BL List
+                            WL Medium
+                          %td.left-bordered
+                            %label Referenced on
+                          %td
+                            -#Add dropdown with links to all cases / tickets with this entry on them
+                            12 Tickets
+                        %tr
+                          %td.input-col
+                            %span.research-table-input-wrapper.sbrs-input-wrapper
+                              %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                            %label SBRS
+                          %td.text-center= entry.sbrs_score
+                          %td
+                            %label SBRS Rule Hits
+                          %td.text-center
+                            = entry.dispute_rule_hits.where(:rule_type => "SBRS").count
+                          %td
+                            %label SBRS Rules
+                          %td.rule-hits-col-list
+                            - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                              = sbrs_hit.name + ', '
+                          %td.input-col
+                            %span.research-table-input-wrapper.crosslisted-input-wrapper
+                              %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                            %label Crosslisted URLs
+                          %td.text-center
+                            -#Number of url results
+                            1
+                          %td.input-offset.left-bordered
+                            %label Umbrella
+                          %td.text-center
+                            -#Disposition on Umbrella
+                            Clean
+                          %td.left-bordered
+                            %label RepTool Class
+                          %td
+                            -#WL/BL List
+                            %span.inline-col-breakup Spam
+                            %span.inline-col-breakup ACTIVE
+                            %span.inline-col-breakup Juno Spam Monitor
+                          %td.left-bordered
+                            %label Last Submitted
+                          %td
+                            -#Add dropdown with links to all cases / tickets with this entry on them
+                            2016-02-24 15:11:22
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}
                       .expanded-row-data-wrapper
@@ -275,80 +214,80 @@
                           .col-sm-3
                             .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header WBRS Rule Hit Details
-                          -#    %table
-                          -#      %thead
-                          -#        %tr
-                          -#          %th Rule
-                          -#          %th Rule Description
-                          -#          %th Weight
-                          -#      %tbody
-                          -#        - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-                          -#          %tr
-                          -#            %td= wbrs_hit.name
-                          -#            %td= wbrs_hit.mnemonic
-                          -#            %td
-                          -#  -#Put weight of rule here
-                          -#  .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
-                          -#    %h5.entry-details-table-header SBRS Rule Hit Details
-                          -#    %table
-                          -#      %thead
-                          -#        %tr
-                          -#          %th Rule
-                          -#          %th Rule Description
-                          -#          %th Weight
-                          -#      %tbody
-                          -#        - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
-                          -#          %tr
-                          -#            %td= sbrs_hit.name
-                          -#            %td= sbrs_hit.mnemonic
-                          -#            %td
-                          -#  -#Put weight of rule here
-                          -#  .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
-                          -#    %h5.entry-details-table-header Virus Total Details
-                          -#    %table
-                          -#      %thead
-                          -#        %tr
-                          -#          %th AV Vendor
-                          -#          %th Results
-                          -#      %tbody
-                          -#        %tr
-                          -#          %td Vendor Name
-                          -#          %td Clean or not
-                          -#-#Put weight of rule here
+                              %table
+                                %thead
+                                  %tr
+                                    %th Rule
+                                    %th Rule Description
+                                    %th Weight
+                                %tbody
+                                  - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                                    %tr
+                                      %td= wbrs_hit.name
+                                      %td= wbrs_hit.mnemonic
+                                      %td
+                            -#Put weight of rule here
+                            .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
+                              %h5.entry-details-table-header SBRS Rule Hit Details
+                              %table
+                                %thead
+                                  %tr
+                                    %th Rule
+                                    %th Rule Description
+                                    %th Weight
+                                %tbody
+                                  - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                                    %tr
+                                      %td= sbrs_hit.name
+                                      %td= sbrs_hit.mnemonic
+                                      %td
+                            -#Put weight of rule here
+                            .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
+                              %h5.entry-details-table-header Virus Total Details
+                              %table
+                                %thead
+                                  %tr
+                                    %th AV Vendor
+                                    %th Results
+                                %tbody
+                                  %tr
+                                    %td Vendor Name
+                                    %td Clean or not
+                          -#Put weight of rule here
                           .col-sm-9
                             .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header XBRS History
-                              -#%table
-                              -#  %thead
-                              -#    %tr
-                              -#      - entry.find_xbrs[1]['legend'].each do |header|
-                              -#        %th= header
-                              -#  %tbody
-                              -#    - unless entry.uri.nil?
-                              -#      - entry.find_xbrs[1]['data'].each do |data|
-                              -#        %tr
-                              -#          - data.each do |datapoint|
-                              -#            %td= datapoint
+                              %table
+                                -#%thead
+                                -#  %tr
+                                -#    - entry.find_xbrs[1]['legend'].each do |header|
+                                -#      %th= header
+                                -#%tbody
+                                -#  - unless entry.uri.nil?
+                                -#    - entry.find_xbrs[1]['data'].each do |data|
+                                -#      %tr
+                                -#        - data.each do |datapoint|
+                                -#          %td= datapoint
 
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header Cross-listed URLs
                               %table
-                                -#%thead
-                                -#  %tr
-                                -#    %th ID
-                                -#    %th URL
-                                -#    %th List Type
-                                -#    %th.text-center Current Score
-                                -#    %th Username
-                                -#    %th Last Update
-                                -#    %th Created
-                                -#%tbody
-                                -#  - entry.wbrs_xlist.each do |cross_listed|
-                                -#    %tr
-                                -#      %td= cross_listed.id
-                                -#      %td= cross_listed.url
-                                -#      %td= cross_listed.list_type
-                                -#      %td -
-                                -#      %td= cross_listed.username
-                                -#      %td= cross_listed.mtime
-                                -#      %td= cross_listed.ctime
+                                %thead
+                                  %tr
+                                    %th ID
+                                    %th URL
+                                    %th List Type
+                                    %th.text-center Current Score
+                                    %th Username
+                                    %th Last Update
+                                    %th Created
+                                %tbody
+                                  - entry.wbrs_xlist.each do |cross_listed|
+                                    %tr
+                                      %td= cross_listed.id
+                                      %td= cross_listed.url
+                                      %td= cross_listed.list_type
+                                      %td -
+                                      %td= cross_listed.username
+                                      %td= cross_listed.mtime
+                                      %td= cross_listed.ctime

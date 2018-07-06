@@ -25,7 +25,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def research
     # This is temporary till we get the searched hooked up
-    @entries = DisputeEntry.all
+    @entries = DisputeEntry.all.limit(50)
   end
 
   def tickets
