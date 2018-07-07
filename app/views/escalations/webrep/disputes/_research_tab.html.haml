@@ -245,7 +245,7 @@
                                   %label.toolbar-section-label{for: "entry-#{entry.id}-wlbl-list-type-select"} WL/BL List
                                   = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
                                    {selected: entry.wbrs_list_type,
-                                     include_blank: 'Not on a List Currently'},
+                                     include_blank: 'Not on a list currently'},
                                    class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
                                    title: 'RepTool Rule Status',
                                    id: "entry-#{entry.id}-wlbl-list-type-select"
@@ -330,7 +330,7 @@
                           %label WL/BL
                         %td.entry-data-wlbl
                           -#WL/BL List
-                          WL-med
+                          Not currently on a list
                         %td.left-bordered
                           %label Referenced on
                         %td

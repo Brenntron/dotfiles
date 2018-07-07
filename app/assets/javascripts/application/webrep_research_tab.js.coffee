@@ -131,7 +131,6 @@ $ ->
           entry_content = $(entry_row).find('.entry-data-content').text()
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
 
-
           show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
           show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
           select_wlbl =  $('#wlbl_adjust_entries').find('#wlbl-list-type-select')
@@ -141,17 +140,14 @@ $ ->
           wlbl_options = $(select_wlbl).find('option')
 
           $(wlbl_options).each ->
-            debugger
             option_value = $(this).val()
             wlbl = $(entry_row).find('.entry-data-wlbl').text()
             console.log(option_value)
             console.log wlbl
-            if option_value == wlbl
-              console.log 'match'
-
+            if $.trim(option_value) == $.trim(wlbl)
+              $(select_wlbl).val(option_value)
             else
-              console.log 'false'
-#            wtf is going on 
+              $(select_wlbl).val()
 
     else
       alert ('No rows selected')
