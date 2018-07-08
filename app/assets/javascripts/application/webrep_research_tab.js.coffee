@@ -47,9 +47,8 @@ $ ->
       $('.edit-entries-buttons').addClass('hidden')
 
 #   Need to add save function after editing.
-
-#        After this is edited the user has to hit save, add a placeholder button for now above the table.
-#        When they hit save it should send the update to the ticket, populate everywhere / reload the page,
+#        When they hit save it should send the update to the ticket,
+  #      populate everywhere / reload the page,
 #        and set the entry span to match the content of the input
 #
 
@@ -165,9 +164,42 @@ $ ->
               $(comment_wrapper).show()
               $(submit_button).removeAttr("disabled")
 
-
     else
       alert ('No rows selected')
+
+#  Inline Adjust WL/BL Button
+  $('.dispute-inline-buttons.adjust-wlbl-button').click ->
+
+    entry_row = $(this).parents('.research-table-row')[0]
+    wlbl = $(entry_row).find('.entry-data-wlbl').text()
+    dropdown = $(this).next('.dropdown-menu')
+    select_wlbl = $(dropdown).find('.adjust-wlbl-input')
+    wlbl_options = $(select_wlbl).find('option')
+
+    entry_list_val = ''
+    preview_button = $(dropdown).find('.wlbl-preview-button')
+    comment_wrapper = $(dropdown).find('.comment-wrapper')
+    submit_button = $(dropdown).find('.dropdown-submit-button')
+
+    $(wlbl_options).each ->
+      option_value = $(this).val()
+      if $.trim(option_value) == $.trim(wlbl)
+        entry_list_val = $(select_wlbl[1]).val(option_value)
+      else
+        entry_list_val = $(select_wlbl[1]).val()
+
+    $(select_wlbl).change ->
+      new_val = $(select_wlbl[1]).val()
+      if new_val != entry_list_val
+        $(preview_button).removeAttr("disabled")
+      else if new_val ==  entry_list_val
+        unless $(preview_button).attr("disabled", true)
+          $(preview_button).attr("disabled", true)
+
+      $(preview_button).click ->
+        if $(preview_button).attr("disabled", false)
+          $(comment_wrapper).show()
+          $(submit_button).removeAttr("disabled")
 
 
 # Show / hide the different research tables in the expanded row

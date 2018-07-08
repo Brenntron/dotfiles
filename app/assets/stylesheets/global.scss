@@ -4740,6 +4740,11 @@ td.data-table-emph {
   font-size: 8.5pt;
 }
 
+.dispute-wlbl-adjust-wrapper label {
+  text-transform: none !important;
+  font-weight: 400 !important;;
+}
+
 .dispute_tool_current td label {
   padding: 0 !important;
 }
@@ -4755,6 +4760,10 @@ td.data-table-emph {
 .inline-tool-content-wrapper .toolbar select.toolbar-select {
   height: 20px;
   font-size: 8pt;
+}
+
+.inline-tool-content-wrapper .toolbar div {
+  height: auto;
 }
 
 .inline-tool-content-wrapper .toolbar {
