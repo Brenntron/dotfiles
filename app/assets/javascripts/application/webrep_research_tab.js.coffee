@@ -122,7 +122,7 @@ $ ->
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
 
-#  Populating the Adjust WL/BL Button
+#  Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     if ($('.dispute_check_box:checked').length > 0)
       $('.dispute_check_box').each ->
@@ -139,22 +139,30 @@ $ ->
           $(show_wbrs[0]).text(wbrs)
           wlbl_options = $(select_wlbl).find('option')
 
+          entry_list_val = ''
+          preview_button = $('#wlbl_adjust_entries').find('.wlbl-preview-button')
+
           $(wlbl_options).each ->
             option_value = $(this).val()
             wlbl = $(entry_row).find('.entry-data-wlbl').text()
-            console.log(option_value)
-            console.log wlbl
             if $.trim(option_value) == $.trim(wlbl)
-              $(select_wlbl).val(option_value)
+              entry_list_val = $(select_wlbl).val(option_value)
             else
-              $(select_wlbl).val()
+              entry_list_val = $(select_wlbl).val()
+
+          $(select_wlbl).change ->
+            new_val = $(select_wlbl).val()
+            if new_val != entry_list_val
+              $(preview_button).removeAttr("disabled")
+            else if new_val ==  entry_list_val
+              unless $(preview_button).attr("disabled", true)
+                $(preview_button).attr("disabled", true)
+
+
+
 
     else
       alert ('No rows selected')
-#      return false
-#        get values
-#        populate dropdown form
-
 
 
 # Show / hide the different research tables in the expanded row

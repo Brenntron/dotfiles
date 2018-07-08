@@ -48,32 +48,35 @@
               .dispute-wlbl-adjust-wrapper
                 .dispute-name-wrapper
                   %label.content-label-sm Dispute
+                  %br
                   %span.entry-dispute-name
                 %table.dispute_tool_current
                   %tr
-                    %td
+                    %td.text-center
                       %label.content-label-sm Current Score
+                      %br
                       %span.current-wbrs-score
                       -#= entry.wbrs_score
-                    %td
+                    %td.text-center
                       %label.content-label-sm New Score
+                      %br
                       %span.new_wbrs_score
                 .inline-tool-content-wrapper
                   .toolbar
                     %div
                       %label.toolbar-section-label{for:'wlbl-list-type-select'} WL/BL List
                       = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                        {include_blank: 'Not on a List Currently'},
+                        {include_blank: 'Not on a list currently'},
                         class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
                         title: 'RepTool Rule Status',
                         id: "wlbl-list-type-select"
-
+                    %button.wlbl-preview-button.tertiary.disabled{type: 'button', disabled: true} Preview
                 %label.content-label-sm Comment
                 -#Comment boxes should only be shown after something other than the original settings is selected
                 %textarea.dropdown-comment.adjust-wlbl-input.note-input
                 -#End of per checked checkbox loop
-                %button.secondary{type: 'button'} Preview
-                %button.primary{type: 'button', onclick:'toolbar_adust_wlbl_button(this);'} Submit Changes
+
+                %button.secondary{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true} Submit Changes
 
         %span.dropdown
           %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}

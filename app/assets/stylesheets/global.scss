@@ -4223,7 +4223,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: lighten($bug-section-color, 20%);
   font-size: 8pt;
   margin: 0 !important;
-  padding: 8px 8px 6px !important;
+  padding: 8px 8px 10px 8px !important;
   border-radius: 0 4px 0 0;
 }
 
@@ -4723,7 +4723,54 @@ td.data-table-emph {
 .unrated-site-result::before { background-image: url(image_path('icon_unrated.svg'));}
 .unclean-site-result::before { background-image: url(image_path('icon_unclean.svg'));}
 
+.new_wbrs_score {
+  background-color: $content-bg-color;
+  display: block;
+  height: 20px;
+  min-width: 40px;
+}
 
+.dispute-wlbl-adjust-wrapper {
+  padding: 0 !important;
+}
+
+.dispute-wlbl-adjust-wrapper button {
+  text-transform: none;
+  font-weight: 400;
+  font-size: 8.5pt;
+}
+
+.dispute_tool_current td label {
+  padding: 0 !important;
+}
+
+.dispute-name-wrapper label {
+  padding-top: 0 !important;
+}
+
+.toolbar label.content-label-sm {
+  color: $content-label-color;
+}
+
+.inline-tool-content-wrapper .toolbar select.toolbar-select {
+  height: 20px;
+  font-size: 8pt;
+}
+
+.wlbl-preview-button {
+  float: right;
+  padding: 4px 12px !important;
+  margin: 0 6px !important;
+}
+
+button[disabled] {
+  background-color: lighten($content-label-color, 25%) !important;
+  color: $faint-neutral-color;
+}
+
+button[disabled]:hover {
+  background-color: lighten($content-label-color, 25%) !important;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
