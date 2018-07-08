@@ -4757,9 +4757,13 @@ td.data-table-emph {
   font-size: 8pt;
 }
 
+.inline-tool-content-wrapper .toolbar {
+  margin-bottom: 0;
+}
+
 .wlbl-preview-button {
   float: right;
-  padding: 4px 12px !important;
+  padding: 4px 20px !important;
   margin: 0 6px !important;
 }
 
@@ -4770,6 +4774,23 @@ button[disabled] {
 
 button[disabled]:hover {
   background-color: lighten($content-label-color, 25%) !important;
+}
+
+button.dropdown-submit-button {
+  margin: 12px auto;
+}
+
+.comment-wrapper .content-label-sm {
+  margin-bottom: 0;
+}
+
+.comment-wrapper {
+  padding: 0 2px;
+  display: none;
+}
+
+.button-row-center {
+  text-align: center;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

@@ -141,6 +141,8 @@ $ ->
 
           entry_list_val = ''
           preview_button = $('#wlbl_adjust_entries').find('.wlbl-preview-button')
+          comment_wrapper = $('#wlbl_adjust_entries').find('.comment-wrapper')
+          submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
 
           $(wlbl_options).each ->
             option_value = $(this).val()
@@ -158,7 +160,10 @@ $ ->
               unless $(preview_button).attr("disabled", true)
                 $(preview_button).attr("disabled", true)
 
-
+          $(preview_button).click ->
+            if $(preview_button).attr("disabled", false)
+              $(comment_wrapper).show()
+              $(submit_button).removeAttr("disabled")
 
 
     else

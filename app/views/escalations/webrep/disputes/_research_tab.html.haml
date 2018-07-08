@@ -70,13 +70,12 @@
                         class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
                         title: 'RepTool Rule Status',
                         id: "wlbl-list-type-select"
-                    %button.wlbl-preview-button.tertiary.disabled{type: 'button', disabled: true} Preview
-                %label.content-label-sm Comment
-                -#Comment boxes should only be shown after something other than the original settings is selected
-                %textarea.dropdown-comment.adjust-wlbl-input.note-input
-                -#End of per checked checkbox loop
-
-                %button.secondary{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true} Submit Changes
+                    %button.wlbl-preview-button.tertiary{type: 'button', disabled: true} Preview
+                  .comment-wrapper
+                    %label.content-label-sm Comment
+                    %textarea.dropdown-comment.adjust-wlbl-input.note-input
+                  .button-row-center
+                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true} Submit Changes
 
         %span.dropdown
           %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -333,7 +332,8 @@
                           %label WL/BL
                         %td.entry-data-wlbl
                           -#WL/BL List
-                          Not currently on a list
+                          -#Not currently on a list
+                          WL-med
                         %td.left-bordered
                           %label Referenced on
                         %td
