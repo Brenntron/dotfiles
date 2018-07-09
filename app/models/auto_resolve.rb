@@ -59,7 +59,8 @@ class AutoResolve
   end
 
   def virus_total_query_string(address)
-    "apikey=#{Rails.configuration.virus_total.api_key}&resource=#{address}"
+    # "apikey=#{Rails.configuration.virus_total.api_key}&resource=#{address}"
+    Virustotal::Scan.scan_query_string(address: address)
   end
 
   def virus_total_request(address)
