@@ -176,15 +176,20 @@ class Dispute < ApplicationRecord
           resolve_args[:url] = key
           resolve_args[:rules] = total_hits
 
-          #auto_resolve_verdict = AutoResolve.new(resolve_args)
+          auto_resolve_verdict = AutoResolve.create_from_payload("IP", key, total_hits)
 
           #this is for return back to TI to populate its ticket show pages
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry["rep_sugg"]
           new_payload_item[:status] = auto_resolve_verdict.ti_status
+
+          if auto_resolve_verdict.malicious?
           #new_payload_item[:resolution_message] = auto_resolve_verdict.resolution_message
           #new_payload_item[:resolution] = auto_resolve_verdict.resolution
-          #new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
+          else
+
+          end
+          new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
           return_payload[key] = new_payload_item
 
           new_dispute_entry = DisputeEntry.new
@@ -194,6 +199,8 @@ class Dispute < ApplicationRecord
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+
+
 
           #new_dispute_entry.status = auto_resolve_verdict.status
           #new_dispute_entry.resolution = auto_resolve_verdict.resolution
@@ -226,17 +233,14 @@ class Dispute < ApplicationRecord
 
         new_entries_urls.each do |key, entry|
 
+          top_url = Wbrs::TopUrl.check_urls([key]).first
+
           #this is for return back to TI to populate its ticket show pages
 
           wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
           sbrs_hits = entry["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
 
-          total_hits = (wbrs_hits + sbrs_hits).uniq
-          resolve_args = {}
-          resolve_args[:url] = key
-          resolve_args[:rules] = total_hits
-
-          #auto_resolve_verdict = AutoResolve.new(resolve_args)
+          #auto_resolve_verdict = AutoResolve.create_from_payload("URI/DOMAIN", key, total_hits)
 
           url_parts = Dispute.parse_url(key)
           new_dispute_entry = DisputeEntry.new
@@ -249,6 +253,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.path = url_parts[:path]
           new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
           new_dispute_entry.entry_type = "URI/DOMAIN"
+          new_dispute_entry.is_important = top_url.is_important != "invalid" ? top_url.is_important : false
 
           #new_dispute_entry.status = auto_resolve_verdict.status
           #new_dispute_entry.resolution = auto_resolve_verdict.resolution
@@ -301,6 +306,7 @@ class Dispute < ApplicationRecord
               },
           "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": case_email}
         }
+
       end
     rescue Exception => e
 
