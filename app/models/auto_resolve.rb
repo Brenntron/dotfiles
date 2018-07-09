@@ -58,32 +58,6 @@ class AutoResolve
     end
   end
 
-  def virus_total_query_string(address)
-    "apikey=#{Rails.configuration.virus_total.api_key}&resource=#{address}"
-  end
-
-  def virus_total_request(address)
-    full_url = "#{Rails.configuration.virus_total.url}?#{virus_total_query_string(address)}"
-    request = HTTPI::Request.new(full_url)
-    request.ssl = true
-    request.auth.ssl.verify_mode = :peer
-    request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    request
-  end
-
-  def call_virus_total(address: self.address)
-    request = virus_total_request(address)
-    response = HTTPI.get(request)
-    case
-      when 300 <= response.code
-        Rails.logger.error("Virus Total http response #{response.code}")
-        return nil
-      when 200 != response.code
-        Rails.logger.warn("Virus Total http response #{response.code}")
-    end
-    JSON.parse(response.body)
-  end
-
   def virus_total_scan_names
     %w{Kaspersky Sophos Avira Google\ Safebrowsing BitDefender}
   end
@@ -91,7 +65,7 @@ class AutoResolve
   # Checks the Virus Total system.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_virus_total(address: self.address)
-    result = call_virus_total(address: address)
+    result = Virustotal::Scan.scan_hashes(address: address)
     if result && result['scans']
       all_scans = result['scans']
       scan_results = virus_total_scan_names.map do |scan_key|
@@ -171,7 +145,7 @@ class AutoResolve
 
   # @param [String] address_type: 'IP' or 'URI/DOMAIN'
   # @param [String] address: ip address, uri, or domain
-  # @param [Array<TBD>] rule_hits: collection of our rule hits
+  # @param [Array<String>] rule_hits: collection of our rule hits as strings of mnem values
   def self.create_from_payload(address_type:, address:, rule_hits: nil)
     address_type_attr =
         case
@@ -194,5 +168,16 @@ class AutoResolve
         resolution: malicious? ? 'Fixed -FN' : '',
         resolution_message: malicious? ? 'This URI/IP has been deemed malicious, and has been blacklisted.' : ''
     }
+  end
+
+  # Save the blacklist object.
+  # @param [String] author: moniker of who is adding or updating this entry.
+  # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
+  def publish_to_rep_api(author:)
+    raise 'Cannot blacklist address which has not been marked malicious through auto-resolve.' unless malicious?
+    RepApi::Blacklist.add_from_hosts(hostnames: [ self.address ],
+                                     classifications: [ 'malware' ],
+                                     author: author,
+                                     comment: 'TE SecHub-Auto')
   end
 end

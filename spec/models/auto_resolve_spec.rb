@@ -134,7 +134,9 @@ describe Repo::RuleCommitter do
       allow(Rails.configuration.umbrella).to receive(:check).and_return(false)
       expect(HTTPI).to receive(:get).and_return(virus_total_400_response)
 
-      auto_cisco.check_sources(rule_hits: [])
+      expect {
+        auto_cisco.check_sources(rule_hits: [])
+      }.to raise_error(Virustotal::VirustotalError)
 
       expect(auto_cisco.malicious?).to be_falsey
       expect(auto_cisco.internal_comment).to be_blank
