@@ -66,6 +66,8 @@ $super-faint-neutral: #f9f9f9;
 $faint-accent-color:  #dff1f7;
 $faint-alt-highlight: #fff7cd; /* focus for form inputs */
 $medium-neutral-color: #EAEAEA;
+$table-dark-body: #4E4E4E;
+$table-dark-header: #413D3D;
 
 /***** Mixins ******/
 @mixin box-shadow($shadow) {
@@ -685,7 +687,7 @@ th.alt-col {
   height: 20px;
 }
 
-.shown .expand-row-button-inline {
+.shown .expand-row-button-inline, .shown.expand-row-button-inline {
   background-image: url(image_path('icon_collapse_blue.svg'));
 }
 
@@ -4051,8 +4053,21 @@ input.file_attachment {
   text-align: left;
 }
 
-.dispute_rep_tools {
-  width: 70px;
+table > tbody > tr > td.dispute_rep_tools {
+  width: 90px;
+  padding: 0 !important;
+  text-align: right;
+}
+
+.dispute_rep_tools_wrapper {
+  display: block;
+  position: absolute;
+  margin-top: 7px;
+  width: 90px
+}
+
+.dispute_rep_tools_wrapper .edit-button {
+  background-image: url(image_path('icon_edit_white.svg'));
 }
 
 .dispute_rep_tools .dropdown.open {
@@ -4060,9 +4075,10 @@ input.file_attachment {
 }
 
 .dispute_rep_tools .dropdown-menu {
-  top: 13px;
-  left: 1px;
-  border-radius: 0 4px 4px 4px;
+  top: 16px;
+  right: 1px;
+  left: auto;
+  border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
   min-width: 250px;
@@ -4305,13 +4321,13 @@ input.file_attachment {
 }
 
 .dispute-entry-table tbody{
-  background-color: #4E4E4E;;
+  background-color: $table-dark-body;
   color: $content-bg-color;
   font-weight: 300;
 }
 
 .dispute-entry-table tbody tr td, .dispute-entry-table thead tr th {
-  border-color: #413D3D;
+  border-color: $table-dark-header;
 }
 
 .dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child {
@@ -4319,7 +4335,7 @@ input.file_attachment {
 }
 
 .dispute-entry-table thead {
-  background-color: #413D3D;
+  background-color: $table-dark-header;
   color: $content-bg-color;
 }
 
@@ -4343,13 +4359,18 @@ input.file_attachment {
 }
 
 .table-entry-input {
-  width: 100%;
-  border: 4px solid $content-bg-color;
+  border: 2px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
+  display: none;
+}
+
+.table-entry-input.wide {
+  width: 100%;
 }
 
 input.table-entry-input:focus {
   background-color: $faint-alt-highlight;
+  outline-offset: 0;
 }
 
 .border-section {
@@ -4363,6 +4384,200 @@ input.table-entry-input:focus {
   display: block;
   padding: 6px 12px;
 }
+
+#disputes-research-table label {
+  font-weight: 700;
+  text-transform: uppercase;
+  padding-right: 10px;
+}
+
+#disputes-research-table .expand-row-button-inline {
+  margin-bottom: -5px;
+}
+
+#disputes-research-table td.expandable-row-column {
+  padding: 0 !important;
+}
+
+#disputes-research-table .nested-data-row {
+  display: none;
+}
+
+.research-table-row-wrapper, .research-table-details-wrapper {
+  padding: 0 !important;
+}
+
+.research-table-details-wrapper table td {
+  background-color: $faint-neutral-color;
+  font-size: 8pt;
+  padding: 6px;
+}
+
+.research-table-details-wrapper table tr:first-of-type td {
+  border-bottom: 1px solid $content-bg-color;
+}
+
+.input-col {
+  padding: 0 !important;
+}
+
+td.left-bordered {
+  border-left: 1px solid $content-bg-color;
+}
+
+.research-table-details-wrapper table td.input-offset {
+  padding-left: 36px;
+}
+
+.research-table-input-wrapper {
+  padding: 4px 8px;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin-right: 6px;
+}
+
+.research-overview-row td:first-of-type, .research-table-details-wrapper, .research-table-row-wrapper {
+  border-bottom: none;
+}
+
+.research-table-input-wrapper.wbrs-input-wrapper {
+  background-color: $bug-section-color;
+}
+
+.research-table-input-wrapper.sbrs-input-wrapper {
+  background-color: $success-color;
+}
+
+.research-table-input-wrapper.xbrs-input-wrapper {
+  background-color: $communication-accent-color;
+}
+
+.research-table-input-wrapper.crosslisted-input-wrapper {
+  background-color: $warning-accent-color;
+}
+
+.research-table-input-wrapper.virus-total-input-wrapper {
+  background-color: $rule-accent-color;
+}
+
+.expanded-row {
+  background-color: $content-tab-color;
+  padding: 0 0 0 20px !important;
+}
+
+.expanded-row::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  margin-top: -1px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid #fff;
+}
+
+.expanded-row-data-wrapper {
+  background-color: $type-lighter-color;
+}
+
+.entry-details-table {
+  margin: 20px;
+  padding-left: 7px;
+}
+
+.col-sm-3 .entry-details-table {
+  margin: 20px 0 20px 20px;
+}
+
+.col-sm-9 .entry-details-table {
+  margin: 20px 20px 20px 0;
+}
+
+.wbrs-details-table { background-color: $bug-section-color;}
+.sbrs-details-table { background-color: $success-color;}
+.xbrs-details-table { background-color: $communication-accent-color;}
+.crosslisted-details-table { background-color: $warning-accent-color;}
+.virustotal-details-table { background-color: $rule-accent-color;}
+
+.entry-details-table table {
+  background-color: $table-dark-body;
+  color: $content-bg-color;
+}
+
+.entry-details-table table > thead > tr > th {
+  border-bottom: 1px solid $table-dark-header;
+  font-weight: 600;
+  padding: 8px;
+}
+
+.entry-details-table table > tbody > tr > td {
+  border-bottom: none;
+  font-size: 8pt;
+  font-weight: 300;
+  padding: 6px 8px;
+}
+
+h5.entry-details-table-header {
+  background-color: $table-dark-header;
+  color: $content-bg-color;
+  font-size: 9.5pt;
+  padding: 3px 12px;
+  font-weight: 600;
+}
+
+.inline-col-breakup {
+  padding: 0 2px;
+}
+
+.toolbar .edit-entries-buttons {
+  border: none;
+  right: 0;
+}
+
+td.data-table-emph {
+  font-weight: 500 !important;
+}
+
+.dataTables_scrollHeadInner {
+  width: 100% !important;
+}
+
+.entry-details-table .missing-data {
+  color: $faint-neutral-color;
+  font-weight: 300;
+  text-transform: none;
+}
+
+.dataTables_scrollBody th {
+  padding: 0 !important;
+  height: 0 !important;
+}
+
+.entry-details-table
+
+.clean-site-result {
+  width: 45%;
+}
+
+.clean-site-result::before, .unrated-site-result::before, .unclean-site-result::before  {
+  content: '';
+  display: block;
+  float: left;
+  margin-right: 8px;
+  width: 14px;
+  height: 14px;
+  background-color: $table-dark-header;
+  border-radius: 7px;
+  background-repeat: no-repeat;
+  background-size: 14px;
+  background-position: center center;
+}
+
+.clean-site-result::before   { background-image: url(image_path('icon_success_check.svg'));}
+.unrated-site-result::before { background-image: url(image_path('icon_unrated.svg'));}
+.unclean-site-result::before { background-image: url(image_path('icon_unclean.svg'));}
+
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
