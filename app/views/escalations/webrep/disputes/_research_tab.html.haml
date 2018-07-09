@@ -317,14 +317,15 @@
                           %label XBRS History
                         %td.text-center
                           -#Number of xbrs results
-                          1
+                          - unless entry.hostlookup.nil?
+                            = entry.find_xbrs[1]['data'].count
                         %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label Virus Total
                         %td.text-center
                           -#Total hits on Virus Total
-                          1
+                          = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                         %td.left-bordered
                           %label WL/BL
                         %td.entry-data-wlbl
@@ -356,7 +357,7 @@
                           %label Crosslisted URLs
                         %td.text-center
                           -#Number of url results
-                          1
+                          = entry.wbrs_xlist.count
                         %td.input-offset.left-bordered
                           %label Umbrella
                         %td.text-center
@@ -411,30 +412,52 @@
                                       -#Put weight of rule here
                           .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Virus Total Details
-                            %table
-                              %thead
-                                %tr
-                                  %th AV Vendor
-                                  %th Results
-                              %tbody
-                                %tr
-                                  %td Vendor Name
-                                  %td Clean or not
+                            - if entry.virustotals.empty?
+                              %table
+                                %thead
+                                  %tr
+                                    %th
+                                      %span.missing-data
+                                        No Virus Total data available.
+                            - else
+                              %table.table-scrollable
+                                %thead
+                                  %tr
+                                    %th AV Vendor
+                                    %th Results
+                                %tbody
+                                  - entry.virustotals.each do |virustotal|
+                                    %tr
+                                      %td.data-table-emph= virustotal[:name]
+                                      - if virustotal[:result] == 'clean site'
+                                        %td.clean-site-result Clean
+                                      - elsif virustotal[:result] == 'unrated site'
+                                        %td.unrated-site-result Unrated
+                                      - else
+                                        %td.unclean-site-result= virustotal[:result]
                         -#Put weight of rule here
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header XBRS History
-                            %table
-                              %thead
-                                %tr
-                                  - entry.find_xbrs[1]['legend'].each do |header|
-                                    %th= header
-                              %tbody
-                                - unless entry.uri.nil?
-                                  - entry.find_xbrs[1]['data'].each do |data|
-                                    %tr
-                                      - data.each do |datapoint|
-                                        %td= datapoint
+                            - if entry.find_xbrs[1]['data'].empty?
+                              %table
+                                %thead
+                                  %tr
+                                    %th
+                                      %span.missing-data
+                                        No XBRS data available.
+                            - else
+                              %table.table-scrollable
+                                %thead
+                                  %tr
+                                    - entry.find_xbrs[1]['legend'].each do |header|
+                                      %th= header
+                                %tbody
+                                  - unless entry.hostlookup.nil?
+                                    - entry.find_xbrs[1]['data'].each do |data|
+                                      %tr
+                                        - data.each do |datapoint|
+                                          %td= datapoint
 
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Cross-listed URLs

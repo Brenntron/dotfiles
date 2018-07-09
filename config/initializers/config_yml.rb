@@ -3,11 +3,14 @@ all_configs = YAML.load_file(Rails.root.join("config", "config.yml"))
 env_config = all_configs[Rails.env]
 raise "config.yml missing #{Rails.env} section" unless env_config
 
+
+
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
 
-auto_resolve = env_config.fetch('auto_resolve', {})
+auto_resolve = env_config['auto_resolve']
+raise "config.yml missing auto_resolve section" unless auto_resolve
 
 complaints                              = OpenStruct.new
 if auto_resolve['complaints']
@@ -16,16 +19,6 @@ else
   complaints.check                      = false
 end
 Rails.configuration.complaints          = complaints
-
-virus_total                             = OpenStruct.new
-if auto_resolve['virus_total']
-  virus_total.check                     = auto_resolve['virus_total']['check']
-  virus_total.url                       = auto_resolve['virus_total']['url']
-  virus_total.api_key                   = auto_resolve['virus_total']['api_key']
-else
-  virus_total.check                     = false
-end
-Rails.configuration.virus_total         = virus_total
 
 umbrella                                = OpenStruct.new
 if auto_resolve['umbrella']
@@ -47,15 +40,17 @@ Rails.configuration.bugzilla_password   = ENV['Bugzilla_secret'] || env_config['
 raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt']
 
+
+peakebridge_config = env_config['peakebridge']
+raise "config.yml missing peakebridge section" unless peakebridge_config
 peakebridge                             = OpenStruct.new
-if env_config['peakebridge']
-  peakebridge.host                        = env_config['peakebridge']['host']
-  peakebridge.port                        = env_config['peakebridge']['port']
-  peakebridge.verify_mode                 = env_config['peakebridge']['ssl_mode']
-  peakebridge.uri_base                    = env_config['peakebridge']['uri_base']
-  peakebridge.sources                     = env_config['peakebridge']['sources'] || []
-end
+peakebridge.host                        = peakebridge_config['host']
+peakebridge.port                        = peakebridge_config['port']
+peakebridge.verify_mode                 = peakebridge_config['ssl_mode']
+peakebridge.uri_base                    = peakebridge_config['uri_base']
+peakebridge.sources                     = peakebridge_config['sources'] || []
 Rails.configuration.peakebridge         = peakebridge
+
 
 raise "config.yml missing perl section" unless env_config['perl']
 Rails.configuration.perl_cmd            = env_config['perl']['cmd']
@@ -66,16 +61,29 @@ Rails.configuration.snort_json_path     = Rails.root.join(env_config['perl']['sn
 Rails.configuration.cve2x_path          = Rails.root.join(env_config['perl']['cve2x_path'])
 Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['rule2yaml_path'])
 
+
+rep_api = env_config['rep_api']
+raise 'config.yml missing rep_api section' unless rep_api
+Rails.configuration.rep_api                = OpenStruct.new
+Rails.configuration.rep_api.host           = rep_api['host']
+Rails.configuration.rep_api.port           = rep_api['port']
+Rails.configuration.rep_api.verify_mode    = rep_api['verify_mode']
+Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
+Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
+
+
 raise "config.yml missing ruletest section" unless env_config['ruletest']
 Rails.configuration.ruletest_server     = env_config['ruletest']['url']
 
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
 
+snort_org_config = env_config['snort_org']
+raise 'config.yml missing snort_org section' unless snort_org_config
 Rails.configuration.snort_org           = OpenStruct.new
 if env_config['snort_org']
-  Rails.configuration.snort_org.host      = env_config['snort_org']['host']
-  Rails.configuration.snort_org.port      = env_config['snort_org']['port']
-  Rails.configuration.snort_org.api_key   = env_config['snort_org']['api_key']
+  Rails.configuration.snort_org.host      = snort_org_config['host']
+  Rails.configuration.snort_org.port      = snort_org_config['port']
+  Rails.configuration.snort_org.api_key   = snort_org_config['api_key']
 end
 
 raise "config.yml missing svn section" unless env_config['svn']
@@ -86,27 +94,33 @@ Rails.configuration.ruledocs_repo_url   = env_config['svn']['ruledocs_repo_url']
 Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['snort_rule_path'])
 
 
-rep_api = env_config.fetch('rep_api', {})
-Rails.configuration.rep_api                = OpenStruct.new
-Rails.configuration.rep_api.host           = rep_api['host']
-Rails.configuration.rep_api.port           = rep_api['port']
-Rails.configuration.rep_api.verify_mode    = rep_api['verify_mode']
-Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
-Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
-
-wbrs = env_config.fetch('wbrs', {})
+wbrs_config = env_config['wbrs']
+raise 'config.yml missing wbrs section' unless wbrs_config
 Rails.configuration.wbrs                = OpenStruct.new
-Rails.configuration.wbrs.host           = wbrs['host']
-Rails.configuration.wbrs.port           = wbrs['port']
-Rails.configuration.wbrs.verify_mode    = wbrs['verify_mode']
-Rails.configuration.wbrs.ca_cert_file   = wbrs['ca_cert_file']
-Rails.configuration.wbrs.gssnegotiate   = wbrs['gssnegotiate']
+Rails.configuration.wbrs.host           = wbrs_config['host']
+Rails.configuration.wbrs.port           = wbrs_config['port']
+Rails.configuration.wbrs.verify_mode    = wbrs_config['verify_mode']
+Rails.configuration.wbrs.ca_cert_file   = wbrs_config['ca_cert_file']
+Rails.configuration.wbrs.gssnegotiate   = wbrs_config['gssnegotiate']
 
-xbrs = env_config.fetch('xbrs', {})
+xbrs_config = env_config['xbrs']
+raise 'config.yml missing xbrs section' unless xbrs_config
 Rails.configuration.xbrs                = OpenStruct.new
-Rails.configuration.xbrs.host           = xbrs['host']
-Rails.configuration.xbrs.port           = xbrs['port']
-Rails.configuration.xbrs.verify_mode    = xbrs['verify_mode']
-Rails.configuration.xbrs.gssnegotiate   = xbrs['gssnegotiate']
+Rails.configuration.xbrs.host           = xbrs_config['host']
+Rails.configuration.xbrs.port           = xbrs_config['port']
+Rails.configuration.xbrs.verify_mode    = xbrs_config['verify_mode']
+Rails.configuration.xbrs.gssnegotiate   = xbrs_config['gssnegotiate']
 
+raise 'config.yml missing virus_total section' unless env_config['virustotal']
+virus_total                             = OpenStruct.new
+virus_total.check                       = auto_resolve['virus_total']['check']
+virus_total.url                         = env_config['virustotal']['url']
+virus_total.api_key                     = env_config['virustotal']['api_key']
+Rails.configuration.virus_total         = virus_total
+
+virustotal = env_config.fetch('virustotal', {})
+Rails.configuration.virustotal          = OpenStruct.new
+Rails.configuration.virustotal.host     = virustotal['host']
+Rails.configuration.virustotal.port     = virustotal['port']
+Rails.configuration.virustotal.api_key  = virustotal['api_key']
 
