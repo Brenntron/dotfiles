@@ -121,6 +121,35 @@ $ ->
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
 
+
+#  Populating the toolbar Adjust RepTool Button
+  $('#reptool_entries_button').click ->
+    if ($('.dispute_check_box:checked').length > 0)
+      $('.dispute_check_box').each ->
+        if $(this).prop('checked')
+#          debugger
+          entry_row = $(this).parents('.research-table-row')[0]
+          entry_content = $(entry_row).find('.entry-data-content').text()
+          entry_rep_class = $(entry_row).find('.entry-reptool-class').text()
+          entry_rep_exp = $(entry_row).find('.entry-reptool-expiration').text()
+
+          show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+          $(show_content[0]).text(entry_content)
+
+          show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
+          show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
+          if entry_rep_class == "Not on RepTool"
+            $(show_rep_class).addClass('missing-data')
+            $(show_rep_exp).addClass('missing-data')
+            $(show_rep_exp[0]).text('N/A')
+          else
+            $(show_rep_exp[0]).text(entry_rep_exp)
+          $(show_rep_class[0]).text(entry_rep_class)
+
+    else
+      alert ('No rows selected')
+
+
 #  Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     if ($('.dispute_check_box:checked').length > 0)

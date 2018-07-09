@@ -56,7 +56,6 @@
                       %label.content-label-sm Current Score
                       %br
                       %span.current-wbrs-score
-                      -#= entry.wbrs_score
                     %td.text-center
                       %label.content-label-sm New Score
                       %br
@@ -79,50 +78,48 @@
 
         %span.dropdown
           %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-            %span.toolbar-button-text Adjust RepTool BL
+            %span.toolbar-button-text Adjust RepTool WL/BL
           .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
             =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
               -#For each checked checkbox populate this information
-              .dispute-name-wrapper
-                %label.content-label-sm Dispute
-                -#<!-- dispute name -->
-                paragon-downloads.com
-              %table.dispute_tool_current
-                %tr
-                  %td
-                    %label.content-label-sm
-                      Classification
-                    -# Put Reptool classification of the entry here if there is any -->
-                    Spam
-                  %td
-                    %label.content-label-sm
-                      Expiration
-                    -# If the entry item has a reptool class (rule), that goes above, the expiration of that class goes here.
-                    2018-06-02T13:12:48
+              .dispute-reptool-adjust-wrapper
+                .dispute-name-wrapper
+                  %label.content-label-sm Dispute
+                  %br
+                  %span.entry-dispute-name
+                %table.dispute_tool_current
+                  %tr
+                    %td
+                      %label.content-label-sm Classification
+                      %br
+                      %span.entry-reptool-class
+                    %td
+                      %label.content-label-sm Expiration
+                      %br
+                      %span.entry-reptool-expiration
+                .inline-tool-content-wrapper
+                  .toolbar
+                    %div
+                      %label.toolbar-section-label{for: 'blacklist-action-select'} Status
+                      = rep_form.select(:action, ['Active', 'Expired'],
+                        {include_blank: true},
+                        class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                        title: 'RepTool Rule Status',
+                        id: "blacklist-action-select")
 
-              .inline-tool-content-wrapper
-                .toolbar
-                  %div
-                    %label.toolbar-section-label{for: 'blacklist-action-select'} Status
-                    = rep_form.select(:action, ['Active', 'Expired'],
-                      {include_blank: true},
-                      class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                      title: 'RepTool Rule Status',
-                      id: "blacklist-action-select")
-
-                  %div
-                    %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool BL
-                    = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                      {include_blank: true},
-                      class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                      title: "RepTool BL Rules",
-                      id: "blacklist-classifications-select")
-
-                %label.content-label-sm Comment
-                %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                -#<!--- End of per checked checkbox loop -->
-                %button.primary{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)'}
-                  Submit Changes
+                    %div
+                      %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool WL/BL
+                      = rep_form.select(:classification, RepApi::Blacklist.classifications,
+                        {include_blank: true},
+                        class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                        title: "RepTool BL Rules",
+                        id: "blacklist-classifications-select")
+                  .comment-wrapper
+                    %label.content-label-sm Comment
+                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                  .button-row-center
+                    %button.primary{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)'}
+                      Submit Changes
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes'}
@@ -169,6 +166,7 @@
                     -# Temporarily putting manual status entries in here
                     %span.dropdown
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                        -#= entry[:status]
                         -#Current entry status here
                         New
                       .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
@@ -266,37 +264,51 @@
                         %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                           = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
-                            %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
-                            %h3 Adjust RepTool BL
-                            %table.dispute_tool_current
-                              %tr
-                                %td
-                                  %label.content-label-sm Classification
-                                  = entry.classifications.first
-                                %td
-                                  %label.content-label-sm Expiration
-                                  = entry.blacklist&.expiration
-                            .inline-tool-content-wrapper
-                              .toolbar
-                                %div
-                                  %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
-                                  = rep_form.select(:action, ['Active', 'Expired'],
-                                    {selected: entry.blacklist ? 'Active' : 'Expired'},
-                                    class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                                    title: 'RepTool Rule Status',
-                                    id: "entry-#{entry.id}-blacklist-action-select")
-                                %div
-                                  %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool BL
-                                  = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                                    {selected: entry.classifications&.first,
-                                      include_blank: !entry.blacklist},
-                                    class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                                    title: "RepTool BL Rules",
-                                    id: "entry-#{entry.id}-blacklist-classifications-select")
-
-                              %label.content-label-sm Comment
-                              %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                              %button.primary{type: 'button', onclick: 'row_adust_reptool_bl_button(this)'} Submit Changes
+                            .dispute-reptool-adjust-wrapper
+                              %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
+                              %h3 Adjust RepTool WL/BL
+                              %table.dispute_tool_current
+                                %tr
+                                  %td
+                                    %label.content-label-sm Classification
+                                    %br
+                                    - if entry.classifications.first.nil?
+                                      %span.missing-data Not on RepTool
+                                    - else
+                                      %span.entry-reptool-class
+                                        = entry.classifications.first
+                                  %td
+                                    %label.content-label-sm Expiration
+                                    %br
+                                    - if entry.classifications.first.nil?
+                                      %span.missing-data N/A
+                                    - else
+                                      %span.entry-reptool-expiration
+                                        = entry.blacklist&.expiration
+                              .inline-tool-content-wrapper
+                                .toolbar
+                                  %div
+                                    %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
+                                    -# Need to add an 'N/A' option in the dropdown for if an item has no classifications
+                                    -# in RepTool
+                                    = rep_form.select(:action, ['Active', 'Expired'],
+                                      {selected: entry.blacklist ? 'Active' : 'Expired'},
+                                      class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                                      title: 'RepTool Rule Status',
+                                      id: "entry-#{entry.id}-blacklist-action-select")
+                                  %div
+                                    %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool WL/BL
+                                    = rep_form.select(:classification, RepApi::Blacklist.classifications,
+                                      {selected: entry.classifications&.first,
+                                        include_blank: 'Not on RepTool'},
+                                      class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                                      title: "RepTool BL Rules",
+                                      id: "entry-#{entry.id}-blacklist-classifications-select")
+                                .comment-wrapper
+                                  %label.content-label-sm Comment
+                                  %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                                .button-row-center
+                                  %button.primary.dropdown-submit-button{type: 'button', onclick: 'row_adust_reptool_bl_button(this)'} Submit Changes
                 %tr.research-overview-row
                   %td
                     -#Expander area
@@ -323,7 +335,6 @@
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label XBRS History
                         %td.text-center
-                          -#Number of xbrs results
                           - unless entry.hostlookup.nil?
                             = entry.find_xbrs[1]['data'].count
                         %td.input-col
@@ -331,7 +342,6 @@
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label Virus Total
                         %td.text-center
-                          -#Total hits on Virus Total
                           = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                         %td.left-bordered
                           %label WL/BL
@@ -366,7 +376,6 @@
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label Crosslisted URLs
                         %td.text-center
-                          -#Number of url results
                           = entry.wbrs_xlist.count
                         %td.input-offset.left-bordered
                           %label Umbrella
@@ -375,11 +384,18 @@
                           Clean
                         %td.left-bordered
                           %label RepTool Class
-                        %td
-                          -#WL/BL List
-                          %span.inline-col-breakup Spam
-                          %span.inline-col-breakup ACTIVE
-                          %span.inline-col-breakup Juno Spam Monitor
+                        %td.entry-reptool-data
+                          - if entry.classifications.first.nil?
+                            %span.missing-data.entry-reptool-class Not on RepTool
+                          - else
+                            %span.inline-col-breakup.entry-reptool-class
+                              = entry.classifications.first
+                            %span.inline-col-breakup.entry-reptool-status
+                              -# Reptool classification status (Active vs expired)
+                              = entry.blacklist
+                            %span.inline-col-breakup.entry-reptool-comment
+                              -# Reptool comment, add comment here
+                              Juno Spam Monitor
                         %td.left-bordered
                           %label Last Submitted
                         %td
@@ -445,7 +461,6 @@
                                         %td.unrated-site-result Unrated
                                       - else
                                         %td.unclean-site-result= virustotal[:result]
-                        -#Put weight of rule here
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header XBRS History

@@ -4730,19 +4730,19 @@ td.data-table-emph {
   min-width: 40px;
 }
 
-.dispute-wlbl-adjust-wrapper {
+.dispute-wlbl-adjust-wrapper, .dispute-reptool-adjust-wrapper {
   padding: 0 !important;
 }
 
-.dispute-wlbl-adjust-wrapper button {
+.dispute-wlbl-adjust-wrapper button, .dispute-reptool-adjust-wrapper button {
   text-transform: none;
   font-weight: 400;
   font-size: 8.5pt;
 }
 
-.dispute-wlbl-adjust-wrapper label {
+.dispute-wlbl-adjust-wrapper label, .dispute-reptool-adjust-wrapper label {
   text-transform: none !important;
-  font-weight: 400 !important;;
+  font-weight: 400 !important;
 }
 
 .dispute_tool_current td label {
