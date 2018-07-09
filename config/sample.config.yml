@@ -6,8 +6,6 @@ development:
       check: true
     virus_total:
       check: true
-      url: "https://www.virustotal.com/vtapi/v2/url/report"
-      api_key: "redacted"
     umbrella:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
@@ -83,6 +81,11 @@ development:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
 
 test:
   amq: #active message queue
@@ -92,8 +95,6 @@ test:
       check: true
     virus_total:
       check: true
-      url: "https://www.virustotal.com/vtapi/v2/url/report"
-      api_key: "redacted"
     umbrella:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
@@ -168,6 +169,11 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
 
 staging:
   amq: #active message queue
@@ -177,8 +183,6 @@ staging:
       check: true
     virus_total:
       check: true
-      url: "https://www.virustotal.com/vtapi/v2/url/report"
-      api_key: "redacted"
     umbrella:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
@@ -239,6 +243,11 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
 
 production:
   amq: #active message queue
@@ -248,8 +257,6 @@ production:
       check: true
     virus_total:
       check: true
-      url: "https://www.virustotal.com/vtapi/v2/url/report"
-      api_key: "redacted"
     umbrella:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
@@ -311,4 +318,9 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
 
