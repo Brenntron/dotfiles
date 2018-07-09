@@ -111,14 +111,11 @@ Rails.configuration.xbrs.port           = xbrs_config['port']
 Rails.configuration.xbrs.verify_mode    = xbrs_config['verify_mode']
 Rails.configuration.xbrs.gssnegotiate   = xbrs_config['gssnegotiate']
 
+raise 'config.yml missing virus_total section' unless env_config['virus_total']
 virus_total                             = OpenStruct.new
-if auto_resolve['virus_total']
-  virus_total.check                     = auto_resolve['virus_total']['check']
-  virus_total.url                       = auto_resolve['virus_total']['url']
-  virus_total.api_key                   = env_config['virus_total']['api_key']
-else
-  virus_total.check                     = false
-end
+virus_total.check                       = auto_resolve['virus_total']['check']
+virus_total.url                         = env_config['virus_total']['url']
+virus_total.api_key                     = env_config['virus_total']['api_key']
 Rails.configuration.virus_total         = virus_total
 
 virustotal = env_config.fetch('virustotal', {})

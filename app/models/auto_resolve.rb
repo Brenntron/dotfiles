@@ -64,7 +64,8 @@ class AutoResolve
   end
 
   def virus_total_request(address)
-    full_url = "#{Rails.configuration.virus_total.url}?#{virus_total_query_string(address)}"
+    # full_url = "#{Rails.configuration.virus_total.url}?#{virus_total_query_string(address)}"
+    full_url = Virustotal::Scan.full_scan_url(address: address)
     request = HTTPI::Request.new(full_url)
     request.ssl = true
     request.auth.ssl.verify_mode = :peer
