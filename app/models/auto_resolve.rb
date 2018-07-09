@@ -171,16 +171,13 @@ class AutoResolve
   end
 
   # Save the blacklist object.
-  # @param [Array<String>] hostnames: array of addresses to blacklist.
-  # @param [Array<String>] classifications: array of classifications to use for blacklisting.
   # @param [String] author: moniker of who is adding or updating this entry.
-  # @param [String] comment: comment to use for blacklist.
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
-  def publish_to_rep_api(classifications:, author:, comment:)
+  def publish_to_rep_api(author:)
     raise 'Cannot blacklist address which has not been marked malicious through auto-resolve.' unless malicious?
     RepApi::Blacklist.add_from_hosts(hostnames: [ self.address ],
-                                     classifications: classifications,
+                                     classifications: [ 'malware' ],
                                      author: author,
-                                     comment: comment)
+                                     comment: 'TE SecHub-Auto')
   end
 end
