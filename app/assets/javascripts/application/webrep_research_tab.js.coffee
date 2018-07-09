@@ -47,9 +47,8 @@ $ ->
       $('.edit-entries-buttons').addClass('hidden')
 
 #   Need to add save function after editing.
-
-#        After this is edited the user has to hit save, add a placeholder button for now above the table.
-#        When they hit save it should send the update to the ticket, populate everywhere / reload the page,
+#        When they hit save it should send the update to the ticket,
+  #      populate everywhere / reload the page,
 #        and set the entry span to match the content of the input
 #
 
@@ -122,7 +121,36 @@ $ ->
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
 
-#  Populating the Adjust WL/BL Button
+
+#  Populating the toolbar Adjust RepTool Button
+  $('#reptool_entries_button').click ->
+    if ($('.dispute_check_box:checked').length > 0)
+      $('.dispute_check_box').each ->
+        if $(this).prop('checked')
+#          debugger
+          entry_row = $(this).parents('.research-table-row')[0]
+          entry_content = $(entry_row).find('.entry-data-content').text()
+          entry_rep_class = $(entry_row).find('.entry-reptool-class').text()
+          entry_rep_exp = $(entry_row).find('.entry-reptool-expiration').text()
+
+          show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+          $(show_content[0]).text(entry_content)
+
+          show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
+          show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
+          if entry_rep_class == "Not on RepTool"
+            $(show_rep_class).addClass('missing-data')
+            $(show_rep_exp).addClass('missing-data')
+            $(show_rep_exp[0]).text('N/A')
+          else
+            $(show_rep_exp[0]).text(entry_rep_exp)
+          $(show_rep_class[0]).text(entry_rep_class)
+
+    else
+      alert ('No rows selected')
+
+
+#  Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     if ($('.dispute_check_box:checked').length > 0)
       $('.dispute_check_box').each ->
@@ -130,7 +158,6 @@ $ ->
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-
 
           show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
           show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
@@ -140,25 +167,66 @@ $ ->
           $(show_wbrs[0]).text(wbrs)
           wlbl_options = $(select_wlbl).find('option')
 
+          entry_list_val = ''
+          preview_button = $('#wlbl_adjust_entries').find('.wlbl-preview-button')
+          comment_wrapper = $('#wlbl_adjust_entries').find('.comment-wrapper')
+          submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+
           $(wlbl_options).each ->
-            debugger
             option_value = $(this).val()
             wlbl = $(entry_row).find('.entry-data-wlbl').text()
-            console.log(option_value)
-            console.log wlbl
-            if option_value == wlbl
-              console.log 'match'
-
+            if $.trim(option_value) == $.trim(wlbl)
+              entry_list_val = $(select_wlbl).val(option_value)
             else
-              console.log 'false'
-#            wtf is going on 
+              entry_list_val = $(select_wlbl).val()
+
+          $(select_wlbl).change ->
+            new_val = $(select_wlbl).val()
+            if new_val != entry_list_val
+              $(preview_button).removeAttr("disabled")
+            else if new_val ==  entry_list_val
+              unless $(preview_button).attr("disabled", true)
+                $(preview_button).attr("disabled", true)
+
+          $(preview_button).click ->
+            if $(preview_button).attr("disabled", false)
+              $(comment_wrapper).show()
+              $(submit_button).removeAttr("disabled")
 
     else
       alert ('No rows selected')
-#      return false
-#        get values
-#        populate dropdown form
 
+
+#  Inline Adjust WL/BL Button
+  $('.dispute-inline-buttons.adjust-wlbl-button').click ->
+
+    entry_row = $(this).parents('.research-table-row')[0]
+    wlbl = $(entry_row).find('.entry-data-wlbl').text()
+    dropdown = $(this).next('.dropdown-menu')
+    select_wlbl = $(dropdown).find('.adjust-wlbl-input')
+    wlbl_options = $(select_wlbl).find('option')
+
+    preview_button = $(dropdown).find('.wlbl-preview-button')
+    comment_wrapper = $(dropdown).find('.comment-wrapper')
+    submit_button = $(dropdown).find('.dropdown-submit-button')
+
+    $(select_wlbl).change ->
+      new_val = $(select_wlbl[1]).val()
+      wlbl = $.trim(wlbl)
+      if wlbl == "Not currently on a list"
+        wlbl = ""
+
+      if new_val != wlbl
+        $(preview_button).removeAttr("disabled")
+      else if new_val ==  wlbl
+        $(preview_button).attr("disabled", true)
+        $(comment_wrapper).hide()
+        $(submit_button).attr("disabled", true)
+
+    $(preview_button).click ->
+      if $(preview_button).attr("disabled", false)
+        $(comment_wrapper).show()
+        $(submit_button).removeAttr("disabled")
 
 
 # Show / hide the different research tables in the expanded row
@@ -201,6 +269,7 @@ $ ->
         $(cl_table).hide()
 
 
+
 # Scrollable tables in the expanded rows
   $('.table-scrollable').DataTable({
     scrollY: 200,
@@ -210,3 +279,4 @@ $ ->
     ordering: false,
     info: false
   })
+
