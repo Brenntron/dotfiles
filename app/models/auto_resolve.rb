@@ -58,19 +58,6 @@ class AutoResolve
     end
   end
 
-  def call_virus_total(address: self.address)
-    request = Virustotal::Scan.virus_total_request(address: address)
-    response = HTTPI.get(request)
-    case
-      when 300 <= response.code
-        Rails.logger.error("Virus Total http response #{response.code}")
-        return nil
-      when 200 != response.code
-        Rails.logger.warn("Virus Total http response #{response.code}")
-    end
-    JSON.parse(response.body)
-  end
-
   def virus_total_scan_names
     %w{Kaspersky Sophos Avira Google\ Safebrowsing BitDefender}
   end
@@ -78,7 +65,7 @@ class AutoResolve
   # Checks the Virus Total system.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_virus_total(address: self.address)
-    result = call_virus_total(address: address)
+    result = Virustotal::Scan.scan_hashes(address: address)
     if result && result['scans']
       all_scans = result['scans']
       scan_results = virus_total_scan_names.map do |scan_key|
