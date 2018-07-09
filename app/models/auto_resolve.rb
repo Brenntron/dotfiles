@@ -58,23 +58,8 @@ class AutoResolve
     end
   end
 
-  def virus_total_query_string(address)
-    # "apikey=#{Rails.configuration.virus_total.api_key}&resource=#{address}"
-    Virustotal::Scan.scan_query_string(address: address)
-  end
-
-  def virus_total_request(address)
-    # full_url = "#{Rails.configuration.virus_total.url}?#{virus_total_query_string(address)}"
-    full_url = Virustotal::Scan.full_scan_url(address: address)
-    request = HTTPI::Request.new(full_url)
-    request.ssl = true
-    request.auth.ssl.verify_mode = :peer
-    request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    request
-  end
-
   def call_virus_total(address: self.address)
-    request = virus_total_request(address)
+    request = Virustotal::Scan.virus_total_request(address: address)
     response = HTTPI.get(request)
     case
       when 300 <= response.code
