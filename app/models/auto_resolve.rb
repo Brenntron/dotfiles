@@ -173,7 +173,7 @@ class AutoResolve
   # Save the blacklist object.
   # @param [String] author: moniker of who is adding or updating this entry.
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
-  def publish_to_rep_api(author:)
+  def publish_to_rep_api(author: 'reptooluser')
     raise 'Cannot blacklist address which has not been marked malicious through auto-resolve.' unless malicious?
     RepApi::Blacklist.add_from_hosts(hostnames: [ self.address ],
                                      classifications: [ 'malware' ],
