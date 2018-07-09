@@ -78,8 +78,8 @@ class RepApi::Blacklist < RepApi::Base
   # and call this method.
   # The entry field is required and may be an array.
   # The classifications field is required and must be an array.
-  # @param [String] author moniker of who is adding or updating this entry.
-  # @param [String] comment
+  # @param [String] author: moniker of who is adding or updating this entry.
+  # @param [String] comment:
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
   def save!(params = {})
     raise "Validation failed: #{errors.full_messages.join(', ')}" unless valid?
@@ -167,15 +167,31 @@ class RepApi::Blacklist < RepApi::Base
     true
   end
 
+  # Save the blacklist object.
+  # @param [Array<String>] hostnames: array of addresses to blacklist.
+  # @param [Array<String>] classifications: array of classifications to use for blacklisting.
+  # @param [String] author: moniker of who is adding or updating this entry.
+  # @param [String] comment: comment to use for blacklist.
+  # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
+  def self.add_from_hosts(hostnames:, classifications:, author:, comment:)
+    blacklist = RepApi::Blacklist.new(entry: hostnames,
+                                      classifications: classifications)
+    blacklist.save!(author: author, comment: comment)
+  end
+
+  # Save the blacklist object.
+  # @param [Hash] params "dispute_entry_ids" array of ids, "classifications" array, and "comment".
+  # @param [String] username: moniker of who is adding or updating this entry.
+  # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
   def self.add_from_params(params, username:)
     dispute_entry_ids = params['dispute_entry_ids']
     raise 'Must provide dispute entry ids' unless dispute_entry_ids
     entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
     reptool_entries = entries.map {|entry| entry.hostlookup}
-
-    blacklist = RepApi::Blacklist.new(entry: reptool_entries,
-                                      classifications: params['classifications'])
-    blacklist.save!(author: username, comment: params['comment'])
+    add_from_hosts(hostnames: reptool_entries,
+                   classifications:params['classifications'],
+                   author: username,
+                   comment: params['comment'])
   end
 
   def self.delete_from_params(params)

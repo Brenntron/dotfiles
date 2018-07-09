@@ -145,7 +145,7 @@ class AutoResolve
 
   # @param [String] address_type: 'IP' or 'URI/DOMAIN'
   # @param [String] address: ip address, uri, or domain
-  # @param [Array<TBD>] rule_hits: collection of our rule hits
+  # @param [Array<String>] rule_hits: collection of our rule hits as strings of mnem values
   def self.create_from_payload(address_type:, address:, rule_hits: nil)
     address_type_attr =
         case
@@ -168,5 +168,18 @@ class AutoResolve
         resolution: malicious? ? 'Fixed -FN' : '',
         resolution_message: malicious? ? 'This URI/IP has been deemed malicious, and has been blacklisted.' : ''
     }
+  end
+
+  # Save the blacklist object.
+  # @param [Array<String>] hostnames: array of addresses to blacklist.
+  # @param [Array<String>] classifications: array of classifications to use for blacklisting.
+  # @param [String] author: moniker of who is adding or updating this entry.
+  # @param [String] comment: comment to use for blacklist.
+  # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
+  def publish_to_rep_api(classifications:, author:, comment:)
+    RepApi::Blacklist.add_from_hosts(hostnames: [ self.address ],
+                                     classifications: classifications,
+                                     author: author,
+                                     comment: comment)
   end
 end
