@@ -88,7 +88,7 @@
         %br
         %label.content-label-sm
           Age
-        %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
+        %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
       .top-info-buttons-wrapper
         %button.edit-button.dispute-top-buttons#edit-dispute-button
         %button.save-button.dispute-top-buttons#save-dispute-button.hidden
