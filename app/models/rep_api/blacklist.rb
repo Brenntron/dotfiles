@@ -27,9 +27,12 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.classifications
-    response = call_json_request(:get, '/blacklist/classifications', body: {})
+    unless @classifications
+      response = call_json_request(:get, '/blacklist/classifications', body: {})
 
-    JSON.parse(response.body)
+      @classifications = JSON.parse(response.body)
+    end
+    @classifications
   end
 
   def self.load_from_attributes(attributes)
