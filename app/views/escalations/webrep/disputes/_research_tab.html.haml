@@ -346,7 +346,13 @@
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label Virustotal
                         %td.text-center
-                          = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+                          - if entry.virustotals.count == 0
+                            %span.missing-data N/A
+                          - else
+                            = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+                            \\
+                            = entry.virustotals.count
+
                         %td.left-bordered
                           %label WL/BL
                         %td.entry-data-wlbl
