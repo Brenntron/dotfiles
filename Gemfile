@@ -98,6 +98,17 @@ group :test do
   gem 'cucumber-api-steps', '~>0.14', require: false
 end
 
+group :profile do
+  gem 'ruby-prof'
+
+  # gem 'rack-mini-profiler'
+  # gem 'memory_profiler'
+  # gem 'flamegraph'
+  # gem 'stackprof'
+
+  # gem 'scout_apm'
+end
+
 gem 'httparty', '~> 0.15.3'
 gem 'uglifier', '~> 3.2.0'
 gem 'jquery-rails', '~> 4.3.1'
