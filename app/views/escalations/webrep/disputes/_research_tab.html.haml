@@ -29,8 +29,7 @@
             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
               .dispute-name-wrapper
                 %label.content-label-sm Dispute
-                -#dispute name
-                paragon-downloads.com
+                = @dispute.org_domain
               %table.dispute_tool_current
                 %tr
                   %td
@@ -66,7 +65,7 @@
               .dispute-name-wrapper
                 %label.content-label-sm Dispute
                 -#<!-- dispute name -->
-                paragon-downloads.com
+                = @dispute.org_domain
               %table.dispute_tool_current
                 %tr
                   %td
@@ -363,7 +362,7 @@
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header XBRS History
-                            - if entry.find_xbrs[1]['data'].empty?
+                            - if entry.xbrs_data['data'].empty?
                               %table
                                 %thead
                                   %tr
@@ -374,11 +373,11 @@
                               %table.table-scrollable
                                 %thead
                                   %tr
-                                    - entry.find_xbrs[1]['legend'].each do |header|
+                                    - entry.xbrs_data['legend'].each do |header|
                                       %th= header
                                 %tbody
                                   - unless entry.hostlookup.nil?
-                                    - entry.find_xbrs[1]['data'].each do |data|
+                                    - entry.xbrs_data['data'].each do |data|
                                       %tr
                                         - data.each do |datapoint|
                                           %td= datapoint
