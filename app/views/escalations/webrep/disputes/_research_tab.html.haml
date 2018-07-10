@@ -74,7 +74,8 @@
                     %label.content-label-sm Comment
                     %textarea.dropdown-comment.adjust-wlbl-input.note-input
                   .button-row-center
-                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true} Submit Changes
+                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true}
+                      Submit Changes
 
         %span.dropdown
           %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -118,7 +119,7 @@
                     %label.content-label-sm Comment
                     %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
                   .button-row-center
-                    %button.primary{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)'}
+                    %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
                       Submit Changes
 
       .edit-button-wrapper.edit-entries-buttons.hidden
@@ -340,7 +341,7 @@
                         %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                          %label Virus Total
+                          %label Virustotal
                         %td.text-center
                           = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                         %td.left-bordered
@@ -437,14 +438,14 @@
                                     %td
                                       -#Put weight of rule here
                           .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Virus Total Details
+                            %h5.entry-details-table-header Virustotal Details
                             - if entry.virustotals.empty?
                               %table
                                 %thead
                                   %tr
                                     %th
                                       %span.missing-data
-                                        No Virus Total data available.
+                                        No Virustotal data available.
                             - else
                               %table.table-scrollable
                                 %thead
