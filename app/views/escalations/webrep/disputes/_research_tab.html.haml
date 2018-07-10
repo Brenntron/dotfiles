@@ -498,23 +498,52 @@
 
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Cross-listed URLs
-                            %table
-                              %thead
-                                %tr
-                                  %th ID
-                                  %th URL
-                                  %th List Type
-                                  %th.text-center Current Score
-                                  %th Username
-                                  %th Last Update
-                                  %th Created
-                              %tbody
-                                - entry.wbrs_xlist.each do |cross_listed|
+                            - if entry.wbrs_xlist.empty?
+                              %table
+                                %thead
                                   %tr
-                                    %td= cross_listed.id
-                                    %td= cross_listed.url
-                                    %td= cross_listed.list_type
-                                    %td -
-                                    %td= cross_listed.username
-                                    %td= cross_listed.mtime
-                                    %td= cross_listed.ctime
+                                    %th
+                                      %span.missing-data
+                                        No cross-listed urls.
+                            - elsif entry.wbrs_xlist.count < 8
+                              %table
+                                %thead
+                                  %tr
+                                    %th ID
+                                    %th URL
+                                    %th List Type
+                                    %th.text-center Current Score
+                                    %th Username
+                                    %th Last Update
+                                    %th Created
+                                %tbody
+                                  - entry.wbrs_xlist.each do |cross_listed|
+                                    %tr
+                                      %td= cross_listed.id
+                                      %td= cross_listed.url
+                                      %td= cross_listed.list_type
+                                      %td -
+                                      %td= cross_listed.username
+                                      %td= cross_listed.mtime
+                                      %td= cross_listed.ctime
+                            - else
+                              %table.table-scrollable
+                                %thead
+                                  %tr
+                                    %th ID
+                                    %th URL
+                                    %th List Type
+                                    %th.text-center Current Score
+                                    %th Username
+                                    %th Last Update
+                                    %th Created
+                                %tbody
+                                  - entry.wbrs_xlist.each do |cross_listed|
+                                    %tr
+                                      %td= cross_listed.id
+                                      %td= cross_listed.url
+                                      %td= cross_listed.list_type
+                                      %td -
+                                      %td= cross_listed.username
+                                      %td= cross_listed.mtime
+                                      %td= cross_listed.ctime

@@ -60,46 +60,46 @@
             %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
-              -#=form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
+              =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                 -#For each checked checkbox populate this information
-              .dispute-reptool-adjust-wrapper
-                .dispute-name-wrapper
-                  %label.content-label-sm Dispute
-                  %br
-                  %span.entry-dispute-name
-                %table.dispute_tool_current
-                  %tr
-                    %td
-                      %label.content-label-sm Classification
-                      %br
-                      %span.entry-reptool-class
-                    %td
-                      %label.content-label-sm Expiration
-                      %br
-                      %span.entry-reptool-expiration
-                .inline-tool-content-wrapper
-                  .toolbar
-                    %div
-                      %label.toolbar-section-label{for: 'blacklist-action-select'} Status
-                      -#= rep_form.select(:action, ['Active', 'Expired'],
-                      -#  {include_blank: true},
-                      -#  class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                      -#  title: 'RepTool Rule Status',
-                      -#  id: "blacklist-action-select")
+                .dispute-reptool-adjust-wrapper
+                  .dispute-name-wrapper
+                    %label.content-label-sm Dispute
+                    %br
+                    %span.entry-dispute-name
+                  %table.dispute_tool_current
+                    %tr
+                      %td
+                        %label.content-label-sm Classification
+                        %br
+                        %span.entry-reptool-class
+                      %td
+                        %label.content-label-sm Expiration
+                        %br
+                        %span.entry-reptool-expiration
+                  .inline-tool-content-wrapper
+                    .toolbar
+                      %div
+                        %label.toolbar-section-label{for: 'blacklist-action-select'} Status
+                        = rep_form.select(:action, ['Active', 'Expired'],
+                          {include_blank: true},
+                          class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                          title: 'RepTool Rule Status',
+                          id: "blacklist-action-select")
 
-                    %div
-                      %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool WL/BL
-                      -#= rep_form.select(:classification, RepApi::Blacklist.classifications,
-                      -#  {include_blank: true},
-                      -#  class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                      -#  title: "RepTool BL Rules",
-                      -#  id: "blacklist-classifications-select")
-                  .comment-wrapper
-                    %label.content-label-sm Comment
-                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                  .button-row-center
-                    %button.primary{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)'}
-                      Submit Changes
+                      %div
+                        %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool WL/BL
+                        = rep_form.select(:classification, RepApi::Blacklist.classifications,
+                          {include_blank: true},
+                          class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                          title: "RepTool BL Rules",
+                          id: "blacklist-classifications-select")
+                    .comment-wrapper
+                      %label.content-label-sm Comment
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                    .button-row-center
+                      %button.primary{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)'}
+                        Submit Changes
 
   .row
     .col-xs-12
@@ -168,34 +168,34 @@
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                           .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
-                            -#= form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
+                            = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                               %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                               %h3 Adjust RepTool BL
-                              -#%table.dispute_tool_current
-                              -#  %tr
-                              -#    %td
-                              -#      %label.content-label-sm Classification
-                              -#      = entry.classifications.first
-                              -#    %td
-                              -#      %label.content-label-sm Expiration
-                              -#      = entry.blacklist&.expiration
-                              -#.inline-tool-content-wrapper
-                              -#  .toolbar
-                              -#    %div
-                              -#      %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
-                              -#      = rep_form.select(:action, ['Active', 'Expired'],
-                              -#          {selected: entry.blacklist ? 'Active' : 'Expired'},
-                              -#          class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                              -#          title: 'RepTool Rule Status',
-                              -#          id: "entry-#{entry.id}-blacklist-action-select")
-                              -#    %div
-                                    -#%label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool BL
-                                    -#= rep_form.select(:classification, RepApi::Blacklist.classifications,
-                                    -#    {selected: entry.classifications&.first,
-                                    -#      include_blank: !entry.blacklist},
-                                    -#    class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                                    -#    title: "RepTool BL Rules",
-                                    -#    id: "entry-#{entry.id}-blacklist-classifications-select")
+                              %table.dispute_tool_current
+                                %tr
+                                  %td
+                                    %label.content-label-sm Classification
+                                    = entry.classifications.first
+                                  %td
+                                    %label.content-label-sm Expiration
+                                    = entry.blacklist&.expiration
+                              .inline-tool-content-wrapper
+                                .toolbar
+                                  %div
+                                    %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
+                                    = rep_form.select(:action, ['Active', 'Expired'],
+                                        {selected: entry.blacklist ? 'Active' : 'Expired'},
+                                        class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                                        title: 'RepTool Rule Status',
+                                        id: "entry-#{entry.id}-blacklist-action-select")
+                                  %div
+                                    %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool BL
+                                    = rep_form.select(:classification, RepApi::Blacklist.classifications,
+                                        {selected: entry.classifications&.first,
+                                          include_blank: !entry.blacklist},
+                                        class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                                        title: "RepTool BL Rules",
+                                        id: "entry-#{entry.id}-blacklist-classifications-select")
 
                                 %label.content-label-sm Comment
                                 %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
@@ -387,23 +387,54 @@
 
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header Cross-listed URLs
-                              %table
-                                %thead
-                                  %tr
-                                    %th ID
-                                    %th URL
-                                    %th List Type
-                                    %th.text-center Current Score
-                                    %th Username
-                                    %th Last Update
-                                    %th Created
-                                %tbody
-                                  - entry.wbrs_xlist.each do |cross_listed|
+                              - if entry.wbrs_xlist.empty?
+                                %table
+                                  %thead
                                     %tr
-                                      %td= cross_listed.id
-                                      %td= cross_listed.url
-                                      %td= cross_listed.list_type
-                                      %td -
-                                      %td= cross_listed.username
-                                      %td= cross_listed.mtime
-                                      %td= cross_listed.ctime
+                                      %th
+                                        %span.missing-data
+                                          No cross-listed urls.
+                              - elsif entry.wbrs_xlist.count < 8
+                                %table
+                                  %thead
+                                    %tr
+                                      %th ID
+                                      %th URL
+                                      %th List Type
+                                      %th.text-center Current Score
+                                      %th Username
+                                      %th Last Update
+                                      %th Created
+                                  %tbody
+                                    - entry.wbrs_xlist.each do |cross_listed|
+                                      %tr
+                                        %td= cross_listed.id
+                                        %td= cross_listed.url
+                                        %td= cross_listed.list_type
+                                        %td -
+                                        %td= cross_listed.username
+                                        %td= cross_listed.mtime
+                                        %td= cross_listed.ctime
+                              - else
+                                %table.table-scrollable
+                                  %thead
+                                    %tr
+                                      %th ID
+                                      %th URL
+                                      %th List Type
+                                      %th.text-center Current Score
+                                      %th Username
+                                      %th Last Update
+                                      %th Created
+                                  %tbody
+                                    - entry.wbrs_xlist.each do |cross_listed|
+                                      %tr
+                                        %td= cross_listed.id
+                                        %td= cross_listed.url
+                                        %td= cross_listed.list_type
+                                        %td -
+                                        %td= cross_listed.username
+                                        %td= cross_listed.mtime
+                                        %td= cross_listed.ctime
+
+
