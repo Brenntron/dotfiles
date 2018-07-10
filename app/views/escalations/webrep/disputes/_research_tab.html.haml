@@ -329,8 +329,11 @@
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
-                          - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-                            = wbrs_hit.name + ', '
+                          - if entry.dispute_rule_hits.where(:rule_type => "WBRS").count == 0
+                            %span.missing-data No rule hits
+                          - else
+                            - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                              = wbrs_hit.name + ', '
                         %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -370,8 +373,11 @@
                         %td
                           %label SBRS Rules
                         %td.rule-hits-col-list
-                          - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
-                            = sbrs_hit.name + ', '
+                          - if entry.dispute_rule_hits.where(:rule_type => "SBRS").count == 0
+                            %span.missing-data No rule hits
+                          - else
+                            - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                              = sbrs_hit.name + ', '
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -472,7 +478,7 @@
                                     %th
                                       %span.missing-data
                                         No XBRS data available.
-                            - if entry.find_xbrs[1]['data'].count < 8
+                            - elsif entry.find_xbrs[1]['data'].count < 8
                               %table
                                 %thead
                                   %tr

@@ -55,7 +55,7 @@
                       %textarea.dropdown-comment.adjust-wlbl-input.note-input
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true}
-                      Submit Changes
+                        Submit Changes
 
           %span.dropdown
             %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -116,7 +116,7 @@
                     %td
                       %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                     %td
-                      %span.entry-data
+                      %span.entry-data.entry-data-content
                         - unless entry[:ip_address].nil?
                           - entry_content = entry[:ip_address]
                         - unless entry[:uri].nil?
@@ -233,8 +233,11 @@
                           %td
                             %label WBRS Rules
                           %td.rule-hits-col-list
-                            - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-                              = wbrs_hit.name + ', '
+                            - if entry.dispute_rule_hits.where(:rule_type => "WBRS").count == 0
+                              %span.missing-data No rule hits
+                            - else
+                              - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                                = wbrs_hit.name + ', '
                           %td.input-col
                             %span.research-table-input-wrapper.xbrs-input-wrapper
                               %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -247,6 +250,7 @@
                               %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                             %label Virustotal
                           %td.text-center
+
                             = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                           %td.left-bordered
                             %label WL/BL
@@ -273,8 +277,11 @@
                           %td
                             %label SBRS Rules
                           %td.rule-hits-col-list
-                            - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
-                              = sbrs_hit.name + ', '
+                            - if entry.dispute_rule_hits.where(:rule_type => "SBRS").count == 0
+                              %span.missing-data No rule hits
+                            - else
+                              - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                                = sbrs_hit.name + ', '
                           %td.input-col
                             %span.research-table-input-wrapper.crosslisted-input-wrapper
                               %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
