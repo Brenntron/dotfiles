@@ -493,7 +493,7 @@
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header XBRS History
-                            - if entry.find_xbrs[1]['data'].empty?
+                            - if entry.xbrs_data['data'].empty?
                               %table
                                 %thead
                                   %tr
@@ -516,11 +516,11 @@
                               %table.table-scrollable
                                 %thead
                                   %tr
-                                    - entry.find_xbrs[1]['legend'].each do |header|
+                                    - entry.xbrs_data['legend'].each do |header|
                                       %th= header
                                 %tbody
                                   - unless entry.hostlookup.nil?
-                                    - entry.find_xbrs[1]['data'].each do |data|
+                                    - entry.xbrs_data['data'].each do |data|
                                       %tr
                                         - data.each do |datapoint|
                                           %td= datapoint
