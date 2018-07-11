@@ -417,7 +417,12 @@
                               %tbody
                                 - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
                                   %tr
-                                    %td= wbrs_hit.name
+                                    %td
+                                      -# If this rule has an escalation communication flag associated with it
+                                      %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
+                                        = wbrs_hit.name
+                                      -# else just the name
+                                      -#= wbrs_hit.name
                                     %td= wbrs_hit.mnemonic
                                     %td
                                       -#Put weight of rule here
