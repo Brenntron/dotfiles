@@ -4823,6 +4823,21 @@ button.dropdown-submit-button {
   text-align: center;
 }
 
+.search-options-row {
+  max-width: 250px;
+  margin: 12px auto;
+}
+.search-options-row label {
+  margin-left: 8px;
+  color: $content-bg-color;
+  font-size: 8pt;
+  fonw-weight: 400;
+}
+
+.search-options-row input[type="radio"] {
+  border: none;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
