@@ -1,39 +1,46 @@
 class DisputeReport::ResolutionReport
   class PerResolution
-    attr_reader :date
+    attr_reader :date, :distribution
     def initialize(date)
       @date = date
+      @distribution = DisputeEntry.where(case_resolved_at: (date..date+1)).group(:resolution).count
+    end
+
+    def total
+      distribution.values.sum
     end
 
     def each_resolution
       %w{UNCHANGED FIXED\ FN FIXED\ FD}.each do |resolution|
-        yield resolution, 43.21, 22
+        count = distribution[resolution]
+        percent = (0 < total && count) ? 100.0 * count / total : nil
+        yield resolution, percent && '%.2f' % percent, count
       end
-    end
-
-    def total
-      66
     end
   end
 
   class PerEngineer
-    attr_reader :date
+    attr_reader :date, :distribution
     def initialize(date)
       @date = date
-    end
-
-    def each_resolution
-      %w{matfeket obaig aheo auto_vtu}.each do |resolution|
-        yield resolution, 43.21, 22
-      end
-    end
-
-    def engineer_count
-      4
+      @distribution = DisputeEntry.where(case_resolved_at: (date..date+1)).group(:user_id).count
     end
 
     def total
-      66
+      distribution.values.sum
+    end
+
+    def engineer_count
+      distribution.count
+    end
+
+    def each_resolution
+      distribution.keys.each do |engineer_id|
+        engineer_name = User.find(engineer_id)&.cvs_username
+        count = distribution[engineer_id]
+        percent = (0 < total && count) ? 100.0 * count / total : nil
+        yield engineer_name, percent && '%.2f' % percent, count
+      end
     end
   end
 
@@ -45,13 +52,13 @@ class DisputeReport::ResolutionReport
   end
 
   def each_per_resolution
-    (date_from..date_to).each do |date|
+    (date_from..date_to).reverse_each do |date|
       yield PerResolution.new(date)
     end
   end
 
   def each_per_engineer
-    (date_from..date_to).each do |date|
+    (date_from..date_to).reverse_each do |date|
       yield PerEngineer.new(date)
     end
   end

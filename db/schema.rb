@@ -297,6 +297,7 @@ ActiveRecord::Schema.define(version: 20180711202236) do
     t.float "wbrs_score", limit: 24
     t.integer "webrep_wlbl_key"
     t.integer "reptool_key"
+    t.integer "user_id"
     t.datetime "case_opened_at"
     t.datetime "case_closed_at"
     t.datetime "case_accepted_at"
