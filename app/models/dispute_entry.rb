@@ -31,26 +31,29 @@ class DisputeEntry < ApplicationRecord
   end
 
   def classifications
-    blacklist&.classifications || []
+    @classifications ||= blacklist&.classifications || []
   end
 
   def wbrs_list_type
-    Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
+    @wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
   end
 
   def wbrs_xlist
-    Wbrs::ManualWlbl.where(url: hostlookup)
+    @wbrs_xlist ||= Wbrs::ManualWlbl.where(url: hostlookup)
   end
 
   def virustotals
-    scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
-    cleandata = Array.new
-    unless scans.nil?
-      scans.each do |s|
-        item = {:name => s[0], :result => s[1]["result"]}
-        cleandata << item
+    unless @virustotals
+      scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
+      cleandata = Array.new
+      unless scans.nil?
+        scans.each do |s|
+          item = {:name => s[0], :result => s[1]["result"]}
+          cleandata << item
+        end
       end
+      @virustotals = cleandata
     end
-    cleandata
+    @virustotals
   end
 end
