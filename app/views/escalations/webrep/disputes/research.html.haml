@@ -2,8 +2,14 @@
   .reputation-research-search-wrapper
     %h1 Reputation Research
     = form_tag('/tickets', method: :get) do
-      = text_field_tag 'result[id]', "#{}", class: 'search-box', placeholder: 'Reputation Entry Search', autofocus: 'true'
-
+      = text_field_tag 'result[id]', "#{}", class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true'
+      %div
+        %div
+          %input{type: 'checkbox'}
+          %label Strict Search
+        %div
+          %input{type: 'checkbox'}
+          %label Broad Search
 
   .row
     .col-xs-12
@@ -16,9 +22,6 @@
           %button.toolbar-button.collapse-button#collapse-all-rows
             %span.toolbar-button-text Collapse All Rows
         %div
-          %label.toolbar-section-label Edit
-          %button.toolbar-button.edit-button#add-entry-to-ticket
-            %span.toolbar-button-text Add to Ticket
           %span.dropdown
             %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust WBRS WL/BL
@@ -322,34 +325,50 @@
                           .col-sm-3
                             .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header WBRS Rule Hit Details
-                              %table
-                                %thead
-                                  %tr
-                                    %th Rule
-                                    %th Rule Description
-                                    %th Weight
-                                %tbody
-                                  - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                              - if entry.dispute_rule_hits.where(:rule_type => "WBRS").empty?
+                                %table
+                                  %thead
                                     %tr
-                                      %td= wbrs_hit.name
-                                      %td= wbrs_hit.mnemonic
-                                      %td
-                            -#Put weight of rule here
+                                      %th
+                                        %span.missing-data
+                                          No rule hits.
+                              - else
+                                %table
+                                  %thead
+                                    %tr
+                                      %th Rule
+                                      %th Rule Description
+                                      %th Weight
+                                  %tbody
+                                    - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                                      %tr
+                                        %td= wbrs_hit.name
+                                        %td= wbrs_hit.mnemonic
+                                        %td
+                                          -#Put weight of rule here
                             .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header SBRS Rule Hit Details
-                              %table
-                                %thead
-                                  %tr
-                                    %th Rule
-                                    %th Rule Description
-                                    %th Weight
-                                %tbody
-                                  - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                              - if entry.dispute_rule_hits.where(:rule_type => "SBRS").empty?
+                                %table
+                                  %thead
                                     %tr
-                                      %td= sbrs_hit.name
-                                      %td= sbrs_hit.mnemonic
-                                      %td
-                            -#Put weight of rule here
+                                      %th
+                                        %span.missing-data
+                                          No rule hits.
+                              - else
+                                %table
+                                  %thead
+                                    %tr
+                                      %th Rule
+                                      %th Rule Description
+                                      %th Weight
+                                  %tbody
+                                    - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                                      %tr
+                                        %td= sbrs_hit.name
+                                        %td= sbrs_hit.mnemonic
+                                        %td
+                                          -#Put weight of rule here
                             .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header Virustotal Details
                               - if entry.virustotals.empty?
