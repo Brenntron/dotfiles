@@ -1,0 +1,52 @@
+%h1 Resolution Report
+
+#date_from= params['report']['date_from']
+#date_to= params['report']['date_to']
+
+
+.report-div
+  #per-resolution-report-div
+    %table#per-resolution-report-table
+      %caption Number of resolved complaints per resolution
+      %thead
+        %tr
+          %th Date
+          %th Resolution
+          %th %
+          %th Count
+      %tbody
+        - @report.each_per_resolution do |pr_report|
+          %tr
+            %td{rowspan: 4}= pr_report.date
+            %td TOTAL:
+            %td
+            %td= pr_report.total
+          - pr_report.each_resolution do |resolution, percent, count|
+            %tr
+              %td= resolution
+              %td= percent
+              %td= count
+
+.report-div
+  #per-engineer-report-div
+    %table#per-engineer-report-table
+      %caption Number of resolved complaints per engineer
+      %thead
+        %tr
+          %th Date
+          %th Resolution
+          %th %
+          %th Count
+      %tbody
+        - @report.each_per_engineer do |pe_report|
+          %tr
+            %td{rowspan: 1 + pe_report.engineer_count}= pe_report.date
+            %td TOTAL:
+            %td
+            %td= pe_report.total
+          - pe_report.each_resolution do |engineer, percent, count|
+            %tr
+              %td= engineer
+              %td= percent
+              %td= count
+

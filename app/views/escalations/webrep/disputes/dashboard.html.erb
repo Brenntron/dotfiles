@@ -12,7 +12,16 @@
       <div>[1] In Progress Tickets</div>
       <div>[11] Closed Tickets</div>
     </div>
-  </div><br style="clear: both;"/>
+  </div>
+  <div style="float: right; padding-bottom: 20px;">
+    <%= simple_form_for :report, url: resolution_report_escalations_webrep_disputes_path,
+                        html: { target: :_blank } do |rpt_form| %>
+    <%= rpt_form.input :date_from, as: :string, input_html: {type: :date} %>
+    <%= rpt_form.input :date_to, as: :string, input_html: {type: :date} %>
+    <%= rpt_form.submit 'Report' %>
+    <% end %>
+  </div>
+  <br style="clear: both;"/>
   <div style="float: left; padding-bottom: 20px;">
     <div style="float: left;">
       [chart]

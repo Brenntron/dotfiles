@@ -44,6 +44,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def contains_search
   end
 
+  def resolution_report
+    @report = DisputeReport::ResolutionReport.new(date_from: params['report']['date_from'],
+                                                  date_to: params['report']['date_to'])
+  end
+
   private
 
   def index_params
