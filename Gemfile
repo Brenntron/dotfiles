@@ -110,7 +110,7 @@ group :development, :profile do
 end
 
 group :profile do
-  gem 'ruby-prof'
+  # gem 'ruby-prof'
 end
 
 gem 'httparty', '~> 0.15.3'
