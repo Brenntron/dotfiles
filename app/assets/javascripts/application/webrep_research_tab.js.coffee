@@ -237,3 +237,36 @@ $ ->
     info: false
   })
 
+  $('#ruleHitEmailDialog').dialog
+    autoOpen: false
+    minWidth: 400
+    position: { my: "right bottom", at: "right bottom", of: window }
+
+#  Rule escalations email
+  $('.wbrs-rule-trigger').click ->
+
+#    debugger
+    rule_id = $(this).attr('data-id')
+    rule_name = $(this).text()
+    entry_row = $(this).parents('.research-table-row')[0]
+    entry_content = $(entry_row).find('.entry-data-content').text()
+    reciever = 'somebody@thisplace.com'
+    subject = 'Need to change an entry associated with ' + rule_name
+    cc = 'someotherdude@here.com'
+    body = 'Hello,' +
+    'We have determined that ' + entry_content + ' should not be triggering ' + rule_name + '. Please look into this.' +
+    'Thanks'
+
+    $('#communication-tab-link').trigger 'click'
+    $('#ruleHitEmailDialog').dialog 'open'
+
+    reciever_input = $('#ruleHitEmailDialog').find('.receiver-email')
+    cc_input = $('#ruleHitEmailDialog').find('.cc-email')
+    subject_input = $('#ruleHitEmailDialog').find('.communication-subject')
+    body_input = $('#ruleHitEmailDialog').find('.email-reply-body')
+    $(reciever_input[0]).val(reciever)
+    $(cc_input[0]).val(cc)
+    $(subject_input[0]).val(subject)
+    $(body_input[0]).text(body)
+
+    return

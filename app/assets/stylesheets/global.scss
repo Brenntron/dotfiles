@@ -3512,9 +3512,44 @@ input.communication-subject {
   background-color: $faint-neutral-color;
 }
 
+.email-reply-header-information input {
+  font-size: 8.5pt;
+  padding: 4px;
+  border: none;
+}
+
+.email-reply-header-information .receiver-email, .email-reply-header-information .cc-email {
+  min-width: 160px;
+}
+
+.email-reply-header-information .row {
+  margin: 0;
+}
+
+.email-reply-header-information .col-xs-6, .email-reply-header-information .col-xs-12 {
+  padding: 0;
+}
+
+.email-reply-header-information .email-reply-buttons {
+  float: left;
+}
+
+.email-reply-header-information .content-label-sm-sub {
+
+}
+
 .email-attachments a {
   color: $content-tab-color;
   font-size: 8pt;
+}
+
+.wbrs-rule-trigger {
+  color: $content-bg-color;
+  text-decoration: underline;
+}
+
+.wbrs-rule-trigger:hover {
+  color: $warning-accent-color;
 }
 
 .template-label {
@@ -3850,10 +3885,6 @@ button.tertiary {
 
 /** Below for the new email dialog box **/
 
-input.receiver-email {
-  border: none;
-}
-
 .ui-dialog .ui-dialog-titlebar {
   background-color: #4E4E4E;
   color: $content-bg-color;
@@ -3909,7 +3940,7 @@ input.receiver-email {
   width: 170px;
 }
 
-.content-label-sm-to {
+.content-label-sm-to, .content-label-sm-cc {
   width: 10px !important;
 }
 

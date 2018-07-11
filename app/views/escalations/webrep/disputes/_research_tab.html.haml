@@ -565,6 +565,15 @@
                               %table
                                 %thead
                                   %tr
+                                    %td
+                                      -# If this rule has an escalation communication flag associated with it
+                                      %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
+                                        = wbrs_hit.name
+                                      -# else just the name
+                                      -#= wbrs_hit.name
+                                    %td= wbrs_hit.mnemonic
+                                    %td
+                                      -#Put weight of rule here
                                     %th
                                       %span.missing-data
                                         No rule hits.
