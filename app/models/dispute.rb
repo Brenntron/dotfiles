@@ -13,6 +13,10 @@ class Dispute < ApplicationRecord
   TI_NEW = 'pending'
   TI_RESOLVED = 'resolved'
 
+  AC_SUCCESS = 'CREATE_ACK'
+  AC_FAILED = 'CREATE_FAILED'
+  AC_PENDING = 'CREATE_PENDING'
+
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
@@ -105,7 +109,17 @@ class Dispute < ApplicationRecord
     versioned_items
   end
 
+  #TODO: REFACTOR TO MAKE PROCESS_BRIDGE_PAYLOAD A SMALLER METHOD
+  #These are instance methods used in building out the full dispute in a thread fired from self.process_bridge_payload
+  #
+
+
+  #
+  #end dispute building instance methods
+  #
   def self.process_bridge_payload(message_payload)
+    verdicts_to_blacklist = []
+
     begin
       ActiveRecord::Base.transaction do
 
@@ -166,28 +180,43 @@ class Dispute < ApplicationRecord
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
         #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
 
+
         new_entries_ips.each do |key, entry|
+
+          #placeholder for preloading stuff from Micah
+          #grab xbrs, reptool stuff, wl/bl entries, virustotal
+          #
+
+          false_negative_claim = false
+
+          if ["Malicious", "Poor"].include?(entry["rep_sugg"])
+            false_negative_claim = true
+          end
 
           wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
           sbrs_hits = entry["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
-          resolve_args = {}
-          resolve_args[:url] = key
-          resolve_args[:rules] = total_hits
 
           auto_resolve_verdict = AutoResolve.create_from_payload("IP", key, total_hits)
 
           #this is for return back to TI to populate its ticket show pages
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry["rep_sugg"]
-          new_payload_item[:status] = auto_resolve_verdict.ti_status
 
-          if auto_resolve_verdict.malicious?
-          #new_payload_item[:resolution_message] = auto_resolve_verdict.resolution_message
-          #new_payload_item[:resolution] = auto_resolve_verdict.resolution
+          if false_negative_claim
+            if auto_resolve_verdict.malicious?
+              new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+              new_payload_item[:resolution] = "FIXED"
+              new_payload_item[:status] = TI_RESOLVED
+            else
+              new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_payload_item[:resolution] = "UNCHANGED"
+              new_payload_item[:status] = TI_RESOLVED
+            end
           else
-
+            new_payload[:status] = TI_NEW
+            new_payload[:resolution_message] = ""
           end
           new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
           return_payload[key] = new_payload_item
@@ -200,12 +229,19 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
 
-
-
-          #new_dispute_entry.status = auto_resolve_verdict.status
-          #new_dispute_entry.resolution = auto_resolve_verdict.resolution
-          #new_dispute_entry.resolution = auto_resolve_verdict.resolution_message
-
+          if false_negative_claim
+            if auto_resolve_verdict.malicious?
+              new_dispute_entry.resolution_message = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+              new_dispute_entry.resolution = "FIXED FN"
+              new_dispute_entry.status = RESOLVED
+            else
+              new_dispute_entry.resolution_message = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution = "UNCHANGED"
+              new_dispute_entry.status = RESOLVED
+            end
+          else
+            new_dispute_entry.status = NEW
+          end
           new_dispute_entry.save
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
@@ -229,9 +265,21 @@ class Dispute < ApplicationRecord
             end
           end
 
+          verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+
         end
 
         new_entries_urls.each do |key, entry|
+
+          #placeholder for preloading stuff from Micah
+          #grab xbrs, reptool stuff, wl/bl entries, virustotal
+          #
+
+          false_negative_claim = false
+
+          if ["Malicious", "Poor"].include?(entry["rep_sugg"])
+            false_negative_claim = true
+          end
 
           top_url = Wbrs::TopUrl.check_urls([key]).first
 
@@ -240,7 +288,9 @@ class Dispute < ApplicationRecord
           wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
           sbrs_hits = entry["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
 
-          #auto_resolve_verdict = AutoResolve.create_from_payload("URI/DOMAIN", key, total_hits)
+          total_hits = (wbrs_hits + sbrs_hits).uniq
+
+          auto_resolve_verdict = AutoResolve.create_from_payload("URI/DOMAIN", key, total_hits)
 
           url_parts = Dispute.parse_url(key)
           new_dispute_entry = DisputeEntry.new
@@ -255,17 +305,39 @@ class Dispute < ApplicationRecord
           new_dispute_entry.entry_type = "URI/DOMAIN"
           new_dispute_entry.is_important = top_url.is_important != "invalid" ? top_url.is_important : false
 
-          #new_dispute_entry.status = auto_resolve_verdict.status
-          #new_dispute_entry.resolution = auto_resolve_verdict.resolution
-          #new_dispute_entry.resolution = auto_resolve_verdict.resolution_message
+          if false_negative_claim
+            if auto_resolve_verdict.malicious?
+              new_dispute_entry.resolution_message = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+              new_dispute_entry.resolution = "FIXED FN"
+              new_dispute_entry.status = RESOLVED
+            else
+              new_dispute_entry.resolution_message = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution = "UNCHANGED"
+              new_dispute_entry.status = RESOLVED
+            end
+          else
+            new_dispute_entry.status = NEW
+          end
 
           new_dispute_entry.save
 
+
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry["rep_sugg"]
-          #new_payload_item[:status] = auto_resolve_verdict.ti_status
-          #new_payload_item[:resolution_message] = auto_resolve_verdict.resolution_message
-          #new_payload_item[:resolution] = auto_resolve_verdict.resolution
+          if false_negative_claim
+            if auto_resolve_verdict.malicious?
+              new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+              new_payload_item[:resolution] = "FIXED"
+              new_payload_item[:status] = TI_RESOLVED
+            else
+              new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_payload_item[:resolution] = "UNCHANGED"
+              new_payload_item[:status] = TI_RESOLVED
+            end
+          else
+            new_payload[:status] = TI_NEW
+            new_payload[:resolution_message] = ""
+          end
           new_payload_item[:company_dup] = is_possible_company_duplicate(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
           return_payload[key] = new_payload_item
 
@@ -278,6 +350,8 @@ class Dispute < ApplicationRecord
               new_rule_hit.save
             end
           end
+
+          verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
 
         end
 
@@ -297,32 +371,82 @@ class Dispute < ApplicationRecord
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
         #change this
-        return {
-          "envelope":
-              {
-                  "channel": "ticket-acknowledge",
-                  "addressee": "talos-intelligence",
-                  "sender": "analyst-console"
-              },
-          "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": case_email}
-        }
+        #send direct push to bridge instead of return, this is now a thread
+
+        conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn.post(return_payload, case_email)
+
+
+        #return_message = {
+        #  "envelope":
+        #      {
+        #          "channel": "ticket-acknowledge",
+        #          "addressee": "talos-intelligence",
+        #          "sender": "analyst-console"
+        #      },
+        #  "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": case_email}
+        #}
 
       end
     rescue Exception => e
-
+      #change this
+      #send direct push to bridge instead of return, this is now a thread
       Rails.logger.error "Dispute failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")
-      return {
-          "envelope":
-              {
-                  "channel": "ticket-acknowledge",
-                  "addressee": "talos-intelligence",
-                  "sender": "analyst-console"
-              },
-          "message": {"source_key":params["source_key"],"ac_status":"SEND_FAILED" }
-      }
+
+      conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+      conn.post
+
+      #return {
+      #    "envelope":
+      #        {
+      #            "channel": "ticket-acknowledge",
+      #            "addressee": "talos-intelligence",
+      #            "sender": "analyst-console"
+      #        },
+      #    "message": {"source_key":params["source_key"],"ac_status":"SEND_FAILED" }
+      #}
     end
+
+
+    verdicts_to_blacklist.each do |blacklist|
+      begin
+        auto_resolve_verdict = blacklist.first
+        auto_resolve_verdict.publish_to_rep_api
+        dispute_entry = blacklist.last
+
+        args = {}
+        args[:dispute_id] = dispute_entry.dispute_id
+        args[:user_id] = user.id
+        args[:comment] = auto_resolve_verdict.internal_comment
+
+        DisputeComment.create(args)
+
+      rescue Exception => e
+        Rails.logger.error "Attempts at blacklisting a dispute entry with reptool failed. Check reptool:"
+        Rails.logger.error $!
+        Rails.logger.error $!.backtrace.join("\n")
+
+        dispute_entry = blacklist.last
+
+        dispute_entry.status = NEW
+        dispute_entry.resolution = ""
+        dispute_entry.resolution_message = ""
+        dispute_entry.save
+
+        args = {}
+        args[:dispute_id] = dispute_entry.dispute_id
+        args[:user_id] = user.id
+        args[:comment] = "Dispute Entry #{dispute_entry.hostlookup} was eligible for auto-resolution, but failed to connect to RepTool. Sending this to the analysts' queue"
+
+        DisputeComment.create(args)
+
+      end
+    end
+
+    return_message
+
   end
 
   # Searches based on supplied fields and values.
