@@ -247,9 +247,9 @@ $ ->
 
 #    debugger
     rule_id = $(this).attr('data-id')
-    rule_name = $(this).text()
+    rule_name = $(this).text().trim()
     entry_row = $(this).parents('.research-table-row')[0]
-    entry_content = $(entry_row).find('.entry-data-content').text()
+    entry_content = $(entry_row).find('.entry-data-content').text().trim()
     reciever = 'somebody@thisplace.com'
     subject = 'Need to change an entry associated with ' + rule_name
     cc = 'someotherdude@here.com'
