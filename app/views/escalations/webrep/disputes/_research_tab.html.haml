@@ -272,7 +272,7 @@
                                   %td
                                     %label.content-label-sm Classification
                                     %br
-                                    - if entry.classifications.first.nil?
+                                    - if entry.classifications.empty?
                                       %span.missing-data Not on RepTool
                                     - else
                                       %span.entry-reptool-class
@@ -280,7 +280,7 @@
                                   %td
                                     %label.content-label-sm Expiration
                                     %br
-                                    - if entry.classifications.first.nil?
+                                    - if entry.blacklist&.expiration.nil?
                                       %span.missing-data N/A
                                     - else
                                       %span.entry-reptool-expiration
