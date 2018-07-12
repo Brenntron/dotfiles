@@ -4,8 +4,8 @@ class Escalations::Webcat::ReportsController < Escalations::WebcatController
   end
 
   def resolution
-    @report = WebcatReport::ResolutionReport.new(date_from: params['date_from'],
-                                                 date_to: params['date_to'])
+    @report = WebcatReport::ResolutionReport.new(date_from: params['report']['date_from'],
+                                                 date_to: params['report']['date_to'])
   end
 
   def export_resolution
