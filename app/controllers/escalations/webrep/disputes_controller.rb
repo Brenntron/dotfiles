@@ -85,6 +85,25 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @entries = DisputeEntry.from_age_report_params(age_report_params)
   end
 
+  def export_resolution_age_report
+    @entries = DisputeEntry.from_age_report_params(age_report_params)
+
+    contents = CSV.generate do |csv|
+      csv << [ 'Date', 'Resolution', 'Engineer', 'Opened', 'Resolved', 'Time to Resolution' ]
+      @entries.each do |entry|
+        csv << [
+            entry.case_resolved_at,
+            entry.resolution,
+            entry.cvs_username,
+            entry.case_opened_at,
+            entry.case_resolved_at,
+            ApplicationRecord.humanize_secs(entry.case_resolved_at - entry.case_opened_at)
+        ]
+      end
+    end
+    send_data contents
+  end
+
   private
 
   def index_params
