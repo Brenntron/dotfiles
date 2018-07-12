@@ -12,7 +12,13 @@ class DisputeEntry < ApplicationRecord
   }
 
   def self.from_age_report_params(params)
-    resolved_date(params['date'])
+    query = resolved_date(params['date'])
+
+    if params['resolution'].present?
+      query = query.where(resolution: params['resolution'])
+    end
+    
+    query
   end
 
   def hostlookup
