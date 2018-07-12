@@ -3,6 +3,18 @@ class DisputeEntry < ApplicationRecord
   belongs_to :dispute
   has_many :dispute_rule_hits
 
+  delegate :cvs_username, to: :dispute, allow_nil: true
+
+  scope :resolved_date, -> (date_iso) {
+    date_from = Date.iso8601(date_iso)
+    date_to = Date.iso8601(date_iso) + 1
+    where(case_resolved_at: (date_from..date_to))
+  }
+
+  def self.from_age_report_params(params)
+    resolved_date(params['date'])
+  end
+
   def hostlookup
     case
     when self.entry_type == "IP"

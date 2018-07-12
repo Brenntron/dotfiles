@@ -1,0 +1,19 @@
+%h1 Resolution Age Report
+
+
+.report-div
+  #resolution-age-report-div
+    %table#resolution-age-report-table
+      %caption Number of resolved complaints per resolution
+      %thead
+        %tr
+          %th Date
+          %th Resolution
+          %th Engineer
+      %tbody
+        - @entries.each do |entry|
+          %tr
+            %td= entry.case_resolved_at
+            %td= entry.resolution
+            %td= entry.cvs_username
+

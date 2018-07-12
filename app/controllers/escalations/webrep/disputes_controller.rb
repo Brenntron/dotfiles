@@ -49,11 +49,19 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                   date_to: params['report']['date_to'])
   end
 
+  def resolution_age_report
+    @entries = DisputeEntry.from_age_report_params(age_report_params)
+  end
+
   private
 
   def index_params
     params.fetch(:dispute, {}).permit(:customer_name, :customer_email, :customer_company_name,
                                       :status, :resolution, :subject,
                                       :value)
+  end
+
+  def age_report_params
+    params.permit(:date, :resolution, :engineer)
   end
 end

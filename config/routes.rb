@@ -41,7 +41,8 @@ Rails.application.routes.draw do
           get :named_search
           get :standard_search
           get :contains_search
-          post :resolution_report
+          get :resolution_report
+          get :resolution_age_report
         end
       end
       resources :dispute_emails

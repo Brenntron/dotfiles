@@ -20,12 +20,12 @@
             %td{rowspan: 4}= pr_report.date
             %td TOTAL:
             %td
-            %td= pr_report.total
+            %td= 0 == pr_report.total ? '' : link_to(pr_report.total, age_report_path(date: pr_report.date))
           - pr_report.each_resolution do |resolution, percent, count|
             %tr
               %td= resolution
               %td= percent
-              %td= count
+              %td= count && link_to(count, age_report_path(date: pr_report.date, resolution: resolution))
 
 .report-div
   #per-engineer-report-div
@@ -43,10 +43,10 @@
             %td{rowspan: 1 + pe_report.engineer_count}= pe_report.date
             %td TOTAL:
             %td
-            %td= pe_report.total
+            %td= 0 == pe_report.total ? '' : link_to(pe_report.total, age_report_path(date: pe_report.date))
           - pe_report.each_resolution do |engineer, percent, count|
             %tr
               %td= engineer
               %td= percent
-              %td= count
+              %td= count && link_to(count, age_report_path(date: pe_report.date, engineer: engineer))
 
