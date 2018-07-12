@@ -17,6 +17,10 @@
           %th Invalid Complaints
           %th Unchanged Complaints
           %th Duplicate Complaints
+          %th Eng Ave
+          %th Eng Max
+          %th Dept Ave
+          %th Dept Max
       %tbody
         - @report.each_engineer do |counts|
           %tr
@@ -25,4 +29,8 @@
             %td= counts.invalid
             %td= counts.unchanged
             %td= counts.duplicate
+            %td= ApplicationRecord.humanize_secs(counts.eng_avg)
+            %td= ApplicationRecord.humanize_secs(counts.eng_max)
+            %td= ApplicationRecord.humanize_secs(counts.dept_avg)
+            %td= ApplicationRecord.humanize_secs(counts.dept_max)
 
