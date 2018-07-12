@@ -24,7 +24,7 @@ class DisputeReport::ResolutionReport
     def initialize(date)
       @date = date
       @distribution =
-        DisputeEntry.joins(:dispute).joins(dispute: :user)
+        DisputeEntry.joins(dispute: :user)
                     .where(case_resolved_at: (date..date+1))
                     .group('users.cvs_username').count
     end

@@ -18,6 +18,10 @@ class DisputeEntry < ApplicationRecord
       query = query.where(resolution: params['resolution'])
     end
 
+    if params['engineer'].present?
+      query = query.joins(dispute: :user).where(users: {cvs_username: params['engineer']})
+    end
+
     query
   end
 
