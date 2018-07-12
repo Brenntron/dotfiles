@@ -18,10 +18,10 @@ class WebcatReport::ResolutionReport
         .group(:id).order(:cvs_username).each do |user|
       counts = Complaint.where(user_id: user.id, complaint_closed_at: (@date_from..@date_to+1)).group(:resolution).count
       yield ResolutionCount.new(username: user.cvs_username,
-                                fixed: counts['FIXED'],
-                                invalid: counts['INVALID'],
-                                unchanged: counts['UNCHANGED'],
-                                duplicate: counts['DUPLICATE'])
+                                fixed: counts[Complaint::RESOLUTION_FIXED],
+                                invalid: counts[Complaint::RESOLUTION_INVALID],
+                                unchanged: counts[Complaint::RESOLUTION_UNCHANGED],
+                                duplicate: counts[Complaint::RESOLUTION_DUPLICATE])
     end
   end
 end
