@@ -17,7 +17,7 @@ class DisputeEntry < ApplicationRecord
     if params['resolution'].present?
       query = query.where(resolution: params['resolution'])
     end
-    
+
     query
   end
 

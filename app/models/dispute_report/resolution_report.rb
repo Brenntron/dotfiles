@@ -23,7 +23,10 @@ class DisputeReport::ResolutionReport
     attr_reader :date, :distribution
     def initialize(date)
       @date = date
-      @distribution = DisputeEntry.where(case_resolved_at: (date..date+1)).group(:user_id).count
+      @distribution =
+        DisputeEntry.joins(:dispute).joins(dispute: :user)
+                    .where(case_resolved_at: (date..date+1))
+                    .group('users.cvs_username').count
     end
 
     def total
@@ -35,11 +38,10 @@ class DisputeReport::ResolutionReport
     end
 
     def each_resolution
-      distribution.keys.each do |engineer_id|
-        engineer_name = User.find(engineer_id)&.cvs_username
-        count = distribution[engineer_id]
+      distribution.keys.each do |username|
+        count = distribution[username]
         percent = (0 < total && count) ? 100.0 * count / total : nil
-        yield engineer_name, percent && '%.2f' % percent, count
+        yield username, percent && '%.2f' % percent, count
       end
     end
   end
