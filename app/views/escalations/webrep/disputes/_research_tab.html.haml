@@ -112,7 +112,6 @@
     %table#disputes-research-table.table.table-sm
       %tbody
         - @entries.each do |entry|
-          - Preloader::Base.fetch_all_api_data(entry.hostlookup, entry.id)
           %tr.research-table-row{'data-entry-id': "#{entry.id}"}
             %td.research-table-row-wrapper
               %table
