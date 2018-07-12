@@ -3538,6 +3538,15 @@ input.communication-subject {
 
 }
 
+.email-reply-header-information .communication-subject {
+  width: 315px;
+  margin: 6px auto 1px auto;
+}
+
+.email-reply-header-information .email-reply-buttons {
+  padding-top: 8px;
+}
+
 .email-attachments a {
   color: $content-tab-color;
   font-size: 8pt;

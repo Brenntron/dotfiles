@@ -253,8 +253,8 @@ $ ->
     reciever = 'somebody@thisplace.com'
     subject = 'Need to change an entry associated with ' + rule_name
     cc = 'someotherdude@here.com'
-    body = 'Hello,' +
-    'We have determined that ' + entry_content + ' should not be triggering ' + rule_name + '. Please look into this.' +
+    body = 'Hello,' + "\n \n" +
+    "We have determined that #{entry_content} should not be triggering #{rule_name}. Please look into this." + "\n \n" +
     'Thanks'
 
     $('#communication-tab-link').trigger 'click'
