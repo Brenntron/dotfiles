@@ -504,11 +504,11 @@
                               %table
                                 %thead
                                   %tr
-                                    - entry.find_xbrs[1]['legend'].each do |header|
+                                    - entry.xbrs_data['legend'].each do |header|
                                       %th= header
                                 %tbody
                                   - unless entry.hostlookup.nil?
-                                    - entry.find_xbrs[1]['data'].each do |data|
+                                    - entry.xbrs_data['data'].each do |data|
                                       %tr
                                         - data.each do |datapoint|
                                           %td= datapoint
