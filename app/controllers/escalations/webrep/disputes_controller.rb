@@ -49,6 +49,38 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                   date_to: params['report']['date_to'])
   end
 
+  def export_per_resolution_report
+    @report = DisputeReport::ResolutionReport.new(date_from: params['date_from'],
+                                                  date_to: params['date_to'])
+
+    contents = CSV.generate do |csv|
+      csv << [ 'Date', 'Resolution', '%', 'Count' ]
+      @report.each_per_resolution do |pr_report|
+        csv << [ pr_report.date, 'TOTAL', nil, pr_report.total ]
+        pr_report.each_resolution do |resolution, percent, count|
+          csv << [ pr_report.date, resolution, percent, count ]
+        end
+      end
+    end
+    send_data contents
+  end
+
+  def export_per_engineer_report
+    @report = DisputeReport::ResolutionReport.new(date_from: params['date_from'],
+                                                  date_to: params['date_to'])
+
+    contents = CSV.generate do |csv|
+      csv << [ 'Date', 'Resolution', '%', 'Count' ]
+      @report.each_per_engineer do |pe_report|
+        csv << [ pe_report.date, 'TOTAL', nil, pe_report.total ]
+        pe_report.each_resolution do |engineer, percent, count|
+          csv << [ pe_report.date, engineer, percent, count ]
+        end
+      end
+    end
+    send_data contents
+  end
+
   def resolution_age_report
     @entries = DisputeEntry.from_age_report_params(age_report_params)
   end

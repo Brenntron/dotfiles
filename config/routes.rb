@@ -42,7 +42,10 @@ Rails.application.routes.draw do
           get :standard_search
           get :contains_search
           get :resolution_report
+          get :export_per_resolution_report
+          get :export_per_engineer_report
           get :resolution_age_report
+          get :export_resolution_age_report
         end
       end
       resources :dispute_emails

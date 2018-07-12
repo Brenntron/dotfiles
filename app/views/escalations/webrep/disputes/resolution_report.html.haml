@@ -1,8 +1,10 @@
 %h1 Resolution Report
 
-#date_from= params['report']['date_from']
-#date_to= params['report']['date_to']
-
+#export-per-resolution-div
+  %form#export-per-resolution-form{action: export_per_resolution_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
+    %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
+    %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+    %button Export
 
 .report-div
   #per-resolution-report-div
@@ -26,6 +28,12 @@
               %td= resolution
               %td= percent
               %td= count && link_to(count, age_report_path(date: pr_report.date, resolution: resolution))
+
+#export-per-engineer-div
+  %form#export-per-engineer-form{action: export_per_engineer_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
+    %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
+    %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+    %button Export
 
 .report-div
   #per-engineer-report-div
