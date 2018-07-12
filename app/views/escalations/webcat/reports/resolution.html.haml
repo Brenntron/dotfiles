@@ -1,0 +1,22 @@
+%h1 Webcat Report
+
+.report-div
+  #webcat-resolution-report-div
+    %table#webcat-resolution-report-table
+      %caption Number of resolved complaints per resolution
+      %thead
+        %tr
+          %th
+          %th Fixed Complaints
+          %th Invalid Complaints
+          %th Unchanged Complaints
+          %th Duplicate Complaints
+      %tbody
+        - @report.each_engineer do |counts|
+          %tr
+            %td= counts.username
+            %td= counts.fixed
+            %td= counts.invalid
+            %td= counts.unchanged
+            %td= counts.duplicate
+
