@@ -4405,6 +4405,27 @@ input.table-entry-input:focus {
   padding: 6px 12px;
 }
 
+.reputation-research-search-wrapper {
+  margin: -15px -15px 40px -15px;
+  text-align: center;
+  padding: 40px 20px;
+  background-color: $content-tab-color;
+  border-radius: 4px 4px 0 0 ;
+}
+
+.reputation-research-search-wrapper h1 {
+  color: $content-bg-color;
+  margin-bottom: 20px;
+}
+
+.reputation-research-search-wrapper .search-box {
+  background-position: right 6px center;
+  padding-left: 10px;
+  padding-right: 26px;
+  height: 28px;
+  max-width: 500px;
+}
+
 #disputes-research-table label {
   font-weight: 700;
   text-transform: uppercase;
@@ -4800,6 +4821,21 @@ button.dropdown-submit-button {
 
 .button-row-center {
   text-align: center;
+}
+
+.search-options-row {
+  max-width: 250px;
+  margin: 12px auto;
+}
+.search-options-row label {
+  margin-left: 8px;
+  color: $content-bg-color;
+  font-size: 8pt;
+  fonw-weight: 400;
+}
+
+.search-options-row input[type="radio"] {
+  border: none;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

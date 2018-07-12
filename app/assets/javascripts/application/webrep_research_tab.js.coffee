@@ -127,7 +127,6 @@ $ ->
     if ($('.dispute_check_box:checked').length > 0)
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
-#          debugger
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
           entry_rep_class = $(entry_row).find('.entry-reptool-class').text()
@@ -268,6 +267,8 @@ $ ->
       else
         $(cl_table).hide()
 
+
+
 # Scrollable tables in the expanded rows
   $('.table-scrollable').DataTable({
     scrollY: 200,
@@ -276,4 +277,5 @@ $ ->
     searching: false,
     ordering: false,
     info: false
-  });
+  })
+
