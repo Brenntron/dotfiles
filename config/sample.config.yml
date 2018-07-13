@@ -1,6 +1,15 @@
 development:
   amq: #active message queue
     host: "localhost"
+  auto_resolve:
+    complaints:
+      check: true
+    virus_total:
+      check: true
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
@@ -52,6 +61,11 @@ development:
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     #host: "localhost"
     #port: 2944                          #default wbrs_stub port
@@ -76,6 +90,15 @@ development:
 test:
   amq: #active message queue
     host: "localhost"
+  auto_resolve:
+    complaints:
+      check: true
+    virus_total:
+      check: true
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
@@ -126,6 +149,11 @@ test:
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     #host: "localhost"
     #port: 2944                          #default wbrs_stub port
@@ -150,6 +178,15 @@ test:
 staging:
   amq: #active message queue
     host: "fmd-actmq-01stg.vrt.sourcefire.com"
+  auto_resolve:
+    complaints:
+      check: true
+    virus_total:
+      check: true
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     host: "bugzilla-staging.vrt.sourcefire.com"
   cert:
@@ -194,6 +231,11 @@ staging:
     rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     host: "stage-wbrsruleapi-vip.vega.ironport.com"
     port: 80
@@ -210,6 +252,15 @@ staging:
 production:
   amq: #active message queue
     host: "mq.vrt.sourcefire.com"
+  auto_resolve:
+    complaints:
+      check: true
+    virus_total:
+      check: true
+    umbrella:
+      check: true
+      url: "https://investigate.api.umbrella.com/domains/categorization/"
+      api_key: "redacted"
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
   cert:
@@ -254,11 +305,16 @@ production:
     rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     host: "prod-wbrsruleapi-vip.vega.ironport.com"
-    port: 443
+    port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-peer"
+    verify_mode: "no-tls"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: false
   xbrs:
@@ -267,3 +323,4 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+

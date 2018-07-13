@@ -12,10 +12,13 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # Get all the manual WL/BL entries.
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.types
-    response = call_json_request(:get, '/v1/rep/wlbl/types/get', body: {})
+    unless @types
+      response = call_json_request(:get, '/v1/rep/wlbl/types/get', body: {})
 
-    response_body = JSON.parse(response.body)
-    response_body['data']
+      response_body = JSON.parse(response.body)
+      @types = response_body['data']
+    end
+    @types
   end
 
   # @param [Integer] id the WL/BL
