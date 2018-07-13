@@ -26,6 +26,7 @@ window.take_selected = ()->
         i = 0
         while i < selected_rows[0].length
           selected_rows.data().cell(selected_rows[0][i],12).data(json.name).draw()
+          selected_rows.data().cell(selected_rows[0][i],5).data("ASSIGNED").draw()
           i++
 
     error: (response) ->
@@ -56,6 +57,7 @@ window.return_selected = ()->
         i = 0
         while i < selected_rows[0].length
           selected_rows.data().cell(selected_rows[0][i],12).data("").draw()
+          selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
           i++
 
     error: (response) ->
