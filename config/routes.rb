@@ -28,6 +28,8 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
+      resources :complaint_entries
+
       get 'show_multiple', to: 'complaints#show_multiple'
       get 'clusters', to: 'complaints#clusters'
       get 'rules', to: 'complaints#rules'

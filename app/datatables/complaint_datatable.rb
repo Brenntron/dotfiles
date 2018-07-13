@@ -7,6 +7,7 @@ class ComplaintDatatable < AjaxDatatablesRails::Base
     # or in aliased_join_table.column_name format
     @view_columns ||={
       id:       {source: "Complaint.id", cond: :eq, searchable: true, orderable: true},
+      age:      {source: "Complaint.age", cond: :eq, searchable: true, orderable: true},
       status:   {source: "Complaint.status", cond: :eq, searchable: true, orderable: true},
       complaint_entries_count: {source: "Complaint.entry_count", cond: :eq, searchable: false, orderable: true},
       customer_name: {source: "Complaint.customer_name", cond: :eq, searchable: true, orderable: true},
@@ -17,6 +18,7 @@ class ComplaintDatatable < AjaxDatatablesRails::Base
     records.map do |record|
       {
           id:         record.id,
+          age:        record.age,
           status:     record.status,
           entry_count: record.entries.count,
           customer_name:   record.customer.name,

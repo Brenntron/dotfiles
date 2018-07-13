@@ -19,7 +19,9 @@ module API
               if complaints
                 complaints.each do |complaint|
                   complaint_packet = {}
+                  complaint_packet[:age] = Complaint.what_time_is_it((Time.now - complaint.created_at).to_i)
                   complaint_packet[:id] = complaint.id
+                  complaint_packet[:entry_id] = complaint.id
                   complaint_packet[:tag] = complaint.tag
                   complaint_packet[:description] = complaint.description
                   complaint_packet[:submission_type] = complaint.submission_type

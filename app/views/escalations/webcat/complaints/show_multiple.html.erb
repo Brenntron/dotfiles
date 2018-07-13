@@ -16,7 +16,7 @@
   <div class="col-xs-6" id="complaint-entries-div">
     <% @complaints.each do |complaint| %>
       <% complaint.complaint_entries.each do |entry| %>
-        <div id="complaint_entry_row_<%= entry.id %>" class="row" onclick="display_preview_window('<%=entry.id%>','<%=entry.subdomain%>','<%=entry.domain%>','<%=entry.path%>')">
+        <div id="complaint_entry_row_<%= entry.id %>" class="row" onclick="display_preview_window(<%=entry.to_json%>)">
           <div class="col-xs-12"><p><%= complaint.customer.name%> from <%=complaint.customer.company.name %> | <%=complaint.tag%> </p></div>
           <div class="col-xs-1">
             <%= check_box_tag "#{entry.id}_site_checkbox",

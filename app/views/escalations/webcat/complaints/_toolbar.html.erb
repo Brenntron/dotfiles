@@ -1,28 +1,18 @@
 <div class="row">
   <div class="col-lg-5 col-lg-offset-1">
+    <input type="checkbox">
+    <button onclick="">New Complaint</button>
     <button onclick="edit_selected_complaints()">Edit Selected</button>
-  </div>
-  <div class="col-lg-6">
-    <div class="dropdown">
-      <button>Resolve selected as</button>
-      <div class="dropdown-content">
-        <%=radio_button_tag 'quick_resolution', 'Dont Change', true%>
-        <%= label_tag 'quick_res_DC', 'Dont Change' %><br>
-        <%=radio_button_tag 'quick_resolution', 'Fixed', false%>
-        <%= label_tag 'quick_res_F', 'Fixed' %><br>
-        <%=radio_button_tag 'quick_resolution', 'Unchanged', false%>
-        <%= label_tag 'quick_res_U', 'Unchanged' %><br>
-        <%=radio_button_tag 'quick_resolution', 'Invalid', false%>
-        <%= label_tag 'quick_res_I', 'Invalid' %><br>
-        <%=text_field_tag 'Resolution comment', nil, placeholder: 'Add a comment...'%>
-      </div>
-    </div>
-    <div class="dropdown">
-    <button>QuickCat</button>
-      <div class="dropdown-content">
-        <%=text_field_tag 'quick_category_text', nil, placeholder: 'Categorize selected as'%>
-      </div>
-    </div>
+    <button onclick="">remove Subdomain from selected prefix</button>
+    <button onclick="take_selected()">Take selected</button>
+    <button onclick="return_selected()">Return selected</button>
+    <button onclick="">collapse all</button>
+    <button onclick="">collapse selected</button>
+    <button onclick="">expand all</button>
+    <button onclick="">expand selected</button>
+    <button type="button" data-toggle="modal" data-target="#cat_new_url_modal">
+      categorize new URL
+    </button>
   </div>
 </div>
 
