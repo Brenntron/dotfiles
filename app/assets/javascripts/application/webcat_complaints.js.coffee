@@ -139,28 +139,37 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window_header_a').href = loc
 
 window.select_all_pages = () ->
-  $('[id$=_site_checkbox]').prop('checked', true);
+  $('#complaints-index').DataTable().rows().select()
 window.unselect_all_pages = () ->
-  $('[id$=_site_checkbox]').prop('checked', false);
+  $('#complaints-index').DataTable().rows().deselect()
 window.open_viewable = () ->
-  $('[id$=_site_checkbox]').each (site)->
-    value = JSON.parse(this.value)
-    if value.viewable == "true"
-      window.open("http://www."+value.site)
+  selected_rows = $('#complaints-index').DataTable().rows()
+  i = 0
+  while i < selected_rows[0].length
+    if selected_rows.data()[i].viewable == true
+      window.open("http://www."+selected_rows.data()[i].domain)
+    i++
 window.open_nonviewable = () ->
-  $('[id$=_site_checkbox]').each (site)->
-    value = JSON.parse(this.value)
-    if value.viewable == "false"
-      window.open("http://www."+value.site)
+  selected_rows = $('#complaints-index').DataTable().rows()
+  i = 0
+  while i < selected_rows[0].length
+    if selected_rows.data()[i].viewable == false
+      window.open("http://www."+selected_rows.data()[i].domain)
+    i++
 window.open_selected = () ->
-  $('[id$=_site_checkbox]:checked').each (site)->
-    value = JSON.parse(this.value)
-    window.open("http://www."+value.site)
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  i = 0
+  while i < selected_rows[0].length
+    window.open("http://www."+selected_rows.data()[i].domain)
+    i++
 window.open_all = () ->
-  $('[id$=_site_checkbox]').each (site)->
-    value = JSON.parse(this.value)
-    window.open("http://www."+value.site)
+  selected_rows = $('#complaints-index').DataTable().rows()
+  i = 0
+  while i < selected_rows[0].length
+    window.open("http://www."+selected_rows.data()[i].domain)
+    i++
 
+    
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
     this.dataset['entryId']

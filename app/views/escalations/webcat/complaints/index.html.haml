@@ -146,7 +146,7 @@
       // dom: '<"datatable-top-tools"lf>t<ip>',
       "rowCallback": function( row, data, index ) {
         var $node = this.api().row(row).nodes().to$();
-        
+
         if (data.is_important ){
           $node.addClass('highlight-second-review')
         }
@@ -183,7 +183,8 @@
         {data: "customer_name"},
         {data: "wbrs_score"},
         {data: "category"},
-        {data: "assigned_to"}
+        {data: "assigned_to"},
+        {data: "viewable"}
       ],
       select: {"style": "os"},
       responsive: true

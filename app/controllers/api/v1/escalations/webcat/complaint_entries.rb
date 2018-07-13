@@ -35,6 +35,7 @@ module API
                   complaint_entry_packet[:ip_address] = complaint_entry.ip_address
                   complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
+                  complaint_entry_packet[:viewable] = complaint_entry.viewable
 
                   json_packet << complaint_entry_packet
                 end

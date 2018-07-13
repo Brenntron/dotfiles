@@ -2,6 +2,7 @@
   <div class="col-lg-5 col-lg-offset-1">
     <input type="checkbox">
     <button onclick="">New Complaint</button>
+    <button onclick="">Fetch more complaints</button>
     <button onclick="edit_selected_complaints()">Edit Selected</button>
     <button onclick="">remove Subdomain from selected prefix</button>
     <button onclick="take_selected()">Take selected</button>
@@ -14,5 +15,14 @@
       categorize new URL
     </button>
   </div>
+  <div class="col-lg-5">
+    <button onclick="select_all_pages()">Select All</button>
+    <button onclick="unselect_all_pages()">Select None</button>
+    <button onclick="open_viewable()">Open All Viewable</button>
+    <button onclick="open_nonviewable()">Open Non Viewable</button>
+    <button onclick="open_selected()">Open Selected</button>
+    <button onclick="open_all()">Open All</button>
+  </div>
+
 </div>
 
