@@ -25,6 +25,10 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   def single
   end
 
+  def show_multiple
+    ids = params["selected_ids"]
+    @complaints = Complaint.where(id:ids)
+  end
   def advanced_search
     @dispute = Dispute.new
   end

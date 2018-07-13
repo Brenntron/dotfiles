@@ -23,6 +23,20 @@ class Wbrs::Category < Wbrs::Base
     @all
   end
 
+  def self.mnem_lookup_hash
+    @mnem_lookup_hash || all.inject({}) do |lookup_hash, cat|
+      lookup_hash[cat.mnem] = cat
+      lookup_hash
+    end
+  end
+
+  # Lookup ThreatCategory by mnem
+  # @param [String] mnem The mnem field of a threat category
+  # @return [Wbrs::ThreatCategory]
+  def self.lookup_by_mnem(mnem)
+    mnem_lookup_hash[mnem]
+  end
+
   # Get a category by id
   # @param [Integer] id the category id
   # @return [Wbrs::Category] the category

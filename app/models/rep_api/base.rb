@@ -9,15 +9,15 @@ class RepApi::Base
     @port ||= Rails.configuration.rep_api.port || 443
   end
 
-  def self.tls_mode
-    @tls_mode ||= Rails.configuration.rep_api.tls_mode
+  def self.verify_mode
+    @verify_mode ||= Rails.configuration.rep_api.verify_mode
   end
 
   def self.gssnegotiate?
     @gssnegotiate ||= Rails.configuration.rep_api.gssnegotiate
   end
 
-  def self.ca_file
+  def self.ca_cert_file
     @ca_cert_file ||= Rails.configuration.rep_api.ca_cert_file
   end
 
@@ -60,7 +60,7 @@ class RepApi::Base
     raise 'Path must start with slash (/)' unless '/' == path[0]
 
     protocol =
-        case tls_mode
+        case verify_mode
           when 'verify-peer'
             'https'
           when 'verify-none'
@@ -72,14 +72,16 @@ class RepApi::Base
     url = "#{protocol}://#{host}:#{port}#{path}"
     request = HTTPI::Request.new(url)
 
-    case tls_mode
+    case verify_mode
       when 'verify-peer'
         request.ssl = true
         request.auth.ssl.verify_mode = :peer
         request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
+        request.auth.ssl.ssl_version = :TLSv1_2
       when 'verify-none'
         request.ssl = true
         request.auth.ssl.verify_mode = :none
+        request.auth.ssl.ssl_version = :TLSv1_2
       else #no-tls
         request.ssl = false
     end
@@ -122,9 +124,9 @@ class RepApi::Base
       else
         response_body = JSON.parse(response.body) rescue nil
         if response_body
-          raise RepApi::RepApiNotFoundError, "HTTP response #{response.code} #{response_body['MSG']}"
+          raise RepApi::RepApiError, "HTTP response #{response.code} #{response_body['MSG']}"
         else
-          raise RepApi::RepApiNotFoundError, "HTTP response #{response.code}"
+          raise RepApi::RepApiError, "HTTP response #{response.code}"
         end
     end
   end
@@ -132,7 +134,7 @@ class RepApi::Base
   def self.call_json_request(method, path, body:)
     request = new_request(path)
 
-    request.headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
+    request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     request.body =
         case body
           when Hash

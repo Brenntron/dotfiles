@@ -1,7 +1,7 @@
 class RepApi::Blacklist < RepApi::Base
   FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
                    expiration hostname author primary_source metadata seen_by
-                   _id _rev first_seen last_seen stale status
+                   _id _rev first_seen last_seen stale status ip ipi
                    message}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
@@ -27,9 +27,12 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.classifications
-    response = call_json_request(:get, '/blacklist/classifications', body: {})
+    unless @classifications
+      response = call_json_request(:get, '/blacklist/classifications', body: {})
 
-    JSON.parse(response.body)
+      @classifications = JSON.parse(response.body)
+    end
+    @classifications
   end
 
   def self.load_from_attributes(attributes)
@@ -49,7 +52,7 @@ class RepApi::Blacklist < RepApi::Base
 
   # Get the blacklist entries from the reputation API
   # This is not a relation and cannot be chained with other relations.
-  # example: get_where(entries: [ 'http://dodgyweb.net/darkweb' ], active: true)
+  # example: where(entries: [ 'http://dodgyweb.net/darkweb' ], active: true)
   # @param [Array<String>] entries: List of ip addresses, domains or fully­qualified URLs
   def self.where(conditions = {})
     params = stringkey_params(conditions)
@@ -78,8 +81,8 @@ class RepApi::Blacklist < RepApi::Base
   # and call this method.
   # The entry field is required and may be an array.
   # The classifications field is required and must be an array.
-  # @param [String] author moniker of who is adding or updating this entry.
-  # @param [String] comment
+  # @param [String] author: moniker of who is adding or updating this entry.
+  # @param [String] comment:
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
   def save!(params = {})
     raise "Validation failed: #{errors.full_messages.join(', ')}" unless valid?
@@ -165,5 +168,53 @@ class RepApi::Blacklist < RepApi::Base
 
     response = call_json_request(:post, '/blacklist/expire', body: build_request_body(input))
     true
+  end
+
+  # Save the blacklist object.
+  # @param [Array<String>] hostnames: array of addresses to blacklist.
+  # @param [Array<String>] classifications: array of classifications to use for blacklisting.
+  # @param [String] author: moniker of who is adding or updating this entry.
+  # @param [String] comment: comment to use for blacklist.
+  # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
+  def self.add_from_hosts(hostnames:, classifications:, author:, comment:)
+    blacklist = RepApi::Blacklist.new(entry: hostnames,
+                                      classifications: classifications)
+    blacklist.save!(author: author, comment: comment)
+  end
+
+  # Save the blacklist object.
+  # @param [Hash] params "dispute_entry_ids" array of ids, "classifications" array, and "comment".
+  # @param [String] username: moniker of who is adding or updating this entry.
+  # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
+  def self.add_from_params(params, username:)
+    dispute_entry_ids = params['dispute_entry_ids']
+    raise 'Must provide dispute entry ids' unless dispute_entry_ids
+    entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
+    reptool_entries = entries.map {|entry| entry.hostlookup}
+    add_from_hosts(hostnames: reptool_entries,
+                   classifications:params['classifications'],
+                   author: username,
+                   comment: params['comment'])
+  end
+
+  def self.delete_from_params(params)
+    dispute_entry_ids = params['dispute_entry_ids']
+    raise 'Must provide dispute entry ids' unless dispute_entry_ids
+    entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
+    reptool_entries = entries.map {|entry| entry.hostlookup}
+
+    blacklist = RepApi::Blacklist.new(entry: reptool_entries)
+    blacklist.delete!
+  end
+
+  def self.adjust_from_params(params, username:)
+    case params['action']
+      when 'Active'
+        add_from_params(params, username: username)
+      when 'Expired'
+        delete_from_params(params)
+      else
+        raise "No known action '#{params['action']}'."
+    end
   end
 end
