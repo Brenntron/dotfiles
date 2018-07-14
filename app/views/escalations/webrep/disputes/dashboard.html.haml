@@ -1,0 +1,15 @@
+.content-wrapper
+  .dashboard-header-area
+    .dashboard-left-data
+      %h1 My Dashboard
+      %span.my-dashboard-icon
+      %h5 = current_user.display_name
+      %p.dashboard-username
+        = current_user
+
+    .dashboard-right-data
+      = simple_form_for :report, url: resolution_report_escalations_webrep_disputes_path, method: :get,
+                        html: { target: :_blank } do |rpt_form|
+        = rpt_form.input :date_from, as: :string, input_html: {type: :date}
+        = rpt_form.input :date_to, as: :string, input_html: {type: :date}
+        = rpt_form.submit 'Report'
