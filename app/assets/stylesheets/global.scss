@@ -4831,12 +4831,59 @@ button.dropdown-submit-button {
   margin-left: 8px;
   color: $content-bg-color;
   font-size: 8pt;
-  fonw-weight: 400;
+  font-weight: 400;
 }
 
 .search-options-row input[type="radio"] {
   border: none;
 }
+
+.my-dashboard-header-area {
+  background-color: $bug-section-color;
+  margin-top: -15px;
+  border-radius: 4px 4px 0 0 ;
+}
+
+.team-dashboard-header-area {
+  background-color: $content-tab-color;
+}
+
+.dashboard-header-area {
+  margin-right: -15px;
+  margin-left: -15px;
+  color: $content-bg-color;
+  padding: 15px;
+}
+
+.dashboard-header-area h1 {
+  color: $content-bg-color;
+  margin-bottom: 24px;
+  display: inline-block;
+}
+
+.dashboard-header-area h5 {
+  color: $content-bg-color;
+  font-size: 9pt;
+  font-weight: 600;
+}
+
+.dashboard-details {
+  font-style: italic;
+  font-size: 8pt;
+  font-weight: 300;
+}
+
+.my-dashboard-icon, .team-icon {
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: -6px;
+}
+
+.my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
+.team-icon {  background-image: url(image_path('icon_team.svg'));}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
