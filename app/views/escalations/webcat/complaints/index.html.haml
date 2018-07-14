@@ -51,7 +51,6 @@
         %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes
 
 
-
 :javascript
   $('#myModal').on('shown.bs.modal', function () {
     $('#myInput').trigger('focus')
@@ -70,6 +69,7 @@
           host = complaint_entry.subdomain + "."
         }
         host = host + complaint_entry.domain
+        url = host
         if(complaint_entry.path != null){
           url = host + complaint_entry.path
         }
@@ -93,6 +93,13 @@
       else {
         confidence = missing_data;
       }
+      var certainty = ''
+      if (complaint_entry.certainty != null) {
+        certainty = complaint_entry.certainty;
+      }
+      else {
+        certainty = missing_data;
+      }
       var category = ''
       if (complaint_entry.category != null) {
         category = complaint_entry.category;
@@ -100,8 +107,42 @@
       else {
         category = '';
       }
+      var complaint_entry_html =  ''
 
-      var complaint_entry_html =  '<div class="row">'+
+      if (complaint_entry.is_important == true){
+       complaint_entry_html = '<div class="row">'+
+          '<div class="col-xs-1">'+
+            'ID <p>'+complaint_entry.entry_id+'</p>'+
+          '</div>'+
+          '<div class="col-xs-2">'+
+            '<div class="row">'+
+              'Category:'+complaint_entry.category+
+            '</div>'+
+            '<div class="row">'+
+              '<h3>'+url+'</h3>'+
+            '</div>'+
+          '</div>'+
+         ' <div class="col-xs-3">'+
+            'Prefix <input id="complaint_review_prefix_'+complaint_entry.entry_id+'" type="text" onclick="this.select()" value="'+host+'"><button onclick="removeSubdomain(complaint_review_prefix_'+complaint_entry.entry_id+',\''+ complaint_entry.domain +'\')">remove subdomain</button>'+
+          '</div>'+
+          '<div class="col-xs-1">'+
+            '<div class="row">'+
+              'Certainty: <p>'+certainty+'</p>'+
+            '</div>'+
+            '<div class="row">'+
+              'Confidence: <p>'+confidence+'</p>'+
+            '</div>'+
+          '</div>'+
+          '<div class="col-xs-4">'+
+         ' Resolution: | <input type="radio" name="status" value="dontChange"> dont change |  <input type="radio" name="status" value="commit"> commit | <input type="radio" name="status" value="decline"> decline'+
+          '</div>'+
+          '<div class="col-xs-1">'+
+            '<button> Change </button>'+
+          '</div>'+
+        '</div>'
+      }
+      else{
+        complaint_entry_html =  '<div class="row">'+
         '<div class="col-xs-10">'+
           '<div class="row">'+
             '<div class="col-xs-1">'+
@@ -111,7 +152,7 @@
               uri +
             '</div>'+
             '<div class="col-xs-4">'+
-              'Prefix <input type="text" onclick="this.select()" value="'+host+'">'+
+              'Prefix <input id="complaint_prefix_'+complaint_entry.entry_id+'" type="text" onclick="this.select()" value="'+host+'"><button onclick="removeSubdomain(complaint_prefix_'+complaint_entry.entry_id+',\''+complaint_entry.domain+'\')">remove subdomain</button>'+
             '</div>'+
             '<div class="col-xs-2">'+
               'WBRS: '+ wbrs_score +' Confidence '+ confidence +
@@ -136,6 +177,9 @@
           '<button>domain</button>'+
         '</div>'+
         '</div>'
+
+      }
+
 
       return complaint_entry_html;
       }

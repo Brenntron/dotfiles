@@ -1,3 +1,6 @@
+window.removeSubdomain = (id,host) ->
+  id.value = host
+
 window.cat_new_url = ()->
   debugger
 
