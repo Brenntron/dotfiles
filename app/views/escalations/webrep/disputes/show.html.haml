@@ -3,7 +3,8 @@
 
   .row
     .col-xs-1.col-with-divider
-      %span.bug-state-info.bug-priority.p-P1
+      %span.bug-state-info.bug-priority{class: "p-#{@dispute.priority}"}
+      %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Case ID
@@ -27,17 +28,23 @@
       %div
         %span= @dispute.assignee || "None"
         %span.take-button
-          hand icon
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition
       .disposition.disp-negative
-        Malicious: Phishing
+        = @dispute.suggested_d
     .col-xs-3.col-with-divider
       %label.content-label-sm
         Dispute
       %div
-        paragon-downloads.com
+        - @entries.each do |entry|
+          - unless entry[:ip_address].nil?
+            - entry_content = entry[:ip_address]
+          - unless entry[:uri].nil?
+            - entry_content = entry[:uri]
+          = entry_content
+          %br
+
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Date/Time Submitted
@@ -51,34 +58,26 @@
     .col-xs-12
       %h3 Submitter Information
       .row
-        .col-xs-1.col-with-divider
+        .col-xs-2.col-with-divider
           %label.content-label-sm
-            Submitter
-          %p Guest
+            Submitter Type
+          %p= @dispute.submitter_type
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Submitter Organization
-          %p Paragon Downloads
+          %p= @dispute.customer.company.name
         .col-xs-3.col-with-divider
           %label.content-label-sm
             Submitter Domain
-          %p paragon-downloads.com
-        .col-xs-1.col-with-divider
+          %p= @dispute.customer.email.partition("@").last
+        .col-xs-2.col-with-divider
           %label.content-label-sm
             Contact Name
-          %p Monica Taylor
+          %p= @dispute.customer.name
         .col-xs-3.col-with-divider
           %label.content-label-sm
             Contact Email
-          %p person@paragon-downloads.com
-        .col-xs-1.col-with-divider
-          %label.content-label-sm
-            Origin
-          %p SenderBase
-        .col-xs-1
-          %label.content-label-sm
-            Origin ID
-          %p 227566
+          %p= @dispute.customer.email
       %h3 Case Management Information
       .row
         .col-xs-2.col-with-divider
@@ -106,7 +105,7 @@
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Email Count
-          %p 3
+          %p= @dispute.dispute_emails.count
         .col-xs-3
           %label.content-label-sm
             Last Updated By

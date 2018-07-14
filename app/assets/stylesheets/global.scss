@@ -4901,6 +4901,19 @@ button.dropdown-submit-button {
   border: none;
 }
 
+.dispute-submission-type {
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: block;
+  float: right;
+  margin-top: 10px;
+}
+
+.dispute-W {background-image: url(image_path('icon_type_web.svg'));}
+.dispute-E {background-image: url(image_path('icon_type_email.svg'));}
+.dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
