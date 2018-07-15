@@ -4090,7 +4090,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
-  min-width: 280px;
+  min-width: 310px;
 }
 
 .dispute-inline-buttons {
@@ -4842,11 +4842,10 @@ button.dropdown-submit-button {
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 34px;
-  height: 18px;
+  width: 32px;
+  height: 16px;
   float: left;
-  margin-right: 6px;
-  margin-top: -1px;
+  margin-right: 8px;
 }
 
 .toggle-switch input {display:none;}
@@ -4867,11 +4866,15 @@ button.dropdown-submit-button {
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 14px;
-  width: 14px;
+  height: 12px;
+  width: 12px;
   left: 2px;
   bottom: 2px;
   background-color: white;
+  background-image: url(image_path('icon_x_grey.svg'));
+  background-position: center center;
+  background-size: 12px;
+  background-repeat: no-repeat;
   -webkit-transition: .4s;
   transition: .4s;
   border-radius: 50%;
@@ -4889,10 +4892,33 @@ input:checked + .toggle-slider:before {
   -webkit-transform: translateX(16px);
   -ms-transform: translateX(16px);
   transform: translateX(16px);
+  background-image: url(image_path('icon_check_grey.svg'));
+}
+
+.toggle-slider:after {
+  content: 'off';
+  display: inline-block;
+  width: 30px;
+  margin-left: -22px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 6.5pt;
+  margin-top: 3px;
+  color: $content-label-color;
+}
+
+input:checked + .toggle-slider:after {
+  content: 'on';
+  color: $type-lighter-color;
 }
 
 .wlbl-toggle-list li {
-  height: 24px;
+  height: 26px;
+  padding-left: 22px;
+}
+
+.dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper {
+  padding-top: 12px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
