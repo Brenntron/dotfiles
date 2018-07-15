@@ -29,6 +29,7 @@ Rails.application.routes.draw do
         end
       end
       resources :complaint_entries
+      resources :customers, only: :index
 
       get 'show_multiple', to: 'complaints#show_multiple'
       get 'clusters', to: 'complaints#clusters'

@@ -204,3 +204,19 @@ window.commit_marked = () ->
     error: (response) ->
       popup_response_error(response, 'Error committing marked entries.')
   )
+
+$ ->
+  $('#new-complaint').on 'click', ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webcat/customers'
+      method: 'GET'
+      dataType: 'json'
+      headers: headers
+      success: (response) ->
+        $('#customerList').empty()
+        i = 0
+        while i < response.data.length
+          $('#customerList').append '<option value=\'' + response.data[i] + '\'></option>'
+          i++
+    )

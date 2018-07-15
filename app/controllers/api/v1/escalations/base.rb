@@ -10,9 +10,10 @@ module API
         mount API::V1::Escalations::Webrep::DisputeEmails
         mount API::V1::Escalations::Webrep::DisputeComments
         mount API::V1::Escalations::Webrep::EmailTemplates
+
         mount API::V1::Escalations::Webcat::Complaints
         mount API::V1::Escalations::Webcat::ComplaintEntries
-
+        mount API::V1::Escalations::Webcat::Customers
       end
     end
   end
