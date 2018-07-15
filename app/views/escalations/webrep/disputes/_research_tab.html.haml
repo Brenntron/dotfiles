@@ -141,13 +141,9 @@
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td
                     %span.entry-data.entry-data-content
-                      - unless entry[:ip_address].nil?
-                        - entry_content = entry[:ip_address]
-                      - unless entry[:uri].nil?
-                        - entry_content = entry[:uri]
-                      = entry_content
+                      = entry.hostlookup
 
-                    %input.table-entry-input.wide{type:'text', value: "#{entry_content}"}
+                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
                   %td
                     %label Category
                     - unless entry[:primary_category].nil?

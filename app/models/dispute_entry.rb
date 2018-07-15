@@ -2,6 +2,7 @@ class DisputeEntry < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
   belongs_to :dispute
   has_many :dispute_rule_hits
+  has_one  :dispute_entry_preload
 
   def hostlookup
     case
@@ -15,6 +16,9 @@ class DisputeEntry < ApplicationRecord
   end
 
   def find_xbrs
+    if dispute_entry_preload.xbrs_history.present?
+      return Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
+    end
     case
     when self.entry_type == "IP"
       Xbrs::GetXbrs.by_ip4(self.ip_address)
@@ -26,8 +30,14 @@ class DisputeEntry < ApplicationRecord
   end
 
   def blacklist(reload: false)
-    @blackist = nil if reload
-    @blackist ||= RepApi::Blacklist.where(entries: [ hostlookup ]).first
+    if reload == false
+      if dispute_entry_preload.wlbl.present?
+        @blacklist = RepApi::Blacklist.load_from_prefetch(dispute_entry_preload.wlbl).first
+        return @blacklist 
+      end
+    end
+    @blacklist = nil if reload
+    @blacklist ||= RepApi::Blacklist.where(entries: [ hostlookup ]).first
   end
 
   def classifications
@@ -35,16 +45,31 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
+    @wbrs_list_type = dispute_entry_preload.wbrs_list_type
+    return @wbrs_list_type if @wbrs_list_type.present?
     @wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
   end
 
   def wbrs_xlist
+    if dispute_entry_preload.crosslisted_urls.present?
+      @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
+      return @wbrs_xlist
+    end
     @wbrs_xlist ||= Wbrs::ManualWlbl.where(url: hostlookup)
   end
 
   def virustotals
+    #@virustotals = self.virustotal
+    #return @virustotals if @virustotals.present?
+
     unless @virustotals
-      scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
+      if dispute_entry_preload.virustotal.present?
+        virustotal_data = Virustotal::GetVirusTotal.load_from_prefetch(dispute_entry_preload.virustotal)
+      else
+        virustotal_data = Virustotal::GetVirustotal.by_domain(hostlookup)
+      end
+      #scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
+      scans = virustotal_data["scans"]
       cleandata = Array.new
       unless scans.nil?
         scans.each do |s|
@@ -55,6 +80,10 @@ class DisputeEntry < ApplicationRecord
       @virustotals = cleandata
     end
     @virustotals
+  end
+
+  def xbrs_data
+    find_xbrs[1]
   end
 
 end

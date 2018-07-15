@@ -1,7 +1,12 @@
 class Virustotal::GetVirustotal < Virustotal::Base
 
-  def self.by_domain(url)
-    call_virustotal_request(:get, "/vtapi/v2/url/report?resource=#{url}", body: {})
+  def self.load_from_prefetch(data)
+    response_body = JSON.parse(data)
+    response_body
+  end
+
+  def self.by_domain(url, raw = false)
+    call_virustotal_request(:get, "/vtapi/v2/url/report?resource=#{url}", body: {}, raw)
   end
 
 end

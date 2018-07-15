@@ -6,7 +6,7 @@ class CreateDisputeEntryPreloads < ActiveRecord::Migration[5.1]
       t.text :crosslisted_urls, limit: 4294967295
       t.text :virustotal, limit: 4294967295
       t.text :wlbl, limit: 4294967295
-
+      t.text :wbrs_list_type, limit: 4294967295
       t.timestamps
     end
   end

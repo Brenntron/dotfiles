@@ -16,8 +16,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @entries = @dispute.dispute_entries
     @entries.each do |entry|
       entry.blacklist(reload: true)
-      entry.class.module_eval { attr_accessor :xbrs_data}
-      entry.xbrs_data = entry.find_xbrs[1]
+      #entry.class.module_eval { attr_accessor :xbrs_data}
+      #entry.xbrs_data = entry.find_xbrs[1]
     end
   end
 
