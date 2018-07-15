@@ -16,7 +16,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def find_xbrs
-    if dispute_entry_preload.xbrs_history.present?
+    if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
       return Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
     end
     case
@@ -31,7 +31,7 @@ class DisputeEntry < ApplicationRecord
 
   def blacklist(reload: false)
     if reload == false
-      if dispute_entry_preload.wlbl.present?
+      if dispute_entry_preload.present? && dispute_entry_preload.wlbl.present?
         @blacklist = RepApi::Blacklist.load_from_prefetch(dispute_entry_preload.wlbl).first
         return @blacklist 
       end
@@ -45,15 +45,17 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
-    @wbrs_list_type = dispute_entry_preload.wbrs_list_type
-    return @wbrs_list_type if @wbrs_list_type.present?
+    if dispute_entry_preload.present?
+      @wbrs_list_type = dispute_entry_preload.wbrs_list_type
+      return @wbrs_list_type if @wbrs_list_type.present?
+      return nil
+    end
+    @wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
 
-    #@wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
-    return nil
   end
 
   def wbrs_xlist
-    if dispute_entry_preload.crosslisted_urls.present?
+    if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
       @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
       return @wbrs_xlist
     end
@@ -65,7 +67,7 @@ class DisputeEntry < ApplicationRecord
     #return @virustotals if @virustotals.present?
 
     unless @virustotals
-      if dispute_entry_preload.virustotal.present?
+      if dispute_entry_preload.present? && dispute_entry_preload.virustotal.present?
         virustotal_data = Virustotal::GetVirustotal.load_from_prefetch(dispute_entry_preload.virustotal)
       else
         virustotal_data = Virustotal::GetVirustotal.by_domain(hostlookup)
