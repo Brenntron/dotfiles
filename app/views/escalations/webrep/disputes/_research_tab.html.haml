@@ -265,48 +265,97 @@
                                 .row
                                   .col-xs-12
                                     %label.content-label-sm{for: "entry-#{entry.id}-wlbl-list-type-select"} Adjust WL/BL List
-                                    -#= wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                                    -# {selected: entry.wbrs_list_type,
-                                    -#   include_blank: 'Not currently on a list '},
-                                    -# class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                                    -# title: 'RepTool Rule Status',
-                                    -# id: "entry-#{entry.id}-wlbl-list-type-select"
-                                .row
-                                  .col-xs-6
-                                    %ul.wlbl-toggle-list
-                                      %li
-                                        %label.toggle-switch
-                                          %input{type: 'checkbox'}
-                                          %span.toggle-slider
-                                        WL - Weak
-                                      %li
-                                        %label.toggle-switch
-                                          %input{type: 'checkbox'}
-                                          %span.toggle-slider
-                                        WL - Medium
-                                      %li
-                                        %label.toggle-switch
-                                          %input{type: 'checkbox'}
-                                          %span.toggle-slider
-                                        WL - Heavy
-                                  .col-xs-6
-                                    %ul.wlbl-toggle-list
-                                      %li
-                                        %label.toggle-switch
-                                          %input{type: 'checkbox'}
-                                          %span.toggle-slider
-                                        BL - Weak
-                                      %li
-                                        %label.toggle-switch
-                                          %input{type: 'checkbox'}
-                                          %span.toggle-slider
-                                        BL - Medium
-                                      %li
-                                        %label.toggle-switch
-                                          %input{type: 'checkbox'}
-                                          %span.toggle-slider
-                                        BL - Heavy
-
+                                - unless entry.wbrs_list_type.nil?
+                                  - entry.wbrs_list_type.each do |list|
+                                    .row
+                                      .col-xs-6
+                                        %ul.wlbl-toggle-list
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'wl-weak'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-weak", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-weak"}
+                                              %span.toggle-slider
+                                            WL - Weak
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'wl-med'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-med", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-med"}
+                                              %span.toggle-slider
+                                            WL - Medium
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'wl-heavy'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-heavy", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-heavy"}
+                                              %span.toggle-slider
+                                            WL - Heavy
+                                      .col-xs-6
+                                        %ul.wlbl-toggle-list
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'bl-weak'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-weak", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-weak"}
+                                              %span.toggle-slider
+                                            BL - Weak
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'bl-med'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-med", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-med"}
+                                              %span.toggle-slider
+                                            BL - Medium
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'bl-heavy'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-heavy", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-heavy"}
+                                              %span.toggle-slider
+                                            BL - Heavy
+                                - else
+                                  .row
+                                    .col-xs-6
+                                      %ul.wlbl-toggle-list
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-weak"}
+                                            %span.toggle-slider
+                                          WL - Weak
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-med"}
+                                            %span.toggle-slider
+                                          WL - Medium
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-heavy"}
+                                            %span.toggle-slider
+                                          WL - Heavy
+                                    .col-xs-6
+                                      %ul.wlbl-toggle-list
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-weak"}
+                                            %span.toggle-slider
+                                          BL - Weak
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-med"}
+                                            %span.toggle-slider
+                                          BL - Medium
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-heavy"}
+                                            %span.toggle-slider
+                                          BL - Heavy
 
                                 .comment-wrapper
                                   %label.content-label-sm Comment
