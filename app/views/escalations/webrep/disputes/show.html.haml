@@ -1,10 +1,10 @@
 -#view single record
-.content-wrapper
+.content-wrapper.top-case-info
 
   .row
     .col-xs-1.col-with-divider
-      %span.bug-state-info.bug-priority.p-P1
-      %span.email-button
+      %span.bug-state-info.bug-priority{class: "p-#{@dispute.priority}"}
+      %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Case ID
@@ -28,15 +28,19 @@
       %div
         %span= @dispute.assignee || "None"
         %span.take-button
-          hand icon
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition
       .disposition.disp-negative
-        Malicious: Phishing
+        = @dispute.suggested_d
     .col-xs-3.col-with-divider
       %label.content-label-sm
         Dispute
+      %div
+        - @entries.each do |entry|
+          = entry.hostlookup
+          %br
+
       %div= @dispute.org_domain
     .col-xs-2.col-with-divider
       %label.content-label-sm
@@ -47,7 +51,78 @@
         Age
       %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
 
--     #<!--  TODO: Put the arrow button under this that expands the content (see mockup p.16 to p. 17)-->
+  .row#top_bar_extended_info
+    .col-xs-12
+      %h3 Submitter Information
+      .row
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
+            Submitter Type
+          %p= @dispute.submitter_type
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
+            Submitter Organization
+          %p= @dispute.customer.company.name
+        .col-xs-3.col-with-divider
+          %label.content-label-sm
+            Submitter Domain
+          %p= @dispute.customer.email.partition("@").last
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
+            Contact Name
+          %p= @dispute.customer.name
+        .col-xs-3.col-with-divider
+          %label.content-label-sm
+            Contact Email
+          %p= @dispute.customer.email
+      %h3 Case Management Information
+      .row
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
+            First Accept Date
+          %p 2017-10-24 15:35:55
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
+            First Repsonse Date
+          %p 2017-10-24 15:36:55
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
+            Minutes to Accept
+          %p 848.9
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
+            Minutes to Respond
+          %p 853.4
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
+            Days to Close
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
+            Minutes to Close
+        .col-xs-1.col-with-divider
+          %label.content-label-sm
+            Email Count
+          %p= @dispute.dispute_emails.count
+        .col-xs-3
+          %label.content-label-sm
+            Last Updated By
+          %p Melissa Taylor
+      %h3 Duplicate Cases
+      .row
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
+            Case ID
+          %p= @dispute.id
+        .col-xs-2.col-with-divider
+          %label.content-label-sm
+            Date/Time Submitted
+          %p= @dispute.case_opened_at
+        .col-xs-8
+          %label.content-label-sm
+            Time Marked Duplicate
+  .row
+    .col-xs-12.text-center
+      %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
 
 
 %ul.nav.nav-tabs#bug-tabs{role: 'tablist'}

@@ -13,7 +13,7 @@ class Dispute < ApplicationRecord
   ASSIGNED = 'assigned'
 
   def is_assigned?
-    (!self.user.blank?)
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 
   def assignee
