@@ -38,13 +38,10 @@
         Dispute
       %div
         - @entries.each do |entry|
-          - unless entry[:ip_address].nil?
-            - entry_content = entry[:ip_address]
-          - unless entry[:uri].nil?
-            - entry_content = entry[:uri]
-          = entry_content
+          = entry.hostlookup
           %br
 
+      %div= @dispute.org_domain
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Date/Time Submitted

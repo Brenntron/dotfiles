@@ -50,11 +50,22 @@ class RepApi::Blacklist < RepApi::Base
     }
   end
 
+  def self.load_from_prefetch(data)
+    data = JSON.parse(data)
+    data.inject({}) do |collection_hash, (entry, value)|
+      unless 'NOT_FOUND' == value
+        collection_hash[entry] = value.merge('entry' => entry)
+      end
+
+      collection_hash
+    end.values.map{ |attributes| load_from_attributes(attributes) }
+  end
+
   # Get the blacklist entries from the reputation API
   # This is not a relation and cannot be chained with other relations.
   # example: where(entries: [ 'http://dodgyweb.net/darkweb' ], active: true)
   # @param [Array<String>] entries: List of ip addresses, domains or fully­qualified URLs
-  def self.where(conditions = {})
+  def self.where(conditions = {}, raw = false)
     params = stringkey_params(conditions)
     entries = params.delete('entries')
     raise 'Missing required entries condition' unless entries
@@ -62,7 +73,7 @@ class RepApi::Blacklist < RepApi::Base
     string_array = entries.map {|entry| "entry=#{entry}"}
 
     response = call_json_request(:post, '/blacklist/get', body: build_request_body(string_array))
-
+    return response.body if raw == true
     response_body = JSON.parse(response.body)
     response_body.inject({}) do |collection_hash, (entry, value)|
       unless 'NOT_FOUND' == value
