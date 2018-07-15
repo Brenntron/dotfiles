@@ -52,6 +52,10 @@
                   %span.entry-dispute-name
                 %table.dispute_tool_current
                   %tr
+                    %td
+                      %label.content-label-sm Current WL/BL List
+                      %br
+                      %span.current-wlbl-list
                     %td.text-center
                       %label.content-label-sm Current Score
                       %br
@@ -233,6 +237,13 @@
                               %h3 Adjust WL/BL
                               %table.dispute_tool_current
                                 %tr
+                                  %td
+                                    %label.content-label-sm Current WL/BL List
+                                    %br
+                                    - if entry.wbrs_list_type.nil?
+                                      %span.missing-data Not currently on a list
+                                    - else
+                                      %span= entry.wbrs_list_type
                                   %td.text-center
                                     %label.content-label-sm Current Score
                                     %br
@@ -251,17 +262,52 @@
                                   -#  %br
                                   -#  %span.new_wbrs_score
                               .inline-tool-content-wrapper
-                                .toolbar
-                                  %div
-                                    %label.toolbar-section-label{for: "entry-#{entry.id}-wlbl-list-type-select"} WL/BL List
-                                    = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                                     {selected: entry.wbrs_list_type,
-                                       include_blank: 'Not currently on a list '},
-                                     class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                                     title: 'RepTool Rule Status',
-                                     id: "entry-#{entry.id}-wlbl-list-type-select"
+                                .row
+                                  .col-xs-12
+                                    %label.content-label-sm{for: "entry-#{entry.id}-wlbl-list-type-select"} Adjust WL/BL List
+                                    -#= wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                                    -# {selected: entry.wbrs_list_type,
+                                    -#   include_blank: 'Not currently on a list '},
+                                    -# class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
+                                    -# title: 'RepTool Rule Status',
+                                    -# id: "entry-#{entry.id}-wlbl-list-type-select"
+                                .row
+                                  .col-xs-6
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input{type: 'checkbox'}
+                                          %span.toggle-slider
+                                        WL - Weak
+                                      %li
+                                        %label.toggle-switch
+                                          %input{type: 'checkbox'}
+                                          %span.toggle-slider
+                                        WL - Medium
+                                      %li
+                                        %label.toggle-switch
+                                          %input{type: 'checkbox'}
+                                          %span.toggle-slider
+                                        WL - Heavy
+                                  .col-xs-6
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input{type: 'checkbox'}
+                                          %span.toggle-slider
+                                        BL - Weak
+                                      %li
+                                        %label.toggle-switch
+                                          %input{type: 'checkbox'}
+                                          %span.toggle-slider
+                                        BL - Medium
+                                      %li
+                                        %label.toggle-switch
+                                          %input{type: 'checkbox'}
+                                          %span.toggle-slider
+                                        BL - Heavy
 
-                                  %button.wlbl-preview-button.tertiary{type: 'button', disabled: true} Preview
+
                                 .comment-wrapper
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-wlbl-input.note-input

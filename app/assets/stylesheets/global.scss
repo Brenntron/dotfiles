@@ -4090,7 +4090,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
-  min-width: 250px;
+  min-width: 280px;
 }
 
 .dispute-inline-buttons {
@@ -4182,6 +4182,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $content-bg-color;
   margin-bottom: -5px;
   border-radius: 0 0 4px 4px;
+  font-size: 8.2pt;
 }
 
 .toolbar select.toolbar-select {
@@ -4836,6 +4837,62 @@ button.dropdown-submit-button {
 
 .search-options-row input[type="radio"] {
   border: none;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 18px;
+  float: left;
+  margin-right: 6px;
+  margin-top: -1px;
+}
+
+.toggle-switch input {display:none;}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $nav-toolbar-color;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: $bug-section-color;
+}
+
+input:focus + .toggle-slider {
+  box-shadow: 0 0 1px $bug-section-color;
+}
+
+input:checked + .toggle-slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+.wlbl-toggle-list li {
+  height: 24px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
