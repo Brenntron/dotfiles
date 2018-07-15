@@ -18,6 +18,12 @@ class Preloader::Base
       xbrs_history = Xbrs::GetXbrs.by_domain(host, true)
     end
 
+    dispute_entry = DisputeEntry.find(dispute_entry_id)
+    if dispute_entry.dispute_entry_preload.present?
+      preload = dispute_entry.dispute_entry_preload
+      preload.destroy
+      dispute_entry.reload
+    end
 
     data = DisputeEntryPreload.new do |d|
       d.dispute_entry_id = dispute_entry_id
