@@ -10,11 +10,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def show
-    @dispute = Dispute.find(params[:id])
+    @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(:dispute_entries => [:dispute_rule_hits, :dispute_entry_preload]).where(:id => params[:id]).first
     @versioned_items = @dispute.compose_versioned_items
 
     @entries = @dispute.dispute_entries
-    @entries.each { |entry| entry.blacklist(reload: true) }
+    @entries.each do |entry|
+      entry.blacklist(reload: true)
+      #entry.class.module_eval { attr_accessor :xbrs_data}
+      #entry.xbrs_data = entry.find_xbrs[1]
+    end
   end
 
   def update
