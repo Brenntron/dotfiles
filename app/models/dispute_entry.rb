@@ -4,6 +4,28 @@ class DisputeEntry < ApplicationRecord
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
 
+  delegate :cvs_username, to: :dispute, allow_nil: true
+
+  scope :resolved_date, -> (date_iso) {
+    date_from = Date.iso8601(date_iso)
+    date_to = Date.iso8601(date_iso) + 1
+    where(case_resolved_at: (date_from..date_to))
+  }
+
+  def self.from_age_report_params(params)
+    query = resolved_date(params['date'])
+
+    if params['resolution'].present?
+      query = query.where(resolution: params['resolution'])
+    end
+
+    if params['engineer'].present?
+      query = query.joins(dispute: :user).where(users: {cvs_username: params['engineer']})
+    end
+
+    query
+  end
+
   def hostlookup
     case
     when self.entry_type == "IP"
