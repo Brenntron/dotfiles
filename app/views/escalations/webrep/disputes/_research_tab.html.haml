@@ -66,15 +66,47 @@
                     -#  %br
                     -#  %span.new_wbrs_score
                 .inline-tool-content-wrapper
-                  .toolbar
-                    %div
-                      %label.toolbar-section-label{for:'wlbl-list-type-select'} WL/BL List
-                      = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                        {include_blank: 'Not currently on a list'},
-                        class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                        title: 'RepTool Rule Status',
-                        id: "wlbl-list-type-select"
-                    %button.wlbl-preview-button.tertiary{type: 'button', disabled: true} Preview
+                  .row
+                    .col-xs-12
+                      %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
+                  .row
+                    .col-xs-6
+                      %ul.wlbl-toggle-list
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "wl-weak"}
+                            %span.toggle-slider
+                          WL - Weak
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "wl-med"}
+                            %span.toggle-slider
+                          WL - Medium
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "wl-heavy"}
+                            %span.toggle-slider
+                          WL - Heavy
+                    .col-xs-6
+                      %ul.wlbl-toggle-list
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "bl-weak"}
+                            %span.toggle-slider
+                          BL - Weak
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "bl-med"}
+                            %span.toggle-slider
+                          BL - Medium
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "bl-heavy"}
+                            %span.toggle-slider
+                          BL - Heavy
+
+
+
                   .comment-wrapper
                     %label.content-label-sm Comment
                     %textarea.dropdown-comment.adjust-wlbl-input.note-input

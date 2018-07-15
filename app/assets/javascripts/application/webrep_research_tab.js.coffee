@@ -167,7 +167,6 @@ $ ->
           wlbl_options = $(select_wlbl).find('option')
 
           entry_list_val = ''
-          preview_button = $('#wlbl_adjust_entries').find('.wlbl-preview-button')
           comment_wrapper = $('#wlbl_adjust_entries').find('.comment-wrapper')
           submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
 
@@ -179,18 +178,9 @@ $ ->
             else
               entry_list_val = $(select_wlbl).val()
 
-          $(select_wlbl).change ->
-            new_val = $(select_wlbl).val()
-            if new_val != entry_list_val
-              $(preview_button).removeAttr("disabled")
-            else if new_val ==  entry_list_val
-              unless $(preview_button).attr("disabled", true)
-                $(preview_button).attr("disabled", true)
 
-          $(preview_button).click ->
-            if $(preview_button).attr("disabled", false)
-              $(comment_wrapper).show()
-              $(submit_button).removeAttr("disabled")
+#              $(comment_wrapper).show()
+#              $(submit_button).removeAttr("disabled")
 
     else
       alert ('No rows selected')

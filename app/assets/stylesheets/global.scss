@@ -4083,7 +4083,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
-.dispute_rep_tools .dropdown-menu {
+.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu {
   top: 16px;
   right: 1px;
   left: auto;
@@ -4921,7 +4921,16 @@ input:checked + .toggle-slider:after {
   padding-top: 12px;
 }
 
-/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+.toolbar .inline-tool-content-wrapper div {
+  margin-right: 0;
+}
+
+.toolbar .inline-tool-content-wrapper .row {
+  margin-left: 0;
+  padding: 0;
+}
+
+  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
   font-size: 14pt;
