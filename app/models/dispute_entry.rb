@@ -47,7 +47,9 @@ class DisputeEntry < ApplicationRecord
   def wbrs_list_type
     @wbrs_list_type = dispute_entry_preload.wbrs_list_type
     return @wbrs_list_type if @wbrs_list_type.present?
-    @wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
+
+    #@wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
+    return nil
   end
 
   def wbrs_xlist
@@ -64,7 +66,7 @@ class DisputeEntry < ApplicationRecord
 
     unless @virustotals
       if dispute_entry_preload.virustotal.present?
-        virustotal_data = Virustotal::GetVirusTotal.load_from_prefetch(dispute_entry_preload.virustotal)
+        virustotal_data = Virustotal::GetVirustotal.load_from_prefetch(dispute_entry_preload.virustotal)
       else
         virustotal_data = Virustotal::GetVirustotal.by_domain(hostlookup)
       end

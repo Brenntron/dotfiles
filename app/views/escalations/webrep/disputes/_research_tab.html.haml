@@ -321,14 +321,14 @@
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
-                          = entry.dispute_rule_hits.where(:rule_type => "WBRS").count
+                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
-                          - if entry.dispute_rule_hits.where(:rule_type => "WBRS").count == 0
+                          - if entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size == 0
                             %span.missing-data No rule hits
                           - else
-                            - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                            - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.each do |wbrs_hit|
                               = wbrs_hit.name + ', '
                         %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
@@ -371,14 +371,14 @@
                         %td
                           %label SBRS Rule Hits
                         %td.text-center
-                          = entry.dispute_rule_hits.where(:rule_type => "SBRS").count
+                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
                         %td
                           %label SBRS Rules
                         %td.rule-hits-col-list
-                          - if entry.dispute_rule_hits.where(:rule_type => "SBRS").count == 0
+                          - if entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.count == 0
                             %span.missing-data No rule hits
                           - else
-                            - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                            - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.each do |sbrs_hit|
                               = sbrs_hit.name + ', '
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
@@ -417,7 +417,7 @@
                         .col-sm-3
                           .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header WBRS Rule Hit Details
-                            - if entry.dispute_rule_hits.where(:rule_type => "WBRS").empty?
+                            - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.empty?
                               %table
                                 %thead
                                   %tr
@@ -432,7 +432,7 @@
                                     %th Rule Description
                                     %th Weight
                                 %tbody
-                                  - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                                  - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.each do |wbrs_hit|
                                     %tr
                                       %td= wbrs_hit.name
                                       %td= wbrs_hit.mnemonic
@@ -440,7 +440,7 @@
                                         -#Put weight of rule here
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header SBRS Rule Hit Details
-                            - if entry.dispute_rule_hits.where(:rule_type => "SBRS").empty?
+                            - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "SBRS"}.empty?
                               %table
                                 %thead
                                   %tr
@@ -455,7 +455,7 @@
                                     %th Rule Description
                                     %th Weight
                                 %tbody
-                                  - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                                  - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "SBRS"}.each do |sbrs_hit|
                                     %tr
                                       %td= sbrs_hit.name
                                       %td= sbrs_hit.mnemonic

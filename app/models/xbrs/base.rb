@@ -116,7 +116,7 @@ class Xbrs::Base
     end
   end
 
-  def self.call_xbrs_request(method, path, body:, raw = false)
+  def self.call_xbrs_request(method, path, body, raw = false)
     request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }

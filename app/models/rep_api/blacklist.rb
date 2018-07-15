@@ -51,6 +51,7 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.load_from_prefetch(data)
+    data = JSON.parse(data)
     data.inject({}) do |collection_hash, (entry, value)|
       unless 'NOT_FOUND' == value
         collection_hash[entry] = value.merge('entry' => entry)

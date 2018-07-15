@@ -7,9 +7,9 @@ class Preloader::Base
 
     is_ip_address = !!(host  =~ Resolv::IPv4::Regex)
 
-    blacklist ||= RepApi::Blacklist.where(entries: [ host ], true)#.first
+    blacklist ||= RepApi::Blacklist.where({entries: [ host ]}, true)#.first
     virustotals ||= Virustotal::GetVirustotal.by_domain(host, true)
-    crosslisted_urls ||= Wbrs::ManualWlbl.where(url: host, true)
+    crosslisted_urls ||= Wbrs::ManualWlbl.where({url: host}, true)
     wbrs_list_type ||= Wbrs::ManualWlbl.where(url: host).first&.list_type
 
     if is_ip_address === true

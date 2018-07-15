@@ -6,7 +6,7 @@ class Virustotal::GetVirustotal < Virustotal::Base
   end
 
   def self.by_domain(url, raw = false)
-    call_virustotal_request(:get, "/vtapi/v2/url/report?resource=#{url}", body: {}, raw)
+    call_virustotal_request(:get, "/vtapi/v2/url/report?resource=#{url}", {}, raw)
   end
 
 end

@@ -31,6 +31,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
   end
 
   def self.load_from_prefetch(data)
+    data = JSON.parse(data)
     data['data'].map {|datum| new_from_attributes(datum)}
   end
 
