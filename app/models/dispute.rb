@@ -6,6 +6,8 @@ class Dispute < ApplicationRecord
   belongs_to :customer
   belongs_to :user
 
+  delegate :cvs_username, to: :user, allow_nil: true
+
   NEW = 'new'
   RESOLVED = 'resolved'
   ASSIGNED = 'assigned'
