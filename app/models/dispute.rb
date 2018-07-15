@@ -6,12 +6,14 @@ class Dispute < ApplicationRecord
   belongs_to :customer
   belongs_to :user
 
+  delegate :cvs_username, to: :user, allow_nil: true
+
   NEW = 'new'
   RESOLVED = 'resolved'
   ASSIGNED = 'assigned'
 
   def is_assigned?
-    (!self.user.blank?)
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 
   def assignee

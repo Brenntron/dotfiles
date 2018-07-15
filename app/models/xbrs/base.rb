@@ -116,7 +116,7 @@ class Xbrs::Base
     end
   end
 
-  def self.call_xbrs_request(method, path, body:)
+  def self.call_xbrs_request(method, path, body, raw = false)
     request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }
@@ -127,6 +127,7 @@ class Xbrs::Base
     response_body = response.body.gsub("\n---\n",",")
     response_body = response_body.gsub("---\n", "")
     response_body = response_body.prepend("[").concat("]")
+    return response_body if raw == true
     response_body = JSON.parse(response_body)
   end
 

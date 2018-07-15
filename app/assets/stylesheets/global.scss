@@ -4413,6 +4413,69 @@ input.table-entry-input:focus {
   padding: 6px 12px;
 }
 
+.top-case-info {
+  padding-bottom: 20px;
+}
+
+#top_bar_extended_info {
+  background-color: $content-tab-color;
+  margin-top: 20px;
+  color: $content-bg-color;
+  margin-bottom: -21px;
+  border-radius: 0 0 4px 4px;
+  padding-bottom: 30px;
+  display: none;
+}
+
+#top_bar_extended_info h3 {
+  color: $content-bg-color;
+  font-weight: 600;
+  margin-top: 50px;
+  margin-bottom: 12px;
+  font-size: 12pt;
+}
+
+#top_bar_extended_info h3:first-of-type {
+  margin-top: 30px;
+}
+
+
+#top_bar_extended_info .content-label-sm {
+  color: $content-bg-color;
+}
+
+#top_bar_extended_info p {
+  font-weight: 300;
+}
+
+#top_bar_extended_info .col-with-divider {
+  border-right-color: #f2f2f230 ;
+}
+
+#top_bar_toggle {
+  background-image: url(image_path('icon_expand_info.svg'));
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background-color: transparent;
+  position: absolute;
+  bottom: -34px;
+  transition: 0.50s;
+  -webkit-transition: 0.50s;
+  -moz-transition: 0.50s;
+  -ms-transition: 0.50s;
+  -o-transition: 0.50s;
+}
+
+#top_bar_toggle.top-info-open {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;
   text-align: center;
@@ -4955,6 +5018,107 @@ table.dispute_tool_current tr:last-of-type td {
 }
 
   /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+.dispute-submission-type {
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: block;
+  float: right;
+  margin-top: 10px;
+}
+
+.dispute-W {background-image: url(image_path('icon_type_web.svg'));}
+.dispute-E {background-image: url(image_path('icon_type_email.svg'));}
+.dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
+
+.my-dashboard-header-area {
+  background-color: $bug-section-color;
+  margin-top: -15px;
+  border-radius: 4px 4px 0 0 ;
+}
+
+.team-dashboard-header-area {
+  background-color: $content-tab-color;
+}
+
+.dashboard-header-area {
+  margin-right: -15px;
+  margin-left: -15px;
+  color: $content-bg-color;
+  padding: 15px;
+}
+
+.dashboard-header-area h1 {
+  color: $content-bg-color;
+  margin-bottom: 24px;
+  display: inline-block;
+}
+
+.dashboard-header-area h5 {
+  color: $content-bg-color;
+  font-size: 9pt;
+  font-weight: 600;
+}
+
+.dashboard-details {
+  font-style: italic;
+  font-size: 8pt;
+  font-weight: 300;
+}
+
+.my-dashboard-icon, .team-icon {
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: -6px;
+}
+
+.my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
+.team-icon {  background-image: url(image_path('icon_team.svg'));}
+
+.tickets-totals-table td {
+  border-bottom: none;
+  font-weight: 300;
+  font-size: 8pt;
+}
+
+.ticket-type-label {
+  font-weight: 700;
+  font-size: 9pt;
+  text-transform: uppercase;
+  padding-right: 4px;
+}
+
+td.ticket-total, td.entries-total {
+  text-align: center;
+  font-size: 11pt;
+  width: 30px;
+}
+
+td.ticket-total {
+  font-weight: 600;
+}
+
+td.ticket-total::before {
+  content: '';
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  background-color: #ffffff4d;
+  border-radius: 15px;
+  position: absolute;
+  left: 19px;
+  margin-top: -4px;
+}
+
+.dashboard-left-data {
+  border-right: 1px solid $content-bg-color;
+}
+
+
+/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
   font-size: 14pt;

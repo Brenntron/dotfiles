@@ -1,0 +1,29 @@
+.content-wrapper
+  %h1 Resolution Age Report
+
+  #export-resolution-age-div
+    %form#export-resolution-age-form{action: export_resolution_age_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
+      %input{type: 'hidden', name: 'date', value: params['date']}
+      %input{type: 'hidden', name: 'resolution', value: params['resolution']}
+      %input{type: 'hidden', name: 'engineer', value: params['engineer']}
+      %button Export
+
+
+  .report-div
+    #resolution-age-report-div
+      %table#resolution-age-report-table
+        %caption Number of resolved complaints per resolution
+        %thead
+          %tr
+            %th Date
+            %th Resolution
+            %th Engineer
+            %th Time to Resolution
+        %tbody
+          - @entries.each do |entry|
+            %tr
+              %td= entry.case_resolved_at
+              %td= entry.resolution
+              %td= entry.cvs_username
+              %td= ApplicationRecord.humanize_secs(entry.case_resolved_at - entry.case_opened_at)
+  
