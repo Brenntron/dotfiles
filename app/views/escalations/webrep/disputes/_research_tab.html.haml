@@ -56,10 +56,11 @@
                       %label.content-label-sm Current Score
                       %br
                       %span.current-wbrs-score
-                    %td.text-center
-                      %label.content-label-sm New Score
-                      %br
-                      %span.new_wbrs_score
+                    -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                    -#%td.text-center
+                    -#  %label.content-label-sm New Score
+                    -#  %br
+                    -#  %span.new_wbrs_score
                 .inline-tool-content-wrapper
                   .toolbar
                     %div
@@ -141,13 +142,8 @@
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td
                     %span.entry-data.entry-data-content
-                      - unless entry[:ip_address].nil?
-                        - entry_content = entry[:ip_address]
-                      - unless entry[:uri].nil?
-                        - entry_content = entry[:uri]
-                      = entry_content
-
-                    %input.table-entry-input.wide{type:'text', value: "#{entry_content}"}
+                      = entry.hostlookup
+                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
                   %td
                     %label Category
                     - unless entry[:primary_category].nil?
@@ -161,10 +157,12 @@
                   %td
                     %label Status
                     %span.entry-data
-                      -#- unless entry[:status].nil?
-                      -#  = entry[:status]
-                      New
-                    -# Temporarily putting manual status entries in here
+                      - if entry[:status].nil?
+                        New
+                        -# Temporarily putting manual status entries in here
+                      - else
+                        = entry[:status]
+
                     %span.dropdown
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         -#= entry[:status]
@@ -238,12 +236,20 @@
                                   %td.text-center
                                     %label.content-label-sm Current Score
                                     %br
-                                    %span.current-wbrs-score
-                                      = entry.wbrs_score
-                                  %td.text-center
-                                    %label.content-label-sm New Score
-                                    %br
-                                    %span.new_wbrs_score
+                                      - if entry.wbrs_score.nil? && entry.score_type == "WBRS"
+                                        %span.current-wbrs-score
+                                          = entry.score
+                                      - elsif entry.wbrs_score.nil? && entry.score_type != "WBRS"
+                                        %span.current-wbrs-score.missing-data
+                                          No score.
+                                      - else
+                                        = entry.wbrs_score
+
+                                  -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                                  -#%td.text-center
+                                  -#  %label.content-label-sm New Score
+                                  -#  %br
+                                  -#  %span.new_wbrs_score
                               .inline-tool-content-wrapper
                                 .toolbar
                                   %div
@@ -321,7 +327,14 @@
                             %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label WBRS
                         %td.text-center.entry-data-wbrs-score
-                          = entry.wbrs_score
+                          - if entry.wbrs_score.nil? && entry.score_type == "WBRS"
+                            %span.current-wbrs-score
+                              = entry.score
+                          - elsif entry.wbrs_score.nil? && entry.score_type != "WBRS"
+                            %span.current-wbrs-score.missing-data
+                              No score.
+                          - else
+                            = entry.wbrs_score
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
@@ -371,7 +384,16 @@
                           %span.research-table-input-wrapper.sbrs-input-wrapper
                             %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label SBRS
-                        %td.text-center= entry.sbrs_score
+                        %td.text-center
+                          - if entry.sbrs_score.nil? && entry.score_type == "SBRS"
+                            %span.current-sbrs-score
+                              = entry.score
+                          - elsif entry.wbrs_score.nil? && entry.score_type != "SBRS"
+                            %span.current-sbrs-score.missing-data
+                              No score.
+                          - else
+                            = entry.sbrs_score
+
                         %td
                           %label SBRS Rule Hits
                         %td.text-center
