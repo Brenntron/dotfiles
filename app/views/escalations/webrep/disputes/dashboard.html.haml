@@ -1,7 +1,7 @@
 .content-wrapper
   .dashboard-header-area.my-dashboard-header-area
     .row
-      .col-xs-4
+      .col-xs-3.dashboard-left-data
         %h1 My Dashboard
         %span.my-dashboard-icon
         %h5= current_user.display_name
@@ -9,19 +9,41 @@
           = current_user.cvs_username
 
       .col-xs-4
-        Ticket information
+        %table.tickets-totals-table
+          %tr
+            %td.ticket-total 5
+            %td.entries-total 13
+            %td
+              %span.ticket-type-label Open
+              Tickets / Dispute Entries
+          %tr
+            %td.ticket-total 12
+            %td.entries-total 26
+            %td
+              %span.ticket-type-label In Progress
+              Tickets / Dispute Entries
+          %tr
+            %td.ticket-total 32
+            %td.entries-total 81
+            %td
+              %span.ticket-type-label Closed
+              Tickets / Dispute Entries
 
-      .col-xs-4
-        = simple_form_for :report, url: resolution_report_escalations_webrep_disputes_path, method: :get,
+      .col-xs-5
+
+
+  .row
+    .col-xs-12
+      = simple_form_for :report, url: resolution_report_escalations_webrep_disputes_path, method: :get,
                           html: { target: :_blank } do |rpt_form|
-          = rpt_form.input :date_from, as: :string, input_html: {type: :date}
-          = rpt_form.input :date_to, as: :string, input_html: {type: :date}
-          = rpt_form.submit 'Report'
+        = rpt_form.input :date_from, as: :string, input_html: {type: :date}
+        = rpt_form.input :date_to, as: :string, input_html: {type: :date}
+        = rpt_form.submit 'Report'
 
 
   .dashboard-header-area.team-dashboard-header-area
     .row
-      .col-xs-4
+      .col-xs-3.dashboard-left-data
         %h1 My Team
         %span.team-icon
         %h5 Web Reputation Escalations
@@ -29,7 +51,24 @@
           Manager: Joel Esler
 
       .col-xs-4
-        Ticket Information
+        %table.tickets-totals-table
+          %tr
+            %td.ticket-total 5
+            %td.entries-total 13
+            %td
+              %span.ticket-type-label Open
+              Tickets / Dispute Entries
+          %tr
+            %td.ticket-total 12
+            %td.entries-total 26
+            %td
+              %span.ticket-type-label In Progress
+              Tickets / Dispute Entries
+          %tr
+            %td.ticket-total 32
+            %td.entries-total 81
+            %td
+              %span.ticket-type-label Closed
+              Tickets / Dispute Entries
 
-      .col-xs-4
-        More information
+      .col-xs-5

@@ -4885,6 +4885,46 @@ button.dropdown-submit-button {
 .my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
 .team-icon {  background-image: url(image_path('icon_team.svg'));}
 
+.tickets-totals-table td {
+  border-bottom: none;
+  font-weight: 300;
+  font-size: 8pt;
+}
+
+.ticket-type-label {
+  font-weight: 700;
+  font-size: 9pt;
+  text-transform: uppercase;
+  padding-right: 4px;
+}
+
+td.ticket-total, td.entries-total {
+  text-align: center;
+  font-size: 11pt;
+  width: 30px;
+}
+
+td.ticket-total {
+  font-weight: 600;
+}
+
+td.ticket-total::before {
+  content: '';
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  background-color: #ffffff4d;
+  border-radius: 15px;
+  position: absolute;
+  left: 19px;
+  margin-top: -4px;
+}
+
+.dashboard-left-data {
+  border-right: 1px solid $content-bg-color;
+}
+
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
