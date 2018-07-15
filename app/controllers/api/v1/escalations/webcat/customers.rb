@@ -13,7 +13,7 @@ module API
 
             get "" do
 
-              customers = Customer.all.includes(:company).map{ |customer| "#{customer.name}(#{customer.company.name})"}
+              customers = Customer.all.includes(:company).map{ |customer| "#{customer.company.name}:#{customer.name}:#{customer.email}"}
               {:data => customers}
 
             end

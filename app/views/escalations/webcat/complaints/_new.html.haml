@@ -14,7 +14,8 @@
       %datalist#customerList
   .form-group.search-item
     %label.content-label-sm Tags
-    %input.form-control
+    %select.form-control.selectized#select-to-new{placeholder: "Add some tags...", multiple: "multiple", tabindex:"-1"}
+    %input.hidden#complaint_tag_list{value: Tag.all.map { |tag| tag.name }.join(',')}
 
   %hr.thin
   .form-group.text-center

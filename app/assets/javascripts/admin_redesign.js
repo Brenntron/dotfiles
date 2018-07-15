@@ -32,5 +32,5 @@
 //= require dataTables/extras/dataTables.responsive
 //= require dataTables/extras/dataTables.select
 //= require application/webcat_complaints
-//= require application/webrep/disputes
+//= require application/webcat/complaint_form
 //= require application/webrep_research_tab
