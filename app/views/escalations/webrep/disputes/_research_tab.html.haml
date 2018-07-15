@@ -46,20 +46,18 @@
             -#For each checked checkbox populate this information
             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
               .dispute-wlbl-adjust-wrapper
-                .dispute-name-wrapper
-                  %label.content-label-sm Dispute
-                  %br
-                  %span.entry-dispute-name
                 %table.dispute_tool_current
-                  %tr
-                    %td
-                      %label.content-label-sm Current WL/BL List
-                      %br
-                      %span.current-wlbl-list
-                    %td.text-center
-                      %label.content-label-sm Current Score
-                      %br
-                      %span.current-wbrs-score
+                  %thead
+                    %tr
+                      %th.content-label-sm Dispute
+                      %th.content-label-sm.no-word-break Current WL/BL List
+                      %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                  %tbody
+                    -#%tr
+                    -#  %td.wlbl-entry-content
+                    -#  %td.wlbl-entry-wlbl
+                    -#  %td.wlbl-current-entry-wbrs.text-center
+
                     -#    Removing for now. We can't do a preview until the api is updated to provide that info
                     -#%td.text-center
                     -#  %label.content-label-sm New Score
@@ -111,7 +109,7 @@
                     %label.content-label-sm Comment
                     %textarea.dropdown-comment.adjust-wlbl-input.note-input
                   .button-row-center
-                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true}
+                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);'}
                       Submit Changes
 
         %span.dropdown

@@ -157,29 +157,36 @@ $ ->
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+          wlbl = $(entry_row).find('.entry-data-wlbl').text()
 
-          show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
-          show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
-          select_wlbl =  $('#wlbl_adjust_entries').find('#wlbl-list-type-select')
-
-          $(show_content[0]).text(entry_content)
-          $(show_wbrs[0]).text(wbrs)
-          wlbl_options = $(select_wlbl).find('option')
-
-          entry_list_val = ''
-          comment_wrapper = $('#wlbl_adjust_entries').find('.comment-wrapper')
-          submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
-
-          $(wlbl_options).each ->
-            option_value = $(this).val()
-            wlbl = $(entry_row).find('.entry-data-wlbl').text()
-            if $.trim(option_value) == $.trim(wlbl)
-              entry_list_val = $(select_wlbl).val(option_value)
-            else
-              entry_list_val = $(select_wlbl).val()
+          tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+          $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
 
 
-#              $(comment_wrapper).show()
+      $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
+
+#          show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
+#          show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
+#          select_wlbl =  $('#wlbl_adjust_entries').find('#wlbl-list-type-select')
+#
+#          $(show_content[0]).text(entry_content)
+#          $(show_wbrs[0]).text(wbrs)
+#          wlbl_options = $(select_wlbl).find('option')
+
+#          entry_list_val = ''
+#
+#          submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+#
+#          $(wlbl_options).each ->
+#            option_value = $(this).val()
+#            wlbl = $(entry_row).find('.entry-data-wlbl').text()
+#            if $.trim(option_value) == $.trim(wlbl)
+#              entry_list_val = $(select_wlbl).val(option_value)
+#            else
+#              entry_list_val = $(select_wlbl).val()
+
+
+
 #              $(submit_button).removeAttr("disabled")
 
     else

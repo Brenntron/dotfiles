@@ -4084,13 +4084,20 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu {
-  top: 16px;
-  right: 1px;
   left: auto;
   border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
   min-width: 310px;
+}
+
+.dispute_rep_tools .dropdown-menu {
+  top: 16px;
+  right: 1px;
+}
+
+#wlbl_adjust_entries .inline-tool-content-wrapper {
+  padding: 12px 15px;
 }
 
 .dispute-inline-buttons {
@@ -4875,8 +4882,8 @@ button.dropdown-submit-button {
   background-position: center center;
   background-size: 12px;
   background-repeat: no-repeat;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: .2s;
+  transition: .2s;
   border-radius: 50%;
 }
 
@@ -4928,6 +4935,23 @@ input:checked + .toggle-slider:after {
 .toolbar .inline-tool-content-wrapper .row {
   margin-left: 0;
   padding: 0;
+}
+
+table.dispute_tool_current th {
+  padding: 10px 10px 4px 10px !important;
+  border-right: 1px solid $content-bg-color;
+}
+
+table.dispute_tool_current th:last-of-type {
+  border-right: none;
+}
+
+table.dispute_tool_current td {
+  padding: 3px 10px;
+}
+
+table.dispute_tool_current tr:last-of-type td {
+  padding-bottom: 10px;
 }
 
   /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
