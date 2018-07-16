@@ -11,6 +11,7 @@ module API
             end
             desc 'get all disputes'
             params do
+              optional :status, type: String
             end
 
             get "" do
@@ -23,7 +24,7 @@ module API
               #                                  params: index_params,
               #                                  user: current_user).includes(:dispute_entries => [:dispute_rule_hits])  # [but inside]
 
-              disputes = Dispute.all.includes(:dispute_entries => [:dispute_rule_hits])
+              disputes = Dispute.all.includes(:user, :dispute_entries => [:dispute_rule_hits])
               #disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
 
               disputes.each do |dispute|

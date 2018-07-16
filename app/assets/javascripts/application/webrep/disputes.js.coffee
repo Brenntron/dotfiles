@@ -1,9 +1,13 @@
 window.populate_webrep_index_table = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  data = {
+    status: $('#new_named_search').find('input[name="dispute[status]"]').val()
+  }
   $.ajax(
     url: '/api/v1/escalations/webrep/disputes'
     method: 'GET'
     headers: headers
+    data: data
     success: (response) ->
 
       json = $.parseJSON(response)
