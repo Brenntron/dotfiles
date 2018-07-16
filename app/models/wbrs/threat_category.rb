@@ -14,7 +14,6 @@ class Wbrs::ThreatCategory < Wbrs::Base
   # Get all the threat categories.
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.all(reload: false)
-    return [Wbrs::ThreatCategory.new({:category_id => '', :desc_long => '', :desc => '', :mnem => ""})]
     unless @all || reload
       response = call_json_request(:get, '/v1/rep/thrtcats/get', body: '')
 

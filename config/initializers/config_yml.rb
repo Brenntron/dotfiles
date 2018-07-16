@@ -61,13 +61,13 @@ Rails.configuration.snort_json_path     = Rails.root.join(env_config['perl']['sn
 Rails.configuration.cve2x_path          = Rails.root.join(env_config['perl']['cve2x_path'])
 Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['rule2yaml_path'])
 
-
+# byebug
 rep_api = env_config['rep_api']
 raise 'config.yml missing rep_api section' unless rep_api
 Rails.configuration.rep_api                = OpenStruct.new
 Rails.configuration.rep_api.host           = rep_api['host']
 Rails.configuration.rep_api.port           = rep_api['port']
-Rails.configuration.rep_api.verify_mode    = rep_api['verify_mode']
+Rails.configuration.rep_api.verify_mode    = rep_api['verify_mode'] || rep_api['tls_mode']
 Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
 Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
 
