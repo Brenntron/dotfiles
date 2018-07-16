@@ -14,11 +14,18 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @versioned_items = @dispute.compose_versioned_items
 
     @entries = @dispute.dispute_entries
+
     @entries.each do |entry|
-      entry.blacklist(reload: true)
-      #entry.class.module_eval { attr_accessor :xbrs_data}
-      #entry.xbrs_data = entry.find_xbrs[1]
+      if entry.dispute_entry_preload.blank?
+        Preloader::Base.fetch_all_api_data(entry.hostlookup, entry.id)
+      end
     end
+
+    #@entries.each do |entry|
+      #todo: do lazy load style checking with blacklist here
+      #entry.blacklist(reload: true)
+
+    #end
   end
 
   def update
