@@ -2,7 +2,7 @@ class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
   def self.humanize_secs(sec_input)
-    mm, ss = sec_input.divmod(60)
+    mm, ss = sec_input.to_i.divmod(60)
     hh, mm = mm.divmod(60)
     dd, hh = hh.divmod(24)
     case
@@ -24,4 +24,5 @@ class ApplicationRecord < ActiveRecord::Base
   def humanize_secs(sec_input)
     ApplicationRecord.humanize_secs(sec_input)
   end
+
 end

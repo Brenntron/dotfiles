@@ -11,20 +11,38 @@ module API
             end
             desc 'get all disputes'
             params do
+              optional :search_type, type: String
+              optional :search_name, type: String
+              optional :case_id, type: Integer
+              optional :org_domain, type: String
+              optional :case_owner_username, type: String
+              optional :status, type: String
+              optional :priority, type: String
+              optional :resolution, type: String
+              optional :submitter_type, type: String
+              optional :customer, type: Hash do
+                optional :name, type: String
+                optional :email, type: String
+                optional :company_name, type: String
+              end
+              optional :dispute_entries, type: Hash do
+                optional :ip_or_uri, type: String
+                optional :suggested_disposition, type: String
+              end
             end
 
             get "" do
 
               json_packet = []
 
-              # disputes = Dispute.all #.includes(:dispute_entries) #  => (:dispute_rule_hit)
-              #disputes = Dispute.robust_search(params.fetch(:dispute, {})['search_type'],
-              #                                  search_name: params.fetch(:dispute, {})['search_name'],
-              #                                  params: index_params,
-              #                                  user: current_user).includes(:dispute_entries => [:dispute_rule_hits])  # [but inside]
-
-              disputes = Dispute.all.includes(:dispute_entries => [:dispute_rule_hits])
-              #disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
+              if permitted_params['search_type']
+                disputes = Dispute.robust_search(permitted_params['search_type'],
+                                                 search_name: permitted_params['search_name'],
+                                                 params: permitted_params,
+                                                 user: current_user).includes(:dispute_entries => [:dispute_rule_hits])  # [but inside]
+              else
+                disputes = Dispute.all.includes(:user, :dispute_entries => [:dispute_rule_hits])
+              end
 
               disputes.each do |dispute|
                 dispute_packet = {}
