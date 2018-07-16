@@ -311,11 +311,11 @@ class Dispute < ApplicationRecord
       relation = relation.joins(:customer)
     end
 
-    dispute_params = params.fetch('dispute_entries', {})
-    dispute_params = dispute_params.select{|ignore_key, value| value.present?}
-    if dispute_params.any?
-      dispute_entry_fields = dispute_params.slice(*%w{suggested_disposition})
-      ip_or_uri = dispute_params['ip_or_uri']
+    entry_params = params.fetch('dispute_entries', {})
+    entry_params = entry_params.select{|ignore_key, value| value.present?}
+    if entry_params.any?
+      dispute_entry_fields = entry_params.slice(*%w{suggested_disposition})
+      ip_or_uri = entry_params['ip_or_uri']
 
       relation = relation.joins(:dispute_entries).group(:id)
       relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
@@ -388,7 +388,6 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.standard_search(search_name, user:)
-    byebug
     case search_name
       when 'my_open'
         where(status: ['new', 'open', 'reopen'], user_id: user.id)
