@@ -51,15 +51,11 @@
         %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes
 
 
-
 :javascript
   $('#myModal').on('shown.bs.modal', function () {
     $('#myInput').trigger('focus')
   })
   $(document).ready(function() {
-
-
-
   var complaint_table = $('#complaints-index').DataTable({
       // order: [[ 9, "desc" ]],
       // dom: '<"datatable-top-tools"lf>t<ip>',
