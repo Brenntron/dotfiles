@@ -165,30 +165,6 @@ $ ->
 
       $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
-#          show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
-#          show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
-#          select_wlbl =  $('#wlbl_adjust_entries').find('#wlbl-list-type-select')
-#
-#          $(show_content[0]).text(entry_content)
-#          $(show_wbrs[0]).text(wbrs)
-#          wlbl_options = $(select_wlbl).find('option')
-
-#          entry_list_val = ''
-#
-#          submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
-#
-#          $(wlbl_options).each ->
-#            option_value = $(this).val()
-#            wlbl = $(entry_row).find('.entry-data-wlbl').text()
-#            if $.trim(option_value) == $.trim(wlbl)
-#              entry_list_val = $(select_wlbl).val(option_value)
-#            else
-#              entry_list_val = $(select_wlbl).val()
-
-
-
-#              $(submit_button).removeAttr("disabled")
-
     else
       alert ('No rows selected')
 
