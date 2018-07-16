@@ -463,8 +463,8 @@
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
-                          - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-                            - if RulehitResolutionMailerTemplate.where(mnemonic: wbrs_hit.name).first
+                          - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.each do |wbrs_hit|
+                            - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
                                 = wbrs_hit.name
                             - else
@@ -520,8 +520,8 @@
                         %td
                           %label SBRS Rules
                         %td.rule-hits-col-list
-                          - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
-                            - if RulehitResolutionMailerTemplate.where(mnemonic: sbrs_hit.name).first
+                          - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.each do |sbrs_hit|
+                            - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}"}
                                 = sbrs_hit.name
                             - else
@@ -568,7 +568,7 @@
                                 %thead
                                   %tr
                                     %td
-                                      - if RulehitResolutionMailerTemplate.where(mnemonic: wbrs_hit.name).first
+                                      - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                                         %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
                                           = wbrs_hit.name
                                       - else
@@ -600,7 +600,7 @@
                                 %thead
                                   %tr
                                     %td
-                                      - if RulehitResolutionMailerTemplate.where(mnemonic: sbrs_hit.name).first
+                                      - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
                                         %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}"}
                                           = sbrs_hit.name
                                       - else
