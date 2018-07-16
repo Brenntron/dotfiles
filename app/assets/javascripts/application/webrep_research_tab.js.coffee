@@ -285,29 +285,31 @@ $ ->
 
 #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
-
-#    debugger
     rule_id = $(this).attr('data-id')
-    rule_name = $(this).text().trim()
-    entry_row = $(this).parents('.research-table-row')[0]
-    entry_content = $(entry_row).find('.entry-data-content').text().trim()
-    reciever = 'somebody@thisplace.com'
-    subject = 'Need to change an entry associated with ' + rule_name
-    cc = 'someotherdude@here.com'
-    body = 'Hello,' + "\n \n" +
-    "We have determined that #{entry_content} should not be triggering #{rule_name}. Please look into this." + "\n \n" +
-    'Thanks'
+    std_msg_ajax(
+      method: 'GET'
+      url: "/api/v1/rulehit_resolution_mailer_templates/make_rulehit_mail/#{rule_id}"
+#      data: {status: 'read'}
+      success_reload: false
+      success: (response) ->
+        response = JSON.parse(response)
 
-    $('#communication-tab-link').trigger 'click'
-    $('#ruleHitEmailDialog').dialog 'open'
+        $('#communication-tab-link').trigger 'click'
+        $('#ruleHitEmailDialog').dialog 'open'
 
-    reciever_input = $('#ruleHitEmailDialog').find('.receiver-email')
-    cc_input = $('#ruleHitEmailDialog').find('.cc-email')
-    subject_input = $('#ruleHitEmailDialog').find('.communication-subject')
-    body_input = $('#ruleHitEmailDialog').find('.email-reply-body')
-    $(reciever_input[0]).val(reciever)
-    $(cc_input[0]).val(cc)
-    $(subject_input[0]).val(subject)
-    $(body_input[0]).text(body)
+        reciever_input = $('#ruleHitEmailDialog').find('.receiver-email')
+        cc_input = $('#ruleHitEmailDialog').find('.cc-email')
+        subject_input = $('#ruleHitEmailDialog').find('.communication-subject')
+        body_input = $('#ruleHitEmailDialog').find('.email-reply-body')
+
+        $(reciever_input[0]).val(response.to)
+        $(cc_input[0]).val(response.cc)
+        $(subject_input[0]).val(response.subject)
+        $(body_input[0]).text(response.body)
+      error: (response) ->
+        std_api_error(response, "Template could not be retrieved.", reload: false)
+    )
+
+
 
     return

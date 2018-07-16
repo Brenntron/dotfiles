@@ -21,14 +21,23 @@ module API
           begin
             rulehit = DisputeRuleHit.where(id: params['rulehit_id']).first
             return {:error => 'Rulehit not found'}.to_json unless rulehit
-            rh_mailer_template = RulehitResolutionMailerTemplate.where(mnemonic: rulehit.mnemonic).first
+            rh_mailer_template = RulehitResolutionMailerTemplate.where(mnemonic: rulehit.name).first # TODO: This is PROBABLY .mnemonic here rather than name but we will clear that up later
             return {:error => 'No template with that mnemonic!'}.to_json unless rh_mailer_template
             parent_dispute = DisputeEntry.where(id: rulehit.dispute_entry_id).first
             return {:error => 'No DisputeEntry found! can\'t make hostname!'}.to_json unless parent_dispute
 
-            hoststring = parent_dispute.hostname || parent_dispute.ip_address
-            rh_mailer_template.subject = rh_mailer_template.subject.gsub! '%%HOSTNAME%%', hoststring
-            rh_mailer_template.body = rh_mailer_template.body.gsub! '%%HOSTNAME%%', hoststring
+            # TODO: This needs to be cleaned up big time, it's too verbose but right now we just need it to work
+            hoststring = "NOHOST"
+
+            unless parent_dispute.hostname.nil?
+              hoststring = parent_dispute.hostname
+            end
+
+            unless parent_dispute.ip_address.nil?
+              hoststring = parent_dispute.ip_address
+            end
+            rh_mailer_template.subject = rh_mailer_template.subject.gsub '%%HOSTNAME%%', hoststring
+            rh_mailer_template.body = rh_mailer_template.body.gsub '%%HOSTNAME%%', hoststring
 
             return rh_mailer_template.to_json
 
