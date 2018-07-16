@@ -290,23 +290,28 @@ class Dispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
     byebug
 
-    dispute_fields = params.slice(%i{status priority resolution})
-    dispute_fields['id'] = present_params.delete('case_id')
+    dispute_fields = params.to_h.slice(*%w{status priority resolution submitter_type case_id case_owner_username})
+    dispute_fields['id'] = dispute_fields.delete('case_id')
 
-    if params['username']
-      user = User.where(cvs_username: present_params.delete('username'))
+    if dispute_fields['case_owner_username'].present?
+      user = User.where(cvs_username: dispute_fields.delete('case_owner_username'))
       dispute_fields['user_id'] = user.id
     end
 
+    dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
     relation = where(dispute_fields)
 
-    if params['customer']
+    customer_params = params.fetch('customer', {})
+    customer_params = customer_params.select{|ignore_key, value| value.present?}
+    if customer_params.any?
       relation = relation.joins(:customer)
     end
 
-    if params['dispute_entries']
-      dispute_entry_fields = params['dispute_entries'].slice(%i{suggested_disposition})
-      ip_or_uri = params['dispute_entries']['ip_or_uri']
+    dispute_params = params.fetch('dispute_entries', {})
+    dispute_params = dispute_params.select{|ignore_key, value| value.present?}
+    if dispute_params.any?
+      dispute_entry_fields = dispute_params.slice(*%w{suggested_disposition})
+      ip_or_uri = dispute_params['ip_or_uri']
 
       relation = relation.joins(:dispute_entries).group(:id)
       relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
@@ -320,7 +325,7 @@ class Dispute < ApplicationRecord
     byebug
     relation.count
 
-    present_params = params ? params.select{ |key, value| value.present? } : {}
+    # present_params = params ? params.select{ |key, value| value.present? } : {}
     # present_params.delete('search_type')
     # present_params.delete('search_name')
 
@@ -346,19 +351,18 @@ class Dispute < ApplicationRecord
     # Last Modified
 
 
-    return self.none
-
-    # Save this search as a named search
-    if params.present? && search_name.present?
-      named_search =
-          user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
-      NamedSearchCriterion.where(named_search: named_search).delete_all
-      params.each do |field_name, value|
-        named_search.named_search_criteria.create(field_name: field_name, value: value)
-      end
-    end
-
-    where(params)
+    # # Save this search as a named search
+    # if params.present? && search_name.present?
+    #   named_search =
+    #       user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
+    #   NamedSearchCriterion.where(named_search: named_search).delete_all
+    #   params.each do |field_name, value|
+    #     named_search.named_search_criteria.create(field_name: field_name, value: value)
+    #   end
+    # end
+    #
+    # where(params)
+    relation
   end
 
   # Searched based on saved search.

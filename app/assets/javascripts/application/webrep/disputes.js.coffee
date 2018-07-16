@@ -29,26 +29,26 @@ window.advanced_webrep_index_table = () ->
   debugger
   data = {
     customer: {
-      name: $('#new_named_search').find('input[id="contact-name-cb"]').val()
-      email: $('#new_named_search').find('input[id="contact-email-cb"]').val()
-      company_name: $('#new_named_search').find('input[id="company-cb"]').val()
+      name: $('#new_named_search').find('input[id="name-input"]').val()
+      email: $('#new_named_search').find('input[id="contact-email"]').val()
+      company_name: $('#new_named_search').find('input[id="company"]').val()
     }
     dispute_entries: {
-      ip_or_uri: $('#new_named_search').find('input[name="ip_or_uri"]').val()
-      suggested_disposition: $('#new_named_search').find('input[id="disposition-cb"]').val()
+      ip_or_uri: $('#new_named_search').find('input[id="dispute-input"]').val()
+      suggested_disposition: $('#new_named_search').find('input[id="disposition-input"]').val()
     }
     search_type: 'advanced'
     search_name: $('#new_named_search').find('input[name="search_name"]').val()
-    case_id: $('#new_named_search').find('input[id="caseid-cb"]').val()
-    username: $('#new_named_search').find('input[name="username"]').val()
-    status: $('#new_named_search').find('input[name="status"]').val()
-    priority: $('#new_named_search').find('input[id="priority-cb"]').val()
-    resolution: $('#new_named_search').find('input[id="resolution-cb"]').val()
+    case_id: $('#new_named_search').find('input[id="caseid-input"]').val()
+    case_owner_username: $('#new_named_search').find('input[id="owner-input"]').val()
+    status: $('#new_named_search').find('input[id="status-input"]').val()
+    priority: $('#new_named_search').find('input[id="priority-input"]').val()
+    resolution: $('#new_named_search').find('input[id="resolution-input"]').val()
+    submitter_type: $('#new_named_search').find('input[id="submitter-input"]').val()
   }
   window.populate_webrep_index_table(data)
 
 window.named_webrep_index_table = (search_name) ->
-  debugger
   data = {
     search_type: 'standard'
     search_name: search_name

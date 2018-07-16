@@ -14,10 +14,11 @@ module API
               optional :search_type, type: String
               optional :search_name, type: String
               optional :case_id, type: Integer
-              optional :username, type: String
+              optional :case_owner_username, type: String
               optional :status, type: String
               optional :priority, type: Integer
               optional :resolution, type: String
+              optional :submitter_type, type: String
               optional :customer, type: Hash do
                 optional :name, type: String
                 optional :email, type: String
@@ -33,8 +34,6 @@ module API
 
               json_packet = []
 
-              # disputes = Dispute.all #.includes(:dispute_entries) #  => (:dispute_rule_hit)
-
               if permitted_params['search_type']
                 disputes = Dispute.robust_search(permitted_params['search_type'],
                                                  search_name: permitted_params['search_name'],
@@ -43,7 +42,6 @@ module API
               else
                 disputes = Dispute.all.includes(:user, :dispute_entries => [:dispute_rule_hits])
               end
-              #disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
 
               disputes.each do |dispute|
                 dispute_packet = {}
