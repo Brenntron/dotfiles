@@ -33,13 +33,15 @@
 
 
   .row
-    .col-xs-12
-      = simple_form_for :report, url: resolution_report_escalations_webrep_disputes_path, method: :get,
-                          html: { target: :_blank } do |rpt_form|
-        = rpt_form.input :date_from, as: :string, input_html: {type: :date}
-        = rpt_form.input :date_to, as: :string, input_html: {type: :date}
-        = rpt_form.submit 'Report'
-
+    .col-xs-12.temp-spacer
+      %h2 Generate Report
+      .report-form-wrapper
+        = simple_form_for :report, url: resolution_report_escalations_webrep_disputes_path, method: :get,
+                            html: { target: :_blank } do |rpt_form|
+          = rpt_form.input :date_from, as: :string, input_html: {type: :date}
+          = rpt_form.input :date_to, as: :string, input_html: {type: :date}
+          = rpt_form.submit 'Create Report', class: 'button_primary create-report'
+      .report-display-wrapper
 
   .dashboard-header-area.team-dashboard-header-area
     .row
@@ -72,3 +74,6 @@
               Tickets / Dispute Entries
 
       .col-xs-5
+
+  .row
+    .col-xs-12.temp-spacer
