@@ -1,6 +1,7 @@
 class Complaint < ApplicationRecord
   belongs_to :customer
   has_many :complaint_entries
+  has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
   def self.can_visit_url?(url)
     begin
@@ -175,6 +176,39 @@ class Complaint < ApplicationRecord
             },
         "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": nil}
     }
+  end
+
+  def self.create_action(ips_urls, description, customer, tags)
+    cust = find_customer(customer)
+    new_complaint = Complaint.create(description: description, customer_id: cust.id)
+
+    handle_tags(new_complaint, tags)
+
+    ips_urls.each do |ip_url|
+      create_complaint_entry(new_complaint, ip_url)
+    end
+  end
+
+  def self.find_customer(customer)
+    email = customer.split(':').last
+    Customer.find_by_email(email)
+  end
+
+  def self.handle_tags(complaint, tags)
+    tags.each do |tag|
+      new_tag = ComplaintTag.find_or_create_by(name: tag)
+      complaint.complaint_tags << new_tag
+    end
+  end
+
+  def self.create_complaint_entry(complaint, url)
+    url_parts = parse_url(url)
+    new_complaint_entry = ComplaintEntry.new
+    new_complaint_entry.complaint_id = complaint.id
+    new_complaint_entry.subdomain = url_parts[:subdomain]
+    new_complaint_entry.domain = url_parts[:domain]
+    new_complaint_entry.path = url_parts[:path]
+    new_complaint_entry.save
   end
 
 end

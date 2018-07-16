@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180711201143) do
+ActiveRecord::Schema.define(version: 20180716175830) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -141,7 +141,6 @@ ActiveRecord::Schema.define(version: 20180711201143) do
 
   create_table "complaint_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "complaint_id"
-    t.string "tag"
     t.string "subdomain"
     t.string "domain"
     t.string "path"
@@ -173,8 +172,20 @@ ActiveRecord::Schema.define(version: 20180711201143) do
     t.string "category_list"
   end
 
+  create_table "complaint_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "complaint_tags_complaints", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "complaint_id", null: false
+    t.bigint "complaint_tag_id", null: false
+    t.index ["complaint_id", "complaint_tag_id"], name: "idx_comp_comp_tag"
+    t.index ["complaint_tag_id", "complaint_id"], name: "idx_comp_tag_comp"
+  end
+
   create_table "complaints", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "tag"
     t.string "channel"
     t.string "status"
     t.text "description"

@@ -14,6 +14,29 @@ $ ->
           i++
     )
 
+  $('#new-complaint-form').submit (e) ->
+    e.preventDefault()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    ips_urls = this.ips_urls.value
+    desc = this.description.value
+    customer = this.customers.value
+    tags = $('.selectized').val()
+
+    $.ajax(
+      url: '/api/v1/escalations/webcat/complaints'
+      method: 'POST'
+      headers: headers
+      data:
+        ips_urls: ips_urls,
+        description: desc,
+        customer: customer,
+        tags: tags
+      success: (response) ->
+        std_msg_success('Complaint Created.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "Complaint was not created.", reload: false)
+    )
+
 
   createSelectOptions = ->
     tags = $('#complaint_tag_list')[0]

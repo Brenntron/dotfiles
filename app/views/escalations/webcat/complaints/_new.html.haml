@@ -1,13 +1,10 @@
 %form#new-complaint-form{method: 'get', 'accept-charset': 'UTF-8'}
   .form-group.search-item
-    %label.content-label-sm URLs
-    %textarea.form-control
+    %label.content-label-sm URLs/IP Addresses
+    %textarea.form-control#ips_urls
   .form-group.search-item
     %label.content-label-sm Description
-    %input.form-control
-  .form-group.search-item
-    %label.content-label-sm Comment
-    %input.form-control
+    %input.form-control#description
   .form-group.search-item
     %label.content-label-sm Customer
     %input.form-control#customers{list: 'customerList'}
@@ -15,7 +12,7 @@
   .form-group.search-item
     %label.content-label-sm Tags
     %select.form-control.selectized#select-to-new{placeholder: "Add some tags...", multiple: "multiple", tabindex:"-1"}
-    %input.hidden#complaint_tag_list{value: Tag.all.map { |tag| tag.name }.join(',')}
+    %input.hidden#complaint_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(',')}
 
   %hr.thin
   .form-group.text-center
@@ -23,5 +20,3 @@
       Create
     %button.secondary
       Cancel
-
-
