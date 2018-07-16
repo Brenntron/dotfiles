@@ -379,12 +379,19 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.standard_search(search_name)
+  def self.standard_search(search_name, user:)
+    byebug
     case search_name
-      when 'Open'
-        where(status: 'Open')
-      when 'Closed'
-        where(status: 'Closed')
+      when 'my_open'
+        where(status: ['new', 'open', 'reopen'], user_id: user.id)
+      when 'my_disputes'
+        where(user_id: user.id)
+      when 'open'
+        where(status: ['new', 'open', 'reopen'])
+      when 'closed'
+        where(status: ['closed', 'fixed', 'resolved'])
+      when 'all'
+        where({})
       else
         raise "No search named '#{search_name}' known."
     end
@@ -418,7 +425,7 @@ class Dispute < ApplicationRecord
       when 'named'
         named_search(search_name, user: user)
       when 'standard'
-        standard_search(search_name)
+        standard_search(search_name, user: user)
       when 'contains'
         contains_search(params['value'])
       else
