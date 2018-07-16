@@ -3553,12 +3553,15 @@ input.communication-subject {
 }
 
 .wbrs-rule-trigger {
-  color: $content-bg-color;
   text-decoration: underline;
 }
 
 .wbrs-rule-trigger:hover {
   color: $warning-accent-color;
+}
+
+.nested-data-row .wbrs-rule-trigger {
+  color: $content-bg-color;
 }
 
 .template-label {
