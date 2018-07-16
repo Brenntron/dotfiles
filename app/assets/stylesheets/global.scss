@@ -5117,6 +5117,19 @@ td.ticket-total::before {
   border-right: 1px solid $content-bg-color;
 }
 
+.dispute-entry-count {
+  background-color: $content-label-color;
+  min-width: 20px;
+  padding: 3px;
+  border-radius: 2px;
+  color: $content-bg-color;
+  font-size: 10pt;
+  font-weight: 600;
+  display: block;
+  float: right;
+  margin-top: -14px;
+  text-align: center;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
