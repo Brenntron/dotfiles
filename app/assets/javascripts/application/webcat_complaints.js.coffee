@@ -1,3 +1,6 @@
+window.removeSubdomain = (id,host) ->
+  id.value = host
+
 window.cat_new_url = ()->
   debugger
 
@@ -77,38 +80,117 @@ window.edit_selected_complaints = () ->
     i++
   window.location = 'show_multiple?selected_ids=' + complaint_ids;
 
+
+
 format = (complaint_entry) ->
   missing_data = '<span class="missing-data">Missing Data</span>'
   uri = ''
   host = ''
   url = ''
-  if complaint_entry.uri != null
+  if complaint_entry.uri
     uri = '<a href="http://' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
-  else if complaint_entry.domain != null
-    if complaint_entry.subdomain != null
+  else if complaint_entry.domain
+    if complaint_entry.subdomain
       host = complaint_entry.subdomain + '.'
     host = host + complaint_entry.domain
-    if complaint_entry.path != null
+    url = host
+    if complaint_entry.path
       url = host + complaint_entry.path
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
   else
     uri = missing_data
   wbrs_score = ''
-  if complaint_entry.wbrs_score != null
+  if complaint_entry.wbrs_score
     wbrs_score = complaint_entry.wbrs_score
   else
     wbrs_score = missing_data
   confidence = ''
-  if complaint_entry.confidence != null
+  if complaint_entry.confidence
     confidence = complaint_entry.confidence
   else
     confidence = missing_data
+  certainty = ''
+  if complaint_entry.certainty
+    certainty = complaint_entry.certainty
+  else
+    certainty = missing_data
   category = ''
-  if complaint_entry.category != null
+  if complaint_entry.category
     category = complaint_entry.category
   else
     category = ''
-  complaint_entry_html = '<div class="row">' + '<div class="col-xs-10">' + '<div class="row">' + '<div class="col-xs-1">' + complaint_entry.complaint_id + '/' + complaint_entry.entry_id + ' </div>' + '<div class="col-xs-3">' + uri + '</div>' + '<div class="col-xs-4">' + 'Prefix <input type="text" onclick="this.select()" value="' + host + '">' + '</div>' + '<div class="col-xs-2">' + 'WBRS: ' + wbrs_score + ' Confidence ' + confidence + '</div>' + '</div>' + '<div class="row">' + '<div class="col-xs-4">' + 'Category<input type="text" onclick="this.select()" value="' + category + '">' + '</div>' + '<div class="col-xs-4">' + 'Status: | <input type="radio" name="status" value="unchanged"> unchanged |  <input type="radio" name="status" value="fixed"> fixed | <input type="radio" name="status" value="invalid"> invalid' + '</div>' + '<div class="col-xs-1">' + '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')">Update</button>' + '</div>' + '</div>' + '</div>' + '<div class="col-xs-2">' + '<button>info</button>' + '<button>lookup</button>' + '<button>history</button>' + '<button>domain</button>' + '</div>' + '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" name="status" value="" placeholder="add a comment" size="50">' + '</div>' + '</div>'
+  complaint_entry_html = ''
+  if complaint_entry.is_important
+    complaint_entry_html = '<div class="row">' +
+      '<div class="col-xs-1">' +
+      'ID <p>' + complaint_entry.entry_id + '</p>' +
+      '</div>' +
+      '<div class="col-xs-2">' +
+      '<div class="row">' +
+      'Category:' + complaint_entry.category +
+      '</div>' +
+      '<div class="row">' +
+      '<h3>' + url + '</h3>' +
+      '</div>' +
+      '</div>' +
+      ' <div class="col-xs-3">' +
+      'Prefix <input id="complaint_review_prefix_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + host + '"><button onclick="removeSubdomain(complaint_review_prefix_' + complaint_entry.entry_id + ',\'' + complaint_entry.domain + '\')">remove subdomain</button>' +
+      '</div>' +
+      '<div class="col-xs-1">' +
+      '<div class="row">' + 'Certainty: <p>' + certainty + '</p>' +
+      '</div>' +
+      '<div class="row">' + 'Confidence: <p>' + confidence + '</p>' +
+      '</div>' +
+      '</div>' +
+      '<div class="col-xs-4">' +
+      ' Resolution: | ' +
+      '<input type="radio" name="status" value="dontChange"> dont change |  ' +
+      '<input type="radio" name="status" value="commit"> commit | ' +
+      '<input type="radio" name="status" value="decline"> decline' +
+      '</div>' +
+      '<div class="col-xs-1">' +
+      '<button> Change </button>' +
+      '</div>' +
+      '</div>'
+  else
+    complaint_entry_html = '<div class="row">' +
+      '<div class="col-xs-10">' +
+      '<div class="row">' +
+      '<div class="col-xs-1">' + complaint_entry.complaint_id + '/' + complaint_entry.entry_id + ' </div>' +
+      '<div class="col-xs-3">' + uri +
+      '</div>' +
+      '<div class="col-xs-4">' +
+      'Prefix <input id="complaint_prefix_' + complaint_entry.entry_id +
+      '" type="text" onclick="this.select()" value="' + host +
+      '"><button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
+      ',\'' + complaint_entry.domain + '\')">remove subdomain</button>' +
+      '</div>' +
+      '<div class="col-xs-2">' +
+      'WBRS: ' + wbrs_score + ' Confidence ' + confidence +
+      '</div>' +
+      '</div>' +
+      '<div class="row">' +
+      '<div class="col-xs-4">' +
+      'Category<input type="text" onclick="this.select()" value="' + category + '">' +
+      '</div>' +
+      '<div class="col-xs-4">' +
+      'Status: | ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged"> unchanged |  ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed"> fixed | ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid"> invalid' +
+      '</div>' +
+      '<div class="col-xs-1">' +
+      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')">Update</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="col-xs-2">' +
+      '<button>info</button>' +
+      '<button>lookup</button>' +
+      '<button>history</button>' +
+      '<button>domain</button>' +
+      '</div>' +
+      '</div>'
   complaint_entry_html
 
 window.click_table_buttons = (complaint_table, button)->
