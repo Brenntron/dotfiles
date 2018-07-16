@@ -4319,7 +4319,7 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 #table-show-columns-dropdown {
-  min-width: 700px;
+  min-width: 750px;
 }
 
 .dropdown-menu-content-block ul {
@@ -4681,7 +4681,7 @@ h5.entry-details-table-header {
   outline: 1px solid #e5e5e5;
 }
 
-.inline-dropdown-menu, .ticket-resolution-submenu {
+.inline-dropdown-menu, .ticket-resolution-submenu, .toolbar-dropdown {
   font-size: 9pt;
   margin-top: -2px;
   margin-left: 2px;
@@ -4702,15 +4702,17 @@ h5.entry-details-table-header {
 
 .submenu-left-wrapper {
   background-color: $bug-section-color;
+
 }
 
-.inline-dropdown-menu .submenu-left-wrapper ul li:hover {
+.inline-dropdown-menu .submenu-left-wrapper ul li:hover, .toolbar-dropdown .submenu-left-wrapper ul li:hover {
   background-color: darken($bug-section-color, 5%);
 }
 
 .submenu-left-wrapper, .submenu-right-wrapper {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0  !important;
+  padding-right: 0 !important;
+  margin-right: 0  !important;
 }
 
 .submenu-header {
@@ -4731,7 +4733,7 @@ h5.entry-details-table-header {
   padding: 4px 12px;
 }
 
-.inline-dropdown-menu ul li:hover, .toolbar-dropdown ul li {
+.inline-dropdown-menu ul li:hover, .toolbar-dropdown ul li:hover {
   background-color: $faint-accent-color;
 }
 
@@ -5164,6 +5166,16 @@ td.ticket-total::before {
 
 #disputes-index-export-form {
   height: 27px;
+}
+
+#edit-ticket-status-dropdown {
+  width: 160px;
+  padding: 0 !important;
+}
+
+#edit-ticket-status-dropdown .ticket-resolution-submenu {
+  left: -323px;
+  padding: 0 !important;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
