@@ -1,8 +1,7 @@
-window.populate_webrep_index_table = () ->
+
+window.populate_webrep_index_table = (data = {}) ->
+  debugger
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  data = {
-    status: $('#new_named_search').find('input[name="dispute[status]"]').val()
-  }
   $.ajax(
     url: '/api/v1/escalations/webrep/disputes'
     method: 'GET'
@@ -26,6 +25,14 @@ window.populate_webrep_index_table = () ->
       #$("#create_research_submit_wait").addClass('hidden').hide()
       #$("#create_research_submit").show()
   , this)
+
+window.advanced_webrep_index_table = () ->
+  data = {
+    search_type: 'advanced'
+    status: $('#new_named_search').find('input[name="dispute[status]"]').val()
+  }
+  window.populate_webrep_index_table(data)
+
 
 window.popup_response_error =(response, prefix) ->
   if response.responseJSON == undefined

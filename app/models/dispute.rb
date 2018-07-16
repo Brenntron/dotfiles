@@ -288,22 +288,18 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    raise 'Search must use ActionController::Parameters!' unless params.kind_of?(ActionController::Parameters)
-    raise 'Cannot search with unpermitted parameters!' unless params.permitted?
-
-    present_params = params.select{ |key, value| value.present? }
 
     # Save this search as a named search
-    if present_params.present? && search_name.present?
+    if params.present? && search_name.present?
       named_search =
           user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
       NamedSearchCriterion.where(named_search: named_search).delete_all
-      present_params.each do |field_name, value|
+      params.each do |field_name, value|
         named_search.named_search_criteria.create(field_name: field_name, value: value)
       end
     end
 
-    where(present_params)
+    where(params)
   end
 
   # Searched based on saved search.
@@ -356,16 +352,20 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, params: nil, search_name: nil, user:)
+  def self.robust_search(search_type, search_name: nil, params: nil, user:)
+    present_params = params ? params.select{ |key, value| value.present? } : {}
+    present_params.delete('search_type')
+    present_params.delete('search_name')
+
     case search_type
       when 'advanced'
-        advanced_search(params, search_name: search_name, user: user)
+        advanced_search(present_params, search_name: search_name, user: user)
       when 'named'
         named_search(search_name, user: user)
       when 'standard'
         standard_search(search_name)
       when 'contains'
-        contains_search(params['value'])
+        contains_search(present_params['value'])
       else
         where({})
     end

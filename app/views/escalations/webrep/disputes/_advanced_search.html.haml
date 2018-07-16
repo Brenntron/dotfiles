@@ -1,6 +1,6 @@
 -#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
 -#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
-= form_for NamedSearch.new, url: escalations_webrep_dashboard_path, method: 'get', 'accept-charset': 'UTF-8' do |named_form|
+= form_for NamedSearch.new, url: escalations_webrep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |named_form|
   .form-group.search-item
     %label.content-label-sm Case IDs
     %input.form-control
@@ -110,7 +110,7 @@
       Add Name to save this search criteria to My Saved Searches
     %input.form-control{name: 'dispute[status]'}
   .form-group.text-center
-    %button.primary#submit-advanced-search{value: 'submit'}
+    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_webrep_index_table();'}
       Submit Search
     %button.secondary#reset-advanced-search.reset
       Reset Search
