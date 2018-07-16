@@ -40,12 +40,17 @@ Rails.application.routes.draw do
 
     namespace :webrep do
       root 'disputes#index'
-      resources :disputes do
+      resources :disputes, only: [:index, :show] do
         collection do
           get :advanced_search
           get :named_search
           get :standard_search
           get :contains_search
+          get :resolution_report
+          get :export_per_resolution_report
+          get :export_per_engineer_report
+          get :resolution_age_report
+          get :export_resolution_age_report
         end
       end
       resources :dispute_emails
