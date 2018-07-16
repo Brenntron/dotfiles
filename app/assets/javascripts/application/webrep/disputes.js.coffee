@@ -40,6 +40,7 @@ window.advanced_webrep_index_table = () ->
     search_type: 'advanced'
     search_name: $('#new_named_search').find('input[name="search_name"]').val()
     case_id: $('#new_named_search').find('input[id="caseid-input"]').val()
+    org_domain: $('#new_named_search').find('input[id="domain-input"]').val()
     case_owner_username: $('#new_named_search').find('input[id="owner-input"]').val()
     status: $('#new_named_search').find('input[id="status-input"]').val()
     priority: $('#new_named_search').find('input[id="priority-input"]').val()

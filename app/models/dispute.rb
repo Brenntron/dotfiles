@@ -288,9 +288,28 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    byebug
+    # params:
+    # Case IDs                          :id
+    # Dispute (URL/IP/Domain)           self.dispute_entries.*
+    # Case Owner                        :user_id
+    # Status                            :status
+    # Priority                          :priority (strip off P from P1, P2, P3)
+    # Suggested Disposition             self.dispute_entries.suggested_disposition
+    # URL Regex                         remove
+    # Resolution                        :resolution
+    # Dispute Type                      remove
+    # Origin                            remove
+    # Origin ID                         remove
+    # Submitter Type                    :submitter_type
+    # Contact Name                      customers.name
+    # Contact Email                     customers.email
+    # Company                           self.customer.company.name
+    # Submitter Domain                  :org_domain
+    # Date Submitted
+    # Case Age
+    # Last Modified
 
-    dispute_fields = params.to_h.slice(*%w{status priority resolution submitter_type case_id case_owner_username})
+    dispute_fields = params.to_h.slice(*%w{status org_domain priority resolution submitter_type case_id case_owner_username})
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
     if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
@@ -329,31 +348,6 @@ class Dispute < ApplicationRecord
     byebug
     relation.count
 
-    # present_params = params ? params.select{ |key, value| value.present? } : {}
-    # present_params.delete('search_type')
-    # present_params.delete('search_name')
-
-    # params:
-    # Case IDs                          :id
-    # Dispute (URL/IP/Domain)           self.dispute_entries.*
-    # Case Owner                        :user_id
-    # Status                            :status
-    # Priority                          :priority (strip off P from P1, P2, P3)
-    # Suggested Disposition             self.dispute_entries.suggested_disposition
-    # URL Regex                         remove
-    # Resolution                        :resolution
-    # Dispute Type                      remove
-    # Origin                            remove
-    # Origin ID                         remove
-    # Submitter Type                    :submitter_type
-    # Contact Name                      customers.name
-    # Contact Email                     customers.email
-    # Company                           self.customer.company.name
-    # Submitter Domain                  :org_domain
-    # Date Submitted
-    # Case Age
-    # Last Modified
-
 
     # # Save this search as a named search
     # if params.present? && search_name.present?
@@ -364,8 +358,7 @@ class Dispute < ApplicationRecord
     #     named_search.named_search_criteria.create(field_name: field_name, value: value)
     #   end
     # end
-    #
-    # where(params)
+
     relation
   end
 

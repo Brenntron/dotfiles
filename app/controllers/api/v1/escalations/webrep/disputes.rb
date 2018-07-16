@@ -14,6 +14,7 @@ module API
               optional :search_type, type: String
               optional :search_name, type: String
               optional :case_id, type: Integer
+              optional :org_domain, type: String
               optional :case_owner_username, type: String
               optional :status, type: String
               optional :priority, type: String
