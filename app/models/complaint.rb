@@ -2,6 +2,11 @@ class Complaint < ApplicationRecord
   belongs_to :customer
   has_many :complaint_entries
 
+  scope :active_count , -> {where(status:"ACTIVE").count}
+  scope :completed_count , -> {where(status:"COMPLETED").count}
+  scope :new_count , -> {where(status:"NEW").count}
+  scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).count}
+
   def self.can_visit_url?(url)
     begin
     request = HTTPI::Request.new(url: url)
