@@ -361,7 +361,6 @@ class Dispute < ApplicationRecord
       end
     end
 
-    byebug
     relation.count
 
 
