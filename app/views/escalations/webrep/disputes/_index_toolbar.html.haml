@@ -8,6 +8,7 @@
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
         .dropdown-menu-content-block
+          .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Entry Details
           %ul
             %li.toggle-vis{'data-column':'2'}
               %input{type: 'checkbox', checked: true} Priority
@@ -44,7 +45,6 @@
             %li.toggle-vis{'data-column':'17'}
               %input{type: 'checkbox'} Contact Email
 
-
         .dropdown-menu-content-block
           .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
           %ul
@@ -76,9 +76,10 @@
               %input{type: 'checkbox', checked: true} RepTool Classification
 
 
-    %button.toolbar-button.expand-row-button{title: 'Expand All Rows'}
-      %span.toolbar-button-text
-        Expand All Rows
+    %button.toolbar-button.expand-row-button#expand-all-index-rows{title: 'Expand All Rows'}
+      %span.toolbar-button-text Expand All Rows
+    %button.toolbar-button.collapse-button#collapse-all-index-rows{title: 'Collapse All Rows'}
+      %span.toolbar-button-text Collapse All Rows
 
   %div
     %button.take-ticket-button#index_ticket_assign{title: 'Assign to me'}
