@@ -177,6 +177,8 @@
   %div
     %label.toolbar-section-label
       File
-    %button.toolbar-button.export-button{title: 'Export to CSV'}
-      %span.toolbar-button-text
-        Export to CSV
+    %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :csv), method: :get}
+      %button.toolbar-button.export-button{title: 'Export to CSV'}
+        %span.toolbar-button-text
+          Export to CSV
+

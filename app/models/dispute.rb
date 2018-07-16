@@ -288,22 +288,77 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    raise 'Search must use ActionController::Parameters!' unless params.kind_of?(ActionController::Parameters)
-    raise 'Cannot search with unpermitted parameters!' unless params.permitted?
+    byebug
 
-    present_params = params.select{ |key, value| value.present? }
+    dispute_fields = params.slice(%i{status priority resolution})
+    dispute_fields['id'] = present_params.delete('case_id')
+
+    if params['username']
+      user = User.where(cvs_username: present_params.delete('username'))
+      dispute_fields['user_id'] = user.id
+    end
+
+    relation = where(dispute_fields)
+
+    if params['customer']
+      relation = relation.joins(:customer)
+    end
+
+    if params['dispute_entries']
+      dispute_entry_fields = params['dispute_entries'].slice(%i{suggested_disposition})
+      ip_or_uri = params['dispute_entries']['ip_or_uri']
+
+      relation = relation.joins(:dispute_entries).group(:id)
+      relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
+
+      if ip_or_uri.present?
+        ip_or_uri_clause = "dispute_entries.ip_address = :ip_or_uri OR dispute_entries.uri like :ip_or_uri_pattern"
+        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+      end
+    end
+
+    byebug
+    relation.count
+
+    present_params = params ? params.select{ |key, value| value.present? } : {}
+    # present_params.delete('search_type')
+    # present_params.delete('search_name')
+
+    # params:
+    # Case IDs                          :id
+    # Dispute (URL/IP/Domain)           self.dispute_entries.*
+    # Case Owner                        :user_id
+    # Status                            :status
+    # Priority                          :priority (strip off P from P1, P2, P3)
+    # Suggested Disposition             self.dispute_entries.suggested_disposition
+    # URL Regex                         remove
+    # Resolution                        :resolution
+    # Dispute Type                      remove
+    # Origin                            remove
+    # Origin ID                         remove
+    # Submitter Type                    :submitter_type
+    # Contact Name                      customers.name
+    # Contact Email                     customers.email
+    # Company                           self.customer.company.name
+    # Submitter Domain                  :org_domain
+    # Date Submitted
+    # Case Age
+    # Last Modified
+
+
+    return self.none
 
     # Save this search as a named search
-    if present_params.present? && search_name.present?
+    if params.present? && search_name.present?
       named_search =
           user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
       NamedSearchCriterion.where(named_search: named_search).delete_all
-      present_params.each do |field_name, value|
+      params.each do |field_name, value|
         named_search.named_search_criteria.create(field_name: field_name, value: value)
       end
     end
 
-    where(present_params)
+    where(params)
   end
 
   # Searched based on saved search.
@@ -324,12 +379,19 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.standard_search(search_name)
+  def self.standard_search(search_name, user:)
+    byebug
     case search_name
-      when 'Open'
-        where(status: 'Open')
-      when 'Closed'
-        where(status: 'Closed')
+      when 'my_open'
+        where(status: ['new', 'open', 'reopen'], user_id: user.id)
+      when 'my_disputes'
+        where(user_id: user.id)
+      when 'open'
+        where(status: ['new', 'open', 'reopen'])
+      when 'closed'
+        where(status: ['closed', 'resolved'])
+      when 'all'
+        where({})
       else
         raise "No search named '#{search_name}' known."
     end
@@ -356,14 +418,14 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, params: nil, search_name: nil, user:)
+  def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
       when 'advanced'
         advanced_search(params, search_name: search_name, user: user)
       when 'named'
         named_search(search_name, user: user)
       when 'standard'
-        standard_search(search_name)
+        standard_search(search_name, user: user)
       when 'contains'
         contains_search(params['value'])
       else
