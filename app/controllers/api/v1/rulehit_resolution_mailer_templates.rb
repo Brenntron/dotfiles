@@ -23,6 +23,12 @@ module API
             return {:error => 'Rulehit not found'}.to_json unless rulehit
             rh_mailer_template = RulehitResolutionMailerTemplate.where(mnemonic: rulehit.mnemonic).first
             return {:error => 'No template with that mnemonic!'}.to_json unless rh_mailer_template
+            parent_dispute = DisputeEntry.where(id: rulehit.dispute_entry_id).first
+            return {:error => 'No DisputeEntry found! can\'t make hostname!'}.to_json unless parent_dispute
+
+            hoststring = parent_dispute.hostname || parent_dispute.ip_address
+            rh_mailer_template.subject = rh_mailer_template.subject.gsub! '%%HOSTNAME%%', hoststring
+            rh_mailer_template.body = rh_mailer_template.body.gsub! '%%HOSTNAME%%', hoststring
 
             return rh_mailer_template.to_json
 
