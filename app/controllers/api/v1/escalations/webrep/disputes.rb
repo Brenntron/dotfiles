@@ -16,7 +16,7 @@ module API
               optional :case_id, type: Integer
               optional :case_owner_username, type: String
               optional :status, type: String
-              optional :priority, type: Integer
+              optional :priority, type: String
               optional :resolution, type: String
               optional :submitter_type, type: String
               optional :customer, type: Hash do
