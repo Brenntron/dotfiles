@@ -5162,6 +5162,10 @@ td.ticket-total::before {
   display: none;
 }
 
+#disputes-index-export-form {
+  height: 27px;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
