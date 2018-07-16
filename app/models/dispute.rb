@@ -324,10 +324,22 @@ class Dispute < ApplicationRecord
     dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
     relation = where(dispute_fields)
 
-    customer_params = params.fetch('customer', {})
+    company_name = nil
+    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
     customer_params = customer_params.select{|ignore_key, value| value.present?}
     if customer_params.any?
-      relation = relation.joins(:customer)
+      if customer_params['company_name'].present?
+        company_name = customer_params.delete('company_name')
+        relation = relation.joins(customer: :company)
+      else
+        relation = relation.joins(:customer)
+      end
+
+      customer_where = customer_params
+      if company_name.present?
+        customer_where = customer_where.merge(companies: {name: company_name})
+      end
+      relation = relation.where(customers: customer_where)
     end
 
     entry_params = params.fetch('dispute_entries', {})

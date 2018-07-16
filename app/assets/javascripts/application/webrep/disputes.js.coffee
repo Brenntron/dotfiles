@@ -30,8 +30,8 @@ window.advanced_webrep_index_table = () ->
   data = {
     customer: {
       name: $('#new_named_search').find('input[id="name-input"]').val()
-      email: $('#new_named_search').find('input[id="contact-email"]').val()
-      company_name: $('#new_named_search').find('input[id="company"]').val()
+      email: $('#new_named_search').find('input[id="email-input"]').val()
+      company_name: $('#new_named_search').find('input[id="company-input"]').val()
     }
     dispute_entries: {
       ip_or_uri: $('#new_named_search').find('input[id="dispute-input"]').val()
