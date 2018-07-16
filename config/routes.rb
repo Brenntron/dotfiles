@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  resources :rulehit_resolution_mailer_templates
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations do
