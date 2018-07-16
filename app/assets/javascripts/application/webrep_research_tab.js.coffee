@@ -157,40 +157,13 @@ $ ->
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+          wlbl = $(entry_row).find('.entry-data-wlbl').text()
 
-          show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
-          show_wbrs =  $('#wlbl_adjust_entries').find('.current-wbrs-score')
-          select_wlbl =  $('#wlbl_adjust_entries').find('#wlbl-list-type-select')
+          tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+          $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
 
-          $(show_content[0]).text(entry_content)
-          $(show_wbrs[0]).text(wbrs)
-          wlbl_options = $(select_wlbl).find('option')
 
-          entry_list_val = ''
-          preview_button = $('#wlbl_adjust_entries').find('.wlbl-preview-button')
-          comment_wrapper = $('#wlbl_adjust_entries').find('.comment-wrapper')
-          submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
-
-          $(wlbl_options).each ->
-            option_value = $(this).val()
-            wlbl = $(entry_row).find('.entry-data-wlbl').text()
-            if $.trim(option_value) == $.trim(wlbl)
-              entry_list_val = $(select_wlbl).val(option_value)
-            else
-              entry_list_val = $(select_wlbl).val()
-
-          $(select_wlbl).change ->
-            new_val = $(select_wlbl).val()
-            if new_val != entry_list_val
-              $(preview_button).removeAttr("disabled")
-            else if new_val ==  entry_list_val
-              unless $(preview_button).attr("disabled", true)
-                $(preview_button).attr("disabled", true)
-
-          $(preview_button).click ->
-            if $(preview_button).attr("disabled", false)
-              $(comment_wrapper).show()
-              $(submit_button).removeAttr("disabled")
+      $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
     else
       alert ('No rows selected')
@@ -198,34 +171,19 @@ $ ->
 
 #  Inline Adjust WL/BL Button
   $('.dispute-inline-buttons.adjust-wlbl-button').click ->
-
-    entry_row = $(this).parents('.research-table-row')[0]
-    wlbl = $(entry_row).find('.entry-data-wlbl').text()
     dropdown = $(this).next('.dropdown-menu')
-    select_wlbl = $(dropdown).find('.adjust-wlbl-input')
-    wlbl_options = $(select_wlbl).find('option')
-
-    preview_button = $(dropdown).find('.wlbl-preview-button')
     comment_wrapper = $(dropdown).find('.comment-wrapper')
     submit_button = $(dropdown).find('.dropdown-submit-button')
+    list_toggle = $(dropdown ).find('.wl-bl-list-inline')
+    initial_val = ''
 
-    $(select_wlbl).change ->
-      new_val = $(select_wlbl[1]).val()
-      wlbl = $.trim(wlbl)
-      if wlbl == "Not currently on a list"
-        wlbl = ""
+    $(list_toggle).each ->
+      initial_val = $(this).prop("checked")
 
-      if new_val != wlbl
-        $(preview_button).removeAttr("disabled")
-      else if new_val ==  wlbl
-        $(preview_button).attr("disabled", true)
-        $(comment_wrapper).hide()
-        $(submit_button).attr("disabled", true)
-
-    $(preview_button).click ->
-      if $(preview_button).attr("disabled", false)
-        $(comment_wrapper).show()
-        $(submit_button).removeAttr("disabled")
+      $(this).click ->
+        if $(this).prop("checked") != initial_val
+          $(comment_wrapper).show()
+          $(submit_button).attr("disabled", false)
 
 
 # Show / hide the different research tables in the expanded row
