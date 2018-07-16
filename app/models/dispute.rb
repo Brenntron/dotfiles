@@ -292,42 +292,6 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    byebug
-
-    dispute_fields = params.slice(%i{status priority resolution})
-    dispute_fields['id'] = present_params.delete('case_id')
-
-    if params['username']
-      user = User.where(cvs_username: present_params.delete('username'))
-      dispute_fields['user_id'] = user.id
-    end
-
-    relation = where(dispute_fields)
-
-    if params['customer']
-      relation = relation.joins(:customer)
-    end
-
-    if params['dispute_entries']
-      dispute_entry_fields = params['dispute_entries'].slice(%i{suggested_disposition})
-      ip_or_uri = params['dispute_entries']['ip_or_uri']
-
-      relation = relation.joins(:dispute_entries).group(:id)
-      relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
-
-      if ip_or_uri.present?
-        ip_or_uri_clause = "dispute_entries.ip_address = :ip_or_uri OR dispute_entries.uri like :ip_or_uri_pattern"
-        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
-      end
-    end
-
-    byebug
-    relation.count
-
-    present_params = params ? params.select{ |key, value| value.present? } : {}
-    # present_params.delete('search_type')
-    # present_params.delete('search_name')
-
     # params:
     # Case IDs                          :id
     # Dispute (URL/IP/Domain)           self.dispute_entries.*
@@ -349,20 +313,69 @@ class Dispute < ApplicationRecord
     # Case Age
     # Last Modified
 
+    dispute_fields = params.to_h.slice(*%w{status org_domain priority resolution submitter_type case_id case_owner_username})
+    dispute_fields['id'] = dispute_fields.delete('case_id')
 
-    return self.none
+    if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
+      dispute_fields['priority'] = priority_digits
+    end
 
-    # Save this search as a named search
-    if params.present? && search_name.present?
-      named_search =
-          user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
-      NamedSearchCriterion.where(named_search: named_search).delete_all
-      params.each do |field_name, value|
-        named_search.named_search_criteria.create(field_name: field_name, value: value)
+    if dispute_fields['case_owner_username'].present?
+      user = User.where(cvs_username: dispute_fields.delete('case_owner_username')).first
+      dispute_fields['user_id'] = user.id
+    end
+
+    dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
+    relation = where(dispute_fields)
+
+    company_name = nil
+    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
+    customer_params = customer_params.select{|ignore_key, value| value.present?}
+    if customer_params.any?
+      if customer_params['company_name'].present?
+        company_name = customer_params.delete('company_name')
+        relation = relation.joins(customer: :company)
+      else
+        relation = relation.joins(:customer)
+      end
+
+      customer_where = customer_params
+      if company_name.present?
+        customer_where = customer_where.merge(companies: {name: company_name})
+      end
+      relation = relation.where(customers: customer_where)
+    end
+
+    entry_params = params.fetch('dispute_entries', {})
+    entry_params = entry_params.select{|ignore_key, value| value.present?}
+    if entry_params.any?
+      dispute_entry_fields = entry_params.slice(*%w{suggested_disposition})
+      ip_or_uri = entry_params['ip_or_uri']
+
+      relation = relation.joins(:dispute_entries).group(:id)
+      relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
+
+      if ip_or_uri.present?
+        ip_or_uri_clause = "dispute_entries.ip_address = :ip_or_uri OR dispute_entries.uri like :ip_or_uri_pattern"
+        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
       end
     end
 
-    where(params)
+    byebug
+    relation.count
+
+
+    # # Save this search as a named search
+    # if params.present? && search_name.present?
+    #   named_search =
+    #       user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
+    #   NamedSearchCriterion.where(named_search: named_search).delete_all
+    #   params.each do |field_name, value|
+    #     named_search.named_search_criteria.create(field_name: field_name, value: value)
+    #   end
+    # end
+
+    relation
   end
 
   # Searched based on saved search.
@@ -384,7 +397,6 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.standard_search(search_name, user:)
-    byebug
     case search_name
       when 'my_open'
         where(status: ['new', 'open', 'reopen'], user_id: user.id)
