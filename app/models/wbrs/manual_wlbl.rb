@@ -56,9 +56,9 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [String] note: User’s note
   # @return [String] JSON for array of warnings
   def self.add_from_params(entries, wlbl_params)
-    wlbl_params['url'] = entries.map {|entry| entry.hostlookup}
+    wlbl_params['urls'] = entries.map {|entry| entry.hostlookup}
     response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
-    wlbl_params.delete('url')
+    wlbl_params.delete('urls')
 
     wlbl_ids = JSON.parse(response.body)["Added WL/BL entries IDs"]
     wlbl_ids.each_with_index do |wlbl_id, index|
