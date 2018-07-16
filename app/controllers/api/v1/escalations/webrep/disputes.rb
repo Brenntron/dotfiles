@@ -13,7 +13,20 @@ module API
             params do
               optional :search_type, type: String
               optional :search_name, type: String
+              optional :case_id, type: Integer
+              optional :username, type: String
               optional :status, type: String
+              optional :priority, type: Integer
+              optional :resolution, type: String
+              optional :customer, type: Hash do
+                optional :name, type: String
+                optional :email, type: String
+                optional :company_name, type: String
+              end
+              optional :dispute_entries, type: Hash do
+                optional :ip_or_uri, type: String
+                optional :suggested_disposition, type: String
+              end
             end
 
             get "" do

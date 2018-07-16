@@ -23,11 +23,11 @@
             %span.nav-dropdown-icon.icon-recently-viewed
             Recently Viewed
         %li
-          %a
+          %a{onclick: 'named_webrep_index_table("my_disputes");'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
         %li
-          %a
+          %a{onclick: 'named_webrep_index_table("my_open");'}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
         %li
@@ -35,15 +35,15 @@
             %span.nav-dropdown-icon.icon-team-bugs
             My Team Tickets
         %li
-          %a
+          %a{onclick: 'named_webrep_index_table("open");'}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
         %li
-          %a
+          %a{onclick: 'named_webrep_index_table("closed");'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
         %li
-          %a
+          %a{onclick: 'named_webrep_index_table("all");'}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 

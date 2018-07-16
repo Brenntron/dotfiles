@@ -1,6 +1,5 @@
 
 window.populate_webrep_index_table = (data = {}) ->
-  debugger
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webrep/disputes'
@@ -27,9 +26,32 @@ window.populate_webrep_index_table = (data = {}) ->
   , this)
 
 window.advanced_webrep_index_table = () ->
+  debugger
   data = {
+    customer: {
+      name: $('#new_named_search').find('input[id="contact-name-cb"]').val()
+      email: $('#new_named_search').find('input[id="contact-email-cb"]').val()
+      company_name: $('#new_named_search').find('input[id="company-cb"]').val()
+    }
+    dispute_entries: {
+      ip_or_uri: $('#new_named_search').find('input[name="ip_or_uri"]').val()
+      suggested_disposition: $('#new_named_search').find('input[id="disposition-cb"]').val()
+    }
     search_type: 'advanced'
-    status: $('#new_named_search').find('input[name="dispute[status]"]').val()
+    search_name: $('#new_named_search').find('input[name="search_name"]').val()
+    case_id: $('#new_named_search').find('input[id="caseid-cb"]').val()
+    username: $('#new_named_search').find('input[name="username"]').val()
+    status: $('#new_named_search').find('input[name="status"]').val()
+    priority: $('#new_named_search').find('input[id="priority-cb"]').val()
+    resolution: $('#new_named_search').find('input[id="resolution-cb"]').val()
+  }
+  window.populate_webrep_index_table(data)
+
+window.named_webrep_index_table = (search_name) ->
+  debugger
+  data = {
+    search_type: 'standard'
+    search_name: search_name
   }
   window.populate_webrep_index_table(data)
 
