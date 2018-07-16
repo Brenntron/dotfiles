@@ -96,7 +96,13 @@
       columns: [
         {data: null, defaultContent: '<button class="expand-row-button-inline"></button>'}, // expansion button
         {data: null, defaultContent: '<p class="">icons</p>'},
-        {data: 'complaint_id'},
+        {
+          sortable: false,
+           "render": function ( data, type, full, meta ) {
+               var complaintID = full.complaint_id;
+               return '<a href="complaints/'+ complaintID.toString() +'">' + complaintID.toString() + '</a>';
+           }
+        },
         {data: 'entry_id'},
         {data: 'age'},
         {data: "status"},                 // status
