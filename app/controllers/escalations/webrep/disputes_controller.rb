@@ -6,8 +6,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.csv do
-        @disputes = Dispute.robust_search(params.fetch(:dispute, {})['search_type'],
-                                          search_name: params.fetch(:dispute, {})['search_name'],
+        @disputes = Dispute.robust_search(search_params['search_type'],
+                                          search_name: search_params['search_name'],
                                           params: index_params,
                                           user: current_user)
         contents = CSV.generate do |csv|
@@ -66,6 +66,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   private
+
+  def search_params
+    params.fetch(:dispute, {}).permit(:search_type, :search_name)
+  end
 
   def index_params
     params.fetch(:dispute, {}).permit(:customer_name, :customer_email, :customer_company_name,
