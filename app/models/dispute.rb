@@ -389,7 +389,7 @@ class Dispute < ApplicationRecord
       when 'open'
         where(status: ['new', 'open', 'reopen'])
       when 'closed'
-        where(status: ['closed', 'fixed', 'resolved'])
+        where(status: ['closed', 'resolved'])
       when 'all'
         where({})
       else
