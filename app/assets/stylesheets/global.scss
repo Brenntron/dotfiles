@@ -4497,13 +4497,13 @@ input.table-entry-input:focus {
   max-width: 500px;
 }
 
-#disputes-research-table label {
+#disputes-research-table label, #edit-ticket-status-dropdown label {
   font-weight: 700;
   text-transform: uppercase;
   padding-right: 10px;
 }
 
-#disputes-research-table .expand-row-button-inline {
+#disputes-research-table .expand-row-button-inline  {
   margin-bottom: -5px;
 }
 
@@ -4727,15 +4727,15 @@ h5.entry-details-table-header {
   text-align: left;
 }
 
-.inline-dropdown-menu ul li {
+.inline-dropdown-menu ul li, .toolbar-dropdown ul li {
   padding: 4px 12px;
 }
 
-.inline-dropdown-menu ul li:hover {
+.inline-dropdown-menu ul li:hover, .toolbar-dropdown ul li {
   background-color: $faint-accent-color;
 }
 
-.inline-dropdown-menu ul li.selected {
+.inline-dropdown-menu ul li.selected, .toolbar-dropdown ul li.selected {
   background-color: #90d8f594;
 }
 
@@ -4745,7 +4745,7 @@ h5.entry-details-table-header {
   color: $type-lighter-color;
 }
 
-.inline-dropdown-menu .radio-label {
+.inline-dropdown-menu .radio-label, .toolbar-dropdown .radio-label {
   width: auto;
   cursor: pointer;
   display: block;
@@ -4753,7 +4753,7 @@ h5.entry-details-table-header {
   padding: 0 12px 2px 22px;
 }
 
-.inline-dropdown-menu input[type='radio'] {
+.inline-dropdown-menu input[type='radio'], .toolbar-dropdown input[type='radio'] {
   box-shadow: none;
   float: left;
 }
