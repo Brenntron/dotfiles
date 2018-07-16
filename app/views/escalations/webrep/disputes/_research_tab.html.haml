@@ -277,13 +277,11 @@
                                   %td.text-center
                                     %label.content-label-sm Current WBRS Score
                                     %br
-                                      - if entry.wbrs_score.nil? && entry.score_type == "WBRS"
-                                        %span.current-wbrs-score
-                                          = entry.score
-                                      - elsif entry.wbrs_score.nil? && entry.score_type != "WBRS"
-                                        %span.current-wbrs-score.missing-data
-                                          No score.
-                                      - else
+                                    - if entry.wbrs_score.nil?
+                                      %span.current-wbrs-score.missing-data
+                                        No score.
+                                    - else
+                                      %span.current-wbrs-score
                                         = entry.wbrs_score
 
                                   -#    Removing for now. We can't do a preview until the api is updated to provide that info
@@ -452,14 +450,12 @@
                             %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label WBRS
                         %td.text-center.entry-data-wbrs-score
-                          - if entry.wbrs_score.nil? && entry.score_type == "WBRS"
-                            %span.current-wbrs-score
-                              = entry.score
-                          - elsif entry.wbrs_score.nil? && entry.score_type != "WBRS"
+                          - if entry.wbrs_score.nil?
                             %span.current-wbrs-score.missing-data
                               No score.
                           - else
-                            = entry.wbrs_score
+                            %span.current-wbrs-score
+                              = entry.wbrs_score
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
@@ -510,15 +506,12 @@
                             %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label SBRS
                         %td.text-center
-                          - if entry.sbrs_score.nil? && entry.score_type == "SBRS"
-                            %span.current-sbrs-score
-                              = entry.score
-                          - elsif entry.wbrs_score.nil? && entry.score_type != "SBRS"
+                          - if entry.sbrs_score.nil?
                             %span.current-sbrs-score.missing-data
                               No score.
                           - else
-                            = entry.sbrs_score
-
+                            %span.current-sbrs-score
+                              = entry.sbrs_score
                         %td
                           %label SBRS Rule Hits
                         %td.text-center
