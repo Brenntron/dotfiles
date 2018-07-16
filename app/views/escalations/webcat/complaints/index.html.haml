@@ -56,145 +56,12 @@
     $('#myInput').trigger('focus')
   })
   $(document).ready(function() {
-    function format ( complaint_entry ) {
-      var missing_data = '<span class="missing-data">Missing Data</span>'
-      var uri = ''
-      var host = ''
-      var url = ''
-      if(complaint_entry.uri != null){
-        uri = '<a href="http://'+complaint_entry.uri+'" onclick="select_cat_text_field('+ complaint_entry.entry_id+')">'+ complaint_entry.uri +'</a>'
-      }
-      else if(complaint_entry.domain != null){
-        if(complaint_entry.subdomain != null){
-          host = complaint_entry.subdomain + "."
-        }
-        host = host + complaint_entry.domain
-        url = host
-        if(complaint_entry.path != null){
-          url = host + complaint_entry.path
-        }
-        uri = '<a href="http://'+url+'" target="_blank" onclick="select_cat_text_field('+ complaint_entry.entry_id +')">'+ url +'</a>'
-      }
-      else{
-        uri = missing_data;
-      }
-
-      var wbrs_score = ''
-      if (complaint_entry.wbrs_score != null) {
-        wbrs_score = complaint_entry.wbrs_score;
-      }
-      else {
-        wbrs_score = missing_data;
-      }
-      var confidence = ''
-      if (complaint_entry.confidence != null) {
-        confidence = complaint_entry.confidence;
-      }
-      else {
-        confidence = missing_data;
-      }
-      var certainty = ''
-      if (complaint_entry.certainty != null) {
-        certainty = complaint_entry.certainty;
-      }
-      else {
-        certainty = missing_data;
-      }
-      var category = ''
-      if (complaint_entry.category != null) {
-        category = complaint_entry.category;
-      }
-      else {
-        category = '';
-      }
-      var complaint_entry_html =  ''
-
-      if (complaint_entry.is_important == true){
-       complaint_entry_html = '<div class="row">'+
-          '<div class="col-xs-1">'+
-            'ID <p>'+complaint_entry.entry_id+'</p>'+
-          '</div>'+
-          '<div class="col-xs-2">'+
-            '<div class="row">'+
-              'Category:'+complaint_entry.category+
-            '</div>'+
-            '<div class="row">'+
-              '<h3>'+url+'</h3>'+
-            '</div>'+
-          '</div>'+
-         ' <div class="col-xs-3">'+
-            'Prefix <input id="complaint_review_prefix_'+complaint_entry.entry_id+'" type="text" onclick="this.select()" value="'+host+'"><button onclick="removeSubdomain(complaint_review_prefix_'+complaint_entry.entry_id+',\''+ complaint_entry.domain +'\')">remove subdomain</button>'+
-          '</div>'+
-          '<div class="col-xs-1">'+
-            '<div class="row">'+
-              'Certainty: <p>'+certainty+'</p>'+
-            '</div>'+
-            '<div class="row">'+
-              'Confidence: <p>'+confidence+'</p>'+
-            '</div>'+
-          '</div>'+
-          '<div class="col-xs-4">'+
-         ' Resolution: | <input type="radio" name="status" value="dontChange"> dont change |  <input type="radio" name="status" value="commit"> commit | <input type="radio" name="status" value="decline"> decline'+
-          '</div>'+
-          '<div class="col-xs-1">'+
-            '<button> Change </button>'+
-          '</div>'+
-        '</div>'+
-        '<div class="row">'+
-        '<div class="col-xs-12">'+
-          'Comment: | <input type="text" name="status" value="" placeholder="add a comment" size="50">' +
-        '</div>'+
-        '</div>'
-      }
-      else{
-        complaint_entry_html =  '<div class="row">'+
-        '<div class="col-xs-10">'+
-          '<div class="row">'+
-            '<div class="col-xs-1">'+
-              complaint_entry.complaint_id + '/'+ complaint_entry.entry_id +
-           ' </div>'+
-            '<div class="col-xs-3">'+
-              uri +
-            '</div>'+
-            '<div class="col-xs-4">'+
-              'Prefix <input id="complaint_prefix_'+complaint_entry.entry_id+'" type="text" onclick="this.select()" value="'+host+'"><button onclick="removeSubdomain(complaint_prefix_'+complaint_entry.entry_id+',\''+complaint_entry.domain+'\')">remove subdomain</button>'+
-            '</div>'+
-            '<div class="col-xs-2">'+
-              'WBRS: '+ wbrs_score +' Confidence '+ confidence +
-            '</div>'+
-          '</div>'+
-          '<div class="row">'+
-            '<div class="col-xs-4">'+
-              'Category<input type="text" onclick="this.select()" value="'+category+'">'+
-            '</div>'+
-            '<div class="col-xs-4">'+
-              'Status: | <input type="radio" name="status" value="unchanged"> unchanged |  <input type="radio" name="status" value="fixed"> fixed | <input type="radio" name="status" value="invalid"> invalid'+
-            '</div>'+
-            '<div class="col-xs-1">'+
-              '<button onclick="updateEntryColumns('+complaint_entry.entry_id+')">Update</button>'+
-            '</div>'+
-          '</div>'+
-        '</div>'+
-        '<div class="col-xs-2">'+
-          '<button>info</button>'+
-          '<button>lookup</button>'+
-          '<button>history</button>'+
-          '<button>domain</button>'+
-        '</div>'+
-        '</div>'
-
-      }
-
-
-      return complaint_entry_html;
-      }
-
-
   var complaint_table = $('#complaints-index').DataTable({
       // order: [[ 9, "desc" ]],
       // dom: '<"datatable-top-tools"lf>t<ip>',
       "rowCallback": function( row, data, index ) {
         var $node = this.api().row(row).nodes().to$();
+        $node.addClass('not-shown')
 
         if (data.subdomain.length > 0 ){
           $node.addClass('highlight-has-subdomain')
@@ -245,40 +112,10 @@
 
 
   $('#complaints-index tbody').on('click', 'td.expandable-row-column', function () {
-      var tr = $(this).closest('tr');
-      var row = complaint_table.row( tr );
 
-      if ( row.child.isShown() ) {
-        // This row is already open - close it
-        row.child.hide();
-        tr.removeClass('shown');
-      }
-      else {
-        // Open this row
-        row.child( format(row.data()) ).show();
-        tr.addClass('shown');
-        var td = $(tr).next("tr").find("td:first");
-        $(td).addClass('complaint-entry-table-wrapper');
-        // Check to see which columns should be displayed
-        $('.toggle-vis-nested').each(function() {
-          var checkbox_trigger = $(this).attr('data-column');
-          var checkbox = $(this).find("input");
-          if ($(checkbox).prop("checked")) {
-            $('.complaint-entry-table td, .complaint-entry-table th').each(function() {
-              if ($(this).hasClass(checkbox_trigger)) {
-                $(this).show();
-              }
-            });
-          }
-          else if ($(checkbox).prop("checked") == false) {
-            $('.complaint-entry-table td, .complaint-entry-table th' ).each(function() {
-              if ($(this).hasClass(checkbox_trigger)) {
-                $(this).hide();
-              }
-            });
-          }
-        });
-      }
+      click_table_buttons(complaint_table, this);
+
+
     });
 
   } );
