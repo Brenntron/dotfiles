@@ -294,7 +294,7 @@ class Dispute < ApplicationRecord
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
     if dispute_fields['case_owner_username'].present?
-      user = User.where(cvs_username: dispute_fields.delete('case_owner_username'))
+      user = User.where(cvs_username: dispute_fields.delete('case_owner_username')).first
       dispute_fields['user_id'] = user.id
     end
 
