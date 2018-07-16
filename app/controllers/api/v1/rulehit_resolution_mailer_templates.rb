@@ -19,7 +19,12 @@ module API
           # progress_bar = Event.create(user: current_user.display_name, action: "import_bug:#{params[:id]}", description: "#{request.headers["Token"]}", progress: 10)
 
           begin
-            return "Hello from Grape!"
+            rulehit = DisputeRuleHit.where(id: params['rulehit_id']).first
+            return {:error => 'Rulehit not found'}.to_json unless rulehit
+            rh_mailer_template = RulehitResolutionMailerTemplate.where(mnemonic: rulehit.mnemonic).first
+            return {:error => 'No template with that mnemonic!'}.to_json unless rh_mailer_template
+
+            return rh_mailer_template.to_json
 
           rescue Exception => e
             Rails.logger.error "Something went wrong! Failed to retrieve template."
