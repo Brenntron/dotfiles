@@ -26,7 +26,6 @@ window.populate_webrep_index_table = (data = {}) ->
   , this)
 
 window.advanced_webrep_index_table = () ->
-  debugger
   data = {
     customer: {
       name: $('#new_named_search').find('input[id="name-input"]').val()
