@@ -288,6 +288,65 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
+    byebug
+
+    dispute_fields = params.slice(%i{status priority resolution})
+    dispute_fields['id'] = present_params.delete('case_id')
+
+    if params['username']
+      user = User.where(cvs_username: present_params.delete('username'))
+      dispute_fields['user_id'] = user.id
+    end
+
+    relation = where(dispute_fields)
+
+    if params['customer']
+      relation = relation.joins(:customer)
+    end
+
+    if params['dispute_entries']
+      dispute_entry_fields = params['dispute_entries'].slice(%i{suggested_disposition})
+      ip_or_uri = params['dispute_entries']['ip_or_uri']
+
+      relation = relation.joins(:dispute_entries).group(:id)
+      relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
+
+      if ip_or_uri.present?
+        ip_or_uri_clause = "dispute_entries.ip_address = :ip_or_uri OR dispute_entries.uri like :ip_or_uri_pattern"
+        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+      end
+    end
+
+    byebug
+    relation.count
+
+    present_params = params ? params.select{ |key, value| value.present? } : {}
+    # present_params.delete('search_type')
+    # present_params.delete('search_name')
+
+    # params:
+    # Case IDs                          :id
+    # Dispute (URL/IP/Domain)           self.dispute_entries.*
+    # Case Owner                        :user_id
+    # Status                            :status
+    # Priority                          :priority (strip off P from P1, P2, P3)
+    # Suggested Disposition             self.dispute_entries.suggested_disposition
+    # URL Regex                         remove
+    # Resolution                        :resolution
+    # Dispute Type                      remove
+    # Origin                            remove
+    # Origin ID                         remove
+    # Submitter Type                    :submitter_type
+    # Contact Name                      customers.name
+    # Contact Email                     customers.email
+    # Company                           self.customer.company.name
+    # Submitter Domain                  :org_domain
+    # Date Submitted
+    # Case Age
+    # Last Modified
+
+
+    return self.none
 
     # Save this search as a named search
     if params.present? && search_name.present?
@@ -353,19 +412,15 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
-    present_params = params ? params.select{ |key, value| value.present? } : {}
-    present_params.delete('search_type')
-    present_params.delete('search_name')
-
     case search_type
       when 'advanced'
-        advanced_search(present_params, search_name: search_name, user: user)
+        advanced_search(params, search_name: search_name, user: user)
       when 'named'
         named_search(search_name, user: user)
       when 'standard'
         standard_search(search_name)
       when 'contains'
-        contains_search(present_params['value'])
+        contains_search(params['value'])
       else
         where({})
     end
