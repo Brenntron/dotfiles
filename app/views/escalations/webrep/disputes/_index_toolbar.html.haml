@@ -8,7 +8,6 @@
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
         .dropdown-menu-content-block
-          .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Details
           %ul
             %li.toggle-vis{'data-column':'2'}
               %input{type: 'checkbox', checked: true} Priority
@@ -80,18 +79,89 @@
     %button.toolbar-button.expand-row-button{title: 'Expand All Rows'}
       %span.toolbar-button-text
         Expand All Rows
+
+  %div
+    %button.take-ticket-button#index_ticket_assign{title: 'Assign to me'}
+      %span.toolbar-button-text
+
   %div
     %label.toolbar-section-label
       Edit Ticket
-    %button.toolbar-button.ticket-status-button{title: 'Edit Ticket Status'}
-      %span.toolbar-button-text
-        Edit Ticket Status
-    %button.toolbar-button.ticket-owner-button{title: 'Change Assignee'}
-      %span.toolbar-button-text
-        Change Assignee
-    %button.toolbar-button.mark-duplicate-button{title: 'Mark as Duplicate'}
-      %span.toolbar-button-text
-        Mark as Duplicate
+    -#%button.toolbar-button.ticket-status-button{title: 'Edit Ticket Status'}
+    %span.dropdown
+      %button#index_ticket_status.toolbar-button.show-col-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Edit Ticket Status
+      .dropdown-menu.toolbar-dropdown#edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
+        %div
+          %ul
+            %li.status-radio-wrapper
+              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Researching'}
+              %label.radio-label{for: 'Researching'} Researching
+            %li.status-radio-wrapper
+              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Escalated'}
+              %label.radio-label{for: 'Escalated'} Escalated
+            %li.status-radio-wrapper
+              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Customer-Pending'}
+              %label.radio-label{for: 'Customer-Pending'} Customer Pending
+
+            %li.status-radio-wrapper
+              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'On-Hold'}
+              %label.radio-label{for: 'On-Hold'} On Hold
+            %li.status-radio-wrapper
+              %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'Resolved-Closed'}
+              %label.radio-label{for: 'Resolved-Closed'} Resolved / Closed
+              .dropdown-menu.ticket-resolution-submenu
+                .col-xs-6.submenu-left-wrapper
+                  .submenu-header
+                    Ticket Resolution
+                  %ul
+                    %li
+                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FP'}
+                      %label.radio-label{for: 'Fixed-FP'} Fixed - FP
+                    %li
+                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FN'}
+                      %label.radio-label{for: 'Fixed-FN'} Fixed - FN
+                    %li
+                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Unchanged'}
+                      %label.radio-label{for: 'Unchanged'} Unchanged
+                    %li
+                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Invalid'}
+                      %label.radio-label{for: 'Invalid'} Invalid / Junk Mail
+                    %li
+                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Test-Training'}
+                      %label.radio-label{for: 'Test-Training'} Test / Training
+                    %li
+                      %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Other'}
+                      %label.radio-label{for: 'Other'} Other
+                .col-xs-6.submenu-right-wrapper
+                  .resolution-comment-wrapper
+                    %label.content-label-sm
+                      Comment
+                    %textarea
+                    %button.primary
+                      Submit
+
+            %li.status-radio-wrapper
+              %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Re-Opened'}
+              %label.radio-label{for: 'Re-Opened'} Re-Opened
+
+    %span.dropdown
+      %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Change Assignee
+      .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+        %select{name: 'index_target_assignee', id: 'index_target_assignee'}
+          - User.all.order('cvs_username ASC').each do |u|
+            %option{id: u.id, value: u.id, label: u.cvs_username}
+        %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
+          Assign
+
+    %span.dropdown
+      %button#index_mark_duplicate.toolbar-button.mark-duplicate-button{title: 'Mark as Duplicate'}
+        %span.toolbar-button-text
+          Mark as Duplicate
+
   %div
     %label.toolbar-section-label
       Edit Dispute Entry

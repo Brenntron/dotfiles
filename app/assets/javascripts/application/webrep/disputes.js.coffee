@@ -129,7 +129,95 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
 
+window.toolbar_index_edit_status = (box_names) ->
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    # this.dataset['entryId']
+    this.value
+  ).toArray()
+
+  new_status = $('index_target_status')
+
+  data = {
+    'dispute_entry_ids': entry_ids,
+    'new_status': new_status
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/edit_status'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error editing ticket status')
+  )
+
+window.toolbar_index_change_assignee = (button_tag) ->
+
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    # this.dataset['entryId']
+    this.value
+  ).toArray()
+
+  new_assignee = $('index_target_assignee')
+
+  data = {
+    'dispute_entry_ids': entry_ids,
+    'new_assignee': new_assignee
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/change_assignee'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error changing assignee')
+  )
+
+window.toolbar_index_mark_duplicate = (box_names) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/mark_duplicate'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error marking duplicate')
+  )
+
+window.determine_checked = (box_names) ->
+  box_flag = ($('.'+box_names+':checked').length > 0)
+  unless box_flag
+    alert('check something first')
+  console.log 'returning: ' + box_flag
+  return box_flag
+
 $ ->
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
     return
+
+  # Edit Ticket: Edit Ticket Status
+  $('#index_ticket_status').click ->
+    if (determine_checked('dispute_check_box'))
+      console.log 'do the needful'
+    else
+      do_not = "show the tab"
+
+  # Edit Ticket: Change Assignee
+  $('#index_change_assign').click ->
+    if (determine_checked('dispute_check_box'))
+      console.log 'do the needful'
+    else
+      do_not = "show the tab"
