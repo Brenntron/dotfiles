@@ -30,15 +30,20 @@ class Wbrs::ManualWlbl < Wbrs::Base
     new_from_attributes(response_body)
   end
 
+  def self.load_from_prefetch(data)
+    data = JSON.parse(data)
+    data['data'].map {|datum| new_from_attributes(datum)}
+  end
+
   # Get all the manual WL/BL entries.
   # @param [String] url URL pattern the WL/BL entry is added for (optional)
   # @param [String] usr Pattern of username who added or modified WL/BL entry (optional)
   # @param [Array<String>] list_types The WL/BL entry’s type (optional)
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
-  def self.where(conditions = {})
+  def self.where(conditions = {}, raw = false)
     params = stringkey_params(conditions)
     response = post_request(path: '/v1/rep/wlbl/get', body: params)
-
+    return response.body if raw == true
     response_body = JSON.parse(response.body)
     response_body['data'].map {|datum| new_from_attributes(datum)}
   end

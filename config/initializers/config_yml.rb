@@ -46,7 +46,7 @@ raise "config.yml missing peakebridge section" unless peakebridge_config
 peakebridge                             = OpenStruct.new
 peakebridge.host                        = peakebridge_config['host']
 peakebridge.port                        = peakebridge_config['port']
-peakebridge.verify_mode                 = peakebridge_config['ssl_mode']
+peakebridge.verify_mode                 = peakebridge_config['verify_mode'] || peakebridge_config['tls_mode'] || peakebridge_config['ssl_mode']
 peakebridge.uri_base                    = peakebridge_config['uri_base']
 peakebridge.sources                     = peakebridge_config['sources'] || []
 Rails.configuration.peakebridge         = peakebridge
@@ -99,7 +99,7 @@ raise 'config.yml missing wbrs section' unless wbrs_config
 Rails.configuration.wbrs                = OpenStruct.new
 Rails.configuration.wbrs.host           = wbrs_config['host']
 Rails.configuration.wbrs.port           = wbrs_config['port']
-Rails.configuration.wbrs.verify_mode    = wbrs_config['verify_mode']
+Rails.configuration.wbrs.verify_mode    = wbrs_config['verify_mode'] || wbrs_config['tls_mode']
 Rails.configuration.wbrs.ca_cert_file   = wbrs_config['ca_cert_file']
 Rails.configuration.wbrs.gssnegotiate   = wbrs_config['gssnegotiate']
 
@@ -108,7 +108,7 @@ raise 'config.yml missing xbrs section' unless xbrs_config
 Rails.configuration.xbrs                = OpenStruct.new
 Rails.configuration.xbrs.host           = xbrs_config['host']
 Rails.configuration.xbrs.port           = xbrs_config['port']
-Rails.configuration.xbrs.verify_mode    = xbrs_config['verify_mode']
+Rails.configuration.xbrs.verify_mode    = xbrs_config['verify_mode'] || xbrs_config['tls_mode']
 Rails.configuration.xbrs.gssnegotiate   = xbrs_config['gssnegotiate']
 
 raise 'config.yml missing virus_total section' unless env_config['virustotal']

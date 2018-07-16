@@ -6,12 +6,14 @@ class Dispute < ApplicationRecord
   belongs_to :customer
   belongs_to :user
 
+  delegate :cvs_username, to: :user, allow_nil: true
+
   NEW = 'new'
   RESOLVED = 'resolved'
   ASSIGNED = 'assigned'
 
   def is_assigned?
-    (!self.user.blank?)
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 
   def assignee
@@ -94,12 +96,14 @@ class Dispute < ApplicationRecord
   end
 
   def compose_versioned_items
+
     versioned_items = [self]
 
-    dispute_comments.map{ |dc| versioned_items << dc}
-    dispute_entries.map{ |de| versioned_items << de}
+    dispute_comments.includes(:versions).map{ |dc| versioned_items << dc}
+    dispute_entries.includes(:versions).map{ |de| versioned_items << de}
 
     versioned_items
+
   end
 
   def self.process_bridge_payload(message_payload)
