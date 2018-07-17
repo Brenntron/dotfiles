@@ -67,7 +67,7 @@ class ComplaintEntry < ApplicationRecord
         if commit_pending == "commit"
           current_status = "COMPLETED"
           #this is where we should send off the category to the API
-          update(resolution:entry_status,category:categories_string,status:current_status,resolution_comment: comment,user:current_user, is_important: importance)
+          update(status:current_status,resolution_comment: comment,user:current_user, is_important: false)
           complaint.set_status(current_status)
         else
           current_status = "ASSIGNED"
