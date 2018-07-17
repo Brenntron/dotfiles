@@ -23,11 +23,11 @@
             %span.nav-dropdown-icon.icon-recently-viewed
             Recently Viewed
         %li
-          %a{onclick: 'named_webrep_index_table("my_disputes");'}
+          %a{onclick: 'standard_webrep_index_table("my_disputes");'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("my_open");'}
+          %a{onclick: 'standard_webrep_index_table("my_open");'}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
         %li
@@ -35,15 +35,15 @@
             %span.nav-dropdown-icon.icon-team-bugs
             My Team Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("open");'}
+          %a{onclick: 'standard_webrep_index_table("open");'}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("closed");'}
+          %a{onclick: 'standard_webrep_index_table("closed");'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("all");'}
+          %a{onclick: 'standard_webrep_index_table("all");'}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 
@@ -52,6 +52,11 @@
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
         %table{class: 'table table-condensed small', id: 'saved-search'}
+          %tbody
+            - current_user.named_searches.each do |named_search|
+              %tr
+                %td{onclick: "named_webrep_index_table('#{named_search.name}');"}= named_search.name
+
           -#- if @saved_search.present?
           -#  - current_user.saved_searches.each do |saved_search|
           -#    %tr
