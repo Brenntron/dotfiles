@@ -59,12 +59,16 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
-    resources :roles
-    resources :org_subsets
     root 'home#index'
+    resources :roles, except: [:show]
+    resources :org_subsets, except: [:show]
     resources :migrations, only: [:index]
     resources :morsels, only: [:index, :show]
-    resources :notes, only: [:index, :edit, :update, :destroy]
+    resources :notes, only: [:index, :edit, :update, :destroy] do
+      member do
+        get :related
+      end
+    end
     resources :rules, only: [:index, :edit, :update] do
       collection do
         get :validations
@@ -74,7 +78,7 @@ Rails.application.routes.draw do
       end
     end
     resources :reference_types, only: [:index, :edit, :update]
-    resources :scheduled_tasks do
+    resources :scheduled_tasks, only: [:index, :show, :create, :destroy] do
       collection do
         post :run_job
       end
@@ -83,15 +87,15 @@ Rails.application.routes.draw do
     namespace :snort_doc do
       root 'root#index'
       get 'doc_output', to: 'rule_docs#doc_output'
+      get :rule_docs, to: 'rule_docs#index'
+      get :upload_docs, to: 'rule_docs#upload'
+      post :upload_docs, to: 'rule_docs#send_yaml'
       namespace :cves do
         get :nvd
         post :download
         get :missing
         post :update
       end
-      get :rule_docs, to: 'rule_docs#index'
-      get :upload_docs, to: 'rule_docs#upload'
-      post :upload_docs, to: 'rule_docs#send_yaml'
     end
 
     resources :rules_sync, only: [:index] do

@@ -1,4 +1,5 @@
 class Admin::OrgSubsetsController < Admin::HomeController
+  load_and_authorize_resource class: 'OrgSubset'
 
   # GET /roles
   # GET /org_subsets.json
