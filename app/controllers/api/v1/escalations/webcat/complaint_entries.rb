@@ -9,11 +9,27 @@ module API
 
             desc 'get all complaint entries'
             params do
+              optional :filter_by, type: String, desc:'filter entries by this value'
             end
 
             get "" do
               json_packet = []
-              complaint_entries = ComplaintEntry.all
+              case permitted_params[:filter_by]
+                when "NEW"
+
+                  complaint_entries = ComplaintEntry.where(status:"NEW")
+                when "COMPLETED"
+
+                  complaint_entries = ComplaintEntry.where(status:"COMPLETED")
+                when "ACTIVE"
+
+                  complaint_entries = ComplaintEntry.where.not(status:"COMPLETED").where.not(status:"NEW")
+                else
+
+                  complaint_entries = ComplaintEntry.all
+
+              end
+
               if complaint_entries
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
@@ -51,12 +67,14 @@ module API
               requires :prefix, type: String, desc: 'the url to categorize'
               requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
               requires :status, type: String, desc: 'setting the status of the entry'
+              optional :comment, type: String, desc: 'resolution comment for the customer'
             end
             post 'update'do
               begin
                 ComplaintEntry.find(permitted_params['id']).change_category( permitted_params['prefix'],
                                            permitted_params['categories'],
-                                           permitted_params['status'])
+                                           permitted_params['status'],
+                                           permitted_params['comment'])
               rescue Exception => e
               end
             end

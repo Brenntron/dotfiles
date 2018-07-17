@@ -4,17 +4,21 @@ window.removeSubdomain = (id,host) ->
 window.cat_new_url = ()->
   debugger
 
-window.updateEntryColumns = (id) ->
+window.filterByStatus = (filter) ->
+  populate_webcat_index_table(filter)
 
+
+window.updateEntryColumns = (id) ->
   prefix = $('#complaint_prefix_'+id)[0].value
   categories = $('#complaint_categories_'+id)[0].value
   status = $('[name=resolution'+id+']:checked').val()
+  comment = $('#complaint_comment_'+id)[0].value()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
     headers: headers
-    data: {'id': id,'prefix': prefix,'categories':categories,'status':status }
+    data: {'id': id,'prefix': prefix,'categories':categories,'status':status,'comment':comment }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -122,7 +126,6 @@ format = (complaint_entry) ->
     uri = missing_data
 
   entry_status = ""
-  debugger
   if complaint_entry.status == "COMPLETED"
     entry_status = "disabled='true'"
   wbrs_score = ''
@@ -217,6 +220,7 @@ format = (complaint_entry) ->
       '<button>history</button>' +
       '<button>domain</button>' +
       '</div>' +
+      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50">' + '</div>' +
       '</div>'
   complaint_entry_html
 
@@ -246,10 +250,10 @@ window.click_table_buttons = (complaint_table, button)->
           if $(button).hasClass(checkbox_trigger)
             $(button).hide()
 
-window.populate_webcat_index_table = () ->
+window.populate_webcat_index_table = (filter) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries'
+    url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter
     method: 'GET'
     headers: headers
     success: (response) ->

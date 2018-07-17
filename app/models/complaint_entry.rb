@@ -29,11 +29,11 @@ class ComplaintEntry < ApplicationRecord
       complaint.set_status("NEW")
     end
   end
-  def change_category(prefix, categories_string, entry_status)
+  def change_category(prefix, categories_string, entry_status, comment)
     categories = categories_string.split(',')
     ActiveRecord::Base.transaction do
       #this is where we should send off the category to the API
-      update(resolution:entry_status,category:categories_string,status:"COMPLETED")
+      update(resolution:entry_status,category:categories_string,status:"COMPLETED",resolution_comment: comment)
       complaint.set_status("COMPLETED")
     end
 
