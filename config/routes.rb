@@ -105,17 +105,17 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :events do
+  resources :events, only: [] do
     collection { get :send_event }
   end
 
   namespace :api_test do
-    resources :jobs, :defaults => {:format => 'json'}
-    resources :pcaps, :defaults => {:format => 'json'}
-    resources :engines, :defaults => {:format => 'json'}
-    resources :engine_types, :defaults => {:format => 'json'}
-    resources :snort_configurations, :defaults => {:format => 'json'}
-    resources :rule_configurations, :defaults => {:format => 'json'}
+    resources :jobs, only: [:index, :create], :defaults => {:format => 'json'}
+    resources :pcaps, only: [:index, :create], :defaults => {:format => 'json'}
+    resources :engines, only: [:index], :defaults => {:format => 'json'}
+    resources :engine_types, only: [:index], :defaults => {:format => 'json'}
+    resources :snort_configurations, only: [:index], :defaults => {:format => 'json'}
+    resources :rule_configurations, only: [:index], :defaults => {:format => 'json'}
   end
 
   # TODO some of these named routes need to be rethought to conform to rails conventions
@@ -128,7 +128,7 @@ Rails.application.routes.draw do
 
   # resources :rules, param: :sid
 
-  resources :tests
+  # resources :tests
 
   resources :users do
 
