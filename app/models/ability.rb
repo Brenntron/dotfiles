@@ -44,7 +44,7 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can [:read, :show_multiple, :advanced_search, :named_search, :standard_search, :contains_search], [Complaint]
+      can [:read, :show_multiple, :advanced_search, :named_search, :standard_search, :contains_search], Complaint
     end
 
     if role_names.include?('webcat user')
@@ -57,6 +57,10 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
+      can [:read, :advanced_search, :named_search, :standard_search, :contains_search, :export_resolution_age_report,
+           :resolution_report, :export_per_resolution_report, :export_per_engineer_report, :resolution_age_report,
+           :dashboard, :research],
+          Dispute
     end
 
     if role_names.include?('webrep user')

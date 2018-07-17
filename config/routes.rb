@@ -48,9 +48,9 @@ Rails.application.routes.draw do
           get :export_resolution_age_report
         end
       end
-      resources :dispute_emails
-      resources :dispute_comments
-      resources :email_templates
+      resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.
+      resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
+      resources :email_templates        # TODO This route has no controller so determine if it should be removed.
 
       get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
