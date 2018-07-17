@@ -39,7 +39,7 @@ module API
                 disputes = Dispute.robust_search(permitted_params['search_type'],
                                                  search_name: permitted_params['search_name'],
                                                  params: permitted_params,
-                                                 user: current_user).includes(:dispute_entries => [:dispute_rule_hits])  # [but inside]
+                                                 user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               else
                 disputes = Dispute.all.includes(:user, :dispute_entries => [:dispute_rule_hits])
               end
