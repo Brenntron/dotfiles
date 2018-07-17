@@ -9,7 +9,7 @@ class Ability
     role_names = roles.pluck(:role)
 
 
-    can :update_preferences, User, id: current_user.id
+    can [:read, :update_preferences], User, id: current_user.id
 
     # roles are partitioned into org subsets (snort rules, snort escalations, web cat, web rep)
     # the current user can read the user records of other users in their subset.
@@ -84,11 +84,12 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
+    # 'manager' role is 'ips rule manager', but renaming would break things.
     if role_names.include?('manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can :read, [ResearchBug, Rule]
+      can :read, [ResearchBug, Rule, RuleDoc]
     end
 
     if role_names.include?('committer')

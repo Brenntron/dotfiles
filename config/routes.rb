@@ -130,7 +130,7 @@ Rails.application.routes.draw do
 
   # resources :tests
 
-  resources :users do
+  resources :users, only: [:index, :show, :update] do
 
     collection do
       get :results
@@ -143,7 +143,7 @@ Rails.application.routes.draw do
     get :component_team_metrics, defaults: {format: :json}
     patch :add_to_team
     patch :remove_from_team
-    resources :relationships do
+    resources :relationships, only: [:index, :show] do
       collection do
         get :member_status
       end
@@ -156,15 +156,15 @@ Rails.application.routes.draw do
   end
 
   resources :research_bugs, controller: 'bugs'
-  resources :bugs do
+  resources :bugs, only: [:index, :new, :create, :show, :update] do
     member do
-      post :create_rules
+      # post :create_rules
       post :add_tag
       post :add_whiteboard
       patch :remove_tag
       patch :remove_whiteboard
     end
-    resources :references
+    resources :references, only: [:create]
     get :bug_metrics, defaults: { format: :json }
   end
 
