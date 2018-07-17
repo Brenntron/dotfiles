@@ -1,5 +1,5 @@
 class DisputeEntry < ApplicationRecord
-  has_paper_trail on: [:update], ignore: [:updated_at]
+  has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
