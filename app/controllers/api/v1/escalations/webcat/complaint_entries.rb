@@ -10,22 +10,21 @@ module API
             desc 'get all complaint entries'
             params do
               optional :filter_by, type: String, desc:'filter entries by this value'
+              optional :self_review, type: Boolean, desc: 'a flag that allows users to review their own categorizations'
             end
 
             get "" do
               json_packet = []
               case permitted_params[:filter_by]
                 when "NEW"
-
                   complaint_entries = ComplaintEntry.where(status:"NEW")
                 when "COMPLETED"
-
                   complaint_entries = ComplaintEntry.where(status:"COMPLETED")
                 when "ACTIVE"
-
                   complaint_entries = ComplaintEntry.where.not(status:"COMPLETED").where.not(status:"NEW")
+                when "REVIEW"
+                  complaint_entries = permitted_params[:self_review]? ComplaintEntry.where(is_important:true) : ComplaintEntry.where(is_important:true).where.not(user:current_user)
                 else
-
                   complaint_entries = ComplaintEntry.all
 
               end

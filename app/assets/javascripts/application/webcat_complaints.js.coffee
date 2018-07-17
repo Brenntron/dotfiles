@@ -14,6 +14,7 @@ window.updateEntryColumns = (id) ->
   status = $('[name=resolution'+id+']:checked').val()
   comment = $('#complaint_comment_'+id)[0].value()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
@@ -173,7 +174,6 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="col-xs-4">' +
       ' Resolution: | ' +
-      '<input type="radio" name="status" value="dontChange"> dont change |  ' +
       '<input type="radio" name="status" value="commit" checked="checked"> commit | ' +
       '<input type="radio" name="status" value="decline"> decline' +
       '</div>' +
@@ -191,8 +191,9 @@ format = (complaint_entry) ->
       '<div class="col-xs-4">' +
       'Prefix <input id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
-      '"><button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')">remove subdomain</button>' +
+      '"' + entry_status + '>' +
+      '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
+      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button>' +
       '</div>' +
       '<div class="col-xs-2">' +
       'WBRS: ' + wbrs_score + ' Confidence ' + confidence +
@@ -201,13 +202,13 @@ format = (complaint_entry) ->
       '<div class="row">' +
       '<div class="col-xs-4">' +
       'Category<input id="complaint_categories_' + complaint_entry.entry_id +
-      '" type="text" onclick="this.select()" value="' + category + '">' +
+      '" type="text" onclick="this.select()" value="' + category + '"' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged"> unchanged |  ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed" checked="checked"> fixed | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid"> invalid' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + entry_status + '> unchanged |  ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed" checked="checked" ' + entry_status + '> fixed | ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + entry_status + '> invalid' +
       '</div>' +
       '<div class="col-xs-1">' +
       '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')" ' + entry_status + '>Update</button>' +
@@ -220,7 +221,7 @@ format = (complaint_entry) ->
       '<button>history</button>' +
       '<button>domain</button>' +
       '</div>' +
-      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50">' + '</div>' +
+      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50" ' + entry_status + '>' + '</div>' +
       '</div>'
   complaint_entry_html
 
@@ -251,9 +252,10 @@ window.click_table_buttons = (complaint_table, button)->
             $(button).hide()
 
 window.populate_webcat_index_table = (filter) ->
+  self_review = $('#self_review')[0].checked
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter
+    url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
     method: 'GET'
     headers: headers
     success: (response) ->
