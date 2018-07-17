@@ -20,11 +20,22 @@ class ComplaintEntry < ApplicationRecord
   def take_complaint(current_user)
     if user.nil?
       self.update(user:current_user, status:"ASSIGNED")
+      complaint.set_status("ASSIGNED")
     end
   end
   def return_complaint(current_user)
     if self.user == current_user
       self.update(user:nil, status:"NEW")
+      complaint.set_status("NEW")
     end
+  end
+  def change_category(prefix, categories_string, entry_status)
+    categories = categories_string.split(',')
+    ActiveRecord::Base.transaction do
+      #this is where we should send off the category to the API
+      update(resolution:entry_status,category:categories_string,status:"COMPLETED")
+      complaint.set_status("COMPLETED")
+    end
+
   end
 end

@@ -45,6 +45,22 @@ module API
             end
 
 
+            desc 'update an entry '
+            params do
+              requires :id, type: Integer, desc:'complaint entry id'
+              requires :prefix, type: String, desc: 'the url to categorize'
+              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              requires :status, type: String, desc: 'setting the status of the entry'
+            end
+            post 'update'do
+              begin
+                ComplaintEntry.find(permitted_params['id']).change_category( permitted_params['prefix'],
+                                           permitted_params['categories'],
+                                           permitted_params['status'])
+              rescue Exception => e
+              end
+            end
+
             desc 'take entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
@@ -77,6 +93,8 @@ module API
               end
               {name:current_user.display_name}.to_json
             end
+
+
 
           end
         end

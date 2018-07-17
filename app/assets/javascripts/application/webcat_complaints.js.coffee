@@ -5,7 +5,28 @@ window.cat_new_url = ()->
   debugger
 
 window.updateEntryColumns = (id) ->
-  debugger
+
+  prefix = $('#complaint_prefix_'+id)[0].value
+  categories = $('#complaint_categories_'+id)[0].value
+  status = $('[name=resolution'+id+']:checked').val()
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/update'
+    method: 'POST'
+    headers: headers
+    data: {'id': id,'prefix': prefix,'categories':categories,'status':status }
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        debugger
+
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
 
 window.take_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
@@ -99,6 +120,11 @@ format = (complaint_entry) ->
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
   else
     uri = missing_data
+
+  entry_status = ""
+  debugger
+  if complaint_entry.status == "COMPLETED"
+    entry_status = "disabled='true'"
   wbrs_score = ''
   if complaint_entry.wbrs_score
     wbrs_score = complaint_entry.wbrs_score
@@ -145,7 +171,7 @@ format = (complaint_entry) ->
       '<div class="col-xs-4">' +
       ' Resolution: | ' +
       '<input type="radio" name="status" value="dontChange"> dont change |  ' +
-      '<input type="radio" name="status" value="commit"> commit | ' +
+      '<input type="radio" name="status" value="commit" checked="checked"> commit | ' +
       '<input type="radio" name="status" value="decline"> decline' +
       '</div>' +
       '<div class="col-xs-1">' +
@@ -171,16 +197,17 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="row">' +
       '<div class="col-xs-4">' +
-      'Category<input type="text" onclick="this.select()" value="' + category + '">' +
+      'Category<input id="complaint_categories_' + complaint_entry.entry_id +
+      '" type="text" onclick="this.select()" value="' + category + '">' +
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
       '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged"> unchanged |  ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed"> fixed | ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed" checked="checked"> fixed | ' +
       '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid"> invalid' +
       '</div>' +
       '<div class="col-xs-1">' +
-      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')">Update</button>' +
+      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')" ' + entry_status + '>Update</button>' +
       '</div>' +
       '</div>' +
       '</div>' +
