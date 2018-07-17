@@ -70,11 +70,28 @@ module API
             end
             post 'update'do
               begin
-                ComplaintEntry.find(permitted_params['id']).change_category( permitted_params['prefix'],
-                                           permitted_params['categories'],
-                                           permitted_params['status'],
-                                           permitted_params['comment'],
-                                           current_user)
+                entry = ComplaintEntry.find(permitted_params['id'])
+                entry.change_category( permitted_params['prefix'],permitted_params['categories'],
+                                         permitted_params['status'],
+                                         permitted_params['comment'],
+                                         current_user, false,"")
+              rescue Exception => e
+              end
+            end
+            desc 'update a high telemetry entry'
+            params do
+              requires :id, type:Integer, desc:'complaint entry id'
+              requires :prefix, type:String, desc: 'the url to categorize'
+              requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
+              optional :comment, type: String, desc: 'resolution comment for the customer'
+            end
+            post 'update_pending' do
+              begin
+                entry = ComplaintEntry.find(permitted_params['id'])
+                entry.change_category( permitted_params['prefix'], permitted_params['categories'],
+                                    permitted_params['status'],
+                                    permitted_params['comment'],
+                                    current_user, entry.is_high_telemetry?, permitted_params['commit'])
               rescue Exception => e
               end
             end

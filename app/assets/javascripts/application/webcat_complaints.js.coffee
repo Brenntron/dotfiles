@@ -7,6 +7,27 @@ window.cat_new_url = ()->
 window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
 
+window.updatePending = (id) ->
+  prefix = $('#complaint_review_prefix_'+id)[0].value
+  status = $('[name=resolution_review_'+id+']:checked').val()
+  comment = $('#complaint_pending_comment_'+id)[0].value
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
+    method: 'POST'
+    headers: headers
+    data: {'id': id,'prefix': prefix,'commit':status,'comment':comment }
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        debugger
+
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
 
 window.updateEntryColumns = (id) ->
   prefix = $('#complaint_prefix_'+id)[0].value
@@ -174,12 +195,13 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="col-xs-4">' +
       ' Resolution: | ' +
-      '<input type="radio" name="status" value="commit" checked="checked"> commit | ' +
-      '<input type="radio" name="status" value="decline"> decline' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" checked="checked"> commit | ' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline"> decline' +
       '</div>' +
       '<div class="col-xs-1">' +
-      '<button> Change </button>' +
+      '<button onclick="updatePending(' + complaint_entry.entry_id + ')"> Change </button>' +
       '</div>' +
+      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50">' + '</div>' +
       '</div>'
   else
     complaint_entry_html = '<div class="row">' +
