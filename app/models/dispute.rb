@@ -312,7 +312,6 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    byebug
 
     dispute_fields = params.to_h.slice(*%w{status org_domain priority resolution submitter_type case_id case_owner_username})
     dispute_fields['id'] = dispute_fields.delete('case_id')
