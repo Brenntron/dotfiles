@@ -20,6 +20,12 @@ module API
               optional :priority, type: String
               optional :resolution, type: String
               optional :submitter_type, type: String
+              optional :submitted_older, type: Date
+              optional :submitted_newer, type: Date
+              optional :age_older, type: String
+              optional :age_newer, type: String
+              optional :modified_older, type: Date
+              optional :modified_newer, type: Date
               optional :customer, type: Hash do
                 optional :name, type: String
                 optional :email, type: String
@@ -32,6 +38,7 @@ module API
             end
 
             get "" do
+              byebug
 
               json_packet = []
 

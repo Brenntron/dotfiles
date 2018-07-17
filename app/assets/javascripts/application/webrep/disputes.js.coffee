@@ -26,6 +26,7 @@ window.populate_webrep_index_table = (data = {}) ->
   , this)
 
 window.advanced_webrep_index_table = () ->
+  debugger
   data = {
     customer: {
       name: $('#new_named_search').find('input[id="name-input"]').val()
@@ -45,6 +46,12 @@ window.advanced_webrep_index_table = () ->
     priority: $('#new_named_search').find('input[id="priority-input"]').val()
     resolution: $('#new_named_search').find('input[id="resolution-input"]').val()
     submitter_type: $('#new_named_search').find('input[id="submitter-input"]').val()
+    submitted_older: $('#new_named_search').find('input[id="submitted-older-input"]').val()
+    submitted_newer: $('#new_named_search').find('input[id="submitted-newer-input"]').val()
+    age_older: $('#new_named_search').find('input[id="age-older-input"]').val()
+    age_newer: $('#new_named_search').find('input[id="age-newer-input"]').val()
+    modified_older: $('#new_named_search').find('input[id="modified-older-input"]').val()
+    modified_newer: $('#new_named_search').find('input[id="modified-newer-input"]').val()
   }
   window.populate_webrep_index_table(data)
 

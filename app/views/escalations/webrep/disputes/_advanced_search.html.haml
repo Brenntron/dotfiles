@@ -50,16 +50,28 @@
     %input.form-control#domain-input{name: 'domain'}
     %button.remove-input
   .form-group.search-item.hidden
-    %label.content-label-sm Date Submitted
-    %input.form-control#submitted-input{name: 'date-submitted'}
+    %label.content-label-sm Date Submitted (Newer)
+    %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
     %button.remove-input
   .form-group.search-item.hidden
-    %label.content-label-sm Case Age
-    %input.form-control#age-input{name: 'age'}
+    %label.content-label-sm Date Submitted (Older)
+    %input.form-control#submitted-older-input{type: 'date', name: 'date-submitted-older'}
     %button.remove-input
   .form-group.search-item.hidden
-    %label.content-label-sm Last Modified
-    %input.form-control#modified-input{name: 'modified'}
+    %label.content-label-sm Case Age (Newer)
+    %input.form-control#age-newer-input{name: 'age'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Case Age (Older)
+    %input.form-control#age-older-input{name: 'age'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Last Modified (Newer)
+    %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Last Modified (Older)
+    %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
     %button.remove-input
 
   %button#add-search-items-button
@@ -117,16 +129,28 @@
             Submitter Domain
         %li
           %label.search-criteria-label
-            %input.search-checkbox#submitted-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted', for: 'submitted-input'}
-            Date Submitted
+            %input.search-checkbox#submitted-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Newer)', for: 'submitted-newer-input'}
+            Date Submitted (Newer)
         %li
           %label.search-criteria-label
-            %input.search-checkbox#age-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-input'}
-            Case Age
+            %input.search-checkbox#submitted-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Older)', for: 'submitted-older-input'}
+            Date Submitted (Older)
         %li
           %label.search-criteria-label
-            %input.search-checkbox#modified-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified', for: 'modified-input'}
-            Last Modified
+            %input.search-checkbox#age-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-newer-input'}
+            Case Age (Newer)
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#age-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-older-input'}
+            Case Age (Older)
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#modified-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Newer)', for: 'modified-newer-input'}
+            Last Modified (Newer)
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#modified-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Older)', for: 'modified-older-input'}
+            Last Modified (Older)
     .form-group.text-center
       %button.primary#add-search-criteria
         Add Search Criteria
