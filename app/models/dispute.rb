@@ -285,6 +285,22 @@ class Dispute < ApplicationRecord
     }
   end
 
+  def self.age_to_seconds(age_str)
+    days =
+        if /(?<days_str>\d+)[Dd]/ =~ age_str
+          days_str.to_i
+        else
+          0
+        end
+    hours =
+        if /(?<hours_str>\d+)[Hh]/ =~ age_str
+          hours_str.to_i
+        else
+          0
+        end
+    (days * 24 + hours) * 3600
+  end
+
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
   # @param [ActionController::Parameters] params supplied fields and values for search.
@@ -328,6 +344,48 @@ class Dispute < ApplicationRecord
     dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
     relation = where(dispute_fields)
 
+
+    if params['submitted_newer'].present?
+      relation =
+          relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+    end
+
+    if params['submitted_older'].present?
+      relation =
+          relation.where('case_opened_at < :submitted_older', submitted_older: params['submitted_older']+1)
+    end
+
+    if params['age_newer'].present?
+      seconds_ago = age_to_seconds(params['age_newer'])
+      unless 0 == seconds_ago
+        age_newer_cutoff = Time.now - seconds_ago
+        relation =
+            relation.where('case_opened_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
+
+      end
+    end
+
+    if params['age_older'].present?
+      seconds_ago = age_to_seconds(params['age_older'])
+      unless 0 == seconds_ago
+        age_older_cutoff = Time.now - seconds_ago
+        relation =
+            relation.where('case_opened_at < :submitted_older', submitted_older: age_older_cutoff)
+      end
+    end
+
+    if params['modified_newer'].present?
+      relation =
+          relation.where('updated_at >= :modified_newer', modified_newer: params['modified_newer'])
+    end
+
+    if params['modified_older'].present?
+      relation =
+          relation.where('updated_at < :modified_older', modified_older: params['modified_older']+1)
+    end
+
+
+
     company_name = nil
     customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
     customer_params = customer_params.select{|ignore_key, value| value.present?}
@@ -360,8 +418,6 @@ class Dispute < ApplicationRecord
         relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
       end
     end
-
-    relation.count
 
 
     # # Save this search as a named search

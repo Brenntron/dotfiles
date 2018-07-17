@@ -38,18 +38,13 @@ module API
             end
 
             get "" do
-              byebug
 
               json_packet = []
 
-              if permitted_params['search_type']
-                disputes = Dispute.robust_search(permitted_params['search_type'],
-                                                 search_name: permitted_params['search_name'],
-                                                 params: permitted_params,
-                                                 user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
-              else
-                disputes = Dispute.all.includes(:user, :dispute_entries => [:dispute_rule_hits])
-              end
+              disputes = Dispute.robust_search(permitted_params['search_type'],
+                                               search_name: permitted_params['search_name'],
+                                               params: permitted_params,
+                                               user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
 
               disputes.each do |dispute|
                 dispute_packet = {}
