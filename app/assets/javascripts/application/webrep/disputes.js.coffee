@@ -365,16 +365,16 @@ $ ->
     table_head + entry_rows.join('') + '</tbody></table>'
 
   populate_webrep_index_table()
-  # removed "My Tickets" logic
+
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
     row = dispute_table.row(tr)
     if row.child.isShown()
-# This row is already open - close it
+    # This row is already open - close it
       row.child.hide()
       tr.removeClass 'shown'
     else
-# Open this row
+    # Open this row
       row.child(format(row.data())).show()
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
@@ -395,6 +395,45 @@ $ ->
             return
         return
     return
+
+  # Expand all rows via toolbar button
+  $('#expand-all-index-rows').click ->
+    td = $('#disputes-index').find('td.expandable-row-column')
+    $(td).each ->
+      tr = $(this).closest('tr')
+      row = dispute_table.row(tr)
+      unless row.child.isShown()
+        row.child(format(row.data())).show()
+        tr.addClass 'shown'
+        td = $(tr).next('tr').find('td:first')
+        $(td).addClass 'dispute-entry-table-wrapper'
+        # Check to see which columns should be displayed
+        $('.toggle-vis-nested').each ->
+          checkbox_trigger = $(this).attr('data-column')
+          checkbox = $(this).find('input')
+          if $(checkbox).prop('checked')
+            $('.dispute-entry-table td, .dispute-entry-table th').each ->
+              if $(this).hasClass(checkbox_trigger)
+                $(this).show()
+              return
+          else if $(checkbox).prop('checked') == false
+            $('.dispute-entry-table td, .dispute-entry-table th').each ->
+              if $(this).hasClass(checkbox_trigger)
+                $(this).hide()
+              return
+          return
+        return
+
+  # Collapse all rows via toolbar button
+  $('#collapse-all-index-rows').click ->
+    td = $('#disputes-index').find('td.expandable-row-column')
+    $(td).each ->
+      tr = $(this).closest('tr')
+      row = dispute_table.row(tr)
+      if row.child.isShown()
+        row.child.hide()
+        tr.removeClass 'shown'
+
   # Hide unchecked columns <- need to somehow save this 'view'
   $('.toggle-vis').each ->
     column = dispute_table.column($(this).attr('data-column'))
