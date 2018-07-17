@@ -56,7 +56,6 @@ window.standard_webrep_index_table = (search_name) ->
   window.populate_webrep_index_table(data)
 
 window.named_webrep_index_table = (search_name) ->
-  debugger
   data = {
     search_type: 'named'
     search_name: search_name
