@@ -73,7 +73,8 @@ module API
                 ComplaintEntry.find(permitted_params['id']).change_category( permitted_params['prefix'],
                                            permitted_params['categories'],
                                            permitted_params['status'],
-                                           permitted_params['comment'])
+                                           permitted_params['comment'],
+                                           current_user)
               rescue Exception => e
               end
             end
@@ -89,8 +90,8 @@ module API
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = "There was an error when attempting to take entry, no entry was taken.-> #{e.message}"
-                {:error => error}.to_json
+                error = "#{e.message}"
+                return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
             end
@@ -105,8 +106,8 @@ module API
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = "There was an error when attempting to take entry, no entry was taken.-> #{e.message}"
-                {:error => error}.to_json
+                error = "#{e.message}"
+                return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
             end

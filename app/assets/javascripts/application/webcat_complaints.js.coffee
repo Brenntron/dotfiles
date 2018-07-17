@@ -12,7 +12,7 @@ window.updateEntryColumns = (id) ->
   prefix = $('#complaint_prefix_'+id)[0].value
   categories = $('#complaint_categories_'+id)[0].value
   status = $('[name=resolution'+id+']:checked').val()
-  comment = $('#complaint_comment_'+id)[0].value()
+  comment = $('#complaint_comment_'+id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
