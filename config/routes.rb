@@ -3,19 +3,18 @@ Rails.application.routes.draw do
   resources :rulehit_resolution_mailer_templates
   devise_for :users, controllers: {sessions: 'sessions'}
 
-  namespace :escalations do
+  namespace :escalations, except: [:destroy, :edit] do
     root 'bugs#index'
     resources :escalation_bugs, controller: 'bugs'
     resources :bugs do
-
       member do
-        post :create_rules
+        # post :create_rules
         post :add_tag
         post :add_whiteboard
         patch :remove_tag
         patch :remove_whiteboard
       end
-      resources :references
+      # resources :references
     end
 
     namespace :webcat do
@@ -29,9 +28,9 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :clusters
-      resources :rules
-      resources :reports
+      resources :clusters, only: [:index]
+      resources :rules, only: [:index]
+      resources :reports, only: [:index]
     end
 
     namespace :webrep do

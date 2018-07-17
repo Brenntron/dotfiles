@@ -19,14 +19,15 @@ class Ability
       end
     end
 
+
+
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
       can :read, :all
       can [:acknowledge_bug], Bug
       can :manage, [Admin, User]
-
-      can [:list_research, :list_escalations], Bug #legacy
     end
+
 
     if role_names.include?('api user')
       # Must be authorized to read API, and read API for V version,
@@ -38,7 +39,21 @@ class Ability
       can :read, ::API::V2
     end
 
+
     if role_names.include?('webcat manager')
+      can :manage, User do |user| #no delete UI is implemented
+        user.ancestors.include?(current_user)
+      end
+      can [:read, :show_multiple, :advanced_search, :named_search, :standard_search, :contains_search], [Complaint]
+    end
+
+    if role_names.include?('webcat user')
+      can :manage, [Complaint, Attachment, Note]
+      can :publish_to_bugzilla, Note
+    end
+
+
+    if role_names.include?('webrep manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
@@ -49,21 +64,13 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
-    if role_names.include?('webrep manager')
-      can :manage, User do |user| #no delete UI is implemented
-        user.ancestors.include?(current_user)
-      end
-    end
-
-    if role_names.include?('webcat user')
-      can :manage, [Complaint, Attachment, Note]
-      can :publish_to_bugzilla, Note
-    end
-
     if role_names.include?('ips escalator manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
+
+      #:manage allows -- :add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics
+      can [:manage, :import], EscalationBug
     end
 
     if role_names.include?('ips escalator')

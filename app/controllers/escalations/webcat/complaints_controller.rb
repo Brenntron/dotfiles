@@ -1,6 +1,5 @@
 class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
-
-
+  load_and_authorize_resource class: 'Complaint'
 
   def index
     respond_to do |format|
@@ -16,14 +15,14 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   def update
   end
 
-  def dashboard
-  end
-
-  def tickets
-  end
-
-  def single
-  end
+  # def dashboard
+  # end
+  #
+  # def tickets
+  # end
+  #
+  # def single
+  # end
 
   def show_multiple
     ids = params["selected_ids"]
