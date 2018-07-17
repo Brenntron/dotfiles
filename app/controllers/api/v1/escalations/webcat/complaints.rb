@@ -67,6 +67,7 @@ module API
                                       permitted_params[:description],
                                       permitted_params[:customer],
                                       permitted_params[:tags])
+              {:status => 'success'}.to_json
             end
 
             desc 'test a url'

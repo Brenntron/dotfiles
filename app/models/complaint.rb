@@ -30,9 +30,10 @@ class Complaint < ApplicationRecord
     uri_object = URI(url)
 
     domain_parts = uri_object.host.split(".")
-    if domain_parts > 2
+
+    if domain_parts.length > 2
       uri_parts[:subdomain] = domain_parts.first
-      uri_parts[:domain] = domain_parts - [domain_parts.first]
+      uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
       uri_parts[:path] = uri_object.path
     else
       uri_parts[:subdomain] = ""
@@ -42,6 +43,10 @@ class Complaint < ApplicationRecord
 
 
     uri_parts
+  end
+
+  def self.is_ip?(ip)
+    !!IPAddr.new(ip) rescue false
   end
 
 
@@ -180,11 +185,11 @@ class Complaint < ApplicationRecord
 
   def self.create_action(ips_urls, description, customer, tags)
     cust = find_customer(customer)
-    new_complaint = Complaint.create(description: description, customer_id: cust.id)
+    new_complaint = Complaint.create(description: description, customer_id: cust.id, status: 'NEW')
 
     handle_tags(new_complaint, tags)
 
-    ips_urls.each do |ip_url|
+    ips_urls.split(' ').each do |ip_url|
       create_complaint_entry(new_complaint, ip_url)
     end
   end
@@ -201,13 +206,23 @@ class Complaint < ApplicationRecord
     end
   end
 
-  def self.create_complaint_entry(complaint, url)
-    url_parts = parse_url(url)
+  def self.create_complaint_entry(complaint, ip_url)
     new_complaint_entry = ComplaintEntry.new
     new_complaint_entry.complaint_id = complaint.id
-    new_complaint_entry.subdomain = url_parts[:subdomain]
-    new_complaint_entry.domain = url_parts[:domain]
-    new_complaint_entry.path = url_parts[:path]
+    new_complaint_entry.status = "NEW"
+
+    if is_ip?(ip_url)
+      new_complaint_entry.ip_address = ip_url
+      new_complaint_entry.entry_type = "IP"
+
+    else
+      url_parts = parse_url(ip_url)
+      new_complaint_entry.uri = ip_url
+      new_complaint_entry.entry_type = "URI/DOMAIN"
+      new_complaint_entry.subdomain = url_parts[:subdomain]
+      new_complaint_entry.domain = url_parts[:domain]
+      new_complaint_entry.path = url_parts[:path]
+    end
     new_complaint_entry.save
   end
 

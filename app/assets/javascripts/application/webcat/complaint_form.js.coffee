@@ -37,6 +37,13 @@ $ ->
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 
+  $('#cancel_complaint').on 'click', ->
+    $(':input','#new-complaint-form').val('')
+    $('#new-complaint').dropdown('toggle')
+
+
+
+
 
   createSelectOptions = ->
     tags = $('#complaint_tag_list')[0]
