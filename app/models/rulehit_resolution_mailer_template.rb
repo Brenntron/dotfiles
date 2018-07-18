@@ -1,0 +1,2 @@
+class RulehitResolutionMailerTemplate < ApplicationRecord
+end

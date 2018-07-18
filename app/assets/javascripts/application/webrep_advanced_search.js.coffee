@@ -12,36 +12,33 @@ $(document).ready ->
     add_button = $('#add-search-items-button')
     selected_checkboxes = []
     $('.search-checkbox:checked').each ->
-      value = $(this).val()
-      div = $(document.createElement('div')).addClass('form-group search-item')
-      label = $(document.createElement('label')).addClass('content-label-sm')
-      input = $(document.createElement('input')).addClass('form-control')
-      remove = $(document.createElement('button')).addClass('remove-input')
-      $(div).append(label)
-      $(label).append(value)
-      $(div).append(input)
-      $(div).append(remove)
+      cb_for = $(this).attr('for')
+      search_criteria_group = $('#advanced-search-wrapper').find('.form-group')
+
+      $(search_criteria_group).each ->
+        input = $(this).find('input')
+        if $(input).attr('id') == cb_for
+          $(this).removeClass('hidden')
 
       $($(this).parent()).parent().addClass('hidden')
       $(this).prop 'checked', false
-
-      $(div).insertBefore(add_button)
       return
 
     $('#search-criteria-options').hide()
     false
 
   $('.remove-input').click ->
-    field_name = $(this).parent().find('.content-label-sm').text()
+    field_name = $(this).parent().find('input').attr('id')
     $('.search-checkbox').each ->
-      if $(this).val() == field_name
+      if $(this).attr('for') == field_name
         $($(this).parent()).parent().removeClass('hidden')
-    $($(this).parent()).remove()
+    $($(this).parent()).addClass('hidden')
+    false
 
   $('#search-webrep-cases-form').on 'click', '.remove-input', ->
-    field_name = $(this).parent().find('.content-label-sm').text()
+    field_name = $(this).parent().find('input').attr('id')
     $('.search-checkbox').each ->
-      if $(this).val() == field_name
+      if $(this).attr('for') == field_name
         $($(this).parent()).parent().removeClass('hidden')
-    $($(this).parent()).remove()
+    $($(this).parent()).addClass('hidden')
     return

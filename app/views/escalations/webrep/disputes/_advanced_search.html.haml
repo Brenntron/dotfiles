@@ -1,20 +1,67 @@
-%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
+-#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
+-#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
+= form_for NamedSearch.new, url: escalations_webrep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |named_form|
   .form-group.search-item
     %label.content-label-sm Case IDs
-    %input.form-control
+    %input.form-control#caseid-input{name: 'case_id'}
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Dispute (URL/IP/Domain)
-    %input.form-control
+    %input.form-control#dispute-input{name: 'ip_or_uri'}
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Case Owner
-    %input.form-control
+    %input.form-control#owner-input{name: 'username'}
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Status
-    %input.form-control{name: 'dispute[status]'}
+    %input.form-control#status-input{name: 'status'}
     %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Priority
+    %input.form-control#priority-input{name: 'priority'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Suggested Disposition
+    %input.form-control#disposition-input{name: 'disposition'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Resolution
+    %input.form-control#resolution-input{name: 'resolution'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Type
+    %input.form-control#submitter-input{name: 'submitter'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Contact Name
+    %input.form-control#name-input{name: 'contact-name'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Contact Email
+    %input.form-control#email-input{name: 'contact-email'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Company
+    %input.form-control#company-input{name: 'company'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Domain
+    %input.form-control#domain-input{name: 'domain'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Date Submitted
+    %input.form-control#submitted-input{name: 'date-submitted'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Case Age
+    %input.form-control#age-input{name: 'age'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Last Modified
+    %input.form-control#modified-input{name: 'modified'}
+    %button.remove-input
+
   %button#add-search-items-button
     Add Search Criteria
   #search-criteria-options
@@ -22,79 +69,63 @@
       %ul
         %li.hidden
           %label.search-criteria-label
-            %input.search-checkbox#caseid-cb{type: 'checkbox', name: 'search-criteria', value: 'Case IDs'}
+            %input.search-checkbox#caseid-cb{type: 'checkbox', name: 'search-criteria', value: 'Case IDs', for: 'caseid-input'}
             Case IDs
         %li.hidden
           %label.search-criteria-label
-            %input.search-checkbox#dispute-cb{type: 'checkbox', name: 'search-criteria', value: 'Dispute (URL/IP/Domain)'}
+            %input.search-checkbox#dispute-cb{type: 'checkbox', name: 'search-criteria', value: 'Dispute (URL/IP/Domain)', for: 'dispute-input'}
             Dispute (URL/IP/Domain)
         %li.hidden
           %label.search-criteria-label
-            %input.search-checkbox#owner-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Owner'}
+            %input.search-checkbox#owner-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Owner', for: 'owner-input'}
             Case Owner
         %li.hidden
           %label.search-criteria-label
-            %input.search-checkbox#status-cb{type: 'checkbox', name: 'search-criteria', value: 'Status'}
+            %input.search-checkbox#status-cb{type: 'checkbox', name: 'search-criteria', value: 'Status', for: 'status-input'}
             Status
         %li
           %label.search-criteria-label
-            %input.search-checkbox#priority-cb{type: 'checkbox', name: 'search-criteria', value: 'Priority'}
+            %input.search-checkbox#priority-cb{type: 'checkbox', name: 'search-criteria', value: 'Priority', for: 'priority-input'}
             Priority
         %li
           %label.search-criteria-label
-            %input.search-checkbox#disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Disposition'}
+            %input.search-checkbox#disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Disposition', for: 'disposition-input'}
             Suggested Disposition
         %li
           %label.search-criteria-label
-            %input.search-checkbox#regex-cb{type: 'checkbox', name: 'search-criteria', value: 'URL Regex'}
-            URL Regex
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution'}
+            %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input' }
             Resolution
         %li
           %label.search-criteria-label
-            %input.search-checkbox#dispute-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Dispute Type'}
-            Dispute Type
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#origin-cb{type: 'checkbox', name: 'search-criteria', value: 'Origin'}
-            Origin
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#origin-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Origin ID'}
-            Origin ID
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#submitter-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type'}
+            %input.search-checkbox#submitter-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type', for: 'submitter-input'}
             Submitter Type
         %li
           %label.search-criteria-label
-            %input.search-checkbox#name-cb{type: 'checkbox', name: 'search-criteria', value: 'Contact Name'}
+            %input.search-checkbox#name-cb{type: 'checkbox', name: 'search-criteria', value: 'Contact Name', for: 'name-input'}
             Contact Name
         %li
           %label.search-criteria-label
-            %input.search-checkbox#email-cb{type: 'checkbox', name: 'search-criteria', value: 'Contact Email'}
+            %input.search-checkbox#email-cb{type: 'checkbox', name: 'search-criteria', value: 'Contact Email', for: 'email-input'}
             Contact Email
         %li
           %label.search-criteria-label
-            %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Company'}
+            %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Company', for: 'company-input'}
             Company
         %li
           %label.search-criteria-label
-            %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Domain'}
+            %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Domain', for: 'domain-input'}
             Submitter Domain
         %li
           %label.search-criteria-label
-            %input.search-checkbox#submitted-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted'}
+            %input.search-checkbox#submitted-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted', for: 'submitted-input'}
             Date Submitted
         %li
           %label.search-criteria-label
-            %input.search-checkbox#age-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age'}
+            %input.search-checkbox#age-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-input'}
             Case Age
         %li
           %label.search-criteria-label
-            %input.search-checkbox#modified-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified'}
+            %input.search-checkbox#modified-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified', for: 'modified-input'}
             Last Modified
     .form-group.text-center
       %button.primary#add-search-criteria
@@ -106,9 +137,9 @@
   .form-group
     %label.content-label-sm
       Add Name to save this search criteria to My Saved Searches
-    %input.form-control{name: 'dispute[status]'}
+    %input.form-control{name: 'search_name'}
   .form-group.text-center
-    %button.primary#submit-advanced-search{value: 'submit'}
+    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_webrep_index_table();'}
       Submit Search
     %button.secondary#reset-advanced-search.reset
       Reset Search

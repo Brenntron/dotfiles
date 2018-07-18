@@ -3512,9 +3512,56 @@ input.communication-subject {
   background-color: $faint-neutral-color;
 }
 
+.email-reply-header-information input {
+  font-size: 8.5pt;
+  padding: 4px;
+  border: none;
+}
+
+.email-reply-header-information .receiver-email, .email-reply-header-information .cc-email {
+  min-width: 160px;
+}
+
+.email-reply-header-information .row {
+  margin: 0;
+}
+
+.email-reply-header-information .col-xs-6, .email-reply-header-information .col-xs-12 {
+  padding: 0;
+}
+
+.email-reply-header-information .email-reply-buttons {
+  float: left;
+}
+
+.email-reply-header-information .content-label-sm-sub {
+
+}
+
+.email-reply-header-information .communication-subject {
+  width: 315px;
+  margin: 6px auto 1px auto;
+}
+
+.email-reply-header-information .email-reply-buttons {
+  padding-top: 8px;
+}
+
 .email-attachments a {
   color: $content-tab-color;
   font-size: 8pt;
+}
+
+.wbrs-rule-trigger {
+  text-decoration: underline;
+}
+
+.wbrs-rule-trigger:hover {
+  color: $warning-accent-color;
+}
+
+.nested-data-row .wbrs-rule-trigger {
+  color: $content-bg-color;
 }
 
 .template-label {
@@ -3731,7 +3778,7 @@ td.wbrs-highlight, td.sbrs-highlight {
   text-align: center;
 }
 
-button.primary, button.secondary, button.tertiary {
+button.primary, button.secondary, button.tertiary, input.button_primary {
   text-transform: uppercase;
   border-radius: 2px;
   font-weight: 600;
@@ -3742,11 +3789,11 @@ button.primary, button.secondary, button.tertiary {
   color: $content-bg-color;
 }
 
-button.primary {
+button.primary, input.button_primary {
   background-color: $bug-section-color;
 }
 
-button.primary:hover {
+button.primary:hover, input.button_primary:hover {
   background-color: darken($bug-section-color, 10%);
 }
 
@@ -3850,10 +3897,6 @@ button.tertiary {
 
 /** Below for the new email dialog box **/
 
-input.receiver-email {
-  border: none;
-}
-
 .ui-dialog .ui-dialog-titlebar {
   background-color: #4E4E4E;
   color: $content-bg-color;
@@ -3909,7 +3952,7 @@ input.receiver-email {
   width: 170px;
 }
 
-.content-label-sm-to {
+.content-label-sm-to, .content-label-sm-cc {
   width: 10px !important;
 }
 
@@ -4319,7 +4362,7 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 #table-show-columns-dropdown {
-  min-width: 700px;
+  min-width: 750px;
 }
 
 .dropdown-menu-content-block ul {
@@ -4497,13 +4540,13 @@ input.table-entry-input:focus {
   max-width: 500px;
 }
 
-#disputes-research-table label {
+#disputes-research-table label, #edit-ticket-status-dropdown label {
   font-weight: 700;
   text-transform: uppercase;
   padding-right: 10px;
 }
 
-#disputes-research-table .expand-row-button-inline {
+#disputes-research-table .expand-row-button-inline  {
   margin-bottom: -5px;
 }
 
@@ -4681,7 +4724,7 @@ h5.entry-details-table-header {
   outline: 1px solid #e5e5e5;
 }
 
-.inline-dropdown-menu, .ticket-resolution-submenu {
+.inline-dropdown-menu, .ticket-resolution-submenu, .toolbar-dropdown {
   font-size: 9pt;
   margin-top: -2px;
   margin-left: 2px;
@@ -4702,15 +4745,17 @@ h5.entry-details-table-header {
 
 .submenu-left-wrapper {
   background-color: $bug-section-color;
+
 }
 
-.inline-dropdown-menu .submenu-left-wrapper ul li:hover {
+.inline-dropdown-menu .submenu-left-wrapper ul li:hover, .toolbar-dropdown .submenu-left-wrapper ul li:hover {
   background-color: darken($bug-section-color, 5%);
 }
 
 .submenu-left-wrapper, .submenu-right-wrapper {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0  !important;
+  padding-right: 0 !important;
+  margin-right: 0  !important;
 }
 
 .submenu-header {
@@ -4727,15 +4772,15 @@ h5.entry-details-table-header {
   text-align: left;
 }
 
-.inline-dropdown-menu ul li {
+.inline-dropdown-menu ul li, .toolbar-dropdown ul li {
   padding: 4px 12px;
 }
 
-.inline-dropdown-menu ul li:hover {
+.inline-dropdown-menu ul li:hover, .toolbar-dropdown ul li:hover {
   background-color: $faint-accent-color;
 }
 
-.inline-dropdown-menu ul li.selected {
+.inline-dropdown-menu ul li.selected, .toolbar-dropdown ul li.selected {
   background-color: #90d8f594;
 }
 
@@ -4745,7 +4790,7 @@ h5.entry-details-table-header {
   color: $type-lighter-color;
 }
 
-.inline-dropdown-menu .radio-label {
+.inline-dropdown-menu .radio-label, .toolbar-dropdown .radio-label {
   width: auto;
   cursor: pointer;
   display: block;
@@ -4753,7 +4798,7 @@ h5.entry-details-table-header {
   padding: 0 12px 2px 22px;
 }
 
-.inline-dropdown-menu input[type='radio'] {
+.inline-dropdown-menu input[type='radio'], .toolbar-dropdown input[type='radio'] {
   box-shadow: none;
   float: left;
 }
@@ -5117,6 +5162,64 @@ td.ticket-total::before {
   border-right: 1px solid $content-bg-color;
 }
 
+
+.dispute-entry-count {
+  background-color: $content-label-color;
+  min-width: 20px;
+  padding: 3px;
+  border-radius: 2px;
+  color: $content-bg-color;
+  font-size: 10pt;
+  font-weight: 600;
+  display: block;
+  float: right;
+  margin-top: -14px;
+  text-align: center;
+}
+
+.temp-spacer {
+  min-height: 400px;
+  padding: 40px 15px;
+}
+
+.create-report {
+  background-image: url(image_path('icon_reports_white.svg'));
+  background-repeat: no-repeat;
+  background-size: 26px;
+  padding-left: 40px !important;
+  background-position: 8px center;
+  margin-top: 20px !important;
+}
+
+.report-form-wrapper {
+  margin-top: 20px;
+}
+
+.report-form-wrapper label {
+  padding-right: 10px;
+}
+
+.report-form-wrapper label::before, .report-form-wrapper input::before, .report-form-wrapper .required::before {
+  display: none;
+}
+
+.report-form-wrapper abbr {
+  display: none;
+}
+
+#disputes-index-export-form {
+  height: 27px;
+}
+
+#edit-ticket-status-dropdown {
+  width: 160px;
+  padding: 0 !important;
+}
+
+#edit-ticket-status-dropdown .ticket-resolution-submenu {
+  left: -323px;
+  padding: 0 !important;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 

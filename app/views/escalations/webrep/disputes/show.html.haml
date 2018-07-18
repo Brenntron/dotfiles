@@ -37,11 +37,12 @@
       %label.content-label-sm
         Dispute
       %div
-        - @entries.each do |entry|
-          = entry.hostlookup
-          %br
+        = @entries.first.hostlookup
+        -#- @entries.each do |entry|
+        -#  = entry.hostlookup
+      %span.dispute-entry-count
+        = @entries.count
 
-      %div= @dispute.org_domain
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Date/Time Submitted

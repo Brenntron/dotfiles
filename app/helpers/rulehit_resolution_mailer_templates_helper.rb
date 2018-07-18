@@ -1,0 +1,2 @@
+module RulehitResolutionMailerTemplatesHelper
+end

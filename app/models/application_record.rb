@@ -24,4 +24,5 @@ class ApplicationRecord < ActiveRecord::Base
   def humanize_secs(sec_input)
     ApplicationRecord.humanize_secs(sec_input)
   end
+
 end
