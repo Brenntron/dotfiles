@@ -20,7 +20,7 @@ Rails.application.routes.draw do
 
     namespace :webcat do
       root 'complaints#index'
-      resources :complaints do
+      resources :complaints, only: [:index, :show, :update] do
         collection do
           get :show_multiple
           get :advanced_search
@@ -31,7 +31,12 @@ Rails.application.routes.draw do
       end
       resources :clusters
       resources :rules
-      resources :reports
+      resources :reports, only: [:index] do
+        collection do
+          get :resolution
+          get :export_resolution
+        end
+      end
     end
 
     namespace :webrep do
