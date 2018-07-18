@@ -1,0 +1,76 @@
+- content_for(:webcat_page) do
+  Category management
+
+= render "escalations/webcat/shared/telemetry"
+
+
+.content-wrapper
+
+  .row
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Complaint ID
+      .bug-top-id
+        %div= @complaint.id
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Status
+      .bug-top-id
+        %div= @complaint.status
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        tag
+      .bug-top-id
+        %div= @complaint.tag
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Channel
+      .bug-top-id
+        %div= @complaint.channel
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Description
+      .bug-top-id
+        %div= @complaint.description
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Added Through
+      .bug-top-id
+        %div= @complaint.added_through
+    .col-xs-1.col-with-divider
+      %label.content-label-sm
+        Resolution
+      .bug-top-id
+        %div= @complaint.resolution
+
+
+
+
+  %p Entries
+  -@complaint.complaint_entries.each do |entry|
+    .row
+      .col-xs-1.col-with-divider
+        %label.content-label-sm
+          Entry ID
+        .bug-top-id
+          %div= entry.id
+      .col-xs-1.col-with-divider
+        %label.content-label-sm
+          Status
+        .bug-top-id
+          %div= entry.status
+      .col-xs-1.col-with-divider
+        %label.content-label-sm
+          Subdomain
+        .bug-top-id
+          %div= entry.subdomain
+      .col-xs-1.col-with-divider
+        %label.content-label-sm
+          Domain
+        .bug-top-id
+          %div= entry.domain
+      .col-xs-1.col-with-divider
+        %label.content-label-sm
+          Path
+        .bug-top-id
+          %div= entry.path

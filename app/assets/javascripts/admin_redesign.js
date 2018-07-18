@@ -34,3 +34,4 @@
 //= require application/webcat_complaints
 //= require application/webcat/complaint_form
 //= require application/webrep_research_tab
+//= require application/webcat/webcat

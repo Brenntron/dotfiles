@@ -10,6 +10,11 @@ class Escalations::WebcatController < ApplicationController
     @int_2 = 0
     @wbnp = 0
 
+    @active_comp = Complaint.active_count
+    @completed_comp = Complaint.completed_count
+    @new_comp = Complaint.new_count
+    @overdue_comp = Complaint.overdue_count
+
     @assigned = ComplaintEntry.assigned_count
     @pending = ComplaintEntry.pending_count
     @new = ComplaintEntry.new_count

@@ -9,11 +9,26 @@ module API
 
             desc 'get all complaint entries'
             params do
+              optional :filter_by, type: String, desc:'filter entries by this value'
+              optional :self_review, type: Boolean, desc: 'a flag that allows users to review their own categorizations'
             end
 
             get "" do
               json_packet = []
-              complaint_entries = ComplaintEntry.all
+              case permitted_params[:filter_by]
+                when "NEW"
+                  complaint_entries = ComplaintEntry.where(status:"NEW")
+                when "COMPLETED"
+                  complaint_entries = ComplaintEntry.where(status:"COMPLETED")
+                when "ACTIVE"
+                  complaint_entries = ComplaintEntry.where.not(status:"COMPLETED").where.not(status:"NEW")
+                when "REVIEW"
+                  complaint_entries = permitted_params[:self_review]? ComplaintEntry.where(is_important:true) : ComplaintEntry.where(is_important:true).where.not(user:current_user)
+                else
+                  complaint_entries = ComplaintEntry.all
+
+              end
+
               if complaint_entries
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
@@ -45,6 +60,42 @@ module API
             end
 
 
+            desc 'update an entry '
+            params do
+              requires :id, type: Integer, desc:'complaint entry id'
+              requires :prefix, type: String, desc: 'the url to categorize'
+              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              requires :status, type: String, desc: 'setting the status of the entry'
+              optional :comment, type: String, desc: 'resolution comment for the customer'
+            end
+            post 'update'do
+              begin
+                entry = ComplaintEntry.find(permitted_params['id'])
+                entry.change_category( permitted_params['prefix'],permitted_params['categories'],
+                                         permitted_params['status'],
+                                         permitted_params['comment'],
+                                         current_user, false,"")
+              rescue Exception => e
+              end
+            end
+            desc 'update a high telemetry entry'
+            params do
+              requires :id, type:Integer, desc:'complaint entry id'
+              requires :prefix, type:String, desc: 'the url to categorize'
+              requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
+              optional :comment, type: String, desc: 'resolution comment for the customer'
+            end
+            post 'update_pending' do
+              begin
+                entry = ComplaintEntry.find(permitted_params['id'])
+                entry.change_category( permitted_params['prefix'], permitted_params['categories'],
+                                    permitted_params['status'],
+                                    permitted_params['comment'],
+                                    current_user, entry.is_high_telemetry?, permitted_params['commit'])
+              rescue Exception => e
+              end
+            end
+
             desc 'take entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
@@ -56,8 +107,8 @@ module API
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = "There was an error when attempting to take entry, no entry was taken.-> #{e.message}"
-                {:error => error}.to_json
+                error = "#{e.message}"
+                return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
             end
@@ -72,11 +123,13 @@ module API
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = "There was an error when attempting to take entry, no entry was taken.-> #{e.message}"
-                {:error => error}.to_json
+                error = "#{e.message}"
+                return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
             end
+
+
 
           end
         end

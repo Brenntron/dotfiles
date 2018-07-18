@@ -12,10 +12,12 @@
   </div>
   <div class="col-sm-6 vl">
   </div>
+
   <div class="col-sm-3 text-center">
     <table class="metrics table table-responsive-sm" >
       <tbody>
       <tr>
+        <td><h5> Extra </h5></td>
         <td>
           SecHub <%=@secHub_1%>  <%=@secHub_2%>
         </td>
@@ -31,9 +33,10 @@
       </tr>
       </tbody>
     </table>
-    <table class="metrics table table-responsive-sm">
+     <table class="metrics table table-responsive-sm">
       <tbody>
       <tr>
+        <td><h5> Entries </h5></td>
         <td>
           assigned <%=@assigned%>
         </td>
@@ -45,6 +48,25 @@
         </td>
         <td>
           overdue <%=@overdue%>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+     <table class="metrics table table-responsive-sm">
+      <tbody>
+      <tr>
+        <td><h5> Complaints </h5> </td>
+        <td>
+          new  <%=@new_comp%>
+        </td>
+        <td>
+          Active <%=@active_comp%>
+        </td>
+        <td>
+          overdue <%=@overdue_comp%>
+        </td>
+        <td>
+          Completed <%=@completed_comp%>
         </td>
       </tr>
       </tbody>

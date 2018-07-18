@@ -19,15 +19,21 @@
     .dropdown-menu.nav-tools-dropdown#group-dropdown{'aria-labelledby': 'group-cases'}
       Group By
 
-  .nav-tool-blocks.col-xs-3.col-sm-2.col-lg-2.dropdown
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'new-complaint', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
-      New Complaint
+      New
     .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-complaint'}
       %h3.nav-tool-dropdown-header.inverse
         New Complaint
       .nav-tool-content-wrapper
         = render 'new'
+     
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'fetch', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-new-white'}
+      Fetch
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'fetch'} Fetch complaints   
 
   .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-3.search-wrapper
     .input-group.search-group

@@ -1,4 +1,4 @@
-class Escalations::Webcat::ComplaintEntriessController < Escalations::WebcatController
+class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatController
 
 
 
