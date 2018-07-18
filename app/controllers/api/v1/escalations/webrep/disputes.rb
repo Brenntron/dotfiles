@@ -153,6 +153,11 @@ module API
               true
             end
 
+            delete "searches/:search_name" do
+              search = NamedSearch.where(name: params['search_name'], user: current_user)
+              search.destroy_all
+              true
+            end
           end
         end
       end

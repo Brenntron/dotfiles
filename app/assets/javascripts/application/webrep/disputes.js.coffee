@@ -54,12 +54,33 @@ window.advanced_webrep_index_table = () ->
   }
   window.populate_webrep_index_table(data)
 
-window.named_webrep_index_table = (search_name) ->
+window.standard_webrep_index_table = (search_name) ->
   data = {
     search_type: 'standard'
     search_name: search_name
   }
   window.populate_webrep_index_table(data)
+
+window.named_webrep_index_table = (search_name) ->
+  data = {
+    search_type: 'named'
+    search_name: search_name
+  }
+  window.populate_webrep_index_table(data)
+
+window.delete_disputes_named_search = (close_button, search_name) ->
+  std_msg_ajax(
+    method: 'DELETE'
+    url: "/api/v1/escalations/webrep/disputes/searches/#{search_name}"
+    data: {}
+    error_prefix: 'Error deleting saved search.'
+    failure_reload: false
+    tr_tag: close_button.closest('tr')
+    success: (response) ->
+      this.tr_tag.remove();
+  )
+
+
 
 
 window.popup_response_error =(response, prefix) ->

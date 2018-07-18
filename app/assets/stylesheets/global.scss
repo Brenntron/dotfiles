@@ -648,6 +648,10 @@ th.alt-col {
   height: 14px;
 }
 
+.delete-search:hover {
+  background: transparent !important;
+}
+
 #note-sync-icon, #attachment-sync-icon {
   width: 20px;
   height: 20px;
@@ -1705,6 +1709,13 @@ a.static-nav-item {
 .saved-search {
   text-transform: none !important;
   font-weight: 400;
+  color: $type-lighter-color !important;
+  cursor: pointer;
+}
+
+.saved-search:hover {
+  background: transparent  !important;
+  color: $type-base-color !important;
 }
 
 .search-box {
