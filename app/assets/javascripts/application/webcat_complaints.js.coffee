@@ -4,68 +4,117 @@ window.removeSubdomain = (id,host) ->
 window.cat_new_url = ()->
   debugger
 
-window.updateEntryColumns = (id) ->
-  debugger
+window.filterByStatus = (filter) ->
+  populate_webcat_index_table(filter)
 
-window.take_selected = ()->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  entry_ids = []
-  i = 0
-  while i < selected_rows[0].length
-    entry_ids.push(selected_rows.data()[i].entry_id)
-    i++
+window.updatePending = (id) ->
+  prefix = $('#complaint_review_prefix_'+id)[0].value
+  status = $('[name=resolution_review_'+id+']:checked').val()
+  comment = $('#complaint_pending_comment_'+id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/take_entry'
+    url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
-    data: 'complaint_entry_ids': entry_ids
+    data: {'id': id,'prefix': prefix,'commit':status,'comment':comment }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        i = 0
-        while i < selected_rows[0].length
-          selected_rows.data().cell(selected_rows[0][i],12).data(json.name).draw()
-          selected_rows.data().cell(selected_rows[0][i],5).data("ASSIGNED").draw()
-          i++
+        debugger
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
+window.updateEntryColumns = (id) ->
+  prefix = $('#complaint_prefix_'+id)[0].value
+  categories = $('#complaint_categories_'+id)[0].value
+  status = $('[name=resolution'+id+']:checked').val()
+  comment = $('#complaint_comment_'+id)[0].value
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/update'
+    method: 'POST'
+    headers: headers
+    data: {'id': id,'prefix': prefix,'categories':categories,'status':status,'comment':comment }
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        debugger
+
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
+
+window.take_selected = ()->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    i = 0
+    while i < selected_rows[0].length
+      entry_ids.push(selected_rows.data()[i].entry_id)
+      i++
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webcat/complaint_entries/take_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          alert(json.error)
+        else
+          i = 0
+          while i < selected_rows[0].length
+            selected_rows.data().cell(selected_rows[0][i],12).data(json.name).draw()
+            selected_rows.data().cell(selected_rows[0][i],5).data("ASSIGNED").draw()
+            i++
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
 
 
 
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  entry_ids = []
-  i = 0
-  while i < selected_rows[0].length
-    entry_ids.push(selected_rows.data()[i].entry_id)
-    i++
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/return_entry'
-    method: 'POST'
-    headers: headers
-    data: 'complaint_entry_ids': entry_ids
-    success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
-      else
-        i = 0
-        while i < selected_rows[0].length
-          selected_rows.data().cell(selected_rows[0][i],12).data("").draw()
-          selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
-          i++
+  if selected_rows[0].length > 0
+    entry_ids = []
+    i = 0
+    while i < selected_rows[0].length
+      entry_ids.push(selected_rows.data()[i].entry_id)
+      i++
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webcat/complaint_entries/return_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          alert(json.error)
+        else
+          i = 0
+          while i < selected_rows[0].length
+            selected_rows.data().cell(selected_rows[0][i],12).data("").draw()
+            selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
+            i++
 
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
 
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
@@ -99,6 +148,10 @@ format = (complaint_entry) ->
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
   else
     uri = missing_data
+
+  entry_status = ""
+  if complaint_entry.status == "COMPLETED"
+    entry_status = "disabled='true'"
   wbrs_score = ''
   if complaint_entry.wbrs_score
     wbrs_score = complaint_entry.wbrs_score
@@ -144,13 +197,13 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="col-xs-4">' +
       ' Resolution: | ' +
-      '<input type="radio" name="status" value="dontChange"> dont change |  ' +
-      '<input type="radio" name="status" value="commit"> commit | ' +
-      '<input type="radio" name="status" value="decline"> decline' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" checked="checked"> commit | ' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline"> decline' +
       '</div>' +
       '<div class="col-xs-1">' +
-      '<button> Change </button>' +
+      '<button onclick="updatePending(' + complaint_entry.entry_id + ')"> Change </button>' +
       '</div>' +
+      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50">' + '</div>' +
       '</div>'
   else
     complaint_entry_html = '<div class="row">' +
@@ -162,8 +215,9 @@ format = (complaint_entry) ->
       '<div class="col-xs-4">' +
       'Prefix <input id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
-      '"><button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')">remove subdomain</button>' +
+      '"' + entry_status + '>' +
+      '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
+      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button>' +
       '</div>' +
       '<div class="col-xs-2">' +
       'WBRS: ' + wbrs_score + ' Confidence ' + confidence +
@@ -171,16 +225,17 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="row">' +
       '<div class="col-xs-4">' +
-      'Category<input type="text" onclick="this.select()" value="' + category + '">' +
+      'Category<input id="complaint_categories_' + complaint_entry.entry_id +
+      '" type="text" onclick="this.select()" value="' + category + '"' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged"> unchanged |  ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed"> fixed | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid"> invalid' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + entry_status + '> unchanged |  ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed" checked="checked" ' + entry_status + '> fixed | ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + entry_status + '> invalid' +
       '</div>' +
       '<div class="col-xs-1">' +
-      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')">Update</button>' +
+      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')" ' + entry_status + '>Update</button>' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -190,6 +245,7 @@ format = (complaint_entry) ->
       '<button>history</button>' +
       '<button>domain</button>' +
       '</div>' +
+      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50" ' + entry_status + '>' + '</div>' +
       '</div>'
   complaint_entry_html
 
@@ -219,10 +275,11 @@ window.click_table_buttons = (complaint_table, button)->
           if $(button).hasClass(checkbox_trigger)
             $(button).hide()
 
-window.populate_webcat_index_table = () ->
+window.populate_webcat_index_table = (filter) ->
+  self_review = $('#self_review')[0].checked
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries'
+    url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
     method: 'GET'
     headers: headers
     success: (response) ->

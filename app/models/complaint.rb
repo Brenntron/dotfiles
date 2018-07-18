@@ -2,6 +2,23 @@ class Complaint < ApplicationRecord
   belongs_to :customer
   has_many :complaint_entries
 
+  scope :active_count , -> {where(status:"ACTIVE").count}
+  scope :completed_count , -> {where(status:"COMPLETED").count}
+  scope :new_count , -> {where(status:"NEW").count}
+  scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:"COMPLETED").count}
+
+  def set_status(new_status)
+    status_list = complaint_entries.map{|entry| entry.status}
+    case new_status
+      when "NEW"
+        update(status: status_list.any? {|item| ["ASSIGNED","PENDING","COMPLETED"].include? item}? "ACTIVE": "NEW")
+      when "ASSIGNED" || "PENDING"
+        update(status:"ACTIVE")
+      when "COMPLETED"
+        update(status: status_list.any? {|item| ["ASSIGNED","PENDING","NEW"].include? item}? "ACTIVE": "COMPLETED")
+    end
+  end
+
   def self.can_visit_url?(url)
     begin
     request = HTTPI::Request.new(url: url)
