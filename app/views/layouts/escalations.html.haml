@@ -23,11 +23,11 @@
             %span.nav-dropdown-icon.icon-recently-viewed
             Recently Viewed
         %li
-          %a{onclick: 'named_webrep_index_table("my_disputes");'}
+          %a{onclick: 'standard_webrep_index_table("my_disputes");'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("my_open");'}
+          %a{onclick: 'standard_webrep_index_table("my_open");'}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
         %li
@@ -35,15 +35,15 @@
             %span.nav-dropdown-icon.icon-team-bugs
             My Team Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("open");'}
+          %a{onclick: 'standard_webrep_index_table("open");'}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("closed");'}
+          %a{onclick: 'standard_webrep_index_table("closed");'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
         %li
-          %a{onclick: 'named_webrep_index_table("all");'}
+          %a{onclick: 'standard_webrep_index_table("all");'}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 
@@ -52,28 +52,15 @@
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
         %table{class: 'table table-condensed small', id: 'saved-search'}
-          -#- if @saved_search.present?
-          -#  - current_user.saved_searches.each do |saved_search|
-          -#    %tr
-          -#      - if @saved_search.id == saved_search.id
-          -#        %td{id: "saved_search_#{saved_search.id}", class: "selected_search"}
-          -#          = saved_search.name
-          -#      - else
-          -#        %td{id: "saved_search_#{saved_search.id}"}
-          -#          %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
-          -#            = saved_search.name
-          -#          %a{class: 'delete-search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
-          -#            = image_tag('icon_cancel_grey.svg')
-          -#
-          -#- else
-          -#  - current_user.saved_searches.each do |saved_search|
-          -#    %tr{id: "saved_search_#{saved_search.id}"}
-          -#      %td
-          -#        %a.saved-search{href: "/bugs?saved_search_id=#{saved_search.id}"}
-          -#          = saved_search.name
-          -#
-          -#        %a{class: 'delete-search tooltipped', title: 'Delete Saved Search', onclick: "AC.Bugs.deleteSavedSearch(#{saved_search.id})"}
-          -#          = image_tag('icon_cancel_grey.svg')
+          %tbody
+            - if current_user.named_searches.any?
+              - current_user.named_searches.each do |named_search|
+                %tr{id: "saved_search_#{named_search.id}"}
+                  %td
+                    %a.saved-search{onclick: "named_webrep_index_table('#{named_search.name}');"}
+                      = named_search.name
+                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
+                      = image_tag('icon_cancel_grey.svg')
 
   .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'import-webrep', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
