@@ -1,9 +1,6 @@
 $('#myModal').on 'shown.bs.modal', ->
   $('#myInput').trigger 'focus'
 $ ->
-  $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
-    click_table_buttons complaint_table, this
-
   complaint_table = $('#complaints-index').DataTable(
     'rowCallback': (row, data, index) ->
       $node = @api().row(row).nodes().to$()
@@ -74,3 +71,5 @@ $ ->
     select: 'style': 'os'
     responsive: true)
   populate_webcat_index_table()
+  $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
+    click_table_buttons complaint_table, this

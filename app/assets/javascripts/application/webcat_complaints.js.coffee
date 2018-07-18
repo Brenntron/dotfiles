@@ -56,63 +56,65 @@ window.updateEntryColumns = (id) ->
 
 window.take_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  entry_ids = []
-  i = 0
-  while i < selected_rows[0].length
-    entry_ids.push(selected_rows.data()[i].entry_id)
-    i++
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/take_entry'
-    method: 'POST'
-    headers: headers
-    data: 'complaint_entry_ids': entry_ids
-    success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
-      else
-        i = 0
-        while i < selected_rows[0].length
-          selected_rows.data().cell(selected_rows[0][i],12).data(json.name).draw()
-          selected_rows.data().cell(selected_rows[0][i],5).data("ASSIGNED").draw()
-          i++
+  if selected_rows[0].length > 0
+    entry_ids = []
+    i = 0
+    while i < selected_rows[0].length
+      entry_ids.push(selected_rows.data()[i].entry_id)
+      i++
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webcat/complaint_entries/take_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          alert(json.error)
+        else
+          i = 0
+          while i < selected_rows[0].length
+            selected_rows.data().cell(selected_rows[0][i],12).data(json.name).draw()
+            selected_rows.data().cell(selected_rows[0][i],5).data("ASSIGNED").draw()
+            i++
 
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
 
 
 
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  entry_ids = []
-  i = 0
-  while i < selected_rows[0].length
-    entry_ids.push(selected_rows.data()[i].entry_id)
-    i++
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/return_entry'
-    method: 'POST'
-    headers: headers
-    data: 'complaint_entry_ids': entry_ids
-    success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
-      else
-        i = 0
-        while i < selected_rows[0].length
-          selected_rows.data().cell(selected_rows[0][i],12).data("").draw()
-          selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
-          i++
+  if selected_rows[0].length > 0
+    entry_ids = []
+    i = 0
+    while i < selected_rows[0].length
+      entry_ids.push(selected_rows.data()[i].entry_id)
+      i++
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webcat/complaint_entries/return_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          alert(json.error)
+        else
+          i = 0
+          while i < selected_rows[0].length
+            selected_rows.data().cell(selected_rows[0][i],12).data("").draw()
+            selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
+            i++
 
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
 
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
