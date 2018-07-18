@@ -6,8 +6,9 @@ class Escalations::Webrep::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.csv do
-        @disputes = Dispute.robust_search(search_params['search_type'],
-                                          search_name: search_params['search_name'],
+        index_params = JSON.parse(params['data_json'])
+        @disputes = Dispute.robust_search(index_params['search_type'],
+                                          search_name: nil,
                                           params: index_params,
                                           user: current_user)
         contents = CSV.generate do |csv|

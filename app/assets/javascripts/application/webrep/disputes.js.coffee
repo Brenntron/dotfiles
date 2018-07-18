@@ -6,7 +6,9 @@ window.populate_webrep_index_table = (data = {}) ->
     method: 'GET'
     headers: headers
     data: data
+    data_json: JSON.stringify(data)
     success: (response) ->
+      $('#disputes-index-export-data-input').val(this.data_json)
 
       json = $.parseJSON(response)
       if json.error
