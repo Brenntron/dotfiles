@@ -20,6 +20,12 @@ module API
               optional :priority, type: String
               optional :resolution, type: String
               optional :submitter_type, type: String
+              optional :submitted_older, type: Date
+              optional :submitted_newer, type: Date
+              optional :age_older, type: String
+              optional :age_newer, type: String
+              optional :modified_older, type: Date
+              optional :modified_newer, type: Date
               optional :customer, type: Hash do
                 optional :name, type: String
                 optional :email, type: String
@@ -35,14 +41,10 @@ module API
 
               json_packet = []
 
-              if permitted_params['search_type']
-                disputes = Dispute.robust_search(permitted_params['search_type'],
-                                                 search_name: permitted_params['search_name'],
-                                                 params: permitted_params,
-                                                 user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
-              else
-                disputes = Dispute.all.includes(:user, :dispute_entries => [:dispute_rule_hits])
-              end
+              disputes = Dispute.robust_search(permitted_params['search_type'],
+                                               search_name: permitted_params['search_name'],
+                                               params: permitted_params,
+                                               user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
 
               disputes.each do |dispute|
                 dispute_packet = {}
