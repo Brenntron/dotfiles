@@ -59,7 +59,7 @@
                   %td
                     %a.saved-search{onclick: "named_webrep_index_table('#{named_search.name}');"}
                       = named_search.name
-                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search('#{named_search.name}');"}
+                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
 
   .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown

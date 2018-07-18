@@ -62,14 +62,16 @@ window.named_webrep_index_table = (search_name) ->
   }
   window.populate_webrep_index_table(data)
 
-window.delete_disputes_named_search = (search_name) ->
+window.delete_disputes_named_search = (close_button, search_name) ->
   std_msg_ajax(
     method: 'DELETE'
     url: "/api/v1/escalations/webrep/disputes/searches/#{search_name}"
     data: {}
     error_prefix: 'Error deleting saved search.'
-    success_reload: false
     failure_reload: false
+    tr_tag: close_button.closest('tr')
+    success: (response) ->
+      this.tr_tag.remove();
   )
 
 
