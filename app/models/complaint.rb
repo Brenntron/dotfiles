@@ -3,6 +3,11 @@ class Complaint < ApplicationRecord
   belongs_to :customer
   has_many :complaint_entries
 
+  RESOLUTION_FIXED                      = 'FIXED'
+  RESOLUTION_INVALID                    = 'INVALID'
+  RESOLUTION_UNCHANGED                  = 'UNCHANGED'
+  RESOLUTION_DUPLICATE                  = 'DUPLICATE'
+
   def self.can_visit_url?(url)
     begin
     request = HTTPI::Request.new(url: url)
