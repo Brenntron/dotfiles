@@ -1,6 +1,7 @@
 class Escalations::Webcat::ReportsController < Escalations::WebcatController
-  def index
+  before_action { authorize!(:read, Complaint) }
 
+  def index
   end
 
   def resolution

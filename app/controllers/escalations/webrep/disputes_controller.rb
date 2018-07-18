@@ -1,4 +1,5 @@
 class Escalations::Webrep::DisputesController < ApplicationController
+  load_and_authorize_resource class: 'Dispute'
 
   before_action :require_login
 
