@@ -6,14 +6,14 @@ class DisputeEntry < ApplicationRecord
 
   delegate :cvs_username, to: :dispute, allow_nil: true
 
-  scope :resolved_date, -> (date_iso) {
-    date_from = Date.iso8601(date_iso)
-    date_to = Date.iso8601(date_iso) + 1
+  scope :resolved_date, -> (date_from_iso, date_to_iso) {
+    date_from = Date.iso8601(date_from_iso)
+    date_to = Date.iso8601(date_to_iso) + 1
     where(case_resolved_at: (date_from..date_to))
   }
 
   def self.from_age_report_params(params)
-    query = resolved_date(params['date'])
+    query = resolved_date(params['date_from'], params['date_to'])
 
     if params['resolution'].present?
       query = query.where(resolution: params['resolution'])
@@ -21,6 +21,10 @@ class DisputeEntry < ApplicationRecord
 
     if params['engineer'].present?
       query = query.joins(dispute: :user).where(users: {cvs_username: params['engineer']})
+    end
+
+    if params['customer_id'].present?
+      query = query.joins(:dispute).where(disputes: {customer_id: params['customer_id']})
     end
 
     query

@@ -34,7 +34,10 @@
               %tr
                 %td= resolution
                 %td= percent
-                %td= count && link_to(count, age_report_path(date: pr_report.date, resolution: resolution))
+                %td
+                  = count && link_to(count, age_report_path(date_from: pr_report.date_from,
+                                                            date_to: pr_report.date_to,
+                                                            resolution: resolution))
 
   #export-per-engineer-div
     %form#export-per-engineer-form{action: export_per_engineer_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
@@ -71,7 +74,8 @@
                 %td= percent
                 %td
                   = count && link_to(count, age_report_path(date_from: pe_report.date_from,
-                                                            date_to: pe_report.date_to, engineer: engineer))
+                                                            date_to: pe_report.date_to,
+                                                            engineer: engineer))
 
 
   .report-div
@@ -98,9 +102,9 @@
                                                                                        date_to: pc_report.date_to))
             - pc_report.each_resolution do |customer, percent, count|
               %tr
-                %td= customer
+                %td= customer.name
                 %td= percent
                 %td
                   = count && link_to(count, age_report_path(date_from: pc_report.date_from,
                                                             date_to: pc_report.date_to,
-                                                            engineer: customer))
+                                                            customer_id: customer.id))

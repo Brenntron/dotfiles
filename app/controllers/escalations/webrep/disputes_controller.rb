@@ -156,6 +156,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def age_report_params
-    params.permit(:date, :resolution, :engineer)
+    params.permit(:date_from, :date_to, :resolution, :engineer, :customer_id)
   end
 end

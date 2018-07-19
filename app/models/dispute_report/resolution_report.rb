@@ -12,7 +12,7 @@ class DisputeReport::ResolutionReport
     end
 
     def each_resolution
-      %w{UNCHANGED FIXED\ FN FIXED\ FD}.each do |resolution|
+      %w{UNCHANGED FIXED\ FN FIXED\ FP}.each do |resolution|
         count = distribution[resolution]
         percent = (0 < total && count) ? 100.0 * count / total : nil
         yield resolution, percent && '%.2f' % percent, count
@@ -56,7 +56,7 @@ class DisputeReport::ResolutionReport
       @distribution =
         DisputeEntry.joins(dispute: :customer)
                     .where(case_resolved_at: (date_from..date_to+1))
-                    .group('customers.name').count
+                    .group('customers.id').count
     end
 
     def total
@@ -68,10 +68,11 @@ class DisputeReport::ResolutionReport
     end
 
     def each_resolution
-      distribution.keys.each do |customer_name|
-        count = distribution[customer_name]
+      distribution.keys.each do |customer_id|
+        customer = Customer.find(customer_id)
+        count = distribution[customer_id]
         percent = (0 < total && count) ? 100.0 * count / total : nil
-        yield customer_name, percent && '%.2f' % percent, count
+        yield customer, percent && '%.2f' % percent, count
       end
     end
   end
