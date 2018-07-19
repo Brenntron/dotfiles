@@ -77,15 +77,18 @@ module API
                 end
 
                 dispute_packet[:dispute_entries] = dispute.dispute_entries
-                # + dispute.submission_type
-
-                dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
                 if dispute.assignee == 'Unassigned'
                   dispute_packet[:assigned_to] = "<span class='missing-data'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me'></button>"
                 end
+
+                if dispute.user_id?
+                  dispute_packet[:assigned_to] = User.find(dispute.user_id).cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+                end
+
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
                 dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
@@ -140,7 +143,7 @@ module API
               json_packet = []
               params[:dispute_ids].each do |dispute|
                 d = Dispute.find_by(id: dispute)
-                d.update(user_id: params[:new_assignee])
+                d.update!(user_id: params[:new_assignee])
                 json_packet << d
               end
               {:status => "success", :data => json_packet}.to_json
