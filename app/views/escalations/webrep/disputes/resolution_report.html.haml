@@ -20,7 +20,10 @@
         %tbody
           - @report.each_per_resolution do |pr_report|
             %tr
-              %td{rowspan: 4}= pr_report.date
+              %td{rowspan: 4}
+                = pr_report.date_from
+                \-
+                = pr_report.date_to
               %td TOTAL:
               %td
               %td= 0 == pr_report.total ? '' : link_to(pr_report.total, age_report_path(date: pr_report.date))
@@ -49,7 +52,10 @@
         %tbody
           - @report.each_per_engineer do |pe_report|
             %tr
-              %td{rowspan: 1 + pe_report.engineer_count}= pe_report.date
+              %td{rowspan: 1 + pe_report.engineer_count}
+                = pe_report.date_from
+                \-
+                = pe_report.date_to
               %td TOTAL:
               %td
               %td= 0 == pe_report.total ? '' : link_to(pe_report.total, age_report_path(date: pe_report.date))

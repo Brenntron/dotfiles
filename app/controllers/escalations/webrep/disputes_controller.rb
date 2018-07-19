@@ -82,12 +82,14 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def resolution_report
     @report = DisputeReport::ResolutionReport.new(date_from: params['report']['date_from'],
-                                                  date_to: params['report']['date_to'])
+                                                  date_to: params['report']['date_to'],
+                                                  period: params['report']['period'])
   end
 
   def export_per_resolution_report
     @report = DisputeReport::ResolutionReport.new(date_from: params['date_from'],
-                                                  date_to: params['date_to'])
+                                                  date_to: params['date_to'],
+                                                  period: params['report']['period'])
 
     contents = CSV.generate do |csv|
       csv << [ 'Date', 'Resolution', '%', 'Count' ]
@@ -103,7 +105,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def export_per_engineer_report
     @report = DisputeReport::ResolutionReport.new(date_from: params['date_from'],
-                                                  date_to: params['date_to'])
+                                                  date_to: params['date_to'],
+                                                  period: params['report']['period'])
 
     contents = CSV.generate do |csv|
       csv << [ 'Date', 'Resolution', '%', 'Count' ]
