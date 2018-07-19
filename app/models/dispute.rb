@@ -1,10 +1,14 @@
 class Dispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
+
+  belongs_to :customer
+  belongs_to :user
+
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
-  belongs_to :customer
-  belongs_to :user
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
   delegate :cvs_username, to: :user, allow_nil: true
 
@@ -500,6 +504,15 @@ class Dispute < ApplicationRecord
         contains_search(params['value'])
       else
         where({})
+    end
+  end
+
+  def peek(user:)
+    if dispute_peeks.where(user: user).exists?
+      dispute_peeks.where(user: user).update_all(updated_at: Time.now)
+    else
+      dispute_peeks.create(user: user)
+      DisputePeek.delete_excess(user: user)
     end
   end
 end
