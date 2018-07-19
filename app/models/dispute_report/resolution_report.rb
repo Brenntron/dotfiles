@@ -48,6 +48,34 @@ class DisputeReport::ResolutionReport
     end
   end
 
+  class PerCustomer
+    attr_reader :date_from, :date_to, :distribution
+    def initialize(date_from_given, date_to_given)
+      @date_from = date_from_given
+      @date_to = date_to_given
+      @distribution =
+        DisputeEntry.joins(dispute: :customer)
+                    .where(case_resolved_at: (date_from..date_to+1))
+                    .group('customers.name').count
+    end
+
+    def total
+      distribution.values.sum
+    end
+
+    def customer_count
+      distribution.count
+    end
+
+    def each_resolution
+      distribution.keys.each do |customer_name|
+        count = distribution[customer_name]
+        percent = (0 < total && count) ? 100.0 * count / total : nil
+        yield customer_name, percent && '%.2f' % percent, count
+      end
+    end
+  end
+
   attr_reader :date_from, :date_to, :period
 
   def initialize(date_from:, date_to:, period:)
@@ -129,6 +157,12 @@ class DisputeReport::ResolutionReport
   def each_per_engineer
     each_period do |date_from, date_to|
       yield PerEngineer.new(date_from, date_to)
+    end
+  end
+
+  def each_per_customer
+    each_period do |date_from, date_to|
+      yield PerCustomer.new(date_from, date_to)
     end
   end
 end

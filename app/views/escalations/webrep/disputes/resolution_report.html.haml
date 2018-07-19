@@ -26,7 +26,10 @@
                 = pr_report.date_to
               %td TOTAL:
               %td
-              %td= 0 == pr_report.total ? '' : link_to(pr_report.total, age_report_path(date: pr_report.date))
+              %td
+                = 0 == pr_report.total ? '' : link_to(pr_report.total,
+                                                      age_report_path(date_from: pr_report.date_from,
+                                                                      date_to: pr_report.date_to))
             - pr_report.each_resolution do |resolution, percent, count|
               %tr
                 %td= resolution
@@ -58,10 +61,46 @@
                 = pe_report.date_to
               %td TOTAL:
               %td
-              %td= 0 == pe_report.total ? '' : link_to(pe_report.total, age_report_path(date: pe_report.date))
+              %td
+                = 0 == pe_report.total ? '' : link_to(pe_report.total,
+                                                      age_report_path(date_from: pe_report.date_from,
+                                                                      date_to: pe_report.date_to))
             - pe_report.each_resolution do |engineer, percent, count|
               %tr
                 %td= engineer
                 %td= percent
-                %td= count && link_to(count, age_report_path(date: pe_report.date, engineer: engineer))
+                %td
+                  = count && link_to(count, age_report_path(date_from: pe_report.date_from,
+                                                            date_to: pe_report.date_to, engineer: engineer))
 
+
+  .report-div
+    #per-customer-report-div
+      %table#per-customer-report-table
+        %caption Number of resolved complaints per customer
+        %thead
+          %tr
+            %th Date
+            %th Resolution
+            %th %
+            %th Count
+        %tbody
+          - @report.each_per_customer do |pc_report|
+            %tr
+              %td{rowspan: 1 + pc_report.customer_count}
+                = pc_report.date_from
+                \-
+                = pc_report.date_to
+              %td TOTAL:
+              %td
+              %td
+                = 0 == pc_report.total ? '' : link_to(pc_report.total, age_report_path(date_from: pc_report.date_from,
+                                                                                       date_to: pc_report.date_to))
+            - pc_report.each_resolution do |customer, percent, count|
+              %tr
+                %td= customer
+                %td= percent
+                %td
+                  = count && link_to(count, age_report_path(date_from: pc_report.date_from,
+                                                            date_to: pc_report.date_to,
+                                                            engineer: customer))
