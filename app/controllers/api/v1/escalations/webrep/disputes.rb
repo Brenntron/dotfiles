@@ -86,7 +86,7 @@ module API
                 end
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
-                dispute_packet[:case_opened_at] = dispute.case_opened_at.strftime('%Y-%m-%d %H:%M:%S')
+                dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
                 dispute_packet[:case_age] = dispute.dispute_age
                 # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
                 dispute_packet[:suggested_disposition] = dispute.suggested_d
