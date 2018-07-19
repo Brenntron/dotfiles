@@ -10,8 +10,8 @@ class Dispute < ApplicationRecord
   RESOLVED = 'resolved'
   ASSIGNED = 'assigned'
 
-  TI_NEW = 'pending'
-  TI_RESOLVED = 'resolved'
+  TI_NEW = 'IN PROGRESS'
+  TI_RESOLVED = 'RESOLVED'
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
@@ -124,6 +124,7 @@ class Dispute < ApplicationRecord
       ActiveRecord::Base.transaction do
 
         user = User.where(cvs_username:"vrtincom").first
+        guest = Customer.where(:name => "Guest")
         #TODO: this should be put in a params method
         message_payload["payload"] = message_payload["payload"].permit!.to_h
         new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
@@ -157,12 +158,10 @@ class Dispute < ApplicationRecord
         bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
 
         new_dispute = Dispute.new
-        new_dispute.submission_type = message_payload["payload"]["submission_type"]
+
         new_dispute.id = bug_stub_hash["id"]
         new_dispute.user_id = user.id
-        new_dispute.customer_name = message_payload["payload"]["name"]
         new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
-        new_dispute.customer_email = message_payload["payload"]["email"]
         new_dispute.org_domain = message_payload["payload"]["domain"]
         new_dispute.case_opened_at = Time.now
         new_dispute.subject = message_payload["payload"]["email_subject"]
@@ -174,6 +173,14 @@ class Dispute < ApplicationRecord
         new_dispute.submission_type = message_payload["submission_type"]  # email, web, both  [e|w|ew]
 
         new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
+
+        new_dispute.submitter_type = new_dispute.customer_id == guest.id ? "Non Customer" : "Customer"
+
+        if new_dispute.submitter_type == "Customer"
+          new_dispute.priority = "P3"
+        else
+          new_dispute.priority = "P4"
+        end
 
         new_dispute.save
 
@@ -189,12 +196,12 @@ class Dispute < ApplicationRecord
 
           false_negative_claim = false
 
-          if ["Malicious", "Poor"].include?(entry["rep_sugg"])
+          if ["Malicious", "Poor"].include?(entry[:sbrs]["rep_sugg"])
             false_negative_claim = true
           end
 
-          wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
-          sbrs_hits = entry["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
@@ -225,9 +232,9 @@ class Dispute < ApplicationRecord
           new_dispute_entry.dispute_id = new_dispute.id
           new_dispute_entry.ip_address = key
           new_dispute_entry.entry_type = "IP"
-          new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"]
-          new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
-          new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+          new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
+          new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["WBRS_SCORE"]
+          new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
 
           if false_negative_claim
             if auto_resolve_verdict.malicious?
@@ -245,7 +252,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.save
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
-            all_hits = entry["SBRS_Rule_Hits"].split(",")
+            all_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",")
             all_hits.each do |rule_hit|
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
@@ -254,8 +261,8 @@ class Dispute < ApplicationRecord
               new_rule_hit.save
             end
           end
-          if entry[:sbrs]["WBRS_Rule_Hits"].present?
-            all_hits = entry["WBRS_Rule_Hits"].split(",")
+          if entry[:wbrs]["WBRS_Rule_Hits"].present?
+            all_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",")
             all_hits.each do |rule_hit|
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
@@ -286,9 +293,9 @@ class Dispute < ApplicationRecord
           #this is for return back to TI to populate its ticket show pages
 
           wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
-          sbrs_hits = entry["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
 
-          total_hits = (wbrs_hits + sbrs_hits).uniq
+
+          total_hits = wbrs_hits
 
           auto_resolve_verdict = AutoResolve.create_from_payload("URI/DOMAIN", key, total_hits)
 
@@ -296,7 +303,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry = DisputeEntry.new
           new_dispute_entry.dispute_id = new_dispute.id
           new_dispute_entry.uri = key
-          new_dispute_entry.wbrs_score = entry["wbrs_score"]
+          new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.subdomain = url_parts[:subdomain]
           new_dispute_entry.domain = url_parts[:domain]
