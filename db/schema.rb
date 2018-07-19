@@ -304,6 +304,14 @@ ActiveRecord::Schema.define(version: 20180711202236) do
     t.datetime "case_resolved_at"
   end
 
+  create_table "dispute_peeks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.integer "dispute_id"
+    t.index ["user_id", "dispute_id"], name: "index_dispute_peeks_on_user_id_and_dispute_id", unique: true
+  end
+
   create_table "dispute_rule_hits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "rule_number"
     t.string "mnemonic"
