@@ -46,6 +46,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
       end
     end
 
+    @dispute.peek(user: current_user)
+
     #@entries.each do |entry|
       #todo: do lazy load style checking with blacklist here
       #entry.blacklist(reload: true)

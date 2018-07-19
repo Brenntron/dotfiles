@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_many :committed_bugs, class_name: 'Bug', foreign_key: :committer_id
   has_many :named_searches
   has_many :dispute_comments
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :recent_dispute_views, class_name: 'Dispute', through: :dispute_peeks, source: :dispute
 
   validates :cvs_username, presence: true, uniqueness: true
 
