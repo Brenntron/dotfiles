@@ -35,7 +35,8 @@ class Dispute < ApplicationRecord
   end
 
   def dispute_age
-    age = case_opened_at - DateTime.now
+    return '' unless self.case_opened_at
+    age = self.case_opened_at - DateTime.now
     age = age.abs # lazy
     mm, ss = age.divmod(60)
     hh, mm = mm.divmod(60)
@@ -456,6 +457,8 @@ class Dispute < ApplicationRecord
         where(status: ['new', 'open', 'reopen'], user_id: user.id)
       when 'my_disputes'
         where(user_id: user.id)
+      when 'team_disputes'
+        where(user_id: user.my_team)
       when 'open'
         where(status: ['new', 'open', 'reopen'])
       when 'closed'
