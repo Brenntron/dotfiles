@@ -118,7 +118,6 @@ module API
             end
 
             put ":id" do
-
             end
 
             desc 'delete a dispute'
@@ -126,6 +125,22 @@ module API
             end
 
             delete "" do
+
+            end
+
+            desc "Change assignee of a group of dispute IDs"
+            params do
+              requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
+              requires :new_assignee, type: Integer, desc: "User ID of new assignee"
+            end
+            post "change_assignee" do
+              json_packet = []
+              params[:dispute_ids].each do |dispute|
+                d = Dispute.find_by(id: dispute)
+                d.update(user_id: params[:new_assignee])
+                json_packet << d
+              end
+              {:status => "success", :data => json_packet}.to_json
 
             end
 
