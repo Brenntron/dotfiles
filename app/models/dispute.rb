@@ -456,6 +456,8 @@ class Dispute < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.standard_search(search_name, user:)
     case search_name
+      when 'recently_viewed'
+        joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
         where(status: ['new', 'open', 'reopen'], user_id: user.id)
       when 'my_disputes'
