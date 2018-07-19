@@ -217,17 +217,16 @@ window.toolbar_index_edit_status = (box_names) ->
       popup_response_error(response, 'Error editing ticket status')
   )
 
-window.toolbar_index_change_assignee = (button_tag) ->
+window.toolbar_index_change_assignee = () ->
 
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     # this.dataset['entryId']
-    this.value
+    Number(this.value)
   ).toArray()
 
-  new_assignee = $('index_target_assignee')
-
+  new_assignee = $('#index_target_assignee option:selected').val()
   data = {
-    'dispute_entry_ids': entry_ids,
+    'dispute_ids': entry_ids,
     'new_assignee': new_assignee
   }
 
@@ -241,7 +240,8 @@ window.toolbar_index_change_assignee = (button_tag) ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error changing assignee')
+      debugger
+#      popup_response_error(response, 'Error changing assignee')
   )
 
 window.toolbar_index_mark_duplicate = (box_names) ->
@@ -272,13 +272,6 @@ $ ->
 
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
-    if (determine_checked('dispute_check_box'))
-      console.log 'do the needful'
-    else
-      do_not = "show the tab"
-
-  # Edit Ticket: Change Assignee
-  $('#index_change_assign').click ->
     if (determine_checked('dispute_check_box'))
       console.log 'do the needful'
     else
