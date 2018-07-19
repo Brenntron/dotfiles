@@ -467,8 +467,12 @@
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
                                 = wbrs_hit.name
+                                - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                  = ","
                             - else
                               = wbrs_hit.name
+                              - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                = ","
                         %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -524,8 +528,12 @@
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}"}
                                 = sbrs_hit.name
+                                - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                  = ","
                             - else
                               = sbrs_hit.name
+                              - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                = ","
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
