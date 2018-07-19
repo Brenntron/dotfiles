@@ -457,6 +457,8 @@ class Dispute < ApplicationRecord
         where(status: ['new', 'open', 'reopen'], user_id: user.id)
       when 'my_disputes'
         where(user_id: user.id)
+      when 'team_disputes'
+        where(user_id: user.my_team)
       when 'open'
         where(status: ['new', 'open', 'reopen'])
       when 'closed'

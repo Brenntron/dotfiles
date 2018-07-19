@@ -80,6 +80,14 @@ class User < ApplicationRecord
     (parent.nil? && children.empty?) ? false : true
   end
 
+  def my_team
+    if children.empty?
+      siblings + [parent, self]
+    else
+      descendants + [self]
+    end
+  end
+
   def available_users
     User.all.reject{|u| self_and_ancestors.include?(u) ||
                         children.include?(u) ||
