@@ -7,6 +7,7 @@ module API
         resource :notes do
           desc "Return all notes"
           get "", root: :notes do
+            authorize!(:index, Note)
             Note.all.sort_by &:created_at
           end
 
@@ -46,6 +47,7 @@ module API
             requires :id, type: String, desc: "ID of the note"
           end
           get ":id", root: "note" do
+            authorize!(:show, Note)
             Note.where(id: permitted_params[:id])
           end
 
@@ -54,6 +56,7 @@ module API
             requires :author, type: String, desc: "name of the author"
           end
           get "by_author/:author", root: "note" do
+            authorize!(:index, Note)
             Note.where("author =? ", permitted_params[:author])
           end
 
