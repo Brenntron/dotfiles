@@ -50,7 +50,8 @@
         %span.team-icon
         %h5 Web Reputation Escalations
         %p.dashboard-details
-          Manager: Joel Esler
+          Manager:
+          = current_user.team_manager.display_name
 
       .col-xs-4
         %table.tickets-totals-table
