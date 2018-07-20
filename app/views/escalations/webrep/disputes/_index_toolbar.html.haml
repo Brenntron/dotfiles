@@ -176,6 +176,7 @@
     %label.toolbar-section-label
       File
     %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :csv), method: :get}
+      = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
       %button.toolbar-button.export-button{title: 'Export to CSV'}
         %span.toolbar-button-text
           Export to CSV

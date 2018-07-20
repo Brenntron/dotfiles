@@ -1,4 +1,5 @@
 class Escalations::Webrep::DisputesController < ApplicationController
+  load_and_authorize_resource class: 'Dispute'
 
   before_action :require_login
 
@@ -6,8 +7,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.csv do
-        @disputes = Dispute.robust_search(search_params['search_type'],
-                                          search_name: search_params['search_name'],
+        index_params = JSON.parse(params['data_json'])
+        search_type = index_params['search_type']
+        search_name = 'advanced' == search_type ? nil : index_params['search_name']
+        @disputes = Dispute.robust_search(search_type,
+                                          search_name: search_name,
                                           params: index_params,
                                           user: current_user)
         contents = CSV.generate do |csv|
@@ -41,6 +45,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
         Preloader::Base.fetch_all_api_data(entry.hostlookup, entry.id)
       end
     end
+
+    @dispute.peek(user: current_user)
 
     #@entries.each do |entry|
       #todo: do lazy load style checking with blacklist here

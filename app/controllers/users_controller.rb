@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  load_and_authorize_resource only: [:index, :update]
+  load_and_authorize_resource
 
   #per_page for User show page Closed bugs tab 
   CLOSED_BUGS_PAGINATION_SIZE = 25

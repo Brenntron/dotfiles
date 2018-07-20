@@ -112,4 +112,24 @@ class DisputeEntry < ApplicationRecord
     find_xbrs[1]
   end
 
+  def umbrellaresult
+    if dispute_entry_preload.present? && dispute_entry_preload.umbrella.present?
+      @umbrellaresult = dispute_entry_preload.umbrella
+      return @umbrellaresult
+    end
+
+    # TODO: This is a little ugly, being as the same logic exists inside `base.rb` of the Preload model.
+    # If time ever permits, refactor it.
+    @umbrella = AutoResolve.new.call_umbrella(address: hostlookup)
+    pretty_umbrella_status = "Unclassified" # Default or "0"
+    case
+      # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
+    when @umbrella[:status] == "-1"
+      pretty_umbrella_status = "Malicious"
+    when @umbrella[:status] == "1"
+      pretty_umbrella_status = "Benign"
+    end
+    pretty_umbrella_status
+  end
+
 end

@@ -1,4 +1,5 @@
 class RelationshipsController < ApplicationController
+  load_and_authorize_resource class: 'User'
 
   before_action :require_login
   before_action :manager_only_access

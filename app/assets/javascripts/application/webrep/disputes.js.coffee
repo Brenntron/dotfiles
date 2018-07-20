@@ -6,7 +6,9 @@ window.populate_webrep_index_table = (data = {}) ->
     method: 'GET'
     headers: headers
     data: data
+    data_json: JSON.stringify(data)
     success: (response) ->
+      $('#disputes-index-export-data-input').val(this.data_json)
 
       json = $.parseJSON(response)
       if json.error
@@ -45,15 +47,42 @@ window.advanced_webrep_index_table = () ->
     priority: $('#new_named_search').find('input[id="priority-input"]').val()
     resolution: $('#new_named_search').find('input[id="resolution-input"]').val()
     submitter_type: $('#new_named_search').find('input[id="submitter-input"]').val()
+    submitted_older: $('#new_named_search').find('input[id="submitted-older-input"]').val()
+    submitted_newer: $('#new_named_search').find('input[id="submitted-newer-input"]').val()
+    age_older: $('#new_named_search').find('input[id="age-older-input"]').val()
+    age_newer: $('#new_named_search').find('input[id="age-newer-input"]').val()
+    modified_older: $('#new_named_search').find('input[id="modified-older-input"]').val()
+    modified_newer: $('#new_named_search').find('input[id="modified-newer-input"]').val()
   }
   window.populate_webrep_index_table(data)
 
-window.named_webrep_index_table = (search_name) ->
+window.standard_webrep_index_table = (search_name) ->
   data = {
     search_type: 'standard'
     search_name: search_name
   }
   window.populate_webrep_index_table(data)
+
+window.named_webrep_index_table = (search_name) ->
+  data = {
+    search_type: 'named'
+    search_name: search_name
+  }
+  window.populate_webrep_index_table(data)
+
+window.delete_disputes_named_search = (close_button, search_name) ->
+  std_msg_ajax(
+    method: 'DELETE'
+    url: "/api/v1/escalations/webrep/disputes/searches/#{search_name}"
+    data: {}
+    error_prefix: 'Error deleting saved search.'
+    failure_reload: false
+    tr_tag: close_button.closest('tr')
+    success: (response) ->
+      this.tr_tag.remove();
+  )
+
+
 
 
 window.popup_response_error =(response, prefix) ->
