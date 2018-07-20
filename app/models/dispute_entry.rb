@@ -4,6 +4,13 @@ class DisputeEntry < ApplicationRecord
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
 
+  RESOLVED = "RESOLVED"
+  NEW = "NEW"
+
+  STATUS_RESOLVED_FIXED_FN = "FIXED FN"
+  STATUS_RESOLVED_FIXED_FP = "FIXED FP"
+  STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+
   delegate :cvs_username, to: :dispute, allow_nil: true
 
   scope :resolved_date, -> (date_iso) {
