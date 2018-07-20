@@ -294,7 +294,7 @@
                                   .col-xs-12
                                     %label.content-label-sm{for: "entry-#{entry.id}-wlbl-list-type-select"} Adjust WL/BL List
                                 - unless entry.wbrs_list_type.nil?
-                                  - entry.wbrs_list_type.each do |list|
+                                  - entry.wbrs_list_type.split(/\s*,\s*/).each do |list|
                                     .row
                                       .col-xs-6
                                         %ul.wlbl-toggle-list

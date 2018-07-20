@@ -60,7 +60,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
     response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
     wlbl_params.delete('urls')
 
-    wlbl_ids = JSON.parse(response.body)["Added WL/BL entries IDs"]
+    wlbl_ids = JSON.parse(response.body)["ids"]
     wlbl_ids.each_with_index do |wlbl_id, index|
       entries[index].update(webrep_wlbl_key: wlbl_id)
     end

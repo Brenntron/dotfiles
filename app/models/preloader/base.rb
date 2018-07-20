@@ -40,7 +40,7 @@ class Preloader::Base
 
     while counter < TRIES
       begin
-        wbrs_list_type ||= Wbrs::ManualWlbl.where(url: host).first&.list_type
+        wbrs_list_type ||= Wbrs::ManualWlbl.where(url: host).map{ |wlbl| wlbl.list_type }.join(',')
         break
       rescue
         counter = counter + 1
