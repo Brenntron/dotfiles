@@ -89,14 +89,14 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def export_per_resolution_report
     @report = DisputeReport::ResolutionReport.new(date_from: params['date_from'],
                                                   date_to: params['date_to'],
-                                                  period: params['report']['period'])
+                                                  period: params['period'])
 
     contents = CSV.generate do |csv|
-      csv << [ 'Date', 'Resolution', '%', 'Count' ]
+      csv << [ 'Date From', 'Date To', 'Resolution', '%', 'Count' ]
       @report.each_per_resolution do |pr_report|
-        csv << [ pr_report.date, 'TOTAL', nil, pr_report.total ]
+        csv << [ pr_report.date_from, pr_report.date_to, 'TOTAL', nil, pr_report.total ]
         pr_report.each_resolution do |resolution, percent, count|
-          csv << [ pr_report.date, resolution, percent, count ]
+          csv << [ pr_report.date_from, pr_report.date_to, resolution, percent, count ]
         end
       end
     end
@@ -106,14 +106,31 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def export_per_engineer_report
     @report = DisputeReport::ResolutionReport.new(date_from: params['date_from'],
                                                   date_to: params['date_to'],
-                                                  period: params['report']['period'])
+                                                  period: params['period'])
 
     contents = CSV.generate do |csv|
-      csv << [ 'Date', 'Resolution', '%', 'Count' ]
+      csv << [ 'Date From', 'Date To', 'Resolution', '%', 'Count' ]
       @report.each_per_engineer do |pe_report|
-        csv << [ pe_report.date, 'TOTAL', nil, pe_report.total ]
+        csv << [ pe_report.date_from, pe_report.date_to, 'TOTAL', nil, pe_report.total ]
         pe_report.each_resolution do |engineer, percent, count|
-          csv << [ pe_report.date, engineer, percent, count ]
+          csv << [ pe_report.date_from, pe_report.date_to, engineer, percent, count ]
+        end
+      end
+    end
+    send_data contents
+  end
+
+  def export_per_customer_report
+    @report = DisputeReport::ResolutionReport.new(date_from: params['date_from'],
+                                                  date_to: params['date_to'],
+                                                  period: params['period'])
+
+    contents = CSV.generate do |csv|
+      csv << [ 'Date From', 'Date To', 'Resolution', '%', 'Count' ]
+      @report.each_per_customer do |pe_report|
+        csv << [ pe_report.date_from, pe_report.date_to, 'TOTAL', nil, pe_report.total ]
+        pe_report.each_resolution do |customer, percent, count|
+          csv << [ pe_report.date_from, pe_report.date_to, customer.name, percent, count ]
         end
       end
     end

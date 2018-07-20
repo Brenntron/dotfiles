@@ -49,6 +49,7 @@ Rails.application.routes.draw do
           get :resolution_report
           get :export_per_resolution_report
           get :export_per_engineer_report
+          get :export_per_customer_report
           get :resolution_age_report
           get :export_resolution_age_report
         end

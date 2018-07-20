@@ -5,6 +5,7 @@
     %form#export-per-resolution-form{action: export_per_resolution_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
       %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
       %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+      %input{type: 'hidden', name: 'period', value: params['report']['period']}
       %button Export
 
   .report-div
@@ -43,6 +44,7 @@
     %form#export-per-engineer-form{action: export_per_engineer_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
       %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
       %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+      %input{type: 'hidden', name: 'period', value: params['report']['period']}
       %button Export
 
   .report-div
@@ -77,6 +79,13 @@
                                                             date_to: pe_report.date_to,
                                                             engineer: engineer))
 
+
+  #export-per-customer-div
+    %form#export-per-customer-form{action: export_per_customer_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
+      %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
+      %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+      %input{type: 'hidden', name: 'period', value: params['report']['period']}
+      %button Export
 
   .report-div
     #per-customer-report-div
