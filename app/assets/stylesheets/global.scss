@@ -648,6 +648,10 @@ th.alt-col {
   height: 14px;
 }
 
+.delete-search:hover {
+  background: transparent !important;
+}
+
 #note-sync-icon, #attachment-sync-icon {
   width: 20px;
   height: 20px;
@@ -1705,6 +1709,13 @@ a.static-nav-item {
 .saved-search {
   text-transform: none !important;
   font-weight: 400;
+  color: $type-lighter-color !important;
+  cursor: pointer;
+}
+
+.saved-search:hover {
+  background: transparent  !important;
+  color: $type-base-color !important;
 }
 
 .search-box {
@@ -3512,9 +3523,56 @@ input.communication-subject {
   background-color: $faint-neutral-color;
 }
 
+.email-reply-header-information input {
+  font-size: 8.5pt;
+  padding: 4px;
+  border: none;
+}
+
+.email-reply-header-information .receiver-email, .email-reply-header-information .cc-email {
+  min-width: 160px;
+}
+
+.email-reply-header-information .row {
+  margin: 0;
+}
+
+.email-reply-header-information .col-xs-6, .email-reply-header-information .col-xs-12 {
+  padding: 0;
+}
+
+.email-reply-header-information .email-reply-buttons {
+  float: left;
+}
+
+.email-reply-header-information .content-label-sm-sub {
+
+}
+
+.email-reply-header-information .communication-subject {
+  width: 315px;
+  margin: 6px auto 1px auto;
+}
+
+.email-reply-header-information .email-reply-buttons {
+  padding-top: 8px;
+}
+
 .email-attachments a {
   color: $content-tab-color;
   font-size: 8pt;
+}
+
+.wbrs-rule-trigger {
+  text-decoration: underline;
+}
+
+.wbrs-rule-trigger:hover {
+  color: $warning-accent-color;
+}
+
+.nested-data-row .wbrs-rule-trigger {
+  color: $content-bg-color;
 }
 
 .template-label {
@@ -3731,7 +3789,7 @@ td.wbrs-highlight, td.sbrs-highlight {
   text-align: center;
 }
 
-button.primary, button.secondary, button.tertiary {
+button.primary, button.secondary, button.tertiary, input.button_primary {
   text-transform: uppercase;
   border-radius: 2px;
   font-weight: 600;
@@ -3742,11 +3800,11 @@ button.primary, button.secondary, button.tertiary {
   color: $content-bg-color;
 }
 
-button.primary {
+button.primary, input.button_primary {
   background-color: $bug-section-color;
 }
 
-button.primary:hover {
+button.primary:hover, input.button_primary:hover {
   background-color: darken($bug-section-color, 10%);
 }
 
@@ -3850,10 +3908,6 @@ button.tertiary {
 
 /** Below for the new email dialog box **/
 
-input.receiver-email {
-  border: none;
-}
-
 .ui-dialog .ui-dialog-titlebar {
   background-color: #4E4E4E;
   color: $content-bg-color;
@@ -3909,7 +3963,7 @@ input.receiver-email {
   width: 170px;
 }
 
-.content-label-sm-to {
+.content-label-sm-to, .content-label-sm-cc {
   width: 10px !important;
 }
 
@@ -4083,14 +4137,21 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
-.dispute_rep_tools .dropdown-menu {
-  top: 16px;
-  right: 1px;
+.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu {
   left: auto;
   border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
-  min-width: 250px;
+  min-width: 310px;
+}
+
+.dispute_rep_tools .dropdown-menu {
+  top: 16px;
+  right: 1px;
+}
+
+#wlbl_adjust_entries .inline-tool-content-wrapper {
+  padding: 12px 15px;
 }
 
 .dispute-inline-buttons {
@@ -4182,6 +4243,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $content-bg-color;
   margin-bottom: -5px;
   border-radius: 0 0 4px 4px;
+  font-size: 8.2pt;
 }
 
 .toolbar select.toolbar-select {
@@ -4311,7 +4373,7 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 #table-show-columns-dropdown {
-  min-width: 700px;
+  min-width: 750px;
 }
 
 .dropdown-menu-content-block ul {
@@ -4405,6 +4467,69 @@ input.table-entry-input:focus {
   padding: 6px 12px;
 }
 
+.top-case-info {
+  padding-bottom: 20px;
+}
+
+#top_bar_extended_info {
+  background-color: $content-tab-color;
+  margin-top: 20px;
+  color: $content-bg-color;
+  margin-bottom: -21px;
+  border-radius: 0 0 4px 4px;
+  padding-bottom: 30px;
+  display: none;
+}
+
+#top_bar_extended_info h3 {
+  color: $content-bg-color;
+  font-weight: 600;
+  margin-top: 50px;
+  margin-bottom: 12px;
+  font-size: 12pt;
+}
+
+#top_bar_extended_info h3:first-of-type {
+  margin-top: 30px;
+}
+
+
+#top_bar_extended_info .content-label-sm {
+  color: $content-bg-color;
+}
+
+#top_bar_extended_info p {
+  font-weight: 300;
+}
+
+#top_bar_extended_info .col-with-divider {
+  border-right-color: #f2f2f230 ;
+}
+
+#top_bar_toggle {
+  background-image: url(image_path('icon_expand_info.svg'));
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background-color: transparent;
+  position: absolute;
+  bottom: -34px;
+  transition: 0.50s;
+  -webkit-transition: 0.50s;
+  -moz-transition: 0.50s;
+  -ms-transition: 0.50s;
+  -o-transition: 0.50s;
+}
+
+#top_bar_toggle.top-info-open {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;
   text-align: center;
@@ -4426,13 +4551,13 @@ input.table-entry-input:focus {
   max-width: 500px;
 }
 
-#disputes-research-table label {
+#disputes-research-table label, #edit-ticket-status-dropdown label {
   font-weight: 700;
   text-transform: uppercase;
   padding-right: 10px;
 }
 
-#disputes-research-table .expand-row-button-inline {
+#disputes-research-table .expand-row-button-inline  {
   margin-bottom: -5px;
 }
 
@@ -4610,7 +4735,7 @@ h5.entry-details-table-header {
   outline: 1px solid #e5e5e5;
 }
 
-.inline-dropdown-menu, .ticket-resolution-submenu {
+.inline-dropdown-menu, .ticket-resolution-submenu, .toolbar-dropdown {
   font-size: 9pt;
   margin-top: -2px;
   margin-left: 2px;
@@ -4631,15 +4756,17 @@ h5.entry-details-table-header {
 
 .submenu-left-wrapper {
   background-color: $bug-section-color;
+
 }
 
-.inline-dropdown-menu .submenu-left-wrapper ul li:hover {
+.inline-dropdown-menu .submenu-left-wrapper ul li:hover, .toolbar-dropdown .submenu-left-wrapper ul li:hover {
   background-color: darken($bug-section-color, 5%);
 }
 
 .submenu-left-wrapper, .submenu-right-wrapper {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0  !important;
+  padding-right: 0 !important;
+  margin-right: 0  !important;
 }
 
 .submenu-header {
@@ -4656,15 +4783,15 @@ h5.entry-details-table-header {
   text-align: left;
 }
 
-.inline-dropdown-menu ul li {
+.inline-dropdown-menu ul li, .toolbar-dropdown ul li {
   padding: 4px 12px;
 }
 
-.inline-dropdown-menu ul li:hover {
+.inline-dropdown-menu ul li:hover, .toolbar-dropdown ul li:hover {
   background-color: $faint-accent-color;
 }
 
-.inline-dropdown-menu ul li.selected {
+.inline-dropdown-menu ul li.selected, .toolbar-dropdown ul li.selected {
   background-color: #90d8f594;
 }
 
@@ -4674,7 +4801,7 @@ h5.entry-details-table-header {
   color: $type-lighter-color;
 }
 
-.inline-dropdown-menu .radio-label {
+.inline-dropdown-menu .radio-label, .toolbar-dropdown .radio-label {
   width: auto;
   cursor: pointer;
   display: block;
@@ -4682,7 +4809,7 @@ h5.entry-details-table-header {
   padding: 0 12px 2px 22px;
 }
 
-.inline-dropdown-menu input[type='radio'] {
+.inline-dropdown-menu input[type='radio'], .toolbar-dropdown input[type='radio'] {
   box-shadow: none;
   float: left;
 }
@@ -4831,11 +4958,278 @@ button.dropdown-submit-button {
   margin-left: 8px;
   color: $content-bg-color;
   font-size: 8pt;
-  fonw-weight: 400;
+  font-weight: 400;
 }
 
 .search-options-row input[type="radio"] {
   border: none;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 16px;
+  float: left;
+  margin-right: 8px;
+}
+
+.toggle-switch input {display:none;}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $nav-toolbar-color;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  background-image: url(image_path('icon_x_grey.svg'));
+  background-position: center center;
+  background-size: 12px;
+  background-repeat: no-repeat;
+  -webkit-transition: .2s;
+  transition: .2s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: $bug-section-color;
+}
+
+input:focus + .toggle-slider {
+  box-shadow: 0 0 1px $bug-section-color;
+}
+
+input:checked + .toggle-slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+  background-image: url(image_path('icon_check_grey.svg'));
+}
+
+.toggle-slider:after {
+  content: 'off';
+  display: inline-block;
+  width: 30px;
+  margin-left: -22px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 6.5pt;
+  margin-top: 3px;
+  color: $content-label-color;
+}
+
+input:checked + .toggle-slider:after {
+  content: 'on';
+  color: $type-lighter-color;
+}
+
+.wlbl-toggle-list li {
+  height: 26px;
+  padding-left: 22px;
+}
+
+.dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper {
+  padding-top: 12px;
+}
+
+.toolbar .inline-tool-content-wrapper div {
+  margin-right: 0;
+}
+
+.toolbar .inline-tool-content-wrapper .row {
+  margin-left: 0;
+  padding: 0;
+}
+
+table.dispute_tool_current th {
+  padding: 10px 10px 4px 10px !important;
+  border-right: 1px solid $content-bg-color;
+}
+
+table.dispute_tool_current th:last-of-type {
+  border-right: none;
+}
+
+table.dispute_tool_current td {
+  padding: 3px 10px;
+}
+
+table.dispute_tool_current tr:last-of-type td {
+  padding-bottom: 10px;
+}
+
+  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+.dispute-submission-type {
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: block;
+  float: right;
+  margin-top: 10px;
+}
+
+.dispute-W {background-image: url(image_path('icon_type_web.svg'));}
+.dispute-E {background-image: url(image_path('icon_type_email.svg'));}
+.dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
+
+.my-dashboard-header-area {
+  background-color: $bug-section-color;
+  margin-top: -15px;
+  border-radius: 4px 4px 0 0 ;
+}
+
+.team-dashboard-header-area {
+  background-color: $content-tab-color;
+}
+
+.dashboard-header-area {
+  margin-right: -15px;
+  margin-left: -15px;
+  color: $content-bg-color;
+  padding: 15px;
+}
+
+.dashboard-header-area h1 {
+  color: $content-bg-color;
+  margin-bottom: 24px;
+  display: inline-block;
+}
+
+.dashboard-header-area h5 {
+  color: $content-bg-color;
+  font-size: 9pt;
+  font-weight: 600;
+}
+
+.dashboard-details {
+  font-style: italic;
+  font-size: 8pt;
+  font-weight: 300;
+}
+
+.my-dashboard-icon, .team-icon {
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: -6px;
+}
+
+.my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
+.team-icon {  background-image: url(image_path('icon_team.svg'));}
+
+.tickets-totals-table td {
+  border-bottom: none;
+  font-weight: 300;
+  font-size: 8pt;
+}
+
+.ticket-type-label {
+  font-weight: 700;
+  font-size: 9pt;
+  text-transform: uppercase;
+  padding-right: 4px;
+}
+
+td.ticket-total, td.entries-total {
+  text-align: center;
+  font-size: 11pt;
+  width: 30px;
+}
+
+td.ticket-total {
+  font-weight: 600;
+}
+
+td.ticket-total::before {
+  content: '';
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  background-color: #ffffff4d;
+  border-radius: 15px;
+  position: absolute;
+  left: 19px;
+  margin-top: -4px;
+}
+
+.dashboard-left-data {
+  border-right: 1px solid $content-bg-color;
+}
+
+
+.dispute-entry-count {
+  background-color: $content-label-color;
+  min-width: 20px;
+  padding: 3px;
+  border-radius: 2px;
+  color: $content-bg-color;
+  font-size: 10pt;
+  font-weight: 600;
+  display: block;
+  float: right;
+  margin-top: -14px;
+  text-align: center;
+}
+
+.temp-spacer {
+  min-height: 400px;
+  padding: 40px 15px;
+}
+
+.create-report {
+  background-image: url(image_path('icon_reports_white.svg'));
+  background-repeat: no-repeat;
+  background-size: 26px;
+  padding-left: 40px !important;
+  background-position: 8px center;
+  margin-top: 20px !important;
+}
+
+.report-form-wrapper {
+  margin-top: 20px;
+}
+
+.report-form-wrapper label {
+  padding-right: 10px;
+}
+
+.report-form-wrapper label::before, .report-form-wrapper input::before, .report-form-wrapper .required::before {
+  display: none;
+}
+
+.report-form-wrapper abbr {
+  display: none;
+}
+
+#disputes-index-export-form {
+  height: 27px;
+}
+
+#edit-ticket-status-dropdown {
+  width: 160px;
+  padding: 0 !important;
+}
+
+#edit-ticket-status-dropdown .ticket-resolution-submenu {
+  left: -323px;
+  padding: 0 !important;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

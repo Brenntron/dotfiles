@@ -1,4 +1,6 @@
 class Admin::ScheduledTasksController < Admin::HomeController
+  load_and_authorize_resource class: 'Task'
+
   before_action :set_scheduled_task, only: [:destroy]
 
 

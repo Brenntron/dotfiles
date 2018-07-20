@@ -1,4 +1,5 @@
 class Admin::RulesController < Admin::HomeController
+  load_and_authorize_resource class: 'Admin'
 
   def index
     respond_to do |format|

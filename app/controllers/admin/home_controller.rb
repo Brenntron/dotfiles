@@ -1,6 +1,7 @@
 class Admin::HomeController < ApplicationController
+  load_and_authorize_resource class: 'Admin'
+
   layout 'admin'
-  before_action { authorize!(:manage, Admin) }
 
   def index
   end

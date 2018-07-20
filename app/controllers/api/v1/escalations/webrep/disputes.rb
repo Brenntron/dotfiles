@@ -11,20 +11,40 @@ module API
             end
             desc 'get all disputes'
             params do
+              optional :search_type, type: String
+              optional :search_name, type: String
+              optional :case_id, type: Integer
+              optional :org_domain, type: String
+              optional :case_owner_username, type: String
+              optional :status, type: String
+              optional :priority, type: String
+              optional :resolution, type: String
+              optional :submitter_type, type: String
+              optional :submitted_older, type: Date
+              optional :submitted_newer, type: Date
+              optional :age_older, type: String
+              optional :age_newer, type: String
+              optional :modified_older, type: Date
+              optional :modified_newer, type: Date
+              optional :customer, type: Hash do
+                optional :name, type: String
+                optional :email, type: String
+                optional :company_name, type: String
+              end
+              optional :dispute_entries, type: Hash do
+                optional :ip_or_uri, type: String
+                optional :suggested_disposition, type: String
+              end
             end
 
             get "" do
 
               json_packet = []
 
-              # disputes = Dispute.all #.includes(:dispute_entries) #  => (:dispute_rule_hit)
-              #disputes = Dispute.robust_search(params.fetch(:dispute, {})['search_type'],
-              #                                  search_name: params.fetch(:dispute, {})['search_name'],
-              #                                  params: index_params,
-              #                                  user: current_user).includes(:dispute_entries => [:dispute_rule_hits])  # [but inside]
-
-              disputes = Dispute.all.includes(:dispute_entries => [:dispute_rule_hits])
-              #disputes = Dispute.where("id like '20%'").includes(:dispute_entries => [:dispute_rule_hits])
+              disputes = Dispute.robust_search(permitted_params['search_type'],
+                                               search_name: permitted_params['search_name'],
+                                               params: permitted_params,
+                                               user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
 
               disputes.each do |dispute|
                 dispute_packet = {}
@@ -66,7 +86,7 @@ module API
                 end
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
-                dispute_packet[:case_opened_at] = dispute.case_opened_at.strftime('%Y-%m-%d %H:%M:%S')
+                dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
                 dispute_packet[:case_age] = dispute.dispute_age
                 # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
                 dispute_packet[:suggested_disposition] = dispute.suggested_d
@@ -133,6 +153,11 @@ module API
               true
             end
 
+            delete "searches/:search_name" do
+              search = NamedSearch.where(name: params['search_name'], user: current_user)
+              search.destroy_all
+              true
+            end
           end
         end
       end

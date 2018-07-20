@@ -61,6 +61,11 @@ development:
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     #host: "localhost"
     #port: 2944                          #default wbrs_stub port
@@ -81,11 +86,6 @@ development:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-  virustotal:
-    url: "https://www.virustotal.com/vtapi/v2/url/report"
-    host: "www.virustotal.com"
-    port: 443
-    api_key: "redacted"
 
 test:
   amq: #active message queue
@@ -149,6 +149,11 @@ test:
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     #host: "localhost"
     #port: 2944                          #default wbrs_stub port
@@ -169,11 +174,6 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-  virustotal:
-    url: "https://www.virustotal.com/vtapi/v2/url/report"
-    host: "www.virustotal.com"
-    port: 443
-    api_key: "redacted"
 
 staging:
   amq: #active message queue
@@ -231,6 +231,11 @@ staging:
     rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     host: "stage-wbrsruleapi-vip.vega.ironport.com"
     port: 80
@@ -243,11 +248,6 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-  virustotal:
-    url: "https://www.virustotal.com/vtapi/v2/url/report"
-    host: "www.virustotal.com"
-    port: 443
-    api_key: "redacted"
 
 production:
   amq: #active message queue
@@ -305,11 +305,16 @@ production:
     rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  virustotal:
+    url: "https://www.virustotal.com/vtapi/v2/url/report"
+    host: "www.virustotal.com"
+    port: 443
+    api_key: "redacted"
   wbrs:
     host: "prod-wbrsruleapi-vip.vega.ironport.com"
-    port: 443
+    port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-peer"
+    verify_mode: "no-tls"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: false
   xbrs:
@@ -318,9 +323,4 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-  virustotal:
-    url: "https://www.virustotal.com/vtapi/v2/url/report"
-    host: "www.virustotal.com"
-    port: 443
-    api_key: "redacted"
 

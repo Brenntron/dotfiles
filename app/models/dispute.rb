@@ -1,10 +1,16 @@
 class Dispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
+
+  belongs_to :customer
+  belongs_to :user
+
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
-  belongs_to :customer
-  belongs_to :user
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
+
+  delegate :cvs_username, to: :user, allow_nil: true
 
   NEW = 'new'
   RESOLVED = 'resolved'
@@ -43,7 +49,8 @@ class Dispute < ApplicationRecord
   end
 
   def dispute_age
-    age = case_opened_at - DateTime.now
+    return '' unless self.case_opened_at
+    age = self.case_opened_at - DateTime.now
     age = age.abs # lazy
     mm, ss = age.divmod(60)
     hh, mm = mm.divmod(60)
@@ -104,12 +111,14 @@ class Dispute < ApplicationRecord
   end
 
   def compose_versioned_items
+
     versioned_items = [self]
 
-    dispute_comments.map{ |dc| versioned_items << dc}
-    dispute_entries.map{ |de| versioned_items << de}
+    dispute_comments.includes(:versions).map{ |dc| versioned_items << dc}
+    dispute_entries.includes(:versions).map{ |de| versioned_items << de}
 
     versioned_items
+
   end
 
   #TODO: REFACTOR TO MAKE PROCESS_BRIDGE_PAYLOAD A SMALLER METHOD
@@ -459,6 +468,42 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.age_to_seconds(age_str)
+    days =
+        if /(?<days_str>\d+)[Dd]/ =~ age_str
+          days_str.to_i
+        else
+          0
+        end
+    hours =
+        if /(?<hours_str>\d+)[Hh]/ =~ age_str
+          hours_str.to_i
+        else
+          0
+        end
+    (days * 24 + hours) * 3600
+  end
+
+  def self.save_named_search(search_name, params, user:)
+    named_search =
+        user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
+    NamedSearchCriterion.where(named_search: named_search).delete_all
+    params.each do |field_name, value|
+      case
+        when value.kind_of?(Hash)
+          value.each do |sub_field_name, sub_value|
+            named_search.named_search_criteria.create(field_name: "#{field_name}~#{sub_field_name}", value: sub_value)
+          end
+        when 'search_type' == field_name
+          #do nothing
+        when 'search_name' == field_name
+          #do nothing
+        else
+          named_search.named_search_criteria.create(field_name: field_name, value: value)
+      end
+    end
+  end
+
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
   # @param [ActionController::Parameters] params supplied fields and values for search.
@@ -466,22 +511,103 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    raise 'Search must use ActionController::Parameters!' unless params.kind_of?(ActionController::Parameters)
-    raise 'Cannot search with unpermitted parameters!' unless params.permitted?
 
-    present_params = params.select{ |key, value| value.present? }
+    dispute_fields = params.to_h.slice(*%w{status org_domain priority resolution submitter_type case_id case_owner_username})
+    dispute_fields['id'] = dispute_fields.delete('case_id')
 
-    # Save this search as a named search
-    if present_params.present? && search_name.present?
-      named_search =
-          user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
-      NamedSearchCriterion.where(named_search: named_search).delete_all
-      present_params.each do |field_name, value|
-        named_search.named_search_criteria.create(field_name: field_name, value: value)
+    if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
+      dispute_fields['priority'] = priority_digits
+    end
+
+    if dispute_fields['case_owner_username'].present?
+      user = User.where(cvs_username: dispute_fields.delete('case_owner_username')).first
+      dispute_fields['user_id'] = user.id
+    end
+
+    dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
+    relation = where(dispute_fields)
+
+
+    if params['submitted_newer'].present?
+      relation =
+          relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+    end
+
+    if params['submitted_older'].present?
+      relation =
+          relation.where('case_opened_at < :submitted_older', submitted_older: params['submitted_older']+1)
+    end
+
+    if params['age_newer'].present?
+      seconds_ago = age_to_seconds(params['age_newer'])
+      unless 0 == seconds_ago
+        age_newer_cutoff = Time.now - seconds_ago
+        relation =
+            relation.where('case_opened_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
+
       end
     end
 
-    where(present_params)
+    if params['age_older'].present?
+      seconds_ago = age_to_seconds(params['age_older'])
+      unless 0 == seconds_ago
+        age_older_cutoff = Time.now - seconds_ago
+        relation =
+            relation.where('case_opened_at < :submitted_older', submitted_older: age_older_cutoff)
+      end
+    end
+
+    if params['modified_newer'].present?
+      relation =
+          relation.where('updated_at >= :modified_newer', modified_newer: params['modified_newer'])
+    end
+
+    if params['modified_older'].present?
+      relation =
+          relation.where('updated_at < :modified_older', modified_older: params['modified_older']+1)
+    end
+
+
+
+    company_name = nil
+    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
+    customer_params = customer_params.select{|ignore_key, value| value.present?}
+    if customer_params.any?
+      if customer_params['company_name'].present?
+        company_name = customer_params.delete('company_name')
+        relation = relation.joins(customer: :company)
+      else
+        relation = relation.joins(:customer)
+      end
+
+      customer_where = customer_params
+      if company_name.present?
+        customer_where = customer_where.merge(companies: {name: company_name})
+      end
+      relation = relation.where(customers: customer_where)
+    end
+
+    entry_params = params.fetch('dispute_entries', {})
+    entry_params = entry_params.select{|ignore_key, value| value.present?}
+    if entry_params.any?
+      dispute_entry_fields = entry_params.slice(*%w{suggested_disposition})
+      ip_or_uri = entry_params['ip_or_uri']
+
+      relation = relation.joins(:dispute_entries).group(:id)
+      relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
+
+      if ip_or_uri.present?
+        ip_or_uri_clause = "dispute_entries.ip_address = :ip_or_uri OR dispute_entries.uri like :ip_or_uri_pattern"
+        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+      end
+    end
+
+    # Save this search as a named search
+    if params.present? && search_name.present?
+      save_named_search(search_name, params, user: user)
+    end
+
+    relation
   end
 
   # Searched based on saved search.
@@ -492,22 +618,37 @@ class Dispute < ApplicationRecord
     named_search = user.named_searches.where(name: search_name).first
     raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
-      search_params[criterion.field_name] = criterion.value
+      if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
+        search_params[super_name] ||= {}
+        search_params[super_name][sub_name] = criterion.value
+      else
+        search_params[criterion.field_name] = criterion.value
+      end
       search_params
     end
-    where(search_params)
+    advanced_search(search_params, search_name: nil, user: user)
   end
 
   # Searches based on standard pre-determined filters.
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.standard_search(search_name)
+  def self.standard_search(search_name, user:)
     case search_name
-      when 'Open'
-        where(status: 'Open')
-      when 'Closed'
-        where(status: 'Closed')
+      when 'recently_viewed'
+        joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
+      when 'my_open'
+        where(status: ['new', 'open', 'reopen'], user_id: user.id)
+      when 'my_disputes'
+        where(user_id: user.id)
+      when 'team_disputes'
+        where(user_id: user.my_team)
+      when 'open'
+        where(status: ['new', 'open', 'reopen'])
+      when 'closed'
+        where(status: ['closed', 'resolved'])
+      when 'all'
+        where({})
       else
         raise "No search named '#{search_name}' known."
     end
@@ -534,18 +675,27 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, params: nil, search_name: nil, user:)
+  def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
       when 'advanced'
         advanced_search(params, search_name: search_name, user: user)
       when 'named'
         named_search(search_name, user: user)
       when 'standard'
-        standard_search(search_name)
+        standard_search(search_name, user: user)
       when 'contains'
         contains_search(params['value'])
       else
         where({})
+    end
+  end
+
+  def peek(user:)
+    if dispute_peeks.where(user: user).exists?
+      dispute_peeks.where(user: user).update_all(updated_at: Time.now)
+    else
+      dispute_peeks.create(user: user)
+      DisputePeek.delete_excess(user: user)
     end
   end
 end
