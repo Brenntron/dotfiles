@@ -17,6 +17,9 @@ class Dispute < ApplicationRecord
   AC_FAILED = 'CREATE_FAILED'
   AC_PENDING = 'CREATE_PENDING'
 
+  SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
+  SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
+
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
@@ -174,9 +177,9 @@ class Dispute < ApplicationRecord
 
         new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
 
-        new_dispute.submitter_type = new_dispute.customer_id == guest.id ? "Non Customer" : "Customer"
+        new_dispute.submitter_type = new_dispute.customer_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-        if new_dispute.submitter_type == "Customer"
+        if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
           new_dispute.priority = "P3"
         else
           new_dispute.priority = "P4"
