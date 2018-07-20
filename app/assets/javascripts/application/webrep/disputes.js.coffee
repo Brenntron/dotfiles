@@ -265,6 +265,37 @@ window.determine_checked = (box_names) ->
   console.log 'returning: ' + box_flag
   return box_flag
 
+
+window.take_dispute = (take_button, dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/take_dispute/" + dispute_id
+    data: {}
+    td_tag: take_button.closest('td')
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      this.td_tag.getElementsByClassName("dispute_username")[0].innerText = response.username
+  )
+
+
+window.take_disputes = () ->
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.dataset['entryId']
+    this.value
+  ).toArray()
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/take_disputes"
+    data: { dispute_ids: dispute_ids }
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      for dispute_id in response.dispute_ids
+        $('#owner_' + dispute_id).text(response.username)
+  )
+
+
 $ ->
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
