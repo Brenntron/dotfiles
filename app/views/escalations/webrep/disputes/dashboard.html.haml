@@ -11,20 +11,20 @@
       .col-xs-4
         %table.tickets-totals-table
           %tr
-            %td.ticket-total 5
-            %td.entries-total 13
+            %td.ticket-total= Dispute.open.where(user: current_user).count
+            %td.entries-total= DisputeEntry.open.where(user: current_user).count
             %td
               %span.ticket-type-label Open
               Tickets / Dispute Entries
           %tr
-            %td.ticket-total 12
-            %td.entries-total 26
+            %td.ticket-total= Dispute.in_progress.where(user: current_user).count
+            %td.entries-total= DisputeEntry.in_progress.where(user: current_user).count
             %td
               %span.ticket-type-label In Progress
               Tickets / Dispute Entries
           %tr
-            %td.ticket-total 32
-            %td.entries-total 81
+            %td.ticket-total= Dispute.closed.where(user: current_user).count
+            %td.entries-total= DisputeEntry.closed.where(user: current_user).count
             %td
               %span.ticket-type-label Closed
               Tickets / Dispute Entries
@@ -55,20 +55,20 @@
       .col-xs-4
         %table.tickets-totals-table
           %tr
-            %td.ticket-total 5
-            %td.entries-total 13
+            %td.ticket-total= Dispute.open.my_team(current_user).count
+            %td.entries-total= DisputeEntry.open.my_team(current_user).count
             %td
               %span.ticket-type-label Open
               Tickets / Dispute Entries
           %tr
-            %td.ticket-total 12
-            %td.entries-total 26
+            %td.ticket-total= Dispute.in_progress.my_team(current_user).count
+            %td.entries-total= DisputeEntry.in_progress.my_team(current_user).count
             %td
               %span.ticket-type-label In Progress
               Tickets / Dispute Entries
           %tr
-            %td.ticket-total 32
-            %td.entries-total 81
+            %td.ticket-total= Dispute.closed.my_team(current_user).count
+            %td.entries-total= DisputeEntry.closed.my_team(current_user).count
             %td
               %span.ticket-type-label Closed
               Tickets / Dispute Entries

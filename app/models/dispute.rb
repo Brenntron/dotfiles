@@ -15,6 +15,12 @@ class Dispute < ApplicationRecord
   NEW = 'new'
   RESOLVED = 'resolved'
   ASSIGNED = 'assigned'
+  CLOSED = 'closed'
+
+  scope :open, -> { where(status: NEW) }
+  scope :closed, -> { where(status: CLOSED) }
+  scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
