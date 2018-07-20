@@ -22,19 +22,21 @@ class Bridge::MessagesController < ApplicationController
         message_params[obj_type_key][:bugzilla_session] = bugzilla_session
         message_params[obj_type_key][:current_user] = current_user
         #return_message = obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
+
         Thread.new { obj_type.constantize.process_bridge_payload(message_params[obj_type_key]) }
+        #obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
 
-        return_message = {
-            "envelope":
-                {
-                    "channel": "ticket-acknowledge",
-                    "addressee": "talos-intelligence",
-                    "sender": "analyst-console"
-                },
-            "message": {"source_key":message_params[obj_type_key]["source_key"],"ac_status":"CREATE_PENDING", "ticket_entries": "", "case_email": case_email}
-        }
+        #return_message = {
+        #    "envelope":
+        #        {
+        #            "channel": "ticket-acknowledge",
+        #            "addressee": "talos-intelligence",
+        #            "sender": "analyst-console"
+        #        },
+        #    "message": {"source_key":message_params[obj_type_key]["source_key"],"ac_status":"CREATE_PENDING", "ticket_entries": "", "case_email": case_email}
+        #}
 
-        render json: return_message, status: :ok
+        render json: {}, status: :ok
       else
         return_message = {
 

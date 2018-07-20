@@ -12,9 +12,13 @@ class Dispute < ApplicationRecord
 
   delegate :cvs_username, to: :user, allow_nil: true
 
-  NEW = 'new'
-  RESOLVED = 'resolved'
-  ASSIGNED = 'assigned'
+  ANALYST_COMPLETED = "Analyst Completed"
+  ALL_AUTO_RESOLVED = "All Auto Resolved"
+
+
+  NEW = 'NEW'
+  RESOLVED = 'RESOLVED'
+  ASSIGNED = 'ASSIGNED'
 
   TI_NEW = 'IN PROGRESS'
   TI_RESOLVED = 'RESOLVED'
@@ -73,7 +77,7 @@ class Dispute < ApplicationRecord
     uri_object = URI(url)
 
     domain_parts = uri_object.host.split(".")
-    if domain_parts > 2
+    if domain_parts.size > 2
       uri_parts[:subdomain] = domain_parts.first
       uri_parts[:domain] = domain_parts - [domain_parts.first]
       uri_parts[:path] = uri_object.path
@@ -89,8 +93,8 @@ class Dispute < ApplicationRecord
 
   def self.is_possible_company_duplicate?(dispute, entry, entry_type)
     company_id = dispute.customer.company.id
-
-    candidates = Dispute.includes(:customer).includes(:dispute_entries).where(:status != RESOLVED, :customers => {:company_id => company_id}, :dispute_entries => {:entry_type => entry_type})
+    possible_duplicates = false
+    candidates = Dispute.includes(:customer).includes(:dispute_entries).where("disputes.status != '#{RESOLVED}'").where(:customers => {:company_id => company_id}, :dispute_entries => {:entry_type => entry_type})
 
     if candidates.blank?
       return false
@@ -98,16 +102,16 @@ class Dispute < ApplicationRecord
 
     candidates.each do |candidate|
       if entry_type == "IP"
-        possible_duplicates = candidate.dispute_entries.any? {|entry| entry.ip_address == entry}
+        possible_duplicates = candidate.dispute_entries.any? {|dispute_entry| dispute_entry.ip_address == entry}
       end
 
       if entry_type == "URI/DOMAIN"
-        possible_duplicates = candidate.dispute_entries.any? {|entry| entry.hostname == entry}
+        possible_duplicates = candidate.dispute_entries.any? {|dispute_entry| dispute_entry.hostname == entry}
       end
 
     end
 
-    return possible_duplicates.present?
+    return possible_duplicates
   end
 
   def compose_versioned_items
@@ -119,6 +123,26 @@ class Dispute < ApplicationRecord
 
     versioned_items
 
+  end
+
+  def check_entries_and_resolve(new_resolution = nil)
+    if new_resolution.blank?
+      new_resolution = ANALYST_COMPLETED
+    end
+    is_resolved = true
+
+    self.dispute_entries.each do |entry|
+      if entry.status != RESOLVED
+        is_resolved = false
+        break
+      end
+    end
+
+    if is_resolved == true
+      self.status = Dispute::RESOLVED
+      self.resolution = new_resolution
+      save!
+    end
   end
 
   #TODO: REFACTOR TO MAKE PROCESS_BRIDGE_PAYLOAD A SMALLER METHOD
@@ -135,8 +159,10 @@ class Dispute < ApplicationRecord
     begin
       ActiveRecord::Base.transaction do
 
+        logger.debug "Starting ticket create"
+
         user = User.where(cvs_username:"vrtincom").first
-        guest = Customer.where(:name => "Guest")
+        guest = Company.where(:name => "Guest").first
         #TODO: this should be put in a params method
         message_payload["payload"] = message_payload["payload"].permit!.to_h
         new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
@@ -166,9 +192,11 @@ class Dispute < ApplicationRecord
             'priority' => 'Unspecified',
             'classification' => 'unclassified',
         }
+        logger.debug "Creating bugzilla bug"
 
-        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user: user)
+        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, false)
 
+        logger.debug "Creating dispute"
         new_dispute = Dispute.new
 
         new_dispute.id = bug_stub_hash["id"]
@@ -183,28 +211,25 @@ class Dispute < ApplicationRecord
         new_dispute.ticket_source = "talos-intelligence"
         new_dispute.ticket_source_type = message_payload["source_type"]
         new_dispute.submission_type = message_payload["submission_type"]  # email, web, both  [e|w|ew]
+        new_dispute.status = NEW
 
         new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
 
-        new_dispute.submitter_type = new_dispute.customer_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_dispute.submitter_type = new_dispute.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
         if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
           new_dispute.priority = "P3"
         else
           new_dispute.priority = "P4"
         end
-
+        logger.debug "Saving Dispute"
         new_dispute.save
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
         #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
 
-
+        logger.debug "Creating ip entries"
         new_entries_ips.each do |key, entry|
-
-          #placeholder for preloading stuff from Micah
-          #grab xbrs, reptool stuff, wl/bl entries, virustotal
-          #
 
           false_negative_claim = false
 
@@ -234,8 +259,8 @@ class Dispute < ApplicationRecord
               new_payload_item[:status] = TI_RESOLVED
             end
           else
-            new_payload[:status] = TI_NEW
-            new_payload[:resolution_message] = ""
+            new_payload_item[:status] = TI_NEW
+            new_payload_item[:resolution_message] = ""
           end
           new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
           return_payload[key] = new_payload_item
@@ -250,16 +275,16 @@ class Dispute < ApplicationRecord
 
           if false_negative_claim
             if auto_resolve_verdict.malicious?
-              new_dispute_entry.resolution_message = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_dispute_entry.resolution = "FIXED FN"
-              new_dispute_entry.status = RESOLVED
+              new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+              new_dispute_entry.status = DisputeEntry::RESOLVED
             else
-              new_dispute_entry.resolution_message = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_dispute_entry.resolution = "UNCHANGED"
-              new_dispute_entry.status = RESOLVED
+              new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_UNCHANGED
+              new_dispute_entry.status = DisputeEntry::RESOLVED
             end
           else
-            new_dispute_entry.status = NEW
+            new_dispute_entry.status = DisputeEntry::NEW
           end
           new_dispute_entry.save
 
@@ -285,9 +310,11 @@ class Dispute < ApplicationRecord
           end
 
           verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+          logger.debug "fetching preload"
+          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
-
+        logger.debug "Creating url entries"
         new_entries_urls.each do |key, entry|
 
           #placeholder for preloading stuff from Micah
@@ -326,16 +353,16 @@ class Dispute < ApplicationRecord
 
           if false_negative_claim
             if auto_resolve_verdict.malicious?
-              new_dispute_entry.resolution_message = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_dispute_entry.resolution = "FIXED FN"
-              new_dispute_entry.status = RESOLVED
+              new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+              new_dispute_entry.status = DisputeEntry::RESOLVED
             else
-              new_dispute_entry.resolution_message = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_dispute_entry.resolution = "UNCHANGED"
-              new_dispute_entry.status = RESOLVED
+              new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_UNCHANGED
+              new_dispute_entry.status = DisputeEntry::RESOLVED
             end
           else
-            new_dispute_entry.status = NEW
+            new_dispute_entry.status = DisputeEntry::NEW
           end
 
           new_dispute_entry.save
@@ -354,10 +381,10 @@ class Dispute < ApplicationRecord
               new_payload_item[:status] = TI_RESOLVED
             end
           else
-            new_payload[:status] = TI_NEW
-            new_payload[:resolution_message] = ""
+            new_payload_item[:status] = TI_NEW
+            new_payload_item[:resolution_message] = ""
           end
-          new_payload_item[:company_dup] = is_possible_company_duplicate(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
+          new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
           return_payload[key] = new_payload_item
 
           if entry["WBRS_Rule_Hits"].present?
@@ -371,10 +398,15 @@ class Dispute < ApplicationRecord
           end
 
           verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+          logger.debug "fetching preload"
+          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
 
+        new_dispute.check_entries_and_resolve(ALL_AUTO_RESOLVED)
 
+
+        logger.debug "Creating email"
         #build first official email of the new case
 
         first_email = DisputeEmail.new
@@ -389,27 +421,15 @@ class Dispute < ApplicationRecord
 
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
-        #change this
-        #send direct push to bridge instead of return, this is now a thread
-
+        logger.debug("Sending reply to bridge")
         conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
         conn.post(return_payload, case_email)
-
-
-        #return_message = {
-        #  "envelope":
-        #      {
-        #          "channel": "ticket-acknowledge",
-        #          "addressee": "talos-intelligence",
-        #          "sender": "analyst-console"
-        #      },
-        #  "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": case_email}
-        #}
 
       end
     rescue Exception => e
       #change this
       #send direct push to bridge instead of return, this is now a thread
+      logger.debug("Failed.")
       Rails.logger.error "Dispute failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")
@@ -432,16 +452,18 @@ class Dispute < ApplicationRecord
     verdicts_to_blacklist.each do |blacklist|
       begin
         auto_resolve_verdict = blacklist.first
-        auto_resolve_verdict.publish_to_rep_api
-        dispute_entry = blacklist.last
+        if auto_resolve_verdict.malicious?
+          auto_resolve_verdict.publish_to_rep_api
 
-        args = {}
-        args[:dispute_id] = dispute_entry.dispute_id
-        args[:user_id] = user.id
-        args[:comment] = auto_resolve_verdict.internal_comment
+          dispute_entry = blacklist.last
 
-        DisputeComment.create(args)
+          args = {}
+          args[:dispute_id] = dispute_entry.dispute_id
+          args[:user_id] = user.id
+          args[:comment] = auto_resolve_verdict.internal_comment
 
+          DisputeComment.create(args)
+        end
       rescue Exception => e
         Rails.logger.error "Attempts at blacklisting a dispute entry with reptool failed. Check reptool:"
         Rails.logger.error $!
@@ -451,7 +473,7 @@ class Dispute < ApplicationRecord
 
         dispute_entry.status = NEW
         dispute_entry.resolution = ""
-        dispute_entry.resolution_message = ""
+        dispute_entry.resolution_comment = ""
         dispute_entry.save
 
         args = {}

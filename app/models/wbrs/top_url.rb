@@ -16,7 +16,7 @@ class Wbrs::TopUrl < Wbrs::Base
     response = call_json_request(:post, '/v1/cat/urls/top', body: url_params)
 
     response_body = JSON.parse(response.body)
-    @all = response_body.map {|datum, important| new_from_datum({:important_url => datum, :is_important => important})}    
+    @all = response_body.map {|datum, important| new_from_datum({:url => datum, :is_important => important})}
 
     @all
   end
