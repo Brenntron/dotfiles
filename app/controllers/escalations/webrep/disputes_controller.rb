@@ -145,7 +145,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @entries = DisputeEntry.from_age_report_params(age_report_params)
 
     contents = CSV.generate do |csv|
-      csv << [ 'Date', 'Resolution', 'Engineer', 'Opened', 'Resolved', 'Time to Resolution' ]
+      csv << [ 'When Resolved', 'Resolution', 'Engineer', 'Opened', 'Resolved', 'Time to Resolution' ]
       @entries.each do |entry|
         csv << [
             entry.case_resolved_at,
