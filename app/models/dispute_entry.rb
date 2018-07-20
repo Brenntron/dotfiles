@@ -15,7 +15,7 @@ class DisputeEntry < ApplicationRecord
   scope :open, -> { where(status: NEW) }
   scope :closed, -> { where(status: CLOSED) }
   scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
-  scope :my_team, ->(user) { where(user_id: user.my_team) }
+  scope :my_team, ->(user) { joins(:dispute).where(disputes: {user_id: user.my_team}) }
 
   scope :resolved_date, -> (date_iso) {
     date_from = Date.iso8601(date_iso)

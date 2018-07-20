@@ -12,19 +12,19 @@
         %table.tickets-totals-table
           %tr
             %td.ticket-total= Dispute.open.where(user: current_user).count
-            %td.entries-total= DisputeEntry.open.where(user: current_user).count
+            %td.entries-total= DisputeEntry.open.joins(:dispute).where(disputes: {user: current_user}).count
             %td
               %span.ticket-type-label Open
               Tickets / Dispute Entries
           %tr
             %td.ticket-total= Dispute.in_progress.where(user: current_user).count
-            %td.entries-total= DisputeEntry.in_progress.where(user: current_user).count
+            %td.entries-total= DisputeEntry.in_progress.joins(:dispute).where(disputes: {user: current_user}).count
             %td
               %span.ticket-type-label In Progress
               Tickets / Dispute Entries
           %tr
             %td.ticket-total= Dispute.closed.where(user: current_user).count
-            %td.entries-total= DisputeEntry.closed.where(user: current_user).count
+            %td.entries-total= DisputeEntry.closed.joins(:dispute).where(disputes: {user: current_user}).count
             %td
               %span.ticket-type-label Closed
               Tickets / Dispute Entries
