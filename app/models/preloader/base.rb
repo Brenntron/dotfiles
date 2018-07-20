@@ -61,6 +61,24 @@ class Preloader::Base
       end
     end
 
+    while counter < TRIES
+      begin
+        @umbrella = AutoResolve.new.call_umbrella(address: host)
+        pretty_umbrella_status = "Unclassified" # Default or "0"
+        case
+          # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
+        when @umbrella[:status] == "-1"
+          pretty_umbrella_status = "Malicious"
+        when @umbrella[:status] == "1"
+          pretty_umbrella_status = "Benign"
+        end
+        pretty_umbrella_status
+        break
+      rescue
+        counter = counter + 1
+      end
+    end
+
 
     dispute_entry = DisputeEntry.find(dispute_entry_id)
     if dispute_entry.dispute_entry_preload.present?
@@ -76,6 +94,7 @@ class Preloader::Base
       d.virustotal = virustotals
       d.wlbl = blacklist
       d.wbrs_list_type = wbrs_list_type
+      d.umbrella = pretty_umbrella_status
     end
 
     data.save!
