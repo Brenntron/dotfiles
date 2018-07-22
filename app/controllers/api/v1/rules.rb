@@ -12,6 +12,7 @@ module API
           requires :rule_id, type: Integer, desc: "the id for the rule to be checked"
         end
         get ":rule_id/to_smtp", root: 'rule' do
+          authorize!(:show, Rule)
           rule = Rule.find(permitted_params[:rule_id])
           rule.check_to_smtp
         end
@@ -22,6 +23,7 @@ module API
         end
         post ":rule_id/to_smtp", root: 'rule' do
           rule = Rule.find(permitted_params[:rule_id])
+          authorize!(:show, rule) if rule
           if rule
             rule_smtp = rule.to_smtp
             references = rule_smtp.references.map do |ref|
@@ -40,6 +42,7 @@ module API
         end
         get "gids/:gid/sids/:sid", root: :rules do
           rule = Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
+          authorize!(:show, rule) if rule
           rule ? {rule: rule} : nil
         end
 
@@ -51,6 +54,7 @@ module API
         end
         get "gids/:gid/sids/:sid/dup", root: :rules do
           rule = Rule.find_or_load(permitted_params[:sid], permitted_params[:gid])
+          authorize!(:show, rule) if rule
           if rule
             {rule: rule.dup}
           else
@@ -64,6 +68,7 @@ module API
           optional :sid, type: String, desc: "SID of the rule"
         end
         get "", root: :rules do
+          authorize!(:index, Rule)
           if permitted_params[:sid]
             Rule.where(sid: permitted_params[:sid]).first
           else
@@ -160,6 +165,7 @@ module API
           authorize! :update, Rule
 
           rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+          authorize!(:update, rule)
           Rule.update_action(rule, permitted_params[:rule][:rule_content])
         end
 
@@ -186,6 +192,7 @@ module API
             authorize! :update, Rule
 
             rule = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).first
+            authorize!(:update, rule)
             Rule.revert_rules_action([rule])
           end
         end
@@ -202,6 +209,7 @@ module API
         end
         put "commit", root: "rule" do
           std_api_v2 do
+            # TODO authorization for committing rules to svn
             rules = Rule.where(id: permitted_params[:rule_ids]).where(state:['UPDATED','NEW']).all.to_a
 
             raise "There are no UPDATED or NEW rules in your selection!\nPlease select rules with a state of UPDATED or NEW." if rules.empty?
@@ -227,6 +235,7 @@ module API
         end
         put "gids/:gid/sids/:sid/commit", root: "rule" do
           std_api_v2 do
+            # TODO authorization for committing rules to svn
             rules = Rule.by_sid(permitted_params[:sid], permitted_params[:gid]).all.to_a
 
             raise "You must select a rule to commit!" if rules.empty?
@@ -282,6 +291,7 @@ module API
           authorize! :update, Rule
 
           rule = Rule.where(id: permitted_params[:id]).first
+          authorize!(:update, rule)
           Rule.update_action(rule,
                              permitted_params[:rule][:rule_content],
                              permitted_params[:rule][:rule_doc])
@@ -324,6 +334,7 @@ module API
           requires :rule_ids, type: Array[String]
         end
         patch ":rule_id/copy_doc", root: 'rule' do
+          authorize!(:create, RuleDoc)
           RuleDoc.copy_doc_action(permitted_params[:rule_id],
                                   permitted_params[:rule_ids])
         end
@@ -334,7 +345,9 @@ module API
           requires :snort_doc_status, type: String
         end
         patch ":rule_id/snort_doc_status", root: 'rule' do
+          authorize!(:update, Rule)
           rule = Rule.find(permitted_params[:rule_id])
+          authorize!(:update, rule)
           rule.update!(snort_doc_status: permitted_params[:snort_doc_status])
         end
       end

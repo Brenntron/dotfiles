@@ -38,6 +38,7 @@ module API
             end
 
             get "" do
+              authorize!(:index, Dispute)
 
               json_packet = []
 
@@ -119,7 +120,7 @@ module API
             end
 
             put ":id" do
-
+              # TODO access control when this is implmented
             end
 
             desc 'delete a dispute'
@@ -127,7 +128,7 @@ module API
             end
 
             delete "" do
-
+              # TODO access control when this is implmented
             end
 
             desc "Adjust a WL/BL entry"
@@ -138,6 +139,7 @@ module API
               requires :note, type: String, desc: "note"
             end
             post "wlbl" do
+              authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_from_params(permitted_params, username: current_user.cvs_username)
             end
 
@@ -155,6 +157,7 @@ module API
             end
 
             delete "searches/:search_name" do
+              # TODO determine access control policy for named searches
               search = NamedSearch.where(name: params['search_name'], user: current_user)
               search.destroy_all
               true

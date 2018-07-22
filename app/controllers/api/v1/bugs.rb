@@ -741,6 +741,7 @@ module API
           requires :committer, type: Boolean, desc: "is this a committer subscribe"
         end
         post ':id/unsubscribe' do
+          # TODO Determine access control policy for unsubscribing from a bug
           bug = current_user.bugs.where(id: permitted_params[:id])
           unless bug.nil?
             begin
@@ -774,7 +775,9 @@ module API
           requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
         end
         post ':bug_id/addref' do
+          authorize!(:create, Reference)
           bug = Bug.where(id: params['bug_id']).first
+          authorize!(:update, bug)
           raise 'bug not found' unless bug
           new_ref = bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
           if new_ref.present?
@@ -804,7 +807,9 @@ module API
           requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
         end
         post ':bug_id/addexploit' do
+          authorize!(:create, Exploit)
           bug = Bug.where(id: params['bug_id']).first
+          authorize!(:update, bug)
           raise 'bug not found' unless bug
           bug.add_exploit_action(reference_id: params['reference_id'],
                                  exploit_type_id: params['exploit_type_id'],
@@ -904,6 +909,7 @@ module API
           authorize!(:create, EscalationLink)
           bug = Bug.where(id: params['bug_id']).first
           return {:error => 'bug not found'}.to_json unless bug
+          authorize!(:update, bug)
           related_bug = Bug.where(id: params['relate_id']).first
           return {:error => 'related bug not found'}.to_json unless related_bug
           if bug.id == related_bug.id
@@ -934,6 +940,7 @@ module API
           authorize!(:destroy, EscalationLink)
           bug = Bug.where(id: params['bug_id']).first
           return {:error => 'bug not found'}.to_json unless bug
+          authorize!(:update, bug)
           related_bug = Bug.where(id: params['relate_id']).first
           return {:error => 'related bug not found'}.to_json unless related_bug
           if bug.product == "Research" && related_bug.product == "Escalations"
@@ -956,6 +963,7 @@ module API
           optional :comment, type: String, desc: "a comment about acknowledging the escalation"
         end
         patch ':bug_id/acknowledge' do
+          authorize!(:acknowledge_bug, EscalationBug)
           bug = Bug.where(id: permitted_params['bug_id']).first
           raise 'bug not found' unless bug
           xmlrpc = Bugzilla::Bug.new(bugzilla_session)
