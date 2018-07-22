@@ -152,4 +152,12 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def last_submitted
+    if self.referenced_tickets.count > 1
+      last_submitted = referenced_tickets.last.created_at
+    else
+      last_submitted = "N/A"
+    end
+  end
+
 end
