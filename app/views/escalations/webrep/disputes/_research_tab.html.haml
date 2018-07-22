@@ -500,7 +500,7 @@
                           %label Referenced on
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
-                          12 Tickets
+                          = "#{entry.referenced_tickets.count} ticket(s)"
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper

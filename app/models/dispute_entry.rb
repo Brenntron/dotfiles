@@ -112,4 +112,13 @@ class DisputeEntry < ApplicationRecord
     find_xbrs[1]
   end
 
+  def referenced_tickets
+    is_ip_address = !!(hostlookup  =~ Resolv::IPv4::Regex)
+    if is_ip_address
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address})
+    else
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:uri => self.uri})
+    end
+  end
+
 end
