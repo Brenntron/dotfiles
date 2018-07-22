@@ -45,24 +45,25 @@ module API
 
             post "", root: "dispute_email" do
               authorize!(:create, DisputeEmail)
-              begin
-                #temporary, for development, don't wanna be sending these to actual customers
-                params[:to] = "claclair@cisco.com"
+              #begin
+                ActiveRecord::Base.transaction do
+                  #temporary, for development, don't wanna be sending these to actual customers
+                  params[:to] = "claclair@cisco.com"
 
+                  new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
 
-                new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
+                  if params[:dispute_email_id].present?
+                    replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
+                    replied_email.status = DisputeEmail::REPLIED
+                    replied_email.save
+                  end
 
-                if params[:dispute_email_id].present?
-                  replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
-                  replied_email.status = DisputeEmail::REPLIED
-                  replied_email.save
+                  return ""
                 end
-
-                return ""
-              rescue Exception => e
-                Rails.logger.error e
-                raise "There was an error in attempting to send an email."
-              end
+              #rescue Exception => e
+              #  Rails.logger.error e
+              #  raise "There was an error in attempting to send an email."
+              #end
 
             end
 

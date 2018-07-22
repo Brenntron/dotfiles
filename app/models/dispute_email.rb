@@ -34,20 +34,24 @@ class DisputeEmail < ApplicationRecord
       conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
       conn.post(bad_email_args, attachments_to_mail)
 
-      return {
-          "envelope":
-              {
-                  "channel": "email-acknowledge",
-                  "addressee": "talos-intelligence",
-                  "sender": "analyst-console"
-              },
-          "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
-      }
+      #TODO: this is in a thread now, so send a bridge event for email acknowledge
+
+      #return {
+      #    "envelope":
+      #        {
+      #            "channel": "email-acknowledge",
+      #            "addressee": "talos-intelligence",
+      #            "sender": "analyst-console"
+      #        },
+      #    "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
+      #}
     end
 
     new_email = DisputeEmail.new
     new_email.dispute_id = case_id
     new_email.email_headers = message_payload["payload"]["headers"]
+    #Need to clean from value, can show up in form of:
+    #\"Chris LaClair (claclair)\" <claclair@cisco.com>   which as an absolute value, is not a valid email address
     new_email.from = message_payload["payload"]["from"]
     new_email.to = message_payload["payload"]["to"]
     new_email.subject = message_payload["payload"]["subject"]
@@ -62,18 +66,20 @@ class DisputeEmail < ApplicationRecord
     end
 
 
-    #change this
-    return_message = {
-        "envelope":
-            {
-                "channel": "email-acknowledge",
-                "addressee": "talos-intelligence",
-                "sender": "analyst-console"
-            },
-        "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
-    }
+    #TODO: this is in a thread now, so send a bridge event for email acknowledge
 
-    return_message
+    #change this
+    #return_message = {
+    #    "envelope":
+    #        {
+    #            "channel": "email-acknowledge",
+    #            "addressee": "talos-intelligence",
+    #            "sender": "analyst-console"
+    #        },
+    #    "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
+    #}
+
+
   end
 
   ## FORMAT FOR AN EXTERNAL FACING CASE NUMBER IS:  ref-[dispute#id]-anco   example: ref-325302-anco wher 325302 is the ID of a record in disputes table
@@ -136,7 +142,7 @@ class DisputeEmail < ApplicationRecord
         new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email, false)
         s3_file_path = new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
-        new_attachment[:file_name] = attachment.original_filename
+        new_attachment[:file_name] = attachment.filename
         new_attachment[:file_url] = new_local_attachment.s3_url(s3_file_path)
         attachments_to_mail << new_attachment
       end
