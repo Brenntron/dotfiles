@@ -79,7 +79,7 @@ class Dispute < ApplicationRecord
     domain_parts = uri_object.host.split(".")
     if domain_parts.size > 2
       uri_parts[:subdomain] = domain_parts.first
-      uri_parts[:domain] = domain_parts - [domain_parts.first]
+      uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
       uri_parts[:path] = uri_object.path
     else
       uri_parts[:subdomain] = ""
@@ -99,14 +99,22 @@ class Dispute < ApplicationRecord
     if candidates.blank?
       return false
     end
+    dispute.reload
+    current_dispute_entries = dispute.dispute_entries
 
     candidates.each do |candidate|
       if entry_type == "IP"
-        possible_duplicates = candidate.dispute_entries.any? {|dispute_entry| dispute_entry.ip_address == entry}
+        possible_duplicates = (candidate.dispute_entries - current_dispute_entries).any? {|dispute_entry| dispute_entry.ip_address == entry}
+        if possible_duplicates == true
+          return true
+        end
       end
 
       if entry_type == "URI/DOMAIN"
-        possible_duplicates = candidate.dispute_entries.any? {|dispute_entry| dispute_entry.hostname == entry}
+        possible_duplicates = (candidate.dispute_entries - current_dispute_entries).any? {|dispute_entry| dispute_entry.uri == entry}
+        if possible_duplicates == true
+          return true
+        end
       end
 
     end
@@ -194,7 +202,7 @@ class Dispute < ApplicationRecord
         }
         logger.debug "Creating bugzilla bug"
 
-        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, false)
+        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
 
         logger.debug "Creating dispute"
         new_dispute = Dispute.new
@@ -210,7 +218,7 @@ class Dispute < ApplicationRecord
         new_dispute.ticket_source_key = message_payload["source_key"]
         new_dispute.ticket_source = "talos-intelligence"
         new_dispute.ticket_source_type = message_payload["source_type"]
-        new_dispute.submission_type = message_payload["submission_type"]  # email, web, both  [e|w|ew]
+        new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
         new_dispute.status = NEW
 
         new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
@@ -427,8 +435,7 @@ class Dispute < ApplicationRecord
 
       end
     rescue Exception => e
-      #change this
-      #send direct push to bridge instead of return, this is now a thread
+
       logger.debug("Failed.")
       Rails.logger.error "Dispute failed to save, backing out all DB changes."
       Rails.logger.error $!
@@ -437,15 +444,6 @@ class Dispute < ApplicationRecord
       conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
 
-      #return {
-      #    "envelope":
-      #        {
-      #            "channel": "ticket-acknowledge",
-      #            "addressee": "talos-intelligence",
-      #            "sender": "analyst-console"
-      #        },
-      #    "message": {"source_key":params["source_key"],"ac_status":"SEND_FAILED" }
-      #}
     end
 
 
@@ -486,7 +484,7 @@ class Dispute < ApplicationRecord
       end
     end
 
-    return_message
+
 
   end
 

@@ -2304,6 +2304,8 @@ class Bug < ApplicationRecord
                                               state: bug_attrs['state'] || 'OPEN',
                                               user_id: user&.id))
       end
+    else
+      return bug_stub_hash
     end
   end
 
