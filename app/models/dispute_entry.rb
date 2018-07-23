@@ -5,6 +5,13 @@ class DisputeEntry < ApplicationRecord
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
 
+  RESOLVED = "RESOLVED"
+  NEW = "NEW"
+
+  STATUS_RESOLVED_FIXED_FN = "FIXED FN"
+  STATUS_RESOLVED_FIXED_FP = "FIXED FP"
+  STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+
   delegate :cvs_username, to: :dispute, allow_nil: true
 
   NEW = 'new'
@@ -17,14 +24,14 @@ class DisputeEntry < ApplicationRecord
   scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
   scope :my_team, ->(user) { joins(:dispute).where(disputes: {user_id: user.my_team}) }
 
-  scope :resolved_date, -> (date_iso) {
-    date_from = Date.iso8601(date_iso)
-    date_to = Date.iso8601(date_iso) + 1
+  scope :resolved_date, -> (date_from_iso, date_to_iso) {
+    date_from = Date.iso8601(date_from_iso)
+    date_to = Date.iso8601(date_to_iso) + 1
     where(case_resolved_at: (date_from..date_to))
   }
 
   def self.from_age_report_params(params)
-    query = resolved_date(params['date'])
+    query = resolved_date(params['date_from'], params['date_to'])
 
     if params['resolution'].present?
       query = query.where(resolution: params['resolution'])
@@ -32,6 +39,10 @@ class DisputeEntry < ApplicationRecord
 
     if params['engineer'].present?
       query = query.joins(dispute: :user).where(users: {cvs_username: params['engineer']})
+    end
+
+    if params['customer_id'].present?
+      query = query.joins(:dispute).where(disputes: {customer_id: params['customer_id']})
     end
 
     query
@@ -141,6 +152,23 @@ class DisputeEntry < ApplicationRecord
       pretty_umbrella_status = "Benign"
     end
     pretty_umbrella_status
+  end
+
+  def referenced_tickets
+    is_ip_address = !!(hostlookup  =~ Resolv::IPv4::Regex)
+    if is_ip_address
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address})
+    else
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:uri => self.uri})
+    end
+  end
+
+  def last_submitted
+    if self.referenced_tickets.count > 1
+      last_submitted = referenced_tickets.last.created_at
+    else
+      last_submitted = "N/A"
+    end
   end
 
 end

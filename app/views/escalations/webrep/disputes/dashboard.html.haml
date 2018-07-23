@@ -40,6 +40,7 @@
                             html: { target: :_blank } do |rpt_form|
           = rpt_form.input :date_from, as: :string, input_html: {type: :date}
           = rpt_form.input :date_to, as: :string, input_html: {type: :date}
+          = rpt_form.input :period, collection: ['Daily', 'Weekly', 'Monthly'], selected: 'Daily'
           = rpt_form.submit 'Create Report', class: 'button_primary create-report'
       .report-display-wrapper
 
@@ -50,7 +51,8 @@
         %span.team-icon
         %h5 Web Reputation Escalations
         %p.dashboard-details
-          Manager: Joel Esler
+          Manager:
+          = current_user.team_manager.display_name
 
       .col-xs-4
         %table.tickets-totals-table

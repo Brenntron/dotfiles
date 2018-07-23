@@ -45,6 +45,7 @@ module API
           requires :id, type: String, desc: "ID of the note"
         end
         get ":id", root: "note" do
+          authorize!(:show, Note)
           Note.where(id: permitted_params[:id])
         end
 

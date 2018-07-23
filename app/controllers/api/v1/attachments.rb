@@ -6,6 +6,7 @@ module API
       resource :attachments do
         desc "get all attachments"
         get "", root: :attachments do
+          authorize! :read, Attachment
           Attachment.all
         end
 
@@ -14,6 +15,7 @@ module API
           requires :id, type: String, desc: "ID of the attachment"
         end
         get ":id", root: "attachment" do
+          authorize! :read, Attachment
           Attachment.where(id: permitted_params[:id])
         end
 

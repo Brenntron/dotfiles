@@ -82,6 +82,14 @@ class User < ApplicationRecord
     (parent.nil? && children.empty?) ? false : true
   end
 
+  def team_manager
+    if children.empty?
+      parent
+    else
+      self
+    end
+  end
+
   def my_team
     if children.empty?
       siblings + [parent, self]

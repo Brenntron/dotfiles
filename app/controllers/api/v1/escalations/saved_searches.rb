@@ -11,6 +11,7 @@ module API
             requires :id, type: Integer, desc: "saved search id"
           end
           delete '/:id' do
+            # TODO determine access control policy on saved searches
             begin
               saved_search = SavedSearch.where(:id => params[:id], :user_id => current_user.id).first
               if saved_search.present?
@@ -32,6 +33,7 @@ module API
             optional :giblets, type: String, desc: "Giblet based saved search"
           end
           post "" do
+            # TODO determine access control policy on saved searches
             begin
 
               if params[:giblets].present?
