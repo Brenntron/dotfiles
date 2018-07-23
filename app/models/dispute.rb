@@ -12,13 +12,13 @@ class Dispute < ApplicationRecord
 
   delegate :cvs_username, to: :user, allow_nil: true
 
-  ANALYST_COMPLETED = "Analyst Completed"
-  ALL_AUTO_RESOLVED = "All Auto Resolved"
-
-
   NEW = 'NEW'
   RESOLVED = 'RESOLVED'
   ASSIGNED = 'ASSIGNED'
+  CLOSED = 'CLOSED'
+
+  ANALYST_COMPLETED = "Analyst Completed"
+  ALL_AUTO_RESOLVED = "All Auto Resolved"
 
   TI_NEW = 'IN PROGRESS'
   TI_RESOLVED = 'RESOLVED'
@@ -29,6 +29,11 @@ class Dispute < ApplicationRecord
 
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
+
+  scope :open, -> { where(status: NEW) }
+  scope :closed, -> { where(status: CLOSED) }
+  scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')

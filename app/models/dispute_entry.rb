@@ -1,6 +1,7 @@
 class DisputeEntry < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute
+  belongs_to :user
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
 
@@ -12,6 +13,16 @@ class DisputeEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
 
   delegate :cvs_username, to: :dispute, allow_nil: true
+
+  NEW = 'NEW'
+  RESOLVED = 'RESOLVED'
+  ASSIGNED = 'ASSIGNED'
+  CLOSED = 'CLOSED'
+
+  scope :open, -> { where(status: NEW) }
+  scope :closed, -> { where(status: CLOSED) }
+  scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :my_team, ->(user) { joins(:dispute).where(disputes: {user_id: user.my_team}) }
 
   scope :resolved_date, -> (date_from_iso, date_to_iso) {
     date_from = Date.iso8601(date_from_iso)
