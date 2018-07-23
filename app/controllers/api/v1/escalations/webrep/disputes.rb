@@ -147,6 +147,8 @@ module API
                 json_packet << d
               end
               {:status => "success", :data => json_packet}.to_json
+            end
+
 
             desc "Change assignee of a group of dispute IDs"
             params do
