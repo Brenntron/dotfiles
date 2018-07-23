@@ -10,6 +10,7 @@ module API
           requires :id, type: String, desc: "ID of the task"
         end
         get ":id", root: "task" do
+          authorize!(:show, Task)
           Task.where(id: permitted_params[:id]).first
         end
 
@@ -18,6 +19,7 @@ module API
           optional :sid, type: String, desc: "SID of the task"
         end
         get "", root: :tasks do
+          authorize!(:index, Task)
           if permitted_params[:sid]
             Task.where(sid: permitted_params[:sid]).first
           else
@@ -37,6 +39,7 @@ module API
         end
         post "", root: "task" do
           begin
+            authorize!(:create, Task)
             new_task = nil
             if permitted_params[:task][:bugzilla_id]
               options = {

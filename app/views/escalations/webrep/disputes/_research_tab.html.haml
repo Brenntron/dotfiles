@@ -467,8 +467,12 @@
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
                                 = wbrs_hit.name
+                                - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                  = ","
                             - else
                               = wbrs_hit.name
+                              - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                = ","
                         %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -500,7 +504,7 @@
                           %label Referenced on
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
-                          12 Tickets
+                          = "#{entry.referenced_tickets.count} ticket(s)"
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper
@@ -524,8 +528,12 @@
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}"}
                                 = sbrs_hit.name
+                                - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                  = ","
                             - else
                               = sbrs_hit.name
+                              - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                = ","
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -554,7 +562,7 @@
                           %label Last Submitted
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
-                          2016-02-24 15:11:22
+                          = entry.last_submitted
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                   %td.expanded-row{colspan: '8'}
                     .expanded-row-data-wrapper

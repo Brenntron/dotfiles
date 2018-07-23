@@ -6,6 +6,7 @@ module API
       resource :users do
         desc "Return all users"
         get "", root: :users do
+          authorize!(:index, User)
           User.all
         end
 
@@ -14,6 +15,7 @@ module API
           requires :id, type: String, desc: "ID of the user"
         end
         get ":id", root: "user" do
+          authorize!(:show, User)
           User.where(id: permitted_params[:id])
         end
 

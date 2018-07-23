@@ -17,6 +17,7 @@ module API
             end
 
             get ":id", root: "dispute_comment" do
+              authorize!(:show, DisputeComment)
               DisputeComment.where(id: permitted_params[:id])
             end
 
@@ -28,7 +29,9 @@ module API
             end
 
             put ":id", root: "dispute_comment" do
+              authorize!(:update, DisputeComment)
               @dispute_comment = DisputeComment.find(permitted_params[:id])
+              authorize!(:update, @dispute_comment)
               if @dispute_comment.user.id == permitted_params[:current_user_id]
                 @dispute_comment.update_attributes(comment: permitted_params[:comment])
               else
@@ -44,6 +47,7 @@ module API
             end
 
             post "", root: "dispute_comment" do
+              authorize!(:create, DisputeComment)
               DisputeComment.create(permitted_params)
             end
 
@@ -54,6 +58,7 @@ module API
             end
 
             delete ":id", root: "dispute_comment" do
+              authorize!(:delete, DisputeComment)
               @dispute_comment = DisputeComment.find(permitted_params[:id])
               if @dispute_comment.user.id == permitted_params[:current_user_id]
                 @dispute_comment.destroy

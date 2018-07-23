@@ -12,6 +12,7 @@ module API
           use :pagination
         end
         get "", root: :events do
+          # TODO This propably should have some authorization, but I do not understand what this does.
           events = Event.all.page(params[:page]).per(params[:per_page])
           render events, {meta: {total_pages: events.total_pages}}
         end
@@ -24,6 +25,7 @@ module API
           optional :action, type: String, desc: "The action"
         end
         get "update-progress" do
+          # TODO This propably should have some authorization, but I do not understand what this does.
           Event.where(description:params["description"],user:params["user"],action:"import_bug:#{params["id"]}").last.progress
         end
 
@@ -36,6 +38,7 @@ module API
           end
         end
         post do
+          # TODO This propably should have some authorization, but I do not understand what this does.
           Event.create({
                            user: permitted_params[:event][:user] || current_user.email,
                            action: permitted_params[:event][:action],

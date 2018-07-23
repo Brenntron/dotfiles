@@ -3,9 +3,11 @@
 
   #export-resolution-age-div
     %form#export-resolution-age-form{action: export_resolution_age_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
-      %input{type: 'hidden', name: 'date', value: params['date']}
+      %input{type: 'hidden', name: 'date_from', value: params['date_from']}
+      %input{type: 'hidden', name: 'date_to', value: params['date_to']}
       %input{type: 'hidden', name: 'resolution', value: params['resolution']}
       %input{type: 'hidden', name: 'engineer', value: params['engineer']}
+      %input{type: 'hidden', name: 'customer_id', value: params['customer_id']}
       %button Export
 
 

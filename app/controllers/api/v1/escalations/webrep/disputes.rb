@@ -38,6 +38,7 @@ module API
             end
 
             get "" do
+              authorize!(:index, Dispute)
 
               json_packet = []
 
@@ -76,8 +77,9 @@ module API
                 end
 
                 dispute_packet[:dispute_entries] = dispute.dispute_entries
+                # + dispute.submission_type
 
-                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+                dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
@@ -118,7 +120,7 @@ module API
             end
 
             put ":id" do
-
+              # TODO access control when this is implmented
             end
 
             desc 'delete a dispute'
@@ -126,7 +128,7 @@ module API
             end
 
             delete "" do
-
+              # TODO access control when this is implmented
             end
 
             desc "Adjust a WL/BL entry"
@@ -137,6 +139,7 @@ module API
               requires :note, type: String, desc: "note"
             end
             post "wlbl" do
+              authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_from_params(permitted_params, username: current_user.cvs_username)
             end
 
@@ -154,6 +157,7 @@ module API
             end
 
             delete "searches/:search_name" do
+              # TODO determine access control policy for named searches
               search = NamedSearch.where(name: params['search_name'], user: current_user)
               search.destroy_all
               true

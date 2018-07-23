@@ -2282,7 +2282,7 @@ class Bug < ApplicationRecord
   # @param [Bugzilla::Bug] bug_factory proxy interface to bugzilla.
   # @param [Hash] bug_attrs values for active record attributes on bug model.
   # @param [User] user assgined to bug.
-  def self.bugzilla_create(bug_factory, bug_attrs, user: nil)
+  def self.bugzilla_create(bug_factory, bug_attrs, user = nil, skip_local_create = false)
     options = bug_attrs.to_h.slice(*%w{product component summary version description state creator opsys
                                        platform priority severity classification})
     options = options.reject { |key, value| value.nil? }
@@ -2291,17 +2291,21 @@ class Bug < ApplicationRecord
     bugzilla_bug_options = options.merge('assigned_to' => user&.email || 'vrt-incoming@sourcefire.com')
     bug_stub_hash = bug_factory.create(bugzilla_bug_options)
 
-    case options['product']
-      when 'Research'
-        ResearchBug.create!(options.merge(id: bug_stub_hash["id"],
-                                          bugzilla_id: bug_stub_hash["id"],
-                                          state: bug_attrs['state'] || 'OPEN',
-                                          user_id: user&.id))
-      when 'Escalations'
-        EscalationBug.create!(options.merge(id: bug_stub_hash["id"],
+    if skip_local_create == false
+      case options['product']
+        when 'Research'
+          ResearchBug.create!(options.merge(id: bug_stub_hash["id"],
                                             bugzilla_id: bug_stub_hash["id"],
                                             state: bug_attrs['state'] || 'OPEN',
                                             user_id: user&.id))
+        when 'Escalations'
+          EscalationBug.create!(options.merge(id: bug_stub_hash["id"],
+                                              bugzilla_id: bug_stub_hash["id"],
+                                              state: bug_attrs['state'] || 'OPEN',
+                                              user_id: user&.id))
+      end
+    else
+      return bug_stub_hash
     end
   end
 

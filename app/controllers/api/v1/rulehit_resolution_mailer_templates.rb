@@ -13,6 +13,7 @@ module API
           requires :rulehit_id, type: Integer, desc: "Bugzilla id."
         end
         get 'make_rulehit_mail/:rulehit_id' do
+          # TODO This propably should have some authorization, but I do not understand what this does.
           # authorize!(:import, ResearchBug)
 
           Rails.logger.debug("Retrieving rulehit mailer template...")

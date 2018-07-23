@@ -5078,9 +5078,19 @@ table.dispute_tool_current tr:last-of-type td {
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
+}
+
+.top-case-info .dispute-submission-type {
   display: block;
   float: right;
   margin-top: 10px;
+}
+
+#disputes-index .dispute-submission-type {
+  display: inline-block;
+  float: left;
+  margin-top: -2px;
+  margin-right: 6px;
 }
 
 .dispute-W {background-image: url(image_path('icon_type_web.svg'));}
