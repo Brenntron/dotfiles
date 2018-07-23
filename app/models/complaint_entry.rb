@@ -66,12 +66,12 @@ class ComplaintEntry < ApplicationRecord
       if importance
         if commit_pending == "commit"
           current_status = "COMPLETED"
-          #this is where we should send off the category to the API
           update(status:current_status,resolution_comment: comment,user:current_user, is_important: false)
           complaint.set_status(current_status)
+          #this is where we should send off the category to the API
         else
           current_status = "ASSIGNED"
-          update(status:current_status, is_important: false)
+          update(status:current_status, resolution_comment: comment, is_important: false)
         end
       else
         if self.is_high_telemetry?
@@ -85,6 +85,5 @@ class ComplaintEntry < ApplicationRecord
         end
       end
     end
-
   end
 end
