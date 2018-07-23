@@ -30,11 +30,12 @@ class Sbrs::ManualSbrs < Sbrs::Base
 
   def self.where(conditions = {}, raw = false)
     params = stringkey_params(conditions)
-    binding.pry
     response = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    binding.pry
     return response.body if raw == true
-    response_body = JSON.parse(response.body)[0]
+    JSON.parse(response.body)[0]["response"]
+    # this should return {"sbrs": {"score": "<score>"}}
+    # where <score> is either between -10 and 10 (inclusive)
+    # or noscore
   end
 
   # Add a WL/BL on the backend

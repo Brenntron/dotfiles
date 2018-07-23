@@ -32,19 +32,12 @@ class Sbrs::Base
     Sbrs::Base.stringkey_params(conditions)
   end
 
-  def self.request_sds(params)
-    # adapted from TI/sb_api
-    query_string = "#{params["path"]}"
-    request_string = ''
-    webcat_flag = false
+  def self.request_sds(path:, body:)
+    # adapted from TI/sb_api, then heavily modified
+    query_string = path
     if /\/score\// =~ query_string ? true : false
-      uri_item = "#{params["uri"]}"
+      uri_item = "#{body["ip"]}"
       request_string = "https://" + sds_host + query_string + uri_item
-    elsif /\/labels\// =~ query_string ? true : false
-      request_string = "https://" + sds_host + query_string
-      webcat_flag = /\/labels\/webcat\// =~ query_string ? true : false
-    end
-    if request_string.present?
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
       request["X-Client-ID"] = "talosweb"
@@ -63,30 +56,7 @@ class Sbrs::Base
         if response.code != "200"  #there was an issue
           '{"response": "request failed[1]"}'
         else
-          if webcat_flag
-            simple_hash = {}
-            full_data = JSON.parse(response.body)
-            full_data.keys.each do |k,v|
-              if k.to_i > 0
-                simple_hash[k] = full_data[k]["name"]
-              end
-            end
-            simple_hash.to_json
-          else
-            response # was: response.body per T/I source code
-          end
-          if webcat_flag
-            simple_hash = {}
-            full_data = JSON.parse(response.body)
-            full_data.keys.each do |k,v|
-              if k.to_i > 0
-                simple_hash[k] = full_data[k]["name"]
-              end
-            end
-            simple_hash.to_json
-          else
-            response # was: response.body per T/I source code
-          end
+          response # was: response.body per T/I source code
         end
       rescue
         '{"response": "request failed[2]"}'
@@ -97,14 +67,8 @@ class Sbrs::Base
   end
 
   def self.new_request(call_item = '', call_type = 'sbrs')
-    params = {}
-    if call_type == "sbrs"
-      params["query_string"] = "/score/sbrs/json?ip="
-      params["uri_item"] = call_item
-    else
-      params["query_string"] = "/score/wbrs;wbrs-rulehits/json?url="
-      params["uri_item"] = call_item
-    end
+    params["query_string"] = "/score/sbrs/json?ip="
+    params["uri_item"] = call_item
     new_request(params) unless params == {}
   end
 
