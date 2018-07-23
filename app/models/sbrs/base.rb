@@ -14,7 +14,7 @@ class Sbrs::Base
   end
 
   def self.gssnegotiate?
-    @gssnegotiate ||= Rails.configuration.sbrs.gssnegotiate
+    @gssnegotiate ||= false
   end
 
   def self.sds_cert
@@ -32,15 +32,13 @@ class Sbrs::Base
     Sbrs::Base.stringkey_params(conditions)
   end
 
-  def self.new_request(params)
+  def self.request_sds(params)
     # adapted from TI/sb_api
-    query_string = "#{params["query_string"]}"
+    query_string = "#{params["path"]}"
     request_string = ''
-    #first_char = query_string[0]
-    #query_string = '/' + query_string if first_char != '/'
     webcat_flag = false
     if /\/score\// =~ query_string ? true : false
-      uri_item = "#{params["uri_item"]}"
+      uri_item = "#{params["uri"]}"
       request_string = "https://" + sds_host + query_string + uri_item
     elsif /\/labels\// =~ query_string ? true : false
       request_string = "https://" + sds_host + query_string
@@ -63,7 +61,7 @@ class Sbrs::Base
         end
 
         if response.code != "200"  #there was an issue
-          '{"response": "request failed"}'
+          '{"response": "request failed[1]"}'
         else
           if webcat_flag
             simple_hash = {}
@@ -75,7 +73,7 @@ class Sbrs::Base
             end
             simple_hash.to_json
           else
-            response.body
+            response # was: response.body per T/I source code
           end
           if webcat_flag
             simple_hash = {}
@@ -87,18 +85,18 @@ class Sbrs::Base
             end
             simple_hash.to_json
           else
-            response.body
+            response # was: response.body per T/I source code
           end
         end
       rescue
-        '{"response": "request failed"}'
+        '{"response": "request failed[2]"}'
       end
     else
       '{"response": "no query_string clause for [' + query_string + ']"}'
     end
   end
 
-  def self.call_sds(call_item = '', call_type = 'sbrs')
+  def self.new_request(call_item = '', call_type = 'sbrs')
     params = {}
     if call_type == "sbrs"
       params["query_string"] = "/score/sbrs/json?ip="
@@ -152,30 +150,28 @@ class Sbrs::Base
         response
       when 404 == response.code
         body = JSON.parse(response.body)
-        raise Sbrs::SbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
+        raise Wbrs::WbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
       else
         body = JSON.parse(response.body)
-        raise Sbrs::SbrsError, "HTTP response #{response.code} #{body['Error']}"
+        raise Wbrs::WbrsError, "HTTP response #{response.code} #{body['Error']}"
     end
   end
 
-  def self.call_sbrs_request(method, path, body, raw = false)
+  def self.call_json_request(method, path, body:)
     request = new_request(path)
 
     request.headers = {"Content-Type" => "application/json" }
     request.body = body.to_json
 
-    response = request_error_handling(call_request(method, request))
-    # transform the response body into valid JSON, from the YAML provided by the API
-    response_body = response.body.gsub("\n---\n",",")
-    response_body = response_body.gsub("---\n", "")
-    response_body = response_body.prepend("[").concat("]")
-    return response_body if raw == true
-    response_body = JSON.parse(response_body)
+    request_error_handling(call_request(method, request))
   end
 
-  def call_sbrs_request(method, path, body:)
-    Sbrs::Base.call_sbrs_request(method, path, body: body)
+  def call_json_request(method, path, body:)
+    Wbrs::Base.call_json_request(method, path, body: body)
   end
 
+  # TODO replace with call_json_request
+  def self.post_request(path:, body:)
+    request_error_handling(make_post_request(path: path, body: body))
+  end
 end
