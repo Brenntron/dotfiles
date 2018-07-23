@@ -240,8 +240,7 @@ window.toolbar_index_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      debugger
-#      popup_response_error(response, 'Error changing assignee')
+      popup_response_error(response, 'Error changing assignee')
   )
 
 window.toolbar_index_mark_duplicate = (box_names) ->
