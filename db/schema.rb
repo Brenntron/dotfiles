@@ -317,16 +317,12 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.index ["dispute_entry_id"], name: "index_dispute_entry_preloads_on_dispute_entry_id"
   end
 
-  create_table "dispute_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "dispute_entry_id"
-    t.text "xbrs_history", limit: 4294967295
-    t.text "crosslisted_urls", limit: 4294967295
-    t.text "virustotal", limit: 4294967295
-    t.text "wlbl", limit: 4294967295
-    t.text "wbrs_list_type", limit: 4294967295
+  create_table "dispute_peeks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["dispute_entry_id"], name: "index_dispute_entry_preloads_on_dispute_entry_id"
+    t.integer "user_id"
+    t.integer "dispute_id"
+    t.index ["user_id", "dispute_id"], name: "index_dispute_peeks_on_user_id_and_dispute_id", unique: true
   end
 
   create_table "dispute_rule_hits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
