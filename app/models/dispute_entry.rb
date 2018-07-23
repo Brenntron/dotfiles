@@ -14,10 +14,10 @@ class DisputeEntry < ApplicationRecord
 
   delegate :cvs_username, to: :dispute, allow_nil: true
 
-  NEW = 'new'
-  RESOLVED = 'resolved'
-  ASSIGNED = 'assigned'
-  CLOSED = 'closed'
+  NEW = 'NEW'
+  RESOLVED = 'RESOLVED'
+  ASSIGNED = 'ASSIGNED'
+  CLOSED = 'CLOSED'
 
   scope :open, -> { where(status: NEW) }
   scope :closed, -> { where(status: CLOSED) }
