@@ -143,4 +143,21 @@ class DisputeEntry < ApplicationRecord
     pretty_umbrella_status
   end
 
+  def referenced_tickets
+    is_ip_address = !!(hostlookup  =~ Resolv::IPv4::Regex)
+    if is_ip_address
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address})
+    else
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:uri => self.uri})
+    end
+  end
+
+  def last_submitted
+    if self.referenced_tickets.count > 1
+      last_submitted = referenced_tickets.last.created_at
+    else
+      last_submitted = "N/A"
+    end
+  end
+
 end
