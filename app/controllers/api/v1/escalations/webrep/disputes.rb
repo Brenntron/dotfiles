@@ -164,7 +164,9 @@ module API
               authorize!(:update, Dispute)
               dispute = Dispute.find(params['dispute_id'])
               authorize!(:update, dispute)
-              dispute.update(user: current_user)
+
+              dispute.take_ticket(user: current_user)
+
               { username: current_user.display_name, dispute_id: dispute.id }
             end
 
@@ -173,8 +175,11 @@ module API
             end
             patch 'take_disputes' do
               authorize!(:update, Dispute)
-              Dispute.where(id: permitted_params['dispute_ids']).update_all(user_id: current_user.id)
-              { username: current_user.display_name, dispute_ids: permitted_params['dispute_ids'] }
+
+              dispute_ids = permitted_params['dispute_ids']
+              Dispute.take_tickets(dispute_ids, user: current_user)
+
+              { username: current_user.display_name, dispute_ids: dispute_ids }
             end
           end
         end

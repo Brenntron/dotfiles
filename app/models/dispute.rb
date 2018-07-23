@@ -520,5 +520,31 @@ class Dispute < ApplicationRecord
       DisputePeek.delete_excess(user: user)
     end
   end
+
+  def take_ticket(user:)
+    raise 'This ticket is already assigned.' unless self.user_id.nil? || User.vrtincoming&.id == self.user_id
+
+    # Atomic update statement to handle possible race condition.
+    Dispute.where(id: self.id,
+                  user_id: self.user_id).update_all(user_id: user.id)
+
+    dispute = Dispute.find(self.id)
+    raise 'This record changed while you were editing.' unless dispute.user_id == user.id
+  end
+
+  def self.take_tickets(dispute_ids, user:)
+    Dispute.transaction do
+      unless Dispute.where(id: dispute_ids, user_id: User.vrtincoming.id)
+        raise 'Some of these ticket are already assigned.'
+      end
+
+      Dispute.where(id: dispute_ids,
+                    user_id: User.vrtincoming.id).update_all(user_id: user.id)
+
+      unless dispute_ids.count == Dispute.where(id: dispute_ids, user_id: user.id).count
+        raise 'This record changed while you were editing.'
+      end
+    end
+  end
 end
 
