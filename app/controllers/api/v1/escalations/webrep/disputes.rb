@@ -155,7 +155,7 @@ module API
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
-              requires :trgt_list, type: String, desc: "type of WL/BL"
+              requires :trgt_list, type: Array[String], desc: "type of WL/BL"
               optional :thrt_cats, type: Array[String], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end

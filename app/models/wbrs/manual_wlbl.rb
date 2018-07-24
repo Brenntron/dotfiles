@@ -97,7 +97,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
   # Add a WL/BL on the backend
   # @param [Array<Integer>] dispute_entry_ids pkey for dispute_entries database table.
-  # @param [String] trgt_list: Target manual list type
+  # @param [Array<String>] trgt_list: Target manual list type
   # @param [String] username: User creating the WL/BL entries
   # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
   # @param [String] note: User’s note
@@ -106,20 +106,23 @@ class Wbrs::ManualWlbl < Wbrs::Base
     wlbl_params = stringkey_params(params)
     wlbl_params['usr'] = username
 
-    target_list = wlbl_params['trgt_list']
+    target_list = wlbl_params.delete('trgt_list')
 
     entries = wlbl_params.delete('dispute_entry_ids').map {|id| DisputeEntry.find(id)}
     existing_entries, new_entries = entries.partition{ |entry| entry.webrep_wlbl_key.present? }
 
-    # when no current wlbl, then add
-    if new_entries.any? && target_list.present?
-      add_from_params(new_entries, wlbl_params)
-    end
+    if target_list.present?
+      target_list.each do |wlbl|
+        if new_entries.any?
+            add_from_params(new_entries, wlbl_params.merge(trgt_list: wlbl))
+        end
 
-    if existing_entries.any?
-      if target_list.present? # when current wlbl and a target list, then edit
-        edit_from_params(existing_entries, wlbl_params)
-      else # when current wlbl and no target list, then drop
+        if existing_entries.any?
+          edit_from_params(existing_entries, wlbl_params.merge(trgt_list: wlbl))
+        end
+      end
+    else
+      if existing_entries.any?
         drop_from_params(existing_entries, wlbl_params)
       end
     end

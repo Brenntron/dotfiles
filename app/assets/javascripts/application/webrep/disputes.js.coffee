@@ -148,11 +148,9 @@ window.index_adust_wlbl_button =(button_tag) ->
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.value
   ).toArray()
-  debugger
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
-  #foo = 'wl-bl-list-inline'
 
   wlbl_form = button_tag.form
   data = {
@@ -161,18 +159,12 @@ window.index_adust_wlbl_button =(button_tag) ->
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#  $.ajax(
-#    url: '/api/v1/escalations/webrep/disputes/wlbl'
-#    method: 'POST'
-#    headers: headers
-#    data: data
-#    dataType: 'json'
-#    success: (response) ->
-#      window.location.reload()
-#    error: (response) ->
-#      popup_response_error(response, 'Error adjusting WL/BL')
-#  )
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error updating WL/BL.'
+  )
 
 
 window.row_adust_reptool_bl_button =(button_tag) ->
