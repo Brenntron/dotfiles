@@ -1,3 +1,28 @@
+
+
+#Populating the toolbar Adjust WL/BL Button
+window.index_expand_wlbl_form = () ->
+  if ($('.dispute_check_box:checked').length > 0)
+    $('.dispute_check_box:checked').each ->
+      debugger
+      #entry_row = $(this).parents('.research-table-row')[0]
+      entry_row = this.closest('tr')
+      #entry_content = $(entry_row).find('.entry-data-content').text()
+      entry_content = $(entry_row).find('.dispute_entry_content_first').text()
+      #wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+      #wlbl = $(entry_row).find('.entry-data-wlbl').text()
+
+      #tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+      tbody = $('#wlbl_adjust_entries').find('tbody')
+      $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + '' + '</td><td class="text-center">' + '' + '</td></tr>')
+
+    $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
+    $('#wlbl_adjust_entries').show();
+
+  else
+    alert ('No rows selected')
+
+
 $ ->
   $('#edit-dispute-entry-button').click ->
 
@@ -149,7 +174,7 @@ $ ->
       alert ('No rows selected')
 
 
-#  Populating the toolbar Adjust WL/BL Button
+  #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     if ($('.dispute_check_box:checked').length > 0)
       $('.dispute_check_box').each ->
@@ -169,7 +194,7 @@ $ ->
       alert ('No rows selected')
 
 
-#  Inline Adjust WL/BL Button
+  #Inline Adjust WL/BL Button
   $('.dispute-inline-buttons.adjust-wlbl-button').click ->
     dropdown = $(this).next('.dropdown-menu')
     comment_wrapper = $(dropdown).find('.comment-wrapper')
