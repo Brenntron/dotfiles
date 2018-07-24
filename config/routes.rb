@@ -32,8 +32,10 @@ Rails.application.routes.draw do
 
       get 'show_multiple', to: 'complaints#show_multiple'
       get 'rules', to: 'complaints#rules'
+
       resources :reports, only: [:index] do
         collection do
+          get :index, to: 'complaints#reports'
           get :resolution
           get :export_resolution
         end
