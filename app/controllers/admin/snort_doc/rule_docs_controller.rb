@@ -1,4 +1,6 @@
 class Admin::SnortDoc::RuleDocsController < ApplicationController
+  load_and_authorize_resource class: 'Admin'
+
   layout 'admin/snort_doc/root'
 
   # GET /admin/snort_doc/RuleDocs

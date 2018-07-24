@@ -13,6 +13,13 @@ class ComplaintEntry < ApplicationRecord
     distance_of_time_in_words(value)
   end
 
+  RESOLVED = "RESOLVED"
+  NEW = "NEW"
+
+  STATUS_RESOLVED_FIXED_FN = "FIXED FN"
+  STATUS_RESOLVED_FIXED_FP = "FIXED FP"
+  STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+
   def location_url
     "http://#{subdomain+'.' if subdomain.present?}#{domain}#{path}"
   end
@@ -66,12 +73,12 @@ class ComplaintEntry < ApplicationRecord
       if importance
         if commit_pending == "commit"
           current_status = "COMPLETED"
-          #this is where we should send off the category to the API
           update(status:current_status,resolution_comment: comment,user:current_user, is_important: false)
           complaint.set_status(current_status)
+          #this is where we should send off the category to the API
         else
           current_status = "ASSIGNED"
-          update(status:current_status, is_important: false)
+          update(status:current_status, resolution_comment: comment, is_important: false)
         end
       else
         if self.is_high_telemetry?
@@ -85,6 +92,5 @@ class ComplaintEntry < ApplicationRecord
         end
       end
     end
-
   end
 end

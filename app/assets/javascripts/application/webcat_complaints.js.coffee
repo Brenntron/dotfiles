@@ -7,10 +7,12 @@ window.cat_new_url = ()->
 window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
 
-window.updatePending = (id) ->
+window.updatePending = (id,row_id) ->
   prefix = $('#complaint_review_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
   comment = $('#complaint_pending_comment_'+id)[0].value
+  resolution = $('.complaint-resolution'+id).text()
+  category = $('.complaint-category'+id).text()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
@@ -23,32 +25,48 @@ window.updatePending = (id) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        debugger
-
+        table = $('#complaints-index').DataTable()
+        temp_row = table.row(row_id)
+        temp_row.data().status = json.status
+        temp_row.data().resolution = resolution
+        temp_row.data().resolution_comment = comment
+        temp_row.data().category = category
+        temp_row.invalidate().draw()
+        temp_row.data().is_important = false
+        temp_row.child().remove()
+        temp_row.child(format(temp_row)).show()
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
-window.updateEntryColumns = (id) ->
-  prefix = $('#complaint_prefix_'+id)[0].value
-  categories = $('#complaint_categories_'+id)[0].value
-  status = $('[name=resolution'+id+']:checked').val()
-  comment = $('#complaint_comment_'+id)[0].value
+window.updateEntryColumns = (entry_id,row_id) ->
+  prefix = $('#complaint_prefix_'+entry_id)[0].value
+  categories = $('#complaint_categories_'+entry_id)[0].value
+  status = $('[name=resolution'+entry_id+']:checked').val()
+  comment = $('#complaint_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
     headers: headers
-    data: {'id': id,'prefix': prefix,'categories':categories,'status':status,'comment':comment }
+    data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        debugger
-
+        table = $('#complaints-index').DataTable()
+        temp_row = table.row(row_id)
+        temp_row.data().status = "PENDING"
+        temp_row.data().category = categories
+        temp_row.data().resolution = status
+        temp_row.data().resolution_comment = comment
+        temp_row.invalidate().draw()
+        temp_row.data().is_important = true
+        temp_row.child().remove()
+        temp_row.child(format(temp_row)).show()
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -131,7 +149,9 @@ window.edit_selected_complaints = () ->
 
 
 
-format = (complaint_entry) ->
+format = (complaint_entry_row) ->
+  complaint_entry = complaint_entry_row.data()
+  row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">Missing Data</span>'
   uri = ''
   host = ''
@@ -172,6 +192,23 @@ format = (complaint_entry) ->
     category = complaint_entry.category
   else
     category = ''
+  resolution_comment=''
+  if complaint_entry.resolution_comment
+    resolution_comment = complaint_entry.resolution_comment
+
+
+  unchanged_radio = ""
+  fixed_radio = ""
+  invalid_radio = ""
+  if complaint_entry.resolution
+    switch (complaint_entry.resolution)
+      when "unchanged"
+        unchanged_radio = "checked='checked'"
+      when "fixed"
+        fixed_radio = "checked='checked'"
+      when "invalid"
+        invalid_radio = "checked='checked'"
+
   complaint_entry_html = ''
   if complaint_entry.is_important
     complaint_entry_html = '<div class="row">' +
@@ -180,10 +217,17 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="col-xs-2">' +
       '<div class="row">' +
-      'Category:' + complaint_entry.category +
+      '<div>Category:' +
+      '<span class="complaint-category' + complaint_entry.entry_id + '">' + complaint_entry.category + '</span>' +
+      '</div>'+
       '</div>' +
       '<div class="row">' +
-      '<h3>' + url + '</h3>' +
+      '<strong>' + url + '</strong>' +
+      '</div>' +
+      '<div class="row">' +
+      '<div>Resolution: '+
+      '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
+      '</div>'+
       '</div>' +
       '</div>' +
       ' <div class="col-xs-3">' +
@@ -197,13 +241,13 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="col-xs-4">' +
       ' Resolution: | ' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" checked="checked"> commit | ' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline"> decline' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > commit | ' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> decline' +
       '</div>' +
       '<div class="col-xs-1">' +
-      '<button onclick="updatePending(' + complaint_entry.entry_id + ')"> Change </button>' +
+      '<button onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Change </button>' +
       '</div>' +
-      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50">' + '</div>' +
+      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50">' + '</div>' +
       '</div>'
   else
     complaint_entry_html = '<div class="row">' +
@@ -230,12 +274,12 @@ format = (complaint_entry) ->
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + entry_status + '> unchanged |  ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed" checked="checked" ' + entry_status + '> fixed | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + entry_status + '> invalid' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> unchanged |  ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> fixed | ' +
+      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> invalid' +
       '</div>' +
       '<div class="col-xs-1">' +
-      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ')" ' + entry_status + '>Update</button>' +
+      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -245,7 +289,7 @@ format = (complaint_entry) ->
       '<button>history</button>' +
       '<button>domain</button>' +
       '</div>' +
-      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="" placeholder="add a comment" size="50" ' + entry_status + '>' + '</div>' +
+      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>' + '</div>' +
       '</div>'
   complaint_entry_html
 
@@ -257,7 +301,7 @@ window.click_table_buttons = (complaint_table, button)->
     tr.removeClass 'shown'
     tr.addClass 'not-shown'
   else                         # Open this row
-    row.child(format(row.data())).show()
+    row.child(format(row)).show()
     tr.removeClass 'not-shown'
     tr.addClass 'shown'
     td = $(tr).next('tr').find('td:first')

@@ -43,6 +43,8 @@ module API
                   complaint_entry_packet[:customer_name] = complaint_entry.complaint&.customer&.name # Customer name
 
                   complaint_entry_packet[:category] = complaint_entry.category
+                  complaint_entry_packet[:resolution]= complaint_entry.resolution
+                  complaint_entry_packet[:resolution_comment] = complaint_entry.resolution_comment
 
                   complaint_entry_packet[:subdomain] = complaint_entry.subdomain
                   complaint_entry_packet[:domain] = complaint_entry.domain
@@ -76,7 +78,9 @@ module API
                                          permitted_params['comment'],
                                          current_user, false,"")
               rescue Exception => e
+                  return e.message
               end
+              {status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
             desc 'update a high telemetry entry'
             params do
@@ -93,7 +97,9 @@ module API
                                     permitted_params['comment'],
                                     current_user, entry.is_high_telemetry?, permitted_params['commit'])
               rescue Exception => e
+                return e.message
               end
+              {status:entry.status, entry_resolution:permitted_params['commit']}.to_json
             end
 
             desc 'take entry'

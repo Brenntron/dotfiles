@@ -13,6 +13,7 @@ module API
             end
 
             get ":id", root: "dispute_email" do
+              authorize!(:show, DisputeEmail)
               DisputeEmail.where(id: permitted_params[:id])
             end
 
@@ -23,7 +24,9 @@ module API
             end
 
             put ":id", root: "dispute_email" do
+              authorize!(:update, DisputeEmail)
               @dispute_email = DisputeEmail.find(permitted_params[:id])
+              authorize!(:update, @dispute_email)
               @dispute_email.update_attributes(status: permitted_params[:status])
 
               {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments}
@@ -41,6 +44,7 @@ module API
             end
 
             post "", root: "dispute_email" do
+              authorize!(:create, DisputeEmail)
               begin
                 #temporary, for development, don't wanna be sending these to actual customers
                 params[:to] = "claclair@cisco.com"

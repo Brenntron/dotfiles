@@ -12,6 +12,7 @@ module API
             end
 
             get "" do
+              authorize!(:index, Complaint)
 
               json_packet = []
 
@@ -75,6 +76,7 @@ module API
               requires :url, type: String, desc: "URL to be visited"
             end
             get "test_url" do
+              # TODO determine access control policy for test_url
               response = JSON.parse(Complaint.can_visit_url?(params[:url]))
               throw :error, status: response["status"], message: "#{response["error"]}" if response["status"] != "SUCCESS"
               response
@@ -86,7 +88,7 @@ module API
             end
 
             put ":id" do
-
+              # TODO access control when this is implemented
             end
 
             desc 'delete a complaint'
@@ -94,7 +96,7 @@ module API
             end
 
             delete "" do
-
+              # TODO access control when this is implemented
             end
 
             # 'complaint_entry_ids': entry_ids
@@ -107,6 +109,7 @@ module API
               requires :comment, type: String
             end
             post 'mark_for_commit' do
+              # TODO determine access control policy for mark_for_commit
               ComplaintMarkedCommit.mark_for_commit(permitted_params['complaint_entry_ids'],
                                                     permitted_params['category_list'],
                                                     user: current_user,
@@ -116,6 +119,7 @@ module API
 
             desc 'commit marked'
             post 'commit_marked' do
+              # TODO determine access control policy for mark_for_commit
               ComplaintMarkedCommit.commit_marked(user: current_user)
               true
             end

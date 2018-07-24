@@ -7,6 +7,7 @@ module API
         resource "escalations/attachments" do
           desc "get all attachments"
           get "", root: :attachments do
+            authorize!(:index, Attachment)
             Attachment.all
           end
 
@@ -15,6 +16,7 @@ module API
             requires :id, type: String, desc: "ID of the attachment"
           end
           get ":id", root: "attachment" do
+            authorize!(:show, Attachment)
             Attachment.where(id: permitted_params[:id])
           end
 
@@ -34,6 +36,7 @@ module API
           post "" , root: :attachments do
             authorize! :create, Attachment
             bug = Bug.where(id: permitted_params[:attachment][:bugzilla_attachment_id]).first
+            authorize!(:update, bug)
 
             bug.add_escalation_attachment_action(bugzilla_session,
                                       permitted_params[:attachment][:file_data][:tempfile],

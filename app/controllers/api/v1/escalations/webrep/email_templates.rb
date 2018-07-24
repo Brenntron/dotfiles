@@ -13,6 +13,7 @@ module API
             end
 
             get ":id", root: "email_template" do
+              authorize!(:show, EmailTemplate)
               EmailTemplate.where(id: permitted_params[:id])
             end
 
@@ -25,7 +26,9 @@ module API
             end
 
             put ":id", root: "email_template" do
+              authorize!(:update, EmailTemplate)
               template = EmailTemplate.find(permitted_params[:id])
+              authorize!(:update, template)
               template.update_attributes(permitted_params)
             end
 
@@ -37,6 +40,7 @@ module API
             end
 
             post "", root: "email_template" do
+              authorize!(:create, EmailTemplate)
               template = EmailTemplate.create(permitted_params)
               if !template.save
                 raise template.errors.full_messages.to_sentence
@@ -49,7 +53,9 @@ module API
             end
 
             delete ":id", root: "email_template" do
+              authorize!(:delete, EmailTemplate)
               template = EmailTemplate.find(permitted_params[:id])
+              authorize!(:delete, template)
               template.destroy
             end
           end

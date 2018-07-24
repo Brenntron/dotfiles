@@ -11,6 +11,8 @@ class User < ApplicationRecord
   has_many :committed_bugs, class_name: 'Bug', foreign_key: :committer_id
   has_many :named_searches
   has_many :dispute_comments
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :recent_dispute_views, class_name: 'Dispute', through: :dispute_peeks, source: :dispute
 
   validates :cvs_username, presence: true, uniqueness: true
 
@@ -79,6 +81,22 @@ class User < ApplicationRecord
 
   def is_on_team?
     (parent.nil? && children.empty?) ? false : true
+  end
+
+  def team_manager
+    if children.empty?
+      parent
+    else
+      self
+    end
+  end
+
+  def my_team
+    if children.empty?
+      siblings + [parent, self]
+    else
+      descendants + [self]
+    end
   end
 
   def available_users

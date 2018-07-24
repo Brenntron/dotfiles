@@ -22,15 +22,6 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   def reports
   end
 
-  def dashboard
-  end
-
-  def tickets
-  end
-
-  def single
-  end
-
   def show_multiple
     ids = params["selected_ids"]&.split(',') || nil
     @complaints = Complaint.where(id:ids)
