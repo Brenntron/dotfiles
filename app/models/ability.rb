@@ -9,7 +9,7 @@ class Ability
     role_names = roles.pluck(:role)
 
 
-    can :update_preferences, User, id: current_user.id
+    can [:read, :update_preferences], User, id: current_user.id
 
     # roles are partitioned into org subsets (snort rules, snort escalations, web cat, web rep)
     # the current user can read the user records of other users in their subset.
@@ -19,14 +19,15 @@ class Ability
       end
     end
 
+
+
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
       can :read, :all
       can [:acknowledge_bug], Bug
-      can :manage, [Admin, User]
-
-      can [:list_research, :list_escalations], Bug #legacy
+      can :manage, [Admin, User, Role, ReferenceType, Task, SnortDocPublisher]
     end
+
 
     if role_names.include?('api user')
       # Must be authorized to read API, and read API for V version,
@@ -38,21 +39,12 @@ class Ability
       can :read, ::API::V2
     end
 
+
     if role_names.include?('webcat manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-    end
-
-    if role_names.include?('webrep user')
-      can :manage, [Dispute, Attachment, Note]
-      can :publish_to_bugzilla, Note
-    end
-
-    if role_names.include?('webrep manager')
-      can :manage, User do |user| #no delete UI is implemented
-        user.ancestors.include?(current_user)
-      end
+      can [:read, :show_multiple, :advanced_search, :named_search, :standard_search, :contains_search], Complaint
     end
 
     if role_names.include?('webcat user')
@@ -60,10 +52,31 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
+
+    if role_names.include?('webrep manager')
+      can :manage, User do |user| #no delete UI is implemented
+        user.ancestors.include?(current_user)
+      end
+      can [:read, :advanced_search, :named_search, :standard_search, :contains_search, :export_resolution_age_report,
+           :resolution_report, :export_per_resolution_report, :export_per_engineer_report, :resolution_age_report,
+           :dashboard, :research],
+          Dispute
+      can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, Attachment, Note, Wbrs::ManualWlbl]
+      can :manage, [EmailTemplate]
+    end
+
+    if role_names.include?('webrep user')
+      can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment, Note, EmailTemplate, Wbrs::ManualWlbl]
+      can :publish_to_bugzilla, Note
+    end
+
     if role_names.include?('ips escalator manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
+
+      #:manage allows -- :add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics
+      can [:manage, :import], EscalationBug
     end
 
     if role_names.include?('ips escalator')
@@ -73,11 +86,12 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
+    # 'manager' role is 'ips rule manager', but renaming would break things.
     if role_names.include?('manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can :read, [ResearchBug, Rule]
+      can :read, [ResearchBug, Rule, RuleDoc]
     end
 
     if role_names.include?('committer')

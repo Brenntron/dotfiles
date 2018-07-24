@@ -7,9 +7,9 @@ class Customer < ApplicationRecord
 
 
   def self.process_and_get_customer(payload)
-    customer_email = payload["email"]
-    customer_company = payload["user_company"]
-    customer_name = payload["name"]
+    customer_email = payload["payload"]["email"]
+    customer_company = payload["payload"]["user_company"]
+    customer_name = payload["payload"]["name"]
 
     customer_exists = Customer.find_or_create_by(:email => customer_email)
     company_exists = Company.find_or_create_by(name: customer_company)

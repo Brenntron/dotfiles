@@ -1,0 +1,119 @@
+.content-wrapper
+  %h1 Resolution Report
+
+  #export-per-resolution-div
+    %form#export-per-resolution-form{action: export_per_resolution_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
+      %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
+      %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+      %input{type: 'hidden', name: 'period', value: params['report']['period']}
+      %button Export
+
+  .report-div
+    #per-resolution-report-div
+      %table#per-resolution-report-table
+        %caption Number of resolved complaints per resolution
+        %thead
+          %tr
+            %th Date
+            %th Resolution
+            %th %
+            %th Count
+        %tbody
+          - @report.each_per_resolution do |pr_report|
+            %tr
+              %td{rowspan: 4}
+                = pr_report.date_from
+                \-
+                = pr_report.date_to
+              %td TOTAL:
+              %td
+              %td
+                = 0 == pr_report.total ? '' : link_to(pr_report.total,
+                                                      age_report_path(date_from: pr_report.date_from,
+                                                                      date_to: pr_report.date_to))
+            - pr_report.each_resolution do |resolution, percent, count|
+              %tr
+                %td= resolution
+                %td= percent
+                %td
+                  = count && link_to(count, age_report_path(date_from: pr_report.date_from,
+                                                            date_to: pr_report.date_to,
+                                                            resolution: resolution))
+
+  #export-per-engineer-div
+    %form#export-per-engineer-form{action: export_per_engineer_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
+      %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
+      %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+      %input{type: 'hidden', name: 'period', value: params['report']['period']}
+      %button Export
+
+  .report-div
+    #per-engineer-report-div
+      %table#per-engineer-report-table
+        %caption Number of resolved complaints per engineer
+        %thead
+          %tr
+            %th Date
+            %th Resolution
+            %th %
+            %th Count
+        %tbody
+          - @report.each_per_engineer do |pe_report|
+            %tr
+              %td{rowspan: 1 + pe_report.engineer_count}
+                = pe_report.date_from
+                \-
+                = pe_report.date_to
+              %td TOTAL:
+              %td
+              %td
+                = 0 == pe_report.total ? '' : link_to(pe_report.total,
+                                                      age_report_path(date_from: pe_report.date_from,
+                                                                      date_to: pe_report.date_to))
+            - pe_report.each_resolution do |engineer, percent, count|
+              %tr
+                %td= engineer
+                %td= percent
+                %td
+                  = count && link_to(count, age_report_path(date_from: pe_report.date_from,
+                                                            date_to: pe_report.date_to,
+                                                            engineer: engineer))
+
+
+  #export-per-customer-div
+    %form#export-per-customer-form{action: export_per_customer_report_escalations_webrep_disputes_path(format: :csv), method: 'get'}
+      %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
+      %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
+      %input{type: 'hidden', name: 'period', value: params['report']['period']}
+      %button Export
+
+  .report-div
+    #per-customer-report-div
+      %table#per-customer-report-table
+        %caption Number of resolved complaints per customer
+        %thead
+          %tr
+            %th Date
+            %th Resolution
+            %th %
+            %th Count
+        %tbody
+          - @report.each_per_customer do |pc_report|
+            %tr
+              %td{rowspan: 1 + pc_report.customer_count}
+                = pc_report.date_from
+                \-
+                = pc_report.date_to
+              %td TOTAL:
+              %td
+              %td
+                = 0 == pc_report.total ? '' : link_to(pc_report.total, age_report_path(date_from: pc_report.date_from,
+                                                                                       date_to: pc_report.date_to))
+            - pc_report.each_resolution do |customer, percent, count|
+              %tr
+                %td= customer.name
+                %td= percent
+                %td
+                  = count && link_to(count, age_report_path(date_from: pc_report.date_from,
+                                                            date_to: pc_report.date_to,
+                                                            customer_id: customer.id))

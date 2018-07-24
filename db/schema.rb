@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180711201143) do
+ActiveRecord::Schema.define(version: 20180720142558) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -299,6 +299,33 @@ ActiveRecord::Schema.define(version: 20180711201143) do
     t.float "wbrs_score", limit: 24
     t.integer "webrep_wlbl_key"
     t.integer "reptool_key"
+    t.boolean "is_important"
+    t.integer "user_id"
+    t.datetime "case_opened_at"
+    t.datetime "case_closed_at"
+    t.datetime "case_accepted_at"
+    t.datetime "case_resolved_at"
+  end
+
+  create_table "dispute_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "dispute_entry_id"
+    t.text "xbrs_history", limit: 4294967295
+    t.text "crosslisted_urls", limit: 4294967295
+    t.text "virustotal", limit: 4294967295
+    t.text "wlbl", limit: 4294967295
+    t.text "wbrs_list_type", limit: 4294967295
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "umbrella", limit: 4294967295
+    t.index ["dispute_entry_id"], name: "index_dispute_entry_preloads_on_dispute_entry_id"
+  end
+
+  create_table "dispute_peeks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.integer "dispute_id"
+    t.index ["user_id", "dispute_id"], name: "index_dispute_peeks_on_user_id_and_dispute_id", unique: true
   end
 
   create_table "dispute_rule_hits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -553,6 +580,16 @@ ActiveRecord::Schema.define(version: 20180711201143) do
     t.index ["rule_id"], name: "index_rule_docs_on_rule_id"
   end
 
+  create_table "rulehit_resolution_mailer_templates", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "mnemonic"
+    t.string "to"
+    t.string "cc"
+    t.string "subject"
+    t.text "body", limit: 4294967295
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "rules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.text "rule_content"
     t.text "rule_parsed"
@@ -726,4 +763,5 @@ ActiveRecord::Schema.define(version: 20180711201143) do
     t.index ["name"], name: "index_whiteboards_on_name"
   end
 
+  add_foreign_key "dispute_entry_preloads", "dispute_entries"
 end

@@ -1,4 +1,5 @@
 class Admin::RolesController < Admin::HomeController
+  load_and_authorize_resource class: 'Role'
 
   # GET /roles
   # GET /roles.json

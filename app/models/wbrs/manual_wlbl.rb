@@ -30,15 +30,20 @@ class Wbrs::ManualWlbl < Wbrs::Base
     new_from_attributes(response_body)
   end
 
+  def self.load_from_prefetch(data)
+    data = JSON.parse(data)
+    data['data'].map {|datum| new_from_attributes(datum)}
+  end
+
   # Get all the manual WL/BL entries.
   # @param [String] url URL pattern the WL/BL entry is added for (optional)
   # @param [String] usr Pattern of username who added or modified WL/BL entry (optional)
   # @param [Array<String>] list_types The WL/BL entry’s type (optional)
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
-  def self.where(conditions = {})
+  def self.where(conditions = {}, raw = false)
     params = stringkey_params(conditions)
     response = post_request(path: '/v1/rep/wlbl/get', body: params)
-
+    return response.body if raw == true
     response_body = JSON.parse(response.body)
     response_body['data'].map {|datum| new_from_attributes(datum)}
   end
@@ -51,11 +56,11 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [String] note: User’s note
   # @return [String] JSON for array of warnings
   def self.add_from_params(entries, wlbl_params)
-    wlbl_params['url'] = entries.map {|entry| entry.hostlookup}
+    wlbl_params['urls'] = entries.map {|entry| entry.hostlookup}
     response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
-    wlbl_params.delete('url')
+    wlbl_params.delete('urls')
 
-    wlbl_ids = JSON.parse(response.body)["Added WL/BL entries IDs"]
+    wlbl_ids = JSON.parse(response.body)["ids"]
     wlbl_ids.each_with_index do |wlbl_id, index|
       entries[index].update(webrep_wlbl_key: wlbl_id)
     end
@@ -63,6 +68,11 @@ class Wbrs::ManualWlbl < Wbrs::Base
     response.body
   end
 
+  # @param [Array<DisputeEntry>] entries the database records for the entries to add the WL/BL to.
+  # @param [String] trgt_list: Target manual list type
+  # @param [String] usr: User creating the WL/BL entries
+  # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
+  # @param [String] note: User’s note
   def self.edit_from_params(entries, wlbl_params)
     entries.each do |entry|
       wlbl_params['wlbl_id'] = entry.webrep_wlbl_key
@@ -70,9 +80,11 @@ class Wbrs::ManualWlbl < Wbrs::Base
       wlbl_params.delete('wlbl_id')
     end
 
-    ''
+    true
   end
 
+  # @param [Array<DisputeEntry>] entries the database records for the entries to add the WL/BL to.
+  # @param [String] usr: User creating the WL/BL entries
   def self.drop_from_params(entries, wlbl_params)
     wlbl_params['ids'] = entries.map {|entry| entry.webrep_wlbl_key}
     response = post_request(path: '/v1/rep/wlbl/drop', body: wlbl_params)

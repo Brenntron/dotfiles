@@ -1,25 +1,25 @@
 Rails.application.routes.draw do
 
+  resources :rulehit_resolution_mailer_templates
   devise_for :users, controllers: {sessions: 'sessions'}
 
-  namespace :escalations do
+  namespace :escalations, except: [:destroy, :edit] do
     root 'bugs#index'
     resources :escalation_bugs, controller: 'bugs'
     resources :bugs do
-
       member do
-        post :create_rules
+        # post :create_rules
         post :add_tag
         post :add_whiteboard
         patch :remove_tag
         patch :remove_whiteboard
       end
-      resources :references
+      # resources :references
     end
 
     namespace :webcat do
       root 'complaints#index'
-      resources :complaints do
+      resources :complaints, only: [:index, :show, :update] do
         collection do
           get :show_multiple
           get :advanced_search
@@ -31,24 +31,34 @@ Rails.application.routes.draw do
       resources :complaint_entries
 
       get 'show_multiple', to: 'complaints#show_multiple'
-      get 'clusters', to: 'complaints#clusters'
       get 'rules', to: 'complaints#rules'
-      get 'reports', to: 'complaints#reports'
+      resources :reports, only: [:index] do
+        collection do
+          get :resolution
+          get :export_resolution
+        end
+      end
     end
 
     namespace :webrep do
       root 'disputes#index'
-      resources :disputes do
+      resources :disputes, only: [:index, :show] do
         collection do
           get :advanced_search
           get :named_search
           get :standard_search
           get :contains_search
+          get :resolution_report
+          get :export_per_resolution_report
+          get :export_per_engineer_report
+          get :export_per_customer_report
+          get :resolution_age_report
+          get :export_resolution_age_report
         end
       end
-      resources :dispute_emails
-      resources :dispute_comments
-      resources :email_templates
+      resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.
+      resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
+      resources :email_templates        # TODO This route has no controller so determine if it should be removed.
 
       get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
@@ -57,12 +67,16 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
-    resources :roles
-    resources :org_subsets
     root 'home#index'
+    resources :roles, except: [:show]
+    resources :org_subsets, except: [:show]
     resources :migrations, only: [:index]
     resources :morsels, only: [:index, :show]
-    resources :notes, only: [:index, :edit, :update, :destroy]
+    resources :notes, only: [:index, :edit, :update, :destroy] do
+      member do
+        get :related
+      end
+    end
     resources :rules, only: [:index, :edit, :update] do
       collection do
         get :validations
@@ -72,7 +86,7 @@ Rails.application.routes.draw do
       end
     end
     resources :reference_types, only: [:index, :edit, :update]
-    resources :scheduled_tasks do
+    resources :scheduled_tasks, only: [:index, :show, :create, :destroy] do
       collection do
         post :run_job
       end
@@ -81,15 +95,15 @@ Rails.application.routes.draw do
     namespace :snort_doc do
       root 'root#index'
       get 'doc_output', to: 'rule_docs#doc_output'
+      get :rule_docs, to: 'rule_docs#index'
+      get :upload_docs, to: 'rule_docs#upload'
+      post :upload_docs, to: 'rule_docs#send_yaml'
       namespace :cves do
         get :nvd
         post :download
         get :missing
         post :update
       end
-      get :rule_docs, to: 'rule_docs#index'
-      get :upload_docs, to: 'rule_docs#upload'
-      post :upload_docs, to: 'rule_docs#send_yaml'
     end
 
     resources :rules_sync, only: [:index] do
@@ -99,17 +113,17 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :events do
+  resources :events, only: [] do
     collection { get :send_event }
   end
 
   namespace :api_test do
-    resources :jobs, :defaults => {:format => 'json'}
-    resources :pcaps, :defaults => {:format => 'json'}
-    resources :engines, :defaults => {:format => 'json'}
-    resources :engine_types, :defaults => {:format => 'json'}
-    resources :snort_configurations, :defaults => {:format => 'json'}
-    resources :rule_configurations, :defaults => {:format => 'json'}
+    resources :jobs, only: [:index, :create], :defaults => {:format => 'json'}
+    resources :pcaps, only: [:index, :create], :defaults => {:format => 'json'}
+    resources :engines, only: [:index], :defaults => {:format => 'json'}
+    resources :engine_types, only: [:index], :defaults => {:format => 'json'}
+    resources :snort_configurations, only: [:index], :defaults => {:format => 'json'}
+    resources :rule_configurations, only: [:index], :defaults => {:format => 'json'}
   end
 
   # TODO some of these named routes need to be rethought to conform to rails conventions
@@ -122,9 +136,9 @@ Rails.application.routes.draw do
 
   # resources :rules, param: :sid
 
-  resources :tests
+  # resources :tests
 
-  resources :users do
+  resources :users, only: [:index, :show, :update] do
 
     collection do
       get :results
@@ -137,7 +151,7 @@ Rails.application.routes.draw do
     get :component_team_metrics, defaults: {format: :json}
     patch :add_to_team
     patch :remove_from_team
-    resources :relationships do
+    resources :relationships, only: [:index, :show] do
       collection do
         get :member_status
       end
@@ -150,15 +164,15 @@ Rails.application.routes.draw do
   end
 
   resources :research_bugs, controller: 'bugs'
-  resources :bugs do
+  resources :bugs, only: [:index, :new, :create, :show, :update] do
     member do
-      post :create_rules
+      # post :create_rules
       post :add_tag
       post :add_whiteboard
       patch :remove_tag
       patch :remove_whiteboard
     end
-    resources :references
+    resources :references, only: [:create]
     get :bug_metrics, defaults: { format: :json }
   end
 

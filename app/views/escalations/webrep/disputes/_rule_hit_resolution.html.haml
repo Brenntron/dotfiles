@@ -1,0 +1,25 @@
+#ruleHitEmailDialog{title: 'Compose New Email'}
+  %form
+    .email-reply-header-information
+      .row
+        .col-xs-6
+          %span.content-label-sm.content-label-sm-to To
+          %input.receiver-email.new-receiver{required: true, type: 'email', name: 'receiver'}
+        .col-xs-6
+          %span.content-label-sm.content-label-sm-cc Cc
+          %input.cc-email{type: 'email', name: 'cc-reciever'}
+      .row
+        .col-xs-12
+          .email-reply-buttons
+            %button.attachment-button.attachment-label.new-attachment
+          %span.content-label-sm.content-label-sm-sub Subject
+          %input.communication-subject.new-subject{type: 'text'}
+
+      #file-fields-new
+
+    .email-reply-body-wrapper
+      %textarea.email-reply-body.new-body
+
+    .email-new-button-wrapper
+      %button.primary#send-new-email{value: 'submit'}
+        Send

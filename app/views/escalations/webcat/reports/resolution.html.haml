@@ -1,0 +1,36 @@
+%h1 Webcat Report
+
+#export-webcat-resolution-div
+  %form#export-webcat-resolution-form{action: export_resolution_escalations_webcat_reports_path(format: :csv), method: 'get'}
+    %input{type: 'hidden', name: 'date_from', value: params['date_from']}
+    %input{type: 'hidden', name: 'date_to', value: params['date_to']}
+    %button Export
+
+.report-div
+  #webcat-resolution-report-div
+    %table#webcat-resolution-report-table
+      %caption Number of resolved complaints per resolution
+      %thead
+        %tr
+          %th
+          %th Fixed Complaints
+          %th Invalid Complaints
+          %th Unchanged Complaints
+          %th Duplicate Complaints
+          %th Eng Ave
+          %th Eng Max
+          %th Dept Ave
+          %th Dept Max
+      %tbody
+        - @report.each_engineer do |counts|
+          %tr
+            %td= counts.username
+            %td= counts.fixed
+            %td= counts.invalid
+            %td= counts.unchanged
+            %td= counts.duplicate
+            %td= ApplicationRecord.humanize_secs(counts.eng_avg)
+            %td= ApplicationRecord.humanize_secs(counts.eng_max)
+            %td= ApplicationRecord.humanize_secs(counts.dept_avg)
+            %td= ApplicationRecord.humanize_secs(counts.dept_max)
+

@@ -1,6 +1,5 @@
 class Escalations::BugsController < ApplicationController
-  load_and_authorize_resource class: 'EscalationBug',
-                              except: [:add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics]
+  load_and_authorize_resource class: 'EscalationBug'
   skip_load_resource only: [:index, :show]
 
   before_action :require_login
@@ -142,6 +141,7 @@ class Escalations::BugsController < ApplicationController
     end
   end
 
+  # TODO find out if this is necessary, or if updates are done via the API.
   def update
     @bug = Bug.find(params[:id])
     respond_to do |format|
@@ -213,18 +213,18 @@ class Escalations::BugsController < ApplicationController
 
 
 
-  def bug_metrics
-    @bug = Bug.find(params[:bug_id])
-
-    respond_to do |format|
-      format.json {
-        render :json => [@bug.work_time,
-                         @bug.rework_time,
-                         @bug.review_time,
-                         @bug.resolution_time]
-      }
-    end
-  end
+  # def bug_metrics
+  #   @bug = Bug.find(params[:bug_id])
+  #
+  #   respond_to do |format|
+  #     format.json {
+  #       render :json => [@bug.work_time,
+  #                        @bug.rework_time,
+  #                        @bug.review_time,
+  #                        @bug.resolution_time]
+  #     }
+  #   end
+  # end
 
   private
 

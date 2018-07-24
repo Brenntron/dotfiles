@@ -46,35 +46,70 @@
             -#For each checked checkbox populate this information
             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
               .dispute-wlbl-adjust-wrapper
-                .dispute-name-wrapper
-                  %label.content-label-sm Dispute
-                  %br
-                  %span.entry-dispute-name
                 %table.dispute_tool_current
-                  %tr
-                    %td.text-center
-                      %label.content-label-sm Current Score
-                      %br
-                      %span.current-wbrs-score
-                    %td.text-center
-                      %label.content-label-sm New Score
-                      %br
-                      %span.new_wbrs_score
+                  %thead
+                    %tr
+                      %th.content-label-sm Dispute
+                      %th.content-label-sm.no-word-break Current WL/BL List
+                      %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                  %tbody
+                    -#%tr
+                    -#  %td.wlbl-entry-content
+                    -#  %td.wlbl-entry-wlbl
+                    -#  %td.wlbl-current-entry-wbrs.text-center
+
+                    -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                    -#%td.text-center
+                    -#  %label.content-label-sm New Score
+                    -#  %br
+                    -#  %span.new_wbrs_score
                 .inline-tool-content-wrapper
-                  .toolbar
-                    %div
-                      %label.toolbar-section-label{for:'wlbl-list-type-select'} WL/BL List
-                      = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                        {include_blank: 'Not currently on a list'},
-                        class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                        title: 'RepTool Rule Status',
-                        id: "wlbl-list-type-select"
-                    %button.wlbl-preview-button.tertiary{type: 'button', disabled: true} Preview
+                  .row
+                    .col-xs-12
+                      %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
+                  .row
+                    .col-xs-6
+                      %ul.wlbl-toggle-list
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "wl-weak"}
+                            %span.toggle-slider
+                          WL - Weak
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "wl-med"}
+                            %span.toggle-slider
+                          WL - Medium
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "wl-heavy"}
+                            %span.toggle-slider
+                          WL - Heavy
+                    .col-xs-6
+                      %ul.wlbl-toggle-list
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "bl-weak"}
+                            %span.toggle-slider
+                          BL - Weak
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "bl-med"}
+                            %span.toggle-slider
+                          BL - Medium
+                        %li
+                          %label.toggle-switch
+                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "bl-heavy"}
+                            %span.toggle-slider
+                          BL - Heavy
+
+
+
                   .comment-wrapper
                     %label.content-label-sm Comment
                     %textarea.dropdown-comment.adjust-wlbl-input.note-input
                   .button-row-center
-                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);', disabled: true}
+                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);'}
                       Submit Changes
 
         %span.dropdown
@@ -141,13 +176,8 @@
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td
                     %span.entry-data.entry-data-content
-                      - unless entry[:ip_address].nil?
-                        - entry_content = entry[:ip_address]
-                      - unless entry[:uri].nil?
-                        - entry_content = entry[:uri]
-                      = entry_content
-
-                    %input.table-entry-input.wide{type:'text', value: "#{entry_content}"}
+                      = entry.hostlookup
+                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
                   %td
                     %label Category
                     - unless entry[:primary_category].nil?
@@ -161,10 +191,12 @@
                   %td
                     %label Status
                     %span.entry-data
-                      -#- unless entry[:status].nil?
-                      -#  = entry[:status]
-                      New
-                    -# Temporarily putting manual status entries in here
+                      - if entry[:status].nil?
+                        New
+                        -# Temporarily putting manual status entries in here
+                      - else
+                        = entry[:status]
+
                     %span.dropdown
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         -#= entry[:status]
@@ -235,27 +267,124 @@
                               %h3 Adjust WL/BL
                               %table.dispute_tool_current
                                 %tr
-                                  %td.text-center
-                                    %label.content-label-sm Current Score
+                                  %td
+                                    %label.content-label-sm Current WL/BL List
                                     %br
-                                    %span.current-wbrs-score
-                                      = entry.wbrs_score
+                                    - if entry.wbrs_list_type.nil?
+                                      %span.missing-data Not currently on a list
+                                    - else
+                                      %span= entry.wbrs_list_type
                                   %td.text-center
-                                    %label.content-label-sm New Score
+                                    %label.content-label-sm Current WBRS Score
                                     %br
-                                    %span.new_wbrs_score
-                              .inline-tool-content-wrapper
-                                .toolbar
-                                  %div
-                                    %label.toolbar-section-label{for: "entry-#{entry.id}-wlbl-list-type-select"} WL/BL List
-                                    = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
-                                     {selected: entry.wbrs_list_type,
-                                       include_blank: 'Not currently on a list '},
-                                     class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
-                                     title: 'RepTool Rule Status',
-                                     id: "entry-#{entry.id}-wlbl-list-type-select"
+                                    - if entry.wbrs_score.nil?
+                                      %span.current-wbrs-score.missing-data
+                                        No score.
+                                    - else
+                                      %span.current-wbrs-score
+                                        = entry.wbrs_score
 
-                                  %button.wlbl-preview-button.tertiary{type: 'button', disabled: true} Preview
+                                  -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                                  -#%td.text-center
+                                  -#  %label.content-label-sm New Score
+                                  -#  %br
+                                  -#  %span.new_wbrs_score
+                              .inline-tool-content-wrapper
+                                .row
+                                  .col-xs-12
+                                    %label.content-label-sm{for: "entry-#{entry.id}-wlbl-list-type-select"} Adjust WL/BL List
+                                - unless entry.wbrs_list_type.nil?
+                                  - entry.wbrs_list_type.each do |list|
+                                    .row
+                                      .col-xs-6
+                                        %ul.wlbl-toggle-list
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'wl-weak'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-weak", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-weak"}
+                                              %span.toggle-slider
+                                            WL - Weak
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'wl-med'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-med", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-med"}
+                                              %span.toggle-slider
+                                            WL - Medium
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'wl-heavy'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-heavy", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-heavy"}
+                                              %span.toggle-slider
+                                            WL - Heavy
+                                      .col-xs-6
+                                        %ul.wlbl-toggle-list
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'bl-weak'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-weak", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-weak"}
+                                              %span.toggle-slider
+                                            BL - Weak
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'bl-med'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-med", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-med"}
+                                              %span.toggle-slider
+                                            BL - Medium
+                                          %li
+                                            %label.toggle-switch
+                                              - if list == 'bl-heavy'
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-heavy", checked: true}
+                                              - else
+                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-heavy"}
+                                              %span.toggle-slider
+                                            BL - Heavy
+                                - else
+                                  .row
+                                    .col-xs-6
+                                      %ul.wlbl-toggle-list
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-weak"}
+                                            %span.toggle-slider
+                                          WL - Weak
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-med"}
+                                            %span.toggle-slider
+                                          WL - Medium
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-wl-heavy"}
+                                            %span.toggle-slider
+                                          WL - Heavy
+                                    .col-xs-6
+                                      %ul.wlbl-toggle-list
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-weak"}
+                                            %span.toggle-slider
+                                          BL - Weak
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-med"}
+                                            %span.toggle-slider
+                                          BL - Medium
+                                        %li
+                                          %label.toggle-switch
+                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "entry-#{entry.id}-bl-heavy"}
+                                            %span.toggle-slider
+                                          BL - Heavy
+
                                 .comment-wrapper
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-wlbl-input.note-input
@@ -321,19 +450,29 @@
                             %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label WBRS
                         %td.text-center.entry-data-wbrs-score
-                          = entry.wbrs_score
+                          - if entry.wbrs_score.nil?
+                            %span.current-wbrs-score.missing-data
+                              No score.
+                          - else
+                            %span.current-wbrs-score
+                              = entry.wbrs_score
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
-                          = entry.dispute_rule_hits.where(:rule_type => "WBRS").count
+                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
-                          - if entry.dispute_rule_hits.where(:rule_type => "WBRS").count == 0
-                            %span.missing-data No rule hits
-                          - else
-                            - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-                              = wbrs_hit.name + ', '
+                          - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.each do |wbrs_hit|
+                            - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
+                              %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
+                                = wbrs_hit.name
+                                - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                  = ","
+                            - else
+                              = wbrs_hit.name
+                              - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                = ","
                         %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -365,25 +504,36 @@
                           %label Referenced on
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
-                          12 Tickets
+                          = "#{entry.referenced_tickets.count} ticket(s)"
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper
                             %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label SBRS
-                        %td.text-center= entry.sbrs_score
+                        %td.text-center
+                          - if entry.sbrs_score.nil?
+                            %span.current-sbrs-score.missing-data
+                              No score.
+                          - else
+                            %span.current-sbrs-score
+                              = entry.sbrs_score
                         %td
                           %label SBRS Rule Hits
                         %td.text-center
-                          = entry.dispute_rule_hits.where(:rule_type => "SBRS").count
+                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
                         %td
                           %label SBRS Rules
                         %td.rule-hits-col-list
-                          - if entry.dispute_rule_hits.where(:rule_type => "SBRS").count == 0
-                            %span.missing-data No rule hits
-                          - else
-                            - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
-                              = sbrs_hit.name + ', '
+                          - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.each do |sbrs_hit|
+                            - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
+                              %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}"}
+                                = sbrs_hit.name
+                                - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                  = ","
+                            - else
+                              = sbrs_hit.name
+                              - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                = ","
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -393,8 +543,7 @@
                         %td.input-offset.left-bordered
                           %label Umbrella
                         %td.text-center
-                          -#Disposition on Umbrella
-                          Clean
+                          = entry.umbrellaresult
                         %td.left-bordered
                           %label RepTool Class
                         %td.entry-reptool-data
@@ -413,7 +562,7 @@
                           %label Last Submitted
                         %td
                           -#Add dropdown with links to all cases / tickets with this entry on them
-                          2016-02-24 15:11:22
+                          = entry.last_submitted
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                   %td.expanded-row{colspan: '8'}
                     .expanded-row-data-wrapper
@@ -421,7 +570,7 @@
                         .col-sm-3
                           .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header WBRS Rule Hit Details
-                            - if entry.dispute_rule_hits.where(:rule_type => "WBRS").empty?
+                            - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.empty?
                               %table
                                 %thead
                                   %tr
@@ -436,7 +585,7 @@
                                     %th Rule Description
                                     %th Weight
                                 %tbody
-                                  - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                                  - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.each do |wbrs_hit|
                                     %tr
                                       %td= wbrs_hit.name
                                       %td= wbrs_hit.mnemonic
@@ -444,7 +593,7 @@
                                         -#Put weight of rule here
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header SBRS Rule Hit Details
-                            - if entry.dispute_rule_hits.where(:rule_type => "SBRS").empty?
+                            - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "SBRS"}.empty?
                               %table
                                 %thead
                                   %tr
@@ -459,9 +608,14 @@
                                     %th Rule Description
                                     %th Weight
                                 %tbody
-                                  - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                                  - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "SBRS"}.each do |sbrs_hit|
                                     %tr
-                                      %td= sbrs_hit.name
+                                      %td
+                                        - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
+                                          %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}"}
+                                            = sbrs_hit.name
+                                        - else
+                                          = sbrs_hit.name
                                       %td= sbrs_hit.mnemonic
                                       %td
                                         -#Put weight of rule here
@@ -493,7 +647,7 @@
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header XBRS History
-                            - if entry.find_xbrs[1]['data'].empty?
+                            - if entry.xbrs_data['data'].empty?
                               %table
                                 %thead
                                   %tr
@@ -504,11 +658,11 @@
                               %table
                                 %thead
                                   %tr
-                                    - entry.find_xbrs[1]['legend'].each do |header|
+                                    - entry.xbrs_data['legend'].each do |header|
                                       %th= header
                                 %tbody
                                   - unless entry.hostlookup.nil?
-                                    - entry.find_xbrs[1]['data'].each do |data|
+                                    - entry.xbrs_data['data'].each do |data|
                                       %tr
                                         - data.each do |datapoint|
                                           %td= datapoint
@@ -516,11 +670,11 @@
                               %table.table-scrollable
                                 %thead
                                   %tr
-                                    - entry.find_xbrs[1]['legend'].each do |header|
+                                    - entry.xbrs_data['legend'].each do |header|
                                       %th= header
                                 %tbody
                                   - unless entry.hostlookup.nil?
-                                    - entry.find_xbrs[1]['data'].each do |data|
+                                    - entry.xbrs_data['data'].each do |data|
                                       %tr
                                         - data.each do |datapoint|
                                           %td= datapoint

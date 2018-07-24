@@ -1,4 +1,5 @@
 class Admin::ReferenceTypesController < Admin::HomeController
+  load_and_authorize_resource class: 'ReferenceType'
 
   def index
     @ref_types = ReferenceType.all

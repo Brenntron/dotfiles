@@ -401,6 +401,7 @@ module API
             requires :committer, type: Boolean, desc: "is this a committer subscribe"
           end
           post ':id/unsubscribe' do
+            # TODO Determine access control policy for unsubscribing from a bug
             bug = current_user.bugs.where(id: permitted_params[:id])
             unless bug.nil?
               begin
@@ -434,7 +435,9 @@ module API
             requires :bug_id, type: Integer, desc: "bugzilla id of the bug"
           end
           post ':bug_id/addref' do
+            authorize!(:create, Reference)
             bug = Bug.where(id: params['bug_id']).first
+            authorize!(:update, bug)
             raise 'bug not found' unless bug
             new_ref = bug.add_ref_action(ref_type_name: params['ref_type_name'], ref_data: params['ref_data'])
             if new_ref.present?

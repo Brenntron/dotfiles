@@ -1,6 +1,8 @@
 require 'snort_doc_publisher'
 
 class Admin::SnortDoc::CvesController < ApplicationController
+  load_and_authorize_resource class: 'SnortDocPublisher'
+
   layout 'admin/snort_doc/root'
 
   # GET /admin/snort_doc/cves/nvd

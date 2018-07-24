@@ -1,6 +1,5 @@
 class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
-
-
+  load_and_authorize_resource class: 'Complaint'
 
   def index
     respond_to do |format|
@@ -20,15 +19,6 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   end
 
   def reports
-  end
-
-  def dashboard
-  end
-
-  def tickets
-  end
-
-  def single
   end
 
   def show_multiple
