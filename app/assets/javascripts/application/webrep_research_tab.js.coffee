@@ -268,7 +268,20 @@ $ ->
       error: (response) ->
         std_api_error(response, "Template could not be retrieved.", reload: false)
     )
-
-
-
     return
+
+
+  # Sync / refresh entry data. Initiate modal / animation
+  $('#sync-data-button').click ->
+    #    If cannot connect to resync data
+    #    Show error message modal
+    #    Else
+    $('#loader-modal').modal('show')
+#    Loader Modal popup
+#    Start animation
+#    When data is finish loading
+#    Turn off animation / hide loading icon
+#    Display success message in modal
+
+
+

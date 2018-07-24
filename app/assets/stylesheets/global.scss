@@ -1042,20 +1042,20 @@ thead th.sorting.center {
   display: none;
 }
 
-#msg-modal .modal-dialog {
+#msg-modal .modal-dialog, #loader-modal .modal-dialog {
   margin-top: 180px;
 }
 
-#msg-modal .message-div::before {
+#msg-modal .message-div::before, #loader-modal .message-div::before {
   margin-top: -30px;
 }
 
-#msg-modal .message-div {
+#msg-modal .message-div, #loader-modal .message-div {
   border: none;
   padding-top: 2px;
 }
 
-#msg-modal .modal-content {
+#msg-modal .modal-content, #loader-modal .modal-content {
   border: 2px solid #f2f2f2;
   border-radius: 2px;
 }

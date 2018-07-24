@@ -1,0 +1,10 @@
+.modal.fade#loader-modal
+  .modal-dialog{role: 'document'}
+    .modal-content
+      .message-div
+        %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
+        #message-text
+          Here is some information
+        .confirmation-buttons.hidden
+          %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Confirm'} Confirm
+          %button.panel-button.secondary.cancel.wide{'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel
