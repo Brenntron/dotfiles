@@ -73,6 +73,22 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def minutes_to_accept
+    if case_accepted_at && case_opened_at
+      (case_accepted_at - case_opened_at) / 60.0
+    end
+  end
+
+  def minutes_to_close
+    if case_closed_at && case_opened_at
+      (case_accepted_at - case_opened_at) / 60.0
+    end
+  end
+
+  def days_to_close
+    minutes_to_close && minutes_to_close / 1440.0
+  end
+
   def self.parse_url(url)
     pre_url = url.gsub("http://", "").gsub("https://", "")
     url = "http://" + pre_url
