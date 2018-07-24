@@ -77,8 +77,6 @@ module API
                 end
 
                 dispute_packet[:dispute_entries] = dispute.dispute_entries
-                # + dispute.submission_type
-
                 dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
@@ -87,6 +85,11 @@ module API
                   dispute_packet[:assigned_to] =
                       "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
                 end
+
+                if dispute.user_id?
+                  dispute_packet[:assigned_to] = User.find(dispute.user_id).cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+                end
+
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
                 dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
@@ -130,6 +133,23 @@ module API
 
             delete "" do
               # TODO access control when this is implmented
+            end
+
+            desc "Change assignee of a group of dispute IDs"
+            params do
+              requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
+              requires :new_assignee, type: Integer, desc: "User ID of new assignee"
+            end
+            post "change_assignee" do
+              json_packet = []
+              params[:dispute_ids].each do |dispute|
+                Dispute.where(id: dispute).update_all(user_id: params[:new_assignee])
+                d = Dispute.find_by(id: dispute)
+
+                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
+                json_packet << d
+              end
+              {:status => "success", :data => json_packet}.to_json
             end
 
             desc "Adjust a WL/BL entry"

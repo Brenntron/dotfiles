@@ -144,16 +144,17 @@
             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Re-Opened'}
             %label.radio-label{for: 'Re-Opened'} Re-Opened
 
-    %span.dropdown
-      %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span.toolbar-button-text
-          Change Assignee
-      .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
-        %select{name: 'index_target_assignee', id: 'index_target_assignee'}
-          - User.all.order('cvs_username ASC').each do |u|
-            %option{id: u.id, value: u.id, label: u.cvs_username}
-        %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
-          Assign
+    - if current_user.has_role?('manager')
+      %span.dropdown
+        %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Change Assignee
+        .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+          %select{name: 'index_target_assignee', id: 'index_target_assignee'}
+            - User.all.order('cvs_username ASC').each do |u|
+              %option{id: u.id, value: u.id, label: u.cvs_username}
+          %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
+            Assign
 
     %span.dropdown
       %button#index_mark_duplicate.toolbar-button.mark-duplicate-button{title: 'Mark as Duplicate'}
