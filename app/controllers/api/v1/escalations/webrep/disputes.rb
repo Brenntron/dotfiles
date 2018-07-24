@@ -159,7 +159,7 @@ module API
               optional :thrt_cats, type: Array[String], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
-            post "wlbl" do
+            post "entry_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
             end

@@ -123,25 +123,22 @@ window.toolbar_adust_wlbl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
 
   wlbl_form = button_tag.form
   data = {
     'dispute_entry_ids': entry_ids
-    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
-    headers: headers
     data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 window.index_adust_wlbl_button =(button_tag) ->
@@ -163,7 +160,7 @@ window.index_adust_wlbl_button =(button_tag) ->
     url: '/api/v1/escalations/webrep/disputes/ticket_wlbl'
     method: 'POST'
     data: data
-    error_prefix: 'Error updating WL/BL.'
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 
