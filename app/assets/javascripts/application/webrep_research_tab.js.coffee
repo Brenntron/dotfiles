@@ -4,15 +4,11 @@
 window.index_expand_wlbl_form = () ->
   if ($('.dispute_check_box:checked').length > 0)
     $('.dispute_check_box:checked').each ->
-      debugger
-      #entry_row = $(this).parents('.research-table-row')[0]
       entry_row = this.closest('tr')
-      #entry_content = $(entry_row).find('.entry-data-content').text()
       entry_content = $(entry_row).find('.dispute_entry_content_first').text()
       #wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
       #wlbl = $(entry_row).find('.entry-data-wlbl').text()
 
-      #tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
       tbody = $('#wlbl_adjust_entries').find('tbody')
       $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + '' + '</td><td class="text-center">' + '' + '</td></tr>')
 
