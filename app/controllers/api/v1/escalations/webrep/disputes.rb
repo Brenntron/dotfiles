@@ -84,7 +84,8 @@ module API
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
                 if dispute.assignee == 'Unassigned'
-                  dispute_packet[:assigned_to] = "<span class='missing-data'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me'></button>"
+                  dispute_packet[:assigned_to] =
+                      "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
                 end
                 dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
 
@@ -161,6 +162,28 @@ module API
               search = NamedSearch.where(name: params['search_name'], user: current_user)
               search.destroy_all
               true
+            end
+
+            patch 'take_dispute/:dispute_id' do
+              authorize!(:update, Dispute)
+              dispute = Dispute.find(params['dispute_id'])
+              authorize!(:update, dispute)
+
+              dispute.take_ticket(user: current_user)
+
+              { username: current_user.display_name, dispute_id: dispute.id }
+            end
+
+            params do
+              requires :dispute_ids, type: Array[Integer]
+            end
+            patch 'take_disputes' do
+              authorize!(:update, Dispute)
+
+              dispute_ids = permitted_params['dispute_ids']
+              Dispute.take_tickets(dispute_ids, user: current_user)
+
+              { username: current_user.display_name, dispute_ids: dispute_ids }
             end
           end
         end

@@ -46,6 +46,10 @@ class User < ApplicationRecord
 
   scope :with_role, ->(role) { joins(:roles).where('roles.role = ?', role) }
 
+  def self.vrtincoming
+    @vrtincoming ||= User.where(cvs_username: 'vrtincom').first
+  end
+
   def self.search(conditions)
     # all
     name = conditions["name"]
