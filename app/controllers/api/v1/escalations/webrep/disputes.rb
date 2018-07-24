@@ -77,7 +77,8 @@ module API
                 end
 
                 dispute_packet[:dispute_entries] = dispute.dispute_entries
-                dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+                dispute_packet[:submission_type] = dispute.submission_type
+                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
                 dispute_packet[:status] = dispute.status
                 dispute_packet[:resolution] = dispute.resolution
                 dispute_packet[:assigned_to] = ''#dispute.user.email
