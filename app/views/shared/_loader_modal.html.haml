@@ -3,8 +3,9 @@
     .modal-content
       .message-div
         %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
-        #message-text
-          Here is some information
+        %h1 Loading Data...
+        .loader-gears
+          =inline_svg 'icon_gears_loader.svg'
         .confirmation-buttons.hidden
           %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Confirm'} Confirm
           %button.panel-button.secondary.cancel.wide{'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel

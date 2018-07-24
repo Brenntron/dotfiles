@@ -1441,7 +1441,7 @@ button.close {
   background-image: url(image_path('icon_cancel.svg'));
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-position: 0 -5px;
+  background-position: -3px -2px;
 }
 
 /************ Side Nav **************/
@@ -5241,6 +5241,12 @@ td.ticket-total::before {
 #edit-ticket-status-dropdown .ticket-resolution-submenu {
   left: -323px;
   padding: 0 !important;
+}
+
+.loader-gears {
+  width: 80px;
+  height: 80px;
+  margin: auto;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
