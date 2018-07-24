@@ -277,10 +277,10 @@ $ ->
     #    Show error message modal
     #    Else
     $('#loader-modal').modal('show')
-#    Loader Modal popup
-#    Start animation
+
 #    When data is finish loading
-#    Turn off animation / hide loading icon
+#    $('#loading-div').hide()
+#    $('#api-msg').show()
 #    Display success message in modal
 
 
