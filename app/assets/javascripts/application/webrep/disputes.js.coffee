@@ -15,6 +15,7 @@ window.populate_webrep_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
+        $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
