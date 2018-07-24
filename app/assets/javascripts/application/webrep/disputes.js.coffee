@@ -154,13 +154,13 @@ window.index_adust_wlbl_button =(button_tag) ->
 
   wlbl_form = button_tag.form
   data = {
-    'dispute_entry_ids': dispute_ids
+    'dispute_ids': dispute_ids
     'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
   std_msg_ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+    url: '/api/v1/escalations/webrep/disputes/ticket_wlbl'
     method: 'POST'
     data: data
     error_prefix: 'Error updating WL/BL.'

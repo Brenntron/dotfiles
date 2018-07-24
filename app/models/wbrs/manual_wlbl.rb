@@ -102,7 +102,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
   # @param [String] note: User’s note
   # @return [Array<String>] warnings
-  def self.adjust_from_params(params = {}, username:)
+  def self.adjust_entries_from_params(params = {}, username:)
     wlbl_params = stringkey_params(params)
     wlbl_params['usr'] = username
 
@@ -126,5 +126,20 @@ class Wbrs::ManualWlbl < Wbrs::Base
         drop_from_params(existing_entries, wlbl_params)
       end
     end
+    true
+  end
+
+  # Add a WL/BL on the backend
+  # @param [Array<Integer>] dispute_ids pkey for dispute_entries database table.
+  # @param [Array<String>] trgt_list: Target manual list type
+  # @param [String] username: User creating the WL/BL entries
+  # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
+  # @param [String] note: User’s note
+  # @return [Array<String>] warnings
+  def self.adjust_tickets_from_params(params = {}, username:)
+    entry_params = params.clone
+    dispute_ids = entry_params.delete('dispute_ids')
+    dispute_entry_ids = DisputeEntry.where(dispute_id: dispute_ids).pluck(:id)
+    adjust_entries_from_params(entry_params.merge('dispute_entry_ids' => dispute_entry_ids), username: username)
   end
 end
