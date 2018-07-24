@@ -94,8 +94,7 @@ class DisputeEntry < ApplicationRecord
       return @wbrs_list_type if @wbrs_list_type.present?
       return nil
     end
-    @wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).first&.list_type
-
+    @wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).map{ |wlbl| wlbl.list_type }.join(',')
   end
 
   def wbrs_xlist
