@@ -187,7 +187,7 @@ class DisputeEntry < ApplicationRecord
       end
     end
 
-    update(attributes.slice(*%w{entry_type ip_address hostname status}))
+    update!(attributes.slice(*%w{entry_type ip_address hostname status}))
   end
 
   def self.update_from_field_data(field_data)

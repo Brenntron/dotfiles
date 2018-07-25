@@ -338,6 +338,7 @@ window.save_dispute_entries = () ->
     method: 'PATCH'
     url: "/api/v1/escalations/webrep/disputes/entries/field_data"
     data: { field_data: data }
+    success_reload: true
     error_prefix: 'Error updating data.'
   )
 
