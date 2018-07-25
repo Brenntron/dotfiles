@@ -84,10 +84,6 @@ class Complaint < ApplicationRecord
     uri_parts
   end
 
-  def self.is_ip?(ip)
-    !!IPAddr.new(ip) rescue false
-  end
-
 
   def self.is_possible_company_duplicate(complaint, entry, entry_type)
     company_id = complaint.customer.company.id
@@ -260,7 +256,7 @@ class Complaint < ApplicationRecord
     handle_tags(new_complaint, tags)
 
     ips_urls.split(' ').each do |ip_url|
-      create_complaint_entry(new_complaint, ip_url)
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url)
     end
   end
 
@@ -274,26 +270,6 @@ class Complaint < ApplicationRecord
       new_tag = ComplaintTag.find_or_create_by(name: tag)
       complaint.complaint_tags << new_tag
     end
-  end
-
-  def self.create_complaint_entry(complaint, ip_url)
-    new_complaint_entry = ComplaintEntry.new
-    new_complaint_entry.complaint_id = complaint.id
-    new_complaint_entry.status = "NEW"
-
-    if is_ip?(ip_url)
-      new_complaint_entry.ip_address = ip_url
-      new_complaint_entry.entry_type = "IP"
-
-    else
-      url_parts = parse_url(ip_url)
-      new_complaint_entry.uri = ip_url
-      new_complaint_entry.entry_type = "URI/DOMAIN"
-      new_complaint_entry.subdomain = url_parts[:subdomain]
-      new_complaint_entry.domain = url_parts[:domain]
-      new_complaint_entry.path = url_parts[:path]
-    end
-    new_complaint_entry.save
   end
 end
 
