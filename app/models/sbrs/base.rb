@@ -1,6 +1,24 @@
 class Sbrs::Base
   include ActiveModel::Model
 
+  def self.load_rules_matchup
+    # a single call to the authority list of number==>rule data (used after SDS calls)
+    binding.pry
+    begin
+      binding.pry
+      JSON.parse(
+          request_sds(path: '/labels/wbrs-rulehits/json', body: '')
+      )
+    rescue Exception => e
+      binding.pry
+      JSON.parse('{}')
+    end
+  end
+
+  def self.rules_matchup
+    @rules_matchup ||= self.load_rules_matchup
+  end
+
   def self.sds_host
     @sds_host ||= ENV['SDS_HOSTNAME']
   end
@@ -32,6 +50,14 @@ class Sbrs::Base
     Sbrs::Base.stringkey_params(conditions)
   end
 
+  def self.determine_sds_uri(sds_type)
+    if sds_type == "sbrs"
+      "/score/sbrs/json?ip="
+    else
+      "/score/wbrs;wbrs-rulehits/json?url="
+    end
+  end
+
   def self.request_sds(path:, body:)
     # adapted from TI/sb_api, then heavily modified
     query_string = path
@@ -54,12 +80,12 @@ class Sbrs::Base
         end
 
         if response.code != "200"  #there was an issue
-          '{"response": "request failed[1]"}'
+          '{"response": "request failed"}'
         else
           response # was: response.body per T/I source code
         end
       rescue
-        '{"response": "request failed[2]"}'
+        '{"response": "request failed"}'
       end
     else
       '{"response": "no query_string clause for [' + query_string + ']"}'
