@@ -85,6 +85,23 @@ module API
               {:status => "success", :data => json_packet}.to_json
             end
 
+            desc "Remove assignee from a group of dispute IDs (revert to vrtincoming)"
+            params do
+              requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
+            end
+            post "unassign_all" do
+              json_packet = []
+              vrt = User.where(email: 'vrt-incoming@sourcefire.com').first
+              params[:dispute_ids].each do |dispute|
+                Dispute.where(id: dispute).update_all(user_id: vrt.id)
+                d = Dispute.find_by(id: dispute)
+
+                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
+                json_packet << d
+              end
+              {:status => "success", :data => json_packet}.to_json
+            end
+
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
