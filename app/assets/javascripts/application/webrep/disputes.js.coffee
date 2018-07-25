@@ -313,6 +313,31 @@ window.take_disputes = () ->
   )
 
 
+window.save_dispute_entries = () ->
+  debugger
+  #$('#disputes-research-table').find('.table-entry-input')[2].value
+  #$('#disputes-research-table').find('.table-entry-input')[2].attributes['value'].value
+  #$('#disputes-research-table').find('.table-entry-input')[3].innerText
+  #$('#disputes-research-table').find('.entry-data')[2].innerText;
+  #$('#disputes-research-table').find('.entry-data')[3].innerText;
+
+  data = $('#disputes-research-table').find('.dual-edit-field').map(() ->
+    debugger
+    new_value = switch (this.dataset.field)
+      when 'status' then $(this).find('.table-entry-input')[0].innerText.trim()
+      else $(this).find('.table-entry-input')[0].value.trim()
+
+    {
+      id: this.dataset.id
+      field: this.dataset.field
+      old: $(this).find('.entry-data')[0].innerText.trim()
+      new: new_value
+      value: $(this).find('.table-entry-input')[0].value
+      selected: $(this).find('.table-entry-input')[0].innerText
+    }
+  )
+  debugger
+
 
 $ ->
   $('#disputes_check_box').change ->

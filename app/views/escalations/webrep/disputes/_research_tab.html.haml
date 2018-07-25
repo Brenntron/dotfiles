@@ -158,7 +158,8 @@
                       Submit Changes
 
       .edit-button-wrapper.edit-entries-buttons.hidden
-        %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes'}
+        %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
+                                                                     onclick: 'save_dispute_entries();'}
         %button.cancel-changes.panel-button.cancel-button.tooltipped{title: 'Cancel'}
 
 .row
@@ -174,7 +175,7 @@
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
                   %td
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
-                  %td
+                  %td.dual-edit-field{'data-id': entry.id, 'data-field': 'host'}
                     %span.entry-data.entry-data-content
                       = entry.hostlookup
                     %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
@@ -188,7 +189,7 @@
                     %label Hostname
                     - unless entry[:hostname].nil?
                       = entry[:hostname]
-                  %td
+                  %td.dual-edit-field{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
                     %span.entry-data
                       - if entry[:status].nil?
