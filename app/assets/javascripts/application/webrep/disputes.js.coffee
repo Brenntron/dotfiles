@@ -334,7 +334,12 @@ window.save_dispute_entries = () ->
     if 0 < fielddata.length
       data[this.dataset.entryId] = fielddata
   )
-  debugger
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    data: { field_data: data }
+    error_prefix: 'Error updating data.'
+  )
 
 
 $ ->
