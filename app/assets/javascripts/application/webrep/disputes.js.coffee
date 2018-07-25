@@ -336,6 +336,10 @@ $ ->
         className: 'state-col'
       }
       {
+        targets: [6]
+        className: 'text-center'
+      }
+      {
         targets: [ 8 ]
         className: 'alt-col'
       }
@@ -361,8 +365,9 @@ $ ->
       { data: 'status' }
       { data: 'resolution' }
       {
-        data: null
-        defaultContent: ''
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
