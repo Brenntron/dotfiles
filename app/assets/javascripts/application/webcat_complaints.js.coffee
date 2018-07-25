@@ -210,7 +210,7 @@ format = (complaint_entry_row) ->
         invalid_radio = "checked='checked'"
 
   complaint_entry_html = ''
-  if complaint_entry.is_important
+  if complaint_entry.status == "PENDING"
     complaint_entry_html = '<div class="row">' +
       '<div class="col-xs-1">' +
       'ID <p>' + complaint_entry.entry_id + '</p>' +
