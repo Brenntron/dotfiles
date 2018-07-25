@@ -158,13 +158,25 @@ module API
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
-              requires :trgt_list, type: String, desc: "type of WL/BL"
+              requires :trgt_list, type: Array[String], desc: "type of WL/BL"
               optional :thrt_cats, type: Array[String], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
-            post "wlbl" do
+            post "entry_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
-              Wbrs::ManualWlbl.adjust_from_params(permitted_params, username: current_user.cvs_username)
+              Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
+            end
+
+            desc "Adjust a WL/BL entry"
+            params do
+              requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
+              requires :trgt_list, type: Array[String], desc: "type of WL/BL"
+              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "ticket_wlbl" do
+              authorize!(:update, Wbrs::ManualWlbl)
+              Wbrs::ManualWlbl.adjust_tickets_from_params(permitted_params, username: current_user.cvs_username)
             end
 
             desc "Adjust a Reptool Bl entry"
