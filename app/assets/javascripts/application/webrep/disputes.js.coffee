@@ -15,6 +15,7 @@ window.populate_webrep_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
+        $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -99,49 +100,66 @@ window.popup_response_error =(response, prefix) ->
 
   alert(prefix + "\n" + errormsg)
 
-window.row_adust_wlbl_button =(button_tag) ->
+window.row_adjust_wlbl_button =(button_tag) ->
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
   wlbl_form = button_tag.form;
   data = {
     'dispute_entry_ids': [ wlbl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
+    'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
-    headers: headers
     data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 window.toolbar_adust_wlbl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
 
   wlbl_form = button_tag.form
   data = {
     'dispute_entry_ids': entry_ids
-    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
-    headers: headers
     data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    error_prefix: 'Error adjusting WL/BL.'
+  )
+
+window.index_adust_wlbl_button =(button_tag) ->
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+  data = {
+    'dispute_ids': dispute_ids
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/ticket_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 
@@ -295,6 +313,16 @@ window.take_disputes = () ->
   )
 
 
+window.dispute_entry_status = (id, status) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
+    data: { status: status }
+    error_prefix: 'Error updating status.'
+  )
+
+
+
 $ ->
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
@@ -335,6 +363,10 @@ $ ->
         className: 'state-col'
       }
       {
+        targets: [6]
+        className: 'text-center'
+      }
+      {
         targets: [ 8 ]
         className: 'alt-col'
       }
@@ -360,8 +392,9 @@ $ ->
       { data: 'status' }
       { data: 'resolution' }
       {
-        data: null
-        defaultContent: ''
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }

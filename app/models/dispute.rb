@@ -654,6 +654,27 @@ class Dispute < ApplicationRecord
     advanced_search(search_params, search_name: nil, user: user)
   end
 
+  def self.standard_search_title(search_name)
+    case search_name
+      when 'recently_viewed'
+        'Recently Viewed Tickets'
+      when 'my_open'
+        'My Open Tickets'
+      when 'my_disputes'
+        'My Tickets'
+      when 'team_disputes'
+        'My Team\'s Tickets'
+      when 'open'
+        'Open Tickets'
+      when 'closed'
+        'Closed Tickets'
+      when 'all'
+        'All Tickets'
+      else
+        raise "No search named '#{search_name}' known."
+    end
+  end
+
   # Searches based on standard pre-determined filters.
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
@@ -687,6 +708,21 @@ class Dispute < ApplicationRecord
                            org_domain subject description problem_summary research_notes}
     where_str = searchable_fields.map{|field| "#{field} like :pattern"}.join(' or ')
     where(where_str, pattern: "%#{value}%")
+  end
+
+  def self.robust_search_title(search_type, search_name: nil)
+    case search_type
+      when 'advanced'
+        search_name.present? ? search_name + ' Search' : 'Advanced Search'
+      when 'named'
+        search_name + ' Search'
+      when 'standard'
+        standard_search_title(search_name)
+      when 'contains'
+        'Substring Search'
+      else
+        'All Tickets'
+    end
   end
 
   # Searches in a variety of ways.
