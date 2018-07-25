@@ -68,6 +68,31 @@ module API
               # TODO access control when this is implmented
             end
 
+            desc "Add new dispute entry"
+            params do
+              requires :uri, type: String, desc: "IP address or host name to add"
+              requires :dispute_id, type: Integer, desc: "ID of the dispute to add the entry to"
+            end
+            post "new_adhoc_entry" do
+              json_packet = []
+
+              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], user_id => current_user.id)
+
+              is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
+
+              if is_ip_address
+                entry.ip_address = params[:uri]
+              else
+                entry.uri = params[:uri]
+              end
+              binding.pry
+              entry.save!
+
+              json_packet << entry
+
+              {:status => "success", :data => json_packet}.to_json if entry.save?
+            end
+
             desc "Change assignee of a group of dispute IDs"
             params do
               requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"

@@ -29,7 +29,7 @@
           .dropdown-menu.toolbar-dropdown#add_entries_dropdown{'aria-labelledby': 'add-entries-button'}
             .input-group.add-entry-group
               %input{id: 'add_dispute_entry', name: 'dispute_entry_content', class: 'form-control', placeholder: 'Entry Content'}
-                %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_import'}
+                %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_add_dispute_entry', onclick: 'add_dispute_entry();'}
                   Submit
             .loading-bar
               .load-bar-segment.hidden
