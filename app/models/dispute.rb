@@ -704,8 +704,8 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    searchable_fields = %w{case_number case_guid customer_name customer_email customer_phone customer_company_name
-                           org_domain subject description problem_summary research_notes}
+    searchable_fields = %w{case_number case_guid org_domain subject description
+                           source_ip_address problem_summary research_notes}
     where_str = searchable_fields.map{|field| "#{field} like :pattern"}.join(' or ')
     where(where_str, pattern: "%#{value}%")
   end
