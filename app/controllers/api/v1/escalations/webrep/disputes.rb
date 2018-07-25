@@ -85,7 +85,9 @@ module API
             post "new_adhoc_entry" do
               json_packet = []
 
-              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], user_id => current_user.id)
+              user = Dispute.find(params[:dispute_id]).user_id
+
+              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user)
 
               is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
 
@@ -94,12 +96,11 @@ module API
               else
                 entry.uri = params[:uri]
               end
-              binding.pry
-              entry.save!
+              entry.save
 
               json_packet << entry
 
-              {:status => "success", :data => json_packet}.to_json if entry.save?
+              {:status => "success", :data => json_packet}.to_json if entry.save
             end
 
             desc "Change assignee of a group of dispute IDs"
