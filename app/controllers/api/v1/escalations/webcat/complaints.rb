@@ -55,6 +55,22 @@ module API
 
             end
 
+            desc 'create a complaint'
+            params do
+              requires :ips_urls, type: String, desc: 'List of URLs to create entries'
+              requires :description, type: String, desc: 'Description of new complaint'
+              optional :customer, type: String, desc: 'Customer related to new complaint'
+              optional :tags, type: Array, desc: 'Array of tags to be associated with the new complaint'
+            end
+
+            post "" do
+              Complaint.create_action(permitted_params[:ips_urls],
+                                      permitted_params[:description],
+                                      permitted_params[:customer],
+                                      permitted_params[:tags])
+              {:status => 'success'}.to_json
+            end
+
             desc 'test a url'
             params do
               requires :url, type: String, desc: "URL to be visited"

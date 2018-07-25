@@ -5,7 +5,7 @@ $ ->
     'rowCallback': (row, data, index) ->
       $node = @api().row(row).nodes().to$()
       $node.addClass 'not-shown'
-      if data.subdomain.length > 0
+      if  data.subdomain && data.subdomain.length > 0
         $node.addClass 'highlight-has-subdomain'
       if data.is_important
         $node.addClass 'highlight-second-review'

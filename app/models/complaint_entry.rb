@@ -24,6 +24,10 @@ class ComplaintEntry < ApplicationRecord
     "http://#{subdomain+'.' if subdomain.present?}#{domain}#{path}"
   end
 
+  def self.is_ip?(ip)
+    !!IPAddr.new(ip) rescue false
+  end
+
   def take_complaint(current_user)
     if user.nil?
       if status!="COMPLETED"
@@ -92,5 +96,25 @@ class ComplaintEntry < ApplicationRecord
         end
       end
     end
+  end
+
+  def self.create_complaint_entry(complaint, ip_url)
+    new_complaint_entry = ComplaintEntry.new
+    new_complaint_entry.complaint_id = complaint.id
+    new_complaint_entry.status = "NEW"
+
+    if is_ip?(ip_url)
+      new_complaint_entry.ip_address = ip_url
+      new_complaint_entry.entry_type = "IP"
+
+    else
+      url_parts = Complaint.parse_url(ip_url)
+      new_complaint_entry.uri = ip_url
+      new_complaint_entry.entry_type = "URI/DOMAIN"
+      new_complaint_entry.subdomain = url_parts[:subdomain]
+      new_complaint_entry.domain = url_parts[:domain]
+      new_complaint_entry.path = url_parts[:path]
+    end
+    new_complaint_entry.save
   end
 end
