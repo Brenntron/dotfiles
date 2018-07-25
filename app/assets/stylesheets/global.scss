@@ -5313,6 +5313,18 @@ td.ticket-total::before {
   background-color: $faint-neutral-color;
 }
 
+#button_reassign {
+  text-transform: none;
+  display: inline-block;
+  padding: 8px 20px;
+  font-weight: 400;
+  margin: 0 6px 0 6px;
+}
+
+.dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
+  padding-bottom: 20px;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
