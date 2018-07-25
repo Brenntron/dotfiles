@@ -259,6 +259,9 @@
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Re-Opened',
                                                       onclick: "dispute_entry_status(#{entry.id}, 'Re-Opened')"}
                             %label.radio-label{for: 'Re-Opened'} Re-Opened
+                  %td
+                    %label As of
+                    = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 
 
                   %td.dispute_rep_tools
