@@ -220,17 +220,6 @@ module API
 
               { username: current_user.display_name, dispute_ids: dispute_ids }
             end
-
-            params do
-              requires :status, type: String
-            end
-            patch 'entries/:entry_id/status' do
-              authorize!(:update, DisputeEntry)
-              entry = DisputeEntry.find(params['entry_id'])
-              authorize!(:update, entry)
-              entry.update(status: permitted_params['status'])
-              true
-            end
           end
         end
       end
