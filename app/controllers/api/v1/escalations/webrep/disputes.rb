@@ -115,7 +115,9 @@ module API
                 dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
                 json_packet << dispute_packet
               end
-              {:status => "success", :data => json_packet}.to_json
+              title = Dispute.robust_search_title(permitted_params['search_type'],
+                                                  search_name: permitted_params['search_name'])
+              {status: "success", title: title, data: json_packet}.to_json
 
             end
 
