@@ -313,6 +313,16 @@ window.take_disputes = () ->
   )
 
 
+window.dispute_entry_status = (id, status) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
+    data: { status: status }
+    error_prefix: 'Error updating status.'
+  )
+
+
+
 $ ->
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
