@@ -503,8 +503,12 @@
                         %td.left-bordered
                           %label Referenced on
                         %td
-                          -#Add dropdown with links to all cases / tickets with this entry on them
-                          = "#{entry.referenced_tickets.count} ticket(s)"
+                          %button#show_references.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                            %span.toolbar-button-text
+                              = "#{entry.referenced_tickets.count} ticket(s)"
+                          .dropdown-menu.toolbar-dropdown#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                            - entry.referenced_tickets.each do |reference|
+                              <a href="/escalations/webrep/disputes/#{reference.id}">#{reference.id}</a>
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper
