@@ -19,9 +19,9 @@
         %div= @complaint.status
     .col-xs-1.col-with-divider
       %label.content-label-sm
-        tag
+        tags
       .bug-top-id
-        %div= @complaint.tag
+        %div= @complaint.complaint_tags.pluck(:name).join(", ")
     .col-xs-1.col-with-divider
       %label.content-label-sm
         Channel

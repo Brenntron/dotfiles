@@ -17,7 +17,7 @@
     <% @complaints.each do |complaint| %>
       <% complaint.complaint_entries.each do |entry| %>
         <div id="complaint_entry_row_<%= entry.id %>" class="row" onclick="display_preview_window(<%=entry.to_json%>)">
-          <div class="col-xs-12"><p><%= complaint.customer.name%> from <%=complaint.customer.company.name %> | <%=complaint.tag%> </p></div>
+          <div class="col-xs-12"><p><%= complaint.customer.name%> from <%=complaint.customer.company.name %> | <%=complaint.complaint_tags.pluck(:name).join(", ")%> </p></div>
           <div class="col-xs-1">
             <%= check_box_tag "#{entry.id}_site_checkbox",
                               '{"site": "' + entry.domain.to_s + '", "viewable": "' + entry.viewable.to_s + '" }',
@@ -29,7 +29,6 @@
           </div>
           <div class="col-xs-8">
             <div>Domain:<br> <%= entry.domain %></div>
-            <div>Tag:<br> <%= entry.tag %></div>
             <div>Status: <%= entry.status %></div>
           </div>
           <div class="col-xs-3">
