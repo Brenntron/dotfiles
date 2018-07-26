@@ -81,7 +81,7 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Accept Date
-          %p 2017-10-24 15:35:55
+          %p= @dispute.case_accepted_at&.strftime('%F %T')
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Repsonse Date
@@ -89,7 +89,7 @@
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Accept
-          %p 848.9
+          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Respond
@@ -97,9 +97,11 @@
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Days to Close
+          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Close
+          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Email Count
