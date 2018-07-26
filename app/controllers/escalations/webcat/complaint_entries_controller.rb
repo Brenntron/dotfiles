@@ -1,15 +1,16 @@
-class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
-  load_and_authorize_resource class: 'Complaint'
+class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatController
+
+
 
   def index
     respond_to do |format|
       format.html
-      format.json { render json: ComplaintDatatable.new(view_context) }
+      format.json { render json: ComplaintEntryDatatable.new(view_context) }
     end
   end
 
   def show
-    @complaint = Complaint.find(params[:id])
+    @complaint_entry = ComplaintEntry.find(params[:id])
   end
 
   def update

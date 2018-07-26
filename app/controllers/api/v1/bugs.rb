@@ -716,7 +716,11 @@ module API
                 if current_user.bugs.exists?(bug.id)
                   return {error: 'already subscribed to this bug'}
                 else
-                  options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                  if request.env['REMOTE_USER']
+                    options = {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                  else
+                    options = Rails.env.development? ? {:ids => permitted_params[:id], :assigned_to => Rails.configuration.backend_auth[:authenticate_email]} : {:ids => permitted_params[:id], :assigned_to => current_user.email}
+                  end
                   Bugzilla::Bug.new(bugzilla_session).update(options.to_h)
                   current_user.bugs << bug
                   Bug.update(permitted_params[:id], state: "ASSIGNED") if ['NEW', 'OPEN'].include? bug.state

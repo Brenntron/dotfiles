@@ -28,10 +28,15 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :clusters, only: [:index]
-      resources :rules, only: [:index]
+      resources :complaint_entries
+      resources :customers, only: :index
+
+      get 'show_multiple', to: 'complaints#show_multiple'
+      get 'rules', to: 'complaints#rules'
+
       resources :reports, only: [:index] do
         collection do
+          get :index, to: 'complaints#reports'
           get :resolution
           get :export_resolution
         end
