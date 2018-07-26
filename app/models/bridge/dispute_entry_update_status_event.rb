@@ -5,7 +5,8 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
   end
 
   def post_entries(entries)
-    message = entries.inject({}) do |message_data, entry|
+    dispute = entries.first.dispute
+    payload = entries.inject({}) do |message_data, entry|
       message_data[entry.hostlookup] = {
           company_dup: entry.is_possible_company_duplicate?,
           status: entry.ti_status,
@@ -14,7 +15,11 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
       }
       message_data
     end
-    post(message: message)
+    post(message: {
+        source_authority: 'talos-intelligence',
+        source_key: dispute.ticket_source_key,
+        ticket_entries: payload
+    })
   end
 
   def post_entry(entry)
