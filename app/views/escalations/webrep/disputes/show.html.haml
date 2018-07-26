@@ -145,4 +145,15 @@
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
-    related cases
+    %h2 Related Cases
+    - if @dispute.related_dispute
+      .related-div
+        %h5= Dispute::DUPLICATE == @dispute.status ? 'Duplicate of' : 'Related'
+        = @dispute.related_dispute.id
+        = @dispute.related_dispute.org_domain
+    - if @dispute.relating_disputes.exists?
+      - @dispute.relating_disputes.each do |relating_dispute|
+        .relating-div
+          %h5= Dispute::DUPLICATE == relating_dispute.status ? 'Duplicate' : 'Relating'
+          = relating_dispute.id
+          = relating_dispute.org_domain
