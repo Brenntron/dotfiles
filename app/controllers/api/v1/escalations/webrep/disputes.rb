@@ -46,7 +46,7 @@ module API
                                                user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               json_packet = Dispute.to_data_packet(disputes)
 
-``              {status: "success", title: title, data: json_packet}.to_json
+              {status: "success", title: title, data: json_packet}.to_json
 
             end
 
