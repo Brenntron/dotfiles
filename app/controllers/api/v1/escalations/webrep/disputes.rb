@@ -232,6 +232,7 @@ module API
               std_api_v2 do
                 authorize!(:update, Dispute)
                 DisputeEntry.update_from_field_data(permitted_params['field_data'])
+                DisputeEntry.send_status_updates(permitted_params['field_data'])
                 true
               end
             end

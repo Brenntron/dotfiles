@@ -59,6 +59,10 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def ti_status
+    CLOSED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
+  end
+
   def find_xbrs
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
       return Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
@@ -170,8 +174,26 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
-  def update_from_field_data(values)
-    attributes = values.inject({}) do |attrs, field_data|
+  def is_possible_company_duplicate?
+    Dispute.is_possible_company_duplicate?(dispute, hostlookup, entry_type)
+  end
+
+  def self.send_status_updates(field_data)
+    entities = []
+    field_data.each do |entry_id, field_ary|
+      if field_ary.any? {|field_hash| %w{status resolution resolution_comment}.include?(field_hash['field'])}
+        entities << DisputeEntry.find(entry_id)
+      end
+    end
+
+    if entities.any?
+      message = Bridge::DisputeEntryUpdateStatusEvent.new
+      message.post_entries(entities)
+    end
+  end
+
+  def update_from_field_data(field_hash)
+    attributes = field_hash.inject({}) do |attrs, field_data|
       attrs[field_data['field']] = field_data['new']
       attrs
     end
@@ -184,16 +206,17 @@ class DisputeEntry < ApplicationRecord
       else
         attributes['entry_type'] = 'URI/DOMAIN'
         attributes['hostname'] = host
+        attributes['uri'] = host
       end
     end
 
-    update!(attributes.slice(*%w{entry_type ip_address hostname status}))
+    update!(attributes.slice(*%w{entry_type ip_address hostname uri status}))
   end
 
   def self.update_from_field_data(field_data)
-    field_data.each do |entry_id, values|
+    field_data.each do |entry_id, field_hash|
       entry = DisputeEntry.find(entry_id)
-      entry.update_from_field_data(values)
+      entry.update_from_field_data(field_hash)
     end
   end
 end
