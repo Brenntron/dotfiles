@@ -5308,12 +5308,7 @@ td.ticket-total::before {
   padding: 2px 10px !important;
 }
 
-.unassign-button {
-  padding: 10px;
-  background-color: $faint-neutral-color;
-}
-
-#button_reassign {
+#button_reassign, #unassign-dispute-button {
   text-transform: none;
   display: inline-block;
   padding: 8px 20px;
