@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180720142558) do
+ActiveRecord::Schema.define(version: 20180726200023) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -385,6 +385,7 @@ ActiveRecord::Schema.define(version: 20180720142558) do
     t.integer "user_id"
     t.string "submission_type"
     t.string "submitter_type"
+    t.integer "related_id"
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
 

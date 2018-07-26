@@ -3,7 +3,9 @@ class Dispute < ApplicationRecord
 
   belongs_to :customer
   belongs_to :user
+  belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id
 
+  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
