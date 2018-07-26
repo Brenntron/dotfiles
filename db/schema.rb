@@ -386,6 +386,7 @@ ActiveRecord::Schema.define(version: 20180730165632) do
     t.string "submission_type"
     t.string "submitter_type"
     t.datetime "case_responded_at"
+    t.integer "related_id"
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
 
