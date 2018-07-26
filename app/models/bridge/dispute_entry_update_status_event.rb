@@ -1,6 +1,6 @@
 class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
   def initialize
-    super(channel: 'dispute-entry-update-status',
+    super(channel: 'update-ticket',
           addressee: 'talos-intelligence')
   end
 
