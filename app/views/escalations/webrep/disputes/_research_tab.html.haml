@@ -739,3 +739,30 @@
                                       %td= cross_listed.username
                                       %td= cross_listed.mtime
                                       %td= cross_listed.ctime
+
+                          .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
+                            %h5.entry-details-table-header Extended Reputation Data
+                            - if entry.blacklist.nil?
+                              %table
+                                %thead
+                                  %tr
+                                    %th
+                                      %span.missing-data
+                                        No blacklist data
+                            - else
+                              %table
+                                %thead
+                                  %tr
+                                    %th Source
+                                    %th Expiration
+                                    %th First Seen
+                                    %th Last Seen
+                                %tbody
+                                  %tr
+                                    %td= entry.blacklist.primary_source
+                                    %td= entry.blacklist.expiration
+                                    %td= entry.blacklist.first_seen
+                                    %td= entry.blacklist.last_seen
+
+
+
