@@ -145,15 +145,29 @@
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
-    %h2 Related Cases
-    - if @dispute.related_dispute
-      .related-div
-        %h5= Dispute::DUPLICATE == @dispute.status ? 'Duplicate of' : 'Related'
-        = @dispute.related_dispute.id
-        = @dispute.related_dispute.org_domain
-    - if @dispute.relating_disputes.exists?
-      - @dispute.relating_disputes.each do |relating_dispute|
-        .relating-div
-          %h5= Dispute::DUPLICATE == relating_dispute.status ? 'Duplicate' : 'Relating'
-          = relating_dispute.id
-          = relating_dispute.org_domain
+    .related-cases-button-div
+      %button{type: 'button', onclick: 'show_set_related_dispute();'} + Maked Related
+      %button{type: 'button', onclick: 'show_set_duplicate_dispute();'} + Duplicate
+      #set-related-dispute-div{style: 'display: none;'}
+        %form#set-related-dispute-form{onsubmit: 'set_related_dispute(this);return false;', 'data-dispute-id': @dispute.id}
+          %label
+            Ticket ID:
+            %input.dispute-id{type: 'text', name: 'dispute_id'}
+      #set-duplicate-dispute-div{style: 'display: none;'}
+        %form#set-duplicate-dispute-form{onsubmit: 'set_duplicate_dispute(this);return false;', 'data-dispute-id': @dispute.id}
+          %label
+            Ticket ID:
+            %input.dispute-id{type: 'text', name: 'dispute_id'}
+    .related-cases-display
+      %h2 Related Cases
+      - if @dispute.related_dispute
+        .related-div
+          %h5= Dispute::DUPLICATE == @dispute.status ? 'Duplicate of' : 'Related'
+          = @dispute.related_dispute.id
+          = @dispute.related_dispute.org_domain
+      - if @dispute.relating_disputes.exists?
+        - @dispute.relating_disputes.each do |relating_dispute|
+          .relating-div
+            %h5= Dispute::DUPLICATE == relating_dispute.status ? 'Duplicate' : 'Relating'
+            = relating_dispute.id
+            = relating_dispute.org_domain

@@ -350,6 +350,34 @@ window.save_dispute_entries = () ->
   )
 
 
+window.show_set_related_dispute = () ->
+  $('#set-related-dispute-div').show()
+
+window.set_related_dispute = (form_tag) ->
+  related_dispute_id = $(form_tag).find(".dispute-id").val()
+  std_msg_ajax(
+    method: 'POST'
+    url: '/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/related_disputes'
+    data: { related_dispute_id: related_dispute_id }
+    success_reload: true
+    error_prefix: 'Error marking relationship.'
+  )
+
+window.show_set_duplicate_dispute = () ->
+  $('#set-duplicate-dispute-div').show()
+
+window.set_duplicate_dispute = (form_tag) ->
+  duplicate_dispute_id = $(form_tag).find(".dispute-id").val()
+  std_msg_ajax(
+    method: 'POST'
+    url: '/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/duplicate_disputes'
+    data: { duplicate_dispute_id: duplicate_dispute_id }
+    success_reload: true
+    error_prefix: 'Error marking duplicate relationship.'
+  )
+
+
+
 $ ->
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
