@@ -160,6 +160,32 @@ module API
               entry.update(status: permitted_params['status'])
               true
             end
+
+            params do
+              requires :related_dispute_id, type: Integer
+            end
+            post ':dispute_id/related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
+                dispute.update!(related_id: permitted_params['related_dispute_id'])
+                true
+              end
+            end
+
+            params do
+              requires :duplicate_dispute_id, type: Integer
+            end
+            post ':dispute_id/duplicate_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
+                dispute.update!(related_id: permitted_params['duplicate_dispute_id'], status: Dispute::DUPLICATE)
+                true
+              end
+            end
           end
         end
       end
