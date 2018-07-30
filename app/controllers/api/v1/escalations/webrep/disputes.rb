@@ -175,7 +175,8 @@ module API
                 authorize!(:update, Dispute)
                 dispute = Dispute.find(params['dispute_id'])
                 authorize!(:update, dispute)
-                dispute.update!(related_id: permitted_params['related_dispute_id'])
+                dispute.update!(related_id: permitted_params['related_dispute_id'],
+                                related_at: DateTime.now)
                 true
               end
             end
@@ -188,7 +189,9 @@ module API
                 authorize!(:update, Dispute)
                 dispute = Dispute.find(params['dispute_id'])
                 authorize!(:update, dispute)
-                dispute.update!(related_id: permitted_params['duplicate_dispute_id'], status: Dispute::DUPLICATE)
+                dispute.update!(related_id: permitted_params['duplicate_dispute_id'],
+                                related_at: DateTime.now,
+                                status: Dispute::DUPLICATE)
                 true
               end
             end
