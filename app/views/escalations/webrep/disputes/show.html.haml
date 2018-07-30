@@ -115,14 +115,23 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Case ID
-          %p= @dispute.id
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
-          %p= @dispute.case_opened_at
         .col-xs-8
           %label.content-label-sm
             Time Marked Duplicate
+      - @dispute.each_duplicate do |dispute_dup|
+        .row
+          .col-xs-2.col-with-divider
+            %label.content-label-sm
+            %p= dispute_dup.id
+          .col-xs-2.col-with-divider
+            %label.content-label-sm
+            %p= dispute_dup.case_opened_at&.strftime('%F %T')
+          .col-xs-8
+            %label.content-label-sm
+            %p= dispute_dup.related_at&.strftime('%F %T')
   .row
     .col-xs-12.text-center
       %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
