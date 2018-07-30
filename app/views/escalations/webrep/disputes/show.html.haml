@@ -26,8 +26,8 @@
       %label.content-label-sm
         Owner
       %div
-        %span= @dispute.assignee || "None"
-        %span.take-button
+        %span#dispute-assignee= @dispute.assignee || "None"
+        %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition

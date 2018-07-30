@@ -320,6 +320,20 @@ window.take_disputes = () ->
   )
 
 
+window.take_single_dispute = (id) ->
+  dispute_ids = [ id ]
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/take_disputes"
+    data: { dispute_ids: dispute_ids }
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      for dispute_id in response.dispute_ids
+        $('#dispute-assignee').text(response.username)
+  )
+
+
 window.dispute_entry_status = (id, status) ->
   std_msg_ajax(
     method: 'PATCH'
