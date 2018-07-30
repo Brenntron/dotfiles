@@ -71,6 +71,13 @@ window.named_webrep_index_table = (search_name) ->
   }
   window.populate_webrep_index_table(data)
 
+window.call_contains_search = (search_form) ->
+  data = {
+    search_type: 'contains'
+    value: search_form.querySelector('input.search-box').value
+  }
+  window.populate_webrep_index_table(data)
+
 window.delete_disputes_named_search = (close_button, search_name) ->
   std_msg_ajax(
     method: 'DELETE'

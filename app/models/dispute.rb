@@ -73,6 +73,22 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def minutes_to_accept
+    if case_accepted_at && case_opened_at
+      (case_accepted_at - case_opened_at) / 60.0
+    end
+  end
+
+  def minutes_to_close
+    if case_closed_at && case_opened_at
+      (case_accepted_at - case_opened_at) / 60.0
+    end
+  end
+
+  def days_to_close
+    minutes_to_close && minutes_to_close / 1440.0
+  end
+
   def self.parse_url(url)
     pre_url = url.gsub("http://", "").gsub("https://", "")
     url = "http://" + pre_url
@@ -704,10 +720,15 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    searchable_fields = %w{case_number case_guid customer_name customer_email customer_phone customer_company_name
-                           org_domain subject description problem_summary research_notes}
-    where_str = searchable_fields.map{|field| "#{field} like :pattern"}.join(' or ')
-    where(where_str, pattern: "%#{value}%")
+    dispute_fields = %w{case_number case_guid org_domain subject description
+                        source_ip_address problem_summary research_notes}
+    dispute_where = dispute_fields.map{|field| "#{field} like :pattern"}.join(' or ')
+
+    customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
+    company_where = 'companies.name like :pattern'
+
+    where_str = "#{dispute_where} or #{customer_where} or #{company_where}"
+    left_joins(customer: :company).where(where_str, pattern: "%#{value}%")
   end
 
   def self.robust_search_title(search_type, search_name: nil)
@@ -748,6 +769,76 @@ class Dispute < ApplicationRecord
         contains_search(params['value'])
       else
         where({})
+    end
+  end
+
+  # @param [Array<Dispute>] disputes colleciton of dispute objects
+  # @return [Array<Array>] data output for data tables.
+  def self.to_data_packet(disputes)
+    disputes.map do |dispute|
+      dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
+
+      dispute_packet[:case_number] = sprintf '%08d', dispute.id
+      dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
+      dispute_packet[:submitter_name] = '' #dispute.customer_name
+      dispute_packet[:submitter_org] = dispute.org_domain
+      dispute_packet[:submitter_domain] = dispute.org_domain
+      dispute_packet[:dispute_domain] = dispute.org_domain
+      unless dispute.dispute_entries.empty?
+        unless dispute.dispute_entries.first[:hostname].nil?
+          dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
+        end
+      end
+      dispute_packet[:dispute_count] = dispute.entry_count.to_s
+
+      dispute_packet[:dispute_entry_content] = []
+      unless dispute.dispute_entries.empty?
+        dispute.dispute_entries.each do |entry|
+          unless entry[:ip_address].nil?
+            dispute_packet[:dispute_entry_content].push(entry[:ip_address])
+          end
+          unless entry[:uri].nil?
+            dispute_packet[:dispute_entry_content].push(entry[:uri])
+          end
+        end
+      end
+
+      dispute_packet[:dispute_entries] = dispute.dispute_entries
+      dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+      dispute_packet[:assigned_to] = ''#dispute.user.email
+      if dispute.assignee == 'Unassigned'
+        dispute_packet[:assigned_to] =
+            "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
+      end
+
+      if dispute.user_id?
+        dispute_packet[:assigned_to] = User.find(dispute.user_id).cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+      end
+
+      dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
+
+      dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
+      dispute_packet[:case_age] = dispute.dispute_age
+      # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
+      dispute_packet[:suggested_disposition] = dispute.suggested_d
+      dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
+      dispute_packet[:source_id] = dispute.ticket_source_key
+      dispute_packet[:source_type] = dispute.ticket_source_type
+
+      dispute_packet[:wbrs_score] = ''
+      dispute_packet[:wbrs_rule_hits] = []
+
+      dispute.dispute_entries.each do |d_entry|
+        if dispute_packet[:wbrs_score].empty? and d_entry[:score_type] == "WBRS"
+          dispute_packet[:wbrs_score] = d_entry[:score].to_s unless d_entry[:score].nil?
+        end
+        d_entry.dispute_rule_hits.each do |d_rule|
+          dispute_packet[:wbrs_rule_hits] << d_rule.name
+        end
+      end
+      dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
+
+      dispute_packet
     end
   end
 

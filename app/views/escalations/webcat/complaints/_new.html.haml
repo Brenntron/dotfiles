@@ -1,0 +1,22 @@
+%form#new-complaint-form{method: 'get', 'accept-charset': 'UTF-8'}
+  .form-group.search-item
+    %label.content-label-sm URLs/IP Addresses
+    %textarea.form-control#ips_urls{required: true}
+  .form-group.search-item
+    %label.content-label-sm Description
+    %input.form-control#description
+  .form-group.search-item
+    %label.content-label-sm Customer
+    %input.form-control#customers{list: 'customerList'}
+      %datalist#customerList
+  .form-group.search-item
+    %label.content-label-sm Tags
+    %select.form-control.selectized#select-to-new{placeholder: "Add some tags...", multiple: "multiple", tabindex:"-1"}
+    %input.hidden#complaint_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(',')}
+
+  %hr.thin
+  .form-group.text-center
+    %button.primary{value: 'submit', type: 'submit'}
+      Create
+    %button.secondary#cancel_complaint{type: 'button'}
+      Cancel

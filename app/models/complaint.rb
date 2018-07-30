@@ -1,7 +1,7 @@
 class Complaint < ApplicationRecord
-  belongs_to :user
   belongs_to :customer
   has_many :complaint_entries
+  has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
@@ -11,6 +11,9 @@ class Complaint < ApplicationRecord
   NEW = 'NEW'
   RESOLVED = 'RESOLVED'
   ASSIGNED = 'ASSIGNED'
+  ACTIVE = 'ACTIVE'
+  COMPLETED = 'COMPLETED'
+  PENDING = 'PENDING'
 
   TI_NEW = 'IN PROGRESS'
   TI_RESOLVED = 'RESOLVED'
@@ -22,6 +25,22 @@ class Complaint < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
+  scope :active_count , -> {where(status:ACTIVE).count}
+  scope :completed_count , -> {where(status:COMPLETED).count}
+  scope :new_count , -> {where(status:NEW).count}
+  scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+
+  def set_status(new_status)
+    status_list = complaint_entries.map{|entry| entry.status}
+    case new_status
+      when NEW
+        update(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
+      when ASSIGNED || PENDING
+        update(status:ACTIVE)
+      when COMPLETED
+        update(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
+    end
+  end
 
   def self.can_visit_url?(url)
     begin
@@ -50,6 +69,7 @@ class Complaint < ApplicationRecord
     uri_object = URI(url)
 
     domain_parts = uri_object.host.split(".")
+
     if domain_parts.size > 2
       uri_parts[:subdomain] = domain_parts.first
       uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
@@ -226,6 +246,29 @@ class Complaint < ApplicationRecord
 
       conn = ::Bridge::ComplaintFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
+    end
+  end
+
+  def self.create_action(ips_urls, description, customer, tags)
+    cust = find_customer(customer)
+    new_complaint = Complaint.create(description: description, customer_id: cust.id, status: 'NEW')
+
+    handle_tags(new_complaint, tags)
+
+    ips_urls.split(' ').each do |ip_url|
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url)
+    end
+  end
+
+  def self.find_customer(customer)
+    email = customer.split(':').last
+    Customer.find_by_email(email)
+  end
+
+  def self.handle_tags(complaint, tags)
+    tags.each do |tag|
+      new_tag = ComplaintTag.find_or_create_by(name: tag)
+      complaint.complaint_tags << new_tag
     end
   end
 end

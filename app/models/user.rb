@@ -3,7 +3,8 @@ class User < ApplicationRecord
 
   # example: user.create_user_api_key
   has_one :user_api_key
-  has_many :complaints
+  has_many :complaint_entries
+  has_many :disputes
   has_many :bugs
   has_many :saved_searches
   has_and_belongs_to_many :roles, dependent: :destroy
