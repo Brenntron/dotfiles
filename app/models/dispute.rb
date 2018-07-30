@@ -79,6 +79,12 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def minutes_to_respond
+    if case_responded_at && case_opened_at
+      (case_responded_at - case_opened_at) / 60.0
+    end
+  end
+
   def minutes_to_close
     if case_closed_at && case_opened_at
       (case_accepted_at - case_opened_at) / 60.0
