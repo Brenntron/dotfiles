@@ -58,6 +58,13 @@ module API
                   replied_email.save
                 end
 
+                if params[:dispute_id].present?
+                  dispute = Dispute.find(params[:dispute_id])
+                  unless dispute.case_responded_at
+                    dispute.update!(case_responded_at: Time.now)
+                  end
+                end
+
                 return ""
               rescue Exception => e
                 Rails.logger.error e
