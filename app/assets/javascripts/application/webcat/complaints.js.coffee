@@ -1,101 +1,3 @@
-categories = [
-  'Unknown',
-  'Adult',
-  'Advertisements',
-  'Alcohol',
-  'Arts',
-  'Astrology',
-  'Auctions',
-  'Business and Industry',
-  'Chat and Instant Messaging',
-  'Cheating and Plagiarism',
-  'Child Abuse Content',
-  'Computer Security',
-  'Computers and Internet'
-  'DIY Projects',
-  'Dating',
-  'Digital Postcards',
-  'Dining and Drinking',
-  'Dynamic and Residential',
-  'Education',
-  'Entertainment',
-  'Extreme',
-  'Fashion',
-  'File Transfer Services',
-  'Filter Avoidance',
-  'Finance',
-  'Freeware and Shareware',
-  'Gambling',
-  'Games',
-  'Government and Law',
-  'Hacking',
-  'Hate Speech',
-  'Health and Nutrition',
-  'Humor',
-  'Hunting',
-  'Illegal Activities',
-  'Illegal Downloads',
-  'Illegal Drugs',
-  'Infrastructure',
-  'Internet Telephony',
-  'Job Search',
-  'Lingerie and Swimsuits',
-  'Lotteries',
-  'Military',
-  'Mobile Phones',
-  'Nature',
-  'News',
-  'Non-governmental Organisations',
-  'Non-sexual Nudity',
-  'Online Communities',
-  'Online Meetings',
-  'Online Storage and Backup',
-  'Online Trading',
-  'Organisation Email',
-  'Paranormal',
-  'Parked Domains',
-  'Peer File Transfer',
-  'Personal Sites',
-  'Personal VPN',
-  'Photo Search and Images',
-  'Politics',
-  'Pornography',
-  'Professional Networking',
-  'Real Estate',
-  'Reference',
-  'Religion',
-  'SaaS and B2B',
-  'Safe for Kids',
-  'Science and Technology',
-  'Search Engines and Portals',
-  'Sex Education',
-  'Shopping',
-  'Social Networking',
-  'Social Science',
-  'Society and Culture',
-  'Software Updates',
-  'Sports and Recreations',
-  'Streaming Audio',
-  'Streaming Video',
-  'Tobacco',
-  'Transportation',
-  'Travel',
-  'Weapons',
-  'Web Hosting',
-  'Web Page Translation',
-  'Web-based Email',
-  'This category is correct'
-]
-
-window.createSelectOptions = ->
-  options = []
-  for x in categories
-    options.push {name: x}
-  return options
-
-
-
-
 window.removeSubdomain = (id,host) ->
   id.value = host
 
@@ -413,7 +315,7 @@ window.click_table_buttons = (complaint_table, button)->
       valueField: 'name'
       labelField: 'name'
       searchField: 'name'
-      options: createSelectOptions()
+      options: AC.WebCat.createSelectOptions()
 
     }
     # Check to see which columns should be displayed

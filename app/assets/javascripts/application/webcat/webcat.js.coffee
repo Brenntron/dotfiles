@@ -73,3 +73,15 @@ $ ->
   populate_webcat_index_table()
   $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
     click_table_buttons complaint_table, this
+
+
+  $('#cat_new_url').selectize {
+    persist: false,
+    create: false,
+    maxItems: 5
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: AC.WebCat.createSelectOptions()
+
+  }
