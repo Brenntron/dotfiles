@@ -5,6 +5,17 @@ class Sbrs::ManualSbrs < Sbrs::Base
 
   attr_accessor *FIELD_SYMS
 
+
+  #TODO: all of this needs to be refactored and improved.  Finished up quickly because of deadline.
+  #Instructions:
+  #get_sbrs_data({:id => '1.2.3.4'})  <-- will return sbrs score for an ip
+  #to get rulehit data for sbrs/email:
+  #Sbrs::GetSbrs.get_sbrs_rules_for_ip('2.3.4.5') <--- will return an array of sbrs specific rules for provided ip string
+
+  #get_wbrs_data({:url => 'www.google.com'}) or get_wbrs_data({:url => '2.3.4.5'}) <-- will return wbrs score and rulehits(ids) for url
+  #get_rule_names_from_rulehits(response_returned_from_get_wbrs_data) <-- will return an array of rulehit mnemonics provided by the response package of above method
+
+
   def self.new_from_attributes(attributes)
     new(attributes.slice(*FIELD_NAMES))
   end
@@ -58,86 +69,47 @@ class Sbrs::ManualSbrs < Sbrs::Base
     # or noscore
   end
 
-  def self.whorks(conditions = {}, raw = false)
+  def self.get_rule_names_from_rulehits(rep_data)
+    all_rules = Sbrs::Base.rules_matchup
+
+    uri_rules = []
+    rep_data["wbrs-rulehits"].each do |rule_id|
+      rule_id = rule_id.to_s
+      if all_rules[rule_id].present?
+        uri_rules.append(all_rules[rule_id]["mnemonic"])
+
+      else
+        uri_rules.append(rule_id)
+
+      end
+    end
+    uri_rules
+
+  end
+
+  def self.get_wbrs_data(conditions)
     params = stringkey_params(conditions)
     response = {}
-    binding.pry
+
+    rw = request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: 'wbrs')
+    rw = JSON.parse(rw.body)[0]["response"]
+
+    response = response.merge(rw)
+
+    response
+
+  end
+
+  def self.get_sbrs_data(conditions)
+    params = stringkey_params(conditions)
+    response = {}
+
     rs = request_sds(path: '/score/sbrs/json?ip=', body: params)
     rs = JSON.parse(rs.body)[0]["response"]
-    binding.pry
+
     response = response.merge(rs)
-    binding.pry
-    rw = request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params)
-    rw = JSON.parse(rw.body)[0]["response"]
-    binding.pry
-    response = response.merge(rw)
-    binding.pry
+
     response
-    #r1 = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    #r2 = request_sds(path: '/score/webcat/json?url=', body: params)
-    #r3 = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    #binding.pry
-    #r4 = request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params)
-    #binding.pry
-    #
-    # am I an IP?
-    # => do IP stuff
-    # otherwise assume domain/URL
-    # => and do URL stuff
-    #
-    #response = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    #return response.body if raw == true
-    #JSON.parse(response.body)[0]["response"]
-    # this should return {"sbrs": {"score": "<score>"}}
-    # where <score> is either between -10 and 10 (inclusive)
-    # or noscore
-  end
-
-  def self.wheeer(conditions = {}, raw = false)
-    params = stringkey_params(conditions)
-    binding.pry
-    #r1 = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    #r2 = request_sds(path: '/score/webcat/json?url=', body: params)
-    #r3 = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    binding.pry
-    r4 = request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params)
-    binding.pry
-    #
-    # am I an IP?
-    # => do IP stuff
-    # otherwise assume domain/URL
-    # => and do URL stuff
-    #
-    response = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    return response.body if raw == true
-    JSON.parse(response.body)[0]["response"]
-    # this should return {"sbrs": {"score": "<score>"}}
-    # where <score> is either between -10 and 10 (inclusive)
-    # or noscore
-  end
-
-  def self.wheer(conditions = {}, raw = false)
-    params = stringkey_params(conditions)
-    response = request_sds(path: '/score/sbrs/json?ip=', body: params)
-    return response.body if raw == true
-    JSON.parse(response.body)[0]["response"]
-    # this should return {"sbrs": {"score": "<score>"}}
-    # where <score> is either between -10 and 10 (inclusive)
-    # or noscore
-  end
-
-  # Add a WL/BL on the backend
-  def self.add_from_params(entries, wlbl_params)
-  end
-
-  def self.edit_from_params(entries, wlbl_params)
-  end
-
-  def self.drop_from_params(entries, wlbl_params)
-  end
-
-  # Add a WL/BL on the backend
-  def self.adjust_from_params(params = {}, username:)
   end
 
 end

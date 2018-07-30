@@ -1,16 +1,16 @@
 class Sbrs::Base
   include ActiveModel::Model
 
+  #TODO: all of this needs to be refactored and improved.  Finished up quickly because of deadline.
+
   def self.load_rules_matchup
     # a single call to the authority list of number==>rule data (used after SDS calls)
-    binding.pry
+
     begin
-      binding.pry
       JSON.parse(
-          request_sds(path: '/labels/wbrs-rulehits/json', body: '')
+          request_sds(path: '/labels/wbrs-rulehits/json', body: '').body
       )
     rescue Exception => e
-      binding.pry
       JSON.parse('{}')
     end
   end
@@ -58,11 +58,16 @@ class Sbrs::Base
     end
   end
 
-  def self.request_sds(path:, body:)
+  def self.request_sds(path:, body:, type: nil)
     # adapted from TI/sb_api, then heavily modified
     query_string = path
     if /\/score\// =~ query_string ? true : false
-      uri_item = "#{body["ip"]}"
+      if type == 'wbrs'
+        uri_item = "#{body['url']}"
+      else
+        uri_item = "#{body['ip']}"
+      end
+
       request_string = "https://" + sds_host + query_string + uri_item
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
@@ -78,7 +83,6 @@ class Sbrs::Base
         response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
           http.request(request)
         end
-
         if response.code != "200"  #there was an issue
           '{"response": "request failed"}'
         else
@@ -87,6 +91,33 @@ class Sbrs::Base
       rescue
         '{"response": "request failed"}'
       end
+    elsif /\/labels\// =~ query_string ? true : false
+      request_string = "https://" + sds_host + query_string
+
+      uri = URI.parse(request_string)
+      request = Net::HTTP::Get.new(uri)
+      request["X-Client-ID"] = "talosweb"
+      request["X-Product-ID"] = "talosintelligence"
+      req_options = {
+          use_ssl: uri.scheme == "https",
+          cert: OpenSSL::X509::Certificate.new(sds_cert.gsub("\\n", "\n")),
+          key: OpenSSL::PKey::RSA.new(sds_cert.gsub("\\n", "\n")),
+          verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
+      begin
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
+        end
+        if response.code != "200"  #there was an issue
+          '{"response": "request failed"}'
+        else
+          response # was: response.body per T/I source code
+        end
+      rescue
+        '{"response": "request failed"}'
+      end
+
+
     else
       '{"response": "no query_string clause for [' + query_string + ']"}'
     end
