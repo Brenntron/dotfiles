@@ -1,3 +1,101 @@
+categories = [
+  'Unknown',
+  'Adult',
+  'Advertisements',
+  'Alcohol',
+  'Arts',
+  'Astrology',
+  'Auctions',
+  'Business and Industry',
+  'Chat and Instant Messaging',
+  'Cheating and Plagiarism',
+  'Child Abuse Content',
+  'Computer Security',
+  'Computers and Internet'
+  'DIY Projects',
+  'Dating',
+  'Digital Postcards',
+  'Dining and Drinking',
+  'Dynamic and Residential',
+  'Education',
+  'Entertainment',
+  'Extreme',
+  'Fashion',
+  'File Transfer Services',
+  'Filter Avoidance',
+  'Finance',
+  'Freeware and Shareware',
+  'Gambling',
+  'Games',
+  'Government and Law',
+  'Hacking',
+  'Hate Speech',
+  'Health and Nutrition',
+  'Humor',
+  'Hunting',
+  'Illegal Activities',
+  'Illegal Downloads',
+  'Illegal Drugs',
+  'Infrastructure',
+  'Internet Telephony',
+  'Job Search',
+  'Lingerie and Swimsuits',
+  'Lotteries',
+  'Military',
+  'Mobile Phones',
+  'Nature',
+  'News',
+  'Non-governmental Organisations',
+  'Non-sexual Nudity',
+  'Online Communities',
+  'Online Meetings',
+  'Online Storage and Backup',
+  'Online Trading',
+  'Organisation Email',
+  'Paranormal',
+  'Parked Domains',
+  'Peer File Transfer',
+  'Personal Sites',
+  'Personal VPN',
+  'Photo Search and Images',
+  'Politics',
+  'Pornography',
+  'Professional Networking',
+  'Real Estate',
+  'Reference',
+  'Religion',
+  'SaaS and B2B',
+  'Safe for Kids',
+  'Science and Technology',
+  'Search Engines and Portals',
+  'Sex Education',
+  'Shopping',
+  'Social Networking',
+  'Social Science',
+  'Society and Culture',
+  'Software Updates',
+  'Sports and Recreations',
+  'Streaming Audio',
+  'Streaming Video',
+  'Tobacco',
+  'Transportation',
+  'Travel',
+  'Weapons',
+  'Web Hosting',
+  'Web Page Translation',
+  'Web-based Email',
+  'This category is correct'
+]
+
+window.createSelectOptions = ->
+  options = []
+  for x in categories
+    options.push {name: x}
+  return options
+
+
+
+
 window.removeSubdomain = (id,host) ->
   id.value = host
 
@@ -41,7 +139,7 @@ window.updatePending = (id,row_id) ->
 
 window.updateEntryColumns = (entry_id,row_id) ->
   prefix = $('#complaint_prefix_'+entry_id)[0].value
-  categories = $('#complaint_categories_'+entry_id)[0].value
+  categories = $('#input_cat_'+entry_id).val().toString()
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -250,6 +348,7 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-12">' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50">' + '</div>' +
       '</div>'
   else
+    input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<div class="row">' +
       '<div class="col-xs-10">' +
       '<div class="row">' +
@@ -269,8 +368,7 @@ format = (complaint_entry_row) ->
       '</div>' +
       '<div class="row">' +
       '<div class="col-xs-4">' +
-      'Category<input id="complaint_categories_' + complaint_entry.entry_id +
-      '" type="text" onclick="this.select()" value="' + category + '"' + entry_status + '>' +
+      'Category: <select id="'+input_cat+'" name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
@@ -293,6 +391,7 @@ format = (complaint_entry_row) ->
       '</div>'
   complaint_entry_html
 
+
 window.click_table_buttons = (complaint_table, button)->
   tr = $(button).closest('tr')
   row = complaint_table.row(tr)
@@ -300,12 +399,23 @@ window.click_table_buttons = (complaint_table, button)->
     row.child.hide()
     tr.removeClass 'shown'
     tr.addClass 'not-shown'
-  else                         # Open this row
+  else
+    # Open this row
     row.child(format(row)).show()
     tr.removeClass 'not-shown'
     tr.addClass 'shown'
     td = $(tr).next('tr').find('td:first')
     $(td).addClass 'complaint-entry-table-wrapper'
+    $('#input_cat_'+ row.data().entry_id).selectize {
+      persist: false,
+      create: false,
+      maxItems: 5
+      valueField: 'name'
+      labelField: 'name'
+      searchField: 'name'
+      options: createSelectOptions()
+
+    }
     # Check to see which columns should be displayed
     $('.toggle-vis-nested').each ->
       checkbox_trigger = $(button).attr('data-column')
@@ -466,3 +576,4 @@ window.commit_marked = () ->
     error: (response) ->
       popup_response_error(response, 'Error committing marked entries.')
   )
+
