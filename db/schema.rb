@@ -10,6 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+ActiveRecord::Schema.define(version: 20180726200023) do
 ActiveRecord::Schema.define(version: 20180730165632) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -152,12 +153,12 @@ ActiveRecord::Schema.define(version: 20180730165632) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "viewable", default: true, null: false
     t.float "sbrs_score", limit: 24
     t.text "uri"
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
+    t.boolean "viewable", default: true, null: false
     t.string "category"
     t.integer "user_id"
     t.boolean "is_important"
@@ -385,6 +386,7 @@ ActiveRecord::Schema.define(version: 20180730165632) do
     t.integer "user_id"
     t.string "submission_type"
     t.string "submitter_type"
+    t.integer "related_id"
     t.datetime "case_responded_at"
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
