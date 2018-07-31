@@ -9,27 +9,24 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   end
 
   def show
-    @dispute = Dispute.find(params[:id])
+    @complaint = Complaint.find(params[:id])
   end
 
   def update
   end
 
-  # def dashboard
-  # end
-  #
-  # def tickets
-  # end
-  #
-  # def single
-  # end
+  def rules
+  end
+
+  def reports
+  end
 
   def show_multiple
-    ids = params["selected_ids"]
+    ids = params["selected_ids"]&.split(',') || nil
     @complaints = Complaint.where(id:ids)
   end
   def advanced_search
-    @dispute = Dispute.new
+
   end
 
   def named_search

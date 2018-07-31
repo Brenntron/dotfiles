@@ -15,6 +15,7 @@ window.populate_webrep_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
+        $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -70,6 +71,13 @@ window.named_webrep_index_table = (search_name) ->
   }
   window.populate_webrep_index_table(data)
 
+window.call_contains_search = (search_form) ->
+  data = {
+    search_type: 'contains'
+    value: search_form.querySelector('input.search-box').value
+  }
+  window.populate_webrep_index_table(data)
+
 window.delete_disputes_named_search = (close_button, search_name) ->
   std_msg_ajax(
     method: 'DELETE'
@@ -99,49 +107,66 @@ window.popup_response_error =(response, prefix) ->
 
   alert(prefix + "\n" + errormsg)
 
-window.row_adust_wlbl_button =(button_tag) ->
+window.row_adjust_wlbl_button =(button_tag) ->
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
   wlbl_form = button_tag.form;
   data = {
     'dispute_entry_ids': [ wlbl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
+    'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
-    headers: headers
     data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 window.toolbar_adust_wlbl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
 
   wlbl_form = button_tag.form
   data = {
     'dispute_entry_ids': entry_ids
-    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
-    headers: headers
     data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    error_prefix: 'Error adjusting WL/BL.'
+  )
+
+window.index_adust_wlbl_button =(button_tag) ->
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+  data = {
+    'dispute_ids': dispute_ids
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/ticket_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 
@@ -295,6 +320,36 @@ window.take_disputes = () ->
   )
 
 
+window.save_dispute_entries = () ->
+  data = {}
+  $('#disputes-research-table').find('tr.research-table-row').each(() ->
+    result = {}
+    fielddata = $(this).find('.dual-edit-field').map(() ->
+      new_value = switch (this.dataset.field)
+        when 'status' then $(this).find('.table-entry-input')[0].innerText.trim()
+        else $(this).find('.table-entry-input')[0].value.trim()
+
+      {
+        id: this.dataset.id
+        field: this.dataset.field
+        old: $(this).find('.entry-data')[0].innerText.trim()
+        new: new_value
+      }
+    ).toArray().filter((field_data) ->
+      field_data.old != field_data.new
+    )
+    if 0 < fielddata.length
+      data[this.dataset.entryId] = fielddata
+  )
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    data: { field_data: data }
+    success_reload: true
+    error_prefix: 'Error updating data.'
+  )
+
+
 $ ->
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
@@ -335,6 +390,10 @@ $ ->
         className: 'state-col'
       }
       {
+        targets: [6]
+        className: 'text-center'
+      }
+      {
         targets: [ 8 ]
         className: 'alt-col'
       }
@@ -360,8 +419,9 @@ $ ->
       { data: 'status' }
       { data: 'resolution' }
       {
-        data: null
-        defaultContent: ''
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
