@@ -60,8 +60,18 @@ $ ->
       { data: 'entry_id' }
       { data: 'age' }
       { data: 'status' }
-      { data: 'subdomain' }
-      { data: 'domain' }
+      { data: 'subdomain'
+      }
+      {
+        'render':(data,type,full,meta)->
+          domain = full.domain
+          ip_address = full.ip_address
+          if domain
+            '<p>' + domain + '</p>'
+          else
+            '<a href="http://' + ip_address + '">' + ip_address + '</a>'
+
+      }
       { data: 'path' }
       { data: 'customer_name' }
       { data: 'wbrs_score' }
