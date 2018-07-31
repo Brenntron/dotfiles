@@ -38,6 +38,10 @@ When(/^I choose "(.*?)"$/) do |target|
   choose(target)
 end
 
+When(/^I click a table row$/) do
+  page.find(:css, ".not-shown").click()
+end
+
 Given(/^I upload "(.*?)" from_button "(.*?)"$/) do |filename, type|
   attach_file("#{type}", "#{Rails.root}/lib/data/#{filename}")
 end
@@ -62,6 +66,10 @@ end
 
 When(/^I click button "(.*?)"$/) do |button|
   click_button(button)
+end
+
+When(/^I click button with class "(.*?)"$/) do |button_class|
+  click_on(class: button_class)
 end
 
 When(/^I "(.*?)" the url "(.*?)"$/) do |method, url|

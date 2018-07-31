@@ -30,9 +30,9 @@ class Dispute < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
-  scope :open, -> { where(status: NEW) }
-  scope :closed, -> { where(status: CLOSED) }
-  scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :open_disputes, -> { where(status: NEW) }
+  scope :closed_disputes, -> { where(status: CLOSED) }
+  scope :in_progress_disputes, -> { where.not(status: [ NEW, CLOSED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def is_assigned?
@@ -76,6 +76,12 @@ class Dispute < ApplicationRecord
   def minutes_to_accept
     if case_accepted_at && case_opened_at
       (case_accepted_at - case_opened_at) / 60.0
+    end
+  end
+
+  def minutes_to_respond
+    if case_responded_at && case_opened_at
+      (case_responded_at - case_opened_at) / 60.0
     end
   end
 
