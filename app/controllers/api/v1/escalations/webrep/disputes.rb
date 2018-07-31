@@ -127,8 +127,15 @@ module API
               requires :dispute_id
             end
             post "sync_data" do
-              sleep(5)
-              {:status => "success"}.to_json
+                
+                dispute = Dispute.where({:id => params[:dispute_id]}).first
+                dispute.dispute_entries.each do |dispute_entry|
+
+                  dispute_entry.sync_up
+
+                end
+                {:status => "success"}.to_json
+
             end
 
             delete "searches/:search_name" do

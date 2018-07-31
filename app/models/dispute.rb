@@ -329,7 +329,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "sbrs"
+              new_rule_hit.rule_type = "SBRS"
               new_rule_hit.save
             end
           end
@@ -339,7 +339,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "wbrs"
+              new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save
             end
           end

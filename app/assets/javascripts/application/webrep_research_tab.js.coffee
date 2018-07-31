@@ -288,6 +288,7 @@ $ ->
         $(body_input[0]).text(response.body)
       error: (response) ->
         std_api_error(response, "Template could not be retrieved.", reload: false)
+
     )
     return
 
@@ -314,10 +315,12 @@ $ ->
       data: data
       dataType: 'json'
       success: (response) ->
-        $('#loading-div').hide()
-        #window.location.reload()
+        response = JSON.parse(response)
+        if response.status == "success"
+          window.location.reload()
       error: (response) ->
         popup_response_error(response, 'Error Syncing Data')
+        window.location.reload()
     )
 
 #    When data is finish loading
