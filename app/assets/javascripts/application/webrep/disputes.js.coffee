@@ -363,6 +363,20 @@ window.set_related_dispute = (form_tag) ->
     error_prefix: 'Error marking relationship.'
   )
 
+window.set_relating_disputes = (form_tag) ->
+  debugger
+  related_dispute_id = $(form_tag).find(".dispute-id").val()
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+#  std_msg_ajax(
+#    method: 'POST'
+#    url: '/api/v1/escalations/webrep/disputes/' + related_dispute_id + '/relating_disputes'
+#    data: { related_dispute_ids: related_dispute_id }
+#    success_reload: true
+#    error_prefix: 'Error marking relationship.'
+#  )
+
 window.show_set_duplicate_dispute = () ->
   $('#set-duplicate-dispute-div').show()
 
