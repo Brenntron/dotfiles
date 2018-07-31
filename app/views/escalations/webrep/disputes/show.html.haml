@@ -85,7 +85,7 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Repsonse Date
-          %p 2017-10-24 15:36:55
+          %p= @dispute.case_responded_at&.strftime('%F %T')
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Accept
@@ -93,7 +93,7 @@
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Respond
-          %p 853.4
+          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Days to Close
