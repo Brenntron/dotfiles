@@ -45,7 +45,7 @@
           %span{"aria-hidden" => "true"} ×
       .modal-body
         %input{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
-        %input{:name => "token", :type => "text", :value => "", :placeholder=>"categories comma separated"}/
+        %select#cat_new_url.contacts.selectized{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
       .modal-footer
         %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
         %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes

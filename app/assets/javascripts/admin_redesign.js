@@ -31,7 +31,8 @@
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require dataTables/extras/dataTables.select
-//= require application/webcat_complaints
+//= require application/webcat/complaints
 //= require application/webcat/complaint_form
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
+//= require application/webcat/categories
