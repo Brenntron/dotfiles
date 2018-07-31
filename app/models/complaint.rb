@@ -25,10 +25,15 @@ class Complaint < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
+  TI_CHANNEL = 'talosintel'
+  INT_CHANNEL = 'internal'
+
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
@@ -168,6 +173,7 @@ class Complaint < ApplicationRecord
         new_complaint.ticket_source_type = message_payload["source_type"]
         new_complaint.customer_id = Customer.process_and_get_customer(message_payload).id
         new_complaint.status = NEW
+        new_complaint.channel = TI_CHANNEL
 
         new_complaint.submitter_type = new_complaint.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
@@ -273,7 +279,11 @@ class Complaint < ApplicationRecord
     bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
 
     cust = find_customer(customer)
-    new_complaint = Complaint.create(id: bug_stub_hash["id"], description: description, customer_id: cust.id, status: 'NEW')
+    new_complaint = Complaint.create(id: bug_stub_hash["id"],
+                                     description: description,
+                                     customer_id: cust.id,
+                                     status: 'NEW',
+                                     channel: INT_CHANNEL)
 
     handle_tags(new_complaint, tags) if tags
 

@@ -54,7 +54,7 @@ $ ->
         sortable: false
         'render': (data, type, full, meta) ->
           complaintID = full.complaint_id.toString()
-          '<a href="' + complaintID + '">' + complaintID + '</a>'
+          '<a href="complaints/' + complaintID + '">' + complaintID + '</a>'
 
       }
       { data: 'entry_id' }
