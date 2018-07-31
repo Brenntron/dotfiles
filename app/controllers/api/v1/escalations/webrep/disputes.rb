@@ -122,6 +122,22 @@ module API
               true
             end
 
+            desc "Sync data for all dispute entry children"
+            params do
+              requires :dispute_id
+            end
+            post "sync_data" do
+                
+                dispute = Dispute.where({:id => params[:dispute_id]}).first
+                dispute.dispute_entries.each do |dispute_entry|
+
+                  dispute_entry.sync_up
+
+                end
+                {:status => "success"}.to_json
+
+            end
+
             delete "searches/:search_name" do
               # TODO determine access control policy for named searches
               search = NamedSearch.where(name: params['search_name'], user: current_user)
