@@ -76,7 +76,7 @@ module API
                 entry.change_category( permitted_params['prefix'],permitted_params['categories'],
                                          permitted_params['status'],
                                          permitted_params['comment'],
-                                         current_user, false,"")
+                                         current_user, "")
               rescue Exception => e
                   return e.message
               end
@@ -95,7 +95,7 @@ module API
                 entry.change_category( permitted_params['prefix'], permitted_params['categories'],
                                     permitted_params['status'],
                                     permitted_params['comment'],
-                                    current_user, entry.is_high_telemetry?, permitted_params['commit'])
+                                    current_user, permitted_params['commit'])
               rescue Exception => e
                 return e.message
               end

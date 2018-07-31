@@ -19,9 +19,9 @@ class DisputeEntry < ApplicationRecord
   ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
 
-  scope :open, -> { where(status: NEW) }
-  scope :closed, -> { where(status: CLOSED) }
-  scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :open_entries, -> { where(status: NEW) }
+  scope :closed_entries, -> { where(status: CLOSED) }
+  scope :in_progress_entries, -> { where.not(status: [ NEW, CLOSED ]) }
   scope :my_team, ->(user) { joins(:dispute).where(disputes: {user_id: user.my_team}) }
 
   scope :resolved_date, -> (date_from_iso, date_to_iso) {
@@ -57,6 +57,10 @@ class DisputeEntry < ApplicationRecord
     else
       self.uri.blank? ? self.ip_address : self.uri
     end
+  end
+
+  def ti_status
+    CLOSED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
   end
 
   def find_xbrs
@@ -170,4 +174,49 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def is_possible_company_duplicate?
+    Dispute.is_possible_company_duplicate?(dispute, hostlookup, entry_type)
+  end
+
+  def self.send_status_updates(field_data)
+    entities = []
+    field_data.each do |entry_id, field_ary|
+      if field_ary.any? {|field_hash| %w{status resolution resolution_comment}.include?(field_hash['field'])}
+        entities << DisputeEntry.find(entry_id)
+      end
+    end
+
+    if entities.any?
+      message = Bridge::DisputeEntryUpdateStatusEvent.new
+      message.post_entries(entities)
+    end
+  end
+
+  def update_from_field_data(field_hash)
+    attributes = field_hash.inject({}) do |attrs, field_data|
+      attrs[field_data['field']] = field_data['new']
+      attrs
+    end
+
+    if attributes.has_key?('host')
+      host = attributes.delete('host')
+      if /\A(?<ip_address>\d+\.\d+\.\d+\.\d+)\z/ =~ host
+        attributes['entry_type'] = 'IP'
+        attributes['ip_address'] = ip_address
+      else
+        attributes['entry_type'] = 'URI/DOMAIN'
+        attributes['hostname'] = host
+        attributes['uri'] = host
+      end
+    end
+
+    update!(attributes.slice(*%w{entry_type ip_address hostname uri status}))
+  end
+
+  def self.update_from_field_data(field_data)
+    field_data.each do |entry_id, field_hash|
+      entry = DisputeEntry.find(entry_id)
+      entry.update_from_field_data(field_hash)
+    end
+  end
 end

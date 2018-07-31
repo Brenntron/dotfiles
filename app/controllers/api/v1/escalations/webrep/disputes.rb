@@ -130,36 +130,41 @@ module API
             end
 
             patch 'take_dispute/:dispute_id' do
-              authorize!(:update, Dispute)
-              dispute = Dispute.find(params['dispute_id'])
-              authorize!(:update, dispute)
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
 
-              dispute.take_ticket(user: current_user)
+                dispute.take_ticket(user: current_user)
 
-              { username: current_user.display_name, dispute_id: dispute.id }
+                { username: current_user.display_name, dispute_id: dispute.id }
+              end
             end
 
             params do
               requires :dispute_ids, type: Array[Integer]
             end
             patch 'take_disputes' do
-              authorize!(:update, Dispute)
+              std_api_v2 do
+                authorize!(:update, Dispute)
 
-              dispute_ids = permitted_params['dispute_ids']
-              Dispute.take_tickets(dispute_ids, user: current_user)
+                dispute_ids = permitted_params['dispute_ids']
+                Dispute.take_tickets(dispute_ids, user: current_user)
 
-              { username: current_user.display_name, dispute_ids: dispute_ids }
+                { username: current_user.display_name, dispute_ids: dispute_ids }
+              end
             end
 
             params do
-              requires :status, type: String
+              requires :field_data, type: Hash
             end
-            patch 'entries/:entry_id/status' do
-              authorize!(:update, DisputeEntry)
-              entry = DisputeEntry.find(params['entry_id'])
-              authorize!(:update, entry)
-              entry.update(status: permitted_params['status'])
-              true
+            patch 'entries/field_data' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                DisputeEntry.update_from_field_data(permitted_params['field_data'])
+                DisputeEntry.send_status_updates(permitted_params['field_data'])
+                true
+              end
             end
 
             params do

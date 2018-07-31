@@ -320,12 +320,33 @@ window.take_disputes = () ->
   )
 
 
-window.dispute_entry_status = (id, status) ->
+window.save_dispute_entries = () ->
+  data = {}
+  $('#disputes-research-table').find('tr.research-table-row').each(() ->
+    result = {}
+    fielddata = $(this).find('.dual-edit-field').map(() ->
+      new_value = switch (this.dataset.field)
+        when 'status' then $(this).find('.table-entry-input')[0].innerText.trim()
+        else $(this).find('.table-entry-input')[0].value.trim()
+
+      {
+        id: this.dataset.id
+        field: this.dataset.field
+        old: $(this).find('.entry-data')[0].innerText.trim()
+        new: new_value
+      }
+    ).toArray().filter((field_data) ->
+      field_data.old != field_data.new
+    )
+    if 0 < fielddata.length
+      data[this.dataset.entryId] = fielddata
+  )
   std_msg_ajax(
     method: 'PATCH'
-    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
-    data: { status: status }
-    error_prefix: 'Error updating status.'
+    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    data: { field_data: data }
+    success_reload: true
+    error_prefix: 'Error updating data.'
   )
 
 
