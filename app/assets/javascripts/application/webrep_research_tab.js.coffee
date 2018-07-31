@@ -297,11 +297,15 @@ $ ->
     #    If cannot connect to resync data
     #    Show error message modal
     #    Else
-    $('#loader-modal').modal('show')
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
 
 #    When data is finish loading
 #    $('#loading-div').hide()
 #    $('#api-msg').show()
+#    $('#loader-modal.hidden).removeClass('hidden')
 #    Display success message in modal
 
 
