@@ -122,7 +122,7 @@
         .row
           .col-xs-2.col-with-divider
             %label.content-label-sm
-            %p= dispute_dup.id
+            %p= link_to(dispute_dup.id, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
           .col-xs-2.col-with-divider
             %label.content-label-sm
             %p= dispute_dup.case_opened_at&.strftime('%F %T')
