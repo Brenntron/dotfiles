@@ -1,67 +1,79 @@
 .row
-  .col-xs-3.dashboard-left-data
+  .col-xs-4.dashboard-left-data
     %h1 Complaints Management
     %span.my-dashboard-icon
     %h5= current_user.display_name
     %p.dashboard-details
       = link_to "#{@current_user.cvs_username}", users_path(current_user[:id])
 
-  .col-xs-3
-    %table.tickets-totals-table
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
       %tr
-        %td Extra
+        %th{colspan: '2'}
+          %span.ticket-type-label Submitter Type
+      %tr
         %td
-          SecHub
+          Customer
+        %td
           =@secHub_1
-          =@secHub_2
+      %tr
         %td
-          int
+          Guest
+        %td
           =@int_1
-          =@int_2
+      %tr
         %td
           WBNP
+        %td
           =@wbnp
-
-  .col-xs-3
-    %table.metrics
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
       %tr
-        %td Entries
+        %th{colspan: '2'}
+          %span.ticket-type-label Entries
+      %tr
         %td
           Assigned
+        %td
           =@assigned
+      %tr
         %td
           Pending
+        %td
           =@pending
+      %tr
         %td
           New
+        %td
           =@new
+      %tr
         %td
           Overdue
+        %td
           =@overdue
-
-  .col-xs-3
-    %table.metrics
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
       %tr
-        %td Complaints
+        %th
+          %span.ticket-type-label Complaints
+      %tr
         %td
           New
+        %td
           =@new_comp
+      %tr
         %td
           Active
+        %td
           =@active_comp
+      %tr
         %td
           Overdue
+        %td
           =@overdue_comp
+      %tr
         %td
           Completed
+        %td
           =@completed_comp
 
--#<div class="row">
--#
--#  <div class="col-sm-3">
--#    <div class="title"><%= content_for :webcat_page%> {icon}</div>
--#    <div class="user_name">
--#      <%= link_to "#{@current_user.display_name}", users_path(current_user[:id])%>
--#    </div>
--#    <div class="user_id">
--#      <%=@current_user.cec_username%> - AC title

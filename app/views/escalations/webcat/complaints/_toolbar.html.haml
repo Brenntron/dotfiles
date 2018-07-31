@@ -8,10 +8,11 @@
       Unselect All
     %button.toolbar-button.open-viewable-button{onclick: 'open_viewable()', type: 'button'}
       Open Viewable
-    %button.toolbar-button.open-selected-button{onclick: 'open_selected()', type: 'button'}
+    %button.toolbar-button.open-nonviewable-button{onclick: 'open_nonviewable()', type: 'button'}
       Open Nonviewable
     %button.toolbar-button.open-selected-button{onclick: 'open_selected()', type: 'button'}
       Open Selected
+    %button.toolbar-button.open-all-button{onclidk: 'open_all()', type: 'button'}
   %div
     %label.toolbar-section-label
       Edit
@@ -28,32 +29,19 @@
       View
     %button.toolbar-button.collapse-all-button{onclick: 'collapse_all()', type: 'button'}
       Collapse All
-    %button.toolbar-button.collapse-sel-button{onclick: 'collapse_all()', type: 'button'}
+    %button.toolbar-button.collapse-sel-button{onclick: 'collapse_selected()', type: 'button'}
       Collapse Selected
-    %button.toolbar-button.expand-all-button{onclick: 'collapse_all()', type: 'button'}
+    %button.toolbar-button.expand-all-button{onclick: 'expand_all()', type: 'button'}
       Expand All
-    %button.toolbar-button.expand-sel-button{onclick: 'collapse_all()', type: 'button'}
+    %button.toolbar-button.expand-sel-button{onclick: 'expand_selected()', type: 'button'}
       Expand Selected
+    %input{type: 'checkbox', checked: true, id:'self_review'}
+      Allow self Review
 
 
--#
--#<!--<div class="row">-->
--#  <!--<div class="col-lg-3 col-lg-offset-1">-->
--#
--#    <!--<button onclick="edit_selected_complaints()">Edit Selected</button>-->
--#    <!--<button onclick="take_selected()">Take selected</button>-->
--#    <!--<button onclick="return_selected()">Return selected</button>-->
--#
--#    <!--<button type="button" data-toggle="modal" data-target="#cat_new_url_modal">-->
--#      <!--categorize new URL-->
--#    <!--</button>-->
--#  <!--</div>-->
--#  <!--<div class="col-lg-2">-->
--#    <!--<button onclick="collapse_all()">collapse all</button>-->
--#    <!--<button onclick="collapse_selected()">collapse selected</button>-->
--#    <!--<button onclick="expand_all()">expand all</button>-->
--#    <!--<button onclick="expand_selected()">expand selected</button>-->
--#  <!--</div>-->
+
+
+
 -#  <!--<div class="col-lg-3">-->
 -#    <!--<button onclick="filterByStatus('ALL')">filterbyALL</button>-->
 -#    <!--<button onclick="filterByStatus('COMPLETED')">filterbycompleted</button>-->
@@ -63,13 +51,5 @@
 -#    <!--<input id="self_review" type="checkbox">allow self Review-->
 -#  <!--</div>-->
 -#
--#  <!--<div class="col-lg-3">-->
--#    <!--<button onclick="select_all_pages()">Select All</button>-->
--#    <!--<button onclick="unselect_all_pages()">Select None</button>-->
--#    <!--<button onclick="open_viewable()">Open All Viewable</button>-->
--#    <!--<button onclick="open_nonviewable()">Open Non Viewable</button>-->
--#    <!--<button onclick="open_selected()">Open Selected</button>-->
--#    <!--<button onclick="open_all()">Open All</button>-->
--#  <!--</div>-->
--#<!--</div>-->
+
 

@@ -15,26 +15,28 @@ module API
 
             get "" do
               json_packet = []
-              case permitted_params[:filter_by]
-                when "NEW"
-                  complaint_entries = ComplaintEntry.where(status:"NEW")
-                when "COMPLETED"
-                  complaint_entries = ComplaintEntry.where(status:"COMPLETED")
-                when "ACTIVE"
-                  complaint_entries = ComplaintEntry.where.not(status:"COMPLETED").where.not(status:"NEW")
-                when "REVIEW"
-                  complaint_entries = permitted_params[:self_review]? ComplaintEntry.where(is_important:true) : ComplaintEntry.where(is_important:true).where.not(user:current_user)
-                else
-                  complaint_entries = ComplaintEntry.all
-
+              if permitted_params[:filter_by]
+                case permitted_params[:filter_by]
+                  when "NEW"
+                    complaint_entries = ComplaintEntry.where(status:"NEW")
+                  when "COMPLETED"
+                    complaint_entries = ComplaintEntry.where(status:"COMPLETED")
+                  when "ACTIVE"
+                    complaint_entries = ComplaintEntry.where.not(status:"COMPLETED").where.not(status:"NEW")
+                  when "REVIEW"
+                    complaint_entries = permitted_params[:self_review]? ComplaintEntry.where(is_important:true) : ComplaintEntry.where(is_important:true).where.not(user:current_user)
+                  else
+                    complaint_entries = ComplaintEntry.all
+                end
+              else
+                complaint_entries = ComplaintEntlry.al
               end
-
               if complaint_entries
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
                   complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
-                  complaint_entry_packet[:complaint_id] = complaint_entry.complaint.id
+                  complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
                   complaint_entry_packet[:entry_id] = complaint_entry.id
 
                   complaint_entry_packet[:assigned_to] = complaint_entry.user&.display_name

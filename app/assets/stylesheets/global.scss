@@ -5136,6 +5136,10 @@ table.dispute_tool_current tr:last-of-type td {
   font-weight: 300;
 }
 
+.dashboard-details a {
+  color: $content-bg-color;
+}
+
 .my-dashboard-icon, .team-icon {
   background-repeat: no-repeat;
   width: 30px;
@@ -5244,6 +5248,10 @@ td.ticket-total::before {
 #edit-ticket-status-dropdown .ticket-resolution-submenu {
   left: -323px;
   padding: 0 !important;
+}
+
+.table-condensed > tbody > tr > td {
+  padding: 3px 4px !important;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
