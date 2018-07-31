@@ -299,6 +299,24 @@ $ ->
     #    Else
     $('#loader-modal').modal('show')
 
+    data = {
+      'dispute_id': $(".case-id-tag").html()
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webrep/disputes/sync_data'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        $('#loading-div').hide()
+        #window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error Syncing Data')
+    )
+
 #    When data is finish loading
 #    $('#loading-div').hide()
 #    $('#api-msg').show()
