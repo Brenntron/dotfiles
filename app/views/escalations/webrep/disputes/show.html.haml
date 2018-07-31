@@ -110,19 +110,22 @@
           %label.content-label-sm
             Last Updated By
           %p Melissa Taylor
-      %h3 Duplicate Cases
+      %h3 Related Cases
       .row
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Case ID
-          %p= @dispute.id
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
-          %p= @dispute.case_opened_at
-        .col-xs-8
-          %label.content-label-sm
-            Time Marked Duplicate
+      - @dispute.each_related do |dispute_dup|
+        .row
+          .col-xs-2.col-with-divider
+            %label.content-label-sm
+            %p= link_to(dispute_dup.id, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+          .col-xs-2.col-with-divider
+            %label.content-label-sm
+            %p= dispute_dup.case_opened_at&.strftime('%F %T')
   .row
     .col-xs-12.text-center
       %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
@@ -137,7 +140,7 @@
       Research
   %li.nav-item{role:'presentation'}
     %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
-      Related Cases
+      Duplicate Cases
 
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane.active#communication_tab{role: 'tabpanel'}
@@ -146,7 +149,6 @@
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
     .related-cases-button-div
-      %button{type: 'button', onclick: 'show_set_related_dispute();'} + Maked Related
       %button{type: 'button', onclick: 'show_set_duplicate_dispute();'} + Duplicate
       #set-related-dispute-div{style: 'display: none;'}
         %form#set-related-dispute-form{onsubmit: 'set_related_dispute(this);return false;', 'data-dispute-id': @dispute.id}
@@ -159,15 +161,11 @@
             Ticket ID:
             %input.dispute-id{type: 'text', name: 'dispute_id'}
     .related-cases-display
-      %h2 Related Cases
-      - if @dispute.related_dispute
-        .related-div
-          %h5= Dispute::DUPLICATE == @dispute.status ? 'Duplicate of' : 'Related'
-          = @dispute.related_dispute.id
-          = @dispute.related_dispute.org_domain
-      - if @dispute.relating_disputes.exists?
-        - @dispute.relating_disputes.each do |relating_dispute|
-          .relating-div
-            %h5= Dispute::DUPLICATE == relating_dispute.status ? 'Duplicate' : 'Relating'
-            = relating_dispute.id
-            = relating_dispute.org_domain
+      %table
+        %caption Duplicate Cases
+        %tbody
+          - @dispute.each_duplicate do |dispute_dup|
+            %tr
+              %td= link_to(dispute_dup.id, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+              %td= dispute_dup.case_opened_at.strftime('%F %T')
+

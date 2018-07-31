@@ -157,9 +157,14 @@
             Assign
 
     %span.dropdown
-      %button#index_mark_duplicate.toolbar-button.mark-duplicate-button{title: 'Mark as Duplicate'}
+      %button#index_mark_duplicate.toolbar-button.mark-duplicate-button{title: 'Mark as Related', onclick: "$('#set-related-dispute-div').show();"}
         %span.toolbar-button-text
-          Mark as Duplicate
+          Mark as Related
+      #set-related-dispute-div{style: 'display: none;'}
+        %form#set-related-dispute-form{onsubmit: 'set_relating_disputes(this);return false;'}
+          %label
+            Ticket ID:
+            %input.dispute-id{type: 'text', name: 'dispute_id'}
 
   %div
     %label.toolbar-section-label

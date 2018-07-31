@@ -98,6 +98,32 @@ class Dispute < ApplicationRecord
     minutes_to_close && minutes_to_close / 1440.0
   end
 
+  def each_duplicate(&block)
+    if related_dispute && Dispute::DUPLICATE == self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def each_related(&block)
+    if related_dispute && Dispute::DUPLICATE != self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def full_duplicates
+    result = []
+    each_duplicate do |other_dispute|
+      result << other_dispute
+    end
+    result
+  end
+
   def self.parse_url(url)
     pre_url = url.gsub("http://", "").gsub("https://", "")
     url = "http://" + pre_url
