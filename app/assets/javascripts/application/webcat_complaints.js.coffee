@@ -195,8 +195,11 @@ format = (complaint_entry_row) ->
   resolution_comment=''
   if complaint_entry.resolution_comment
     resolution_comment = complaint_entry.resolution_comment
-
-
+  disposition = ''
+  if complaint_entry.suggested_disposition
+    disposition = complaint_entry.suggested_disposition
+  else
+    disposition = missing_data
   unchanged_radio = ""
   fixed_radio = ""
   invalid_radio = ""
@@ -229,6 +232,11 @@ format = (complaint_entry_row) ->
       '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
       '</div>'+
       '</div>' +
+      '<div class="row">' +
+      '<div>Suggested Disposition: '+
+      '<span>' + disposition + '</span>' +
+      '</div>'+
+      '</div>' +
       '</div>' +
       ' <div class="col-xs-3">' +
       'Prefix <input id="complaint_review_prefix_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + host + '"><button onclick="removeSubdomain(complaint_review_prefix_' + complaint_entry.entry_id + ',\'' + complaint_entry.domain + '\')">remove subdomain</button>' +
@@ -254,7 +262,15 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-10">' +
       '<div class="row">' +
       '<div class="col-xs-1">' + complaint_entry.complaint_id + '/' + complaint_entry.entry_id + ' </div>' +
-      '<div class="col-xs-3">' + uri +
+      '<div class="col-xs-3">' +
+      '<div class="row">' +
+      '<div class="col-xs-12">' +
+      uri +
+      '</div>' +
+      '<div class="col-xs-12">' +
+      'suggested disposition: ' + disposition +
+      '</div>' +
+      '</div>' +
       '</div>' +
       '<div class="col-xs-4">' +
       'Prefix <input id="complaint_prefix_' + complaint_entry.entry_id +
