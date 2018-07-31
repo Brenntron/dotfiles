@@ -152,12 +152,12 @@ ActiveRecord::Schema.define(version: 20180720142558) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "viewable", default: true, null: false
     t.float "sbrs_score", limit: 24
     t.text "uri"
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
-    t.boolean "viewable", default: true, null: false
     t.string "category"
     t.integer "user_id"
     t.boolean "is_important"

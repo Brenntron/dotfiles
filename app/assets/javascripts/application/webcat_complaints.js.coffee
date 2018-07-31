@@ -32,7 +32,6 @@ window.updatePending = (id,row_id) ->
         temp_row.data().resolution_comment = comment
         temp_row.data().category = category
         temp_row.invalidate().draw()
-        temp_row.data().is_important = false
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
     error: (response) ->
@@ -59,12 +58,11 @@ window.updateEntryColumns = (entry_id,row_id) ->
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
-        temp_row.data().status = "PENDING"
+        temp_row.data().status = json.status
         temp_row.data().category = categories
         temp_row.data().resolution = status
         temp_row.data().resolution_comment = comment
         temp_row.invalidate().draw()
-        temp_row.data().is_important = true
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
     error: (response) ->
@@ -274,9 +272,9 @@ format = (complaint_entry_row) ->
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> unchanged |  ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> fixed | ' +
-      '<input type="radio" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> invalid' +
+      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> unchanged |  ' +
+      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> fixed | ' +
+      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> invalid' +
       '</div>' +
       '<div class="col-xs-1">' +
       '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +

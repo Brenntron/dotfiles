@@ -70,25 +70,25 @@ class ComplaintEntry < ApplicationRecord
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important
-        if commit_pending == "commit"
-          current_status = "COMPLETED"
-          update(status:current_status,resolution_comment: comment,user:current_user)
-          complaint.set_status(current_status)
-          #this is where we should send off the category to the API
+        if self.status == "PENDING"
+          if commit_pending == "commit"
+            current_status = "COMPLETED"
+            update(status:current_status,resolution_comment: comment,user:current_user)
+            complaint.set_status(current_status)
+            #this is where we should send off the category to the API
+          else
+            current_status = "ASSIGNED"
+            update(status:current_status, resolution_comment: comment)
+          end
         else
-          current_status = "ASSIGNED"
-          update(status:current_status, resolution_comment: comment)
+          current_status = "PENDING"
+          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
         end
       else
-        if self.is_important
-          current_status = "PENDING"
-          update(resolution:entry_status,category:categories_string,status:current_status,resolution_comment: comment,user:current_user,status:current_status)
-        else
-          current_status = "COMPLETED"
-          update(resolution:entry_status,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
-          complaint.set_status(current_status)
-          #this is where we should send off the category to the API
-        end
+        current_status = "COMPLETED"
+        update(resolution:entry_status,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
+        complaint.set_status(current_status)
+        #this is where we should send off the category to the API
       end
     end
   end

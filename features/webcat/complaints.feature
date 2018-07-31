@@ -23,3 +23,31 @@ Feature: Webcat complaints
     And I click button "Create"
     And I wait for "3" seconds
     And I should see "COMPLAINT CREATED"
+
+  @javascript
+  Scenario: A user must review a high telemetry site
+    Given a user with role "admin" exists and is logged in
+    And a complaint entry with trait "important" exists
+    And I goto "/escalations/webcat"
+    And I should see "bogus_category"
+    Then I should not see "Update"
+    When I click button with class "expand-row-button-inline"
+    And I choose "fixed1"
+    And I should see "Update"
+    And I should not see "commit"
+    When I click "Update"
+    Then I should see "commit"
+
+  @javascript
+  Scenario: A user does not need to review a low telemetry site
+    Given a user with role "admin" exists and is logged in
+    And a complaint entry with trait "not_important" exists
+    And I goto "/escalations/webcat"
+    And I should see "bogus_category"
+    Then I should not see "Update"
+    When I click button with class "expand-row-button-inline"
+    And I choose "fixed1"
+    And I should see "Update"
+    And I should not see "commit"
+    When I click "Update"
+    Then I should not see "commit"
