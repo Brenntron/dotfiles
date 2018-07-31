@@ -140,7 +140,7 @@
       Research
   %li.nav-item{role:'presentation'}
     %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
-      Related Cases
+      Duplicate Cases
 
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane.active#communication_tab{role: 'tabpanel'}
@@ -149,7 +149,6 @@
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
     .related-cases-button-div
-      %button{type: 'button', onclick: 'show_set_related_dispute();'} + Maked Related
       %button{type: 'button', onclick: 'show_set_duplicate_dispute();'} + Duplicate
       #set-related-dispute-div{style: 'display: none;'}
         %form#set-related-dispute-form{onsubmit: 'set_related_dispute(this);return false;', 'data-dispute-id': @dispute.id}
@@ -162,15 +161,11 @@
             Ticket ID:
             %input.dispute-id{type: 'text', name: 'dispute_id'}
     .related-cases-display
-      %h2 Related Cases
-      - if @dispute.related_dispute
-        .related-div
-          %h5= Dispute::DUPLICATE == @dispute.resolution ? 'Duplicate of' : 'Related'
-          = @dispute.related_dispute.id
-          = @dispute.related_dispute.org_domain
-      - if @dispute.relating_disputes.exists?
-        - @dispute.relating_disputes.each do |relating_dispute|
-          .relating-div
-            %h5= Dispute::DUPLICATE == relating_dispute.resolution ? 'Duplicate' : 'Relating'
-            = relating_dispute.id
-            = relating_dispute.org_domain
+      %table
+        %caption Duplicate Cases
+        %tbody
+          - @dispute.each_duplicate do |dispute_dup|
+            %tr
+              %td= link_to(dispute_dup.id, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+              %td= dispute_dup.case_opened_at.strftime('%F %T')
+
