@@ -249,11 +249,33 @@ class Complaint < ApplicationRecord
     end
   end
 
-  def self.create_action(ips_urls, description, customer, tags)
-    cust = find_customer(customer)
-    new_complaint = Complaint.create(description: description, customer_id: cust.id, status: 'NEW')
+  def self.create_action(bugzilla_session, ips_urls, description, customer, tags)
+    user = User.where(cvs_username:"vrtincom").first
+    bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
-    handle_tags(new_complaint, tags)
+    summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          IPs/URIs: #{ips_urls}
+          Problem Summary: #{description}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations',
+        'component' => 'WebCat',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+
+    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+
+    cust = find_customer(customer)
+    new_complaint = Complaint.create(id: bug_stub_hash["id"], description: description, customer_id: cust.id, status: 'NEW')
+
+    handle_tags(new_complaint, tags) if tags
 
     ips_urls.split(' ').each do |ip_url|
       ComplaintEntry.create_complaint_entry(new_complaint, ip_url)

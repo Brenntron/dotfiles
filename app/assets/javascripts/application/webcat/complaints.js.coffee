@@ -40,7 +40,7 @@ window.updatePending = (id,row_id) ->
 
 window.updateEntryColumns = (entry_id,row_id) ->
   prefix = $('#complaint_prefix_'+entry_id)[0].value
-  categories = $('#complaint_categories_'+entry_id)[0].value
+  categories = $('#input_cat_'+entry_id).val().toString()
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -248,6 +248,7 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-12">' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50">' + '</div>' +
       '</div>'
   else
+    input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<div class="row">' +
       '<div class="col-xs-10">' +
       '<div class="row">' +
@@ -267,8 +268,7 @@ format = (complaint_entry_row) ->
       '</div>' +
       '<div class="row">' +
       '<div class="col-xs-4">' +
-      'Category<input id="complaint_categories_' + complaint_entry.entry_id +
-      '" type="text" onclick="this.select()" value="' + category + '"' + entry_status + '>' +
+      'Category: <select id="'+input_cat+'" name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
@@ -291,6 +291,7 @@ format = (complaint_entry_row) ->
       '</div>'
   complaint_entry_html
 
+
 window.click_table_buttons = (complaint_table, button)->
   tr = $(button).closest('tr')
   row = complaint_table.row(tr)
@@ -298,12 +299,23 @@ window.click_table_buttons = (complaint_table, button)->
     row.child.hide()
     tr.removeClass 'shown'
     tr.addClass 'not-shown'
-  else                         # Open this row
+  else
+    # Open this row
     row.child(format(row)).show()
     tr.removeClass 'not-shown'
     tr.addClass 'shown'
     td = $(tr).next('tr').find('td:first')
     $(td).addClass 'complaint-entry-table-wrapper'
+    $('#input_cat_'+ row.data().entry_id).selectize {
+      persist: false,
+      create: false,
+      maxItems: 5
+      valueField: 'name'
+      labelField: 'name'
+      searchField: 'name'
+      options: AC.WebCat.createSelectOptions()
+
+    }
     # Check to see which columns should be displayed
     $('.toggle-vis-nested').each ->
       checkbox_trigger = $(button).attr('data-column')
@@ -464,3 +476,4 @@ window.commit_marked = () ->
     error: (response) ->
       popup_response_error(response, 'Error committing marked entries.')
   )
+
