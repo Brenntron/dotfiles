@@ -205,7 +205,8 @@ module API
                 authorize!(:update, dispute)
                 dispute.update!(related_id: permitted_params['duplicate_dispute_id'],
                                 related_at: DateTime.now,
-                                status: Dispute::DUPLICATE)
+                                status: Dispute::CLOSED,
+                                resolution: Dispute::DUPLICATE)
                 true
               end
             end

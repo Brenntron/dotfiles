@@ -99,11 +99,20 @@ class Dispute < ApplicationRecord
   end
 
   def each_duplicate(&block)
-    if related_dispute && Dispute::DUPLICATE == self.status
+    if related_dispute && Dispute::DUPLICATE == self.resolution
       block.call(related_dispute)
-      related_dispute.relating_disputes.where(status: Dispute::DUPLICATE).each(&block)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
     else
-      relating_disputes.where(status: Dispute::DUPLICATE).each(&block)
+      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def each_related(&block)
+    if related_dispute && Dispute::DUPLICATE != self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
     end
   end
 
