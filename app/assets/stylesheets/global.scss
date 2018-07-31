@@ -5101,7 +5101,7 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-E {background-image: url(image_path('icon_type_email.svg'));}
 .dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
 
-.my-dashboard-header-area {
+.my-dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $bug-section-color;
   margin-top: -15px;
   border-radius: 4px 4px 0 0 ;
@@ -5111,20 +5111,20 @@ table.dispute_tool_current tr:last-of-type td {
   background-color: $content-tab-color;
 }
 
-.dashboard-header-area {
+.dashboard-header-area, .complaint-mgt-top-area {
   margin-right: -15px;
   margin-left: -15px;
   color: $content-bg-color;
   padding: 15px;
 }
 
-.dashboard-header-area h1 {
+.dashboard-header-area h1, .complaint-mgt-top-area h1 {
   color: $content-bg-color;
   margin-bottom: 24px;
   display: inline-block;
 }
 
-.dashboard-header-area h5 {
+.dashboard-header-area h5, .complaint-mgt-top-area h5 {
   color: $content-bg-color;
   font-size: 9pt;
   font-weight: 600;

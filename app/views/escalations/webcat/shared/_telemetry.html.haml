@@ -1,0 +1,67 @@
+.row
+  .col-xs-3.dashboard-left-data
+    %h1 Complaints Management
+    %span.my-dashboard-icon
+    %h5= current_user.display_name
+    %p.dashboard-details
+      = link_to "#{@current_user.cvs_username}", users_path(current_user[:id])
+
+  .col-xs-3
+    %table.tickets-totals-table
+      %tr
+        %td Extra
+        %td
+          SecHub
+          =@secHub_1
+          =@secHub_2
+        %td
+          int
+          =@int_1
+          =@int_2
+        %td
+          WBNP
+          =@wbnp
+
+  .col-xs-3
+    %table.metrics
+      %tr
+        %td Entries
+        %td
+          Assigned
+          =@assigned
+        %td
+          Pending
+          =@pending
+        %td
+          New
+          =@new
+        %td
+          Overdue
+          =@overdue
+
+  .col-xs-3
+    %table.metrics
+      %tr
+        %td Complaints
+        %td
+          New
+          =@new_comp
+        %td
+          Active
+          =@active_comp
+        %td
+          Overdue
+          =@overdue_comp
+        %td
+          Completed
+          =@completed_comp
+
+-#<div class="row">
+-#
+-#  <div class="col-sm-3">
+-#    <div class="title"><%= content_for :webcat_page%> {icon}</div>
+-#    <div class="user_name">
+-#      <%= link_to "#{@current_user.display_name}", users_path(current_user[:id])%>
+-#    </div>
+-#    <div class="user_id">
+-#      <%=@current_user.cec_username%> - AC title
