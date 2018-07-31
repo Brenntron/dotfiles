@@ -687,6 +687,7 @@ th.alt-col {
 .expand-row-button-inline {
   background-image: url(image_path('icon_expand_lt_grey.svg'));
   background-repeat: no-repeat;
+  background-color: transparent;
   border: none;
   display: block;
   width: 20px;
@@ -4124,15 +4125,21 @@ input.file_attachment {
 
 table > tbody > tr > td.dispute_rep_tools {
   width: 90px;
-  padding: 0 !important;
+  padding: 0 0 8px 0 !important;
   text-align: right;
 }
 
 .dispute_rep_tools_wrapper {
-  display: block;
   position: absolute;
+  width: 90px;
+  margin-left: -90px;
   margin-top: 7px;
-  width: 90px
+}
+
+@-moz-document url-prefix() {
+  .dispute_rep_tools_wrapper {
+    margin-top: -18px;
+  }
 }
 
 .dispute_rep_tools_wrapper .edit-button {
