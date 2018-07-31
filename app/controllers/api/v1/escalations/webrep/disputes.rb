@@ -168,6 +168,20 @@ module API
             end
 
             params do
+              requires :relating_dispute_ids, type: Array[Integer]
+            end
+            patch ':dispute_id/relating_disputes' do
+              std_api_v2 do
+                byebug
+                authorize!(:update, Dispute)
+                relating_dispute_ids = permitted_params['relating_dispute_ids']
+                Dispute.where(id: relating_dispute_ids).update_all(related_id: params['dispute_id'],
+                                                                   related_at: DateTime.now)
+                true
+              end
+            end
+
+            params do
               requires :related_dispute_id, type: Integer
             end
             post ':dispute_id/related_disputes' do
