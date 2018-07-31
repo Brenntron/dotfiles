@@ -69,7 +69,7 @@ $ ->
           if domain
             '<p>' + domain + '</p>'
           else
-            '<a href="http://' + ip_address + '">' + ip_address + '</a>'
+            '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 
       }
       { data: 'path' }
