@@ -194,6 +194,10 @@ class Dispute < ApplicationRecord
     return possible_duplicates
   end
 
+  def self.is_possible_customer_duplicate?()
+
+  end
+
   def compose_versioned_items
 
     versioned_items = [self]
@@ -303,7 +307,15 @@ class Dispute < ApplicationRecord
           new_dispute.priority = "P4"
         end
         logger.debug "Saving Dispute"
+
         new_dispute.save
+
+        response = is_possible_customer_duplicate?(new_dispute, )
+
+        if response[:is_dupe] == true
+          manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls )
+          return
+        end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
         #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
