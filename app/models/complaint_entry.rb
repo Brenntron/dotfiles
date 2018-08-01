@@ -86,7 +86,7 @@ class ComplaintEntry < ApplicationRecord
         end
       else
         current_status = "COMPLETED"
-        update(resolution:entry_status,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
+        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
       end
