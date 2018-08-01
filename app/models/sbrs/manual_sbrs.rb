@@ -8,7 +8,7 @@ class Sbrs::ManualSbrs < Sbrs::Base
 
   #TODO: all of this needs to be refactored and improved.  Finished up quickly because of deadline.
   #Instructions:
-  #get_sbrs_data({:id => '1.2.3.4'})  <-- will return sbrs score for an ip
+  #get_sbrs_data({:ip => '1.2.3.4'})  <-- will return sbrs score for an ip
   #to get rulehit data for sbrs/email:
   #Sbrs::GetSbrs.get_sbrs_rules_for_ip('2.3.4.5') <--- will return an array of sbrs specific rules for provided ip string
 

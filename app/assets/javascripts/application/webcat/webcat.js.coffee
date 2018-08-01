@@ -54,14 +54,24 @@ $ ->
         sortable: false
         'render': (data, type, full, meta) ->
           complaintID = full.complaint_id.toString()
-          '<a href="' + complaintID + '">' + complaintID + '</a>'
+          '<a href="complaints/' + complaintID + '">' + complaintID + '</a>'
 
       }
       { data: 'entry_id' }
       { data: 'age' }
       { data: 'status' }
-      { data: 'subdomain' }
-      { data: 'domain' }
+      { data: 'subdomain'
+      }
+      {
+        'render':(data,type,full,meta)->
+          domain = full.domain
+          ip_address = full.ip_address
+          if domain
+            '<p>' + domain + '</p>'
+          else
+            '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
+
+      }
       { data: 'path' }
       { data: 'customer_name' }
       { data: 'wbrs_score' }

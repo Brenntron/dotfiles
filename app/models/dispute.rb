@@ -102,6 +102,32 @@ class Dispute < ApplicationRecord
     minutes_to_close && minutes_to_close / 1440.0
   end
 
+  def each_duplicate(&block)
+    if related_dispute && Dispute::DUPLICATE == self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def each_related(&block)
+    if related_dispute && Dispute::DUPLICATE != self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def full_duplicates
+    result = []
+    each_duplicate do |other_dispute|
+      result << other_dispute
+    end
+    result
+  end
+
   def self.parse_url(url)
     pre_url = url.gsub("http://", "").gsub("https://", "")
     url = "http://" + pre_url
@@ -336,7 +362,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "sbrs"
+              new_rule_hit.rule_type = "SBRS"
               new_rule_hit.save
             end
           end
@@ -346,7 +372,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "wbrs"
+              new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save
             end
           end
