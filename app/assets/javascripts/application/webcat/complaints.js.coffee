@@ -280,11 +280,11 @@ format = (complaint_entry_row) ->
       '</div>'
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
-    complaint_entry_html = '<table><thead><tr>' +
+    complaint_entry_html = '<table><tr>' +
       '<td>' + uri + '</td>' +
-      '<th>Status</th><th>Confidence</th><th>Suggested Disposition</th><th></th></tr>' +
-      '<tbody><tr><td>' +
-      'Prefix <input id="complaint_prefix_' + complaint_entry.entry_id +
+      '<td>Status</td><td>Confidence</td><td>Suggested Disposition</td><td></td></tr>' +
+      '<tr><td>' +
+      'Prefix <input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
       '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +

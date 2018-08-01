@@ -4458,6 +4458,18 @@ table > tbody > tr > td.dispute_rep_tools {
   color: $content-bg-color;
 }
 
+.nested-complaint-data-wrapper table a {
+  color: $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table td {
+  border-bottom: none;
+}
+
+.nested-table-input {
+  color: $type-base-color;
+}
+
 .table-entry-input {
   border: 2px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
