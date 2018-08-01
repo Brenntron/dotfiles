@@ -1,5 +1,9 @@
 $('#myModal').on 'shown.bs.modal', ->
   $('#myInput').trigger 'focus'
+
+window.display_tooltip = (id)->
+  $('#cat_tooltip_' + id).tooltip('toggle')
+
 $ ->
   complaint_table = $('#complaints-index').DataTable(
     'rowCallback': (row, data, index) ->
@@ -75,7 +79,19 @@ $ ->
       { data: 'path' }
       { data: 'customer_name' }
       { data: 'wbrs_score' }
-      { data: 'category' }
+      {
+        sortable: false
+        'render': (data, type, full, meta) ->
+          categories = ''
+          category = ''
+          plus = ''
+          if full.category
+            categories = full.category.split(',')
+            category = categories[0]
+          if categories.length > 1
+            plus = '+'
+          '<p id="cat_tooltip_' + full.entry_id + '" data-toggle="tooltip" title="' + full.category + '" onmouseover=display_tooltip(' + full.entry_id + ')>' + category + plus + '</p>'
+      }
       { data: 'assigned_to' }
     ]
     select: 'style': 'os'
