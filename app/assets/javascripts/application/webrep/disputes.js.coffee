@@ -22,13 +22,6 @@ window.populate_webrep_index_table = (data = {}) ->
         datatable.draw();
 
         if undefined != json.search_name
-          debugger
-#          search_id = json.search_id
-#          delete_image = named_search_tag(json.search_name, json.search_id)
-#          delete_tag = '<a class="delete-search"' +
-#            ' onclick="delete_disputes_named_search(this, \'' + json.search_name + '\');"' +
-#            ' title="Delete Saved Search">' +
-#            '<img src="' + delete_image + '"/ alt="Icon cancel grey"></a>'
           $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
