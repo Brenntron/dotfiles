@@ -38,6 +38,10 @@ class Dispute < ApplicationRecord
   scope :in_progress_disputes, -> { where.not(status: [ NEW, CLOSED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
+  def case_id_str
+    '%010i' % id
+  end
+
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
@@ -58,6 +62,18 @@ class Dispute < ApplicationRecord
 
   def entry_count
     dispute_entries.length
+  end
+
+  def last_updated_by
+    if versions.any?
+      User.find(versions.last&.whodunnit)
+    else
+      nil
+    end
+  end
+
+  def last_updated_by_username
+    last_updated_by&.cvs_username
   end
 
   def dispute_age
@@ -96,6 +112,32 @@ class Dispute < ApplicationRecord
 
   def days_to_close
     minutes_to_close && minutes_to_close / 1440.0
+  end
+
+  def each_duplicate(&block)
+    if related_dispute && Dispute::DUPLICATE == self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def each_related(&block)
+    if related_dispute && Dispute::DUPLICATE != self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def full_duplicates
+    result = []
+    each_duplicate do |other_dispute|
+      result << other_dispute
+    end
+    result
   end
 
   def self.parse_url(url)
@@ -332,7 +374,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "sbrs"
+              new_rule_hit.rule_type = "SBRS"
               new_rule_hit.save
             end
           end
@@ -342,7 +384,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "wbrs"
+              new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save
             end
           end
@@ -787,7 +829,7 @@ class Dispute < ApplicationRecord
     disputes.map do |dispute|
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
 
-      dispute_packet[:case_number] = sprintf '%08d', dispute.id
+      dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_name] = '' #dispute.customer_name
       dispute_packet[:submitter_org] = dispute.org_domain

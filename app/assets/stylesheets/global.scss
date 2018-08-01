@@ -634,6 +634,7 @@ th.alt-col {
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
+.sync-button {background-image: url(image_path('icon_sync.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -686,6 +687,7 @@ th.alt-col {
 .expand-row-button-inline {
   background-image: url(image_path('icon_expand_lt_grey.svg'));
   background-repeat: no-repeat;
+  background-color: transparent;
   border: none;
   display: block;
   width: 20px;
@@ -1041,20 +1043,20 @@ thead th.sorting.center {
   display: none;
 }
 
-#msg-modal .modal-dialog {
+#msg-modal .modal-dialog, #loader-modal .modal-dialog {
   margin-top: 180px;
 }
 
-#msg-modal .message-div::before {
+#msg-modal .message-div::before, #loader-modal .message-div::before {
   margin-top: -30px;
 }
 
-#msg-modal .message-div {
+#msg-modal .message-div, #loader-modal .message-div {
   border: none;
   padding-top: 2px;
 }
 
-#msg-modal .modal-content {
+#msg-modal .modal-content, #loader-modal .modal-content {
   border: 2px solid #f2f2f2;
   border-radius: 2px;
 }
@@ -1440,7 +1442,7 @@ button.close {
   background-image: url(image_path('icon_cancel.svg'));
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-position: 0 -5px;
+  background-position: -3px -2px;
 }
 
 /************ Side Nav **************/
@@ -4123,15 +4125,21 @@ input.file_attachment {
 
 table > tbody > tr > td.dispute_rep_tools {
   width: 90px;
-  padding: 0 !important;
+  padding: 0 0 8px 0 !important;
   text-align: right;
 }
 
 .dispute_rep_tools_wrapper {
-  display: block;
   position: absolute;
+  width: 90px;
+  margin-left: -90px;
   margin-top: 7px;
-  width: 90px
+}
+
+@-moz-document url-prefix() {
+  .dispute_rep_tools_wrapper {
+    margin-top: -18px;
+  }
 }
 
 .dispute_rep_tools_wrapper .edit-button {
@@ -5244,6 +5252,12 @@ td.ticket-total::before {
 #edit-ticket-status-dropdown .ticket-resolution-submenu {
   left: -323px;
   padding: 0 !important;
+}
+
+.loader-gears {
+  width: 80px;
+  height: 80px;
+  margin: auto;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

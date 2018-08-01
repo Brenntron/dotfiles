@@ -1,8 +1,6 @@
 class DisputeEmailAttachment < ApplicationRecord
   belongs_to :dispute_email
 
-
-
   def self.build_and_push_to_bugzilla(bugzilla_session, payload, user, dispute_email, remote = true)
     if remote == true
       file_content = open(payload[:url]).read
@@ -16,9 +14,9 @@ class DisputeEmailAttachment < ApplicationRecord
       ids: dispute_email.dispute.id,
       data: XMLRPC::Base64.new(file_content),
       file_name: payload[:file_name],
-      content_type: payload[:file_type],
+      content_type: payload[:content_type],
       summary: payload[:file_name],
-      comment: "a file: #{payload[:filename]} for case: #{dispute_email.dispute_id} generated during a correspondence."
+      comment: "a file: #{payload[:file_name]} for case: #{dispute_email.dispute_id} generated during a correspondence."
     }
 
     attachment_hash = bug_stub.add_attachment(options)
@@ -37,6 +35,8 @@ class DisputeEmailAttachment < ApplicationRecord
       )
 
       new_local_attachment.save!
+
+      new_local_attachment
 
     end
 

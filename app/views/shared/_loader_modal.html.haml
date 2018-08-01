@@ -1,0 +1,12 @@
+.modal.fade#loader-modal
+  .modal-dialog{role: 'document'}
+    .modal-content
+      %button.close.hidden{'data-dismiss': 'modal', 'aria-label': 'Close'}
+      #loading-div.message-div
+        %h1 Loading Data...
+        .loader-gears
+          =inline_svg 'icon_gears_loader.svg'
+      #api-msg.message-div{class: 'hidden-msg'}
+        #message-text= 'message'
+        .confirmation-buttons.hidden
+          %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Ok'} Ok
