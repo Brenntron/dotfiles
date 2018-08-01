@@ -241,7 +241,6 @@ class DisputeEntry < ApplicationRecord
     end
 
     if attributes.has_key?('status')
-      binding.pry
       attributes['status'] = attributes['status'].upcase
     end
 
