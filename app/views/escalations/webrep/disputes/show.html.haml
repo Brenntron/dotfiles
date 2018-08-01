@@ -9,7 +9,7 @@
       %label.content-label-sm
         Case ID
       .bug-top-id
-        %a.case-id-tag= @dispute.id
+        %a.case-id-tag= @dispute.case_id_str
     .col-xs-1.bug-state-col
       #bugzilla_popover_state.bug-state-info.bug-state
         %select#status.inpage-select{name: 'status'}
@@ -122,7 +122,7 @@
         .row
           .col-xs-2.col-with-divider
             %label.content-label-sm
-            %p= link_to(dispute_dup.id, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+            %p= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
           .col-xs-2.col-with-divider
             %label.content-label-sm
             %p= dispute_dup.case_opened_at&.strftime('%F %T')
@@ -166,6 +166,6 @@
         %tbody
           - @dispute.each_duplicate do |dispute_dup|
             %tr
-              %td= link_to(dispute_dup.id, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+              %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
               %td= dispute_dup.case_opened_at.strftime('%F %T')
 

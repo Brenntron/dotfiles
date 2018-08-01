@@ -38,6 +38,10 @@ class Dispute < ApplicationRecord
   scope :in_progress_disputes, -> { where.not(status: [ NEW, CLOSED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
+  def case_id_str
+    '%010i' % id
+  end
+
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
@@ -813,7 +817,7 @@ class Dispute < ApplicationRecord
     disputes.map do |dispute|
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
 
-      dispute_packet[:case_number] = sprintf '%08d', dispute.id
+      dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_name] = '' #dispute.customer_name
       dispute_packet[:submitter_org] = dispute.org_domain
