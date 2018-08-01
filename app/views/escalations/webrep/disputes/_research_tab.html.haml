@@ -175,8 +175,12 @@
                   %td
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td
-                    %span.entry-data.entry-data-content
-                      = entry.hostlookup
+                    - if entry[:is_important]
+                      %span.entry-data.entry-data-content.entry-important-flag
+                        = entry.hostlookup
+                    - else
+                      %span.entry-data.entry-data-content
+                        = entry.hostlookup
                     %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
                   %td
                     %label Category
