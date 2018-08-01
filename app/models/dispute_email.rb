@@ -16,7 +16,7 @@ class DisputeEmail < ApplicationRecord
 
     xmlrpc = message_payload[:bugzilla_session]
     user = message_payload[:current_user] 
-
+    envelope = JSON.parse(message_payload["payload"]["envelope"])
     #check envelope for case validity
     case_id = find_case_number_in_email(message_payload["payload"])
 
@@ -34,17 +34,9 @@ class DisputeEmail < ApplicationRecord
       conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
       conn.post(bad_email_args, attachments_to_mail)
 
-      #TODO: this is in a thread now, so send a bridge event for email acknowledge
+      conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+      conn.post()
 
-      #return {
-      #    "envelope":
-      #        {
-      #            "channel": "email-acknowledge",
-      #            "addressee": "talos-intelligence",
-      #            "sender": "analyst-console"
-      #        },
-      #    "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
-      #}
     end
 
     new_email = DisputeEmail.new
@@ -52,8 +44,8 @@ class DisputeEmail < ApplicationRecord
     new_email.email_headers = message_payload["payload"]["headers"]
     #Need to clean from value, can show up in form of:
     #\"Chris LaClair (claclair)\" <claclair@cisco.com>   which as an absolute value, is not a valid email address
-    new_email.from = message_payload["payload"]["from"]
-    new_email.to = message_payload["payload"]["to"]
+    new_email.from = envelope["from"]
+    new_email.to = envelope["to"].join(",")
     new_email.subject = message_payload["payload"]["subject"]
     new_email.body = message_payload["payload"]["text"]
     new_email.status = UNREAD
@@ -66,20 +58,8 @@ class DisputeEmail < ApplicationRecord
     end
 
 
-    #TODO: this is in a thread now, so send a bridge event for email acknowledge
-
-    #change this
-    #return_message = {
-    #    "envelope":
-    #        {
-    #            "channel": "email-acknowledge",
-    #            "addressee": "talos-intelligence",
-    #            "sender": "analyst-console"
-    #        },
-    #    "message": {"source_key":message_payload[:source_key],"ac_status":"CREATE_ACK"}
-    #}
-
-
+    conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+    conn.post()
   end
 
   ## FORMAT FOR AN EXTERNAL FACING CASE NUMBER IS:  ref-[dispute#id]-anco   example: ref-325302-anco wher 325302 is the ID of a record in disputes table
