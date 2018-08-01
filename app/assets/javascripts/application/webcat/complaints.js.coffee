@@ -413,7 +413,19 @@ open_selected = (selected_rows, toggle) ->
   i = 0
   while i < selected_rows[0].length
     if selected_rows.data()[i].viewable == toggle
-      window.open("http://www."+selected_rows.data()[i].domain)
+      subdomain = ""
+      domain = ""
+      path = ""
+      if selected_rows.data()[i].subdomain
+        subdomain = selected_rows.data()[i].subdomain + "."
+      if selected_rows.data()[i].domain
+        domain = selected_rows.data()[i].domain
+      if selected_rows.data()[i].path
+        path = selected_rows.data()[i].path
+      if selected_rows.data()[i].domain
+        window.open("http://"+ subdomain + domain + path)
+      else
+        window.open("http://"+selected_rows.data()[i].ip_address)
     i++
 
 window.select_all_pages = () ->
