@@ -1,7 +1,7 @@
 .row
   .col-xs-4.dashboard-left-data
-    %h1 Complaints Management
-    %span.my-dashboard-icon
+    %h1= content_for :webcat_page
+    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
     %h5= current_user.display_name
     %p.dashboard-details
       = link_to "#{@current_user.cvs_username}", users_path(current_user[:id])
