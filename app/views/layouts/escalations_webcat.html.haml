@@ -65,11 +65,11 @@
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
         %li
-          %a{onclick: 'standard_webrep_index_table("closed");'}
+          %a{onclick: "filterByStatus('COMPLETED')"}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
         %li
-          %a{onclick: 'standard_webrep_index_table("all");'}
+          %a{onclick: "filterByStatus('REVIEW')"}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 

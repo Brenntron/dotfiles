@@ -19,16 +19,15 @@ $ ->
       return
     columnDefs: [
       {
-        targets: [
-          0
-          1
-        ]
-        orderable: false
-        searchable: false
-      }
-      {
         targets: [ 0 ]
         className: 'expandable-row-column'
+        sortable: false
+        orderable: false
+      }
+      {
+        targets: [ 1 ]
+        sortable: false
+        orderable: false
       }
       {
         targets: [ 2 ]
@@ -43,15 +42,18 @@ $ ->
     ]
     columns: [
       {
+        sortable: false
+        orderable: false
         data: null
         defaultContent: '<button class="expand-row-button-inline"></button>'
       }
       {
+        sortable: false
+        orderable: false
         data: null
         defaultContent: '<p class="">icons</p>'
       }
       {
-        sortable: false
         'render': (data, type, full, meta) ->
           complaintID = full.complaint_id.toString()
           '<a href="' + complaintID + '">' + complaintID + '</a>'
