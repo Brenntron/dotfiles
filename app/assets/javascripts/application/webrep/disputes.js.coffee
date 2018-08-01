@@ -15,7 +15,6 @@ window.populate_webrep_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        debugger
         $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
@@ -26,9 +25,15 @@ window.populate_webrep_index_table = (data = {}) ->
           alert(json.search_name)
           search_id = json.search_id
           $('#saved-search-tbody').append(
-            '<tr id="saved_search_' + json.search_id + '">' +
-              '<td><a class="saved-search"' +
-              ' onclick="named_webrep_index_table(\'' + json.search_name + '\');">' + json.search_name + '</a></td></tr>'
+            '<tr id="saved_search_' + json.search_id + '"><td>' +
+              '<a class="saved-search"' +
+              ' onclick="named_webrep_index_table(\'' + json.search_name + '\');">' +
+              json.search_name + '</a>' +
+              '<a class="delete-search"' +
+              ' onclick="delete_disputes_named_search(this, \'' + json.search_name + '\');"' +
+              ' title="Delete Saved Search">' +
+              '<img src="/assets/icon_cancel_grey-720f88d6b924d6573d7d317506164582eca46292c3b563b84d21b512b58e794e.svg"/ alt="Icon cancel grey"></a>' +
+              '</td></tr>'
           )
 
     error: (response) ->
