@@ -15,11 +15,17 @@ window.populate_webrep_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
+        debugger
         $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+
+        if undefined != json.search_name
+          alert(json.search_name)
+          search_id = json.search_id
+          $('#saved-search-tbody').append('<tr></tr>')
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
