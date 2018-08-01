@@ -11,6 +11,7 @@ class DisputeEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_CLOSED_DUPLICATE = "DUPLICATE"
 
   delegate :cvs_username, to: :dispute, allow_nil: true
 
