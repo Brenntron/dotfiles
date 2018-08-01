@@ -5242,6 +5242,16 @@ td.ticket-total::before {
   padding: 0 !important;
 }
 
+.references-dropdown {
+  border: none;
+  background-color: transparent;
+  background-image: url(image_path('icon_down_arrow_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  padding-right: 20px;
+  background-size: 15px;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
