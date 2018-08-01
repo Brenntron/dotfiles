@@ -25,7 +25,11 @@ window.populate_webrep_index_table = (data = {}) ->
         if undefined != json.search_name
           alert(json.search_name)
           search_id = json.search_id
-          $('#saved-search-tbody').append('<tr></tr>')
+          $('#saved-search-tbody').append(
+            '<tr id="saved_search_' + json.search_id + '">' +
+              '<td><a class="saved-search"' +
+              ' onclick="named_webrep_index_table(\'' + json.search_name + '\');">' + json.search_name + '</a></td></tr>'
+          )
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
