@@ -12,7 +12,7 @@ window.updatePending = (id,row_id) ->
   status = $('[name=resolution_review_'+id+']:checked').val()
   comment = $('#complaint_pending_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
-  category = $('.complaint-category'+id).text()
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
@@ -27,13 +27,23 @@ window.updatePending = (id,row_id) ->
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
+
         temp_row.data().status = json.status
         temp_row.data().resolution = resolution
         temp_row.data().resolution_comment = comment
-        temp_row.data().category = category
         temp_row.invalidate().draw()
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
+        $('#input_cat_'+ temp_row.data().entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5
+          valueField: 'name'
+          labelField: 'name'
+          searchField: 'name'
+          options: AC.WebCat.createSelectOptions()
+          items: selected_options(temp_row.data().category)
+        }
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -59,7 +69,16 @@ window.updateEntryColumns = (entry_id,row_id) ->
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
         temp_row.data().status = json.status
-        temp_row.data().category = categories
+        $('#input_cat_'+ temp_row.data().entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5
+          valueField: 'name'
+          labelField: 'name'
+          searchField: 'name'
+          options: AC.WebCat.createSelectOptions()
+          items: selected_options(temp_row.data().category)
+        }
         temp_row.data().resolution = status
         temp_row.data().resolution_comment = comment
         temp_row.invalidate().draw()
@@ -145,7 +164,11 @@ window.edit_selected_complaints = () ->
     i++
   window.location = 'show_multiple?selected_ids=' + complaint_ids;
 
-
+selected_options = (categories) ->
+  options = []
+  if categories
+    options = categories.split(',')
+  return options
 
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
@@ -284,7 +307,7 @@ format = (complaint_entry_row) ->
       '</div>' +
       '<div class="row">' +
       '<div class="col-xs-4">' +
-      'Category: <select id="'+input_cat+'" name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
+      'Category: <select id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
       '</div>' +
       '<div class="col-xs-4">' +
       'Status: | ' +
@@ -330,7 +353,7 @@ window.click_table_buttons = (complaint_table, button)->
       labelField: 'name'
       searchField: 'name'
       options: AC.WebCat.createSelectOptions()
-
+      items: selected_options(row.data().category)
     }
     # Check to see which columns should be displayed
     $('.toggle-vis-nested').each ->
@@ -413,7 +436,19 @@ open_selected = (selected_rows, toggle) ->
   i = 0
   while i < selected_rows[0].length
     if selected_rows.data()[i].viewable == toggle
-      window.open("http://www."+selected_rows.data()[i].domain)
+      subdomain = ""
+      domain = ""
+      path = ""
+      if selected_rows.data()[i].subdomain
+        subdomain = selected_rows.data()[i].subdomain + "."
+      if selected_rows.data()[i].domain
+        domain = selected_rows.data()[i].domain
+      if selected_rows.data()[i].path
+        path = selected_rows.data()[i].path
+      if selected_rows.data()[i].domain
+        window.open("http://"+ subdomain + domain + path)
+      else
+        window.open("http://"+selected_rows.data()[i].ip_address)
     i++
 
 window.select_all_pages = () ->

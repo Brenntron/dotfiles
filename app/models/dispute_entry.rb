@@ -1,7 +1,7 @@
 class DisputeEntry < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
 
@@ -187,15 +187,61 @@ class DisputeEntry < ApplicationRecord
     end
 
     if entities.any?
-      message = Bridge::DisputeEntryUpdateStatusEvent.new
-      message.post_entries(entities)
+      begin
+        message = Bridge::DisputeEntryUpdateStatusEvent.new
+        message.post_entries(entities)
+      rescue
+        #think of something later, but this will at least gracefully return
+        #in development when you  may not have the bridge running
+      end
     end
+  end
+
+  def sync_up
+    dispute_rule_hits.destroy_all
+
+    ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
+
+    wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => self.hostlookup})
+
+    wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+
+
+    self.wbrs_score = wbrs_stuff["wbrs"]["score"]
+    wbrs_stuff_rulehits.each do |rule_hit|
+      new_rule_hit = DisputeRuleHit.new
+      new_rule_hit.dispute_entry_id = self.id
+      new_rule_hit.name = rule_hit.strip
+      new_rule_hit.rule_type = "WBRS"
+      new_rule_hit.save
+    end
+
+    if self.entry_type == "IP"
+      sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => self.hostlookup})
+      sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(self.hostlookup)
+
+      self.sbrs_score = sbrs_stuff["sbrs"]["score"]
+      sbrs_stuff_rules.each do |rule_hit|
+        new_rule_hit = DisputeRuleHit.new
+        new_rule_hit.dispute_entry_id = self.id
+        new_rule_hit.name = rule_hit.strip
+        new_rule_hit.rule_type = "SBRS"
+        new_rule_hit.save
+      end
+
+    end
+
+    save
   end
 
   def update_from_field_data(field_hash)
     attributes = field_hash.inject({}) do |attrs, field_data|
       attrs[field_data['field']] = field_data['new']
       attrs
+    end
+
+    if attributes.has_key?('status')
+      attributes['status'] = attributes['status'].upcase
     end
 
     if attributes.has_key?('host')
@@ -208,6 +254,13 @@ class DisputeEntry < ApplicationRecord
         attributes['hostname'] = host
         attributes['uri'] = host
       end
+    end
+
+    if attributes['ip_address'].present? && attributes['ip_address'] != self.ip_address
+      sync_up
+    end
+    if attributes['uri'].present? && attributes['uri'] != self.uri
+      sync_up
     end
 
     update!(attributes.slice(*%w{entry_type ip_address hostname uri status}))
