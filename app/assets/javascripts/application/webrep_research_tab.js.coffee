@@ -1,3 +1,24 @@
+
+
+#Populating the toolbar Adjust WL/BL Button
+window.index_expand_wlbl_form = () ->
+  if ($('.dispute_check_box:checked').length > 0)
+    $('.dispute_check_box:checked').each ->
+      entry_row = this.closest('tr')
+      entry_content = $(entry_row).find('.dispute_entry_content_first').text()
+      #wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+      #wlbl = $(entry_row).find('.entry-data-wlbl').text()
+
+      tbody = $('#wlbl_adjust_entries').find('tbody')
+      $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + '' + '</td><td class="text-center">' + '' + '</td></tr>')
+
+    $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
+    $('#wlbl_adjust_entries').show();
+
+  else
+    alert ('No rows selected')
+
+
 $ ->
   $('#edit-dispute-entry-button').click ->
 
@@ -149,7 +170,7 @@ $ ->
       alert ('No rows selected')
 
 
-#  Populating the toolbar Adjust WL/BL Button
+  #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     if ($('.dispute_check_box:checked').length > 0)
       $('.dispute_check_box').each ->
@@ -169,7 +190,7 @@ $ ->
       alert ('No rows selected')
 
 
-#  Inline Adjust WL/BL Button
+  #Inline Adjust WL/BL Button
   $('.dispute-inline-buttons.adjust-wlbl-button').click ->
     dropdown = $(this).next('.dropdown-menu')
     comment_wrapper = $(dropdown).find('.comment-wrapper')
@@ -267,8 +288,46 @@ $ ->
         $(body_input[0]).text(response.body)
       error: (response) ->
         std_api_error(response, "Template could not be retrieved.", reload: false)
+
+    )
+    return
+
+
+  # Sync / refresh entry data. Initiate modal / animation
+  $('#sync-data-button').click ->
+    #    If cannot connect to resync data
+    #    Show error message modal
+    #    Else
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+
+    data = {
+      'dispute_id': $(".case-id-tag").html()
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webrep/disputes/sync_data'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        response = JSON.parse(response)
+        if response.status == "success"
+          window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error Syncing Data')
+        window.location.reload()
     )
 
+#    When data is finish loading
+#    $('#loading-div').hide()
+#    $('#api-msg').show()
+#    $('#loader-modal.hidden).removeClass('hidden')
+#    Display success message in modal
 
 
-    return
+

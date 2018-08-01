@@ -3,15 +3,21 @@ class Escalations::WebcatController < ApplicationController
   before_action :dashboard_metrics
 
   def dashboard_metrics
-    @secHub_1 = 62
-    @secHub_2 = 2827
-    @ss = 0
-    @int_1 = 0
-    @int_2 = 0
-    @wbnp = 37
+    @ti_comps = Complaint.from_ti.count
+    @ti_comp_entries = Complaint.from_ti.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
+    @int_comps = Complaint.from_int.count
+    @int_comp_entries = Complaint.from_int.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
+    @wbnp = "-"
 
-    @pending = 25
-    @new = 25
-    @overdue = 0
+    @active_comp = Complaint.active_count
+    @completed_comp = Complaint.completed_count
+    @new_comp = Complaint.new_count
+    @overdue_comp = Complaint.overdue_count
+
+    @assigned = ComplaintEntry.assigned_count
+    @pending = ComplaintEntry.pending_count
+    @new = ComplaintEntry.new_count
+    @overdue = ComplaintEntry.overdue_count
+
   end
 end

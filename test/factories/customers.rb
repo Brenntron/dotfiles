@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :customer do
-    company_id 1
+    company { FactoryBot.create(:company)}
     name "Bob Jones"
     email "bob@bob.com"
     phone "1234567890"

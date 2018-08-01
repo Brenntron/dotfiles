@@ -634,6 +634,7 @@ th.alt-col {
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
+.sync-button {background-image: url(image_path('icon_sync.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -686,6 +687,7 @@ th.alt-col {
 .expand-row-button-inline {
   background-image: url(image_path('icon_expand_lt_grey.svg'));
   background-repeat: no-repeat;
+  background-color: transparent;
   border: none;
   display: block;
   width: 20px;
@@ -1041,20 +1043,20 @@ thead th.sorting.center {
   display: none;
 }
 
-#msg-modal .modal-dialog {
+#msg-modal .modal-dialog, #loader-modal .modal-dialog {
   margin-top: 180px;
 }
 
-#msg-modal .message-div::before {
+#msg-modal .message-div::before, #loader-modal .message-div::before {
   margin-top: -30px;
 }
 
-#msg-modal .message-div {
+#msg-modal .message-div, #loader-modal .message-div {
   border: none;
   padding-top: 2px;
 }
 
-#msg-modal .modal-content {
+#msg-modal .modal-content, #loader-modal .modal-content {
   border: 2px solid #f2f2f2;
   border-radius: 2px;
 }
@@ -1440,7 +1442,7 @@ button.close {
   background-image: url(image_path('icon_cancel.svg'));
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-position: 0 -5px;
+  background-position: -3px -2px;
 }
 
 /************ Side Nav **************/
@@ -3699,33 +3701,35 @@ td.wbrs-highlight, td.sbrs-highlight {
   margin: 0;
 }
 
-.escalations--webrep--disputes-controller #nav-banner {
+.escalations--webrep--disputes-controller #nav-banner, .escalations--webcat--complaints-controller #nav-banner {
   background-color: #4E4E4E;
   color: $content-bg-color;
 }
 
-.escalations--webrep--disputes-controller #nav-banner a {
+.escalations--webrep--disputes-controller #nav-banner a, .escalations--webcat--complaints-controller #nav-banner a {
   color: $content-bg-color;
 }
 
-.escalations--webrep--disputes-controller .nav-tool-blocks {
+.escalations--webrep--disputes-controller .nav-tool-blocks, .escalations--webcat--complaints-controller .nav-tool-blocks {
   border: none;
 }
 
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button {
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button, .escalations--webcat--complaints-controller #nav-banner .nav-page-button {
   display: inline-block;
   width: 44px;
 }
 
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button.active {
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button.active, .escalations--webcat--complaints-controller #nav-banner .nav-page-button.active {
   background-color: $bug-section-color;
 }
 
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button:hover, .escalations--webrep--disputes-controller #nav-banner a:hover, .escalations--webrep--disputes-controller .dropdown.open {
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button:hover, .escalations--webrep--disputes-controller #nav-banner a:hover,
+.escalations--webrep--disputes-controller .dropdown.open, .escalations--webcat--complaints-controller #nav-banner .nav-page-button:hover,
+.escalations--webcat--complaints-controller #nav-banner a:hover, .escalations--webcat--complaints-controller .dropdown.open {
   background-color: lighten(#4E4E4E, 10%);
 }
 
-.escalations--webrep--disputes-controller #advanced-search-button {
+.escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button  {
   background-color: darken($faint-neutral-color, 5%);
   color: $type-lighter-color;
   text-transform: uppercase;
@@ -3738,12 +3742,12 @@ td.wbrs-highlight, td.sbrs-highlight {
   right: 0;
 }
 
-.escalations--webrep--disputes-controller  #advanced-search-button::before {
+.escalations--webrep--disputes-controller  #advanced-search-button::before, .escalations--webcat--complaints-controller  #advanced-search-button::before {
   display: none;
 }
 
 
-.escalations--webrep--disputes-controller .search-box {
+.escalations--webrep--disputes-controller .search-box, .escalations--webcat--complaints-controller .search-box {
   background-image: url(image_path('layout/search_icon_lighter.svg'));
 }
 
@@ -3884,6 +3888,9 @@ button.tertiary {
 .icon-research  {background-image: url(image_path('icon_tools.svg'));}
 .icon-filter-white {background-image: url(image_path('icon_filter_white.svg'));}
 .icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
+.icon-categories {background-image: url(image_path('icon_categories.svg'));}
+.icon-reports {background-image: url(image_path('icon_reports.svg'));}
+.icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -4118,15 +4125,21 @@ input.file_attachment {
 
 table > tbody > tr > td.dispute_rep_tools {
   width: 90px;
-  padding: 0 !important;
+  padding: 0 0 8px 0 !important;
   text-align: right;
 }
 
 .dispute_rep_tools_wrapper {
-  display: block;
   position: absolute;
+  width: 90px;
+  margin-left: -90px;
   margin-top: 7px;
-  width: 90px
+}
+
+@-moz-document url-prefix() {
+  .dispute_rep_tools_wrapper {
+    margin-top: -18px;
+  }
 }
 
 .dispute_rep_tools_wrapper .edit-button {
@@ -5088,9 +5101,8 @@ table.dispute_tool_current tr:last-of-type td {
 
 #disputes-index .dispute-submission-type {
   display: inline-block;
-  float: left;
   margin-top: -2px;
-  margin-right: 6px;
+  margin-right: -3px;
 }
 
 .dispute-W {background-image: url(image_path('icon_type_web.svg'));}
@@ -5240,6 +5252,12 @@ td.ticket-total::before {
 #edit-ticket-status-dropdown .ticket-resolution-submenu {
   left: -323px;
   padding: 0 !important;
+}
+
+.loader-gears {
+  width: 80px;
+  height: 80px;
+  margin: auto;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

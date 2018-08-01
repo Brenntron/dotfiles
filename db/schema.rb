@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180719161218) do
+ActiveRecord::Schema.define(version: 20180730184700) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -141,7 +141,6 @@ ActiveRecord::Schema.define(version: 20180719161218) do
 
   create_table "complaint_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "complaint_id"
-    t.string "tag"
     t.string "subdomain"
     t.string "domain"
     t.string "path"
@@ -153,12 +152,15 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "viewable", default: true, null: false
     t.float "sbrs_score", limit: 24
     t.text "uri"
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
+    t.boolean "viewable", default: true, null: false
+    t.string "category"
+    t.integer "user_id"
+    t.boolean "is_important"
   end
 
   create_table "complaint_marked_commits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -170,8 +172,20 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.string "category_list"
   end
 
+  create_table "complaint_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "complaint_tags_complaints", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "complaint_id", null: false
+    t.bigint "complaint_tag_id", null: false
+    t.index ["complaint_id", "complaint_tag_id"], name: "idx_comp_comp_tag"
+    t.index ["complaint_tag_id", "complaint_id"], name: "idx_comp_tag_comp"
+  end
+
   create_table "complaints", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "tag"
     t.string "channel"
     t.string "status"
     t.text "description"
@@ -181,7 +195,6 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.string "resolution"
     t.text "resolution_comment"
     t.string "region"
-    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "customer_id"
@@ -293,6 +306,8 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.text "resolution_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "sbrs_score", limit: 24
+    t.float "wbrs_score", limit: 24
     t.integer "webrep_wlbl_key"
     t.integer "reptool_key"
     t.boolean "is_important"
@@ -301,8 +316,6 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.datetime "case_closed_at"
     t.datetime "case_accepted_at"
     t.datetime "case_resolved_at"
-    t.float "sbrs_score", limit: 24
-    t.float "wbrs_score", limit: 24
   end
 
   create_table "dispute_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -314,6 +327,7 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.text "wbrs_list_type", limit: 4294967295
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "umbrella", limit: 4294967295
     t.index ["dispute_entry_id"], name: "index_dispute_entry_preloads_on_dispute_entry_id"
   end
 
@@ -367,10 +381,13 @@ ActiveRecord::Schema.define(version: 20180719161218) do
     t.string "ticket_source_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "submission_type"
-    t.string "submitter_type"
     t.integer "customer_id"
     t.integer "user_id"
+    t.string "submission_type"
+    t.string "submitter_type"
+    t.datetime "case_responded_at"
+    t.integer "related_id"
+    t.datetime "related_at"
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
 

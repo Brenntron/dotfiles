@@ -46,30 +46,32 @@ module API
             post "", root: "dispute_email" do
               authorize!(:create, DisputeEmail)
               begin
-                ActiveRecord::Base.transaction do
+                #temporary, for development, don't wanna be sending these to actual customers
+                params[:to] = "claclair@cisco.com"
 
-                  #extra precaution to make *sure* goofy test emails doesn't slip off to an actual customer when using 'realistic' data
-                  if Rails.env == "development"
-                    params[:to] = current_user.email
-                  end
 
-                  new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
+                new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
 
-                  if params[:dispute_email_id].present?
-                    replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
-                    replied_email.status = DisputeEmail::REPLIED
-                    replied_email.save
-                  end
-
-                  return ""
+                if params[:dispute_email_id].present?
+                  replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
+                  replied_email.status = DisputeEmail::REPLIED
+                  replied_email.save
                 end
+
+                if params[:dispute_id].present?
+                  dispute = Dispute.find(params[:dispute_id])
+                  unless dispute.case_responded_at
+                    dispute.update!(case_responded_at: Time.now)
+                  end
+                end
+
+                return ""
               rescue Exception => e
                 Rails.logger.error e
                 raise "There was an error in attempting to send an email."
               end
 
             end
-
 
             desc "create a general email"
             params do
@@ -101,10 +103,7 @@ module API
                 Rails.logger.error e
                 raise "There was an error in attempting to send an email."
               end
-
             end
-
-
 
           end
         end
