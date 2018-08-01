@@ -1,65 +1,52 @@
-- content_for(:webcat_page) do
-  Complaints management
+.content-wrapper
+  - content_for(:webcat_page) do
+    Complaints management
 
-= render "escalations/webcat/shared/telemetry"
+  = render "escalations/webcat/shared/telemetry"
 
-.tool-bar
-  = render "toolbar"
-%p rule builder should be included here
+.content-wrapper
+  .tool-bar
+    = render "toolbar"
 
-%div{:style => "position:relative"}
-  %div{:style => "width:600px;"}
-    .grid-header{:style => "width:100%"}
-%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
--#
--#.tab-content.content-wrapper{id: 'complaints-tab-content'}
--#  .tab-pane.active{id: 'complaints', role: 'tabpanel', 'aria-labelledby': 'admin-complaints-tab'}
--#    %h1 Notes
--#    %table#complaints-index.table.responsive.no-wrap.compact{'data-source': "#{escalations_webcat_complaints_path(format: :json)}"}
--#      %thead
--#        %tr
--#          %th ID
--#          %th Tag
--#          %th Subdomain
--#          %th Domain
--#          %th Path
--#          %th Status
--#          %th Age
--#          %th Customer
--#          %th WBRS Score
--#          %th
--#      %tbody
+  %div{:style => "position:relative"}
+    %div{:style => "width:600px;"}
+      .grid-header{:style => "width:100%"}
+  %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
+
+  .row
+    .col-xs-12
+      %table.table.responsive#complaints-index
+        %thead
+          %tr
+            %th
+            %th
+            %th Complaint id
+            %th Entry id
+            %th Age
+            %th Status
+            %th Subdomain
+            %th Domain / IP
+            %th Path
+            %th Customer
+            %th WBRS
+            %th Category
+            %th Assigned To
+            %th
 
 
-%table#complaints-index.table.responsive.no-wrap.compact
-  %thead
-    %th ID
-    %th Tag
-    %th Subdomain
-    %th Domain
-    %th Path
-    %th Status
-    %th Age
-    %th Customer
-    %th WBRS Score
-  %tbody
 
-:javascript
-  $(document).ready(function() {
-    $('#disputes-index').DataTable({
-      searching: false,
-      columns: [
-        {data: "id"},
-        {data: "Tag"},
-        {data: "Subdomain"},
-        {data: "Domain"},
-        {data: "Path"},
-        {data: "Status"},
-        {data: "Age"},
-        {data: "Customer"},
-        {data: "WBRS Score"}
-      ]
-    });
-    populate_webcat_index_table();
+/ Modal
+#cat_new_url_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "cat_new_url_modal_label", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %h5#cat_new_url_modal_label.modal-title Add Categories to URL
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+      .modal-body
+        %input{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+        %select#cat_new_url.contacts.selectized{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
+      .modal-footer
+        %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
+        %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes
 
-  } );
