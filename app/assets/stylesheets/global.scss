@@ -5242,7 +5242,7 @@ td.ticket-total::before {
   padding: 0 !important;
 }
 
-.references-dropdown {
+.references-dropdown-button {
   border: none;
   background-color: transparent;
   background-image: url(image_path('icon_down_arrow_grey.svg'));
@@ -5250,6 +5250,39 @@ td.ticket-total::before {
   background-position: right 0 center;
   padding-right: 20px;
   background-size: 15px;
+}
+
+.references-dropdown {
+  right: 0;
+  left: auto;
+  border: none;
+  border-radius: 2px 0 2px 2px;
+  width: 250px;
+  background-color: $bug-section-color;
+  padding: 3px 6px;
+}
+
+.references-dropdown table td {
+  background-color: $bug-section-color;
+  color: $content-bg-color;
+  border-bottom-color: $faint-accent-color;
+}
+
+.references-dropdown table tr:last-of-type td {
+  border-bottom: none;
+}
+
+.references-dropdown table td a {
+  color: $content-bg-color;
+  text-decoration: underline;
+}
+
+.referenced-tickets-col .dropdown.open {
+  background-color: transparent;
+}
+
+.referenced-tickets-col .dropdown.open .references-dropdown-button{
+  color: $bug-section-color;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
