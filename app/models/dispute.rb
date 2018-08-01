@@ -2,7 +2,7 @@ class Dispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   belongs_to :customer
-  belongs_to :user
+  belongs_to :user, :optional => true
   belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
   has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
