@@ -64,6 +64,18 @@ class Dispute < ApplicationRecord
     dispute_entries.length
   end
 
+  def last_updated_by
+    if versions.any?
+      User.find(versions.last&.whodunnit)
+    else
+      nil
+    end
+  end
+
+  def last_updated_by_username
+    last_updated_by&.cvs_username
+  end
+
   def dispute_age
     return '' unless self.case_opened_at
     age = self.case_opened_at - DateTime.now
