@@ -4438,12 +4438,12 @@ table > tbody > tr > td.dispute_rep_tools {
   font-weight: 600 !important;
 }
 
-.dispute-entry-table-wrapper {
+.dispute-entry-table-wrapper, .nested-complaint-data-wrapper {
   padding: 0 0 0 20px !important;
   background-color: $bug-section-color;
 }
 
-.dispute-entry-table-wrapper::before {
+.dispute-entry-table-wrapper::before, .nested-complaint-data-wrapper::before {
   content: '';
   position: absolute;
   left: 4px;
@@ -4451,6 +4451,11 @@ table > tbody > tr > td.dispute_rep_tools {
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   border-top: 10px solid $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table {
+  background-color: $table-dark-body;
+  color: $content-bg-color;
 }
 
 .table-entry-input {
@@ -5266,6 +5271,10 @@ td.ticket-total::before {
   width: 80px;
   height: 80px;
   margin: auto;
+}
+
+table.dataTable tbody tr.selected {
+  background-color: $faint-accent-color;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

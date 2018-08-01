@@ -280,54 +280,34 @@ format = (complaint_entry_row) ->
       '</div>'
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
-    complaint_entry_html = '<div class="row">' +
-      '<div class="col-xs-10">' +
-      '<div class="row">' +
-      '<div class="col-xs-1">' + complaint_entry.complaint_id + '/' + complaint_entry.entry_id + ' </div>' +
-      '<div class="col-xs-3">' +
-      '<div class="row">' +
-      '<div class="col-xs-12">' +
-      uri +
-      '</div>' +
-      '<div class="col-xs-12">' +
-      'suggested disposition: ' + disposition +
-      '</div>' +
-      '</div>' +
-      '</div>' +
-      '<div class="col-xs-4">' +
+    complaint_entry_html = '<table><thead><tr>' +
+      '<td>' + uri + '</td>' +
+      '<th>Status</th><th>Confidence</th><th>Suggested Disposition</th><th></th></tr>' +
+      '<tbody><tr><td>' +
       'Prefix <input id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
       '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
       ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button>' +
-      '</div>' +
-      '<div class="col-xs-2">' +
-      'WBRS: ' + wbrs_score + ' Confidence ' + confidence +
-      '</div>' +
-      '</div>' +
-      '<div class="row">' +
-      '<div class="col-xs-4">' +
-      'Category: <select id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
-      '</div>' +
-      '<div class="col-xs-4">' +
-      'Status: | ' +
+      '</td><td>' +
       '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> unchanged |  ' +
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> fixed | ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> invalid' +
-      '</div>' +
-      '<div class="col-xs-1">' +
-      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
-      '</div>' +
-      '</div>' +
-      '</div>' +
-      '<div class="col-xs-2">' +
+      '</td><td>' + confidence + '</td><td>' + disposition +
+      '</td><td>' +
       '<button>info</button>' +
       '<button>lookup</button>' +
       '<button>history</button>' +
       '<button>domain</button>' +
-      '</div>' +
-      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>' + '</div>' +
-      '</div>'
+      '</td></tr>' +
+      '<tr>' +
+      '<td>' +
+      'Category: <select id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
+      '</td><td>' +
+      'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>'  +
+      '</td><td>' +
+      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
+      '</td></tr></tbody></table>'
   complaint_entry_html
 
 
@@ -344,7 +324,8 @@ window.click_table_buttons = (complaint_table, button)->
     tr.removeClass 'not-shown'
     tr.addClass 'shown'
     td = $(tr).next('tr').find('td:first')
-    $(td).addClass 'complaint-entry-table-wrapper'
+    unless $(td).hasClass 'nested-complaint-data-wrapper'
+      $(td).addClass 'nested-complaint-data-wrapper'
     $('#input_cat_'+ row.data().entry_id).selectize {
       persist: false,
       create: false,

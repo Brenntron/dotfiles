@@ -25,13 +25,8 @@ $ ->
       {
         targets: [ 0 ]
         className: 'expandable-row-column'
-        sortable: false
         orderable: false
-      }
-      {
-        targets: [ 1 ]
-        sortable: false
-        orderable: false
+        searchable: false
       }
       {
         targets: [ 2 ]
@@ -46,16 +41,8 @@ $ ->
     ]
     columns: [
       {
-        sortable: false
-        orderable: false
         data: null
         defaultContent: '<button class="expand-row-button-inline"></button>'
-      }
-      {
-        sortable: false
-        orderable: false
-        data: null
-        defaultContent: '<p class="">icons</p>'
       }
       {
         'render': (data, type, full, meta) ->
@@ -65,9 +52,11 @@ $ ->
       }
       { data: 'entry_id' }
       { data: 'age' }
-      { data: 'status' }
-      { data: 'subdomain'
+      {
+        data: 'status'
+        className: 'state-col'
       }
+      { data: 'subdomain'}
       {
         'render':(data,type,full,meta)->
           domain = full.domain
@@ -94,7 +83,10 @@ $ ->
             plus = '+'
           '<p id="cat_tooltip_' + full.entry_id + '" data-toggle="tooltip" title="' + full.category + '" onmouseover=display_tooltip(' + full.entry_id + ')>' + category + plus + '</p>'
       }
-      { data: 'assigned_to' }
+      {
+        data: 'assigned_to'
+        className: 'alt-col'
+      }
     ]
     select: 'style': 'os'
     responsive: true)
