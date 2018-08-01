@@ -10,13 +10,9 @@
         %label.content-label-sm
           Case ID
         .bug-top-id
-          %a#dispute_id= @dispute.id
-    .col-xs-1.col-with-divider
-      %label.content-label-sm
-        Case ID
-      .bug-top-id
-        %a.case-id-tag#dispute_id = @dispute.id
+          %a.case-id-tag#dispute_id= @dispute.id
     .col-xs-1.bug-state-col
+      %label.content-label-sm
         Status
       #bugzilla_popover_state.bug-state-info.bug-state
         %select#status.inpage-select{name: 'status'}
