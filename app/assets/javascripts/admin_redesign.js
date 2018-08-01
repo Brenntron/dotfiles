@@ -22,6 +22,7 @@
 //= require admin/snort-docs
 //= require admin/std_api
 //= require admin/std_msg
+//= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
 //= require application/helpers

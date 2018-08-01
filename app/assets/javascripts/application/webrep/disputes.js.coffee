@@ -22,19 +22,14 @@ window.populate_webrep_index_table = (data = {}) ->
         datatable.draw();
 
         if undefined != json.search_name
-          alert(json.search_name)
-          search_id = json.search_id
-          $('#saved-search-tbody').append(
-            '<tr id="saved_search_' + json.search_id + '"><td>' +
-              '<a class="saved-search"' +
-              ' onclick="named_webrep_index_table(\'' + json.search_name + '\');">' +
-              json.search_name + '</a>' +
-              '<a class="delete-search"' +
-              ' onclick="delete_disputes_named_search(this, \'' + json.search_name + '\');"' +
-              ' title="Delete Saved Search">' +
-              '<img src="/assets/icon_cancel_grey-720f88d6b924d6573d7d317506164582eca46292c3b563b84d21b512b58e794e.svg"/ alt="Icon cancel grey"></a>' +
-              '</td></tr>'
-          )
+          debugger
+#          search_id = json.search_id
+#          delete_image = named_search_tag(json.search_name, json.search_id)
+#          delete_tag = '<a class="delete-search"' +
+#            ' onclick="delete_disputes_named_search(this, \'' + json.search_name + '\');"' +
+#            ' title="Delete Saved Search">' +
+#            '<img src="' + delete_image + '"/ alt="Icon cancel grey"></a>'
+          $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
