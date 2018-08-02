@@ -1,7 +1,7 @@
 class Complaint < ApplicationRecord
-  belongs_to :user
   belongs_to :customer
   has_many :complaint_entries
+  has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
@@ -11,6 +11,9 @@ class Complaint < ApplicationRecord
   NEW = 'NEW'
   RESOLVED = 'RESOLVED'
   ASSIGNED = 'ASSIGNED'
+  ACTIVE = 'ACTIVE'
+  COMPLETED = 'COMPLETED'
+  PENDING = 'PENDING'
 
   TI_NEW = 'IN PROGRESS'
   TI_RESOLVED = 'RESOLVED'
@@ -22,6 +25,27 @@ class Complaint < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
+  TI_CHANNEL = 'talosintel'
+  INT_CHANNEL = 'internal'
+
+  scope :active_count , -> {where(status:ACTIVE).count}
+  scope :completed_count , -> {where(status:COMPLETED).count}
+  scope :new_count , -> {where(status:NEW).count}
+  scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+
+  def set_status(new_status)
+    status_list = complaint_entries.map{|entry| entry.status}
+    case new_status
+      when NEW
+        update(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
+      when ASSIGNED || PENDING
+        update(status:ACTIVE)
+      when COMPLETED
+        update(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
+    end
+  end
 
   def self.can_visit_url?(url)
     begin
@@ -50,6 +74,7 @@ class Complaint < ApplicationRecord
     uri_object = URI(url)
 
     domain_parts = uri_object.host.split(".")
+
     if domain_parts.size > 2
       uri_parts[:subdomain] = domain_parts.first
       uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
@@ -142,12 +167,12 @@ class Complaint < ApplicationRecord
         new_complaint.submission_type = message_payload["payload"]["submission_type"]
         new_complaint.id = bug_stub_hash["id"]
         new_complaint.description = message_payload["payload"]["problem"]
-        new_complaint.user_id = user.id
         new_complaint.ticket_source_key = message_payload["source_key"]
         new_complaint.ticket_source = "talos-intelligence"
         new_complaint.ticket_source_type = message_payload["source_type"]
         new_complaint.customer_id = Customer.process_and_get_customer(message_payload).id
         new_complaint.status = NEW
+        new_complaint.channel = TI_CHANNEL
 
         new_complaint.submitter_type = new_complaint.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
@@ -159,7 +184,7 @@ class Complaint < ApplicationRecord
         new_entries_ips.each do |key, entry|
 
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["cat_sugg"]
+          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
@@ -168,11 +193,12 @@ class Complaint < ApplicationRecord
 
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
+          new_complaint_entry.user_id = user.id
           new_complaint_entry.ip_address = key
-          new_complaint_entry.wbrs_score = entry["wbrs_score"]
+          new_complaint_entry.wbrs_score = entry['wbrs']["wbrs_score"]
           new_complaint_entry.entry_type = "IP"
-          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
-          new_complaint_entry.url_primary_category = entry["current_cat"]
+          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
+          new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
           new_complaint_entry.status = ComplaintEntry::NEW
           new_complaint_entry.save
 
@@ -183,11 +209,12 @@ class Complaint < ApplicationRecord
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
+          new_complaint_entry.user_id = user.id
           new_complaint_entry.uri = key
           new_complaint_entry.entry_type = "URI/DOMAIN"
 
-          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
-          new_complaint_entry.url_primary_category = entry["current_cat"]
+          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
+          new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
           new_complaint_entry.subdomain = url_parts[:subdomain]
           new_complaint_entry.domain = url_parts[:domain]
           new_complaint_entry.path = url_parts[:path]
@@ -195,7 +222,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.save
 
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["cat_sugg"]
+          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
@@ -226,6 +253,55 @@ class Complaint < ApplicationRecord
 
       conn = ::Bridge::ComplaintFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
+    end
+  end
+
+  def self.create_action(bugzilla_session, ips_urls, description, customer, tags)
+    user = User.where(cvs_username:"vrtincom").first
+    bug_factory = Bugzilla::Bug.new(bugzilla_session)
+
+    summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          IPs/URIs: #{ips_urls}
+          Problem Summary: #{description}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations',
+        'component' => 'WebCat',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+
+    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+
+    cust = find_customer(customer)
+    new_complaint = Complaint.create(id: bug_stub_hash["id"],
+                                     description: description,
+                                     customer_id: cust.id,
+                                     status: 'NEW',
+                                     channel: INT_CHANNEL)
+
+    handle_tags(new_complaint, tags) if tags
+
+    ips_urls.split(' ').each do |ip_url|
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url)
+    end
+  end
+
+  def self.find_customer(customer)
+    email = customer.split(':').last
+    Customer.find_by_email(email)
+  end
+
+  def self.handle_tags(complaint, tags)
+    tags.each do |tag|
+      new_tag = ComplaintTag.find_or_create_by(name: tag)
+      complaint.complaint_tags << new_tag
     end
   end
 end

@@ -61,12 +61,14 @@ class Ability
            :resolution_report, :export_per_resolution_report, :export_per_engineer_report, :resolution_age_report,
            :dashboard, :research],
           Dispute
-      can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, Attachment, Note, Wbrs::ManualWlbl]
+      can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, DisputeEntry,
+                  Attachment, Note, Wbrs::ManualWlbl]
       can :manage, [EmailTemplate]
     end
 
     if role_names.include?('webrep user')
-      can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment, Note, EmailTemplate, Wbrs::ManualWlbl]
+      can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment, Attachment, Note,
+                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl]
       can :publish_to_bugzilla, Note
     end
 

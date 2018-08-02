@@ -9,7 +9,7 @@
       %label.content-label-sm
         Case ID
       .bug-top-id
-        %a= @dispute.id
+        %a.case-id-tag#dispute_id= @dispute.case_id_str
     .col-xs-1.bug-state-col
       #bugzilla_popover_state.bug-state-info.bug-state
         %select#status.inpage-select{name: 'status'}
@@ -22,12 +22,40 @@
           -#%option{value: 'Resolved'} Resolved
           -#%option{value: 'Reopened'} Reopened
 
-    .col-xs-1.col-with-divider
-      %label.content-label-sm
-        Owner
-      %div
-        %span= @dispute.assignee || "None"
-        %span.take-button
+    .col-xs-2.col-with-divider
+      .nested-col-sections
+        %label.content-label-sm
+          Owner
+        %div
+          - if @dispute.assignee == 'Unassigned'
+            %span.missing-data#dispute-assignee= @dispute.assignee || "None"
+          - else
+            %span= @dispute.assignee || "None"
+          .dispute-owner-buttons-wrapper
+            - if @dispute.assignee == current_user.email
+              %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
+            - else
+              %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
+
+            - if current_user.has_role?('manager')
+              %span.dropdown
+                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                  .change-assignee-dropdown-wrapper
+                    %h3 Change Assignee
+                    .inline-tool-content-wrapper
+                      .toolbar
+                        %div
+                          %label.toolbar-section-label Assignee
+                          %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                            - User.all.order('cvs_username ASC').each do |u|
+                              %option{id: u.id, value: u.id, label: u.cvs_username}
+                        %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                          Assign
+                        %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                          Unassign
+
+
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition
@@ -81,25 +109,27 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Accept Date
-          %p 2017-10-24 15:35:55
+          %p= @dispute.case_accepted_at&.strftime('%F %T')
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Repsonse Date
-          %p 2017-10-24 15:36:55
+          %p= @dispute.case_responded_at&.strftime('%F %T')
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Accept
-          %p 848.9
+          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Respond
-          %p 853.4
+          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Days to Close
+          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Close
+          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Email Count
@@ -107,20 +137,23 @@
         .col-xs-3
           %label.content-label-sm
             Last Updated By
-          %p Melissa Taylor
-      %h3 Duplicate Cases
+          %p= @dispute.last_updated_by_username
+      %h3 Related Cases
       .row
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Case ID
-          %p= @dispute.id
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
-          %p= @dispute.case_opened_at
-        .col-xs-8
-          %label.content-label-sm
-            Time Marked Duplicate
+      - @dispute.each_related do |dispute_dup|
+        .row
+          .col-xs-2.col-with-divider
+            %label.content-label-sm
+            %p= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+          .col-xs-2.col-with-divider
+            %label.content-label-sm
+            %p= dispute_dup.case_opened_at&.strftime('%F %T')
   .row
     .col-xs-12.text-center
       %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
@@ -135,7 +168,7 @@
       Research
   %li.nav-item{role:'presentation'}
     %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
-      Related Cases
+      Duplicate Cases
 
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane.active#communication_tab{role: 'tabpanel'}
@@ -143,4 +176,24 @@
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
-    related cases
+    .related-cases-button-div
+      %button{type: 'button', onclick: 'show_set_duplicate_dispute();'} + Duplicate
+      #set-related-dispute-div{style: 'display: none;'}
+        %form#set-related-dispute-form{onsubmit: 'set_related_dispute(this);return false;', 'data-dispute-id': @dispute.id}
+          %label
+            Ticket ID:
+            %input.dispute-id{type: 'text', name: 'dispute_id'}
+      #set-duplicate-dispute-div{style: 'display: none;'}
+        %form#set-duplicate-dispute-form{onsubmit: 'set_duplicate_dispute(this);return false;', 'data-dispute-id': @dispute.id}
+          %label
+            Ticket ID:
+            %input.dispute-id{type: 'text', name: 'dispute_id'}
+    .related-cases-display
+      %table
+        %caption Duplicate Cases
+        %tbody
+          - @dispute.each_duplicate do |dispute_dup|
+            %tr
+              %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+              %td= dispute_dup.case_opened_at.strftime('%F %T')
+

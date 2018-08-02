@@ -15,10 +15,14 @@ window.populate_webrep_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
+        $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+
+        if undefined != json.search_name
+          $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -70,6 +74,13 @@ window.named_webrep_index_table = (search_name) ->
   }
   window.populate_webrep_index_table(data)
 
+window.call_contains_search = (search_form) ->
+  data = {
+    search_type: 'contains'
+    value: search_form.querySelector('input.search-box').value
+  }
+  window.populate_webrep_index_table(data)
+
 window.delete_disputes_named_search = (close_button, search_name) ->
   std_msg_ajax(
     method: 'DELETE'
@@ -99,49 +110,66 @@ window.popup_response_error =(response, prefix) ->
 
   alert(prefix + "\n" + errormsg)
 
-window.row_adust_wlbl_button =(button_tag) ->
+window.row_adjust_wlbl_button =(button_tag) ->
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
   wlbl_form = button_tag.form;
   data = {
     'dispute_entry_ids': [ wlbl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
+    'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
-    headers: headers
     data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 window.toolbar_adust_wlbl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
 
   wlbl_form = button_tag.form
   data = {
     'dispute_entry_ids': entry_ids
-    'trgt_list': wlbl_form.getElementsByClassName('trgt_list-input')[0].value
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/wlbl'
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
-    headers: headers
     data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    error_prefix: 'Error adjusting WL/BL.'
+  )
+
+window.index_adust_wlbl_button =(button_tag) ->
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+  data = {
+    'dispute_ids': dispute_ids
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/ticket_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
   )
 
 
@@ -243,6 +271,50 @@ window.toolbar_index_change_assignee = () ->
       popup_response_error(response, 'Error changing assignee')
   )
 
+window.toolbar_show_change_assignee = () ->
+  single_id = $('#dispute_id').text()
+  entry_ids = [single_id]
+
+  new_assignee = $('#index_target_assignee option:selected').val()
+  data = {
+    'dispute_ids': entry_ids,
+    'new_assignee': new_assignee
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/change_assignee'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error changing assignee')
+  )
+
+window.toolbar_unassign_dispute = () ->
+  single_id = $('#dispute_id').text()
+  entry_ids = [single_id]
+
+  data = {
+    'dispute_ids': entry_ids
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/unassign_all'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error removing assignee')
+  )
+
 window.toolbar_index_mark_duplicate = (box_names) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -255,6 +327,26 @@ window.toolbar_index_mark_duplicate = (box_names) ->
       window.location.reload()
     error: (response) ->
       popup_response_error(response, 'Error marking duplicate')
+  )
+
+
+window.add_dispute_entry = () ->
+  data = {
+    'uri': $('#add_dispute_entry').val(),
+    'dispute_id': $('#dispute_id').text(),
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/new_adhoc_entry'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adding entry.')
   )
 
 window.determine_checked = (box_names) ->
@@ -293,6 +385,101 @@ window.take_disputes = () ->
       for dispute_id in response.dispute_ids
         $('#owner_' + dispute_id).text(response.username)
   )
+
+
+
+window.take_single_dispute = (id) ->
+  dispute_ids = [ id ]
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/take_disputes"
+    data: { dispute_ids: dispute_ids }
+    error_prefix: 'Error updating ticket.'
+    success_reload: true
+  )
+
+
+window.dispute_entry_status = (id, status) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
+    data: { status: status }
+    error_prefix: 'Error updating status.'
+  )
+
+
+window.save_dispute_entries = () ->
+
+  data = {}
+  $('#disputes-research-table').find('tr.research-table-row').each(() ->
+    result = {}
+    fielddata = $(this).find('.dual-edit-field').map(() ->
+
+      new_value = switch (this.dataset.field)
+        when 'status' then $(this).find("input[name='entry-status']:checked").attr('id')
+        else $(this).find('.table-entry-input')[0].value.trim()
+
+      {
+        id: this.dataset.id
+        field: this.dataset.field
+        old: $(this).find('.entry-data')[0].innerText.trim()
+        new: new_value
+      }
+    ).toArray().filter((field_data) ->
+      field_data.old != field_data.new
+    )
+    if 0 < fielddata.length
+      data[this.dataset.entryId] = fielddata
+  )
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    data: { field_data: data }
+    success_reload: true
+    error_prefix: 'Error updating data.'
+  )
+
+
+window.show_set_related_dispute = () ->
+  $('#set-related-dispute-div').show()
+
+window.set_related_dispute = (form_tag) ->
+  related_dispute_id = $(form_tag).find(".dispute-id").val()
+  std_msg_ajax(
+    method: 'POST'
+    url: '/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/related_disputes'
+    data: { related_dispute_id: related_dispute_id }
+    success_reload: true
+    error_prefix: 'Error marking relationship.'
+  )
+
+window.set_relating_disputes = (form_tag) ->
+  related_dispute_id = $(form_tag).find(".dispute-id").val()
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+  std_msg_ajax(
+    method: 'PATCH'
+    url: '/api/v1/escalations/webrep/disputes/' + related_dispute_id + '/relating_disputes'
+    data: { relating_dispute_ids: dispute_ids }
+    success_reload: true
+    error_prefix: 'Error marking relationship.'
+  )
+
+window.show_set_duplicate_dispute = () ->
+  $('#set-duplicate-dispute-div').show()
+
+window.set_duplicate_dispute = (form_tag) ->
+  duplicate_dispute_id = $(form_tag).find(".dispute-id").val()
+  std_msg_ajax(
+    method: 'POST'
+    url: '/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/duplicate_disputes'
+    data: { duplicate_dispute_id: duplicate_dispute_id }
+    success_reload: true
+    error_prefix: 'Error marking duplicate relationship.'
+  )
+
 
 
 $ ->
@@ -335,6 +522,10 @@ $ ->
         className: 'state-col'
       }
       {
+        targets: [6]
+        className: 'text-center'
+      }
+      {
         targets: [ 8 ]
         className: 'alt-col'
       }
@@ -360,8 +551,9 @@ $ ->
       { data: 'status' }
       { data: 'resolution' }
       {
-        data: null
-        defaultContent: ''
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
@@ -410,7 +602,11 @@ $ ->
         suggested_disposition = @suggested_disposition
       else
         suggested_disposition = missing_data
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content">' + entry_content + '</td>' + '<td class="entry-col-status">' + status + '</td>' + '<td class="entry-col-disp">' + suggested_disposition + '</td>' + '<td class="entry-col-cat">' + category + '</td>' + '<td class="entry-col-wbrs-score">' + @score + '</td>' + '<td class="entry-col-wbrs-hits"></td>' + '<td class="entry-col-wbrs-rules"></td>' + '<td class="entry-col-sbrs-score"></td>' + '<td class="entry-col-sbrs-hits"></td>' + '<td class="entry-col-sbrs-rules"></td>' + '<td class="entry-col-wlbl"></td>' + '<td class="entry-col-reptool-class"></td>' + '</tr>'
+      if @is_important == true
+        important = 'entry-important-flag'
+      else
+        important = ''
+      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' + '<td class="entry-col-status">' + status + '</td>' + '<td class="entry-col-disp">' + suggested_disposition + '</td>' + '<td class="entry-col-cat">' + category + '</td>' + '<td class="entry-col-wbrs-score">' + @score + '</td>' + '<td class="entry-col-wbrs-hits"></td>' + '<td class="entry-col-wbrs-rules"></td>' + '<td class="entry-col-sbrs-score"></td>' + '<td class="entry-col-sbrs-hits"></td>' + '<td class="entry-col-sbrs-rules"></td>' + '<td class="entry-col-wlbl"></td>' + '<td class="entry-col-reptool-class"></td>' + '</tr>'
       entry_rows.push entry_row
       return
     # `d` is the original data object for the row
@@ -525,6 +721,3 @@ $ ->
 
 # ---
 # generated by js2coffee 2.2.0
-
-#  # Expand All Rows
-#  $('#expand-all-index-rows').click ->

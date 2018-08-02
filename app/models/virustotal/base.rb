@@ -63,10 +63,10 @@ class Virustotal::Base
       when 300 > response.code
         response
       when 404 == response.code
-        body = JSON.parse(response.body)
+        body = response.body
         raise Virustotal::VirustotalNotFoundError, "HTTP response #{response.code} #{body['Error']}"
       else
-        body = JSON.parse(response.body)
+        body = response.body
         raise Virustotal::VirustotalError, "HTTP response #{response.code} #{body['Error']}"
     end
   end

@@ -1,0 +1,56 @@
+.toolbar
+  %div
+    %label.toolbar-section-label
+      Select
+    %button.toolbar-button.select-all-button{onclick: 'select_all_pages()', type: 'button'}
+      Select All
+    %button.toolbar-button.select-none-button{onclick: 'unselect_all_pages()', type: 'button'}
+      Unselect All
+    %button.toolbar-button.open-viewable-button{onclick: 'open_viewable()', type: 'button'}
+      Open Viewable
+    %button.toolbar-button.open-nonviewable-button{onclick: 'open_nonviewable()', type: 'button'}
+      Open Nonviewable
+    %button.toolbar-button.open-selected-button{onclick: 'open_selected()', type: 'button'}
+      Open Selected
+    %button.toolbar-button.open-all-button{onclidk: 'open_all()', type: 'button'}
+      Open All
+  %div
+    %label.toolbar-section-label
+      Edit
+    %button.toolbar-button#edit-button{onclick: 'edit_selected_complaints()', type: 'button'}
+      Edit Selected
+    %button.toolbar-button.take-button{onclick: 'take_selected()', type: 'button'}
+      Take Selected
+    %button.toolbar-button.return-button{onclick: 'return_selected()', type: 'button'}
+      Return Selected
+    %button.toolbar-button.url-cat-button{'data-toggle': 'modal', type: 'button', 'data-target': '#cat_new_url_modal'}
+      Categorize New URL
+  %div
+    %label.toolbar-section-label
+      View
+    %button.toolbar-button.collapse-all-button{onclick: 'collapse_all()', type: 'button'}
+      Collapse All
+    %button.toolbar-button.collapse-sel-button{onclick: 'collapse_selected()', type: 'button'}
+      Collapse Selected
+    %button.toolbar-button.expand-all-button{onclick: 'expand_all()', type: 'button'}
+      Expand All
+    %button.toolbar-button.expand-sel-button{onclick: 'expand_selected()', type: 'button'}
+      Expand Selected
+    %input{type: 'checkbox', checked: true, id:'self_review'}
+      Allow Self Review
+
+
+
+
+
+-#  <!--<div class="col-lg-3">-->
+-#    <!--<button onclick="filterByStatus('ALL')">filterbyALL</button>-->
+-#    <!--<button onclick="filterByStatus('COMPLETED')">filterbycompleted</button>-->
+-#    <!--<button onclick="filterByStatus('ACTIVE')">filterbyACTIVE</button>-->
+-#    <!--<button onclick="filterByStatus('NEW')">filterbyNEW</button>-->
+-#    <!--<button onclick="filterByStatus('REVIEW')">filterbyREVIEW</button>-->
+-#    <!--<input id="self_review" type="checkbox">allow self Review-->
+-#  <!--</div>-->
+-#
+
+

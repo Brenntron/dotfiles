@@ -157,9 +157,14 @@
             Assign
 
     %span.dropdown
-      %button#index_mark_duplicate.toolbar-button.mark-duplicate-button{title: 'Mark as Duplicate'}
+      %button#index_mark_duplicate.toolbar-button.mark-duplicate-button{title: 'Mark as Related', onclick: "$('#set-related-dispute-div').show();"}
         %span.toolbar-button-text
-          Mark as Duplicate
+          Mark as Related
+      #set-related-dispute-div{style: 'display: none;'}
+        %form#set-related-dispute-form{onsubmit: 'set_relating_disputes(this);return false;'}
+          %label
+            Ticket ID:
+            %input.dispute-id{type: 'text', name: 'dispute_id'}
 
   %div
     %label.toolbar-section-label
@@ -167,9 +172,65 @@
     %button.toolbar-button.ticket-status-button{title: 'Edit Entry Status'}
       %span.toolbar-button-text
         Edit Entry Status
-    %button.toolbar-button.adjust-wlbl-button{title: 'Adjust WL/BL'}
+    %button.toolbar-button.adjust-wlbl-button{title: 'Adjust WL/BL', onclick: 'index_expand_wlbl_form();'}
       %span.toolbar-button-text
         Adjust WL/BL
+    .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
+      %form.adjust-wlbl-form
+        .dispute-wlbl-adjust-wrapper
+          %table.dispute_tool_current
+            %thead
+              %tr
+                %th.content-label-sm Dispute
+                %th.content-label-sm.no-word-break Current WL/BL List
+                %th.text-center.content-label-sm.no-word-break Current WBRS Score
+            %tbody
+          .inline-tool-content-wrapper
+            .row
+              .col-xs-12
+                %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
+            .row
+              .col-xs-6
+                %ul.wlbl-toggle-list
+                  %li
+                    %label.toggle-switch
+                      %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
+                      %span.toggle-slider
+                    WL - Weak
+                  %li
+                    %label.toggle-switch
+                      %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
+                      %span.toggle-slider
+                    WL - Medium
+                  %li
+                    %label.toggle-switch
+                      %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
+                      %span.toggle-slider
+                    WL - Heavy
+              .col-xs-6
+                %ul.wlbl-toggle-list
+                  %li
+                    %label.toggle-switch
+                      %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
+                      %span.toggle-slider
+                    BL - Weak
+                  %li
+                    %label.toggle-switch
+                      %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
+                      %span.toggle-slider
+                    BL - Medium
+                  %li
+                    %label.toggle-switch
+                      %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
+                      %span.toggle-slider
+                    BL - Heavy
+            .comment-wrapper
+              %label.content-label-sm Comment
+              %textarea.dropdown-comment.adjust-wlbl-input.note-input
+            .button-row-center
+              %button.primary.dropdown-submit-button{type: 'button', onclick:'index_adust_wlbl_button(this);'}
+                Submit Changes
+
     %button.toolbar-button.adjust-reptool-button#reptool_entries_button{title: 'Adjust RepTool BL'}
       %span.toolbar-button-text
         Adjust RepTool BL

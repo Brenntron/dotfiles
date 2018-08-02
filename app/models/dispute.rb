@@ -2,8 +2,10 @@ class Dispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   belongs_to :customer
-  belongs_to :user
+  belongs_to :user, :optional => true
+  belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
+  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
@@ -16,12 +18,14 @@ class Dispute < ApplicationRecord
   RESOLVED = 'RESOLVED'
   ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
+  DUPLICATE = 'DUPLICATE'
 
   ANALYST_COMPLETED = "Analyst Completed"
   ALL_AUTO_RESOLVED = "All Auto Resolved"
 
   TI_NEW = 'IN PROGRESS'
   TI_RESOLVED = 'RESOLVED'
+  TI_CLOSED = 'CLOSED'
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
@@ -30,10 +34,14 @@ class Dispute < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
-  scope :open, -> { where(status: NEW) }
-  scope :closed, -> { where(status: CLOSED) }
-  scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :open_disputes, -> { where(status: NEW) }
+  scope :closed_disputes, -> { where(status: RESOLVED) }
+  scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
+
+  def case_id_str
+    '%010i' % id
+  end
 
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
@@ -57,6 +65,19 @@ class Dispute < ApplicationRecord
     dispute_entries.length
   end
 
+  def last_updated_by
+    if versions.any?
+      who = versions.last&.whodunnit
+      who && User.find(who)
+    else
+      nil
+    end
+  end
+
+  def last_updated_by_username
+    last_updated_by&.cvs_username
+  end
+
   def dispute_age
     return '' unless self.case_opened_at
     age = self.case_opened_at - DateTime.now
@@ -71,6 +92,54 @@ class Dispute < ApplicationRecord
     else
       "%dm %ds" % [mm, ss]
     end
+  end
+
+  def minutes_to_accept
+    if case_accepted_at && case_opened_at
+      (case_accepted_at - case_opened_at) / 60.0
+    end
+  end
+
+  def minutes_to_respond
+    if case_responded_at && case_opened_at
+      (case_responded_at - case_opened_at) / 60.0
+    end
+  end
+
+  def minutes_to_close
+    if case_closed_at && case_opened_at
+      (case_accepted_at - case_opened_at) / 60.0
+    end
+  end
+
+  def days_to_close
+    minutes_to_close && minutes_to_close / 1440.0
+  end
+
+  def each_duplicate(&block)
+    if related_dispute && Dispute::DUPLICATE == self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def each_related(&block)
+    if related_dispute && Dispute::DUPLICATE != self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def full_duplicates
+    result = []
+    each_duplicate do |other_dispute|
+      result << other_dispute
+    end
+    result
   end
 
   def self.parse_url(url)
@@ -125,6 +194,79 @@ class Dispute < ApplicationRecord
     end
 
     return possible_duplicates
+  end
+
+  def self.is_possible_customer_duplicate?(dispute, new_entries_ips, new_entries_urls)
+
+    new_uris = new_entries_urls.keys.sort
+    new_ips = new_entries_ips.keys.sort
+
+    response = {}
+    possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != RESOLVED || dispute.status != DUPLICATE}
+    candidates = []
+
+    possibles.each do |poss|
+
+      ips = poss.dispute_entries.select{ |entry| entry.entry_type == "IP"}.pluck(:ip_address).sort
+      uris = poss.dispute_entries.select{ |entry| entry.entry_type == "URI/DOMAIN"}.pluck(:uri).sort
+
+      if ips == new_ips && uris == new_uris
+        candidates << poss
+      end
+    end
+
+    if candidates.present?
+      best_candidate = candidates.sort_by {|candidate| candidate.id}.first
+      response[:authority] = best_candidate
+      response[:is_dupe] = true
+    else
+      response[:is_dupe] = false
+    end
+
+    response
+
+  end
+
+  def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
+    dispute.status = DUPLICATE
+    dispute.related_id = authority_dispute.id
+    dispute.related_at = Time.now
+    dispute.save
+
+    return_payload = {}
+
+    new_entries_ips.each do |ip|
+      new_payload_item = {}
+      new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
+      new_payload_item[:resolution] = "DUPLICATE"
+      new_payload_item[:status] = TI_RESOLVED
+      return_payload[ip] = new_payload_item
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.ip_address = ip
+      new_dispute_entry.entry_type = "IP"
+      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.save
+    end
+    new_entries_urls.each do |url|
+      new_payload_item = {}
+      new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
+      new_payload_item[:resolution] = "DUPLICATE"
+      new_payload_item[:status] = TI_RESOLVED
+      return_payload[url] = new_payload_item
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.uri = url
+      new_dispute_entry.entry_type = "URI/DOMAIN"
+      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.save
+    end
+
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn.post(return_payload, "")
+
   end
 
   def compose_versioned_items
@@ -236,7 +378,15 @@ class Dispute < ApplicationRecord
           new_dispute.priority = "P4"
         end
         logger.debug "Saving Dispute"
+
         new_dispute.save
+
+        response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
+
+        if response[:is_dupe] == true
+          manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
+          return
+        end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
         #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
@@ -307,7 +457,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "sbrs"
+              new_rule_hit.rule_type = "SBRS"
               new_rule_hit.save
             end
           end
@@ -317,7 +467,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "wbrs"
+              new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save
             end
           end
@@ -654,6 +804,27 @@ class Dispute < ApplicationRecord
     advanced_search(search_params, search_name: nil, user: user)
   end
 
+  def self.standard_search_title(search_name)
+    case search_name
+      when 'recently_viewed'
+        'Recently Viewed Tickets'
+      when 'my_open'
+        'My Open Tickets'
+      when 'my_disputes'
+        'My Tickets'
+      when 'team_disputes'
+        'My Team\'s Tickets'
+      when 'open'
+        'Open Tickets'
+      when 'closed'
+        'Closed Tickets'
+      when 'all'
+        'All Tickets'
+      else
+        raise "No search named '#{search_name}' known."
+    end
+  end
+
   # Searches based on standard pre-determined filters.
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
@@ -683,10 +854,30 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    searchable_fields = %w{case_number case_guid customer_name customer_email customer_phone customer_company_name
-                           org_domain subject description problem_summary research_notes}
-    where_str = searchable_fields.map{|field| "#{field} like :pattern"}.join(' or ')
-    where(where_str, pattern: "%#{value}%")
+    dispute_fields = %w{case_number case_guid org_domain subject description
+                        source_ip_address problem_summary research_notes}
+    dispute_where = dispute_fields.map{|field| "#{field} like :pattern"}.join(' or ')
+
+    customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
+    company_where = 'companies.name like :pattern'
+
+    where_str = "#{dispute_where} or #{customer_where} or #{company_where}"
+    left_joins(customer: :company).where(where_str, pattern: "%#{value}%")
+  end
+
+  def self.robust_search_title(search_type, search_name: nil)
+    case search_type
+      when 'advanced'
+        search_name.present? ? search_name + ' Search' : 'Advanced Search'
+      when 'named'
+        search_name + ' Search'
+      when 'standard'
+        standard_search_title(search_name)
+      when 'contains'
+        'Substring Search'
+      else
+        'All Tickets'
+    end
   end
 
   # Searches in a variety of ways.
@@ -712,6 +903,75 @@ class Dispute < ApplicationRecord
         contains_search(params['value'])
       else
         where({})
+    end
+  end
+
+  # @param [Array<Dispute>] disputes colleciton of dispute objects
+  # @return [Array<Array>] data output for data tables.
+  def self.to_data_packet(disputes)
+    disputes.map do |dispute|
+      dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
+
+      dispute_packet[:case_number] = dispute.case_id_str
+      dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
+      dispute_packet[:submitter_name] = '' #dispute.customer_name
+      dispute_packet[:submitter_org] = dispute.org_domain
+      dispute_packet[:submitter_domain] = dispute.org_domain
+      dispute_packet[:dispute_domain] = dispute.org_domain
+      unless dispute.dispute_entries.empty?
+        unless dispute.dispute_entries.first[:hostname].nil?
+          dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
+        end
+      end
+      dispute_packet[:dispute_count] = dispute.entry_count.to_s
+
+      dispute_packet[:dispute_entry_content] = []
+      unless dispute.dispute_entries.empty?
+        dispute.dispute_entries.each do |entry|
+          unless entry[:ip_address].nil?
+            dispute_packet[:dispute_entry_content].push(entry[:ip_address])
+          end
+          unless entry[:uri].nil?
+            dispute_packet[:dispute_entry_content].push(entry[:uri])
+          end
+        end
+      end
+
+      dispute_packet[:dispute_entries] = dispute.dispute_entries
+      dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+      case
+        when dispute.assignee == 'Unassigned'
+          dispute_packet[:assigned_to] =
+              "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
+
+        when dispute.user_id?
+          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+      end
+
+      dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
+
+      dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
+      dispute_packet[:case_age] = dispute.dispute_age
+      # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
+      dispute_packet[:suggested_disposition] = dispute.suggested_d
+      dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
+      dispute_packet[:source_id] = dispute.ticket_source_key
+      dispute_packet[:source_type] = dispute.ticket_source_type
+
+      dispute_packet[:wbrs_score] = ''
+      dispute_packet[:wbrs_rule_hits] = []
+
+      dispute.dispute_entries.each do |d_entry|
+        if dispute_packet[:wbrs_score].empty? and d_entry[:score_type] == "WBRS"
+          dispute_packet[:wbrs_score] = d_entry[:score].to_s unless d_entry[:score].nil?
+        end
+        d_entry.dispute_rule_hits.each do |d_rule|
+          dispute_packet[:wbrs_rule_hits] << d_rule.name
+        end
+      end
+      dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
+
+      dispute_packet
     end
   end
 

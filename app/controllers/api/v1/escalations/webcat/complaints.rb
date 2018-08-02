@@ -20,21 +20,56 @@ module API
               if complaints
                 complaints.each do |complaint|
                   complaint_packet = {}
+                  complaint_packet[:age] = Complaint.what_time_is_it((Time.now - complaint.created_at).to_i)
                   complaint_packet[:id] = complaint.id
+                  complaint_packet[:entry_id] = complaint.id
                   complaint_packet[:tag] = complaint.tag
-                  complaint_packet[:subdomain] = complaint.subdomain
-                  complaint_packet[:domain] = complaint.domain
-                  complaint_packet[:path] = complaint.path
+                  complaint_packet[:description] = complaint.description
+                  complaint_packet[:submission_type] = complaint.submission_type
+                  complaint_packet[:submitter_type] = complaint.submitter_type
+                  complaint_packet[:assigned_to] = complaint.user_id
                   complaint_packet[:status] = complaint.status
-                  complaint_packet[:age] = complaint.age
-                  complaint_packet[:customer] = complaint.wbrs_score
-                  complaint_packet[:url_primary_cat] = complaint.url_primary_cat
+                  complaint_packet[:created_at] = complaint.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                  complaint_packet[:customer_name] = complaint.customer.name # Customer name
+                  complaint_packet[:complaint_entries] = complaint.complaint_entries
+                  complaint_packet[:complaint_entries_count] = complaint.complaint_entries.count
+
+                  complaint_packet[:complaint_entry_content] = []
+                  unless complaint.complaint_entries.empty?
+                    complaint.complaint_entries.each do |entry|
+
+                      complaint_packet[:complaint_entry_content].push(entry[:subdomain]) unless entry[:subdomain].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:domain]) unless entry[:domain].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:path]) unless entry[:path].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:resolution]) unless entry[:resolution].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:ip_address]) unless entry[:ip_address].nil?
+                      complaint_packet[:complaint_entry_content].push(entry[:uri]) unless entry[:uri].nil?
+                    end
+                  end
+                  complaint_packet[:complaint_entry_preview] = complaint_packet[:complaint_entry_content].first.to_s
 
                   json_packet << complaint_packet
                 end
               end
               {:status => "success", :data => json_packet}.to_json
 
+            end
+
+            desc 'create a complaint'
+            params do
+              requires :ips_urls, type: String, desc: 'List of URLs to create entries'
+              requires :description, type: String, desc: 'Description of new complaint'
+              optional :customer, type: String, desc: 'Customer related to new complaint'
+              optional :tags, type: Array, desc: 'Array of tags to be associated with the new complaint'
+            end
+
+            post "" do
+              Complaint.create_action(bugzilla_session,
+                                      permitted_params[:ips_urls],
+                                      permitted_params[:description],
+                                      permitted_params[:customer],
+                                      permitted_params[:tags])
+              {:status => 'success'}.to_json
             end
 
             desc 'test a url'
