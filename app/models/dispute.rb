@@ -35,8 +35,8 @@ class Dispute < ApplicationRecord
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
   scope :open_disputes, -> { where(status: NEW) }
-  scope :closed_disputes, -> { where(status: CLOSED) }
-  scope :in_progress_disputes, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :closed_disputes, -> { where(status: RESOLVED) }
+  scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def case_id_str
@@ -201,7 +201,7 @@ class Dispute < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != CLOSED || dispute.status != DUPLICATE}
+    possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != RESOLVED || dispute.status != DUPLICATE}
     candidates = []
 
     possibles.each do |poss|
@@ -238,28 +238,28 @@ class Dispute < ApplicationRecord
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
-      new_payload_item[:status] = TI_CLOSED
+      new_payload_item[:status] = TI_RESOLVED
       return_payload[ip] = new_payload_item
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.ip_address = ip
       new_dispute_entry.entry_type = "IP"
-      new_dispute_entry.status = DisputeEntry::CLOSED
-      new_dispute_entry.resolution = DisputeEntry::STATUS_CLOSED_DUPLICATE
+      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.save
     end
     new_entries_urls.each do |url|
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
-      new_payload_item[:status] = TI_CLOSED
+      new_payload_item[:status] = TI_RESOLVED
       return_payload[url] = new_payload_item
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.uri = url
       new_dispute_entry.entry_type = "URI/DOMAIN"
-      new_dispute_entry.status = DisputeEntry::CLOSED
-      new_dispute_entry.resolution = DisputeEntry::STATUS_CLOSED_DUPLICATE
+      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.save
     end
 
