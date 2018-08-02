@@ -1,14 +1,14 @@
 .content-wrapper
   .reputation-research-search-wrapper
     %h1 Reputation Research
-    = form_tag('/tickets', method: :get) do
+    = form_tag('#') do
       = text_field_tag 'result[id]', "#{}", class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true'
       .row.search-options-row
         .col-xs-6
-          %input{type: 'radio', name: 'search-type', id: 'research-search-strict'}
+          %input{type: 'radio', name: 'search-type', value: 'strict', id: 'research-search-strict'}
           %label{for: 'research-search-strict'} Strict Search
         .col-xs-6
-          %input{type: 'radio', name: 'search-type', id: 'research-search-broad', checked: true}
+          %input{type: 'radio', name: 'search-type', value: 'broad', id: 'research-search-broad', checked: true}
           %label{for: 'research-search-broad'} Broad Search
 
   .row
