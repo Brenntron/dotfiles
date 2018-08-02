@@ -5264,6 +5264,17 @@ td.ticket-total::before {
   padding: 0 !important;
 }
 
+.entry-important-flag::before {
+  display: inline-block;
+  content: '';
+  background-image: url(image_path('icon_important.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  margin-bottom: -6px;
+  margin-right: 4px;
+}
+
 .loader-gears {
   width: 80px;
   height: 80px;
