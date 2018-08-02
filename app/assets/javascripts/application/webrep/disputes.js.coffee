@@ -376,9 +376,7 @@ window.take_single_dispute = (id) ->
     url: "/api/v1/escalations/webrep/disputes/take_disputes"
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
-    success: (response) ->
-      for dispute_id in response.dispute_ids
-        $('#dispute-assignee').text(response.username)
+    success_reload: true
   )
 
 
