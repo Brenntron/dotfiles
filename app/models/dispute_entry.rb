@@ -1,4 +1,6 @@
 class DisputeEntry < ApplicationRecord
+  attr_writer :wbrs_xlist
+
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute
   belongs_to :user, optional: true
@@ -39,6 +41,12 @@ class DisputeEntry < ApplicationRecord
     date_to = Date.iso8601(date_to_iso) + 1
     where(case_resolved_at: (date_from..date_to))
   }
+
+  def self.new_from_wlbl(wlbl)
+    new(uri: wlbl.url).tap do |entry|
+      entry.wbrs_xlist = [ wlbl ]
+    end
+  end
 
   def self.from_age_report_params(params)
     query = resolved_date(params['date_from'], params['date_to'])
@@ -290,7 +298,7 @@ class DisputeEntry < ApplicationRecord
       url = research_params['uri']
       # [ DisputeEntry.new(uri: research_params['url']) ]
       entries = Wbrs::ManualWlbl.where(url: url).map do |wlbl|
-        DisputeEntry.new(uri: wlbl.url)
+        DisputeEntry.new_from_wlbl(wlbl)
       end
       unless entries.find{|entry| url == entry.uri}
         entries << DisputeEntry.new(uri: url)
