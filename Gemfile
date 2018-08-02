@@ -105,7 +105,7 @@ group :development, :profile do
   # gem 'stackprof'
 
   # https://scoutapp.com/devtrace
-  # SCOUT_DEV_TRACE=true rails server
+  # SCOUT_DEV_TRACE=true bundle exec rails server
   gem 'scout_apm'
 end
 
