@@ -31,7 +31,7 @@
           Owner
         %div
           - if @dispute.assignee == 'Unassigned'
-            %span.missing-data= @dispute.assignee || "None"
+            %span.missing-data#dispute-assignee= @dispute.assignee || "None"
           - else
             %span= @dispute.assignee || "None"
           .dispute-owner-buttons-wrapper
