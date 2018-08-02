@@ -856,14 +856,13 @@ class Dispute < ApplicationRecord
 
       dispute_packet[:dispute_entries] = dispute.dispute_entries
       dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
-      dispute_packet[:assigned_to] = ''#dispute.user.email
-      if dispute.assignee == 'Unassigned'
-        dispute_packet[:assigned_to] =
-            "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
-      end
+      case
+        when dispute.assignee == 'Unassigned'
+          dispute_packet[:assigned_to] =
+              "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
 
-      if dispute.user_id?
-        dispute_packet[:assigned_to] = User.find(dispute.user_id).cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+        when dispute.user_id?
+          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
       end
 
       dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"

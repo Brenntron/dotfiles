@@ -21,6 +21,9 @@ window.populate_webrep_index_table = (data = {}) ->
         datatable.rows.add(json.data);
         datatable.draw();
 
+        if undefined != json.search_name
+          $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
       #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)

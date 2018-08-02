@@ -48,7 +48,16 @@ module API
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
               json_packet = Dispute.to_data_packet(disputes)
 
-              {status: "success", title: title, data: json_packet}.to_json
+              response_data = {status: "success", title: title, data: json_packet}
+              if 'advanced' == permitted_params['search_type']
+                if permitted_params['search_name'].present?
+                  search_name = permitted_params['search_name']
+                  response_data['search_name'] = search_name
+                  named_search = NamedSearch.where(user: current_user, name: search_name).first
+                  response_data['search_id'] = named_search&.id
+                end
+              end
+              response_data.to_json
 
             end
 
