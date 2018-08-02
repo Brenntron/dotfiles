@@ -11,6 +11,7 @@ class DisputeEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
   delegate :cvs_username, to: :dispute, allow_nil: true
 
@@ -20,8 +21,8 @@ class DisputeEntry < ApplicationRecord
   CLOSED = 'CLOSED'
 
   scope :open_entries, -> { where(status: NEW) }
-  scope :closed_entries, -> { where(status: CLOSED) }
-  scope :in_progress_entries, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :closed_entries, -> { where(status: RESOLVED) }
+  scope :in_progress_entries, -> { where.not(status: [ NEW, RESOLVED ]) }
   scope :my_team, ->(user) { joins(:dispute).where(disputes: {user_id: user.my_team}) }
 
   scope :resolved_date, -> (date_from_iso, date_to_iso) {
@@ -60,7 +61,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def ti_status
-    CLOSED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
+    RESOLVED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
   end
 
   def find_xbrs
@@ -241,7 +242,9 @@ class DisputeEntry < ApplicationRecord
     end
 
     if attributes.has_key?('status')
-      attributes['status'] = attributes['status'].upcase
+      unless attributes['status'].nil?
+        attributes['status'] = attributes['status'].upcase
+      end
     end
 
     if attributes.has_key?('host')
