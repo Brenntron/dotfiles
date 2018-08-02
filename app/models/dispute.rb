@@ -2,7 +2,7 @@ class Dispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   belongs_to :customer
-  belongs_to :user
+  belongs_to :user, :optional => true
   belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
   has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
@@ -25,6 +25,7 @@ class Dispute < ApplicationRecord
 
   TI_NEW = 'IN PROGRESS'
   TI_RESOLVED = 'RESOLVED'
+  TI_CLOSED = 'CLOSED'
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
@@ -34,8 +35,8 @@ class Dispute < ApplicationRecord
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
   scope :open_disputes, -> { where(status: NEW) }
-  scope :closed_disputes, -> { where(status: CLOSED) }
-  scope :in_progress_disputes, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :closed_disputes, -> { where(status: RESOLVED) }
+  scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def case_id_str
@@ -195,6 +196,79 @@ class Dispute < ApplicationRecord
     return possible_duplicates
   end
 
+  def self.is_possible_customer_duplicate?(dispute, new_entries_ips, new_entries_urls)
+
+    new_uris = new_entries_urls.keys.sort
+    new_ips = new_entries_ips.keys.sort
+
+    response = {}
+    possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != RESOLVED || dispute.status != DUPLICATE}
+    candidates = []
+
+    possibles.each do |poss|
+
+      ips = poss.dispute_entries.select{ |entry| entry.entry_type == "IP"}.pluck(:ip_address).sort
+      uris = poss.dispute_entries.select{ |entry| entry.entry_type == "URI/DOMAIN"}.pluck(:uri).sort
+
+      if ips == new_ips && uris == new_uris
+        candidates << poss
+      end
+    end
+
+    if candidates.present?
+      best_candidate = candidates.sort_by {|candidate| candidate.id}.first
+      response[:authority] = best_candidate
+      response[:is_dupe] = true
+    else
+      response[:is_dupe] = false
+    end
+
+    response
+
+  end
+
+  def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
+    dispute.status = DUPLICATE
+    dispute.related_id = authority_dispute.id
+    dispute.related_at = Time.now
+    dispute.save
+
+    return_payload = {}
+
+    new_entries_ips.each do |ip|
+      new_payload_item = {}
+      new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
+      new_payload_item[:resolution] = "DUPLICATE"
+      new_payload_item[:status] = TI_RESOLVED
+      return_payload[ip] = new_payload_item
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.ip_address = ip
+      new_dispute_entry.entry_type = "IP"
+      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.save
+    end
+    new_entries_urls.each do |url|
+      new_payload_item = {}
+      new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
+      new_payload_item[:resolution] = "DUPLICATE"
+      new_payload_item[:status] = TI_RESOLVED
+      return_payload[url] = new_payload_item
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.uri = url
+      new_dispute_entry.entry_type = "URI/DOMAIN"
+      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.save
+    end
+
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn.post(return_payload, "")
+
+  end
+
   def compose_versioned_items
 
     versioned_items = [self]
@@ -304,7 +378,15 @@ class Dispute < ApplicationRecord
           new_dispute.priority = "P4"
         end
         logger.debug "Saving Dispute"
+
         new_dispute.save
+
+        response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
+
+        if response[:is_dupe] == true
+          manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
+          return
+        end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
         #TODO:  answer the above question later and if the answer is it's eligible for consolidating into one method, do so.
