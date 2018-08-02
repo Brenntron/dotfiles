@@ -566,7 +566,7 @@
                               = entry.blacklist
                             %span.inline-col-breakup.entry-reptool-comment
                               -# Reptool comment, add comment here
-                              Juno Spam Monitor
+                              = entry.blacklist.metadata['VRT']['comment']
                         %td.left-bordered
                           %label Last Submitted
                         %td
