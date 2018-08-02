@@ -66,7 +66,8 @@ class Dispute < ApplicationRecord
 
   def last_updated_by
     if versions.any?
-      User.find(versions.last&.whodunnit)
+      who = versions.last&.whodunnit
+      who && User.find(who)
     else
       nil
     end
