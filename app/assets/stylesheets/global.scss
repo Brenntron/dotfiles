@@ -4448,12 +4448,12 @@ table > tbody > tr > td.dispute_rep_tools {
   font-weight: 600 !important;
 }
 
-.dispute-entry-table-wrapper {
+.dispute-entry-table-wrapper, .nested-complaint-data-wrapper {
   padding: 0 0 0 20px !important;
   background-color: $bug-section-color;
 }
 
-.dispute-entry-table-wrapper::before {
+.dispute-entry-table-wrapper::before, .nested-complaint-data-wrapper::before {
   content: '';
   position: absolute;
   left: 4px;
@@ -4461,6 +4461,23 @@ table > tbody > tr > td.dispute_rep_tools {
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   border-top: 10px solid $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table {
+  background-color: $table-dark-body;
+  color: $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table a {
+  color: $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table td {
+  border-bottom: none;
+}
+
+.nested-table-input {
+  color: $type-base-color;
 }
 
 .table-entry-input {
@@ -5119,7 +5136,7 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-E {background-image: url(image_path('icon_type_email.svg'));}
 .dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
 
-.my-dashboard-header-area {
+.my-dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $bug-section-color;
   margin-top: -15px;
   border-radius: 4px 4px 0 0 ;
@@ -5129,20 +5146,20 @@ table.dispute_tool_current tr:last-of-type td {
   background-color: $content-tab-color;
 }
 
-.dashboard-header-area {
+.dashboard-header-area, .complaint-mgt-top-area {
   margin-right: -15px;
   margin-left: -15px;
   color: $content-bg-color;
   padding: 15px;
 }
 
-.dashboard-header-area h1 {
+.dashboard-header-area h1, .complaint-mgt-top-area h1 {
   color: $content-bg-color;
   margin-bottom: 24px;
   display: inline-block;
 }
 
-.dashboard-header-area h5 {
+.dashboard-header-area h5, .complaint-mgt-top-area h5 {
   color: $content-bg-color;
   font-size: 9pt;
   font-weight: 600;
@@ -5154,7 +5171,11 @@ table.dispute_tool_current tr:last-of-type td {
   font-weight: 300;
 }
 
-.my-dashboard-icon, .team-icon {
+.dashboard-details a {
+  color: $content-bg-color;
+}
+
+.my-dashboard-icon, .team-icon, .top-info-icon {
   background-repeat: no-repeat;
   width: 30px;
   height: 30px;
@@ -5264,6 +5285,10 @@ td.ticket-total::before {
   padding: 0 !important;
 }
 
+.table-condensed > tbody > tr > td {
+  padding: 3px 4px !important;
+}
+
 .entry-important-flag::before {
   display: inline-block;
   content: '';
@@ -5279,6 +5304,10 @@ td.ticket-total::before {
   width: 80px;
   height: 80px;
   margin: auto;
+}
+
+table.dataTable tbody tr.selected {
+  background-color: $faint-accent-color;
 }
 
 .nested-col-sections {
