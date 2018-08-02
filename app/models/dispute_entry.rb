@@ -88,14 +88,17 @@ class DisputeEntry < ApplicationRecord
   end
 
   def blacklist(reload: false)
-    if reload == false
-      if dispute_entry_preload.present? && dispute_entry_preload.wlbl.present?
-        @blacklist = RepApi::Blacklist.load_from_prefetch(dispute_entry_preload.wlbl).first
-        return @blacklist 
-      end
+    @blacklist_loaded = false if reload
+    unless @blacklist_loaded
+      @blacklist =
+          if dispute_entry_preload.present? && dispute_entry_preload.wlbl.present?
+            RepApi::Blacklist.load_from_prefetch(dispute_entry_preload.wlbl).first
+          else
+            RepApi::Blacklist.where(entries: [ hostlookup ]).first
+          end
+      @blacklist_loaded = true
     end
-    @blacklist = nil if reload
-    @blacklist ||= RepApi::Blacklist.where(entries: [ hostlookup ]).first
+    @blacklist
   end
 
   def classifications
