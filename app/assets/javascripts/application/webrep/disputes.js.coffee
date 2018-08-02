@@ -367,6 +367,28 @@ window.take_disputes = () ->
   )
 
 
+
+window.take_single_dispute = (id) ->
+  dispute_ids = [ id ]
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/take_disputes"
+    data: { dispute_ids: dispute_ids }
+    error_prefix: 'Error updating ticket.'
+    success_reload: true
+  )
+
+
+window.dispute_entry_status = (id, status) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
+    data: { status: status }
+    error_prefix: 'Error updating status.'
+  )
+
+
 window.save_dispute_entries = () ->
   data = {}
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
