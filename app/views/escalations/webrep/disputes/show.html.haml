@@ -3,17 +3,14 @@
 
   .row
     .col-xs-1.col-with-divider
-      .nested-col-sections
-        %span.bug-state-info.bug-priority{class: "p-#{@dispute.priority}"}
-        %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
-      .nested-col-sections
-        %label.content-label-sm
-          Case ID
-        .bug-top-id
-          %a.case-id-tag#dispute_id= @dispute.id
-    .col-xs-1.bug-state-col
+      %span.bug-state-info.bug-priority{class: "p-#{@dispute.priority}"}
+      %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
+    .col-xs-1.col-with-divider
       %label.content-label-sm
-        Status
+        Case ID
+      .bug-top-id
+        %a.case-id-tag#dispute_id= @dispute.case_id_str
+    .col-xs-1.bug-state-col
       #bugzilla_popover_state.bug-state-info.bug-state
         %select#status.inpage-select{name: 'status'}
           %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
