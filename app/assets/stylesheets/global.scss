@@ -5368,11 +5368,15 @@ td.ticket-total::before {
 }
 
 .dispute-top-buttons {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
+  background-size: 22px;
+  background-position: center center;
   background-repeat: no-repeat;
   border: none;
   border-radius: 2px;
+  display: block;
+  margin: 0 auto 8px auto;
 }
 
 .top-info-buttons-wrapper {
@@ -5391,6 +5395,21 @@ td.ticket-total::before {
 .disposition-wrapper {
   margin-top: 12px;
 }
+
+#dispute-priority-select {
+  display: none;
+  width: 45px;
+  margin-bottom: 4px;
+}
+
+.dispute-edit-input {
+  display: none;
+  color: $type-base-color;
+  border: none;
+  padding: 4px 6px;
+}
+
+.block {display:block;}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
