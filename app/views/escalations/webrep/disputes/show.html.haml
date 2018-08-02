@@ -36,7 +36,7 @@
             %span= @dispute.assignee || "None"
           .dispute-owner-buttons-wrapper
             - if @dispute.assignee == current_user.email
-              %button.return-ticket-button
+              %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
             - else
               %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
 
