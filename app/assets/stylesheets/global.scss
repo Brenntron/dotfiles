@@ -5349,6 +5349,49 @@ td.ticket-total::before {
   padding-bottom: 20px;
 }
 
+.priority-col-wrapper, .case-id-wrapper, .dispute-owner-wrapper, .dispute-time-wrapper, .top-info-buttons-wrapper {
+  display: inline-block;
+}
+
+.priority-col-wrapper, .case-id-wrapper {
+  float: left;
+  border-right: solid 1px $faint-neutral-color;
+  margin-right: 12px;
+}
+
+.priority-col-wrapper {
+  padding-right: 6px;
+}
+
+.case-id-wrapper {
+  padding-right: 12px;
+}
+
+.dispute-top-buttons {
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 2px;
+}
+
+.top-info-buttons-wrapper {
+  float: right;
+  background-color: $type-lighter-color;
+  width: 45px;
+  text-align: center;
+  margin-top: -15px;
+  margin-right: -16px;
+  margin-bottom: -21px;
+  min-height: 127px;
+  padding: 20px 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.disposition-wrapper {
+  margin-top: 12px;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
