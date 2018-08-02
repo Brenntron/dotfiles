@@ -503,7 +503,7 @@
                         %td.left-bordered
                           %label Referenced on
                         %td.referenced-tickets-col
-                          - if entry.referenced_tickets.count == 1
+                          - if entry.referenced_tickets.count < 1 
                             %span.missing-data
                               Not on any other tickets
                           - else
