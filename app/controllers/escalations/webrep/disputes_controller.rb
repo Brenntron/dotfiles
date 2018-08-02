@@ -62,8 +62,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def research
-    # This is temporary till we get the searched hooked up
-    @entries = DisputeEntry.all.limit(5)
+    @entries = DisputeEntry.research_results(research_params)
   end
 
   def tickets
@@ -176,5 +175,9 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def age_report_params
     params.permit(:date_from, :date_to, :resolution, :engineer, :customer_id)
+  end
+
+  def research_params
+    params.fetch(:search, {}).permit(:uri, :scope)
   end
 end

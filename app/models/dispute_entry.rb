@@ -284,4 +284,22 @@ class DisputeEntry < ApplicationRecord
       entry.update_from_field_data(field_hash)
     end
   end
+
+  # If the research page is served from the DisputesController, this method is here.
+  # If the controller action is moved to another controller, move this method to another class.
+  def self.research_results(research_params)
+    url = research_params['uri']
+    if research_params.present?
+      # [ DisputeEntry.new(uri: research_params['url']) ]
+      entries = Wbrs::ManualWlbl.where(url: url).map do wlbl
+        DisputeEntry.new(uri: wlbl.url)
+      end
+      unless entries.find{|entry| url == entry.uri}
+        entries << DisputeEntry.new(uri: url)
+      end
+      entries
+    else
+      []
+    end
+  end
 end
