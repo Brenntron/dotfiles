@@ -242,7 +242,9 @@ class DisputeEntry < ApplicationRecord
     end
 
     if attributes.has_key?('status')
-      attributes['status'] = attributes['status'].upcase
+      unless attributes['status'].nil?
+        attributes['status'] = attributes['status'].upcase
+      end
     end
 
     if attributes.has_key?('host')

@@ -410,12 +410,14 @@ window.dispute_entry_status = (id, status) ->
 
 
 window.save_dispute_entries = () ->
+
   data = {}
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
     result = {}
     fielddata = $(this).find('.dual-edit-field').map(() ->
+
       new_value = switch (this.dataset.field)
-        when 'status' then $(this).find('.table-entry-input')[0].innerText.trim()
+        when 'status' then $(this).find("input[name='entry-status']:checked").attr('id')
         else $(this).find('.table-entry-input')[0].value.trim()
 
       {
