@@ -515,9 +515,23 @@
 
                         %td.left-bordered
                           %label Referenced on
-                        %td
-                          -#Add dropdown with links to all cases / tickets with this entry on them
-                          = "#{entry.referenced_tickets.count} ticket(s)"
+                        %td.referenced-tickets-col
+                          - if entry.referenced_tickets.count < 1 
+                            %span.missing-data
+                              Not on any other tickets
+                          - else
+                            %span.dropdown
+                              %button#show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced n', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                                = "#{entry.referenced_tickets.count} ticket(s)"
+                              .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
+                                %table
+                                  - entry.referenced_tickets.each do |reference|
+                                    %tr
+                                      %td
+                                        %a{href: "/escalations/webrep/disputes/#{reference.id}"}
+                                          = reference.id
+                                      %td
+                                        = reference.case_opened_at
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper
