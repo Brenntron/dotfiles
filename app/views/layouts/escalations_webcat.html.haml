@@ -88,8 +88,7 @@
 
   .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-2.search-wrapper
     .input-group.search-group
-      = form_tag('/tickets', method: :get) do
-        = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search'
+      = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced

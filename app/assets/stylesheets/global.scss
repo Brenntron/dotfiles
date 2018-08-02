@@ -2002,8 +2002,7 @@ a.static-nav-item {
   background-repeat: no-repeat;
   background-position: center center;
   margin-right: 5px;
-  float: left;
-  margin-top: 6px;
+  margin-top: -2px;
 }
 
 table .bug-priority {
@@ -4215,7 +4214,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px 2px 0 0 ;
 }
 
-.dispute_rep_tools .dropdown-menu h3 {
+.dispute_rep_tools .dropdown-menu h3, .dispute-owner-buttons-wrapper .dropdown-menu h3 {
   color: $content-bg-color;
   padding: 0 10px;
   font-weight: 400;
@@ -4337,6 +4336,17 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .take-ticket-button {
   background-image: url(image_path('icon_take_light2.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  float: right;
+  border: none;
+  background-color: transparent;
+}
+
+.return-ticket-button {
+  background-image: url(image_path('icon_return_light2.svg'));
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
@@ -4533,7 +4543,7 @@ input.table-entry-input:focus {
 }
 
 #top_bar_extended_info .col-with-divider {
-  border-right-color: #f2f2f230 ;
+  border-right-color: #f2f2f2;
 }
 
 #top_bar_toggle {
@@ -5112,8 +5122,8 @@ table.dispute_tool_current tr:last-of-type td {
 
 .top-case-info .dispute-submission-type {
   display: block;
-  float: right;
-  margin-top: 10px;
+  margin-top: 2px;
+  margin-left: 3px;
 }
 
 #disputes-index .dispute-submission-type {
@@ -5279,6 +5289,17 @@ td.ticket-total::before {
   padding: 3px 4px !important;
 }
 
+.entry-important-flag::before {
+  display: inline-block;
+  content: '';
+  background-image: url(image_path('icon_important.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  margin-bottom: -6px;
+  margin-right: 4px;
+}
+
 .loader-gears {
   width: 80px;
   height: 80px;
@@ -5287,6 +5308,74 @@ td.ticket-total::before {
 
 table.dataTable tbody tr.selected {
   background-color: $faint-accent-color;
+}
+
+.nested-col-sections {
+  display: inline-block;
+  float: left;
+}
+
+.nested-col-sections:first-of-type {
+  margin-right: 10px;
+}
+
+#status.inpage-select {
+  min-width: 80px;
+}
+
+.top-case-info .bug-state {
+  margin-top: -3px;
+}
+
+.top-case-info .take-ticket-button, .top-case-info .return-ticket-button {
+  display: inline-block;
+  float: left;
+}
+
+.dispute-owner-buttons-wrapper {
+  display: inline-block;
+  margin-top: -4px;
+  margin-left: 10px;
+  width: 50px;
+  float: right;
+}
+
+.dispute-owner-buttons-wrapper .dropdown {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.dispute-owner-buttons-wrapper .dropdown.open {
+  background-color: transparent !important;
+}
+
+.dispute-owner-buttons-wrapper .ticket-owner-button {
+  background-image: url(image_path('icon_user_white.svg'));
+}
+
+.dispute-owner-buttons-wrapper .dropdown-menu {
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: #6dbcdb;
+  min-width: 200px;
+  top: 16px;
+  left: 1px;
+}
+
+.dispute-owner-buttons-wrapper h3 {
+  padding: 2px 10px !important;
+}
+
+#button_reassign, #unassign-dispute-button {
+  text-transform: none;
+  display: inline-block;
+  padding: 8px 20px;
+  font-weight: 400;
+  margin: 0 6px 0 6px;
+}
+
+.dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
+  padding-bottom: 20px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
