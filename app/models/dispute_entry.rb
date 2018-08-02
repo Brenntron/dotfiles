@@ -81,7 +81,7 @@ class DisputeEntry < ApplicationRecord
     RESOLVED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
   end
 
-  def find_xbrs
+  def get_xbrs_value
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
       return Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
     end
@@ -93,6 +93,11 @@ class DisputeEntry < ApplicationRecord
     else
       self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri)
     end
+  end
+
+  def find_xbrs(reload: false)
+    @xbrs = nil if reload
+    @xbrs ||= get_xbrs_value
   end
 
   def blacklist(reload: false)
