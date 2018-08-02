@@ -22,6 +22,7 @@
 //= require admin/snort-docs
 //= require admin/std_api
 //= require admin/std_msg
+//= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
 //= require application/helpers
@@ -31,7 +32,8 @@
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
 //= require dataTables/extras/dataTables.select
-//= require application/webcat_complaints
+//= require application/webcat/complaints
 //= require application/webcat/complaint_form
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
+//= require application/webcat/categories

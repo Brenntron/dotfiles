@@ -48,7 +48,16 @@ module API
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
               json_packet = Dispute.to_data_packet(disputes)
 
-              {status: "success", title: title, data: json_packet}.to_json
+              response_data = {status: "success", title: title, data: json_packet}
+              if 'advanced' == permitted_params['search_type']
+                if permitted_params['search_name'].present?
+                  search_name = permitted_params['search_name']
+                  response_data['search_name'] = search_name
+                  named_search = NamedSearch.where(user: current_user, name: search_name).first
+                  response_data['search_id'] = named_search&.id
+                end
+              end
+              response_data.to_json
 
             end
 
@@ -80,6 +89,23 @@ module API
                 d = Dispute.find_by(id: dispute)
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
+                json_packet << d
+              end
+              {:status => "success", :data => json_packet}.to_json
+            end
+
+            desc "Remove assignee from a group of dispute IDs (revert to vrtincoming)"
+            params do
+              requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
+            end
+            post "unassign_all" do
+              json_packet = []
+              vrt = User.where(email: 'vrt-incoming@sourcefire.com').first
+              params[:dispute_ids].each do |dispute|
+                Dispute.where(id: dispute).update_all(user_id: vrt.id)
+                d = Dispute.find_by(id: dispute)
+
+                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
                 json_packet << d
               end
               {:status => "success", :data => json_packet}.to_json
@@ -122,6 +148,22 @@ module API
               true
             end
 
+            desc "Sync data for all dispute entry children"
+            params do
+              requires :dispute_id
+            end
+            post "sync_data" do
+                
+                dispute = Dispute.where({:id => params[:dispute_id]}).first
+                dispute.dispute_entries.each do |dispute_entry|
+
+                  dispute_entry.sync_up
+
+                end
+                {:status => "success"}.to_json
+
+            end
+
             delete "searches/:search_name" do
               # TODO determine access control policy for named searches
               search = NamedSearch.where(name: params['search_name'], user: current_user)
@@ -130,36 +172,85 @@ module API
             end
 
             patch 'take_dispute/:dispute_id' do
-              authorize!(:update, Dispute)
-              dispute = Dispute.find(params['dispute_id'])
-              authorize!(:update, dispute)
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
 
-              dispute.take_ticket(user: current_user)
+                dispute.take_ticket(user: current_user)
 
-              { username: current_user.display_name, dispute_id: dispute.id }
+                { username: current_user.display_name, dispute_id: dispute.id }
+              end
             end
 
             params do
               requires :dispute_ids, type: Array[Integer]
             end
             patch 'take_disputes' do
-              authorize!(:update, Dispute)
+              std_api_v2 do
+                authorize!(:update, Dispute)
 
-              dispute_ids = permitted_params['dispute_ids']
-              Dispute.take_tickets(dispute_ids, user: current_user)
+                dispute_ids = permitted_params['dispute_ids']
+                Dispute.take_tickets(dispute_ids, user: current_user)
 
-              { username: current_user.display_name, dispute_ids: dispute_ids }
+                { username: current_user.display_name, dispute_ids: dispute_ids }
+              end
             end
 
             params do
-              requires :status, type: String
+              requires :field_data, type: Hash
             end
-            patch 'entries/:entry_id/status' do
-              authorize!(:update, DisputeEntry)
-              entry = DisputeEntry.find(params['entry_id'])
-              authorize!(:update, entry)
-              entry.update(status: permitted_params['status'])
-              true
+            patch 'entries/field_data' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                DisputeEntry.update_from_field_data(permitted_params['field_data'])
+                DisputeEntry.send_status_updates(permitted_params['field_data'])
+                true
+              end
+            end
+
+            params do
+              requires :relating_dispute_ids, type: Array[Integer]
+            end
+            patch ':dispute_id/relating_disputes' do
+              std_api_v2 do
+                byebug
+                authorize!(:update, Dispute)
+                relating_dispute_ids = permitted_params['relating_dispute_ids']
+                Dispute.where(id: relating_dispute_ids).update_all(related_id: params['dispute_id'],
+                                                                   related_at: DateTime.now)
+                true
+              end
+            end
+
+            params do
+              requires :related_dispute_id, type: Integer
+            end
+            post ':dispute_id/related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
+                dispute.update!(related_id: permitted_params['related_dispute_id'],
+                                related_at: DateTime.now)
+                true
+              end
+            end
+
+            params do
+              requires :duplicate_dispute_id, type: Integer
+            end
+            post ':dispute_id/duplicate_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
+                dispute.update!(related_id: permitted_params['duplicate_dispute_id'],
+                                related_at: DateTime.now,
+                                status: Dispute::CLOSED,
+                                resolution: Dispute::DUPLICATE)
+                true
+              end
             end
           end
         end

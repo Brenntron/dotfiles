@@ -3,7 +3,9 @@ class Dispute < ApplicationRecord
 
   belongs_to :customer
   belongs_to :user
+  belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
+  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
   has_many :dispute_comments
   has_many :dispute_emails
   has_many :dispute_entries
@@ -16,6 +18,7 @@ class Dispute < ApplicationRecord
   RESOLVED = 'RESOLVED'
   ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
+  DUPLICATE = 'DUPLICATE'
 
   ANALYST_COMPLETED = "Analyst Completed"
   ALL_AUTO_RESOLVED = "All Auto Resolved"
@@ -30,10 +33,14 @@ class Dispute < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
-  scope :open, -> { where(status: NEW) }
-  scope :closed, -> { where(status: CLOSED) }
-  scope :in_progress, -> { where.not(status: [ NEW, CLOSED ]) }
+  scope :open_disputes, -> { where(status: NEW) }
+  scope :closed_disputes, -> { where(status: CLOSED) }
+  scope :in_progress_disputes, -> { where.not(status: [ NEW, CLOSED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
+
+  def case_id_str
+    '%010i' % id
+  end
 
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
@@ -55,6 +62,19 @@ class Dispute < ApplicationRecord
 
   def entry_count
     dispute_entries.length
+  end
+
+  def last_updated_by
+    if versions.any?
+      who = versions.last&.whodunnit
+      who && User.find(who)
+    else
+      nil
+    end
+  end
+
+  def last_updated_by_username
+    last_updated_by&.cvs_username
   end
 
   def dispute_age
@@ -79,6 +99,12 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def minutes_to_respond
+    if case_responded_at && case_opened_at
+      (case_responded_at - case_opened_at) / 60.0
+    end
+  end
+
   def minutes_to_close
     if case_closed_at && case_opened_at
       (case_accepted_at - case_opened_at) / 60.0
@@ -87,6 +113,32 @@ class Dispute < ApplicationRecord
 
   def days_to_close
     minutes_to_close && minutes_to_close / 1440.0
+  end
+
+  def each_duplicate(&block)
+    if related_dispute && Dispute::DUPLICATE == self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def each_related(&block)
+    if related_dispute && Dispute::DUPLICATE != self.resolution
+      block.call(related_dispute)
+      related_dispute.relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    else
+      relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+    end
+  end
+
+  def full_duplicates
+    result = []
+    each_duplicate do |other_dispute|
+      result << other_dispute
+    end
+    result
   end
 
   def self.parse_url(url)
@@ -323,7 +375,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "sbrs"
+              new_rule_hit.rule_type = "SBRS"
               new_rule_hit.save
             end
           end
@@ -333,7 +385,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "wbrs"
+              new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save
             end
           end
@@ -778,7 +830,7 @@ class Dispute < ApplicationRecord
     disputes.map do |dispute|
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
 
-      dispute_packet[:case_number] = sprintf '%08d', dispute.id
+      dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_name] = '' #dispute.customer_name
       dispute_packet[:submitter_org] = dispute.org_domain
@@ -805,14 +857,13 @@ class Dispute < ApplicationRecord
 
       dispute_packet[:dispute_entries] = dispute.dispute_entries
       dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
-      dispute_packet[:assigned_to] = ''#dispute.user.email
-      if dispute.assignee == 'Unassigned'
-        dispute_packet[:assigned_to] =
-            "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
-      end
+      case
+        when dispute.assignee == 'Unassigned'
+          dispute_packet[:assigned_to] =
+              "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
 
-      if dispute.user_id?
-        dispute_packet[:assigned_to] = User.find(dispute.user_id).cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+        when dispute.user_id?
+          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
       end
 
       dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"

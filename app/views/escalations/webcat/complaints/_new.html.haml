@@ -14,6 +14,10 @@
     %select.form-control.selectized#select-to-new{placeholder: "Add some tags...", multiple: "multiple", tabindex:"-1"}
     %input.hidden#complaint_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(',')}
 
+    %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+    %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
+    %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+
   %hr.thin
   .form-group.text-center
     %button.primary{value: 'submit', type: 'submit'}

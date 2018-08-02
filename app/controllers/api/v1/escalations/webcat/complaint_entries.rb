@@ -42,7 +42,7 @@ module API
                   complaint_entry_packet[:created_at] = complaint_entry.created_at.strftime('%Y-%m-%d %H:%M:%S')
                   complaint_entry_packet[:customer_name] = complaint_entry.complaint&.customer&.name # Customer name
 
-                  complaint_entry_packet[:category] = complaint_entry.category
+                  complaint_entry_packet[:category] = complaint_entry.url_primary_category
                   complaint_entry_packet[:resolution]= complaint_entry.resolution
                   complaint_entry_packet[:resolution_comment] = complaint_entry.resolution_comment
 
@@ -76,7 +76,7 @@ module API
                 entry.change_category( permitted_params['prefix'],permitted_params['categories'],
                                          permitted_params['status'],
                                          permitted_params['comment'],
-                                         current_user, false,"")
+                                         current_user, "")
               rescue Exception => e
                   return e.message
               end
@@ -95,7 +95,7 @@ module API
                 entry.change_category( permitted_params['prefix'], permitted_params['categories'],
                                     permitted_params['status'],
                                     permitted_params['comment'],
-                                    current_user, entry.is_high_telemetry?, permitted_params['commit'])
+                                    current_user, permitted_params['commit'])
               rescue Exception => e
                 return e.message
               end

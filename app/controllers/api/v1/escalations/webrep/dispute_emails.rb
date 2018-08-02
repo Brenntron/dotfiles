@@ -58,12 +58,51 @@ module API
                   replied_email.save
                 end
 
+                if params[:dispute_id].present?
+                  dispute = Dispute.find(params[:dispute_id])
+                  unless dispute.case_responded_at
+                    dispute.update!(case_responded_at: Time.now)
+                  end
+                end
+
                 return ""
               rescue Exception => e
                 Rails.logger.error e
                 raise "There was an error in attempting to send an email."
               end
 
+            end
+
+            desc "create a general email"
+            params do
+              requires :to, type: String, desc: "The email address the email is send to"
+              requires :body, type: String, desc: "The body of the email"
+              requires :subject, type: String, desc: "The subject of the email"
+              optional :from, type: String, desc: "The email address the email is from"
+              optional :attachments, type: Hash, desc: "File attachments"
+            end
+
+            post "ad_hoc", root: "dispute_email" do
+              authorize!(:create, DisputeEmail)
+              begin
+                ActiveRecord::Base.transaction do
+
+                  #extra precaution to make *sure* goofy test emails doesn't slip off to an actual customer when using 'realistic' data
+                  if Rails.env == "development"
+                    params[:to] = current_user.email
+                  end
+
+                  email_info = EscalationEmailTool.generate_email_info(params, current_user)
+
+                  conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+                  conn.post(email_info[:email_args], email_info[:attachments_to_mail])
+
+                  return ""
+                end
+              rescue Exception => e
+                Rails.logger.error e
+                raise "There was an error in attempting to send an email."
+              end
             end
 
           end
