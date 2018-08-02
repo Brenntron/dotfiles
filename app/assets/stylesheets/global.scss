@@ -4524,13 +4524,16 @@ input.table-entry-input:focus {
 #top_bar_extended_info h3 {
   color: $content-bg-color;
   font-weight: 600;
-  margin-top: 50px;
-  margin-bottom: 12px;
+  padding-top: 20px;
+  margin-top: 30px;
+  margin-bottom: 10px;
   font-size: 12pt;
+  border-top: 1px solid #ffffff26;
 }
 
 #top_bar_extended_info h3:first-of-type {
-  margin-top: 30px;
+  margin-top: 8px;
+  border-top: none;
 }
 
 
@@ -5377,6 +5380,84 @@ table.dataTable tbody tr.selected {
 .dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
   padding-bottom: 20px;
 }
+
+.priority-col-wrapper, .case-id-wrapper, .dispute-owner-wrapper, .dispute-time-wrapper, .top-info-buttons-wrapper {
+  display: inline-block;
+}
+
+.priority-col-wrapper, .case-id-wrapper {
+  float: left;
+  border-right: solid 1px $faint-neutral-color;
+  margin-right: 12px;
+}
+
+.priority-col-wrapper {
+  padding-right: 6px;
+}
+
+.case-id-wrapper {
+  padding-right: 12px;
+}
+
+.dispute-top-buttons {
+  width: 24px;
+  height: 24px;
+  background-size: 22px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 2px;
+  display: block;
+  margin: 0 auto 8px auto;
+}
+
+.top-info-buttons-wrapper {
+  float: right;
+  background-color: $type-lighter-color;
+  width: 45px;
+  text-align: center;
+  margin-top: -15px;
+  margin-right: -16px;
+  margin-bottom: -21px;
+  min-height: 127px;
+  padding: 20px 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.disposition-wrapper {
+  margin-top: 12px;
+}
+
+#dispute-priority-select {
+  display: none;
+  width: 45px;
+  margin-bottom: 4px;
+}
+
+.dispute-edit-input {
+  display: none;
+  color: $type-base-color;
+  border: none;
+  padding: 4px 6px;
+}
+
+.block {display:block;}
+
+#related-dispute-button {
+  position: absolute;
+  margin-top: -28px;
+  margin-left: 122px;
+  background-repeat: no-repeat;
+  background-position: 4px center;
+  border: none;
+  border-radius: 2px;
+  color: $content-bg-color;
+  font-size: 9pt;
+  padding: 5px 8px 5px 30px;
+  background-color: $content-label-color;
+  background-image: url(image_path('icon_related_white.svg'))
+}
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
