@@ -35,7 +35,6 @@
               .load-bar-segment.hidden
               .load-bar-segment.hidden
               .load-bar-segment.hidden
-      -#          After submit add new row at the bottom of entries, may take a while to retrieve all data to populate the information
 
       %div
         %label.toolbar-section-label Reputation
@@ -181,8 +180,13 @@
                   %td
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                   %td.dual-edit-field{'data-id': entry.id, 'data-field': 'host'}
-                    %span.entry-data.entry-data-content
-                      = entry.hostlookup
+                    - if entry[:is_important]
+                      %span.entry-data.entry-data-content.entry-important-flag
+                        = entry.hostlookup
+                    - else
+                      %span.entry-data.entry-data-content
+                        = entry.hostlookup
+
                     %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
                   %td
                     %label Category

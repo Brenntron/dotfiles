@@ -111,3 +111,28 @@ $ ->
     options: AC.WebCat.createSelectOptions()
 
   }
+
+  $('#general_search').on 'keyup', (e) ->
+    if event.keyCode == 13
+      # do the ajax call
+      filter = this.value
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax(
+        url: '/api/v1/escalations/webcat/complaint_entries?search='+filter
+        method: 'GET'
+        headers: headers
+        success: (response) ->
+
+          json = $.parseJSON(response)
+          if json.error
+            notice_html = "<p>Something went wrong: #{json.error}</p>"
+            alert(json.error)
+          else
+            datatable = $('#complaints-index').DataTable()
+            datatable.clear();
+            datatable.rows.add(json.data);
+            datatable.draw();
+
+        error: (response) ->
+          std_api_error(response, "There was an error loading search results.", reload: false)
+      , this)

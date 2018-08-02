@@ -3,14 +3,17 @@
 
   .row
     .col-xs-1.col-with-divider
-      %span.bug-state-info.bug-priority{class: "p-#{@dispute.priority}"}
-      %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
-    .col-xs-1.col-with-divider
-      %label.content-label-sm
-        Case ID
-      .bug-top-id
-        %a.case-id-tag= @dispute.case_id_str
+      .nested-col-sections
+        %span.bug-state-info.bug-priority{class: "p-#{@dispute.priority}"}
+        %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
+      .nested-col-sections
+        %label.content-label-sm
+          Case ID
+        .bug-top-id
+          %a.case-id-tag#dispute_id= @dispute.id
     .col-xs-1.bug-state-col
+      %label.content-label-sm
+        Status
       #bugzilla_popover_state.bug-state-info.bug-state
         %select#status.inpage-select{name: 'status'}
           %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
@@ -22,12 +25,40 @@
           -#%option{value: 'Resolved'} Resolved
           -#%option{value: 'Reopened'} Reopened
 
-    .col-xs-1.col-with-divider
-      %label.content-label-sm
-        Owner
-      %div
-        %span= @dispute.assignee || "None"
-        %span.take-button
+    .col-xs-2.col-with-divider
+      .nested-col-sections
+        %label.content-label-sm
+          Owner
+        %div
+          - if @dispute.assignee == 'Unassigned'
+            %span.missing-data#dispute-assignee= @dispute.assignee || "None"
+          - else
+            %span= @dispute.assignee || "None"
+          .dispute-owner-buttons-wrapper
+            - if @dispute.assignee == current_user.email
+              %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
+            - else
+              %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
+
+            - if current_user.has_role?('manager')
+              %span.dropdown
+                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                  .change-assignee-dropdown-wrapper
+                    %h3 Change Assignee
+                    .inline-tool-content-wrapper
+                      .toolbar
+                        %div
+                          %label.toolbar-section-label Assignee
+                          %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                            - User.all.order('cvs_username ASC').each do |u|
+                              %option{id: u.id, value: u.id, label: u.cvs_username}
+                        %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                          Assign
+                        %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                          Unassign
+
+
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Suggested Disposition
