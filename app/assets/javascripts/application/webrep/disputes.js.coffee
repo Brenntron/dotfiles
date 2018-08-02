@@ -724,7 +724,6 @@ $ ->
 
 $ ->
   $('#edit-dispute-button').click ->
-    debugger
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
     $('.dispute-edit-field').hide()

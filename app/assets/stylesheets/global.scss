@@ -4507,13 +4507,16 @@ input.table-entry-input:focus {
 #top_bar_extended_info h3 {
   color: $content-bg-color;
   font-weight: 600;
-  margin-top: 50px;
-  margin-bottom: 12px;
+  padding-top: 20px;
+  margin-top: 30px;
+  margin-bottom: 10px;
   font-size: 12pt;
+  border-top: 1px solid #ffffff26;
 }
 
 #top_bar_extended_info h3:first-of-type {
-  margin-top: 30px;
+  margin-top: 8px;
+  border-top: none;
 }
 
 
@@ -5410,6 +5413,22 @@ td.ticket-total::before {
 }
 
 .block {display:block;}
+
+#related-dispute-button {
+  position: absolute;
+  margin-top: -28px;
+  margin-left: 122px;
+  background-repeat: no-repeat;
+  background-position: 4px center;
+  border: none;
+  border-radius: 2px;
+  color: $content-bg-color;
+  font-size: 9pt;
+  padding: 5px 8px 5px 30px;
+  background-color: $content-label-color;
+  background-image: url(image_path('icon_related_white.svg'))
+}
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 

@@ -93,7 +93,6 @@
         %button.edit-button.dispute-top-buttons#edit-dispute-button
         %button.save-button.dispute-top-buttons#save-dispute-button.hidden
         %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden
-        %button.related-button.dispute-top-buttons#related-dispute-button.hidden
 
 
   .row#top_bar_extended_info
@@ -158,6 +157,8 @@
             Last Updated By
           %p= @dispute.last_updated_by_username
       %h3 Related Cases
+      %button#related-dispute-button
+        Add Related Case
       .row
         .col-xs-2.col-with-divider
           %label.content-label-sm
