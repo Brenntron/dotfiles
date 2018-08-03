@@ -432,10 +432,14 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+selected_rows.data()[i].ip_address)
     i++
 
-window.select_all_pages = () ->
-  $('#complaints-index').DataTable().rows().select()
-window.unselect_all_pages = () ->
-  $('#complaints-index').DataTable().rows().deselect()
+$ ->
+  $('#complaints_check_box').click ->
+    if $('#complaints_check_box').prop('checked')
+      $('#complaints-index').DataTable().rows().select()
+    else
+      $('#complaints-index').DataTable().rows().deselect()
+  return
+
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)

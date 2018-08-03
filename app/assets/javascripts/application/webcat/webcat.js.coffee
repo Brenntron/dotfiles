@@ -51,7 +51,10 @@ $ ->
 
       }
       { data: 'entry_id' }
-      { data: 'age' }
+      {
+        data: 'age'
+        width: '40px'
+      }
       {
         data: 'status'
         className: 'state-col'
