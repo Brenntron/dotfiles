@@ -5,17 +5,7 @@
     .col-xs-4.col-with-divider
       .priority-col-wrapper
         %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
-
         =select_tag(:'dispute-priority-select', options_for_select([["#{Dispute::PRIORITY_1}"], ["#{Dispute::PRIORITY_2}"], ["#{Dispute::PRIORITY_3}"], ["#{Dispute::PRIORITY_4}"], ["#{Dispute::PRIORITY_5}"]], @dispute.priority))
-
-        -#%select.inpage-select#dispute-priority-select{name: 'dispute-priority'}
-        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
-        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
-        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
-        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
-        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
-          -# Add all priority options to dropdown
-
         %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
       .case-id-wrapper
         %label.content-label-sm
@@ -62,15 +52,8 @@
         %label.content-label-sm
           Status
         #bugzilla_popover_state
-          %select#status.inpage-select{name: 'dispute-status'}
-            %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
-            -#%option{value: 'New', selected: 'selected'} New
-            -#%option{value: 'Assigned'} Assigned
-            -#%option{value: 'Researching'} Researching
-            -#%option{value: 'On Hold'} On Hold
-            -#%option{value: 'Customer Pending'} Customer Pending
-            -#%option{value: 'Resolved'} Resolved
-            -#%option{value: 'Reopened'} Reopened
+          =select_tag(:status, options_for_select([["#{Dispute::NEW}"], ["#{Dispute::RESOLVED}"], ["#{Dispute::ASSIGNED}"], ["#{Dispute::DUPLICATE}"]], @dispute.status), class: 'inpage-select')
+
       .disposition-wrapper
         %label.content-label-sm
           Suggested Disposition
