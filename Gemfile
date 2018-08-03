@@ -98,6 +98,21 @@ group :test do
   gem 'cucumber-api-steps', '~>0.14', require: false
 end
 
+group :development, :profile do
+  # gem 'rack-mini-profiler'
+  # gem 'memory_profiler'                 # ?pp=profile-memory
+  # gem 'flamegraph'                      # ?pp=flamegraph
+  # gem 'stackprof'
+
+  # https://scoutapp.com/devtrace
+  # SCOUT_DEV_TRACE=true bundle exec rails server
+  gem 'scout_apm'
+end
+
+group :profile do
+  # gem 'ruby-prof'
+end
+
 gem 'httparty', '~> 0.15.3'
 gem 'uglifier', '~> 3.2.0'
 gem 'jquery-rails', '~> 4.3.1'
