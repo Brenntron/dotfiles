@@ -65,6 +65,10 @@ class ComplaintEntry < ApplicationRecord
     "PENDING" == status
   end
 
+  def uri_or_ip
+    uri.present? ? uri : ip_address
+  end
+
   def change_category(prefix, categories_string, entry_status, comment,current_user, commit_pending)
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
@@ -76,6 +80,7 @@ class ComplaintEntry < ApplicationRecord
             update(status:current_status,resolution_comment: comment,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
+            commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
           else
             current_status = "ASSIGNED"
             update(status:current_status, resolution_comment: comment)
@@ -89,7 +94,21 @@ class ComplaintEntry < ApplicationRecord
         update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
+        commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
       end
+    end
+  end
+
+  def commit_category(ip_or_uri:, categories_string:, description:, user:)
+    # Look for existing prefix
+    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+    if existing_prefix.present?
+      prefix_object = Wbrs::Prefix.new
+      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+    else
+      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
     end
   end
 

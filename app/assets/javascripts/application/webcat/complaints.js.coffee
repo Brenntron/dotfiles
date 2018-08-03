@@ -63,8 +63,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+        std_msg_error(response,"", reload: false)
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
@@ -86,7 +85,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
           items: selected_options(temp_row.data().category)
         }
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      std_msg_error(response,"", reload: false)
   , this)
 
 

@@ -74,7 +74,7 @@ module API
                                          permitted_params['comment'],
                                          current_user, "")
               rescue Exception => e
-                  return e.message
+                  return {error:e.message}.to_json
               end
               {status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
