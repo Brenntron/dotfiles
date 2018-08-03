@@ -23,16 +23,10 @@ $ ->
       return
     columnDefs: [
       {
-        targets: [
-          0
-          1
-        ]
-        orderable: false
-        searchable: false
-      }
-      {
         targets: [ 0 ]
         className: 'expandable-row-column'
+        orderable: false
+        searchable: false
       }
       {
         targets: [ 2 ]
@@ -51,11 +45,6 @@ $ ->
         defaultContent: '<button class="expand-row-button-inline"></button>'
       }
       {
-        data: null
-        defaultContent: '<p class="">icons</p>'
-      }
-      {
-        sortable: false
         'render': (data, type, full, meta) ->
           complaintID = full.complaint_id.toString()
           '<a href="complaints/' + complaintID + '">' + complaintID + '</a>'
@@ -63,9 +52,11 @@ $ ->
       }
       { data: 'entry_id' }
       { data: 'age' }
-      { data: 'status' }
-      { data: 'subdomain'
+      {
+        data: 'status'
+        className: 'state-col'
       }
+      { data: 'subdomain'}
       {
         'render':(data,type,full,meta)->
           domain = full.domain
@@ -94,7 +85,11 @@ $ ->
             plus = '+'
           '<p id="cat_tooltip_' + full.entry_id + '" data-toggle="tooltip" title="' + full.category + '" onmouseover=display_tooltip(' + full.entry_id + ')>' + category + plus + '</p>'
       }
-      {data: 'assigned_to'}
+
+      {
+        data: 'assigned_to'
+        className: 'alt-col'
+      }
     ]
     select: 'style': 'os'
     responsive: true)
@@ -113,6 +108,7 @@ $ ->
     options: AC.WebCat.createSelectOptions()
 
   }
+
 
   $('#general_search').on 'keyup', (e) ->
     if event.keyCode == 13

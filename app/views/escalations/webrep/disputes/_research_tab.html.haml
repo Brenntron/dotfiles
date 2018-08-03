@@ -216,19 +216,19 @@
                         %ul
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RESEARCHING'}
-                            %label.radio-label{for: 'RESEARCHING'} Researching
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ESCALATED'}
-                            %label.radio-label{for: 'ESCALATED'} Escalated
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} Escalated
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'CUSTOMER_PENDING'}
-                            %label.radio-label{for: 'CUSTOMER_PENDING'} Customer Pending
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}"} Customer Pending
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ON_HOLD'}
-                            %label.radio-label{for: 'ON_HOLD'} On Hold
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} On Hold
                           %li.status-radio-wrapper
                             %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'RESOLVED_CLOSED'}
-                            %label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}"} Resolved / Closed
                             .dropdown-menu.ticket-resolution-submenu
                               .col-xs-6.submenu-left-wrapper
                                 .submenu-header
@@ -236,22 +236,22 @@
                                 %ul
                                   %li
                                     %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FP'}
-                                    %label.radio-label{for: 'FIXED_FP'} Fixed - FP
+                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
                                   %li
                                     %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FN'}
-                                    %label.radio-label{for: 'FIXED_FN'} Fixed - FN
+                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
                                   %li
                                     %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'UNCHANGED'}
-                                    %label.radio-label{for: 'UNCHANGED'} Unchanged
+                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"} Unchanged
                                   %li
                                     %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'INVALID'}
-                                    %label.radio-label{for: 'INVALID'} Invalid / Junk Mail
+                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
                                   %li
                                     %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'TEST_TRAINING'}
-                                    %label.radio-label{for: 'TEST_TRAINING'} Test / Training
+                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_TEST}"} Test / Training
                                   %li
                                     %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'OTHER'}
-                                    %label.radio-label{for: 'OTHER'} Other
+                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
                               .col-xs-6.submenu-right-wrapper
                                 .resolution-comment-wrapper
                                   %label.content-label-sm
@@ -262,7 +262,7 @@
 
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RE-OPENED'}
-                            %label.radio-label{for: 'RE-OPENED'} Re-Opened
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_REOPENED}"} Re-Opened
                   %td
                     %label As of
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
@@ -515,9 +515,23 @@
 
                         %td.left-bordered
                           %label Referenced on
-                        %td
-                          -#Add dropdown with links to all cases / tickets with this entry on them
-                          = "#{entry.referenced_tickets.count} ticket(s)"
+                        %td.referenced-tickets-col
+                          - if entry.referenced_tickets.count < 1 
+                            %span.missing-data
+                              Not on any other tickets
+                          - else
+                            %span.dropdown
+                              %button#show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced n', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                                = "#{entry.referenced_tickets.count} ticket(s)"
+                              .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
+                                %table
+                                  - entry.referenced_tickets.each do |reference|
+                                    %tr
+                                      %td
+                                        %a{href: "/escalations/webrep/disputes/#{reference.id}"}
+                                          = reference.id
+                                      %td
+                                        = reference.case_opened_at
                       %tr
                         %td.input-col
                           %span.research-table-input-wrapper.sbrs-input-wrapper
