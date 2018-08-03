@@ -63,10 +63,22 @@ module API
 
             desc 'update a dispute'
             params do
+              # TODO: Find out what the options for this should be and put them in here.
+              # Currently, we're only doing Priority, Contact Name, Contact Email, and Status,
+              # all of which are optional
             end
-
             put ":id" do
-              # TODO access control when this is implmented
+              dispute = Dispute.find(params[:id])
+
+              dispute.priority = params[:priority]
+              dispute.customer.name = params[:customer_name]
+              dispute.customer.email = params[:customer_email]
+              dispute.status = params[:status]
+
+              dispute.save
+              dispute.customer.save
+
+              dispute.to_json
             end
 
             desc 'delete a dispute'
