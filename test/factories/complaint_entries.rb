@@ -20,6 +20,7 @@ FactoryBot.define do
     trait :new_entry do
       status 'NEW'
       resolution ''
+      user {FactoryBot.create(:user,:vrt_incoming_user)}
     end
     trait :pending_entry do
       status 'PENDING'
@@ -29,7 +30,7 @@ FactoryBot.define do
     trait :assigned_entry do
       status 'ASSIGNED'
       resolution ''
-      user {FactoryBot.create(:user)}
+      user {User.first}
     end
     trait :completed_entry do
       status 'COMPLETED'

@@ -69,6 +69,12 @@ window.updateEntryColumns = (entry_id,row_id) ->
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
         temp_row.data().status = json.status
+        temp_row.data().resolution = status
+        temp_row.data().resolution_comment = comment
+        temp_row.data().category = categories
+        temp_row.invalidate().draw()
+        temp_row.child().remove()
+        temp_row.child(format(temp_row)).show()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
@@ -79,11 +85,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
           options: AC.WebCat.createSelectOptions()
           items: selected_options(temp_row.data().category)
         }
-        temp_row.data().resolution = status
-        temp_row.data().resolution_comment = comment
-        temp_row.invalidate().draw()
-        temp_row.child().remove()
-        temp_row.child(format(temp_row)).show()
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -143,7 +144,7 @@ window.return_selected = ()->
         else
           i = 0
           while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],12).data("").draw()
+            selected_rows.data().cell(selected_rows[0][i],12).data("Vrt Incoming").draw()
             selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
             i++
 
