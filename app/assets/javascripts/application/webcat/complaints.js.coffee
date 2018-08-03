@@ -281,33 +281,32 @@ format = (complaint_entry_row) ->
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<table><tr>' +
-      '<td>' + uri + '</td>' +
-      '<td>Status</td><td>Confidence</td><td>Suggested Disposition</td><td></td></tr>' +
-      '<tr><td>' +
+      '<td>' + uri + '<br/>' +
       'Prefix <input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
       '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button>' +
-      '</td><td>' +
-      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> unchanged |  ' +
-      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> fixed | ' +
-      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> invalid' +
-      '</td><td>' + confidence + '</td><td>' + disposition +
-      '</td><td>' +
+      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button></td>' +
+      '<td>Status<br/>' +
+      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
+      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
+      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> Invalid' +
+      '</td>' +
+      '<td>Confidence<br/>' + confidence + '</td>' +
+      '<td>Suggested Disposition<br/>' + disposition + '</td>' +
+      '<td>' +
       '<button>info</button>' +
       '<button>lookup</button>' +
       '<button>history</button>' +
       '<button>domain</button>' +
       '</td></tr>' +
       '<tr>' +
-      '<td>' +
-      'Category: <select id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
-      '</td><td>' +
+      '<td>Category: <select id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
+      '<td colspan="3">' +
       'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>'  +
-      '</td><td>' +
-      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
-      '</td></tr></tbody></table>'
+      '</td>' +
+      '<td><button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
+      '</td></tr></table>'
   complaint_entry_html
 
 
