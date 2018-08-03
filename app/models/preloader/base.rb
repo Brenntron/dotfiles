@@ -30,7 +30,7 @@ class Preloader::Base
 
     while counter < TRIES
       begin
-        crosslisted_urls ||= Wbrs::ManualWlbl.where({url: host}, true)
+        crosslisted_urls ||= Wbrs::ManualWlbl.where({:url => host}, true)
         break
       rescue
         counter = counter + 1
@@ -40,7 +40,7 @@ class Preloader::Base
 
     while counter < TRIES
       begin
-        wbrs_list_type ||= Wbrs::ManualWlbl.where(url: host).map{ |wlbl| wlbl.list_type }.join(',')
+        wbrs_list_type ||= Wbrs::ManualWlbl.where({:url => host}).map{ |wlbl| wlbl.list_type }.join(',')
         break
       rescue
         counter = counter + 1

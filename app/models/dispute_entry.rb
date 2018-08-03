@@ -127,7 +127,7 @@ class DisputeEntry < ApplicationRecord
       @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
       return @wbrs_xlist
     end
-    @wbrs_xlist ||= Wbrs::ManualWlbl.where(url: hostlookup)
+    @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
   end
 
   def virustotals
@@ -302,7 +302,7 @@ class DisputeEntry < ApplicationRecord
     if research_params.present?
       url = research_params['uri']
       # [ DisputeEntry.new(uri: research_params['url']) ]
-      entries = Wbrs::ManualWlbl.where(url: url).map do |wlbl|
+      entries = Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
         DisputeEntry.new_from_wlbl(wlbl)
       end
       unless entries.find{|entry| url == entry.uri}
