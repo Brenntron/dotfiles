@@ -2002,8 +2002,7 @@ a.static-nav-item {
   background-repeat: no-repeat;
   background-position: center center;
   margin-right: 5px;
-  float: left;
-  margin-top: 6px;
+  margin-top: -2px;
 }
 
 table .bug-priority {
@@ -4215,7 +4214,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px 2px 0 0 ;
 }
 
-.dispute_rep_tools .dropdown-menu h3 {
+.dispute_rep_tools .dropdown-menu h3, .dispute-owner-buttons-wrapper .dropdown-menu h3 {
   color: $content-bg-color;
   padding: 0 10px;
   font-weight: 400;
@@ -4346,6 +4345,17 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
+.return-ticket-button {
+  background-image: url(image_path('icon_return_light2.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  float: right;
+  border: none;
+  background-color: transparent;
+}
+
 .dropdown-menu-content-block {
   display: inline-block;
   width: 50%;
@@ -4438,12 +4448,12 @@ table > tbody > tr > td.dispute_rep_tools {
   font-weight: 600 !important;
 }
 
-.dispute-entry-table-wrapper {
+.dispute-entry-table-wrapper, .nested-complaint-data-wrapper {
   padding: 0 0 0 20px !important;
   background-color: $bug-section-color;
 }
 
-.dispute-entry-table-wrapper::before {
+.dispute-entry-table-wrapper::before, .nested-complaint-data-wrapper::before {
   content: '';
   position: absolute;
   left: 4px;
@@ -4451,6 +4461,23 @@ table > tbody > tr > td.dispute_rep_tools {
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   border-top: 10px solid $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table {
+  background-color: $table-dark-body;
+  color: $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table a {
+  color: $content-bg-color;
+}
+
+.nested-complaint-data-wrapper table td {
+  border-bottom: none;
+}
+
+.nested-table-input {
+  color: $type-base-color;
 }
 
 .table-entry-input {
@@ -4497,13 +4524,16 @@ input.table-entry-input:focus {
 #top_bar_extended_info h3 {
   color: $content-bg-color;
   font-weight: 600;
-  margin-top: 50px;
-  margin-bottom: 12px;
+  padding-top: 20px;
+  margin-top: 30px;
+  margin-bottom: 10px;
   font-size: 12pt;
+  border-top: 1px solid #ffffff26;
 }
 
 #top_bar_extended_info h3:first-of-type {
-  margin-top: 30px;
+  margin-top: 8px;
+  border-top: none;
 }
 
 
@@ -4516,7 +4546,7 @@ input.table-entry-input:focus {
 }
 
 #top_bar_extended_info .col-with-divider {
-  border-right-color: #f2f2f230 ;
+  border-right-color: #f2f2f2;
 }
 
 #top_bar_toggle {
@@ -5095,8 +5125,8 @@ table.dispute_tool_current tr:last-of-type td {
 
 .top-case-info .dispute-submission-type {
   display: block;
-  float: right;
-  margin-top: 10px;
+  margin-top: 2px;
+  margin-left: 3px;
 }
 
 #disputes-index .dispute-submission-type {
@@ -5109,7 +5139,7 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-E {background-image: url(image_path('icon_type_email.svg'));}
 .dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
 
-.my-dashboard-header-area {
+.my-dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $bug-section-color;
   margin-top: -15px;
   border-radius: 4px 4px 0 0 ;
@@ -5119,20 +5149,20 @@ table.dispute_tool_current tr:last-of-type td {
   background-color: $content-tab-color;
 }
 
-.dashboard-header-area {
+.dashboard-header-area, .complaint-mgt-top-area {
   margin-right: -15px;
   margin-left: -15px;
   color: $content-bg-color;
   padding: 15px;
 }
 
-.dashboard-header-area h1 {
+.dashboard-header-area h1, .complaint-mgt-top-area h1 {
   color: $content-bg-color;
   margin-bottom: 24px;
   display: inline-block;
 }
 
-.dashboard-header-area h5 {
+.dashboard-header-area h5, .complaint-mgt-top-area h5 {
   color: $content-bg-color;
   font-size: 9pt;
   font-weight: 600;
@@ -5144,7 +5174,11 @@ table.dispute_tool_current tr:last-of-type td {
   font-weight: 300;
 }
 
-.my-dashboard-icon, .team-icon {
+.dashboard-details a {
+  color: $content-bg-color;
+}
+
+.my-dashboard-icon, .team-icon, .top-info-icon {
   background-repeat: no-repeat;
   width: 30px;
   height: 30px;
@@ -5254,11 +5288,219 @@ td.ticket-total::before {
   padding: 0 !important;
 }
 
+.references-dropdown-button {
+  border: none;
+  background-color: transparent;
+  background-image: url(image_path('icon_down_arrow_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  padding-right: 20px;
+  background-size: 15px;
+}
+
+.references-dropdown {
+  right: 0;
+  left: auto;
+  border: none;
+  border-radius: 2px 0 2px 2px;
+  width: 250px;
+  background-color: $bug-section-color;
+  padding: 3px 6px;
+}
+
+.references-dropdown table td {
+  background-color: $bug-section-color;
+  color: $content-bg-color;
+  border-bottom-color: $faint-accent-color;
+}
+
+.references-dropdown table tr:last-of-type td {
+  border-bottom: none;
+}
+
+.references-dropdown table td a {
+  color: $content-bg-color;
+  text-decoration: underline;
+}
+
+.referenced-tickets-col .dropdown.open {
+  background-color: transparent;
+}
+
+.referenced-tickets-col .dropdown.open .references-dropdown-button {
+  color: $bug-section-color;
+}
+
+.table-condensed > tbody > tr > td {
+  padding: 3px 4px !important;
+}
+
+.entry-important-flag::before {
+  display: inline-block;
+  content: '';
+  background-image: url(image_path('icon_important.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  margin-bottom: -6px;
+  margin-right: 4px;
+}
+
 .loader-gears {
   width: 80px;
   height: 80px;
   margin: auto;
 }
+
+table.dataTable tbody tr.selected {
+  background-color: $faint-accent-color;
+}
+
+.nested-col-sections {
+  display: inline-block;
+  float: left;
+}
+
+.nested-col-sections:first-of-type {
+  margin-right: 10px;
+}
+
+#status.inpage-select {
+  min-width: 80px;
+}
+
+.top-case-info .bug-state {
+  margin-top: -3px;
+}
+
+.top-case-info .take-ticket-button, .top-case-info .return-ticket-button {
+  display: inline-block;
+  float: left;
+}
+
+.dispute-owner-buttons-wrapper {
+  display: inline-block;
+  margin-top: -4px;
+  margin-left: 10px;
+  width: 50px;
+  float: right;
+}
+
+.dispute-owner-buttons-wrapper .dropdown {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.dispute-owner-buttons-wrapper .dropdown.open {
+  background-color: transparent !important;
+}
+
+.dispute-owner-buttons-wrapper .ticket-owner-button {
+  background-image: url(image_path('icon_user_white.svg'));
+}
+
+.dispute-owner-buttons-wrapper .dropdown-menu {
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: #6dbcdb;
+  min-width: 200px;
+  top: 16px;
+  left: 1px;
+}
+
+.dispute-owner-buttons-wrapper h3 {
+  padding: 2px 10px !important;
+}
+
+#button_reassign, #unassign-dispute-button {
+  text-transform: none;
+  display: inline-block;
+  padding: 8px 20px;
+  font-weight: 400;
+  margin: 0 6px 0 6px;
+}
+
+.dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
+  padding-bottom: 20px;
+}
+
+.priority-col-wrapper, .case-id-wrapper, .dispute-owner-wrapper, .dispute-time-wrapper, .top-info-buttons-wrapper {
+  display: inline-block;
+}
+
+.priority-col-wrapper, .case-id-wrapper {
+  float: left;
+  border-right: solid 1px $faint-neutral-color;
+  margin-right: 12px;
+}
+
+.priority-col-wrapper {
+  padding-right: 6px;
+}
+
+.case-id-wrapper {
+  padding-right: 12px;
+}
+
+.dispute-top-buttons {
+  width: 24px;
+  height: 24px;
+  background-size: 22px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 2px;
+  display: block;
+  margin: 0 auto 8px auto;
+}
+
+.top-info-buttons-wrapper {
+  float: right;
+  background-color: $type-lighter-color;
+  width: 45px;
+  text-align: center;
+  margin-top: -15px;
+  margin-right: -16px;
+  margin-bottom: -21px;
+  min-height: 127px;
+  padding: 20px 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.disposition-wrapper {
+  margin-top: 12px;
+}
+
+#dispute-priority-select {
+  display: none;
+  width: 45px;
+  margin-bottom: 4px;
+}
+
+.dispute-edit-input {
+  display: none;
+  color: $type-base-color;
+  border: none;
+  padding: 4px 6px;
+}
+
+.block {display:block;}
+
+#related-dispute-button {
+  position: absolute;
+  margin-top: -28px;
+  margin-left: 122px;
+  background-repeat: no-repeat;
+  background-position: 4px center;
+  border: none;
+  border-radius: 2px;
+  color: $content-bg-color;
+  font-size: 9pt;
+  padding: 5px 8px 5px 30px;
+  background-color: $content-label-color;
+  background-image: url(image_path('icon_related_white.svg'))
+}
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 

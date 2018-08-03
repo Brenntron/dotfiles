@@ -167,7 +167,6 @@ class Complaint < ApplicationRecord
         new_complaint.submission_type = message_payload["payload"]["submission_type"]
         new_complaint.id = bug_stub_hash["id"]
         new_complaint.description = message_payload["payload"]["problem"]
-        new_complaint.user_id = user.id
         new_complaint.ticket_source_key = message_payload["source_key"]
         new_complaint.ticket_source = "talos-intelligence"
         new_complaint.ticket_source_type = message_payload["source_type"]
@@ -185,7 +184,7 @@ class Complaint < ApplicationRecord
         new_entries_ips.each do |key, entry|
 
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["cat_sugg"]
+          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
@@ -194,11 +193,12 @@ class Complaint < ApplicationRecord
 
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
+          new_complaint_entry.user_id = user.id
           new_complaint_entry.ip_address = key
-          new_complaint_entry.wbrs_score = entry["wbrs_score"]
+          new_complaint_entry.wbrs_score = entry['wbrs']["wbrs_score"]
           new_complaint_entry.entry_type = "IP"
-          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
-          new_complaint_entry.url_primary_category = entry["current_cat"]
+          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
+          new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
           new_complaint_entry.status = ComplaintEntry::NEW
           new_complaint_entry.save
 
@@ -209,11 +209,12 @@ class Complaint < ApplicationRecord
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
+          new_complaint_entry.user_id = user.id
           new_complaint_entry.uri = key
           new_complaint_entry.entry_type = "URI/DOMAIN"
 
-          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
-          new_complaint_entry.url_primary_category = entry["current_cat"]
+          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
+          new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
           new_complaint_entry.subdomain = url_parts[:subdomain]
           new_complaint_entry.domain = url_parts[:domain]
           new_complaint_entry.path = url_parts[:path]
@@ -221,7 +222,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.save
 
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["cat_sugg"]
+          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""

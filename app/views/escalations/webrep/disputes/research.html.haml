@@ -1,14 +1,14 @@
 .content-wrapper
   .reputation-research-search-wrapper
     %h1 Reputation Research
-    = form_tag('/tickets', method: :get) do
-      = text_field_tag 'result[id]', "#{}", class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true'
+    = form_for(:search) do |search_form|
+      = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
       .row.search-options-row
         .col-xs-6
-          %input{type: 'radio', name: 'search-type', id: 'research-search-strict'}
+          = search_form.radio_button(:scope, 'strict', id: 'research-search-strict')
           %label{for: 'research-search-strict'} Strict Search
         .col-xs-6
-          %input{type: 'radio', name: 'search-type', id: 'research-search-broad', checked: true}
+          = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: true)
           %label{for: 'research-search-broad'} Broad Search
 
   .row
@@ -119,12 +119,12 @@
                     %td
                       %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
                     %td
-                      %span.entry-data.entry-data-content
-                        - unless entry[:ip_address].nil?
-                          - entry_content = entry[:ip_address]
-                        - unless entry[:uri].nil?
-                          - entry_content = entry[:uri]
-                        = entry_content
+                      - if entry[:is_important]
+                        %span.entry-data.entry-data-content.entry-important-flag
+                          = entry.hostlookup
+                      - else
+                        %span.entry-data.entry-data-content
+                          = entry.hostlookup
                     %td
                       %label Category
                       - unless entry[:primary_category].nil?

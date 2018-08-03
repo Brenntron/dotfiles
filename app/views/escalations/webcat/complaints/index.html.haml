@@ -1,27 +1,29 @@
 .content-wrapper
   - content_for(:webcat_page) do
-    Complaints management
-
-  = render "escalations/webcat/shared/telemetry"
-
-.content-wrapper
-  .tool-bar
-    = render "toolbar"
-
-  %div{:style => "position:relative"}
-    %div{:style => "width:600px;"}
-      .grid-header{:style => "width:100%"}
-  %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
+    Complaints Management
+  - content_for(:webcat_icon) do
+    icon-queue
+  .complaint-mgt-top-area
+    = render "escalations/webcat/shared/telemetry"
 
   .row
-    .col-xs-12
+    .col-xs-12.temp-spacer
+      = render "toolbar"
+
+      %div{:style => "position:relative"}
+        %div{:style => "width:600px;"}
+          .grid-header{:style => "width:100%"}
+      %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
+
+
       %table.table.responsive#complaints-index
         %thead
           %tr
-            %th
-            %th
-            %th Complaint id
-            %th Entry id
+            %th.sorting_disabled
+            -#  Expandable button area
+            %th Case ID
+            -# Changed Complaint ID to Case ID for space saving
+            %th Entry ID
             %th Age
             %th Status
             %th Subdomain
@@ -31,8 +33,6 @@
             %th WBRS
             %th Category
             %th Assigned To
-            %th
-
 
 
 / Modal

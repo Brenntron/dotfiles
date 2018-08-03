@@ -39,6 +39,7 @@ module API
 
             get "" do
               json_packet = []
+
               search_type = ComplaintEntry.get_search_type(permitted_params)
               search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
 
@@ -54,7 +55,7 @@ module API
                   complaint_entry_packet = {}
                   complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
-                  complaint_entry_packet[:complaint_id] = complaint_entry.complaint.id
+                  complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
                   complaint_entry_packet[:entry_id] = complaint_entry.id
 
                   complaint_entry_packet[:assigned_to] = complaint_entry.user&.display_name

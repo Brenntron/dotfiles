@@ -48,7 +48,16 @@ module API
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
               json_packet = Dispute.to_data_packet(disputes)
 
-              {status: "success", title: title, data: json_packet}.to_json
+              response_data = {status: "success", title: title, data: json_packet}
+              if 'advanced' == permitted_params['search_type']
+                if permitted_params['search_name'].present?
+                  search_name = permitted_params['search_name']
+                  response_data['search_name'] = search_name
+                  named_search = NamedSearch.where(user: current_user, name: search_name).first
+                  response_data['search_id'] = named_search&.id
+                end
+              end
+              response_data.to_json
 
             end
 
@@ -68,6 +77,32 @@ module API
               # TODO access control when this is implmented
             end
 
+            desc "Add new dispute entry"
+            params do
+              requires :uri, type: String, desc: "IP address or host name to add"
+              requires :dispute_id, type: Integer, desc: "ID of the dispute to add the entry to"
+            end
+            post "new_adhoc_entry" do
+              json_packet = []
+
+              user = Dispute.find(params[:dispute_id]).user_id
+
+              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user)
+
+              is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
+
+              if is_ip_address
+                entry.ip_address = params[:uri]
+              else
+                entry.uri = params[:uri]
+              end
+              entry.save
+
+              json_packet << entry
+
+              {:status => "success", :data => json_packet}.to_json if entry.save
+            end
+
             desc "Change assignee of a group of dispute IDs"
             params do
               requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -80,6 +115,23 @@ module API
                 d = Dispute.find_by(id: dispute)
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
+                json_packet << d
+              end
+              {:status => "success", :data => json_packet}.to_json
+            end
+
+            desc "Remove assignee from a group of dispute IDs (revert to vrtincoming)"
+            params do
+              requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
+            end
+            post "unassign_all" do
+              json_packet = []
+              vrt = User.where(email: 'vrt-incoming@sourcefire.com').first
+              params[:dispute_ids].each do |dispute|
+                Dispute.where(id: dispute).update_all(user_id: vrt.id)
+                d = Dispute.find_by(id: dispute)
+
+                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
                 json_packet << d
               end
               {:status => "success", :data => json_packet}.to_json
@@ -167,7 +219,7 @@ module API
                 dispute_ids = permitted_params['dispute_ids']
                 Dispute.take_tickets(dispute_ids, user: current_user)
 
-                { username: current_user.display_name, dispute_ids: dispute_ids }
+                { username: current_user.email, dispute_ids: dispute_ids }
               end
             end
 
@@ -188,7 +240,6 @@ module API
             end
             patch ':dispute_id/relating_disputes' do
               std_api_v2 do
-                byebug
                 authorize!(:update, Dispute)
                 relating_dispute_ids = permitted_params['relating_dispute_ids']
                 Dispute.where(id: relating_dispute_ids).update_all(related_id: params['dispute_id'],
