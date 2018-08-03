@@ -246,6 +246,15 @@ $ ->
       else
         $(cl_table).hide()
 
+    if $(this).hasClass('reptool-checkbox')
+      rt_table = $(entry_row).find('.reptool-details-table')[0]
+      if $(this).prop('checked')
+        $(rt_table).show()
+      else
+        $(rt_table).hide()
+
+
+
 
 
 # Scrollable tables in the expanded rows
