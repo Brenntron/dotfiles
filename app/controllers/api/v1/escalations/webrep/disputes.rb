@@ -93,10 +93,13 @@ module API
 
               if is_ip_address
                 entry.ip_address = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
               else
                 entry.uri = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
               end
-              entry.save
 
               json_packet << entry
 
