@@ -34,6 +34,12 @@ class Dispute < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
+  PRIORITY_1 = 'P1'
+  PRIORITY_2 = 'P2'
+  PRIORITY_3 = 'P3'
+  PRIORITY_4 = 'P4'
+  PRIORITY_5 = 'P5'
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
   scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
