@@ -173,6 +173,22 @@ window.index_adust_wlbl_button =(button_tag) ->
     error_prefix: 'Error adjusting WL/BL.'
   )
 
+window.save_dispute = () ->
+  data = {
+    'priority': $('#dispute-priority-select').val()
+    'customer_name': $('#dispute-customer-name-input').val()
+    'customer_email': $('#dispute-customer-email-input').val()
+    'status': $('#status').val()
+  }
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/' + $('#dispute_id').text()
+    method: 'PUT'
+    data: data
+    error_prefix: 'Unable to update dispute.'
+    success_reload: true
+  )
+
 window.row_adust_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
