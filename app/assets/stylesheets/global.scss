@@ -5292,6 +5292,9 @@ td.ticket-total::before {
 .entry-important-flag::before {
   display: inline-block;
   content: '';
+}
+
+.entry-important-flag::before, .highlight-second-review .important-flag-col span {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
   width: 20px;
@@ -5299,6 +5302,11 @@ td.ticket-total::before {
   margin-bottom: -6px;
   margin-right: 4px;
 }
+
+.highlight-second-review .important-flag-col span {
+  display: block;
+}
+
 
 .loader-gears {
   width: 80px;
