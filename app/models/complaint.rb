@@ -212,9 +212,8 @@ class Complaint < ApplicationRecord
           new_complaint_entry.user_id = user.id
           new_complaint_entry.uri = key
           new_complaint_entry.entry_type = "URI/DOMAIN"
-
-          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
-          new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
+          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
+          new_complaint_entry.url_primary_category = entry["current_cat"]
           new_complaint_entry.subdomain = url_parts[:subdomain]
           new_complaint_entry.domain = url_parts[:domain]
           new_complaint_entry.path = url_parts[:path]
