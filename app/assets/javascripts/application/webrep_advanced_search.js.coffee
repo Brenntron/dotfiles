@@ -17,7 +17,8 @@ $(document).ready ->
 
       $(search_criteria_group).each ->
         input = $(this).find('input')
-        if $(input).attr('id') == cb_for
+        select = $(this).find('select')
+        if $(input).attr('id') == cb_for || $(select).attr('id')
           $(this).removeClass('hidden')
 
       $($(this).parent()).parent().addClass('hidden')
@@ -28,7 +29,7 @@ $(document).ready ->
     false
 
   $('.remove-input').click ->
-    field_name = $(this).parent().find('input').attr('id')
+    field_name = $(this).parent().find('input').attr('id') || $(this).parent().find('select').attr('id')
     $('.search-checkbox').each ->
       if $(this).attr('for') == field_name
         $($(this).parent()).parent().removeClass('hidden')
@@ -36,7 +37,7 @@ $(document).ready ->
     false
 
   $('#search-webrep-cases-form').on 'click', '.remove-input', ->
-    field_name = $(this).parent().find('input').attr('id')
+    field_name = $(this).parent().find('input').attr('id') || $(this).parent().find('select').attr('id')
     $('.search-checkbox').each ->
       if $(this).attr('for') == field_name
         $($(this).parent()).parent().removeClass('hidden')
