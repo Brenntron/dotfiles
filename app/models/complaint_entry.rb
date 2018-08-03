@@ -191,11 +191,7 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-
-    # complaint_fields = params.to_h.slice(*%w{description})
-    #
-    # complaint_fields = complaint_fields.select{|ignore_key, value| value.present?}
-    # relation = where(complaint_fields)
+    
     relation = where({})
 
     if params['submitted_newer'].present?

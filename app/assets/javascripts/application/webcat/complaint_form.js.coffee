@@ -44,6 +44,7 @@ $ ->
 
 
 
+
   createSelectOptions = ->
     tags = $('#complaint_tag_list')[0]
     if tags
