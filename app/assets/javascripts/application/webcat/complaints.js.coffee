@@ -547,6 +547,7 @@ window.advanced_webcat_index_table = () ->
     search_name: $('#cat_named_search').find('input[name="search_name"]').val()
     description: $('#cat_named_search').find('input[id="desc-input"]').val()
     channel: $('#cat_named_search').find('select[id="channel-input"]').val()
+    tags: $('#cat_named_search').find('select[id="tags-input"]').val() || []
     submitted_older: $('#cat_named_search').find('input[id="submitted-older-input"]').val()
     submitted_newer: $('#cat_named_search').find('input[id="submitted-newer-input"]').val()
     modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()

@@ -11,16 +11,17 @@
     %label.content-label-sm Category
     %input.form-control#category-input{name: 'category'}
     %button.remove-input
-  -#.form-group.search-item
-  -#  %label.content-label-sm URL Regex
-  -#  %input.form-control
-  -#  %button.remove-input
   .form-group.search-item
     %label.content-label-sm Status
     %select.form-control#status-input{name: 'status'}
       =options_for_select(['', Complaint::NEW, Complaint::RESOLVED, Complaint::ASSIGNED, Complaint::ACTIVE, Complaint::COMPLETED, Complaint::PENDING])
     %button.remove-input
   .form-group.search-item
+    %label.content-label-sm Tags
+    %select.form-control.selectized#tags-input{placeholder: "Search tags", multiple: "multiple", tabindex:"-1", name: 'tags'}
+    %input.hidden#search_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(','), name: 'tags'}
+    %button.remove-input
+  .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %select.form-control#resolution-input{name: 'resolution'}
       =options_for_select(['', Complaint::RESOLUTION_FIXED, Complaint::RESOLUTION_INVALID, Complaint::RESOLUTION_UNCHANGED, Complaint::RESOLUTION_DUPLICATE])
@@ -85,6 +86,10 @@
             %input.search-checkbox#status-cb{type: 'checkbox', name: 'search-criteria', value: 'Status', for: 'status-input'}
             Status
         %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#tags-cb{type: 'checkbox', name: 'search-criteria', value: 'Tags', for: 'tags-input-selectized'}
+            Tags
+        %li
           %label.search-criteria-label
             %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input'}
             Resolution

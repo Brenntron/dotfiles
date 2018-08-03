@@ -44,9 +44,9 @@ $ ->
 
 
 
-
+  # advanced search tags
   createSelectOptions = ->
-    tags = $('#complaint_tag_list')[0]
+    tags = $('#search_tag_list')[0]
     if tags
       tag_list = tags.value
       array = tag_list.split(',')
@@ -55,10 +55,9 @@ $ ->
         options.push {name: x}
       return options
 
-  $('#select-to-new').selectize {
-    persist: false,
-    create: (input) ->
-      {name: input}
+  $('#tags-input').selectize {
+    persist: false
+    create: false
     maxItmes: null
     valueField: 'name'
     labelField: 'name'

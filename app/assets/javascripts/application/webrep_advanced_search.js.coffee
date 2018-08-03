@@ -18,7 +18,7 @@ $(document).ready ->
       $(search_criteria_group).each ->
         input = $(this).find('input')
         select = $(this).find('select')
-        if $(input).attr('id') == cb_for || $(select).attr('id')
+        if $(input).attr('id') == cb_for || $(select).attr('id') == cb_for
           $(this).removeClass('hidden')
 
       $($(this).parent()).parent().addClass('hidden')

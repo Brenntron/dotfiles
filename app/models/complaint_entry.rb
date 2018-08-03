@@ -237,6 +237,9 @@ class ComplaintEntry < ApplicationRecord
           relation.joins(:complaint).where('complaints.updated_at < :modified_older', modified_older: params['modified_older']+1)
     end
 
+    if params['tags'].present?
+      relation = relation.joins(complaint: :complaint_tags).where('complaint_tags.name IN (?)', params['tags'])
+    end
 
 
     company_name = nil

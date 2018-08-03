@@ -34,6 +34,7 @@ module API
               optional :modified_older, type: Date
               optional :modified_newer, type: Date
               optional :channel, type: String
+              optional :tags, type: Array
             end
 
             get "" do
