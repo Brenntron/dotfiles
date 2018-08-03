@@ -57,6 +57,8 @@ class Wbrs::Category < Wbrs::Base
               category
           end
         end
+      when NilClass
+        nil
       else #integer
         [ categories_given ]
     end
