@@ -88,11 +88,13 @@ $ ->
           if full.category
             categories = full.category.split(',')
             category = categories[0]
+            if category == "Not in our list"
+              category = ""
           if categories.length > 1
             plus = '+'
           '<p id="cat_tooltip_' + full.entry_id + '" data-toggle="tooltip" title="' + full.category + '" onmouseover=display_tooltip(' + full.entry_id + ')>' + category + plus + '</p>'
       }
-      { data: 'assigned_to' }
+      {data: 'assigned_to'}
     ]
     select: 'style': 'os'
     responsive: true)

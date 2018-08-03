@@ -29,7 +29,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def take_complaint(current_user)
-    if user.nil?
+    if user.nil? ||user.display_name == "Vrt Incoming"
       if status!="COMPLETED"
         self.update(user:current_user, status:"ASSIGNED")
         complaint.set_status("ASSIGNED")
@@ -44,7 +44,7 @@ class ComplaintEntry < ApplicationRecord
     if self.user == current_user
       if !self.is_important
         if status!="COMPLETED"
-          self.update(user:nil, status:"NEW")
+          self.update(user:User.where(display_name:"Vrt Incoming").first, status:"NEW")
           complaint.set_status("NEW")
         else
           raise("Cannot return complaint that has been completed.")
