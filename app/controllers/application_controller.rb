@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
   rescue_from ::CanCan::AccessDenied do |exception|
     respond_to do |format|
       format.json { head :forbidden, content_type: 'text/html' }
-      format.html { redirect_to "/users/#{current_user.id}"
+      format.html { redirect_to "/users"
                     flash[:alert] = exception.message }
       format.js   { head :forbidden, content_type: 'text/html' }
     end
