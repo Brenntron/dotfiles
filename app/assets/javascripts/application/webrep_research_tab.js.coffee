@@ -172,6 +172,8 @@ $ ->
 
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
+    tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    $(tbody).empty()
     if ($('.dispute_check_box:checked').length > 0)
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
@@ -180,13 +182,14 @@ $ ->
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
           wlbl = $(entry_row).find('.entry-data-wlbl').text()
 
-          tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+
           $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
 
 
       $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
     else
+      return
       alert ('No rows selected')
 
 
