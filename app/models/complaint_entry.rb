@@ -144,6 +144,8 @@ class ComplaintEntry < ApplicationRecord
       'contains'
     elsif search_params['filter_by']
       'filter'
+    elsif search_params['search_type']
+      'advanced'
     else
       nil
     end
@@ -180,5 +182,109 @@ class ComplaintEntry < ApplicationRecord
       else
         all
     end
+  end
+
+  # Searches based on supplied fields and values.
+  # Optionally takes a name to save this search as a saved search.
+  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [String] search_name name to save this search as a saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.advanced_search(params, search_name:, user:)
+    
+    relation = where({})
+
+    if params['submitted_newer'].present?
+      relation =
+          relation.joins(:complaint).where('complaints.created_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+    end
+
+    if params['submitted_older'].present?
+      relation =
+          relation.joins(:complaint).where('complaints.created_at < :submitted_older', submitted_older: params['submitted_older']+1)
+    end
+
+    if params['age_newer'].present?
+      seconds_ago = Dispute.age_to_seconds(params['age_newer'])
+      unless 0 == seconds_ago
+        age_newer_cutoff = Time.now - seconds_ago
+        relation =
+            relation.joins(:complaint).where('complaints.created_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
+
+      end
+    end
+
+    if params['age_older'].present?
+      seconds_ago = Dispute.age_to_seconds(params['age_older'])
+      unless 0 == seconds_ago
+        age_older_cutoff = Time.now - seconds_ago
+        relation =
+            relation.joins(:complaint).where('complaints.created_at < :submitted_older', submitted_older: age_older_cutoff)
+      end
+    end
+
+    if params['modified_newer'].present?
+      relation =
+          relation.joins(:complaint).where('complaints.updated_at >= :modified_newer', modified_newer: params['modified_newer'])
+    end
+
+    if params['modified_older'].present?
+      relation =
+          relation.joins(:complaint).where('complaints.updated_at < :modified_older', modified_older: params['modified_older']+1)
+    end
+
+    if params['tags'].present?
+      relation = relation.joins(complaint: :complaint_tags).where('complaint_tags.name IN (?)', params['tags'])
+    end
+
+
+    company_name = nil
+    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
+    customer_params = customer_params.select{|ignore_key, value| value.present?}
+    if customer_params.any?
+      if customer_params['company_name'].present?
+        company_name = customer_params.delete('company_name')
+        relation = relation.joins(complaint: [customer: :company])
+      else
+        relation = relation.joins(complaint: :customer)
+      end
+
+      customer_where = { customers: customer_params }
+      if company_name.present?
+        customer_where = { companies: {name: company_name} }
+      end
+      relation = relation.joins(complaint: [customer: :company]).where(customer_where)
+    end
+
+    entry_params = params.fetch('complaint_entries', {})
+    entry_params = entry_params.select{|ignore_key, value| value.present?}
+    if entry_params.any?
+      complaint_entry_fields = entry_params.slice(*%w{complaint_id resolution status})
+      ip_or_uri = entry_params['ip_or_uri']
+      category = entry_params['category']
+
+      relation = relation.group(:id)
+      relation = relation.where(complaint_entry_fields) if complaint_entry_fields.present?
+
+      if category.present?
+        relation = relation.where('category like :category', category: "%#{category}%")
+      end
+
+      if ip_or_uri.present?
+        ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
+        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+      end
+    end
+
+    complaint_fields = params.to_h.slice(*%w{description channel})
+
+    complaint_fields = complaint_fields.select{|ignore_key, value| value.present?}
+    relation = relation.includes(:complaint).where(complaints: complaint_fields) if complaint_fields.present?
+
+    # Save this search as a named search
+    if params.present? && search_name.present?
+      Dispute.save_named_search(search_name, params, user: user)
+    end
+    relation
   end
 end

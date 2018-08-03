@@ -12,15 +12,40 @@ module API
               optional :filter_by, type: String, desc: 'filter entries by this value'
               optional :self_review, type: Boolean, desc: 'a flag that allows users to review their own categorizations'
               optional :search, type: String, desc: 'search entries by this value'
+
+              optional :customer, type: Hash do
+                optional :name, type: String
+                optional :email, type: String
+                optional :company_name, type: String
+              end
+
+              optional :complaint_entries, type: Hash do
+                optional :ip_or_uri, type: String
+                optional :resolution, type: String
+                optional :category, type: String
+                optional :status, type: String
+                optional :complaint_id, type: Integer
+              end
+              optional :search_type, type: String
+              optional :search_name, type: String
+              optional :description, type: String
+              optional :submitted_older, type: Date
+              optional :submitted_newer, type: Date
+              optional :modified_older, type: Date
+              optional :modified_newer, type: Date
+              optional :channel, type: String
+              optional :tags, type: Array
             end
 
             get "" do
               json_packet = []
 
               search_type = ComplaintEntry.get_search_type(permitted_params)
+              search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
+
 
               complaint_entries = ComplaintEntry.robust_search(search_type,
-                                                               search_name: nil,
+                                                               search_name: search_name,
                                                                params: permitted_params,
                                                                user: current_user)
 
