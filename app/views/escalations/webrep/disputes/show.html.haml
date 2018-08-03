@@ -6,8 +6,14 @@
       .priority-col-wrapper
         %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
 
-        %select.inpage-select#dispute-priority-select{name: 'dispute-priority'}
-          %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
+        =select_tag(:'dispute-priority-select', options_for_select([["#{Dispute::PRIORITY_1}"], ["#{Dispute::PRIORITY_2}"], ["#{Dispute::PRIORITY_3}"], ["#{Dispute::PRIORITY_4}"], ["#{Dispute::PRIORITY_5}"]], @dispute.priority))
+
+        -#%select.inpage-select#dispute-priority-select{name: 'dispute-priority'}
+        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
+        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
+        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
+        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
+        -#  %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
           -# Add all priority options to dropdown
 
         %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
