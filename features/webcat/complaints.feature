@@ -51,3 +51,30 @@ Feature: Webcat complaints
     And I should not see "commit"
     When I click "Update"
     Then I should not see "commit"
+
+  @javascript
+  Scenario: a user can take a complaint
+    Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "not_important" exists
+    And I goto "/escalations/webcat"
+    And I wait for "2" seconds
+    And I should see "Vrt Incoming"
+    And I click a table row
+    And I click button "Take selected"
+    Then I should see "ASSIGNED"
+    Then take a photo
+    And I should not see "Vrt Incoming"
+
+  @javascript
+  Scenario: a user can return a complaint
+    Given a user with role "admin" exists and is logged in
+    And an assigned complaint entry with trait "not_important" exists
+    And I goto "/escalations/webcat"
+    And I wait for "1" seconds
+    And I should not see "Vrt Incoming"
+    And I click a table row
+    And I click button "Return selected"
+    And I wait for "1" seconds
+    Then I should see "Vrt Incoming"
+
+

@@ -1,24 +1,3 @@
-
-
-#Populating the toolbar Adjust WL/BL Button
-window.index_expand_wlbl_form = () ->
-  if ($('.dispute_check_box:checked').length > 0)
-    $('.dispute_check_box:checked').each ->
-      entry_row = this.closest('tr')
-      entry_content = $(entry_row).find('.dispute_entry_content_first').text()
-      #wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-      #wlbl = $(entry_row).find('.entry-data-wlbl').text()
-
-      tbody = $('#wlbl_adjust_entries').find('tbody')
-      $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + '' + '</td><td class="text-center">' + '' + '</td></tr>')
-
-    $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
-    $('#wlbl_adjust_entries').show();
-
-  else
-    alert ('No rows selected')
-
-
 $ ->
   $('#edit-dispute-entry-button').click ->
 
@@ -172,7 +151,11 @@ $ ->
 
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
+    tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    $(tbody).empty()
+    dropdown_wrapper = $(this).parent()
     if ($('.dispute_check_box:checked').length > 0)
+
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
@@ -180,13 +163,11 @@ $ ->
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
           wlbl = $(entry_row).find('.entry-data-wlbl').text()
 
-          tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
           $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
-
-
       $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
     else
+      $(dropdown_wrapper).removeClass('open')
       alert ('No rows selected')
 
 
@@ -245,6 +226,15 @@ $ ->
         $(cl_table).show()
       else
         $(cl_table).hide()
+
+    if $(this).hasClass('reptool-checkbox')
+      rt_table = $(entry_row).find('.reptool-details-table')[0]
+      if $(this).prop('checked')
+        $(rt_table).show()
+      else
+        $(rt_table).hide()
+
+
 
 
 

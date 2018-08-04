@@ -103,10 +103,13 @@ $ ->
           if full.category
             categories = full.category.split(',')
             category = categories[0]
+            if category == "Not in our list"
+              category = ""
           if categories.length > 1
             plus = '+'
           '<p id="cat_tooltip_' + full.entry_id + '" data-toggle="tooltip" title="' + full.category + '" onmouseover=display_tooltip(' + full.entry_id + ')>' + category + plus + '</p>'
       }
+
       {
         data: 'assigned_to'
         className: 'alt-col'
@@ -155,3 +158,26 @@ $ ->
         error: (response) ->
           std_api_error(response, "There was an error loading search results.", reload: false)
       , this)
+
+
+  # advanced search tags
+  createSelectOptions = ->
+    tags = $('#search_tag_list')[0]
+    if tags
+      tag_list = tags.value
+      array = tag_list.split(',')
+      options = []
+      for x in array
+        options.push {name: x}
+      return options
+
+  $('#tags-input').selectize {
+    persist: false
+    create: false
+    maxItmes: null
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: createSelectOptions()
+
+  }

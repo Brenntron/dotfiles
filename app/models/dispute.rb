@@ -443,7 +443,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.status = DisputeEntry::RESOLVED
             else
               new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_UNCHANGED
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
             end
           else
@@ -521,7 +521,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.status = DisputeEntry::RESOLVED
             else
               new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_UNCHANGED
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
             end
           else
@@ -556,6 +556,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
+              new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save
             end
           end

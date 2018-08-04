@@ -103,7 +103,11 @@ class DisputeEmail < ApplicationRecord
     new_email = DisputeEmail.new
     new_email.dispute_id = params[:dispute_id]
     new_email.from = user.email
-    new_email.to = params[:to]
+    if params[:cc].present?
+      new_email.to = "#{params[:to]}, #{params[:cc]}"
+    else
+      new_email.to = params[:to]
+    end
     new_email.subject = params[:subject]
     new_email.body = append_case_number(params[:body], params[:dispute_id])
     new_email.status = SENT
@@ -129,7 +133,10 @@ class DisputeEmail < ApplicationRecord
     end
 
     email_args = {}
-    email_args[:to] = new_email.to
+    email_args[:to] = params[:to]
+    if params[:cc].present?
+      email_args[:cc] = params[:cc]
+    end
     email_args[:from] = generate_case_email_address(params[:dispute_id])
     email_args[:subject] = new_email.subject
     email_args[:body] = new_email.body

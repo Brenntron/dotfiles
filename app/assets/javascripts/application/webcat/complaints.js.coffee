@@ -63,12 +63,17 @@ window.updateEntryColumns = (entry_id,row_id) ->
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+        std_msg_error(response,"", reload: false)
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
         temp_row.data().status = json.status
+        temp_row.data().resolution = status
+        temp_row.data().resolution_comment = comment
+        temp_row.data().category = categories
+        temp_row.invalidate().draw()
+        temp_row.child().remove()
+        temp_row.child(format(temp_row)).show()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
@@ -79,13 +84,8 @@ window.updateEntryColumns = (entry_id,row_id) ->
           options: AC.WebCat.createSelectOptions()
           items: selected_options(temp_row.data().category)
         }
-        temp_row.data().resolution = status
-        temp_row.data().resolution_comment = comment
-        temp_row.invalidate().draw()
-        temp_row.child().remove()
-        temp_row.child(format(temp_row)).show()
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      std_msg_error(response,"", reload: false)
   , this)
 
 
@@ -143,7 +143,7 @@ window.return_selected = ()->
         else
           i = 0
           while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],12).data("").draw()
+            selected_rows.data().cell(selected_rows[0][i],12).data("Vrt Incoming").draw()
             selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
             i++
 
@@ -511,4 +511,56 @@ window.commit_marked = () ->
     error: (response) ->
       popup_response_error(response, 'Error committing marked entries.')
   )
+
+
+window.advanced_webcat_index_table = () ->
+  data = {
+    customer: {
+      name: $('#cat_named_search').find('input[id="name-input"]').val()
+      email: $('#cat_named_search').find('input[id="email-input"]').val()
+      company_name: $('#cat_named_search').find('input[id="company-input"]').val()
+    }
+    complaint_entries: {
+      ip_or_uri: $('#cat_named_search').find('input[id="complaint-input"]').val()
+      resolution: $('#cat_named_search').find('select[id="resolution-input"]').val()
+      category: $('#cat_named_search').find('input[id="category-input"]').val()
+      status: $('#cat_named_search').find('select[id="status-input"]').val()
+      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val()
+    }
+    search_type: 'advanced'
+    search_name: $('#cat_named_search').find('input[name="search_name"]').val()
+    description: $('#cat_named_search').find('input[id="desc-input"]').val()
+    channel: $('#cat_named_search').find('select[id="channel-input"]').val()
+    tags: $('#cat_named_search').find('select[id="tags-input"]').val() || []
+    submitted_older: $('#cat_named_search').find('input[id="submitted-older-input"]').val()
+    submitted_newer: $('#cat_named_search').find('input[id="submitted-newer-input"]').val()
+    modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
+    modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
+  }
+  window.populate_advanced_webcat_index_table(data)
+
+
+window.populate_advanced_webcat_index_table = (data = {}) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries'
+    method: 'GET'
+    headers: headers
+    data: data
+    data_json: JSON.stringify(data)
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        $('#advanced-search-button').dropdown('toggle')
+        datatable = $('#complaints-index').DataTable()
+        datatable.clear();
+        datatable.rows.add(json.data);
+        datatable.draw();
+
+      error: (response) ->
+        std_api_error(response, "There was an error loading search results.", reload: false)
+  , this)
 

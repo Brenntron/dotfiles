@@ -93,10 +93,13 @@ module API
 
               if is_ip_address
                 entry.ip_address = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
               else
                 entry.uri = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
               end
-              entry.save
 
               json_packet << entry
 
@@ -240,7 +243,6 @@ module API
             end
             patch ':dispute_id/relating_disputes' do
               std_api_v2 do
-                byebug
                 authorize!(:update, Dispute)
                 relating_dispute_ids = permitted_params['relating_dispute_ids']
                 Dispute.where(id: relating_dispute_ids).update_all(related_id: params['dispute_id'],

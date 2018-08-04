@@ -2,28 +2,23 @@
 .content-wrapper.top-case-info
 
   .row
-    .col-xs-1.col-with-divider
-      %span.bug-state-info.bug-priority{class: "p-#{@dispute.priority}"}
-      %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
-    .col-xs-1.col-with-divider
-      %label.content-label-sm
-        Case ID
-      .bug-top-id
-        %a.case-id-tag#dispute_id= @dispute.case_id_str
-    .col-xs-1.bug-state-col
-      #bugzilla_popover_state.bug-state-info.bug-state
-        %select#status.inpage-select{name: 'status'}
-          %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
-          -#%option{value: 'New', selected: 'selected'} New
-          -#%option{value: 'Assigned'} Assigned
-          -#%option{value: 'Researching'} Researching
-          -#%option{value: 'On Hold'} On Hold
-          -#%option{value: 'Customer Pending'} Customer Pending
-          -#%option{value: 'Resolved'} Resolved
-          -#%option{value: 'Reopened'} Reopened
+    .col-xs-4.col-with-divider
+      .priority-col-wrapper
+        %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
 
-    .col-xs-2.col-with-divider
-      .nested-col-sections
+        %select.inpage-select#dispute-priority-select{name: 'dispute-priority'}
+          %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
+          -# Add all priority options to dropdown
+
+        %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
+      .case-id-wrapper
+        %label.content-label-sm
+          Case ID
+        .bug-top-id
+          %a.case-id-tag#dispute_id= @dispute.case_id_str
+
+
+      .dispute-owner-wrapper
         %label.content-label-sm
           Owner
         %div
@@ -57,13 +52,27 @@
 
 
     .col-xs-2.col-with-divider
-      %label.content-label-sm
-        Suggested Disposition
-      .disposition.disp-negative
-        = @dispute.suggested_d
+      .dispute-status-col-wrapper
+        %label.content-label-sm
+          Status
+        #bugzilla_popover_state
+          %select#status.inpage-select{name: 'dispute-status'}
+            %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
+            -#%option{value: 'New', selected: 'selected'} New
+            -#%option{value: 'Assigned'} Assigned
+            -#%option{value: 'Researching'} Researching
+            -#%option{value: 'On Hold'} On Hold
+            -#%option{value: 'Customer Pending'} Customer Pending
+            -#%option{value: 'Resolved'} Resolved
+            -#%option{value: 'Reopened'} Reopened
+      .disposition-wrapper
+        %label.content-label-sm
+          Suggested Disposition
+        .disposition.disp-negative
+          = @dispute.suggested_d
     .col-xs-3.col-with-divider
       %label.content-label-sm
-        Dispute
+        Dispute Entries
       %div
         = @entries.first.hostlookup
         -#- @entries.each do |entry|
@@ -71,14 +80,20 @@
       %span.dispute-entry-count
         = @entries.count
 
-    .col-xs-2.col-with-divider
-      %label.content-label-sm
-        Date/Time Submitted
-      %div= @dispute.case_opened_at
-    .col-xs-1.col-with-divider
-      %label.content-label-sm
-        Age
-      %div= distance_of_time_in_words(Time.now, @dispute.case_opened_at)
+    .col-xs-3.col-with-divider
+      .dispute-time-wrapper
+        %label.content-label-sm
+          Date/Time Submitted
+        %div= @dispute.case_opened_at
+        %br
+        %label.content-label-sm
+          Age
+        %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
+      .top-info-buttons-wrapper
+        %button.edit-button.dispute-top-buttons#edit-dispute-button
+        %button.save-button.dispute-top-buttons#save-dispute-button.hidden
+        %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden
+
 
   .row#top_bar_extended_info
     .col-xs-12
@@ -99,11 +114,14 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Contact Name
-          %p= @dispute.customer.name
+          %p.dispute-edit-field#dispute-customer-name= @dispute.customer.name
+          %input.dispute-edit-input#dispute-customer-name-input{type: 'text', value: "#{@dispute.customer.name}"}
+
         .col-xs-3.col-with-divider
           %label.content-label-sm
             Contact Email
-          %p= @dispute.customer.email
+          %p.dispute-edit-field#dispute-customer-email= @dispute.customer.email
+          %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer.email}"}
       %h3 Case Management Information
       .row
         .col-xs-2.col-with-divider
@@ -139,6 +157,8 @@
             Last Updated By
           %p= @dispute.last_updated_by_username
       %h3 Related Cases
+      %button#related-dispute-button
+        Add Related Case
       .row
         .col-xs-2.col-with-divider
           %label.content-label-sm

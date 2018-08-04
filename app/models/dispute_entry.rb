@@ -1,4 +1,6 @@
 class DisputeEntry < ApplicationRecord
+  attr_writer :wbrs_xlist
+
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute
   belongs_to :user, optional: true
@@ -40,6 +42,12 @@ class DisputeEntry < ApplicationRecord
     where(case_resolved_at: (date_from..date_to))
   }
 
+  def self.new_from_wlbl(wlbl)
+    new(uri: wlbl.url).tap do |entry|
+      entry.wbrs_xlist = [ wlbl ]
+    end
+  end
+
   def self.from_age_report_params(params)
     query = resolved_date(params['date_from'], params['date_to'])
 
@@ -73,7 +81,7 @@ class DisputeEntry < ApplicationRecord
     RESOLVED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
   end
 
-  def find_xbrs
+  def get_xbrs_value
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
       return Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
     end
@@ -87,15 +95,23 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def find_xbrs(reload: false)
+    @xbrs = nil if reload
+    @xbrs ||= get_xbrs_value
+  end
+
   def blacklist(reload: false)
-    if reload == false
-      if dispute_entry_preload.present? && dispute_entry_preload.wlbl.present?
-        @blacklist = RepApi::Blacklist.load_from_prefetch(dispute_entry_preload.wlbl).first
-        return @blacklist 
-      end
+    @blacklist_loaded = false if reload
+    unless @blacklist_loaded
+      @blacklist =
+          if dispute_entry_preload.present? && dispute_entry_preload.wlbl.present?
+            RepApi::Blacklist.load_from_prefetch(dispute_entry_preload.wlbl).first
+          else
+            RepApi::Blacklist.where(entries: [ hostlookup ]).first
+          end
+      @blacklist_loaded = true
     end
-    @blacklist = nil if reload
-    @blacklist ||= RepApi::Blacklist.where(entries: [ hostlookup ]).first
+    @blacklist
   end
 
   def classifications
@@ -103,12 +119,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
-    if dispute_entry_preload.present?
-      @wbrs_list_type = dispute_entry_preload.wbrs_list_type
-      return @wbrs_list_type if @wbrs_list_type.present?
-      return nil
-    end
-    @wbrs_list_type ||= Wbrs::ManualWlbl.where(url: hostlookup).map{ |wlbl| wlbl.list_type }.join(',')
+    @wbrs_list_type ||= wbrs_xlist.map{ |wlbl| wlbl.list_type }.join(',')
   end
 
   def wbrs_xlist
@@ -116,7 +127,7 @@ class DisputeEntry < ApplicationRecord
       @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
       return @wbrs_xlist
     end
-    @wbrs_xlist ||= Wbrs::ManualWlbl.where(url: hostlookup)
+    @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
   end
 
   def virustotals
@@ -170,9 +181,9 @@ class DisputeEntry < ApplicationRecord
   def referenced_tickets
     is_ip_address = !!(hostlookup  =~ Resolv::IPv4::Regex)
     if is_ip_address
-      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address})
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address}).where.not(:dispute_entries => {:dispute_id => self.dispute_id})
     else
-      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:uri => self.uri})
+      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:uri => self.uri}).where.not(:dispute_entries => {:dispute_id => self.dispute_id})
     end
   end
 
@@ -282,6 +293,24 @@ class DisputeEntry < ApplicationRecord
     field_data.each do |entry_id, field_hash|
       entry = DisputeEntry.find(entry_id)
       entry.update_from_field_data(field_hash)
+    end
+  end
+
+  # If the research page is served from the DisputesController, this method is here.
+  # If the controller action is moved to another controller, move this method to another class.
+  def self.research_results(research_params)
+    if research_params.present?
+      url = research_params['uri']
+      # [ DisputeEntry.new(uri: research_params['url']) ]
+      entries = Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
+        DisputeEntry.new_from_wlbl(wlbl)
+      end
+      unless entries.find{|entry| url == entry.uri}
+        entries << DisputeEntry.new(uri: url)
+      end
+      entries
+    else
+      []
     end
   end
 end
