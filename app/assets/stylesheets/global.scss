@@ -4464,12 +4464,8 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .nested-complaint-data-wrapper table {
-  background-color: $table-dark-body;
-  color: $content-bg-color;
-}
-
-.nested-complaint-data-wrapper table a {
-  color: $content-bg-color;
+  background-color: $faint-neutral-color;
+  color: $type-base-color;
 }
 
 .nested-complaint-data-wrapper table td {
