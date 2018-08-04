@@ -880,6 +880,35 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    disputes.each do |dispute|
+      dispute.status = status
+      if resolution.present?
+        dispute.resolution = resolution
+      end
+
+      if dispute.status == RESOLVED
+        disputes.dispute_entries.each do |entry|
+          entry.status = status
+          entry.resolution = resolution
+          entry.resolution_comment = comment
+          entry.save
+        end
+      end
+
+      dispute.save
+      if comment.present?
+        DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
+      end
+
+      dispute.reload
+
+      message = Bridge::DisputeEntryUpdateStatusEvent.new
+      message.post_entries(dispute.dispute_entries)
+
+    end
+  end
+
   # Searches in a variety of ways.
   # advanced -- search by supplied field.
   # named -- call a saved search.
