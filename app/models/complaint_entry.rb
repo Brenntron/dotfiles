@@ -163,6 +163,8 @@ class ComplaintEntry < ApplicationRecord
       'contains'
     elsif search_params['filter_by']
       'filter'
+    elsif search_params['search_type'] == 'named'
+      'named'
     elsif search_params['search_type']
       'advanced'
     else
@@ -201,6 +203,25 @@ class ComplaintEntry < ApplicationRecord
       else
         all
     end
+  end
+
+  # Searched based on saved search.
+  # @param [String] search_name the name of the saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.named_search(search_name, user:)
+    named_search = user.named_searches.where(name: search_name).first
+    raise "No search named '#{search_name}' found." unless named_search
+    search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
+      if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
+        search_params[super_name] ||= {}
+        search_params[super_name][sub_name] = criterion.value
+      else
+        search_params[criterion.field_name] = criterion.value
+      end
+      search_params
+    end
+    advanced_search(search_params, search_name: nil, user: user)
   end
 
   # Searches based on supplied fields and values.
