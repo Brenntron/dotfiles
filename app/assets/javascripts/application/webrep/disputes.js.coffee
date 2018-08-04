@@ -498,15 +498,17 @@ $ ->
     else
 
   # Select Status
-    $('.radio-label').click ->
-      radio_button = $(this).prev('input[type="radio"')
+    $('.ticket-status-radio-label').click ->
+      radio_button = $(this).prev('.ticket-status-radio')
       $(radio_button[0]).trigger('click')
       if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
         $('#index-ticket-resolution-submenu').show()
-        $('.non-resolution-submit-wrapper').hide()
+        $('#ticket-non-res-submit').hide()
       else
-        $('.non-resolution-submit-wrapper').show()
+        $('#ticket-non-res-submit').show()
         $('#index-ticket-resolution-submenu').hide()
+
+
 
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
@@ -514,14 +516,14 @@ $ ->
 
     else
 
-    $('.radio-label').click ->
-      radio_button = $(this).prev('input[type="radio"')
+    $('.entry-status-radio-label').click ->
+      radio_button = $(this).prev('.entry-status-radio')
       $(radio_button[0]).trigger('click')
       if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
         $('#index-entry-resolution-submenu').show()
-        $('.non-resolution-submit-wrapper').hide()
+        $('#entry-non-res-submit').hide()
       else
-        $('.non-resolution-submit-wrapper').show()
+        $('#entry-non-res-submit').show()
         $('#index-entry-resolution-submenu').hide()
 
 
