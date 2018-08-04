@@ -64,6 +64,17 @@ class Wbrs::Category < Wbrs::Base
     end
   end
 
+  def self.get_category_ids(category_array)
+    categories = Wbrs::Category.all
+    category_ids = []
+    categories.each do |cat|
+      if category_array.include?(cat.descr)
+        category_ids << cat.id
+      end
+    end
+    category_ids
+  end
+
   def self.category_ids_from_params(params)
     category_ids(params.delete('categories') || params.delete('category_ids') || params.delete('category_id'))
   end
