@@ -575,11 +575,15 @@ $ ->
     ])
 
   format = (dispute) ->
+
     table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox"></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '<th class="entry-col-wlbl">WL/BL Entries</th>' + '<th class="entry-col-reptool-class">RepTool Classification</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
+    console.log entry
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
     $(entry).each ->
+      console.log this
+      #debugger
       entry_content = ''
       if @ip_address != null
         entry_content = @ip_address
@@ -587,6 +591,7 @@ $ ->
         entry_content = @uri
       else
         entry_content = missing_data
+
       category = ''
       if @primary_category != null
         category = @primary_category
@@ -606,7 +611,24 @@ $ ->
         important = 'entry-important-flag'
       else
         important = ''
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' + '<td class="entry-col-status">' + status + '</td>' + '<td class="entry-col-disp">' + suggested_disposition + '</td>' + '<td class="entry-col-cat">' + category + '</td>' + '<td class="entry-col-wbrs-score">' + @score + '</td>' + '<td class="entry-col-wbrs-hits"></td>' + '<td class="entry-col-wbrs-rules"></td>' + '<td class="entry-col-sbrs-score"></td>' + '<td class="entry-col-sbrs-hits"></td>' + '<td class="entry-col-sbrs-rules"></td>' + '<td class="entry-col-wlbl"></td>' + '<td class="entry-col-reptool-class"></td>' + '</tr>'
+      if this.wbrs_score != null
+        wbrs_score = this.wbrs_score
+      else wbrs_score = missing_data
+      if this.sbrs_score != null
+        sbrs_score = this.sbrs_score
+      else sbrs = missing_data
+      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+        '<td class="entry-col-status">' + status + '</td>' +
+        '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
+        '<td class="entry-col-cat">' + category + '</td>' +
+        '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
+        '<td class="entry-col-wbrs-hits">' +  '</td>' +
+        '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits + '</td>' +
+        '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +
+        '<td class="entry-col-sbrs-hits">' +  '</td>' +
+        '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits + '</td>' +
+        '<td class="entry-col-wlbl">' + this.wlbl + '</td>' +
+        '<td class="entry-col-reptool-class"></td>' + '</tr>'
       entry_rows.push entry_row
       return
     # `d` is the original data object for the row

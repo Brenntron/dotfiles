@@ -17,5 +17,4 @@
 //= require bootstrap-multiselect
 //= require application/tree-table
 //= require application/util
-//= require application/webrep/webrep_index
 //= require_directory ./application
