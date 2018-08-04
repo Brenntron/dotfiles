@@ -579,60 +579,54 @@ $ ->
     ])
 
   format = (dispute) ->
-
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox"></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '<th class="entry-col-wlbl">WL/BL Entries</th>' + '<th class="entry-col-reptool-class">RepTool Classification</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox"></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
-    console.log entry
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
     $(entry).each ->
-      console.log this
-      #debugger
       entry_content = ''
-      if @ip_address != null
-        entry_content = @ip_address
-      else if @uri != null
-        entry_content = @uri
+      if this.entry.ip_address != null
+        entry_content = this.entry.ip_address
+      else if this.entry.uri != null
+        entry_content = this.entry.uri
       else
         entry_content = missing_data
 
       category = ''
-      if @primary_category != null
-        category = @primary_category
+      if this.entry.primary_category != null
+        category = this.entry.primary_category
       else
         category = missing_data
       status = ''
-      if @status != null
-        status = @status
+      if this.entry.status != null
+        status = this.entry.status
       else
         status = missing_data
       suggested_disposition = ''
-      if @suggested_disposition != null
-        suggested_disposition = @suggested_disposition
+      if this.entry.suggested_disposition != null
+        suggested_disposition = this.entry.suggested_disposition
       else
         suggested_disposition = missing_data
-      if @is_important == true
+      if this.entry.is_important == true
         important = 'entry-important-flag'
       else
         important = ''
-      if this.wbrs_score != null
-        wbrs_score = this.wbrs_score
+      if this.entry.wbrs_score != null
+        wbrs_score = this.entry.wbrs_score
       else wbrs_score = missing_data
-      if this.sbrs_score != null
-        sbrs_score = this.sbrs_score
-      else sbrs = missing_data
+      if this.entry.sbrs_score != null
+        sbrs_score = this.entry.sbrs_score
+      else sbrs_score = missing_data
       entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
         '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
-        '<td class="entry-col-wbrs-hits">' +  '</td>' +
-        '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits + '</td>' +
+        '<td class="entry-col-wbrs-hits">' +  this.wbrs_rule_hits.length + '</td>' +
+        '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits.join(', ') + '</td>' +
         '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +
-        '<td class="entry-col-sbrs-hits">' +  '</td>' +
-        '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits + '</td>' +
-        '<td class="entry-col-wlbl">' + this.wlbl + '</td>' +
-        '<td class="entry-col-reptool-class"></td>' + '</tr>'
+        '<td class="entry-col-sbrs-hits">' + this.sbrs_rule_hits.length + '</td>' +
+        '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits.join(', ') + '</td>'
       entry_rows.push entry_row
       return
     # `d` is the original data object for the row

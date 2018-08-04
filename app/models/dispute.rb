@@ -938,7 +938,7 @@ class Dispute < ApplicationRecord
         end
       end
 
-      dispute_packet[:dispute_entries] = dispute.dispute_entries
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.wbrs_rule_hits.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.sbrs_rule_hits.pluck(:name)}}
       dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
         when dispute.assignee == 'Unassigned'
