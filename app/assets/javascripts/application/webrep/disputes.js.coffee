@@ -508,6 +508,23 @@ $ ->
         $('.non-resolution-submit-wrapper').show()
         $('#index-ticket-resolution-submenu').hide()
 
+  # Edit Entry: Edit Entry Status
+  $('#index-entry-status-button').click ->
+    if (determine_checked('dispute-entry-checkbox'))
+
+    else
+
+    $('.radio-label').click ->
+      radio_button = $(this).prev('input[type="radio"')
+      $(radio_button[0]).trigger('click')
+      if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+        $('#index-entry-resolution-submenu').show()
+        $('.non-resolution-submit-wrapper').hide()
+      else
+        $('.non-resolution-submit-wrapper').show()
+        $('#index-entry-resolution-submenu').hide()
+
+
 
 # Create index table
   dispute_table = $('#disputes-index').DataTable(
