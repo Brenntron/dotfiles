@@ -4290,7 +4290,7 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .toolbar-dropdown div {
   height: auto;
-  border: none !important;
+  border: none;
 }
 
 .dispute-name-wrapper {
@@ -4798,7 +4798,7 @@ h5.entry-details-table-header {
   margin-left: 1px;
 }
 
-.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label  {
+.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu .radio-label  {
   color: $content-bg-color  !important;
   font-size: 9pt  !important;
 }
@@ -5294,12 +5294,12 @@ td.ticket-total::before {
   padding: 0 !important;
 }
 
-#index-edit-ticket-status-dropdown {
+#index-edit-ticket-status-dropdown, #index-edit-entry-status-dropdown {
   margin-left: 0;
   width: 170px !important;
 }
 
-#index-edit-ticket-status-dropdown .radio-label {
+#index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
   margin-bottom: 0;
 }
@@ -5327,7 +5327,7 @@ td.ticket-total::before {
   background-color: $faint-neutral-color !important;
 }
 
-#index-ticket-resolution-submenu {
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
   width: 340px;
   left: 100%;
   padding: 0;

@@ -221,7 +221,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.save
 
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
+          new_payload_item[:sugg_type] = entry["cat_sugg"].join(",")
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
