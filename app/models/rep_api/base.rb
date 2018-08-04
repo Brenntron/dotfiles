@@ -122,12 +122,8 @@ class RepApi::Base
           raise RepApi::RepApiNotFoundError, "HTTP response #{response.code}"
         end
       else
-        response_body = JSON.parse(response.body) rescue nil
-        if response_body
-          raise RepApi::RepApiError, "HTTP response #{response.code} #{response_body['MSG']}"
-        else
-          raise RepApi::RepApiError, "HTTP response #{response.code}"
-        end
+        response.body = "{}"
+        return response
     end
   end
 

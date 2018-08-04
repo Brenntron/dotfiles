@@ -331,6 +331,10 @@ window.toolbar_index_mark_duplicate = (box_names) ->
 
 
 window.add_dispute_entry = () ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   data = {
     'uri': $('#add_dispute_entry').val(),
     'dispute_id': $('#dispute_id').text(),

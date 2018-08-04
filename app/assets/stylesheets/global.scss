@@ -4670,6 +4670,10 @@ td.left-bordered {
   background-color: $rule-accent-color;
 }
 
+.research-table-input-wrapper.reptool-input-wrapper {
+  background-color: $fifth-section-color;
+}
+
 .expanded-row {
   background-color: $content-tab-color;
   padding: 0 0 0 20px !important;
@@ -4707,6 +4711,7 @@ td.left-bordered {
 .xbrs-details-table { background-color: $communication-accent-color;}
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
+.reptool-details-table {background-color: $fifth-section-color;}
 
 .entry-details-table table {
   background-color: $table-dark-body;
