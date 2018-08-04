@@ -92,57 +92,65 @@
       %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Edit Ticket Status
-      .dropdown-menu.toolbar-dropdown#edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
+      .dropdown-menu.toolbar-dropdown#index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
         %ul
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Researching'}
-            %label.radio-label{for: 'Researching'} Researching
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RESEARCHING'}
+            %label.radio-label{for: 'RESEARCHING'} Researching
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Escalated'}
-            %label.radio-label{for: 'Escalated'} Escalated
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ESCALATED'}
+            %label.radio-label{for: 'ESCALATED'} Escalated
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Customer-Pending'}
-            %label.radio-label{for: 'Customer-Pending'} Customer Pending
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'CUSTOMER_PENDING'}
+            %label.radio-label{for: 'CUSTOMER_PENDING'} Customer Pending
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'On-Hold'}
-            %label.radio-label{for: 'On-Hold'} On Hold
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ON_HOLD'}
+            %label.radio-label{for: 'ON_HOLD'} On Hold
           %li.status-radio-wrapper
-            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'Resolved-Closed'}
-            %label.radio-label{for: 'Resolved-Closed'} Resolved / Closed
-            .dropdown-menu.ticket-resolution-submenu
+            %input.entry-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'RESOLVED_CLOSED'}
+            %label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
+            .dropdown-menu#index-ticket-resolution-submenu
               .col-xs-6.submenu-left-wrapper
                 .submenu-header
                   Ticket Resolution
                 %ul
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FP'}
-                    %label.radio-label{for: 'Fixed-FP'} Fixed - FP
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FP'}
+                    %label.radio-label{for: 'FIXED_FP'} Fixed - FP
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Fixed-FN'}
-                    %label.radio-label{for: 'Fixed-FN'} Fixed - FN
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FN'}
+                    %label.radio-label{for: 'FIXED_FN'} Fixed - FN
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Unchanged'}
-                    %label.radio-label{for: 'Unchanged'} Unchanged
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'UNCHANGED'}
+                    %label.radio-label{for: 'UNCHANGED'} Unchanged
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Invalid'}
-                    %label.radio-label{for: 'Invalid'} Invalid / Junk Mail
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'INVALID'}
+                    %label.radio-label{for: 'INVALID'} Invalid / Junk Mail
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Test-Training'}
-                    %label.radio-label{for: 'Test-Training'} Test / Training
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'TEST_TRAINING'}
+                    %label.radio-label{for: 'TEST_TRAINING'} Test / Training
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'Other'}
-                    %label.radio-label{for: 'Other'} Other
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'OTHER'}
+                    %label.radio-label{for: 'OTHER'} Other
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Comment
                   %textarea
-                  %button.primary
-                    Submit
+                  .button-row-center
+                    %button.primary
+                      Submit
 
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'Re-Opened'}
-            %label.radio-label{for: 'Re-Opened'} Re-Opened
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RE-OPENED'}
+            %label.radio-label{for: 'RE-OPENED'} Re-Opened
+          %li.non-resolution-submit-wrapper
+            %label.content-label-sm
+              Comment
+            %textarea
+            .button-row-center
+              %button.primary
+                Submit
 
     - if current_user.has_role?('manager')
       %span.dropdown
