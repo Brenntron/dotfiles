@@ -487,6 +487,39 @@ window.set_duplicate_dispute = (form_tag) ->
 
 
 $ ->
+
+  $('.change_ticket_status_button').click ->
+    # :dispute_ids, type: Array[Integer]
+    # :status, type, String
+    status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+    resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+    comment1 = $('#index-edit-ticket-status-dropdown').find('.ticket-status-comment').val()
+    console.log status
+    console.log resolution
+    console.log comment1
+    # :resolution, type: String
+    # :comment
+    data = {
+
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webrep/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        response = JSON.parse(response)
+        if response.status == "success"
+          window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error Syncing Data')
+        window.location.reload()
+    )
+
+
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
     return

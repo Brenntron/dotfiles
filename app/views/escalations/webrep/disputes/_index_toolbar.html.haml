@@ -95,19 +95,19 @@
       .dropdown-menu.toolbar-dropdown#index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
         %ul
           %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'RESEARCHING'}
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'RESEARCHING', value:'RESEARCHING' }
             %label.ticket-status-radio-label.radio-label{for: 'RESEARCHING'} Researching
           %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ESCALATED'}
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ESCALATED', value: 'ESCALATED'}
             %label.ticket-status-radio-label.radio-label{for: 'ESCALATED'} Escalated
           %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'CUSTOMER_PENDING'}
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'CUSTOMER_PENDING', value: 'CUSTOMER_PENDING'}
             %label.ticket-status-radio-label.radio-label{for: 'CUSTOMER_PENDING'} Customer Pending
           %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD'}
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'ON_HOLD'}
             %label.ticket-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
           %li.status-radio-wrapper
-            %input.ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'ticket-status', id: 'RESOLVED_CLOSED'}
+            %input.ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'ticket-status', id: 'RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
             %label.ticket-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
             .dropdown-menu#index-ticket-resolution-submenu
               .col-xs-6.submenu-left-wrapper
@@ -115,41 +115,41 @@
                   Ticket Resolution
                 %ul
                   %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FP'}
+                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FP', value: 'FIXED_FP'}
                     %label.ticket-res-radio-label.radio-label{for: 'FIXED_FP'} Fixed - FP
                   %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FN'}
+                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FN', value: 'FIXED_FN'}
                     %label.ticket-res-radio-label.radio-label{for: 'FIXED_FN'} Fixed - FN
                   %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'UNCHANGED'}
+                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'UNCHANGED', value: 'UNCHANGED'}
                     %label.ticket-res-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
                   %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'INVALID'}
+                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'INVALID', value: 'INVALID'}
                     %label.ticket-res-radio-label.radio-label{for: 'INVALID'} Invalid / Junk Mail
                   %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'TEST_TRAINING'}
+                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'TEST_TRAINING', value: 'TEST_TRAINING'}
                     %label.ticket-res-radio-label.radio-label{for: 'TEST_TRAINING'} Test / Training
                   %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'OTHER'}
+                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'OTHER', value: 'OTHER'}
                     %label.ticket-res-radio-label.radio-label{for: 'OTHER'} Other
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Comment
-                  %textarea
+                  %textarea.ticket-status-comment
                   .button-row-center
-                    %button.primary
+                    %button.primary.change_ticket_status_button
                       Submit
 
           %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'RE-OPENED'}
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'RE-OPENED', value: 'RE-OPENED'}
             %label.ticket-status-radio-label.radio-label{for: 'RE-OPENED'} Re-Opened
           %li.non-resolution-submit-wrapper#ticket-non-res-submit
             %label.content-label-sm
               Comment
-            %textarea
+            %textarea.ticket-status-comment
             .button-row-center
-              %button.primary
+              %button.primary.change_ticket_status_button
                 Submit
 
     - if current_user.has_role?('manager')
