@@ -494,10 +494,22 @@ $ ->
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
     if (determine_checked('dispute_check_box'))
-      console.log 'do the needful'
-    else
-      do_not = "show the tab"
 
+    else
+
+  # Select Status
+    $('.radio-label').click ->
+      radio_button = $(this).prev('input[type="radio"')
+      $(radio_button[0]).trigger('click')
+      if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+        $('#index-ticket-resolution-submenu').show()
+        $('.non-resolution-submit-wrapper').hide()
+      else
+        $('.non-resolution-submit-wrapper').show()
+        $('#index-ticket-resolution-submenu').hide()
+
+
+# Create index table
   dispute_table = $('#disputes-index').DataTable(
     order: [ [
       9
