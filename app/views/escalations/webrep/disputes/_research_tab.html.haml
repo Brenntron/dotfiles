@@ -134,7 +134,7 @@
                   .toolbar
                     %div
                       %label.toolbar-section-label{for: 'blacklist-action-select'} Status
-                      = rep_form.select(:action, ['Active', 'Expired'],
+                      = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
                         {include_blank: true},
                         class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
                         title: 'RepTool Rule Status',

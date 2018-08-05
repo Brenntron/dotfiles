@@ -307,6 +307,26 @@ module API
                 true
               end
             end
+
+            params do
+              requires :entry, type: String
+            end
+
+            get 'reptool_get_info_for_form' do
+              params[:entry] = params[:entry].strip
+              information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
+              information = JSON.parse(information)
+
+              if information[params[:entry]] == "NOT_FOUND"
+                return {:classification => "not found", :expiration => "", :status => ""}.to_json
+              else
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"]}.to_json
+              end
+
+
+
+            end
+
           end
         end
       end
