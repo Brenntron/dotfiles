@@ -160,10 +160,10 @@
             Assign
 
     %span.dropdown
-      %button#index_mark_duplicate.toolbar-button.mark-duplicate-button{title: 'Mark as Related', onclick: "$('#set-related-dispute-div').show();"}
+      %button#index_mark_related.toolbar-button.mark-related-button{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Mark as Related
-      #set-related-dispute-div{style: 'display: none;'}
+      .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
         %form#set-related-dispute-form{onsubmit: 'set_relating_disputes(this);return false;'}
           %label
             Ticket ID:
