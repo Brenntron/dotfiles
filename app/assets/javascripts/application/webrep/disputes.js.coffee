@@ -487,17 +487,117 @@ window.set_duplicate_dispute = (form_tag) ->
 
 
 $ ->
+
+  $('.change_ticket_status_button').click ->
+    status = ""
+    resolution = ""
+    comment = ""
+    checkboxes = $('#disputes-index').find('.dispute_check_box')
+    checked_disputes = []
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        dispute_id = $(this).val()
+        checked_disputes.push(dispute_id)
+
+    status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+    if status == 'RESOLVED_CLOSED'
+      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+    else
+      comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
+
+
+    data = {
+      status: status,
+      resolution: resolution,
+      comment: comment,
+      dispute_ids: checked_disputes.toString()
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webrep/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        response = JSON.parse(response)
+        if response.status == "success"
+          window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error Updating Status')
+        window.location.reload()
+
+    )
+
+
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
     return
 
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
-    if (determine_checked('dispute_check_box'))
-      console.log 'do the needful'
-    else
-      do_not = "show the tab"
+    dropdown = $('#index-edit-ticket-status-dropdown').parent()
+    if ($('.dispute_check_box:checked').length > 0)
+      # Select Status
+      $('.ticket-status-radio-label').click ->
+        radio_button = $(this).prev('.ticket-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
 
+      $('.ticket-status-radio').click ->
+        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+    else
+      $(dropdown).removeClass('open')
+      alert ('No rows selected')
+
+
+
+  # Edit Entry: Edit Entry Status
+  $('#index-entry-status-button').click ->
+    if (determine_checked('dispute-entry-checkbox'))
+
+    else
+
+    $('.entry-status-radio-label').click ->
+      radio_button = $(this).prev('.entry-status-radio')
+      $(radio_button[0]).trigger('click')
+      if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+        $('#index-entry-resolution-submenu').show()
+        $('#entry-non-res-submit').hide()
+      else
+        $('#entry-non-res-submit').show()
+        $('#index-entry-resolution-submenu').hide()
+
+
+
+# Create index table
   dispute_table = $('#disputes-index').DataTable(
     order: [ [
       9

@@ -4290,7 +4290,7 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .toolbar-dropdown div {
   height: auto;
-  border: none !important;
+  border: none;
 }
 
 .dispute-name-wrapper {
@@ -4798,8 +4798,9 @@ h5.entry-details-table-header {
   margin-left: 1px;
 }
 
-.ticket-resolution-submenu li label {
-  color: $content-bg-color;
+.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu .radio-label  {
+  color: $content-bg-color  !important;
+  font-size: 9pt  !important;
 }
 
 .submenu-left-wrapper {
@@ -4820,9 +4821,9 @@ h5.entry-details-table-header {
 .submenu-header {
   color: $content-bg-color;
   width: 100%;
-  border-bottom: 1px solid $content-bg-color;
+  border-bottom: 1px solid $content-bg-color !important;
   text-transform: uppercase;
-  padding: 6px 8px;
+  padding: 6px 8px !important;
   font-size: 8pt;
 }
 
@@ -4864,7 +4865,7 @@ h5.entry-details-table-header {
 
 .resolution-comment-wrapper {
   background-color: $content-bg-color;
-  padding: 4px 12px;
+  padding: 4px 12px !important;;
 }
 
 .resolution-comment-wrapper input[type='text'] {
@@ -5292,6 +5293,50 @@ td.ticket-total::before {
 #edit-ticket-status-dropdown .ticket-resolution-submenu {
   left: -323px;
   padding: 0 !important;
+}
+
+#index-edit-ticket-status-dropdown, #index-edit-entry-status-dropdown {
+  margin-left: 0;
+  width: 170px !important;
+}
+
+#index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.non-resolution-submit-wrapper {
+  padding: 12px !important;
+  background-color: $faint-neutral-color;
+  border-radius: 0 0 4px 4px;
+}
+
+.non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
+  width: 100%;
+  margin: auto;
+  border: 1px solid darken($faint-neutral-color, 5%);
+  font-size: 8pt;
+  padding: 6px;
+  min-height: 50px;
+}
+
+.non-resolution-submit-wrapper button {
+  margin: 20px auto 8px auto;
+}
+
+.non-resolution-submit-wrapper:hover {
+  background-color: $faint-neutral-color !important;
+}
+
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
+  width: 340px;
+  left: 100%;
+  padding: 0;
+  margin-top: -56px;
+}
+
+.non-resolution-submit-wrapper {
+  display: none;
 }
 
 .references-dropdown-button {
