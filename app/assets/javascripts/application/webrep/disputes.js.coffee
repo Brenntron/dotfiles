@@ -455,6 +455,8 @@ window.set_related_dispute = (form_tag) ->
     error_prefix: 'Error marking relationship.'
   )
 
+
+
 window.set_relating_disputes = (form_tag) ->
   related_dispute_id = $(form_tag).find(".dispute-id").val()
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
@@ -811,3 +813,17 @@ $ ->
     $('#cancel-dispute-button').addClass('hidden')
     $('#related-dispute-button').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
+
+
+  $('#set-related-dispute-submit-button').click ->
+    dropdown = $('#set-related-dispute-div').parent()
+    orig_ticket =  $('#set-related-dispute-form').find('input.dispute-id')
+    if ($('.dispute-entry-checkbox:checked').length > 0)
+      if orig_ticket.val() == ''
+        alert ('Please provide an original ticket number to relate the selected tickets to.')
+      else
+#      submit that shit
+    else
+      alert('No disputes selected')
+
+    
