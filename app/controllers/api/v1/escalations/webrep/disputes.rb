@@ -280,6 +280,20 @@ module API
                 true
               end
             end
+
+            params do
+              requires :entry, type: String
+            end
+
+            get 'reptool_get_info_for_form' do
+
+              #information = RepApi::Blacklist.where({entries: [ params[:url] ]}, true)
+              #information = JSON.parse(information)
+
+              {:classification => "malware", :expiration => "09/09/2018", :status => 'ACTIVE' }.to_json
+
+            end
+
           end
         end
       end

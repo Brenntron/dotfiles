@@ -147,18 +147,18 @@ $ ->
 
       headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       $.ajax(
-        url: '/api/v1/escalations/webrep/disputes/reptool_bl'
-        method: 'POST'
+        url: '/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+        method: 'GET'
         headers: headers
         data: data
         dataType: 'json'
         success: (response) ->
           response = JSON.parse(response)
           $(show_content[0]).text(entry_content)
-          $(show_rep_class[0]).text(response.classifications[0])
+          $(show_rep_class[0]).text(response.classification)
           $(show_rep_exp[0]).text(response.expiration)
           $(select_status).val(response.status)
-          $(select_rep_class).val(response.classifications[0])
+          $(select_rep_class).val(response.classification)
           $(submit_button).attr('disabled', false)
 #          window.location.reload()
         error: (response) ->
