@@ -1,4 +1,21 @@
 $ ->
+#  Keep tabs open on page refresh
+  if location.hash != ''
+    $('a[href="' + location.hash + '"]').tab 'show'
+  # remember the hash in the URL without jumping
+  $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
+    if history.pushState
+      history.pushState null, null, '#' + $(e.target).attr('href').substr(1)
+    else
+      location.hash = '#' + $(e.target).attr('href').substr(1)
+    return
+  # remember to back button
+
+  window.onpopstate = (e) ->
+    $('a[href="' + location.hash + '"]').tab 'show'
+    return
+
+
   $('#edit-dispute-entry-button').click ->
 
     if ($('.dispute_check_box:checked').length > 0)
