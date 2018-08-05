@@ -235,7 +235,7 @@ class Dispute < ApplicationRecord
 
     return_payload = {}
 
-    new_entries_ips.each do |ip|
+    new_entries_ips.each do |ip, entry|
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
@@ -249,7 +249,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.save
     end
-    new_entries_urls.each do |url|
+    new_entries_urls.each do |url, entry|
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
@@ -967,7 +967,7 @@ class Dispute < ApplicationRecord
         end
       end
 
-      dispute_packet[:dispute_entries] = dispute.dispute_entries
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.wbrs_rule_hits.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.sbrs_rule_hits.pluck(:name)}}
       dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
         when dispute.assignee == 'Unassigned'
