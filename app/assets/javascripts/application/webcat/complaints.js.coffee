@@ -551,7 +551,7 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        $('#advanced-search-button').dropdown('toggle')
+        $('.tickets-totals-table').trigger("click") #close open dropdowns
         datatable = $('#complaints-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -560,4 +560,12 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
       error: (response) ->
         std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
+
+
+window.named_webcat_index_table = (search_name) ->
+  data = {
+    search_type: 'named'
+    search_name: search_name
+  }
+  window.populate_advanced_webcat_index_table(data)
 
