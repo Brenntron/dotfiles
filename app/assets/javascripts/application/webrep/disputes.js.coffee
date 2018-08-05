@@ -512,20 +512,45 @@ $ ->
 
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
-    if (determine_checked('dispute-entry-checkbox'))
+    dropdown = $('#index-edit-entry-status-dropdown').parent()
+    if ($('.dispute-entry-checkbox:checked').length > 0)
 
+      $('.entry-status-radio-label').click ->
+        radio_button = $(this).prev('.entry-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-entry-resolution-submenu').show()
+          stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
+          $('#entry-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#entry-non-res-submit').show()
+          res_comment = $('#index-entry-resolution-submenu').find('.entry-status-comment')
+          $('.entry-resolution-radio').prop('checked', false)
+          $('#index-entry-resolution-submenu').hide()
+          $(res_comment).val('')
+
+      $('.entry-status-radio').click ->
+        all_stat_radios = $('#index-edit-entry-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-entry-resolution-submenu').show()
+          stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
+          $('#entry-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#entry-non-res-submit').show()
+          res_comment = $('#index-entry-resolution-submenu').find('.entry-status-comment')
+          $('.entry-resolution-radio').prop('checked', false)
+          $('#index-entry-resolution-submenu').hide()
+          $(res_comment).val('')
     else
-
-    $('.entry-status-radio-label').click ->
-      radio_button = $(this).prev('.entry-status-radio')
-      $(radio_button[0]).trigger('click')
-      if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
-        $('#index-entry-resolution-submenu').show()
-        $('#entry-non-res-submit').hide()
-      else
-        $('#entry-non-res-submit').show()
-        $('#index-entry-resolution-submenu').hide()
-
+      alert ('No rows selected')
+      $(dropdown).removeClass('open')
+      return false
 
 
 # Create index table

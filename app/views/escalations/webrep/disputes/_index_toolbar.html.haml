@@ -201,7 +201,7 @@
             .dropdown-menu#index-entry-resolution-submenu
               .col-xs-6.submenu-left-wrapper
                 .submenu-header
-                  Ticket Resolution
+                  Entry Resolution
                 %ul
                   %li
                     %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FP'}
@@ -225,7 +225,7 @@
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Comment
-                  %textarea
+                  %textarea.entry-status-comment
                   .button-row-center
                     %button.primary
                       Submit
@@ -236,7 +236,7 @@
           %li.non-resolution-submit-wrapper#entry-non-res-submit
             %label.content-label-sm
               Comment
-            %textarea
+            %textarea.entry-status-comment
             .button-row-center
               %button.primary
                 Submit
