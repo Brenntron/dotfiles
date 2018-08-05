@@ -235,7 +235,7 @@ class Dispute < ApplicationRecord
 
     return_payload = {}
 
-    new_entries_ips.each do |ip|
+    new_entries_ips.each do |ip, entry|
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
@@ -249,7 +249,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.save
     end
-    new_entries_urls.each do |url|
+    new_entries_urls.each do |url, entry|
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
