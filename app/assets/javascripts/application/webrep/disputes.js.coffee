@@ -489,12 +489,14 @@ window.set_duplicate_dispute = (form_tag) ->
 $ ->
 
   $('.change_ticket_status_button').click ->
+    status = ""
+    resolution = ""
+    comment = ""
     checkboxes = $('#disputes-index').find('.dispute_check_box')
     checked_disputes = []
     $(checkboxes).each ->
       if $(this).is(':checked')
-        dispute_id = $(this).attr('id')
-        console.log dispute_id
+        dispute_id = $(this).val()
         checked_disputes.push(dispute_id)
 
     status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
@@ -506,7 +508,10 @@ $ ->
 
 
     data = {
-
+      status: status,
+      resolution: resolution,
+      comment: comment,
+      dispute_ids: checked_disputes.toString()
     }
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -521,8 +526,9 @@ $ ->
         if response.status == "success"
           window.location.reload()
       error: (response) ->
-        popup_response_error(response, 'Error Syncing Data')
+        popup_response_error(response, 'Error Updating Status')
         window.location.reload()
+
     )
 
 

@@ -239,8 +239,8 @@ module API
             end
 
             params do
-              requires :dispute_ids, type: Array[Integer]
-              requires :status, type, String
+              requires :dispute_ids, type: Array[String]
+              requires :status, type: String
               optional :resolution, type: String
               optional :comment, type: String
             end
@@ -248,7 +248,7 @@ module API
             post 'set_disputes_status' do
 
               authorize!(:update, Dispute)
-              dispute_ids = params[:dispute_ids]
+              dispute_ids = params[:dispute_ids].map{|id| id.to_i}
               status = params[:status]
               resolution = ""
               comment = ""
@@ -262,7 +262,7 @@ module API
               disputes = Dispute.where(id: dispute_ids)
 
               Dispute.process_status_changes(disputes, status, resolution, comment, current_user)
-              true
+              {:status => "success"}.to_json
             end
 
             params do

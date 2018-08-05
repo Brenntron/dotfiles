@@ -15,7 +15,7 @@ class Dispute < ApplicationRecord
   delegate :cvs_username, to: :user, allow_nil: true
 
   NEW = 'NEW'
-  RESOLVED = 'RESOLVED'
+  RESOLVED = 'RESOLVED_CLOSED'
   ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
   DUPLICATE = 'DUPLICATE'
@@ -889,7 +889,7 @@ class Dispute < ApplicationRecord
       end
 
       if dispute.status == RESOLVED
-        disputes.dispute_entries.each do |entry|
+        dispute.dispute_entries.each do |entry|
           entry.status = status
           entry.resolution = resolution
           entry.resolution_comment = comment
