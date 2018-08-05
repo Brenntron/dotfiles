@@ -219,10 +219,11 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.adjust_from_params(params, username:)
-    case params['action']
-      when 'Active'
+
+    case params['action'].downcase
+      when 'active'
         add_from_params(params, username: username)
-      when 'Expired'
+      when 'expired'
         delete_from_params(params)
       else
         raise "No known action '#{params['action']}'."
