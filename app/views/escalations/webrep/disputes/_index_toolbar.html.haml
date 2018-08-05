@@ -178,18 +178,18 @@
           Edit Entry Status
       .dropdown-menu.toolbar-dropdown#index-edit-entry-status-dropdown{'aria-labelledby': 'index_ticket_status'}
         %ul
+          %li.status-radio-wrapper{}
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: "#{DisputeEntry::STATUS_RESEARCHING}"}
+            %label.entry-status-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RESEARCHING'}
-            %label.entry-status-radio-label.radio-label{for: 'RESEARCHING'} Researching
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: "#{DisputeEntry::STATUS_ESCALATED}"}
+            %label.entry-status-radio-label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} Escalated
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ESCALATED'}
-            %label.entry-status-radio-label.radio-label{for: 'ESCALATED'} Escalated
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}"}
+            %label.entry-status-radio-label.radio-label{for: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}"} Customer Pending
           %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'CUSTOMER_PENDING'}
-            %label.entry-status-radio-label.radio-label{for: 'CUSTOMER_PENDING'} Customer Pending
-          %li.status-radio-wrapper
-            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ON_HOLD'}
-            %label.entry-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
+            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: "#{DisputeEntry::STATUS_ON_HOLD}"}
+            %label.entry-status-radio-label.radio-label{for: "#{DisputeEntry::STATUS_ON_HOLD}"} On Hold
           %li.status-radio-wrapper
             %input.entry-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'RESOLVED_CLOSED'}
             %label.entry-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
@@ -199,30 +199,30 @@
                   Entry Resolution
                 %ul
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FP'}
-                    %label.entry-res-radio-label.radio-label{for: 'FIXED_FP'} Fixed - FP
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"}
+                    %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FN'}
-                    %label.entry-res-radio-label.radio-label{for: 'FIXED_FN'} Fixed - FN
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"}
+                    %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'UNCHANGED'}
-                    %label.entry-res-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"}
+                    %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"} Unchanged
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'INVALID'}
-                    %label.entry-res-radio-label.radio-label{for: 'INVALID'} Invalid / Junk Mail
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "#{DisputeEntry::STATUS_RESOLVED_INVALID}"}
+                    %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'TEST_TRAINING'}
-                    %label.entry-res-radio-label.radio-label{for: 'TEST_TRAINING'} Test / Training
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "#{DisputeEntry::STATUS_RESOLVED_TEST}"}
+                    %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_TEST}"} Test / Training
                   %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'OTHER'}
-                    %label.entry-res-radio-label.radio-label{for: 'OTHER'} Other
+                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"}
+                    %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Comment
-                  %textarea.entry-status-comment
+                  %textarea.entry-status-comment#entry-status-comment
                   .button-row-center
-                    %button.primary
+                    %button.primary{onclick: "toolbar_index_edit_status()"}
                       Submit
 
           %li.status-radio-wrapper
@@ -231,9 +231,9 @@
           %li.non-resolution-submit-wrapper#entry-non-res-submit
             %label.content-label-sm
               Comment
-            %textarea.entry-status-comment
+            %textarea.entry-status-comment#entry-status-non-res-comment
             .button-row-center
-              %button.primary
+              %button.primary{onclick: "toolbar_index_edit_status"}
                 Submit
 
 
