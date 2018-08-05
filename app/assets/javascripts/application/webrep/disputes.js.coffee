@@ -532,43 +532,44 @@ $ ->
 
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
-    if (determine_checked('dispute_check_box'))
+    dropdown = $('#index-edit-ticket-status-dropdown').parent()
+    if ($('.dispute_check_box:checked').length > 0)
+      # Select Status
+      $('.ticket-status-radio-label').click ->
+        radio_button = $(this).prev('.ticket-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
 
+      $('.ticket-status-radio').click ->
+        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
     else
-
-  # Select Status
-    $('.ticket-status-radio-label').click ->
-      radio_button = $(this).prev('.ticket-status-radio')
-      $(radio_button[0]).trigger('click')
-      if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
-        $('#index-ticket-resolution-submenu').show()
-        stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-        $('#ticket-non-res-submit').hide()
-        $(stat_comment).val('')
-      else
-        $('#ticket-non-res-submit').show()
-        res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-        $('.ticket-resolution-radio').prop('checked', false)
-        $('#index-ticket-resolution-submenu').hide()
-        $(res_comment[0]).val('')
-
-    $('.ticket-status-radio').click ->
-      all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
-      if $(this).is(':checked')
-        wrapper = $(this).parent()
-        $(all_stat_radios).removeClass('selected')
-        $(wrapper).addClass('selected')
-      if $(this).attr('id') == 'RESOLVED_CLOSED'
-        $('#index-ticket-resolution-submenu').show()
-        stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-        $('#ticket-non-res-submit').hide()
-        $(stat_comment).val('')
-      else
-        $('#ticket-non-res-submit').show()
-        res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-        $('.ticket-resolution-radio').prop('checked', false)
-        $('#index-ticket-resolution-submenu').hide()
-        $(res_comment[0]).val('')
+      $(dropdown).removeClass('open')
+      alert ('No rows selected')
 
 
 
