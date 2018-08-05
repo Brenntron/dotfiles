@@ -131,8 +131,6 @@ $ ->
       show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
       show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
       show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
-      select_status = $('#blacklist-action-select').val()
-      select_rep_class = $('#blacklist-classifications-select').val()
       submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
       entry_content = ''
       $('.dispute_check_box').each ->
@@ -157,8 +155,8 @@ $ ->
           $(show_content[0]).text(entry_content)
           $(show_rep_class[0]).text(response.classification)
           $(show_rep_exp[0]).text(response.expiration)
-          $(select_status).val(response.status)
-          $(select_rep_class).val(response.classification)
+          $('#blacklist-action-select').val(response.status)
+          $('#blacklist-classifications-select').val(response.classification)
           $(submit_button).attr('disabled', false)
 #          window.location.reload()
         error: (response) ->
