@@ -489,16 +489,22 @@ window.set_duplicate_dispute = (form_tag) ->
 $ ->
 
   $('.change_ticket_status_button').click ->
-    # :dispute_ids, type: Array[Integer]
-    # :status, type, String
+    checkboxes = $('#disputes-index').find('.dispute_check_box')
+    checked_disputes = []
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        dispute_id = $(this).attr('id')
+        console.log dispute_id
+        checked_disputes.push(dispute_id)
+
     status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
-    resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-    comment1 = $('#index-edit-ticket-status-dropdown').find('.ticket-status-comment').val()
-    console.log status
-    console.log resolution
-    console.log comment1
-    # :resolution, type: String
-    # :comment
+    if status == 'RESOLVED_CLOSED'
+      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+    else
+      comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
+
+
     data = {
 
     }
@@ -542,6 +548,7 @@ $ ->
       else
         $('#ticket-non-res-submit').show()
         res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+        $('.ticket-resolution-radio').prop('checked', false)
         $('#index-ticket-resolution-submenu').hide()
         $(res_comment[0]).val('')
 
@@ -559,6 +566,7 @@ $ ->
       else
         $('#ticket-non-res-submit').show()
         res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+        $('.ticket-resolution-radio').prop('checked', false)
         $('#index-ticket-resolution-submenu').hide()
         $(res_comment[0]).val('')
 
