@@ -369,7 +369,7 @@
                                           -#Put weight of rule here
                             .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header SBRS Rule Hit Details
-                              - if entry.dispute_rule_hits.where(:rule_type => "SBRS").empty?
+                              - if entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == "SBRS"}.empty?
                                 %table
                                   %thead
                                     %tr
@@ -384,9 +384,14 @@
                                       %th Rule Description
                                       %th Weight
                                   %tbody
-                                    - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                                    - entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == "SBRS"}.each do |sbrs_hit|
                                       %tr
-                                        %td= sbrs_hit.name
+                                        %td
+                                          - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
+                                            %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': sbrs_hit.name}
+                                              = sbrs_hit.name
+                                          - else
+                                            = sbrs_hit.name
                                         %td= sbrs_hit.mnemonic
                                         %td
                                           -#Put weight of rule here
