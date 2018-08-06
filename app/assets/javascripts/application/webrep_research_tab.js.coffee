@@ -178,10 +178,22 @@ $ ->
     show_content = $('#wlbl_adjust_entries').find('.wlbl-entry-content')
     show_wlbl = $('#wlbl_adjust_entries').find('.wlbl-entry-wlbl')
     show_wbrs = $('#wlbl_adjust_entries').find('.wlbl-current-entry-wbrs')
+    wl_weak = $('#wlbl_adjust_entries').find('.wl-weak-checkbox')
+    wl_med = $('#wlbl_adjust_entries').find('.wl-med-checkbox')
+    wl_heavy = $('#wlbl_adjust_entries').find('.wl-heavy-checkbox')
+    bl_weak = $('#wlbl_adjust_entries').find('.bl-weak-checkbox')
+    bl_med = $('#wlbl_adjust_entries').find('.bl-med-checkbox')
+    bl_heavy = $('#wlbl_adjust_entries').find('.bl-heavy-checkbox')
 
     $(show_content[0]).empty()
     $(show_wbrs[0]).empty()
     $(show_wlbl[0]).empty()
+    $(wl_weak[0]).prop('checked', false)
+    $(wl_med[0]).prop('checked', false)
+    $(wl_heavy[0]).prop('checked', false)
+    $(bl_weak[0]).prop('checked', false)
+    $(bl_med[0]).prop('checked', false)
+    $(bl_heavy[0]).prop('checked', false)
 
 #    $(tbody).empty()
     dropdown_wrapper = $(this).parent()
@@ -193,7 +205,6 @@ $ ->
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text()
         wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
-
 
         data = {
         # Send entry content to reptool
@@ -208,29 +219,33 @@ $ ->
           data: data
           dataType: 'json'
           success: (response) ->
-
             #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
 
             response = JSON.parse(response)
             if response.data != ""
+              console.log response.data
+
+              $(response.data).each ->
+                if String(this) == 'WL-weak'
+                  $(wl_weak[0]).prop('checked', true)
+                if String(this) == 'WL-med'
+                  $(wl_med[0]).prop('checked', true)
+                if String(this) == 'WL-heavy'
+                  $(wl_heavy[0]).prop('checked', true)
+                if String(this) == 'BL-weak'
+                  $(bl_weak[0]).prop('checked', true)
+                if String(this) == 'BL-med'
+                  $(bl_med[0]).prop('checked', true)
+                if String(this) == 'BL-heavy'
+                  $(bl_heavy[0]).prop('checked', true)
+
               $(show_content[0]).text(entry_content)
               $(show_wbrs[0]).text(wbrs)
               $(show_wlbl[0]).text(response.data)
             else
-              #should be in the format of ['BL-med', 'BL-heavy']
-              list_types = response.data
-
               $(show_content[0]).text(entry_content)
               $(show_wbrs[0]).text(wbrs)
               $(show_wlbl[0]).text('Not on a list')
-              #do stuff when data is empty
-            #$(show_content[0]).text(entry_content)
-            #$(show_rep_class[0]).text(response.classification)
-            #$(show_rep_exp[0]).text(response.expiration)
-            #$('#blacklist-action-select').val(response.status)
-            #$('#blacklist-classifications-select').val(response.classification)
-              $(submit_button).attr('disabled', false)
-#              window.location.reload()
 
             #this should probably call the resync data then reload the page, for an up to date score
 

@@ -4157,7 +4157,11 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
-  min-width: 310px;
+  min-width: 330px;
+}
+
+#wlbl_adjust_entries.dropdown-menu li:hover, #wlbl_adjust_entries_index.dropdown-menu li:hover{
+  background-color: transparent;
 }
 
 .dispute_rep_tools .dropdown-menu {
@@ -5571,7 +5575,7 @@ table.dataTable tbody tr.selected {
 }
 
 .toggle-offset {
-  margin-left: 15px;
+  margin-left: 12px !important;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

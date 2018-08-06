@@ -316,7 +316,6 @@ module API
               params[:entry] = params[:entry].strip
               information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
               information = JSON.parse(information)
-
               if information[params[:entry]] == "NOT_FOUND"
                 return {:classification => "not found", :expiration => "", :status => ""}.to_json
               else
