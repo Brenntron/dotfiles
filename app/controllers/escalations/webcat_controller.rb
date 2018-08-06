@@ -3,10 +3,9 @@ class Escalations::WebcatController < ApplicationController
   before_action :dashboard_metrics
 
   def dashboard_metrics
-    @ti_comps = Complaint.from_ti.count
-    @ti_comp_entries = Complaint.from_ti.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
-    @int_comps = Complaint.from_int.count
-    @int_comp_entries = Complaint.from_int.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
+    @ti_comp_guest = Complaint.from_ti.by_guest.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
+    @ti_comp_cust = Complaint.from_ti.by_cust.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
+    @int_comp_entries = Complaint.from_int.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
     @wbnp = "-"
 
     @active_comp = Complaint.active_count

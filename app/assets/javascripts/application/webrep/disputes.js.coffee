@@ -26,9 +26,9 @@ window.populate_webrep_index_table = (data = {}) ->
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-      #$("#create_research_submit_wait").addClass('hidden').hide()
-      #$("#create_research_submit").show()
+#$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+#$("#create_research_submit_wait").addClass('hidden').hide()
+#$("#create_research_submit").show()
   , this)
 
 window.advanced_webrep_index_table = () ->
@@ -221,7 +221,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
 
 window.toolbar_index_edit_status = (box_names) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-    # this.dataset['entryId']
+# this.dataset['entryId']
     this.value
   ).toArray()
 
@@ -248,7 +248,7 @@ window.toolbar_index_edit_status = (box_names) ->
 window.toolbar_index_change_assignee = () ->
 
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-    # this.dataset['entryId']
+# this.dataset['entryId']
     Number(this.value)
   ).toArray()
 
@@ -540,7 +540,7 @@ $ ->
   $('#index_ticket_status').click ->
     dropdown = $('#index-edit-ticket-status-dropdown').parent()
     if ($('.dispute_check_box:checked').length > 0)
-      # Select Status
+# Select Status
       $('.ticket-status-radio-label').click ->
         radio_button = $(this).prev('.ticket-status-radio')
         $(radio_button[0]).trigger('click')
@@ -597,7 +597,7 @@ $ ->
 
 
 
-# Create index table
+  # Create index table
   dispute_table = $('#disputes-index').DataTable(
     order: [ [
       9
@@ -732,17 +732,18 @@ $ ->
     # `d` is the original data object for the row
     table_head + entry_rows.join('') + '</tbody></table>'
 
-  populate_webrep_index_table()
+  if $('body.index-action').length
+    populate_webrep_index_table()
 
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
     row = dispute_table.row(tr)
     if row.child.isShown()
-    # This row is already open - close it
+# This row is already open - close it
       row.child.hide()
       tr.removeClass 'shown'
     else
-    # Open this row
+# Open this row
       row.child(format(row.data())).show()
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
@@ -899,3 +900,18 @@ $ ->
 
 
 
+
+
+
+  $('#set-related-dispute-submit-button').click ->
+    dropdown = $('#set-related-dispute-div').parent()
+    orig_ticket =  $('#set-related-dispute-form').find('input.dispute-id')
+    if ($('.dispute-entry-checkbox:checked').length > 0)
+      if orig_ticket.val() == ''
+        alert ('Please provide an original ticket number to relate the selected tickets to.')
+      else
+#      submit that shit
+    else
+      alert('No disputes selected')
+
+    
