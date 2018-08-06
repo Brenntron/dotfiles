@@ -4763,6 +4763,7 @@ h5.entry-details-table-header {
   padding-bottom: 1px;
   border: 2px solid #fff;
   outline: 1px solid #e5e5e5;
+  font-size: 9pt;
 }
 
 .dropdown.open .inline-select-dropdown {
@@ -5501,6 +5502,19 @@ table.dataTable tbody tr.selected {
   background-image: url(image_path('icon_related_white.svg'))
 }
 
+#show-edit-ticket-status-dropdown {
+  margin-top: 1px;
+  margin-left: 0;
+}
+
+#show-edit-ticket-status-button {
+  padding: 4px 6px;
+}
+
+#show-edit-ticket-status-dropdown .radio-label {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
