@@ -732,7 +732,8 @@ $ ->
     # `d` is the original data object for the row
     table_head + entry_rows.join('') + '</tbody></table>'
 
-  populate_webrep_index_table()
+  if $('body.index-action').length
+    populate_webrep_index_table()
 
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
