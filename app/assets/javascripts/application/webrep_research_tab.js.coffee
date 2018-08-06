@@ -175,46 +175,68 @@ $ ->
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
-    $(tbody).empty()
+    show_content = $('#wlbl_adjust_entries').find('.wlbl-entry-content')
+    show_wlbl = $('#wlbl_adjust_entries').find('.wlbl-entry-wlbl')
+    show_wbrs = $('#wlbl_adjust_entries').find('.wlbl-current-entry-wbrs')
+
+    $(show_content[0]).empty()
+    $(show_wbrs[0]).empty()
+    $(show_wlbl[0]).empty()
+
+#    $(tbody).empty()
     dropdown_wrapper = $(this).parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute_check_box:checked').length == 1)
+      submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+      entry_content = ''
 
-      data = {
-      # Send entry content to reptool
-        'entry' : entry_content
-      }
+      $('.dispute_check_box:checked').each ->
+        entry_row = $(this).parents('.research-table-row')[0]
+        entry_content = $(entry_row).find('.entry-data-content').text()
+        wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
 
-      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-      $.ajax(
-        url: '/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-        method: 'GET'
-        headers: headers
-        data: data
-        dataType: 'json'
-        success: (response) ->
 
-          #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+        data = {
+        # Send entry content to reptool
+          'entry' : entry_content
+        }
 
-          response = JSON.parse(response)
-          if response.data != ""
+        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+        $.ajax(
+          url: '/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+          method: 'GET'
+          headers: headers
+          data: data
+          dataType: 'json'
+          success: (response) ->
 
-          else
-            #should be in the format of ['BL-med', 'BL-heavy']
-            list_types = response.data
-            #do stuff when data is empty
-          #$(show_content[0]).text(entry_content)
-          #$(show_rep_class[0]).text(response.classification)
-          #$(show_rep_exp[0]).text(response.expiration)
-          #$('#blacklist-action-select').val(response.status)
-          #$('#blacklist-classifications-select').val(response.classification)
-          #$(submit_button).attr('disabled', false)
-          #window.location.reload()
+            #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
 
-          #this should probably call the resync data then reload the page, for an up to date score
+            response = JSON.parse(response)
+            if response.data != ""
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text(response.data)
+            else
+              #should be in the format of ['BL-med', 'BL-heavy']
+              list_types = response.data
 
-        error: (response) ->
-          popup_response_error(response, 'Error retrieving Reptool Data')
-      )
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text('Not on a list')
+              #do stuff when data is empty
+            #$(show_content[0]).text(entry_content)
+            #$(show_rep_class[0]).text(response.classification)
+            #$(show_rep_exp[0]).text(response.expiration)
+            #$('#blacklist-action-select').val(response.status)
+            #$('#blacklist-classifications-select').val(response.classification)
+              $(submit_button).attr('disabled', false)
+#              window.location.reload()
+
+            #this should probably call the resync data then reload the page, for an up to date score
+
+          error: (response) ->
+            popup_response_error(response, 'Error retrieving WL/BL Data')
+        )
 
 
 
@@ -230,7 +252,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      alert ('No rows selected')
+      alert ('Please select 1 row')
 
 
 
