@@ -63,9 +63,11 @@ module API
 
             desc 'update a dispute'
             params do
-              # TODO: Find out what the options for this should be and put them in here.
-              # Currently, we're only doing Priority, Contact Name, Contact Email, and Status,
-              # all of which are optional
+              requires :priority, type: String, desc: "Priority of P1 through P5"
+              requires :customer_name, type: String, desc: "Name of the customer associated with this dispute. Note that changing this changes this customer's name on all their disputes."
+              requires :customer_email, type: String, desc: "Email of the customer associated with this dispute"
+              requires :status, type: String, desc: "Status of the dispute"
+              optional :related_id, type: Integer, desc: "ID of a dispute to relate to this one"
             end
             put ":id" do
               dispute = Dispute.find(params[:id])
@@ -77,6 +79,13 @@ module API
 
               dispute.save
               dispute.customer.save
+
+              if permitted_params[:related_id]
+                related_dispute = Dispute.find(permitted_params[:related_id])
+                related_dispute.related_id = params[:id]
+                related_dispute.related_at = Time.now
+                related_dispute.save
+              end
 
               dispute.to_json
             end
