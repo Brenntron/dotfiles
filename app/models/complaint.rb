@@ -32,8 +32,11 @@ class Complaint < ApplicationRecord
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  scope :open_comps, -> { where.not(status: COMPLETED) }
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :by_guest, -> { joins(customer: :company).where('companies.name = ?', 'Guest')}
+  scope :by_cust, -> { joins(customer: :company).where('companies.name != ?', 'Guest')}
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
