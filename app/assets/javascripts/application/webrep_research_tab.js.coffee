@@ -1,4 +1,20 @@
 $ ->
+
+  # go back to the last tab after reload
+
+  $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
+    localStorage.setItem 'lastTab', $(this).attr('id')
+    return
+
+  $(document).on 'ready page:load', (e) ->
+    lastTab = localStorage.getItem('lastTab')
+    if lastTab
+      $('#' + lastTab).tab('show');
+    else
+      $('#communication-tab-link').tab('show')
+    return
+
+
   $('#edit-dispute-entry-button').click ->
 
     if ($('.dispute_check_box:checked').length > 0)

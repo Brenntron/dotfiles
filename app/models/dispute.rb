@@ -23,7 +23,7 @@ class Dispute < ApplicationRecord
   ANALYST_COMPLETED = "Analyst Completed"
   ALL_AUTO_RESOLVED = "All Auto Resolved"
 
-  TI_NEW = 'IN PROGRESS'
+  TI_NEW = 'PENDING'
   TI_RESOLVED = 'RESOLVED'
   TI_CLOSED = 'CLOSED'
 
@@ -338,7 +338,7 @@ class Dispute < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations',
+            'product' => 'Escalations_Console',
             'component' => 'IP/Domain',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
