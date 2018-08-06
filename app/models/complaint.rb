@@ -15,7 +15,7 @@ class Complaint < ApplicationRecord
   COMPLETED = 'COMPLETED'
   PENDING = 'PENDING'
 
-  TI_NEW = 'IN PROGRESS'
+  TI_NEW = 'PENDING'
   TI_RESOLVED = 'RESOLVED'
 
   AC_SUCCESS = 'CREATE_ACK'
@@ -151,8 +151,8 @@ class Complaint < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations',
-            'component' => 'WebCat',
+            'product' => 'Escalations_Console',
+            'component' => 'Categorization',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
             'description' => full_description,
