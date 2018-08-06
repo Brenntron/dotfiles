@@ -150,6 +150,9 @@ module API
             post "entry_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
+              dispute = DisputeEntry.where({:id => params[:dispute_entry_ids].first}).first.dispute
+              DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+              true
             end
 
             desc "Adjust a WL/BL entry"
@@ -162,6 +165,7 @@ module API
             post "ticket_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_tickets_from_params(permitted_params, username: current_user.cvs_username)
+
             end
 
             desc "Adjust a Reptool Bl entry"
@@ -316,16 +320,40 @@ module API
               params[:entry] = params[:entry].strip
               information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
               information = JSON.parse(information)
-
               if information[params[:entry]] == "NOT_FOUND"
                 return {:classification => "not found", :expiration => "", :status => ""}.to_json
               else
                 return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"]}.to_json
               end
 
+            end
 
+            params do
+              requires :entry, type: String
+            end
+
+            get 'rule_ui_wlbl_get_info_for_form' do
+              params[:entry] = params[:entry].strip
+              
+              information = Wbrs::ManualWlbl.where({:url => params[:entry]})
+
+              if information.blank?
+                return {:status => 'success', :data => ""}.to_json
+              end
+
+              list_types = []
+              information.each do |entry|
+                if entry.url == params[:entry]
+                  if entry.state == "active"
+                    list_types << entry.list_type
+                  end
+                end
+              end
+
+              return {:status => "success", :data => list_types}.to_json
 
             end
+
 
           end
         end
