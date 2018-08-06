@@ -52,10 +52,10 @@
                       %th.content-label-sm.no-word-break Current WL/BL List
                       %th.text-center.content-label-sm.no-word-break Current WBRS Score
                   %tbody
-                    -#%tr
-                    -#  %td.wlbl-entry-content
-                    -#  %td.wlbl-entry-wlbl
-                    -#  %td.wlbl-current-entry-wbrs.text-center
+                    %tr
+                      %td.wlbl-entry-content
+                      %td.wlbl-entry-wlbl
+                      %td.wlbl-current-entry-wbrs.text-center
 
                     -#    Removing for now. We can't do a preview until the api is updated to provide that info
                     -#%td.text-center
@@ -66,7 +66,7 @@
                   .row
                     .col-xs-12
                       %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
-                  .row
+                  .row.toggle-offset
                     .col-xs-6
                       %ul.wlbl-toggle-list
                         %li
@@ -106,7 +106,7 @@
                     %label.content-label-sm Comment
                     %textarea.dropdown-comment.adjust-wlbl-input.note-input
                   .button-row-center
-                    %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);'}
+                    %button.primary.dropdown-submit-button{type: 'button', disabled: true}
                       Submit Changes
 
         %span.dropdown
