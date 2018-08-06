@@ -632,9 +632,12 @@ th.alt-col {
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
+.mark-related-button {background-image: url(image_path('icon_related.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+
+.dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
 
 .delete-search {
   display: inline-block;
@@ -5552,6 +5555,16 @@ table.dataTable tbody tr.selected {
   background-image: url(image_path('icon_related_white.svg'))
 }
 
+#set-related-dispute-div {
+  margin-left: 0;
+  padding: 8px 12px 12px !important;
+}
+
+#set-related-dispute-div input.dispute-id {
+  width: 100%;
+  border: 1px solid darken( $faint-neutral-color, 5%);
+  padding: 6px;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
