@@ -219,22 +219,32 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   )
 
 window.toolbar_index_edit_status = () ->
-
   statusName = $('input[name=entry-status]:checked').attr('id')
 
   if statusName == "RESOLVED_CLOSED"
     statusName = $('input[name=entry-resolution]:checked').attr('id')
 
+  data = {}
   entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
-    this.id
-  ).toArray()
+    data[this.id] = [{
+      id: this.id
+      field: "status"
+      new: statusName
+    }]
+  )
 
-  data = {
-    'dispute_entry_ids': entry_ids,
-    'new_status': statusName
-  }
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    data: { field_data: data }
+    success_reload: true
+    error_prefix: 'Error updating data.'
+  )
 
-  debugger
+
+
+
+
 #  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 #  $.ajax(
 #    url: '/api/v1/escalations/webrep/disputes/edit_status'
@@ -407,13 +417,13 @@ window.take_single_dispute = (id) ->
   )
 
 
-window.dispute_entry_status = (id, status) ->
-  std_msg_ajax(
-    method: 'PATCH'
-    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
-    data: { status: status }
-    error_prefix: 'Error updating status.'
-  )
+#window.dispute_entry_status = (id, status) ->
+#  std_msg_ajax(
+#    method: 'PATCH'
+#    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
+#    data: { status: status }
+#    error_prefix: 'Error updating status.'
+#  )
 
 
 window.save_dispute_entries = () ->
@@ -439,6 +449,7 @@ window.save_dispute_entries = () ->
     if 0 < fielddata.length
       data[this.dataset.entryId] = fielddata
   )
+
   std_msg_ajax(
     method: 'PATCH'
     url: "/api/v1/escalations/webrep/disputes/entries/field_data"
@@ -739,7 +750,7 @@ $ ->
         important = 'entry-important-flag'
       else
         important = ''
-      dispute_entry_id = this.id
+      dispute_entry_id = this.entry.id
       if this.entry.wbrs_score != null
         wbrs_score = this.entry.wbrs_score
       else wbrs_score = missing_data
