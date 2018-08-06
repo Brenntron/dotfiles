@@ -1,0 +1,87 @@
+.content-wrapper
+  - content_for(:webcat_page) do
+    Complaints Show
+
+  %input{type: 'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+  %input{type: 'hidden', name: 'current_user_id', value: "#{current_user.id}"}
+  %input{type: 'hidden', name: 'xml_token', value: "#{xml_token}"}
+
+  .complaint-mgt-top-area
+    = render "escalations/webcat/shared/telemetry"
+
+  .row
+    .col-xs-12.temp-spacer
+      = render "show_toolbar"
+
+
+  .row
+    .col-xs-6#complaint-entries-div
+      - @complaints.each do |complaint|
+        - complaint.complaint_entries.each do |entry|
+          .row{id: "complaint_entry_row_#{entry.id}", onclick: "display_preview_window(#{entry.to_json})"}
+            .col-xs-12
+              %p
+                = complaint.customer.name
+                from
+                =complaint.customer.company.name
+                |
+                =complaint.complaint_tags.pluck(:name).join(", ")
+          .row
+            .col-xs-1
+              = check_box_tag "#{entry.id}_site_checkbox",
+                '{"site": "' + entry.domain.to_s + '", "viewable": "' + entry.viewable.to_s + '" }',
+                false,
+                class: 'complaint-entry-checkbox',
+                'data-complaint-id' => complaint.id,
+                'data-entry-id' => entry.id
+              %div ID: = entry.id
+            .col-xs-8
+              %div
+                Domain:
+                %br
+                = entry.domain
+              %div
+                Status:
+                = entry.status
+            .col-xs-3
+              %div
+                = radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_dont_fix", true
+                = label_tag "Dont Fix", nil, title: "Selecting Dont Fix indicates that you have no idea how to categorize the site."
+                %br
+                = radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_fixed", false
+                = label_tag "Fixed", nil, title: "Selecting fixed indicates the category of the site will be changed."
+                %br
+                = radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_unchanged", false
+                = label_tag "unchanged", nil, title: "Selecting unchanged indicates that no change will be made to the category of the site."
+                %br
+                = radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_invalid", false
+                = label_tag "Invalid", nil, title: "Selecting Invalid indicates that currently there is no way to categorize the site at all."
+                %br
+    .col-xs-6
+      .row
+        .col-xs-12
+          .preview-url
+            Previewing
+          %a#preview_window_header_a{href: '#', target: '_blank'}
+            %p#preview_window_header_p
+          .embed-responsive.embed-responsive-1by1
+            %iframe#preview_window.embed-responsive-item.webcat-iframe{src: '', sandbox: true}
+      .row
+        .col-sm-6.col-xs-12
+          .form-group
+            = label_tag "Prefix", nil, class: "h4"
+            %br
+            = text_field_tag "complaint_id_x_prefix", nil, placeholder: "Prefix", class: "form-control"
+            = label_tag "Categories", nil, class: "h4"
+            %br
+            = text_field_tag "complaint_id_x_categories", nil, placeholder: "cat1, cat2, cat3, etc...", class: "form-control"
+        .col-sm-6.col-xs-12
+          = button_tag "mark for commit", type: "submit", class: "btn-lg btn-primary", onclick: 'mark_for_commit();'
+      .row
+        .col-xs-12
+          .form-group
+            = label_tag "Comment", nil, class: "h4"
+            = text_field_tag "complaint_id_x_comment", nil, placeholder: "entry level comment", class: "form-control"
+      .row
+        .col-xs-12.text-center
+          = button_tag "Submit marked", type: "submit", class: "btn-lg btn-primary", onclick: 'commit_marked();'

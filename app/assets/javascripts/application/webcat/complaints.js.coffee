@@ -235,79 +235,49 @@ format = (complaint_entry_row) ->
 
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
-    complaint_entry_html = '<div class="row">' +
-      '<div class="col-xs-1">' +
-      'ID <p>' + complaint_entry.entry_id + '</p>' +
-      '</div>' +
-      '<div class="col-xs-2">' +
-      '<div class="row">' +
-      '<div>Category:' +
-      '<span class="complaint-category' + complaint_entry.entry_id + '">' + complaint_entry.category + '</span>' +
-      '</div>'+
-      '</div>' +
-      '<div class="row">' +
-      '<strong>' + url + '</strong>' +
-      '</div>' +
-      '<div class="row">' +
-      '<div>Resolution: '+
-      '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
-      '</div>'+
-      '</div>' +
-      '<div class="row">' +
-      '<div>Suggested Disposition: '+
-      '<span>' + disposition + '</span>' +
-      '</div>'+
-      '</div>' +
-      '</div>' +
-      ' <div class="col-xs-3">' +
+    complaint_entry_html = '<table><tr>' +
+      '<td>' + url + '<br/>' +
       'Prefix <input id="complaint_review_prefix_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + host + '"><button onclick="removeSubdomain(complaint_review_prefix_' + complaint_entry.entry_id + ',\'' + complaint_entry.domain + '\')">remove subdomain</button>' +
-      '</div>' +
-      '<div class="col-xs-1">' +
-      '<div class="row">' + 'Certainty: <p>' + certainty + '</p>' +
-      '</div>' +
-      '<div class="row">' + 'Confidence: <p>' + confidence + '</p>' +
-      '</div>' +
-      '</div>' +
-      '<div class="col-xs-4">' +
-      ' Resolution: | ' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > commit | ' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> decline' +
-      '</div>' +
-      '<div class="col-xs-1">' +
-      '<button onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Change </button>' +
-      '</div>' +
-      '<div class="col-xs-12">' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50">' + '</div>' +
-      '</div>'
+      '<td>Status:<br/>' + '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
+      '<td>Certainty:' + certainty + '<br/>Confidence:' + confidence + '</td>' +
+      '<td>Suggested Disposition<br/>' + disposition + '</td>' +
+      '<td>Category: <span class="complaint-category' + complaint_entry.entry_id + '">' + complaint_entry.category + '</span></td>' +
+
+      '<td>Resolution:<br/>' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
+      '<td><button onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Change </button>' + '</td>' +
+      '</tr><tr>' +
+      '<td>' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50">' + '</td>'
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<table><tr>' +
-      '<td>' + uri + '</td>' +
-      '<td>Status</td><td>Confidence</td><td>Suggested Disposition</td><td></td></tr>' +
-      '<tr><td>' +
+      '<td>' + uri + '<br/>' +
       'Prefix <input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
       '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button>' +
-      '</td><td>' +
-      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> unchanged |  ' +
-      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> fixed | ' +
-      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> invalid' +
-      '</td><td>' + confidence + '</td><td>' + disposition +
-      '</td><td>' +
+      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button></td>' +
+      '<td>Status<br/>' +
+      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
+      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
+      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> Invalid' +
+      '</td>' +
+      '<td>Confidence<br/>' + confidence + '</td>' +
+      '<td>Suggested Disposition<br/>' + disposition + '</td>' +
+      '<td>' +
       '<button>info</button>' +
       '<button>lookup</button>' +
       '<button>history</button>' +
       '<button>domain</button>' +
       '</td></tr>' +
       '<tr>' +
-      '<td>' +
-      'Category: <select id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectized" placeholder="Enter up to 5 categories" multiple="multiple"></select>' +
-      '</td><td>' +
+      '<td>Category: <fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectize" placeholder="Enter up to 5 categories" value="">' +
+      '<td colspan="3">' +
       'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>'  +
-      '</td><td>' +
-      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
-      '</td></tr></tbody></table>'
+      '</td>' +
+      '<td><button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
+      '</td></tr></table>'
   complaint_entry_html
 
 
@@ -350,30 +320,31 @@ window.click_table_buttons = (complaint_table, button)->
             $(button).hide()
 
 window.populate_webcat_index_table = (filter) ->
-  self_review = $('#self_review')[0].checked
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
-    method: 'GET'
-    headers: headers
-    success: (response) ->
+  if $('body.index-action').length
+    self_review = $('#self_review')[0].checked
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
+      method: 'GET'
+      headers: headers
+      success: (response) ->
 
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
-      else
-        datatable = $('#complaints-index').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          alert(json.error)
+        else
+          datatable = $('#complaints-index').DataTable()
+          datatable.clear();
+          datatable.rows.add(json.data);
+          datatable.draw();
 
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-      #$("#create_research_submit_wait").addClass('hidden').hide()
-      #$("#create_research_submit").show()
-  , this)
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+        #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+        #$("#create_research_submit_wait").addClass('hidden').hide()
+        #$("#create_research_submit").show()
+    , this)
 
 window.display_preview_window = (entry) ->
 
@@ -432,10 +403,14 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+selected_rows.data()[i].ip_address)
     i++
 
-window.select_all_pages = () ->
-  $('#complaints-index').DataTable().rows().select()
-window.unselect_all_pages = () ->
-  $('#complaints-index').DataTable().rows().deselect()
+$ ->
+  $('#complaints_check_box').click ->
+    if $('#complaints_check_box').prop('checked')
+      $('#complaints-index').DataTable().rows().select()
+    else
+      $('#complaints-index').DataTable().rows().deselect()
+  return
+
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
