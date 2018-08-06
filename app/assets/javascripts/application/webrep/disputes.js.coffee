@@ -221,9 +221,6 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').attr('id')
 
-  if statusName == "RESOLVED_CLOSED"
-    statusName = "RESOLVED:" + $('input[name=entry-resolution]:checked').attr('id')
-
   data = {}
   entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
     data[this.id] = [{
@@ -231,6 +228,20 @@ window.toolbar_index_edit_status = () ->
       field: "status"
       new: statusName
     }]
+
+    if statusName == "RESOLVED_CLOSED"
+      data[this.id].push({
+        id: this.id
+        field: "resolution"
+        new: $('input[name=entry-resolution]:checked').attr('id')
+      })
+
+      data[this.id].push({
+        id: this.id
+        field: "resolution_comment"
+        new: $('#entry-status-comment').val()
+      })
+
   )
 
   std_msg_ajax(
