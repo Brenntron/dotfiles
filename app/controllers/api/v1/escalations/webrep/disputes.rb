@@ -323,9 +323,34 @@ module API
                 return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"]}.to_json
               end
 
+            end
 
+            params do
+              requires :entry, type: String
+            end
+
+            get 'rule_ui_wlbl_get_info_for_form' do
+              params[:entry] = params[:entry].strip
+              
+              information = Wbrs::ManualWlbl.where({:url => params[:entry]})
+
+              if information.blank?
+                return {:status => 'success', :data => ""}.to_json
+              end
+
+              list_types = []
+              information.each do |entry|
+                if entry.url == params[:entry]
+                  if entry.state == "active"
+                    list_types << entry.list_type
+                  end
+                end
+              end
+
+              return {:status => "success", :data => list_types}.to_json
 
             end
+
 
           end
         end

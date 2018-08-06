@@ -170,6 +170,8 @@ $ ->
       return false
 
 
+
+
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
@@ -177,19 +179,62 @@ $ ->
     dropdown_wrapper = $(this).parent()
     if ($('.dispute_check_box:checked').length > 0)
 
-      $('.dispute_check_box').each ->
-        if $(this).prop('checked')
-          entry_row = $(this).parents('.research-table-row')[0]
-          entry_content = $(entry_row).find('.entry-data-content').text()
-          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-          wlbl = $(entry_row).find('.entry-data-wlbl').text()
+      data = {
+      # Send entry content to reptool
+        'entry' : entry_content
+      }
 
-          $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
-      $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax(
+        url: '/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+
+          #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+
+          response = JSON.parse(response)
+          if response.data != ""
+
+          else
+            #should be in the format of ['BL-med', 'BL-heavy']
+            list_types = response.data
+            #do stuff when data is empty
+          #$(show_content[0]).text(entry_content)
+          #$(show_rep_class[0]).text(response.classification)
+          #$(show_rep_exp[0]).text(response.expiration)
+          #$('#blacklist-action-select').val(response.status)
+          #$('#blacklist-classifications-select').val(response.classification)
+          #$(submit_button).attr('disabled', false)
+          #window.location.reload()
+
+          #this should probably call the resync data then reload the page, for an up to date score
+
+        error: (response) ->
+          popup_response_error(response, 'Error retrieving Reptool Data')
+      )
+
+
+
+      #$('.dispute_check_box').each ->
+      #  if $(this).prop('checked')
+      #    entry_row = $(this).parents('.research-table-row')[0]
+      #    entry_content = $(entry_row).find('.entry-data-content').text()
+      #    wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+      #    wlbl = $(entry_row).find('.entry-data-wlbl').text()
+
+      #    $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
+      #$($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
     else
       $(dropdown_wrapper).removeClass('open')
       alert ('No rows selected')
+
+
+
+
 
 
   #Inline Adjust WL/BL Button
