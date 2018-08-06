@@ -178,9 +178,8 @@
     .col-xs-12.text-center
       %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
 
-
-%ul.nav.nav-tabs#bug-tabs{role: 'tablist'}
-  %li.nav-item.active{role:'presentation'}
+%ul.nav.nav-tabs#research-tab{role: 'tablist'}
+  %li.nav-item{role:'presentation'}
     %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
       Communication
   %li.nav-item{role:'presentation'}
@@ -191,7 +190,7 @@
       Duplicate Cases
 
 .tab-content.content-wrapper#bug-tab-content
-  .tab-pane.active#communication_tab{role: 'tabpanel'}
+  .tab-pane#communication_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/communication_tab'
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'

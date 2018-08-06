@@ -1,18 +1,17 @@
 $ ->
-#  Keep tabs open on page refresh
-  if location.hash != ''
-    $('a[href="' + location.hash + '"]').tab 'show'
-  # remember the hash in the URL without jumping
-  $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
-    if history.pushState
-      history.pushState null, null, '#' + $(e.target).attr('href').substr(1)
-    else
-      location.hash = '#' + $(e.target).attr('href').substr(1)
-    return
-  # remember to back button
 
-  window.onpopstate = (e) ->
-    $('a[href="' + location.hash + '"]').tab 'show'
+  # go back to the last tab after reload
+
+  $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
+    localStorage.setItem 'lastTab', $(this).attr('id')
+    return
+
+  $(document).on 'ready page:load', (e) ->
+    lastTab = localStorage.getItem('lastTab')
+    if lastTab
+      $('#' + lastTab).tab('show');
+    else
+      $('#communication-tab-link').tab('show')
     return
 
 
