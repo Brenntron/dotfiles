@@ -232,15 +232,23 @@
                           %td
                             %label WBRS Rule Hits
                           %td.text-center
-                            = entry.dispute_rule_hits.where(:rule_type => "WBRS").count
+                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count
                           %td
                             %label WBRS Rules
                           %td.rule-hits-col-list
-                            - if entry.dispute_rule_hits.where(:rule_type => "WBRS").count == 0
+                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count == 0
                               %span.missing-data No rule hits
                             - else
-                              - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
-                                = wbrs_hit.name + ', '
+                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.each do |wbrs_hit|
+                                - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
+                                  %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
+                                    = wbrs_hit.name
+                                    - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                      = ","
+                                - else
+                                  = wbrs_hit.name
+                                  - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                    = ","
                           %td.input-col
                             %span.research-table-input-wrapper.xbrs-input-wrapper
                               %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -280,14 +288,14 @@
                           %td
                             %label SBRS Rule Hits
                           %td.text-center
-                            = entry.dispute_rule_hits.where(:rule_type => "SBRS").count
+                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
                           %td
                             %label SBRS Rules
                           %td.rule-hits-col-list
-                            - if entry.dispute_rule_hits.where(:rule_type => "SBRS").count == 0
+                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
                               %span.missing-data No rule hits
                             - else
-                              - entry.dispute_rule_hits.where(:rule_type => "SBRS").each do |sbrs_hit|
+                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.each do |sbrs_hit|
                                 = sbrs_hit.name + ', '
                           %td.input-col
                             %span.research-table-input-wrapper.crosslisted-input-wrapper
@@ -481,4 +489,6 @@
                                         %td= cross_listed.mtime
                                         %td= cross_listed.ctime
 
-
+= render 'escalations/webrep/disputes/rule_hit_resolution'
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+%input{:name => "xml_token", :type => "hidden", :value => "#{xml_token}"}

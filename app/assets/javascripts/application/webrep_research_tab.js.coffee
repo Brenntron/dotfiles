@@ -303,6 +303,36 @@ $ ->
     )
     return
 
+  $('.adhoc-email-trigger').click ->
+    data = {
+      rulehit_name: $(this).attr('data-name')
+      url: $(this).attr('data-url')
+    }
+    std_msg_ajax(
+      method: 'POST'
+      url: "/api/v1/rulehit_resolution_mailer_templates/make_adhoc_rulehit_mail"
+      data: data
+      success_reload: false
+      success: (response) ->
+        response = JSON.parse(response)
+
+        $('#ruleHitEmailDialog').dialog 'open'
+
+        reciever_input = $('#ruleHitEmailDialog').find('.receiver-email')
+        cc_input = $('#ruleHitEmailDialog').find('.cc-email')
+        subject_input = $('#ruleHitEmailDialog').find('.communication-subject')
+        body_input = $('#ruleHitEmailDialog').find('.email-reply-body')
+
+        $(reciever_input[0]).val(response.to)
+        $(cc_input[0]).val(response.cc)
+        $(subject_input[0]).val(response.subject)
+        $(body_input[0]).text(response.body)
+      error: (response) ->
+        std_api_error(response, "Template could not be retrieved.", reload: false)
+
+    )
+    return
+
 
   # Sync / refresh entry data. Initiate modal / animation
   $('#sync-data-button').click ->

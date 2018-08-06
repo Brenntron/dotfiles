@@ -13,16 +13,13 @@ module API
           requires :rulehit_id, type: Integer, desc: "Bugzilla id."
         end
         get 'make_rulehit_mail/:rulehit_id' do
-          # TODO This propably should have some authorization, but I do not understand what this does.
-          # authorize!(:import, ResearchBug)
 
           Rails.logger.debug("Retrieving rulehit mailer template...")
-          # progress_bar = Event.create(user: current_user.display_name, action: "import_bug:#{params[:id]}", description: "#{request.headers["Token"]}", progress: 10)
 
           begin
             rulehit = DisputeRuleHit.where(id: params['rulehit_id']).first
             return {:error => 'Rulehit not found'}.to_json unless rulehit
-            rh_mailer_template = RulehitResolutionMailerTemplate.where(mnemonic: rulehit.name).first # TODO: This is PROBABLY .mnemonic here rather than name but we will clear that up later
+            rh_mailer_template = RulehitResolutionMailerTemplate.where(mnemonic: rulehit.name).first
             return {:error => 'No template with that mnemonic!'}.to_json unless rh_mailer_template
             parent_dispute = DisputeEntry.where(id: rulehit.dispute_entry_id).first
             return {:error => 'No DisputeEntry found! can\'t make hostname!'}.to_json unless parent_dispute
@@ -52,7 +49,28 @@ module API
 
         end
 
+        desc "build your own email corresponding to a rule hit name"
+        params do
+          requires :rulehit_name, type: String, desc: "name of the rule hit whose template you want to retrieve"
+          requires :url, type: String, desc: "url/ip of the dispute entry"
+        end
+        post "make_adhoc_rulehit_mail" do
+          begin
+            rh_mailer_template = RulehitResolutionMailerTemplate.where(mnemonic: params[:rulehit_name]).first
 
+            rh_mailer_template.subject = rh_mailer_template.subject.gsub '%%HOSTNAME%%', params[:url]
+            rh_mailer_template.body = rh_mailer_template.body.gsub '%%HOSTNAME%%', params[:url]
+
+            return rh_mailer_template.to_json
+
+          rescue Exception => e
+            Rails.logger.error "Something went wrong! Failed to retrieve template."
+            Rails.logger.error $!
+            Rails.logger.error $!.backtrace.join("\n")
+            error = "Something went wrong! Failed to retrieve template."
+            {:error => error}.to_json
+          end
+        end
       end
     end
   end
