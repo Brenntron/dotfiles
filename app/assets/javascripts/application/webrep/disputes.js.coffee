@@ -222,7 +222,7 @@ window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').attr('id')
 
   if statusName == "RESOLVED_CLOSED"
-    statusName = $('input[name=entry-resolution]:checked').attr('id')
+    statusName = "RESOLVED:" + $('input[name=entry-resolution]:checked').attr('id')
 
   data = {}
   entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
