@@ -154,7 +154,7 @@ class Complaint < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations_Console',
+            'product' => 'Escalations Console',
             'component' => 'Categorization',
             'summary' => summary,
             'version' => 'unspecified', #self.version,

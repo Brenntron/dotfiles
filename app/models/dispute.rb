@@ -338,7 +338,7 @@ class Dispute < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations_Console',
+            'product' => 'Escalations Console',
             'component' => 'IP/Domain',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
