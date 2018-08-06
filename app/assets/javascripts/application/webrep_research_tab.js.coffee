@@ -194,6 +194,12 @@ $ ->
     $(bl_weak[0]).prop('checked', false)
     $(bl_med[0]).prop('checked', false)
     $(bl_heavy[0]).prop('checked', false)
+    wl_weak_status = 'false'
+    wl_med_status = 'false'
+    wl_heavy_status = 'false'
+    bl_weak_status = 'false'
+    bl_med_status = 'false'
+    bl_heavy_status = 'false'
 
 #    $(tbody).empty()
     dropdown_wrapper = $(this).parent()
@@ -228,30 +234,40 @@ $ ->
               $(response.data).each ->
                 if String(this) == 'WL-weak'
                   $(wl_weak[0]).prop('checked', true)
+                  wl_weak_status = 'true'
                 if String(this) == 'WL-med'
                   $(wl_med[0]).prop('checked', true)
+                  wl_med_status = 'true'
                 if String(this) == 'WL-heavy'
                   $(wl_heavy[0]).prop('checked', true)
+                  wl_heavy_status = 'true'
                 if String(this) == 'BL-weak'
                   $(bl_weak[0]).prop('checked', true)
+                  bl_weak_status = 'true'
                 if String(this) == 'BL-med'
                   $(bl_med[0]).prop('checked', true)
+                  bl_med_status = 'true'
                 if String(this) == 'BL-heavy'
                   $(bl_heavy[0]).prop('checked', true)
+                  bl_heavy_status = 'true'
 
               $(show_content[0]).text(entry_content)
               $(show_wbrs[0]).text(wbrs)
               $(show_wlbl[0]).text(response.data)
+              $(submit_button).attr('disabled', false)
             else
               $(show_content[0]).text(entry_content)
               $(show_wbrs[0]).text(wbrs)
               $(show_wlbl[0]).text('Not on a list')
-
+              $(submit_button).attr('disabled', false)
             #this should probably call the resync data then reload the page, for an up to date score
 
           error: (response) ->
             popup_response_error(response, 'Error retrieving WL/BL Data')
         )
+
+
+
 
 
 

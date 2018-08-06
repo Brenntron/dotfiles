@@ -148,6 +148,7 @@ window.toolbar_adust_wlbl_button =(button_tag) ->
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
   )
 
 window.index_adust_wlbl_button =(button_tag) ->
