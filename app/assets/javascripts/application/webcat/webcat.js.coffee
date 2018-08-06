@@ -28,35 +28,56 @@ $ ->
         orderable: false
         searchable: false
       }
+        targets: [ 1 ]
+        className: 'important-flag-col'
+        orderable: false
+        searchable: false
       {
         targets: [ 2 ]
         className: 'id-col'
-        'width': '1%'
       }
       {
         targets: [ 3 ]
         className: 'entry-id-col'
-        'width': '1%'
       }
     ]
     columns: [
       {
         data: null
         defaultContent: '<button class="expand-row-button-inline"></button>'
+        width: '14px'
+        orderable: false
+        searchable: false
+        sortable: false
+      }
+      {
+        data: null
+        defaultContent: '<span></span>'
+        width: '24px'
       }
       {
         'render': (data, type, full, meta) ->
           complaintID = full.complaint_id.toString()
           '<a href="complaints/' + complaintID + '">' + complaintID + '</a>'
+        width: '45px'
 
       }
-      { data: 'entry_id' }
-      { data: 'age' }
+      {
+        data: 'entry_id'
+        width: '50px'
+      }
+      {
+        data: 'age'
+        width: '40px'
+      }
       {
         data: 'status'
         className: 'state-col'
       }
-      { data: 'subdomain'}
+      {
+        data: 'subdomain'
+        width: '50px'
+      }
       {
         'render':(data,type,full,meta)->
           domain = full.domain
@@ -69,7 +90,10 @@ $ ->
       }
       { data: 'path' }
       { data: 'customer_name' }
-      { data: 'wbrs_score' }
+      {
+        data: 'wbrs_score'
+        width: '20px'
+      }
       {
         sortable: false
         'render': (data, type, full, meta) ->
