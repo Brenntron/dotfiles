@@ -3,7 +3,7 @@
 
 - content_for(:nav_banner) do
   .nav-tool-blocks.nav-page-button-wrapper.col-xs-2.col-sm-1.col-lg-2
-    %a#complaints.nav-page-button{href: '/escalations/webcat/complaints/'}
+    %a#complaints.nav-page-button{href: '/escalations/webcat/complaints'}
       %span.nav-toolbar-icon-large.icon-queue
 
     %a#rules.nav-page-button{href: '/escalations/webcat/rules/'}
@@ -29,12 +29,6 @@
       Fetch
     .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'fetch'} Fetch complaints   
 
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
-    %a{href: '#', class: 'dropdown-toggle', id: 'group-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-filter-white'}
-      Group By
-    .dropdown-menu.nav-tools-dropdown#group-dropdown{'aria-labelledby': 'group-cases'}
-      Group By
 
   .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -42,34 +36,31 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
+        -# add this in later
+        -#%li
+        -#  %a{onclick: 'standard_webrep_index_table("my_open");'}
+        -#    %span.nav-dropdown-icon.icon-my-open-bugs
+        -#    My Open Tickets
         %li
-          %a{onclick: 'standard_webrep_index_table("recently_viewed");'}
+          %a{onclick: 'filterByStatus("ALL");'}
             %span.nav-dropdown-icon.icon-recently-viewed
-            Recently Viewed
+            All
         %li
-          %a{onclick: 'standard_webrep_index_table("my_disputes");'}
+          %a{onclick: 'filterByStatus("COMPLETED");'}
             %span.nav-dropdown-icon.icon-my-bugs
-            My Tickets
+            Completed
         %li
-          %a{onclick: 'standard_webrep_index_table("my_open");'}
-            %span.nav-dropdown-icon.icon-my-open-bugs
-            My Open Tickets
-        %li
-          %a{onclick: 'standard_webrep_index_table("team_disputes");'}
+          %a{onclick: 'filterByStatus("ACTIVE");'}
             %span.nav-dropdown-icon.icon-team-bugs
-            My Team Tickets
+            Active
         %li
-          %a{onclick: 'standard_webrep_index_table("open");'}
+          %a{onclick: 'filterByStatus("NEW");'}
             %span.nav-dropdown-icon.icon-open-bugs
-            Open Tickets
-        %li
-          %a{onclick: "filterByStatus('COMPLETED')"}
-            %span.nav-dropdown-icon.icon-fixed-bugs
-            Closed Tickets
+            New
         %li
           %a{onclick: "filterByStatus('REVIEW')"}
-            %span.nav-dropdown-icon.icon-all-tickets
-            All Tickets
+            %span.nav-dropdown-icon.icon-fixed-bugs
+            Review
 
       #saved-searches-wrapper.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
@@ -81,12 +72,12 @@
               - current_user.named_searches.each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
-                    %a.saved-search{onclick: "named_webrep_index_table('#{named_search.name}');"}
+                    %a.saved-search{onclick: "named_webcat_index_table('#{named_search.name}');"}
                       = named_search.name
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
 
-  .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-2.search-wrapper
+  .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-3.search-wrapper
     .input-group.search-group
       = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 

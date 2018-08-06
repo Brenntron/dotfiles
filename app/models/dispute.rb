@@ -15,7 +15,7 @@ class Dispute < ApplicationRecord
   delegate :cvs_username, to: :user, allow_nil: true
 
   NEW = 'NEW'
-  RESOLVED = 'RESOLVED'
+  RESOLVED = 'RESOLVED_CLOSED'
   ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
   DUPLICATE = 'DUPLICATE'
@@ -23,7 +23,7 @@ class Dispute < ApplicationRecord
   ANALYST_COMPLETED = "Analyst Completed"
   ALL_AUTO_RESOLVED = "All Auto Resolved"
 
-  TI_NEW = 'IN PROGRESS'
+  TI_NEW = 'PENDING'
   TI_RESOLVED = 'RESOLVED'
   TI_CLOSED = 'CLOSED'
 
@@ -241,7 +241,7 @@ class Dispute < ApplicationRecord
 
     return_payload = {}
 
-    new_entries_ips.each do |ip|
+    new_entries_ips.each do |ip, entry|
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
@@ -255,7 +255,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.save
     end
-    new_entries_urls.each do |url|
+    new_entries_urls.each do |url, entry|
       new_payload_item = {}
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
@@ -344,7 +344,7 @@ class Dispute < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations',
+            'product' => 'Escalations_Console',
             'component' => 'IP/Domain',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
@@ -449,7 +449,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.status = DisputeEntry::RESOLVED
             else
               new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_UNCHANGED
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
             end
           else
@@ -527,7 +527,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.status = DisputeEntry::RESOLVED
             else
               new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_UNCHANGED
+              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
             end
           else
@@ -562,6 +562,7 @@ class Dispute < ApplicationRecord
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
+              new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save
             end
           end
@@ -886,6 +887,35 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    disputes.each do |dispute|
+      dispute.status = status
+      if resolution.present?
+        dispute.resolution = resolution
+      end
+
+      if dispute.status == RESOLVED
+        dispute.dispute_entries.each do |entry|
+          entry.status = status
+          entry.resolution = resolution
+          entry.resolution_comment = comment
+          entry.save
+        end
+      end
+
+      dispute.save
+      if comment.present?
+        DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
+      end
+
+      dispute.reload
+
+      message = Bridge::DisputeEntryUpdateStatusEvent.new
+      message.post_entries(dispute.dispute_entries)
+
+    end
+  end
+
   # Searches in a variety of ways.
   # advanced -- search by supplied field.
   # named -- call a saved search.
@@ -943,7 +973,7 @@ class Dispute < ApplicationRecord
         end
       end
 
-      dispute_packet[:dispute_entries] = dispute.dispute_entries
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.wbrs_rule_hits.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.sbrs_rule_hits.pluck(:name)}}
       dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
         when dispute.assignee == 'Unassigned'

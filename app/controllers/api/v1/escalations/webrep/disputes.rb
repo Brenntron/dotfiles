@@ -114,10 +114,13 @@ module API
 
               if is_ip_address
                 entry.ip_address = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
               else
                 entry.uri = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
               end
-              entry.save
 
               json_packet << entry
 
@@ -257,6 +260,33 @@ module API
             end
 
             params do
+              requires :dispute_ids, type: Array[String]
+              requires :status, type: String
+              optional :resolution, type: String
+              optional :comment, type: String
+            end
+
+            post 'set_disputes_status' do
+
+              authorize!(:update, Dispute)
+              dispute_ids = params[:dispute_ids].map{|id| id.to_i}
+              status = params[:status]
+              resolution = ""
+              comment = ""
+              if params[:resolution].present?
+                resolution = params[:resolution]
+              end
+              if params[:comment].present?
+                comment = params[:comment]
+              end
+
+              disputes = Dispute.where(id: dispute_ids)
+
+              Dispute.process_status_changes(disputes, status, resolution, comment, current_user)
+              {:status => "success"}.to_json
+            end
+
+            params do
               requires :relating_dispute_ids, type: Array[Integer]
             end
             patch ':dispute_id/relating_disputes' do
@@ -298,6 +328,26 @@ module API
                 true
               end
             end
+
+            params do
+              requires :entry, type: String
+            end
+
+            get 'reptool_get_info_for_form' do
+              params[:entry] = params[:entry].strip
+              information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
+              information = JSON.parse(information)
+
+              if information[params[:entry]] == "NOT_FOUND"
+                return {:classification => "not found", :expiration => "", :status => ""}.to_json
+              else
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"]}.to_json
+              end
+
+
+
+            end
+
           end
         end
       end

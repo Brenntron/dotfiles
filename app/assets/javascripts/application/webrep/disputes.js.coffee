@@ -347,6 +347,10 @@ window.toolbar_index_mark_duplicate = (box_names) ->
 
 
 window.add_dispute_entry = () ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   data = {
     'uri': $('#add_dispute_entry').val(),
     'dispute_id': $('#dispute_id').text(),
@@ -499,17 +503,117 @@ window.set_duplicate_dispute = (form_tag) ->
 
 
 $ ->
+
+  $('.change_ticket_status_button').click ->
+    status = ""
+    resolution = ""
+    comment = ""
+    checkboxes = $('#disputes-index').find('.dispute_check_box')
+    checked_disputes = []
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        dispute_id = $(this).val()
+        checked_disputes.push(dispute_id)
+
+    status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+    if status == 'RESOLVED_CLOSED'
+      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+    else
+      comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
+
+
+    data = {
+      status: status,
+      resolution: resolution,
+      comment: comment,
+      dispute_ids: checked_disputes.toString()
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webrep/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        response = JSON.parse(response)
+        if response.status == "success"
+          window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error Updating Status')
+        window.location.reload()
+
+    )
+
+
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
     return
 
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
-    if (determine_checked('dispute_check_box'))
-      console.log 'do the needful'
-    else
-      do_not = "show the tab"
+    dropdown = $('#index-edit-ticket-status-dropdown').parent()
+    if ($('.dispute_check_box:checked').length > 0)
+      # Select Status
+      $('.ticket-status-radio-label').click ->
+        radio_button = $(this).prev('.ticket-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
 
+      $('.ticket-status-radio').click ->
+        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+    else
+      $(dropdown).removeClass('open')
+      alert ('No rows selected')
+
+
+
+  # Edit Entry: Edit Entry Status
+  $('#index-entry-status-button').click ->
+    if (determine_checked('dispute-entry-checkbox'))
+
+    else
+
+    $('.entry-status-radio-label').click ->
+      radio_button = $(this).prev('.entry-status-radio')
+      $(radio_button[0]).trigger('click')
+      if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+        $('#index-entry-resolution-submenu').show()
+        $('#entry-non-res-submit').hide()
+      else
+        $('#entry-non-res-submit').show()
+        $('#index-entry-resolution-submenu').hide()
+
+
+
+# Create index table
   dispute_table = $('#disputes-index').DataTable(
     order: [ [
       9
@@ -591,44 +695,61 @@ $ ->
     ])
 
   format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox"></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '<th class="entry-col-wlbl">WL/BL Entries</th>' + '<th class="entry-col-reptool-class">RepTool Classification</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox"></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
     $(entry).each ->
       entry_content = ''
-      if @ip_address != null
-        entry_content = @ip_address
-      else if @uri != null
-        entry_content = @uri
+      if this.entry.ip_address != null
+        entry_content = this.entry.ip_address
+      else if this.entry.uri != null
+        entry_content = this.entry.uri
       else
         entry_content = missing_data
+
       category = ''
-      if @primary_category != null
-        category = @primary_category
+      if this.entry.primary_category != null
+        category = this.entry.primary_category
       else
         category = missing_data
       status = ''
-      if @status != null
-        status = @status
+      if this.entry.status != null
+        status = this.entry.status
       else
         status = missing_data
       suggested_disposition = ''
-      if @suggested_disposition != null
-        suggested_disposition = @suggested_disposition
+      if this.entry.suggested_disposition != null
+        suggested_disposition = this.entry.suggested_disposition
       else
         suggested_disposition = missing_data
-      if @is_important == true
+      if this.entry.is_important == true
         important = 'entry-important-flag'
       else
         important = ''
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' + '<td class="entry-col-status">' + status + '</td>' + '<td class="entry-col-disp">' + suggested_disposition + '</td>' + '<td class="entry-col-cat">' + category + '</td>' + '<td class="entry-col-wbrs-score">' + @score + '</td>' + '<td class="entry-col-wbrs-hits"></td>' + '<td class="entry-col-wbrs-rules"></td>' + '<td class="entry-col-sbrs-score"></td>' + '<td class="entry-col-sbrs-hits"></td>' + '<td class="entry-col-sbrs-rules"></td>' + '<td class="entry-col-wlbl"></td>' + '<td class="entry-col-reptool-class"></td>' + '</tr>'
+      if this.entry.wbrs_score != null
+        wbrs_score = this.entry.wbrs_score
+      else wbrs_score = missing_data
+      if this.entry.sbrs_score != null
+        sbrs_score = this.entry.sbrs_score
+      else sbrs_score = missing_data
+      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+        '<td class="entry-col-status">' + status + '</td>' +
+        '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
+        '<td class="entry-col-cat">' + category + '</td>' +
+        '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
+        '<td class="entry-col-wbrs-hits">' +  this.wbrs_rule_hits.length + '</td>' +
+        '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits.join(', ') + '</td>' +
+        '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +
+        '<td class="entry-col-sbrs-hits">' + this.sbrs_rule_hits.length + '</td>' +
+        '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits.join(', ') + '</td>'
       entry_rows.push entry_row
       return
     # `d` is the original data object for the row
     table_head + entry_rows.join('') + '</tbody></table>'
 
-  populate_webrep_index_table()
+  if $('body.index-action').length
+    populate_webrep_index_table()
 
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
@@ -772,3 +893,28 @@ $ ->
     $('#related-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
+
+
+  $('#index-adjust-wlbl').click ->
+    console.log ('clicked!')
+    tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
+    $(tbody).empty()
+    dropdown_wrapper = $(this).parent()
+    if ($('.dispute-entry-checkbox:checked').length > 0)
+      $('.dispute-entry-checkbox').each ->
+        if $(this).prop('checked')
+          entry_row = $(this).parent().parent()[0]
+          entry_content = $(entry_row).find('.entry-col-content').text()
+          wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
+          wlbl = $(entry_row).find('.entry-col-wlbl').text()
+
+          $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
+      $($('#wlbl_adjust_entries_index').find('.comment-wrapper')).show()
+    else
+      $(dropdown_wrapper).removeClass('open')
+      alert ('No rows selected')
+
+
+
+
+

@@ -4149,7 +4149,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
-.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu {
+.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu, #wlbl_adjust_entries_index.dropdown-menu {
   left: auto;
   border-radius: 4px 0 4px 4px;
   border: none;
@@ -4162,7 +4162,7 @@ table > tbody > tr > td.dispute_rep_tools {
   right: 1px;
 }
 
-#wlbl_adjust_entries .inline-tool-content-wrapper {
+#wlbl_adjust_entries .inline-tool-content-wrapper, #wlbl_adjust_entries_index .inline-tool-content-wrapper {
   padding: 12px 15px;
 }
 
@@ -4290,7 +4290,7 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .toolbar-dropdown div {
   height: auto;
-  border: none !important;
+  border: none;
 }
 
 .dispute-name-wrapper {
@@ -4670,6 +4670,10 @@ td.left-bordered {
   background-color: $rule-accent-color;
 }
 
+.research-table-input-wrapper.reptool-input-wrapper {
+  background-color: $fifth-section-color;
+}
+
 .expanded-row {
   background-color: $content-tab-color;
   padding: 0 0 0 20px !important;
@@ -4707,6 +4711,7 @@ td.left-bordered {
 .xbrs-details-table { background-color: $communication-accent-color;}
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
+.reptool-details-table {background-color: $fifth-section-color;}
 
 .entry-details-table table {
   background-color: $table-dark-body;
@@ -4794,8 +4799,9 @@ h5.entry-details-table-header {
   margin-left: 1px;
 }
 
-.ticket-resolution-submenu li label {
-  color: $content-bg-color;
+.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu .radio-label  {
+  color: $content-bg-color  !important;
+  font-size: 9pt  !important;
 }
 
 .submenu-left-wrapper {
@@ -4816,9 +4822,9 @@ h5.entry-details-table-header {
 .submenu-header {
   color: $content-bg-color;
   width: 100%;
-  border-bottom: 1px solid $content-bg-color;
+  border-bottom: 1px solid $content-bg-color !important;
   text-transform: uppercase;
-  padding: 6px 8px;
+  padding: 6px 8px !important;
   font-size: 8pt;
 }
 
@@ -4860,7 +4866,7 @@ h5.entry-details-table-header {
 
 .resolution-comment-wrapper {
   background-color: $content-bg-color;
-  padding: 4px 12px;
+  padding: 4px 12px !important;;
 }
 
 .resolution-comment-wrapper input[type='text'] {
@@ -4868,7 +4874,7 @@ h5.entry-details-table-header {
   min-height: 40px;
 }
 
-#wlbl_adjust_entries {
+#wlbl_adjust_entries, #wlbl_adjust_entries_index {
   margin-top: 0;
 }
 
@@ -5133,7 +5139,8 @@ table.dispute_tool_current tr:last-of-type td {
 #disputes-index .dispute-submission-type {
   display: inline-block;
   margin-top: -2px;
-  margin-right: -3px;
+  margin-bottom: -6px;
+  margin-right: 6px;
 }
 
 .dispute-W {background-image: url(image_path('icon_type_web.svg'));}
@@ -5287,6 +5294,50 @@ td.ticket-total::before {
 #edit-ticket-status-dropdown .ticket-resolution-submenu {
   left: -323px;
   padding: 0 !important;
+}
+
+#index-edit-ticket-status-dropdown, #index-edit-entry-status-dropdown {
+  margin-left: 0;
+  width: 170px !important;
+}
+
+#index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.non-resolution-submit-wrapper {
+  padding: 12px !important;
+  background-color: $faint-neutral-color;
+  border-radius: 0 0 4px 4px;
+}
+
+.non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
+  width: 100%;
+  margin: auto;
+  border: 1px solid darken($faint-neutral-color, 5%);
+  font-size: 8pt;
+  padding: 6px;
+  min-height: 50px;
+}
+
+.non-resolution-submit-wrapper button {
+  margin: 20px auto 8px auto;
+}
+
+.non-resolution-submit-wrapper:hover {
+  background-color: $faint-neutral-color !important;
+}
+
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
+  width: 340px;
+  left: 100%;
+  padding: 0;
+  margin-top: -56px;
+}
+
+.non-resolution-submit-wrapper {
+  display: none;
 }
 
 .references-dropdown-button {

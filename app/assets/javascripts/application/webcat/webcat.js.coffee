@@ -134,3 +134,26 @@ $ ->
         error: (response) ->
           std_api_error(response, "There was an error loading search results.", reload: false)
       , this)
+
+
+  # advanced search tags
+  createSelectOptions = ->
+    tags = $('#search_tag_list')[0]
+    if tags
+      tag_list = tags.value
+      array = tag_list.split(',')
+      options = []
+      for x in array
+        options.push {name: x}
+      return options
+
+  $('#tags-input').selectize {
+    persist: false
+    create: false
+    maxItmes: null
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: createSelectOptions()
+
+  }

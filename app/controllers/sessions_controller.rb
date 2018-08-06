@@ -17,7 +17,7 @@ class SessionsController < ApplicationController
           if session[:previous_url].present?
             redirect_to session[:previous_url]
           else
-            redirect_to '/bugs'
+            redirect_to(user_home)
           end
         end
         format.json do
@@ -59,5 +59,22 @@ class SessionsController < ApplicationController
     logger.error(error_message.backtrace[2])
     flash[:error] = error_message
     redirect_to root_url
+  end
+
+  def user_home
+    case
+      when can?(:manage, Admin)
+        admin_root_path
+      when can?(:read, Complaint)
+        escalations_webcat_complaints_path
+      when can?(:read, Dispute)
+        escalations_webrep_disputes_path
+      when can?(:read, EscalationBug)
+        escalations_bugs_path
+      when can?(:read, ResearchBug)
+        bugs_path
+      else
+        users_path
+    end
   end
 end

@@ -23,8 +23,8 @@ class Wbrs::Prefix < Wbrs::Base
   # @return [Array<Wbrs::Prefix>] Array of the results.
   def self.where(conditions = {})
     params = stringkey_params(conditions)
-    category_ids = Wbrs::Category.category_ids_from_params(params)
-    params['categories'] = category_ids if category_ids.present?
+    # category_ids = Wbrs::Category.category_ids_from_params(params)
+    # params['categories'] = category_ids if category_ids.present?
     params['is_active'] = params.delete('active') ? 1 : 0 if params['active'].present?
 
     response = post_request(path: '/v1/cat/rules/get', body: params)
@@ -70,8 +70,6 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [String] description: A description
   # @return [Integer] id of created prefix.
   def self.create_from_url(params)
-    category_ids = Wbrs::Category.category_ids_from_params(params)
-    params['categories'] = category_ids if category_ids.present?
     response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(params))
 
     response_body = JSON.parse(response.body)
@@ -83,9 +81,8 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [String] user: The user for this action
   # @param [String] description: A description
   # @return [Integer] id of updated prefix.
-  def set_categories(category_array, user:, description: nil)
-    category_ids = Wbrs::Category.category_ids(category_array)
-    options = { 'prefix_id' => id, 'categories' => category_ids, 'user' => user, 'description' => description }
+  def set_categories(category_ids_array, user:, description: nil, prefix_id:)
+    options = { 'prefix_id' => prefix_id, 'categories' => category_ids_array, 'user' => user, 'description' => description }
     response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/edit', body: Wbrs::Prefix.stringkey_params(options))
 
     response_body = JSON.parse(response.body)

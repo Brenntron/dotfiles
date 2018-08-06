@@ -41,14 +41,16 @@ module API
               optional :dispute_email_id, type: Integer, desc: "The ID of the dispute email being replied to"
               optional :from, type: String, desc: "The email address the email is from"
               optional :attachments, type: Hash, desc: "File attachments"
+              optional :cc, type: String, desc: "string of emails for CC"
             end
 
             post "", root: "dispute_email" do
               authorize!(:create, DisputeEmail)
               begin
                 #temporary, for development, don't wanna be sending these to actual customers
-                params[:to] = "claclair@cisco.com"
-
+                if Rails.env == "development"
+                  params[:to] = current_user.email
+                end
 
                 new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
 
@@ -80,6 +82,7 @@ module API
               requires :subject, type: String, desc: "The subject of the email"
               optional :from, type: String, desc: "The email address the email is from"
               optional :attachments, type: Hash, desc: "File attachments"
+              optional :cc, type: String, desc: "string of emails for CC"
             end
 
             post "ad_hoc", root: "dispute_email" do

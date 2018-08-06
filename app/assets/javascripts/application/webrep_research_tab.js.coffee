@@ -1,24 +1,3 @@
-
-
-#Populating the toolbar Adjust WL/BL Button
-window.index_expand_wlbl_form = () ->
-  if ($('.dispute_check_box:checked').length > 0)
-    $('.dispute_check_box:checked').each ->
-      entry_row = this.closest('tr')
-      entry_content = $(entry_row).find('.dispute_entry_content_first').text()
-      #wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-      #wlbl = $(entry_row).find('.entry-data-wlbl').text()
-
-      tbody = $('#wlbl_adjust_entries').find('tbody')
-      $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + '' + '</td><td class="text-center">' + '' + '</td></tr>')
-
-    $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
-    $('#wlbl_adjust_entries').show();
-
-  else
-    alert ('No rows selected')
-
-
 $ ->
   $('#edit-dispute-entry-button').click ->
 
@@ -145,34 +124,59 @@ $ ->
 
 #  Populating the toolbar Adjust RepTool Button
   $('#reptool_entries_button').click ->
-    if ($('.dispute_check_box:checked').length > 0)
+    dropdown = $('#reptool_adjust_entries').parent()
+
+    # Only allowing a single submission at a time for now.
+    if ($('.dispute_check_box:checked').length == 1)
+      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
+      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
+      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+      entry_content = ''
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
-          entry_rep_class = $(entry_row).find('.entry-reptool-class').text()
-          entry_rep_exp = $(entry_row).find('.entry-reptool-expiration').text()
 
-          show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+      data = {
+      # Send entry content to reptool
+        'entry' : entry_content
+      }
+
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax(
+        url: '/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          response = JSON.parse(response)
           $(show_content[0]).text(entry_content)
-
-          show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
-          show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
-          if entry_rep_class == "Not on RepTool"
-            $(show_rep_class).addClass('missing-data')
-            $(show_rep_exp).addClass('missing-data')
-            $(show_rep_exp[0]).text('N/A')
-          else
-            $(show_rep_exp[0]).text(entry_rep_exp)
-          $(show_rep_class[0]).text(entry_rep_class)
+          $(show_rep_class[0]).text(response.classification)
+          $(show_rep_exp[0]).text(response.expiration)
+          $('#blacklist-action-select').val(response.status)
+          $('#blacklist-classifications-select').val(response.classification)
+          $(submit_button).attr('disabled', false)
+#          window.location.reload()
+        error: (response) ->
+          popup_response_error(response, 'Error retrieving Reptool Data')
+      )
+#
 
     else
-      alert ('No rows selected')
+      alert ('Please select only one row.')
+      $(dropdown).removeClass('open')
+      return false
 
 
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
+    tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    $(tbody).empty()
+    dropdown_wrapper = $(this).parent()
     if ($('.dispute_check_box:checked').length > 0)
+
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
@@ -180,13 +184,11 @@ $ ->
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
           wlbl = $(entry_row).find('.entry-data-wlbl').text()
 
-          tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
           $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
-
-
       $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
     else
+      $(dropdown_wrapper).removeClass('open')
       alert ('No rows selected')
 
 
@@ -245,6 +247,15 @@ $ ->
         $(cl_table).show()
       else
         $(cl_table).hide()
+
+    if $(this).hasClass('reptool-checkbox')
+      rt_table = $(entry_row).find('.reptool-details-table')[0]
+      if $(this).prop('checked')
+        $(rt_table).show()
+      else
+        $(rt_table).hide()
+
+
 
 
 
