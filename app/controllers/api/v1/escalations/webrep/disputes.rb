@@ -150,6 +150,9 @@ module API
             post "entry_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
+              dispute = DisputeEntry.where({:id => params[:dispute_entry_ids].first}).first.dispute
+              DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+              true
             end
 
             desc "Adjust a WL/BL entry"
@@ -162,6 +165,7 @@ module API
             post "ticket_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_tickets_from_params(permitted_params, username: current_user.cvs_username)
+
             end
 
             desc "Adjust a Reptool Bl entry"
