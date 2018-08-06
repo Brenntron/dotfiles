@@ -296,7 +296,15 @@
                               %span.missing-data No rule hits
                             - else
                               - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.each do |sbrs_hit|
-                                = sbrs_hit.name + ', '
+                                - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
+                                  %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': sbrs_hit.name}
+                                    = sbrs_hit.name
+                                    - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                      = ","
+                                - else
+                                  = sbrs_hit.name
+                                  - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                    = ","
                           %td.input-col
                             %span.research-table-input-wrapper.crosslisted-input-wrapper
                               %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -333,7 +341,7 @@
                           .col-sm-3
                             .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header WBRS Rule Hit Details
-                              - if entry.dispute_rule_hits.where(:rule_type => "WBRS").empty?
+                              - if entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == "WBRS"}.empty?
                                 %table
                                   %thead
                                     %tr
@@ -348,9 +356,14 @@
                                       %th Rule Description
                                       %th Weight
                                   %tbody
-                                    - entry.dispute_rule_hits.where(:rule_type => "WBRS").each do |wbrs_hit|
+                                    - entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == "WBRS"}.each do |wbrs_hit|
                                       %tr
-                                        %td= wbrs_hit.name
+                                        %td
+                                          - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
+                                            %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
+                                              = wbrs_hit.name
+                                          - else
+                                            = wbrs_hit.name
                                         %td= wbrs_hit.mnemonic
                                         %td
                                           -#Put weight of rule here
