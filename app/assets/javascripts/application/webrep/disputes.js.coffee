@@ -172,7 +172,6 @@ window.index_adust_wlbl_button =(button_tag) ->
     error_prefix: 'Error adjusting WL/BL.'
   )
 
-
 window.row_adust_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
@@ -219,31 +218,57 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
 
-window.toolbar_index_edit_status = (box_names) ->
-  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-# this.dataset['entryId']
-    this.value
-  ).toArray()
+window.toolbar_index_edit_status = () ->
+  statusName = $('input[name=entry-status]:checked').attr('id')
+  
+  data = {}
+  
+  entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
+    data[this.id] = [{
+      id: this.id
+      field: "status"
+      new: statusName
+    }]
 
-  new_status = $('index_target_status')
+    if statusName == "RESOLVED_CLOSED"
+      data[this.id].push({
+        id: this.id
+        field: "resolution"
+        new: $('input[name=entry-resolution]:checked').attr('id')
+      })
 
-  data = {
-    'dispute_entry_ids': entry_ids,
-    'new_status': new_status
-  }
+      data[this.id].push({
+        id: this.id
+        field: "resolution_comment"
+        new: $('#entry-status-comment').val()
+      })
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/edit_status'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error editing ticket status')
   )
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    data: { field_data: data }
+    success_reload: true
+    error_prefix: 'Error updating data.'
+  )
+
+
+
+
+
+#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  $.ajax(
+#    url: '/api/v1/escalations/webrep/disputes/edit_status'
+#    method: 'POST'
+#    headers: headers
+#    data: data
+#    dataType: 'json'
+#    success: (response) ->
+#      window.location.reload()
+#    error: (response) ->
+#      popup_response_error(response, 'Error editing ticket status')
+#  )
 
 window.toolbar_index_change_assignee = () ->
 
@@ -404,13 +429,13 @@ window.take_single_dispute = (id) ->
   )
 
 
-window.dispute_entry_status = (id, status) ->
-  std_msg_ajax(
-    method: 'PATCH'
-    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
-    data: { status: status }
-    error_prefix: 'Error updating status.'
-  )
+#window.dispute_entry_status = (id, status) ->
+#  std_msg_ajax(
+#    method: 'PATCH'
+#    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
+#    data: { status: status }
+#    error_prefix: 'Error updating status.'
+#  )
 
 
 window.save_dispute_entries = () ->
@@ -436,6 +461,7 @@ window.save_dispute_entries = () ->
     if 0 < fielddata.length
       data[this.dataset.entryId] = fielddata
   )
+
   std_msg_ajax(
     method: 'PATCH'
     url: "/api/v1/escalations/webrep/disputes/entries/field_data"
@@ -581,20 +607,45 @@ $ ->
 
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
-    if (determine_checked('dispute-entry-checkbox'))
+    dropdown = $('#index-edit-entry-status-dropdown').parent()
+    if ($('.dispute-entry-checkbox:checked').length > 0)
 
+      $('.entry-status-radio-label').click ->
+        radio_button = $(this).prev('.entry-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-entry-resolution-submenu').show()
+          stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
+          $('#entry-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#entry-non-res-submit').show()
+          res_comment = $('#index-entry-resolution-submenu').find('.entry-status-comment')
+          $('.entry-resolution-radio').prop('checked', false)
+          $('#index-entry-resolution-submenu').hide()
+          $(res_comment).val('')
+
+      $('.entry-status-radio').click ->
+        all_stat_radios = $('#index-edit-entry-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-entry-resolution-submenu').show()
+          stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
+          $('#entry-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#entry-non-res-submit').show()
+          res_comment = $('#index-entry-resolution-submenu').find('.entry-status-comment')
+          $('.entry-resolution-radio').prop('checked', false)
+          $('#index-entry-resolution-submenu').hide()
+          $(res_comment).val('')
     else
-
-    $('.entry-status-radio-label').click ->
-      radio_button = $(this).prev('.entry-status-radio')
-      $(radio_button[0]).trigger('click')
-      if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
-        $('#index-entry-resolution-submenu').show()
-        $('#entry-non-res-submit').hide()
-      else
-        $('#entry-non-res-submit').show()
-        $('#index-entry-resolution-submenu').hide()
-
+      alert ('No rows selected')
+      $(dropdown).removeClass('open')
+      return false
 
 
   # Create index table
@@ -711,13 +762,14 @@ $ ->
         important = 'entry-important-flag'
       else
         important = ''
+      dispute_entry_id = this.entry.id
       if this.entry.wbrs_score != null
         wbrs_score = this.entry.wbrs_score
       else wbrs_score = missing_data
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox"></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
