@@ -155,6 +155,11 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
+      .row.hidden#related-dispute-input
+        .col-xs-2.col-with-divider
+          %input.dispute-edit-input#related-dispute-id{type: 'text'}
+        .col-xs-2.col-with-divider
+          -#Placeholder for now
       - @dispute.each_related do |dispute_dup|
         .row
           .col-xs-2.col-with-divider

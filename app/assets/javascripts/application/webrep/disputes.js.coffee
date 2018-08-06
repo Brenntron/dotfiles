@@ -178,6 +178,7 @@ window.save_dispute = () ->
     'customer_name': $('#dispute-customer-name-input').val()
     'customer_email': $('#dispute-customer-email-input').val()
     'status': $('#status').val()
+    'related_id': $('#related-dispute-id').val()
   }
 
   std_msg_ajax(
@@ -747,6 +748,7 @@ $ ->
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
     $('#related-dispute-button').removeClass('hidden')
+    $('#related-dispute-input').removeClass('hidden')
     $('#edit-dispute-button').addClass('hidden')
 
 
@@ -768,4 +770,5 @@ $ ->
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
     $('#related-dispute-button').addClass('hidden')
+    $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
