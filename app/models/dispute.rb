@@ -287,7 +287,7 @@ class Dispute < ApplicationRecord
     is_resolved = true
 
     self.dispute_entries.each do |entry|
-      if entry.status != RESOLVED
+      if entry.status != DisputeEntry::RESOLVED
         is_resolved = false
         break
       end
@@ -310,14 +310,15 @@ class Dispute < ApplicationRecord
   #
   def self.process_bridge_payload(message_payload)
     verdicts_to_blacklist = []
-
+    user = User.where(cvs_username:"vrtincom").first
+    guest = Company.where(:name => "Guest").first
     begin
       ActiveRecord::Base.transaction do
 
         logger.debug "Starting ticket create"
 
-        user = User.where(cvs_username:"vrtincom").first
-        guest = Company.where(:name => "Guest").first
+        #user = User.where(cvs_username:"vrtincom").first
+
         #TODO: this should be put in a params method
         message_payload["payload"] = message_payload["payload"].permit!.to_h
         new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
@@ -338,7 +339,8 @@ class Dispute < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations Console',
+            #'product' => 'Escalations Console',
+            'product' => 'Escalations',
             'component' => 'IP/Domain',
             'summary' => summary,
             'version' => 'unspecified', #self.version,

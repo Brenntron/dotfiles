@@ -154,8 +154,10 @@ class Complaint < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations Console',
-            'component' => 'Categorization',
+            #'product' => 'Escalations Console',
+            'product' => 'Escalations',
+            #'component' => 'Categorization',
+            'component' => 'WebCat',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
             'description' => full_description,
