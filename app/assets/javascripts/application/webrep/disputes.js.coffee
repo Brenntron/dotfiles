@@ -271,22 +271,31 @@ window.toolbar_index_edit_status = () ->
     error_prefix: 'Error updating data.'
   )
 
+window.show_page_edit_status = () ->
+  statusName = $('input[name=dispute-status]:checked').attr('id')
+  comment = $('#dispute-status-comment').val()
+  dispute_id = $('#dispute_id').text()
 
+  if statusName == "RESOLVED_CLOSED"
+    resolution = $('input[name=dispute-resolution]:checked').attr('id')
 
+  data = {
+    dispute_ids: [ dispute_id ]
+    status: statusName
+    commment: comment
+  }
 
+  if resolution
+    data.resolution = resolution
+    data.comment = $('#dispute-resolution-comment').val()
 
-#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#  $.ajax(
-#    url: '/api/v1/escalations/webrep/disputes/edit_status'
-#    method: 'POST'
-#    headers: headers
-#    data: data
-#    dataType: 'json'
-#    success: (response) ->
-#      window.location.reload()
-#    error: (response) ->
-#      popup_response_error(response, 'Error editing ticket status')
-#  )
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/set_disputes_status'
+    method: 'POST'
+    data: data
+    error_prefix: 'Unable to update dispute.'
+    success_reload: true
+  )
 
 window.toolbar_index_change_assignee = () ->
 

@@ -68,6 +68,7 @@ module API
               optional :customer_email, type: String, desc: "Email of the customer associated with this dispute"
               optional :status, type: String, desc: "Status of the dispute"
               optional :related_id, type: Integer, desc: "ID of a dispute to relate to this one"
+              optional :comment, type: String, desc: "Comment, available regardless of whether resolving"
               optional :resolution, type: String, desc: "Resolution; write this if status is Resolved"
             end
             put ":id" do
@@ -91,6 +92,14 @@ module API
                 related_dispute.related_id = params[:id]
                 related_dispute.related_at = Time.now
                 related_dispute.save
+              end
+
+
+              if permitted_params[:comment]
+                dispute_comment = DisputeComment.new
+                dispute_comment.dispute = dispute
+                dispute_comment.comment = permitted_params[:comment]
+                dispute_comment.save
               end
 
 
