@@ -40,6 +40,23 @@ class Dispute < ApplicationRecord
   PRIORITY_4 = 'P4'
   PRIORITY_5 = 'P5'
 
+  # It's possible that some of this is duplicates of the above but I'm too scared to try and consolidate
+  # them. These strings apply specifically to the "Status" dropdown on **Disputes**. To edit these strings
+  # for a **DisputeEntry**, see `models/dispute_entry.rb`
+  STATUS_RESEARCHING = "RESEARCHING"
+  STATUS_ESCALATED = "ESCALATED"
+  STATUS_CUSTOMER_PENDING = "CUSTOMER_PENDING"
+  STATUS_ON_HOLD = "ON_HOLD"
+  STATUS_RESOLVED = "RESOLVED_CLOSED"
+  STATUS_REOPENED = "RE-OPENED"
+
+  STATUS_RESOLVED_FIXED_FP = "FIXED_FP"
+  STATUS_RESOLVED_FIXED_FN = "FIXED_FN"
+  STATUS_RESOLVED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_INVALID = "INVALID"
+  STATUS_RESOLVED_TEST = "TEST_TRAINING"
+  STATUS_RESOLVED_OTHER = "OTHER"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
   scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
