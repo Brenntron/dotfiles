@@ -14,9 +14,7 @@ class Dispute < ApplicationRecord
 
   delegate :cvs_username, to: :user, allow_nil: true
 
-  NEW = 'NEW'
   RESOLVED = 'RESOLVED_CLOSED'
-  ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
   DUPLICATE = 'DUPLICATE'
 
@@ -43,11 +41,13 @@ class Dispute < ApplicationRecord
   # It's possible that some of this is duplicates of the above but I'm too scared to try and consolidate
   # them. These strings apply specifically to the "Status" dropdown on **Disputes**. To edit these strings
   # for a **DisputeEntry**, see `models/dispute_entry.rb`
+  STATUS_NEW = "NEW"
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
   STATUS_CUSTOMER_PENDING = "CUSTOMER_PENDING"
   STATUS_ON_HOLD = "ON_HOLD"
   STATUS_RESOLVED = "RESOLVED_CLOSED"
+  STATUS_ASSIGNED = "ASSIGNED"
   STATUS_REOPENED = "RE-OPENED"
 
   STATUS_RESOLVED_FIXED_FP = "FIXED_FP"
