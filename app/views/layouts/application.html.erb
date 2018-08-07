@@ -39,6 +39,12 @@
           <% if can?(:read, Admin) %>
             <li class="admin-menu"><%= link_to 'ADMIN', admin_root_path %></li>
           <% end %>
+          <% if current_user.has_role?("webrep user") || current_user.has_role?("webrep manager") %>
+              <li class="admin-menu"><%= link_to 'WEBREP', escalations_webrep_disputes_path %></li>
+          <% end %>
+          <% if current_user.has_role?("webcat user") || current_user.has_role?("webcat manager") %>
+              <li class="admin-menu"><%= link_to 'WEBCAT', escalations_webcat_complaints_path %></li>
+          <% end %>
 
         </ul>
       </nav>
@@ -79,6 +85,7 @@
             <% elsif ac_namespace == "escalations/webrep" %>
               <%= render 'layouts/webrep_disputes_layout' %>
             <% end %>
+
 
         </div>
       </div>
