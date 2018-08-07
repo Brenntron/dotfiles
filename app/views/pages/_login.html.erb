@@ -6,7 +6,7 @@
       <% if Rails.env == "production" %>
           Please sign in using your CEC credentials
       <% else %>
-          Please sign in using your Talos credentials
+          Please sign in using your Cisco credentials
       <% end %>
       <%= form_tag('/sessions/create', method: :post, :content_type => 'application/json') do -%>
         <div class="container">
