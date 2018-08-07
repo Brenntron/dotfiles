@@ -544,3 +544,17 @@ window.named_webcat_index_table = (search_name) ->
   }
   window.populate_advanced_webcat_index_table(data)
 
+
+$ ->
+  $(document).ready ->
+    if window.location.pathname != '/escalations/webcat/complaints'
+      $('#filter-complaints').hide()
+      $('#fetch').hide()
+      $('#web-cat-search').hide()
+      $('#new-complaint').hide()
+    else
+      $('#filter-complaints').show()
+      $('#fetch').show()
+      $('#web-cat-search').show()
+      $('#new-complaint').show()
+
