@@ -88,29 +88,29 @@
                       Ticket Resolution
                     %ul
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_FIXED_FP}", value: "#{Dispute::RESOLVED_FIXED_FP}"}
-                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_FIXED_FP}"} Fixed - FP
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_FIXED_FN}", value: "#{Dispute::RESOLVED_FIXED_FN}"}
-                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_FIXED_FN}"} Fixed - FN
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_UNCHANGED}", value: "#{Dispute::RESOLVED_UNCHANGED}"}
-                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_UNCHANGED}"} Unchanged
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_INVALID}", value: "#{Dispute::RESOLVED_INVALID}"}
-                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_INVALID}"} Invalid / Junk Mail
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_TEST}", value: "#{Dispute::RESOLVED_TEST}"}
-                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_TEST}"} Test / Training
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_OTHER}", value: "#{Dispute::RESOLVED_OTHER}"}
-                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_OTHER}"} Other
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
                   .col-xs-6.submenu-right-wrapper
                     .resolution-comment-wrapper
                       %label.content-label-sm
                         Comment
                       %textarea
-                      %button.primary
+                      %button.primary{onClick: 'show_page_edit_status()'}
                         Submit
 
               %li.status-radio-wrapper
