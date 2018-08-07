@@ -88,23 +88,23 @@
                       Ticket Resolution
                     %ul
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: 'FIXED_FP', value: 'FIXED_FP'}
-                        %label.ticket-res-radio-label.radio-label{for: 'FIXED_FP'} Fixed - FP
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_FIXED_FP}", value: "#{Dispute::RESOLVED_FIXED_FP}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_FIXED_FP}"} Fixed - FP
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: 'FIXED_FN', value: 'FIXED_FN'}
-                        %label.ticket-res-radio-label.radio-label{for: 'FIXED_FN'} Fixed - FN
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_FIXED_FN}", value: "#{Dispute::RESOLVED_FIXED_FN}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_FIXED_FN}"} Fixed - FN
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: 'UNCHANGED', value: 'UNCHANGED'}
-                        %label.ticket-res-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_UNCHANGED}", value: "#{Dispute::RESOLVED_UNCHANGED}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_UNCHANGED}"} Unchanged
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: 'INVALID', value: 'INVALID'}
-                        %label.ticket-res-radio-label.radio-label{for: 'INVALID'} Invalid / Junk Mail
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_INVALID}", value: "#{Dispute::RESOLVED_INVALID}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_INVALID}"} Invalid / Junk Mail
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: 'TEST_TRAINING', value: 'TEST_TRAINING'}
-                        %label.ticket-res-radio-label.radio-label{for: 'TEST_TRAINING'} Test / Training
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_TEST}", value: "#{Dispute::RESOLVED_TEST}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_TEST}"} Test / Training
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: 'OTHER', value: 'OTHER'}
-                        %label.ticket-res-radio-label.radio-label{for: 'OTHER'} Other
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::RESOLVED_OTHER}", value: "#{Dispute::RESOLVED_OTHER}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::RESOLVED_OTHER}"} Other
                   .col-xs-6.submenu-right-wrapper
                     .resolution-comment-wrapper
                       %label.content-label-sm
