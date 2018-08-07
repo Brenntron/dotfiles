@@ -3567,15 +3567,15 @@ input.communication-subject {
   font-size: 8pt;
 }
 
-.wbrs-rule-trigger {
+.wbrs-rule-trigger, .adhoc-email-trigger {
   text-decoration: underline;
 }
 
-.wbrs-rule-trigger:hover {
+.wbrs-rule-trigger:hover, .adhoc-email-trigger:hover {
   color: $warning-accent-color;
 }
 
-.nested-data-row .wbrs-rule-trigger {
+.nested-data-row .wbrs-rule-trigger, .nested-data-row .adhoc-email-trigger {
   color: $content-bg-color;
 }
 
