@@ -261,6 +261,9 @@
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RE-OPENED'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_REOPENED}"} Re-Opened
+                  %td{:data-toggle => "tooltip", :data-placement => "top", :title => "#{entry.resolution_comment}"}
+                    %label Resolution
+                    = entry.resolution
                   %td
                     %label As of
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
