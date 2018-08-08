@@ -37,11 +37,11 @@ window.updatePending = (id,row_id) ->
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
-          maxItems: 5
-          valueField: 'name'
-          labelField: 'name'
-          searchField: 'name'
-          options: AC.WebCat.createSelectOptions()
+          maxItems: 5,
+          valueField: 'value',
+          labelField: 'value',
+          searchField: ['text'],
+          options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
     error: (response) ->
@@ -299,10 +299,10 @@ window.click_table_buttons = (complaint_table, button)->
     $('#input_cat_'+ row.data().entry_id).selectize {
       persist: false,
       create: false,
-      maxItems: 5
-      valueField: 'name'
-      labelField: 'name'
-      searchField: 'name'
+      maxItems: 5,
+      valueField: 'value',
+      labelField: 'value',
+      searchField: ['text'],
       options: AC.WebCat.createSelectOptions()
       items: selected_options(row.data().category)
     }
