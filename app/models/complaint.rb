@@ -1,5 +1,5 @@
 class Complaint < ApplicationRecord
-  belongs_to :customer
+  belongs_to :customer, optional: true
   has_many :complaint_entries
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
@@ -286,14 +286,14 @@ class Complaint < ApplicationRecord
     cust = find_customer(customer)
     new_complaint = Complaint.create(id: bug_stub_hash["id"],
                                      description: description,
-                                     customer_id: cust.id,
+                                     customer_id: cust ? cust.id : nil,
                                      status: 'NEW',
                                      channel: INT_CHANNEL)
 
     handle_tags(new_complaint, tags) if tags
 
     ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url)
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first)
     end
   end
 
