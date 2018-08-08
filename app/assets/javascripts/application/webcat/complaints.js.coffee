@@ -157,12 +157,15 @@ window.select_cat_text_field = (id) ->
 
 window.edit_selected_complaints = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  complaint_ids = []
-  i = 0
-  while i < selected_rows[0].length
-    complaint_ids.push(selected_rows.data()[i].complaint_id)
-    i++
-  window.location = 'show_multiple?selected_ids=' + complaint_ids;
+  if selected_rows.count() > 0
+    complaint_ids = []
+    i = 0
+    while i < selected_rows[0].length
+      complaint_ids.push(selected_rows.data()[i].complaint_id)
+      i++
+    window.location = 'show_multiple?selected_ids=' + complaint_ids;
+  else
+    std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
 selected_options = (categories) ->
   options = []
