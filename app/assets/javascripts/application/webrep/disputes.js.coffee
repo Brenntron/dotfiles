@@ -700,7 +700,7 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="bug-priority p-P' + data + '"></span>'
+          '<span class="bug-priority p-' + data + '"></span>'
 
       }
       { data: 'case_link' }
