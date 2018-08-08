@@ -899,13 +899,13 @@ $ ->
 $ ->
   $(document).ready ->
     if window.location.pathname != '/escalations/webrep/tickets'
-#      $('#filter-cases').hide()
+      $('#filter-cases').hide()
       $('#import-webrep').hide()
-#      $('.search-group').hide()
+      $('#web-rep-search').hide()
     else
-#      $('#filter-cases').show()
+      $('#filter-cases').show()
       $('#import-webrep').show()
-#      $('.search-group').show()
+      $('#web-rep-search').show()
 
   $('#edit-dispute-button').click ->
     $('#dispute-priority-icon').hide()

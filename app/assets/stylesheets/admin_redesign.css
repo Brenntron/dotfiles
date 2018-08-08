@@ -5,6 +5,8 @@
  *= require jquery-ui
  *= require custom-bootstrap
  *= require bootstrap-switch
+ *= require selectize
+ *= require selectize.default
  *= require dataTables/extras/dataTables.responsive
  *= require dataTables/jquery.dataTables
  *= require reset
