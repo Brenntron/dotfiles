@@ -15,5 +15,7 @@
  *= require rule-docs
  *= require webcat_telemetry
  *= require webcat_complaints
+ *= require tooltipster.bundle.min
+ *= require tooltipster-sideTip-borderless.min
 
 */

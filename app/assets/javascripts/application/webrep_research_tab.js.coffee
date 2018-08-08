@@ -485,4 +485,12 @@ $ ->
 #    Display success message in modal
 
 
+$(document).ready ->
 
+  ### Using 'tooltipped' class instead of 'tooltip' so that it doesn't interfere with Bootstrap ###
+
+  $('.esc-tooltipped').tooltipster theme: [
+    'tooltipster-borderless'
+    'tooltipster-borderless-customized'
+  ]
+  return

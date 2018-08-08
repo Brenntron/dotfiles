@@ -2718,6 +2718,15 @@ fieldset.top-content {
   border-top-color: $content-bg-color;
 }
 
+.tooltipster-base.tooltipster-top.tooltipster-show {
+  margin-bottom: -20px !important;
+}
+
+.esc-tooltipped:hover {
+  cursor: pointer;
+}
+
+
 .rule-alerts-table .alerted-flag {
   background-image: url(image_path('icon_alert_red.svg'));
   background-repeat: no-repeat;
