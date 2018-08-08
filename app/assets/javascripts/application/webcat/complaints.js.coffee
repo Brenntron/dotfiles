@@ -236,6 +236,8 @@ format = (complaint_entry_row) ->
         fixed_radio = "checked='checked'"
       when "invalid"
         invalid_radio = "checked='checked'"
+  else
+    fixed_radio = "checked='checked'"
 
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
