@@ -14,7 +14,9 @@ class Dispute < ApplicationRecord
 
   delegate :cvs_username, to: :user, allow_nil: true
 
+  NEW = 'NEW'
   RESOLVED = 'RESOLVED_CLOSED'
+  ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
   DUPLICATE = 'DUPLICATE'
 
