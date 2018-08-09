@@ -3787,13 +3787,13 @@ td.wbrs-highlight, td.sbrs-highlight {
   width: 100%;
 }
 
-#advanced-search-wrapper input {
+#advanced-search-wrapper input, #new-complaint-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
   border-radius: 1px;
 }
-#advanced-search-wrapper .content-label-sm {
+#advanced-search-wrapper .content-label-sm, #new-complaint-form .content-label-sm {
   margin-bottom: 0;
 }
 
@@ -3863,14 +3863,18 @@ button.tertiary {
   left: auto;
 }
 
-#advanced-search-dropdown input {
+#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown input:focus {
+#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus   {
   background-color: $faint-alt-highlight;
+  border: 4px solid $content-bg-color;
+  outline: 1px solid darken($faint-neutral-color, 5%);
 }
+
+
 
 #search-criteria-options {
   color: $type-base-color;
@@ -5641,6 +5645,31 @@ table.dataTable tbody tr.selected {
 
 .preview-website-col {
   background-color: $faint-neutral-color;
+}
+
+#new-complaint-wrapper {
+  min-width: 350px;
+}
+
+#new-complaint-wrapper form {
+  margin-top: -20px;
+}
+
+#new-complaint-wrapper textarea, #new-complaint-wrapper input {
+  width: 100%;
+  margin-top: -9px;
+}
+
+#new-complaint-wrapper .form-group.margin-adjustment {
+  margin-top: -10px;
+}
+
+#new-complaint-wrapper .form-group {
+  margin-bottom: 0;
+}
+
+#new-complaint-wrapper button {
+  padding: 0 30px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
