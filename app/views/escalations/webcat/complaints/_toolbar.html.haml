@@ -14,24 +14,24 @@
     %label.toolbar-section-label
       Edit
     %button.toolbar-button#edit-button{onclick: 'edit_selected_complaints()', type: 'button'}
-      %span.toolbar-button-text Edit Selected
-    %button.toolbar-button.take-button{onclick: 'take_selected()', type: 'button'}
-      %span.toolbar-button-text Take Selected
-    %button.toolbar-button.return-button{onclick: 'return_selected()', type: 'button'}
-      %span.toolbar-button-text Return Selected
+      %span.toolbar-button-text Edit
+    %button.toolbar-button.take-ticket-toolbar-button{onclick: 'take_selected()', type: 'button'}
+      %span.toolbar-button-text Take
+    %button.toolbar-button.return-ticket-toolbar-button{onclick: 'return_selected()', type: 'button'}
+      %span.toolbar-button-text Return
     %button.toolbar-button.url-cat-button{'data-toggle': 'modal', type: 'button', 'data-target': '#cat_new_url_modal'}
       %span.toolbar-button-text Categorize New URL
   %div
     %label.toolbar-section-label
-      View
-    %button.toolbar-button.collapse-button.collapse-all-button{onclick: 'collapse_all()', type: 'button'}
-      %span.toolbar-button-text Collapse All
-    %button.toolbar-button.collapse-sel-button{onclick: 'collapse_selected()', type: 'button'}
+      View Nested Data
+    %button.toolbar-button.collapse-button{onclick: 'collapse_selected()', type: 'button'}
       %span.toolbar-button-text Collapse Selected
-    %button.toolbar-button.expand-row-button.expand-all-button{onclick: 'expand_all()', type: 'button'}
-      %span.toolbar-button-text Expand All
-    %button.toolbar-button.expand-sel-button{onclick: 'expand_selected()', type: 'button'}
+    %button.toolbar-button.collapse-all{onclick: 'collapse_all()', type: 'button'}
+      %span.toolbar-button-text Collapse All
+    %button.toolbar-button.expand-row-button{onclick: 'expand_selected()', type: 'button'}
       %span.toolbar-button-text Expand Selected
+    %button.toolbar-button.expand-all{onclick: 'expand_all()', type: 'button'}
+      %span.toolbar-button-text Expand All
     %input{type: 'checkbox', checked: true, id:'self_review'}
       Allow Self Review
 
