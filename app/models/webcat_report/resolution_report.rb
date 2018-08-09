@@ -13,18 +13,19 @@ class WebcatReport::ResolutionReport
   end
 
   def each_engineer
+    byebug
 
     times_select_phrase =
-        'avg(time_to_sec(timediff( complaint_closed_at, complaint_assigned_at ))) as eng_avg, ' +
-            'max( time_to_sec( timediff( complaint_closed_at, complaint_assigned_at ))) as eng_max, ' +
-            'avg(time_to_sec(timediff( complaint_closed_at, created_at ))) as dept_avg, ' +
-            'max( time_to_sec( timediff( complaint_closed_at, created_at ))) as dept_max'
+        'avg(time_to_sec(timediff( case_closed_at, case_assigned_at ))) as eng_avg, ' +
+            'max( time_to_sec( timediff( case_closed_at, case_assigned_at ))) as eng_max, ' +
+            'avg(time_to_sec(timediff( case_closed_at, created_at ))) as dept_avg, ' +
+            'max( time_to_sec( timediff( case_closed_at, created_at ))) as dept_max'
 
-    counts = Complaint.where(complaint_closed_at: (@date_from..@date_to+1)).group(:resolution).count
+    counts = ComplaintEntry.where(case_closed_at: (@date_from..@date_to+1)).group(:resolution).count
 
     times =
-        Complaint.where.not(complaints: {resolution: nil})
-            .where(complaints: {complaint_closed_at: (@date_from..@date_to+1)})
+        ComplaintEntry.where.not(resolution: nil)
+            .where(case_closed_at: (@date_from..@date_to+1))
             .select(times_select_phrase).first
 
     yield ResolutionCount.new(username: 'TOTAL',
@@ -38,15 +39,15 @@ class WebcatReport::ResolutionReport
 
     User.joins(:complaint_entries)
         .where.not(complaint_entries: {resolution: nil})
-        .where(complaint_entries: {complaint_closed_at: (@date_from..@date_to+1)})
+        .where(complaint_entries: {case_closed_at: (@date_from..@date_to+1)})
         .group(:id).order(:cvs_username).each do |user|
 
       counts =
-        Complaint.where(user_id: user.id, complaint_closed_at: (@date_from..@date_to+1)).group(:resolution).count
+          ComplaintEntry.where(user_id: user.id, case_closed_at: (@date_from..@date_to+1)).group(:resolution).count
 
       times =
-        Complaint.where.not(complaints: {resolution: nil})
-          .where(user_id: user.id, complaints: {complaint_closed_at: (@date_from..@date_to+1)})
+          ComplaintEntry.where.not(resolution: nil)
+          .where(user_id: user.id, case_closed_at: (@date_from..@date_to+1))
           .select(times_select_phrase).first
 
       yield ResolutionCount.new(username: user.cvs_username,

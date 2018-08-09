@@ -77,13 +77,13 @@ class ComplaintEntry < ApplicationRecord
         if self.status == "PENDING"
           if commit_pending == "commit"
             current_status = "COMPLETED"
-            update(status:current_status,resolution_comment: comment,user:current_user)
+            update(status:current_status,resolution_comment: comment, case_closed_at: Time.now,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
           else
             current_status = "ASSIGNED"
-            update(status:current_status, resolution_comment: comment)
+            update(status:current_status, resolution_comment: comment, case_assigned_at: Time.now)
           end
         else
           current_status = "PENDING"
@@ -91,7 +91,7 @@ class ComplaintEntry < ApplicationRecord
         end
       else
         current_status = "COMPLETED"
-        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
+        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment, case_closed_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
