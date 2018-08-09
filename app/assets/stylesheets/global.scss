@@ -851,6 +851,21 @@ thead th.sorting.center {
   margin: 9px 3px;
 }
 
+.toolbar .toolbar-checkbox-wrapper {
+  border: none;
+  padding-top: 10px;
+}
+
+#login-div.nav-tool-block {
+  display: none;
+}
+
+@media (min-width: 1000px ) {
+  #login-div.nav-tool-block {
+    display: block;
+  }
+}
+
 .panel-button {
   background-repeat: no-repeat;
   background-position: center center;
