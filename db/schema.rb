@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180730184700) do
+ActiveRecord::Schema.define(version: 20180809144852) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -160,6 +160,8 @@ ActiveRecord::Schema.define(version: 20180730184700) do
     t.string "category"
     t.integer "user_id"
     t.boolean "is_important"
+    t.datetime "complaint_assigned_at"
+    t.datetime "complaint_closed_at"
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
   end
 
@@ -321,6 +323,7 @@ ActiveRecord::Schema.define(version: 20180730184700) do
     t.datetime "case_closed_at"
     t.datetime "case_accepted_at"
     t.datetime "case_resolved_at"
+    t.string "webrep_wlbl_keys"
     t.index ["dispute_id"], name: "index_dispute_entries_on_dispute_id"
   end
 
@@ -440,7 +443,6 @@ ActiveRecord::Schema.define(version: 20180730184700) do
     t.string "pcap_validation"
     t.integer "unused_exploit_id"
     t.index ["name"], name: "index_exploit_types_on_name"
-    t.index ["unused_exploit_id"], name: "index_exploit_types_on_unused_exploit_id"
   end
 
   create_table "exploits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
