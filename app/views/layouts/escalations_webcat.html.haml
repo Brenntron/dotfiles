@@ -21,7 +21,7 @@
       %h3.nav-tool-dropdown-header.inverse
         New Complaint
       .nav-tool-content-wrapper
-        = "render 'new'"
+        = render 'escalations/webcat/complaints/new'
 
   -#.nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
   -#  %a{href: '#', class: 'dropdown-toggle', id: 'fetch', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -87,7 +87,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-          = "render 'advanced_search'"
+          = "render 'escalations/webcat/complaints/advanced_search'"
 
           -#= label_tag 'advanced_query_complaints', 'Complaint IDs'
           -#%br/
