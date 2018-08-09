@@ -125,10 +125,10 @@ $ ->
   $('#cat_new_url').selectize {
     persist: false,
     create: false,
-    maxItems: 5
-    valueField: 'name'
-    labelField: 'name'
-    searchField: 'name'
+    maxItems: 5,
+    valueField: 'value',
+    labelField: 'value',
+    searchField: ['text'],
     options: AC.WebCat.createSelectOptions()
 
   }
