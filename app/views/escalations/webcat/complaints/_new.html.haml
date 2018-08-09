@@ -15,7 +15,7 @@
       %datalist#customerList
   .form-group.margin-adjustment
     %label.content-label-sm Tags
-    %input.form-control.selectize#select-to-new{placeholder: "Add some tags...", multiple: "multiple", tabindex:"-1"}
+    %fieldset.form-control.selectize#select-to-new{placeholder: "Add some tags...", multiple: "multiple", tabindex:"-1"}
     %input.hidden#complaint_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(',')}
 
 
