@@ -160,8 +160,9 @@ ActiveRecord::Schema.define(version: 20180809144852) do
     t.string "category"
     t.integer "user_id"
     t.boolean "is_important"
-    t.datetime "complaint_entry_assigned_at"
-    t.datetime "complaint_entry_closed_at"
+    t.datetime "case_resolved_at"
+    t.datetime "case_assigned_at"
+    t.datetime "case_closed_at"
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
   end
 
