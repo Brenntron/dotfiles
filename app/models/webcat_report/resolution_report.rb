@@ -13,8 +13,7 @@ class WebcatReport::ResolutionReport
   end
 
   def each_engineer
-    byebug
-
+    
     times_select_phrase =
         'avg(time_to_sec(timediff( case_closed_at, case_assigned_at ))) as eng_avg, ' +
             'max( time_to_sec( timediff( case_closed_at, case_assigned_at ))) as eng_max, ' +
