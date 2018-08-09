@@ -63,10 +63,47 @@ module API
 
             desc 'update a dispute'
             params do
+              optional :priority, type: String, desc: "Priority of P1 through P5"
+              optional :customer_name, type: String, desc: "Name of the customer associated with this dispute. Note that changing this changes this customer's name on all their disputes."
+              optional :customer_email, type: String, desc: "Email of the customer associated with this dispute"
+              optional :status, type: String, desc: "Status of the dispute"
+              optional :related_id, type: Integer, desc: "ID of a dispute to relate to this one"
+              optional :comment, type: String, desc: "Comment, available regardless of whether resolving"
+              optional :resolution, type: String, desc: "Resolution; write this if status is Resolved"
             end
-
             put ":id" do
-              # TODO access control when this is implmented
+              dispute = Dispute.find(params[:id])
+
+              dispute.priority = permitted_params[:priority]
+              dispute.customer.name = permitted_params[:customer_name]
+              dispute.customer.email = permitted_params[:customer_email]
+              dispute.status = permitted_params[:status]
+
+              if permitted_params[:resolution]
+                dispute.resolution = permitted_params[:resolution]
+                dispute.case_resolved_at = Time.now
+              end
+
+              dispute.save
+              dispute.customer.save
+
+              if permitted_params[:related_id]
+                related_dispute = Dispute.find(permitted_params[:related_id])
+                related_dispute.related_id = params[:id]
+                related_dispute.related_at = Time.now
+                related_dispute.save
+              end
+
+
+              if permitted_params[:comment]
+                dispute_comment = DisputeComment.new
+                dispute_comment.dispute = dispute
+                dispute_comment.comment = permitted_params[:comment]
+                dispute_comment.save
+              end
+
+
+              dispute.to_json
             end
 
             desc 'delete a dispute'

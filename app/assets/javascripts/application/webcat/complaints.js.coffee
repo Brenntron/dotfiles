@@ -157,12 +157,15 @@ window.select_cat_text_field = (id) ->
 
 window.edit_selected_complaints = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  complaint_ids = []
-  i = 0
-  while i < selected_rows[0].length
-    complaint_ids.push(selected_rows.data()[i].complaint_id)
-    i++
-  window.location = 'show_multiple?selected_ids=' + complaint_ids;
+  if selected_rows.count() > 0
+    complaint_ids = []
+    i = 0
+    while i < selected_rows[0].length
+      complaint_ids.push(selected_rows.data()[i].complaint_id)
+      i++
+    window.location = 'show_multiple?selected_ids=' + complaint_ids;
+  else
+    std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
 selected_options = (categories) ->
   options = []
@@ -187,6 +190,10 @@ format = (complaint_entry_row) ->
     if complaint_entry.path
       url = host + complaint_entry.path
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
+  else if  complaint_entry.ip_address
+    host = complaint_entry.ip_address
+    url = host
+    uri = '<a href="http://' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
 
@@ -232,6 +239,8 @@ format = (complaint_entry_row) ->
         fixed_radio = "checked='checked'"
       when "invalid"
         invalid_radio = "checked='checked'"
+  else
+    fixed_radio = "checked='checked'"
 
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
@@ -543,4 +552,18 @@ window.named_webcat_index_table = (search_name) ->
     search_name: search_name
   }
   window.populate_advanced_webcat_index_table(data)
+
+
+$ ->
+  $(document).ready ->
+    if window.location.pathname != '/escalations/webcat/complaints'
+      $('#filter-complaints').hide()
+      $('#fetch').hide()
+      $('#web-cat-search').hide()
+      $('#new-complaint').hide()
+    else
+      $('#filter-complaints').show()
+      $('#fetch').show()
+      $('#web-cat-search').show()
+      $('#new-complaint').show()
 

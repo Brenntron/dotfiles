@@ -2718,6 +2718,15 @@ fieldset.top-content {
   border-top-color: $content-bg-color;
 }
 
+.tooltipster-base.tooltipster-top.tooltipster-show {
+  margin-bottom: -20px !important;
+}
+
+.esc-tooltipped:hover {
+  cursor: pointer;
+}
+
+
 .rule-alerts-table .alerted-flag {
   background-image: url(image_path('icon_alert_red.svg'));
   background-repeat: no-repeat;
@@ -4771,6 +4780,7 @@ h5.entry-details-table-header {
   padding-bottom: 1px;
   border: 2px solid #fff;
   outline: 1px solid #e5e5e5;
+  font-size: 9pt;
 }
 
 .dropdown.open .inline-select-dropdown {
@@ -5567,6 +5577,10 @@ table.dataTable tbody tr.selected {
   margin-left: 0;
   padding: 8px 12px 12px !important;
 }
+#show-edit-ticket-status-dropdown {
+  margin-top: 1px;
+  margin-left: 0;
+}
 
 #set-related-dispute-div input.dispute-id {
   width: 100%;
@@ -5576,6 +5590,28 @@ table.dataTable tbody tr.selected {
 
 .toggle-offset {
   margin-left: 12px !important;
+}
+
+#show-edit-ticket-status-button {
+  padding: 4px 6px;
+}
+
+#show-edit-ticket-status-dropdown .radio-label {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+#show-ticket-resolution-submenu {
+  left: 100%;
+  border-radius: 0 4px 4px 4px;
+  width: 330px;
+  margin-top: -55px;
+  padding: 0;
+}
+
+#show-ticket-resolution-submenu .radio-label {
+  font-size: 9pt;
+  color: $content-bg-color;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

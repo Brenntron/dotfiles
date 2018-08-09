@@ -112,7 +112,7 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def self.create_complaint_entry(complaint, ip_url)
+  def self.create_complaint_entry(complaint, ip_url, user = nil)
     new_complaint_entry = ComplaintEntry.new
     new_complaint_entry.complaint_id = complaint.id
     new_complaint_entry.status = "NEW"
@@ -129,6 +129,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.domain = url_parts[:domain]
       new_complaint_entry.path = url_parts[:path]
     end
+    new_complaint_entry.user = user
     new_complaint_entry.save
   end
 

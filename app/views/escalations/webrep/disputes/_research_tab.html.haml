@@ -262,6 +262,19 @@
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RE-OPENED'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_REOPENED}"} Re-Opened
                   %td
+                    - if entry.resolution.nil?
+                      %label Resolution
+                      %span.missing-data
+                        Unresolved
+                    - elsif entry.resolution_comment.nil?
+                      %label Resolution
+                      = entry.resolution
+                    - else
+                      %span.esc-tooltipped{title: "#{entry.resolution_comment}"}
+                        %label Resolution
+                        = entry.resolution
+
+                  %td
                     %label As of
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 

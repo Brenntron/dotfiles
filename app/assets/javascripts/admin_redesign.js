@@ -9,6 +9,8 @@
 //= require util
 //= require tree-table
 //= require selectize
+//= require tooltipster.bundle.min
+//= require tooltipster-custom
 //= require Chart.bundle
 //= require chartkick
 //= require bootstrap-multiselect
@@ -37,3 +39,4 @@
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
 //= require application/webcat/categories
+

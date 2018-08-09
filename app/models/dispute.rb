@@ -34,6 +34,31 @@ class Dispute < ApplicationRecord
   SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
 
+  PRIORITY_1 = 'P1'
+  PRIORITY_2 = 'P2'
+  PRIORITY_3 = 'P3'
+  PRIORITY_4 = 'P4'
+  PRIORITY_5 = 'P5'
+
+  # It's possible that some of this is duplicates of the above but I'm too scared to try and consolidate
+  # them. These strings apply specifically to the "Status" dropdown on **Disputes**. To edit these strings
+  # for a **DisputeEntry**, see `models/dispute_entry.rb`
+  STATUS_NEW = "NEW"
+  STATUS_RESEARCHING = "RESEARCHING"
+  STATUS_ESCALATED = "ESCALATED"
+  STATUS_CUSTOMER_PENDING = "CUSTOMER_PENDING"
+  STATUS_ON_HOLD = "ON_HOLD"
+  STATUS_RESOLVED = "RESOLVED_CLOSED"
+  STATUS_ASSIGNED = "ASSIGNED"
+  STATUS_REOPENED = "RE-OPENED"
+
+  STATUS_RESOLVED_FIXED_FP = "FIXED_FP"
+  STATUS_RESOLVED_FIXED_FN = "FIXED_FN"
+  STATUS_RESOLVED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_INVALID = "INVALID"
+  STATUS_RESOLVED_TEST = "TEST_TRAINING"
+  STATUS_RESOLVED_OTHER = "OTHER"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
   scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
@@ -287,7 +312,7 @@ class Dispute < ApplicationRecord
     is_resolved = true
 
     self.dispute_entries.each do |entry|
-      if entry.status != RESOLVED
+      if entry.status != DisputeEntry::RESOLVED
         is_resolved = false
         break
       end
@@ -310,14 +335,15 @@ class Dispute < ApplicationRecord
   #
   def self.process_bridge_payload(message_payload)
     verdicts_to_blacklist = []
-
+    user = User.where(cvs_username:"vrtincom").first
+    guest = Company.where(:name => "Guest").first
     begin
       ActiveRecord::Base.transaction do
 
         logger.debug "Starting ticket create"
 
-        user = User.where(cvs_username:"vrtincom").first
-        guest = Company.where(:name => "Guest").first
+        #user = User.where(cvs_username:"vrtincom").first
+
         #TODO: this should be put in a params method
         message_payload["payload"] = message_payload["payload"].permit!.to_h
         new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
@@ -338,7 +364,8 @@ class Dispute < ApplicationRecord
         }
 
         bug_attrs = {
-            'product' => 'Escalations Console',
+            #'product' => 'Escalations Console',
+            'product' => 'Escalations',
             'component' => 'IP/Domain',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
@@ -966,8 +993,7 @@ class Dispute < ApplicationRecord
           end
         end
       end
-
-      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.wbrs_rule_hits.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.sbrs_rule_hits.pluck(:name)}}
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
       dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
         when dispute.assignee == 'Unassigned'

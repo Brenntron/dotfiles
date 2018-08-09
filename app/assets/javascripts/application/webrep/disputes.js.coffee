@@ -173,6 +173,23 @@ window.index_adust_wlbl_button =(button_tag) ->
     error_prefix: 'Error adjusting WL/BL.'
   )
 
+window.save_dispute = () ->
+  data = {
+    'priority': $('#dispute-priority-select').val()
+    'customer_name': $('#dispute-customer-name-input').val()
+    'customer_email': $('#dispute-customer-email-input').val()
+    'status': $('#status').val()
+    'related_id': $('#related-dispute-id').val()
+  }
+
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/' + $('#dispute_id').text()
+    method: 'PUT'
+    data: data
+    error_prefix: 'Unable to update dispute.'
+    success_reload: true
+  )
+
 window.row_adust_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
@@ -254,22 +271,31 @@ window.toolbar_index_edit_status = () ->
     error_prefix: 'Error updating data.'
   )
 
+window.show_page_edit_status = () ->
+  statusName = $('input[name=dispute-status]:checked').attr('id')
+  comment = $('#dispute-status-comment').val()
+  dispute_id = $('#dispute_id').text()
 
+  if statusName == "RESOLVED_CLOSED"
+    resolution = $('input[name=dispute-resolution]:checked').attr('id')
 
+  data = {
+    dispute_ids: [ dispute_id ]
+    status: statusName
+    commment: comment
+  }
 
+  if resolution
+    data.resolution = resolution
+    data.comment = $('#dispute-resolution-comment').val()
 
-#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#  $.ajax(
-#    url: '/api/v1/escalations/webrep/disputes/edit_status'
-#    method: 'POST'
-#    headers: headers
-#    data: data
-#    dataType: 'json'
-#    success: (response) ->
-#      window.location.reload()
-#    error: (response) ->
-#      popup_response_error(response, 'Error editing ticket status')
-#  )
+  std_msg_ajax(
+    url: '/api/v1/escalations/webrep/disputes/set_disputes_status'
+    method: 'POST'
+    data: data
+    error_prefix: 'Unable to update dispute.'
+    success_reload: true
+  )
 
 window.toolbar_index_change_assignee = () ->
 
@@ -700,7 +726,7 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="bug-priority p-P' + data + '"></span>'
+          '<span class="bug-priority p-' + data + '"></span>'
 
       }
       { data: 'case_link' }
@@ -899,13 +925,13 @@ $ ->
 $ ->
   $(document).ready ->
     if window.location.pathname != '/escalations/webrep/tickets'
-#      $('#filter-cases').hide()
+      $('#filter-cases').hide()
       $('#import-webrep').hide()
-#      $('.search-group').hide()
+      $('#web-rep-search').hide()
     else
-#      $('#filter-cases').show()
+      $('#filter-cases').show()
       $('#import-webrep').show()
-#      $('.search-group').show()
+      $('#web-rep-search').show()
 
   $('#edit-dispute-button').click ->
     $('#dispute-priority-icon').hide()
@@ -916,6 +942,7 @@ $ ->
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
     $('#related-dispute-button').removeClass('hidden')
+    $('#related-dispute-input').removeClass('hidden')
     $('#edit-dispute-button').addClass('hidden')
 
 
@@ -937,6 +964,7 @@ $ ->
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
     $('#related-dispute-button').addClass('hidden')
+    $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
 
 

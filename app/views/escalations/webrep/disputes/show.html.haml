@@ -5,11 +5,7 @@
     .col-xs-4.col-with-divider
       .priority-col-wrapper
         %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
-
-        %select.inpage-select#dispute-priority-select{name: 'dispute-priority'}
-          %option{value: "#{@dispute.priority}", selected: 'selected'}= @dispute.priority
-          -# Add all priority options to dropdown
-
+        =select_tag(:'dispute-priority-select', options_for_select([["#{Dispute::PRIORITY_1}"], ["#{Dispute::PRIORITY_2}"], ["#{Dispute::PRIORITY_3}"], ["#{Dispute::PRIORITY_4}"], ["#{Dispute::PRIORITY_5}"]], @dispute.priority))
         %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
       .case-id-wrapper
         %label.content-label-sm
@@ -55,16 +51,79 @@
       .dispute-status-col-wrapper
         %label.content-label-sm
           Status
-        #bugzilla_popover_state
-          %select#status.inpage-select{name: 'dispute-status'}
-            %option{value: "#{@dispute.status}", selected: 'selected'}= @dispute.status
-            -#%option{value: 'New', selected: 'selected'} New
-            -#%option{value: 'Assigned'} Assigned
-            -#%option{value: 'Researching'} Researching
-            -#%option{value: 'On Hold'} On Hold
-            -#%option{value: 'Customer Pending'} Customer Pending
-            -#%option{value: 'Resolved'} Resolved
-            -#%option{value: 'Reopened'} Reopened
+        %br
+        -##bugzilla_popover_state
+        %span.dropdown
+          %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            - if @dispute.status.nil?
+              NEW
+            - else
+              = @dispute.status
+          .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
+            %ul
+              %li.status-radio-wrapper
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_NEW}", value: "#{Dispute::STATUS_NEW}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_NEW}"} New
+              %li.status-radio-wrapper
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESEARCHING}"} Researching
+              %li.status-radio-wrapper
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ESCALATED}"} Escalated
+              %li.status-radio-wrapper
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_CUSTOMER_PENDING}"} Customer Pending
+              %li.status-radio-wrapper
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ON_HOLD}"} On Hold
+              %li.status-radio-wrapper
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ASSIGNED}", value: "#{Dispute::STATUS_ASSIGNED}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ASSIGNED}"} Assigned
+              %li.status-radio-wrapper
+                %input.ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
+                .dropdown-menu#show-ticket-resolution-submenu
+                  .col-xs-6.submenu-left-wrapper
+                    .submenu-header
+                      Ticket Resolution
+                    %ul
+                      %li
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
+                      %li
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
+                      %li
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
+                      %li
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
+                      %li
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
+                      %li
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                        %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
+                  .col-xs-6.submenu-right-wrapper
+                    .resolution-comment-wrapper
+                      %label.content-label-sm
+                        Comment
+                      %textarea
+                      %button.primary{onClick: 'show_page_edit_status()'}
+                        Submit
+
+              %li.status-radio-wrapper
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
+                %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
+              %li.non-resolution-submit-wrapper#ticket-non-res-submit
+                %label.content-label-sm
+                  Comment
+                %textarea.ticket-status-comment
+                .button-row-center
+                  %button.primary{onClick: 'show_page_edit_status()'}
+                    Submit
+
       .disposition-wrapper
         %label.content-label-sm
           Suggested Disposition
@@ -91,7 +150,7 @@
         %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
       .top-info-buttons-wrapper
         %button.edit-button.dispute-top-buttons#edit-dispute-button
-        %button.save-button.dispute-top-buttons#save-dispute-button.hidden
+        %button.save-button.dispute-top-buttons#save-dispute-button.hidden{onclick: 'save_dispute();'}
         %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden
 
 
@@ -166,6 +225,11 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
+      .row.hidden#related-dispute-input
+        .col-xs-2.col-with-divider
+          %input.dispute-edit-input#related-dispute-id{type: 'text'}
+        .col-xs-2.col-with-divider
+          -#Placeholder for now
       - @dispute.each_related do |dispute_dup|
         .row
           .col-xs-2.col-with-divider

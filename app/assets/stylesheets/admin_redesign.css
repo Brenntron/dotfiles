@@ -5,6 +5,8 @@
  *= require jquery-ui
  *= require custom-bootstrap
  *= require bootstrap-switch
+ *= require selectize
+ *= require selectize.default
  *= require dataTables/extras/dataTables.responsive
  *= require dataTables/jquery.dataTables
  *= require reset
@@ -15,5 +17,7 @@
  *= require rule-docs
  *= require webcat_telemetry
  *= require webcat_complaints
+ *= require tooltipster.bundle.min
+ *= require tooltipster-sideTip-borderless.min
 
 */
