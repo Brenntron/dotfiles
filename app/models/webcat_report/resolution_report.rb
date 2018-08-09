@@ -36,9 +36,9 @@ class WebcatReport::ResolutionReport
                               dept_avg: times.dept_avg, dept_max: times.dept_max)
 
 
-    User.joins(:complaints)
-        .where.not(complaints: {resolution: nil})
-        .where(complaints: {complaint_closed_at: (@date_from..@date_to+1)})
+    User.joins(:complaint_entries)
+        .where.not(complaint_entries: {resolution: nil})
+        .where(complaint_entries: {complaint_closed_at: (@date_from..@date_to+1)})
         .group(:id).order(:cvs_username).each do |user|
 
       counts =
