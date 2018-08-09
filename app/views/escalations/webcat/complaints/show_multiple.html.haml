@@ -57,11 +57,11 @@
                 = radio_button_tag "complaint_entry_resolution_#{entry.id}", "#{entry.id}_invalid", false
                 = label_tag "Invalid", nil, title: "Selecting Invalid indicates that currently there is no way to categorize the site at all."
                 %br
-    .col-xs-6
+    .col-xs-6.preview-website-col
       .row
         .col-xs-12
           .preview-url
-            Previewing
+            %h2 Website Preview
           %a#preview_window_header_a{href: '#', target: '_blank'}
             %p#preview_window_header_p
           .embed-responsive.embed-responsive-1by1
