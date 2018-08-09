@@ -636,9 +636,16 @@ th.alt-col {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
-
+.open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
+.open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
+.open-selected {background-image: url(image_path('icon_open_selected.svg'));}
+.open-all {background-image: url(image_path('icon_open_all.svg'));}
+.take-ticket-toolbar-button {background-image: url(image_path('icon_take.svg'));}
+.return-ticket-toolbar-button {background-image: url(image_path('icon_return.svg'));}
+.collapse-all {background-image: url(image_path('icon_collapse_all.svg'));}
+.expand-all {background-image: url(image_path('icon_expand_all.svg'));}
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
-
+.url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
 .delete-search {
   display: inline-block;
   float: right;
@@ -810,7 +817,7 @@ thead th.sorting.center {
   display: none;
 }
 
-@media (min-width: 1500px) {
+@media (min-width: 1600px) {
   .toolbar-button-text {
     display: inline-block;
     padding-left: 8px;
@@ -823,7 +830,6 @@ thead th.sorting.center {
   .toolbar-select-wrapper {
     padding: 4px 5px 2px 6px;
   }
-
 
   .toolbar-button-label {
     min-width: 20px;
@@ -843,6 +849,21 @@ thead th.sorting.center {
   border: none;
   background-repeat: no-repeat;
   margin: 9px 3px;
+}
+
+.toolbar .toolbar-checkbox-wrapper {
+  border: none;
+  padding-top: 10px;
+}
+
+#login-div.nav-tool-block {
+  display: none;
+}
+
+@media (min-width: 1000px ) {
+  #login-div.nav-tool-block {
+    display: block;
+  }
 }
 
 .panel-button {
@@ -5612,6 +5633,14 @@ table.dataTable tbody tr.selected {
 #show-ticket-resolution-submenu .radio-label {
   font-size: 9pt;
   color: $content-bg-color;
+}
+
+.show-toolbar-wrapper {
+  margin-top: 40px;
+}
+
+.preview-website-col {
+  background-color: $faint-neutral-color;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
