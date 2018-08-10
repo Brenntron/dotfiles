@@ -286,7 +286,9 @@ format = (complaint_entry_row) ->
       'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>'  +
       '</td>' +
       '<td><button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
-      '</td></tr></table>'
+      '</td>' +
+      '<td><img id="screenshot_'+complaint_entry.entry_id+'" onclick: "load_screenshot(this, ' + complaint_entry.entry_id + ');" src="/favicon.ico"/></td>' +
+      '</tr></table>'
   complaint_entry_html
 
 
@@ -552,6 +554,23 @@ window.named_webcat_index_table = (search_name) ->
     search_name: search_name
   }
   window.populate_advanced_webcat_index_table(data)
+
+
+window.load_screenshot = (img_tag, complaint_entry_id) ->
+  debugger
+  std_msg_ajax(
+    method: 'GET'
+    url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
+    data: {}
+    img_tag: img_tag
+    error_prefix: 'Error downloading screenshot.'
+    success: (response) ->
+      debugger
+      JSON.parse(response).image_data
+      image_data = JSON.parse(response).image_data
+      src = 'data:image/png;base64,' + image_data
+      this.img_tag.src = src
+  )
 
 
 $ ->
