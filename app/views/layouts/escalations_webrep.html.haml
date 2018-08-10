@@ -6,10 +6,6 @@
     %a#dashboard.nav-page-button{href: '/escalations/webrep/dashboard'}
       %span.nav-toolbar-icon-large.icon-dashboard
 
-    - if current_user&.has_role?('big_email_honcho')
-      %a#resolution-email-editor.nav-page-button{href: '/rulehit_resolution_mailer_templates'}
-        %span.nav-toolbar-icon-large.icon-dashboard
-
     %a#queue.nav-page-button{href: '/escalations/webrep/tickets'}
       %span.nav-toolbar-icon-large.icon-queue
 
