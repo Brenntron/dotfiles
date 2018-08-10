@@ -367,10 +367,10 @@ end
 # b1.notes << n4
 # b1.save
 Company.create(name:"Cisco")
-Customer.create(name:"Nick Herbert",company:Company.first)
+Customer.create(name:"Nick Herbert",email:"nherbert@cisco.com",company:Company.first)
 Complaint.create(channel:"somechannel", status:"NEW", description:"THis needs a description",added_through:"Admin Portal",complaint_assigned_at:Time.now, customer:Customer.first)
-ComplaintEntry.create(complaint:Complaint.first,subdomain:"www",domain:"snort.org",path:"/downloads",wbrs_score:2,status:"NEW",user:User.find(504))
+ComplaintEntry.create(complaint:Complaint.first,subdomain:"www",domain:"snort.org",path:"/downloads",wbrs_score:2,status:"NEW",user:User.find(4))
 Complaint.create(channel:"somechannel", status:"NEW", description:"Here is a description",added_through:"Admin Portal",complaint_assigned_at:Time.now, customer:Customer.first)
-ComplaintEntry.create(complaint:Complaint.last,subdomain:"www",domain:"talosintelligence.com",path:nil, wbrs_score:8,status:"NEW",user:User.find(504))
-ComplaintEntry.create(complaint:Complaint.last,subdomain:"www",domain:"hbo.com",path:nil, wbrs_score:4,status:"NEW",user:User.find(504))
-ComplaintEntry.create(complaint:Complaint.first,subdomain:"www",domain:"sssscomic.com",path:nil, wbrs_score:4,status:"NEW",user:User.find(504))
+ComplaintEntry.create(complaint:Complaint.last,subdomain:"www",domain:"talosintelligence.com",path:nil, wbrs_score:8,status:"NEW",user:User.find(4))
+ComplaintEntry.create(complaint:Complaint.last,subdomain:"www",domain:"hbo.com",path:nil, wbrs_score:4,status:"NEW",user:User.find(4))
+ComplaintEntry.create(complaint:Complaint.first,subdomain:"www",domain:"sssscomic.com",path:nil, wbrs_score:4,status:"NEW",user:User.find(4))

@@ -22,3 +22,9 @@ use Rack::Cors do
              :max_age => 0
   end
 end
+
+
+if Rails.env.profile?
+  use Rack::RubyProf, :path => '/tmp/profile'
+end
+

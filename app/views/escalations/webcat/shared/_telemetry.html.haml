@@ -1,0 +1,84 @@
+.row
+  .col-xs-4.dashboard-left-data
+    %h1= content_for :webcat_page
+    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
+    %h5= current_user.display_name
+    %p.dashboard-details
+      = link_to "#{@current_user.cvs_username}", users_path(current_user[:id])
+
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th{colspan: '2'}
+          %span.ticket-type-label Submitter Type
+      %tr
+        %td
+          Customer
+        %td
+          =@ti_comp_cust
+      %tr
+        %td
+          Guest
+        %td
+          =@ti_comp_guest
+      %tr
+        %td
+          Internal
+        %td
+          =@int_comp_entries
+      %tr
+        %td
+          WBNP
+        %td
+          =@wbnp
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th{colspan: '2'}
+          %span.ticket-type-label Entries
+      %tr
+        %td
+          Assigned
+        %td
+          =@assigned
+      %tr
+        %td
+          Pending
+        %td
+          =@pending
+      %tr
+        %td
+          New
+        %td
+          =@new
+      %tr
+        %td
+          Overdue
+        %td
+          =@overdue
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th
+          %span.ticket-type-label Complaints
+      %tr
+        %td
+          New
+        %td
+          =@new_comp
+      %tr
+        %td
+          Active
+        %td
+          =@active_comp
+      %tr
+        %td
+          Overdue
+        %td
+          =@overdue_comp
+      %tr
+        %td
+          Completed
+        %td
+          =@completed_comp
+

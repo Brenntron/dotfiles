@@ -1,0 +1,41 @@
+.toolbar#webcat-index-toolbar
+  %div
+    %label.toolbar-section-label
+      Open in New Tab
+    %button.toolbar-button.open-viewable{onclick: 'open_viewable()', type: 'button'}
+      %span.toolbar-button-text Open Viewable
+    %button.toolbar-button.open-nonviewable{onclick: 'open_nonviewable()', type: 'button'}
+      %span.toolbar-button-text Open Nonviewable
+    %button.toolbar-button.open-selected{onclick: 'open_selected()', type: 'button'}
+      %span.toolbar-button-text Open Selected
+    %button.toolbar-button.open-all{onclick: 'open_all()', type: 'button'}
+      %span.toolbar-button-text Open All
+  %div
+    %label.toolbar-section-label
+      Edit
+    %button.toolbar-button#edit-button{onclick: 'edit_selected_complaints()', type: 'button'}
+      %span.toolbar-button-text Edit
+    %button.toolbar-button.take-ticket-toolbar-button{onclick: 'take_selected()', type: 'button'}
+      %span.toolbar-button-text Take
+    %button.toolbar-button.return-ticket-toolbar-button{onclick: 'return_selected()', type: 'button'}
+      %span.toolbar-button-text Return
+    %button.toolbar-button.url-cat-button{'data-toggle': 'modal', type: 'button', 'data-target': '#cat_new_url_modal'}
+      %span.toolbar-button-text Categorize New URL
+  %div
+    %label.toolbar-section-label
+      View Nested Data
+    %button.toolbar-button.collapse-button{onclick: 'collapse_selected()', type: 'button'}
+      %span.toolbar-button-text Collapse Selected
+    %button.toolbar-button.collapse-all{onclick: 'collapse_all()', type: 'button'}
+      %span.toolbar-button-text Collapse All
+    %button.toolbar-button.expand-row-button{onclick: 'expand_selected()', type: 'button'}
+      %span.toolbar-button-text Expand Selected
+    %button.toolbar-button.expand-all{onclick: 'expand_all()', type: 'button'}
+      %span.toolbar-button-text Expand All
+  %div.toolbar-checkbox-wrapper
+    %input{type: 'checkbox', checked: true, id:'self_review'}
+      Allow Self Review
+
+
+
+

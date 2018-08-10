@@ -41,7 +41,7 @@ module Api
     end
 
     case Rails.env
-      when "development"
+      when "development", 'profile'
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Test.Result"
         config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Test.Work"

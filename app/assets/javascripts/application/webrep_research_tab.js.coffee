@@ -1,25 +1,20 @@
-
-
-#Populating the toolbar Adjust WL/BL Button
-window.index_expand_wlbl_form = () ->
-  if ($('.dispute_check_box:checked').length > 0)
-    $('.dispute_check_box:checked').each ->
-      entry_row = this.closest('tr')
-      entry_content = $(entry_row).find('.dispute_entry_content_first').text()
-      #wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-      #wlbl = $(entry_row).find('.entry-data-wlbl').text()
-
-      tbody = $('#wlbl_adjust_entries').find('tbody')
-      $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + '' + '</td><td class="text-center">' + '' + '</td></tr>')
-
-    $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
-    $('#wlbl_adjust_entries').show();
-
-  else
-    alert ('No rows selected')
-
-
 $ ->
+
+  # go back to the last tab after reload
+
+  $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
+    localStorage.setItem 'lastTab', $(this).attr('id')
+    return
+
+  $(document).on 'ready page:load', (e) ->
+    lastTab = localStorage.getItem('lastTab')
+    if lastTab
+      $('#' + lastTab).tab('show');
+    else
+      $('#communication-tab-link').tab('show')
+    return
+
+
   $('#edit-dispute-entry-button').click ->
 
     if ($('.dispute_check_box:checked').length > 0)
@@ -145,49 +140,170 @@ $ ->
 
 #  Populating the toolbar Adjust RepTool Button
   $('#reptool_entries_button').click ->
-    if ($('.dispute_check_box:checked').length > 0)
+    dropdown = $('#reptool_adjust_entries').parent()
+
+    # Only allowing a single submission at a time for now.
+    if ($('.dispute_check_box:checked').length == 1)
+      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
+      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
+      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+      entry_content = ''
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
-          entry_rep_class = $(entry_row).find('.entry-reptool-class').text()
-          entry_rep_exp = $(entry_row).find('.entry-reptool-expiration').text()
 
-          show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+      data = {
+      # Send entry content to reptool
+        'entry' : entry_content
+      }
+
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax(
+        url: '/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          response = JSON.parse(response)
           $(show_content[0]).text(entry_content)
-
-          show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
-          show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
-          if entry_rep_class == "Not on RepTool"
-            $(show_rep_class).addClass('missing-data')
-            $(show_rep_exp).addClass('missing-data')
-            $(show_rep_exp[0]).text('N/A')
-          else
-            $(show_rep_exp[0]).text(entry_rep_exp)
-          $(show_rep_class[0]).text(entry_rep_class)
+          $(show_rep_class[0]).text(response.classification)
+          $(show_rep_exp[0]).text(response.expiration)
+          $('#blacklist-action-select').val(response.status)
+          $('#blacklist-classifications-select').val(response.classification)
+          $(submit_button).attr('disabled', false)
+#          window.location.reload()
+        error: (response) ->
+          popup_response_error(response, 'Error retrieving Reptool Data')
+      )
+#
 
     else
-      alert ('No rows selected')
+      alert ('Please select only one row.')
+      $(dropdown).removeClass('open')
+      return false
+
+
 
 
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
-    if ($('.dispute_check_box:checked').length > 0)
-      $('.dispute_check_box').each ->
-        if $(this).prop('checked')
-          entry_row = $(this).parents('.research-table-row')[0]
-          entry_content = $(entry_row).find('.entry-data-content').text()
-          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-          wlbl = $(entry_row).find('.entry-data-wlbl').text()
+    tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    show_content = $('#wlbl_adjust_entries').find('.wlbl-entry-content')
+    show_wlbl = $('#wlbl_adjust_entries').find('.wlbl-entry-wlbl')
+    show_wbrs = $('#wlbl_adjust_entries').find('.wlbl-current-entry-wbrs')
+    wl_weak = $('#wlbl_adjust_entries').find('.wl-weak-checkbox')
+    wl_med = $('#wlbl_adjust_entries').find('.wl-med-checkbox')
+    wl_heavy = $('#wlbl_adjust_entries').find('.wl-heavy-checkbox')
+    bl_weak = $('#wlbl_adjust_entries').find('.bl-weak-checkbox')
+    bl_med = $('#wlbl_adjust_entries').find('.bl-med-checkbox')
+    bl_heavy = $('#wlbl_adjust_entries').find('.bl-heavy-checkbox')
 
-          tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
-          $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
+    $(show_content[0]).empty()
+    $(show_wbrs[0]).empty()
+    $(show_wlbl[0]).empty()
+    $(wl_weak[0]).prop('checked', false)
+    $(wl_med[0]).prop('checked', false)
+    $(wl_heavy[0]).prop('checked', false)
+    $(bl_weak[0]).prop('checked', false)
+    $(bl_med[0]).prop('checked', false)
+    $(bl_heavy[0]).prop('checked', false)
+    wl_weak_status = 'false'
+    wl_med_status = 'false'
+    wl_heavy_status = 'false'
+    bl_weak_status = 'false'
+    bl_med_status = 'false'
+    bl_heavy_status = 'false'
+
+#    $(tbody).empty()
+    dropdown_wrapper = $(this).parent()
+    if ($('.dispute_check_box:checked').length == 1)
+      submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+      entry_content = ''
+
+      $('.dispute_check_box:checked').each ->
+        entry_row = $(this).parents('.research-table-row')[0]
+        entry_content = $(entry_row).find('.entry-data-content').text()
+        wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
+
+        data = {
+        # Send entry content to reptool
+          'entry' : entry_content
+        }
+
+        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+        $.ajax(
+          url: '/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+          method: 'GET'
+          headers: headers
+          data: data
+          dataType: 'json'
+          success: (response) ->
+            #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+
+            response = JSON.parse(response)
+            if response.data != ""
+              console.log response.data
+
+              $(response.data).each ->
+                if String(this) == 'WL-weak'
+                  $(wl_weak[0]).prop('checked', true)
+                  wl_weak_status = 'true'
+                if String(this) == 'WL-med'
+                  $(wl_med[0]).prop('checked', true)
+                  wl_med_status = 'true'
+                if String(this) == 'WL-heavy'
+                  $(wl_heavy[0]).prop('checked', true)
+                  wl_heavy_status = 'true'
+                if String(this) == 'BL-weak'
+                  $(bl_weak[0]).prop('checked', true)
+                  bl_weak_status = 'true'
+                if String(this) == 'BL-med'
+                  $(bl_med[0]).prop('checked', true)
+                  bl_med_status = 'true'
+                if String(this) == 'BL-heavy'
+                  $(bl_heavy[0]).prop('checked', true)
+                  bl_heavy_status = 'true'
+
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text(response.data)
+              $(submit_button).attr('disabled', false)
+            else
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text('Not on a list')
+              $(submit_button).attr('disabled', false)
+            #this should probably call the resync data then reload the page, for an up to date score
+
+          error: (response) ->
+            popup_response_error(response, 'Error retrieving WL/BL Data')
+        )
 
 
-      $($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
+
+
+
+
+      #$('.dispute_check_box').each ->
+      #  if $(this).prop('checked')
+      #    entry_row = $(this).parents('.research-table-row')[0]
+      #    entry_content = $(entry_row).find('.entry-data-content').text()
+      #    wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+      #    wlbl = $(entry_row).find('.entry-data-wlbl').text()
+
+      #    $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
+      #$($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
     else
-      alert ('No rows selected')
+      $(dropdown_wrapper).removeClass('open')
+      alert ('Please select 1 row')
+
+
+
+
 
 
   #Inline Adjust WL/BL Button
@@ -246,6 +362,15 @@ $ ->
       else
         $(cl_table).hide()
 
+    if $(this).hasClass('reptool-checkbox')
+      rt_table = $(entry_row).find('.reptool-details-table')[0]
+      if $(this).prop('checked')
+        $(rt_table).show()
+      else
+        $(rt_table).hide()
+
+
+
 
 
 # Scrollable tables in the expanded rows
@@ -288,8 +413,117 @@ $ ->
         $(body_input[0]).text(response.body)
       error: (response) ->
         std_api_error(response, "Template could not be retrieved.", reload: false)
+
+    )
+    return
+
+  $('.adhoc-email-trigger').click ->
+    data = {
+      rulehit_name: $(this).attr('data-name')
+      url: $(this).attr('data-url')
+    }
+    std_msg_ajax(
+      method: 'POST'
+      url: "/api/v1/rulehit_resolution_mailer_templates/make_adhoc_rulehit_mail"
+      data: data
+      success_reload: false
+      success: (response) ->
+        response = JSON.parse(response)
+
+        $('#ruleHitEmailDialog').dialog 'open'
+
+        reciever_input = $('#ruleHitEmailDialog').find('.receiver-email')
+        cc_input = $('#ruleHitEmailDialog').find('.cc-email')
+        subject_input = $('#ruleHitEmailDialog').find('.communication-subject')
+        body_input = $('#ruleHitEmailDialog').find('.email-reply-body')
+
+        $(reciever_input[0]).val(response.to)
+        $(cc_input[0]).val(response.cc)
+        $(subject_input[0]).val(response.subject)
+        $(body_input[0]).text(response.body)
+      error: (response) ->
+        std_api_error(response, "Template could not be retrieved.", reload: false)
+
+    )
+    return
+
+
+  # Sync / refresh entry data. Initiate modal / animation
+  $('#sync-data-button').click ->
+    #    If cannot connect to resync data
+    #    Show error message modal
+    #    Else
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+
+    data = {
+      'dispute_id': $(".case-id-tag").html()
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webrep/disputes/sync_data'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        response = JSON.parse(response)
+        if response.status == "success"
+          window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error Syncing Data')
+        window.location.reload()
     )
 
+#    When data is finish loading
+#    $('#loading-div').hide()
+#    $('#api-msg').show()
+#    $('#loader-modal.hidden).removeClass('hidden')
+#    Display success message in modal
 
 
-    return
+$(document).ready ->
+
+  ### Using 'tooltipped' class instead of 'tooltip' so that it doesn't interfere with Bootstrap ###
+#    Edit Ticket (Show page). Edit Ticket Status
+  $('.ticket-status-radio-label').click ->
+    radio_button = $(this).prev('.ticket-status-radio')
+    $(radio_button[0]).trigger('click')
+    if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
+
+  $('.esc-tooltipped').tooltipster theme: [
+    'tooltipster-borderless'
+    'tooltipster-borderless-customized'
+  ]
+  return
+
+  $('.ticket-status-radio').click ->
+    all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+    if $(this).is(':checked')
+      wrapper = $(this).parent()
+      $(all_stat_radios).removeClass('selected')
+      $(wrapper).addClass('selected')
+    if $(this).attr('id') == 'RESOLVED_CLOSED'
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')

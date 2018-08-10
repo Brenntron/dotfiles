@@ -1,4 +1,4 @@
-.tool-bar{
+.tool-bar {
 
     padding: 10px;
     background-color: #848484;
@@ -8,12 +8,13 @@
     position: relative;
     display: inline-block;
 }
+
 .dropdown-content {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     padding: 12px 16px;
     z-index: 1;
 }
@@ -69,12 +70,13 @@
     }
 }
 
-.preview-url{
+.preview-url {
     text-align: center;
     font-size: 1.4em;
     font-weight: 600;
 }
-#preview_window_header_p{
+
+#preview_window_header_p {
     text-align: center;
     font-size: .9em;
     font-weight: 300;
@@ -82,6 +84,14 @@
     padding-bottom: 10px;
 }
 
-.complaint_selected{
+.complaint_selected {
     background-color: rgba(150, 220, 247, 0.39);
+}
+
+
+tr.highlight-plus5Hours {
+
+}
+tr.highlight-has-subdomain{
+
 }

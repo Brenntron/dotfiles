@@ -1,0 +1,20 @@
+.toolbar
+  %div
+    %label.toolbar-section-label
+      Select
+    %button.toolbar-button.open-viewable{onclick: 'select_all_pages()', type: 'button'}
+      %span.toolbar-button-text Select All
+    %button.toolbar-button.open-viewable{onclick: 'unselect_all_pages()', type: 'button'}
+      %span.toolbar-button-text Select None
+  %div
+    %label.toolbar-section-label
+      Open in New Tab
+    %button.toolbar-button.open-viewable{onclick: 'open_viewable()', type: 'button'}
+      %span.toolbar-button-text Open Viewable
+    %button.toolbar-button.open-nonviewable{onclick: 'open_nonviewable()', type: 'button'}
+      %span.toolbar-button-text Open Nonviewable
+    %button.toolbar-button.open-selected{onclick: 'open_selected()', type: 'button'}
+      %span.toolbar-button-text Open Selected
+    %button.toolbar-button.open-all{onclick: 'open_all()', type: 'button'}
+      %span.toolbar-button-text Open All
+

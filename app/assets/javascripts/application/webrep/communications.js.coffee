@@ -155,21 +155,38 @@ $ ->
 
     if $('form')[0].checkValidity() == true
       e.preventDefault()
-      $.ajax(
-        headers: headers
-        method: 'POST'
-        url: '/api/v1/escalations/webrep/dispute_emails'
-        data: form_data
-        contentType: false
-        processData: false
-        success_reload: true
-        success: (response) ->
-          $('#newEmail').modal('hide');
-          std_msg_success('Email Sent.', [], reload: true)
-        error: (response) ->
-          $('#newEmail').modal('hide');
-          std_api_error(response, "Email was not sent", response, reload: false)
-      )
+      if form_data.dispute_id
+        $.ajax(
+          headers: headers
+          method: 'POST'
+          url: '/api/v1/escalations/webrep/dispute_emails'
+          data: form_data
+          contentType: false
+          processData: false
+          success_reload: true
+          success: (response) ->
+            $('#newEmail').modal('hide');
+            std_msg_success('Email Sent.', [], reload: true)
+          error: (response) ->
+            $('#newEmail').modal('hide');
+            std_api_error(response, "Email was not sent", response, reload: false)
+        )
+      else
+        $.ajax(
+          headers: headers
+          method: 'POST'
+          url: '/api/v1/escalations/webrep/dispute_emails/ad_hoc'
+          data: form_data
+          contentType: false
+          processData: false
+          success_reload: true
+          success: (response) ->
+            $('#newEmail').modal('hide');
+            std_msg_success('Email Sent.', [], reload: true)
+          error: (response) ->
+            $('#newEmail').modal('hide');
+            std_api_error(response, "Email was not sent", response, reload: false)
+        )
 
 
 

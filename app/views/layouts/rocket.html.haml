@@ -1,7 +1,7 @@
 !!! html
 %html
   %head
-    %title= content_for?(:title) ? content_for(:title) : 'Analyst Console'
+    %title= content_for?(:title) ? '^ ' + content_for(:title) : '^ Analyst Console'
     = stylesheet_link_tag("admin_redesign", media: "all", "data-turbolinks-track" => true)
     = javascript_include_tag("admin_redesign", "data-turbolinks-track" => true)
     = csrf_meta_tags
@@ -9,6 +9,7 @@
   %body{class: "rocket-layout #{controller_path.gsub('/', '--')}-controller #{action_name}-action"}
 
     = render '/shared/alert_modal'
+    = render '/shared/loader_modal'
  
     #sidenav-icons-div
       %input{id: 'nav-trigger', type: 'checkbox', hidden: 'hidden'}
@@ -142,7 +143,7 @@
         = content_for(:nav_banner) if content_for?(:nav_banner)
 
         - if current_user
-          #login-div.nav-tool-block.col-xs-1.col-sm-3.col-lg-4
+          #login-div.nav-tool-block.col-sm-2.col-lg-4
             %a{href: "/users/#{current_user[:id]}"}
               = current_user[:display_name]
 

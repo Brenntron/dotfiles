@@ -13,6 +13,7 @@ module API
             params do
               optional :search_type, type: String
               optional :search_name, type: String
+              optional :value, type: String
               optional :case_id, type: Integer
               optional :org_domain, type: String
               optional :case_owner_username, type: String
@@ -40,94 +41,69 @@ module API
             get "" do
               authorize!(:index, Dispute)
 
-              json_packet = []
-
               disputes = Dispute.robust_search(permitted_params['search_type'],
                                                search_name: permitted_params['search_name'],
                                                params: permitted_params,
                                                user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
+              title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
+              json_packet = Dispute.to_data_packet(disputes)
 
-              disputes.each do |dispute|
-                dispute_packet = {}
-                dispute_packet[:id] = dispute.id
-
-                dispute_packet[:case_number] = sprintf '%08d', dispute.id
-                dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
-                dispute_packet[:submitter_name] = '' #dispute.customer_name
-                dispute_packet[:submitter_org] = dispute.org_domain
-                dispute_packet[:submitter_domain] = dispute.org_domain
-                dispute_packet[:dispute_domain] = dispute.org_domain
-                unless dispute.dispute_entries.empty?
-                  unless dispute.dispute_entries.first[:hostname].nil?
-                    dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
-                  end
+              response_data = {status: "success", title: title, data: json_packet}
+              if 'advanced' == permitted_params['search_type']
+                if permitted_params['search_name'].present?
+                  search_name = permitted_params['search_name']
+                  response_data['search_name'] = search_name
+                  named_search = NamedSearch.where(user: current_user, name: search_name).first
+                  response_data['search_id'] = named_search&.id
                 end
-                dispute_packet[:dispute_count] = dispute.entry_count.to_s
-
-                dispute_packet[:dispute_entry_content] = []
-                unless dispute.dispute_entries.empty?
-                  dispute.dispute_entries.each do |entry|
-                    unless entry[:ip_address].nil?
-                      dispute_packet[:dispute_entry_content].push(entry[:ip_address])
-                    end
-                    unless entry[:uri].nil?
-                      dispute_packet[:dispute_entry_content].push(entry[:uri])
-                    end
-                  end
-                end
-
-                dispute_packet[:dispute_entries] = dispute.dispute_entries
-                dispute_packet[:submission_type] = dispute.submission_type
-                dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
-                dispute_packet[:status] = dispute.status
-                dispute_packet[:resolution] = dispute.resolution
-                dispute_packet[:assigned_to] = ''#dispute.user.email
-                if dispute.assignee == 'Unassigned'
-                  dispute_packet[:assigned_to] =
-                      "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
-                end
-
-                if dispute.user_id?
-                  dispute_packet[:assigned_to] = User.find(dispute.user_id).cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
-                end
-
-                dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
-
-                dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
-                dispute_packet[:case_age] = dispute.dispute_age
-                # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
-                dispute_packet[:suggested_disposition] = dispute.suggested_d
-                dispute_packet[:priority] = (( dispute.id % 3 ) + 1).to_s # should be: dispute.priority
-                dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
-                dispute_packet[:source_id] = dispute.ticket_source_key
-                dispute_packet[:source_type] = dispute.ticket_source_type
-
-                dispute_packet[:wbrs_score] = ''
-                dispute_packet[:wbrs_rule_hits] = []
-
-                dispute.dispute_entries.each do |d_entry|
-                  if dispute_packet[:wbrs_score].empty? and d_entry[:score_type] == "WBRS"
-                    dispute_packet[:wbrs_score] = d_entry[:score].to_s unless d_entry[:score].nil?
-                  end
-                  d_entry.dispute_rule_hits.each do |d_rule|
-                    dispute_packet[:wbrs_rule_hits] << d_rule.name
-                  end
-                end
-                dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
-                json_packet << dispute_packet
               end
-              title = Dispute.robust_search_title(permitted_params['search_type'],
-                                                  search_name: permitted_params['search_name'])
-              {status: "success", title: title, data: json_packet}.to_json
+              response_data.to_json
 
             end
 
             desc 'update a dispute'
             params do
+              optional :priority, type: String, desc: "Priority of P1 through P5"
+              optional :customer_name, type: String, desc: "Name of the customer associated with this dispute. Note that changing this changes this customer's name on all their disputes."
+              optional :customer_email, type: String, desc: "Email of the customer associated with this dispute"
+              optional :status, type: String, desc: "Status of the dispute"
+              optional :related_id, type: Integer, desc: "ID of a dispute to relate to this one"
+              optional :comment, type: String, desc: "Comment, available regardless of whether resolving"
+              optional :resolution, type: String, desc: "Resolution; write this if status is Resolved"
             end
-
             put ":id" do
-              # TODO access control when this is implmented
+              dispute = Dispute.find(params[:id])
+
+              dispute.priority = permitted_params[:priority]
+              dispute.customer.name = permitted_params[:customer_name]
+              dispute.customer.email = permitted_params[:customer_email]
+              dispute.status = permitted_params[:status]
+
+              if permitted_params[:resolution]
+                dispute.resolution = permitted_params[:resolution]
+                dispute.case_resolved_at = Time.now
+              end
+
+              dispute.save
+              dispute.customer.save
+
+              if permitted_params[:related_id]
+                related_dispute = Dispute.find(permitted_params[:related_id])
+                related_dispute.related_id = params[:id]
+                related_dispute.related_at = Time.now
+                related_dispute.save
+              end
+
+
+              if permitted_params[:comment]
+                dispute_comment = DisputeComment.new
+                dispute_comment.dispute = dispute
+                dispute_comment.comment = permitted_params[:comment]
+                dispute_comment.save
+              end
+
+
+              dispute.to_json
             end
 
             desc 'delete a dispute'
@@ -136,6 +112,35 @@ module API
 
             delete "" do
               # TODO access control when this is implmented
+            end
+
+            desc "Add new dispute entry"
+            params do
+              requires :uri, type: String, desc: "IP address or host name to add"
+              requires :dispute_id, type: Integer, desc: "ID of the dispute to add the entry to"
+            end
+            post "new_adhoc_entry" do
+              json_packet = []
+
+              user = Dispute.find(params[:dispute_id]).user_id
+
+              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user)
+
+              is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
+
+              if is_ip_address
+                entry.ip_address = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
+              else
+                entry.uri = params[:uri]
+                entry.save
+                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
+              end
+
+              json_packet << entry
+
+              {:status => "success", :data => json_packet}.to_json if entry.save
             end
 
             desc "Change assignee of a group of dispute IDs"
@@ -155,6 +160,23 @@ module API
               {:status => "success", :data => json_packet}.to_json
             end
 
+            desc "Remove assignee from a group of dispute IDs (revert to vrtincoming)"
+            params do
+              requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
+            end
+            post "unassign_all" do
+              json_packet = []
+              vrt = User.where(email: 'vrt-incoming@sourcefire.com').first
+              params[:dispute_ids].each do |dispute|
+                Dispute.where(id: dispute).update_all(user_id: vrt.id)
+                d = Dispute.find_by(id: dispute)
+
+                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
+                json_packet << d
+              end
+              {:status => "success", :data => json_packet}.to_json
+            end
+
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -165,6 +187,9 @@ module API
             post "entry_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
+              dispute = DisputeEntry.where({:id => params[:dispute_entry_ids].first}).first.dispute
+              DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+              true
             end
 
             desc "Adjust a WL/BL entry"
@@ -177,6 +202,7 @@ module API
             post "ticket_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
               Wbrs::ManualWlbl.adjust_tickets_from_params(permitted_params, username: current_user.cvs_username)
+
             end
 
             desc "Adjust a Reptool Bl entry"
@@ -192,6 +218,22 @@ module API
               true
             end
 
+            desc "Sync data for all dispute entry children"
+            params do
+              requires :dispute_id
+            end
+            post "sync_data" do
+                
+                dispute = Dispute.where({:id => params[:dispute_id]}).first
+                dispute.dispute_entries.each do |dispute_entry|
+
+                  dispute_entry.sync_up
+
+                end
+                {:status => "success"}.to_json
+
+            end
+
             delete "searches/:search_name" do
               # TODO determine access control policy for named searches
               search = NamedSearch.where(name: params['search_name'], user: current_user)
@@ -200,37 +242,156 @@ module API
             end
 
             patch 'take_dispute/:dispute_id' do
-              authorize!(:update, Dispute)
-              dispute = Dispute.find(params['dispute_id'])
-              authorize!(:update, dispute)
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
 
-              dispute.take_ticket(user: current_user)
+                dispute.take_ticket(user: current_user)
 
-              { username: current_user.display_name, dispute_id: dispute.id }
+                { username: current_user.display_name, dispute_id: dispute.id }
+              end
             end
 
             params do
               requires :dispute_ids, type: Array[Integer]
             end
             patch 'take_disputes' do
-              authorize!(:update, Dispute)
+              std_api_v2 do
+                authorize!(:update, Dispute)
 
-              dispute_ids = permitted_params['dispute_ids']
-              Dispute.take_tickets(dispute_ids, user: current_user)
+                dispute_ids = permitted_params['dispute_ids']
+                Dispute.take_tickets(dispute_ids, user: current_user)
 
-              { username: current_user.display_name, dispute_ids: dispute_ids }
+                { username: current_user.email, dispute_ids: dispute_ids }
+              end
             end
 
             params do
+              requires :field_data, type: Hash
+            end
+            patch 'entries/field_data' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                DisputeEntry.update_from_field_data(permitted_params['field_data'])
+                DisputeEntry.send_status_updates(permitted_params['field_data'])
+                true
+              end
+            end
+
+            params do
+              requires :dispute_ids, type: Array[String]
               requires :status, type: String
+              optional :resolution, type: String
+              optional :comment, type: String
             end
-            patch 'entries/:entry_id/status' do
-              authorize!(:update, DisputeEntry)
-              entry = DisputeEntry.find(params['entry_id'])
-              authorize!(:update, entry)
-              entry.update(status: permitted_params['status'])
-              true
+
+            post 'set_disputes_status' do
+
+              authorize!(:update, Dispute)
+              dispute_ids = params[:dispute_ids].map{|id| id.to_i}
+              status = params[:status]
+              resolution = ""
+              comment = ""
+              if params[:resolution].present?
+                resolution = params[:resolution]
+              end
+              if params[:comment].present?
+                comment = params[:comment]
+              end
+
+              disputes = Dispute.where(id: dispute_ids)
+
+              Dispute.process_status_changes(disputes, status, resolution, comment, current_user)
+              {:status => "success"}.to_json
             end
+
+            params do
+              requires :relating_dispute_ids, type: Array[Integer]
+            end
+            patch ':dispute_id/relating_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                relating_dispute_ids = permitted_params['relating_dispute_ids']
+                Dispute.where(id: relating_dispute_ids).update_all(related_id: params['dispute_id'],
+                                                                   related_at: DateTime.now)
+                true
+              end
+            end
+
+            params do
+              requires :related_dispute_id, type: Integer
+            end
+            post ':dispute_id/related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
+                dispute.update!(related_id: permitted_params['related_dispute_id'],
+                                related_at: DateTime.now)
+                true
+              end
+            end
+
+            params do
+              requires :duplicate_dispute_id, type: Integer
+            end
+            post ':dispute_id/duplicate_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                dispute = Dispute.find(params['dispute_id'])
+                authorize!(:update, dispute)
+                dispute.update!(related_id: permitted_params['duplicate_dispute_id'],
+                                related_at: DateTime.now,
+                                status: Dispute::CLOSED,
+                                resolution: Dispute::DUPLICATE)
+                true
+              end
+            end
+
+            params do
+              requires :entry, type: String
+            end
+
+            get 'reptool_get_info_for_form' do
+              params[:entry] = params[:entry].strip
+              information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
+              information = JSON.parse(information)
+              if information[params[:entry]] == "NOT_FOUND"
+                return {:classification => "not found", :expiration => "", :status => ""}.to_json
+              else
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"]}.to_json
+              end
+
+            end
+
+            params do
+              requires :entry, type: String
+            end
+
+            get 'rule_ui_wlbl_get_info_for_form' do
+              params[:entry] = params[:entry].strip
+              
+              information = Wbrs::ManualWlbl.where({:url => params[:entry]})
+
+              if information.blank?
+                return {:status => 'success', :data => ""}.to_json
+              end
+
+              list_types = []
+              information.each do |entry|
+                if entry.url == params[:entry]
+                  if entry.state == "active"
+                    list_types << entry.list_type
+                  end
+                end
+              end
+
+              return {:status => "success", :data => list_types}.to_json
+
+            end
+
+
           end
         end
       end

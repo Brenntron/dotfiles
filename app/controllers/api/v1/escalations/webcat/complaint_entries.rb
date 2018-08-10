@@ -9,32 +9,53 @@ module API
 
             desc 'get all complaint entries'
             params do
-              optional :filter_by, type: String, desc:'filter entries by this value'
+              optional :filter_by, type: String, desc: 'filter entries by this value'
               optional :self_review, type: Boolean, desc: 'a flag that allows users to review their own categorizations'
+              optional :search, type: String, desc: 'search entries by this value'
+
+              optional :customer, type: Hash do
+                optional :name, type: String
+                optional :email, type: String
+                optional :company_name, type: String
+              end
+
+              optional :complaint_entries, type: Hash do
+                optional :ip_or_uri, type: String
+                optional :resolution, type: String
+                optional :category, type: String
+                optional :status, type: String
+                optional :complaint_id, type: Integer
+              end
+              optional :search_type, type: String
+              optional :search_name, type: String
+              optional :description, type: String
+              optional :submitted_older, type: Date
+              optional :submitted_newer, type: Date
+              optional :modified_older, type: Date
+              optional :modified_newer, type: Date
+              optional :channel, type: String
+              optional :tags, type: Array
             end
 
             get "" do
               json_packet = []
-              case permitted_params[:filter_by]
-                when "NEW"
-                  complaint_entries = ComplaintEntry.where(status:"NEW")
-                when "COMPLETED"
-                  complaint_entries = ComplaintEntry.where(status:"COMPLETED")
-                when "ACTIVE"
-                  complaint_entries = ComplaintEntry.where.not(status:"COMPLETED").where.not(status:"NEW")
-                when "REVIEW"
-                  complaint_entries = permitted_params[:self_review]? ComplaintEntry.where(is_important:true) : ComplaintEntry.where(is_important:true).where.not(user:current_user)
-                else
-                  complaint_entries = ComplaintEntry.all
 
-              end
+              search_type = ComplaintEntry.get_search_type(permitted_params)
+              search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
+
+
+              complaint_entries = ComplaintEntry.robust_search(search_type,
+                                                               search_name: search_name,
+                                                               params: permitted_params,
+                                                               user: current_user)
+
 
               if complaint_entries
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
                   complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
-                  complaint_entry_packet[:complaint_id] = complaint_entry.complaint.id
+                  complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
                   complaint_entry_packet[:entry_id] = complaint_entry.id
 
                   complaint_entry_packet[:assigned_to] = complaint_entry.user&.display_name
@@ -42,7 +63,7 @@ module API
                   complaint_entry_packet[:created_at] = complaint_entry.created_at.strftime('%Y-%m-%d %H:%M:%S')
                   complaint_entry_packet[:customer_name] = complaint_entry.complaint&.customer&.name # Customer name
 
-                  complaint_entry_packet[:category] = complaint_entry.category
+                  complaint_entry_packet[:category] = complaint_entry.url_primary_category
                   complaint_entry_packet[:resolution]= complaint_entry.resolution
                   complaint_entry_packet[:resolution_comment] = complaint_entry.resolution_comment
 
@@ -76,9 +97,9 @@ module API
                 entry.change_category( permitted_params['prefix'],permitted_params['categories'],
                                          permitted_params['status'],
                                          permitted_params['comment'],
-                                         current_user, false,"")
+                                         current_user, "")
               rescue Exception => e
-                  return e.message
+                  return {error:e.message}.to_json
               end
               {status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
@@ -95,7 +116,7 @@ module API
                 entry.change_category( permitted_params['prefix'], permitted_params['categories'],
                                     permitted_params['status'],
                                     permitted_params['comment'],
-                                    current_user, entry.is_high_telemetry?, permitted_params['commit'])
+                                    current_user, permitted_params['commit'])
               rescue Exception => e
                 return e.message
               end

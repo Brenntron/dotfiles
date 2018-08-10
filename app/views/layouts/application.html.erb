@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for?(:title) ? content_for(:title) : "Analyst Console" %></title>
+    <title><%= content_for?(:title) ? '# ' + content_for(:title) : "# Analyst Console" %></title>
     <link rel="shortcut icon" href="<%= image_path('analyst-console-favicon.ico') %>">
     <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
     <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
@@ -38,6 +38,14 @@
           <li class="doc-menu"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
           <% if can?(:read, Admin) %>
             <li class="admin-menu"><%= link_to 'ADMIN', admin_root_path %></li>
+          <% end %>
+          <% if current_user.present? %>
+          <% if current_user.has_role?("webrep user") || current_user.has_role?("webrep manager") %>
+              <li class="admin-menu"><%= link_to 'WEBREP', escalations_webrep_disputes_path %></li>
+          <% end %>
+          <% if current_user.has_role?("webcat user") || current_user.has_role?("webcat manager") %>
+              <li class="admin-menu"><%= link_to 'WEBCAT', escalations_webcat_complaints_path %></li>
+          <% end %>
           <% end %>
 
         </ul>
@@ -79,6 +87,7 @@
             <% elsif ac_namespace == "escalations/webrep" %>
               <%= render 'layouts/webrep_disputes_layout' %>
             <% end %>
+
 
         </div>
       </div>
