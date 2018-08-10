@@ -346,7 +346,7 @@ class ComplaintEntry < ApplicationRecord
   def current_category_data
 
     data = {}
-    prefix_id = null
+    prefix_id = nil
     prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
 
     prefix_results.each do |result|
@@ -355,9 +355,9 @@ class ComplaintEntry < ApplicationRecord
     end
 
     audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
-
+    by_cat = {}
     audit_history.each do |hist|
-      by_cat = {}
+
       if by_cat[hist.category_id].blank?
         by_cat[hist.category_id] = []
       end
@@ -367,8 +367,17 @@ class ComplaintEntry < ApplicationRecord
 
     data.each do |key, value|
       data[key][:confidence] = by_cat[key].last.confidence
+      data[key][:name] = by_cat[key].last.category.descr
+      data[key][:long_description] = by_cat[key].last.category.desc_long
     end
 
+    ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
+    ##in the meantime, dummy data
+    data.each do |key, value|
+      data[key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+    end
+
+    data
   end
 
   def historic_category_data
