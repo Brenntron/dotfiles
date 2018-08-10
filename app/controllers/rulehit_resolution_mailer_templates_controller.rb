@@ -1,6 +1,5 @@
 class RulehitResolutionMailerTemplatesController < ApplicationController
   before_action :set_rulehit_resolution_mailer_template, only: [:show, :edit, :update, :destroy]
-  layout "escalations"
 
   # GET /rulehit_resolution_mailer_templates
   # GET /rulehit_resolution_mailer_templates.json
