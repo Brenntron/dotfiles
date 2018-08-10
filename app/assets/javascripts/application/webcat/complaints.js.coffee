@@ -78,9 +78,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
           persist: false,
           create: false,
           maxItems: 5
-          valueField: 'name'
-          labelField: 'name'
-          searchField: 'name'
+          valueField: 'value'
+          labelField: 'value'
+          searchField: 'text'
           options: AC.WebCat.createSelectOptions()
           items: selected_options(temp_row.data().category)
         }
