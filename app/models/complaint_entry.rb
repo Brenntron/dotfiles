@@ -328,4 +328,60 @@ class ComplaintEntry < ApplicationRecord
     end
     relation
   end
+
+
+  def hostlookup
+    case
+      when self.entry_type == "IP"
+        self.ip_address
+      when self.entry_type == "URI/DOMAIN"
+        self.uri
+      else
+        self.uri.blank? ? self.ip_address : self.uri
+    end
+  end
+
+  ####RULEUI RULEAPI METHODS
+
+  def current_category_data
+
+    data = {}
+    prefix_id = null
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+
+    prefix_results.each do |result|
+      data[result.category] = {:is_active => result.is_active, :mnemonic => result.mnem, :category_id => result.category, :prefix_id => result.prefix_id}
+      prefix_id = result.prefix_id
+    end
+
+    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+
+    audit_history.each do |hist|
+      by_cat = {}
+      if by_cat[hist.category_id].blank?
+        by_cat[hist.category_id] = []
+      end
+
+      by_cat[hist.category_id] << hist
+    end
+
+    data.each do |key, value|
+      data[key][:confidence] = by_cat[key].last.confidence
+    end
+
+  end
+
+  def historic_category_data
+
+    prefix_id = null
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    if prefix_results.present?
+      prefix_id = prefix_results.first.prefix_id
+    end
+
+    prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+
+    prefix_history
+  end
+
 end
