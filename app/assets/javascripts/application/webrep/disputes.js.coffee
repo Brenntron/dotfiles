@@ -538,6 +538,20 @@ window.set_duplicate_dispute = (form_tag) ->
   )
 
 
+window.load_screenshot = (img_tag, complaint_entry_id) ->
+  std_msg_ajax(
+    method: 'GET'
+    url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
+    data: {}
+    img_tag: img_tag
+    error_prefix: 'Error downloading screenshot.'
+    success: (response) ->
+      JSON.parse(response).image_data
+      image_data = JSON.parse(response).image_data
+      src = 'data:image/png;base64,' + image_data
+      this.img_tag.src = src
+  )
+
 
 $ ->
 
