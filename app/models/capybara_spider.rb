@@ -48,3 +48,9 @@ end
 
 #appropriate spot in the origination code to save screenshot
 #session.save_screenshot(filename, :full => true)
+
+
+# example:
+# session = CapybaraSpider.build_session
+# session.visit("http://stackoverflow.com/")
+# session.save_screenshot("~/pictures/stackoverlog.png", full: true)
