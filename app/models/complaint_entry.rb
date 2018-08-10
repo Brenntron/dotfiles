@@ -331,4 +331,69 @@ class ComplaintEntry < ApplicationRecord
     end
     relation
   end
+
+
+  def hostlookup
+    case
+      when self.entry_type == "IP"
+        self.ip_address
+      when self.entry_type == "URI/DOMAIN"
+        self.uri
+      else
+        self.uri.blank? ? self.ip_address : self.uri
+    end
+  end
+
+  ####RULEUI RULEAPI METHODS
+
+  def current_category_data
+
+    data = {}
+    prefix_id = nil
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+
+    prefix_results.each do |result|
+      data[result.category] = {:is_active => result.is_active, :mnemonic => result.mnem, :category_id => result.category, :prefix_id => result.prefix_id}
+      prefix_id = result.prefix_id
+    end
+
+    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    by_cat = {}
+    audit_history.each do |hist|
+
+      if by_cat[hist.category_id].blank?
+        by_cat[hist.category_id] = []
+      end
+
+      by_cat[hist.category_id] << hist
+    end
+
+    data.each do |key, value|
+      data[key][:confidence] = by_cat[key].last.confidence
+      data[key][:name] = by_cat[key].last.category.descr
+      data[key][:long_description] = by_cat[key].last.category.desc_long
+    end
+
+    ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
+    ##in the meantime, dummy data
+    data.each do |key, value|
+      data[key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+    end
+
+    data
+  end
+
+  def historic_category_data
+
+    prefix_id = nil
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    if prefix_results.present?
+      prefix_id = prefix_results.first.prefix_id
+    end
+
+    prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+
+    prefix_history
+  end
+
 end
