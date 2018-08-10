@@ -1,7 +1,8 @@
 require 'capybara'
 require 'capybara/poltergeist'
 
-class CapybaraSpider
+class CapybaraSpider < Capybara::Session
+  cattr_accessor :file, :filename
 
   def self.build_session
     self.build_configuration
@@ -15,10 +16,37 @@ class CapybaraSpider
   end
 
   def self.new_session
-    Capybara::Session.new(:poltergeist)
+    new(:poltergeist)
   end
 
+  def self.tmpfilename
+    Dir::Tmpname.make_tmpname(['./tmp/webcapture_', '.png'], nil)
+  end
+
+  def self.capture(url)
+    session = CapybaraSpider.build_session
+    session.visit(url)
+    session.filename = tmpfilename
+    session.save_screenshot(session.filename, full: false)
+
+    if block_given?
+      File.open(session.filename, 'r') do |file|
+        session.file = file
+        yield session
+      end
+
+      nil
+    else
+      filename
+    end
+  end
+
+  def read(*args)
+    file.read(*args)
+  end
 end
+
+
 #THIS IS A PROTOTYPE FOR NICK HERBERT
 #this actually currently works on my macbook pro as is *yay*
 #so maybe no configuration tweaking and library installation is required
