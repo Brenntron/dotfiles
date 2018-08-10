@@ -268,9 +268,9 @@ format = (complaint_entry_row) ->
       '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
       ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button></td>' +
       '<td>Status<br/>' +
-      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="unchanged" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
-      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="fixed"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
-      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="invalid" ' + invalid_radio + entry_status + '> Invalid' +
+      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
+      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
+      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '</td>' +
       '<td>Confidence<br/>' + confidence + '</td>' +
       '<td>Suggested Disposition<br/>' + disposition + '</td>' +
