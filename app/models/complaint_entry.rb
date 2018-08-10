@@ -31,7 +31,7 @@ class ComplaintEntry < ApplicationRecord
   def take_complaint(current_user)
     if user.nil? ||user.display_name == "Vrt Incoming"
       if status!="COMPLETED"
-        self.update(user:current_user, status:"ASSIGNED")
+        self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED")
       else
         raise("Cannot take a completed complaint. How did this happen.")
@@ -44,7 +44,7 @@ class ComplaintEntry < ApplicationRecord
     if self.user == current_user
       if !self.is_important
         if status!="COMPLETED"
-          self.update(user:User.where(display_name:"Vrt Incoming").first, status:"NEW")
+          self.update(user: User.vrtincoming, status:"NEW")
           complaint.set_status("NEW")
         else
           raise("Cannot return complaint that has been completed.")
@@ -77,13 +77,14 @@ class ComplaintEntry < ApplicationRecord
         if self.status == "PENDING"
           if commit_pending == "commit"
             current_status = "COMPLETED"
-            update(status:current_status,resolution_comment: comment,user:current_user)
+            self.case_assigned_at ||= Time.now
+            update(status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
           else
             current_status = "ASSIGNED"
-            update(status:current_status, resolution_comment: comment)
+            update(status:current_status, resolution_comment: comment, case_assigned_at: Time.now)
           end
         else
           current_status = "PENDING"
@@ -91,7 +92,8 @@ class ComplaintEntry < ApplicationRecord
         end
       else
         current_status = "COMPLETED"
-        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
+        self.case_assigned_at ||= Time.now
+        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
@@ -130,6 +132,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.path = url_parts[:path]
     end
     new_complaint_entry.user = user
+    new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
     new_complaint_entry.save
   end
 
@@ -328,4 +331,69 @@ class ComplaintEntry < ApplicationRecord
     end
     relation
   end
+
+
+  def hostlookup
+    case
+      when self.entry_type == "IP"
+        self.ip_address
+      when self.entry_type == "URI/DOMAIN"
+        self.uri
+      else
+        self.uri.blank? ? self.ip_address : self.uri
+    end
+  end
+
+  ####RULEUI RULEAPI METHODS
+
+  def current_category_data
+
+    data = {}
+    prefix_id = nil
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+
+    prefix_results.each do |result|
+      data[result.category] = {:is_active => result.is_active, :mnemonic => result.mnem, :category_id => result.category, :prefix_id => result.prefix_id}
+      prefix_id = result.prefix_id
+    end
+
+    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    by_cat = {}
+    audit_history.each do |hist|
+
+      if by_cat[hist.category_id].blank?
+        by_cat[hist.category_id] = []
+      end
+
+      by_cat[hist.category_id] << hist
+    end
+
+    data.each do |key, value|
+      data[key][:confidence] = by_cat[key].last.confidence
+      data[key][:name] = by_cat[key].last.category.descr
+      data[key][:long_description] = by_cat[key].last.category.desc_long
+    end
+
+    ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
+    ##in the meantime, dummy data
+    data.each do |key, value|
+      data[key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+    end
+
+    data
+  end
+
+  def historic_category_data
+
+    prefix_id = nil
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    if prefix_results.present?
+      prefix_id = prefix_results.first.prefix_id
+    end
+
+    prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+
+    prefix_history
+  end
+
 end
