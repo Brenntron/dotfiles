@@ -35,6 +35,8 @@ class CapybaraSpider < Capybara::Session
         yield session
       end
 
+      File.delete(session.filename)
+
       nil
     else
       filename

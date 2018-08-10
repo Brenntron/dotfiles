@@ -333,4 +333,16 @@ class ComplaintEntry < ApplicationRecord
     end
     relation
   end
+
+  def capture_screenshot
+    CapybaraSpider.capture(self.location_url) do |capture|
+      byebug
+      if complaint_entry_screenshot
+        complaint_entry_screenshot.destroy
+      end
+      my_screenshot = build_complaint_entry_screenshot
+      my_screenshot.screenshot = capture.read
+      my_screenshot.save!
+    end
+  end
 end
