@@ -74,6 +74,9 @@ module API
                   complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
+                  complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
+                  complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
+                  complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
 
                   json_packet << complaint_entry_packet
                 end
