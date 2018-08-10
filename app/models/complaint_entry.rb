@@ -382,7 +382,7 @@ class ComplaintEntry < ApplicationRecord
 
   def historic_category_data
 
-    prefix_id = null
+    prefix_id = nil
     prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
     if prefix_results.present?
       prefix_id = prefix_results.first.prefix_id
