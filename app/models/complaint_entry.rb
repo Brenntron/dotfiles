@@ -11,10 +11,6 @@ class ComplaintEntry < ApplicationRecord
 
   has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
 
-  def self.what_time_is_it(value)
-    distance_of_time_in_words(value)
-  end
-
   RESOLVED = "RESOLVED"
   NEW = "NEW"
 
@@ -22,12 +18,39 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
 
-  def location_url
-    "http://#{subdomain+'.' if subdomain.present?}#{domain}#{path}"
+
+  def self.what_time_is_it(value)
+    distance_of_time_in_words(value)
   end
 
   def self.is_ip?(ip)
     !!IPAddr.new(ip) rescue false
+  end
+
+  def self.manipulate_changeset(changeset)
+    altered_set = {}
+    changeset.each do |field, (changed_from, changed_to)|
+      if field == "user_id"
+        user_from = User.where(id: changed_from).first&.cvs_username
+        user_to = User.where(id: changed_to).first&.cvs_username
+        altered_set["cvs_username"] = [user_from, user_to]
+      end
+    end
+    altered_set.merge(changeset)
+  end
+
+  def compose_versions
+    for_view = {}
+    versions.each do |version|
+      whodunnit = {whodunnit: User.where(id: version.whodunnit).first&.cvs_username}
+      set_with_usernames = ComplaintEntry.manipulate_changeset(version.changeset)
+      for_view[version.created_at] = set_with_usernames.merge(whodunnit)
+    end
+    for_view
+  end
+
+  def location_url
+    "http://#{subdomain+'.' if subdomain.present?}#{domain}#{path}"
   end
 
   def take_complaint(current_user)
