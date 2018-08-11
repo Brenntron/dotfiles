@@ -7,6 +7,10 @@ module API
 
           resource "escalations/webcat/complaint_entries" do
 
+            before do
+              PaperTrail.whodunnit = current_user.id if current_user.present?
+            end
+
             desc 'get all complaint entries'
             params do
               optional :filter_by, type: String, desc: 'filter entries by this value'
@@ -88,6 +92,13 @@ module API
 
                   complaint_entry_packet[:current_categories] = fake_ass_bullshit
                   #complaint_entry_packet[:categories] = {"entertainment" => {:confidence => 1, :certainty => [{:source => 'something', :source_category => 'someting', :source_certainty => '1000'}]}, "NGO" => {:confidence => 2, :certainty => {}}}
+
+                  #each row has available to it: action, confidence, description, even_id, prefix_id, time, user, category.   "category" has its own hash
+                  #which has available to it: mnem, descr, category_id, desc_long
+
+                  complaint_entry_packet[:entry_history] = {}
+                  complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                  complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
                 end

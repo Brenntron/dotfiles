@@ -5669,6 +5669,15 @@ table.dataTable tbody tr.selected {
   margin-top: -9px;
 }
 
+#new-complaint-wrapper textarea {
+  padding: 4px;
+  color: $type-lighter-color;
+  font-size: 9.5pt;
+  font-weight: 400;
+  line-height: 1.25em;
+  min-height: 100px;
+}
+
 #new-complaint-wrapper .form-group.margin-adjustment {
   margin-top: -10px;
 }
@@ -5712,6 +5721,7 @@ table.dataTable tbody tr.selected {
 .selectize-dropdown.multi.form-control.selectize {
   top: 28px !important;
   background-color: $content-bg-color;
+  height: auto !important;
 }
 
 .selectize-dropdown-content {
