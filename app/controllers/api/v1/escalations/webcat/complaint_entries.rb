@@ -7,6 +7,10 @@ module API
 
           resource "escalations/webcat/complaint_entries" do
 
+            before do
+              PaperTrail.whodunnit = current_user.id if current_user.present?
+            end
+
             desc 'get all complaint entries'
             params do
               optional :filter_by, type: String, desc: 'filter entries by this value'
@@ -91,7 +95,7 @@ module API
 
                   complaint_entry_packet[:entry_history] = {}
                   complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
-                  complaint_entry_packet[:entry_history][:complaint_history] = []  #<-- for Nicolette to fill out / papertrail
+                  complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
                 end
