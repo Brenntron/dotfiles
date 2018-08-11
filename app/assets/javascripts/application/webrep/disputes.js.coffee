@@ -190,6 +190,52 @@ window.save_dispute = () ->
     success_reload: true
   )
 
+# Populating the in line Adjust Reptool button for research page and research tab
+window.inline_load_reptool_button =(button_tag) ->
+  #debugger
+  adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
+  submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
+  #$(submit_button).attr("disabled", false)
+
+  #button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0].getElementsByClassName('dropdown-submit-button')
+
+  #dropdown = $('#reptool_adjust_entries').parent()
+
+  show_content = $(adjust_form).find('.entry-dispute-name')
+  show_rep_class = $(adjust_form).find('.entry-reptool-class')
+  show_rep_exp = $(adjust_form).find('.entry-reptool-expiration')
+  action_input = $(adjust_form).find('.action-input')
+  classifications_input = $(adjust_form).find('.classifications-input')
+  comment_input = $(adjust_form).find('.comment-input')
+  data = {
+# Send entry content to reptool
+    'entry' : adjust_form.getElementsByClassName('dispute-entry-content')[0].value
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+
+      show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
+      show_rep_class.text(response.classification)
+      show_rep_exp.text(response.expiration)
+      action_input.val(response.status)
+      classifications_input.val(response.classification)
+      comment_input.val(response.comment)
+      $(submit_button).attr('disabled', false)
+#          window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error retrieving Reptool Data')
+  )
+
+
+
 window.row_adust_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
@@ -210,6 +256,30 @@ window.row_adust_reptool_bl_button =(button_tag) ->
     error: (response) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
+
+window.row_adust_reptool_bl_button_research =(button_tag) ->
+  reptool_bl_form = button_tag.form
+
+  data = {
+    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
+    'entries': [ reptool_bl_form.getElementsByClassName('dispute-entry-content')[0].value ]
+    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webrep/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
+  )
+
+
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
