@@ -5729,7 +5729,7 @@ table.dataTable tbody tr.selected {
 }
 
 .nested-complaint-static-data, .nested-complaint-editable-data {
-  padding: 15px;
+  padding: 12px 15px;
 }
 
 .nested-complaint-static-data {
@@ -5753,6 +5753,10 @@ table.dataTable tbody tr.selected {
   border-color: darken($faint-neutral-color, 15%);
 }
 
+.nested-complaint-editable-data .col-with-divider {
+  border-color: lighten($content-bg-color, 5%);
+}
+
 .simple-nested-table th {
   color: darken($content-label-color, 8%);
   font-weight: 400 !important;
@@ -5768,6 +5772,21 @@ table.dataTable tbody tr.selected {
   width: 100%;
 }
 
+.nested-complaint-data-wrapper button.tertiary {
+  padding: 5px 10px;
+  margin: 0 0 6px 0;
+  text-transform: none;
+  font-weight: 300;
+}
+
+.nested-complaint-data-wrapper button.secondary.inline-button {
+  padding: 5px 10px;
+  margin: 0 0 0 8px;
+  text-transform: none;
+  font-weight: 300;
+  width: auto;
+}
+
 .case-id {
   font-weight: 600;
 }
@@ -5776,6 +5795,15 @@ table.dataTable tbody tr.selected {
   margin-bottom: 16px;
   margin-top: -4px;
   display: block;
+}
+
+.nested-complaint-editable-data .nested-table-input {
+  padding: 2px 4px;
+  min-height: 30px;
+}
+
+.complaint-selectize-col-wrapper {
+  margin-top: 12px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

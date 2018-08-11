@@ -283,31 +283,31 @@ format = (complaint_entry_row) ->
 
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
-      '<div class="col-xs-7">' +
+      '<div class="col-xs-6 col-with-divider">' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button><br/>' +
+      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
+      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectize" placeholder="Enter up to 5 categories" value="">' +
+      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
       '</div><div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Tags</label><br/>' +
-      '<fieldset class="selectize" placeholder="Add tags here." value="">' +
-      '</div></div><div class="col-xs-3">' +
-      '<label class="content-label-sm">Internal Comment</label>' +
-      '<input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" name="status" value="' + resolution_comment + '" placeholder="add a comment" ' + entry_status + '><br/>'  +
+      '<fieldset id="" class="selectize" placeholder="Add tags here." name="" value="">' +
+      '</div></div><div class="col-xs-4 col-with-divider">' +
+      '<label class="content-label-sm">Internal Comment</label><br/>' +
+      '<input class="nested-table-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" name="status" value="' + resolution_comment + '" placeholder="add a comment" ' + entry_status + '><br/>'  +
       '<label class="content-label-sm">Customer Comment</label><br/>' +
       '<input class="nested-table-input"></input>' +
       '</div><div class="col-xs-2">' +
-      '<label class="content-label-sm">Resolution</label>' +
+      '<label class="content-label-sm">Resolution</label><br/>' +
       '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '<br/>' +
-      '<button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+      '<button class="tertiary" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
   complaint_entry_html
 
