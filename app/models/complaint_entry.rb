@@ -390,8 +390,11 @@ class ComplaintEntry < ApplicationRecord
     if prefix_results.present?
       prefix_id = prefix_results.first.prefix_id
     end
-
-    prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    if prefix_id.present?
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    else
+      prefix_history = []
+    end
 
     prefix_history
   end
