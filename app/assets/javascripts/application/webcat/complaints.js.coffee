@@ -260,46 +260,49 @@ format = (complaint_entry_row) ->
       '<td>' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50">' + '</td>'
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
-    complaint_entry_html = '<table><tr><td><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
+    complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
-      '<div class="col-xs-6">' +
+      '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper"><img/></div>' +
       '<div class="complaint-entry-info">' +
-      '<label class="content-lable-sm">Case ID</label><br/>' +
-      '<br/>' + complaint_entry.complaint_id +
-      '<br/><label class="content-lable-sm">Entry URI</label>' +
-      '<br/>' + uri +
-      '</div></div><div class="col-xs-5">' +
-      '<table><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<label class="content-label-sm">Case ID</label>' +
+      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<label class="content-label-sm">Entry URI</label>' +
+      '<span class="nested-complaint-data">' + uri + '</span>' +
+      '</div></div><div class="col-xs-5 col-with-divider">' +
+      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' +
+#      Temporary manual table
       '<tr><td>1</td><td>tech</td><td>Technology</td><td>1000</td></tr>' +
+      '<tr><td>2</td><td>busi</td><td>Business</td><td>500</td></tr>' +
+      '<tr><td>3</td><td>comp</td><td>Computers</td><td>100</td></tr>' +
       '</tbody></table>' +
-      '</div><div class="col-xs-1">' +
-      '<button>Lookup</button><br/><button>History</button><br/><button>Domain</domain>' +
+      '</div><div class="col-xs-2">' +
+      '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/><button class="secondary">Domain</domain>' +
       '</div></div>' +
 
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-7">' +
-      '<label class="content-lable-sm">Edit URI</label><br/>' +
+      '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
       '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
       ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
-      '<label class="content-lable-sm">Edit Categories / Confidence Order</label>' +
+      '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectize" placeholder="Enter up to 5 categories" value="">' +
       '</div><div class="complaint-selectize-col-wrapper">' +
-      '<label class="content-lable-sm">Edit Tags</label><br/>' +
+      '<label class="content-label-sm">Edit Tags</label><br/>' +
       '<fieldset class="selectize" placeholder="Add tags here." value="">' +
       '</div></div><div class="col-xs-3">' +
-      '<label class="content-lable-sm">Internal Comment</label>' +
+      '<label class="content-label-sm">Internal Comment</label>' +
       '<input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" name="status" value="' + resolution_comment + '" placeholder="add a comment" ' + entry_status + '><br/>'  +
-      '<label class="content-lable-sm">Customer Comment</label><br/>' +
+      '<label class="content-label-sm">Customer Comment</label><br/>' +
       '<input class="nested-table-input"></input>' +
       '</div><div class="col-xs-2">' +
-      '<label class="content-lable-sm">Resolution</label>' +
+      '<label class="content-label-sm">Resolution</label>' +
       '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +

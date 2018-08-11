@@ -124,7 +124,7 @@ body {
   padding-top: 26px;
 }
 .no_pad{
-  padding:0;
+  padding:0 !important;
 }
 #due_date{
   margin:-16px 0px 0px 0px !important;
@@ -4494,6 +4494,11 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $bug-section-color;
 }
 
+.nested-complaint-data-wrapper {
+  padding: 0 15px 0 20px !important;
+  background-color: $bug-section-color;
+}
+
 .dispute-entry-table-wrapper::before, .nested-complaint-data-wrapper::before {
   content: '';
   position: absolute;
@@ -4505,12 +4510,16 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .nested-complaint-data-wrapper table {
-  background-color: $faint-neutral-color;
+  background-color: darken($faint-neutral-color, 5%);
   color: $type-base-color;
 }
 
 .nested-complaint-data-wrapper table td {
   border-bottom: none;
+  border-bottom: none;
+  padding: 1px 10px !important;
+  font-size: 8pt;
+  color: $type-lighter-color;
 }
 
 .nested-table-input {
@@ -5707,6 +5716,66 @@ table.dataTable tbody tr.selected {
 
 .selectize-dropdown-content {
   min-height: 28px !important;
+}
+
+/**** Nested Complaint Table styles ****/
+.nested-complaint-editable-data {
+  background-color: darken($faint-accent-color, 5%)
+}
+
+.nested-complaint-data-wrapper .content-label-sm {
+  color: darken($content-label-color, 8%);
+
+}
+
+.nested-complaint-static-data, .nested-complaint-editable-data {
+  padding: 15px;
+}
+
+.nested-complaint-static-data {
+  padding-left: 30px;
+}
+
+.screenshot-thumb-wrapper, .complaint-entry-info {
+  display: inline-block;
+}
+
+.screenshot-thumb-wrapper {
+  width: 100px;
+  height: 100px;
+  border: 1px solid $content-label-color;
+  background-color: $content-bg-color;
+  float: left;
+  margin-right: 12px;
+}
+
+.nested-complaint-static-data .col-with-divider {
+  border-color: darken($faint-neutral-color, 15%);
+}
+
+.simple-nested-table th {
+  color: darken($content-label-color, 8%);
+  font-weight: 400 !important;
+  text-transform: none;
+  border-bottom: none !important;
+}
+
+.nested-complaint-data-wrapper button.secondary {
+  padding: 5px 10px;
+  margin: 0 0 6px 0;
+  text-transform: none;
+  font-weight: 300;
+  width: 100%;
+}
+
+.case-id {
+  font-weight: 600;
+}
+
+.nested-complaint-data {
+  margin-bottom: 16px;
+  margin-top: -4px;
+  display: block;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
