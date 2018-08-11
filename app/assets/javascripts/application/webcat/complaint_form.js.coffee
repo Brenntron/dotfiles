@@ -20,7 +20,7 @@ $ ->
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
-    tags = $('.selectized').val() || []
+    tags = $('.selectize').val() || []
 
     $.ajax(
       url: '/api/v1/escalations/webcat/complaints'
