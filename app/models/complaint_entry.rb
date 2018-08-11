@@ -11,6 +11,8 @@ class ComplaintEntry < ApplicationRecord
 
   has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
 
+  before_save :set_current_category
+
   def self.what_time_is_it(value)
     distance_of_time_in_words(value)
   end
@@ -84,6 +86,8 @@ class ComplaintEntry < ApplicationRecord
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+            cat_from_wbrs = self.set_current_category
+            update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             current_status = "ASSIGNED"
             update(status:current_status, resolution_comment: comment, case_assigned_at: Time.now)
@@ -99,6 +103,9 @@ class ComplaintEntry < ApplicationRecord
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+        
+        cat_from_wbrs = self.set_current_category
+        update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
     end
   end
@@ -347,6 +354,16 @@ class ComplaintEntry < ApplicationRecord
   end
 
   ####RULEUI RULEAPI METHODS
+  #
+
+  def set_current_category
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    if prefix_results
+      categories = prefix_results.map{ |result| result.descr}
+      self.url_primary_category = categories.join(',')
+      self.category = categories.join(',')
+    end
+  end
 
   def current_category_data
 
