@@ -241,6 +241,22 @@ format = (complaint_entry_row) ->
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
+  if complaint_entry.current_categories?
+    categories = complaint_entry.current_categories
+    $.each categories, (key, value) ->
+      debugger
+      console.log this
+      category = this
+      active =  $(this).attr("is_active")
+      if active == 1
+        confidence = this.confidence
+        mnemonic = this.mnemonic
+        name = this.name
+        top_certainty = this.certainty[0].source_certainty
+      console.log( key + ': ' + value)
+      return
+
+
 
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
@@ -273,14 +289,16 @@ format = (complaint_entry_row) ->
       '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' +
 #      Temporary manual table
+#      '<tr><td>' + complaint_entry.current_categories + '</td></tr>' +
       '<tr><td>1</td><td>tech</td><td>Technology</td><td>1000</td></tr>' +
       '<tr><td>2</td><td>busi</td><td>Business</td><td>500</td></tr>' +
       '<tr><td>3</td><td>comp</td><td>Computers</td><td>100</td></tr>' +
       '</tbody></table>' +
+
+
       '</div><div class="col-xs-2">' +
       '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/><button class="secondary">Domain</domain>' +
       '</div></div>' +
-
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
