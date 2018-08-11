@@ -3,6 +3,8 @@ class Complaint < ApplicationRecord
   has_many :complaint_entries
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
+  has_paper_trail on: [:update], ignore: [:updated_at]
+
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
   RESOLUTION_UNCHANGED                  = 'UNCHANGED'

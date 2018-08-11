@@ -7,6 +7,10 @@ module API
 
           resource "escalations/webcat/complaint_entries" do
 
+            before do
+              PaperTrail.whodunnit = current_user.id if current_user.present?
+            end
+
             desc 'get all complaint entries'
             params do
               optional :filter_by, type: String, desc: 'filter entries by this value'

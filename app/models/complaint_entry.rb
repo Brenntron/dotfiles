@@ -9,6 +9,8 @@ class ComplaintEntry < ApplicationRecord
   scope :new_count , -> {where(status:"NEW").count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:"COMPLETED").count}
 
+  has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
+
   before_save :set_current_category
 
   def self.what_time_is_it(value)
