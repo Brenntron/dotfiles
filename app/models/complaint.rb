@@ -128,6 +128,20 @@ class Complaint < ApplicationRecord
   end
 
 
+  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:)
+    # Look for existing prefix
+    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+    if existing_prefix.present?
+      prefix_object = Wbrs::Prefix.new
+      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+    else
+      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+    end
+  end
+
+
 
   def self.process_bridge_payload(message_payload)
 
