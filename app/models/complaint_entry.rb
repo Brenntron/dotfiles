@@ -399,22 +399,25 @@ class ComplaintEntry < ApplicationRecord
       prefix_id = result.prefix_id
     end
 
-    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
-    by_cat = {}
-    audit_history.each do |hist|
 
-      if by_cat[hist.category_id].blank?
-        by_cat[hist.category_id] = []
-      end
+    ###LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
 
-      by_cat[hist.category_id] << hist
-    end
+    #audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    #by_cat = {}
+    #audit_history.each do |hist|
 
-    data.each do |key, value|
-      data[key][:confidence] = by_cat[key].last.confidence
-      data[key][:name] = by_cat[key].last.category.descr
-      data[key][:long_description] = by_cat[key].last.category.desc_long
-    end
+    #  if by_cat[hist.category_id].blank?
+    #    by_cat[hist.category_id] = []
+    #  end
+
+    #  by_cat[hist.category_id] << hist
+    #end
+
+    #data.each do |key, value|
+    #  data[key][:confidence] = by_cat[key].last.confidence
+    #  data[key][:name] = by_cat[key].last.category.descr
+    #  data[key][:long_description] = by_cat[key].last.category.desc_long
+    #end
 
     ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
     ##in the meantime, dummy data
