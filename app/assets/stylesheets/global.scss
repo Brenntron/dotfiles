@@ -5854,6 +5854,16 @@ table.dataTable tbody tr.selected {
   width: 100%;
 }
 
+.certainty-flag {
+  background-image: url(image_path('icon_asterisk.svg'));
+  background-repeat: no-repeat;
+  width: 100%;
+  background-position: right center;
+  background-size: 9px 9px;
+  display: block;
+  cursor: pointer;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {

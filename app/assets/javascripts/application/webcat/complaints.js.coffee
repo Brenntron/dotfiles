@@ -245,19 +245,36 @@ format = (complaint_entry_row) ->
     categories = complaint_entry.current_categories
     category_table = ''
     category_row = ''
+    tooltip_table = ''
+    tooltip_all = ''
+    tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
+    tooltip_table_start = '<table class="tooltip-table"><thead><tr><td>Certainty</td><td>Category</td><td>Source</td></tr></thead><tbody>'
+    tooltip_table_end = '</tbody></table>'
+    tooltip_table_guts = ''
+    tooltip_wrapper_end = '</span></div>'
     $.each categories, (key, value) ->
-#      debugger
       category = this
       active =  $(this).attr("is_active")
       if active == 1
         confidence = this.confidence
         mnemonic = this.mnemonic
         name = this.name
+        cat_id = this.category_id
         top_certainty = this.certainty[0].source_certainty
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td>' + top_certainty + '</td></tr>'
-        category_table = category_table + category_row
-      return
+        certainties = this.certainty
+        $(certainties).each ->
+          source_certainty = this.source_certainty
+          source_category = this.source_category
+          source_name = this.source
+          certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_category + '</td><td>' + source_name + '</td></tr>'
+          tooltip_table_guts = tooltip_table_guts + certainty_row
 
+        tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
+        tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
+        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="nested-tooltipped certainty-flag" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
+        category_table = category_table + category_row
+
+      return
   if complaint_entry.tags.length >= 1
     tags = ''
     $(complaint_entry.tags).each ->
@@ -641,3 +658,9 @@ $ ->
       $('#web-cat-search').show()
       $('#new-complaint').show()
 
+
+  $('.nested-tooltipped').tooltipster theme: [
+    'tooltipster-borderless'
+    'tooltipster-borderless-customized'
+  ]
+  return
