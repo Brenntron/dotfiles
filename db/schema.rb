@@ -135,6 +135,7 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_companies_on_name", unique: true
   end
 
   create_table "complaint_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -179,12 +180,14 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.integer "complaint_entry_id"
     t.string "comment"
     t.string "category_list"
+    t.index ["user_id"], name: "index_complaint_marked_commits_on_user_id"
   end
 
   create_table "complaint_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_complaint_tags_on_name", unique: true
   end
 
   create_table "complaint_tags_complaints", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -269,6 +272,7 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["dispute_id"], name: "index_dispute_comments_on_dispute_id"
   end
 
   create_table "dispute_email_attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -279,7 +283,7 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.integer "size"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["dispute_id"], name: "index_dispute_comments_on_dispute_id"
+    t.index ["dispute_email_id", "bugzilla_attachment_id"], name: "index_dispute_email_attachments_on_email_and_attachment"
   end
 
   create_table "dispute_emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -422,7 +426,6 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.integer "snort_research_bug_id"
     t.index ["snort_escalation_bug_id"], name: "index_escalation_links_on_snort_escalation_bug_id"
     t.index ["snort_research_bug_id", "snort_escalation_bug_id"], name: "index_escalation_links"
-    t.index ["user"], name: "index_events_on_user"
   end
 
   create_table "escalations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -439,6 +442,7 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.integer "progress"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["user"], name: "index_events_on_user"
   end
 
   create_table "exploit_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
