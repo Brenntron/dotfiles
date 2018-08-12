@@ -68,7 +68,7 @@ module API
 
                   complaint_entry_packet[:category] = complaint_entry.url_primary_category
                   complaint_entry_packet[:resolution]= complaint_entry.resolution
-                  complaint_entry_packet[:resolution_comment] = complaint_entry.resolution_comment
+                  complaint_entry_packet[:internal_comment] = complaint_entry.internal_comment
 
                   complaint_entry_packet[:subdomain] = complaint_entry.subdomain
                   complaint_entry_packet[:domain] = complaint_entry.domain

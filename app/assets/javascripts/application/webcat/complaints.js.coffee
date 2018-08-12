@@ -30,7 +30,7 @@ window.updatePending = (id,row_id) ->
 
         temp_row.data().status = json.status
         temp_row.data().resolution = resolution
-        temp_row.data().resolution_comment = comment
+        temp_row.data().internal_comment = comment
         temp_row.invalidate().draw()
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
@@ -69,7 +69,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
         temp_row = table.row(row_id)
         temp_row.data().status = json.status
         temp_row.data().resolution = status
-        temp_row.data().resolution_comment = comment
+        temp_row.data().internal_comment = comment
         temp_row.data().category = categories
         temp_row.invalidate().draw()
         temp_row.child().remove()
@@ -220,9 +220,9 @@ format = (complaint_entry_row) ->
     category = complaint_entry.category
   else
     category = ''
-  resolution_comment=''
-  if complaint_entry.resolution_comment
-    resolution_comment = complaint_entry.resolution_comment
+  internal_comment=''
+  if complaint_entry.internal_comment
+    internal_comment = complaint_entry.internal_comment
   disposition = ''
   if complaint_entry.suggested_disposition
     disposition = complaint_entry.suggested_disposition
@@ -257,7 +257,7 @@ format = (complaint_entry_row) ->
       '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
       '<td><button onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Change </button>' + '</td>' +
       '</tr><tr>' +
-      '<td>' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50">' + '</td>'
+      '<td>' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + internal_comment + '" placeholder="add a comment" size="50">' + '</td>'
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<table><tr>' +
@@ -283,7 +283,7 @@ format = (complaint_entry_row) ->
       '<tr>' +
       '<td>Category: <fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectize" placeholder="Enter up to 5 categories" value="">' +
       '<td colspan="3">' +
-      'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>'  +
+      'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + internal_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>'  +
       '</td>' +
       '<td><button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
       '</td></tr></table>'
