@@ -5784,7 +5784,7 @@ table.dataTable tbody tr.selected {
 
 .nested-complaint-data-wrapper button.tertiary {
   padding: 5px 10px;
-  margin: 0 0 6px 0;
+  margin: 20px 0 6px 0;
   text-transform: none;
   font-weight: 300;
 }
@@ -5815,6 +5815,8 @@ table.dataTable tbody tr.selected {
 .complaint-selectize-col-wrapper {
   margin-top: 12px;
 }
+
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
