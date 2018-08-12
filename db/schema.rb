@@ -321,6 +321,8 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.text "resolution_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "sbrs_score", limit: 24
+    t.float "wbrs_score", limit: 24
     t.integer "webrep_wlbl_key"
     t.integer "reptool_key"
     t.boolean "is_important"
@@ -329,8 +331,6 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.datetime "case_closed_at"
     t.datetime "case_accepted_at"
     t.datetime "case_resolved_at"
-    t.float "sbrs_score", limit: 24
-    t.float "wbrs_score", limit: 24
     t.string "webrep_wlbl_keys"
     t.index ["dispute_id"], name: "index_dispute_entries_on_dispute_id"
   end
@@ -800,6 +800,4 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_whiteboards_on_name"
   end
-
-  add_foreign_key "dispute_entry_preloads", "dispute_entries"
 end
