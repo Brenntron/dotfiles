@@ -168,17 +168,35 @@ module API
               requires :lookup, type: String, desc: 'ComplaintEntry ids'
             end
             post 'domain_whois' do
+              whois = {}
               begin
-                whois_info = Whois::Client.new
-                whois_info.lookup(params[:lookup])
-
-                # binding.pry
+                record = Whois.whois(params[:lookup])
+                parser = Whois::Parser.new(record)
+                parser.record.content.each_line do |line|
+                  key,value = line.split(":",2)
+                  if value&.strip == nil
+                    next
+                  end
+                  key = key.gsub(">>>","").gsub("   ","").downcase.gsub(" ","_").to_sym
+                  value = value.gsub("<<<","").gsub("   ","")&.strip
+                  if whois[key]
+                    if whois[key].kind_of?(Array)
+                      whois[key] << value
+                    else
+                      binding.pry
+                      whois[key] = [whois[key], value]
+                    end
+                  else
+                    whois[key] = value
+                  end
+                end
               rescue Exception => e
                 Rails.logger.error "Failed to determine Whois info: error=> #{e.message}"
                 error = "#{e.message}"
                 return {:error => error}.to_json
               end
-              whois_info.to_json
+
+              whois.to_json
             end
 
 
