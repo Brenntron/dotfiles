@@ -166,6 +166,8 @@ class ComplaintEntry < ApplicationRecord
     new_complaint_entry.user = user
     new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
     new_complaint_entry.save
+
+    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
   end
 
   # Searches in a variety of ways.
