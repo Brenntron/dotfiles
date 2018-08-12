@@ -4495,7 +4495,7 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .nested-complaint-data-wrapper {
-  padding: 0 15px 0 20px !important;
+  padding: 0 0 0 20px !important;
   background-color: $bug-section-color;
 }
 
@@ -5802,7 +5802,7 @@ table.dataTable tbody tr.selected {
 }
 
 .nested-complaint-data {
-  margin-bottom: 16px;
+  margin-bottom: 6px;
   margin-top: -4px;
   display: block;
 }
@@ -5819,16 +5819,39 @@ table.dataTable tbody tr.selected {
 .nested-complaint-data-wrapper .selectize-input {
   margin: 0 !important;
   padding: 0 !important;
-  min-height: 30px;
+  min-height: 30px !important;;
   border-radius: 1px;
   border: 2px solid $content-bg-color;
   outline: 1px solid #cccccc;
   box-shadow: none;
+  font-size: 8pt;
 }
 
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item {
-  padding: 4px 6px;
+  padding: 2px 6px;
   margin: 2px;
+  font-size: 8pt;
+}
+
+.tag-capsule {
+  padding: 2px 4px;
+  margin: 4px 2px 0 2px;
+  background-color: $bug-section-color;
+  border-radius: 2px;
+  color: $content-bg-color;
+  display: inline-block;
+}
+
+.customer-label {
+  margin-top: 14px;
+}
+
+.no_pad div.row:first-of-type {
+  margin-right: -10px !important;
+}
+
+.complaint-comment-input {
+  width: 100%;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

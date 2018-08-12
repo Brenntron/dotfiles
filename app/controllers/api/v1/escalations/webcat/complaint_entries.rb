@@ -80,6 +80,8 @@ module API
                   complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
                   complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
                   complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
+                  complaint_entry_packet[:tags] = {}
+                  complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags
 
                   #complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
 
