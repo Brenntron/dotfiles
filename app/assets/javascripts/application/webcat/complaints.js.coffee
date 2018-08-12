@@ -4,6 +4,24 @@ window.removeSubdomain = (id,host) ->
 window.cat_new_url = ()->
   debugger
 
+window.domain_whois = (IP_Domain) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/domain_whois'
+    method: 'POST'
+    headers: headers
+    data: {'lookup': IP_Domain}
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        debugger
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
 window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
 
@@ -242,6 +260,9 @@ format = (complaint_entry_row) ->
   else
     fixed_radio = "checked='checked'"
 
+  whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
+
+
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
     complaint_entry_html = '<table><tr>' +
@@ -278,7 +299,7 @@ format = (complaint_entry_row) ->
       '<button>info</button>' +
       '<button>lookup</button>' +
       '<button>history</button>' +
-      '<button>domain</button>' +
+      '<button onclick="domain_whois(\'' + whois_lookup + '\')">domain</button>' +
       '</td></tr>' +
       '<tr>' +
       '<td>Category: <fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectize" placeholder="Enter up to 5 categories" value="">' +

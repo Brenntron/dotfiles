@@ -103,6 +103,8 @@ module API
               end
               {status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
+
+
             desc 'update a high telemetry entry'
             params do
               requires :id, type:Integer, desc:'complaint entry id'
@@ -123,6 +125,7 @@ module API
               {status:entry.status, entry_resolution:permitted_params['commit']}.to_json
             end
 
+
             desc 'take entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
@@ -139,6 +142,8 @@ module API
               end
               {name:current_user.display_name}.to_json
             end
+
+
             desc 'return entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
@@ -154,6 +159,26 @@ module API
                 return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
+            end
+
+
+
+            desc 'look up who is information from the domain given a complaint entry id'
+            params do
+              requires :lookup, type: String, desc: 'ComplaintEntry ids'
+            end
+            post 'domain_whois' do
+              begin
+                whois_info = Whois::Client.new
+                whois_info.lookup(params[:lookup])
+
+                # binding.pry
+              rescue Exception => e
+                Rails.logger.error "Failed to determine Whois info: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+              whois_info.to_json
             end
 
 
