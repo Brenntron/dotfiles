@@ -16,6 +16,10 @@ $ ->
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     ips_urls = this.ips_urls.value
     desc = this.description.value
@@ -32,8 +36,10 @@ $ ->
         customer: customer,
         tags: tags
       success: (response) ->
+        $('#loader-modal').hide()
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
+        $('#loader-modal').hide()
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 
