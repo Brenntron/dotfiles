@@ -284,7 +284,7 @@ format = (complaint_entry_row) ->
 
       '</div>' +
       '<div class="col-xs-2">' +
-      '<label class="content-label-sm">Status</label><br/>' +
+      '<label class="content-label-sm">Resolution</label><br/>' +
       '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
       '</div></div></div>' +
 
@@ -307,7 +307,7 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-2">' +
       '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
       '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
-      '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Change </button>' +
+      '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button>' +
       '</div></div>' +
       '</div></div></td></tr></table>'
 

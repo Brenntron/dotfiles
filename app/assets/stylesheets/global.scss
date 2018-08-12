@@ -5816,7 +5816,20 @@ table.dataTable tbody tr.selected {
   margin-top: 12px;
 }
 
+.nested-complaint-data-wrapper .selectize-input {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 30px;
+  border-radius: 1px;
+  border: 2px solid $content-bg-color;
+  outline: 1px solid #cccccc;
+  box-shadow: none;
+}
 
+.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item {
+  padding: 4px 6px;
+  margin: 2px;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
