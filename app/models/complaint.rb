@@ -209,6 +209,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.status = ComplaintEntry::NEW
           new_complaint_entry.save
 
+          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
         end
 
@@ -235,6 +236,7 @@ class Complaint < ApplicationRecord
           new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, key, "URI/DOMAIN")
           return_payload[key] = new_payload_item
 
+          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
         end
 
         conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
