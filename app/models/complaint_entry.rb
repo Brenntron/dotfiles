@@ -3,7 +3,7 @@ include ActionView::Helpers::DateHelper
 class ComplaintEntry < ApplicationRecord
   belongs_to :complaint
   belongs_to :user, optional: true
-
+  has_one :complaint_entry_preload
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
