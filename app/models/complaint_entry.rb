@@ -96,7 +96,7 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
-  def change_category(prefix, categories_string, entry_status, comment,current_user, commit_pending)
+  def change_category(prefix, categories_string, entry_status, comment,resolution_comment, current_user, commit_pending)
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
@@ -105,7 +105,7 @@ class ComplaintEntry < ApplicationRecord
           if commit_pending == "commit"
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
+            update(status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
@@ -113,16 +113,16 @@ class ComplaintEntry < ApplicationRecord
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             current_status = "ASSIGNED"
-            update(status:current_status, resolution_comment: comment, case_assigned_at: Time.now)
+            update(status:current_status, internal_comment: comment, resolution_comment: resolution_comment, case_assigned_at: Time.now)
           end
         else
           current_status = "PENDING"
-          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
+          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, user:current_user)
         end
       else
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
-        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
+        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
@@ -215,7 +215,7 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
     complaint_entry_fields = %w{complaint_id subdomain domain path url_primary_category
-                        complaint_entries.resolution complaint_entries.resolution_comment complaint_entries.status uri ip_address category}
+                        complaint_entries.resolution complaint_entries.internal_comment complaint_entries.status uri ip_address category}
     complaint_entry_where = complaint_entry_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')

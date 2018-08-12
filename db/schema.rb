@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180812153050) do
+ActiveRecord::Schema.define(version: 20180812154342) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -162,6 +162,7 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.boolean "is_important"
     t.datetime "case_resolved_at"
     t.datetime "case_assigned_at"
+    t.text "internal_comment"
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
   end
 

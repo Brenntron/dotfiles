@@ -68,6 +68,7 @@ module API
 
                   complaint_entry_packet[:category] = complaint_entry.url_primary_category
                   complaint_entry_packet[:resolution]= complaint_entry.resolution
+                  complaint_entry_packet[:internal_comment] = complaint_entry.internal_comment
                   complaint_entry_packet[:resolution_comment] = complaint_entry.resolution_comment
 
                   complaint_entry_packet[:subdomain] = complaint_entry.subdomain
@@ -129,7 +130,8 @@ module API
               requires :prefix, type: String, desc: 'the url to categorize'
               requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
               requires :status, type: String, desc: 'setting the status of the entry'
-              optional :comment, type: String, desc: 'resolution comment for the customer'
+              optional :comment, type: String, desc: 'internal comment'
+              optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
             end
             post 'update'do
               begin
@@ -137,6 +139,7 @@ module API
                 entry.change_category( permitted_params['prefix'],permitted_params['categories'],
                                          permitted_params['status'],
                                          permitted_params['comment'],
+                                         permitted_params['resolution_comment'],
                                          current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
 
