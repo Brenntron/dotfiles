@@ -3,7 +3,7 @@ include ActionView::Helpers::DateHelper
 class ComplaintEntry < ApplicationRecord
   belongs_to :complaint
   belongs_to :user, optional: true
-
+  has_one :complaint_entry_preload
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
@@ -166,6 +166,8 @@ class ComplaintEntry < ApplicationRecord
     new_complaint_entry.user = user
     new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
     new_complaint_entry.save
+
+    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
   end
 
   # Searches in a variety of ways.
@@ -399,22 +401,25 @@ class ComplaintEntry < ApplicationRecord
       prefix_id = result.prefix_id
     end
 
-    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
-    by_cat = {}
-    audit_history.each do |hist|
 
-      if by_cat[hist.category_id].blank?
-        by_cat[hist.category_id] = []
-      end
+    ###LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
 
-      by_cat[hist.category_id] << hist
-    end
+    #audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    #by_cat = {}
+    #audit_history.each do |hist|
 
-    data.each do |key, value|
-      data[key][:confidence] = by_cat[key].last.confidence
-      data[key][:name] = by_cat[key].last.category.descr
-      data[key][:long_description] = by_cat[key].last.category.desc_long
-    end
+    #  if by_cat[hist.category_id].blank?
+    #    by_cat[hist.category_id] = []
+    #  end
+
+    #  by_cat[hist.category_id] << hist
+    #end
+
+    #data.each do |key, value|
+    #  data[key][:confidence] = by_cat[key].last.confidence
+    #  data[key][:name] = by_cat[key].last.category.descr
+    #  data[key][:long_description] = by_cat[key].last.category.desc_long
+    #end
 
     ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
     ##in the meantime, dummy data

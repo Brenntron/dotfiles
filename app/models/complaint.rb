@@ -128,6 +128,20 @@ class Complaint < ApplicationRecord
   end
 
 
+  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:)
+    # Look for existing prefix
+    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+    if existing_prefix.present?
+      prefix_object = Wbrs::Prefix.new
+      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+    else
+      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+    end
+  end
+
+
 
   def self.process_bridge_payload(message_payload)
 
@@ -209,6 +223,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.status = ComplaintEntry::NEW
           new_complaint_entry.save
 
+          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
         end
 
@@ -235,6 +250,7 @@ class Complaint < ApplicationRecord
           new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, key, "URI/DOMAIN")
           return_payload[key] = new_payload_item
 
+          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
         end
 
         conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
