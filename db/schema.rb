@@ -800,4 +800,5 @@ ActiveRecord::Schema.define(version: 20180812153050) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_whiteboards_on_name"
   end
+
 end

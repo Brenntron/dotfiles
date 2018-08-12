@@ -1,0 +1,2 @@
+CREATE TABLE `complaint_entry_preloads` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, `complaint_entry_id` bigint, `current_category_information` longtext, `historic_category_information` longtext) ENGINE=InnoDB DEFAULT CHARACTER SET = utf8;
+INSERT INTO `schema_migrations` (`version`) VALUES ('20180812153050');
