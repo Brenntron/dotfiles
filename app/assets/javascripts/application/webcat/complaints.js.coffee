@@ -243,9 +243,10 @@ format = (complaint_entry_row) ->
     fixed_radio = "checked='checked'"
   if complaint_entry.current_categories?
     categories = complaint_entry.current_categories
+    category_table = ''
+    category_row = ''
     $.each categories, (key, value) ->
-      debugger
-      console.log this
+#      debugger
       category = this
       active =  $(this).attr("is_active")
       if active == 1
@@ -253,7 +254,9 @@ format = (complaint_entry_row) ->
         mnemonic = this.mnemonic
         name = this.name
         top_certainty = this.certainty[0].source_certainty
-      console.log( key + ': ' + value)
+        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td>' + top_certainty + '</td></tr>'
+        category_table = category_table + category_row
+
       return
 
 
@@ -287,12 +290,7 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data">' + uri + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' +
-#      Temporary manual table
-#      '<tr><td>' + complaint_entry.current_categories + '</td></tr>' +
-      '<tr><td>1</td><td>tech</td><td>Technology</td><td>1000</td></tr>' +
-      '<tr><td>2</td><td>busi</td><td>Business</td><td>500</td></tr>' +
-      '<tr><td>3</td><td>comp</td><td>Computers</td><td>100</td></tr>' +
+      '<tbody>' + category_table +
       '</tbody></table>' +
 
 

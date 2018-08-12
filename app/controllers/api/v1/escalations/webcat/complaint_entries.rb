@@ -88,7 +88,7 @@ module API
                   fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
                   fake_ass_bullshit[77][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
                   fake_ass_bullshit[88] = {:is_active => 1, :mnemonic => "auct", :category_id => 88, :prefix_id => 12, :confidence => 2, :name => "Auctions", :long_description => "Buy stuff from cool people who yell."}
-                  fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+                  fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
 
                   complaint_entry_packet[:current_categories] = fake_ass_bullshit
                   #complaint_entry_packet[:categories] = {"entertainment" => {:confidence => 1, :certainty => [{:source => 'something', :source_category => 'someting', :source_certainty => '1000'}]}, "NGO" => {:confidence => 2, :certainty => {}}}
