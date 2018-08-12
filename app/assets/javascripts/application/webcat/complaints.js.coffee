@@ -4,6 +4,52 @@ window.removeSubdomain = (id,host) ->
 window.cat_new_url = ()->
   debugger
 
+name_servers =(server_list)->
+  i = 0
+  text = ""
+  while i < server_list.length
+    text += server_list[i] + '<br>'
+    i++
+  text
+
+format_domain_info = (info)->
+  '<div class="row"> ' +
+    '<div class="col-xs-6">'+
+      '<h4>Domain Name:</h4>'+
+        info.domain_name + '<br><br>'+
+      '<h4> Registrant: </h4>'+
+        'organization: ' + info.registrant_organization + '<br>'+
+        'country: ' + info.registrant_country + '<br>'+
+        'state/province: ' + info['registrant_state/province'] + '<br><br>'+
+      '<h4> Name Servers: </h4>'+
+          name_servers(info.name_server)+
+    '</div>' +
+    '<div class="col-xs-6">'+
+      '<h4> Dates:</h4>'+
+        'created: ' + info.creation_date + '<br><br>'+
+        'last updated: ' + info.updated_date + '<br><br>'+
+        'expiry_date: ' + info.registry_expiry_date + '<br><br>' +
+    '</div>' +
+  '</div>'
+
+window.domain_whois = (IP_Domain) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/domain_whois'
+    method: 'POST'
+    headers: headers
+    data: {'lookup': IP_Domain}
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        std_msg_success("",[format_domain_info(json)], reload: false)
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
 window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
 
@@ -242,6 +288,9 @@ format = (complaint_entry_row) ->
   else
     fixed_radio = "checked='checked'"
 
+  whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
+
+
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
     complaint_entry_html = '<table><tr>' +
@@ -278,7 +327,7 @@ format = (complaint_entry_row) ->
       '<button>info</button>' +
       '<button>lookup</button>' +
       '<button>history</button>' +
-      '<button>domain</button>' +
+      '<button onclick="domain_whois(\'' + whois_lookup + '\')">domain</button>' +
       '</td></tr>' +
       '<tr>' +
       '<td>Category: <fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectize" placeholder="Enter up to 5 categories" value="">' +
