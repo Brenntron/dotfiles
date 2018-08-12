@@ -1,7 +1,7 @@
 class AutoResolve
   include ActiveModel::Model
 
-  attr_accessor :address_type, :address, :status, :rule_hits, :internal_comment
+  attr_accessor :address_type, :address, :status, :rule_hits, :internal_comment, :resolution_comment
 
   ADDRESS_TYPE_IP           = 'IP'
   ADDRESS_TYPE_URI          = 'URI'
@@ -38,6 +38,9 @@ class AutoResolve
   def append_comment(str)
     @internal_comment ||= ''
     @internal_comment += str
+
+    @resolution_comment ||= ''
+    @resolution_comment += str
   end
 
   def good_mnem?(rule_hit)
