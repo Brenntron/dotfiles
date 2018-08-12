@@ -2,7 +2,21 @@ window.removeSubdomain = (id,host) ->
   id.value = host
 
 window.cat_new_url = ()->
-  debugger
+  data = {}
+  for i in [1...6] by 1
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url:'/api/v1/escalations/webcat/complaints/cat_new_url'
+    method: 'POST'
+    headers: headers
+    data: {data: data}
+    success: (response) ->
+      std_msg_success('URLs categorized successfully.',"", reload: true)
+    error: (response) ->
+      std_msg_error(response,"", reload: false)
+  )
 
 name_servers =(server_list)->
   i = 0
