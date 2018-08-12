@@ -78,7 +78,17 @@ module API
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
 
-                  #complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+
+                  if complaint_entry.complaint_entry_preload.present?
+                    if complaint_entry.complaint_entry_preload.current_category_information.present?
+                      complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
+                    else
+                      complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+                    end
+                  else
+                    complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+                  end
+
 
                   #fake it til they make it
                   fake_ass_bullshit = {}
@@ -88,13 +98,21 @@ module API
                   fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
 
                   complaint_entry_packet[:current_categories] = fake_ass_bullshit
-                  #complaint_entry_packet[:categories] = {"entertainment" => {:confidence => 1, :certainty => [{:source => 'something', :source_category => 'someting', :source_certainty => '1000'}]}, "NGO" => {:confidence => 2, :certainty => {}}}
 
                   #each row has available to it: action, confidence, description, even_id, prefix_id, time, user, category.   "category" has its own hash
                   #which has available to it: mnem, descr, category_id, desc_long
 
                   complaint_entry_packet[:entry_history] = {}
-                  complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                  if complaint_entry.complaint_entry_preload.present?
+                    if complaint_entry.complaint_entry_preload.historic_category_information.present?
+                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
+                    else
+                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                    end
+                  else
+                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                  end
+
                   complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
@@ -120,6 +138,8 @@ module API
                                          permitted_params['status'],
                                          permitted_params['comment'],
                                          current_user, "")
+                ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
+
               rescue Exception => e
                   return {error:e.message}.to_json
               end
