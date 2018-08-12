@@ -248,7 +248,7 @@ format = (complaint_entry_row) ->
     tooltip_table = ''
     tooltip_all = ''
     tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
-    tooltip_table_start = '<table class="tooltip-table"><thead><tr><td>Certainty</td><td>Category</td><td>Source</td></tr></thead><tbody>'
+    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Category</th><th>Source</th></tr></thead><tbody>'
     tooltip_table_end = '</tbody></table>'
     tooltip_table_guts = ''
     tooltip_wrapper_end = '</span></div>'
@@ -646,10 +646,13 @@ window.named_webcat_index_table = (search_name) ->
 
 
 window.triggerTooltips = () ->
-  $('.nested-tooltipped').tooltipster theme: [
-    'tooltipster-borderless'
-    'tooltipster-borderless-customized'
-  ]
+  $('.nested-tooltipped').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
+    side: 'bottom'
+    interactive: true
   return
 
 $ ->

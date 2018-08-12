@@ -5864,6 +5864,46 @@ table.dataTable tbody tr.selected {
   cursor: pointer;
 }
 
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized .tooltipster-box {
+  background: $table-dark-body;
+  border-radius: 4px;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized .tooltipster-content {
+  color: $content-bg-color;
+  padding: 8px;
+}
+
+.category-tooltip-table td, .category-tooltip-table th {
+  text-align: left;
+}
+
+.category-tooltip-table tr:first-child td {
+  padding-top: 6px;
+}
+.category-tooltip-table td {
+  border-bottom: none;
+  font-weight: 300 !important;
+  padding: 0 6px 0 6px;
+  font-size: 8pt;
+}
+
+.category-tooltip-table th {
+  border-bottom: 1px solid $type-lighter-color;
+  text-transform: none;
+  font-weight: 400;
+  color: darken($content-bg-color, 10%);
+  padding: 2px 6px;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-bottom .tooltipster-arrow-border {
+  border-bottom-color: $table-dark-body;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-top .tooltipster-arrow-border {
+  border-top-color: $table-dark-body;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
