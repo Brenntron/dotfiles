@@ -27,23 +27,61 @@ name_servers =(server_list)->
   text
 
 format_domain_info = (info)->
-  '<div class="row"> ' +
-    '<div class="col-xs-6">'+
-      '<h4>Domain Name:</h4>'+
-        info.domain_name + '<br><br>'+
-      '<h4> Registrant: </h4>'+
-        'organization: ' + info.registrant_organization + '<br>'+
-        'country: ' + info.registrant_country + '<br>'+
-        'state/province: ' + info['registrant_state/province'] + '<br><br>'+
-      '<h4> Name Servers: </h4>'+
-          name_servers(info.name_server)+
-    '</div>' +
-    '<div class="col-xs-6">'+
-      '<h4> Dates:</h4>'+
-        'created: ' + info.creation_date + '<br><br>'+
-        'last updated: ' + info.updated_date + '<br><br>'+
-        'expiry_date: ' + info.registry_expiry_date + '<br><br>' +
-    '</div>' +
+  '<div class="dialog-content-wrapper">' +
+    '<h5>Domain Name</h5>' +
+    '<p>' + info.domain_name + '</p>' +
+    '<hr class="thin">' +
+    '<h5>Registrant </h5>' +
+    '<table class="nested-dialog-table">' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+           'Organization' +
+        '</td>' +
+        '<td>' +
+          info.registrant_organization +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Country' +
+        '</td>' +
+        '<td>' +
+          info.registrant_country +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+        'State/Province' +
+        '</td>' +
+        '<td>' +
+          info['registrant_state/province'] +
+        '</td>' +
+      '</tr>' +
+    '</table>' +
+    '<hr class="thin">' +
+    '<h5>Name Servers</h5>'+
+    name_servers(info.name_server) +
+    '<hr class="thin">' +
+    '<h5> Dates</h5>'+
+    '<table class="nested-dialog-table">' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+          'Created' +
+        '</td>' +
+        '<td>' + info.creation_date + '</td>'+
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Last updated' +
+        '</td>' +
+        '<td>' +
+          info.updated_date +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Expiry_date' +
+        '</td>' +
+        '<td>' +
+          info.registry_expiry_date +
+        '</td>' +
+      '</tr>' +
+    '</table>' +
   '</div>'
 
 window.domain_whois = (IP_Domain) ->
@@ -59,7 +97,22 @@ window.domain_whois = (IP_Domain) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        std_msg_success("",[format_domain_info(json)], reload: false)
+        dialog_content = $(format_domain_info(json))
+        if $("#complaint_button_dialog").length
+          complaint_dialog = this
+          $('#complaint_button_dialog').html(dialog_content[0])
+        else
+          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
+          $('body').append(complaint_dialog)
+          $('#complaint_button_dialog').append(dialog_content[0])
+          $('#complaint_button_dialog').dialog
+            autoOpen: true
+            minWidth: 400
+            position: { my: "right bottom", at: "right bottom", of: window }
+
+
+#        Add popup here, rather than success message
+#        std_msg_success("[format_domain_info(json)]",, reload: false)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -79,7 +132,7 @@ window.updatePending = (id,row_id) ->
     url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
-    data: {'id': id,'prefix': prefix,'commit':status,'comment':comment, 'resolution_comment': resolution_comment }
+    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -111,13 +164,13 @@ window.updatePending = (id,row_id) ->
   , this)
 
 window.updateEntryColumns = (entry_id,row_id) ->
+  $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
@@ -149,6 +202,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
           items: selected_options(temp_row.data().category)
         }
     error: (response) ->
+      $("#submit_changes_#{entry_id}").prop("disabled",false)
       std_msg_error(response,"", reload: false)
   , this)
 
@@ -240,7 +294,7 @@ selected_options = (categories) ->
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
-  missing_data = '<span class="missing-data">Missing Data</span>'
+  missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
   host = ''
   url = ''
@@ -274,6 +328,13 @@ format = (complaint_entry_row) ->
     confidence = complaint_entry.confidence
   else
     confidence = missing_data
+
+  customer_description = ''
+  if complaint_entry.description
+    customer_description = complaint_entry.description
+  else
+    customer_description = missing_data
+
   certainty = ''
   if complaint_entry.certainty
     certainty = complaint_entry.certainty
@@ -300,11 +361,11 @@ format = (complaint_entry_row) ->
   invalid_radio = ""
   if complaint_entry.resolution
     switch (complaint_entry.resolution)
-      when "unchanged"
+      when "UNCHANGED"
         unchanged_radio = "checked='checked'"
-      when "fixed"
+      when "FIXED"
         fixed_radio = "checked='checked'"
-      when "invalid"
+      when "INVALID"
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
@@ -365,7 +426,7 @@ format = (complaint_entry_row) ->
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
-      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
       '<span class="nested-complaint-data">' + url + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
@@ -414,20 +475,23 @@ format = (complaint_entry_row) ->
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
-      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
       '<span class="nested-complaint-data">' + uri + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
       '<span class="nested-complaint-data">' + tags + '</span>' +
+      '<label class="content-label-sm">Customer Description</label>' +
+      '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
-      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
-      '</div></div>' +
 
+      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+
+      '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
@@ -451,9 +515,8 @@ format = (complaint_entry_row) ->
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '<br/>' +
-      '<button class="tertiary" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
-      '</div></div></div></div></td>' +
-      '</tr></table>'
+      '<button class="tertiary" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+      '</div></div></div></div></div></td></tr></table>'
   complaint_entry_html
 
 

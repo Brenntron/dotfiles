@@ -51,15 +51,6 @@ $ ->
         defaultContent: '<span></span>'
         width: '24px'
       }
-#      {
-#        'render': (data, type, full, meta) ->
-#          complaintID = full.complaint_id.toString()
-#          '<a href="complaints/' + complaintID + '">' + complaintID + '</a>'
-#        width: '45px'
-#
-#      }
-
-
       {
         data: 'entry_id'
         width: '50px'

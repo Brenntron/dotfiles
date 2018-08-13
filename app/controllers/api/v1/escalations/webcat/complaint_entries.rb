@@ -160,14 +160,16 @@ module API
               requires :id, type:Integer, desc:'complaint entry id'
               requires :prefix, type:String, desc: 'the url to categorize'
               requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
+              requires :status, type: String, desc: 'this is the status of this complaint Entry'
               optional :comment, type: String, desc: 'resolution comment for the customer'
+              optional :resolution_comment, type:String, desc: 'an internal comment'
             end
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
                 entry.change_category( permitted_params['prefix'], permitted_params['categories'],
                                     permitted_params['status'],
-                                    permitted_params['comment'],
+                                    permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
               rescue Exception => e
                 return e.message

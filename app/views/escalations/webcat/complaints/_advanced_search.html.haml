@@ -18,7 +18,8 @@
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Tags
-    %select.form-control.selectized#tags-input{placeholder: "Search tags", multiple: "multiple", tabindex:"-1", name: 'tags'}
+    %br
+    %select.form-control.selectize#tags-input{placeholder: "Search tags", multiple: "multiple", tabindex:"-1", name: 'tags'}
     %input.hidden#search_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(','), name: 'tags'}
     %button.remove-input
   .form-group.search-item.hidden
