@@ -27,23 +27,61 @@ name_servers =(server_list)->
   text
 
 format_domain_info = (info)->
-  '<div class="row"> ' +
-    '<div class="col-xs-6">'+
-      '<h4>Domain Name:</h4>'+
-        info.domain_name + '<br><br>'+
-      '<h4> Registrant: </h4>'+
-        'organization: ' + info.registrant_organization + '<br>'+
-        'country: ' + info.registrant_country + '<br>'+
-        'state/province: ' + info['registrant_state/province'] + '<br><br>'+
-      '<h4> Name Servers: </h4>'+
-          name_servers(info.name_server)+
-    '</div>' +
-    '<div class="col-xs-6">'+
-      '<h4> Dates:</h4>'+
-        'created: ' + info.creation_date + '<br><br>'+
-        'last updated: ' + info.updated_date + '<br><br>'+
-        'expiry_date: ' + info.registry_expiry_date + '<br><br>' +
-    '</div>' +
+  '<div class="dialog-content-wrapper">' +
+    '<h5>Domain Name</h5>' +
+    '<p>' + info.domain_name + '</p>' +
+    '<hr class="thin">' +
+    '<h5>Registrant </h5>' +
+    '<table class="nested-dialog-table">' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+           'Organization' +
+        '</td>' +
+        '<td>' +
+          info.registrant_organization +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Country' +
+        '</td>' +
+        '<td>' +
+          info.registrant_country +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+        'State/Province' +
+        '</td>' +
+        '<td>' +
+          info['registrant_state/province'] +
+        '</td>' +
+      '</tr>' +
+    '</table>' +
+    '<hr class="thin">' +
+    '<h5>Name Servers</h5>'+
+    name_servers(info.name_server) +
+    '<hr class="thin">' +
+    '<h5> Dates</h5>'+
+    '<table class="nested-dialog-table">' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+          'Created' +
+        '</td>' +
+        '<td>' + info.creation_date + '</td>'+
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Last updated' +
+        '</td>' +
+        '<td>' +
+          info.updated_date +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Expiry_date' +
+        '</td>' +
+        '<td>' +
+          info.registry_expiry_date +
+        '</td>' +
+      '</tr>' +
+    '</table>' +
   '</div>'
 
 window.domain_whois = (IP_Domain) ->
@@ -59,8 +97,22 @@ window.domain_whois = (IP_Domain) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
+        dialog_content = $(format_domain_info(json))
+        if $("#complaint_button_dialog").length
+          complaint_dialog = this
+          $('#complaint_button_dialog').html(dialog_content[0])
+        else
+          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
+          $('body').append(complaint_dialog)
+          $('#complaint_button_dialog').append(dialog_content[0])
+          $('#complaint_button_dialog').dialog
+            autoOpen: true
+            minWidth: 400
+            position: { my: "right bottom", at: "right bottom", of: window }
+
+
 #        Add popup here, rather than success message
-        std_msg_success("",[format_domain_info(json)], reload: false)
+#        std_msg_success("[format_domain_info(json)]",, reload: false)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -432,7 +484,9 @@ format = (complaint_entry_row) ->
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
+
       '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
