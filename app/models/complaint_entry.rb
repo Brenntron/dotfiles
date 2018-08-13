@@ -105,10 +105,12 @@ class ComplaintEntry < ApplicationRecord
           if commit_pending == "commit"
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
+            update(resolution:entry_status,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+            if entry_status != "INVALID"
+              commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+            end
             cat_from_wbrs = self.set_current_category
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
@@ -125,8 +127,9 @@ class ComplaintEntry < ApplicationRecord
         update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
-        
+        if entry_status != "INVALID"
+          commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+        end
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end

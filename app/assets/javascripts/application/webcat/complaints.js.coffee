@@ -79,7 +79,7 @@ window.updatePending = (id,row_id) ->
     url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
-    data: {'id': id,'prefix': prefix,'commit':status,'comment':comment, 'resolution_comment': resolution_comment }
+    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -117,7 +117,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
@@ -300,11 +299,11 @@ format = (complaint_entry_row) ->
   invalid_radio = ""
   if complaint_entry.resolution
     switch (complaint_entry.resolution)
-      when "unchanged"
+      when "UNCHANGED"
         unchanged_radio = "checked='checked'"
-      when "fixed"
+      when "FIXED"
         fixed_radio = "checked='checked'"
-      when "invalid"
+      when "INVALID"
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
