@@ -215,6 +215,37 @@ module API
 
 
 
+            desc 'Get the history'
+            params do
+              requires :id, type: Integer, desc: 'ComplaintEntry id'
+            end
+            post 'history' do
+              begin
+                  entry = ComplaintEntry.find(params[:id])
+                  complaint_entry_packet={}
+                  complaint_entry_packet[:entry_history] = {}
+                  if entry.complaint_entry_preload.present?
+                    if entry.complaint_entry_preload.historic_category_information.present?
+                      complaint_entry_packet[:entry_history][:domain_history] = entry.complaint_entry_preload.historic_category_information
+                    else
+                      complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                    end
+                  else
+                    complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                  end
+
+                  complaint_entry_packet[:entry_history][:complaint_history] = entry.compose_versions
+
+              rescue Exception => e
+                Rails.logger.error "Failed to find entry: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+              complaint_entry_packet.to_json
+            end
+
+
+
             desc 'look up who is information from the domain given a complaint entry id'
             params do
               requires :lookup, type: String, desc: 'ComplaintEntry ids'

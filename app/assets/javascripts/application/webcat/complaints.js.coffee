@@ -64,7 +64,7 @@ format_domain_info = (info)->
       '<tr>' +
         '<td class="table-side-header">' +
           'Created' +
-        '</td>' +
+        '</td>'
         '<td>' + info.creation_date + '</td>'+
       '</tr><tr>' +
         '<td class="table-side-header">' +
@@ -412,13 +412,11 @@ format = (complaint_entry_row) ->
     if complaint_entry.entry_history.domain_history.length >= 1
       domain_history = complaint_entry.entry_history.domain_history
     else
-      domain_history = '<span class="missing-data">No domain history.</span>'
+      domain_history = ''
     if complaint_entry.entry_history.complaint_history.length >= 1
       complaint_history = complaint_entry.entry_history.complaint_history
     else
-      complaint_history = '<span class="missing-data">No complaint entry history.</span>'
-
-
+      complaint_history = ''
 
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
 
@@ -472,13 +470,7 @@ format = (complaint_entry_row) ->
 
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
-    history_dialog_content = '<div class="dialog-content-wrapper">' +
-      '<h5>Domain History</h5>' +
-      '<p>' + domain_history + '</p>' +
-      '<hr class="thin"/>' +
-      '<h5>Complaint Entry History</h5>' +
-      '<p>' + complaint_history + '</p>' +
-      '</div>'
+
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -498,7 +490,7 @@ format = (complaint_entry_row) ->
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary">Lookup</button><br/>' +
-      '<button class="secondary" onclick="history_dialog()">History</button><br/>' +
+      '<button class="secondary" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
       '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
@@ -527,22 +519,58 @@ format = (complaint_entry_row) ->
       '<button class="tertiary" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
 
-
-
   complaint_entry_html
 
-window.history_dialog = (history_dialog_content) ->
-  if $("#history_dialog").length
-    history_dialog = this
-    $("#history_dialog").html(history_dialog_content)
-  else
-    history_dialog = '<div id="history_dialog" title="History Information"></div>'
-    $('body').append(history_dialog)
-    $('#history_dialog').append(history_dialog_content)
-    $('#history_dialog').dialog
-      autoOpen: true
-      minWidth: 400
-      position: { my: "right top", at: "right top", of: window }
+window.history_dialog = (id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/history'
+    method: 'POST'
+    headers: headers
+    data: {'id': id}
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        #parse this json properly
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<h5>Domain History</h5>' +
+          '<p>' + json.entry_history.domain_history[0] + '</p>' +
+          '<hr class="thin"/>' +
+          '<h5>Complaint Entry History</h5>' +
+          '<p>' + json.entry_history.complaint_history + '</p>' +
+          '</div>'
+        if $("#history_dialog").length
+          history_dialog = this
+          $("#history_dialog").html(history_dialog_content)
+        else
+          history_dialog = '<div id="history_dialog" title="History Information"></div>'
+          $('body').append(history_dialog)
+          $('#history_dialog').append(history_dialog_content)
+          $('#history_dialog').dialog
+            autoOpen: true
+            minWidth: 400
+            position: { my: "right top", at: "right top", of: window }
+
+#        dialog_content = $(format_domain_info(json))
+#        if $("#complaint_button_dialog").length
+#          complaint_dialog = this
+#          $('#complaint_button_dialog').html(dialog_content[0])
+#        else
+#          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
+#          $('body').append(complaint_dialog)
+#          $('#complaint_button_dialog').append(dialog_content[0])
+#          $('#complaint_button_dialog').dialog
+#            autoOpen: true
+#            minWidth: 400
+#            position: { my: "right bottom", at: "right bottom", of: window }
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
+
 
 
 window.click_table_buttons = (complaint_table, button)->

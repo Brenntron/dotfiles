@@ -5937,7 +5937,7 @@ table.dataTable tbody tr.selected {
   border-top-color: $table-dark-body;
 }
 
-#complaint_button_dialog .dialog-content-wrapper {
+#complaint_button_dialog .dialog-content-wrapper, #history_dialog .dialog-content-wrapper {
   padding: 15px;
 }
 
