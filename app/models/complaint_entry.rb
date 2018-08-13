@@ -150,27 +150,36 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.create_complaint_entry(complaint, ip_url, user = nil)
-    new_complaint_entry = ComplaintEntry.new
-    new_complaint_entry.complaint_id = complaint.id
-    new_complaint_entry.status = "NEW"
+    begin
+      new_complaint_entry = ComplaintEntry.new
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.status = "NEW"
 
-    if is_ip?(ip_url)
-      new_complaint_entry.ip_address = ip_url
-      new_complaint_entry.entry_type = "IP"
+      if is_ip?(ip_url)
+        new_complaint_entry.ip_address = ip_url
+        new_complaint_entry.entry_type = "IP"
 
-    else
-      url_parts = Complaint.parse_url(ip_url)
-      new_complaint_entry.uri = ip_url
-      new_complaint_entry.entry_type = "URI/DOMAIN"
-      new_complaint_entry.subdomain = url_parts[:subdomain]
-      new_complaint_entry.domain = url_parts[:domain]
-      new_complaint_entry.path = url_parts[:path]
+      else
+        url_parts = Complaint.parse_url(ip_url)
+        new_complaint_entry.uri = ip_url
+        new_complaint_entry.entry_type = "URI/DOMAIN"
+        new_complaint_entry.subdomain = url_parts[:subdomain]
+        new_complaint_entry.domain = url_parts[:domain]
+        new_complaint_entry.path = url_parts[:path]
+      end
+      #lets query the top url API endpoint to determine if this is an important site or not
+      # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
+      importance = Wbrs::TopUrl.check_urls([ip_url]).first.is_important
+      new_complaint_entry.is_important = importance if importance
+      new_complaint_entry.user = user
+      new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+      new_complaint_entry.save
+
+      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+    rescue Exception => e
+      raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
-    new_complaint_entry.user = user
-    new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
-    new_complaint_entry.save
 
-    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
   end
 
   # Searches in a variety of ways.
