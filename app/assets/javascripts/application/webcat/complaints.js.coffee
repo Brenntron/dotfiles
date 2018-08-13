@@ -291,6 +291,18 @@ selected_options = (categories) ->
     options = categories.split(',')
   return options
 
+$('html').on 'click', (e) ->
+  if typeof $(e.target).data('original-title') == 'undefined' and !$(e.target).parents().is('.popover.in')
+    $('[data-original-title]').popover 'hide'
+
+window.enlarge_image = (id,image)->
+  $('#screenshot_id_'+ id).popover(
+    html: true
+    trigger: 'focus'
+    content: '<img width="400" src="' + image + '">').popover 'show'
+
+
+
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
@@ -422,7 +434,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img class="screenshot-thumb-img" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
@@ -471,7 +483,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img class="screenshot-thumb-img" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
