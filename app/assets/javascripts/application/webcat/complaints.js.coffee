@@ -121,18 +121,19 @@ window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
 
 window.updatePending = (id,row_id) ->
-  prefix = $('#complaint_review_prefix_'+id)[0].value
+  prefix = $('#complaint_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
-  comment = $('#complaint_pending_comment_'+id)[0].value
-  resolution_comment = $('#complaint_pending_resolution_comment_'+id)[0].value
+  comment = $('#complaint_comment_'+id)[0].value
+  resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
+  categories = $('#input_cat_'+id).val().toString()
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
-    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment }
+    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -192,6 +193,16 @@ window.updateEntryColumns = (entry_id,row_id) ->
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5
+          valueField: 'value'
+          labelField: 'value'
+          searchField: 'text'
+          options: AC.WebCat.createSelectOptions()
+          items: selected_options(temp_row.data().category)
+        }
+        $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
           maxItems: 5
@@ -417,6 +428,7 @@ format = (complaint_entry_row) ->
 
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
+    input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row">' +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
@@ -449,7 +461,10 @@ format = (complaint_entry_row) ->
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
       ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
-      '</div>' +
+      '<div class="complaint-selectize-col-wrapper">' +
+      '<label class="content-label-sm">Categories to commit</label>' +
+      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
+      '</div></div>' +
       '<div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
