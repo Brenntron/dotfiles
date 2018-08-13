@@ -40,11 +40,10 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   end
 
   def serve_image
-
     complaint_entry = ComplaintEntry.find(params[:complaint_entry_id])
-    data = complaint_entry.screenshot     #<—this should return a binary blob
+    data = complaint_entry.complaint_entry_screenshot.screenshot     #<—this should return a binary blob
 
-    send_data data, type: image.content_type
+    send_data data, type: 'image/jpeg'
   end
 
 

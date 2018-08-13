@@ -410,7 +410,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img class="screenshot-thumb-img" onload="load_screenshot(this, ' + complaint_entry.entry_id + ');" />' +
+      '<img class="screenshot-thumb-img" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
