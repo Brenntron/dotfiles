@@ -11,7 +11,7 @@ class CapybaraSpider < Capybara::Session
 
   def self.build_configuration
     Capybara.register_driver :poltergeist do |app|
-      Capybara::Poltergeist::Driver.new( app, { is_errors: false } )
+      Capybara::Poltergeist::Driver.new( app, { is_errors: false, js_errors: false } )
     end
   end
 
