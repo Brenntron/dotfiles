@@ -5842,6 +5842,10 @@ table.dataTable tbody tr.selected {
   display: inline-block;
 }
 
+.nested-complaint-data-wrapper a {
+  text-decoration: underline;
+}
+
 .customer-label {
   margin-top: 14px;
 }
@@ -5903,6 +5907,8 @@ table.dataTable tbody tr.selected {
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-top .tooltipster-arrow-border {
   border-top-color: $table-dark-body;
 }
+
+
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
