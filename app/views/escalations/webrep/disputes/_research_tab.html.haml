@@ -532,7 +532,7 @@
                               Not on any other tickets
                           - else
                             %span.dropdown
-                              %button#show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced n', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                              %button.show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced on', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                                 = "#{entry.referenced_tickets.count} ticket(s)"
                               .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                 %table

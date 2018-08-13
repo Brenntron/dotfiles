@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180730184700) do
+ActiveRecord::Schema.define(version: 20180812154342) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -171,6 +171,17 @@ ActiveRecord::Schema.define(version: 20180730184700) do
     t.string "category"
     t.integer "user_id"
     t.boolean "is_important"
+    t.datetime "case_resolved_at"
+    t.datetime "case_assigned_at"
+    t.text "internal_comment"
+  end
+
+  create_table "complaint_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "complaint_entry_id"
+    t.text "current_category_information"
+    t.text "historic_category_information"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "complaint_marked_commits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

@@ -54,6 +54,9 @@ gem 'awesome_nested_set', '~> 3.1.3'
 
 gem 'aws-sdk', '~> 2.6'
 
+gem 'whois'
+gem 'whois-parser'
+
 gem 'will_paginate', '~> 3.1.5'
 
 gem 'delayed_job', '~> 4.1.3'

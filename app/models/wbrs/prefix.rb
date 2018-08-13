@@ -1,5 +1,5 @@
 class Wbrs::Prefix < Wbrs::Base
-  FIELD_NAMES = %w{prefix_id domain is_active path path_hashed port protocol subdomain truncated}
+  FIELD_NAMES = %w{prefix_id domain is_active path path_hashed port protocol subdomain truncated category descr mnem }
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
@@ -30,13 +30,14 @@ class Wbrs::Prefix < Wbrs::Base
     response = post_request(path: '/v1/cat/rules/get', body: params)
 
     response_body = JSON.parse(response.body)
-    response_body['data'].inject({}) do |prefix_hash, datum|
-      prefix_id = datum['prefix_id']
-      unless prefix_hash[prefix_id]
-        prefix_hash[prefix_id] = new_from_attributes(datum.slice(*FIELD_NAMES))
-      end
-      prefix_hash
-    end.values
+
+    multicat_results = []
+
+    response_body['data'].each do |datum|
+      multicat_results << new_from_attributes(datum.slice(*FIELD_NAMES))
+    end
+
+    multicat_results
   end
 
   # @return [Array<Wbrs::Category>] array of categories related to this prefix.

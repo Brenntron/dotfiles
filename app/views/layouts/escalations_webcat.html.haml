@@ -2,7 +2,7 @@
   Escalations WebCat - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-2.col-sm-1.col-lg-2
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
     %a#complaints.nav-page-button{href: '/escalations/webcat/complaints'}
       %span.nav-toolbar-icon-large.icon-queue
 
@@ -13,15 +13,15 @@
       %span.nav-toolbar-icon-large.icon-reports
 
 
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'new-complaint', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
       New
     .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-complaint'}
       %h3.nav-tool-dropdown-header.inverse
         New Complaint
-      .nav-tool-content-wrapper
-        = render 'new'
+      .nav-tool-content-wrapper#new-complaint-wrapper
+        = render 'escalations/webcat/complaints/new'
 
   -#.nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
   -#  %a{href: '#', class: 'dropdown-toggle', id: 'fetch', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -30,7 +30,7 @@
   -#  .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'fetch'} Fetch complaints   
 
 
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-complaints', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
@@ -77,7 +77,7 @@
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
 
-  .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-3.search-wrapper
+  .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-4.search-wrapper
     .input-group.search-group#web-cat-search
       = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 
@@ -87,7 +87,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-          = render 'advanced_search'
+          = "render 'escalations/webcat/complaints/advanced_search'"
 
           -#= label_tag 'advanced_query_complaints', 'Complaint IDs'
           -#%br/
