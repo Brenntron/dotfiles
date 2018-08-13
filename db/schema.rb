@@ -160,10 +160,18 @@ ActiveRecord::Schema.define(version: 20180810190727) do
     t.string "category"
     t.integer "user_id"
     t.boolean "is_important"
-    t.datetime "unused_case_closed_at"
     t.datetime "case_resolved_at"
     t.datetime "case_assigned_at"
+    t.text "internal_comment"
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
+  end
+
+  create_table "complaint_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "complaint_entry_id"
+    t.text "current_category_information"
+    t.text "historic_category_information"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "complaint_entry_screenshots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
