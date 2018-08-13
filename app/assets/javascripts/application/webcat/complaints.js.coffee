@@ -59,6 +59,7 @@ window.domain_whois = (IP_Domain) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
+#        Add popup here, rather than success message
         std_msg_success("",[format_domain_info(json)], reload: false)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -363,7 +364,7 @@ format = (complaint_entry_row) ->
       '<div class="screenshot-thumb-wrapper"><img/></div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
-      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
       '<span class="nested-complaint-data">' + url + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
@@ -410,7 +411,7 @@ format = (complaint_entry_row) ->
       '<div class="screenshot-thumb-wrapper"><img/></div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
-      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
       '<span class="nested-complaint-data">' + uri + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
