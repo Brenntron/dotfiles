@@ -1,7 +1,7 @@
 .content-wrapper
   .reputation-research-search-wrapper
     %h1 Reputation Research
-    = form_for(:search) do |search_form|
+    = form_for(:search, method: "get") do |search_form|
       = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
       .row.search-options-row
         .col-xs-6

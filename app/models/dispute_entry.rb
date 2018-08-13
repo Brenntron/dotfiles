@@ -334,8 +334,8 @@ class DisputeEntry < ApplicationRecord
         end
 
         if is_ip_address === true
-          sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => self.hostlookup})
-          sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(self.hostlookup)
+          sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+          sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(sbrs_stuff)
 
           # self.sbrs_score = sbrs_stuff["sbrs"]["score"]
           sbrs_stuff_rules.each do |rule_hit|
