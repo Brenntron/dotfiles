@@ -39,6 +39,15 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   def contains_search
   end
 
+  def serve_image
+
+    complaint_entry = ComplaintEntry.find(params[:complaint_entry_id])
+    data = complaint_entry.screenshot     #<—this should return a binary blob
+
+    send_data data, type: image.content_type
+  end
+
+
   private
 
 
