@@ -5705,7 +5705,7 @@ table.dataTable tbody tr.selected {
   width: 100%;
 }
 
-.nav-tool-content-wrapper .form-control.selectize .selectize-input input {
+.nav-tool-content-wrapper .form-control.selectize .selectize-input input, #advanced-search-wrapper .form-control.selectize .selectize-input input {
   outline: none !important;
 }
 
@@ -5718,14 +5718,43 @@ table.dataTable tbody tr.selected {
   box-shadow: none;
 }
 
-.selectize-dropdown.multi.form-control.selectize {
+#new-complaint-wrapper .selectize-dropdown.multi.form-control.selectize {
   top: 28px !important;
   background-color: $content-bg-color;
   height: auto !important;
 }
 
+#advanced-search-wrapper .selectize-dropdown.multi.form-control.selectize {
+  background-color: $content-bg-color;
+  height: auto !important;
+  top: 8px !important;
+  width: auto;
+  max-width: 409px !important;
+}
+
 .selectize-dropdown-content {
   min-height: 28px !important;
+}
+
+#advanced-search-wrapper .selectize-input.dropdown-active::before {
+  display: none;
+}
+
+#advanced-search-wrapper .selectize-input.items.not-full.has-options.focus.input-active.dropdown-active, #advanced-search-wrapper .selectize-control.form-control.selectize.multi {
+  max-width: 409px !important;
+}
+
+#advanced-search-wrapper .selectize-dropdown.multi.form-control.selectize {
+  z-index: 5000  !important;
+}
+
+.nav-tool-content-wrapper select.form-control {
+  background-color: transparent;
+  border: 4px solid $content-bg-color;
+  outline: 1px solid darken($faint-neutral-color, 5%);
+  border-radius: 0;
+  height: 26px;
+  margin-bottom: 8px;
 }
 
 /**** Nested Complaint Table styles ****/
