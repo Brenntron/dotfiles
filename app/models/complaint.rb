@@ -229,6 +229,16 @@ class Complaint < ApplicationRecord
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
+          begin
+            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open(screenshot_filename).read
+            ces.save!
+          rescue
+            #do nothing, it was worth a try
+          end
+
         end
 
         new_entries_urls.each do |key, entry|
@@ -259,6 +269,16 @@ class Complaint < ApplicationRecord
           return_payload[key] = new_payload_item
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+
+          begin
+            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open(screenshot_filename).read
+            ces.save!
+          rescue
+            #do nothing, it was worth a try
+          end
         end
 
         conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])

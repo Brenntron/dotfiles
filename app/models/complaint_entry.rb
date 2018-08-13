@@ -1,16 +1,19 @@
 include ActionView::Helpers::DateHelper
 
 class ComplaintEntry < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
+
   belongs_to :complaint
   belongs_to :user, optional: true
+
+  has_one :complaint_entry_screenshot
   has_one :complaint_entry_preload
+
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:"COMPLETED").count}
 
-  has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
-  
   before_save :set_current_category
 
   RESOLVED = "RESOLVED"
@@ -180,6 +183,17 @@ class ComplaintEntry < ApplicationRecord
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
 
+    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+
+    begin
+      screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = open(screenshot_filename).read
+      ces.save!
+    rescue
+      #do nothing, it was worth a try
+    end
   end
 
   # Searches in a variety of ways.
@@ -378,7 +392,6 @@ class ComplaintEntry < ApplicationRecord
     relation
   end
 
-
   def hostlookup
     case
       when self.entry_type == "IP"
@@ -456,6 +469,18 @@ class ComplaintEntry < ApplicationRecord
     end
 
     prefix_history
+  end
+
+  def capture_screenshot
+    CapybaraSpider.capture(self.location_url) do |capture|
+      byebug
+      if complaint_entry_screenshot
+        complaint_entry_screenshot.destroy
+      end
+      my_screenshot = build_complaint_entry_screenshot
+      my_screenshot.screenshot = capture.read
+      my_screenshot.save!
+    end
   end
 
 end

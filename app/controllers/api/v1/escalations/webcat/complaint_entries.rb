@@ -214,7 +214,6 @@ module API
             end
 
 
-
             desc 'look up who is information from the domain given a complaint entry id'
             params do
               requires :lookup, type: String, desc: 'ComplaintEntry ids'
@@ -251,6 +250,15 @@ module API
             end
 
 
+            get ':complaint_entry_id/screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                return { image_data: '' }.to_json unless entry
+                record = entry.complaint_entry_screenshot
+                return { image_data: '' }.to_json unless record
+                return { image_data: Base64.encode64(record.screenshot) }.to_json
+              end
+            end
 
           end
         end

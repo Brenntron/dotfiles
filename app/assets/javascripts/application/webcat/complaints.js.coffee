@@ -291,6 +291,18 @@ selected_options = (categories) ->
     options = categories.split(',')
   return options
 
+$('html').on 'click', (e) ->
+  if typeof $(e.target).data('original-title') == 'undefined' and !$(e.target).parents().is('.popover.in')
+    $('[data-original-title]').popover 'hide'
+
+window.enlarge_image = (id,image)->
+  $('#screenshot_id_'+ id).popover(
+    html: true
+    trigger: 'focus'
+    content: '<img width="400" src="' + image + '">').popover 'show'
+
+
+
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
@@ -421,7 +433,9 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<div class="screenshot-thumb-wrapper"><img/></div>' +
+      '<div class="screenshot-thumb-wrapper">' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
@@ -468,7 +482,9 @@ format = (complaint_entry_row) ->
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<div class="screenshot-thumb-wrapper"><img/></div>' +
+      '<div class="screenshot-thumb-wrapper">' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
@@ -779,6 +795,22 @@ window.named_webcat_index_table = (search_name) ->
   }
   window.populate_advanced_webcat_index_table(data)
 
+
+window.load_screenshot = (img_tag, complaint_entry_id) ->
+  debugger
+  std_msg_ajax(
+    method: 'GET'
+    url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
+    data: {}
+    img_tag: img_tag
+    error_prefix: 'Error downloading screenshot.'
+    success: (response) ->
+      debugger
+      JSON.parse(response).image_data
+      image_data = JSON.parse(response).image_data
+      src = 'data:image/png;base64,' + image_data
+      this.img_tag.src = src
+  )
 
 window.triggerTooltips = () ->
   $('.nested-tooltipped').tooltipster
