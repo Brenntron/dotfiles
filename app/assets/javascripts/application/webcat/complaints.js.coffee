@@ -241,7 +241,7 @@ selected_options = (categories) ->
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
-  missing_data = '<span class="missing-data">Missing Data</span>'
+  missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
   host = ''
   url = ''
@@ -275,6 +275,13 @@ format = (complaint_entry_row) ->
     confidence = complaint_entry.confidence
   else
     confidence = missing_data
+
+  customer_description = ''
+  if complaint_entry.description
+    customer_description = complaint_entry.description
+  else
+    customer_description = missing_data
+
   certainty = ''
   if complaint_entry.certainty
     certainty = complaint_entry.certainty
@@ -416,6 +423,8 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data">' + uri + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
       '<span class="nested-complaint-data">' + tags + '</span>' +
+      '<label class="content-label-sm">Customer Description</label>' +
+      '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
@@ -424,7 +433,6 @@ format = (complaint_entry_row) ->
       '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
       '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
-
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
