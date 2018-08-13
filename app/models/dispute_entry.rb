@@ -309,7 +309,8 @@ class DisputeEntry < ApplicationRecord
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
     if research_params.present?
-      url = research_params['uri']
+      url = research_params['uri'].gsub(/\s+/, "") # Remove all white spaces
+
       # [ DisputeEntry.new(uri: research_params['url']) ]
       entries = Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
         DisputeEntry.new_from_wlbl(wlbl)
