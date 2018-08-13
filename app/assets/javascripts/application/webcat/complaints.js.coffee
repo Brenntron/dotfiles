@@ -2,7 +2,67 @@ window.removeSubdomain = (id,host) ->
   id.value = host
 
 window.cat_new_url = ()->
-  debugger
+  data = {}
+  for i in [1...6] by 1
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url:'/api/v1/escalations/webcat/complaints/cat_new_url'
+    method: 'POST'
+    headers: headers
+    data: {data: data}
+    success: (response) ->
+      std_msg_success('URLs categorized successfully.',"", reload: true)
+    error: (response) ->
+      std_msg_error(response,"", reload: false)
+  )
+
+name_servers =(server_list)->
+  i = 0
+  text = ""
+  while i < server_list.length
+    text += server_list[i] + '<br>'
+    i++
+  text
+
+format_domain_info = (info)->
+  '<div class="row"> ' +
+    '<div class="col-xs-6">'+
+      '<h4>Domain Name:</h4>'+
+        info.domain_name + '<br><br>'+
+      '<h4> Registrant: </h4>'+
+        'organization: ' + info.registrant_organization + '<br>'+
+        'country: ' + info.registrant_country + '<br>'+
+        'state/province: ' + info['registrant_state/province'] + '<br><br>'+
+      '<h4> Name Servers: </h4>'+
+          name_servers(info.name_server)+
+    '</div>' +
+    '<div class="col-xs-6">'+
+      '<h4> Dates:</h4>'+
+        'created: ' + info.creation_date + '<br><br>'+
+        'last updated: ' + info.updated_date + '<br><br>'+
+        'expiry_date: ' + info.registry_expiry_date + '<br><br>' +
+    '</div>' +
+  '</div>'
+
+window.domain_whois = (IP_Domain) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/domain_whois'
+    method: 'POST'
+    headers: headers
+    data: {'lookup': IP_Domain}
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        std_msg_success("",[format_domain_info(json)], reload: false)
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
 
 window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
@@ -11,6 +71,7 @@ window.updatePending = (id,row_id) ->
   prefix = $('#complaint_review_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
   comment = $('#complaint_pending_comment_'+id)[0].value
+  resolution_comment = $('#complaint_pending_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -18,7 +79,7 @@ window.updatePending = (id,row_id) ->
     url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
-    data: {'id': id,'prefix': prefix,'commit':status,'comment':comment }
+    data: {'id': id,'prefix': prefix,'commit':status,'comment':comment, 'resolution_comment': resolution_comment }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -30,7 +91,8 @@ window.updatePending = (id,row_id) ->
 
         temp_row.data().status = json.status
         temp_row.data().resolution = resolution
-        temp_row.data().resolution_comment = comment
+        temp_row.data().internal_comment = comment
+        temp_row.data().resolution_comment = resolution_comment
         temp_row.invalidate().draw()
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
@@ -53,13 +115,14 @@ window.updateEntryColumns = (entry_id,row_id) ->
   categories = $('#input_cat_'+entry_id).val().toString()
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
+  resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
     headers: headers
-    data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment }
+    data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -69,7 +132,8 @@ window.updateEntryColumns = (entry_id,row_id) ->
         temp_row = table.row(row_id)
         temp_row.data().status = json.status
         temp_row.data().resolution = status
-        temp_row.data().resolution_comment = comment
+        temp_row.data().internal_comment = comment
+        temp_row.data().resolution_comment = resolution_comment
         temp_row.data().category = categories
         temp_row.invalidate().draw()
         temp_row.child().remove()
@@ -220,6 +284,9 @@ format = (complaint_entry_row) ->
     category = complaint_entry.category
   else
     category = ''
+  internal_comment=''
+  if complaint_entry.internal_comment
+    internal_comment = complaint_entry.internal_comment
   resolution_comment=''
   if complaint_entry.resolution_comment
     resolution_comment = complaint_entry.resolution_comment
@@ -284,6 +351,9 @@ format = (complaint_entry_row) ->
   else
     tags = '<span class="missing-data">No tags</span>'
 
+  whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
+
+
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row">' +
@@ -321,9 +391,9 @@ format = (complaint_entry_row) ->
       '</div>' +
       '<div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment">' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input"></input>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-2">' +
       '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
@@ -350,7 +420,8 @@ format = (complaint_entry_row) ->
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/><button class="secondary">Domain</domain>' +
+      '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
+      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
 
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
@@ -367,9 +438,9 @@ format = (complaint_entry_row) ->
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
       '</div></div><div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" name="status" value="' + resolution_comment + '" placeholder="add a comment" ' + entry_status + '><br/>'  +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input"></input>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div><div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
       '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +

@@ -128,7 +128,7 @@ $ ->
     click_table_buttons complaint_table, this
 
 
-  $('#cat_new_url').selectize {
+  $('.cat_new_url').selectize {
     persist: false,
     create: false,
     maxItems: 5,

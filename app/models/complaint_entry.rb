@@ -3,7 +3,7 @@ include ActionView::Helpers::DateHelper
 class ComplaintEntry < ApplicationRecord
   belongs_to :complaint
   belongs_to :user, optional: true
-
+  has_one :complaint_entry_preload
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
@@ -96,7 +96,7 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
-  def change_category(prefix, categories_string, entry_status, comment,current_user, commit_pending)
+  def change_category(prefix, categories_string, entry_status, comment,resolution_comment, current_user, commit_pending)
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
@@ -105,7 +105,7 @@ class ComplaintEntry < ApplicationRecord
           if commit_pending == "commit"
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
+            update(status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
@@ -113,16 +113,16 @@ class ComplaintEntry < ApplicationRecord
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             current_status = "ASSIGNED"
-            update(status:current_status, resolution_comment: comment, case_assigned_at: Time.now)
+            update(status:current_status, internal_comment: comment, resolution_comment: resolution_comment, case_assigned_at: Time.now)
           end
         else
           current_status = "PENDING"
-          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
+          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, user:current_user)
         end
       else
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
-        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
+        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
@@ -166,6 +166,8 @@ class ComplaintEntry < ApplicationRecord
     new_complaint_entry.user = user
     new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
     new_complaint_entry.save
+
+    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
   end
 
   # Searches in a variety of ways.
@@ -213,7 +215,7 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
     complaint_entry_fields = %w{complaint_id subdomain domain path url_primary_category
-                        complaint_entries.resolution complaint_entries.resolution_comment complaint_entries.status uri ip_address category}
+                        complaint_entries.resolution complaint_entries.internal_comment complaint_entries.status uri ip_address category}
     complaint_entry_where = complaint_entry_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
@@ -399,22 +401,25 @@ class ComplaintEntry < ApplicationRecord
       prefix_id = result.prefix_id
     end
 
-    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
-    by_cat = {}
-    audit_history.each do |hist|
 
-      if by_cat[hist.category_id].blank?
-        by_cat[hist.category_id] = []
-      end
+    ###LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
 
-      by_cat[hist.category_id] << hist
-    end
+    #audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    #by_cat = {}
+    #audit_history.each do |hist|
 
-    data.each do |key, value|
-      data[key][:confidence] = by_cat[key].last.confidence
-      data[key][:name] = by_cat[key].last.category.descr
-      data[key][:long_description] = by_cat[key].last.category.desc_long
-    end
+    #  if by_cat[hist.category_id].blank?
+    #    by_cat[hist.category_id] = []
+    #  end
+
+    #  by_cat[hist.category_id] << hist
+    #end
+
+    #data.each do |key, value|
+    #  data[key][:confidence] = by_cat[key].last.confidence
+    #  data[key][:name] = by_cat[key].last.category.descr
+    #  data[key][:long_description] = by_cat[key].last.category.desc_long
+    #end
 
     ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
     ##in the meantime, dummy data
@@ -437,6 +442,7 @@ class ComplaintEntry < ApplicationRecord
     else
       prefix_history = []
     end
+
     prefix_history
   end
 
