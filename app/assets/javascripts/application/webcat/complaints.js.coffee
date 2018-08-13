@@ -111,6 +111,7 @@ window.updatePending = (id,row_id) ->
   , this)
 
 window.updateEntryColumns = (entry_id,row_id) ->
+  $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
   status = $('[name=resolution'+entry_id+']:checked').val()
@@ -148,6 +149,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
           items: selected_options(temp_row.data().category)
         }
     error: (response) ->
+      $("#submit_changes_#{entry_id}").prop("disabled",false)
       std_msg_error(response,"", reload: false)
   , this)
 
@@ -463,7 +465,7 @@ format = (complaint_entry_row) ->
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '<br/>' +
-      '<button class="tertiary" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+      '<button class="tertiary" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
   complaint_entry_html
 
