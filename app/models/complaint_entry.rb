@@ -171,6 +171,16 @@ class ComplaintEntry < ApplicationRecord
     new_complaint_entry.save
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+
+    begin
+      screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = open(screenshot_filename).read
+      ces.save!
+    rescue
+      #do nothing, it was worth a try
+    end
   end
 
   # Searches in a variety of ways.
