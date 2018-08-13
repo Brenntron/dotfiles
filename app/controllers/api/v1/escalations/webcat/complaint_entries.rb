@@ -233,7 +233,6 @@ module API
                     if whois[key].kind_of?(Array)
                       whois[key] << value
                     else
-                      binding.pry
                       whois[key] = [whois[key], value]
                     end
                   else
