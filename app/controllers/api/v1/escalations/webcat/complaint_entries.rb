@@ -78,6 +78,11 @@ module API
                   complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
+                  complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
+                  complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
+                  complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
+                  complaint_entry_packet[:tags] = {}
+                  complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags
 
 
                   if complaint_entry.complaint_entry_preload.present?
@@ -96,7 +101,7 @@ module API
                   fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
                   fake_ass_bullshit[77][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
                   fake_ass_bullshit[88] = {:is_active => 1, :mnemonic => "auct", :category_id => 88, :prefix_id => 12, :confidence => 2, :name => "Auctions", :long_description => "Buy stuff from cool people who yell."}
-                  fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+                  fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
 
                   complaint_entry_packet[:current_categories] = fake_ass_bullshit
 

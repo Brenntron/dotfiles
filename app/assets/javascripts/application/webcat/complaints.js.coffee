@@ -308,59 +308,147 @@ format = (complaint_entry_row) ->
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
+  if complaint_entry.current_categories?
+    categories = complaint_entry.current_categories
+    category_table = ''
+    category_row = ''
+    tooltip_table = ''
+    tooltip_all = ''
+    tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
+    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Category</th><th>Source</th></tr></thead><tbody>'
+    tooltip_table_end = '</tbody></table>'
+    tooltip_table_guts = ''
+    tooltip_wrapper_end = '</span></div>'
+    $.each categories, (key, value) ->
+      category = this
+      active =  $(this).attr("is_active")
+      if active == 1
+        confidence = this.confidence
+        mnemonic = this.mnemonic
+        name = this.name
+        cat_id = this.category_id
+        top_certainty = this.certainty[0].source_certainty
+        certainties = this.certainty
+        $(certainties).each ->
+          source_certainty = this.source_certainty
+          source_category = this.source_category
+          source_name = this.source
+          certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_category + '</td><td>' + source_name + '</td></tr>'
+          tooltip_table_guts = tooltip_table_guts + certainty_row
+
+        tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
+        tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
+        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="nested-tooltipped certainty-flag" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
+        category_table = category_table + category_row
+
+      return
+  if complaint_entry.tags.length >= 1
+    tags = ''
+    $(complaint_entry.tags).each ->
+      tag = $(this).attr("name")
+      tag_item = '<span class="tag-capsule">' + tag + '</span>'
+      tags = tags + tag_item
+  else
+    tags = '<span class="missing-data">No tags</span>'
 
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
 
 
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
-    complaint_entry_html = '<table><tr>' +
-      '<td>' + url + '<br/>' +
-      'Prefix <input id="complaint_review_prefix_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + host + '"><button onclick="removeSubdomain(complaint_review_prefix_' + complaint_entry.entry_id + ',\'' + complaint_entry.domain + '\')">remove subdomain</button>' +
-      '<td>Status:<br/>' + '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
-      '<td>Certainty:' + certainty + '<br/>Confidence:' + confidence + '</td>' +
-      '<td>Suggested Disposition<br/>' + disposition + '</td>' +
-      '<td>Category: <span class="complaint-category' + complaint_entry.entry_id + '">' + complaint_entry.category + '</span></td>' +
+    complaint_entry_html = '<table><tr><td class="no_pad"><div class="row">' +
+      '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
+      '<div class="row">' +
+      '<div class="col-xs-5 col-with-divider">' +
+      '<div class="screenshot-thumb-wrapper"><img/></div>' +
+      '<div class="complaint-entry-info">' +
+      '<label class="content-label-sm">Case ID</label>' +
+      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<label class="content-label-sm">Entry URI</label>' +
+      '<span class="nested-complaint-data">' + url + '</span>' +
+      '<label class="content-label-sm">Tags</label>' +
+      '<span class="nested-complaint-data">' + tags + '</span>' +
+      '</div></div>' +
+      '<div class="col-xs-5 col-with-divider">' +
+      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<tbody>' + category_table +
+      '</tbody></table>' +
+      '</div>' +
+      '<div class="col-xs-2">' +
+      '<label class="content-label-sm">Resolution</label><br/>' +
+      '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
+      '</div></div></div>' +
 
-      '<td>Resolution:<br/>' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
-      '<td><button onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Change </button>' + '</td>' +
-      '</tr><tr>' +
-      '<td>' + 'Comment: | <input id="complaint_pending_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + internal_comment + '" placeholder="add a comment" size="50">' + '</td>' +
-      '<td>' + 'Customer Facing Comment: | <input id="complaint_pending_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment for the customer" size="50">' + '</td>'
-  else
-    input_cat = 'input_cat_' + complaint_entry.entry_id
-    complaint_entry_html = '<table><tr>' +
-      '<td>' + uri + '<br/>' +
-      'Prefix <input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
+      '<div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
+      '<div class="row">' +
+      '<div class="col-xs-6 col-with-divider">' +
+      '<label class="content-label-sm">Edit URI</label><br/>' +
+      '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>remove subdomain</button></td>' +
-      '<td>Status<br/>' +
+      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
+      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '</div>' +
+      '<div class="col-xs-4 col-with-divider">' +
+      '<label class="content-label-sm">Internal Comment</label><br/>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
+      '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '</div>' +
+      '<div class="col-xs-2">' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
+      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
+      '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button>' +
+      '</div></div>' +
+      '</div></div></td></tr></table>'
+
+  else
+    input_cat = 'input_cat_' + complaint_entry.entry_id
+    complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
+      '<div class="row">' +
+      '<div class="col-xs-5 col-with-divider">' +
+      '<div class="screenshot-thumb-wrapper"><img/></div>' +
+      '<div class="complaint-entry-info">' +
+      '<label class="content-label-sm">Case ID</label>' +
+      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<label class="content-label-sm">Entry URI</label>' +
+      '<span class="nested-complaint-data">' + uri + '</span>' +
+      '<label class="content-label-sm">Tags</label>' +
+      '<span class="nested-complaint-data">' + tags + '</span>' +
+      '</div></div><div class="col-xs-5 col-with-divider">' +
+      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<tbody>' + category_table +
+      '</tbody></table>' +
+      '</div><div class="col-xs-2">' +
+      '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
+      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '</div></div>' +
+
+      '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
+      '<div class="row">' +
+      '<div class="col-xs-6 col-with-divider">' +
+      '<label class="content-label-sm">Edit URI</label><br/>' +
+      '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
+      '" type="text" onclick="this.select()" value="' + host +
+      '"' + entry_status + '>' +
+      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
+      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '<div class="complaint-selectize-col-wrapper">' +
+      '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
+      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
+      '</div></div><div class="col-xs-4 col-with-divider">' +
+      '<label class="content-label-sm">Internal Comment</label><br/>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
+      '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '</div><div class="col-xs-2">' +
+      '<label class="content-label-sm">Resolution</label><br/>' +
       '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
-      '</td>' +
-      '<td>Confidence<br/>' + confidence + '</td>' +
-      '<td>Suggested Disposition<br/>' + disposition + '</td>' +
-      '<td>' +
-      '<button>info</button>' +
-      '<button>lookup</button>' +
-      '<button>history</button>' +
-      '<button onclick="domain_whois(\'' + whois_lookup + '\')">domain</button>' +
-      '</td></tr>' +
-      '<tr>' +
-      '<td>Category: <fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="contacts selectize" placeholder="Enter up to 5 categories" value="">' +
-      '<td colspan="3">' +
-      'Comment: | <input id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + internal_comment + '" placeholder="add a comment" size="50" ' + entry_status + '>'  +
-      '</td>' +
-      '<td colspan="3">' +
-      'Customer Facing Comment: | <input id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" name="status" value="' + resolution_comment + '" placeholder="add a comment for the customer" size="50" ' + entry_status + '>'  +
-      '</td>' +
-      '<td><button onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Update</button>' +
-      '</td></tr></table>'
+      '<br/>' +
+      '<button class="tertiary" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+      '</div></div></div></div></div></td></tr></table>'
   complaint_entry_html
 
 
@@ -628,6 +716,15 @@ window.named_webcat_index_table = (search_name) ->
   window.populate_advanced_webcat_index_table(data)
 
 
+window.triggerTooltips = () ->
+  $('.nested-tooltipped').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
+    side: 'bottom'
+  return
+
 $ ->
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
@@ -640,4 +737,6 @@ $ ->
       $('#fetch').show()
       $('#web-cat-search').show()
       $('#new-complaint').show()
+
+
 
