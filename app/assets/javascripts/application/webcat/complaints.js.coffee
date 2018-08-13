@@ -109,10 +109,6 @@ window.domain_whois = (IP_Domain) ->
             autoOpen: true
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
-
-
-#        Add popup here, rather than success message
-#        std_msg_success("[format_domain_info(json)]",, reload: false)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -412,6 +408,18 @@ format = (complaint_entry_row) ->
   else
     tags = '<span class="missing-data">No tags</span>'
 
+  if complaint_entry.entry_history?
+    if complaint_entry.entry_history.domain_history.length >= 1
+      domain_history = complaint_entry.entry_history.domain_history
+    else
+      domain_history = '<span class="missing-data">No domain history.</span>'
+    if complaint_entry.entry_history.complaint_history.length >= 1
+      complaint_history = complaint_entry.entry_history.complaint_history
+    else
+      complaint_history = '<span class="missing-data">No complaint entry history.</span>'
+
+
+
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
 
 
@@ -439,7 +447,6 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Resolution</label><br/>' +
       '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
       '</div></div></div>' +
-
       '<div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
@@ -465,6 +472,13 @@ format = (complaint_entry_row) ->
 
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
+    history_dialog_content = '<div class="dialog-content-wrapper">' +
+      '<h5>Domain History</h5>' +
+      '<p>' + domain_history + '</p>' +
+      '<hr class="thin"/>' +
+      '<h5>Complaint Entry History</h5>' +
+      '<p>' + complaint_history + '</p>' +
+      '</div>'
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -483,10 +497,9 @@ format = (complaint_entry_row) ->
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
-
+      '<button class="secondary">Lookup</button><br/>' +
+      '<button class="secondary" onclick="history_dialog()">History</button><br/>' +
       '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
-
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -513,7 +526,23 @@ format = (complaint_entry_row) ->
       '<br/>' +
       '<button class="tertiary" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
+
+
+
   complaint_entry_html
+
+window.history_dialog = (history_dialog_content) ->
+  if $("#history_dialog").length
+    history_dialog = this
+    $("#history_dialog").html(history_dialog_content)
+  else
+    history_dialog = '<div id="history_dialog" title="History Information"></div>'
+    $('body').append(history_dialog)
+    $('#history_dialog').append(history_dialog_content)
+    $('#history_dialog').dialog
+      autoOpen: true
+      minWidth: 400
+      position: { my: "right top", at: "right top", of: window }
 
 
 window.click_table_buttons = (complaint_table, button)->
