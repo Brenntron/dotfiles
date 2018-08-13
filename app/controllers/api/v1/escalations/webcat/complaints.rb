@@ -7,6 +7,10 @@ module API
 
           resource "escalations/webcat/complaints" do
 
+            before do
+              PaperTrail.whodunnit = current_user.id if current_user.present?
+            end
+
             desc 'get all complaints'
             params do
             end
@@ -123,6 +127,21 @@ module API
               # TODO determine access control policy for mark_for_commit
               ComplaintMarkedCommit.commit_marked(user: current_user)
               true
+            end
+
+            desc 'categorize url without complaint'
+            params do
+              requires :data, type: Hash, desc: "Hash of urls and categories to create prefixes on"
+            end
+            post 'cat_new_url' do
+              params["data"].each do |item, prefix|
+                if prefix["url"].present?
+                  Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
+                                                     categories_string: prefix["cats"].join(','),
+                                                     description: '',
+                                                     user: current_user.email)
+                end
+              end
             end
           end
         end

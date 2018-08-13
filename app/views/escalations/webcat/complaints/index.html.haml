@@ -24,17 +24,21 @@
               %input#complaints_check_box{type: 'checkbox'}
             %th
             -#    icons
-            %th Case ID
-            -# Changed Complaint ID to Case ID for space saving
+            -#%th Case ID
             %th Entry ID
             %th Age
             %th Status
             %th Subdomain
             %th Domain / IP
             %th Path
-            %th Customer
+            %th Primary Cat
+            %th Suggested Cat
             %th WBRS
-            %th Category
+            %th Submitter Type
+            %th Submitter Org
+            %th Contact Name
+
+            -#%th Category
             %th Assigned To
 
   .row
@@ -45,13 +49,31 @@
   .modal-dialog{:role => "document"}
     .modal-content
       .modal-header
-        %h5#cat_new_url_modal_label.modal-title Add Categories to URL
+        %h5#cat_new_url_modal_label.modal-title Categorize URLs without a complaint
         %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
           %span{"aria-hidden" => "true"} ×
       .modal-body
-        %input{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
-        %select#cat_new_url.contacts.selectized{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
-      .modal-footer
-        %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
-        %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes
+        .form-group
+          %input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+          %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
+
+        .form-group
+          %input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+          %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
+
+        .form-group
+          %input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+          %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
+
+        .form-group
+          %input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+          %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
+
+        .form-group
+          %input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+          %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
+
+        .modal-footer
+          %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
+          %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes
 
