@@ -1,5 +1,10 @@
+window.select_or_deselect_all = (dispute_id)->
+
+
+  $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
 
 window.populate_webrep_index_table = (data = {}) ->
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webrep/disputes'
@@ -630,8 +635,6 @@ $ ->
       $(dropdown).removeClass('open')
       alert ('No rows selected')
 
-
-
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
     dropdown = $('#index-edit-entry-status-dropdown').parent()
@@ -719,7 +722,9 @@ $ ->
       }
       {
         data: 'case_number'
+
         render: (data) ->
+
           '<input type="checkbox" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
 
       }
@@ -757,7 +762,7 @@ $ ->
     ])
 
   format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox"></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
@@ -796,7 +801,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
@@ -813,7 +818,6 @@ $ ->
 
   if $('body.index-action').length
     populate_webrep_index_table()
-
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
     row = dispute_table.row(tr)
@@ -987,13 +991,6 @@ $ ->
       $(dropdown_wrapper).removeClass('open')
       alert ('No rows selected')
 
-
-
-
-
-
-
-
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
     orig_ticket =  $('#set-related-dispute-form').find('input.dispute-id')
@@ -1004,5 +1001,3 @@ $ ->
 #      submit that shit
     else
       alert('No disputes selected')
-
-    
