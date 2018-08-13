@@ -360,7 +360,9 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<div class="screenshot-thumb-wrapper"><img/></div>' +
+      '<div class="screenshot-thumb-wrapper">' +
+      '<img class="screenshot-thumb-img" onload="load_screenshot(this, ' + complaint_entry.entry_id + ');" />' +
+      '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
@@ -407,7 +409,9 @@ format = (complaint_entry_row) ->
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<div class="screenshot-thumb-wrapper"><img/></div>' +
+      '<div class="screenshot-thumb-wrapper">' +
+      '<img class="screenshot-thumb-img" onload="load_screenshot(this, ' + complaint_entry.entry_id + ');" />' +
+      '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
@@ -448,8 +452,7 @@ format = (complaint_entry_row) ->
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '<br/>' +
       '<button class="tertiary" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
-      '</div></div></div></div></div></td>' +
-      '<td><img id="screenshot_'+complaint_entry.entry_id+'" onclick: "load_screenshot(this, ' + complaint_entry.entry_id + ');" src="/favicon.ico"/></td>' +
+      '</div></div></div></div></td>' +
       '</tr></table>'
   complaint_entry_html
 
