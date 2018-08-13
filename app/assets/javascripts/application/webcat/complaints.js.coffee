@@ -723,7 +723,6 @@ window.triggerTooltips = () ->
       'tooltipster-borderless-customized'
     ]
     side: 'bottom'
-    interactive: true
   return
 
 $ ->
