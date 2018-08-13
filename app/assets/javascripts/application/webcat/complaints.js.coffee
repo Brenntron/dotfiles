@@ -99,7 +99,6 @@ window.domain_whois = (IP_Domain) ->
       else
         dialog_content = $(format_domain_info(json))
         if $("#complaint_button_dialog").length
-          debugger
           complaint_dialog = this
           $('#complaint_button_dialog').html(dialog_content[0])
         else
