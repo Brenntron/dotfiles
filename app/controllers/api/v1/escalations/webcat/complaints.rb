@@ -134,19 +134,12 @@ module API
               requires :data, type: Hash, desc: "Hash of urls and categories to create prefixes on"
             end
             post 'cat_new_url' do
-              std_api_v2 do
-                permitted_params["data"].each do |item, prefix|
-                  1/0
-                  begin
-                    if prefix["url"].present?
-                      Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
-                                                         categories_string: prefix["cats"].join(','),
-                                                         description: '',
-                                                         user: current_user.email)
-                    end
-                  rescue NoMethodError => e
-                  rescue Exception => e
-                  end
+              params["data"].each do |item, prefix|
+                if prefix["url"].present?
+                  Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
+                                                     categories_string: prefix["cats"].join(','),
+                                                     description: '',
+                                                     user: current_user.email)
                 end
               end
             end
