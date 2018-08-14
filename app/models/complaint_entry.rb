@@ -14,8 +14,6 @@ class ComplaintEntry < ApplicationRecord
   scope :new_count , -> {where(status:"NEW").count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:"COMPLETED").count}
 
-  before_save :set_current_category
-
   RESOLVED = "RESOLVED"
   NEW = "NEW"
 
@@ -176,6 +174,8 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.is_important = importance if importance
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+      new_complaint_entry.url_primary_category = new_complaint_entry.set_current_category
+      new_complaint_entry.category = new_complaint_entry.set_current_category
       new_complaint_entry.save
 
       ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
