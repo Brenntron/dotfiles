@@ -8,7 +8,7 @@
       <% else %>
           Please sign in using your Cisco credentials
       <% end %>
-      <%= form_tag('/sessions/create', method: :post, :content_type => 'application/json') do -%>
+      <%= form_tag(escalations_sessions_path, method: :post, :content_type => 'application/json') do -%>
         <div class="container">
           <label><b>Username</b></label>
           <input type="text" placeholder="Enter Username" name="uname" required>
