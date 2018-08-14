@@ -19,5 +19,6 @@
  *= require webcat_complaints
  *= require tooltipster.bundle.min
  *= require tooltipster-sideTip-borderless.min
+ *= require scaffold
 
 */
