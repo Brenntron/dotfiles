@@ -13,7 +13,7 @@
 
   .row
     .col-xs-12
-      %h4 Entry Results
+      %h4 Entry Results (#{@entries.count} found)
       #research-page-toolbar.toolbar
         %div
           %label.toolbar-section-label Table View
@@ -104,7 +104,9 @@
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
                         Submit Changes
-
+        %div
+          %label.toolbar-section-label Type to filter results
+          %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
   .row
     .col-xs-12
       %table#disputes-research-table.table.table-sm
