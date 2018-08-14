@@ -44,16 +44,6 @@ ActiveRecord::Schema.define(version: 20180812154342) do
     t.index ["task_id"], name: "index_attachments_on_task_id"
   end
 
-  create_table "attachments_exploits", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "attachment_id"
-    t.integer "exploit_id"
-  end
-
-  create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "attachment_id"
-    t.integer "rule_id"
-  end
-
   create_table "bug_blockers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "snort_blocker_bug_id"
     t.integer "snort_blocked_bug_id"
@@ -131,7 +121,6 @@ ActiveRecord::Schema.define(version: 20180812154342) do
     t.integer "bug_id", null: false
     t.integer "tag_id", null: false
     t.index ["bug_id", "tag_id"], name: "index_bugs_tags_on_bug_id_and_tag_id", unique: true
-    t.index ["bug_id"], name: "index_bugs_tags_on_bug_id"
     t.index ["tag_id"], name: "index_bugs_tags_on_tag_id"
   end
 
@@ -139,7 +128,6 @@ ActiveRecord::Schema.define(version: 20180812154342) do
     t.bigint "bug_id", null: false
     t.bigint "whiteboard_id", null: false
     t.index ["bug_id", "whiteboard_id"], name: "index_bugs_whiteboards_on_bug_id_and_whiteboard_id", unique: true
-    t.index ["bug_id"], name: "index_bugs_whiteboards_on_bug_id"
     t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
   end
 
@@ -147,6 +135,7 @@ ActiveRecord::Schema.define(version: 20180812154342) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_companies_on_name", unique: true
   end
 
   create_table "complaint_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -174,6 +163,7 @@ ActiveRecord::Schema.define(version: 20180812154342) do
     t.datetime "case_resolved_at"
     t.datetime "case_assigned_at"
     t.text "internal_comment"
+    t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
   end
 
   create_table "complaint_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -191,12 +181,14 @@ ActiveRecord::Schema.define(version: 20180812154342) do
     t.integer "complaint_entry_id"
     t.string "comment"
     t.string "category_list"
+    t.index ["user_id"], name: "index_complaint_marked_commits_on_user_id"
   end
 
   create_table "complaint_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_complaint_tags_on_name", unique: true
   end
 
   create_table "complaint_tags_complaints", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

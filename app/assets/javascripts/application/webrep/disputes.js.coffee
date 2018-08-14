@@ -4,7 +4,6 @@ window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
 
 window.populate_webrep_index_table = (data = {}) ->
-
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webrep/disputes'
@@ -818,6 +817,7 @@ $ ->
 
   if $('body.index-action').length
     populate_webrep_index_table()
+
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
     row = dispute_table.row(tr)
