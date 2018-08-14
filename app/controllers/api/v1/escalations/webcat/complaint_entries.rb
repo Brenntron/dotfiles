@@ -161,6 +161,7 @@ module API
               requires :prefix, type:String, desc: 'the url to categorize'
               requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
               requires :status, type: String, desc: 'this is the status of this complaint Entry'
+              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
               optional :comment, type: String, desc: 'resolution comment for the customer'
               optional :resolution_comment, type:String, desc: 'an internal comment'
             end
