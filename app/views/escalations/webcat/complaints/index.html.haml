@@ -75,3 +75,26 @@
           %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
           %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes
 
+/ Multiple URL Categorization Modal
+
+#multiple_url_categorization_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "cat_new_url_modal_label", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %h5#multiple_url_categorization_modal.modal-title Add Categories to Multiple URLs
+        .form-group
+          .col-xs-6.temp-spacer
+            %input.form-control#multi_url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+            %input.form-control#multi_url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+            %input.form-control#multi_url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+            %input.form-control#multi_url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+            %input.form-control#multi_url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+            %input.form-control#multi_url_6{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+            %input.form-control#multi_url_7{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+            %input.form-control#multi_url_8{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
+          .col-xs-6.temp-spacer
+            %select.form-control#multi_cat.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
+        .modal-footer
+          %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
+          %button.btn.btn-primary{:type => "button", :onclick=>"multiple_url_categorization()", "data-dismiss" => "modal"} Save changes
+          %button.btn.btn-primary{:type => "button", :onclick=>"clear_fields()"} Clear
