@@ -280,8 +280,24 @@
                           %td.left-bordered
                             %label Referenced on
                           %td
-                            -#Add dropdown with links to all cases / tickets with this entry on them
-                            12 Tickets
+                            - referenced_entries = entry.research_referenced_tickets
+                            - referenced_entries_size = referenced_entries.size
+                            - if referenced_entries_size < 1
+                              %span.missing-data
+                              Not on any other tickets
+                            - else
+                              %span.dropdown
+                                %button.show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced on', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                                  = "#{referenced_entries_size} ticket(s)"
+                                .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
+                                  %table
+                                    - referenced_entries.each do |reference|
+                                      %tr
+                                        %td
+                                          %a{href: "/escalations/webrep/disputes/#{reference.id}"}
+                                            = reference.id
+                                        %td
+                                          = reference.case_opened_at
                         %tr
                           %td.input-col
                             %span.research-table-input-wrapper.sbrs-input-wrapper
@@ -314,29 +330,24 @@
                             %label Crosslisted URLs
                           %td.text-center
                             = entry.wbrs_xlist.count
-                          %td.input-offset.left-bordered
-                            %label Umbrella
-                          %td.text-center
-                            -#Disposition on Umbrella
-                            Clean
-                          %td.left-bordered
+                          %td.input-col
+                            %span.research-table-input-wrapper.reptool-input-wrapper
+                              %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                             %label RepTool Class
-                          %td.entry-reptool-data
-                            - if entry.classifications.first.nil?
-                              %span.missing-data.entry-reptool-class Not on RepTool
-                            - else
-                              %span.inline-col-breakup.entry-reptool-class
-                                = entry.classifications.first
-                              %span.inline-col-breakup.entry-reptool-status
-                                = entry.blacklist
-                              %span.inline-col-breakup.entry-reptool-comment
-                                -# Reptool comment, add comment here
-                                Juno Spam Monitor
-                          %td.left-bordered
-                            %label Last Submitted
-                          %td
-                            -#Add dropdown with links to all cases / tickets with this entry on them
-                            2016-02-24 15:11:22
+                            %td.entry-reptool-data
+                              - if entry.classifications.first.nil?
+                                %span.missing-data.entry-reptool-class Not on RepTool
+                              - else
+                                %span.inline-col-breakup.entry-reptool-class
+                                  = entry.classifications.first
+                                %span.inline-col-breakup.entry-reptool-status
+                                  = entry.blacklist.status
+                                %span.inline-col-breakup.entry-reptool-comment
+                                  = entry.blacklist.metadata['VRT']['comment']
+                            %td.left-bordered
+                              %label Umbrella
+                            %td.text-center
+                              = entry.umbrellaresult
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}
                       .expanded-row-data-wrapper
@@ -509,6 +520,35 @@
                                         %td= cross_listed.username
                                         %td= cross_listed.mtime
                                         %td= cross_listed.ctime
+                            .entry-details-table.reptool-details-table{'data-entry-id': "#{entry.id}"}
+                              %h5.entry-details-table-header RepTool Details
+                              - if entry.blacklist.nil?
+                                %table
+                                  %thead
+                                    %tr
+                                      %th
+                                        %span.missing-data
+                                          No blacklist data
+                              - else
+                                %table
+                                  %thead
+                                    %tr
+                                      %th RepTool Class
+                                      %th Status
+                                      %th Expiration
+                                      %th Comment
+                                      %th Source
+                                      %th First Seen
+                                      %th Last Seen
+                                  %tbody
+                                    %tr
+                                      %td= entry.classifications.first
+                                      %td= entry.blacklist.status
+                                      %td= entry.blacklist.expiration
+                                      %td= entry.blacklist.metadata['VRT']['comment']
+                                      %td= entry.blacklist.primary_source
+                                      %td= entry.blacklist.first_seen
+                                      %td= entry.blacklist.last_seen
 
 = render 'escalations/webrep/disputes/rule_hit_resolution'
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}

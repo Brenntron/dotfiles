@@ -34,10 +34,6 @@ $ ->
         searchable: false
       {
         targets: [ 2 ]
-        className: 'id-col'
-      }
-      {
-        targets: [ 3 ]
         className: 'entry-id-col'
       }
     ]
@@ -54,13 +50,6 @@ $ ->
         data: null
         defaultContent: '<span></span>'
         width: '24px'
-      }
-      {
-        'render': (data, type, full, meta) ->
-          complaintID = full.complaint_id.toString()
-          '<a href="complaints/' + complaintID + '">' + complaintID + '</a>'
-        width: '45px'
-
       }
       {
         data: 'entry_id'
@@ -89,13 +78,7 @@ $ ->
 
       }
       { data: 'path' }
-      { data: 'customer_name' }
       {
-        data: 'wbrs_score'
-        width: '20px'
-      }
-      {
-        sortable: false
         'render': (data, type, full, meta) ->
           categories = ''
           category = ''
@@ -105,10 +88,24 @@ $ ->
             category = categories[0]
             if category == "Not in our list"
               category = ""
-          if categories.length > 1
-            plus = '+'
-          '<p id="cat_tooltip_' + full.entry_id + '" data-toggle="tooltip" title="' + full.category + '" onmouseover=display_tooltip(' + full.entry_id + ')>' + category + plus + '</p>'
+          category
       }
+      {
+        data: 'suggested_category'
+      }
+      {
+        data: 'wbrs_score'
+        width: '20px'
+      }
+      {
+        data: 'submitter_type'
+      }
+      {
+        data: 'company_name'
+      }
+      { data: 'customer_name' }
+
+
 
       {
         data: 'assigned_to'
@@ -122,7 +119,7 @@ $ ->
     click_table_buttons complaint_table, this
 
 
-  $('#cat_new_url').selectize {
+  $('.cat_new_url').selectize {
     persist: false,
     create: false,
     maxItems: 5,

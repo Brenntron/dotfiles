@@ -68,6 +68,7 @@ module API
 
                   complaint_entry_packet[:category] = complaint_entry.url_primary_category
                   complaint_entry_packet[:resolution]= complaint_entry.resolution
+                  complaint_entry_packet[:internal_comment] = complaint_entry.internal_comment
                   complaint_entry_packet[:resolution_comment] = complaint_entry.resolution_comment
 
                   complaint_entry_packet[:subdomain] = complaint_entry.subdomain
@@ -77,18 +78,48 @@ module API
                   complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
+                  complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
+                  complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
+                  complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
+                  complaint_entry_packet[:tags] = {}
+                  complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags
 
-                  #complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+
+                  if complaint_entry.complaint_entry_preload.present?
+                    if complaint_entry.complaint_entry_preload.current_category_information.present?
+                      complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
+                    else
+                      complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+                    end
+                  else
+                    complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+                  end
+
 
                   #fake it til they make it
                   fake_ass_bullshit = {}
                   fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
                   fake_ass_bullshit[77][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
                   fake_ass_bullshit[88] = {:is_active => 1, :mnemonic => "auct", :category_id => 88, :prefix_id => 12, :confidence => 2, :name => "Auctions", :long_description => "Buy stuff from cool people who yell."}
-                  fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+                  fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
 
                   complaint_entry_packet[:current_categories] = fake_ass_bullshit
-                  #complaint_entry_packet[:categories] = {"entertainment" => {:confidence => 1, :certainty => [{:source => 'something', :source_category => 'someting', :source_certainty => '1000'}]}, "NGO" => {:confidence => 2, :certainty => {}}}
+
+                  #each row has available to it: action, confidence, description, even_id, prefix_id, time, user, category.   "category" has its own hash
+                  #which has available to it: mnem, descr, category_id, desc_long
+
+                  complaint_entry_packet[:entry_history] = {}
+                  if complaint_entry.complaint_entry_preload.present?
+                    if complaint_entry.complaint_entry_preload.historic_category_information.present?
+                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
+                    else
+                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                    end
+                  else
+                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                  end
+
+                  complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
                 end
@@ -104,7 +135,8 @@ module API
               requires :prefix, type: String, desc: 'the url to categorize'
               requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
               requires :status, type: String, desc: 'setting the status of the entry'
-              optional :comment, type: String, desc: 'resolution comment for the customer'
+              optional :comment, type: String, desc: 'internal comment'
+              optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
             end
             post 'update'do
               begin
@@ -112,31 +144,40 @@ module API
                 entry.change_category( permitted_params['prefix'],permitted_params['categories'],
                                          permitted_params['status'],
                                          permitted_params['comment'],
+                                         permitted_params['resolution_comment'],
                                          current_user, "")
+                ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
+
               rescue Exception => e
                   return {error:e.message}.to_json
               end
               {status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
+
+
             desc 'update a high telemetry entry'
             params do
               requires :id, type:Integer, desc:'complaint entry id'
               requires :prefix, type:String, desc: 'the url to categorize'
               requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
+              requires :status, type: String, desc: 'this is the status of this complaint Entry'
+              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
               optional :comment, type: String, desc: 'resolution comment for the customer'
+              optional :resolution_comment, type:String, desc: 'an internal comment'
             end
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
                 entry.change_category( permitted_params['prefix'], permitted_params['categories'],
                                     permitted_params['status'],
-                                    permitted_params['comment'],
+                                    permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
               rescue Exception => e
                 return e.message
               end
               {status:entry.status, entry_resolution:permitted_params['commit']}.to_json
             end
+
 
             desc 'take entry'
             params do
@@ -154,6 +195,8 @@ module API
               end
               {name:current_user.display_name}.to_json
             end
+
+
             desc 'return entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
@@ -172,6 +215,51 @@ module API
             end
 
 
+            desc 'look up who is information from the domain given a complaint entry id'
+            params do
+              requires :lookup, type: String, desc: 'ComplaintEntry ids'
+            end
+            post 'domain_whois' do
+              whois = {}
+              begin
+                record = Whois.whois(params[:lookup])
+                parser = Whois::Parser.new(record)
+                parser.record.content.each_line do |line|
+                  key,value = line.split(":",2)
+                  if value&.strip == nil
+                    next
+                  end
+                  key = key.gsub(">>>","").gsub("   ","").downcase.gsub(" ","_").to_sym
+                  value = value.gsub("<<<","").gsub("   ","")&.strip
+                  if whois[key]
+                    if whois[key].kind_of?(Array)
+                      whois[key] << value
+                    else
+                      whois[key] = [whois[key], value]
+                    end
+                  else
+                    whois[key] = value
+                  end
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to determine Whois info: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+
+              whois.to_json
+            end
+
+
+            get ':complaint_entry_id/screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                return { image_data: '' }.to_json unless entry
+                record = entry.complaint_entry_screenshot
+                return { image_data: '' }.to_json unless record
+                return { image_data: Base64.encode64(record.screenshot) }.to_json
+              end
+            end
 
           end
         end

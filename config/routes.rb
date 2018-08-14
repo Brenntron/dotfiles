@@ -28,7 +28,11 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :complaint_entries
+      resources :complaint_entries do
+        collection do
+          get :serve_image
+        end
+      end
       resources :customers, only: :index
 
       get 'show_multiple', to: 'complaints#show_multiple'

@@ -128,6 +128,20 @@ class Complaint < ApplicationRecord
   end
 
 
+  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:)
+    # Look for existing prefix
+    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+    if existing_prefix.present?
+      prefix_object = Wbrs::Prefix.new
+      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+    else
+      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+    end
+  end
+
+
 
   def self.process_bridge_payload(message_payload)
 
@@ -207,8 +221,23 @@ class Complaint < ApplicationRecord
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
           new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
           new_complaint_entry.status = ComplaintEntry::NEW
+          #lets query the top url API endpoint to determine if this is an important site or not
+          # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
+          importance = Wbrs::TopUrl.check_urls([key]).first.is_important
+          new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
           new_complaint_entry.save
 
+          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+
+          begin
+            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open(screenshot_filename).read
+            ces.save!
+          rescue
+            #do nothing, it was worth a try
+          end
 
         end
 
@@ -225,6 +254,10 @@ class Complaint < ApplicationRecord
           new_complaint_entry.domain = url_parts[:domain]
           new_complaint_entry.path = url_parts[:path]
           new_complaint_entry.status = ComplaintEntry::NEW
+          #lets query the top url API endpoint to determine if this is an important site or not
+          # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
+          importance = Wbrs::TopUrl.check_urls([key]).first.is_important
+          new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
           new_complaint_entry.save
 
           new_payload_item = {}
@@ -235,6 +268,17 @@ class Complaint < ApplicationRecord
           new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, key, "URI/DOMAIN")
           return_payload[key] = new_payload_item
 
+          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+
+          begin
+            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open(screenshot_filename).read
+            ces.save!
+          rescue
+            #do nothing, it was worth a try
+          end
         end
 
         conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])

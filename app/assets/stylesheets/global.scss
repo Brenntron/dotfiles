@@ -124,7 +124,7 @@ body {
   padding-top: 26px;
 }
 .no_pad{
-  padding:0;
+  padding:0 !important;
 }
 #due_date{
   margin:-16px 0px 0px 0px !important;
@@ -4494,6 +4494,11 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $bug-section-color;
 }
 
+.nested-complaint-data-wrapper {
+  padding: 0 0 0 20px !important;
+  background-color: $bug-section-color;
+}
+
 .dispute-entry-table-wrapper::before, .nested-complaint-data-wrapper::before {
   content: '';
   position: absolute;
@@ -4505,12 +4510,16 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .nested-complaint-data-wrapper table {
-  background-color: $faint-neutral-color;
+  background-color: darken($faint-neutral-color, 5%);
   color: $type-base-color;
 }
 
 .nested-complaint-data-wrapper table td {
   border-bottom: none;
+  border-bottom: none;
+  padding: 1px 10px !important;
+  font-size: 8pt;
+  color: $type-lighter-color;
 }
 
 .nested-table-input {
@@ -5695,7 +5704,7 @@ table.dataTable tbody tr.selected {
   width: 100%;
 }
 
-.nav-tool-content-wrapper .form-control.selectize .selectize-input input {
+.nav-tool-content-wrapper .form-control.selectize .selectize-input input, #advanced-search-wrapper .form-control.selectize .selectize-input input {
   outline: none !important;
 }
 
@@ -5708,14 +5717,227 @@ table.dataTable tbody tr.selected {
   box-shadow: none;
 }
 
-.selectize-dropdown.multi.form-control.selectize {
+#new-complaint-wrapper .selectize-dropdown.multi.form-control.selectize {
   top: 28px !important;
   background-color: $content-bg-color;
   height: auto !important;
 }
 
+#advanced-search-wrapper .selectize-dropdown.multi.form-control.selectize {
+  background-color: $content-bg-color;
+  height: auto !important;
+  top: 8px !important;
+  width: auto;
+  max-width: 409px !important;
+}
+
 .selectize-dropdown-content {
   min-height: 28px !important;
+}
+
+#advanced-search-wrapper .selectize-input.dropdown-active::before {
+  display: none;
+}
+
+#advanced-search-wrapper .selectize-input.items.not-full.has-options.focus.input-active.dropdown-active, #advanced-search-wrapper .selectize-control.form-control.selectize.multi {
+  max-width: 409px !important;
+}
+
+#advanced-search-wrapper .selectize-dropdown.multi.form-control.selectize {
+  z-index: 5000  !important;
+}
+
+.nav-tool-content-wrapper select.form-control {
+  background-color: transparent;
+  border: 4px solid $content-bg-color;
+  outline: 1px solid darken($faint-neutral-color, 5%);
+  border-radius: 0;
+  height: 26px;
+  margin-bottom: 8px;
+}
+
+/**** Nested Complaint Table styles ****/
+.nested-complaint-editable-data {
+  background-color: darken($faint-accent-color, 5%)
+}
+
+.nested-complaint-data-wrapper .content-label-sm {
+  color: darken($content-label-color, 8%);
+
+}
+
+.nested-complaint-static-data, .nested-complaint-editable-data {
+  padding: 12px 15px;
+}
+
+.nested-complaint-static-data {
+  padding-left: 30px;
+}
+
+.screenshot-thumb-wrapper, .complaint-entry-info {
+  display: inline-block;
+}
+
+.screenshot-thumb-wrapper {
+  width: 100px;
+  height: 100px;
+  border: 1px solid $content-label-color;
+  background-color: $content-bg-color;
+  float: left;
+  margin-right: 12px;
+}
+
+.nested-complaint-static-data .col-with-divider {
+  border-color: darken($faint-neutral-color, 15%);
+}
+
+.nested-complaint-editable-data .col-with-divider {
+  border-color: lighten($content-bg-color, 5%);
+}
+
+.simple-nested-table th {
+  color: darken($content-label-color, 8%);
+  font-weight: 400 !important;
+  text-transform: none;
+  border-bottom: none !important;
+}
+
+.nested-complaint-data-wrapper button.secondary {
+  padding: 5px 10px;
+  margin: 0 0 6px 0;
+  text-transform: none;
+  font-weight: 300;
+  width: 100%;
+}
+
+.nested-complaint-data-wrapper button.tertiary {
+  padding: 5px 10px;
+  margin: 20px 0 6px 0;
+  text-transform: none;
+  font-weight: 300;
+}
+
+.nested-complaint-data-wrapper button.secondary.inline-button {
+  padding: 5px 10px;
+  margin: 0 0 0 8px;
+  text-transform: none;
+  font-weight: 300;
+  width: auto;
+}
+
+.case-id {
+  font-weight: 600;
+}
+
+.nested-complaint-data {
+  margin-bottom: 6px;
+  margin-top: -4px;
+  display: block;
+}
+
+.nested-complaint-editable-data .nested-table-input {
+  padding: 2px 4px;
+  min-height: 30px;
+}
+
+.complaint-selectize-col-wrapper {
+  margin-top: 12px;
+}
+
+.nested-complaint-data-wrapper .selectize-input {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 30px !important;;
+  border-radius: 1px;
+  border: 2px solid $content-bg-color;
+  outline: 1px solid #cccccc;
+  box-shadow: none;
+  font-size: 8pt;
+}
+
+.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item {
+  padding: 2px 6px;
+  margin: 2px;
+  font-size: 8pt;
+}
+
+.tag-capsule {
+  padding: 2px 4px;
+  margin: 4px 2px 0 2px;
+  background-color: $bug-section-color;
+  border-radius: 2px;
+  color: $content-bg-color;
+  display: inline-block;
+}
+
+.nested-complaint-data-wrapper a {
+  text-decoration: underline;
+}
+
+.customer-label {
+  margin-top: 14px;
+}
+
+.no_pad div.row:first-of-type {
+  margin-right: -10px !important;
+}
+
+.complaint-comment-input {
+  width: 100%;
+}
+
+.certainty-flag {
+  background-image: url(image_path('icon_asterisk.svg'));
+  background-repeat: no-repeat;
+  width: 100%;
+  background-position: right center;
+  background-size: 9px 9px;
+  display: block;
+  cursor: pointer;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized .tooltipster-box {
+  background: $table-dark-body;
+  border-radius: 4px;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized .tooltipster-content {
+  color: $content-bg-color;
+  padding: 8px;
+}
+
+.category-tooltip-table td, .category-tooltip-table th {
+  text-align: left;
+}
+
+.category-tooltip-table tr:first-child td {
+  padding-top: 6px;
+}
+.category-tooltip-table td {
+  border-bottom: none;
+  font-weight: 300 !important;
+  padding: 0 6px 0 6px;
+  font-size: 8pt;
+}
+
+.category-tooltip-table th {
+  border-bottom: 1px solid $type-lighter-color;
+  text-transform: none;
+  font-weight: 400;
+  color: darken($content-bg-color, 10%);
+  padding: 2px 6px;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-bottom .tooltipster-arrow-border {
+  border-bottom-color: $table-dark-body;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-top .tooltipster-arrow-border {
+  border-top-color: $table-dark-body;
+}
+
+#complaint_button_dialog .dialog-content-wrapper {
+  padding: 15px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

@@ -1,21 +1,20 @@
 include ActionView::Helpers::DateHelper
 
 class ComplaintEntry < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
+
   belongs_to :complaint
   belongs_to :user, optional: true
+
+  has_one :complaint_entry_screenshot
+  has_one :complaint_entry_preload
 
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:"COMPLETED").count}
 
-  has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
-
   before_save :set_current_category
-
-  def self.what_time_is_it(value)
-    distance_of_time_in_words(value)
-  end
 
   RESOLVED = "RESOLVED"
   NEW = "NEW"
@@ -24,12 +23,39 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
 
-  def location_url
-    "http://#{subdomain+'.' if subdomain.present?}#{domain}#{path}"
+
+  def self.what_time_is_it(value)
+    distance_of_time_in_words(value)
   end
 
   def self.is_ip?(ip)
     !!IPAddr.new(ip) rescue false
+  end
+
+  def self.manipulate_changeset(changeset)
+    altered_set = {}
+    changeset.each do |field, (changed_from, changed_to)|
+      if field == "user_id"
+        user_from = User.where(id: changed_from).first&.cvs_username
+        user_to = User.where(id: changed_to).first&.cvs_username
+        altered_set["cvs_username"] = [user_from, user_to]
+      end
+    end
+    altered_set.merge(changeset)
+  end
+
+  def compose_versions
+    for_view = {}
+    versions.each do |version|
+      whodunnit = {whodunnit: User.where(id: version.whodunnit).first&.cvs_username}
+      set_with_usernames = ComplaintEntry.manipulate_changeset(version.changeset)
+      for_view[version.created_at] = set_with_usernames.merge(whodunnit)
+    end
+    for_view
+  end
+
+  def location_url
+    "http://#{subdomain+'.' if subdomain.present?}#{domain}#{path}"
   end
 
   def take_complaint(current_user)
@@ -73,7 +99,7 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
-  def change_category(prefix, categories_string, entry_status, comment,current_user, commit_pending)
+  def change_category(prefix, categories_string, entry_status, comment,resolution_comment, current_user, commit_pending)
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
@@ -82,28 +108,31 @@ class ComplaintEntry < ApplicationRecord
           if commit_pending == "commit"
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
+            update(resolution:entry_status,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+            if entry_status != "INVALID"
+              commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+            end
             cat_from_wbrs = self.set_current_category
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             current_status = "ASSIGNED"
-            update(status:current_status, resolution_comment: comment, case_assigned_at: Time.now)
+            update(status:current_status, internal_comment: comment, resolution_comment: resolution_comment, case_assigned_at: Time.now)
           end
         else
           current_status = "PENDING"
-          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment,user:current_user)
+          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, user:current_user)
         end
       else
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
-        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,resolution_comment: comment, case_resolved_at: Time.now,user:current_user)
+        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
-        
+        if entry_status != "INVALID"
+          commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+        end
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
@@ -124,25 +153,47 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.create_complaint_entry(complaint, ip_url, user = nil)
-    new_complaint_entry = ComplaintEntry.new
-    new_complaint_entry.complaint_id = complaint.id
-    new_complaint_entry.status = "NEW"
+    begin
+      new_complaint_entry = ComplaintEntry.new
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.status = "NEW"
 
-    if is_ip?(ip_url)
-      new_complaint_entry.ip_address = ip_url
-      new_complaint_entry.entry_type = "IP"
+      if is_ip?(ip_url)
+        new_complaint_entry.ip_address = ip_url
+        new_complaint_entry.entry_type = "IP"
 
-    else
-      url_parts = Complaint.parse_url(ip_url)
-      new_complaint_entry.uri = ip_url
-      new_complaint_entry.entry_type = "URI/DOMAIN"
-      new_complaint_entry.subdomain = url_parts[:subdomain]
-      new_complaint_entry.domain = url_parts[:domain]
-      new_complaint_entry.path = url_parts[:path]
+      else
+        url_parts = Complaint.parse_url(ip_url)
+        new_complaint_entry.uri = ip_url
+        new_complaint_entry.entry_type = "URI/DOMAIN"
+        new_complaint_entry.subdomain = url_parts[:subdomain]
+        new_complaint_entry.domain = url_parts[:domain]
+        new_complaint_entry.path = url_parts[:path]
+      end
+      #lets query the top url API endpoint to determine if this is an important site or not
+      # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
+      importance = Wbrs::TopUrl.check_urls([ip_url]).first.is_important
+      new_complaint_entry.is_important = importance if importance
+      new_complaint_entry.user = user
+      new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+      new_complaint_entry.save
+
+      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+    rescue Exception => e
+      raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
-    new_complaint_entry.user = user
-    new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
-    new_complaint_entry.save
+
+    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+
+    begin
+      screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = open(screenshot_filename).read
+      ces.save!
+    rescue
+      #do nothing, it was worth a try
+    end
   end
 
   # Searches in a variety of ways.
@@ -190,7 +241,7 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
     complaint_entry_fields = %w{complaint_id subdomain domain path url_primary_category
-                        complaint_entries.resolution complaint_entries.resolution_comment complaint_entries.status uri ip_address category}
+                        complaint_entries.resolution complaint_entries.internal_comment complaint_entries.status uri ip_address category}
     complaint_entry_where = complaint_entry_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
@@ -341,7 +392,6 @@ class ComplaintEntry < ApplicationRecord
     relation
   end
 
-
   def hostlookup
     case
       when self.entry_type == "IP"
@@ -376,22 +426,25 @@ class ComplaintEntry < ApplicationRecord
       prefix_id = result.prefix_id
     end
 
-    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
-    by_cat = {}
-    audit_history.each do |hist|
 
-      if by_cat[hist.category_id].blank?
-        by_cat[hist.category_id] = []
-      end
+    ###LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
 
-      by_cat[hist.category_id] << hist
-    end
+    #audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    #by_cat = {}
+    #audit_history.each do |hist|
 
-    data.each do |key, value|
-      data[key][:confidence] = by_cat[key].last.confidence
-      data[key][:name] = by_cat[key].last.category.descr
-      data[key][:long_description] = by_cat[key].last.category.desc_long
-    end
+    #  if by_cat[hist.category_id].blank?
+    #    by_cat[hist.category_id] = []
+    #  end
+
+    #  by_cat[hist.category_id] << hist
+    #end
+
+    #data.each do |key, value|
+    #  data[key][:confidence] = by_cat[key].last.confidence
+    #  data[key][:name] = by_cat[key].last.category.descr
+    #  data[key][:long_description] = by_cat[key].last.category.desc_long
+    #end
 
     ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
     ##in the meantime, dummy data
@@ -409,10 +462,25 @@ class ComplaintEntry < ApplicationRecord
     if prefix_results.present?
       prefix_id = prefix_results.first.prefix_id
     end
-
-    prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    if prefix_id.present?
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    else
+      prefix_history = []
+    end
 
     prefix_history
+  end
+
+  def capture_screenshot
+    CapybaraSpider.capture(self.location_url) do |capture|
+      byebug
+      if complaint_entry_screenshot
+        complaint_entry_screenshot.destroy
+      end
+      my_screenshot = build_complaint_entry_screenshot
+      my_screenshot.screenshot = capture.read
+      my_screenshot.save!
+    end
   end
 
 end
