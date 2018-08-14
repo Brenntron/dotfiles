@@ -1,7 +1,7 @@
 !!! html
 %html
   %head
-    %title= content_for?(:title) ? '^ ' + content_for(:title) : '^ Analyst Console'
+    %title= content_for?(:title) ? '^* ' + content_for(:title) : '^* Analyst Console'
     = stylesheet_link_tag("admin_redesign", media: "all", "data-turbolinks-track" => true)
     = javascript_include_tag("admin_redesign", "data-turbolinks-track" => true)
     = csrf_meta_tags
