@@ -57,7 +57,7 @@
             <% if @user.children.any? %>
               <ul class="compact-list">
                 <% @user.children.each do |member| %>
-                <li><%= link_to member.cvs_username, user_path(member) %></li>
+                <li><%= link_to member.cvs_username, escalations_user_path(member) %></li>
                 <% end %>
               </ul>
             <% else %>
@@ -69,7 +69,7 @@
             <% if @user.siblings.any?  && @user.child? %>
                 <ul class="compact-list">
                   <% @user.siblings.each do |co| %>
-                      <li><%= link_to co.cvs_username, user_path(co) %></li>
+                      <li><%= link_to co.cvs_username, escalations_user_path(co) %></li>
                   <% end %>
                 </ul>
             <% else %>
