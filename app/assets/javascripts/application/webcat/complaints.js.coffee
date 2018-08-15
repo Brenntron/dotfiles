@@ -337,7 +337,7 @@ format = (complaint_entry_row) ->
   else if  complaint_entry.ip_address
     host = complaint_entry.ip_address
     url = host
-    uri = '<a href="http://' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + url + ')">' + complaint_entry.ip_address + '</a>'
+    uri = '<a href="http://' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A+' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
