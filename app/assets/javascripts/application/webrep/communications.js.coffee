@@ -9,7 +9,7 @@ $ ->
 
     std_msg_ajax(
       method: 'PUT'
-      url: "/api/v1/escalations/webrep/dispute_emails/#{email_id}"
+      url: "/escalations/api/v1/escalations/webrep/dispute_emails/#{email_id}"
       data: {status: 'read'}
       success_reload: false
       success: (response) ->
@@ -66,7 +66,7 @@ $ ->
 
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
         $('.reply-body')[0].innerHTML = response[0].body
@@ -121,7 +121,7 @@ $ ->
 
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
         $('.new-body')[0].innerHTML = response[0].body
@@ -201,7 +201,7 @@ $ ->
     if confirmation
       std_msg_ajax(
         method: 'DELETE'
-        url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
+        url: "/escalations/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
         data: {current_user_id: current_user_id}
         success_reload: false
         success: (response) ->
@@ -220,7 +220,7 @@ $ ->
 
     std_msg_ajax(
       method: 'PUT'
-      url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
+      url: "/escalations/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
       data: {current_user_id: current_user_id, comment: updated_comment}
       success_reload: true
       success: (response) ->
@@ -268,7 +268,7 @@ $ ->
 
     std_msg_ajax(
       method: 'POST'
-      url: "/api/v1/escalations/webrep/dispute_comments"
+      url: "/escalations/api/v1/escalations/webrep/dispute_comments"
       data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
       success_reload: true
       success: (response) ->
@@ -301,7 +301,7 @@ $ ->
     template_id = $(this).attr('template_id')
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
         $('#edit-template-name')[0].value = response[0].template_name
@@ -345,7 +345,7 @@ $ ->
 
     std_msg_ajax(
       method: 'PUT'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       data: {template_name: template_name, description: description, body: body}
       success_reload: true
       success: (response) ->
@@ -361,7 +361,7 @@ $ ->
     if confirmation
       std_msg_ajax(
         method: 'DELETE'
-        url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+        url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
         success_reload: true
         success: (response) ->
           std_msg_success('Email Template Deleted.', [], reload: true)
@@ -377,7 +377,7 @@ $ ->
 
     std_msg_ajax(
       method: 'POST'
-      url: "/api/v1/escalations/webrep/email_templates"
+      url: "/escalations/api/v1/escalations/webrep/email_templates"
       data: {template_name: template_name, description: description, body: body}
       success_reload: false
       success_reload: false

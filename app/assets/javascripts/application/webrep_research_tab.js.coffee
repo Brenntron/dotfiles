@@ -161,7 +161,7 @@ $ ->
 
       headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       $.ajax(
-        url: '/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+        url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
         method: 'GET'
         headers: headers
         data: data
@@ -235,7 +235,7 @@ $ ->
 
         headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
         $.ajax(
-          url: '/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
           method: 'GET'
           headers: headers
           data: data
@@ -464,7 +464,7 @@ $ ->
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webrep/disputes/sync_data'
+      url: '/escalations/api/v1/escalations/webrep/disputes/sync_data'
       method: 'POST'
       headers: headers
       data: data

@@ -242,7 +242,7 @@ Rails.application.routes.draw do
   end
 
 
-  mount API::Base => '/api'
+  mount API::Base => '/escalations/api'
 
   # Hack to test permissions to Admin page
   if Rails.env.test?

@@ -8,7 +8,7 @@ window.cat_new_url = ()->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url:'/api/v1/escalations/webcat/complaints/cat_new_url'
+    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
     method: 'POST'
     headers: headers
     data: {data: data}
@@ -87,7 +87,7 @@ format_domain_info = (info)->
 window.domain_whois = (IP_Domain) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/domain_whois'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
     method: 'POST'
     headers: headers
     data: {'lookup': IP_Domain}
@@ -130,7 +130,7 @@ window.updatePending = (id,row_id) ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
     data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
@@ -173,7 +173,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/update'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
     headers: headers
     data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
@@ -228,7 +228,7 @@ window.take_selected = ()->
       i++
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaint_entries/take_entry'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
       method: 'POST'
       headers: headers
       data: 'complaint_entry_ids': entry_ids
@@ -260,7 +260,7 @@ window.return_selected = ()->
       i++
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaint_entries/return_entry'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
       method: 'POST'
       headers: headers
       data: 'complaint_entry_ids': entry_ids
@@ -590,7 +590,7 @@ window.populate_webcat_index_table = (filter) ->
     self_review = $('#self_review')[0].checked
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
       method: 'GET'
       headers: headers
       success: (response) ->
@@ -626,7 +626,7 @@ window.display_preview_window = (entry) ->
     path = entry.path
   loc = "http://" + subdomain + entry.domain + path
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaints/test_url'
+    url: '/escalations/api/v1/escalations/webcat/complaints/test_url'
     method: 'GET'
     headers: headers
     data: {
@@ -729,7 +729,7 @@ window.mark_for_commit = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaints/mark_for_commit'
+    url: '/escalations/api/v1/escalations/webcat/complaints/mark_for_commit'
     method: 'POST'
     headers: headers
     data: data
@@ -741,7 +741,7 @@ window.mark_for_commit = () ->
 window.commit_marked = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaints/commit_marked'
+    url: '/escalations/api/v1/escalations/webcat/complaints/commit_marked'
     method: 'POST'
     headers: headers
     data: {}
@@ -781,7 +781,7 @@ window.advanced_webcat_index_table = () ->
 window.populate_advanced_webcat_index_table = (data = {}) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries'
     method: 'GET'
     headers: headers
     data: data
@@ -815,7 +815,7 @@ window.load_screenshot = (img_tag, complaint_entry_id) ->
   debugger
   std_msg_ajax(
     method: 'GET'
-    url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
     data: {}
     img_tag: img_tag
     error_prefix: 'Error downloading screenshot.'
