@@ -14,6 +14,22 @@ $ ->
           i++
     )
 
+  $('#advanced-search-button').on 'click', ->
+    console.log("happier")
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/customers'
+    method: 'GET'
+    dataType: 'json'
+    headers: headers
+    success: (response) ->
+      $('#customerList').empty()
+      i = 0
+      while i < response.data.length
+        $('#customerList').append '<option value=\'' + response.data[i] + '\'></option>'
+        i++
+  )
+
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
     $('#loader-modal').modal({
