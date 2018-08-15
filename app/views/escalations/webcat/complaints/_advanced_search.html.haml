@@ -35,14 +35,17 @@
   .form-group.search-item.hidden
     %label.content-label-sm Customer Name
     %input.form-control#name-input{name: 'customer-name', list: 'customerList'}
+    %datalist#customerList
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Customer Email
-    %input.form-control#email-input{name: 'customer-email'}
+    %input.form-control#email-input{name: 'customer-email', list: 'customerEmailList'}
+    %datalist#customerEmailList
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Company
-    %input.form-control#company-input{name: 'company'}
+    %input.form-control#company-input{name: 'company', list: 'customerCompanyList'}
+    %datalist#customerCompanyList
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Description
