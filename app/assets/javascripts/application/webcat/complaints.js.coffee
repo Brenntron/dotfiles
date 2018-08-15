@@ -812,7 +812,6 @@ window.named_webcat_index_table = (search_name) ->
 
 
 window.load_screenshot = (img_tag, complaint_entry_id) ->
-  debugger
   std_msg_ajax(
     method: 'GET'
     url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
@@ -820,7 +819,6 @@ window.load_screenshot = (img_tag, complaint_entry_id) ->
     img_tag: img_tag
     error_prefix: 'Error downloading screenshot.'
     success: (response) ->
-      debugger
       JSON.parse(response).image_data
       image_data = JSON.parse(response).image_data
       src = 'data:image/png;base64,' + image_data
