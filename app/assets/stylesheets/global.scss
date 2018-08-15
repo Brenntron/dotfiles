@@ -3260,7 +3260,7 @@ fieldset.top-content {
   font-size: 9pt !important;
   line-height: 1.4;
   color: $type-lighter-color;
-}
+  }
 
 .email-reply-body {
   min-height: 300px;
@@ -5169,7 +5169,7 @@ table.dispute_tool_current tr:last-of-type td {
   padding-bottom: 10px;
 }
 
-/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
   width: 20px;
@@ -5951,4 +5951,3 @@ h2 {
   margin-bottom: 6px;
   color: #333;
 }
-

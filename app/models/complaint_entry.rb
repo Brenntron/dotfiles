@@ -209,16 +209,16 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
-    when 'advanced'
-      advanced_search(params, search_name: search_name, user: user)
-    when 'named'
-      named_search(search_name, user: user)
-    when 'filter'
-      filter_search(params, user: user)
-    when 'contains'
-      contains_search(params[:search])
-    else
-      where({})
+      when 'advanced'
+        advanced_search(params, search_name: search_name, user: user)
+      when 'named'
+        named_search(search_name, user: user)
+      when 'filter'
+        filter_search(params, user: user)
+      when 'contains'
+        contains_search(params[:search])
+      else
+        where({})
     end
   end
 
@@ -256,16 +256,16 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.filter_search(params, user)
     case params[:filter_by]
-    when "NEW"
-      where(status:"NEW")
-    when "COMPLETED"
-      where(status:"COMPLETED")
-    when "ACTIVE"
-      where.not(status:"COMPLETED").where.not(status:"NEW")
-    when "REVIEW"
-      params[:self_review]? where(is_important:true) : where(is_important:true).where.not(user:user)
-    else
-      all
+      when "NEW"
+        where(status:"NEW")
+      when "COMPLETED"
+        where(status:"COMPLETED")
+      when "ACTIVE"
+        where.not(status:"COMPLETED").where.not(status:"NEW")
+      when "REVIEW"
+        params[:self_review]? where(is_important:true) : where(is_important:true).where.not(user:user)
+      else
+        all
     end
   end
 
@@ -295,7 +295,7 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-
+    
     relation = where({})
 
     if params['submitted_newer'].present?
@@ -394,12 +394,12 @@ class ComplaintEntry < ApplicationRecord
 
   def hostlookup
     case
-    when self.entry_type == "IP"
-      self.ip_address
-    when self.entry_type == "URI/DOMAIN"
-      self.uri
-    else
-      self.uri.blank? ? self.ip_address : self.uri
+      when self.entry_type == "IP"
+        self.ip_address
+      when self.entry_type == "URI/DOMAIN"
+        self.uri
+      else
+        self.uri.blank? ? self.ip_address : self.uri
     end
   end
 
@@ -484,4 +484,3 @@ class ComplaintEntry < ApplicationRecord
   end
 
 end
-
