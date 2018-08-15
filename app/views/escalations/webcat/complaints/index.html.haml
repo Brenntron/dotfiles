@@ -45,35 +45,45 @@
     %img#screenshot{src: '/favicon.ico', onclick: 'load_screenshot(this, 9);'}
 
 / Modal
-#cat_new_url_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "cat_new_url_modal_label", :role => "dialog", :tabindex => "-1"}
+#cat_new_url_modal.form-modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "cat_new_url_modal_label", :role => "dialog", :tabindex => "-1"}
   .modal-dialog{:role => "document"}
     .modal-content
       .modal-header
-        %h5#cat_new_url_modal_label.modal-title Categorize URLs without a complaint
+        %h3#cat_new_url_modal_label.modal-title Categorize URLs without a complaint
         %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
-          %span{"aria-hidden" => "true"} ×
+          %span{"aria-hidden" => "true"}
       .modal-body
         .form-group
-          %input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
-          %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
-
+          %label.content-label-sm URL
+          %input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
+          %label.content-label-sm Categories
+          %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: '2'}
+        %hr.thin.condensed
         .form-group
-          %input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
-          %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
-
+          %label.content-label-sm URL
+          %input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3'}/
+          %label.content-label-sm Categories
+          %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4"}
+        %hr.thin.condensed
         .form-group
-          %input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
-          %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
-
+          %label.content-label-sm URL
+          %input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5'}/
+          %label.content-label-sm Categories
+          %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6"}
+        %hr.thin.condensed
         .form-group
-          %input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
-          %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
-
+          %label.content-label-sm URL
+          %input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7'}/
+          %label.content-label-sm Categories
+          %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8"}
+        %hr.thin.condensed
         .form-group
-          %input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}/
-          %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "-1"}
-
+          %label.content-label-sm URL
+          %input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
+          %label.content-label-sm Categories
+          %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
         .modal-footer
-          %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
-          %button.btn.btn-primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal"} Save changes
+          .form-group.text-center
+            %button.primary{:type => "button", :onclick=>"cat_new_url()", "data-dismiss" => "modal", tabindex: '11'} Categorize URLs
+            %button.secondary{"data-dismiss" => "modal", :type => "button", tabindex: '12'} Close
 
