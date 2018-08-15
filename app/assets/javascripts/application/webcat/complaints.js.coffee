@@ -849,5 +849,7 @@ $ ->
       $('#web-cat-search').show()
       $('#new-complaint').show()
 
-
+  $('#cat_new_url_modal').on 'shown.bs.modal', ->
+    $('#url_1').focus()
+    return
 

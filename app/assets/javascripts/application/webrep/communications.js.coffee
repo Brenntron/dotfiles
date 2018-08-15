@@ -152,6 +152,7 @@ $ ->
     form_data.append('dispute_id', $('input[name="dispute_id"]').val())
     form_data.append('to', $('.new-receiver').val())
     form_data.append('subject', $('.new-subject').val())
+    form_data.append('cc', $('.cc-email').val())
 
     if $('form')[0].checkValidity() == true
       e.preventDefault()
