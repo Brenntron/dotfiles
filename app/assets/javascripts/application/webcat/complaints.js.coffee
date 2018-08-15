@@ -550,12 +550,11 @@ window.history_dialog = (id) ->
         history_dialog_content += '<hr class="thin"/>'
         history_dialog_content += '<h5>Complaint Entry History</h5>'
         entry_string = ""
-        debugger
-        for key, entry in json.entry_history.complaint_history
+        for key, entry of json.entry_history.complaint_history
 
           entry_string = "" +
           '<p>Time: ' + key + '</p>'
-          for change_key, change_entry in entry
+          for change_key, change_entry of entry
             if change_key != "whodunnit"
               entry_string += "<p>" + change_key + ": " + change_entry[0] + " - " + change_entry[1] + "</p>"
             else
