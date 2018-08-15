@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :escalations, except: [:destroy, :edit] do
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
-    
+
     # TODO These may be reimplemented in the research passenger instance, and then removed from here
     root 'bugs#index'
     resources :escalation_bugs, controller: 'bugs'
