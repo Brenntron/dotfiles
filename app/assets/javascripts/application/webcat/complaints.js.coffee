@@ -594,6 +594,9 @@ window.click_table_buttons = (complaint_table, button)->
             $(button).hide()
 
 window.populate_webcat_index_table = (filter) ->
+  if !filter
+    filter = "NEW"
+
   if $('body.index-action').length
     self_review = $('#self_review')[0].checked
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
