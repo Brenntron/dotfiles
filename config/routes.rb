@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations, except: [:destroy, :edit] do
+    resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
     root 'bugs#index'
     resources :escalation_bugs, controller: 'bugs'
     resources :bugs do
