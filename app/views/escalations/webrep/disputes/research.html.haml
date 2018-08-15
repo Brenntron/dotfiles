@@ -15,8 +15,7 @@
     .col-xs-12
       %h4
         Entry Search Results for
-        %span.searched-for-url search.com
-        -#  Add search term here
+        %span.searched-for-url #{params['search']['uri']}
         (#{@entries.count} found)
       #research-page-toolbar.toolbar
         %div
