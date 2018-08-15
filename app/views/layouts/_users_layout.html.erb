@@ -42,7 +42,7 @@
       </div>
       <div class="col-xs-8 actions-bar form-inline">
         <p>
-          <%= form_for :user, url: results_users_path, method: :get do |form| %>
+          <%= form_for :user, url: results_escalations_users_path, method: :get do |form| %>
             <%= form.fields_for :search do |search_fields| %>
               <%= search_fields.text_field :name, class: 'form-control input-sm', placeholder: 'search users' %>
             <% end %>

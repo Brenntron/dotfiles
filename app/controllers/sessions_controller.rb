@@ -74,7 +74,7 @@ class SessionsController < ApplicationController
       when can?(:read, ResearchBug)
         bugs_path
       else
-        users_path
+        escalations_users_path
     end
   end
 end
