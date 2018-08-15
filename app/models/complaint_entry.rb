@@ -1,18 +1,17 @@
 include ActionView::Helpers::DateHelper
 
 class ComplaintEntry < ApplicationRecord
-  has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
-
   belongs_to :complaint
   belongs_to :user, optional: true
-
-  has_one :complaint_entry_screenshot
   has_one :complaint_entry_preload
-
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:"COMPLETED").count}
+
+  has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
+  
+  before_save :set_current_category
 
   RESOLVED = "RESOLVED"
   NEW = "NEW"
@@ -106,12 +105,10 @@ class ComplaintEntry < ApplicationRecord
           if commit_pending == "commit"
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(resolution:entry_status,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
+            update(status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if entry_status != "INVALID"
-              commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
-            end
+            commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
             cat_from_wbrs = self.set_current_category
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
@@ -128,9 +125,8 @@ class ComplaintEntry < ApplicationRecord
         update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if entry_status != "INVALID"
-          commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
-        end
+        commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+        
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
@@ -151,49 +147,27 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.create_complaint_entry(complaint, ip_url, user = nil)
-    begin
-      new_complaint_entry = ComplaintEntry.new
-      new_complaint_entry.complaint_id = complaint.id
-      new_complaint_entry.status = "NEW"
+    new_complaint_entry = ComplaintEntry.new
+    new_complaint_entry.complaint_id = complaint.id
+    new_complaint_entry.status = "NEW"
 
-      if is_ip?(ip_url)
-        new_complaint_entry.ip_address = ip_url
-        new_complaint_entry.entry_type = "IP"
+    if is_ip?(ip_url)
+      new_complaint_entry.ip_address = ip_url
+      new_complaint_entry.entry_type = "IP"
 
-      else
-        url_parts = Complaint.parse_url(ip_url)
-        new_complaint_entry.uri = ip_url
-        new_complaint_entry.entry_type = "URI/DOMAIN"
-        new_complaint_entry.subdomain = url_parts[:subdomain]
-        new_complaint_entry.domain = url_parts[:domain]
-        new_complaint_entry.path = url_parts[:path]
-      end
-      #lets query the top url API endpoint to determine if this is an important site or not
-      # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
-      importance = Wbrs::TopUrl.check_urls([ip_url]).first.is_important
-      new_complaint_entry.is_important = importance if importance
-      new_complaint_entry.user = user
-      new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
-      new_complaint_entry.url_primary_category = new_complaint_entry.set_current_category
-      new_complaint_entry.category = new_complaint_entry.set_current_category
-      new_complaint_entry.save
-
-      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    rescue Exception => e
-      raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
+    else
+      url_parts = Complaint.parse_url(ip_url)
+      new_complaint_entry.uri = ip_url
+      new_complaint_entry.entry_type = "URI/DOMAIN"
+      new_complaint_entry.subdomain = url_parts[:subdomain]
+      new_complaint_entry.domain = url_parts[:domain]
+      new_complaint_entry.path = url_parts[:path]
     end
+    new_complaint_entry.user = user
+    new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+    new_complaint_entry.save
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-
-    begin
-      screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
-      ces = ComplaintEntryScreenshot.new
-      ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = open(screenshot_filename).read
-      ces.save!
-    rescue
-      #do nothing, it was worth a try
-    end
   end
 
   # Searches in a variety of ways.
@@ -264,6 +238,15 @@ class ComplaintEntry < ApplicationRecord
         where.not(status:"COMPLETED").where.not(status:"NEW")
       when "REVIEW"
         params[:self_review]? where(is_important:true) : where(is_important:true).where.not(user:user)
+      when "MY COMPLAINTS"
+        where(user_id: user[:user].id)
+      when "MY OPEN COMPLAINTS"
+        where(user_id: user[:user].id, status: "ACTIVE")
+      when "MY CLOSED COMPLAINTS"
+        where(user_id: user[:user].id, status:"COMPLETED")
+      when "ALL"
+        all
+      # You can change default filter here
       else
         all
     end
@@ -392,6 +375,7 @@ class ComplaintEntry < ApplicationRecord
     relation
   end
 
+
   def hostlookup
     case
       when self.entry_type == "IP"
@@ -469,18 +453,6 @@ class ComplaintEntry < ApplicationRecord
     end
 
     prefix_history
-  end
-
-  def capture_screenshot
-    CapybaraSpider.capture(self.location_url) do |capture|
-      byebug
-      if complaint_entry_screenshot
-        complaint_entry_screenshot.destroy
-      end
-      my_screenshot = build_complaint_entry_screenshot
-      my_screenshot.screenshot = capture.read
-      my_screenshot.save!
-    end
   end
 
 end
