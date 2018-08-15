@@ -96,6 +96,18 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    namespace :peake_bridge do
+      resources :channels, only: [] do
+        collection do
+          get 'poll-from-bridge/messages', to: 'messages#get_messages'
+          post 'fp-event/messages', to: 'messages#messages_from_bridge'
+          post 'fp-create/messages', to: 'messages#fp_create'
+          post 'ticket-event/messages', to: 'messages#messages_from_bridge'
+        end
+        resources :messages, only: [:create]
+      end
+    end
   end #namespace :escalations
 
   namespace :admin do
