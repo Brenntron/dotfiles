@@ -535,20 +535,41 @@ window.history_dialog = (id) ->
         alert(json.error)
       else
         #parse this json properly
-        history_dialog_content = '<div class="dialog-content-wrapper">' +
-          '<h5>Domain History</h5>' +
-          '<p>' + json.entry_history.domain_history[0] + '</p>' +
-          '<hr class="thin"/>' +
-          '<h5>Complaint Entry History</h5>' +
-          '<p>' + json.entry_history.complaint_history + '</p>' +
-          '</div>'
+        history_dialog_content = '<div class="dialog-content-wrapper">' + '<h5>Domain History</h5>'
+
+        for entry in json.entry_history.domain_history
+          entry_string = "" +
+          '<p>Action: ' + entry['action'] + '</p>' +
+          '<p>Confidence: ' + entry['confidence'] + '</p>' +
+          '<p>Description: ' + entry['description'] + '</p>' +
+          '<p>Time: ' + entry['time'] + '</p>' +
+          '<p>User: ' + entry['user'] + '</p>' +
+          '<p>Category: ' + entry['category']['descr'] + '</p>' +
+          '<br />'
+          history_dialog_content += entry_string
+        history_dialog_content += '<hr class="thin"/>'
+        history_dialog_content += '<h5>Complaint Entry History</h5>'
+        entry_string = ""
+        debugger
+        for key, entry in json.entry_history.complaint_history
+
+          entry_string = "" +
+          '<p>Time: ' + key + '</p>'
+          for change_key, change_entry in entry
+            if change_key != "whodunnit"
+              entry_string += "<p>" + change_key + ": " + change_entry[0] + " - " + change_entry[1] + "</p>"
+            else
+              entry_string += "<p>User: " + change_entry + "</p>"
+          history_dialog_content += entry_string
+
         if $("#history_dialog").length
           history_dialog = this
           $("#history_dialog").html(history_dialog_content)
         else
           history_dialog = '<div id="history_dialog" title="History Information"></div>'
           $('body').append(history_dialog)
-          $('#history_dialog').append(history_dialog_content)
+          $("#history_dialog").html(history_dialog_content)
+          #$('#history_dialog').append(history_dialog_content)
           $('#history_dialog').dialog
             autoOpen: true
             minWidth: 400
