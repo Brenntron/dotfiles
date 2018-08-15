@@ -457,7 +457,7 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
       '<span class="nested-complaint-data">' + url + '</span>' +
-      '<label class="content-label-sm">Search Site</label>' +
+      '<label class="content-label-sm">Site Search</label>' +
       '<span class="nested-complaint-data">' + search_uri + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
       '<span class="nested-complaint-data">' + tags + '</span>' +
@@ -511,7 +511,7 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
       '<span class="nested-complaint-data">' + uri + '</span>' +
-      '<label class="content-label-sm">Search Site</label>' +
+      '<label class="content-label-sm">Site Search</label>' +
       '<span class="nested-complaint-data">' + search_uri + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
       '<span class="nested-complaint-data">' + tags + '</span>' +
