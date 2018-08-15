@@ -1674,7 +1674,7 @@ a.static-nav-item {
   color: $sidebar-nav-base;
   text-decoration: none;
   text-transform: uppercase;
-  width: 100%;
+  width: 120%;
   height: 100%;
   display: block;
 }
@@ -1781,7 +1781,8 @@ a.static-nav-item {
   border-radius: 4px;
   padding: 10px;
   margin-left: 25%;
-  padding-bottom: 0
+  padding-bottom: 0;
+  width: 300px;
 }
 
 .nav-tools-dropdown::before {

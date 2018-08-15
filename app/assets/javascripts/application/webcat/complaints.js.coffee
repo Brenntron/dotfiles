@@ -24,15 +24,6 @@ window.multiple_url_categorization = ()->
     data[i] = {url: $("#multi_url_#{i}").val(), cats: $("#multi_cat").val()}
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  #  std_msg_ajax(
-  #    url: '/api/v1/escalations/webcat/complaints/cat_new_url'
-  #    method: 'POST'
-  #    data: data
-  #    success_reload: true
-  #    error_prefix: 'Error Updating Status'
-  #    failure_reload: true
-  #  )
-
   $.ajax(
     url:'/api/v1/escalations/webcat/complaints/cat_new_url'
     method: 'POST'

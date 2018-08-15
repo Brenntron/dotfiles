@@ -36,15 +36,18 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        -# add this in later
-        -#%li
-        -#  %a{onclick: 'standard_webrep_index_table("my_open");'}
-        -#    %span.nav-dropdown-icon.icon-my-open-bugs
-        -#    My Open Tickets
         %li
-          %a{onclick: 'filterByStatus("ALL");'}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            All
+          %a{onclick: 'filterByStatus("MY COMPLAINTS");'}
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Complaints
+        %li
+          %a{onclick: 'filterByStatus("MY OPEN COMPLAINTS");'}
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Open Complaints
+        %li
+          %a{onclick: 'filterByStatus("MY CLOSED COMPLAINTS");'}
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Closed Complaints
         %li
           %a{onclick: 'filterByStatus("COMPLETED");'}
             %span.nav-dropdown-icon.icon-my-bugs
@@ -61,6 +64,10 @@
           %a{onclick: "filterByStatus('REVIEW')"}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Review
+        %li
+          %a{onclick: 'filterByStatus("ALL");'}
+            %span.nav-dropdown-icon.icon-recently-viewed
+            All
 
       #saved-searches-wrapper.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header

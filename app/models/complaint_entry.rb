@@ -256,6 +256,12 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.filter_search(params, user)
     case params[:filter_by]
+      when "MY COMPLAINTS"
+        where(status:"TEST")
+      when "MY OPEN COMPLAINTS"
+        where(status:"OPEN")
+      when "MY CLOSED COMPLAINTS"
+        where(status:"CLOSED")
       when "NEW"
         where(status:"NEW")
       when "COMPLETED"
