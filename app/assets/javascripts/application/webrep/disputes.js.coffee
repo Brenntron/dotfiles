@@ -800,7 +800,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
