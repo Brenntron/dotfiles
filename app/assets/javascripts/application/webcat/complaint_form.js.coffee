@@ -15,28 +15,27 @@ $ ->
     )
 
   $('#advanced-search-button').on 'click', ->
-    console.log("happier")
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/api/v1/escalations/webcat/customers_names'
-    method: 'GET'
-    dataType: 'json'
-    headers: headers
-    success: (response) ->
-      $('#customerList').empty()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/api/v1/escalations/webcat/customers_names'
+      method: 'GET'
+      dataType: 'json'
+      headers: headers
+      success: (response) ->
+        $('#customerList').empty()
 
-      uniques = []
+        uniques = []
 
-      i = 0
-      while i < response.data.length
-        if uniques.indexOf(response.data[i]) == -1
-          uniques.push(response.data[i])
-        i++
+        i = 0
+        while i < response.data.length
+          if uniques.indexOf(response.data[i]) == -1
+            uniques.push(response.data[i])
+          i++
 
-      j = 0
-      while j < uniques.length
-        $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
-        j++
+        j = 0
+        while j < uniques.length
+          $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
+          j++
 
   )
 
@@ -60,10 +59,6 @@ $ ->
       while j < uniques.length
         $('#customerCompanyList').append '<option value=\'' + uniques[j] + '\'></option>'
         j++
-
-#      while i < response.data.length
-#        $('#customerCompanyList').append '<option value=\'' + response.data[i] + '\'></option>'
-#        i++
   )
 
   $.ajax(
@@ -86,11 +81,6 @@ $ ->
       while j < uniques.length
         $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
         j++
-
-
-#      while i < response.data.length
-#        $('#customerEmailList').append '<option value=\'' + response.data[i] + '\'></option>'
-#        i++
   )
 
   $('#new-complaint-form').submit (e) ->
