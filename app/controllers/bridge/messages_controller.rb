@@ -48,7 +48,6 @@ class Bridge::MessagesController < ApplicationController
 
   # Message to recieve notification from subversion when a rules file has been committed.
   def rule_file_notify
-    byebug
     filenames = message_params.fetch(:filenames, [])
     if filenames
       Thread.new do
