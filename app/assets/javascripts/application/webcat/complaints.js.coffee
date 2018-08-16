@@ -19,7 +19,7 @@ window.cat_new_url = ()->
     data: {data: data}
     success: (response) ->
       $('#loader-modal').hide()
-      std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending compliant entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+      std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
     error: (response) ->
       $('#loader-modal').hide()
       $('.modal-backdrop').remove();

@@ -16,6 +16,7 @@ class ComplaintEntry < ApplicationRecord
 
   RESOLVED = "RESOLVED"
   NEW = "NEW"
+  PENDING = "PENDING"
 
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
@@ -150,7 +151,7 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def self.create_complaint_entry(complaint, ip_url, user = nil, status = 'NEW', categories = nil)
+  def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
     begin
       new_complaint_entry = ComplaintEntry.new
       new_complaint_entry.complaint_id = complaint.id
@@ -175,7 +176,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
 
-      if status == 'PENDING' # occurs when attempt to categorized a Top URl without a complaint
+      if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
         new_complaint_entry.url_primary_category = categories
         new_complaint_entry.category = categories
       else

@@ -133,7 +133,7 @@ class Complaint < ApplicationRecord
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_session, ip_or_uri, description, nil, nil, 'PENDING', categories_string)
+      Complaint.create_action(bugzilla_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
@@ -313,7 +313,7 @@ class Complaint < ApplicationRecord
     end
   end
 
-  def self.create_action(bugzilla_session, ips_urls, description, customer, tags, status="NEW", categories = nil)
+  def self.create_action(bugzilla_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
     user = User.where(cvs_username:"vrtincom").first
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
