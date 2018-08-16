@@ -148,6 +148,9 @@ module API
                                          current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
 
+                message = Bridge::ComplaintUpdateStatusEvent.new
+                message.post_complaint(entry.complaint)
+
               rescue Exception => e
                   return {error:e.message}.to_json
               end
