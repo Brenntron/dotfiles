@@ -41,7 +41,7 @@
           = rpt_form.input :date_from, as: :string, input_html: {type: :date}
           = rpt_form.input :date_to, as: :string, input_html: {type: :date}
           = rpt_form.input :period, collection: ['Daily', 'Weekly', 'Monthly'], selected: 'Daily'
-          = rpt_form.submit 'Create Report', class: 'button_primary create-report'
+          = rpt_form.submit 'Create Report', class: 'button_primary create-report', data: { disable_with: false }
       .report-display-wrapper
 
     - if current_user&.has_role?('big_email_honcho')
