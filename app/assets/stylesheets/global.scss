@@ -5816,8 +5816,8 @@ table.dataTable tbody tr.selected {
 }
 
 .screenshot-thumb-wrapper {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  height: 100%;
   border: 1px solid $content-label-color;
   background-color: $content-bg-color;
   float: left;
