@@ -37,6 +37,7 @@ $ ->
           $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
           j++
 
+
     )
 
     $.ajax(
@@ -81,6 +82,7 @@ $ ->
         while j < uniques.length
           $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
           j++
+
     )
 
   $('#new-complaint-form').submit (e) ->
