@@ -27,23 +27,61 @@ name_servers =(server_list)->
   text
 
 format_domain_info = (info)->
-  '<div class="row"> ' +
-    '<div class="col-xs-6">'+
-      '<h4>Domain Name:</h4>'+
-        info.domain_name + '<br><br>'+
-      '<h4> Registrant: </h4>'+
-        'organization: ' + info.registrant_organization + '<br>'+
-        'country: ' + info.registrant_country + '<br>'+
-        'state/province: ' + info['registrant_state/province'] + '<br><br>'+
-      '<h4> Name Servers: </h4>'+
-          name_servers(info.name_server)+
-    '</div>' +
-    '<div class="col-xs-6">'+
-      '<h4> Dates:</h4>'+
-        'created: ' + info.creation_date + '<br><br>'+
-        'last updated: ' + info.updated_date + '<br><br>'+
-        'expiry_date: ' + info.registry_expiry_date + '<br><br>' +
-    '</div>' +
+  '<div class="dialog-content-wrapper">' +
+    '<h5>Domain Name</h5>' +
+    '<p>' + info.domain_name + '</p>' +
+    '<hr class="thin">' +
+    '<h5>Registrant </h5>' +
+    '<table class="nested-dialog-table">' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+           'Organization' +
+        '</td>' +
+        '<td>' +
+          info.registrant_organization +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Country' +
+        '</td>' +
+        '<td>' +
+          info.registrant_country +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+        'State/Province' +
+        '</td>' +
+        '<td>' +
+          info['registrant_state/province'] +
+        '</td>' +
+      '</tr>' +
+    '</table>' +
+    '<hr class="thin">' +
+    '<h5>Name Servers</h5>'+
+    name_servers(info.name_server) +
+    '<hr class="thin">' +
+    '<h5> Dates</h5>'+
+    '<table class="nested-dialog-table">' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+          'Created' +
+        '</td>' +
+        '<td>' + info.creation_date + '</td>'+
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Last updated' +
+        '</td>' +
+        '<td>' +
+          info.updated_date +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Expiry_date' +
+        '</td>' +
+        '<td>' +
+          info.registry_expiry_date +
+        '</td>' +
+      '</tr>' +
+    '</table>' +
   '</div>'
 
 window.domain_whois = (IP_Domain) ->
@@ -59,7 +97,22 @@ window.domain_whois = (IP_Domain) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        std_msg_success("",[format_domain_info(json)], reload: false)
+        dialog_content = $(format_domain_info(json))
+        if $("#complaint_button_dialog").length
+          complaint_dialog = this
+          $('#complaint_button_dialog').html(dialog_content[0])
+        else
+          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
+          $('body').append(complaint_dialog)
+          $('#complaint_button_dialog').append(dialog_content[0])
+          $('#complaint_button_dialog').dialog
+            autoOpen: true
+            minWidth: 400
+            position: { my: "right bottom", at: "right bottom", of: window }
+
+
+#        Add popup here, rather than success message
+#        std_msg_success("[format_domain_info(json)]",, reload: false)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -68,18 +121,19 @@ window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
 
 window.updatePending = (id,row_id) ->
-  prefix = $('#complaint_review_prefix_'+id)[0].value
+  prefix = $('#complaint_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
-  comment = $('#complaint_pending_comment_'+id)[0].value
-  resolution_comment = $('#complaint_pending_resolution_comment_'+id)[0].value
+  comment = $('#complaint_comment_'+id)[0].value
+  resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
+  categories = $('#input_cat_'+id).val().toString()
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
-    data: {'id': id,'prefix': prefix,'commit':status,'comment':comment, 'resolution_comment': resolution_comment }
+    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -111,13 +165,13 @@ window.updatePending = (id,row_id) ->
   , this)
 
 window.updateEntryColumns = (entry_id,row_id) ->
+  $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
   $.ajax(
     url: '/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
@@ -148,7 +202,18 @@ window.updateEntryColumns = (entry_id,row_id) ->
           options: AC.WebCat.createSelectOptions()
           items: selected_options(temp_row.data().category)
         }
+        $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5
+          valueField: 'value'
+          labelField: 'value'
+          searchField: 'text'
+          options: AC.WebCat.createSelectOptions()
+          items: selected_options(temp_row.data().category)
+        }
     error: (response) ->
+      $("#submit_changes_#{entry_id}").prop("disabled",false)
       std_msg_error(response,"", reload: false)
   , this)
 
@@ -237,6 +302,18 @@ selected_options = (categories) ->
     options = categories.split(',')
   return options
 
+$('html').on 'click', (e) ->
+  if typeof $(e.target).data('original-title') == 'undefined' and !$(e.target).parents().is('.popover.in')
+    $('[data-original-title]').popover 'hide'
+
+window.enlarge_image = (id,image)->
+  $('#screenshot_id_'+ id).popover(
+    html: true
+    trigger: 'focus'
+    content: '<img width="400" src="' + image + '">').popover 'show'
+
+
+
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
@@ -244,8 +321,10 @@ format = (complaint_entry_row) ->
   uri = ''
   host = ''
   url = ''
+  search_uri = ''
   if complaint_entry.uri
     uri = '<a href="http://' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
+    search_uri = '<a href="https://www.google.com/search?q=site%3A+' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
   else if complaint_entry.domain
     if complaint_entry.subdomain
       host = complaint_entry.subdomain + '.'
@@ -254,10 +333,12 @@ format = (complaint_entry_row) ->
     if complaint_entry.path
       url = host + complaint_entry.path
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
+    search_uri = '<a href="https://www.google.com/search?q=site%3A+' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
   else if  complaint_entry.ip_address
     host = complaint_entry.ip_address
     url = host
     uri = '<a href="http://' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
+    search_uri = '<a href="https://www.google.com/search?q=site%3A+' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
 
@@ -307,11 +388,11 @@ format = (complaint_entry_row) ->
   invalid_radio = ""
   if complaint_entry.resolution
     switch (complaint_entry.resolution)
-      when "unchanged"
+      when "UNCHANGED"
         unchanged_radio = "checked='checked'"
-      when "fixed"
+      when "FIXED"
         fixed_radio = "checked='checked'"
-      when "invalid"
+      when "INVALID"
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
@@ -363,16 +444,21 @@ format = (complaint_entry_row) ->
 
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
+    input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row">' +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<div class="screenshot-thumb-wrapper"><img/></div>' +
+      '<div class="screenshot-thumb-wrapper">' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
-      '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
+      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
       '<span class="nested-complaint-data">' + url + '</span>' +
+      '<label class="content-label-sm">Site Search</label>' +
+      '<span class="nested-complaint-data">' + search_uri + '</span>' +
       '<label class="content-label-sm">Tags</label>' +
       '<span class="nested-complaint-data">' + tags + '</span>' +
       '</div></div>' +
@@ -395,7 +481,10 @@ format = (complaint_entry_row) ->
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
       ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
-      '</div>' +
+      '<div class="complaint-selectize-col-wrapper">' +
+      '<label class="content-label-sm">Categories to commit</label>' +
+      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
+      '</div></div>' +
       '<div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
@@ -413,34 +502,31 @@ format = (complaint_entry_row) ->
     input_cat = 'input_cat_' + complaint_entry.entry_id
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
-        '<div class="col-xs-5 col-with-divider">' +
-          '<div class="screenshot-thumb-wrapper"><img/></div>' +
-          '<div class="complaint-entry-info">' +
-            '<label class="content-label-sm">Case ID</label>' +
-            '<span class="nested-complaint-data case-id">' + complaint_entry.complaint_id + '</span>' +
-            '<label class="content-label-sm">Entry URI</label>' +
-            '<span class="nested-complaint-data">' + uri + '</span>' +
-            '<label class="content-label-sm">Tags</label>' +
-            '<span class="nested-complaint-data">' + tags + '</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="col-xs-5 col-with-divider">' +
-          '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
-          '<tbody>' + category_table +
-          '</tbody></table>' +
-        '</div>' +
-        '<div class="col-xs-2">' +
-          '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
-          '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
-        '</div>' +
+      '<div class="col-xs-5 col-with-divider">' +
+      '<div class="screenshot-thumb-wrapper">' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
-      '<div class="row">' +
-        '<div class="col-xs-12">' +
-          '<label class="content-label-sm">Customer Description</label>' +
-          '<span class="nested-complaint-data">' + customer_description + '</span>' +
-        '</div>' +
-      '</div>' +
+      '<div class="complaint-entry-info">' +
+      '<label class="content-label-sm">Case ID</label>' +
+      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
+      '<label class="content-label-sm">Entry URI</label>' +
+      '<span class="nested-complaint-data">' + uri + '</span>' +
+      '<label class="content-label-sm">Site Search</label>' +
+      '<span class="nested-complaint-data">' + search_uri + '</span>' +
+      '<label class="content-label-sm">Tags</label>' +
+      '<span class="nested-complaint-data">' + tags + '</span>' +
+      '<label class="content-label-sm">Customer Description</label>' +
+      '<span class="nested-complaint-data">' + customer_description + '</span>' +
+      '</div></div><div class="col-xs-5 col-with-divider">' +
+      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<tbody>' + category_table +
+      '</tbody></table>' +
+      '</div><div class="col-xs-2">' +
+      '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
 
+      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+
+      '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
@@ -464,7 +550,7 @@ format = (complaint_entry_row) ->
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '<br/>' +
-      '<button class="tertiary" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+      '<button class="tertiary" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
   complaint_entry_html
 
@@ -733,6 +819,22 @@ window.named_webcat_index_table = (search_name) ->
   window.populate_advanced_webcat_index_table(data)
 
 
+window.load_screenshot = (img_tag, complaint_entry_id) ->
+  debugger
+  std_msg_ajax(
+    method: 'GET'
+    url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
+    data: {}
+    img_tag: img_tag
+    error_prefix: 'Error downloading screenshot.'
+    success: (response) ->
+      debugger
+      JSON.parse(response).image_data
+      image_data = JSON.parse(response).image_data
+      src = 'data:image/png;base64,' + image_data
+      this.img_tag.src = src
+  )
+
 window.triggerTooltips = () ->
   $('.nested-tooltipped').tooltipster
     theme: [
@@ -755,5 +857,7 @@ $ ->
       $('#web-cat-search').show()
       $('#new-complaint').show()
 
-
+  $('#cat_new_url_modal').on 'shown.bs.modal', ->
+    $('#url_1').focus()
+    return
 

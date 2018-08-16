@@ -68,6 +68,9 @@ echo RAILS_ROOT = $RAILS_ROOT
 cd $RAILS_ROOT
 echo `pwd`
 
+
+
+
 if [ "" == "$RELTMP" ]; then
     RELTMP=$RAILS_ROOT/tmp
 fi
@@ -121,7 +124,7 @@ fi
 if [ "SKIP" != "$BUNDLE_INSTALL" ]; then
     echo '* bundle install'
     if [ "DEPLOYMENT" == "$DEPLOYMENT" ]; then
-        bundle _1.16.1_ install --deployment --clean --local --path vendor/bundle --without development test
+        bundle _1.16.1_ install --deployment --clean --local --path vendor/bundle --without development test profile
     else
         bundle _1.16.1_ install --local --path vendor/bundle
     fi
@@ -280,3 +283,5 @@ if [ "" != "$VERSION" ]; then
 echo copying $RAILS_ROOT.tar.gz  to  /nfs/research/distfiles
 cp $RAILS_ROOT.tar.gz /nfs/research/distfiles
 fi
+
+

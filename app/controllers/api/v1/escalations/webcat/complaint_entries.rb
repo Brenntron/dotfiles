@@ -160,14 +160,17 @@ module API
               requires :id, type:Integer, desc:'complaint entry id'
               requires :prefix, type:String, desc: 'the url to categorize'
               requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
+              requires :status, type: String, desc: 'this is the status of this complaint Entry'
+              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
               optional :comment, type: String, desc: 'resolution comment for the customer'
+              optional :resolution_comment, type:String, desc: 'an internal comment'
             end
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
                 entry.change_category( permitted_params['prefix'], permitted_params['categories'],
                                     permitted_params['status'],
-                                    permitted_params['comment'],
+                                    permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
               rescue Exception => e
                 return e.message
@@ -212,7 +215,6 @@ module API
             end
 
 
-
             desc 'look up who is information from the domain given a complaint entry id'
             params do
               requires :lookup, type: String, desc: 'ComplaintEntry ids'
@@ -249,6 +251,15 @@ module API
             end
 
 
+            get ':complaint_entry_id/screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                return { image_data: '' }.to_json unless entry
+                record = entry.complaint_entry_screenshot
+                return { image_data: '' }.to_json unless record
+                return { image_data: Base64.encode64(record.screenshot) }.to_json
+              end
+            end
 
           end
         end
