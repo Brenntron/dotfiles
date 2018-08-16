@@ -100,7 +100,16 @@ window.domain_whois = (IP_Domain) ->
         dialog_content = $(format_domain_info(json))
         if $("#complaint_button_dialog").length
           complaint_dialog = this
-          $('#complaint_button_dialog').html(dialog_content[0])
+
+          $('#complaint_button_dialog').html("")
+          $('body').innerHTML=""
+
+          $('body').append(complaint_dialog)
+          $('#complaint_button_dialog').append(dialog_content[0])
+          $('#complaint_button_dialog').dialog
+            autoOpen: true
+            minWidth: 400
+            position: { my: "right bottom", at: "right bottom", of: window }
         else
           complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
           $('body').append(complaint_dialog)
@@ -109,7 +118,6 @@ window.domain_whois = (IP_Domain) ->
             autoOpen: true
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
-
 
 #        Add popup here, rather than success message
 #        std_msg_success("[format_domain_info(json)]",, reload: false)
