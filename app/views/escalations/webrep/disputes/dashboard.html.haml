@@ -61,6 +61,10 @@
           Manager:
           = current_user.team_manager.display_name
 
+        %ul
+          - current_user.my_team.each do |teammate|
+            %li #{teammate.display_name} (#{teammate.cvs_username})
+
       .col-xs-4
         %table.tickets-totals-table
           %tr
