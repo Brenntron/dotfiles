@@ -816,8 +816,7 @@ $ ->
     table_head + entry_rows.join('') + '</tbody></table>'
 
   if $('body.index-action').length
-    populate_webrep_index_table()
-
+    standard_webrep_index_table('open')
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
     row = dispute_table.row(tr)
