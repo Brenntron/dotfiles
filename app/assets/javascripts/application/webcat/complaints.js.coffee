@@ -2,6 +2,11 @@ window.removeSubdomain = (id,host) ->
   id.value = host
 
 window.cat_new_url = ()->
+  event.preventDefault()
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   data = {}
   for i in [1...6] by 1
     data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
@@ -13,8 +18,11 @@ window.cat_new_url = ()->
     headers: headers
     data: {data: data}
     success: (response) ->
-      std_msg_success('URLs categorized successfully.',"", reload: true)
+      $('#loader-modal').hide()
+      std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
     error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove();
       std_msg_error(response,"", reload: false)
   )
 
@@ -100,7 +108,16 @@ window.domain_whois = (IP_Domain) ->
         dialog_content = $(format_domain_info(json))
         if $("#complaint_button_dialog").length
           complaint_dialog = this
-          $('#complaint_button_dialog').html(dialog_content[0])
+
+          $('#complaint_button_dialog').html("")
+          $('body').innerHTML=""
+
+          $('body').append(complaint_dialog)
+          $('#complaint_button_dialog').append(dialog_content[0])
+          $('#complaint_button_dialog').dialog
+            autoOpen: true
+            minWidth: 400
+            position: { my: "right bottom", at: "right bottom", of: window }
         else
           complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
           $('body').append(complaint_dialog)
@@ -109,7 +126,6 @@ window.domain_whois = (IP_Domain) ->
             autoOpen: true
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
-
 
 #        Add popup here, rather than success message
 #        std_msg_success("[format_domain_info(json)]",, reload: false)
@@ -309,8 +325,9 @@ $('html').on 'click', (e) ->
 window.enlarge_image = (id,image)->
   $('#screenshot_id_'+ id).popover(
     html: true
+    container: 'body'
     trigger: 'focus'
-    content: '<img width="400" src="' + image + '">').popover 'show'
+    content: '<img src="' + image + '">').popover 'show'
 
 
 
@@ -594,6 +611,9 @@ window.click_table_buttons = (complaint_table, button)->
             $(button).hide()
 
 window.populate_webcat_index_table = (filter) ->
+  if !filter
+    filter = "NEW"
+
   if $('body.index-action').length
     self_review = $('#self_review')[0].checked
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -820,7 +840,6 @@ window.named_webcat_index_table = (search_name) ->
 
 
 window.load_screenshot = (img_tag, complaint_entry_id) ->
-  debugger
   std_msg_ajax(
     method: 'GET'
     url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
@@ -828,7 +847,6 @@ window.load_screenshot = (img_tag, complaint_entry_id) ->
     img_tag: img_tag
     error_prefix: 'Error downloading screenshot.'
     success: (response) ->
-      debugger
       JSON.parse(response).image_data
       image_data = JSON.parse(response).image_data
       src = 'data:image/png;base64,' + image_data

@@ -32,6 +32,7 @@ class DisputeEntry < ApplicationRecord
   CLOSED = "CLOSED"
 
   scope :open_entries, -> { where(status: NEW) }
+  scope :assigned_entries, -> { where(status: ASSIGNED) }
   scope :closed_entries, -> { where(status: RESOLVED) }
   scope :in_progress_entries, -> { where.not(status: [ NEW, RESOLVED ]) }
   scope :my_team, ->(user) { joins(:dispute).where(disputes: {user_id: user.my_team}) }

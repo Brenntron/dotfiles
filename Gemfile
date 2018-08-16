@@ -65,6 +65,8 @@ gem 'jquery-datatables-rails', '~> 3.4.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
 gem 'clipboard-rails', '1.7.1'
 
+gem 'capybara', '~> 2.11.0'
+gem 'poltergeist', '~> 1.11.0'
 
 gem 'inline_svg'
 
@@ -87,8 +89,6 @@ end
 group :test do
   gem 'factory_bot', '~> 4.10'
   gem 'factory_bot_rails', '~> 4.10'
-  gem 'capybara', '~> 2.11.0'
-  gem 'poltergeist', '~> 1.11.0'
   gem 'cucumber-rails', '~> 1.5.0', :require => false
   gem 'database_cleaner', '~> 1.6.1'
   gem 'launchy', '~> 2.4.2'
