@@ -110,7 +110,6 @@ window.domain_whois = (IP_Domain) ->
             autoOpen: true
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
-
         else
           complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
           $('body').append(complaint_dialog)
@@ -119,7 +118,6 @@ window.domain_whois = (IP_Domain) ->
             autoOpen: true
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
-
 
 #        Add popup here, rather than success message
 #        std_msg_success("[format_domain_info(json)]",, reload: false)
