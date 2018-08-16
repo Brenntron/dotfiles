@@ -317,8 +317,9 @@ $('html').on 'click', (e) ->
 window.enlarge_image = (id,image)->
   $('#screenshot_id_'+ id).popover(
     html: true
+    container: 'body'
     trigger: 'focus'
-    content: '<img width="400" src="' + image + '">').popover 'show'
+    content: '<img src="' + image + '">').popover 'show'
 
 
 
