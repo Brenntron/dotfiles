@@ -68,19 +68,19 @@
             %td.entries-total= DisputeEntry.open_entries.my_team(current_user).count
             %td
               %span.ticket-type-label Open
-              Tickets / Dispute Entries
+              Tickets / Total Entries per Ticket
           %tr
             %td.ticket-total= Dispute.in_progress_disputes.my_team(current_user).count
             %td.entries-total= DisputeEntry.in_progress_entries.my_team(current_user).count
             %td
               %span.ticket-type-label In Progress
-              Tickets / Dispute Entries
+              Tickets / Total Entries per Ticket
           %tr
             %td.ticket-total= Dispute.closed_disputes.my_team(current_user).count
             %td.entries-total= DisputeEntry.closed_entries.my_team(current_user).count
             %td
               %span.ticket-type-label Closed
-              Tickets / Dispute Entries
+              Tickets / Total Entries per Ticket
 
       .col-xs-5
 
