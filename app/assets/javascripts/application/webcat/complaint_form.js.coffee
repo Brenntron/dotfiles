@@ -37,7 +37,8 @@ $ ->
           $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
           j++
 
-  )
+
+    )
 
     $.ajax(
       url: '/api/v1/escalations/webcat/customers_company_name'
@@ -81,7 +82,8 @@ $ ->
         while j < uniques.length
           $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
           j++
-  )
+
+    )
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
