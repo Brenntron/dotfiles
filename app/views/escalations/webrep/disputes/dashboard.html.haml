@@ -11,7 +11,7 @@
       .col-xs-4
         %table.tickets-totals-table
           %tr
-            %td.ticket-total= Dispute.open_disputes.where(user: current_user).count
+            %td.ticket-total= Dispute.assigned_disputes.where(user: current_user).count
             %td.entries-total= DisputeEntry.open_entries.joins(:dispute).where(disputes: {user: current_user}).count
             %td
               %span.ticket-type-label Open
