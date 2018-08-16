@@ -139,7 +139,8 @@ module API
                   Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
                                                      categories_string: prefix["cats"].join(','),
                                                      description: '',
-                                                     user: current_user.email)
+                                                     user: current_user.email,
+                                                     bugzilla_session: bugzilla_session)
                 end
               end
             end
