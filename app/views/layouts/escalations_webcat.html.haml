@@ -42,10 +42,6 @@
         -#    %span.nav-dropdown-icon.icon-my-open-bugs
         -#    My Open Tickets
         %li
-          %a{onclick: 'filterByStatus("ALL");'}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            All
-        %li
           %a{onclick: 'filterByStatus("COMPLETED");'}
             %span.nav-dropdown-icon.icon-my-bugs
             Completed
@@ -58,9 +54,13 @@
             %span.nav-dropdown-icon.icon-open-bugs
             New
         %li
-          %a{onclick: "filterByStatus('REVIEW')"}
+          %a{onclick: 'filterByStatus("REVIEW")'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Review
+        %li
+          %a{onclick: 'filterByStatus("ALL");'}
+            %span.nav-dropdown-icon.icon-recently-viewed
+            All
 
       #saved-searches-wrapper.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
@@ -87,7 +87,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-          = "render 'escalations/webcat/complaints/advanced_search'"
+          = render 'escalations/webcat/complaints/advanced_search'
 
           -#= label_tag 'advanced_query_complaints', 'Complaint IDs'
           -#%br/
