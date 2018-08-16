@@ -2,6 +2,11 @@ window.removeSubdomain = (id,host) ->
   id.value = host
 
 window.cat_new_url = ()->
+  event.preventDefault()
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   data = {}
   for i in [1...6] by 1
     data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
@@ -13,8 +18,11 @@ window.cat_new_url = ()->
     headers: headers
     data: {data: data}
     success: (response) ->
-      std_msg_success('URLs categorized successfully.',"", reload: true)
+      $('#loader-modal').hide()
+      std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
     error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove();
       std_msg_error(response,"", reload: false)
   )
 
