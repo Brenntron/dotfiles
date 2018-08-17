@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   #protect_from_forgery with: :null_session, :if => Proc.new { |c| c.request.accept == 'application/json' }
   before_action :set_paper_trail_whodunnit
-  before_action :require_login
+  # before_action :require_login
   helper_method :current_user
   helper_method :xml_token
 
