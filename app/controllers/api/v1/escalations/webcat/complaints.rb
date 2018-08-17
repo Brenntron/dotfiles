@@ -147,7 +147,8 @@ module API
 
             post 'fetch' do
               std_api_v2 do
-                byebug
+                response = Bridge::DirectRequest.poll('talos-intelligence')
+                raise "Error code #{response.code} fetching complaints." unless 400 > response.code
               end
             end
           end
