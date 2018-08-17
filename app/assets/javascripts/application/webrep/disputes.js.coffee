@@ -15,6 +15,10 @@ window.populate_webrep_index_table = (data = {}) ->
       $('#disputes-index-export-data-input').val(this.data_json)
 
       json = $.parseJSON(response)
+
+      if json.data.length == 0
+        std_msg_error("No tickets matching filter or search.","")
+
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
