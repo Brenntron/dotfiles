@@ -265,7 +265,7 @@ module API
                 dispute_ids = permitted_params['dispute_ids']
                 Dispute.take_tickets(dispute_ids, user: current_user)
 
-                { username: current_user.email, dispute_ids: dispute_ids }
+                { username: current_user.cec_username, dispute_ids: dispute_ids }
               end
             end
 
