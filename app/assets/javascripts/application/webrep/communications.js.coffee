@@ -14,18 +14,19 @@ $ ->
       success_reload: false
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
-        populate_communication_details(response.email, response.attachments)
+        populate_communication_details(response.email, response.attachments, response.case_email)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email.", reload: false)
     )
 
 
-  populate_communication_details = (email, attachments) ->
+  populate_communication_details = (email, attachments, case_email) ->
     $('input[type=text].reply-subject').val("Re: " + email.subject)
     $('.author-username')[0].innerHTML = email.from
-    $('.receiver-email')[0].innerHTML = email.to
+    $('.receiver-email')[0].innerHTML = (email.to || case_email)
     $('.receiver-email')[1].innerHTML = email.from
     $('.email-msg-content')[0].innerHTML = email.body
+
 
     date = moment.utc(email.created_at)
     $('.email-datetime')[0].innerHTML = moment(date).format('YYYY-MM-DD') + "<br>" + moment(date).format('HH:mm:ss')
