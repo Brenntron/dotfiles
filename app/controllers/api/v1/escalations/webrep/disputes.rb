@@ -153,7 +153,9 @@ module API
               params[:dispute_ids].each do |dispute|
                 Dispute.where(id: dispute).update_all(user_id: params[:new_assignee])
                 d = Dispute.find_by(id: dispute)
-                Dispute.where(id: dispute).update(status: 'ASSIGNED')
+                if d.status == 'NEW' || d.status == 'REOPENED'
+                  d.update(status: 'ASSIGNED')
+                end
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
                 json_packet << d
               end
