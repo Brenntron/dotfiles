@@ -20,8 +20,7 @@ window.populate_webrep_index_table = (data = {}) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+        std_msg_error("An error occured while retrieving data.","")
       else
         $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
