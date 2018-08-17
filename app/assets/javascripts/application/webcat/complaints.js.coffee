@@ -684,6 +684,7 @@ window.fetch_complaints = () ->
     method: 'POST'
     url: '/api/v1/escalations/webcat/complaints/fetch'
     data: {}
+    success_msg: 'Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly.'
     error_prefix: 'Error fetching complaints.'
   )
 
