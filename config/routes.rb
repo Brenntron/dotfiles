@@ -71,7 +71,6 @@ Rails.application.routes.draw do
       get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
-      post 'research', to: 'disputes#research'
     end
   end
 
