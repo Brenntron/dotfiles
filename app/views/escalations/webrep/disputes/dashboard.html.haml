@@ -64,7 +64,7 @@
       .col-xs-4
         %table.tickets-totals-table
           %tr
-            %td.ticket-total= Dispute.open_disputes.my_team(current_user).count
+            %td.ticket-total= Dispute.assigned_disputes.my_team(current_user).count
             %td.entries-total= DisputeEntry.open_entries.my_team(current_user).count
             %td
               %span.ticket-type-label Open
