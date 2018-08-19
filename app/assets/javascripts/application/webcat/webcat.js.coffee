@@ -137,7 +137,7 @@ $ ->
       filter = this.value
       headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       $.ajax(
-        url: '/api/v1/escalations/webcat/complaint_entries?search='+filter
+        url: '/escalations/api/v1/escalations/webcat/complaint_entries?search='+filter
         method: 'GET'
         headers: headers
         success: (response) ->
