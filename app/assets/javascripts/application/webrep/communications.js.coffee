@@ -22,6 +22,7 @@ $ ->
 
   populate_communication_details = (email, attachments, case_email) ->
     $('input[type=text].reply-subject').val("Re: " + email.subject)
+    $('.communication-subject')[0].innerHTML = email.subject
     $('.author-username')[0].innerHTML = email.from
     $('.receiver-email')[0].innerHTML = (email.to || case_email)
     $('.receiver-email')[1].innerHTML = email.from
@@ -57,6 +58,11 @@ $ ->
     email_reply = $('#email-reply')
     $('#email-reply').removeClass('hidden')
     $('.email-reply-body').focus()
+
+  $('.forward-button').on 'click', ->
+    $('#newEmailDialog').dialog 'open'
+    $('.new-subject').val("Fwd:" + $(".communication-subject")[0].textContent)
+    $('.new-body').val("\n" + "###################################" + "\n" + "Begin Forwarded Message:" + "\n" + $('.email-msg-content')[0].innerHTML)
 
   $('.delete-email').on 'click', ->
     $('.reply-body').val('')
