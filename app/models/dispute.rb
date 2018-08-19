@@ -969,12 +969,6 @@ class Dispute < ApplicationRecord
   def self.to_data_packet(disputes)
     disputes.map do |dispute|
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
-
-      dispute_packet[:status] =
-          "<span class='dispute_username' id='status_#{dispute.id}'>#{dispute.status}</p>"
-
-
-      #binding.pry
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_name] = '' #dispute.customer_name
