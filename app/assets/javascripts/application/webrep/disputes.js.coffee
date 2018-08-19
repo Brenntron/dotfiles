@@ -33,9 +33,7 @@ window.populate_webrep_index_table = (data = {}) ->
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-#$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-#$("#create_research_submit_wait").addClass('hidden').hide()
-#$("#create_research_submit").show()
+      std_msg_error("An error occured while retrieving data.","")
   , this)
 
 window.advanced_webrep_index_table = () ->
