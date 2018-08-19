@@ -15,9 +15,12 @@ window.populate_webrep_index_table = (data = {}) ->
       $('#disputes-index-export-data-input').val(this.data_json)
 
       json = $.parseJSON(response)
+
+      if json.data.length == 0
+        std_msg_error("No tickets matching filter or search.","")
+
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+        std_msg_error("An error occured while retrieving data.","")
       else
         $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
@@ -30,9 +33,7 @@ window.populate_webrep_index_table = (data = {}) ->
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-      #$("#create_research_submit_wait").addClass('hidden').hide()
-      #$("#create_research_submit").show()
+      std_msg_error("An error occured while retrieving data.","")
   , this)
 
 window.advanced_webrep_index_table = () ->
