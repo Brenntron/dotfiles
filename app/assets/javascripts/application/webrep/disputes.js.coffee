@@ -444,6 +444,7 @@ window.take_disputes = () ->
     success: (response) ->
       for dispute_id in response.dispute_ids
         $('#owner_' + dispute_id).text(response.username)
+        $('#status_' + dispute_id).text("Assigned")
   )
 
 
