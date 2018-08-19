@@ -48,6 +48,7 @@ peakebridge.host                        = peakebridge_config['host']
 peakebridge.port                        = peakebridge_config['port']
 peakebridge.verify_mode                 = peakebridge_config['verify_mode'] || peakebridge_config['tls_mode'] || peakebridge_config['ssl_mode']
 peakebridge.uri_base                    = peakebridge_config['uri_base']
+peakebridge.ca_cert_file                = peakebridge_config['ca_cert_file']
 peakebridge.sources                     = peakebridge_config['sources'] || []
 Rails.configuration.peakebridge         = peakebridge
 

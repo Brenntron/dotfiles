@@ -23,11 +23,13 @@
       .nav-tool-content-wrapper#new-complaint-wrapper
         = render 'escalations/webcat/complaints/new'
 
-  -#.nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
-  -#  %a{href: '#', class: 'dropdown-toggle', id: 'fetch', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-  -#    %span{class: 'nav-toolbar-icon icon-new-white'}
-  -#    Fetch
-  -#  .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'fetch'} Fetch complaints   
+
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'fetch', onclick: 'fetch_complaints();',
+       'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-new-white'}
+      Fetch
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'fetch'} Fetch complaints   
 
 
   .nav-tool-blocks.col-xs-2.col-sm-2.col-lg-1.dropdown
@@ -89,7 +91,7 @@
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
 
-  .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-4.search-wrapper
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-lg-2.search-wrapper
     .input-group.search-group#web-cat-search
       = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 

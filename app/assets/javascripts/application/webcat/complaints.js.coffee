@@ -678,6 +678,17 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
 
+
+window.fetch_complaints = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: '/api/v1/escalations/webcat/complaints/fetch'
+    data: {}
+    success_msg: 'Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly.'
+    error_prefix: 'Error fetching complaints.'
+  )
+
+
 open_selected = (selected_rows, toggle) ->
   i = 0
   while i < selected_rows[0].length
@@ -696,6 +707,7 @@ open_selected = (selected_rows, toggle) ->
       else
         window.open("http://"+selected_rows.data()[i].ip_address)
     i++
+
 
 $ ->
   $('#complaints_check_box').click ->
