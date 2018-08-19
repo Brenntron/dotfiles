@@ -393,7 +393,7 @@ $ ->
     rule_id = $(this).attr('data-id')
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/rulehit_resolution_mailer_templates/make_rulehit_mail/#{rule_id}"
+      url: "/escalations/api/v1/rulehit_resolution_mailer_templates/make_rulehit_mail/#{rule_id}"
 #      data: {status: 'read'}
       success_reload: false
       success: (response) ->
@@ -424,7 +424,7 @@ $ ->
     }
     std_msg_ajax(
       method: 'POST'
-      url: "/api/v1/rulehit_resolution_mailer_templates/make_adhoc_rulehit_mail"
+      url: "/escalations/api/v1/rulehit_resolution_mailer_templates/make_adhoc_rulehit_mail"
       data: data
       success_reload: false
       success: (response) ->

@@ -102,7 +102,7 @@ $ ->
     $.ajax(
       headers: headers
       method: 'POST'
-      url: '/api/v1/escalations/webrep/dispute_emails'
+      url: '/escalations/api/v1/escalations/webrep/dispute_emails'
       data: form_data
       contentType: false
       processData: false
@@ -160,7 +160,7 @@ $ ->
         $.ajax(
           headers: headers
           method: 'POST'
-          url: '/api/v1/escalations/webrep/dispute_emails'
+          url: '/escalations/api/v1/escalations/webrep/dispute_emails'
           data: form_data
           contentType: false
           processData: false
@@ -176,7 +176,7 @@ $ ->
         $.ajax(
           headers: headers
           method: 'POST'
-          url: '/api/v1/escalations/webrep/dispute_emails/ad_hoc'
+          url: '/escalations/api/v1/escalations/webrep/dispute_emails/ad_hoc'
           data: form_data
           contentType: false
           processData: false
