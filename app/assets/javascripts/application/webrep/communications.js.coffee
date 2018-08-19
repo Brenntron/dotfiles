@@ -69,7 +69,7 @@ $ ->
       url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
-        $('.reply-body')[0].innerHTML = response[0].body
+        $('.reply-body').val(response[0].body)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
@@ -124,7 +124,7 @@ $ ->
       url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
-        $('.new-body')[0].innerHTML = response[0].body
+        $('.new-body').val(response[0].body)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
