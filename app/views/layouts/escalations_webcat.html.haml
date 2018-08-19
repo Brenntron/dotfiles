@@ -42,6 +42,18 @@
         -#    %span.nav-dropdown-icon.icon-my-open-bugs
         -#    My Open Tickets
         %li
+          %a{onclick: 'filterByStatus("MY COMPLAINTS");'}
+            %span.nav-dropdown-icon.icon-my-bugs
+            My Complaints
+        %li
+          %a{onclick: 'filterByStatus("MY OPEN COMPLAINTS");'}
+            %span.nav-dropdown-icon.icon-my-bugs
+            My Open Complaints
+        %li
+          %a{onclick: 'filterByStatus("MY CLOSED COMPLAINTS");'}
+            %span.nav-dropdown-icon.icon-my-bugs
+            My Closed Complaints
+        %li
           %a{onclick: 'filterByStatus("COMPLETED");'}
             %span.nav-dropdown-icon.icon-my-bugs
             Completed
@@ -54,7 +66,7 @@
             %span.nav-dropdown-icon.icon-open-bugs
             New
         %li
-          %a{onclick: 'filterByStatus("REVIEW")'}
+          %a{onclick: "filterByStatus('REVIEW')"}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Review
         %li
@@ -87,7 +99,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-          = render 'escalations/webcat/complaints/advanced_search'
+          = "render 'escalations/webcat/complaints/advanced_search'"
 
           -#= label_tag 'advanced_query_complaints', 'Complaint IDs'
           -#%br/

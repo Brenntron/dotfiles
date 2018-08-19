@@ -37,51 +37,52 @@ $ ->
           $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
           j++
 
-  )
+    )
 
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/customers_company_name'
-    method: 'GET'
-    dataType: 'json'
-    headers: headers
-    success: (response) ->
-      $('#customerCompanyList').empty()
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/customers_company_name'
+      method: 'GET'
+      dataType: 'json'
+      headers: headers
+      success: (response) ->
+        $('#customerCompanyList').empty()
 
-      uniques = []
+        uniques = []
 
-      i = 0
-      while i < response.data.length
-        if uniques.indexOf(response.data[i]) == -1
-          uniques.push(response.data[i])
-        i++
+        i = 0
+        while i < response.data.length
+          if uniques.indexOf(response.data[i]) == -1
+            uniques.push(response.data[i])
+          i++
 
-      j = 0
-      while j < uniques.length
-        $('#customerCompanyList').append '<option value=\'' + uniques[j] + '\'></option>'
-        j++
-  )
+        j = 0
+        while j < uniques.length
+          $('#customerCompanyList').append '<option value=\'' + uniques[j] + '\'></option>'
+          j++
+    )
 
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/customers_email'
-    method: 'GET'
-    dataType: 'json'
-    headers: headers
-    success: (response) ->
-      $('#customerEmailList').empty()
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/customers_email'
+      method: 'GET'
+      dataType: 'json'
+      headers: headers
+      success: (response) ->
+        $('#customerEmailList').empty()
 
-      uniques = []
+        uniques = []
 
-      i = 0
-      while i < response.data.length
-        if uniques.indexOf(response.data[i]) == -1
-          uniques.push(response.data[i])
-        i++
+        i = 0
+        while i < response.data.length
+          if uniques.indexOf(response.data[i]) == -1
+            uniques.push(response.data[i])
+          i++
 
-      j = 0
-      while j < uniques.length
-        $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
-        j++
-  )
+        j = 0
+        while j < uniques.length
+          $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
+          j++
+
+    )
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()

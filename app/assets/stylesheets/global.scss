@@ -5824,6 +5824,10 @@ table.dataTable tbody tr.selected {
   margin-right: 12px;
 }
 
+.popover{
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+}
+
 .nested-complaint-static-data .col-with-divider {
   border-color: darken($faint-neutral-color, 15%);
 }
@@ -5971,6 +5975,10 @@ table.dataTable tbody tr.selected {
 
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-top .tooltipster-arrow-border {
   border-top-color: $table-dark-body;
+}
+
+.searched-for-url {
+  color: $bug-section-color;
 }
 
 #complaint_button_dialog .dialog-content-wrapper {

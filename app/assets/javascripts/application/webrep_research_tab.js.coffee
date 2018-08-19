@@ -484,6 +484,11 @@ $ ->
 #    $('#loader-modal.hidden).removeClass('hidden')
 #    Display success message in modal
 
+  window.researchfilter = (element) ->
+    query = $(element).val();
+#    Rather than doing the javascript .each for this, let's use CSS
+    $('.entry-data-content:not(:contains(' + query + '))').parents('.research-table-row').hide()
+    $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
 
 $(document).ready ->
 

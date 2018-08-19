@@ -18,5 +18,5 @@
                           html: { target: :_blank } do |rpt_form|
           = rpt_form.input :date_from, as: :string, input_html: {type: :date}
           = rpt_form.input :date_to, as: :string, input_html: {type: :date}
-          = rpt_form.submit 'Report'
+          = rpt_form.submit 'Report', data: { disable_with: false }
 

@@ -1,5 +1,5 @@
 class Bridge::MessagesController < ApplicationController
-
+  skip_before_action :require_login
   def get_messages
     #if peake bridge ever asks for info from AC this is where you would return a response
     return_message = {

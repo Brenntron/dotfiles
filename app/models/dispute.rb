@@ -60,8 +60,9 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_OTHER = "OTHER"
 
   scope :open_disputes, -> { where(status: NEW) }
+  scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
-  scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
+  scope :in_progress_disputes, -> { where(status: [ STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_CUSTOMER_PENDING, STATUS_ON_HOLD, STATUS_REOPENED ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def case_id_str
@@ -364,8 +365,7 @@ class Dispute < ApplicationRecord
         }
 
         bug_attrs = {
-            #'product' => 'Escalations Console',
-            'product' => 'Escalations',
+            'product' => 'Escalations Console',
             'component' => 'IP/Domain',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
