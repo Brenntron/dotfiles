@@ -6,7 +6,7 @@ window.select_or_deselect_all = (dispute_id)->
 window.populate_webrep_index_table = (data = {}) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes'
+    url: '/escalations/api/v1/escalations/webrep/disputes'
     method: 'GET'
     headers: headers
     data: data
@@ -89,7 +89,7 @@ window.call_contains_search = (search_form) ->
 window.delete_disputes_named_search = (close_button, search_name) ->
   std_msg_ajax(
     method: 'DELETE'
-    url: "/api/v1/escalations/webrep/disputes/searches/#{search_name}"
+    url: "/escalations/api/v1/escalations/webrep/disputes/searches/#{search_name}"
     data: {}
     error_prefix: 'Error deleting saved search.'
     failure_reload: false
@@ -127,7 +127,7 @@ window.row_adjust_wlbl_button =(button_tag) ->
   }
 
   std_msg_ajax(
-    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
@@ -149,7 +149,7 @@ window.toolbar_adust_wlbl_button =(button_tag) ->
   }
 
   std_msg_ajax(
-    url: '/api/v1/escalations/webrep/disputes/entry_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
@@ -172,7 +172,7 @@ window.index_adust_wlbl_button =(button_tag) ->
   }
 
   std_msg_ajax(
-    url: '/api/v1/escalations/webrep/disputes/ticket_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/ticket_wlbl'
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
@@ -188,7 +188,7 @@ window.save_dispute = () ->
   }
 
   std_msg_ajax(
-    url: '/api/v1/escalations/webrep/disputes/' + $('#dispute_id').text()
+    url: '/escalations/api/v1/escalations/webrep/disputes/' + $('#dispute_id').text()
     method: 'PUT'
     data: data
     error_prefix: 'Unable to update dispute.'
@@ -205,7 +205,7 @@ window.row_adust_reptool_bl_button =(button_tag) ->
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/reptool_bl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     method: 'POST'
     headers: headers
     data: data
@@ -230,7 +230,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/reptool_bl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     method: 'POST'
     headers: headers
     data: data
@@ -270,7 +270,7 @@ window.toolbar_index_edit_status = () ->
 
   std_msg_ajax(
     method: 'PATCH'
-    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
     data: { field_data: data }
     success_reload: true
     error_prefix: 'Error updating data.'
@@ -295,7 +295,7 @@ window.show_page_edit_status = () ->
     data.comment = $('#dispute-resolution-comment').val()
 
   std_msg_ajax(
-    url: '/api/v1/escalations/webrep/disputes/set_disputes_status'
+    url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
     method: 'POST'
     data: data
     error_prefix: 'Unable to update dispute.'
@@ -317,7 +317,7 @@ window.toolbar_index_change_assignee = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/change_assignee'
+    url: '/escalations/api/v1/escalations/webrep/disputes/change_assignee'
     method: 'POST'
     headers: headers
     data: data
@@ -340,7 +340,7 @@ window.toolbar_show_change_assignee = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/change_assignee'
+    url: '/escalations/api/v1/escalations/webrep/disputes/change_assignee'
     method: 'POST'
     headers: headers
     data: data
@@ -361,7 +361,7 @@ window.toolbar_unassign_dispute = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/unassign_all'
+    url: '/escalations/api/v1/escalations/webrep/disputes/unassign_all'
     method: 'POST'
     headers: headers
     data: data
@@ -375,7 +375,7 @@ window.toolbar_unassign_dispute = () ->
 window.toolbar_index_mark_duplicate = (box_names) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/mark_duplicate'
+    url: '/escalations/api/v1/escalations/webrep/disputes/mark_duplicate'
     method: 'POST'
     headers: headers
     data: data
@@ -399,7 +399,7 @@ window.add_dispute_entry = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/new_adhoc_entry'
+    url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
     method: 'POST'
     headers: headers
     data: data
@@ -421,7 +421,7 @@ window.determine_checked = (box_names) ->
 window.take_dispute = (take_button, dispute_id) ->
   std_msg_ajax(
     method: 'PATCH'
-    url: "/api/v1/escalations/webrep/disputes/take_dispute/" + dispute_id
+    url: "/escalations/api/v1/escalations/webrep/disputes/take_dispute/" + dispute_id
     data: {}
     td_tag: take_button.closest('td')
     dispute_id: dispute_id
@@ -439,12 +439,13 @@ window.take_disputes = () ->
 
   std_msg_ajax(
     method: 'PATCH'
-    url: "/api/v1/escalations/webrep/disputes/take_disputes"
+    url: "/escalations/api/v1/escalations/webrep/disputes/take_disputes"
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       for dispute_id in response.dispute_ids
         $('#owner_' + dispute_id).text(response.username)
+        $('#status_' + dispute_id).text("Assigned")
   )
 
 
@@ -454,7 +455,7 @@ window.take_single_dispute = (id) ->
 
   std_msg_ajax(
     method: 'PATCH'
-    url: "/api/v1/escalations/webrep/disputes/take_disputes"
+    url: "/escalations/api/v1/escalations/webrep/disputes/take_disputes"
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success_reload: true
@@ -464,7 +465,7 @@ window.take_single_dispute = (id) ->
 #window.dispute_entry_status = (id, status) ->
 #  std_msg_ajax(
 #    method: 'PATCH'
-#    url: '/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
+#    url: '/escalations/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
 #    data: { status: status }
 #    error_prefix: 'Error updating status.'
 #  )
@@ -496,7 +497,7 @@ window.save_dispute_entries = () ->
 
   std_msg_ajax(
     method: 'PATCH'
-    url: "/api/v1/escalations/webrep/disputes/entries/field_data"
+    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
     data: { field_data: data }
     success_reload: true
     error_prefix: 'Error updating data.'
@@ -510,7 +511,7 @@ window.set_related_dispute = (form_tag) ->
   related_dispute_id = $(form_tag).find(".dispute-id").val()
   std_msg_ajax(
     method: 'POST'
-    url: '/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/related_disputes'
+    url: '/escalations/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/related_disputes'
     data: { related_dispute_id: related_dispute_id }
     success_reload: true
     error_prefix: 'Error marking relationship.'
@@ -523,7 +524,7 @@ window.set_relating_disputes = (form_tag) ->
   ).toArray()
   std_msg_ajax(
     method: 'PATCH'
-    url: '/api/v1/escalations/webrep/disputes/' + related_dispute_id + '/relating_disputes'
+    url: '/escalations/api/v1/escalations/webrep/disputes/' + related_dispute_id + '/relating_disputes'
     data: { relating_dispute_ids: dispute_ids }
     success_reload: true
     error_prefix: 'Error marking relationship.'
@@ -536,7 +537,7 @@ window.set_duplicate_dispute = (form_tag) ->
   duplicate_dispute_id = $(form_tag).find(".dispute-id").val()
   std_msg_ajax(
     method: 'POST'
-    url: '/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/duplicate_disputes'
+    url: '/escalations/api/v1/escalations/webrep/disputes/' + form_tag.dataset.disputeId + '/duplicate_disputes'
     data: { duplicate_dispute_id: duplicate_dispute_id }
     success_reload: true
     error_prefix: 'Error marking duplicate relationship.'
@@ -574,7 +575,7 @@ $ ->
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webrep/disputes/set_disputes_status'
+      url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
       method: 'POST'
       headers: headers
       data: data
@@ -748,10 +749,7 @@ $ ->
       { data: 'case_age' }
       { data: 'source' }
       { data: 'source_id' }
-      {
-        data: null
-        defaultContent: ''
-      }
+      { data: 'submitter_type'}
       { data: 'submitter_name' }
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
@@ -817,8 +815,7 @@ $ ->
     table_head + entry_rows.join('') + '</tbody></table>'
 
   if $('body.index-action').length
-    populate_webrep_index_table()
-
+    standard_webrep_index_table('open')
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
     row = dispute_table.row(tr)

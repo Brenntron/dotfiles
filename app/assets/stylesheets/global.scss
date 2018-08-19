@@ -5977,6 +5977,10 @@ table.dataTable tbody tr.selected {
   border-top-color: $table-dark-body;
 }
 
+.searched-for-url {
+  color: $bug-section-color;
+}
+
 #complaint_button_dialog .dialog-content-wrapper {
   padding: 15px;
 }

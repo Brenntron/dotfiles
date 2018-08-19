@@ -53,11 +53,11 @@
             <% end %>
           </div>
           <div class="col-xs-6 col-sm-4">
-            <h6 class="text-muted"><%= link_to 'team', users_path %></h6>
+            <h6 class="text-muted"><%= link_to 'team', escalations_users_path %></h6>
             <% if @user.children.any? %>
               <ul class="compact-list">
                 <% @user.children.each do |member| %>
-                <li><%= link_to member.cvs_username, user_path(member) %></li>
+                <li><%= link_to member.cvs_username, escalations_user_path(member) %></li>
                 <% end %>
               </ul>
             <% else %>
@@ -65,11 +65,11 @@
             <% end %>
           </div>
           <div class="col-xs-6 col-sm-4">
-            <h6 class="text-muted"><%= link_to 'co-workers', users_path %></h6>
+            <h6 class="text-muted"><%= link_to 'co-workers', escalations_users_path %></h6>
             <% if @user.siblings.any?  && @user.child? %>
                 <ul class="compact-list">
                   <% @user.siblings.each do |co| %>
-                      <li><%= link_to co.cvs_username, user_path(co) %></li>
+                      <li><%= link_to co.cvs_username, escalations_user_path(co) %></li>
                   <% end %>
                 </ul>
             <% else %>
