@@ -154,9 +154,12 @@ $ ->
     form_data.append('subject', $('.new-subject').val())
     form_data.append('cc', $('.cc-email').val())
 
+    dispute_id = $('input[name="dispute_id"]').val()
+
+
     if $('form')[0].checkValidity() == true
       e.preventDefault()
-      if form_data.dispute_id
+      if dispute_id
         $.ajax(
           headers: headers
           method: 'POST'
