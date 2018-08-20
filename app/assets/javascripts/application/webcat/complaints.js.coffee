@@ -535,18 +535,23 @@ window.history_dialog = (id) ->
         alert(json.error)
       else
         #parse this json properly
-        history_dialog_content = '<div class="dialog-content-wrapper">' + '<h5>Domain History</h5>'
-
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<h5>Domain History</h5>' +
+          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+          '<tbody>'
         for entry in json.entry_history.domain_history
           entry_string = "" +
-          '<p>Action: ' + entry['action'] + '</p>' +
-          '<p>Confidence: ' + entry['confidence'] + '</p>' +
-          '<p>Description: ' + entry['description'] + '</p>' +
-          '<p>Time: ' + entry['time'] + '</p>' +
-          '<p>User: ' + entry['user'] + '</p>' +
-          '<p>Category: ' + entry['category']['descr'] + '</p>' +
-          '<br />'
+          '<tr>' +
+          '<td>' + entry['action'] + '</td>' +
+          '<td>' + entry['confidence'] + '</td>' +
+          '<td>' + entry['description'] + '</td>' +
+          '<td>' + entry['time'] + '</td>' +
+          '<td>' + entry['user'] + '</td>' +
+          '<td>' + entry['category']['descr'] + '</td>' +
+          '</tr>'
+
           history_dialog_content += entry_string
+        history_dialog_content += '</tbody></table>'
         history_dialog_content += '<hr class="thin"/>'
         history_dialog_content += '<h5>Complaint Entry History</h5>'
         entry_string = ""
@@ -571,7 +576,7 @@ window.history_dialog = (id) ->
           #$('#history_dialog').append(history_dialog_content)
           $('#history_dialog').dialog
             autoOpen: true
-            minWidth: 400
+            minWidth: 600
             position: { my: "right top", at: "right top", of: window }
 
 #        dialog_content = $(format_domain_info(json))
