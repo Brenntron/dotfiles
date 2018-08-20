@@ -351,6 +351,31 @@ window.toolbar_show_change_assignee = () ->
       popup_response_error(response, 'Error changing assignee')
   )
 
+window.related_disputes = () ->
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    Number(this.value)
+  ).toArray()
+
+  original_dispute_id = $('.dispute-id').val()
+
+  data = {
+    'original_dispute_id': original_dispute_id
+    'relating_dispute_ids': entry_ids
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/related_disputes'
+    method: 'PATCH'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error setting related dispute.')
+  )
+
 window.toolbar_unassign_dispute = () ->
   single_id = $('#dispute_id').text()
   entry_ids = [single_id]
