@@ -359,7 +359,6 @@ class DisputeEntry < ApplicationRecord
   end
 
   def return_dispute(dispute_entry)
-    #binding.pry
     Dispute.find(dispute_entry).update(user_id: 1)
   end
 end
