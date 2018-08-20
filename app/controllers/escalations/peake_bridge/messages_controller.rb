@@ -1,5 +1,5 @@
-class Bridge::MessagesController < ApplicationController
-  skip_before_action :require_login
+class Escalations::PeakeBridge::MessagesController < ApplicationController
+
   def get_messages
     #if peake bridge ever asks for info from AC this is where you would return a response
     return_message = {
@@ -44,21 +44,6 @@ class Bridge::MessagesController < ApplicationController
         render json: return_message, status: :ok
     end
 
-  end
-
-  # Message to recieve notification from subversion when a rules file has been committed.
-  def rule_file_notify
-    filenames = message_params.fetch(:filenames, [])
-    if filenames
-      Thread.new do
-        Repo::RuleContentCommitter.repo_notify_given_filenames(filenames)
-      end
-
-      render plain: "success", status: :accepted
-    else
-      Rails.warn("No files names in notify message.")
-      render plain: "No files given to process.", status: :no_content
-    end
   end
 
   # Add route for specific channels to their own action under the channels collection.

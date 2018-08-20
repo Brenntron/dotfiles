@@ -1,19 +1,22 @@
 .content-wrapper
   .reputation-research-search-wrapper
     %h1 Reputation Research
-    = form_for(:search) do |search_form|
+    = form_for(:search, method: "get") do |search_form|
       = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
       .row.search-options-row
         .col-xs-6
-          = search_form.radio_button(:scope, 'strict', id: 'research-search-strict')
+          = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
           %label{for: 'research-search-strict'} Strict Search
         .col-xs-6
-          = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: true)
+          = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
           %label{for: 'research-search-broad'} Broad Search
 
   .row
     .col-xs-12
-      %h4 Entry Results
+      - if params['search']
+        %h4 Entry Search Results for
+        %span.searched-for-url #{params['search']['uri']}
+        (#{@entries.count} found)
       #research-page-toolbar.toolbar
         %div
           %label.toolbar-section-label Table View
@@ -104,7 +107,9 @@
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
                         Submit Changes
-
+        %div
+          %label.toolbar-section-label Type to filter results
+          %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
   .row
     .col-xs-12
       %table#disputes-research-table.table.table-sm

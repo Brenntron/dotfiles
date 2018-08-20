@@ -25,7 +25,7 @@ class RelationshipsController < ApplicationController
   def manager_only_access
     if !current_user.has_role?('manager')
       flash[:error] = "You must be a manager to access that page."
-      redirect_to users_path
+      redirect_to escalations_users_path
     end
   end
 

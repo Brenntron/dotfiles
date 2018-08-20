@@ -1,6 +1,6 @@
 <tr data-id="<%=user.id%>" data-parent="<%=user.parent.try(:id)%>" data-level="<%=level%>">
   <td data-column="name">
-    <%= link_to user.cvs_username, user_path(user) %>
+    <%= link_to user.cvs_username, escalations_user_path(user) %>
   </td>
   <td class="text-muted small">
     <%= user.roles.map(&:role).join(', ') %>

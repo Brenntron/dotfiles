@@ -4,7 +4,7 @@
     %span.top-info-icon{class: "#{content_for :webcat_icon}"}
     %h5= current_user.display_name
     %p.dashboard-details
-      = link_to "#{@current_user.cvs_username}", users_path(current_user[:id])
+      = link_to "#{@current_user.cvs_username}", escalations_users_path(current_user[:id])
 
   .col-xs-2
     %table.tickets-totals-table.table-condensed
