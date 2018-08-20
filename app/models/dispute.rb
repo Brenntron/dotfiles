@@ -1011,7 +1011,6 @@ class Dispute < ApplicationRecord
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
       dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
-      dispute_packet[:source_id] = dispute.ticket_source_key
       dispute_packet[:source_type] = dispute.ticket_source_type
 
       dispute_packet[:wbrs_score] = ''
