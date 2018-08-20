@@ -459,6 +459,18 @@ window.take_single_dispute = (id) ->
     success_reload: true
   )
 
+window.return_dispute = (id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/api/v1/escalations/webrep/disputes/take_dispute/" + dispute_id
+    data: {}
+    td_tag: take_button.closest('td')
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      this.td_tag.getElementsByClassName("dispute_username")[0].innerText = response.username
+  )
+
 
 #window.dispute_entry_status = (id, status) ->
 #  std_msg_ajax(

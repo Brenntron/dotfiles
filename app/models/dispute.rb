@@ -966,7 +966,7 @@ class Dispute < ApplicationRecord
 
   # @param [Array<Dispute>] disputes colleciton of dispute objects
   # @return [Array<Array>] data output for data tables.
-  def self.to_data_packet(disputes)
+  def self.to_data_packet(disputes, user:)
     disputes.map do |dispute|
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
 
@@ -1001,8 +1001,12 @@ class Dispute < ApplicationRecord
           dispute_packet[:assigned_to] =
               "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
 
-        when dispute.user_id?
-          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+      when dispute.user_id?
+          if dispute.user_id == user.id
+            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='return-ticket-button' title='Return onclick='return_dispute(this, #{dispute.id});'></button>"
+          else
+            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+          end
       end
 
       dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"

@@ -46,7 +46,7 @@ module API
                                                params: permitted_params,
                                                user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
-              json_packet = Dispute.to_data_packet(disputes)
+              json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
               response_data = {status: "success", title: title, data: json_packet}
               if 'advanced' == permitted_params['search_type']
@@ -264,6 +264,12 @@ module API
                 Dispute.take_tickets(dispute_ids, user: current_user)
 
                 { username: current_user.email, dispute_ids: dispute_ids }
+              end
+            end
+
+            patch 'return_dispute' do
+              std_api_v2 do
+                
               end
             end
 
