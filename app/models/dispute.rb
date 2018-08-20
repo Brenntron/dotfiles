@@ -1003,7 +1003,7 @@ class Dispute < ApplicationRecord
 
       when dispute.user_id?
           if dispute.user_id == user.id
-            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='return-ticket-button' title='Return onclick='return_dispute(this, #{dispute.id});'></button>"
+            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='return-ticket-button' title='Return' onclick='return_dispute(#{dispute.id});'></button>"
           else
             dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
           end
@@ -1069,6 +1069,10 @@ class Dispute < ApplicationRecord
         raise 'This record changed while you were editing.'
       end
     end
+  end
+
+  def return_dispute(dispute_entry)
+    Dispute.find(dispute_entry).update(user_id: 1)
   end
 end
 

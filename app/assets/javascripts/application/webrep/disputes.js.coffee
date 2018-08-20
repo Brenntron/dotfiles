@@ -459,16 +459,16 @@ window.take_single_dispute = (id) ->
     success_reload: true
   )
 
-window.return_dispute = (id) ->
+window.return_dispute = (dispute_id) ->
+  dispute_id = dispute_id
   std_msg_ajax(
     method: 'PATCH'
-    url: "/api/v1/escalations/webrep/disputes/take_dispute/" + dispute_id
+    url: "/api/v1/escalations/webrep/disputes/return_dispute/" + dispute_id
     data: {}
-    td_tag: take_button.closest('td')
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      this.td_tag.getElementsByClassName("dispute_username")[0].innerText = response.username
+      $('#owner_' + response.dispute_id).text('Unassigned')
   )
 
 
