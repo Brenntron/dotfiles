@@ -133,6 +133,27 @@ window.row_adjust_wlbl_button =(button_tag) ->
     error_prefix: 'Error adjusting WL/BL.'
   )
 
+window.row_research_adjust_wlbl_button =(button_tag) ->
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+  wlbl_form = button_tag.form;
+
+  data = {
+    'urls': [ wlbl_form.getElementsByClassName('wlbl-entry-content')[0].textContent ]
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
+  )
+
+
 window.toolbar_adust_wlbl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
@@ -219,7 +240,7 @@ window.inline_load_reptool_button =(button_tag) ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
     method: 'GET'
     headers: headers
     data: data
@@ -273,7 +294,7 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webrep/disputes/reptool_bl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     method: 'POST'
     headers: headers
     data: data

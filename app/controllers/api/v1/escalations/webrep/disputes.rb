@@ -179,6 +179,23 @@ module API
               {:status => "success", :data => json_packet}.to_json
             end
 
+            desc "Adjust a WL/BL entry via uris"
+            params do
+              requires :urls, type: Array[String], desc: "uris to wl/bl"
+              requires :trgt_list, type: Array[String], desc: "type of WL/BL"
+              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "uri_wlbl" do
+              authorize!(:update, Wbrs::ManualWlbl)
+              #Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
+              Wbrs::ManualWlbl.adjust_urls_from_params(permitted_params, username: current_user.cvs_username)
+              true
+            end
+
+
+
+
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
