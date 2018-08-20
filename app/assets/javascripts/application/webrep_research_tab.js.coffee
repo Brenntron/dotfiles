@@ -161,7 +161,7 @@ $ ->
 
       headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       $.ajax(
-        url: '/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+        url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
         method: 'GET'
         headers: headers
         data: data
@@ -232,7 +232,7 @@ $ ->
 
         headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
         $.ajax(
-          url: '/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
           method: 'GET'
           headers: headers
           data: data
@@ -390,7 +390,7 @@ $ ->
     rule_id = $(this).attr('data-id')
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/rulehit_resolution_mailer_templates/make_rulehit_mail/#{rule_id}"
+      url: "/escalations/api/v1/rulehit_resolution_mailer_templates/make_rulehit_mail/#{rule_id}"
 #      data: {status: 'read'}
       success_reload: false
       success: (response) ->
@@ -421,7 +421,7 @@ $ ->
     }
     std_msg_ajax(
       method: 'POST'
-      url: "/api/v1/rulehit_resolution_mailer_templates/make_adhoc_rulehit_mail"
+      url: "/escalations/api/v1/rulehit_resolution_mailer_templates/make_adhoc_rulehit_mail"
       data: data
       success_reload: false
       success: (response) ->
@@ -461,7 +461,7 @@ $ ->
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webrep/disputes/sync_data'
+      url: '/escalations/api/v1/escalations/webrep/disputes/sync_data'
       method: 'POST'
       headers: headers
       data: data
@@ -481,6 +481,11 @@ $ ->
 #    $('#loader-modal.hidden).removeClass('hidden')
 #    Display success message in modal
 
+  window.researchfilter = (element) ->
+    query = $(element).val();
+#    Rather than doing the javascript .each for this, let's use CSS
+    $('.entry-data-content:not(:contains(' + query + '))').parents('.research-table-row').hide()
+    $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
 
 $(document).ready ->
 

@@ -14,10 +14,9 @@ class ComplaintEntry < ApplicationRecord
   scope :new_count , -> {where(status:"NEW").count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:"COMPLETED").count}
 
-  before_save :set_current_category
-
   RESOLVED = "RESOLVED"
   NEW = "NEW"
+  PENDING = "PENDING"
 
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
@@ -152,11 +151,11 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def self.create_complaint_entry(complaint, ip_url, user = nil)
+  def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
     begin
       new_complaint_entry = ComplaintEntry.new
       new_complaint_entry.complaint_id = complaint.id
-      new_complaint_entry.status = "NEW"
+      new_complaint_entry.status = status
 
       if is_ip?(ip_url)
         new_complaint_entry.ip_address = ip_url
@@ -176,6 +175,15 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.is_important = importance if importance
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+
+      if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
+        new_complaint_entry.url_primary_category = categories
+        new_complaint_entry.category = categories
+      else
+        new_complaint_entry.url_primary_category = new_complaint_entry.set_current_category
+        new_complaint_entry.category = new_complaint_entry.set_current_category
+      end
+
       new_complaint_entry.save
 
       ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
@@ -254,7 +262,7 @@ class ComplaintEntry < ApplicationRecord
   # Searches specific to quick generic button filters.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.filter_search(params, user)
+  def self.filter_search(params, user:)
     case params[:filter_by]
       when "NEW"
         where(status:"NEW")
@@ -264,10 +272,19 @@ class ComplaintEntry < ApplicationRecord
         where.not(status:"COMPLETED").where.not(status:"NEW")
       when "REVIEW"
         params[:self_review]? where(is_important:true) : where(is_important:true).where.not(user:user)
+      when "MY COMPLAINTS"
+        where(user_id: user.id)
+      when "MY OPEN COMPLAINTS"
+        where(user_id: user.id, status: "ACTIVE")
+      when "MY CLOSED COMPLAINTS"
+        where(user_id: user.id, status:"COMPLETED")
+      when "ALL"
+        all
       else
         all
     end
   end
+
 
   # Searched based on saved search.
   # @param [String] search_name the name of the saved search.
@@ -473,7 +490,6 @@ class ComplaintEntry < ApplicationRecord
 
   def capture_screenshot
     CapybaraSpider.capture(self.location_url) do |capture|
-      byebug
       if complaint_entry_screenshot
         complaint_entry_screenshot.destroy
       end

@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations, except: [:destroy, :edit] do
+    resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
+
+    # TODO These may be reimplemented in the research passenger instance, and then removed from here
     root 'bugs#index'
     resources :escalation_bugs, controller: 'bugs'
     resources :bugs do
@@ -70,9 +73,43 @@ Rails.application.routes.draw do
       get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
-      post 'research', to: 'disputes#research'
     end
-  end
+
+    resources :users, controller: '/users', only: [:index, :show, :update] do
+
+      collection do
+        get :results
+      end
+
+      # TODO Review metrics for applicability to escalations users
+      get :status_metrics, defaults: {format: :json}
+      get :time_metrics, defaults: {format: :json}
+      get :pending_team_metrics, defaults: {format: :json}
+      get :resolved_team_metrics, defaults: {format: :json}
+      get :time_team_metrics, defaults: {format: :json}
+      get :component_team_metrics, defaults: {format: :json}
+
+      patch :add_to_team
+      patch :remove_from_team
+      resources :relationships, only: [:index, :show] do
+        collection do
+          get :member_status
+        end
+      end
+    end
+
+    namespace :peake_bridge do
+      resources :channels, only: [] do
+        collection do
+          get 'poll-from-bridge/messages', to: 'messages#get_messages'
+          post 'fp-event/messages', to: 'messages#messages_from_bridge'
+          post 'fp-create/messages', to: 'messages#fp_create'
+          post 'ticket-event/messages', to: 'messages#messages_from_bridge'
+        end
+        resources :messages, only: [:create]
+      end
+    end
+  end #namespace :escalations
 
   namespace :admin do
     root 'home#index'
@@ -206,7 +243,7 @@ Rails.application.routes.draw do
   end
 
 
-  mount API::Base => '/api'
+  mount API::Base => '/escalations/api'
 
   # Hack to test permissions to Admin page
   if Rails.env.test?

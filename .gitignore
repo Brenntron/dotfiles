@@ -16,6 +16,7 @@
 .DS_Store
 .byebug_history
 /public/assets/*
+/public/escalations/assets/*
 /public/system/*
 
 config/config.yml

@@ -454,7 +454,7 @@ $ ->
         }
       ), 1000)
       $.ajax(
-        url: '/api/v1/escalations/bugs/import/' + bid
+        url: '/escalations/api/v1/escalations/bugs/import/' + bid
         method: 'GET'
         headers: headers
       ).done (response) ->
@@ -475,7 +475,7 @@ $ ->
     $('.resync_escalation_button').hide()
     $('.loading_image').removeClass('hidden').show()
     $.ajax(
-      url: '/api/v1/escalations/bugs/import/' + bid
+      url: '/escalations/api/v1/escalations/bugs/import/' + bid
       method: 'GET'
       headers: headers
     ).done (response) ->
@@ -681,7 +681,7 @@ $ ->
     $('.edit-bug').hide()
     $('#saving_bug').removeClass('hidden').show()
     $.ajax(
-      url: '/api/v1/bugs/escalation'
+      url: '/escalations/api/v1/bugs/escalation'
       method: 'POST'
       headers: headers
       data: data
