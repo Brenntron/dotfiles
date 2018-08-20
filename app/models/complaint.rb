@@ -128,16 +128,23 @@ class Complaint < ApplicationRecord
   end
 
 
-  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:)
-    # Look for existing prefix
-    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
-    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
-
-    if existing_prefix.present?
-      prefix_object = Wbrs::Prefix.new
-      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:, bugzilla_session:)
+    # check to see if URL is in Top URLS
+    top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
+    if top_url
+      #create a complaint/complaint entry and set to pending
+      Complaint.create_action(bugzilla_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
     else
-      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+      # Look for existing prefix
+      existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
+      category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+      if existing_prefix.present?
+        prefix_object = Wbrs::Prefix.new
+        prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+      else
+        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+      end
     end
   end
 
@@ -170,10 +177,8 @@ class Complaint < ApplicationRecord
         }
 
         bug_attrs = {
-            #'product' => 'Escalations Console',
-            'product' => 'Escalations',
-            #'component' => 'Categorization',
-            'component' => 'WebCat',
+            'product' => 'Escalations Console',
+            'component' => 'Categorization',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
             'description' => full_description,
@@ -229,6 +234,16 @@ class Complaint < ApplicationRecord
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
+          begin
+            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open(screenshot_filename).read
+            ces.save!
+          rescue
+            #do nothing, it was worth a try
+          end
+
         end
 
         new_entries_urls.each do |key, entry|
@@ -259,6 +274,16 @@ class Complaint < ApplicationRecord
           return_payload[key] = new_payload_item
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+
+          begin
+            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open(screenshot_filename).read
+            ces.save!
+          rescue
+            #do nothing, it was worth a try
+          end
         end
 
         conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
@@ -286,7 +311,7 @@ class Complaint < ApplicationRecord
     end
   end
 
-  def self.create_action(bugzilla_session, ips_urls, description, customer, tags)
+  def self.create_action(bugzilla_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
     user = User.where(cvs_username:"vrtincom").first
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
@@ -298,8 +323,8 @@ class Complaint < ApplicationRecord
     }
 
     bug_attrs = {
-        'product' => 'Escalations',
-        'component' => 'WebCat',
+        'product' => 'Escalations Console',
+        'component' => 'Categorization',
         'summary' => summary,
         'version' => 'unspecified', #self.version,
         'description' => full_description,
@@ -309,17 +334,17 @@ class Complaint < ApplicationRecord
 
     bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
 
-    cust = find_customer(customer)
+    cust = find_customer(customer) if customer
     new_complaint = Complaint.create(id: bug_stub_hash["id"],
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
-                                     status: 'NEW',
+                                     status: status,
                                      channel: INT_CHANNEL)
 
     handle_tags(new_complaint, tags) if tags
 
     ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first)
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories)
     end
   end
 

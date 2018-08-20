@@ -148,6 +148,9 @@ module API
                                          current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
 
+                message = Bridge::ComplaintUpdateStatusEvent.new
+                message.post_complaint(entry.complaint)
+
               rescue Exception => e
                   return {error:e.message}.to_json
               end
@@ -161,6 +164,7 @@ module API
               requires :prefix, type:String, desc: 'the url to categorize'
               requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
               requires :status, type: String, desc: 'this is the status of this complaint Entry'
+              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
               optional :comment, type: String, desc: 'resolution comment for the customer'
               optional :resolution_comment, type:String, desc: 'an internal comment'
             end
@@ -249,7 +253,6 @@ module API
             end
 
 
-
             desc 'look up who is information from the domain given a complaint entry id'
             params do
               requires :lookup, type: String, desc: 'ComplaintEntry ids'
@@ -286,6 +289,15 @@ module API
             end
 
 
+            get ':complaint_entry_id/screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                return { image_data: '' }.to_json unless entry
+                record = entry.complaint_entry_screenshot
+                return { image_data: '' }.to_json unless record
+                return { image_data: Base64.encode64(record.screenshot) }.to_json
+              end
+            end
 
           end
         end

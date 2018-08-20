@@ -1,5 +1,7 @@
 class EscalationEmailTool
 
+  DEFAULT_EMAIL = "no-reply@#{DisputeEmail::EMAIL_DOMAIN}"
+
   def self.generate_email_info(params, current_user)
 
     email_params = {}
@@ -32,7 +34,7 @@ class EscalationEmailTool
 
 
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-    conn.post(email_args, attachments_to_mail)
+    conn.post(email_params, attachments_to_mail)
   end
 
 

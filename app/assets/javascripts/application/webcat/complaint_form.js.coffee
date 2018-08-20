@@ -2,7 +2,7 @@ $ ->
   $('#new-complaint').on 'click', ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/customers'
+      url: '/escalations/api/v1/escalations/webcat/customers'
       method: 'GET'
       dataType: 'json'
       headers: headers
@@ -12,6 +12,76 @@ $ ->
         while i < response.data.length
           $('#customerList').append '<option value=\'' + response.data[i] + '\'></option>'
           i++
+    )
+
+  $('#advanced-search-button').on 'click', ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/customers_names'
+      method: 'GET'
+      dataType: 'json'
+      headers: headers
+      success: (response) ->
+        $('#customerList').empty()
+
+        uniques = []
+
+        i = 0
+        while i < response.data.length
+          if uniques.indexOf(response.data[i]) == -1
+            uniques.push(response.data[i])
+          i++
+
+        j = 0
+        while j < uniques.length
+          $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
+          j++
+
+    )
+
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/customers_company_name'
+      method: 'GET'
+      dataType: 'json'
+      headers: headers
+      success: (response) ->
+        $('#customerCompanyList').empty()
+
+        uniques = []
+
+        i = 0
+        while i < response.data.length
+          if uniques.indexOf(response.data[i]) == -1
+            uniques.push(response.data[i])
+          i++
+
+        j = 0
+        while j < uniques.length
+          $('#customerCompanyList').append '<option value=\'' + uniques[j] + '\'></option>'
+          j++
+    )
+
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/customers_email'
+      method: 'GET'
+      dataType: 'json'
+      headers: headers
+      success: (response) ->
+        $('#customerEmailList').empty()
+
+        uniques = []
+
+        i = 0
+        while i < response.data.length
+          if uniques.indexOf(response.data[i]) == -1
+            uniques.push(response.data[i])
+          i++
+
+        j = 0
+        while j < uniques.length
+          $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
+          j++
+
     )
 
   $('#new-complaint-form').submit (e) ->
@@ -27,7 +97,7 @@ $ ->
     tags = $('.selectize').val() || []
 
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaints'
+      url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
       headers: headers
       data:
@@ -40,6 +110,7 @@ $ ->
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
         $('#loader-modal').hide()
+        $('.modal-backdrop').remove();
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 

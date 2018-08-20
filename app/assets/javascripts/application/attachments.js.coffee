@@ -103,7 +103,7 @@ $ ->
     data.append( 'attachment[file_data]', $('input[id="file_data"]')[0].files[0])
     data = data
     $.ajax(
-      url: '/api/v1/escalations/attachments'
+      url: '/escalations/api/v1/escalations/attachments'
       method: 'POST'
       headers: headers
       xhr: ->
