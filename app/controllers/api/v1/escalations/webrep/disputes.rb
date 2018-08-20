@@ -272,7 +272,6 @@ module API
             patch 'return_dispute/:dispute_id' do
               std_api_v2 do
                 authorize!(:update, Dispute)
-                #binding.pry
                 dispute = Dispute.find(params['dispute_id'])
                 authorize!(:update, dispute)
 
