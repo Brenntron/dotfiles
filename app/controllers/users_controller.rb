@@ -23,10 +23,10 @@ class UsersController < ApplicationController
     case
       when @user.nil?
         flash[:error] = "Could not find user '#{params[:id]}'"
-        redirect_to users_path
+        redirect_to escalations_users_path
       when !current_user.authorized_to_see?( @user.id )
         flash[:error] = 'You are not authorized to view that user.'
-        redirect_to users_path
+        redirect_to escalations_users_path
       else
         @users = current_user.children
     end

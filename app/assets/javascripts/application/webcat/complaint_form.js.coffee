@@ -2,7 +2,7 @@ $ ->
   $('#new-complaint').on 'click', ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/customers'
+      url: '/escalations/api/v1/escalations/webcat/customers'
       method: 'GET'
       dataType: 'json'
       headers: headers
@@ -17,7 +17,7 @@ $ ->
   $('#advanced-search-button').on 'click', ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/customers_names'
+      url: '/escalations/api/v1/escalations/webcat/customers_names'
       method: 'GET'
       dataType: 'json'
       headers: headers
@@ -40,7 +40,7 @@ $ ->
     )
 
     $.ajax(
-      url: '/api/v1/escalations/webcat/customers_company_name'
+      url: '/escalations/api/v1/escalations/webcat/customers_company_name'
       method: 'GET'
       dataType: 'json'
       headers: headers
@@ -62,7 +62,7 @@ $ ->
     )
 
     $.ajax(
-      url: '/api/v1/escalations/webcat/customers_email'
+      url: '/escalations/api/v1/escalations/webcat/customers_email'
       method: 'GET'
       dataType: 'json'
       headers: headers
@@ -81,6 +81,7 @@ $ ->
         while j < uniques.length
           $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
           j++
+
     )
 
   $('#new-complaint-form').submit (e) ->
@@ -96,7 +97,7 @@ $ ->
     tags = $('.selectize').val() || []
 
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaints'
+      url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
       headers: headers
       data:
