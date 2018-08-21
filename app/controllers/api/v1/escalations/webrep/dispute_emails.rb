@@ -31,7 +31,7 @@ module API
               @dispute_email.update_attributes(status: permitted_params[:status])
 
               # Return whether or not the email is from a customer
-              
+              #
               from = Customer.where(email: @dispute_email.from)
               to = Customer.where(email: @dispute_email.to)
 

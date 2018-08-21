@@ -1,6 +1,5 @@
 $ ->
 
-
   # Generic email show stuff
   $('.email-row').on 'click', ->
     clean_up_current_email_view()
