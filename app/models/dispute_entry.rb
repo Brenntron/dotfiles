@@ -328,7 +328,7 @@ class DisputeEntry < ApplicationRecord
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
       wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
 
-      # self.wbrs_score = wbrs_stuff["wbrs"]["score"]
+      entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
       wbrs_stuff_rulehits.each do |rule_hit|
         new_rule_hit = DisputeRuleHit.new
         new_rule_hit.dispute_entry_id = entry.id
@@ -338,6 +338,8 @@ class DisputeEntry < ApplicationRecord
       end
 
       if is_ip_address === true
+        sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+        entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
         sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
 
         sbrs_stuff_rules.each do |rule_hit|

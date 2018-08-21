@@ -140,7 +140,7 @@ window.row_research_adjust_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form;
 
   data = {
-    'urls': [ wlbl_form.getElementsByClassName('wlbl-entry-content')[0].textContent ]
+    'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
     'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
