@@ -144,11 +144,11 @@
                     %td.dispute_rep_tools
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                          .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          .dropdown-menu
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper
-                                %input.adjust-wlbl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}"}
+                                %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
                                 %h3 Adjust WL/BL
                                 %table.dispute_tool_current
                                   %thead

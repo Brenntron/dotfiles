@@ -1090,3 +1090,111 @@ $ ->
 #      submit that shit
     else
       alert('No disputes selected')
+
+
+
+#      BFRP (Research tools page)
+
+
+# Inline WLBL Adjust Button
+  $('.bfrp-inline-wlbl-button').click ->
+#    Get entry content
+    research_row = $(this).parents('.research-table-row')[0]
+    entry_wrapper = $(research_row).find('.entry-data-content')[0]
+    entry_content = $(entry_wrapper).text()
+    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
+
+#    Define fields that need to be filled out in the dropdown
+    dropdown = $(this).next('.dropdown-menu')[0]
+    wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
+    wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
+    submit_button = $(dropdown).find('.dropdown-submit-button')
+    wl_weak = $(dropdown).find('.wl-weak-checkbox')
+    wl_med = $(dropdown).find('.wl-med-checkbox')
+    wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
+    bl_weak = $(dropdown).find('.bl-weak-checkbox')
+    bl_med = $(dropdown).find('.bl-med-checkbox')
+    bl_heavy = $(dropdown).find('.bl-heavy-checkbox')
+
+#   Clearing data to start in case user has page open for a while and data needs to be regrabbed
+    $(wlbl_list[0]).empty()
+    $(wbrs_score[0]).empty()
+    $(wl_weak[0]).prop('checked', false)
+    $(wl_med[0]).prop('checked', false)
+    $(wl_heavy[0]).prop('checked', false)
+    $(bl_weak[0]).prop('checked', false)
+    $(bl_med[0]).prop('checked', false)
+    $(bl_heavy[0]).prop('checked', false)
+    wl_weak_status = 'false'
+    wl_med_status = 'false'
+    wl_heavy_status = 'false'
+    bl_weak_status = 'false'
+    bl_med_status = 'false'
+    bl_heavy_status = 'false'
+
+#    Initializing 'current' status of lists to be filled in when data is fetched
+    initial_wl_weak_status = ''
+    initial_wl_med_status = ''
+    initial_wl_heavy_status = ''
+    initial_bl_weak_status = ''
+    initial_bl_med_status = ''
+    initial_bl_heavy_status = ''
+
+    data = {
+#   Send entry content to wbrs
+      'entry' : entry_content
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+      #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+
+        response = JSON.parse(response)
+        if response.data != ""
+          $(response.data).each ->
+            if String(this) == 'WL-weak'
+              $(wl_weak[0]).prop('checked', true)
+              wl_weak_status = 'true'
+              initial_wl_weak_status = wl_weak_status
+            if String(this) == 'WL-med'
+              $(wl_med[0]).prop('checked', true)
+              wl_med_status = 'true'
+              initial_wl_med_status = wl_med_status
+            if String(this) == 'WL-heavy'
+              $(wl_heavy[0]).prop('checked', true)
+              wl_heavy_status = 'true'
+              initial_wl_heavy_status = wl_heavy_status
+            if String(this) == 'BL-weak'
+              $(bl_weak[0]).prop('checked', true)
+              bl_weak_status = 'true'
+              initial_bl_weak_stats = bl_weak_status
+            if String(this) == 'BL-med'
+              $(bl_med[0]).prop('checked', true)
+              bl_med_status = 'true'
+              initial_bl_med_status = bl_med_status
+            if String(this) == 'BL-heavy'
+              $(bl_heavy[0]).prop('checked', true)
+              bl_heavy_status = 'true'
+              initial_bl_heavy_status = bl_heavy_status
+
+          $(wbrs_score).text(wbrs)
+          $(wlbl_list[0]).text(response.data)
+          $(submit_button[0]).attr('disabled', false)
+        else
+          $(wbrs_score).text(wbrs)
+          $(wlbl_list[0]).text('Not on a list')
+          $(submit_button[0]).attr('disabled', false)
+
+
+      error: (response) ->
+        popup_response_error(response, 'Error retrieving WL/BL Data')
+    )
+
+#    If user changes buttons from initial status, enable the submit button
+#   TODO add this check in later that only allows user to submit if there have been changes made
