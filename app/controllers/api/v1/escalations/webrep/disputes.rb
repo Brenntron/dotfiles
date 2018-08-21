@@ -188,7 +188,6 @@ module API
             end
             post "uri_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
-              #Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
               Wbrs::ManualWlbl.adjust_urls_from_params(permitted_params, username: current_user.cvs_username)
               true
             end
