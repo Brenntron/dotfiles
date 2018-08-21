@@ -19,6 +19,7 @@ gem 'devise', '~> 4.3.0'
 gem 'net-ldap', '~> 0.16.0'
 
 gem 'mysql2', '0.3.21'
+gem 'with_advisory_lock', '~> 4.0'
 gem 'rmagick', '~> 2.16.0'
 gem 'ruby-bugzilla', '~> 0.6.4'
 
