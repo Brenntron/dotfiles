@@ -2,7 +2,7 @@ class DisputeEmail < ApplicationRecord
   belongs_to :dispute
   has_many :dispute_email_attachments
 
-  EMAIL_DOMAIN = "email.talosintelligence.com"
+  EMAIL_DOMAIN = "dispute.talosintelligence.com"
   NOREPLY      = "noreply"
 
   UNREAD   = "unread"
