@@ -148,15 +148,15 @@
                           .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper
+                                %input.adjust-wlbl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}"}
+                                %h3 Adjust WL/BL
                                 %table.dispute_tool_current
                                   %thead
                                     %tr
-                                      %th.content-label-sm Dispute
                                       %th.content-label-sm.no-word-break Current WL/BL List
                                       %th.text-center.content-label-sm.no-word-break Current WBRS Score
                                   %tbody
                                     %tr
-                                      %td.wlbl-entry-content
                                       %td.wlbl-entry-wlbl
                                       %td.wlbl-current-entry-wbrs.text-center
 
@@ -169,7 +169,7 @@
                                   .row
                                     .col-xs-12
                                       %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
-                                  .row.toggle-offset
+                                  .row
                                     .col-xs-6
                                       %ul.wlbl-toggle-list
                                         %li

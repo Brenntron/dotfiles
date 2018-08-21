@@ -120,7 +120,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
-    @wbrs_list_type ||= wbrs_xlist.map{ |wlbl| wlbl.list_type }.join(',')
+    @wbrs_list_type ||= wbrs_xlist.map{ |wlbl| wlbl.list_type }.join(', ')
   end
 
   def wbrs_xlist
