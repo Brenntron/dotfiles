@@ -198,11 +198,14 @@ class DisputeEntry < ApplicationRecord
   end
 
   def last_submitted
-    if self.referenced_tickets.count > 1
+    if self.referenced_tickets.count > 0
+
       last_submitted = referenced_tickets.last.created_at
     else
       last_submitted = "N/A"
     end
+    
+    return last_submitted
   end
 
   def is_possible_company_duplicate?
