@@ -185,9 +185,6 @@ $ ->
       $(dropdown).removeClass('open')
       return false
 
-
-
-
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
