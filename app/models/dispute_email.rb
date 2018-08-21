@@ -36,7 +36,7 @@ class DisputeEmail < ApplicationRecord
 
       conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post()
-
+      return
     end
 
     new_email = DisputeEmail.new
@@ -57,6 +57,10 @@ class DisputeEmail < ApplicationRecord
       end
     end
 
+    #Update ticket status
+    dispute = Dispute.find(case_id)
+    dispute.status = Dispute::STATUS_CUSTOMER_UPDATE
+    dispute.save
 
     conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
     conn.post()
@@ -143,6 +147,11 @@ class DisputeEmail < ApplicationRecord
     email_args[:dispute_email_id] = new_email.id
 
     new_email.reload
+
+    #update dispute status
+    dispute = Dispute.find(params[:dispute_id])
+    dispute.status = Dispute::STATUS_CUSTOMER_PENDING
+    dispute.save
 
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
