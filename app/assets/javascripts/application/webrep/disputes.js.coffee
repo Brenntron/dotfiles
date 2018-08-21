@@ -839,7 +839,6 @@ $ ->
       { data: 'case_opened_at' }
       { data: 'case_age' }
       { data: 'source' }
-      { data: 'source_id' }
       { data: 'submitter_type'}
       { data: 'submitter_name' }
       { data: 'submitter_org' }
@@ -905,7 +904,7 @@ $ ->
     # `d` is the original data object for the row
     table_head + entry_rows.join('') + '</tbody></table>'
 
-  if $('body.index-action').length
+  if $('#disputes-index').length
     standard_webrep_index_table('open')
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
