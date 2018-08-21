@@ -157,7 +157,7 @@ class Dispute < ApplicationRecord
       block.call(related_dispute)
       related_dispute.relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
     else
-      relating_disputes.where.not(resolution: Dispute::DUPLICATE).each(&block)
+      relating_disputes.each(&block)
     end
   end
 
