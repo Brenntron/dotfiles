@@ -8,7 +8,7 @@ class Dispute < ApplicationRecord
   has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
   has_many :dispute_comments
   has_many :dispute_emails
-  has_many :dispute_entries
+  has_many :dispute_entries, dependent: :destroy
   has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
   has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
@@ -47,6 +47,7 @@ class Dispute < ApplicationRecord
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
   STATUS_CUSTOMER_PENDING = "CUSTOMER_PENDING"
+  STATUS_CUSTOMER_UPDATE = "CUSTOMER_UPDATE"
   STATUS_ON_HOLD = "ON_HOLD"
   STATUS_RESOLVED = "RESOLVED_CLOSED"
   STATUS_ASSIGNED = "ASSIGNED"
@@ -62,7 +63,7 @@ class Dispute < ApplicationRecord
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
-  scope :in_progress_disputes, -> { where(status: [ STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_CUSTOMER_PENDING, STATUS_ON_HOLD, STATUS_REOPENED ]) }
+  scope :in_progress_disputes, -> { where(status: [ STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_CUSTOMER_PENDING, STATUS_ON_HOLD, STATUS_REOPENED, STATUS_CUSTOMER_UPDATE ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def case_id_str
@@ -348,6 +349,8 @@ class Dispute < ApplicationRecord
     guest = Company.where(:name => "Guest").first
     opened_at = Time.now
     resolved_at = Time.now
+    customer = Customer.process_and_get_customer(message_payload)
+
     begin
       ActiveRecord::Base.transaction do
 
@@ -405,7 +408,7 @@ class Dispute < ApplicationRecord
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
         new_dispute.status = NEW
 
-        new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
+        new_dispute.customer_id = customer.id
 
         new_dispute.submitter_type = new_dispute.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
@@ -882,15 +885,15 @@ class Dispute < ApplicationRecord
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where(status: ['new', 'open', 'reopen'], user_id: user.id)
+        where(status: [STATUS_ASSIGNED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_REOPENED], user_id: user.id)
       when 'my_disputes'
         where(user_id: user.id)
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'open'
-        where(status: ['new', 'open', 'reopen'])
+        where(status: [STATUS_NEW, STATUS_REOPENED])
       when 'closed'
-        where(status: ['closed', 'resolved', 'resolved_closed'])
+        where(status: [CLOSED, STATUS_RESOLVED])
     when 'all'
         where({})
       else
@@ -1036,7 +1039,6 @@ class Dispute < ApplicationRecord
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
       dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
-      dispute_packet[:source_id] = dispute.ticket_source_key
       dispute_packet[:source_type] = dispute.ticket_source_type
 
       dispute_packet[:wbrs_score] = ''

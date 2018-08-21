@@ -5061,7 +5061,6 @@ button.dropdown-submit-button {
 
 .comment-wrapper {
   padding: 0 2px;
-  display: none;
 }
 
 .button-row-center {
@@ -5975,6 +5974,18 @@ table.dataTable tbody tr.selected {
 
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-top .tooltipster-arrow-border {
   border-top-color: $table-dark-body;
+}
+
+#complaint_button_dialog .dialog-content-wrapper, #history_dialog .dialog-content-wrapper {
+  padding: 15px;
+}
+
+.history-table {
+  font-size: 8pt;
+}
+
+.history-table td {
+  padding: 4px 8px;
 }
 
 .searched-for-url {

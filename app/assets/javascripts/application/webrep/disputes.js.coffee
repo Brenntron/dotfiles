@@ -133,6 +133,27 @@ window.row_adjust_wlbl_button =(button_tag) ->
     error_prefix: 'Error adjusting WL/BL.'
   )
 
+window.row_research_adjust_wlbl_button =(button_tag) ->
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+  wlbl_form = button_tag.form;
+
+  data = {
+    'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
+  )
+
+
 window.toolbar_adust_wlbl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
@@ -195,6 +216,52 @@ window.save_dispute = () ->
     success_reload: true
   )
 
+# Populating the in line Adjust Reptool button for research page and research tab
+window.inline_load_reptool_button =(button_tag) ->
+  #debugger
+  adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
+  submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
+  #$(submit_button).attr("disabled", false)
+
+  #button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0].getElementsByClassName('dropdown-submit-button')
+
+  #dropdown = $('#reptool_adjust_entries').parent()
+
+  show_content = $(adjust_form).find('.entry-dispute-name')
+  show_rep_class = $(adjust_form).find('.entry-reptool-class')
+  show_rep_exp = $(adjust_form).find('.entry-reptool-expiration')
+  action_input = $(adjust_form).find('.action-input')
+  classifications_input = $(adjust_form).find('.classifications-input')
+  comment_input = $(adjust_form).find('.comment-input')
+  data = {
+# Send entry content to reptool
+    'entry' : adjust_form.getElementsByClassName('dispute-entry-content')[0].value
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+
+      show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
+      show_rep_class.text(response.classification)
+      show_rep_exp.text(response.expiration)
+      action_input.val(response.status)
+      classifications_input.val(response.classification)
+      comment_input.val(response.comment)
+      $(submit_button).attr('disabled', false)
+#          window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error retrieving Reptool Data')
+  )
+
+
+
 window.row_adust_reptool_bl_button =(button_tag) ->
   reptool_bl_form = button_tag.form
   data = {
@@ -215,6 +282,30 @@ window.row_adust_reptool_bl_button =(button_tag) ->
     error: (response) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
+
+window.row_adust_reptool_bl_button_research =(button_tag) ->
+  reptool_bl_form = button_tag.form
+
+  data = {
+    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
+    'entries': [ reptool_bl_form.getElementsByClassName('dispute-entry-content')[0].value ]
+    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
+  )
+
+
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
@@ -769,7 +860,6 @@ $ ->
       { data: 'case_opened_at' }
       { data: 'case_age' }
       { data: 'source' }
-      { data: 'source_id' }
       { data: 'submitter_type'}
       { data: 'submitter_name' }
       { data: 'submitter_org' }
@@ -835,7 +925,7 @@ $ ->
     # `d` is the original data object for the row
     table_head + entry_rows.join('') + '</tbody></table>'
 
-  if $('body.index-action').length
+  if $('#disputes-index').length
     standard_webrep_index_table('open')
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
@@ -1020,3 +1110,111 @@ $ ->
 #      submit that shit
     else
       alert('No disputes selected')
+
+
+
+#      BFRP (Research tools page)
+
+
+# Inline WLBL Adjust Button
+  $('.bfrp-inline-wlbl-button').click ->
+#    Get entry content
+    research_row = $(this).parents('.research-table-row')[0]
+    entry_wrapper = $(research_row).find('.entry-data-content')[0]
+    entry_content = $(entry_wrapper).text()
+    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
+
+#    Define fields that need to be filled out in the dropdown
+    dropdown = $(this).next('.dropdown-menu')[0]
+    wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
+    wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
+    submit_button = $(dropdown).find('.dropdown-submit-button')
+    wl_weak = $(dropdown).find('.wl-weak-checkbox')
+    wl_med = $(dropdown).find('.wl-med-checkbox')
+    wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
+    bl_weak = $(dropdown).find('.bl-weak-checkbox')
+    bl_med = $(dropdown).find('.bl-med-checkbox')
+    bl_heavy = $(dropdown).find('.bl-heavy-checkbox')
+
+#   Clearing data to start in case user has page open for a while and data needs to be regrabbed
+    $(wlbl_list[0]).empty()
+    $(wbrs_score[0]).empty()
+    $(wl_weak[0]).prop('checked', false)
+    $(wl_med[0]).prop('checked', false)
+    $(wl_heavy[0]).prop('checked', false)
+    $(bl_weak[0]).prop('checked', false)
+    $(bl_med[0]).prop('checked', false)
+    $(bl_heavy[0]).prop('checked', false)
+    wl_weak_status = 'false'
+    wl_med_status = 'false'
+    wl_heavy_status = 'false'
+    bl_weak_status = 'false'
+    bl_med_status = 'false'
+    bl_heavy_status = 'false'
+
+#    Initializing 'current' status of lists to be filled in when data is fetched
+    initial_wl_weak_status = ''
+    initial_wl_med_status = ''
+    initial_wl_heavy_status = ''
+    initial_bl_weak_status = ''
+    initial_bl_med_status = ''
+    initial_bl_heavy_status = ''
+
+    data = {
+#   Send entry content to wbrs
+      'entry' : entry_content
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+      #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+
+        response = JSON.parse(response)
+        if response.data != ""
+          $(response.data).each ->
+            if String(this) == 'WL-weak'
+              $(wl_weak[0]).prop('checked', true)
+              wl_weak_status = 'true'
+              initial_wl_weak_status = wl_weak_status
+            if String(this) == 'WL-med'
+              $(wl_med[0]).prop('checked', true)
+              wl_med_status = 'true'
+              initial_wl_med_status = wl_med_status
+            if String(this) == 'WL-heavy'
+              $(wl_heavy[0]).prop('checked', true)
+              wl_heavy_status = 'true'
+              initial_wl_heavy_status = wl_heavy_status
+            if String(this) == 'BL-weak'
+              $(bl_weak[0]).prop('checked', true)
+              bl_weak_status = 'true'
+              initial_bl_weak_stats = bl_weak_status
+            if String(this) == 'BL-med'
+              $(bl_med[0]).prop('checked', true)
+              bl_med_status = 'true'
+              initial_bl_med_status = bl_med_status
+            if String(this) == 'BL-heavy'
+              $(bl_heavy[0]).prop('checked', true)
+              bl_heavy_status = 'true'
+              initial_bl_heavy_status = bl_heavy_status
+
+          $(wbrs_score).text(wbrs)
+          $(wlbl_list[0]).text(response.data)
+          $(submit_button[0]).attr('disabled', false)
+        else
+          $(wbrs_score).text(wbrs)
+          $(wlbl_list[0]).text('Not on a list')
+          $(submit_button[0]).attr('disabled', false)
+
+
+      error: (response) ->
+        popup_response_error(response, 'Error retrieving WL/BL Data')
+    )
+
+#    If user changes buttons from initial status, enable the submit button
+#   TODO add this check in later that only allows user to submit if there have been changes made

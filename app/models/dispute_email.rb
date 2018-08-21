@@ -2,7 +2,7 @@ class DisputeEmail < ApplicationRecord
   belongs_to :dispute
   has_many :dispute_email_attachments
 
-  EMAIL_DOMAIN = "email.talosintelligence.com"
+  EMAIL_DOMAIN = "dispute.talosintelligence.com"
   NOREPLY      = "noreply"
 
   UNREAD   = "unread"
@@ -31,12 +31,12 @@ class DisputeEmail < ApplicationRecord
       bad_email_args[:body] = bad_gateway_body
 
       attachments_to_mail = []
-      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence', source_authority: 'talos-intelligence')
+      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
       conn.post(bad_email_args, attachments_to_mail)
 
       conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post()
-
+      return
     end
 
     new_email = DisputeEmail.new
@@ -57,6 +57,10 @@ class DisputeEmail < ApplicationRecord
       end
     end
 
+    #Update ticket status
+    dispute = Dispute.find(case_id)
+    dispute.status = Dispute::STATUS_CUSTOMER_UPDATE
+    dispute.save
 
     conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
     conn.post()
@@ -144,6 +148,11 @@ class DisputeEmail < ApplicationRecord
 
     new_email.reload
 
+    #update dispute status
+    dispute = Dispute.find(params[:dispute_id])
+    dispute.status = Dispute::STATUS_CUSTOMER_PENDING
+    dispute.save
+
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 
@@ -182,14 +191,13 @@ class DisputeEmail < ApplicationRecord
   ## AUTO EMAIL MANAGEMENT
 
   def self.bad_gateway_subject
-    "THINGS"
+    "Unable to process dispute submission"
   end
 
   def self.bad_gateway_body
-    <<-BADGATEWAY
-
-      THIS IS THE BODY OF A BAD GATEWAY EMAIL THAT INSTRUCTS HOW TO USE TALOS INTELLIGENCE TO START A NEW CASE
-
+    <<~BADGATEWAY
+Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, we are not able to accommodate a request sent directly to the system.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
+https://talosintelligence.com/reputation_center/support
     BADGATEWAY
   end
 
