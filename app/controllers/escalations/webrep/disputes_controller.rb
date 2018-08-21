@@ -15,21 +15,28 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                           params: index_params,
                                           user: current_user)
         contents = RubyXL::Workbook.new
-        # contents = CSV.generate do |csv|
-        #   csv << [ 'Priority', 'Case ID', 'Status', 'Dispute', 'Count', 'Owner', 'Time Submitted', 'Age' ]
-        #   @disputes.each do |dispute|
-        #     csv << [
-        #         'P3',
-        #         dispute.case_id_str,
-        #         dispute.status,
-        #         dispute.org_domain,
-        #         dispute.dispute_entries.count,
-        #         dispute.user.cvs_username,
-        #         dispute.case_opened_at,
-        #         ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)
-        #     ]
-        #   end
-        # end
+        @worksheet = contents[0]
+        dispute_headers = ['Priority', 'Case ID', 'Status', 'Dispute', 'Count', 'Owner', 'Time Submitted', 'Age']
+        dispute_headers.each_with_index do |header, i|
+          @worksheet.add_cell(0, i, header)
+        end
+
+        def insert_row_with_data(data)
+          data_insertion_index = @worksheet.sheet_data.rows.count
+          data.each_with_index do |new_data, i|
+            @worksheet.add_cell(data_insertion_index, i, new_data)
+          end
+        end
+
+        @disputes.each do |dispute|
+          insert_row_with_data(['P3', dispute.case_id_str, dispute.status, dispute.org_domain, dispute.dispute_entries.count, dispute.user.cvs_username, dispute.case_opened_at, ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)])
+          insert_row_with_data([ 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits' ])
+          dispute.dispute_entries.each do |dispute_entry|
+            insert_row_with_data([ dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count ])
+          end
+
+        end
+
         send_data contents.stream.string, filename: "myworkbook.xlsx",
                   disposition: 'attachment'
       end
