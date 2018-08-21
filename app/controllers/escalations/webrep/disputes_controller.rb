@@ -14,22 +14,24 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                           search_name: search_name,
                                           params: index_params,
                                           user: current_user)
-        contents = CSV.generate do |csv|
-          csv << [ 'Priority', 'Case ID', 'Status', 'Dispute', 'Count', 'Owner', 'Time Submitted', 'Age' ]
-          @disputes.each do |dispute|
-            csv << [
-                'P3',
-                dispute.case_number,
-                dispute.status,
-                dispute.org_domain,
-                dispute.dispute_entries.count,
-                dispute.user.cvs_username,
-                dispute.case_opened_at,
-                ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)
-            ]
-          end
-        end
-        send_data contents
+        contents = RubyXL::Workbook.new
+        # contents = CSV.generate do |csv|
+        #   csv << [ 'Priority', 'Case ID', 'Status', 'Dispute', 'Count', 'Owner', 'Time Submitted', 'Age' ]
+        #   @disputes.each do |dispute|
+        #     csv << [
+        #         'P3',
+        #         dispute.case_id_str,
+        #         dispute.status,
+        #         dispute.org_domain,
+        #         dispute.dispute_entries.count,
+        #         dispute.user.cvs_username,
+        #         dispute.case_opened_at,
+        #         ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)
+        #     ]
+        #   end
+        # end
+        send_data contents.stream.string, filename: "myworkbook.xlsx",
+                  disposition: 'attachment'
       end
     end
   end
