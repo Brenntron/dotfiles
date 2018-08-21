@@ -964,12 +964,10 @@ class Dispute < ApplicationRecord
   end
 
   def customer_name
-    customer = Customer.find(customer_id)
     return customer.name
   end
 
   def customer_email
-    customer = Customer.find(customer_id)
     return customer.email
   end
 
