@@ -1,5 +1,6 @@
 $ ->
 
+
   # Generic email show stuff
   $('.email-row').on 'click', ->
     clean_up_current_email_view()
@@ -15,10 +16,15 @@ $ ->
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
         populate_communication_details(response.email, response.attachments)
+
+        if response.customer == true
+          $('.customer-facing-notice').show()
+        else
+          $('.customer-facing-notice').hide()
+
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email.", reload: false)
     )
-
 
   populate_communication_details = (email, attachments) ->
     $('input[type=text].reply-subject').val("Re: " + email.subject)
