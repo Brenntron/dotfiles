@@ -24,7 +24,6 @@ module API
             end
 
             put ":id", root: "dispute_email" do
-
               authorize!(:update, DisputeEmail)
               @dispute_email = DisputeEmail.find(permitted_params[:id])
               authorize!(:update, @dispute_email)
