@@ -30,15 +30,18 @@
     .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'categorize-urls'}
       %h3.nav-tool-dropdown-header.inverse
         Categorize URLs
-      .nav-tool-content-wrapper#categorize-urls-form-wrapper
-        .categorize-radio-wrapper
-          %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-same', value: 'cat-urls-same'}
-          %label.radio-label{for: 'cat-urls-diff'} Same Categories
-          %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-diff', value: 'cat-urls-diff'}
+      .row.categorize-radio-wrapper
+        .col-xs-6
+          %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-diff', value: 'cat-urls-diff', checked: true}
           %label.radio-label{for: 'cat-urls-diff'} Different Categories
+        .col-xs-6
+          %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-same', value: 'cat-urls-same'}
+          %label.radio-label{for: 'cat-urls-same'} Same Categories
+
+      .nav-tool-content-wrapper#categorize-urls-form-wrapper
         .categorize-same-form
           %form{method: 'get', 'accept-charset': 'UTF-8'}
-            %h5 Categorize URLs with Same Categories
+            %h5 Categorize URLs with Different Categories
             .form-group
               %label.content-label-sm URL
               %input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
@@ -70,7 +73,7 @@
               %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
         %form{method: 'get', 'accept-charset': 'UTF-8'}
           .categorize-diff-form
-            %h5 Categorize URLs with Different Categories
+            %h5 Categorize URLs with Same Categories
             .form-group
               %label.content-label-sm Categories
               %select.form-control#multi_cat_url_cats.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}

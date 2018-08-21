@@ -5994,6 +5994,28 @@ hr.condensed {
   width: 500px;
 }
 
+.categorize-radio-wrapper {
+  line-height: initial;
+  background-color: $faint-neutral-color;
+}
+
+.categorize-radio-wrapper .radio-label {
+  font-size: 8pt;
+  padding-left: 8px;
+}
+
+.categorize-radio-wrapper input[type="radio"] {
+  border: none !important;
+  outline: none !important;
+}
+
+.categorize-radio-wrapper.row {
+  margin-right: -10px;
+  margin-left: -10px;
+  padding: 12px 6px;
+}
+
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
