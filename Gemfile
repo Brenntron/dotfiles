@@ -72,6 +72,7 @@ gem 'inline_svg'
 
 
 gem 'gzip', '1.0'
+gem 'rubyXL', '3.3.29'
 
 group :development do
   gem 'thin', '~> 1.7.0'
