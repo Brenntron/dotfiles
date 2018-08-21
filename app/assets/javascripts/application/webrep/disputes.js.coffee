@@ -738,25 +738,23 @@ $ ->
       { data: 'case_link' }
       { data: 'status' }
       { data: 'resolution' }
-      {
+       {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>' #6
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
       { data: 'case_opened_at' }
       { data: 'case_age' }
       { data: 'source' }
-      { data: 'source_id' }
       { data: 'submitter_type'}
-      { data: 'submitter_name' }
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
-      {
-        data: null
-        defaultContent: ''
-      }
+      { data: 'submitter_name' }
+      { data: 'submitter_email' }
+
+
     ])
 
   format = (dispute) ->
