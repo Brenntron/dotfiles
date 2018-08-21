@@ -969,6 +969,7 @@ class Dispute < ApplicationRecord
     disputes.map do |dispute|
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
+      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_name] = '' #dispute.customer_name
       dispute_packet[:submitter_org] = dispute.org_domain
@@ -1005,7 +1006,7 @@ class Dispute < ApplicationRecord
             dispute_packet[:assigned_to] =
                 "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.cvs_username} </span><button class='return-ticket-button' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
           else
-            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
           end
       end
 
@@ -1083,7 +1084,9 @@ class Dispute < ApplicationRecord
   end
 
   def return_dispute(dispute_entry)
-    Dispute.find(dispute_entry).update(user_id: 1)
+    Dispute.find(dispute_entry).update(user_id: User.where(cvs_username:"vrtincom").first)
+    Dispute.find(dispute_entry).update(case_accepted_at: nil)
+    Dispute.find(dispute_entry).update(status: 'NEW')
   end
 end
 

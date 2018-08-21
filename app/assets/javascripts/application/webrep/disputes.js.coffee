@@ -427,7 +427,8 @@ window.take_dispute = (take_button, dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      this.td_tag.getElementsByClassName("dispute_username")[0].innerText = response.username
+      $('#owner_' + dispute_id).text(response.username)
+      $('#status_' + dispute_id).text("Assigned")
   )
 
 
@@ -471,6 +472,7 @@ window.return_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       $('#owner_' + response.dispute_id).text('Unassigned')
+      $('#status_' + response.dispute_id).text('NEW')
   )
 
 
