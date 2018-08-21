@@ -274,8 +274,17 @@ class DisputeEntry < ApplicationRecord
     if attributes.has_key?('status')
       unless attributes['status'].nil?
         attributes['status'] = attributes['status'].upcase
+        if attributes['status'] == DisputeEntry::STATUS_RESOLVED
+          resolved_at = Time.now
+          attributes['case_closed_at'] = resolved_at
+          attributes['case_resolved_at'] = resolved_at
+        elsif attributes['status'] == DisputeEntry::ASSIGNED
+          assigned_at = Time.now
+          attributes['case_accepted_at'] = assigned_at
+        end
       end
     end
+
 
     if attributes.has_key?('host')
       host = attributes.delete('host')
@@ -296,7 +305,7 @@ class DisputeEntry < ApplicationRecord
       sync_up
     end
 
-    update!(attributes.slice(*%w{entry_type ip_address hostname uri status resolution resolution_comment}))
+    update!(attributes.slice(*%w{entry_type ip_address hostname uri status resolution resolution_comment case_accepted_at case_resolved_at case_closed_at}))
   end
 
   def self.update_from_field_data(field_data)
