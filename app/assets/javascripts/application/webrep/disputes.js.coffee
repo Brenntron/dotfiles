@@ -748,7 +748,6 @@ $ ->
       { data: 'case_opened_at' }
       { data: 'case_age' }
       { data: 'source' }
-      { data: 'source_id' }
       { data: 'submitter_type'}
       { data: 'submitter_name' }
       { data: 'submitter_org' }
