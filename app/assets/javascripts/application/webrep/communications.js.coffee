@@ -9,12 +9,12 @@ $ ->
 
     std_msg_ajax(
       method: 'PUT'
-      url: "/api/v1/escalations/webrep/dispute_emails/#{email_id}"
+      url: "/escalations/api/v1/escalations/webrep/dispute_emails/#{email_id}"
       data: {status: 'read'}
       success_reload: false
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
-        populate_communication_details(response.email, response.attachments)
+        populate_communication_details(response.email, response.attachments, response.case_email)
 
         if response.customer == true
           $('.customer-facing-notice').show()
@@ -25,12 +25,14 @@ $ ->
         std_api_error(response, "There was a problem retrieving email.", reload: false)
     )
 
-  populate_communication_details = (email, attachments) ->
+  populate_communication_details = (email, attachments, case_email) ->
     $('input[type=text].reply-subject').val("Re: " + email.subject)
+    $('.communication-subject')[0].innerHTML = email.subject
     $('.author-username')[0].innerHTML = email.from
-    $('.receiver-email')[0].innerHTML = email.to
+    $('.receiver-email')[0].innerHTML = (email.to || case_email)
     $('.receiver-email')[1].innerHTML = email.from
     $('.email-msg-content')[0].innerHTML = email.body
+
 
     date = moment.utc(email.created_at)
     $('.email-datetime')[0].innerHTML = moment(date).format('YYYY-MM-DD') + "<br>" + moment(date).format('HH:mm:ss')
@@ -62,6 +64,11 @@ $ ->
     $('#email-reply').removeClass('hidden')
     $('.email-reply-body').focus()
 
+  $('.forward-button').on 'click', ->
+    $('#newEmailDialog').dialog 'open'
+    $('.new-subject').val("Fwd:" + $(".communication-subject")[0].textContent)
+    $('.new-body').val("\n" + "###################################" + "\n" + "Begin Forwarded Message:" + "\n" + $('.email-msg-content')[0].innerHTML)
+
   $('.delete-email').on 'click', ->
     $('.reply-body').val('')
     $('#email-reply').addClass('hidden')
@@ -71,10 +78,10 @@ $ ->
 
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
-        $('.reply-body')[0].innerHTML = response[0].body
+        $('.reply-body').val(response[0].body)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
@@ -107,7 +114,7 @@ $ ->
     $.ajax(
       headers: headers
       method: 'POST'
-      url: '/api/v1/escalations/webrep/dispute_emails'
+      url: '/escalations/api/v1/escalations/webrep/dispute_emails'
       data: form_data
       contentType: false
       processData: false
@@ -126,10 +133,10 @@ $ ->
 
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
-        $('.new-body')[0].innerHTML = response[0].body
+        $('.new-body').val(response[0].body)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
@@ -159,13 +166,16 @@ $ ->
     form_data.append('subject', $('.new-subject').val())
     form_data.append('cc', $('.cc-email').val())
 
+    dispute_id = $('input[name="dispute_id"]').val()
+
+
     if $('form')[0].checkValidity() == true
       e.preventDefault()
-      if form_data.dispute_id
+      if dispute_id
         $.ajax(
           headers: headers
           method: 'POST'
-          url: '/api/v1/escalations/webrep/dispute_emails'
+          url: '/escalations/api/v1/escalations/webrep/dispute_emails'
           data: form_data
           contentType: false
           processData: false
@@ -181,7 +191,7 @@ $ ->
         $.ajax(
           headers: headers
           method: 'POST'
-          url: '/api/v1/escalations/webrep/dispute_emails/ad_hoc'
+          url: '/escalations/api/v1/escalations/webrep/dispute_emails/ad_hoc'
           data: form_data
           contentType: false
           processData: false
@@ -207,7 +217,7 @@ $ ->
     if confirmation
       std_msg_ajax(
         method: 'DELETE'
-        url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
+        url: "/escalations/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
         data: {current_user_id: current_user_id}
         success_reload: false
         success: (response) ->
@@ -226,7 +236,7 @@ $ ->
 
     std_msg_ajax(
       method: 'PUT'
-      url: "/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
+      url: "/escalations/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
       data: {current_user_id: current_user_id, comment: updated_comment}
       success_reload: true
       success: (response) ->
@@ -274,7 +284,7 @@ $ ->
 
     std_msg_ajax(
       method: 'POST'
-      url: "/api/v1/escalations/webrep/dispute_comments"
+      url: "/escalations/api/v1/escalations/webrep/dispute_comments"
       data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
       success_reload: true
       success: (response) ->
@@ -307,7 +317,7 @@ $ ->
     template_id = $(this).attr('template_id')
     std_msg_ajax(
       method: 'GET'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
         $('#edit-template-name')[0].value = response[0].template_name
@@ -351,7 +361,7 @@ $ ->
 
     std_msg_ajax(
       method: 'PUT'
-      url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+      url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
       data: {template_name: template_name, description: description, body: body}
       success_reload: true
       success: (response) ->
@@ -367,7 +377,7 @@ $ ->
     if confirmation
       std_msg_ajax(
         method: 'DELETE'
-        url: "/api/v1/escalations/webrep/email_templates/#{template_id}"
+        url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
         success_reload: true
         success: (response) ->
           std_msg_success('Email Template Deleted.', [], reload: true)
@@ -383,7 +393,7 @@ $ ->
 
     std_msg_ajax(
       method: 'POST'
-      url: "/api/v1/escalations/webrep/email_templates"
+      url: "/escalations/api/v1/escalations/webrep/email_templates"
       data: {template_name: template_name, description: description, body: body}
       success_reload: false
       success_reload: false

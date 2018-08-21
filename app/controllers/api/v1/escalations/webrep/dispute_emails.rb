@@ -28,9 +28,10 @@ module API
               @dispute_email = DisputeEmail.find(permitted_params[:id])
               authorize!(:update, @dispute_email)
               @dispute_email.update_attributes(status: permitted_params[:status])
+              @case_email = DisputeEmail.generate_case_email_address(@dispute_email.dispute_id)
+
 
               # Return whether or not the email is from a customer
-              #
               from = Customer.where(email: @dispute_email.from)
               to = Customer.where(email: @dispute_email.to)
 
@@ -40,7 +41,7 @@ module API
                 customer_boolean = false
               end
 
-              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments, customer: customer_boolean}
+              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments, case_email: @case_email, customer: customer_boolean}
             end
 
             desc "create a dispute email"
@@ -58,27 +59,29 @@ module API
             post "", root: "dispute_email" do
               authorize!(:create, DisputeEmail)
               begin
-                #temporary, for development, don't wanna be sending these to actual customers
-                if Rails.env == "development"
-                  params[:to] = current_user.email
-                end
-
-                new_email = DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
-
-                if params[:dispute_email_id].present?
-                  replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
-                  replied_email.status = DisputeEmail::REPLIED
-                  replied_email.save
-                end
-
-                if params[:dispute_id].present?
-                  dispute = Dispute.find(params[:dispute_id])
-                  unless dispute.case_responded_at
-                    dispute.update!(case_responded_at: Time.now)
+                ActiveRecord::Base.transaction do
+                  #temporary, for development, don't wanna be sending these to actual customers
+                  if Rails.env == "development"
+                    params[:to] = current_user.email
                   end
-                end
 
-                return ""
+                  DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
+
+                  if params[:dispute_email_id].present?
+                    replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
+                    replied_email.status = DisputeEmail::REPLIED
+                    replied_email.save
+                  end
+
+                  if params[:dispute_id].present?
+                    dispute = Dispute.find(params[:dispute_id])
+                    unless dispute.case_responded_at
+                      dispute.update!(case_responded_at: Time.now)
+                    end
+                  end
+
+                  return ""
+                end
               rescue Exception => e
                 Rails.logger.error e
                 raise "There was an error in attempting to send an email."
@@ -106,10 +109,7 @@ module API
                     params[:to] = current_user.email
                   end
 
-                  email_info = EscalationEmailTool.generate_email_info(params, current_user)
-
-                  conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-                  conn.post(email_info[:email_args], email_info[:attachments_to_mail])
+                  EscalationEmailTool.generate_email_info(params, current_user)
 
                   return ""
                 end

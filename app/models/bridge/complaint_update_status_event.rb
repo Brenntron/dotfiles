@@ -4,7 +4,7 @@ class Bridge::ComplaintUpdateStatusEvent < Bridge::BaseMessage
           addressee: 'talos-intelligence')
   end
 
-  def post_entries(entries, source_key: source_key)
+  def post_entries(entries, source_key: nil)
     payload = entries.inject({}) do |message_data, entry|
       message_data[entry.hostlookup] = {
           hostname: entry.hostlookup,

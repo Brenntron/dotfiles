@@ -13,7 +13,7 @@ window.cat_new_url = ()->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url:'/api/v1/escalations/webcat/complaints/cat_new_url'
+    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
     method: 'POST'
     headers: headers
     data: {data: data}
@@ -72,7 +72,7 @@ format_domain_info = (info)->
       '<tr>' +
         '<td class="table-side-header">' +
           'Created' +
-        '</td>' +
+        '</td>'
         '<td>' + info.creation_date + '</td>'+
       '</tr><tr>' +
         '<td class="table-side-header">' +
@@ -95,7 +95,7 @@ format_domain_info = (info)->
 window.domain_whois = (IP_Domain) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/domain_whois'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
     method: 'POST'
     headers: headers
     data: {'lookup': IP_Domain}
@@ -126,9 +126,6 @@ window.domain_whois = (IP_Domain) ->
             autoOpen: true
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
-
-#        Add popup here, rather than success message
-#        std_msg_success("[format_domain_info(json)]",, reload: false)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -146,7 +143,7 @@ window.updatePending = (id,row_id) ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/update_pending'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
     headers: headers
     data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
@@ -189,7 +186,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/update'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
     method: 'POST'
     headers: headers
     data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
@@ -244,7 +241,7 @@ window.take_selected = ()->
       i++
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaint_entries/take_entry'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
       method: 'POST'
       headers: headers
       data: 'complaint_entry_ids': entry_ids
@@ -276,7 +273,7 @@ window.return_selected = ()->
       i++
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaint_entries/return_entry'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
       method: 'POST'
       headers: headers
       data: 'complaint_entry_ids': entry_ids
@@ -456,6 +453,16 @@ format = (complaint_entry_row) ->
   else
     tags = '<span class="missing-data">No tags</span>'
 
+  if complaint_entry.entry_history?
+    if complaint_entry.entry_history.domain_history.length >= 1
+      domain_history = complaint_entry.entry_history.domain_history
+    else
+      domain_history = ''
+    if complaint_entry.entry_history.complaint_history.length >= 1
+      complaint_history = complaint_entry.entry_history.complaint_history
+    else
+      complaint_history = ''
+
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
 
 
@@ -488,7 +495,6 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Resolution</label><br/>' +
       '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
       '</div></div></div>' +
-
       '<div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
@@ -517,6 +523,7 @@ format = (complaint_entry_row) ->
 
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
+
     complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -539,10 +546,9 @@ format = (complaint_entry_row) ->
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary">Lookup</button><br/><button class="secondary">History</button><br/>' +
-
+      '<button class="secondary">Lookup</button><br/>' +
+      '<button class="secondary" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
       '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
-
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -569,7 +575,84 @@ format = (complaint_entry_row) ->
       '<br/>' +
       '<button class="tertiary" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
+
   complaint_entry_html
+
+window.history_dialog = (id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/api/v1/escalations/webcat/complaint_entries/history'
+    method: 'POST'
+    headers: headers
+    data: {'id': id}
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        #parse this json properly
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<h5>Domain History</h5>' +
+          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+          '<tbody>'
+        for entry in json.entry_history.domain_history
+          entry_string = "" +
+          '<tr>' +
+          '<td>' + entry['action'] + '</td>' +
+          '<td>' + entry['confidence'] + '</td>' +
+          '<td>' + entry['description'] + '</td>' +
+          '<td>' + entry['time'] + '</td>' +
+          '<td>' + entry['user'] + '</td>' +
+          '<td>' + entry['category']['descr'] + '</td>' +
+          '</tr>'
+
+          history_dialog_content += entry_string
+        history_dialog_content += '</tbody></table>'
+        history_dialog_content += '<hr class="thin"/>'
+        history_dialog_content += '<h5>Complaint Entry History</h5>'
+        entry_string = ""
+        for key, entry of json.entry_history.complaint_history
+
+          entry_string = "" +
+          '<p>Time: ' + key + '</p>'
+          for change_key, change_entry of entry
+            if change_key != "whodunnit"
+              entry_string += "<p>" + change_key + ": " + change_entry[0] + " - " + change_entry[1] + "</p>"
+            else
+              entry_string += "<p>User: " + change_entry + "</p>"
+          history_dialog_content += entry_string
+
+        if $("#history_dialog").length
+          history_dialog = this
+          $("#history_dialog").html(history_dialog_content)
+        else
+          history_dialog = '<div id="history_dialog" title="History Information"></div>'
+          $('body').append(history_dialog)
+          $("#history_dialog").html(history_dialog_content)
+          #$('#history_dialog').append(history_dialog_content)
+          $('#history_dialog').dialog
+            autoOpen: true
+            minWidth: 600
+            position: { my: "right top", at: "right top", of: window }
+
+#        dialog_content = $(format_domain_info(json))
+#        if $("#complaint_button_dialog").length
+#          complaint_dialog = this
+#          $('#complaint_button_dialog').html(dialog_content[0])
+#        else
+#          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
+#          $('body').append(complaint_dialog)
+#          $('#complaint_button_dialog').append(dialog_content[0])
+#          $('#complaint_button_dialog').dialog
+#            autoOpen: true
+#            minWidth: 400
+#            position: { my: "right bottom", at: "right bottom", of: window }
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
+
 
 
 window.click_table_buttons = (complaint_table, button)->
@@ -618,7 +701,7 @@ window.populate_webcat_index_table = (filter) ->
     self_review = $('#self_review')[0].checked
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
       method: 'GET'
       headers: headers
       success: (response) ->
@@ -654,7 +737,7 @@ window.display_preview_window = (entry) ->
     path = entry.path
   loc = "http://" + subdomain + entry.domain + path
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaints/test_url'
+    url: '/escalations/api/v1/escalations/webcat/complaints/test_url'
     method: 'GET'
     headers: headers
     data: {
@@ -678,6 +761,17 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
 
+
+window.fetch_complaints = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/fetch'
+    data: {}
+    success_msg: 'Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly.'
+    error_prefix: 'Error fetching complaints.'
+  )
+
+
 open_selected = (selected_rows, toggle) ->
   i = 0
   while i < selected_rows[0].length
@@ -696,6 +790,7 @@ open_selected = (selected_rows, toggle) ->
       else
         window.open("http://"+selected_rows.data()[i].ip_address)
     i++
+
 
 $ ->
   $('#complaints_check_box').click ->
@@ -757,7 +852,7 @@ window.mark_for_commit = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaints/mark_for_commit'
+    url: '/escalations/api/v1/escalations/webcat/complaints/mark_for_commit'
     method: 'POST'
     headers: headers
     data: data
@@ -769,7 +864,7 @@ window.mark_for_commit = () ->
 window.commit_marked = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaints/commit_marked'
+    url: '/escalations/api/v1/escalations/webcat/complaints/commit_marked'
     method: 'POST'
     headers: headers
     data: {}
@@ -809,7 +904,7 @@ window.advanced_webcat_index_table = () ->
 window.populate_advanced_webcat_index_table = (data = {}) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries'
     method: 'GET'
     headers: headers
     data: data
@@ -842,7 +937,7 @@ window.named_webcat_index_table = (search_name) ->
 window.load_screenshot = (img_tag, complaint_entry_id) ->
   std_msg_ajax(
     method: 'GET'
-    url: '/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
     data: {}
     img_tag: img_tag
     error_prefix: 'Error downloading screenshot.'

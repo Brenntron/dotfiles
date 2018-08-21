@@ -61,7 +61,7 @@
                 %a{href: escalations_webcat_complaints_path}
                   =inline_svg 'icon_cat.svg'
         %li{class: 'nav-item nav-users'}
-          %a{href: users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
+          %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
 
         - if can?(:read, Admin)
           %li{class: 'nav-item nav-admin'}
@@ -117,7 +117,7 @@
                 %li{class: 'cat-link'}
                   %a Categorization
           %li{class: 'nav-users static-nav-item'}
-            %a{href: users_path}
+            %a{href: escalations_users_path}
               Users
           - if can?(:read, Admin)
             %li{class: 'nav-admin static-nav-item'}

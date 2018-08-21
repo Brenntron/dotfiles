@@ -260,20 +260,8 @@
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
     .related-cases-button-div
-      %button{type: 'button', onclick: 'show_set_duplicate_dispute();'} + Duplicate
-      #set-related-dispute-div{style: 'display: none;'}
-        %form#set-related-dispute-form{onsubmit: 'set_related_dispute(this);return false;', 'data-dispute-id': @dispute.id}
-          %label
-            Ticket ID:
-            %input.dispute-id{type: 'text', name: 'dispute_id'}
-      #set-duplicate-dispute-div{style: 'display: none;'}
-        %form#set-duplicate-dispute-form{onsubmit: 'set_duplicate_dispute(this);return false;', 'data-dispute-id': @dispute.id}
-          %label
-            Ticket ID:
-            %input.dispute-id{type: 'text', name: 'dispute_id'}
     .related-cases-display
       %table
-        %caption Duplicate Cases
         %tbody
           - @dispute.each_duplicate do |dispute_dup|
             %tr

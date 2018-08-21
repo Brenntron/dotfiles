@@ -153,7 +153,9 @@ module API
               params[:dispute_ids].each do |dispute|
                 Dispute.where(id: dispute).update_all(user_id: params[:new_assignee])
                 d = Dispute.find_by(id: dispute)
-
+                if d.status == 'NEW' || d.status == 'REOPENED'
+                  d.update(status: 'ASSIGNED')
+                end
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
                 json_packet << d
               end
@@ -176,6 +178,22 @@ module API
               end
               {:status => "success", :data => json_packet}.to_json
             end
+
+            desc "Adjust a WL/BL entry via uris"
+            params do
+              requires :urls, type: Array[String], desc: "uris to wl/bl"
+              requires :trgt_list, type: Array[String], desc: "type of WL/BL"
+              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "uri_wlbl" do
+              authorize!(:update, Wbrs::ManualWlbl)
+              Wbrs::ManualWlbl.adjust_urls_from_params(permitted_params, username: current_user.cvs_username)
+              true
+            end
+
+
+
 
             desc "Adjust a WL/BL entry"
             params do
@@ -208,8 +226,8 @@ module API
             desc "Adjust a Reptool Bl entry"
             params do
               requires :action, type: String, desc: 'activate or expire'
-              requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
-              #requires :entries, type: Array[String], desc: "urls"
+              optional :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+              optional :entries, type: Array[String], desc: "urls"
               requires :classifications, type: Array[String], desc: "classifications"
               requires :comment, type: String, desc: "comment"
             end
@@ -263,7 +281,7 @@ module API
                 dispute_ids = permitted_params['dispute_ids']
                 Dispute.take_tickets(dispute_ids, user: current_user)
 
-                { username: current_user.email, dispute_ids: dispute_ids }
+                { username: current_user.cec_username, dispute_ids: dispute_ids }
               end
             end
 
@@ -357,10 +375,11 @@ module API
               params[:entry] = params[:entry].strip
               information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
               information = JSON.parse(information)
+
               if information[params[:entry]] == "NOT_FOUND"
-                return {:classification => "not found", :expiration => "", :status => ""}.to_json
+                return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
               else
-                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"]}.to_json
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end
