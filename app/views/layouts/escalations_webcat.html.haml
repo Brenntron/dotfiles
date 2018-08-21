@@ -23,13 +23,73 @@
       .nav-tool-content-wrapper#new-complaint-wrapper
         = render 'escalations/webcat/complaints/new'
 
-
   .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
-    %a{href: '#', class: 'dropdown-toggle', id: 'fetch', onclick: 'fetch_complaints();',
-       'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', class: 'dropdown-toggle', id: 'categorize-urls', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
-      Fetch
-    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'fetch'} Fetch complaints   
+      Categorize URLs
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'categorize-urls'}
+      %h3.nav-tool-dropdown-header.inverse
+        Categorize URLs
+      .nav-tool-content-wrapper#categorize-urls-form-wrapper
+        .categorize-radio-wrapper
+          %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-same', value: 'cat-urls-same'}
+          %label.radio-label{for: 'cat-urls-diff'} Same Categories
+          %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-diff', value: 'cat-urls-diff'}
+          %label.radio-label{for: 'cat-urls-diff'} Different Categories
+        .categorize-same-form
+          %form{method: 'get', 'accept-charset': 'UTF-8'}
+            %h5 Categorize URLs with Same Categories
+            .form-group
+              %label.content-label-sm URL
+              %input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
+              %label.content-label-sm Categories
+              %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: '2'}
+            %hr.thin.condensed
+            .form-group
+              %label.content-label-sm URL
+              %input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3'}/
+              %label.content-label-sm Categories
+              %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4"}
+            %hr.thin.condensed
+            .form-group
+              %label.content-label-sm URL
+              %input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5'}/
+              %label.content-label-sm Categories
+              %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6"}
+            %hr.thin.condensed
+            .form-group
+              %label.content-label-sm URL
+              %input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7'}/
+              %label.content-label-sm Categories
+              %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8"}
+            %hr.thin.condensed
+            .form-group
+              %label.content-label-sm URL
+              %input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
+              %label.content-label-sm Categories
+              %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
+        %form{method: 'get', 'accept-charset': 'UTF-8'}
+          .categorize-diff-form
+            %h5 Categorize URLs with Different Categories
+            .form-group
+              %label.content-label-sm Categories
+              %select.form-control#multi_cat_url_cats.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
+            %hr.thin.condensed
+            .form-group
+              %label.content-label-sm URLs
+              %input.form-control#multi_url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+              %input.form-control#multi_url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+              %input.form-control#multi_url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+              %input.form-control#multi_url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+              %input.form-control#multi_url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+
+
+  -#.nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+  -#  %a{href: '#', class: 'dropdown-toggle', id: 'fetch', onclick: 'fetch_complaints();',
+  -#     'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+  -#    %span{class: 'nav-toolbar-icon icon-new-white'}
+  -#    Fetch
+  -#  .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'fetch'} Fetch complaints   
 
 
   .nav-tool-blocks.col-xs-2.col-sm-2.col-lg-1.dropdown
