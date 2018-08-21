@@ -8,7 +8,7 @@ class Dispute < ApplicationRecord
   has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
   has_many :dispute_comments
   has_many :dispute_emails
-  has_many :dispute_entries
+  has_many :dispute_entries, dependent: :destroy
   has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
   has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
@@ -339,6 +339,9 @@ class Dispute < ApplicationRecord
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
     guest = Company.where(:name => "Guest").first
+
+    customer = Customer.process_and_get_customer(message_payload)
+
     begin
       ActiveRecord::Base.transaction do
 
@@ -396,7 +399,7 @@ class Dispute < ApplicationRecord
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
         new_dispute.status = NEW
 
-        new_dispute.customer_id = Customer.process_and_get_customer(message_payload).id
+        new_dispute.customer_id = customer.id
 
         new_dispute.submitter_type = new_dispute.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
