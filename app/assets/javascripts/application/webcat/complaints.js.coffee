@@ -682,7 +682,7 @@ window.display_preview_window = (entry) ->
 window.fetch_complaints = () ->
   std_msg_ajax(
     method: 'POST'
-    url: '/api/v1/escalations/webcat/complaints/fetch'
+    url: '/escalations/api/v1/escalations/webcat/complaints/fetch'
     data: {}
     success_msg: 'Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly.'
     error_prefix: 'Error fetching complaints.'

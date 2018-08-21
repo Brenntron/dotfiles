@@ -28,8 +28,9 @@ module API
               @dispute_email = DisputeEmail.find(permitted_params[:id])
               authorize!(:update, @dispute_email)
               @dispute_email.update_attributes(status: permitted_params[:status])
+              @case_email = DisputeEmail.generate_case_email_address(@dispute_email.dispute_id)
 
-              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments}
+              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments, case_email: @case_email}
             end
 
             desc "create a dispute email"

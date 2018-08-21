@@ -870,8 +870,8 @@ class Dispute < ApplicationRecord
       when 'open'
         where(status: ['new', 'open', 'reopen'])
       when 'closed'
-        where(status: ['closed', 'resolved'])
-      when 'all'
+        where(status: ['closed', 'resolved', 'resolved_closed'])
+    when 'all'
         where({})
       else
         raise "No search named '#{search_name}' known."
