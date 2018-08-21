@@ -148,6 +148,9 @@ module API
                                          current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
 
+                message = Bridge::ComplaintUpdateStatusEvent.new
+                message.post_complaint(entry.complaint)
+
               rescue Exception => e
                   return {error:e.message}.to_json
               end
@@ -212,6 +215,41 @@ module API
                 return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
+            end
+
+
+
+            desc 'Get the history'
+            params do
+              requires :id, type: Integer, desc: 'ComplaintEntry id'
+            end
+            post 'history' do
+              begin
+                  entry = ComplaintEntry.find(params[:id])
+                  complaint_entry_packet={}
+                  complaint_entry_packet[:entry_history] = {}
+                  #if entry.complaint_entry_preload.present?
+                  #  if entry.complaint_entry_preload.historic_category_information.present?
+                  #    complaint_entry_packet[:entry_history][:domain_history] = entry.complaint_entry_preload.historic_category_information
+                  #  else
+                  #    complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                  #  end
+                  #else
+                  #  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                  #end
+
+                  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+
+                  complaint_entry_packet[:entry_history][:complaint_history] = entry.compose_versions
+
+
+
+              rescue Exception => e
+                Rails.logger.error "Failed to find entry: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+              complaint_entry_packet.to_json
             end
 
 

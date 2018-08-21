@@ -2,7 +2,7 @@ $ ->
   $('#child_id').on 'change', ->
     newTeamMember = $('#child_id option:selected')
     $.ajax
-      url: 'relationships/member_status'
+      url: '/escalations/relationships/member_status'
       method: 'GET'
       data: 'new_member': newTeamMember.val()
       success: (res, status, xhr) ->
@@ -45,7 +45,7 @@ $ ->
       id = $('input[name="current_user"]').val()
       timeframe = $('#user_metrics_timeframe option:selected').val()
       $.ajax(
-        url: '/api/v1/users/' + id
+        url: '/escalations/api/v1/users/' + id
         method: 'PUT'
         headers: headers
         data:

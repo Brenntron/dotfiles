@@ -47,6 +47,7 @@ class Dispute < ApplicationRecord
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
   STATUS_CUSTOMER_PENDING = "CUSTOMER_PENDING"
+  STATUS_CUSTOMER_UPDATE = "CUSTOMER_UPDATE"
   STATUS_ON_HOLD = "ON_HOLD"
   STATUS_RESOLVED = "RESOLVED_CLOSED"
   STATUS_ASSIGNED = "ASSIGNED"
@@ -60,8 +61,9 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_OTHER = "OTHER"
 
   scope :open_disputes, -> { where(status: NEW) }
+  scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
-  scope :in_progress_disputes, -> { where.not(status: [ NEW, RESOLVED ]) }
+  scope :in_progress_disputes, -> { where(status: [ STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_CUSTOMER_PENDING, STATUS_ON_HOLD, STATUS_REOPENED, STATUS_CUSTOMER_UPDATE ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
 
   def case_id_str
@@ -364,8 +366,7 @@ class Dispute < ApplicationRecord
         }
 
         bug_attrs = {
-            #'product' => 'Escalations Console',
-            'product' => 'Escalations',
+            'product' => 'Escalations Console',
             'component' => 'IP/Domain',
             'summary' => summary,
             'version' => 'unspecified', #self.version,
@@ -862,16 +863,16 @@ class Dispute < ApplicationRecord
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where(status: ['new', 'open', 'reopen'], user_id: user.id)
+        where(status: [STATUS_ASSIGNED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_REOPENED], user_id: user.id)
       when 'my_disputes'
         where(user_id: user.id)
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'open'
-        where(status: ['new', 'open', 'reopen'])
+        where(status: [STATUS_NEW, STATUS_REOPENED])
       when 'closed'
-        where(status: ['closed', 'resolved'])
-      when 'all'
+        where(status: [CLOSED, STATUS_RESOLVED])
+    when 'all'
         where({})
       else
         raise "No search named '#{search_name}' known."
@@ -968,11 +969,11 @@ class Dispute < ApplicationRecord
   def self.to_data_packet(disputes)
     disputes.map do |dispute|
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
-
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_name] = '' #dispute.customer_name
       dispute_packet[:submitter_org] = dispute.org_domain
+      dispute_packet[:submitter_type] = dispute.submitter_type
       dispute_packet[:submitter_domain] = dispute.org_domain
       dispute_packet[:dispute_domain] = dispute.org_domain
       unless dispute.dispute_entries.empty?
@@ -998,7 +999,7 @@ class Dispute < ApplicationRecord
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='missing-data dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
+              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
 
         when dispute.user_id?
           dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
@@ -1011,7 +1012,6 @@ class Dispute < ApplicationRecord
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
       dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
-      dispute_packet[:source_id] = dispute.ticket_source_key
       dispute_packet[:source_type] = dispute.ticket_source_type
 
       dispute_packet[:wbrs_score] = ''
@@ -1048,6 +1048,10 @@ class Dispute < ApplicationRecord
                   user_id: self.user_id).update_all(user_id: user.id)
 
     dispute = Dispute.find(self.id)
+
+    if dispute.status == 'NEW' || dispute.status == 'REOPENED'
+      dispute.update(status: 'ASSIGNED')
+    end
     raise 'This record changed while you were editing.' unless dispute.user_id == user.id
   end
 
@@ -1058,7 +1062,14 @@ class Dispute < ApplicationRecord
       end
 
       Dispute.where(id: dispute_ids,
-                    user_id: User.vrtincoming.id).update_all(user_id: user.id)
+                    user_id:  User.vrtincoming.id).update_all(user_id: user.id)
+
+      queries = Dispute.where(id: dispute_ids, user_id: user.id)
+      queries.each do |query|
+        if query.status == 'NEW' || query.status == 'REOPENED'
+          query.update(status: 'ASSIGNED')
+        end
+      end
 
       unless dispute_ids.count == Dispute.where(id: dispute_ids, user_id: user.id).count
         raise 'This record changed while you were editing.'

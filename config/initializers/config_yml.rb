@@ -3,7 +3,7 @@ all_configs = YAML.load_file(Rails.root.join("config", "config.yml"))
 env_config = all_configs[Rails.env]
 raise "config.yml missing #{Rails.env} section" unless env_config
 
-
+Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
 
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
@@ -48,6 +48,7 @@ peakebridge.host                        = peakebridge_config['host']
 peakebridge.port                        = peakebridge_config['port']
 peakebridge.verify_mode                 = peakebridge_config['verify_mode'] || peakebridge_config['tls_mode'] || peakebridge_config['ssl_mode']
 peakebridge.uri_base                    = peakebridge_config['uri_base']
+peakebridge.ca_cert_file                = peakebridge_config['ca_cert_file']
 peakebridge.sources                     = peakebridge_config['sources'] || []
 Rails.configuration.peakebridge         = peakebridge
 

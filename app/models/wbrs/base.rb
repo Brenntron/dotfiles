@@ -17,7 +17,7 @@ class Wbrs::Base
     @gssnegotiate ||= Rails.configuration.wbrs.gssnegotiate
   end
 
-  def self.ca_file
+  def self.ca_cert_file
     @ca_cert_file ||= Rails.configuration.wbrs.ca_cert_file
   end
 

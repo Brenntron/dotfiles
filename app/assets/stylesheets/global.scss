@@ -3787,13 +3787,35 @@ td.wbrs-highlight, td.sbrs-highlight {
   width: 100%;
 }
 
-#advanced-search-wrapper input, #new-complaint-form input {
+#advanced-search-wrapper input, #new-complaint-form input, #cat_new_url_modal input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
   border-radius: 1px;
 }
 #advanced-search-wrapper .content-label-sm, #new-complaint-form .content-label-sm {
+  margin-bottom: 0;
+}
+
+#cat_new_url_modal .modal-header {
+  background-color: $bug-section-color;
+  border: none;
+  border-radius: 4px 4px 0 0;
+}
+
+#cat_new_url_modal .modal-header h3 {
+  color: $content-bg-color;
+  font-size: 14pt;
+  font-weight: 300;
+}
+
+#cat_new_url_modal button.close {
+  background-image: url(image_path('icon_cancel_white.svg'));
+  right: 3px;
+  top: 5px;
+}
+
+#cat_new_url_modal .content-label-sm {
   margin-bottom: 0;
 }
 
@@ -3840,7 +3862,7 @@ button.primary, input.button_primary {
   background-color: $bug-section-color;
 }
 
-button.primary:hover, input.button_primary:hover {
+button.primary:hover, input.button_primary:hover, button.primary:focus {
   background-color: darken($bug-section-color, 10%);
 }
 
@@ -3863,12 +3885,12 @@ button.tertiary {
   left: auto;
 }
 
-#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea {
+#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea, #cat_new_url_modal input {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus   {
+#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus, #cat_new_url_modal input:focus {
   background-color: $faint-alt-highlight;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -5247,7 +5269,7 @@ table.dispute_tool_current tr:last-of-type td {
 .tickets-totals-table td {
   border-bottom: none;
   font-weight: 300;
-  font-size: 8pt;
+  font-size: 10pt;
 }
 
 .ticket-type-label {
@@ -5690,7 +5712,7 @@ table.dataTable tbody tr.selected {
   padding: 0 30px;
 }
 
-.nav-tool-content-wrapper .form-control.selectize {
+.nav-tool-content-wrapper .form-control.selectize, #cat_new_url_modal .form-control.selectize {
   background-color: transparent;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -5698,15 +5720,29 @@ table.dataTable tbody tr.selected {
   height: 32px;
 }
 
-.nav-tool-content-wrapper .form-control.selectize .selectize-input {
+.selectize-dropdown.multi.form-control.selectize {
+  min-height: 32px !important;
+  height: auto !important;
+  background-color: $content-bg-color !important;
+}
+
+#cat_new_url_modal .selectize-dropdown.multi.form-control.selectize {
+  margin-top: 8px;
+}
+
+.nav-tool-content-wrapper .form-control.selectize .selectize-input, #cat_new_url_modal .form-control.selectize .selectize-input {
   padding: 2px;
   margin-left: -2px;
   box-shadow: none;
   width: 100%;
 }
 
-.nav-tool-content-wrapper .form-control.selectize .selectize-input input, #advanced-search-wrapper .form-control.selectize .selectize-input input {
+.nav-tool-content-wrapper .form-control.selectize .selectize-input input, #advanced-search-wrapper .form-control.selectize .selectize-input input, #cat_new_url_modal .form-control.selectize .selectize-input input {
   outline: none !important;
+}
+
+.selectize-input.dropdown-active::before {
+  display: none;
 }
 
 .selectize-control.multi .selectize-input .item {
@@ -5748,7 +5784,7 @@ table.dataTable tbody tr.selected {
   z-index: 5000  !important;
 }
 
-.nav-tool-content-wrapper select.form-control {
+.nav-tool-content-wrapper select.form-control, #cat_new_url_modal select.form-control {
   background-color: transparent;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -5786,6 +5822,10 @@ table.dataTable tbody tr.selected {
   background-color: $content-bg-color;
   float: left;
   margin-right: 12px;
+}
+
+.popover{
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
 
 .nested-complaint-static-data .col-with-divider {
@@ -5937,8 +5977,29 @@ table.dataTable tbody tr.selected {
   border-top-color: $table-dark-body;
 }
 
+#complaint_button_dialog .dialog-content-wrapper, #history_dialog .dialog-content-wrapper {
+  padding: 15px;
+}
+
+.history-table {
+  font-size: 8pt;
+}
+
+.history-table td {
+  padding: 4px 8px;
+}
+
+.searched-for-url {
+  color: $bug-section-color;
+}
+
 #complaint_button_dialog .dialog-content-wrapper {
   padding: 15px;
+}
+
+hr.condensed {
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
