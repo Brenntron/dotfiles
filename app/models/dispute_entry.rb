@@ -359,6 +359,6 @@ class DisputeEntry < ApplicationRecord
   end
 
   def return_dispute(dispute_entry)
-    Dispute.find(dispute_entry).update(user_id: 1)
+    Dispute.find(dispute_entry).update(user_id: User.where(cvs_username:"vrtincom").first)
   end
 end
