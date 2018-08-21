@@ -1057,6 +1057,11 @@ class Dispute < ApplicationRecord
 
     if dispute.status == 'NEW' || dispute.status == 'REOPENED'
       dispute.update(status: 'ASSIGNED')
+      dispute.dispute_entries.each do |dispute_entry|
+        if dispute_entry.status == 'NEW' || dispute_entry.status == 'REOPENED'
+          dispute.dispute_entries.update(status: 'ASSIGNED')
+        end
+      end
     end
     raise 'This record changed while you were editing.' unless dispute.user_id == user.id
   end
@@ -1067,26 +1072,44 @@ class Dispute < ApplicationRecord
         raise 'Some of these ticket are already assigned.'
       end
 
-      Dispute.where(id: dispute_ids,
-                    user_id:  User.vrtincoming.id).update_all(user_id: user.id)
+      disputes = Dispute.where(id: dispute_ids, user_id: User.vrtincoming.id)
 
-      queries = Dispute.where(id: dispute_ids, user_id: user.id)
-      queries.each do |query|
-        if query.status == 'NEW' || query.status == 'REOPENED'
-          query.update(status: 'ASSIGNED')
-        end
+      disputes.each do |dispute|
+          dispute.update(user_id: user.id)
+
+          if dispute.status == 'NEW' || dispute.status == 'REOPENED'
+            dispute.update(status: 'ASSIGNED')
+          end
+
+          dispute.dispute_entries.each do |dispute_entry|
+            if dispute_entry.status == 'NEW' || dispute_entry.status == 'REOPENED'
+              dispute_entry.update(status: 'ASSIGNED')
+            end
+          end
+
       end
 
       unless dispute_ids.count == Dispute.where(id: dispute_ids, user_id: user.id).count
-        raise 'This record changed while you were editing.'
+        raise 'This record changed while you were editing and may be already assigned'
       end
     end
   end
 
-  def return_dispute(dispute_entry)
-    Dispute.find(dispute_entry).update(user_id: User.where(cvs_username:"vrtincom").first)
-    Dispute.find(dispute_entry).update(case_accepted_at: nil)
-    Dispute.find(dispute_entry).update(status: 'NEW')
+  def return_dispute(dispute)
+    this_dispute = Dispute.find(dispute)
+    this_dispute.update(user_id: User.vrtincoming.id)
+    this_dispute.update(case_accepted_at: nil)
+
+    if this_dispute.status == 'ASSIGNED'
+      this_dispute.update(status: 'NEW')
+
+      this_dispute.dispute_entries.each do |dispute_entry|
+        if dispute_entry.status == 'ASSIGNED'
+          dispute_entry.update(status: 'NEW')
+        end
+      end
+    end
+
   end
 end
 

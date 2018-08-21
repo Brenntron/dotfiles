@@ -277,6 +277,10 @@ module API
 
                 dispute.return_dispute(dispute.id)
 
+                message = Bridge::DisputeEntryUpdateStatusEvent.new
+                message.post_entries(dispute.dispute_entries)
+
+
                 { dispute_id: dispute.id }
               end
             end
