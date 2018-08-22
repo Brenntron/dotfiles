@@ -357,8 +357,4 @@ class DisputeEntry < ApplicationRecord
       []
     end
   end
-
-  def return_dispute(dispute_entry)
-    Dispute.find(dispute_entry).update(user_id: User.vrtincoming.id)
-  end
 end

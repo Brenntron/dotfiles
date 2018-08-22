@@ -275,7 +275,7 @@ module API
                 dispute = Dispute.find(params['dispute_id'])
                 authorize!(:update, dispute)
 
-                dispute.return_dispute(dispute.id)
+                dispute.return_dispute
 
                 message = Bridge::DisputeEntryUpdateStatusEvent.new
                 message.post_entries(dispute.dispute_entries)

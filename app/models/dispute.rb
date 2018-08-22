@@ -1095,17 +1095,15 @@ class Dispute < ApplicationRecord
     end
   end
 
-  def return_dispute(dispute)
-    this_dispute = Dispute.find(dispute)
-    this_dispute.update(user_id: User.vrtincoming.id)
-    this_dispute.update(case_accepted_at: nil)
+  def return_dispute
+    update(user_id: User.vrtincoming.id, case_accepted_at: nil)
 
-    if this_dispute.status == 'ASSIGNED'
-      this_dispute.update(status: 'NEW')
+    if status == 'ASSIGNED'
+      update(status: 'NEW')
 
-      this_dispute.dispute_entries.each do |dispute_entry|
+      dispute_entries.each do |dispute_entry|
         if dispute_entry.status == 'ASSIGNED'
-          dispute_entry.update(status: 'NEW')
+          dispute_entry.update(status: 'NEW', case_accepted_at: nil)
         end
       end
     end
