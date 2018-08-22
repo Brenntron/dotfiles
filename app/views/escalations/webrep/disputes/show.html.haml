@@ -216,7 +216,7 @@
             Last Updated By
           %p= @dispute.last_updated_by_username
       %h3 Related Cases
-      %button#related-dispute-button
+      %button#related-dispute-button{onClick: 'add_related_case_id()'}
         Add Related Case
       .row
         .col-xs-2.col-with-divider

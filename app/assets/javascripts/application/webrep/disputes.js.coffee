@@ -410,6 +410,26 @@ window.add_dispute_entry = () ->
       popup_response_error(response, 'Error adding entry.')
   )
 
+window.add_related_case_id= ()->
+  id = $('#dispute_id').text()
+  related_id = $('#related-dispute-id').val().split(",")
+  data = {
+    'relating_dispute_ids': related_id
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/' + id + '/relating_disputes/'
+    method: 'PATCH'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error relating cases with ids :' + related_id + ' entry.')
+  )
+
+
 window.determine_checked = (box_names) ->
   box_flag = ($('.'+box_names+':checked').length > 0)
   unless box_flag

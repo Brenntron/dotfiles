@@ -308,6 +308,13 @@ module API
               {:status => "success"}.to_json
             end
 
+            get ':dispute_id/related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                Dispute.where(related_id: params['dispute_id'])
+              end
+            end
+
             params do
               requires :relating_dispute_ids, type: Array[Integer]
             end
