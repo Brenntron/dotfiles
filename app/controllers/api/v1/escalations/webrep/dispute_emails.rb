@@ -30,7 +30,18 @@ module API
               @dispute_email.update_attributes(status: permitted_params[:status])
               @case_email = DisputeEmail.generate_case_email_address(@dispute_email.dispute_id)
 
-              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments, case_email: @case_email}
+
+              # Return whether or not the email is from a customer
+              from = Customer.where(email: @dispute_email.from)
+              to = Customer.where(email: @dispute_email.to)
+
+              if from.present? || to.present?
+                customer_boolean = true
+              else
+                customer_boolean = false
+              end
+
+              {email: @dispute_email, attachments: @dispute_email.dispute_email_attachments, case_email: @case_email, customer: customer_boolean}
             end
 
             desc "create a dispute email"

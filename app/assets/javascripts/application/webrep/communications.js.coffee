@@ -15,10 +15,15 @@ $ ->
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
         populate_communication_details(response.email, response.attachments, response.case_email)
+
+        if response.customer == true
+          $('.customer-facing-notice').show()
+        else
+          $('.customer-facing-notice').hide()
+
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email.", reload: false)
     )
-
 
   populate_communication_details = (email, attachments, case_email) ->
     $('input[type=text].reply-subject').val("Re: " + email.subject)
