@@ -980,7 +980,7 @@ class Dispute < ApplicationRecord
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
-      dispute_packet[:submitter_org] = dispute.org_domain
+      dispute_packet[:submitter_org] = dispute.customer.company.name
       dispute_packet[:submitter_type] = dispute.submitter_type
       dispute_packet[:submitter_domain] = dispute.org_domain
       dispute_packet[:submitter_name] = dispute.customer_name
