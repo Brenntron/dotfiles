@@ -273,7 +273,7 @@
                               %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score
-                            = entry.wbrs_score
+                            = entry.wbrs_score.to_d.truncate(2).to_f
                           %td
                             %label WBRS Rule Hits
                           %td.text-center
