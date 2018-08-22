@@ -28,6 +28,11 @@
       %span.toolbar-button-text Expand Selected
     %button.toolbar-button.expand-all{onclick: 'expand_all()', type: 'button'}
       %span.toolbar-button-text Expand All
+  %div
+    %label.toolbar-section-label Data
+    %button.toolbar-button.sync-button#fetch{ onclick: 'fetch_complaints();'}
+      %span.toolbar-button-text Fetch Complaints
+
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}
       Allow Self Review
