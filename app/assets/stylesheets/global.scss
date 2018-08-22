@@ -5061,7 +5061,6 @@ button.dropdown-submit-button {
 
 .comment-wrapper {
   padding: 0 2px;
-  display: none;
 }
 
 .button-row-center {
@@ -5977,6 +5976,18 @@ table.dataTable tbody tr.selected {
   border-top-color: $table-dark-body;
 }
 
+#complaint_button_dialog .dialog-content-wrapper, #history_dialog .dialog-content-wrapper {
+  padding: 15px;
+}
+
+.history-table {
+  font-size: 8pt;
+}
+
+.history-table td {
+  padding: 4px 8px;
+}
+
 .searched-for-url {
   color: $bug-section-color;
 }
@@ -5988,6 +5999,11 @@ table.dataTable tbody tr.selected {
 hr.condensed {
   margin-top: 12px;
   margin-bottom: 12px;
+}
+
+.top-case-info a {
+  color: $content-bg-color;
+  text-decoration: underline;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

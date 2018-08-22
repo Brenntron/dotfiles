@@ -233,11 +233,9 @@
       - @dispute.each_related do |dispute_dup|
         .row
           .col-xs-2.col-with-divider
-            %label.content-label-sm
-            %p= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+            = link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
           .col-xs-2.col-with-divider
-            %label.content-label-sm
-            %p= dispute_dup.case_opened_at&.strftime('%F %T')
+            = dispute_dup.case_opened_at&.strftime('%F %T')
   .row
     .col-xs-12.text-center
       %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
@@ -260,20 +258,8 @@
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
     .related-cases-button-div
-      %button{type: 'button', onclick: 'show_set_duplicate_dispute();'} + Duplicate
-      #set-related-dispute-div{style: 'display: none;'}
-        %form#set-related-dispute-form{onsubmit: 'set_related_dispute(this);return false;', 'data-dispute-id': @dispute.id}
-          %label
-            Ticket ID:
-            %input.dispute-id{type: 'text', name: 'dispute_id'}
-      #set-duplicate-dispute-div{style: 'display: none;'}
-        %form#set-duplicate-dispute-form{onsubmit: 'set_duplicate_dispute(this);return false;', 'data-dispute-id': @dispute.id}
-          %label
-            Ticket ID:
-            %input.dispute-id{type: 'text', name: 'dispute_id'}
     .related-cases-display
       %table
-        %caption Duplicate Cases
         %tbody
           - @dispute.each_duplicate do |dispute_dup|
             %tr
