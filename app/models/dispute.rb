@@ -992,11 +992,11 @@ class Dispute < ApplicationRecord
   end
 
   def customer_name
-    return customer.name
+    customer.name
   end
 
   def customer_email
-    return customer.email
+    customer.email
   end
 
   # @param [Array<Dispute>] disputes colleciton of dispute objects
