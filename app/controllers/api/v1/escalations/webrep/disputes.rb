@@ -187,6 +187,9 @@ module API
                       entry.update(status: DisputeEntry::NEW, case_accepted_at: nil)
                     end
                   end
+
+                  message = Bridge::DisputeEntryUpdateStatusEvent.new
+                  message.post_entries(d.dispute_entries)
                 end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
