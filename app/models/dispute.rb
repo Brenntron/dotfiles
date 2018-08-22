@@ -1122,10 +1122,10 @@ class Dispute < ApplicationRecord
   end
 
   def return_dispute
-    update(user_id: User.vrtincoming.id, case_accepted_at: nil)
+    update(user_id: User.vrtincoming.id)
 
     if status == 'ASSIGNED'
-      update(status: 'NEW')
+      update(status: 'NEW', case_accepted_at: nil)
 
       dispute_entries.each do |dispute_entry|
         if dispute_entry.status == 'ASSIGNED'
