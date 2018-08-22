@@ -542,6 +542,7 @@ window.take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
+      $('.take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
       $('#owner_' + dispute_id).text(response.username)
       $('#status_' + dispute_id).text("Assigned")
   )
@@ -584,7 +585,7 @@ window.return_dispute = (dispute_id) ->
     data: {}
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      $('.return-dispute-' + dispute_id).replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
+      $('.return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
       $('#owner_' + response.dispute_id).text('Unassigned')
       $('#status_' + response.dispute_id).text('NEW')
 
