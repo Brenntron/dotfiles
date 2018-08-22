@@ -888,7 +888,7 @@ $ ->
       { data: 'case_link' }
       { data: 'status' }
       { data: 'resolution' }
-      {
+       {
         data: 'submission_type'
         render: (data) ->
           '<span class="dispute-submission-type dispute-' + data  + '"></span>'
@@ -899,13 +899,12 @@ $ ->
       { data: 'case_age' }
       { data: 'source' }
       { data: 'submitter_type'}
-      { data: 'submitter_name' }
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
-      {
-        data: null
-        defaultContent: ''
-      }
+      { data: 'submitter_name' }
+      { data: 'submitter_email' }
+
+
     ])
 
   format = (dispute) ->

@@ -135,7 +135,7 @@ class Dispute < ApplicationRecord
 
   def minutes_to_close
     if case_closed_at && case_opened_at
-      (case_accepted_at - case_opened_at) / 60.0
+      (case_closed_at - case_opened_at) / 60.0
     end
   end
 
@@ -991,18 +991,29 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def customer_name
+    return customer.name
+  end
+
+  def customer_email
+    return customer.email
+  end
+
   # @param [Array<Dispute>] disputes colleciton of dispute objects
   # @return [Array<Array>] data output for data tables.
+
   def self.to_data_packet(disputes, user:)
     disputes.map do |dispute|
+
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
-      dispute_packet[:submitter_name] = '' #dispute.customer_name
-      dispute_packet[:submitter_org] = dispute.org_domain
+      dispute_packet[:submitter_org] = dispute.customer.company.name
       dispute_packet[:submitter_type] = dispute.submitter_type
       dispute_packet[:submitter_domain] = dispute.org_domain
+      dispute_packet[:submitter_name] = dispute.customer_name
+      dispute_packet[:submitter_email] = dispute.customer_email
       dispute_packet[:dispute_domain] = dispute.org_domain
       unless dispute.dispute_entries.empty?
         unless dispute.dispute_entries.first[:hostname].nil?
