@@ -89,11 +89,11 @@ class DisputeEntry < ApplicationRecord
     end
     case
     when self.entry_type == "IP"
-      Xbrs::GetXbrs.by_ip4(self.ip_address)
+      Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
     when self.entry_type == "URI/DOMAIN"
-      Xbrs::GetXbrs.by_domain(self.uri)
+      Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
     else
-      self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri)
+      self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
     end
   end
 
@@ -323,7 +323,7 @@ class DisputeEntry < ApplicationRecord
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
     if research_params.present?
-      url = research_params['uri'].gsub(/\s+/, "") # Remove all white spaces
+      url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
 
       entries = Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
         DisputeEntry.new_from_wlbl(wlbl)
