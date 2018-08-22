@@ -611,12 +611,10 @@ window.save_dispute_entries = () ->
       }]
 
       if new_value == "RESOLVED_CLOSED" && (new_value != old_value)
-#        binding.pry
         data[this.dataset.id].push(
           id: this.dataset.id
           field: "resolution"
           new: $('input[name=entry-resolution]:checked').attr('id')
-#          binding.pry
         )
 
         data[this.dataset.id].push({
