@@ -380,16 +380,23 @@ module API
               end
             end
 
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
             get 'dispute_entry_status/:dispute_entry_id' do
               std_api_v2 do
-                dispute_entry = DisputeEntry.find(params['dispute_entry_id'])
+                binding.pry
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
                 return {:status => dispute_entry.status}.to_json
               end
             end
 
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
             get 'dispute_entry_resolution/:dispute_entry_id' do
               std_api_v2 do
-                dispute_entry = DisputeEntry.find(params['dispute_entry_id'])
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
                 return {:resolution => dispute_entry.resolution}.to_json
               end
             end
