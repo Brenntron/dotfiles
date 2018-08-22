@@ -39,9 +39,9 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
         @disputes.each do |dispute|
           insert_row_with_data([dispute.priority, dispute.case_id_str, dispute.status, dispute.org_domain, dispute.dispute_entries.count, dispute.user.cvs_username, dispute.case_opened_at, ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)], "h2")
-          insert_row_with_data([ 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Resolution', 'Resolution Comments' ], "bold")
+          insert_row_with_data([ 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments' ], "bold")
           dispute.dispute_entries.each do |dispute_entry|
-            insert_row_with_data([ dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.resolution, dispute_entry.resolution_comment ])
+            insert_row_with_data([ dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
           end
 
         end
