@@ -1090,7 +1090,7 @@ class Dispute < ApplicationRecord
     if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
       accepted_at = Time.now
       dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-      dispute.entries.each do |entry|
+      dispute.dispute_entries.each do |entry|
         if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
           entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
         end
