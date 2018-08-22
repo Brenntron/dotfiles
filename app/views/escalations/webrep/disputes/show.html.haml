@@ -10,10 +10,6 @@
       .case-id-wrapper
         %label.content-label-sm
           Case ID
-          %br
-          %br
-          %br
-            =@dispute.status
         - if @dispute.status == 'DUPLICATE'
           .duplicate-email-notice
           Duplicate
