@@ -385,7 +385,6 @@ module API
             end
             get 'dispute_entry_status/:dispute_entry_id' do
               std_api_v2 do
-                binding.pry
                 dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
                 return {:status => dispute_entry.status}.to_json
               end
