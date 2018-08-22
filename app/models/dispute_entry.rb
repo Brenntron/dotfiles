@@ -329,6 +329,24 @@ class DisputeEntry < ApplicationRecord
         DisputeEntry.new_from_wlbl(wlbl)
       end
 
+      # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
+      entries.each do |entry|
+        entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
+        entry.consolidated_wlbl_strings = entry.wbrs_list_type
+      end
+
+      # Yes it is ugly to do these separately but right now I need the granularity of seeing which if any part of this fails
+
+      unique_entries = entries.uniq{|e| e.hostlookup}
+      duplicate_entries = entries - unique_entries
+
+      duplicate_entries.each do |duplicate_entry|
+        unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
+      end
+
+      entries = unique_entries
+      # END WLBL LOGIC, WE SHOULD ONLY HAVE UNIQUE URIS NOW
+
       if research_params['scope'] == "strict"
         unless entries.find{|entry| url == entry.uri}
           entries << DisputeEntry.new(uri: url)

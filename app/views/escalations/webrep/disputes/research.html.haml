@@ -315,10 +315,10 @@
                           %td.left-bordered
                             %label WL/BL
                           %td
-                            - if entry.wbrs_list_type.nil?
+                            - if entry.consolidated_wlbl_strings.nil?
                               %span.missing-data Not currently on a list
                             - else
-                              = entry.wbrs_list_type
+                              = entry.consolidated_wlbl_strings
                           %td.left-bordered
                             %label Referenced on
                           %td
