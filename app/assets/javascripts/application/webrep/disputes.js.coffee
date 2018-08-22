@@ -845,7 +845,10 @@ $ ->
         className: 'state-col'
       }
       {
-        targets: [6]
+        targets: [
+          2
+          6
+        ]
         className: 'text-center'
       }
       {
@@ -878,7 +881,7 @@ $ ->
        {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+          '<span class="dispute-submission-type dispute-' + data  + '"><!-- ' + data + ' --></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
