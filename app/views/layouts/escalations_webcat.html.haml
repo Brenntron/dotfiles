@@ -71,12 +71,15 @@
               %input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
+            .form-group.text-center
+              %button.primary{:type => "button", :onclick=>"cat_new_url()", tabindex: '11'} Categorize URLs
+
         %form{method: 'get', 'accept-charset': 'UTF-8'}
           #categorize-same-form
             %h5 Categorize URLs with Same Categories
             .form-group
               %label.content-label-sm Categories
-              %select.form-control#multi_cat_url_cats.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
+              %select.form-control#multi_cat_url_cats.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;"}
             %hr.thin.condensed
             .form-group
               %label.content-label-sm URLs
@@ -85,6 +88,8 @@
               %input.form-control#multi_url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
               %input.form-control#multi_url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
               %input.form-control#multi_url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+            .form-group.text-center
+              %button.primary{:type => "button", :onclick=>"multiple_url_categorization()"} Categorize URLs
 
 
   -#.nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
@@ -164,7 +169,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-          = "render 'escalations/webcat/complaints/advanced_search'"
+          = render 'escalations/webcat/complaints/advanced_search'
 
           -#= label_tag 'advanced_query_complaints', 'Complaint IDs'
           -#%br/

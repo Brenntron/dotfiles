@@ -27,19 +27,27 @@ window.cat_new_url = ()->
   )
 
 window.multiple_url_categorization = ()->
+  event.preventDefault()
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   data = {}
-  for i in [1...9] by 1
-    data[i] = {url: $("#multi_url_#{i}").val(), cats: $("#multi_cat").val()}
+  for i in [1...6] by 1
+    data[i] = {url: $("#multi_url_#{i}").val(), cats: $("#multi_cat_url_cats").val()}
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url:'/api/v1/escalations/webcat/complaints/cat_new_url'
+    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
     method: 'POST'
     headers: headers
     data: {data: data}
     success: (response) ->
+      $('#loader-modal').hide()
       std_msg_success('URLs categorized successfully.',"", reload: true)
     error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove();
       std_msg_error('Error:' + ' ' + response.responseJSON.message,"", reload: false)
   )
 
