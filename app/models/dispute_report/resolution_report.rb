@@ -12,7 +12,7 @@ class DisputeReport::ResolutionReport
     end
 
     def each_resolution
-      %w{UNCHANGED FIXED\ FN FIXED\ FP}.each do |resolution|
+      [DisputeEntry::STATUS_RESOLVED_FIXED_FP, DisputeEntry::STATUS_RESOLVED_FIXED_FN, DisputeEntry::STATUS_RESOLVED_UNCHANGED].each do |resolution|
         count = distribution[resolution]
         percent = (0 < total && count) ? 100.0 * count / total : nil
         yield resolution, percent && '%.2f' % percent, count
