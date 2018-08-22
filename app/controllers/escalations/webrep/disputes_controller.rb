@@ -24,7 +24,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
             case format
               when "bold"
                 @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
-              when "header"
+              when "h1"
+                @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
+                @worksheet.sheet_data[data_insertion_index][i].change_font_size(14)
+              when "h2"
                 @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
                 @worksheet.sheet_data[data_insertion_index][i].change_font_size(12)
             end
@@ -32,13 +35,13 @@ class Escalations::Webrep::DisputesController < ApplicationController
         end
 
         dispute_headers = ['Priority', 'Case ID', 'Status', 'Dispute', 'Count', 'Owner', 'Time Submitted', 'Age']
-        insert_row_with_data(dispute_headers, "header")
+        insert_row_with_data(dispute_headers, "h1")
 
         @disputes.each do |dispute|
-          insert_row_with_data([dispute.priority, dispute.case_id_str, dispute.status, dispute.org_domain, dispute.dispute_entries.count, dispute.user.cvs_username, dispute.case_opened_at, ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)])
-          insert_row_with_data([ 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits' ], "bold")
+          insert_row_with_data([dispute.priority, dispute.case_id_str, dispute.status, dispute.org_domain, dispute.dispute_entries.count, dispute.user.cvs_username, dispute.case_opened_at, ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)], "h2")
+          insert_row_with_data([ 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Resolution', 'Resolution Comments' ], "bold")
           dispute.dispute_entries.each do |dispute_entry|
-            insert_row_with_data([ dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count ])
+            insert_row_with_data([ dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.resolution, dispute_entry.resolution_comment ])
           end
 
         end
