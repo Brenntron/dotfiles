@@ -378,7 +378,7 @@ window.show_page_edit_status = () ->
   data = {
     dispute_ids: [ dispute_id ]
     status: statusName
-    commment: comment
+    comment: comment
   }
 
   if resolution

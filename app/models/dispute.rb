@@ -941,15 +941,15 @@ class Dispute < ApplicationRecord
         dispute.case_resolved_at = resolved_at
       end
 
-      if dispute.status == RESOLVED
-        dispute.dispute_entries.each do |entry|
-          entry.status = status
+      dispute.dispute_entries.each do |entry|
+        entry.status = status
+        if resolution.present?
           entry.resolution = resolution
           entry.resolution_comment = comment
           entry.case_closed_at = resolved_at
           entry.case_resolved_at = resolved_at
-          entry.save
         end
+        entry.save
       end
 
       dispute.save
