@@ -1021,7 +1021,7 @@ class Dispute < ApplicationRecord
         end
       end
       dispute_packet[:dispute_count] = dispute.entry_count.to_s
-
+      dispute_packet[:dispute_resolution] = "<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>"
       dispute_packet[:dispute_entry_content] = []
       unless dispute.dispute_entries.empty?
         dispute.dispute_entries.each do |entry|

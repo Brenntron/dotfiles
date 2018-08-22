@@ -874,7 +874,9 @@ $ ->
       }
       { data: 'case_link' }
       { data: 'status' }
-      { data: 'resolution' }
+      {
+        data: 'dispute_resolution'
+      }
        {
         data: 'submission_type'
         render: (data) ->
