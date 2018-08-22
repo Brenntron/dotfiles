@@ -3218,6 +3218,10 @@ fieldset.top-content {
   padding: 0 20px;
 }
 
+.customer-facing-notice {
+  display: none;
+}
+
 .customer-facing-notice::before, .duplicate-email-notice::before {
   content: '';
   display: block;
