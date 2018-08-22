@@ -4812,6 +4812,19 @@ h5.entry-details-table-header {
   font-weight: 600;
 }
 
+.nested-table-tally {
+  float: right;
+  font-weight: 300;
+  background-color: lighten($table-dark-header, 15%);
+  border-radius: 50%;
+  height: 20px;
+  min-width: 20px;
+  padding: 2px;
+  margin-top: 2px;
+  text-align: center;
+  line-height: 1.25em;
+}
+
 .inline-col-breakup {
   padding: 0 2px;
 }
