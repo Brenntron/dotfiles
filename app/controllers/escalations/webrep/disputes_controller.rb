@@ -6,7 +6,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def index
     respond_to do |format|
       format.html
-      format.csv do
+      format.xlsx do
         index_params = JSON.parse(params['data_json'])
         search_type = index_params['search_type']
         search_name = 'advanced' == search_type ? nil : index_params['search_name']
