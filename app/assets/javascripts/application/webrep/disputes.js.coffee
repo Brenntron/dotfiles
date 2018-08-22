@@ -611,10 +611,12 @@ window.save_dispute_entries = () ->
       }]
 
       if new_value == "RESOLVED_CLOSED" && (new_value != old_value)
+#        binding.pry
         data[this.dataset.id].push(
           id: this.dataset.id
           field: "resolution"
           new: $('input[name=entry-resolution]:checked').attr('id')
+#          binding.pry
         )
 
         data[this.dataset.id].push({
@@ -1136,9 +1138,36 @@ $ ->
     else
       alert('No disputes selected')
 
+  window.status_drop_down = (dispute_id) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_id}"
+      method: 'GET'
+      headers: headers
+      data: {}
+      dataType: 'json'
+      success: (response) ->
+        response = JSON.parse(response)
+        status = response.status
 
-#      BFRP (Research tools page)
+        $('.entry-status-radio' + '#' + status).prop("checked", true);
+    )
+
+  window.resolution_drop_down = (dispute_id) ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_id}"
+      method: 'GET'
+      headers: headers
+      data: {}
+      dataType: 'json'
+      success: (response) ->
+        response = JSON.parse(response)
+        resolution = response.resolution
+        $('.entry-resolution-radio' + '#' + resolution).prop("checked", true);
+    )
 
 
 # Inline WLBL Adjust Button

@@ -380,6 +380,20 @@ module API
               end
             end
 
+            get 'dispute_entry_status/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(params['dispute_entry_id'])
+                return {:status => dispute_entry.status}.to_json
+              end
+            end
+
+            get 'dispute_entry_resolution/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(params['dispute_entry_id'])
+                return {:resolution => dispute_entry.resolution}.to_json
+              end
+            end
+
             params do
               requires :duplicate_dispute_id, type: Integer
             end
