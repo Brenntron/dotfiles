@@ -33,16 +33,14 @@
             %li.toggle-vis{'data-column':'11'}
               %input{type: 'checkbox'} Case Origin
             %li.toggle-vis{'data-column':'12'}
-              %input{type: 'checkbox'} Origin ID
-            %li.toggle-vis{'data-column':'13'}
               %input{type: 'checkbox'} Submitter Type
-            %li.toggle-vis{'data-column':'14'}
+            %li.toggle-vis{'data-column':'13'}
               %input{type: 'checkbox'} Submitter Org
-            %li.toggle-vis{'data-column':'15'}
+            %li.toggle-vis{'data-column':'14'}
               %input{type: 'checkbox'} Submitter Domain
-            %li.toggle-vis{'data-column':'16'}
+            %li.toggle-vis{'data-column':'15'}
               %input{type: 'checkbox'} Contact Name
-            %li.toggle-vis{'data-column':'17'}
+            %li.toggle-vis{'data-column':'16'}
               %input{type: 'checkbox'} Contact Email
 
         .dropdown-menu-content-block
@@ -169,7 +167,7 @@
           %br
           %input.dispute-id{type: 'text', name: 'dispute_id'}
           .button-row-center
-            %button.primary#set-related-dispute-submit-button
+            %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onclick:'related_disputes();'}
               Submit
 
   %div

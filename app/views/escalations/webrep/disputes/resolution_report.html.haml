@@ -28,7 +28,7 @@
               %td TOTAL:
               %td
               %td
-                = 0 == pr_report.total ? '' : link_to(pr_report.total,
+                = 0 == pr_report.total ? 0 : link_to(pr_report.total,
                                                       age_report_path(date_from: pr_report.date_from,
                                                                       date_to: pr_report.date_to))
             - pr_report.each_resolution do |resolution, percent, count|
@@ -67,7 +67,7 @@
               %td TOTAL:
               %td
               %td
-                = 0 == pe_report.total ? '' : link_to(pe_report.total,
+                = 0 == pe_report.total ? 0 : link_to(pe_report.total,
                                                       age_report_path(date_from: pe_report.date_from,
                                                                       date_to: pe_report.date_to))
             - pe_report.each_resolution do |engineer, percent, count|
@@ -107,7 +107,7 @@
               %td TOTAL:
               %td
               %td
-                = 0 == pc_report.total ? '' : link_to(pc_report.total, age_report_path(date_from: pc_report.date_from,
+                = 0 == pc_report.total ? 0 : link_to(pc_report.total, age_report_path(date_from: pc_report.date_from,
                                                                                        date_to: pc_report.date_to))
             - pc_report.each_resolution do |customer, percent, count|
               %tr

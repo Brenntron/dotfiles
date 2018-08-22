@@ -68,6 +68,17 @@ class Wbrs::ManualWlbl < Wbrs::Base
     response.body
   end
 
+  # @param [String] trgt_list: Target manual list type
+  # @param [Array<String>] urls: list of urls to apply the trg_list to
+  # @param [String] usr: User creating the WL/BL entries
+  # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
+  # @param [String] note: User’s note
+  # @return [String] JSON for array of warnings
+  def self.new_wlbl_from_params(wlbl_params)
+    response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
+    response
+  end
+
   # @param [Array<DisputeEntry>] entries the database records for the entries to add the WL/BL to.
   # @param [String] trgt_list: Target manual list type
   # @param [String] usr: User creating the WL/BL entries
@@ -93,6 +104,13 @@ class Wbrs::ManualWlbl < Wbrs::Base
     entries.each { |entry| entry.update(webrep_wlbl_key: nil) }
 
     response.body
+  end
+
+  def self.drop_from_ids(ids, username)
+    drop_params = {'ids' => ids, 'usr' => username}
+
+    response = post_request(path: '/v1/rep/wlbl/drop', body: drop_params)
+    response
   end
 
   # Add a WL/BL on the backend
@@ -127,6 +145,33 @@ class Wbrs::ManualWlbl < Wbrs::Base
       end
     end
     true
+  end
+
+  # @param [Array<String>] urls: urls to adjust
+  # @param [Array<String>] trgt_list: Target manual list type
+  # @param [String] username: User creating the WL/BL entries
+  # @param [String] note: User’s note
+  def self.adjust_urls_from_params(params = {}, username:)
+    wlbl_params = stringkey_params(params)
+    wlbl_params['usr'] = username
+
+    target_list = wlbl_params.delete('trgt_list')
+
+    params[:urls].each do |param_url|
+      information = Wbrs::ManualWlbl.where({:url => param_url})
+
+      if information.present?
+        drop_from_ids(information.select {|info| info.state == 'active' }.map {|info| info.id}, username)
+      end
+    end
+
+    if target_list.present?
+      target_list.each do |wlbl|
+        new_wlbl_from_params({'urls' => params[:urls], 'usr' => username, 'note' => params[:note], 'trgt_list' => wlbl })
+      end
+
+    end
+
   end
 
   # Add a WL/BL on the backend

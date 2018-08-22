@@ -180,13 +180,13 @@ class ComplaintEntry < ApplicationRecord
         new_complaint_entry.url_primary_category = categories
         new_complaint_entry.category = categories
       else
-        new_complaint_entry.url_primary_category = new_complaint_entry.set_current_category
-        new_complaint_entry.category = new_complaint_entry.set_current_category
+        current_category = new_complaint_entry.set_current_category
+        new_complaint_entry.url_primary_category = current_category
+        new_complaint_entry.category = current_category
       end
 
       new_complaint_entry.save
 
-      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     rescue Exception => e
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
