@@ -1149,7 +1149,7 @@ $ ->
         response = JSON.parse(response)
         status = response.status
 
-        $('.entry-status-radio' + '#' + status).prop("checked", true);
+        $('.radio-dispute-' + dispute_id + '#' + status).prop("checked", true);
     )
 
   window.resolution_drop_down = (dispute_id) ->
@@ -1164,7 +1164,8 @@ $ ->
       success: (response) ->
         response = JSON.parse(response)
         resolution = response.resolution
-        $('.entry-resolution-radio' + '#' + resolution).prop("checked", true);
+        
+        $('.resolution-dispute-' + dispute_id + '#' + resolution).prop("checked", true);
     )
 
 
