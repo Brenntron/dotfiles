@@ -121,7 +121,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
-    @wbrs_list_type ||= wbrs_xlist.map{ |wlbl| wlbl.list_type }.join(',')
+    @wbrs_list_type ||= wbrs_xlist.map{ |wlbl| wlbl.list_type }.join(', ')
   end
 
   def wbrs_xlist
@@ -199,11 +199,14 @@ class DisputeEntry < ApplicationRecord
   end
 
   def last_submitted
-    if self.referenced_tickets.count > 1
+    if self.referenced_tickets.count > 0
+
       last_submitted = referenced_tickets.last.created_at
     else
       last_submitted = "N/A"
     end
+
+    return last_submitted
   end
 
   def is_possible_company_duplicate?
@@ -275,8 +278,17 @@ class DisputeEntry < ApplicationRecord
     if attributes.has_key?('status')
       unless attributes['status'].nil?
         attributes['status'] = attributes['status'].upcase
+        if attributes['status'] == DisputeEntry::STATUS_RESOLVED
+          resolved_at = Time.now
+          attributes['case_closed_at'] = resolved_at
+          attributes['case_resolved_at'] = resolved_at
+        elsif attributes['status'] == DisputeEntry::ASSIGNED
+          assigned_at = Time.now
+          attributes['case_accepted_at'] = assigned_at
+        end
       end
     end
+
 
     if attributes.has_key?('host')
       host = attributes.delete('host')
@@ -297,7 +309,7 @@ class DisputeEntry < ApplicationRecord
       sync_up
     end
 
-    update!(attributes.slice(*%w{entry_type ip_address hostname uri status resolution resolution_comment}))
+    update!(attributes.slice(*%w{entry_type ip_address hostname uri status resolution resolution_comment case_accepted_at case_resolved_at case_closed_at}))
   end
 
   def self.update_from_field_data(field_data)
@@ -328,7 +340,7 @@ class DisputeEntry < ApplicationRecord
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
       wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
 
-      # self.wbrs_score = wbrs_stuff["wbrs"]["score"]
+      entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
       wbrs_stuff_rulehits.each do |rule_hit|
         new_rule_hit = DisputeRuleHit.new
         new_rule_hit.dispute_entry_id = entry.id
@@ -338,6 +350,8 @@ class DisputeEntry < ApplicationRecord
       end
 
       if is_ip_address === true
+        sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+        entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
         sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
 
         sbrs_stuff_rules.each do |rule_hit|

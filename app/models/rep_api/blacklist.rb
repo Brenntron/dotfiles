@@ -108,6 +108,7 @@ class RepApi::Blacklist < RepApi::Base
     input += entries.map{ |entry_curr| "entry=#{entry_curr}" }
 
     response = call_json_request(:post, '/blacklist/add', body: build_request_body(input))
+
     @new_record = false
     blacklist_hash = JSON.parse(response.body).inject({}) do |hash, message|
       contained_entry = entries.find{ |entry| message['MSG'].include?(entry) }
@@ -199,9 +200,18 @@ class RepApi::Blacklist < RepApi::Base
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
   def self.add_from_params(params, username:)
     dispute_entry_ids = params['dispute_entry_ids']
-    raise 'Must provide dispute entry ids' unless dispute_entry_ids
-    entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
-    reptool_entries = entries.map {|entry| entry.hostlookup}
+    entries = params['entries']
+    if (dispute_entry_ids.blank? && entries.blank?)
+      raise 'Must provide dispute entry ids or url entries'
+    end
+    if dispute_entry_ids.present?
+      entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
+
+      reptool_entries = entries.map {|entry| entry.hostlookup}
+    else
+      reptool_entries = entries
+    end
+
     add_from_hosts(hostnames: reptool_entries,
                    classifications:params['classifications'],
                    author: username,
@@ -210,9 +220,17 @@ class RepApi::Blacklist < RepApi::Base
 
   def self.delete_from_params(params)
     dispute_entry_ids = params['dispute_entry_ids']
-    raise 'Must provide dispute entry ids' unless dispute_entry_ids
-    entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
-    reptool_entries = entries.map {|entry| entry.hostlookup}
+    entries = params['entries']
+    if (dispute_entry_ids.blank? && entries.blank?)
+      raise 'Must provide dispute entry ids or url entries'
+    end
+    if dispute_entry_ids.present?
+      entries = dispute_entry_ids.map {|id| DisputeEntry.find(id)}
+
+      reptool_entries = entries.map {|entry| entry.hostlookup}
+    else
+      reptool_entries = entries
+    end
 
     blacklist = RepApi::Blacklist.new(entry: reptool_entries)
     blacklist.delete!
@@ -224,7 +242,7 @@ class RepApi::Blacklist < RepApi::Base
       when 'active'
         add_from_params(params, username: username)
       when 'expired'
-        delete_from_params(params)
+        delete_from_params(params, entries)
       else
         raise "No known action '#{params['action']}'."
     end

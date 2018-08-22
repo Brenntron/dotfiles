@@ -72,6 +72,7 @@ module API
               optional :resolution, type: String, desc: "Resolution; write this if status is Resolved"
             end
             put ":id" do
+              resolved_at = Time.now
               dispute = Dispute.find(params[:id])
 
               dispute.priority = permitted_params[:priority]
@@ -81,7 +82,8 @@ module API
 
               if permitted_params[:resolution]
                 dispute.resolution = permitted_params[:resolution]
-                dispute.case_resolved_at = Time.now
+                dispute.case_resolved_at = resolved_at
+                dispute.case_closed_at = resolved_at
               end
 
               dispute.save
@@ -124,7 +126,7 @@ module API
 
               user = Dispute.find(params[:dispute_id]).user_id
 
-              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user)
+              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user, status: Dispute::NEW, case_opened_at: Time.now)
 
               is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
 
@@ -153,8 +155,14 @@ module API
               params[:dispute_ids].each do |dispute|
                 Dispute.where(id: dispute).update_all(user_id: params[:new_assignee])
                 d = Dispute.find_by(id: dispute)
-                if d.status == 'NEW' || d.status == 'REOPENED'
-                  d.update(status: 'ASSIGNED')
+                if d.status == Dispute::STATUS_NEW || d.status == Dispute::STATUS_REOPENED
+                  accepted_at = Time.now
+                  d.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
+                  d.dispute_entries.each do |entry|
+                    if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
+                      entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+                    end
+                  end
                 end
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
                 json_packet << d
@@ -172,12 +180,36 @@ module API
               params[:dispute_ids].each do |dispute|
                 Dispute.where(id: dispute).update_all(user_id: vrt.id)
                 d = Dispute.find_by(id: dispute)
+                if d.status == Dispute::ASSIGNED
+                  d.update(status: Dispute::NEW, case_accepted_at: nil)
+                  d.dispute_entries.each do |entry|
+                    if entry.status == DisputeEntry::ASSIGNED
+                      entry.update(status: DisputeEntry::NEW, case_accepted_at: nil)
+                    end
+                  end
+                end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
                 json_packet << d
               end
               {:status => "success", :data => json_packet}.to_json
             end
+
+            desc "Adjust a WL/BL entry via uris"
+            params do
+              requires :urls, type: Array[String], desc: "uris to wl/bl"
+              requires :trgt_list, type: Array[String], desc: "type of WL/BL"
+              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "uri_wlbl" do
+              authorize!(:update, Wbrs::ManualWlbl)
+              Wbrs::ManualWlbl.adjust_urls_from_params(permitted_params, username: current_user.cvs_username)
+              true
+            end
+
+
+
 
             desc "Adjust a WL/BL entry"
             params do
@@ -210,8 +242,8 @@ module API
             desc "Adjust a Reptool Bl entry"
             params do
               requires :action, type: String, desc: 'activate or expire'
-              requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
-              #requires :entries, type: Array[String], desc: "urls"
+              optional :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+              optional :entries, type: Array[String], desc: "urls"
               requires :classifications, type: Array[String], desc: "classifications"
               requires :comment, type: String, desc: "comment"
             end
@@ -329,6 +361,19 @@ module API
             end
 
             params do
+              requires :relating_dispute_ids, type: Array[Integer]
+            end
+            patch 'related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                relating_dispute_ids = permitted_params['relating_dispute_ids']
+                Dispute.where(id: relating_dispute_ids).update_all(related_id: params['original_dispute_id'],
+                                                                   related_at: DateTime.now)
+                true
+              end
+            end
+
+            params do
               requires :related_dispute_id, type: Integer
             end
             post ':dispute_id/related_disputes' do
@@ -349,11 +394,14 @@ module API
               std_api_v2 do
                 authorize!(:update, Dispute)
                 dispute = Dispute.find(params['dispute_id'])
+                resolved_at = Time.now
                 authorize!(:update, dispute)
                 dispute.update!(related_id: permitted_params['duplicate_dispute_id'],
                                 related_at: DateTime.now,
                                 status: Dispute::CLOSED,
-                                resolution: Dispute::DUPLICATE)
+                                resolution: Dispute::DUPLICATE,
+                                case_closed_at: resolved_at,
+                                case_resolved_at: resolved_at)
                 true
               end
             end
@@ -366,10 +414,11 @@ module API
               params[:entry] = params[:entry].strip
               information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
               information = JSON.parse(information)
+
               if information[params[:entry]] == "NOT_FOUND"
-                return {:classification => "not found", :expiration => "", :status => ""}.to_json
+                return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
               else
-                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"]}.to_json
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end
