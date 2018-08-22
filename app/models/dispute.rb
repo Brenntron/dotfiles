@@ -255,6 +255,7 @@ class Dispute < ApplicationRecord
   end
 
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
+    resolved_at = Time.now
     dispute.status = DUPLICATE
     dispute.related_id = authority_dispute.id
     dispute.related_at = Time.now
@@ -274,6 +275,8 @@ class Dispute < ApplicationRecord
       new_dispute_entry.entry_type = "IP"
       new_dispute_entry.status = DisputeEntry::RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.case_closed_at = resolved_at
+      new_dispute_entry.case_resolved_at = resolved_at
       new_dispute_entry.save
     end
     new_entries_urls.each do |url, entry|
@@ -288,6 +291,8 @@ class Dispute < ApplicationRecord
       new_dispute_entry.entry_type = "URI/DOMAIN"
       new_dispute_entry.status = DisputeEntry::RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.case_closed_at = resolved_at
+      new_dispute_entry.case_resolved_at = resolved_at
       new_dispute_entry.save
     end
 
@@ -321,8 +326,11 @@ class Dispute < ApplicationRecord
     end
 
     if is_resolved == true
+      resolved_at = Time.now
       self.status = Dispute::RESOLVED
       self.resolution = new_resolution
+      self.case_closed_at = resolved_at
+      self.case_resolved_at = resolved_at
       save!
     end
   end
@@ -339,7 +347,8 @@ class Dispute < ApplicationRecord
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
     guest = Company.where(:name => "Guest").first
-
+    opened_at = Time.now
+    resolved_at = Time.now
     customer = Customer.process_and_get_customer(message_payload)
 
     begin
@@ -389,7 +398,7 @@ class Dispute < ApplicationRecord
         new_dispute.user_id = user.id
         new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
         new_dispute.org_domain = message_payload["payload"]["domain"]
-        new_dispute.case_opened_at = Time.now
+        new_dispute.case_opened_at = opened_at
         new_dispute.subject = message_payload["payload"]["email_subject"]
         new_dispute.description = message_payload["payload"]["email_body"]
         new_dispute.problem_summary = message_payload["payload"]["problem"]
@@ -466,16 +475,21 @@ class Dispute < ApplicationRecord
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
+          new_dispute_entry.case_opened_at = opened_at
 
           if false_negative_claim
             if auto_resolve_verdict.malicious?
               new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
               new_dispute_entry.status = DisputeEntry::RESOLVED
+              new_dispute_entry.case_closed_at = resolved_at
+              new_dispute_entry.case_resolved_at = resolved_at
             else
               new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
+              new_dispute_entry.case_closed_at = resolved_at
+              new_dispute_entry.case_resolved_at = resolved_at
             end
           else
             new_dispute_entry.status = DisputeEntry::NEW
@@ -544,16 +558,21 @@ class Dispute < ApplicationRecord
           new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
           new_dispute_entry.entry_type = "URI/DOMAIN"
           new_dispute_entry.is_important = top_url.is_important != "invalid" ? top_url.is_important : false
+          new_dispute_entry.case_opened_at = opened_at
 
           if false_negative_claim
             if auto_resolve_verdict.malicious?
               new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
               new_dispute_entry.status = DisputeEntry::RESOLVED
+              new_dispute_entry.case_closed_at = resolved_at
+              new_dispute_entry.case_resolved_at = resolved_at
             else
               new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
+              new_dispute_entry.case_closed_at = resolved_at
+              new_dispute_entry.case_resolved_at = resolved_at
             end
           else
             new_dispute_entry.status = DisputeEntry::NEW
@@ -913,10 +932,13 @@ class Dispute < ApplicationRecord
   end
 
   def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    resolved_at = Time.now
     disputes.each do |dispute|
       dispute.status = status
       if resolution.present?
         dispute.resolution = resolution
+        dispute.case_closed_at = resolved_at
+        dispute.case_resolved_at = resolved_at
       end
 
       if dispute.status == RESOLVED
@@ -924,6 +946,8 @@ class Dispute < ApplicationRecord
           entry.status = status
           entry.resolution = resolution
           entry.resolution_comment = comment
+          entry.case_closed_at = resolved_at
+          entry.case_resolved_at = resolved_at
           entry.save
         end
       end
@@ -1052,8 +1076,14 @@ class Dispute < ApplicationRecord
 
     dispute = Dispute.find(self.id)
 
-    if dispute.status == 'NEW' || dispute.status == 'REOPENED'
-      dispute.update(status: 'ASSIGNED')
+    if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
+      accepted_at = Time.now
+      dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
+      dispute.entries.each do |entry|
+        if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
+          entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+        end
+      end
     end
     raise 'This record changed while you were editing.' unless dispute.user_id == user.id
   end
@@ -1069,8 +1099,14 @@ class Dispute < ApplicationRecord
 
       queries = Dispute.where(id: dispute_ids, user_id: user.id)
       queries.each do |query|
-        if query.status == 'NEW' || query.status == 'REOPENED'
-          query.update(status: 'ASSIGNED')
+        if query.status == Dispute::STATUS_NEW || query.status == Dispute::STATUS_REOPENED
+          accepted_at = Time.now
+          query.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
+          query.dispute_entries.each do |entry|
+            if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
+              entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+            end
+          end
         end
       end
 

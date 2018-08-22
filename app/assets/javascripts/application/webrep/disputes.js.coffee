@@ -598,17 +598,38 @@ window.save_dispute_entries = () ->
         when 'status' then $(this).find("input[name='entry-status']:checked").attr('id')
         else $(this).find('.table-entry-input')[0].value.trim()
 
-      {
+      old_value = $(this).find('.entry-data')[0].innerText.trim()
+
+      if new_value == undefined
+        new_value = old_value
+
+      data[this.dataset.id] = [{
         id: this.dataset.id
         field: this.dataset.field
-        old: $(this).find('.entry-data')[0].innerText.trim()
+        old: old_value
         new: new_value
-      }
+      }]
+
+      if new_value == "RESOLVED_CLOSED" && (new_value != old_value)
+        data[this.dataset.id].push(
+          id: this.dataset.id
+          field: "resolution"
+          new: $('input[name=entry-resolution]:checked').attr('id')
+        )
+
+        data[this.dataset.id].push({
+          id: this.dataset.id
+          field: "resolution_comment"
+          new: $(this).find("textarea[name='resolution-comment']")[0].value
+        })
+
     ).toArray().filter((field_data) ->
       field_data.old != field_data.new
     )
+
     if 0 < fielddata.length
       data[this.dataset.entryId] = fielddata
+
   )
 
   std_msg_ajax(
