@@ -33,13 +33,13 @@
       .row.categorize-radio-wrapper
         .col-xs-6
           %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-diff', value: 'cat-urls-diff', checked: true}
-          %label.radio-label{for: 'cat-urls-diff'} Different Categories
+          %label.radio-label{for: 'cat-urls-diff'} Different categories for each url
         .col-xs-6
           %input{type: 'radio', name: 'categorize-url-form-type', id: 'cat-urls-same', value: 'cat-urls-same'}
-          %label.radio-label{for: 'cat-urls-same'} Same Categories
+          %label.radio-label{for: 'cat-urls-same'} Same categories for all urls
 
       .nav-tool-content-wrapper#categorize-urls-form-wrapper
-        .categorize-same-form
+        #categorize-diff-form
           %form{method: 'get', 'accept-charset': 'UTF-8'}
             %h5 Categorize URLs with Different Categories
             .form-group
@@ -72,7 +72,7 @@
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
         %form{method: 'get', 'accept-charset': 'UTF-8'}
-          .categorize-diff-form
+          #categorize-same-form
             %h5 Categorize URLs with Same Categories
             .form-group
               %label.content-label-sm Categories

@@ -6015,6 +6015,21 @@ hr.condensed {
   padding: 12px 6px;
 }
 
+.nav-tool-content-wrapper#categorize-urls-form-wrapper {
+  padding-top: 10px;
+}
+
+#categorize-diff-form .content-label-sm {
+  margin-bottom: 0;
+}
+
+#categorize-diff-form input {
+  margin-bottom: 0;
+}
+
+#categorize-same-form {
+  display: none;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 

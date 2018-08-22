@@ -991,3 +991,13 @@ $ ->
     $('#url_1').focus()
     return
 
+  $('#cat-urls-diff').click ->
+    if $('#cat-urls-diff').prop('checked')
+      $('#categorize-diff-form').show()
+      $('#categorize-same-form').hide()
+
+  $('#cat-urls-same').click ->
+    if $('#cat-urls-same').prop('checked')
+      $('#categorize-diff-form').hide()
+      $('#categorize-same-form').show()
+
