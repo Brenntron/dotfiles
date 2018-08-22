@@ -937,18 +937,19 @@ class Dispute < ApplicationRecord
       dispute.status = status
       if resolution.present?
         dispute.resolution = resolution
+        dispute.resolution_comment = comment
         dispute.case_closed_at = resolved_at
         dispute.case_resolved_at = resolved_at
       end
 
       dispute.dispute_entries.each do |entry|
-        entry.status = status
-        if resolution.present?
+        if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
           entry.resolution = resolution
           entry.resolution_comment = comment
           entry.case_closed_at = resolved_at
           entry.case_resolved_at = resolved_at
         end
+        entry.status = status
         entry.save
       end
 
