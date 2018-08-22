@@ -579,12 +579,10 @@ window.take_single_dispute = (id) ->
   )
 
 window.return_dispute = (dispute_id) ->
-  dispute_id = dispute_id
   std_msg_ajax(
     method: 'PATCH'
     url: "/escalations/api/v1/escalations/webrep/disputes/return_dispute/" + dispute_id
     data: {}
-    dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       $('#owner_' + response.dispute_id).text('Unassigned')
