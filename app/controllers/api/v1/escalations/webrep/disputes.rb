@@ -275,15 +275,17 @@ module API
               true
             end
 
+            params do
+              requires :dispute_id, type: Integer
+            end
             patch 'take_dispute/:dispute_id' do
               std_api_v2 do
-                authorize!(:update, Dispute)
-                dispute = Dispute.find(params['dispute_id'])
+                dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
                 dispute.take_ticket(user: current_user)
 
-                { username: current_user.display_name, dispute_id: dispute.id }
+                { username: current_user.cec_username, dispute_id: dispute.id }
               end
             end
 
@@ -301,9 +303,12 @@ module API
               end
             end
 
+            params do
+              requires :dispute_id, type: Integer
+            end
             patch 'return_dispute/:dispute_id' do
               std_api_v2 do
-                dispute = Dispute.find(params['dispute_id'])
+                dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
                 dispute.return_dispute

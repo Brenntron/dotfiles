@@ -534,12 +534,11 @@ window.determine_checked = (box_names) ->
   return box_flag
 
 
-window.take_dispute = (take_button, dispute_id) ->
+window.take_dispute = (dispute_id) ->
   std_msg_ajax(
     method: 'PATCH'
     url: "/escalations/api/v1/escalations/webrep/disputes/take_dispute/" + dispute_id
     data: {}
-    td_tag: take_button.closest('td')
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
@@ -585,8 +584,10 @@ window.return_dispute = (dispute_id) ->
     data: {}
     error_prefix: 'Error updating ticket.'
     success: (response) ->
+      $('.return-dispute-' + dispute_id).replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
       $('#owner_' + response.dispute_id).text('Unassigned')
       $('#status_' + response.dispute_id).text('NEW')
+
   )
 
 

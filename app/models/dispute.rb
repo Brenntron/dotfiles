@@ -1027,14 +1027,14 @@ class Dispute < ApplicationRecord
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
+              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
 
         when dispute.user_id?
           if dispute.user_id == user.id
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='return-ticket-button' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='return-ticket-button return-dispute-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
           else
-            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
+            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
           end
       end
 
@@ -1085,9 +1085,12 @@ class Dispute < ApplicationRecord
     if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
       accepted_at = Time.now
       dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-      dispute.entries.each do |entry|
-        if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-          entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+
+      if dispute.dispute_entries.present?
+        dispute.dispute_entries.each do |entry|
+          if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
+            entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+          end
         end
       end
     end
