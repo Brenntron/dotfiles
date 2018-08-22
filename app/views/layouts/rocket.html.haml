@@ -142,14 +142,6 @@
       %nav{id: "nav-banner"}
         = content_for(:nav_banner) if content_for?(:nav_banner)
 
-        - if current_user
-          #login-div.nav-tool-block.col-sm-2.col-lg-4
-            %a{href: "/users/#{current_user[:id]}"}
-              = current_user[:display_name]
-
-          -##username= current_user.cvs_username
-
-
 
       #page-content-wrapper
         =yield
