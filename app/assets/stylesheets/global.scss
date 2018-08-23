@@ -4879,9 +4879,10 @@ h5.entry-details-table-header {
 }
 
 .ticket-resolution-submenu {
-  left: -200%;
+  left: -219%;
   margin-top: -56px;
   margin-left: 1px;
+  width: 350px;
 }
 
 .ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu .radio-label  {
@@ -5681,7 +5682,7 @@ table.dataTable tbody tr.selected {
 #show-ticket-resolution-submenu {
   left: 100%;
   border-radius: 0 4px 4px 4px;
-  width: 330px;
+  width: 350px;
   margin-top: -55px;
   padding: 0;
 }
@@ -6059,6 +6060,29 @@ hr.condensed {
 .top-case-info a {
   color: $content-bg-color;
   text-decoration: underline;
+}
+
+#disputes-research-table label.customer-facing-comment {
+  font-weight: 600;
+  padding-right: 0;
+}
+
+.customer-facing-comment {
+  color: $warning-accent-color !important;
+  font-weight: 600;
+  text-transform: none !important;
+}
+
+.customer-facing-comment::before {
+  content: '';
+  background-image: url(image_path('icon_warning_orange.svg'));
+  background-repeat: no-repeat;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  float: left;
+  margin-top: -2px;
+  margin-right: 2px;
 }
 
 th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc {

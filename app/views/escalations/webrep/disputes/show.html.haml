@@ -107,11 +107,12 @@
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
                   .col-xs-6.submenu-right-wrapper
                     .resolution-comment-wrapper
-                      %label.content-label-sm
-                        Comment
+                      %label.content-label-sm.customer-facing-comment
+                        Customer Facing Comment
                       %textarea#dispute-resolution-comment
-                      %button.primary{onClick: 'show_page_edit_status()'}
-                        Submit
+                      .button-row-center
+                        %button.primary{onClick: 'show_page_edit_status()'}
+                          Submit
 
               %li.status-radio-wrapper
                 %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
