@@ -881,7 +881,7 @@ $ ->
        {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"><!-- ' + data + ' --></span>'
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
