@@ -434,8 +434,16 @@ module API
               std_api_v2 do
                 dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
 
-                {:resolution => dispute_entry.resolution,
-                 :resolution_comment => dispute_entry.resolution_comment}.to_json
+                resolution = dispute_entry.resolution
+
+                if dispute_entry.resolution_comment.present?
+                  resolution_comment = dispute_entry.resolution_comment
+                else
+                  resolution_comment = ''
+                end
+
+                {:resolution => resolution,
+                 :resolution_comment => resolution_comment}.to_json
               end
             end
 

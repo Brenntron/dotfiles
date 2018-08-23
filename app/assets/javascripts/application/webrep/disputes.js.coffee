@@ -98,7 +98,7 @@ window.delete_disputes_named_search = (close_button, search_name) ->
       this.tr_tag.remove();
   )
 
-window.status_drop_down = (dispute_id) ->
+window.entry_status_drop_down = (dispute_id) ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
@@ -109,14 +109,14 @@ window.status_drop_down = (dispute_id) ->
     data: {}
     dataType: 'json'
     success: (response) ->
-      debugger
       response = JSON.parse(response)
       status = response.status
 
       $('.radio-dispute-' + dispute_id + '#' + status).prop("checked", true);
   )
 
-window.resolution_drop_down = (dispute_id) ->
+window.entry_resolution_drop_down = (dispute_id) ->
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
