@@ -1102,11 +1102,14 @@ class Dispute < ApplicationRecord
     if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
       accepted_at = Time.now
       dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-      dispute.entries.each do |entry|
+      dispute.dispute_entries.each do |entry|
         if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
           entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
         end
       end
+
+      message = Bridge::DisputeEntryUpdateStatusEvent.new
+      message.post_entries(dispute.dispute_entries)
     end
     raise 'This record changed while you were editing.' unless dispute.user_id == user.id
   end
@@ -1130,6 +1133,9 @@ class Dispute < ApplicationRecord
               entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
             end
           end
+
+          message = Bridge::DisputeEntryUpdateStatusEvent.new
+          message.post_entries(query.dispute_entries)
         end
       end
 
