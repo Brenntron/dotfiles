@@ -304,7 +304,7 @@
                                         No score.
                                     - else
                                       %span.current-wbrs-score
-                                        = entry.wbrs_score.to_d.truncate(2).to_f
+                                        = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
 
                                   -#    Removing for now. We can't do a preview until the api is updated to provide that info
                                   -#%td.text-center
@@ -477,7 +477,7 @@
                               No score.
                           - else
                             %span.current-wbrs-score
-                              = entry.wbrs_score.to_d.truncate(2).to_f
+                              = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
@@ -552,7 +552,7 @@
                               No score.
                           - else
                             %span.current-sbrs-score
-                              = entry.sbrs_score.to_d.truncate(2).to_f
+                              = entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                         %td
                           %label SBRS Rule Hits
                         %td.text-center
