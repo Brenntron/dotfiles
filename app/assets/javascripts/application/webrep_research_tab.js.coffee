@@ -232,8 +232,7 @@ $ ->
         wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
         if !wbrs
           wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-        console.log entry_content
-        console.log wbrs
+
         data = {
         # Send entry content to reptool
           'entry' : entry_content
@@ -251,8 +250,7 @@ $ ->
 
             response = JSON.parse(response)
             if response.data != ""
-              console.log response.data
-
+        
               $(response.data).each ->
                 if String(this) == 'WL-weak'
                   $(wl_weak[0]).prop('checked', true)
