@@ -937,19 +937,20 @@ class Dispute < ApplicationRecord
       dispute.status = status
       if resolution.present?
         dispute.resolution = resolution
+        dispute.resolution_comment = comment
         dispute.case_closed_at = resolved_at
         dispute.case_resolved_at = resolved_at
       end
 
-      if dispute.status == RESOLVED
-        dispute.dispute_entries.each do |entry|
-          entry.status = status
+      dispute.dispute_entries.each do |entry|
+        if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
           entry.resolution = resolution
           entry.resolution_comment = comment
           entry.case_closed_at = resolved_at
           entry.case_resolved_at = resolved_at
-          entry.save
         end
+        entry.status = status
+        entry.save
       end
 
       dispute.save
@@ -1021,6 +1022,16 @@ class Dispute < ApplicationRecord
       end
       dispute_packet[:dispute_count] = dispute.entry_count.to_s
 
+      if dispute.resolution.nil?
+        dispute_packet[:dispute_resolution] = ''
+      else
+        if dispute.resolution_comment.nil? || dispute.resolution_comment.empty?
+          dispute_packet[:dispute_resolution] = dispute.resolution
+        else
+          dispute_packet[:dispute_resolution] = "<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>"
+        end
+      end
+
       dispute_packet[:dispute_entry_content] = []
       unless dispute.dispute_entries.empty?
         dispute.dispute_entries.each do |entry|
@@ -1033,14 +1044,15 @@ class Dispute < ApplicationRecord
         end
       end
       dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
-      dispute_packet[:d_entry_preview] = "<span class='dispute-submission-type dispute-#{dispute.submission_type}'></span><span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+      dispute_packet[:submission_type] = dispute.submission_type
+      dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
+              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button esc-tooltipped' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
 
         when dispute.user_id?
-          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button esc-tooltipped' title='Assign this ticket to me'></button>"
       end
 
       dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
@@ -1090,11 +1102,14 @@ class Dispute < ApplicationRecord
     if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
       accepted_at = Time.now
       dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-      dispute.entries.each do |entry|
+      dispute.dispute_entries.each do |entry|
         if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
           entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
         end
       end
+
+      message = Bridge::DisputeEntryUpdateStatusEvent.new
+      message.post_entries(dispute.dispute_entries)
     end
     raise 'This record changed while you were editing.' unless dispute.user_id == user.id
   end
@@ -1118,6 +1133,9 @@ class Dispute < ApplicationRecord
               entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
             end
           end
+
+          message = Bridge::DisputeEntryUpdateStatusEvent.new
+          message.post_entries(query.dispute_entries)
         end
       end
 

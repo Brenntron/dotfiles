@@ -205,7 +205,6 @@ window.save_dispute = () ->
     'customer_name': $('#dispute-customer-name-input').val()
     'customer_email': $('#dispute-customer-email-input').val()
     'status': $('#status').val()
-    'related_id': $('#related-dispute-id').val()
   }
 
   std_msg_ajax(
@@ -378,7 +377,7 @@ window.show_page_edit_status = () ->
   data = {
     dispute_ids: [ dispute_id ]
     status: statusName
-    commment: comment
+    comment: comment
   }
 
   if resolution
@@ -525,6 +524,30 @@ window.add_dispute_entry = () ->
     error: (response) ->
       popup_response_error(response, 'Error adding entry.')
   )
+
+window.add_related_case_id= ()->
+  id = $('#dispute_id').text()
+  invalid_id = false
+  related_id = $('.dispute-id').val().split(",")
+  data = {
+    'relating_dispute_ids': related_id
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  for i in related_id
+    if(isNaN(i)||i.length < 1)
+      invalid_id = true
+  if related_id[0].length < 1
+    std_msg_error("Invalid ID",["You must enter a valid ID to relate."])
+  else if(invalid_id)
+    std_msg_error("Invalid ID",["One of your IDs is NOT a valid ID number."])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: '/escalations/api/v1/escalations/webrep/disputes/' + id + '/relating_disputes'
+      data: data
+      success_reload: true
+      error_prefix: 'Error marking relationship.'
+    )
 
 window.determine_checked = (box_names) ->
   box_flag = ($('.'+box_names+':checked').length > 0)
@@ -845,7 +868,10 @@ $ ->
         className: 'state-col'
       }
       {
-        targets: [6]
+        targets: [
+          2
+          6
+        ]
         className: 'text-center'
       }
       {
@@ -874,7 +900,9 @@ $ ->
       }
       { data: 'case_link' }
       { data: 'status' }
-      { data: 'resolution' }
+      {
+        data: 'dispute_resolution'
+      }
        {
         data: 'submission_type'
         render: (data) ->
@@ -895,7 +923,7 @@ $ ->
     ])
 
   format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-status">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
@@ -918,6 +946,16 @@ $ ->
         status = this.entry.status
       else
         status = missing_data
+      resolution = ''
+      if this.entry.resolution != null
+        resolution = this.entry.resolution
+      else
+        resolution = missing_data
+      resolution_comment = ''
+      if this.entry.resolution_comment != null
+        resolution_comment = this.entry.resolution_comment
+      else
+        resolution_comment = missing_data
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -936,6 +974,7 @@ $ ->
       else sbrs_score = missing_data
       entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
+        '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
         '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
@@ -1060,6 +1099,18 @@ $ ->
 # generated by js2coffee 2.2.0
 
 $ ->
+
+  $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
+    $(this).tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+        'tooltipster-borderless-comment'
+        ]
+      'maxWidth': 500
+    $(this).tooltipster 'show'
+  return
+
   $(document).ready ->
     if window.location.pathname != '/escalations/webrep/tickets'
       $('#filter-cases').hide()
@@ -1074,11 +1125,9 @@ $ ->
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
     $('.dispute-edit-field').hide()
-    $('.dispute-edit-input').addClass('block')
 
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
-    $('#related-dispute-button').removeClass('hidden')
     $('#related-dispute-input').removeClass('hidden')
     $('#edit-dispute-button').addClass('hidden')
 
@@ -1096,11 +1145,9 @@ $ ->
     $('#dispute-priority-icon').show()
     $('#dispute-priority-select').hide()
     $('.dispute-edit-field').show()
-    $('.dispute-edit-input').removeClass('block')
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
-    $('#related-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
 
