@@ -130,6 +130,13 @@ class DisputeEntry < ApplicationRecord
       return @wbrs_xlist
     end
     @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
+  rescue => except
+
+    Rails.logger.warn "Populating xlist from Wbrs failed."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    []
   end
 
   def virustotals
