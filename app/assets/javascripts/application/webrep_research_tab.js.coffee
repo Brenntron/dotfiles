@@ -189,8 +189,12 @@ $ ->
   $('#wlbl_entries_button').click ->
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
     show_content = $('#wlbl_adjust_entries').find('.wlbl-entry-content')
+    if !show_content[0]
+      show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
     show_wlbl = $('#wlbl_adjust_entries').find('.wlbl-entry-wlbl')
     show_wbrs = $('#wlbl_adjust_entries').find('.wlbl-current-entry-wbrs')
+    if !show_wbrs[0]
+      show_wbrs = $('#wlbl_adjust_entries').find('.current-wbrs-score')
     wl_weak = $('#wlbl_adjust_entries').find('.wl-weak-checkbox')
     wl_med = $('#wlbl_adjust_entries').find('.wl-med-checkbox')
     wl_heavy = $('#wlbl_adjust_entries').find('.wl-heavy-checkbox')
@@ -224,7 +228,10 @@ $ ->
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text()
         wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
-
+        if !wbrs
+          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+        console.log entry_content
+        console.log wbrs
         data = {
         # Send entry content to reptool
           'entry' : entry_content
