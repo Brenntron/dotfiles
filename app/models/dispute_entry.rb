@@ -86,16 +86,17 @@ class DisputeEntry < ApplicationRecord
   def get_xbrs_value
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
       xbrs = Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
-    end
-    case
-    when self.entry_type == "IP"
-      Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
-    when self.entry_type == "URI/DOMAIN"
-      Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
     else
-      self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      case
+      when self.entry_type == "IP"
+        Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
+      when self.entry_type == "URI/DOMAIN"
+        Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      else
+        self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      end
     end
-
+    
     # Starting here, we are cleaning up this data to remove columns that are completely empty.
     datacounter = 0
     @columns_to_remove = []
