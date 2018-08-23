@@ -1049,10 +1049,10 @@ class Dispute < ApplicationRecord
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
+              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button esc-tooltipped' title='Assign this ticket to me' onclick='take_dispute(this, #{dispute.id});'></button>"
 
         when dispute.user_id?
-          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me'></button>"
+          dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button esc-tooltipped' title='Assign this ticket to me'></button>"
       end
 
       dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"

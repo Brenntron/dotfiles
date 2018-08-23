@@ -20,13 +20,13 @@
       #research-page-toolbar.toolbar
         %div
           %label.toolbar-section-label Table View
-          %button.toolbar-button.expand-row-button#expand-all-rows
+          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped{title: 'Expand All Rows'}
             %span.toolbar-button-text Expand All Rows
-          %button.toolbar-button.collapse-button#collapse-all-rows
+          %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
             %span.toolbar-button-text Collapse All Rows
         %div
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               -#For each checked checkbox populate this information
@@ -64,7 +64,7 @@
                         Submit Changes
 
           %span.dropdown
-            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
               =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
