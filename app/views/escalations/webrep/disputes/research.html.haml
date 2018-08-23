@@ -20,13 +20,13 @@
       #research-page-toolbar.toolbar
         %div
           %label.toolbar-section-label Table View
-          %button.toolbar-button.expand-row-button#expand-all-rows
+          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped{title: 'Expand All Rows'}
             %span.toolbar-button-text Expand All Rows
-          %button.toolbar-button.collapse-button#collapse-all-rows
+          %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
             %span.toolbar-button-text Collapse All Rows
         %div
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               -#For each checked checkbox populate this information
@@ -94,7 +94,7 @@
                         Submit Changes
 
           %span.dropdown
-            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
               =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
@@ -303,7 +303,7 @@
                               %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score
-                            = entry.wbrs_score
+                            = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
                           %td
                             %label WBRS Rule Hits
                           %td.text-center
@@ -345,10 +345,10 @@
                           %td.left-bordered
                             %label WL/BL
                           %td
-                            - if entry.wbrs_list_type.nil?
+                            - if entry.consolidated_wlbl_strings.nil?
                               %span.missing-data Not currently on a list
                             - else
-                              = entry.wbrs_list_type
+                              = entry.consolidated_wlbl_strings
                           %td.left-bordered
                             %label Referenced on
                           %td
@@ -375,7 +375,7 @@
                             %span.research-table-input-wrapper.sbrs-input-wrapper
                               %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                             %label SBRS
-                          %td.text-center= entry.sbrs_score
+                          %td.text-center= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                           %td
                             %label SBRS Rule Hits
                           %td.text-center
@@ -426,7 +426,10 @@
                         .row
                           .col-sm-3
                             .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header WBRS Rule Hit Details
+                              %h5.entry-details-table-header
+                                WBRS Rule Hit Details
+                                %span.nested-table-tally
+                                  = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size
                               - if entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == "WBRS"}.empty?
                                 %table
                                   %thead
@@ -454,7 +457,10 @@
                                         %td
                                           -#Put weight of rule here
                             .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header SBRS Rule Hit Details
+                              %h5.entry-details-table-header
+                                SBRS Rule Hit Details
+                                %span.nested-table-tally
+                                  = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
                               - if entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == "SBRS"}.empty?
                                 %table
                                   %thead
@@ -482,7 +488,10 @@
                                         %td
                                           -#Put weight of rule here
                             .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header Virustotal Details
+                              %h5.entry-details-table-header
+                                Virustotal Details
+                                %span.nested-table-tally
+                                  = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                               - if entry.virustotals.empty?
                                 %table
                                   %thead
@@ -508,7 +517,11 @@
                                           %td.unclean-site-result= virustotal[:result]
                           .col-sm-9
                             .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header XBRS History
+                              %h5.entry-details-table-header
+                                XBRS History
+                                %span.nested-table-tally
+                                  - unless entry.hostlookup.nil?
+                                    = entry.find_xbrs[1]['data'].count
                               - if entry.find_xbrs[1]['data'].empty?
                                 %table
                                   %thead
@@ -542,7 +555,10 @@
                                             %td= datapoint
 
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header Cross-listed URLs
+                              %h5.entry-details-table-header
+                                Cross-listed URLs
+                                %span.nested-table-tally
+                                  = entry.wbrs_xlist.count
                               - if entry.wbrs_xlist.empty?
                                 %table
                                   %thead
