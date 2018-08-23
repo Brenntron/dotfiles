@@ -340,6 +340,20 @@ class Dispute < ApplicationRecord
   #
 
 
+  def self.is_important?(key)
+    top_url = Wbrs::TopUrl.check_urls([key]).first
+    return false if top_url.is_important != "invalid"
+    top_url.is_important
+  rescue => except
+
+    Rails.logger.warn "Processing bridge payload failed checking WBRS for is_important"
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    nil
+  end
+
+
   #
   #end dispute building instance methods
   #
@@ -535,8 +549,6 @@ class Dispute < ApplicationRecord
             false_negative_claim = true
           end
 
-          top_url = Wbrs::TopUrl.check_urls([key]).first
-
           #this is for return back to TI to populate its ticket show pages
 
           wbrs_hits = entry["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
@@ -557,7 +569,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.path = url_parts[:path]
           new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
           new_dispute_entry.entry_type = "URI/DOMAIN"
-          new_dispute_entry.is_important = top_url.is_important != "invalid" ? top_url.is_important : false
+          new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.case_opened_at = opened_at
 
           if false_negative_claim
@@ -642,7 +654,6 @@ class Dispute < ApplicationRecord
       end
     rescue Exception => e
 
-      logger.debug("Failed.")
       Rails.logger.error "Dispute failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")
