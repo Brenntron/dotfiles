@@ -345,7 +345,7 @@
                           %td.left-bordered
                             %label WL/BL
                           %td
-                            - if entry.consolidated_wlbl_strings.nil?
+                            - if !entry.respond_to?(:consolidated_wlbl_strings)
                               %span.missing-data Not currently on a list
                             - else
                               = entry.consolidated_wlbl_strings
