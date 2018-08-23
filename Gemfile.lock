@@ -415,7 +415,11 @@ GEM
     ruby-bugzilla (0.6.4)
       gruff (~> 0)
       highline
+    rubyXL (3.3.29)
+      nokogiri (>= 1.4.4)
+      rubyzip (>= 1.1.6)
     ruby_dep (1.5.0)
+    rubyzip (1.2.1)
     sass (3.5.7)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -569,6 +573,7 @@ DEPENDENCIES
   rmagick (~> 2.16.0)
   rspec-rails (~> 3.6.0)
   ruby-bugzilla (~> 0.6.4)
+  rubyXL (= 3.3.29)
   rule_test_api!
   scout_apm
   selectize-rails (~> 0.12.4)
