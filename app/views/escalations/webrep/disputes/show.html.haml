@@ -27,13 +27,16 @@
             %span= @dispute.assignee || "None"
           .dispute-owner-buttons-wrapper
             - if @dispute.assignee == current_user.email
-              %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
+              - if @dispute.status != 'DUPLICATE'
+                %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
             - else
-              %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
+              - if @dispute.status != 'DUPLICATE'
+                %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
 
             - if current_user.has_role?('manager')
               %span.dropdown
-                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                - if @dispute.status != 'DUPLICATE'
+                  %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                 .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                   .change-assignee-dropdown-wrapper
                     %h3 Change Assignee
