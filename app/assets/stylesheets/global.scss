@@ -3245,7 +3245,10 @@ fieldset.top-content {
   background-image: url(image_path('icon_mark_duplicate_orange.svg'));
 }
 
-
+.duplicate-email-notice{
+  margin-top: 30px;
+  margin-right: 27px;
+}
 
 .email-header-information {
   background-color: $faint-neutral-color;
