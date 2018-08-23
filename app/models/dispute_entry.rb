@@ -85,16 +85,44 @@ class DisputeEntry < ApplicationRecord
 
   def get_xbrs_value
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
-      return Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
-    end
-    case
-    when self.entry_type == "IP"
-      Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
-    when self.entry_type == "URI/DOMAIN"
-      Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      xbrs = Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
     else
-      self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      case
+      when self.entry_type == "IP"
+        xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
+      when self.entry_type == "URI/DOMAIN"
+        xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      else
+        self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      end
     end
+    
+    # Starting here, we are cleaning up this data to remove columns that are completely empty.
+    datacounter = 0
+    @columns_to_remove = []
+    while (datacounter < xbrs[1]['data'].length)
+      i = 0
+      nil_entries = []
+      while (i < xbrs[1]['data'][datacounter].length)
+        nil_entries = xbrs[1]['data'][datacounter].each_index.select{ |v| !xbrs[1]['data'][datacounter][v].present? }
+        i += 1
+      end
+
+      @columns_to_remove << nil_entries
+
+      datacounter += 1
+    end
+
+    if @columns_to_remove.reduce(:&)
+      @columns_to_remove = @columns_to_remove.reduce(:&)
+      xbrs[1]['data'].each do |data_row|
+        data_row.delete_if.with_index{|_, index| @columns_to_remove.include? index}
+      end
+      xbrs[1]['legend'].delete_if.with_index{|_, index| @columns_to_remove.include? index}
+    end
+    # End remove empty columns
+
+    xbrs
   end
 
   def find_xbrs(reload: false)

@@ -6094,6 +6094,12 @@ th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc 
   margin: auto;
 }
 
+//Crappy temporary hack to keep the annoying insane amt of entries for xbrs from taking over and ruining the whole page
+.xbrs-details-table .dataTables_scrollBody {
+  max-width: 1200px !important;
+  overflow-y: scroll !important;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
