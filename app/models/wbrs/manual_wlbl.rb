@@ -21,6 +21,17 @@ class Wbrs::ManualWlbl < Wbrs::Base
     @types
   end
 
+  def self.offline_types
+    types
+  rescue => except
+
+    Rails.logger.warn "Failed while getting types from WBRS."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    %w(WL-weak WL-med WL-heavy BL-weak BL-med BL-heavy)
+  end
+
   # @param [Integer] id the WL/BL
   # @return [Wbrs::Prefix] the WL/BL
   def self.find(id)
