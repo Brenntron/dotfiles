@@ -118,7 +118,7 @@
                     .toolbar
                       %div
                         %label.toolbar-section-label{for: 'blacklist-action-select'} Status
-                        = rep_form.select(:action, ['Active', 'Expired'],
+                        = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
                           {include_blank: true},
                           class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
                           title: 'RepTool Rule Status',
@@ -135,7 +135,7 @@
                       %label.content-label-sm Comment
                       %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
                     .button-row-center
-                      %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
+                      %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button_research(this)', disabled: true}
                         Submit Changes
         %div
           %label.toolbar-section-label Type to filter results

@@ -148,6 +148,7 @@ $ ->
       show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
       show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
       submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+      comment_input = $('#reptool_adjust_entries').find('.comment-input')
       entry_content = ''
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
@@ -173,6 +174,7 @@ $ ->
           $(show_rep_exp[0]).text(response.expiration)
           $('#blacklist-action-select').val(response.status)
           $('#blacklist-classifications-select').val(response.classification)
+          $(comment_input[0]).val(response.comment)
           $(submit_button).attr('disabled', false)
 #          window.location.reload()
         error: (response) ->
