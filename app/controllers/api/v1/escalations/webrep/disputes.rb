@@ -292,7 +292,7 @@ module API
 
                 dispute.take_ticket(user: current_user)
 
-                { username: current_user.display_name, dispute_id: dispute.id }
+                { username: current_user.cvs_username, dispute_id: dispute.id }
               end
             end
 
