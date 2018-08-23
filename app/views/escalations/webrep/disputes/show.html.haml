@@ -216,8 +216,17 @@
             Last Updated By
           %p= @dispute.last_updated_by_username
       %h3 Related Cases
-      %button#related-dispute-button
-        Add Related Case
+      %span#related-dispute-dropdown.dropdown
+        %button#related-dispute-button.toolbar-dropdown{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          Add Related Cases
+        .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
+          %form#set-related-dispute-form
+            %label.content-label-sm.related-dropdown-text Ticket Id's
+            %br
+            %input.related-dropdown-text.dispute-id{type: 'text', name: 'dispute_id'}
+            .button-row-center
+              %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onClick: 'add_related_case_id()'}
+                Submit
       .row
         .col-xs-2.col-with-divider
           %label.content-label-sm
@@ -225,11 +234,6 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
-      .row.hidden#related-dispute-input
-        .col-xs-2.col-with-divider
-          %input.dispute-edit-input#related-dispute-id{type: 'text'}
-        .col-xs-2.col-with-divider
-          -#Placeholder for now
       - @dispute.each_related do |dispute_dup|
         .row
           .col-xs-2.col-with-divider

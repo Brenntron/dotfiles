@@ -205,7 +205,6 @@ window.save_dispute = () ->
     'customer_name': $('#dispute-customer-name-input').val()
     'customer_email': $('#dispute-customer-email-input').val()
     'status': $('#status').val()
-    'related_id': $('#related-dispute-id').val()
   }
 
   std_msg_ajax(
@@ -525,6 +524,30 @@ window.add_dispute_entry = () ->
     error: (response) ->
       popup_response_error(response, 'Error adding entry.')
   )
+
+window.add_related_case_id= ()->
+  id = $('#dispute_id').text()
+  invalid_id = false
+  related_id = $('.dispute-id').val().split(",")
+  data = {
+    'relating_dispute_ids': related_id
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  for i in related_id
+    if(isNaN(i)||i.length < 1)
+      invalid_id = true
+  if related_id[0].length < 1
+    std_msg_error("Invalid ID",["You must enter a valid ID to relate."])
+  else if(invalid_id)
+    std_msg_error("Invalid ID",["One of your IDs is NOT a valid ID number."])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: '/escalations/api/v1/escalations/webrep/disputes/' + id + '/relating_disputes'
+      data: data
+      success_reload: true
+      error_prefix: 'Error marking relationship.'
+    )
 
 window.determine_checked = (box_names) ->
   box_flag = ($('.'+box_names+':checked').length > 0)
@@ -1074,11 +1097,9 @@ $ ->
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
     $('.dispute-edit-field').hide()
-    $('.dispute-edit-input').addClass('block')
 
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
-    $('#related-dispute-button').removeClass('hidden')
     $('#related-dispute-input').removeClass('hidden')
     $('#edit-dispute-button').addClass('hidden')
 
@@ -1096,11 +1117,9 @@ $ ->
     $('#dispute-priority-icon').show()
     $('#dispute-priority-select').hide()
     $('.dispute-edit-field').show()
-    $('.dispute-edit-input').removeClass('block')
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
-    $('#related-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
 
