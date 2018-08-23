@@ -280,9 +280,11 @@
 
                   %td.dispute_rep_tools
                     %span.dispute_rep_tools_wrapper
-                      %button.dispute-inline-buttons.edit-button.inline-edit-entry-button{'data-entry-id': "#{entry.id}"}
+                      - if @dispute.status != 'DUPLICATE'
+                        %button.dispute-inline-buttons.edit-button.inline-edit-entry-button{'data-entry-id': "#{entry.id}"}
                       %span.dropdown
-                        %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                        - if @dispute.status != 'DUPLICATE'
+                          %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
                           = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                             .dispute-wlbl-adjust-wrapper
@@ -414,7 +416,8 @@
                                 .button-row-center
                                   %button.primary.dropdown-submit-button{type:'button', onclick:'row_adjust_wlbl_button(this);', disabled: true} Submit Changes
                       %span.dropdown
-                        %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                        - if @dispute.status != 'DUPLICATE'
+                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                           = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                             .dispute-reptool-adjust-wrapper

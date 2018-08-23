@@ -230,24 +230,25 @@
 
 
   .col-sm-3
-    %h1.notes-header Notes
-    %button.add-case-note-button#new-case-note-button
-      Add Note
+    - if @dispute.status != 'DUPLICATE'
+      %h1.notes-header Notes
+      %button.add-case-note-button#new-case-note-button
+        Add Note
 
 
-    .note-wrapper.new-case-note-row
-      .row
-        .col-xs-12
-          .note-info-item.author-notation
-            Creating new note
-          .note-info-item.note-tool-buttons
-            %button.note-save-button.new-case-note-save-button
-            %button.note-cancel-button.new-case-note-cancel-button
-            %button.note-copy-button
-      .row
-        .col-xs-12
-          .note-block.content-editable.new-case-note-textarea{contenteditable: true}
-            %pre
+      .note-wrapper.new-case-note-row
+        .row
+          .col-xs-12
+            .note-info-item.author-notation
+              Creating new note
+            .note-info-item.note-tool-buttons
+              %button.note-save-button.new-case-note-save-button
+              %button.note-cancel-button.new-case-note-cancel-button
+              %button.note-copy-button
+        .row
+          .col-xs-12
+            .note-block.content-editable.new-case-note-textarea{contenteditable: true}
+              %pre
 
     -@dispute.dispute_comments.recent_first.each do |comment|
       .note-wrapper
