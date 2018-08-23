@@ -43,21 +43,23 @@ class Wbrs::Base
           when 'verify-none'
             'https'
           else #no-tls
-            'http'
+            'https'
         end
-
+    port = 443
     request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}")
 
     case verify_mode
       when 'verify-peer'
         request.ssl = true
-        request.auth.ssl.verify_mode = :peer
-        request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
+        request.auth.ssl.verify_mode = :none
+        #request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
       when 'verify-none'
         request.ssl = true
         request.auth.ssl.verify_mode = :none
       else #no-tls
-        request.ssl = false
+        request.ssl = true
+        #added this here for new ruleAPI auth requirements.
+        request.auth.ssl.verify_mode = :none
     end
 
     request
@@ -67,7 +69,7 @@ class Wbrs::Base
   def self.request(path:, body:)
     request = new_request(path)
 
-    request.headers = {"Content-Type" => "application/json" }
+    request.headers = {"Content-Type" => "application/json", "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}" }
     request.body = body.to_json
 
     request
@@ -115,7 +117,8 @@ class Wbrs::Base
   def self.call_json_request(method, path, body:)
     request = new_request(path)
 
-    request.headers = {"Content-Type" => "application/json" }
+    request.headers = {"Content-Type" => "application/json", "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}" }
+
     request.body = body.to_json
 
     request_error_handling(call_request(method, request))
