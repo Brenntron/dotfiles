@@ -266,7 +266,18 @@
     .related-cases-display
       %table
         %tbody
-          - @dispute.each_duplicate do |dispute_dup|
-            %tr
-              %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
-              %td= dispute_dup.case_opened_at.strftime('%F %T')
+        - if @dispute.each_duplicate.size == 0
+          No duplicate cases.
+        - else
+          .col-xs-12
+            %table.table.responsive#duplicates
+              %thead
+                %tr
+                  %th Case ID
+                  %th Time Submitted
+                  - @dispute.each_duplicate do |dispute_dup|
+                    %tr
+                      %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+                      %td= dispute_dup.case_opened_at.strftime('%F %T')
+
+

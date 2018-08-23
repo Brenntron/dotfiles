@@ -145,7 +145,7 @@ class Dispute < ApplicationRecord
 
   def each_duplicate(&block)
     if related_dispute && Dispute::DUPLICATE == self.resolution
-      block.call(related_dispute)
+      #block.call(related_dispute)
       related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
     else
       relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
@@ -256,9 +256,10 @@ class Dispute < ApplicationRecord
 
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
     resolved_at = Time.now
-    dispute.status = DUPLICATE
+    dispute.status = Dispute::RESOLVED
     dispute.related_id = authority_dispute.id
     dispute.related_at = Time.now
+    dispute.resolution = Dispute::DUPLICATE
     dispute.save
 
     return_payload = {}
