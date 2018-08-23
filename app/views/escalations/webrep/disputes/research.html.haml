@@ -273,7 +273,7 @@
                               %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score
-                            = entry.wbrs_score
+                            = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
                           %td
                             %label WBRS Rule Hits
                           %td.text-center
@@ -315,10 +315,10 @@
                           %td.left-bordered
                             %label WL/BL
                           %td
-                            - if entry.wbrs_list_type.nil?
+                            - if entry.consolidated_wlbl_strings.nil?
                               %span.missing-data Not currently on a list
                             - else
-                              = entry.wbrs_list_type
+                              = entry.consolidated_wlbl_strings
                           %td.left-bordered
                             %label Referenced on
                           %td
@@ -345,7 +345,7 @@
                             %span.research-table-input-wrapper.sbrs-input-wrapper
                               %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                             %label SBRS
-                          %td.text-center= entry.sbrs_score
+                          %td.text-center= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                           %td
                             %label SBRS Rule Hits
                           %td.text-center
