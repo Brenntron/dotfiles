@@ -500,7 +500,7 @@
                                         %span.missing-data
                                           No XBRS data available.
                               - elsif entry.find_xbrs[1]['data'].count < 8
-                                %table
+                                %table.xbrs-short-scrollable
                                   %thead
                                     %tr
                                       - entry.find_xbrs[1]['legend'].each do |header|
@@ -512,7 +512,7 @@
                                           - data.each do |datapoint|
                                             %td= datapoint
                               - else
-                                %table.table-scrollable
+                                %table.xbrs-long-scrollable
                                   %thead
                                     %tr
                                       - entry.find_xbrs[1]['legend'].each do |header|
