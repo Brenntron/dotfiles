@@ -937,19 +937,20 @@ class Dispute < ApplicationRecord
       dispute.status = status
       if resolution.present?
         dispute.resolution = resolution
+        dispute.resolution_comment = comment
         dispute.case_closed_at = resolved_at
         dispute.case_resolved_at = resolved_at
       end
 
-      if dispute.status == RESOLVED
-        dispute.dispute_entries.each do |entry|
-          entry.status = status
+      dispute.dispute_entries.each do |entry|
+        if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
           entry.resolution = resolution
           entry.resolution_comment = comment
           entry.case_closed_at = resolved_at
           entry.case_resolved_at = resolved_at
-          entry.save
         end
+        entry.status = status
+        entry.save
       end
 
       dispute.save
@@ -1020,6 +1021,16 @@ class Dispute < ApplicationRecord
         end
       end
       dispute_packet[:dispute_count] = dispute.entry_count.to_s
+
+      if dispute.resolution.nil?
+        dispute_packet[:dispute_resolution] = ''
+      else
+        if dispute.resolution_comment.nil? || dispute.resolution_comment.empty?
+          dispute_packet[:dispute_resolution] = dispute.resolution
+        else
+          dispute_packet[:dispute_resolution] = "<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>"
+        end
+      end
 
       dispute_packet[:dispute_entry_content] = []
       unless dispute.dispute_entries.empty?

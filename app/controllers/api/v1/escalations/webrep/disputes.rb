@@ -78,7 +78,13 @@ module API
               dispute.priority = permitted_params[:priority]
               dispute.customer.name = permitted_params[:customer_name]
               dispute.customer.email = permitted_params[:customer_email]
-              dispute.status = permitted_params[:status]
+
+              if permitted_params[:status]
+                dispute.status = permitted_params[:status]
+                if permitted_params[:status] == Dispute::STATUS_ASSIGNED
+                  dispute.case_accepted_at = Time.now
+                end
+              end
 
               if permitted_params[:resolution]
                 dispute.resolution = permitted_params[:resolution]
