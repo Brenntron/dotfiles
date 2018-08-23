@@ -78,7 +78,13 @@ module API
               dispute.priority = permitted_params[:priority]
               dispute.customer.name = permitted_params[:customer_name]
               dispute.customer.email = permitted_params[:customer_email]
-              dispute.status = permitted_params[:status]
+
+              if permitted_params[:status]
+                dispute.status = permitted_params[:status]
+                if permitted_params[:status] == Dispute::STATUS_ASSIGNED
+                  dispute.case_accepted_at = Time.now
+                end
+              end
 
               if permitted_params[:resolution]
                 dispute.resolution = permitted_params[:resolution]
@@ -187,6 +193,9 @@ module API
                       entry.update(status: DisputeEntry::NEW, case_accepted_at: nil)
                     end
                   end
+
+                  message = Bridge::DisputeEntryUpdateStatusEvent.new
+                  message.post_entries(d.dispute_entries)
                 end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
@@ -358,6 +367,13 @@ module API
 
               Dispute.process_status_changes(disputes, status, resolution, comment, current_user)
               {:status => "success"}.to_json
+            end
+
+            get ':dispute_id/related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                Dispute.where(related_id: params['dispute_id'])
+              end
             end
 
             params do
