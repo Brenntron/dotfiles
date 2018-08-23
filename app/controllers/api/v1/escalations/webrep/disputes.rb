@@ -286,7 +286,7 @@ module API
 
             params do
               requires :dispute_id, type: Integer
-            endx
+            end
             patch 'take_dispute/:dispute_id' do
               std_api_v2 do
                 dispute = Dispute.find(permitted_params['dispute_id'])
