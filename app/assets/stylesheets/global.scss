@@ -5221,10 +5221,8 @@ table.dispute_tool_current tr:last-of-type td {
 }
 
 #disputes-index .dispute-submission-type {
-  display: inline-block;
-  margin-top: -2px;
-  margin-bottom: -6px;
-  margin-right: 6px;
+  display: block;
+  margin: auto;
 }
 
 .dispute-W {background-image: url(image_path('icon_type_web.svg'));}
@@ -6060,6 +6058,15 @@ hr.condensed {
 .top-case-info a {
   color: $content-bg-color;
   text-decoration: underline;
+}
+
+th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc {
+  background-position: center !important;
+}
+
+#disputes-index .bug-priority {
+  padding-right: 0 !important;
+  margin: auto;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

@@ -868,7 +868,10 @@ $ ->
         className: 'state-col'
       }
       {
-        targets: [6]
+        targets: [
+          2
+          6
+        ]
         className: 'text-center'
       }
       {
