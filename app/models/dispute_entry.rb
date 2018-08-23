@@ -144,14 +144,27 @@ class DisputeEntry < ApplicationRecord
       end
       #scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
       scans = virustotal_data["scans"]
-      cleandata = Array.new
+      scans_clean = Array.new
+      scans_hit = Array.new
+      scans_unrated = Array.new
       unless scans.nil?
         scans.each do |s|
           item = {:name => s[0], :result => s[1]["result"]}
-          cleandata << item
+          case item[:result]
+            when "clean site"
+              scans_clean << item
+            when "unrated site"
+              scans_unrated << item
+            else
+              scans_hit << item
+          end
         end
       end
-      @virustotals = cleandata
+      sordiddata = Array.new
+      scans_hit.each { |hit| sordiddata << hit }
+      scans_unrated.each { |hit| sordiddata << hit }
+      scans_clean.each { |hit| sordiddata << hit }
+      @virustotals = sordiddata
     end
     @virustotals
   end
