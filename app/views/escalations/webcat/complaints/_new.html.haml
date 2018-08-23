@@ -11,11 +11,11 @@
   .form-group
     %label.content-label-sm Description
     %input.form-control#description
-  .form-group.margin-adjustment
+  .form-group
     %label.content-label-sm Customer
     %input.form-control#customers{list: 'customerList'}
       %datalist#customerList
-  .form-group.margin-adjustment
+  .form-group
     %label.content-label-sm Tags
     %select.form-control.selectize#select-to-new{placeholder: "Select or create tags", multiple: "multiple", tabindex:"-1"}
     %input.hidden#complaint_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(',')}

@@ -46,7 +46,7 @@ module API
                                                params: permitted_params,
                                                user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
-              json_packet = Dispute.to_data_packet(disputes)
+              json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
               response_data = {status: "success", title: title, data: json_packet}
               if 'advanced' == permitted_params['search_type']
@@ -78,7 +78,13 @@ module API
               dispute.priority = permitted_params[:priority]
               dispute.customer.name = permitted_params[:customer_name]
               dispute.customer.email = permitted_params[:customer_email]
-              dispute.status = permitted_params[:status]
+
+              if permitted_params[:status]
+                dispute.status = permitted_params[:status]
+                if permitted_params[:status] == Dispute::STATUS_ASSIGNED
+                  dispute.case_accepted_at = Time.now
+                end
+              end
 
               if permitted_params[:resolution]
                 dispute.resolution = permitted_params[:resolution]
@@ -187,6 +193,9 @@ module API
                       entry.update(status: DisputeEntry::NEW, case_accepted_at: nil)
                     end
                   end
+
+                  message = Bridge::DisputeEntryUpdateStatusEvent.new
+                  message.post_entries(d.dispute_entries)
                 end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
@@ -275,15 +284,17 @@ module API
               true
             end
 
+            params do
+              requires :dispute_id, type: Integer
+            end
             patch 'take_dispute/:dispute_id' do
               std_api_v2 do
-                authorize!(:update, Dispute)
-                dispute = Dispute.find(params['dispute_id'])
+                dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
                 dispute.take_ticket(user: current_user)
 
-                { username: current_user.display_name, dispute_id: dispute.id }
+                { username: current_user.cvs_username, dispute_id: dispute.id }
               end
             end
 
@@ -298,6 +309,24 @@ module API
                 Dispute.take_tickets(dispute_ids, user: current_user)
 
                 { username: current_user.cec_username, dispute_ids: dispute_ids }
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            patch 'return_dispute/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                authorize!(:update, dispute)
+
+                dispute.return_dispute
+
+                message = Bridge::DisputeEntryUpdateStatusEvent.new
+                message.post_entries(dispute.dispute_entries)
+
+
+                { dispute_id: dispute.id }
               end
             end
 
@@ -338,6 +367,13 @@ module API
 
               Dispute.process_status_changes(disputes, status, resolution, comment, current_user)
               {:status => "success"}.to_json
+            end
+
+            get ':dispute_id/related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                Dispute.where(related_id: params['dispute_id'])
+              end
             end
 
             params do

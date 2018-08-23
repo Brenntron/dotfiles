@@ -26,6 +26,31 @@ window.cat_new_url = ()->
       std_msg_error(response,"", reload: false)
   )
 
+window.multiple_url_categorization = ()->
+  event.preventDefault()
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+  data = {}
+  for i in [1...6] by 1
+    data[i] = {url: $("#multi_url_#{i}").val(), cats: $("#multi_cat_url_cats").val()}
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+    method: 'POST'
+    headers: headers
+    data: {data: data}
+    success: (response) ->
+      $('#loader-modal').hide()
+      std_msg_success('URLs categorized successfully.',"", reload: true)
+    error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove();
+      std_msg_error('Error:' + ' ' + response.responseJSON.message,"", reload: false)
+  )
+
 name_servers =(server_list)->
   i = 0
   text = ""
@@ -973,4 +998,14 @@ $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
     $('#url_1').focus()
     return
+
+  $('#cat-urls-diff').click ->
+    if $('#cat-urls-diff').prop('checked')
+      $('#categorize-diff-form').show()
+      $('#categorize-same-form').hide()
+
+  $('#cat-urls-same').click ->
+    if $('#cat-urls-same').prop('checked')
+      $('#categorize-diff-form').hide()
+      $('#categorize-same-form').show()
 

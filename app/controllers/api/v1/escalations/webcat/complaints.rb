@@ -134,13 +134,16 @@ module API
               requires :data, type: Hash, desc: "Hash of urls and categories to create prefixes on"
             end
             post 'cat_new_url' do
-              params["data"].each do |item, prefix|
-                if prefix["url"].present?
-                  Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
-                                                     categories_string: prefix["cats"].join(','),
-                                                     description: '',
-                                                     user: current_user.email,
-                                                     bugzilla_session: bugzilla_session)
+              std_api_v2 do
+                params["data"].each do |item, prefix|
+                  if prefix["url"].present?
+                    Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
+                                                       categories_string: prefix["cats"].join(','),
+                                                       description: '',
+                                                       user: current_user.email,
+                                                       bugzilla_session: bugzilla_session)
+
+                  end
                 end
               end
             end

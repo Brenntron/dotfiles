@@ -24,13 +24,13 @@
             %span= @dispute.assignee || "None"
           .dispute-owner-buttons-wrapper
             - if @dispute.assignee == current_user.email
-              %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
+              %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
             - else
-              %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
+              %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
 
             - if current_user.has_role?('manager')
               %span.dropdown
-                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                 .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                   .change-assignee-dropdown-wrapper
                     %h3 Change Assignee
@@ -107,11 +107,12 @@
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
                   .col-xs-6.submenu-right-wrapper
                     .resolution-comment-wrapper
-                      %label.content-label-sm
-                        Comment
-                      %textarea
-                      %button.primary{onClick: 'show_page_edit_status()'}
-                        Submit
+                      %label.content-label-sm.customer-facing-comment
+                        Customer Facing Comment
+                      %textarea#dispute-resolution-comment
+                      .button-row-center
+                        %button.primary{onClick: 'show_page_edit_status()'}
+                          Submit
 
               %li.status-radio-wrapper
                 %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
@@ -149,9 +150,9 @@
           Age
         %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
       .top-info-buttons-wrapper
-        %button.edit-button.dispute-top-buttons#edit-dispute-button
-        %button.save-button.dispute-top-buttons#save-dispute-button.hidden{onclick: 'save_dispute();'}
-        %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden
+        %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information'}
+        %button.save-button.dispute-top-buttons#save-dispute-button.hidden.esc-tooltipped{title: 'Save ticket changes', onclick: 'save_dispute();'}
+        %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden.esc-tooltipped{title: 'Cancel'}
 
 
   .row#top_bar_extended_info
@@ -216,8 +217,17 @@
             Last Updated By
           %p= @dispute.last_updated_by_username
       %h3 Related Cases
-      %button#related-dispute-button
-        Add Related Case
+      %span#related-dispute-dropdown.dropdown
+        %button#related-dispute-button.toolbar-dropdown{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          Add Related Cases
+        .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
+          %form#set-related-dispute-form
+            %label.content-label-sm.related-dropdown-text Ticket Id's
+            %br
+            %input.related-dropdown-text.dispute-id{type: 'text', name: 'dispute_id'}
+            .button-row-center
+              %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onClick: 'add_related_case_id()'}
+                Submit
       .row
         .col-xs-2.col-with-divider
           %label.content-label-sm
@@ -225,11 +235,6 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
-      .row.hidden#related-dispute-input
-        .col-xs-2.col-with-divider
-          %input.dispute-edit-input#related-dispute-id{type: 'text'}
-        .col-xs-2.col-with-divider
-          -#Placeholder for now
       - @dispute.each_related do |dispute_dup|
         .row
           .col-xs-2.col-with-divider
