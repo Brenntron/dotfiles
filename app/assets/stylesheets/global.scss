@@ -5620,16 +5620,22 @@ table.dataTable tbody tr.selected {
 #related-dispute-button {
   position: absolute;
   margin-top: -28px;
-  margin-left: 122px;
+  margin-left: 0px;
   background-repeat: no-repeat;
   background-position: 4px center;
   border: none;
   border-radius: 2px;
   color: $content-bg-color;
   font-size: 9pt;
-  padding: 5px 8px 5px 30px;
+  padding: 5px 8px 5px 30px !important;
   background-color: $content-label-color;
   background-image: url(image_path('icon_related_white.svg'))
+}
+#related-dispute-dropdown{
+  margin-top: 20px;
+}
+.related-dropdown-text{
+  color: #999 !important;
 }
 
 #set-related-dispute-div {
