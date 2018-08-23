@@ -103,6 +103,7 @@ Rails.configuration.wbrs.port           = wbrs_config['port']
 Rails.configuration.wbrs.verify_mode    = wbrs_config['verify_mode'] || wbrs_config['tls_mode']
 Rails.configuration.wbrs.ca_cert_file   = wbrs_config['ca_cert_file']
 Rails.configuration.wbrs.gssnegotiate   = wbrs_config['gssnegotiate']
+Rails.configuration.wbrs.auth_token     = wbrs_config['auth_token']
 
 xbrs_config = env_config['xbrs']
 raise 'config.yml missing xbrs section' unless xbrs_config
