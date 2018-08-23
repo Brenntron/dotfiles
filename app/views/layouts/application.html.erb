@@ -41,7 +41,7 @@
           <% end %>
           <% if current_user.present? %>
           <% if current_user.has_role?("webrep user") || current_user.has_role?("webrep manager") %>
-              <li class="admin-menu"><%= link_to 'WEBREP', escalations_webrep_disputes_path %></li>
+              <li class="admin-menu"><%= link_to 'WEBREP', escalations_webrep_tickets_path %></li>
           <% end %>
           <% if current_user.has_role?("webcat user") || current_user.has_role?("webcat manager") %>
               <li class="admin-menu"><%= link_to 'WEBCAT', escalations_webcat_complaints_path %></li>
