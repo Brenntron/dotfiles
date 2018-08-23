@@ -127,8 +127,8 @@
                     %label.ticket-res-radio-label.radio-label{for: 'OTHER'} Other
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
-                  %label.content-label-sm
-                    Comment
+                  %label.content-label-sm.customer-facing-comment
+                    Customer Facing Comment
                   %textarea.ticket-status-comment
                   .button-row-center
                     %button.primary.change_ticket_status_button
@@ -219,8 +219,8 @@
                     %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
-                  %label.content-label-sm
-                    Comment
+                  %label.content-label-sm.customer-facing-comment
+                    Customer Facing Comment
                   %textarea.entry-status-comment#entry-status-comment
                   .button-row-center
                     %button.primary{onclick: "toolbar_index_edit_status()"}

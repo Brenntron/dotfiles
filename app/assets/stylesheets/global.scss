@@ -4867,7 +4867,7 @@ h5.entry-details-table-header {
 }
 
 .ticket-resolution-submenu {
-  left: -200%;
+  left: -220%;
   margin-top: -56px;
   margin-left: 1px;
 }
@@ -5664,7 +5664,7 @@ table.dataTable tbody tr.selected {
 #show-ticket-resolution-submenu {
   left: 100%;
   border-radius: 0 4px 4px 4px;
-  width: 330px;
+  width: 350px;
   margin-top: -55px;
   padding: 0;
 }
@@ -6038,6 +6038,23 @@ hr.condensed {
 .top-case-info a {
   color: $content-bg-color;
   text-decoration: underline;
+}
+
+.customer-facing-comment {
+  color: $warning-accent-color !important;
+  font-weight: 600;
+}
+
+.customer-facing-comment::before {
+  content: '';
+  background-image: url(image_path('icon_warning_orange.svg'));
+  background-repeat: no-repeat;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  float: left;
+  margin-top: -2px;
+  margin-right: 2px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
