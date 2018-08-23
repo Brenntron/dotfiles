@@ -605,7 +605,10 @@
                       .row
                         .col-sm-3
                           .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header WBRS Rule Hit Details
+                            %h5.entry-details-table-header
+                              WBRS Rule Hit Details
+                              %span.nested-table-tally
+                                = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size
                             - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.empty?
                               %table
                                 %thead
@@ -628,7 +631,10 @@
                                       %td
                                         -#Put weight of rule here
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header SBRS Rule Hit Details
+                            %h5.entry-details-table-header
+                              SBRS Rule Hit Details
+                              %span.nested-table-tally
+                                = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
                             - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "SBRS"}.empty?
                               %table
                                 %thead
@@ -656,7 +662,10 @@
                                       %td
                                         -#Put weight of rule here
                           .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Virustotal Details
+                            %h5.entry-details-table-header
+                              Virustotal Details
+                              %span.nested-table-tally
+                                = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                             - if entry.virustotals.empty?
                               %table
                                 %thead
@@ -682,7 +691,11 @@
                                         %td.unclean-site-result= virustotal[:result]
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header XBRS History
+                            %h5.entry-details-table-header
+                              XBRS History
+                              %span.nested-table-tally
+                                - unless entry.hostlookup.nil?
+                                  = entry.find_xbrs[1]['data'].count
                             - if entry.xbrs_data['data'].empty?
                               %table
                                 %thead
@@ -716,7 +729,10 @@
                                           %td= datapoint
 
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Cross-listed URLs
+                            %h5.entry-details-table-header
+                              Cross-listed URLs
+                              %span.nested-table-tally
+                                = entry.wbrs_xlist.count
                             - if entry.wbrs_xlist.empty?
                               %table
                                 %thead
