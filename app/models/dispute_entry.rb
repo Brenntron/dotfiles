@@ -89,11 +89,11 @@ class DisputeEntry < ApplicationRecord
     else
       case
       when self.entry_type == "IP"
-        Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
+        xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
       when self.entry_type == "URI/DOMAIN"
-        Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+        xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
       else
-        self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+        self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
       end
     end
     
