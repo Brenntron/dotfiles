@@ -277,7 +277,7 @@ module API
 
             params do
               requires :dispute_id, type: Integer
-            end
+            endx
             patch 'take_dispute/:dispute_id' do
               std_api_v2 do
                 dispute = Dispute.find(permitted_params['dispute_id'])
@@ -285,7 +285,7 @@ module API
 
                 dispute.take_ticket(user: current_user)
 
-                { username: current_user.cec_username, dispute_id: dispute.id }
+                { username: current_user.cvs_username, dispute_id: dispute.id }
               end
             end
 
