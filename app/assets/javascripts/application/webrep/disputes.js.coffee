@@ -920,11 +920,16 @@ $ ->
         status = this.entry.status
       else
         status = missing_data
+      resolution = ''
       if this.entry.resolution != null
-        resolution = entry.resolution
+        resolution = this.entry.resolution
       else
         resolution = missing_data
-
+      resolution_comment = ''
+      if this.entry.resolution_comment != null
+        resolution_comment = this.entry.resolution_comment
+      else
+        resolution_comment = missing_data
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -943,7 +948,7 @@ $ ->
       else sbrs_score = missing_data
       entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
-        '<td class="entry-col-res">' + resolution + '</td>' +
+        '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
         '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
@@ -1074,7 +1079,9 @@ $ ->
       theme: [
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
+        'tooltipster-borderless-comment'
         ]
+      'maxWidth': 500
     $(this).tooltipster 'show'
   return
 
