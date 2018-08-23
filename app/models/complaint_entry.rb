@@ -151,6 +151,17 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
+  def self.self_importance(ip_url)
+    Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
+  rescue
+
+    Rails.logger.warn "Failed while getting importance."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    nil
+  end
+
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
     begin
       new_complaint_entry = ComplaintEntry.new
@@ -171,7 +182,7 @@ class ComplaintEntry < ApplicationRecord
       end
       #lets query the top url API endpoint to determine if this is an important site or not
       # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
-      importance = Wbrs::TopUrl.check_urls([ip_url]).first.is_important
+      importance = self_importance(ip_url)
       new_complaint_entry.is_important = importance if importance
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
@@ -430,6 +441,13 @@ class ComplaintEntry < ApplicationRecord
       self.url_primary_category = categories.join(',')
       self.category = categories.join(',')
     end
+  rescue => except
+
+    Rails.logger.warn "Populating categories from Wbrs failed."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    ''
   end
 
   def current_category_data
