@@ -144,10 +144,11 @@ class DisputeEntry < ApplicationRecord
       end
       #scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
       scans = virustotal_data["scans"]
-      scans_clean = Array.new
-      scans_hit = Array.new
-      scans_unrated = Array.new
+      sordiddata = Array.new
       unless scans.nil?
+        scans_clean = Array.new
+        scans_hit = Array.new
+        scans_unrated = Array.new
         scans.each do |s|
           item = {:name => s[0], :result => s[1]["result"]}
           case item[:result]
@@ -159,11 +160,10 @@ class DisputeEntry < ApplicationRecord
               scans_hit << item
           end
         end
+        scans_hit.each { |hit| sordiddata << hit }
+        scans_unrated.each { |hit| sordiddata << hit }
+        scans_clean.each { |hit| sordiddata << hit }
       end
-      sordiddata = Array.new
-      scans_hit.each { |hit| sordiddata << hit }
-      scans_unrated.each { |hit| sordiddata << hit }
-      scans_clean.each { |hit| sordiddata << hit }
       @virustotals = sordiddata
     end
     @virustotals
