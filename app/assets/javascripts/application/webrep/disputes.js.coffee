@@ -98,12 +98,11 @@ window.delete_disputes_named_search = (close_button, search_name) ->
       this.tr_tag.remove();
   )
 
-window.entry_status_drop_down = (dispute_id) ->
-
+window.dispute_status_drop_down = (dispute_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_id}"
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_status/#{dispute_id}"
     method: 'GET'
     headers: headers
     data: {}
@@ -112,15 +111,52 @@ window.entry_status_drop_down = (dispute_id) ->
       response = JSON.parse(response)
       status = response.status
 
-      $('.radio-dispute-' + dispute_id + '#' + status).prop("checked", true);
+      $('.dispute-status-' + dispute_id + '#' + status).prop("checked", true);
   )
 
-window.entry_resolution_drop_down = (dispute_id) ->
+window.dispute_resolution_drop_down = (dispute_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_resolution/#{dispute_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+
+      resolution = response.resolution
+      resolution_comment = response.resolution_comment
+
+      # Fill in resolution radio button and comment
+      $('.dispute-resolution-' + dispute_id + '#' + resolution).prop("checked", true)
+      $('#dispute-resolution-comment-' + dispute_id).text(resolution_comment)
+  )
+
+window.entry_status_drop_down = (dispute_entry_id) ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_id}"
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_entry_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.radio-dispute-' + dispute_entry_id + '#' + status).prop("checked", true);
+  )
+
+window.entry_resolution_drop_down = (dispute_entry_id) ->
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_entry_id}"
     method: 'GET'
     headers: headers
     data: {}
@@ -130,8 +166,8 @@ window.entry_resolution_drop_down = (dispute_id) ->
       resolution = response.resolution
       resolution_comment = response.resolution_comment
 
-      $('.resolution-dispute-' + dispute_id + '#' + resolution).prop("checked", true);
-      $('#resolution-comment-' + dispute_id).text(resolution_comment)
+      $('.resolution-dispute-' + dispute_entry_id + '#' + resolution).prop("checked", true)
+      $('#resolution-comment-' + dispute_entry_id).text(resolution_comment)
   )
 
 
