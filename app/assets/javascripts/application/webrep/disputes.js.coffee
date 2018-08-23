@@ -1164,8 +1164,10 @@ $ ->
       success: (response) ->
         response = JSON.parse(response)
         resolution = response.resolution
+        resolution_comment = response.resolution_comment
         
         $('.resolution-dispute-' + dispute_id + '#' + resolution).prop("checked", true);
+        $('#resolution-comment-' + dispute_id).text(resolution_comment)
     )
 
 

@@ -386,7 +386,8 @@ module API
             get 'dispute_entry_status/:dispute_entry_id' do
               std_api_v2 do
                 dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
-                return {:status => dispute_entry.status}.to_json
+
+                {:status => dispute_entry.status}.to_json
               end
             end
 
@@ -396,7 +397,9 @@ module API
             get 'dispute_entry_resolution/:dispute_entry_id' do
               std_api_v2 do
                 dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
-                return {:resolution => dispute_entry.resolution}.to_json
+
+                {:resolution => dispute_entry.resolution,
+                 :resolution_comment => dispute_entry.resolution_comment}.to_json
               end
             end
 
