@@ -44,16 +44,6 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.index ["task_id"], name: "index_attachments_on_task_id"
   end
 
-  create_table "attachments_exploits", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "attachment_id"
-    t.integer "exploit_id"
-  end
-
-  create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "attachment_id"
-    t.integer "rule_id"
-  end
-
   create_table "bug_blockers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "snort_blocker_bug_id"
     t.integer "snort_blocked_bug_id"
@@ -335,8 +325,6 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.text "resolution_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.float "sbrs_score", limit: 24
-    t.float "wbrs_score", limit: 24
     t.integer "webrep_wlbl_key"
     t.integer "reptool_key"
     t.boolean "is_important"
@@ -345,6 +333,8 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.datetime "case_closed_at"
     t.datetime "case_accepted_at"
     t.datetime "case_resolved_at"
+    t.float "sbrs_score", limit: 24
+    t.float "wbrs_score", limit: 24
   end
 
   create_table "dispute_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -410,12 +400,12 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.string "ticket_source_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "customer_id"
-    t.integer "user_id"
     t.string "submission_type"
     t.string "submitter_type"
-    t.integer "related_id"
+    t.integer "customer_id"
+    t.integer "user_id"
     t.datetime "case_responded_at"
+    t.integer "related_id"
     t.datetime "related_at"
     t.text "resolution_comment"
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
@@ -583,13 +573,6 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.datetime "updated_at"
     t.integer "fail_count"
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
-  end
-
-  create_table "references_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "reference_id"
-    t.integer "rule_id"
-    t.index ["reference_id"], name: "index_references_rules_on_reference_id"
-    t.index ["rule_id"], name: "index_references_rules_on_rule_id"
   end
 
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
