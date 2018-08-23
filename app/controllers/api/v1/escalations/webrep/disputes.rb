@@ -46,7 +46,7 @@ module API
                                                params: permitted_params,
                                                user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
-              json_packet = Dispute.to_data_packet(disputes)
+              json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
               response_data = {status: "success", title: title, data: json_packet}
               if 'advanced' == permitted_params['search_type']
@@ -284,10 +284,12 @@ module API
               true
             end
 
+            params do
+              requires :dispute_id, type: Integer
+            end
             patch 'take_dispute/:dispute_id' do
               std_api_v2 do
-                authorize!(:update, Dispute)
-                dispute = Dispute.find(params['dispute_id'])
+                dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
                 dispute.take_ticket(user: current_user)
@@ -307,6 +309,24 @@ module API
                 Dispute.take_tickets(dispute_ids, user: current_user)
 
                 { username: current_user.cec_username, dispute_ids: dispute_ids }
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            patch 'return_dispute/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                authorize!(:update, dispute)
+
+                dispute.return_dispute
+
+                message = Bridge::DisputeEntryUpdateStatusEvent.new
+                message.post_entries(dispute.dispute_entries)
+
+
+                { dispute_id: dispute.id }
               end
             end
 
