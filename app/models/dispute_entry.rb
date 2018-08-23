@@ -326,15 +326,26 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def self.entries_of_url(url)
+    Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
+      DisputeEntry.new_from_wlbl(wlbl)
+    end
+  rescue => except
+
+    Rails.logger.warn "Failed while getting entries from WBRS."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    []
+  end
+
   # If the research page is served from the DisputesController, this method is here.
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
     if research_params.present?
       url = research_params['uri'].gsub(/\s+/, "") # Remove all white spaces
 
-      entries = Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
-        DisputeEntry.new_from_wlbl(wlbl)
-      end
+      entries = entries_of_url(url)
 
       if research_params['scope'] == "strict"
         unless entries.find{|entry| url == entry.uri}
