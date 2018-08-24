@@ -247,6 +247,31 @@ window.toolbar_adust_wlbl_button =(button_tag) ->
     success_reload: true
   )
 
+window.toolbar_research_adjust_wlbl_button =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+
+  data = {
+    'urls': [ url ]
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
+  )
+
+
 window.index_adust_wlbl_button =(button_tag) ->
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.value
@@ -400,6 +425,35 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     error: (response) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
+
+window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
+
+  reptool_bl_form = button_tag.form
+  data = {
+    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
+    'entries': [ url ]
+    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
+  )
+
+
+
+
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').attr('id')
