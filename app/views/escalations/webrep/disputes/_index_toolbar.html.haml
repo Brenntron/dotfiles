@@ -312,9 +312,50 @@
                   Submit Changes
 
 
-    %button.toolbar-button.adjust-reptool-button#reptool_entries_button.esc-tooltipped{title: 'Adjust RepTool BL'}
+    %button.toolbar-button.adjust-reptool-button.dropdown-toggle#reptool_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span.toolbar-button-text
         Adjust RepTool BL
+    .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
+      =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
+                -#For each checked checkbox populate this information
+        .dispute-reptool-adjust-wrapper
+          .dispute-name-wrapper
+            %label.content-label-sm Dispute
+            %br
+            %span.entry-dispute-name
+          %table.dispute_tool_current
+            %tr
+              %td
+                %label.content-label-sm Classification
+                %br
+                %span.entry-reptool-class
+              %td
+                %label.content-label-sm Expiration
+                %br
+                %span.entry-reptool-expiration
+          .inline-tool-content-wrapper
+            .toolbar
+              %div
+                %label.toolbar-section-label{for: 'blacklist-action-select'} Status
+                = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
+                          {include_blank: true},
+                          class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                          title: 'RepTool Rule Status',
+                          id: "blacklist-action-select")
+
+              %div
+                %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool WL/BL
+                = rep_form.select(:classification, RepApi::Blacklist.classifications,
+                          {include_blank: true},
+                          class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                          title: "RepTool BL Rules",
+                          id: "blacklist-classifications-select")
+            .comment-wrapper
+              %label.content-label-sm Comment
+              %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+            .button-row-center
+              %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button_research(this)', disabled: true}
+                Submit Changes
   %div
     %label.toolbar-section-label
       File
