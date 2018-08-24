@@ -143,7 +143,7 @@ $ ->
     dropdown = $('#reptool_adjust_entries').parent()
 
     # Only allowing a single submission at a time for now.
-    if ($('.dispute_check_box:checked').length == 1)
+    if ($('.dispute-entry-checkbox:checked').length == 1)
       show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
       show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
       show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
