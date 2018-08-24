@@ -360,7 +360,11 @@ module API
                 resolution = params[:resolution]
               end
               if params[:comment].present?
-                comment = params[:comment]
+                if status == 'RESOLVED_CLOSED'
+                  comment = status + ' : ' + resolution + ' - ' + params[:comment]
+                else
+                  comment = status + ' - ' + params[:comment]
+                end
               end
 
               disputes = Dispute.where(id: dispute_ids)

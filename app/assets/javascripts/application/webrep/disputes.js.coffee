@@ -492,7 +492,7 @@ window.toolbar_index_edit_status = () ->
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').attr('id')
-  comment = $('#dispute-status-comment').val()
+  comment = $('.ticket-status-comment').val()
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
