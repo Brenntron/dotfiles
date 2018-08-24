@@ -203,15 +203,28 @@ class ComplaintEntry < ApplicationRecord
     end
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-
+    max_wait_for_job = 10 #seconds
     begin
-      screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+      Timeout::timeout(max_wait_for_job) do
+        screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+      end
       ces = ComplaintEntryScreenshot.new
       ces.complaint_entry_id = new_complaint_entry.id
       ces.screenshot = open(screenshot_filename).read
       ces.save!
+    rescue Timeout::Error => e
+      #couldnt complete in time
+      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+      ces.save!
     rescue
-      #do nothing, it was worth a try
+      #do nothing, it was worth a try. kittens are sad now
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+      ces.save!
     end
   end
 
