@@ -143,7 +143,7 @@ $ ->
     dropdown = $('#reptool_adjust_entries').parent()
 
     # Only allowing a single submission at a time for now.
-    if ($('.dispute-entry-checkbox:checked').length == 1)
+    if ($('.dispute_check_box:checked').length == 1)
       show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
       show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
       show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
@@ -186,6 +186,61 @@ $ ->
       alert ('Please select only one row.')
       $(dropdown).removeClass('open')
       return false
+
+
+  $('#reptool_index_entries_button').click ->
+    dropdown = $('#reptool_adjust_entries').parent()
+
+    # Only allowing a single submission at a time for now.
+    if ($('.dispute-entry-checkbox:checked').length == 1)
+      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
+      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
+      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+      comment_input = $('#reptool_adjust_entries').find('.comment-input')
+      entry_content = ''
+      $('.dispute-entry-checkbox').each ->
+        if $(this).prop('checked')
+          entry_row = $(this).parents('.index-entry-row')[0]
+          entry_content = $(entry_row).find('.entry-col-content').text()
+
+      data = {
+# Send entry content to reptool
+        'entry' : entry_content
+      }
+
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          response = JSON.parse(response)
+          $(show_content[0]).text(entry_content)
+          $(show_rep_class[0]).text(response.classification)
+          $(show_rep_exp[0]).text(response.expiration)
+          $('#blacklist-action-select').val(response.status)
+          $('#blacklist-classifications-select').val(response.classification)
+          $(comment_input[0]).val(response.comment)
+          $(submit_button).attr('disabled', false)
+#          window.location.reload()
+        error: (response) ->
+          popup_response_error(response, 'Error retrieving Reptool Data')
+      )
+#
+
+    else
+      alert ('Please select only one row.')
+      $(dropdown).removeClass('open')
+      return false
+
+
+
+
+
+
 
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->

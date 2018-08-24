@@ -399,13 +399,14 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
 
-
-
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
-
+  if entry_ids.length == 0
+    entry_ids = $('.dispute-entry-checkbox:checkbox:checked').map(() ->
+      parseInt(this.id)
+    ).toArray()
   reptool_bl_form = button_tag.form
   data = {
     'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
@@ -450,10 +451,6 @@ window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
     error: (response) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
-
-
-
-
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').attr('id')
@@ -1111,7 +1108,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +

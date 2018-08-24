@@ -200,7 +200,9 @@ class RepApi::Blacklist < RepApi::Base
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
   def self.add_from_params(params, username:)
     dispute_entry_ids = params['dispute_entry_ids']
-    entries = params['entries'].map {|entry| entry.strip }
+    if params['entries'].present?
+      entries = params['entries'].map {|entry| entry.strip }
+    end
     if (dispute_entry_ids.blank? && entries.blank?)
       raise 'Must provide dispute entry ids or url entries'
     end
