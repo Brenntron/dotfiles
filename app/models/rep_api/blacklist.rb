@@ -200,7 +200,10 @@ class RepApi::Blacklist < RepApi::Base
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
   def self.add_from_params(params, username:)
     dispute_entry_ids = params['dispute_entry_ids']
-    entries = params['entries'].map {|entry| entry.strip }
+    entries = []
+    if params['entries'].present?
+      entries = params['entries'].map {|entry| entry.strip }
+    end
     if (dispute_entry_ids.blank? && entries.blank?)
       raise 'Must provide dispute entry ids or url entries'
     end
@@ -220,7 +223,11 @@ class RepApi::Blacklist < RepApi::Base
 
   def self.delete_from_params(params)
     dispute_entry_ids = params['dispute_entry_ids']
-    entries = params['entries']
+    entries = []
+    if params['entries'].present?
+      entries = params['entries'].map {|entry| entry.strip }
+    end
+
     if (dispute_entry_ids.blank? && entries.blank?)
       raise 'Must provide dispute entry ids or url entries'
     end
@@ -237,12 +244,12 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.adjust_from_params(params, username:)
-
+    
     case params['action'].downcase
       when 'active'
         add_from_params(params, username: username)
       when 'expired'
-        delete_from_params(params, entries)
+        delete_from_params(params)
       else
         raise "No known action '#{params['action']}'."
     end
