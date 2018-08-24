@@ -418,6 +418,67 @@ module API
             end
 
             params do
+              requires :dispute_id, type: Integer
+            end
+            get 'dispute_status/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                status = dispute.status
+
+                {:status => status}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            get 'dispute_resolution/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                resolution = dispute.resolution
+
+                if dispute.resolution_comment.present?
+                  resolution_comment = dispute.resolution_comment
+                else
+                  resolution_comment = ''
+                end
+
+                {:resolution => resolution, :resolution_comment => resolution_comment}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
+            get 'dispute_entry_status/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
+                status = dispute_entry.status
+                {:status => status}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
+            get 'dispute_entry_resolution/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
+
+                resolution = dispute_entry.resolution
+
+                if dispute_entry.resolution_comment.present?
+                  resolution_comment = dispute_entry.resolution_comment
+                else
+                  resolution_comment = ''
+                end
+
+                {:resolution => resolution,
+                 :resolution_comment => resolution_comment}.to_json
+              end
+            end
+
+            params do
               requires :duplicate_dispute_id, type: Integer
             end
             post ':dispute_id/duplicate_disputes' do
