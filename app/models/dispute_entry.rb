@@ -158,6 +158,13 @@ class DisputeEntry < ApplicationRecord
       return @wbrs_xlist
     end
     @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
+  rescue => except
+
+    Rails.logger.warn "Populating xlist from Wbrs failed."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    []
   end
 
   def virustotals
@@ -347,15 +354,26 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def self.entries_of_url(url)
+    Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
+      DisputeEntry.new_from_wlbl(wlbl)
+    end
+  rescue => except
+
+    Rails.logger.warn "Failed while getting entries from WBRS."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    []
+  end
+
   # If the research page is served from the DisputesController, this method is here.
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
     if research_params.present?
       url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
 
-      entries = Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
-        DisputeEntry.new_from_wlbl(wlbl)
-      end
+      entries = entries_of_url(url)
 
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
       entries.each do |entry|
