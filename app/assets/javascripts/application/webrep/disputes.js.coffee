@@ -98,7 +98,77 @@ window.delete_disputes_named_search = (close_button, search_name) ->
       this.tr_tag.remove();
   )
 
+window.dispute_status_drop_down = (dispute_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_status/#{dispute_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.dispute-status-' + dispute_id + '#' + status).prop("checked", true);
+  )
+
+window.dispute_resolution_drop_down = (dispute_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_resolution/#{dispute_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+
+      resolution = response.resolution
+      resolution_comment = response.resolution_comment
+
+      # Fill in resolution radio button and comment
+      $('.dispute-resolution-' + dispute_id + '#' + resolution).prop("checked", true)
+      $('#dispute-resolution-comment').text(resolution_comment)
+  )
+
+window.entry_status_drop_down = (dispute_entry_id) ->
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_entry_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.radio-dispute-' + dispute_entry_id + '#' + status).prop("checked", true);
+  )
+
+window.entry_resolution_drop_down = (dispute_entry_id) ->
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_entry_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      resolution = response.resolution
+      resolution_comment = response.resolution_comment
+
+      $('.resolution-dispute-' + dispute_entry_id + '#' + resolution).prop("checked", true)
+      $('#resolution-comment-' + dispute_entry_id).text(resolution_comment)
+  )
 
 
 window.popup_response_error =(response, prefix) ->
@@ -176,6 +246,31 @@ window.toolbar_adust_wlbl_button =(button_tag) ->
     error_prefix: 'Error adjusting WL/BL.'
     success_reload: true
   )
+
+window.toolbar_research_adjust_wlbl_button =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+
+  data = {
+    'urls': [ url ]
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
+  )
+
 
 window.index_adust_wlbl_button =(button_tag) ->
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
@@ -330,6 +425,35 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     error: (response) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
+
+window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
+
+  reptool_bl_form = button_tag.form
+  data = {
+    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
+    'entries': [ url ]
+    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
+  )
+
+
+
+
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').attr('id')
@@ -1184,11 +1308,6 @@ $ ->
 #      submit that shit
     else
       alert('No disputes selected')
-
-
-
-#      BFRP (Research tools page)
-
 
 # Inline WLBL Adjust Button
   $('.bfrp-inline-wlbl-button').click ->
