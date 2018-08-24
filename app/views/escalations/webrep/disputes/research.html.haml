@@ -50,7 +50,7 @@
                     .toolbar
                       %div
                         %label.toolbar-section-label{for:'wlbl-list-type-select'} WL/BL List
-                        = wlbl_form.select :list_type, Wbrs::ManualWlbl.types,
+                        = wlbl_form.select :list_type, Wbrs::ManualWlbl.offline_types,
                           {include_blank: 'Not currently on a list'},
                           class: 'toolbar-select select-status adjust-wlbl-input trgt_list-input',
                           title: 'RepTool Rule Status',

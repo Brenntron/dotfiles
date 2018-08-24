@@ -391,12 +391,13 @@ module API
 
             params do
               requires :relating_dispute_ids, type: Array[Integer]
+              optional :original_dispute_id, type: Integer
             end
             patch 'related_disputes' do
               std_api_v2 do
                 authorize!(:update, Dispute)
                 relating_dispute_ids = permitted_params['relating_dispute_ids']
-                Dispute.where(id: relating_dispute_ids).update_all(related_id: params['original_dispute_id'],
+                Dispute.where(id: relating_dispute_ids).update_all(related_id: permitted_params['original_dispute_id'],
                                                                    related_at: DateTime.now)
                 true
               end
