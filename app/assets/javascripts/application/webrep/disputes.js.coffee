@@ -582,9 +582,10 @@ window.add_dispute_entry = () ->
 window.add_related_case_id= ()->
   id = $('#dispute_id').text()
   invalid_id = false
-  related_id = $('.dispute-id').val().split(",")
+  related_id = $("input[name='related_dispute_id']" ).val().split(",")
   data = {
-    'relating_dispute_ids': related_id
+    'relating_dispute_ids': related_id,
+    'original_dispute_id': id
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   for i in related_id
@@ -597,7 +598,7 @@ window.add_related_case_id= ()->
   else
     std_msg_ajax(
       method: 'PATCH'
-      url: '/escalations/api/v1/escalations/webrep/disputes/' + id + '/relating_disputes'
+      url: '/escalations/api/v1/escalations/webrep/disputes/related_disputes'
       data: data
       success_reload: true
       error_prefix: 'Error marking relationship.'
