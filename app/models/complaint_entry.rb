@@ -138,7 +138,8 @@ class ComplaintEntry < ApplicationRecord
             update(status:current_status,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
-                   case_assigned_at: Time.now)
+                   case_assigned_at: Time.now,
+                   was_dismissed: true)
           end
         else
           # important not from pending

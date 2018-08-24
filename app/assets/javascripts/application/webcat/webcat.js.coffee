@@ -14,6 +14,8 @@ $ ->
           $node.addClass 'highlight-has-subdomain'
         if data.is_important
           $node.addClass 'highlight-second-review'
+        if data.was_dismissed
+          $node.addClass 'highlight-was-dismissed'
         if data.age_int < 10800
           $node.addClass 'highlight-minus3Hours'
         else if data.age_int < 18000
