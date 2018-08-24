@@ -97,7 +97,7 @@ format_domain_info = (info)->
       '<tr>' +
         '<td class="table-side-header">' +
           'Created' +
-        '</td>'
+        '</td>' +
         '<td>' + info.creation_date + '</td>'+
       '</tr><tr>' +
         '<td class="table-side-header">' +
