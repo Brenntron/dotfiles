@@ -11,7 +11,7 @@
         %label.content-label-sm
           Case ID
         .bug-top-id
-          %a.case-id-tag#dispute_id= @dispute.case_id_str
+          %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
 
       .dispute-owner-wrapper
@@ -224,7 +224,7 @@
           %form#set-related-dispute-form
             %label.content-label-sm.related-dropdown-text Ticket Id's
             %br
-            %input.related-dropdown-text.dispute-id{type: 'text', name: 'dispute_id'}
+            %input.related-dropdown-text.dispute-id{type: 'text', name: 'related_dispute_id'}
             .button-row-center
               %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onClick: 'add_related_case_id()'}
                 Submit

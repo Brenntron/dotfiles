@@ -528,7 +528,7 @@ window.add_dispute_entry = () ->
 window.add_related_case_id= ()->
   id = $('#dispute_id').text()
   invalid_id = false
-  related_id = $('.dispute-id').val().split(",")
+  related_id = $("input[name='related_dispute_id']" ).val().split(",")
   data = {
     'relating_dispute_ids': related_id
   }
