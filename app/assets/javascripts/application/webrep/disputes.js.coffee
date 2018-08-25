@@ -6,6 +6,21 @@ window.select_or_deselect_all = (dispute_id)->
 window.populate_webrep_index_table = (data = {}) ->
 
   array_of_showns = []
+  array_of_dispute_clicks = []
+  array_of_dispute_entry_clicks = []
+  array_of_dispute_entry_selectalls = []
+
+  $('.dispute_entry_select_all').each ->
+    if this.checked == true
+      array_of_dispute_entry_selectalls.push this.id
+
+  $('.dispute_check_box').each ->
+    if this.checked == true
+      array_of_dispute_clicks.push this.value
+
+  $('.dispute-entry-checkbox').each ->
+    if this.checked == true
+      array_of_dispute_entry_clicks.push this.id
 
   td = $('#disputes-index').find('td.expandable-row-column')
   $(td).each ->
@@ -74,6 +89,24 @@ window.populate_webrep_index_table = (data = {}) ->
                       return
                   return
                 return
+
+        if array_of_dispute_clicks.length > 0
+          for dispute_click in array_of_dispute_clicks
+            $('.dispute_check_box').each ->
+              if this.value == dispute_click
+                this.checked = true
+
+        if array_of_dispute_entry_clicks.length > 0
+          for dispute_entry_click in array_of_dispute_entry_clicks
+            $('.dispute-entry-checkbox').each ->
+              if this.id == dispute_entry_click
+                this.checked = true
+        if array_of_dispute_entry_selectalls.length > 0
+          for dispute_entry_selectall in array_of_dispute_entry_selectalls
+            $('.dispute_entry_select_all').each ->
+              if this.id == dispute_entry_selectall
+                this.checked = true
+
 
         if undefined != json.search_name
           $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
@@ -1117,7 +1150,7 @@ $ ->
     ])
 
   window.format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-status">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-status">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
