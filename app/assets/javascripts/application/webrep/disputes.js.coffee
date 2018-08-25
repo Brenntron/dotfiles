@@ -4,6 +4,16 @@ window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
 
 window.populate_webrep_index_table = (data = {}) ->
+
+  array_of_showns = []
+
+  td = $('#disputes-index').find('td.expandable-row-column')
+  $(td).each ->
+    tr = $(this).closest('tr')
+    row = window.dispute_table.row(tr)
+    if row.child.isShown()
+      array_of_showns.push row.data().id
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes'
@@ -27,13 +37,43 @@ window.populate_webrep_index_table = (data = {}) ->
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+        if array_of_showns.length > 0
+          for dispute_id_shown in array_of_showns
+            td = $('#disputes-index').find('td.expandable-row-column')
+            $(td).each ->
+              tr = $(this).closest('tr')
+              row = window.dispute_table.row(tr)
+              #unless row.child.isShown()
+              if row.data().id == dispute_id_shown
+                row.child(window.format(row.data())).show()
+                tr.addClass 'shown'
+                td = $(tr).next('tr').find('td:first')
+                $(td).addClass 'dispute-entry-table-wrapper'
+                # Check to see which columns should be displayed
+                $('.toggle-vis-nested').each ->
+                  checkbox_trigger = $(this).attr('data-column')
+                  checkbox = $(this).find('input')
+                  if $(checkbox).prop('checked')
+                    $('.dispute-entry-table td, .dispute-entry-table th').each ->
+                      if $(this).hasClass(checkbox_trigger)
+                        $(this).show()
+                      return
+                  else if $(checkbox).prop('checked') == false
+                    $('.dispute-entry-table td, .dispute-entry-table th').each ->
+                      if $(this).hasClass(checkbox_trigger)
+                        $(this).hide()
+                      return
+                  return
+                return
 
         if undefined != json.search_name
           $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      std_msg_error("An error occured while retrieving data.","")
+      #TODO implement some sort of passive flag to show the current state of connection between
+      #UI and bridge when periodically refreshing
+      #notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      #std_msg_error("An error occured while retrieving data.","")
   , this)
 
 window.advanced_webrep_index_table = () ->
@@ -63,6 +103,7 @@ window.advanced_webrep_index_table = () ->
     modified_older: $('#new_named_search').find('input[id="modified-older-input"]').val()
     modified_newer: $('#new_named_search').find('input[id="modified-newer-input"]').val()
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
@@ -70,6 +111,7 @@ window.standard_webrep_index_table = (search_name) ->
     search_type: 'standard'
     search_name: search_name
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.named_webrep_index_table = (search_name) ->
@@ -77,6 +119,7 @@ window.named_webrep_index_table = (search_name) ->
     search_type: 'named'
     search_name: search_name
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.call_contains_search = (search_form) ->
@@ -84,6 +127,7 @@ window.call_contains_search = (search_form) ->
     search_type: 'contains'
     value: search_form.querySelector('input.search-box').value
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.delete_disputes_named_search = (close_button, search_name) ->
@@ -976,7 +1020,7 @@ $ ->
 
 
   # Create index table
-  dispute_table = $('#disputes-index').DataTable(
+  window.dispute_table = $('#disputes-index').DataTable(
     order: [ [
       9
       'desc'
@@ -1058,7 +1102,7 @@ $ ->
 
     ])
 
-  format = (dispute) ->
+  window.format = (dispute) ->
     table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-status">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing Data</span>'
@@ -1128,14 +1172,14 @@ $ ->
     standard_webrep_index_table('open')
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
-    row = dispute_table.row(tr)
+    row = window.dispute_table.row(tr)
     if row.child.isShown()
 # This row is already open - close it
       row.child.hide()
       tr.removeClass 'shown'
     else
 # Open this row
-      row.child(format(row.data())).show()
+      row.child(window.format(row.data())).show()
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
@@ -1161,9 +1205,9 @@ $ ->
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
-      row = dispute_table.row(tr)
+      row = window.dispute_table.row(tr)
       unless row.child.isShown()
-        row.child(format(row.data())).show()
+        row.child(window.format(row.data())).show()
         tr.addClass 'shown'
         td = $(tr).next('tr').find('td:first')
         $(td).addClass 'dispute-entry-table-wrapper'
@@ -1189,14 +1233,14 @@ $ ->
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
-      row = dispute_table.row(tr)
+      row = window.dispute_table.row(tr)
       if row.child.isShown()
         row.child.hide()
         tr.removeClass 'shown'
 
   # Hide unchecked columns <- need to somehow save this 'view'
   $('.toggle-vis').each ->
-    column = dispute_table.column($(this).attr('data-column'))
+    column = window.dispute_table.column($(this).attr('data-column'))
     checkbox = $(this).find('input')
     if $(checkbox).prop('checked')
       column.visible true
@@ -1409,6 +1453,12 @@ $ ->
 
 $ ->
   $(document).ready ->
+
+    setInterval ->
+      if window.current_search_data
+        window.populate_webrep_index_table(window.current_search_data)
+    , 15000
+
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
       $(this).tooltipster
         theme: [
@@ -1419,5 +1469,7 @@ $ ->
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
+
+
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
