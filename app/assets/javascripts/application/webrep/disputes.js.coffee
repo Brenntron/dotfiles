@@ -1382,25 +1382,6 @@ $ ->
       $(dropdown_wrapper).removeClass('open')
       alert ('Please select 1 row')
 
-
-
-    #tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
-    #$(tbody).empty()
-    #dropdown_wrapper = $(this).parent()
-    #if ($('.dispute-entry-checkbox:checked').length > 0)
-    #  $('.dispute-entry-checkbox').each ->
-    #    if $(this).prop('checked')
-    #      entry_row = $(this).parent().parent()[0]
-    #      entry_content = $(entry_row).find('.entry-col-content').text()
-    #      wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
-    #      wlbl = $(entry_row).find('.entry-col-wlbl').text()
-
-    #      $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
-    #  $($('#wlbl_adjust_entries_index').find('.comment-wrapper')).show()
-    #else
-    #  $(dropdown_wrapper).removeClass('open')
-    #  alert ('No rows selected')
-
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
     orig_ticket =  $('#set-related-dispute-form').find('input.dispute-id')
