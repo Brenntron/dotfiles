@@ -45,17 +45,14 @@ window.populate_webrep_index_table = (data = {}) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
-        unless $('#refresh-message').hasClass('refresh-error')
-          $('#refresh-message').addClass('refresh-error')
-        if $('#refresh-message').hasClass('refresh-working')
-          $('#refresh-message').removeClass('refresh-working')
-        $('#refresh-message').html('An error occured while retrieving data')
+        $('#refresh-working-msg').hide()
+        $('#refresh-error-msg').show()
+        $('#refresh-error-msg').html('An error occured while retrieving data')
+
       else
-        unless $('#refresh-message').hasClass('refresh-working')
-          $('#refresh-message').addClass('refresh-working')
-        if $('#refresh-message').hasClass('refresh-error')
-          $('#refresh-message').removeClass('refresh-error')
-        $('#refresh-message').html('Table data updating correctly')
+        $('#refresh-error-msg').hide()
+        $('#refresh-working-msg').show()
+        $('#refresh-working-msg').html('Table data updating correctly')
         $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
@@ -112,15 +109,9 @@ window.populate_webrep_index_table = (data = {}) ->
           $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
-      unless $('#refresh-message').hasClass('refresh-error')
-        $('#refresh-message').addClass('refresh-error')
-      if $('#refresh-message').hasClass('refresh-working')
-        $('#refresh-message').removeClass('refresh-working')
-      $('#refresh-message').html('An error occured while retrieving data')
-      #TODO implement some sort of passive flag to show the current state of connection between
-      #UI and bridge when periodically refreshing
-      #notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      #std_msg_error("An error occured while retrieving data.","")
+      $('#refresh-working-msg').hide()
+      $('#refresh-error-msg').show()
+      $('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
 window.advanced_webrep_index_table = () ->

@@ -6104,7 +6104,7 @@ th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc 
   display: inline-block;
 }
 
-#refresh-message {
+.refresh-message {
   display: inline-block;
   float: right;
   font-weight: 700;
@@ -6116,12 +6116,12 @@ th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc 
   padding-top: 3px;
 }
 
-.refresh-working {
+#refresh-working-msg {
   background-image: url(image_path('icon_sync_green.svg'));
   background-repeat: no-repeat;
 }
 
-.refresh-error {
+#refresh-error-msg {
   background-image: url(image_path('icon_error.svg'));
   background-repeat: no-repeat;
 }
