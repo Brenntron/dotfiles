@@ -1495,7 +1495,7 @@ $ ->
     setInterval ->
       if window.current_search_data
         window.populate_webrep_index_table(window.current_search_data)
-    , 15000
+    , 60000
 
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
       $(this).tooltipster
