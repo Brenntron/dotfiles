@@ -247,23 +247,20 @@
         -#For each checked checkbox populate this information
         = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
           .dispute-wlbl-adjust-wrapper
+            .dispute-name-wrapper
+              %label.content-label-sm Dispute
+              %br
+              %span.entry-dispute-name
             %table.dispute_tool_current
-              %thead
-                %tr
-                  %th.content-label-sm Dispute
-                  %th.content-label-sm.no-word-break Current WL/BL List
-                  %th.text-center.content-label-sm.no-word-break Current WBRS Score
-              %tbody
-            -#%tr
-            -#  %td.wlbl-entry-content
-            -#  %td.wlbl-entry-wlbl
-            -#  %td.wlbl-current-entry-wbrs.text-center
-
-            -#    Removing for now. We can't do a preview until the api is updated to provide that info
-            -#%td.text-center
-            -#  %label.content-label-sm New Score
-            -#  %br
-            -#  %span.new_wbrs_score
+              %tr
+                %td.text-center
+                  %label.content-label-sm Current Score
+                  %br
+                  %span.current-wbrs-score
+                %td.text-center
+                  %label.content-label-sm New Score
+                  %br
+                  %span.new_wbrs_score
             .inline-tool-content-wrapper
               .row
                 .col-xs-12
@@ -273,34 +270,34 @@
                   %ul.wlbl-toggle-list
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
+                        %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
                         %span.toggle-slider
                       WL - Weak
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
+                        %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
                         %span.toggle-slider
                       WL - Medium
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
+                        %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
                         %span.toggle-slider
                       WL - Heavy
                 .col-xs-6
                   %ul.wlbl-toggle-list
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
+                        %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
                         %span.toggle-slider
                       BL - Weak
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
+                        %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
                         %span.toggle-slider
                       BL - Medium
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
+                        %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
                         %span.toggle-slider
                       BL - Heavy
 
@@ -308,7 +305,7 @@
                 %label.content-label-sm Comment
                 %textarea.dropdown-comment.adjust-wlbl-input.note-input
               .button-row-center
-                %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);'}
+                %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'index_adjust_wlbl_button(this);'}
                   Submit Changes
 
     %span.dropdown
