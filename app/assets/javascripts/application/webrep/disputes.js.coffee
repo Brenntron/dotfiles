@@ -55,7 +55,7 @@ window.populate_webrep_index_table = (data = {}) ->
           $('#refresh-message').addClass('refresh-working')
         if $('#refresh-message').hasClass('refresh-error')
           $('#refresh-message').removeClass('refresh-error')
-        $('#refresh-message').html('Table data updating correctly.')
+        $('#refresh-message').html('Table data updating correctly')
         $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();

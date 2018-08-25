@@ -6111,12 +6111,19 @@ th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc 
   font-size: 8.5pt;
   color: $type-lighter-color;
   text-transform: uppercase;
+  padding-left: 24px;
+  height: 18px;
+  padding-top: 3px;
 }
 
 .refresh-working {
   background-image: url(image_path('icon_sync_green.svg'));
   background-repeat: no-repeat;
-  
+}
+
+.refresh-error {
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
