@@ -5385,6 +5385,15 @@ td.ticket-total::before {
   width: 170px !important;
 }
 
+#index-change-assign-dropdown{
+  margin-left: 0;
+  min-width: 0;
+}
+
+#index-change-assign-dropdown .toolbar {
+  margin-bottom: 5px;
+}
+
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
   margin-bottom: 0;

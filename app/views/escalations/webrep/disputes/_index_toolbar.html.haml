@@ -153,11 +153,14 @@
           %span.toolbar-button-text
             Change Assignee
         .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
-          %select{name: 'index_target_assignee', id: 'index_target_assignee'}
-            - User.all.order('cvs_username ASC').each do |u|
-              %option{id: u.id, value: u.id, label: u.cvs_username}
-          %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
-            Assign
+          .toolbar
+            %div
+              %label.toolbar-section-label Assignee
+              %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                - User.all.order('cvs_username ASC').each do |u|
+                  %option{id: u.id, value: u.id, label: u.cvs_username}
+            %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
+              Assign
 
     %span.dropdown
       %button#index_mark_related.toolbar-button.mark-related-button.esc-tooltipped{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
