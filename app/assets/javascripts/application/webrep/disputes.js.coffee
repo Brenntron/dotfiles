@@ -224,23 +224,24 @@ window.row_research_adjust_wlbl_button =(button_tag) ->
   )
 
 
-window.toolbar_adust_wlbl_button =(button_tag) ->
-  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-    this.dataset['entryId']
-  ).toArray()
+window.toolbar_adjust_wlbl_button =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
 
   wlbl_form = button_tag.form
+
   data = {
-    'dispute_entry_ids': entry_ids
+    'urls': [ url ]
     'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
