@@ -218,7 +218,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
-        std_msg_error(response,"", reload: false)
+        if categories.length == 0
+          std_msg_error("Must include at least one category.","", reload: false)
+        else
+          std_msg_error(response,"", reload: false)
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
