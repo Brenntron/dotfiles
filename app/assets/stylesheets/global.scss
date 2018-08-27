@@ -2834,7 +2834,7 @@ fieldset.top-content {
 
 
 /********** Filter / Search Related Elements **********/
-#filter-bugs-list .selected::after {
+#filter-bugs-list .selected::after, #filter-cases-list .selected::after {
   content: '';
   border: solid transparent;
   height: 0;
