@@ -3135,16 +3135,8 @@ fieldset.top-content {
 
 .note-block pre {
   background-color: transparent;
-
-  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
-  white-space: -pre-wrap;      /* Opera 4-6 */
-  white-space: -o-pre-wrap;    /* Opera 7 */
   white-space: pre-wrap;       /* css-3 */
-  word-wrap: break-word;       /* Internet Explorer 5.5+ */
   white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
-  word-break: break-all;
-  white-space: normal;
-  hyphens: auto;
 }
 
 .case-history-icon {
@@ -3168,6 +3160,10 @@ fieldset.top-content {
   width: 100%;
   font-size: 8pt;
   line-height: 1.3em;
+}
+
+.note-history-row .case-history-preview {
+  word-break: break-all;
 }
 
 .case-history-author {

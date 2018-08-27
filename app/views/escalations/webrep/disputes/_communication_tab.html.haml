@@ -24,7 +24,7 @@
                 =email.created_at.strftime("%H:%M:%S")
 
           -@dispute.dispute_comments.recent_first.each do |comment|
-            %tr
+            %tr.note-history-row
               %td.alt-col.icon-col
                 %span.case-history-icon.note-icon
               %td
