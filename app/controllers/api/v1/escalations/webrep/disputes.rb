@@ -513,7 +513,13 @@ module API
               if information[params[:entry]] == "NOT_FOUND"
                 return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
               else
-                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
+                expiration = ""
+                begin
+                  expiration = Time.parse(information[params[:entry]]["expiration"]).to_s
+                rescue
+                  expiration = information[params[:entry]]["expiration"]
+                end
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => expiration, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end
