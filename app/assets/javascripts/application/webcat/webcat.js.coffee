@@ -67,6 +67,18 @@ $ ->
           className: 'state-col'
         }
         {
+          'render':(data,type,full,meta)->
+            tags = full.tags
+            tag_items = ''
+            if tags.length > 0
+              for tag in tags
+                item = '<span class="tag-capsule">' + tag + '</span>'
+                tag_items = tag_items + item
+            else
+              tag_items = '<span class="missing-data">No tags</span>'
+            tag_items
+        }
+        {
           data: 'subdomain'
           width: '50px'
         }
@@ -106,9 +118,6 @@ $ ->
         {
           data: 'company_name'
         }
-        { data: 'customer_name' }
-
-
 
         {
           data: 'assigned_to'

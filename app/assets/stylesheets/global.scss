@@ -2834,7 +2834,7 @@ fieldset.top-content {
 
 
 /********** Filter / Search Related Elements **********/
-#filter-bugs-list .selected::after {
+#filter-bugs-list .selected::after, #filter-cases-list .selected::after {
   content: '';
   border: solid transparent;
   height: 0;
@@ -5385,6 +5385,15 @@ td.ticket-total::before {
   width: 170px !important;
 }
 
+#index-change-assign-dropdown{
+  margin-left: 0;
+  min-width: 0;
+}
+
+#index-change-assign-dropdown .toolbar {
+  margin-bottom: 5px;
+}
+
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
   margin-bottom: 0;
@@ -6112,6 +6121,32 @@ th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc 
 
 .highlight-was-dismissed .important-flag-col {
   min-width: 50px;
+}
+
+#dispute-index-title {
+  display: inline-block;
+}
+
+.refresh-message {
+  display: inline-block;
+  float: right;
+  font-weight: 700;
+  font-size: 8.5pt;
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  padding-left: 24px;
+  height: 18px;
+  padding-top: 3px;
+}
+
+#refresh-working-msg {
+  background-image: url(image_path('icon_sync_green.svg'));
+  background-repeat: no-repeat;
+}
+
+#refresh-error-msg {
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

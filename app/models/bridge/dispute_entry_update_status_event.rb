@@ -22,7 +22,11 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
     })
   end
 
+  handle_asynchronously :post_entries, :queue => "dispute_update"
+
   def post_entry(entry)
     post_entries([ entry ])
   end
+
+  handle_asynchronously :post_entry, :queue => "dispute_update"
 end
