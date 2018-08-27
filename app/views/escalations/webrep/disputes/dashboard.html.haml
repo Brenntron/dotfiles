@@ -61,7 +61,7 @@
           Manager:
           = current_user.team_manager.display_name
 
-      .col-xs-4
+      .col-xs-4.dashboard-left-data
         %table.tickets-totals-table
           %tr
             %td.ticket-total= Dispute.assigned_disputes.my_team(current_user).count
@@ -84,6 +84,11 @@
               Tickets / Total Entries per Ticket
 
       .col-xs-5
+        %h5 Team Members
+        %ul.multi-col
+          - current_user.my_team.each do |teammate|
+            - unless teammate.cvs_username == current_user.cvs_username
+              %li.dashboard-details #{teammate.display_name} (#{teammate.cvs_username})
 
   .row
     .col-xs-12.temp-spacer

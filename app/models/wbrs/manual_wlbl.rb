@@ -21,6 +21,17 @@ class Wbrs::ManualWlbl < Wbrs::Base
     @types
   end
 
+  def self.offline_types
+    types
+  rescue => except
+
+    Rails.logger.warn "Failed while getting types from WBRS."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    %w(WL-weak WL-med WL-heavy BL-weak BL-med BL-heavy)
+  end
+
   # @param [Integer] id the WL/BL
   # @return [Wbrs::Prefix] the WL/BL
   def self.find(id)
@@ -154,10 +165,10 @@ class Wbrs::ManualWlbl < Wbrs::Base
   def self.adjust_urls_from_params(params = {}, username:)
     wlbl_params = stringkey_params(params)
     wlbl_params['usr'] = username
-
+    params_urls = params[:urls].map {|url| url.strip}
     target_list = wlbl_params.delete('trgt_list')
 
-    params[:urls].each do |param_url|
+    params_urls.each do |param_url|
       information = Wbrs::ManualWlbl.where({:url => param_url})
 
       if information.present?
@@ -167,7 +178,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
     if target_list.present?
       target_list.each do |wlbl|
-        new_wlbl_from_params({'urls' => params[:urls], 'usr' => username, 'note' => params[:note], 'trgt_list' => wlbl })
+        new_wlbl_from_params({'urls' => params_urls, 'usr' => username, 'note' => params[:note], 'trgt_list' => wlbl })
       end
 
     end

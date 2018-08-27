@@ -4,6 +4,31 @@ window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
 
 window.populate_webrep_index_table = (data = {}) ->
+
+  array_of_showns = []
+  array_of_dispute_clicks = []
+  array_of_dispute_entry_clicks = []
+  array_of_dispute_entry_selectalls = []
+
+  $('.dispute_entry_select_all').each ->
+    if this.checked == true
+      array_of_dispute_entry_selectalls.push this.id
+
+  $('.dispute_check_box').each ->
+    if this.checked == true
+      array_of_dispute_clicks.push this.value
+
+  $('.dispute-entry-checkbox').each ->
+    if this.checked == true
+      array_of_dispute_entry_clicks.push this.id
+
+  td = $('#disputes-index').find('td.expandable-row-column')
+  $(td).each ->
+    tr = $(this).closest('tr')
+    row = window.dispute_table.row(tr)
+    if row.child.isShown()
+      array_of_showns.push row.data().id
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes'
@@ -20,20 +45,73 @@ window.populate_webrep_index_table = (data = {}) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
-        std_msg_error("An error occured while retrieving data.","")
+        $('#refresh-working-msg').hide()
+        $('#refresh-error-msg').show()
+        $('#refresh-error-msg').html('An error occured while retrieving data')
+
       else
+        $('#refresh-error-msg').hide()
+        $('#refresh-working-msg').show()
+        $('#refresh-working-msg').html('Table data updating correctly')
         $('#dispute-index-title').text(json['title'])
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+        if array_of_showns.length > 0
+          for dispute_id_shown in array_of_showns
+            td = $('#disputes-index').find('td.expandable-row-column')
+            $(td).each ->
+              tr = $(this).closest('tr')
+              row = window.dispute_table.row(tr)
+              #unless row.child.isShown()
+              if row.data().id == dispute_id_shown
+                row.child(window.format(row.data())).show()
+                tr.addClass 'shown'
+                td = $(tr).next('tr').find('td:first')
+                $(td).addClass 'dispute-entry-table-wrapper'
+                # Check to see which columns should be displayed
+                $('.toggle-vis-nested').each ->
+                  checkbox_trigger = $(this).attr('data-column')
+                  checkbox = $(this).find('input')
+                  if $(checkbox).prop('checked')
+                    $('.dispute-entry-table td, .dispute-entry-table th').each ->
+                      if $(this).hasClass(checkbox_trigger)
+                        $(this).show()
+                      return
+                  else if $(checkbox).prop('checked') == false
+                    $('.dispute-entry-table td, .dispute-entry-table th').each ->
+                      if $(this).hasClass(checkbox_trigger)
+                        $(this).hide()
+                      return
+                  return
+                return
+
+        if array_of_dispute_clicks.length > 0
+          for dispute_click in array_of_dispute_clicks
+            $('.dispute_check_box').each ->
+              if this.value == dispute_click
+                this.checked = true
+
+        if array_of_dispute_entry_clicks.length > 0
+          for dispute_entry_click in array_of_dispute_entry_clicks
+            $('.dispute-entry-checkbox').each ->
+              if this.id == dispute_entry_click
+                this.checked = true
+        if array_of_dispute_entry_selectalls.length > 0
+          for dispute_entry_selectall in array_of_dispute_entry_selectalls
+            $('.dispute_entry_select_all').each ->
+              if this.id == dispute_entry_selectall
+                this.checked = true
+
 
         if undefined != json.search_name
           $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      std_msg_error("An error occured while retrieving data.","")
+      $('#refresh-working-msg').hide()
+      $('#refresh-error-msg').show()
+      $('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
 window.advanced_webrep_index_table = () ->
@@ -63,6 +141,7 @@ window.advanced_webrep_index_table = () ->
     modified_older: $('#new_named_search').find('input[id="modified-older-input"]').val()
     modified_newer: $('#new_named_search').find('input[id="modified-newer-input"]').val()
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
@@ -70,6 +149,7 @@ window.standard_webrep_index_table = (search_name) ->
     search_type: 'standard'
     search_name: search_name
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.named_webrep_index_table = (search_name) ->
@@ -77,6 +157,7 @@ window.named_webrep_index_table = (search_name) ->
     search_type: 'named'
     search_name: search_name
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.call_contains_search = (search_form) ->
@@ -84,6 +165,7 @@ window.call_contains_search = (search_form) ->
     search_type: 'contains'
     value: search_form.querySelector('input.search-box').value
   }
+  window.current_search_data = data
   window.populate_webrep_index_table(data)
 
 window.delete_disputes_named_search = (close_button, search_name) ->
@@ -98,7 +180,77 @@ window.delete_disputes_named_search = (close_button, search_name) ->
       this.tr_tag.remove();
   )
 
+window.dispute_status_drop_down = (dispute_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_status/#{dispute_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.dispute-status-' + dispute_id + '#' + status).prop("checked", true);
+  )
+
+window.dispute_resolution_drop_down = (dispute_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_resolution/#{dispute_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+
+      resolution = response.resolution
+      resolution_comment = response.resolution_comment
+
+      # Fill in resolution radio button and comment
+      $('.dispute-resolution-' + dispute_id + '#' + resolution).prop("checked", true)
+      $('#dispute-resolution-comment').text(resolution_comment)
+  )
+
+window.entry_status_drop_down = (dispute_entry_id) ->
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_entry_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.radio-dispute-' + dispute_entry_id + '#' + status).prop("checked", true);
+  )
+
+window.entry_resolution_drop_down = (dispute_entry_id) ->
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_entry_id}"
+    method: 'GET'
+    headers: headers
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      resolution = response.resolution
+      resolution_comment = response.resolution_comment
+
+      $('.resolution-dispute-' + dispute_entry_id + '#' + resolution).prop("checked", true)
+      $('#resolution-comment-' + dispute_entry_id).text(resolution_comment)
+  )
 
 
 window.popup_response_error =(response, prefix) ->
@@ -154,49 +306,77 @@ window.row_research_adjust_wlbl_button =(button_tag) ->
   )
 
 
-window.toolbar_adust_wlbl_button =(button_tag) ->
-  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-    this.dataset['entryId']
-  ).toArray()
+window.toolbar_adjust_wlbl_button =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
 
   wlbl_form = button_tag.form
+
   data = {
-    'dispute_entry_ids': entry_ids
+    'urls': [ url ]
     'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
     success_reload: true
   )
 
-window.index_adust_wlbl_button =(button_tag) ->
-  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
+window.toolbar_research_adjust_wlbl_button =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
 
   wlbl_form = button_tag.form
+
   data = {
-    'dispute_ids': dispute_ids
+    'urls': [ url ]
     'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/ticket_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
+  )
+
+
+window.index_adjust_wlbl_button =(button_tag) ->
+  checked_url = $('.dispute-entry-checkbox:checked')[0]
+  entry_row = $(checked_url).parent().parent()[0]
+  url = $(entry_row).find('.entry-col-content').text()
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+
+  data = {
+    'urls': [ url ]
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
   )
 
 window.save_dispute = () ->
@@ -205,7 +385,6 @@ window.save_dispute = () ->
     'customer_name': $('#dispute-customer-name-input').val()
     'customer_email': $('#dispute-customer-email-input').val()
     'status': $('#status').val()
-    'related_id': $('#related-dispute-id').val()
   }
 
   std_msg_ajax(
@@ -305,17 +484,43 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
       popup_response_error(response, 'Error adjusting WL/BL')
   )
 
-
-
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
   ).toArray()
-
+  if entry_ids.length == 0
+    entry_ids = $('.dispute-entry-checkbox:checkbox:checked').map(() ->
+      parseInt(this.id)
+    ).toArray()
   reptool_bl_form = button_tag.form
   data = {
     'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
     'dispute_entry_ids': entry_ids
+    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error adjusting WL/BL')
+  )
+
+window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
+  checked_url = $('.dispute_check_box:checked')[0]
+  entry_row = $(checked_url).parents('.research-table-row')[0]
+  url = $(entry_row).find('.entry-data-content').text()
+
+  reptool_bl_form = button_tag.form
+  data = {
+    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
+    'entries': [ url ]
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
@@ -369,7 +574,7 @@ window.toolbar_index_edit_status = () ->
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').attr('id')
-  comment = $('#dispute-status-comment').val()
+  comment = $('.ticket-status-comment').val()
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
@@ -378,7 +583,7 @@ window.show_page_edit_status = () ->
   data = {
     dispute_ids: [ dispute_id ]
     status: statusName
-    commment: comment
+    comment: comment
   }
 
   if resolution
@@ -526,6 +731,31 @@ window.add_dispute_entry = () ->
       popup_response_error(response, 'Error adding entry.')
   )
 
+window.add_related_case_id= ()->
+  id = $('#dispute_id').text()
+  invalid_id = false
+  related_id = $("input[name='related_dispute_id']" ).val().split(",")
+  data = {
+    'relating_dispute_ids': related_id,
+    'original_dispute_id': id
+  }
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  for i in related_id
+    if(isNaN(i)||i.length < 1)
+      invalid_id = true
+  if related_id[0].length < 1
+    std_msg_error("Invalid ID",["You must enter a valid ID to relate."])
+  else if(invalid_id)
+    std_msg_error("Invalid ID",["One of your IDs is NOT a valid ID number."])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: '/escalations/api/v1/escalations/webrep/disputes/related_disputes'
+      data: data
+      success_reload: true
+      error_prefix: 'Error marking relationship.'
+    )
+
 window.determine_checked = (box_names) ->
   box_flag = ($('.'+box_names+':checked').length > 0)
   unless box_flag
@@ -534,16 +764,17 @@ window.determine_checked = (box_names) ->
   return box_flag
 
 
-window.take_dispute = (take_button, dispute_id) ->
+window.take_dispute = (dispute_id) ->
   std_msg_ajax(
     method: 'PATCH'
     url: "/escalations/api/v1/escalations/webrep/disputes/take_dispute/" + dispute_id
     data: {}
-    td_tag: take_button.closest('td')
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      this.td_tag.getElementsByClassName("dispute_username")[0].innerText = response.username
+      $('.take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
+      $('#owner_' + dispute_id).text(response.username)
+      $('#status_' + dispute_id).text("Assigned")
   )
 
 
@@ -575,6 +806,19 @@ window.take_single_dispute = (id) ->
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success_reload: true
+  )
+
+window.return_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/webrep/disputes/return_dispute/" + dispute_id
+    data: {}
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $('.return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
+      $('#owner_' + response.dispute_id).text('Unassigned')
+      $('#status_' + response.dispute_id).text('NEW')
+
   )
 
 
@@ -817,7 +1061,7 @@ $ ->
 
 
   # Create index table
-  dispute_table = $('#disputes-index').DataTable(
+  window.dispute_table = $('#disputes-index').DataTable(
     order: [ [
       9
       'desc'
@@ -845,7 +1089,10 @@ $ ->
         className: 'state-col'
       }
       {
-        targets: [6]
+        targets: [
+          2
+          6
+        ]
         className: 'text-center'
       }
       {
@@ -874,7 +1121,9 @@ $ ->
       }
       { data: 'case_link' }
       { data: 'status' }
-      { data: 'resolution' }
+      {
+        data: 'dispute_resolution'
+      }
        {
         data: 'submission_type'
         render: (data) ->
@@ -894,8 +1143,8 @@ $ ->
 
     ])
 
-  format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+  window.format = (dispute) ->
+    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-status">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
@@ -918,6 +1167,16 @@ $ ->
         status = this.entry.status
       else
         status = missing_data
+      resolution = ''
+      if this.entry.resolution != null
+        resolution = this.entry.resolution
+      else
+        resolution = missing_data
+      resolution_comment = ''
+      if this.entry.resolution_comment != null
+        resolution_comment = this.entry.resolution_comment
+      else
+        resolution_comment = ''
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -934,8 +1193,9 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr>' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
+        '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
         '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
@@ -953,14 +1213,14 @@ $ ->
     standard_webrep_index_table('open')
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
-    row = dispute_table.row(tr)
+    row = window.dispute_table.row(tr)
     if row.child.isShown()
 # This row is already open - close it
       row.child.hide()
       tr.removeClass 'shown'
     else
 # Open this row
-      row.child(format(row.data())).show()
+      row.child(window.format(row.data())).show()
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
@@ -986,9 +1246,9 @@ $ ->
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
-      row = dispute_table.row(tr)
+      row = window.dispute_table.row(tr)
       unless row.child.isShown()
-        row.child(format(row.data())).show()
+        row.child(window.format(row.data())).show()
         tr.addClass 'shown'
         td = $(tr).next('tr').find('td:first')
         $(td).addClass 'dispute-entry-table-wrapper'
@@ -1014,14 +1274,14 @@ $ ->
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
-      row = dispute_table.row(tr)
+      row = window.dispute_table.row(tr)
       if row.child.isShown()
         row.child.hide()
         tr.removeClass 'shown'
 
   # Hide unchecked columns <- need to somehow save this 'view'
   $('.toggle-vis').each ->
-    column = dispute_table.column($(this).attr('data-column'))
+    column = window.dispute_table.column($(this).attr('data-column'))
     checkbox = $(this).find('input')
     if $(checkbox).prop('checked')
       column.visible true
@@ -1074,11 +1334,9 @@ $ ->
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
     $('.dispute-edit-field').hide()
-    $('.dispute-edit-input').addClass('block')
 
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
-    $('#related-dispute-button').removeClass('hidden')
     $('#related-dispute-input').removeClass('hidden')
     $('#edit-dispute-button').addClass('hidden')
 
@@ -1096,33 +1354,113 @@ $ ->
     $('#dispute-priority-icon').show()
     $('#dispute-priority-select').hide()
     $('.dispute-edit-field').show()
-    $('.dispute-edit-input').removeClass('block')
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
-    $('#related-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
 
 
   $('#index-adjust-wlbl').click ->
-    console.log ('clicked!')
     tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
-    $(tbody).empty()
-    dropdown_wrapper = $(this).parent()
-    if ($('.dispute-entry-checkbox:checked').length > 0)
-      $('.dispute-entry-checkbox').each ->
-        if $(this).prop('checked')
-          entry_row = $(this).parent().parent()[0]
-          entry_content = $(entry_row).find('.entry-col-content').text()
-          wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
-          wlbl = $(entry_row).find('.entry-col-wlbl').text()
+    show_content = $('#wlbl_adjust_entries_index').find('.wlbl-entry-content')
+    if !show_content[0]
+      show_content = $('#wlbl_adjust_entries_index').find('.entry-dispute-name')
+    show_wlbl = $('#wlbl_adjust_entries_index').find('.wlbl-entry-wlbl')
+    show_wbrs = $('#wlbl_adjust_entries_index').find('.wlbl-current-entry-wbrs')
+    if !show_wbrs[0]
+      show_wbrs = $('#wlbl_adjust_entries_index').find('.current-wbrs-score')
+    wl_weak = $('#wlbl_adjust_entries_index').find('.wl-weak-checkbox')
+    wl_med = $('#wlbl_adjust_entries_index').find('.wl-med-checkbox')
+    wl_heavy = $('#wlbl_adjust_entries_index').find('.wl-heavy-checkbox')
+    bl_weak = $('#wlbl_adjust_entries_index').find('.bl-weak-checkbox')
+    bl_med = $('#wlbl_adjust_entries_index').find('.bl-med-checkbox')
+    bl_heavy = $('#wlbl_adjust_entries_index').find('.bl-heavy-checkbox')
 
-          $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
-      $($('#wlbl_adjust_entries_index').find('.comment-wrapper')).show()
+    $(show_content[0]).empty()
+    $(show_wbrs[0]).empty()
+    $(show_wlbl[0]).empty()
+    $(wl_weak[0]).prop('checked', false)
+    $(wl_med[0]).prop('checked', false)
+    $(wl_heavy[0]).prop('checked', false)
+    $(bl_weak[0]).prop('checked', false)
+    $(bl_med[0]).prop('checked', false)
+    $(bl_heavy[0]).prop('checked', false)
+    wl_weak_status = 'false'
+    wl_med_status = 'false'
+    wl_heavy_status = 'false'
+    bl_weak_status = 'false'
+    bl_med_status = 'false'
+    bl_heavy_status = 'false'
+
+    #    $(tbody).empty()
+    dropdown_wrapper = $(this).parent()
+    if ($('.dispute-entry-checkbox:checked').length == 1)
+      submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
+      entry_content = ''
+
+      $('.dispute-entry-checkbox:checked').each ->
+
+        entry_row = $(this).parent().parent()[0]
+        entry_content = $(entry_row).find('.entry-col-content').text()
+        wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
+
+        data = {
+# Send entry content to reptool
+          'entry' : entry_content
+        }
+
+        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+        $.ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+          method: 'GET'
+          headers: headers
+          data: data
+          dataType: 'json'
+          success: (response) ->
+#values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+
+            response = JSON.parse(response)
+            if response.data != ""
+
+              $(response.data).each ->
+                if String(this) == 'WL-weak'
+                  $(wl_weak[0]).prop('checked', true)
+                  wl_weak_status = 'true'
+                if String(this) == 'WL-med'
+                  $(wl_med[0]).prop('checked', true)
+                  wl_med_status = 'true'
+                if String(this) == 'WL-heavy'
+                  $(wl_heavy[0]).prop('checked', true)
+                  wl_heavy_status = 'true'
+                if String(this) == 'BL-weak'
+                  $(bl_weak[0]).prop('checked', true)
+                  bl_weak_status = 'true'
+                if String(this) == 'BL-med'
+                  $(bl_med[0]).prop('checked', true)
+                  bl_med_status = 'true'
+                if String(this) == 'BL-heavy'
+                  $(bl_heavy[0]).prop('checked', true)
+                  bl_heavy_status = 'true'
+
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text(response.data)
+              $(submit_button).attr('disabled', false)
+            else
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text('Not on a list')
+              $(submit_button).attr('disabled', false)
+#this should probably call the resync data then reload the page, for an up to date score
+
+          error: (response) ->
+            popup_response_error(response, 'Error retrieving WL/BL Data')
+        )
+
     else
       $(dropdown_wrapper).removeClass('open')
-      alert ('No rows selected')
+      alert ('Please select 1 row')
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
@@ -1134,11 +1472,6 @@ $ ->
 #      submit that shit
     else
       alert('No disputes selected')
-
-
-
-#      BFRP (Research tools page)
-
 
 # Inline WLBL Adjust Button
   $('.bfrp-inline-wlbl-button').click ->
@@ -1239,6 +1572,27 @@ $ ->
       error: (response) ->
         popup_response_error(response, 'Error retrieving WL/BL Data')
     )
+
+
+$ ->
+  $(document).ready ->
+
+    setInterval ->
+      if window.current_search_data
+        window.populate_webrep_index_table(window.current_search_data)
+    , 60000
+
+    $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
+      $(this).tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+          'tooltipster-borderless-comment'
+          ]
+        'maxWidth': 500
+      $(this).tooltipster 'show'
+    return
+
 
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made

@@ -117,6 +117,7 @@ Rails.application.routes.draw do
     resources :org_subsets, except: [:show]
     resources :migrations, only: [:index]
     resources :morsels, only: [:index, :show]
+    resources :delayed_jobs, only: [:index]
     resources :notes, only: [:index, :edit, :update, :destroy] do
       member do
         get :related

@@ -13,4 +13,6 @@ class Bridge::ComplaintCreatedEvent < Bridge::BaseMessage
                     ac_status: Complaint::AC_SUCCESS
                     })
   end
+
+  handle_asynchronously :post, :queue => "complaint_created"
 end
