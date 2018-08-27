@@ -6,7 +6,7 @@
     %a#dashboard.nav-page-button{href: '/escalations/webrep/dashboard', class: ("active" if current_page?('/escalations/webrep/dashboard'))}
       %span.nav-toolbar-icon-large.icon-dashboard
 
-    %a#queue.nav-page-button{href: '/escalations/webrep/tickets', class: ("active" if current_page?('/escalations/webrep/tickets'))}
+    %a#queue.nav-page-button{href: '/escalations/webrep/tickets?f=open', class: ("active" if current_page?('/escalations/webrep/tickets'))}
       %span.nav-toolbar-icon-large.icon-queue
 
     %a#research.nav-page-button{href: '/escalations/webrep/research', class: ("active" if current_page?('/escalations/webrep/research'))}
@@ -18,32 +18,32 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        %li
-          %a{onclick: 'standard_webrep_index_table("recently_viewed");'}
+        %li{class: ("selected" if params[:f] == "recently_viewed")}
+          %a{href: '?f=recently_viewed'}
             %span.nav-dropdown-icon.icon-recently-viewed
             Recently Viewed
-        %li
-          %a{onclick: 'standard_webrep_index_table("my_disputes");'}
+        %li{class: ("selected" if params[:f] == "my_disputes")}
+          %a{href: '?f=my_disputes'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
-        %li
-          %a{onclick: 'standard_webrep_index_table("my_open");'}
+        %li{class: ("selected" if params[:f] == "my_open")}
+          %a{href: '?f=my_open'}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
-        %li
-          %a{onclick: 'standard_webrep_index_table("team_disputes");'}
+        %li{class: ("selected" if params[:f] == "team_disputes")}
+          %a{href: '?f=team_disputes'}
             %span.nav-dropdown-icon.icon-team-bugs
             My Team Tickets
-        %li
-          %a{onclick: 'standard_webrep_index_table("open");'}
+        %li{class: ("selected" if params[:f] == "open")}
+          %a{href: '?f=open'}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
-        %li
-          %a{onclick: 'standard_webrep_index_table("closed");'}
+        %li{class: ("selected" if params[:f] == "closed")}
+          %a{href: '?f=closed'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
-        %li
-          %a{onclick: 'standard_webrep_index_table("all");'}
+        %li{class: ("selected" if params[:f] == "all")}
+          %a{href: '?f=all'}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 
@@ -82,4 +82,10 @@
 
     -##username= current_user.cvs_username
 
-= render template: "layouts/rocket" 
+= render template: "layouts/rocket"
+
+- if params[:f]
+  :javascript
+    $(document).ready(function(){
+      standard_webrep_index_table("#{params[:f]}")
+    })
