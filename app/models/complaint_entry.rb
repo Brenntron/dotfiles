@@ -295,7 +295,7 @@ class ComplaintEntry < ApplicationRecord
       when "ACTIVE"
         where.not(status:"COMPLETED").where.not(status:"NEW")
       when "REVIEW"
-        params[:self_review]? where(is_important:true) : where(is_important:true).where.not(user:user)
+        where(status: "PENDING")
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
