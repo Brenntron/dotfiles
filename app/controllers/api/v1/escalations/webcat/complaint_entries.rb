@@ -28,7 +28,7 @@ module API
                 optional :resolution, type: String
                 optional :category, type: String
                 optional :status, type: String
-                optional :complaint_id, type: Integer
+                optional :complaint_id, type: Array
               end
               optional :search_type, type: String
               optional :search_name, type: String

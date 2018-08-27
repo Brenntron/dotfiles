@@ -911,7 +911,7 @@ window.advanced_webcat_index_table = () ->
       resolution: $('#cat_named_search').find('select[id="resolution-input"]').val()
       category: $('#cat_named_search').find('input[id="category-input"]').val()
       status: $('#cat_named_search').find('select[id="status-input"]').val()
-      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val()
+      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val().split(",")
     }
     search_type: 'advanced'
     search_name: $('#cat_named_search').find('input[name="search_name"]').val()
