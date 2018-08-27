@@ -10,7 +10,7 @@
       .case-id-wrapper
         %label.content-label-sm
           Case ID
-        - if @dispute.status == 'DUPLICATE'
+        - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
           .duplicate-email-notice
           Duplicate
         .bug-top-id
@@ -27,15 +27,15 @@
             %span= @dispute.assignee || "None"
           .dispute-owner-buttons-wrapper
             - if @dispute.assignee == current_user.email
-              - if @dispute.status != 'DUPLICATE'
+              - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                 %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
             - else
-              - if @dispute.status != 'DUPLICATE'
+              - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                 %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
 
             - if current_user.has_role?('manager')
               %span.dropdown
-                - if @dispute.status != 'DUPLICATE'
+                - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                   %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                 .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                   .change-assignee-dropdown-wrapper
@@ -59,7 +59,7 @@
           Status
         %br
         -##bugzilla_popover_state
-        - if @dispute.status != 'DUPLICATE'
+        - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
           %span.dropdown
             %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               - if @dispute.status.nil?
@@ -156,7 +156,7 @@
         %label.content-label-sm
           Age
         %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
-      - if @dispute.status != 'DUPLICATE'
+      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         .top-info-buttons-wrapper
           %button.edit-button.dispute-top-buttons#edit-dispute-button
           %button.save-button.dispute-top-buttons#save-dispute-button.hidden{onclick: 'save_dispute();'}

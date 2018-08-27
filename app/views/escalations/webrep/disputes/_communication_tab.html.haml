@@ -230,7 +230,7 @@
 
 
   .col-sm-3
-    - if @dispute.status != 'DUPLICATE'
+    - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
       %h1.notes-header Notes
       %button.add-case-note-button#new-case-note-button
         Add Note
