@@ -1211,7 +1211,7 @@ $ ->
     # `d` is the original data object for the row
     table_head + entry_rows.join('') + '</tbody></table>'
 
-  if $('#disputes-index').length
+  if !window.filter_param && $('#disputes-index').length
     standard_webrep_index_table('open')
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
