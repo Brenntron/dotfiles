@@ -394,8 +394,6 @@ class DisputeEntry < ApplicationRecord
         entry.consolidated_wlbl_strings = entry.wbrs_list_type
       end
 
-      # Yes it is ugly to do these separately but right now I need the granularity of seeing which if any part of this fails
-
       unique_entries = entries.uniq{|e| e.hostlookup}
       duplicate_entries = entries - unique_entries
 
@@ -408,41 +406,43 @@ class DisputeEntry < ApplicationRecord
 
       if research_params['scope'] == "strict"
         unless entries.find{|entry| url == entry.uri}
-          entries << DisputeEntry.new(uri: url)
+          return entries << DisputeEntry.new(uri: url)
         end
       end
 
-    entries.each do |entry|
-      is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
-      wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+      if research_params['broad'] || entries.find{|entry| url == entry.uri}
+        entries.each do |entry|
+          is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
+          wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
+          wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
 
-      entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
-      wbrs_stuff_rulehits.each do |rule_hit|
-        new_rule_hit = DisputeRuleHit.new
-        new_rule_hit.dispute_entry_id = entry.id
-        new_rule_hit.name = rule_hit.strip
-        new_rule_hit.rule_type = "WBRS"
-        entry.dispute_rule_hits << new_rule_hit
-      end
+          entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
+          wbrs_stuff_rulehits.each do |rule_hit|
+            new_rule_hit = DisputeRuleHit.new
+            new_rule_hit.dispute_entry_id = entry.id
+            new_rule_hit.name = rule_hit.strip
+            new_rule_hit.rule_type = "WBRS"
+            entry.dispute_rule_hits << new_rule_hit
+          end
 
-      if is_ip_address === true
-        sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
-        entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
-        sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
+          if is_ip_address === true
+            sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+            entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
+            sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
 
-        sbrs_stuff_rules.each do |rule_hit|
-          new_rule_hit = DisputeRuleHit.new
-          new_rule_hit.dispute_entry_id = entry.id
-          new_rule_hit.name = rule_hit.strip
-          new_rule_hit.rule_type = "SBRS"
-          entry.dispute_rule_hits << new_rule_hit
+            sbrs_stuff_rules.each do |rule_hit|
+              new_rule_hit = DisputeRuleHit.new
+              new_rule_hit.dispute_entry_id = entry.id
+              new_rule_hit.name = rule_hit.strip
+              new_rule_hit.rule_type = "SBRS"
+              entry.dispute_rule_hits << new_rule_hit
+            end
+
+          end
+
         end
 
       end
-
-    end
-
 
       entries
     else
