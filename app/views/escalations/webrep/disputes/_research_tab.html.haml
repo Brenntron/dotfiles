@@ -22,10 +22,10 @@
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div
           %label.toolbar-section-label Edit
-          %button.toolbar-button.edit-button#edit-dispute-entry-button
+          %button.toolbar-button.edit-button#edit-dispute-entry-button.esc-tooltipped{title: 'Edit Dispute Entry'}
             %span.toolbar-button-text Edit Dispute Entry
           %span.dropdown
-            %button.toolbar-button.add-dispute-entry#add-entries-button.dropdown-toggle{title: 'Add Dispute Entry', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button.toolbar-button.add-dispute-entry#add-entries-button.dropdown-toggle.esc-tooltipped{title: 'Add Dispute Entry', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Add Dispute Entry
             .dropdown-menu.toolbar-dropdown#add_entries_dropdown{'aria-labelledby': 'add-entries-button'}
               .input-group.add-entry-group
@@ -40,7 +40,7 @@
         %div
           %label.toolbar-section-label Reputation
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               -#For each checked checkbox populate this information
@@ -111,7 +111,7 @@
                         Submit Changes
 
           %span.dropdown
-            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
               =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
@@ -281,10 +281,10 @@
                   %td.dispute_rep_tools
                     %span.dispute_rep_tools_wrapper
                       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                        %button.dispute-inline-buttons.edit-button.inline-edit-entry-button{'data-entry-id': "#{entry.id}"}
+                        %button.dispute-inline-buttons.edit-button.inline-edit-entry-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'Edit this entry'}
                       %span.dropdown
                         - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                          %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle.esc-tooltipped{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
                           = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                             .dispute-wlbl-adjust-wrapper
@@ -417,7 +417,7 @@
                                   %button.primary.dropdown-submit-button{type:'button', onclick:'row_adjust_wlbl_button(this);', disabled: true} Submit Changes
                       %span.dropdown
                         - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle.esc-tooltipped{onclick: "inline_load_reptool_button(this)", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                           = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                             .dispute-reptool-adjust-wrapper
