@@ -336,7 +336,7 @@ class ComplaintEntry < ApplicationRecord
       when "ACTIVE"
         where.not(status:"COMPLETED").where.not(status:"NEW")
       when "REVIEW"
-        params[:self_review]? where(is_important:true) : where(is_important:true).where.not(user:user)
+        where(status: "PENDING")
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
@@ -443,6 +443,11 @@ class ComplaintEntry < ApplicationRecord
     end
 
     entry_params = params.fetch('complaint_entries', {})
+
+    if entry_params['complaint_id'] == [""]
+      entry_params.delete('complaint_id')
+    end
+
     entry_params = entry_params.select{|ignore_key, value| value.present?}
     if entry_params.any?
       complaint_entry_fields = entry_params.slice(*%w{complaint_id resolution status})
