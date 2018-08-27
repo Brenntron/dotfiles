@@ -3,13 +3,13 @@
 
 - content_for(:nav_banner) do
   .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
-    %a#dashboard.nav-page-button{href: '/escalations/webrep/dashboard'}
+    %a#dashboard.nav-page-button{href: '/escalations/webrep/dashboard', class: ("active" if current_page?('/escalations/webrep/dashboard'))}
       %span.nav-toolbar-icon-large.icon-dashboard
 
-    %a#queue.nav-page-button{href: '/escalations/webrep/tickets?f=open'}
+    %a#queue.nav-page-button{href: '/escalations/webrep/tickets?f=open', class: ("active" if current_page?('/escalations/webrep/tickets'))}
       %span.nav-toolbar-icon-large.icon-queue
 
-    %a#research.nav-page-button{href: '/escalations/webrep/research'}
+    %a#research.nav-page-button{href: '/escalations/webrep/research', class: ("active" if current_page?('/escalations/webrep/research'))}
       %span.nav-toolbar-icon-large.icon-research
 
   .nav-tool-blocks.col-xs-2.col-sm-2.col-lg-2.dropdown
