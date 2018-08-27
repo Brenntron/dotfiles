@@ -3135,6 +3135,8 @@ fieldset.top-content {
 
 .note-block pre {
   background-color: transparent;
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
 }
 
 .case-history-icon {
@@ -3158,6 +3160,10 @@ fieldset.top-content {
   width: 100%;
   font-size: 8pt;
   line-height: 1.3em;
+}
+
+.note-history-row .case-history-preview {
+  word-break: break-all;
 }
 
 .case-history-author {
