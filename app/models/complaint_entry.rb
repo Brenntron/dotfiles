@@ -98,39 +98,80 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
-  def change_category(prefix, categories_string, entry_status, comment,resolution_comment, current_user, commit_pending)
+  def change_category(prefix,
+                      categories_string,
+                      entry_status,
+                      comment,
+                      resolution_comment,
+                      current_user,
+                      commit_pending)
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important
         if self.status == "PENDING"
           if commit_pending == "commit"
+            # commit from pending of important case
+
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(resolution:entry_status,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
+            update(resolution:entry_status,
+                   status:current_status,
+                   internal_comment: comment,
+                   resolution_comment: resolution_comment,
+                   case_resolved_at: Time.now,
+                   user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             if entry_status != "INVALID"
-              commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+              commit_category(ip_or_uri: self.uri_or_ip,
+                              categories_string: categories_string,
+                              description: comment,
+                              user: current_user.email)
             end
             cat_from_wbrs = self.set_current_category
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
+            # dismiss from pending of important case
+
             current_status = "ASSIGNED"
-            update(status:current_status, internal_comment: comment, resolution_comment: resolution_comment, case_assigned_at: Time.now)
+            update(status:current_status,
+                   internal_comment: comment,
+                   resolution_comment: resolution_comment,
+                   case_assigned_at: Time.now,
+                   was_dismissed: true)
           end
         else
+          # important not from pending
+
           current_status = "PENDING"
-          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, user:current_user)
+          update(resolution: entry_status,
+                 url_primary_category: categories_string,
+                 category: categories_string,
+                 status:current_status,
+                 internal_comment: comment,
+                 resolution_comment: resolution_comment,
+                 user:current_user)
         end
       else
+        # not important case
+
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
-        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
+        update(resolution: entry_status,
+               url_primary_category: categories_string,
+               category: categories_string,
+               status: current_status,
+               internal_comment: comment,
+               resolution_comment: resolution_comment,
+               case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         if entry_status != "INVALID"
-          commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+          commit_category(ip_or_uri: self.uri_or_ip,
+                          categories_string: categories_string,
+                          description: comment,
+                          user: current_user.email)
         end
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)

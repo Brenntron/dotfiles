@@ -181,6 +181,9 @@ window.updatePending = (id,row_id) ->
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
 
+        if json.was_dismissed
+          temp_row.node().className += ' highlight-was-dismissed'
+
         temp_row.data().status = json.status
         temp_row.data().resolution = resolution
         temp_row.data().internal_comment = comment

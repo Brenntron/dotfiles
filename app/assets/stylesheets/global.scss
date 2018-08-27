@@ -6109,6 +6109,20 @@ th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc 
   overflow-y: scroll !important;
 }
 
+.highlight-was-dismissed .important-flag-col span::after {
+  display: block;
+  background-image: url(image_path('icon_reviewed_check.svg'));
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  margin-left: 24px;
+  content: '';
+}
+
+.highlight-was-dismissed .important-flag-col {
+  min-width: 50px;
+}
+
 #dispute-index-title {
   display: inline-block;
 }

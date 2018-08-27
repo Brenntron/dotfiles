@@ -1186,6 +1186,8 @@ $ ->
         important = 'entry-important-flag'
       else
         important = ''
+      if this.entry.was_dismissed
+        important = important + ' entry-was-dismissed-flag'
       dispute_entry_id = this.entry.id
       if this.entry.wbrs_score != null
         wbrs_score = this.entry.wbrs_score

@@ -77,6 +77,7 @@ module API
                   complaint_entry_packet[:ip_address] = complaint_entry.ip_address
                   complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
+                  complaint_entry_packet[:was_dismissed] = complaint_entry.was_dismissed?
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
                   complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
                   complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
@@ -178,7 +179,7 @@ module API
               rescue Exception => e
                 return e.message
               end
-              {status:entry.status, entry_resolution:permitted_params['commit']}.to_json
+              {status:entry.status, entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
 
