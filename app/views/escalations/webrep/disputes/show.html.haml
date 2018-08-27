@@ -10,9 +10,6 @@
       .case-id-wrapper
         %label.content-label-sm
           Case ID
-        - if @dispute.status == 'DUPLICATE'
-          .duplicate-email-notice
-          Duplicate
         .bug-top-id
           %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
@@ -58,8 +55,6 @@
         %label.content-label-sm
           Status
         %br
-        -##bugzilla_popover_state
-<<<<<<< HEAD
         - if @dispute.status != 'DUPLICATE'
           %span.dropdown
             %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down(#{@dispute.id})"}
@@ -132,7 +127,8 @@
                     %button.primary{onClick: 'show_page_edit_status()'}
                       Submit
         - else
-          =@dispute.status
+          .duplicate-status-notice
+            =@dispute.status
       .disposition-wrapper
         %label.content-label-sm
           Suggested Disposition
