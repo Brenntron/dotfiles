@@ -9,9 +9,9 @@
     #research-tab-toolbar.toolbar
       %div
         %label.toolbar-section-label Table View
-        %button.toolbar-button.expand-row-button#expand-all-rows
+        %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped{title: 'Expand All Rows'}
           %span.toolbar-button-text Expand All Rows
-        %button.toolbar-button.collapse-button#collapse-all-rows
+        %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
           %span.toolbar-button-text Collapse All Rows
         -#%span.dropdown
         -#  %button.toolbar-button.sort-by-button#sort-table-by{title: 'Sort Table By', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -22,25 +22,22 @@
       - if @dispute.status != 'DUPLICATE'
         %div
           %label.toolbar-section-label Edit
-          %button.toolbar-button.edit-button#edit-dispute-entry-button
+          %button.toolbar-button.edit-button#edit-dispute-entry-button.esc-tooltipped{title: 'Edit Dispute Entry'}
             %span.toolbar-button-text Edit Dispute Entry
           %span.dropdown
-            %button.toolbar-button.add-dispute-entry#add-entries-button.dropdown-toggle{title: 'Add Dispute Entry', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button.toolbar-button.add-dispute-entry#add-entries-button.dropdown-toggle.esc-tooltipped{title: 'Add Dispute Entry', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Add Dispute Entry
             .dropdown-menu.toolbar-dropdown#add_entries_dropdown{'aria-labelledby': 'add-entries-button'}
               .input-group.add-entry-group
                 %input{id: 'add_dispute_entry', name: 'dispute_entry_content', class: 'form-control', placeholder: 'Entry Content'}
                   %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_add_dispute_entry', onclick: 'add_dispute_entry();'}
                     Submit
-              .loading-bar
-                .load-bar-segment.hidden
-                .load-bar-segment.hidden
-                .load-bar-segment.hidden
+
       - if @dispute.status != 'DUPLICATE'
         %div
           %label.toolbar-section-label Reputation
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               -#For each checked checkbox populate this information
@@ -57,6 +54,7 @@
                         %td.wlbl-entry-content
                         %td.wlbl-entry-wlbl
                         %td.wlbl-current-entry-wbrs.text-center
+
 
                       -#    Removing for now. We can't do a preview until the api is updated to provide that info
                       -#%td.text-center
@@ -111,7 +109,7 @@
                         Submit Changes
 
           %span.dropdown
-            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
               =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
@@ -157,13 +155,13 @@
 
       %div
         %label.toolbar-section-label Data
-        %button.toolbar-button.sync-button#sync-data-button
+        %button.toolbar-button.sync-button#sync-data-button.esc-tooltipped{title: 'Refresh Data'}
           %span.toolbar-button-text Refresh Data
 
       .edit-button-wrapper.edit-entries-buttons.hidden
-        %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
+        %button.save-all-changes.panel-button.save-button.esc-tooltipped{title: 'Save All Changes',
                                                                      onclick: 'save_dispute_entries();'}
-        %button.cancel-changes.panel-button.cancel-button.tooltipped{title: 'Cancel'}
+        %button.cancel-changes.panel-button.cancel-button.esc-tooltipped{title: 'Cancel'}
 
 .row
   .col-xs-12
@@ -206,7 +204,7 @@
                         = entry[:status]
 
                     %span.dropdown
-                      %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "entry_status_drop_down(#{entry.id})"}
                         - if entry[:status].nil?
                           NEW
                         - else
@@ -214,19 +212,19 @@
                       .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
                         %ul
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RESEARCHING'}
+                            %input.entry-status-radio{class: "radio-dispute-#{entry.id}", type: 'radio', name: 'entry-status', id: "RESEARCHING"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ESCALATED'}
+                            %input.entry-status-radio{class: "radio-dispute-#{entry.id}", type: 'radio', name: 'entry-status', id: "ESCALATED"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} Escalated
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'CUSTOMER_PENDING'}
+                            %input.entry-status-radio{class: "radio-dispute-#{entry.id}", type: 'radio', name: 'entry-status', id: "CUSTOMER_PENDING"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}"} Customer Pending
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ON_HOLD'}
+                            %input.entry-status-radio{class: "radio-dispute-#{entry.id}", type: 'radio', name: 'entry-status', id: "ON_HOLD"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} On Hold
                           %li.status-radio-wrapper
-                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'RESOLVED_CLOSED'}
+                            %input.entry-status-radio.resolution-drodown-menu{class: "radio-dispute-#{entry.id}", type: 'radio', name: 'entry-status', id: 'RESOLVED_CLOSED', 'onclick': "entry_resolution_drop_down(#{entry.id})"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}"} Resolved / Closed
                             .dropdown-menu.ticket-resolution-submenu
                               .col-xs-6.submenu-left-wrapper
@@ -234,28 +232,28 @@
                                   Ticket Resolution
                                 %ul
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FP'}
+                                    %input.entry-resolution-radio{class: "resolution-dispute-#{entry.id}", type: 'radio', name: 'entry-resolution', id: 'FIXED_FP'}
                                     %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FN'}
+                                    %input.entry-resolution-radio{class: "resolution-dispute-#{entry.id}", type: 'radio', name: 'entry-resolution', id: 'FIXED_FN'}
                                     %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'UNCHANGED'}
+                                    %input.entry-resolution-radio{class: "resolution-dispute-#{entry.id}", type: 'radio', name: 'entry-resolution', id: 'UNCHANGED'}
                                     %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"} Unchanged
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'INVALID'}
+                                    %input.entry-resolution-radio{class: "resolution-dispute-#{entry.id}", type: 'radio', name: 'entry-resolution', id: 'INVALID'}
                                     %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'TEST_TRAINING'}
+                                    %input.entry-resolution-radio{class: "resolution-dispute-#{entry.id}", type: 'radio', name: 'entry-resolution', id: 'TEST_TRAINING'}
                                     %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_TEST}"} Test / Training
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'OTHER'}
+                                    %input.entry-resolution-radio{class: "resolution-dispute-#{entry.id}", type: 'radio', name: 'entry-resolution', id: 'OTHER'}
                                     %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
                               .col-xs-6.submenu-right-wrapper
                                 .resolution-comment-wrapper
-                                  %label.content-label-sm
-                                    Comment
-                                  %textarea{name: 'resolution-comment'}
+                                  %label.content-label-sm.customer-facing-comment
+                                    Customer Facing Comment
+                                  %textarea{name: 'resolution-comment', id: "resolution-comment-#{entry.id}"}
 
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RE-OPENED'}
@@ -281,147 +279,86 @@
                   %td.dispute_rep_tools
                     %span.dispute_rep_tools_wrapper
                       - if @dispute.status != 'DUPLICATE'
-                        %button.dispute-inline-buttons.edit-button.inline-edit-entry-button{'data-entry-id': "#{entry.id}"}
+                        %button.dispute-inline-buttons.edit-button.inline-edit-entry-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'Edit this entry'}
                       %span.dropdown
                         - if @dispute.status != 'DUPLICATE'
-                          %button.dispute-inline-buttons.adjust-wlbl-button.dropdown-toggle{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle.esc-tooltipped{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+
                         .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
                           = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                             .dispute-wlbl-adjust-wrapper
-                              %input.adjust-wlbl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}"}
+                              %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
                               %h3 Adjust WL/BL
                               %table.dispute_tool_current
-                                %tr
-                                  %td
-                                    %label.content-label-sm Current WL/BL List
-                                    %br
-                                    - if entry.wbrs_list_type.nil?
-                                      %span.missing-data Not currently on a list
-                                    - else
-                                      %span= entry.wbrs_list_type
-                                  %td.text-center
-                                    %label.content-label-sm Current WBRS Score
-                                    %br
-                                    - if entry.wbrs_score.nil?
-                                      %span.current-wbrs-score.missing-data
-                                        No score.
-                                    - else
-                                      %span.current-wbrs-score
-                                        = entry.wbrs_score
+                                %thead
+                                  %tr
+                                    %th.content-label-sm.no-word-break Current WL/BL List
+                                    %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                                %tbody
+                                  %tr
+                                    %td.wlbl-entry-wlbl
+                                    %td.wlbl-current-entry-wbrs.text-center
 
-                                  -#    Removing for now. We can't do a preview until the api is updated to provide that info
-                                  -#%td.text-center
-                                  -#  %label.content-label-sm New Score
-                                  -#  %br
-                                  -#  %span.new_wbrs_score
+                                    -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                                    -#%td.text-center
+                                    -#  %label.content-label-sm New Score
+                                    -#  %br
+                                    -#  %span.new_wbrs_score
                               .inline-tool-content-wrapper
                                 .row
                                   .col-xs-12
-                                    %label.content-label-sm{for: "entry-#{entry.id}-wlbl-list-type-select"} Adjust WL/BL List
-                                - unless entry.wbrs_list_type.nil?
-                                  - entry.wbrs_list_type.split(/\s*,\s*/).each do |list|
-                                    .row
-                                      .col-xs-6
-                                        %ul.wlbl-toggle-list
-                                          %li
-                                            %label.toggle-switch
-                                              - if list == 'wl-weak'
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak", checked: true}
-                                              - else
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
-                                              %span.toggle-slider
-                                            WL - Weak
-                                          %li
-                                            %label.toggle-switch
-                                              - if list == 'wl-med'
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med", checked: true}
-                                              - else
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
-                                              %span.toggle-slider
-                                            WL - Medium
-                                          %li
-                                            %label.toggle-switch
-                                              - if list == 'wl-heavy'
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy", checked: true}
-                                              - else
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
-                                              %span.toggle-slider
-                                            WL - Heavy
-                                      .col-xs-6
-                                        %ul.wlbl-toggle-list
-                                          %li
-                                            %label.toggle-switch
-                                              - if list == 'bl-weak'
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak", checked: true}
-                                              - else
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
-                                              %span.toggle-slider
-                                            BL - Weak
-                                          %li
-                                            %label.toggle-switch
-                                              - if list == 'bl-med'
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med", checked: true}
-                                              - else
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
-                                              %span.toggle-slider
-                                            BL - Medium
-                                          %li
-                                            %label.toggle-switch
-                                              - if list == 'bl-heavy'
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy", checked: true}
-                                              - else
-                                                %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
-                                              %span.toggle-slider
-                                            BL - Heavy
-                                - else
-                                  .row
-                                    .col-xs-6
-                                      %ul.wlbl-toggle-list
-                                        %li
-                                          %label.toggle-switch
-                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
-                                            %span.toggle-slider
-                                          WL - Weak
-                                        %li
-                                          %label.toggle-switch
-                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
-                                            %span.toggle-slider
-                                          WL - Medium
-                                        %li
-                                          %label.toggle-switch
-                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
-                                            %span.toggle-slider
-                                          WL - Heavy
-                                    .col-xs-6
-                                      %ul.wlbl-toggle-list
-                                        %li
-                                          %label.toggle-switch
-                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
-                                            %span.toggle-slider
-                                          BL - Weak
-                                        %li
-                                          %label.toggle-switch
-                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
-                                            %span.toggle-slider
-                                          BL - Medium
-                                        %li
-                                          %label.toggle-switch
-                                            %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
-                                            %span.toggle-slider
-                                          BL - Heavy
+                                    %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
+                                .row
+                                  .col-xs-6
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
+                                          %span.toggle-slider
+                                        WL - Weak
+                                      %li
+                                        %label.toggle-switch
+                                          %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
+                                          %span.toggle-slider
+                                        WL - Medium
+                                      %li
+                                        %label.toggle-switch
+                                          %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
+                                          %span.toggle-slider
+                                        WL - Heavy
+                                  .col-xs-6
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
+                                          %span.toggle-slider
+                                        BL - Weak
+                                      %li
+                                        %label.toggle-switch
+                                          %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
+                                          %span.toggle-slider
+                                        BL - Medium
+                                      %li
+                                        %label.toggle-switch
+                                          %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
+                                          %span.toggle-slider
+                                        BL - Heavy
 
                                 .comment-wrapper
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-wlbl-input.note-input
                                 .button-row-center
-                                  %button.primary.dropdown-submit-button{type:'button', onclick:'row_adjust_wlbl_button(this);', disabled: true} Submit Changes
+                                  %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'row_research_adjust_wlbl_button(this);'}
+                                    Submit Changes
                       %span.dropdown
                         - if @dispute.status != 'DUPLICATE'
-                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle.esc-tooltipped{onclick: "inline_load_reptool_button(this)", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+
                         .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                           = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                             .dispute-reptool-adjust-wrapper
                               %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
+                              %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
                               %h3 Adjust RepTool WL/BL
                               %table.dispute_tool_current
                                 %tr
@@ -429,7 +366,7 @@
                                     %label.content-label-sm Classification
                                     %br
                                     - if entry.classifications.empty?
-                                      %span.missing-data Not on RepTool
+                                      %span.entry-reptool-class Not on RepTool
                                     - else
                                       %span.entry-reptool-class
                                         = entry.classifications.first
@@ -437,7 +374,7 @@
                                     %label.content-label-sm Expiration
                                     %br
                                     - if entry.blacklist&.expiration.nil?
-                                      %span.missing-data N/A
+                                      %span.entry-reptool-expiration N/A
                                     - else
                                       %span.entry-reptool-expiration
                                         = entry.blacklist&.expiration
@@ -447,7 +384,7 @@
                                     %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
                                     -# Need to add an 'N/A' option in the dropdown for if an item has no classifications
                                     -# in RepTool
-                                    = rep_form.select(:action, ['Active', 'Expired'],
+                                    = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
                                       {selected: entry.blacklist ? 'Active' : 'Expired'},
                                       class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
                                       title: 'RepTool Rule Status',
@@ -464,7 +401,7 @@
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
                                 .button-row-center
-                                  %button.primary.dropdown-submit-button{type: 'button', onclick: 'row_adust_reptool_bl_button(this)'} Submit Changes
+                                  %button.primary.dropdown-submit-button{type: 'button', onclick: 'row_adust_reptool_bl_button(this)', disabled: true} Submit Changes
                 %tr.research-overview-row
                   %td
                     -#Expander area
@@ -481,7 +418,7 @@
                               No score.
                           - else
                             %span.current-wbrs-score
-                              = entry.wbrs_score
+                              = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
@@ -556,7 +493,7 @@
                               No score.
                           - else
                             %span.current-sbrs-score
-                              = entry.sbrs_score
+                              = entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                         %td
                           %label SBRS Rule Hits
                         %td.text-center
@@ -609,7 +546,10 @@
                       .row
                         .col-sm-3
                           .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header WBRS Rule Hit Details
+                            %h5.entry-details-table-header
+                              WBRS Rule Hit Details
+                              %span.nested-table-tally
+                                = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size
                             - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.empty?
                               %table
                                 %thead
@@ -632,7 +572,10 @@
                                       %td
                                         -#Put weight of rule here
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header SBRS Rule Hit Details
+                            %h5.entry-details-table-header
+                              SBRS Rule Hit Details
+                              %span.nested-table-tally
+                                = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
                             - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "SBRS"}.empty?
                               %table
                                 %thead
@@ -660,7 +603,10 @@
                                       %td
                                         -#Put weight of rule here
                           .entry-details-table.virustotal-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Virustotal Details
+                            %h5.entry-details-table-header
+                              Virustotal Details
+                              %span.nested-table-tally
+                                = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                             - if entry.virustotals.empty?
                               %table
                                 %thead
@@ -686,7 +632,11 @@
                                         %td.unclean-site-result= virustotal[:result]
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header XBRS History
+                            %h5.entry-details-table-header
+                              XBRS History
+                              %span.nested-table-tally
+                                - unless entry.hostlookup.nil?
+                                  = entry.find_xbrs[1]['data'].count
                             - if entry.xbrs_data['data'].empty?
                               %table
                                 %thead
@@ -695,7 +645,7 @@
                                       %span.missing-data
                                         No XBRS data available.
                             - elsif entry.find_xbrs[1]['data'].count < 8
-                              %table
+                              %table.xbrs-short-scrollable
                                 %thead
                                   %tr
                                     - entry.xbrs_data['legend'].each do |header|
@@ -707,7 +657,7 @@
                                         - data.each do |datapoint|
                                           %td= datapoint
                             - else
-                              %table.table-scrollable
+                              %table.xbrs-long-scrollable
                                 %thead
                                   %tr
                                     - entry.xbrs_data['legend'].each do |header|
@@ -720,7 +670,10 @@
                                           %td= datapoint
 
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Cross-listed URLs
+                            %h5.entry-details-table-header
+                              Cross-listed URLs
+                              %span.nested-table-tally
+                                = entry.wbrs_xlist.count
                             - if entry.wbrs_xlist.empty?
                               %table
                                 %thead

@@ -97,7 +97,7 @@ format_domain_info = (info)->
       '<tr>' +
         '<td class="table-side-header">' +
           'Created' +
-        '</td>'
+        '</td>' +
         '<td>' + info.creation_date + '</td>'+
       '</tr><tr>' +
         '<td class="table-side-header">' +
@@ -278,8 +278,8 @@ window.take_selected = ()->
         else
           i = 0
           while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],12).data(json.name).draw()
-            selected_rows.data().cell(selected_rows[0][i],5).data("ASSIGNED").draw()
+            selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
+            selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
             i++
 
       error: (response) ->

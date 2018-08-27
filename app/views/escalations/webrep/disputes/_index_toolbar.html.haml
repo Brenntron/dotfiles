@@ -3,7 +3,7 @@
     %label.toolbar-section-label
       Table View
     %span.dropdown
-      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
@@ -49,7 +49,9 @@
             %li.toggle-vis-nested{'data-column': 'entry-col-content'}
               %input{type: 'checkbox', checked: true} Dispute Entry
             %li.toggle-vis-nested{'data-column': 'entry-col-status'}
-              %input{type: 'checkbox', checked: true} Dispute Entry Status
+              %input{type: 'checkbox', checked: true} Entry Status
+            %li.toggle-vis-nested{'data-column': 'entry-col-res'}
+              %input{type: 'checkbox', checked: true} Entry Resolution
             %li.toggle-vis-nested{'data-column': 'entry-col-disp'}
               %input{type: 'checkbox', checked: true} Suggested Disposition
             %li.toggle-vis-nested{'data-column': 'entry-col-cat'}
@@ -69,20 +71,20 @@
             %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-rules'}
               %input{type: 'checkbox'} SBRS Rules
 
-    %button.toolbar-button.expand-row-button#expand-all-index-rows{title: 'Expand All Rows'}
+    %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped{title: 'Expand All Rows'}
       %span.toolbar-button-text Expand All Rows
-    %button.toolbar-button.collapse-button#collapse-all-index-rows{title: 'Collapse All Rows'}
+    %button.toolbar-button.collapse-button#collapse-all-index-rows.esc-tooltipped{title: 'Collapse All Rows'}
       %span.toolbar-button-text Collapse All Rows
 
   %div
-    %button.take-ticket-button#index_ticket_assign{title: 'Assign to me', onclick: 'take_disputes();'}
+    %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me', onclick: 'take_disputes();'}
       %span.toolbar-button-text
 
   %div
     %label.toolbar-section-label
       Edit Ticket
     %span.dropdown
-      %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-toggle.esc-tooltipped{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Edit Ticket Status
       .dropdown-menu.toolbar-dropdown#index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
@@ -127,8 +129,8 @@
                     %label.ticket-res-radio-label.radio-label{for: 'OTHER'} Other
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
-                  %label.content-label-sm
-                    Comment
+                  %label.content-label-sm.customer-facing-comment
+                    Customer Facing Comment
                   %textarea.ticket-status-comment
                   .button-row-center
                     %button.primary.change_ticket_status_button
@@ -147,18 +149,21 @@
 
     - if current_user.has_role?('manager')
       %span.dropdown
-        %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
             Change Assignee
         .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
-          %select{name: 'index_target_assignee', id: 'index_target_assignee'}
-            - User.all.order('cvs_username ASC').each do |u|
-              %option{id: u.id, value: u.id, label: u.cvs_username}
-          %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
-            Assign
+          .toolbar
+            %div
+              %label.toolbar-section-label Assignee
+              %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                - User.all.order('cvs_username ASC').each do |u|
+                  %option{id: u.id, value: u.id, label: u.cvs_username}
+            %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
+              Assign
 
     %span.dropdown
-      %button#index_mark_related.toolbar-button.mark-related-button{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_mark_related.toolbar-button.mark-related-button.esc-tooltipped{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Mark as Related
       .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
@@ -174,12 +179,12 @@
     %label.toolbar-section-label
       Edit Dispute Entry
     %span.dropdown
-      %button#index-entry-status-button.toolbar-button.ticket-status-button{title: 'Edit Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index-entry-status-button.toolbar-button.ticket-status-button.esc-tooltipped{title: 'Edit Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Edit Entry Status
       .dropdown-menu.toolbar-dropdown#index-edit-entry-status-dropdown{'aria-labelledby': 'index_ticket_status'}
         %ul
-          %li.status-radio-wrapper{}
+          %li.status-radio-wrapper
             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: "#{DisputeEntry::STATUS_RESEARCHING}"}
             %label.entry-status-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
           %li.status-radio-wrapper
@@ -219,8 +224,8 @@
                     %label.entry-res-radio-label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
-                  %label.content-label-sm
-                    Comment
+                  %label.content-label-sm.customer-facing-comment
+                    Customer Facing Comment
                   %textarea.entry-status-comment#entry-status-comment
                   .button-row-center
                     %button.primary{onclick: "toolbar_index_edit_status()"}
@@ -239,29 +244,26 @@
 
 
     %span.dropdown
-      %button#index-adjust-wlbl.toolbar-button.adjust-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index-adjust-wlbl.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text Adjust WL/BL
       .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries_index{'aria-labelledby': 'wlbl_entries_button'}
         -#For each checked checkbox populate this information
         = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
           .dispute-wlbl-adjust-wrapper
+            .dispute-name-wrapper
+              %label.content-label-sm Dispute
+              %br
+              %span.entry-dispute-name
             %table.dispute_tool_current
-              %thead
-                %tr
-                  %th.content-label-sm Dispute
-                  %th.content-label-sm.no-word-break Current WL/BL List
-                  %th.text-center.content-label-sm.no-word-break Current WBRS Score
-              %tbody
-            -#%tr
-            -#  %td.wlbl-entry-content
-            -#  %td.wlbl-entry-wlbl
-            -#  %td.wlbl-current-entry-wbrs.text-center
-
-            -#    Removing for now. We can't do a preview until the api is updated to provide that info
-            -#%td.text-center
-            -#  %label.content-label-sm New Score
-            -#  %br
-            -#  %span.new_wbrs_score
+              %tr
+                %td.text-center
+                  %label.content-label-sm Current Score
+                  %br
+                  %span.current-wbrs-score
+                %td.text-center
+                  %label.content-label-sm New Score
+                  %br
+                  %span.new_wbrs_score
             .inline-tool-content-wrapper
               .row
                 .col-xs-12
@@ -271,34 +273,34 @@
                   %ul.wlbl-toggle-list
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
+                        %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
                         %span.toggle-slider
                       WL - Weak
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
+                        %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
                         %span.toggle-slider
                       WL - Medium
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
+                        %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
                         %span.toggle-slider
                       WL - Heavy
                 .col-xs-6
                   %ul.wlbl-toggle-list
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
+                        %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
                         %span.toggle-slider
                       BL - Weak
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
+                        %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
                         %span.toggle-slider
                       BL - Medium
                     %li
                       %label.toggle-switch
-                        %input{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
+                        %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
                         %span.toggle-slider
                       BL - Heavy
 
@@ -306,19 +308,60 @@
                 %label.content-label-sm Comment
                 %textarea.dropdown-comment.adjust-wlbl-input.note-input
               .button-row-center
-                %button.primary.dropdown-submit-button{type: 'button', onclick:'toolbar_adust_wlbl_button(this);'}
+                %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'index_adjust_wlbl_button(this);'}
                   Submit Changes
 
+    %span.dropdown
+      %button.toolbar-button.adjust-reptool-button.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Adjust RepTool BL
+      .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
+        =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
 
-    %button.toolbar-button.adjust-reptool-button#reptool_entries_button{title: 'Adjust RepTool BL'}
-      %span.toolbar-button-text
-        Adjust RepTool BL
+          .dispute-reptool-adjust-wrapper
+            .dispute-name-wrapper
+              %label.content-label-sm Dispute
+              %br
+              %span.entry-dispute-name
+            %table.dispute_tool_current
+              %tr
+                %td
+                  %label.content-label-sm Classification
+                  %br
+                  %span.entry-reptool-class
+                %td
+                  %label.content-label-sm Expiration
+                  %br
+                  %span.entry-reptool-expiration
+            .inline-tool-content-wrapper
+              .toolbar
+                %div
+                  %label.toolbar-section-label{for: 'blacklist-action-select'} Status
+                  = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
+                            {include_blank: true},
+                            class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
+                            title: 'RepTool Rule Status',
+                            id: "blacklist-action-select")
+
+                %div
+                  %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool WL/BL
+                  = rep_form.select(:classification, RepApi::Blacklist.classifications,
+                            {include_blank: true},
+                            class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
+                            title: "RepTool BL Rules",
+                            id: "blacklist-classifications-select")
+              .comment-wrapper
+                %label.content-label-sm Comment
+                %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+              .button-row-center
+                %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
+                  Submit Changes
   %div
     %label.toolbar-section-label
       File
-    %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :csv), method: :get}
+    %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
       = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-      %button.toolbar-button.export-button{title: 'Export to CSV'}
+      %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
         %span.toolbar-button-text
           Export to CSV
 

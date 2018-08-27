@@ -1,5 +1,7 @@
 .content-wrapper
   %h1#dispute-index-title All Tickets
+  %span.refresh-message#refresh-working-msg
+  %span.refresh-message#refresh-error-msg
 
   = render('index_toolbar')
 
@@ -14,12 +16,12 @@
             -# Expand / Collapse Button
             %th
               %input#disputes_check_box{type: 'checkbox'}
-            %th.center
+            %th.text-center
             -# Priority
             %th Case ID
             %th Status
             %th Resolution
-            %th.center
+            %th.text-center
               -#Ticket Type
             %th Dispute
             %th Owner

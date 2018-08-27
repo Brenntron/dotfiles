@@ -46,7 +46,7 @@ module API
                                                params: permitted_params,
                                                user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
-              json_packet = Dispute.to_data_packet(disputes)
+              json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
               response_data = {status: "success", title: title, data: json_packet}
               if 'advanced' == permitted_params['search_type']
@@ -78,7 +78,13 @@ module API
               dispute.priority = permitted_params[:priority]
               dispute.customer.name = permitted_params[:customer_name]
               dispute.customer.email = permitted_params[:customer_email]
-              dispute.status = permitted_params[:status]
+
+              if permitted_params[:status]
+                dispute.status = permitted_params[:status]
+                if permitted_params[:status] == Dispute::STATUS_ASSIGNED
+                  dispute.case_accepted_at = Time.now
+                end
+              end
 
               if permitted_params[:resolution]
                 dispute.resolution = permitted_params[:resolution]
@@ -187,6 +193,9 @@ module API
                       entry.update(status: DisputeEntry::NEW, case_accepted_at: nil)
                     end
                   end
+
+                  message = Bridge::DisputeEntryUpdateStatusEvent.new
+                  message.post_entries(d.dispute_entries)
                 end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
@@ -275,15 +284,17 @@ module API
               true
             end
 
+            params do
+              requires :dispute_id, type: Integer
+            end
             patch 'take_dispute/:dispute_id' do
               std_api_v2 do
-                authorize!(:update, Dispute)
-                dispute = Dispute.find(params['dispute_id'])
+                dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
                 dispute.take_ticket(user: current_user)
 
-                { username: current_user.display_name, dispute_id: dispute.id }
+                { username: current_user.cvs_username, dispute_id: dispute.id }
               end
             end
 
@@ -298,6 +309,24 @@ module API
                 Dispute.take_tickets(dispute_ids, user: current_user)
 
                 { username: current_user.cec_username, dispute_ids: dispute_ids }
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            patch 'return_dispute/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                authorize!(:update, dispute)
+
+                dispute.return_dispute
+
+                message = Bridge::DisputeEntryUpdateStatusEvent.new
+                message.post_entries(dispute.dispute_entries)
+
+
+                { dispute_id: dispute.id }
               end
             end
 
@@ -331,13 +360,24 @@ module API
                 resolution = params[:resolution]
               end
               if params[:comment].present?
-                comment = params[:comment]
+                if status == 'RESOLVED_CLOSED'
+                  comment = status + ' : ' + resolution + ' - ' + params[:comment]
+                else
+                  comment = status + ' - ' + params[:comment]
+                end
               end
 
               disputes = Dispute.where(id: dispute_ids)
 
               Dispute.process_status_changes(disputes, status, resolution, comment, current_user)
               {:status => "success"}.to_json
+            end
+
+            get ':dispute_id/related_disputes' do
+              std_api_v2 do
+                authorize!(:update, Dispute)
+                Dispute.where(related_id: params['dispute_id'])
+              end
             end
 
             params do
@@ -355,12 +395,13 @@ module API
 
             params do
               requires :relating_dispute_ids, type: Array[Integer]
+              optional :original_dispute_id, type: Integer
             end
             patch 'related_disputes' do
               std_api_v2 do
                 authorize!(:update, Dispute)
                 relating_dispute_ids = permitted_params['relating_dispute_ids']
-                Dispute.where(id: relating_dispute_ids).update_all(related_id: params['original_dispute_id'],
+                Dispute.where(id: relating_dispute_ids).update_all(related_id: permitted_params['original_dispute_id'],
                                                                    related_at: DateTime.now)
                 true
               end
@@ -377,6 +418,67 @@ module API
                 dispute.update!(related_id: permitted_params['related_dispute_id'],
                                 related_at: DateTime.now)
                 true
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            get 'dispute_status/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                status = dispute.status
+
+                {:status => status}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            get 'dispute_resolution/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                resolution = dispute.resolution
+
+                if dispute.resolution_comment.present?
+                  resolution_comment = dispute.resolution_comment
+                else
+                  resolution_comment = ''
+                end
+
+                {:resolution => resolution, :resolution_comment => resolution_comment}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
+            get 'dispute_entry_status/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
+                status = dispute_entry.status
+                {:status => status}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
+            get 'dispute_entry_resolution/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
+
+                resolution = dispute_entry.resolution
+
+                if dispute_entry.resolution_comment.present?
+                  resolution_comment = dispute_entry.resolution_comment
+                else
+                  resolution_comment = ''
+                end
+
+                {:resolution => resolution,
+                 :resolution_comment => resolution_comment}.to_json
               end
             end
 
@@ -411,7 +513,13 @@ module API
               if information[params[:entry]] == "NOT_FOUND"
                 return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
               else
-                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
+                expiration = ""
+                begin
+                  expiration = Time.parse(information[params[:entry]]["expiration"]).to_s
+                rescue
+                  expiration = information[params[:entry]]["expiration"]
+                end
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => expiration, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end

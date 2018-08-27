@@ -14,7 +14,7 @@
           .duplicate-email-notice
           Duplicate
         .bug-top-id
-          %a.case-id-tag#dispute_id= @dispute.case_id_str
+          %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
 
       .dispute-owner-wrapper
@@ -28,15 +28,15 @@
           .dispute-owner-buttons-wrapper
             - if @dispute.assignee == current_user.email
               - if @dispute.status != 'DUPLICATE'
-                %button.return-ticket-button{onclick: 'toolbar_unassign_dispute();'}
+                %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
             - else
               - if @dispute.status != 'DUPLICATE'
-                %button.take-ticket-button#show_ticket_assign{title: "Assign to me", onclick: "take_single_dispute(#{@dispute.id});"}
+                %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
 
             - if current_user.has_role?('manager')
               %span.dropdown
                 - if @dispute.status != 'DUPLICATE'
-                  %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                  %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                 .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                   .change-assignee-dropdown-wrapper
                     %h3 Change Assignee
@@ -59,9 +59,10 @@
           Status
         %br
         -##bugzilla_popover_state
+<<<<<<< HEAD
         - if @dispute.status != 'DUPLICATE'
           %span.dropdown
-            %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down(#{@dispute.id})"}
               - if @dispute.status.nil?
                 NEW
               - else
@@ -121,7 +122,7 @@
                           Submit
 
                 %li.status-radio-wrapper
-                  %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
+                  %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
                   %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
                 %li.non-resolution-submit-wrapper#ticket-non-res-submit
                   %label.content-label-sm
@@ -158,9 +159,9 @@
         %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
       - if @dispute.status != 'DUPLICATE'
         .top-info-buttons-wrapper
-          %button.edit-button.dispute-top-buttons#edit-dispute-button
-          %button.save-button.dispute-top-buttons#save-dispute-button.hidden{onclick: 'save_dispute();'}
-          %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden
+          %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information'}
+          %button.save-button.dispute-top-buttons#save-dispute-button.hidden.esc-tooltipped{title: 'Save ticket changes', onclick: 'save_dispute();'}
+          %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden.esc-tooltipped{title: 'Cancel'}
 
 
   .row#top_bar_extended_info
@@ -195,38 +196,47 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Accept Date
-          %p= @dispute.case_accepted_at&.strftime('%F %T')
+          %p= @dispute.case_accepted_at&.strftime('%F %T') || 'N/A'
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Repsonse Date
-          %p= @dispute.case_responded_at&.strftime('%F %T')
+          %p= @dispute.case_responded_at&.strftime('%F %T') || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Accept
-          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept
+          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Respond
-          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond
+          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Days to Close
-          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close
+          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Close
-          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close
+          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Email Count
-          %p= @dispute.dispute_emails.count
+          %p= @dispute.dispute_emails.count || 'N/A'
         .col-xs-3
           %label.content-label-sm
             Last Updated By
-          %p= @dispute.last_updated_by_username
+          %p= @dispute.last_updated_by_username || 'N/A'
       %h3 Related Cases
-      %button#related-dispute-button
-        Add Related Case
+      %span#related-dispute-dropdown.dropdown
+        %button#related-dispute-button.toolbar-dropdown{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          Add Related Cases
+        .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
+          %form#set-related-dispute-form
+            %label.content-label-sm.related-dropdown-text Ticket Id's
+            %br
+            %input.related-dropdown-text.dispute-id{type: 'text', name: 'related_dispute_id'}
+            .button-row-center
+              %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onClick: 'add_related_case_id()'}
+                Submit
       .row
         .col-xs-2.col-with-divider
           %label.content-label-sm
@@ -234,11 +244,6 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             Date/Time Submitted
-      .row.hidden#related-dispute-input
-        .col-xs-2.col-with-divider
-          %input.dispute-edit-input#related-dispute-id{type: 'text'}
-        .col-xs-2.col-with-divider
-          -#Placeholder for now
       - @dispute.each_related do |dispute_dup|
         .row
           .col-xs-2.col-with-divider

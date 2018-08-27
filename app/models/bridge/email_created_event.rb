@@ -12,4 +12,5 @@ class Bridge::EmailCreatedEvent < Bridge::BaseMessage
                     ac_status: Dispute::AC_SUCCESS
                     })
   end
+  handle_asynchronously :post, :queue => "email_created"
 end

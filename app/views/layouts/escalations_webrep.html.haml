@@ -12,7 +12,7 @@
     %a#research.nav-page-button{href: '/escalations/webrep/research'}
       %span.nav-toolbar-icon-large.icon-research
 
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-lg-2.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
@@ -62,21 +62,7 @@
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
 
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
-    %a{href: '#', class: 'dropdown-toggle', id: 'import-webrep', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-import-white'}
-      Import
-    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'import-webrep'}
-      .input-group.import-group
-        %input{id: 'import_webrep', name: 'webrep_name', class: 'form-control', placeholder: 'Case ID'}
-          %button{class: 'btn btn-default nav-tool-button', type:'button', id: 'button_import'}
-            Submit
-      .loading-bar
-        .load-bar-segment.hidden
-        .load-bar-segment.hidden
-        .load-bar-segment.hidden
-
-  .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-4.search-wrapper
+  .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-5.search-wrapper
     .input-group.search-group#web-rep-search
       = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Substring'
@@ -90,10 +76,10 @@
           = render 'escalations/webrep/disputes/advanced_search'
 
   - if current_user
-    #login-div.nav-tool-block.col-sm-2.col-lg-2
+    #login-div.nav-tool-block.col-sm-3.col-lg-3
       %a{href: "/users/#{current_user[:id]}"}
         = current_user[:display_name]
 
     -##username= current_user.cvs_username
 
-= render template: "layouts/rocket"
+= render template: "layouts/rocket" 

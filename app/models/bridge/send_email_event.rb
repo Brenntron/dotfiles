@@ -13,4 +13,5 @@ class Bridge::SendEmailEvent < Bridge::BaseMessage
                     s3_paths: s3_paths
                     })
   end
+  handle_asynchronously :post, :queue => "send_email"
 end
