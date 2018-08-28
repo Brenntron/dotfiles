@@ -262,21 +262,24 @@
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'
   .tab-pane#related_tab{role: 'tabpanel'}
-    .related-cases-button-div
-    .related-cases-display
-      %table.table.responsive#duplicates
-        %tbody
-        - if @dispute.each_duplicate.size == 0
-          No duplicate cases.
-        - else
-          .col-xs-12
-            %thead
-              %tr
-                %th Case ID
-                %th Time Submitted
-                - @dispute.each_duplicate do |dispute_dup|
+    %h1 Duplicate Cases
+    .row
+      .col-xs-12
+        .related-cases-button-div
+        .related-cases-display
+          %table.table.responsive#duplicates
+            %tbody
+            - if @dispute.each_duplicate.size == 0
+              No duplicate cases.
+            - else
+              .col-xs-12
+                %thead
                   %tr
-                    %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
-                    %td= dispute_dup.case_opened_at.strftime('%F %T')
+                    %th Case ID
+                    %th Time Submitted
+                    - @dispute.each_duplicate do |dispute_dup|
+                      %tr
+                        %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
+                        %td= dispute_dup.case_opened_at.strftime('%F %T')
 
 

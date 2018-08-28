@@ -3299,7 +3299,7 @@ fieldset.top-content {
 
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
-.nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_related_tab.svg'));}
+.nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 
 .email-msg-body pre {
   background-color: $content-bg-color;
@@ -6092,6 +6092,14 @@ th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc 
 #disputes-index .bug-priority {
   padding-right: 0 !important;
   margin: auto;
+}
+
+table#duplicates {
+  max-width: 400px;
+}
+
+table#duplicates a {
+  text-decoration: underline;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
