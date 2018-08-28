@@ -21,6 +21,7 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
 
   def self.what_time_is_it(value)
