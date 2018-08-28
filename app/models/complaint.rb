@@ -371,7 +371,10 @@ class Complaint < ApplicationRecord
     handle_tags(new_complaint, tags) if tags
 
     ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories)
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_score = wbrs_stuff["wbrs"]["score"]
+
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories, wbrs_score)
     end
   end
 
