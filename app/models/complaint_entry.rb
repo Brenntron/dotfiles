@@ -17,10 +17,12 @@ class ComplaintEntry < ApplicationRecord
   RESOLVED = "RESOLVED"
   NEW = "NEW"
   PENDING = "PENDING"
+  STATUS_COMPLETED = "COMPLETED"
 
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
 
   def self.what_time_is_it(value)
@@ -340,7 +342,7 @@ class ComplaintEntry < ApplicationRecord
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
-        where(user_id: user.id, status: "ACTIVE")
+        where(user_id: user.id).where.not(status: STATUS_COMPLETED)
       when "MY CLOSED COMPLAINTS"
         where(user_id: user.id, status:"COMPLETED")
       when "ALL"

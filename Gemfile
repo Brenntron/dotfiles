@@ -111,7 +111,7 @@ group :development, :profile do
 
   # https://scoutapp.com/devtrace
   # SCOUT_DEV_TRACE=true bundle exec rails server
-  gem 'scout_apm'
+  # gem 'scout_apm'
 end
 
 group :profile do
