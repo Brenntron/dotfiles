@@ -10,9 +10,6 @@
       .case-id-wrapper
         %label.content-label-sm
           Case ID
-        - if (@dispute.resolution == Dispute::DUPLICATE) && (@dispute.status == Dispute::RESOLVED)
-          .duplicate-email-notice
-          Duplicate
         .bug-top-id
           %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
@@ -132,7 +129,7 @@
                       Submit
         - else
           .duplicate-status-notice
-            =@dispute.status
+            =@dispute.resolution
       .disposition-wrapper
         %label.content-label-sm
           Suggested Disposition
