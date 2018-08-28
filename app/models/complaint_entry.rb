@@ -203,12 +203,16 @@ class ComplaintEntry < ApplicationRecord
     nil
   end
 
-  def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil, wbrs_score)
+  def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
     begin
       new_complaint_entry = ComplaintEntry.new
       new_complaint_entry.complaint_id = complaint.id
       new_complaint_entry.status = status
+
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
+
 
       if is_ip?(ip_url)
         new_complaint_entry.ip_address = ip_url
