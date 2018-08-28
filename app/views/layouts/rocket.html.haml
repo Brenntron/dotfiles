@@ -2,6 +2,7 @@
 %html
   %head
     %title= content_for?(:title) ? '^ ' + content_for(:title) : '^ Analyst Console'
+    %link{rel: "shortcut icon", href: image_path('analyst-console-favicon.ico')}
     = stylesheet_link_tag("admin_redesign", media: "all", "data-turbolinks-track" => true)
     = javascript_include_tag("admin_redesign", "data-turbolinks-track" => true)
     = csrf_meta_tags
