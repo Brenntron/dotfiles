@@ -181,6 +181,9 @@ window.updatePending = (id,row_id) ->
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
 
+        if json.was_dismissed
+          temp_row.node().className += ' highlight-was-dismissed'
+
         temp_row.data().status = json.status
         temp_row.data().resolution = resolution
         temp_row.data().internal_comment = comment
@@ -218,7 +221,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
-        std_msg_error(response,"", reload: false)
+        if categories.length == 0
+          std_msg_error("Must include at least one category.","", reload: false)
+        else
+          std_msg_error(response,"", reload: false)
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
@@ -278,8 +284,8 @@ window.take_selected = ()->
         else
           i = 0
           while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],12).data(json.name).draw()
-            selected_rows.data().cell(selected_rows[0][i],5).data("ASSIGNED").draw()
+            selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
+            selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
             i++
 
       error: (response) ->
@@ -469,14 +475,6 @@ format = (complaint_entry_row) ->
         category_table = category_table + category_row
 
       return
-  if complaint_entry.tags.length >= 1
-    tags = ''
-    $(complaint_entry.tags).each ->
-      tag = $(this).attr("name")
-      tag_item = '<span class="tag-capsule">' + tag + '</span>'
-      tags = tags + tag_item
-  else
-    tags = '<span class="missing-data">No tags</span>'
 
   if complaint_entry.entry_history?
     if complaint_entry.entry_history.domain_history.length >= 1
@@ -508,8 +506,6 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data">' + url + '</span>' +
       '<label class="content-label-sm">Site Search</label>' +
       '<span class="nested-complaint-data">' + search_uri + '</span>' +
-      '<label class="content-label-sm">Tags</label>' +
-      '<span class="nested-complaint-data">' + tags + '</span>' +
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
@@ -562,8 +558,6 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data">' + uri + '</span>' +
       '<label class="content-label-sm">Site Search</label>' +
       '<span class="nested-complaint-data">' + search_uri + '</span>' +
-      '<label class="content-label-sm">Tags</label>' +
-      '<span class="nested-complaint-data">' + tags + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
@@ -911,7 +905,7 @@ window.advanced_webcat_index_table = () ->
       resolution: $('#cat_named_search').find('select[id="resolution-input"]').val()
       category: $('#cat_named_search').find('input[id="category-input"]').val()
       status: $('#cat_named_search').find('select[id="status-input"]').val()
-      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val()
+      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val().split(",")
     }
     search_type: 'advanced'
     search_name: $('#cat_named_search').find('input[name="search_name"]').val()

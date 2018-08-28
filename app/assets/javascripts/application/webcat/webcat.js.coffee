@@ -14,6 +14,8 @@ $ ->
           $node.addClass 'highlight-has-subdomain'
         if data.is_important
           $node.addClass 'highlight-second-review'
+        if data.was_dismissed
+          $node.addClass 'highlight-was-dismissed'
         if data.age_int < 10800
           $node.addClass 'highlight-minus3Hours'
         else if data.age_int < 18000
@@ -65,6 +67,18 @@ $ ->
           className: 'state-col'
         }
         {
+          'render':(data,type,full,meta)->
+            tags = full.tags
+            tag_items = ''
+            if tags.length > 0
+              for tag in tags
+                item = '<span class="tag-capsule">' + tag + '</span>'
+                tag_items = tag_items + item
+            else
+              tag_items = '<span class="missing-data">No tags</span>'
+            tag_items
+        }
+        {
           data: 'subdomain'
           width: '50px'
         }
@@ -104,9 +118,6 @@ $ ->
         {
           data: 'company_name'
         }
-        { data: 'customer_name' }
-
-
 
         {
           data: 'assigned_to'

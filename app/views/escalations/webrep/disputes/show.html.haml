@@ -187,35 +187,35 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Accept Date
-          %p= @dispute.case_accepted_at&.strftime('%F %T')
+          %p= @dispute.case_accepted_at&.strftime('%F %T') || 'N/A'
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Repsonse Date
-          %p= @dispute.case_responded_at&.strftime('%F %T')
+          %p= @dispute.case_responded_at&.strftime('%F %T') || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Accept
-          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept
+          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Respond
-          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond
+          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Days to Close
-          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close
+          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Close
-          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close
+          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Email Count
-          %p= @dispute.dispute_emails.count
+          %p= @dispute.dispute_emails.count || 'N/A'
         .col-xs-3
           %label.content-label-sm
             Last Updated By
-          %p= @dispute.last_updated_by_username
+          %p= @dispute.last_updated_by_username || 'N/A'
       %h3 Related Cases
       %span#related-dispute-dropdown.dropdown
         %button#related-dispute-button.toolbar-dropdown{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}

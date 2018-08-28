@@ -28,7 +28,7 @@ module API
                 optional :resolution, type: String
                 optional :category, type: String
                 optional :status, type: String
-                optional :complaint_id, type: Integer
+                optional :complaint_id, type: Array
               end
               optional :search_type, type: String
               optional :search_name, type: String
@@ -77,12 +77,13 @@ module API
                   complaint_entry_packet[:ip_address] = complaint_entry.ip_address
                   complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
+                  complaint_entry_packet[:was_dismissed] = complaint_entry.was_dismissed?
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
                   complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
                   complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
                   complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
                   complaint_entry_packet[:tags] = {}
-                  complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags
+                  complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags.map{|tag| tag&.name }
 
 
                   if complaint_entry.complaint_entry_preload.present?
@@ -178,7 +179,7 @@ module API
               rescue Exception => e
                 return e.message
               end
-              {status:entry.status, entry_resolution:permitted_params['commit']}.to_json
+              {status:entry.status, entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
 
