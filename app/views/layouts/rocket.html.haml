@@ -40,7 +40,7 @@
               %li{class: 'cat-link'}
                 %a
                   =inline_svg 'icon_cat.svg'
-        - if can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+        - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
           %li{class: 'nav-escalations'}
             %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
               = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
@@ -49,12 +49,12 @@
                 %li{class: 'ips-link'}
                   %a{href: escalations_bugs_path}
                     =inline_svg 'icon_snort.svg'
-              %li{class: 'clam-link'}
-                %a
-                  =inline_svg 'icon_clam.svg'
-              %li{class: 'amp-link'}
-                %a
-                  =inline_svg 'icon_amp.svg'
+              - if can?(:read, Admin)
+                %li{class: 'clam-link'}
+                  %a= inline_svg 'icon_clam.svg'
+              - if can?(:read, Admin)
+                %li{class: 'amp-link'}
+                  %a= inline_svg 'icon_amp.svg'
               - if can?(:index, Dispute)
                 %li{class: 'rep-link'}
                   %a{href: escalations_webrep_tickets_path}
@@ -104,7 +104,7 @@
                 %li{class: 'cat-link'}
                   %a Categorization
 
-          - if can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+          - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
             %li{class: 'nav-escalations'}
               %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
                 Escalations
@@ -112,10 +112,12 @@
                 - if can?(:index, EscalationBug)
                   %li{class: 'ips-link'}
                     %a{href: escalations_bugs_path} IPS
-                %li{class: 'clam-link'}
-                  %a Clam
-                %li{class: 'amp-link'}
-                  %a AMP
+                - if can?(:read, Admin)
+                  %li{class: 'clam-link'}
+                    %a Clam
+                - if can?(:read, Admin)
+                  %li{class: 'amp-link'}
+                    %a AMP
                 - if can?(:index, Dispute)
                   %li{class: 'rep-link'}
                     %a{href: escalations_webrep_tickets_path} Reputation
