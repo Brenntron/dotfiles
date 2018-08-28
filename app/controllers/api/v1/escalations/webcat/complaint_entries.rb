@@ -79,7 +79,14 @@ module API
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
                   complaint_entry_packet[:was_dismissed] = complaint_entry.was_dismissed?
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
-                  complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
+
+                  if !complaint_entry.suggested_disposition.nil?
+                    first_category = complaint_entry.suggested_disposition.split(',')
+                    complaint_entry_packet[:suggested_category] = first_category.first + "<span data-toggle='popover' title='Suggested Categories' onclick='suggested_cat_popover()' data-content='" + complaint_entry.suggested_disposition + "'>" + " + "
+                  else
+                    complaint_entry_packet[:suggested_category] = ''
+                  end
+
                   complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
                   complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
                   complaint_entry_packet[:tags] = {}

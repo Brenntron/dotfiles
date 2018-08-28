@@ -732,6 +732,7 @@ window.populate_webcat_index_table = (filter) ->
         else
           datatable = $('#complaints-index').DataTable()
           datatable.clear();
+
           datatable.rows.add(json.data);
           datatable.draw();
 
@@ -976,6 +977,9 @@ window.triggerTooltips = () ->
     side: 'bottom'
   return
 
+window.suggested_cat_popover = () ->
+  $('[data-toggle="popover"]').popover()
+
 $ ->
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
@@ -1002,4 +1006,7 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+
+
 
