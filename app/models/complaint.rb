@@ -222,7 +222,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
           new_complaint_entry.ip_address = key
-          new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
+          new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
           new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
