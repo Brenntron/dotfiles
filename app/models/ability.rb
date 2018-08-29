@@ -109,8 +109,11 @@ class Ability
       can [:manage, :acknowledge_bug, :import], ResearchBug do |bug|
         bug.check_permission(current_user)
       end
-      can [:manage, :acknowledge_bug, :import], EscalationBug
-      can :manage, [EscalationLink, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
+      can :manage, [Attachment, Note, RuleDoc, Exploit, Reference]
+      can [:read, :create, :update, :destroy], Rule #CRUD but no publish/commit
+      # TODO When implementing escalation bugs re-enable
+      # can [:manage, :acknowledge_bug, :import], EscalationBug
+      # can :manage, EscalationLink
       can :publish_to_bugzilla, Note
       can :toggle_liberty, ResearchBug do |bug|
         bug.liberty_clear?

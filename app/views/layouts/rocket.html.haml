@@ -21,46 +21,49 @@
           = image_tag('layout/analyst_console_icon.svg', class: 'sidenav-icon', alt: 'Analyst Console')
         %li{class: 'nav-menu-spacer static-nav-item'}
           -# Spacer for Menu Toggle
-        - if can?(:index, ResearchBug)
+        - if can?(:read, Admin) || can?(:index, ResearchBug)
           %li{class: 'nav-bugs'}
             %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
               = image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
             %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav-icons'}
-              %li{class: 'ips-link'}
-                %a{href: bugs_path}
-                  =inline_svg 'icon_snort.svg'
-              %li{class: 'clam-link'}
-                %a
-                  =inline_svg 'icon_clam.svg'
-              %li{class: 'amp-link'}
-                %a
-                  =inline_svg 'icon_amp.svg'
-              %li{class: 'rep-link'}
-                %a
-                  =inline_svg 'icon_rep.svg'
-              %li{class: 'cat-link'}
-                %a
-                  =inline_svg 'icon_cat.svg'
-        - if can?(:index, EscalationBug)
+              - if can?(:index, ResearchBug)
+                %li{class: 'ips-link'}
+                  %a{href: bugs_path}= inline_svg 'icon_snort.svg'
+              - if can?(:read, Admin)
+                %li{class: 'clam-link'}
+                  %a= inline_svg 'icon_clam.svg'
+              - if can?(:read, Admin)
+                %li{class: 'amp-link'}
+                  %a= inline_svg 'icon_amp.svg'
+              - if can?(:read, Admin)
+                %li{class: 'rep-link'}
+                  %a= inline_svg 'icon_rep.svg'
+              - if can?(:read, Admin)
+                %li{class: 'cat-link'}
+                  %a= inline_svg 'icon_cat.svg'
+        - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
           %li{class: 'nav-escalations'}
             %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
               = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
             %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav-icons'}
-              %li{class: 'ips-link'}
-                %a{href: escalations_bugs_path}
-                  =inline_svg 'icon_snort.svg'
-              %li{class: 'clam-link'}
-                %a
-                  =inline_svg 'icon_clam.svg'
-              %li{class: 'amp-link'}
-                %a
-                  =inline_svg 'icon_amp.svg'
-              %li{class: 'rep-link'}
-                %a{href: escalations_webrep_tickets_path}
-                  =inline_svg 'icon_rep.svg'
-              %li{class: 'cat-link'}
-                %a{href: escalations_webcat_complaints_path}
-                  =inline_svg 'icon_cat.svg'
+              - if can?(:index, EscalationBug)
+                %li{class: 'ips-link'}
+                  %a{href: escalations_bugs_path}
+                    =inline_svg 'icon_snort.svg'
+              - if can?(:read, Admin)
+                %li{class: 'clam-link'}
+                  %a= inline_svg 'icon_clam.svg'
+              - if can?(:read, Admin)
+                %li{class: 'amp-link'}
+                  %a= inline_svg 'icon_amp.svg'
+              - if can?(:index, Dispute)
+                %li{class: 'rep-link'}
+                  %a{href: escalations_webrep_tickets_path}
+                    =inline_svg 'icon_rep.svg'
+              - if can?(:index, Complaint)
+                %li{class: 'cat-link'}
+                  %a{href: escalations_webcat_complaints_path}
+                    =inline_svg 'icon_cat.svg'
         %li{class: 'nav-item nav-users'}
           %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
 
@@ -85,38 +88,48 @@
           %li{class: 'nav-ac static-nav-item'}
             = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
           %li{class: 'static-nav-item'}
-          - if can?(:index, ResearchBug)
+          - if can?(:read, Admin) || can?(:index, ResearchBug)
             %li{class: 'nav-bugs'}
               %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
                 Bugs
 
               %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav'}
-                %li{class: 'ips-link'}
-                  %a{href: bugs_path} IPS
-                %li{class: 'clam-link'}
-                  %a Clam
-                %li{class: 'amp-link'}
-                  %a AMP
-                %li{class: 'rep-link'}
-                  %a Reputation
-                %li{class: 'cat-link'}
-                  %a Categorization
+                - if can?(:index, ResearchBug)
+                  %li{class: 'ips-link'}
+                    %a{href: bugs_path} IPS
+                - if can?(:read, Admin)
+                  %li{class: 'clam-link'}
+                    %a Clam
+                - if can?(:read, Admin)
+                  %li{class: 'amp-link'}
+                    %a AMP
+                - if can?(:read, Admin)
+                  %li{class: 'rep-link'}
+                    %a Reputation
+                - if can?(:read, Admin)
+                  %li{class: 'cat-link'}
+                    %a Categorization
 
-          - if can?(:index, EscalationBug)
+          - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
             %li{class: 'nav-escalations'}
               %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
                 Escalations
               %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
-                %li{class: 'ips-link'}
-                  %a{href: escalations_bugs_path} IPS
-                %li{class: 'clam-link'}
-                  %a Clam
-                %li{class: 'amp-link'}
-                  %a AMP
-                %li{class: 'rep-link'}
-                  %a Reputation
-                %li{class: 'cat-link'}
-                  %a Categorization
+                - if can?(:index, EscalationBug)
+                  %li{class: 'ips-link'}
+                    %a{href: escalations_bugs_path} IPS
+                - if can?(:read, Admin)
+                  %li{class: 'clam-link'}
+                    %a Clam
+                - if can?(:read, Admin)
+                  %li{class: 'amp-link'}
+                    %a AMP
+                - if can?(:index, Dispute)
+                  %li{class: 'rep-link'}
+                    %a{href: escalations_webrep_tickets_path} Reputation
+                - if can?(:index, Complaint)
+                  %li{class: 'cat-link'}
+                    %a{href: escalations_webcat_complaints_path} Categorization
           %li{class: 'nav-users static-nav-item'}
             %a{href: escalations_users_path}
               Users
