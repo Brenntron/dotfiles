@@ -148,6 +148,7 @@ $ ->
       show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
       show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
       submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+      comment_input = $('#reptool_adjust_entries').find('.comment-input')
       entry_content = ''
       $('.dispute_check_box').each ->
         if $(this).prop('checked')
@@ -173,6 +174,7 @@ $ ->
           $(show_rep_exp[0]).text(response.expiration)
           $('#blacklist-action-select').val(response.status)
           $('#blacklist-classifications-select').val(response.classification)
+          $(comment_input[0]).val(response.comment)
           $(submit_button).attr('disabled', false)
 #          window.location.reload()
         error: (response) ->
@@ -185,12 +187,71 @@ $ ->
       $(dropdown).removeClass('open')
       return false
 
+
+  $('#reptool_index_entries_button').click ->
+    dropdown = $('#reptool_adjust_entries').parent()
+
+    # Only allowing a single submission at a time for now.
+    if ($('.dispute-entry-checkbox:checked').length == 1)
+      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
+      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
+      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+      comment_input = $('#reptool_adjust_entries').find('.comment-input')
+      entry_content = ''
+      $('.dispute-entry-checkbox').each ->
+        if $(this).prop('checked')
+          entry_row = $(this).parents('.index-entry-row')[0]
+          entry_content = $(entry_row).find('.entry-col-content').text()
+
+      data = {
+# Send entry content to reptool
+        'entry' : entry_content
+      }
+
+      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          response = JSON.parse(response)
+          $(show_content[0]).text(entry_content)
+          $(show_rep_class[0]).text(response.classification)
+          $(show_rep_exp[0]).text(response.expiration)
+          $('#blacklist-action-select').val(response.status)
+          $('#blacklist-classifications-select').val(response.classification)
+          $(comment_input[0]).val(response.comment)
+          $(submit_button).attr('disabled', false)
+#          window.location.reload()
+        error: (response) ->
+          popup_response_error(response, 'Error retrieving Reptool Data')
+      )
+#
+
+    else
+      alert ('Please select only one row.')
+      $(dropdown).removeClass('open')
+      return false
+
+
+
+
+
+
+
   #Populating the toolbar Adjust WL/BL Button
   $('#wlbl_entries_button').click ->
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
     show_content = $('#wlbl_adjust_entries').find('.wlbl-entry-content')
+    if !show_content[0]
+      show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
     show_wlbl = $('#wlbl_adjust_entries').find('.wlbl-entry-wlbl')
     show_wbrs = $('#wlbl_adjust_entries').find('.wlbl-current-entry-wbrs')
+    if !show_wbrs[0]
+      show_wbrs = $('#wlbl_adjust_entries').find('.current-wbrs-score')
     wl_weak = $('#wlbl_adjust_entries').find('.wl-weak-checkbox')
     wl_med = $('#wlbl_adjust_entries').find('.wl-med-checkbox')
     wl_heavy = $('#wlbl_adjust_entries').find('.wl-heavy-checkbox')
@@ -224,6 +285,8 @@ $ ->
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text()
         wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
+        if !wbrs
+          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
 
         data = {
         # Send entry content to reptool
@@ -242,8 +305,7 @@ $ ->
 
             response = JSON.parse(response)
             if response.data != ""
-              console.log response.data
-
+        
               $(response.data).each ->
                 if String(this) == 'WL-weak'
                   $(wl_weak[0]).prop('checked', true)
@@ -374,6 +436,23 @@ $ ->
   $('.table-scrollable').DataTable({
     scrollY: 200,
 #    scrollCollapse: true,
+    paging: false,
+    searching: false,
+    ordering: false,
+    info: false
+  })
+
+  $('.xbrs-short-scrollable').DataTable({
+    scrollX: '90%',
+    paging: false,
+    searching: false,
+    ordering: false,
+    info: false
+  })
+
+  $('.xbrs-long-scrollable').DataTable({
+    scrollY: 200,
+    scrollX: '70%',
     paging: false,
     searching: false,
     ordering: false,

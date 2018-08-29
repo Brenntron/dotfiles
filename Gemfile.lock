@@ -431,7 +431,6 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
-    scout_apm (2.4.14)
     selectize-rails (0.12.5)
     shellany (0.0.1)
     simple_form (3.5.1)
@@ -575,7 +574,6 @@ DEPENDENCIES
   ruby-bugzilla (~> 0.6.4)
   rubyXL (= 3.3.29)
   rule_test_api!
-  scout_apm
   selectize-rails (~> 0.12.4)
   sfbugzilla!
   simple_form (~> 3.5.0)

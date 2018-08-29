@@ -360,7 +360,11 @@ module API
                 resolution = params[:resolution]
               end
               if params[:comment].present?
-                comment = params[:comment]
+                if status == 'RESOLVED_CLOSED'
+                  comment = status + ' : ' + resolution + ' - ' + params[:comment]
+                else
+                  comment = status + ' - ' + params[:comment]
+                end
               end
 
               disputes = Dispute.where(id: dispute_ids)
@@ -391,12 +395,13 @@ module API
 
             params do
               requires :relating_dispute_ids, type: Array[Integer]
+              optional :original_dispute_id, type: Integer
             end
             patch 'related_disputes' do
               std_api_v2 do
                 authorize!(:update, Dispute)
                 relating_dispute_ids = permitted_params['relating_dispute_ids']
-                Dispute.where(id: relating_dispute_ids).update_all(related_id: params['original_dispute_id'],
+                Dispute.where(id: relating_dispute_ids).update_all(related_id: permitted_params['original_dispute_id'],
                                                                    related_at: DateTime.now)
                 true
               end
@@ -413,6 +418,67 @@ module API
                 dispute.update!(related_id: permitted_params['related_dispute_id'],
                                 related_at: DateTime.now)
                 true
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            get 'dispute_status/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                status = dispute.status
+
+                {:status => status}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            get 'dispute_resolution/:dispute_id' do
+              std_api_v2 do
+                dispute = Dispute.find(permitted_params['dispute_id'])
+                resolution = dispute.resolution
+
+                if dispute.resolution_comment.present?
+                  resolution_comment = dispute.resolution_comment
+                else
+                  resolution_comment = ''
+                end
+
+                {:resolution => resolution, :resolution_comment => resolution_comment}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
+            get 'dispute_entry_status/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
+                status = dispute_entry.status
+                {:status => status}.to_json
+              end
+            end
+
+            params do
+              requires :dispute_entry_id, type: Integer
+            end
+            get 'dispute_entry_resolution/:dispute_entry_id' do
+              std_api_v2 do
+                dispute_entry = DisputeEntry.find(permitted_params['dispute_entry_id'])
+
+                resolution = dispute_entry.resolution
+
+                if dispute_entry.resolution_comment.present?
+                  resolution_comment = dispute_entry.resolution_comment
+                else
+                  resolution_comment = ''
+                end
+
+                {:resolution => resolution,
+                 :resolution_comment => resolution_comment}.to_json
               end
             end
 
@@ -447,7 +513,13 @@ module API
               if information[params[:entry]] == "NOT_FOUND"
                 return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
               else
-                return {:classification => information[params[:entry]]["classifications"].first, :expiration => Time.parse(information[params[:entry]]["expiration"]).to_s, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
+                expiration = ""
+                begin
+                  expiration = Time.parse(information[params[:entry]]["expiration"]).to_s
+                rescue
+                  expiration = information[params[:entry]]["expiration"]
+                end
+                return {:classification => information[params[:entry]]["classifications"].first, :expiration => expiration, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end

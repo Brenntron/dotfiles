@@ -17,10 +17,12 @@ class ComplaintEntry < ApplicationRecord
   RESOLVED = "RESOLVED"
   NEW = "NEW"
   PENDING = "PENDING"
+  STATUS_COMPLETED = "COMPLETED"
 
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
 
   def self.what_time_is_it(value)
@@ -98,39 +100,80 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
-  def change_category(prefix, categories_string, entry_status, comment,resolution_comment, current_user, commit_pending)
+  def change_category(prefix,
+                      categories_string,
+                      entry_status,
+                      comment,
+                      resolution_comment,
+                      current_user,
+                      commit_pending)
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important
         if self.status == "PENDING"
           if commit_pending == "commit"
+            # commit from pending of important case
+
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(resolution:entry_status,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
+            update(resolution:entry_status,
+                   status:current_status,
+                   internal_comment: comment,
+                   resolution_comment: resolution_comment,
+                   case_resolved_at: Time.now,
+                   user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             if entry_status != "INVALID"
-              commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+              commit_category(ip_or_uri: self.uri_or_ip,
+                              categories_string: categories_string,
+                              description: comment,
+                              user: current_user.email)
             end
             cat_from_wbrs = self.set_current_category
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
+            # dismiss from pending of important case
+
             current_status = "ASSIGNED"
-            update(status:current_status, internal_comment: comment, resolution_comment: resolution_comment, case_assigned_at: Time.now)
+            update(status:current_status,
+                   internal_comment: comment,
+                   resolution_comment: resolution_comment,
+                   case_assigned_at: Time.now,
+                   was_dismissed: true)
           end
         else
+          # important not from pending
+
           current_status = "PENDING"
-          update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, user:current_user)
+          update(resolution: entry_status,
+                 url_primary_category: categories_string,
+                 category: categories_string,
+                 status:current_status,
+                 internal_comment: comment,
+                 resolution_comment: resolution_comment,
+                 user:current_user)
         end
       else
+        # not important case
+
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
-        update(resolution:entry_status,url_primary_category:categories_string,category:categories_string,status:current_status,internal_comment: comment, resolution_comment: resolution_comment, case_resolved_at: Time.now,user:current_user)
+        update(resolution: entry_status,
+               url_primary_category: categories_string,
+               category: categories_string,
+               status: current_status,
+               internal_comment: comment,
+               resolution_comment: resolution_comment,
+               case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         if entry_status != "INVALID"
-          commit_category(ip_or_uri: self.uri_or_ip, categories_string: categories_string, description: comment, user: current_user.email)
+          commit_category(ip_or_uri: self.uri_or_ip,
+                          categories_string: categories_string,
+                          description: comment,
+                          user: current_user.email)
         end
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
@@ -149,6 +192,17 @@ class ComplaintEntry < ApplicationRecord
     else
       Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
     end
+  end
+
+  def self.self_importance(ip_url)
+    Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
+  rescue
+
+    Rails.logger.warn "Failed while getting importance."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    nil
   end
 
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
@@ -171,7 +225,7 @@ class ComplaintEntry < ApplicationRecord
       end
       #lets query the top url API endpoint to determine if this is an important site or not
       # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
-      importance = Wbrs::TopUrl.check_urls([ip_url]).first.is_important
+      importance = self_importance(ip_url)
       new_complaint_entry.is_important = importance if importance
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
@@ -192,15 +246,28 @@ class ComplaintEntry < ApplicationRecord
     end
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-
+    max_wait_for_job = 10 #seconds
     begin
-      screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+      Timeout::timeout(max_wait_for_job) do
+        screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+      end
       ces = ComplaintEntryScreenshot.new
       ces.complaint_entry_id = new_complaint_entry.id
       ces.screenshot = open(screenshot_filename).read
       ces.save!
+    rescue Timeout::Error => e
+      #couldnt complete in time
+      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+      ces.save!
     rescue
-      #do nothing, it was worth a try
+      #do nothing, it was worth a try. kittens are sad now
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+      ces.save!
     end
   end
 
@@ -271,11 +338,11 @@ class ComplaintEntry < ApplicationRecord
       when "ACTIVE"
         where.not(status:"COMPLETED").where.not(status:"NEW")
       when "REVIEW"
-        params[:self_review]? where(is_important:true) : where(is_important:true).where.not(user:user)
+        where(status: "PENDING")
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
-        where(user_id: user.id, status: "ACTIVE")
+        where(user_id: user.id).where.not(status: STATUS_COMPLETED)
       when "MY CLOSED COMPLAINTS"
         where(user_id: user.id, status:"COMPLETED")
       when "ALL"
@@ -378,6 +445,11 @@ class ComplaintEntry < ApplicationRecord
     end
 
     entry_params = params.fetch('complaint_entries', {})
+
+    if entry_params['complaint_id'] == [""]
+      entry_params.delete('complaint_id')
+    end
+
     entry_params = entry_params.select{|ignore_key, value| value.present?}
     if entry_params.any?
       complaint_entry_fields = entry_params.slice(*%w{complaint_id resolution status})
@@ -430,6 +502,13 @@ class ComplaintEntry < ApplicationRecord
       self.url_primary_category = categories.join(',')
       self.category = categories.join(',')
     end
+  rescue => except
+
+    Rails.logger.warn "Populating categories from Wbrs failed."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    ''
   end
 
   def current_category_data

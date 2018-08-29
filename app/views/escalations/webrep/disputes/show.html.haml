@@ -11,7 +11,7 @@
         %label.content-label-sm
           Case ID
         .bug-top-id
-          %a.case-id-tag#dispute_id= @dispute.case_id_str
+          %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
 
       .dispute-owner-wrapper
@@ -39,7 +39,7 @@
                         %div
                           %label.toolbar-section-label Assignee
                           %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
-                            - User.all.order('cvs_username ASC').each do |u|
+                            - User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username).each do |u|
                               %option{id: u.id, value: u.id, label: u.cvs_username}
                         %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                           Assign
@@ -54,7 +54,7 @@
         %br
         -##bugzilla_popover_state
         %span.dropdown
-          %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down(#{@dispute.id})"}
             - if @dispute.status.nil?
               NEW
             - else
@@ -62,25 +62,25 @@
           .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
             %ul
               %li.status-radio-wrapper
-                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_NEW}", value: "#{Dispute::STATUS_NEW}"}
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_NEW}", value: "#{Dispute::STATUS_NEW}"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_NEW}"} New
               %li.status-radio-wrapper
-                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESEARCHING}"} Researching
               %li.status-radio-wrapper
-                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ESCALATED}"} Escalated
               %li.status-radio-wrapper
-                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_CUSTOMER_PENDING}"} Customer Pending
               %li.status-radio-wrapper
-                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ON_HOLD}"} On Hold
               %li.status-radio-wrapper
-                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ASSIGNED}", value: "#{Dispute::STATUS_ASSIGNED}"}
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_ASSIGNED}", value: "#{Dispute::STATUS_ASSIGNED}"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ASSIGNED}"} Assigned
               %li.status-radio-wrapper
-                %input.ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
+                %input.ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}", 'onclick': "dispute_resolution_drop_down(#{@dispute.id})"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
                 .dropdown-menu#show-ticket-resolution-submenu
                   .col-xs-6.submenu-left-wrapper
@@ -88,22 +88,22 @@
                       Ticket Resolution
                     %ul
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', class: "dispute-resolution-#{@dispute.id}", id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', class: "dispute-resolution-#{@dispute.id}", id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', class: "dispute-resolution-#{@dispute.id}", id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', class: "dispute-resolution-#{@dispute.id}", id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', class: "dispute-resolution-#{@dispute.id}", id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
                       %li
-                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                        %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', class: "dispute-resolution-#{@dispute.id}", id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
                         %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
                   .col-xs-6.submenu-right-wrapper
                     .resolution-comment-wrapper
@@ -115,7 +115,7 @@
                           Submit
 
               %li.status-radio-wrapper
-                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
+                %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
                 %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
               %li.non-resolution-submit-wrapper#ticket-non-res-submit
                 %label.content-label-sm
@@ -187,35 +187,35 @@
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Accept Date
-          %p= @dispute.case_accepted_at&.strftime('%F %T')
+          %p= @dispute.case_accepted_at&.strftime('%F %T') || 'N/A'
         .col-xs-2.col-with-divider
           %label.content-label-sm
             First Repsonse Date
-          %p= @dispute.case_responded_at&.strftime('%F %T')
+          %p= @dispute.case_responded_at&.strftime('%F %T') || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Accept
-          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept
+          %p= @dispute.minutes_to_accept && '%.1f' % @dispute.minutes_to_accept || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Respond
-          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond
+          %p= @dispute.minutes_to_respond && '%.1f' % @dispute.minutes_to_respond || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Days to Close
-          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close
+          %p= @dispute.days_to_close && '%.1f' % @dispute.days_to_close || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Minutes to Close
-          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close
+          %p= @dispute.minutes_to_close && '%.1f' % @dispute.minutes_to_close || 'N/A'
         .col-xs-1.col-with-divider
           %label.content-label-sm
             Email Count
-          %p= @dispute.dispute_emails.count
+          %p= @dispute.dispute_emails.count || 'N/A'
         .col-xs-3
           %label.content-label-sm
             Last Updated By
-          %p= @dispute.last_updated_by_username
+          %p= @dispute.last_updated_by_username || 'N/A'
       %h3 Related Cases
       %span#related-dispute-dropdown.dropdown
         %button#related-dispute-button.toolbar-dropdown{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -224,7 +224,7 @@
           %form#set-related-dispute-form
             %label.content-label-sm.related-dropdown-text Ticket Id's
             %br
-            %input.related-dropdown-text.dispute-id{type: 'text', name: 'dispute_id'}
+            %input.related-dropdown-text.dispute-id{type: 'text', name: 'related_dispute_id'}
             .button-row-center
               %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onClick: 'add_related_case_id()'}
                 Submit

@@ -13,4 +13,6 @@ class Bridge::FpCreatedEvent < Bridge::BaseMessage
                     ac_false_positive_id: false_positive_id,
                     ac_bug_id: bug_id})
   end
+
+  handle_asynchronously :post, :queue => "fp_created"
 end

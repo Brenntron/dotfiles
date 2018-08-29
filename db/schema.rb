@@ -164,6 +164,7 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.datetime "case_resolved_at"
     t.datetime "case_assigned_at"
     t.text "internal_comment"
+    t.boolean "was_dismissed", default: false
   end
 
   create_table "complaint_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

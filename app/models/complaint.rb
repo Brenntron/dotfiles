@@ -16,6 +16,7 @@ class Complaint < ApplicationRecord
   ACTIVE = 'ACTIVE'
   COMPLETED = 'COMPLETED'
   PENDING = 'PENDING'
+  DUPLICATE = "DUPLICATE"
 
   TI_NEW = 'PENDING'
   TI_RESOLVED = 'RESOLVED'
@@ -149,11 +150,93 @@ class Complaint < ApplicationRecord
   end
 
 
+  def self.is_possible_customer_duplicate?(complaint, new_entries_ips, new_entries_urls)
+
+    new_uris = new_entries_urls.keys.sort
+    new_ips = new_entries_ips.keys.sort
+
+    response = {}
+    possibles = Complaint.includes(:complaint_entries).where(:customer_id => complaint.customer_id).select {|complaint| complaint.status != RESOLVED || complaint.status != DUPLICATE}
+    candidates = []
+
+    possibles.each do |poss|
+
+      ips = poss.complaint_entries.select{ |entry| entry.entry_type == "IP"}.pluck(:ip_address).sort
+      uris = poss.complaint_entries.select{ |entry| entry.entry_type == "URI/DOMAIN"}.pluck(:uri).sort
+
+      if ips == new_ips && uris == new_uris
+        candidates << poss
+      end
+    end
+
+    if candidates.present?
+      best_candidate = candidates.sort_by {|candidate| candidate.id}.first
+      response[:authority] = best_candidate
+      response[:is_dupe] = true
+    else
+      response[:is_dupe] = false
+    end
+
+    response
+
+  end
+
+  def self.manage_duplicate_complaint(complaint, authority_complaint, new_entries_ips, new_entries_urls, source_key)
+    resolved_at = Time.now
+    complaint.status = RESOLVED
+    complaint.resolution = RESOLUTION_DUPLICATE
+    complaint.save
+
+    return_payload = {}
+
+    new_entries_ips.each do |ip, entry|
+      new_payload_item = {}
+      new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
+      new_payload_item[:resolution] = "DUPLICATE"
+      new_payload_item[:status] = TI_RESOLVED
+      return_payload[ip] = new_payload_item
+      new_complaint_entry = ComplaintEntry.new
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.ip_address = ip
+      new_complaint_entry.entry_type = "IP"
+      new_complaint_entry.status = ComplaintEntry::RESOLVED
+      new_complaint_entry.resolution = ComplaintEntry::STATUS_RESOLVED_DUPLICATE
+      new_complaint_entry.case_resolved_at = resolved_at
+      new_complaint_entry.save
+    end
+    new_entries_urls.each do |url, entry|
+      new_payload_item = {}
+      new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
+      new_payload_item[:resolution] = "DUPLICATE"
+      new_payload_item[:status] = TI_RESOLVED
+      return_payload[url] = new_payload_item
+      url_parts = parse_url(url)
+      new_complaint_entry = ComplaintEntry.new
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.uri = url
+      new_complaint_entry.entry_type = "URI/DOMAIN"
+      new_complaint_entry.status = ComplaintEntry::RESOLVED
+      new_complaint_entry.resolution = ComplaintEntry::STATUS_RESOLVED_DUPLICATE
+      new_complaint_entry.case_resolved_at = resolved_at
+      new_complaint_entry.subdomain = url_parts[:subdomain]
+      new_complaint_entry.domain = url_parts[:domain]
+      new_complaint_entry.path = url_parts[:path]
+      new_complaint_entry.save
+    end
+
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn.post(return_payload, "")
+
+  end
+
+
+
 
   def self.process_bridge_payload(message_payload)
 
     begin
       ActiveRecord::Base.transaction do
+        max_wait_for_job = 10 #seconds
 
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
@@ -204,6 +287,13 @@ class Complaint < ApplicationRecord
 
         new_complaint.save
 
+        response = is_possible_customer_duplicate?(new_complaint, new_entries_ips, new_entries_urls)
+
+        if response[:is_dupe] == true
+          manage_duplicate_complaint(new_complaint, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
+          return
+        end
+
         #IP based and DOMAIN based entry creation is similar enough that it might be worth investigating refactoring into a common method
         #TODO: investigate above to see if its worth refactoring, and refactor it if so.
 
@@ -234,14 +324,27 @@ class Complaint < ApplicationRecord
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
+
           begin
-            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            Timeout::timeout(max_wait_for_job) do
+                screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
             ces.screenshot = open(screenshot_filename).read
             ces.save!
+          rescue Timeout::Error => e
+            #couldnt complete in time
+            Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+            ces.save!
           rescue
-            #do nothing, it was worth a try
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+            ces.save!
           end
 
         end
@@ -276,13 +379,25 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
-            screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            Timeout::timeout(max_wait_for_job) do
+              screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+            end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
             ces.screenshot = open(screenshot_filename).read
             ces.save!
+          rescue Timeout::Error => e
+            #couldnt complete in time
+            Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+            ces.save!
           rescue
-            #do nothing, it was worth a try
+            ces = ComplaintEntryScreenshot.new
+            ces.complaint_entry_id = new_complaint_entry.id
+            ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+            ces.save!
           end
         end
 

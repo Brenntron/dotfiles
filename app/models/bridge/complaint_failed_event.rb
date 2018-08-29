@@ -10,4 +10,6 @@ class Bridge::ComplaintFailedEvent < Bridge::BaseMessage
     super(message: {source_key: source_key,
                     ac_status: ac_status})
   end
+
+  handle_asynchronously :post, :queue => "complaint_failed"
 end

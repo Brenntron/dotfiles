@@ -85,16 +85,44 @@ class DisputeEntry < ApplicationRecord
 
   def get_xbrs_value
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
-      return Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
-    end
-    case
-    when self.entry_type == "IP"
-      Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
-    when self.entry_type == "URI/DOMAIN"
-      Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      xbrs = Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
     else
-      self.uri.blank? ? Xbrs::GetXbrs.by_ip4(self.ip_address) : Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      case
+      when self.entry_type == "IP"
+        xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
+      when self.entry_type == "URI/DOMAIN"
+        xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      else
+        self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+      end
     end
+    
+    # Starting here, we are cleaning up this data to remove columns that are completely empty.
+    datacounter = 0
+    @columns_to_remove = []
+    while (datacounter < xbrs[1]['data'].length)
+      i = 0
+      nil_entries = []
+      while (i < xbrs[1]['data'][datacounter].length)
+        nil_entries = xbrs[1]['data'][datacounter].each_index.select{ |v| !xbrs[1]['data'][datacounter][v].present? }
+        i += 1
+      end
+
+      @columns_to_remove << nil_entries
+
+      datacounter += 1
+    end
+
+    if @columns_to_remove.reduce(:&)
+      @columns_to_remove = @columns_to_remove.reduce(:&)
+      xbrs[1]['data'].each do |data_row|
+        data_row.delete_if.with_index{|_, index| @columns_to_remove.include? index}
+      end
+      xbrs[1]['legend'].delete_if.with_index{|_, index| @columns_to_remove.include? index}
+    end
+    # End remove empty columns
+
+    xbrs
   end
 
   def find_xbrs(reload: false)
@@ -130,6 +158,13 @@ class DisputeEntry < ApplicationRecord
       return @wbrs_xlist
     end
     @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
+  rescue => except
+
+    Rails.logger.warn "Populating xlist from Wbrs failed."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    []
   end
 
   def virustotals
@@ -144,14 +179,27 @@ class DisputeEntry < ApplicationRecord
       end
       #scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
       scans = virustotal_data["scans"]
-      cleandata = Array.new
+      sordiddata = Array.new
       unless scans.nil?
+        scans_clean = Array.new
+        scans_hit = Array.new
+        scans_unrated = Array.new
         scans.each do |s|
           item = {:name => s[0], :result => s[1]["result"]}
-          cleandata << item
+          case item[:result]
+            when "clean site"
+              scans_clean << item
+            when "unrated site"
+              scans_unrated << item
+            else
+              scans_hit << item
+          end
         end
+        scans_hit.each { |hit| sordiddata << hit }
+        scans_unrated.each { |hit| sordiddata << hit }
+        scans_clean.each { |hit| sordiddata << hit }
       end
-      @virustotals = cleandata
+      @virustotals = sordiddata
     end
     @virustotals
   end
@@ -319,23 +367,32 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def self.entries_of_url(url)
+    Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
+      DisputeEntry.new_from_wlbl(wlbl)
+    end
+  rescue => except
+
+    Rails.logger.warn "Failed while getting entries from WBRS."
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    []
+  end
+
   # If the research page is served from the DisputesController, this method is here.
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
     if research_params.present?
       url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
 
-      entries = Wbrs::ManualWlbl.where({:url => url}).map do |wlbl|
-        DisputeEntry.new_from_wlbl(wlbl)
-      end
+      entries = entries_of_url(url)
 
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
       entries.each do |entry|
         entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
         entry.consolidated_wlbl_strings = entry.wbrs_list_type
       end
-
-      # Yes it is ugly to do these separately but right now I need the granularity of seeing which if any part of this fails
 
       unique_entries = entries.uniq{|e| e.hostlookup}
       duplicate_entries = entries - unique_entries
@@ -349,41 +406,43 @@ class DisputeEntry < ApplicationRecord
 
       if research_params['scope'] == "strict"
         unless entries.find{|entry| url == entry.uri}
-          entries << DisputeEntry.new(uri: url)
+          return entries << DisputeEntry.new(uri: url)
         end
       end
 
-    entries.each do |entry|
-      is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
-      wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+      if research_params['broad'] || entries.find{|entry| url == entry.uri}
+        entries.each do |entry|
+          is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
+          wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
+          wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
 
-      entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
-      wbrs_stuff_rulehits.each do |rule_hit|
-        new_rule_hit = DisputeRuleHit.new
-        new_rule_hit.dispute_entry_id = entry.id
-        new_rule_hit.name = rule_hit.strip
-        new_rule_hit.rule_type = "WBRS"
-        entry.dispute_rule_hits << new_rule_hit
-      end
+          entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
+          wbrs_stuff_rulehits.each do |rule_hit|
+            new_rule_hit = DisputeRuleHit.new
+            new_rule_hit.dispute_entry_id = entry.id
+            new_rule_hit.name = rule_hit.strip
+            new_rule_hit.rule_type = "WBRS"
+            entry.dispute_rule_hits << new_rule_hit
+          end
 
-      if is_ip_address === true
-        sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
-        entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
-        sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
+          if is_ip_address === true
+            sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+            entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
+            sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
 
-        sbrs_stuff_rules.each do |rule_hit|
-          new_rule_hit = DisputeRuleHit.new
-          new_rule_hit.dispute_entry_id = entry.id
-          new_rule_hit.name = rule_hit.strip
-          new_rule_hit.rule_type = "SBRS"
-          entry.dispute_rule_hits << new_rule_hit
+            sbrs_stuff_rules.each do |rule_hit|
+              new_rule_hit = DisputeRuleHit.new
+              new_rule_hit.dispute_entry_id = entry.id
+              new_rule_hit.name = rule_hit.strip
+              new_rule_hit.rule_type = "SBRS"
+              entry.dispute_rule_hits << new_rule_hit
+            end
+
+          end
+
         end
 
       end
-
-    end
-
 
       entries
     else

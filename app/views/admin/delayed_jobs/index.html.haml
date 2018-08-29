@@ -1,0 +1,41 @@
+
+= render partial: 'admin_control'
+
+
+
+#alert_message{:role => "alert"}
+  = render "shared/flash_messages", flash: flash
+
+.content-wrapper
+  %h1 Delayed Jobs
+
+  .row
+    .col-sm-8
+      %h2 Delayed Jobs
+      %table.table.table-responsive
+        %thead
+          %tr
+            %th id
+            %th attempts
+            %th last error
+            %th run at
+            %th locked at
+            %th failed at
+            %th locked by
+            %th queue
+            %th created at
+            %th updated at
+
+        - @delayed_jobs.each do |job|
+          %tbody
+            %tr
+              %td= job.id
+              %td= job.attempts
+              %td= job.last_error.truncate(500)
+              %td= job.run_at
+              %td= job.locked_at
+              %td= job.failed_at
+              %td= job.locked_by
+              %td= job.queue
+              %td= job.created_at
+              %td= job.updated_at
