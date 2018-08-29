@@ -154,6 +154,32 @@ module API
                 raise "Error code #{response.code} fetching complaints." unless 400 > response.code
               end
             end
+
+            params do
+              requires :url, type: String, desc: "Use URL to look up history"
+            end
+            get 'retrieve_history' do
+              std_api_v2 do
+                # Replace google.com with params[:url]
+                prefix_id = Wbrs::Prefix.where(:urls => ['google.com']).first.prefix_id
+                history_records = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
+
+                render json: history_records
+                end
+              end
+
+            params do
+              requires :url, type: String, desc: "Use URL to look up history"
+            end
+            post 'remove_cats_from_prefix' do
+              std_api_v2 do
+                # Replace google.com with params[:url]
+                prefix_id = Wbrs::Prefix.where(:urls => ['google.com']).first.prefix_id
+                options = { 'prefix_ids' => [ prefix_id ], 'user' => current_user }
+                Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+              end
+            end
+
           end
         end
       end

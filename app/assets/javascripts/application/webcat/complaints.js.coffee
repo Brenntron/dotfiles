@@ -357,7 +357,33 @@ window.enlarge_image = (id,image)->
     trigger: 'focus'
     content: '<img src="' + image + '">').popover 'show'
 
+window.retrieve_history = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+  data = {url: $("#prefix").val()}
+
+  $.ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/retrieve_history'
+    method: 'GET'
+    data: {data: data}
+    headers: headers
+    success: (response) ->
+      $('#history').text(response)
+  )
+
+window.remove_cats_from_prefix = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  data = {url: $("#prefix").val()}
+
+  $.ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/remove_cats_from_prefix'
+    method: 'POST'
+    data: {data: data}
+    headers: headers
+    success: (response) ->
+      console.log("It worked!")
+)
 
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()

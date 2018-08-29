@@ -32,6 +32,8 @@
     %label.toolbar-section-label Data
     %button.toolbar-button.sync-button#fetch{ onclick: 'fetch_complaints();'}
       %span.toolbar-button-text Fetch Complaints
+    %button.toolbar-button{ onclick: 'retrieve_history();'}
+      %span.toolbar-button-text Retrieve History
 
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}
