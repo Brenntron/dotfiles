@@ -326,6 +326,7 @@ class Complaint < ApplicationRecord
 
 
           begin
+            screenshot_filename =  ""
             Timeout::timeout(max_wait_for_job) do
                 screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
             end
@@ -337,11 +338,14 @@ class Complaint < ApplicationRecord
             #couldnt complete in time
             Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
             ces.save!
-          rescue
+          rescue Exception => e
+            Rails.logger.error("#{e.message}")
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
             ces.save!
