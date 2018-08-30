@@ -195,14 +195,13 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.self_importance(ip_url)
-    Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
-  rescue
-
-    Rails.logger.warn "Failed while getting importance."
-    Rails.logger.warn except
-    Rails.logger.warn except.backtrace.join("\n")
-
-    nil
+    begin
+      Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
+    rescue Exception => e
+      Rails.logger.warn "Failed while getting importance."
+      Rails.logger.warn e
+      Rails.logger.warn e&.backtrace&.join("\n")
+    end
   end
 
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
