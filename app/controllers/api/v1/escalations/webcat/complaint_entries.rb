@@ -75,7 +75,11 @@ module API
                   complaint_entry_packet[:domain] = complaint_entry.domain
                   complaint_entry_packet[:path] = complaint_entry.path
                   complaint_entry_packet[:ip_address] = complaint_entry.ip_address
-                  complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
+                  if complaint_entry.wbrs_score.present?
+                    complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score.to_d.truncate(2).to_f
+                  else
+                    complaint_entry_packet[:wbrs_score] = ''
+                  end
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
                   complaint_entry_packet[:was_dismissed] = complaint_entry.was_dismissed?
                   complaint_entry_packet[:viewable] = complaint_entry.viewable

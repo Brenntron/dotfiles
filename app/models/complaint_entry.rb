@@ -210,6 +210,11 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.complaint_id = complaint.id
       new_complaint_entry.status = status
 
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_score = wbrs_stuff["wbrs"]["score"]
+      new_complaint_entry.wbrs_score = wbrs_score
+
+
       if is_ip?(ip_url)
         new_complaint_entry.ip_address = ip_url
         new_complaint_entry.entry_type = "IP"
