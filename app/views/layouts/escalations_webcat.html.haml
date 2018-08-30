@@ -3,7 +3,7 @@
 
 - content_for(:nav_banner) do
   .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
-    %a#complaints.nav-page-button{href: '/escalations/webcat/complaints', class: ("active" if current_page?('/escalations/webcat/complaints'))}
+    %a#complaints.nav-page-button{href: '/escalations/webcat/complaints?f=ACTIVE', class: ("active" if current_page?('/escalations/webcat/complaints'))}
       %span.nav-toolbar-icon-large.icon-queue
 
     %a#rules.nav-page-button{href: '/escalations/webcat/rules', class: ("active" if current_page?('/escalations/webcat/rules'))}
@@ -102,36 +102,36 @@
         -#  %a{onclick: 'standard_webrep_index_table("my_open");'}
         -#    %span.nav-dropdown-icon.icon-my-open-bugs
         -#    My Open Tickets
-        %li
-          %a{onclick: 'filterByStatus("MY COMPLAINTS");'}
+        %li{class: ("selected" if params[:f] == "MY COMPLAINTS")}
+          %a{href: '?f=MY COMPLAINTS'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Complaints
-        %li
-          %a{onclick: 'filterByStatus("MY OPEN COMPLAINTS");'}
+        %li{class: ("selected" if params[:f] == "MY OPEN COMPLAINTS")}
+          %a{href: '?f=MY OPEN COMPLAINTS'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Open Complaints
-        %li
-          %a{onclick: 'filterByStatus("MY CLOSED COMPLAINTS");'}
+        %li{class: ("selected" if params[:f] == "MY CLOSED COMPLAINTS")}
+          %a{href: '?f=MY CLOSED COMPLAINTS'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Closed Complaints
-        %li
-          %a{onclick: 'filterByStatus("COMPLETED");'}
+        %li{class: ("selected" if params[:f] == "COMPLETED")}
+          %a{href: '?f=COMPLETED'}
             %span.nav-dropdown-icon.icon-my-bugs
             Completed
-        %li
-          %a{onclick: 'filterByStatus("ACTIVE");'}
+        %li{class: ("selected" if params[:f] == "ACTIVE")}
+          %a{href: '?f=ACTIVE'}
             %span.nav-dropdown-icon.icon-team-bugs
             Active
-        %li
-          %a{onclick: 'filterByStatus("NEW");'}
+        %li{class: ("selected" if params[:f] == "NEW")}
+          %a{href: '?f=NEW'}
             %span.nav-dropdown-icon.icon-open-bugs
             New
-        %li
-          %a{onclick: "filterByStatus('REVIEW')"}
+        %li{class: ("selected" if params[:f] == "REVIEW")}
+          %a{href: '?f=REVIEW'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Review
-        %li
-          %a{onclick: 'filterByStatus("ALL");'}
+        %li{class: ("selected" if params[:f] == "ALL")}
+          %a{href: '?f=ALL'}
             %span.nav-dropdown-icon.icon-recently-viewed
             All
 
@@ -204,3 +204,9 @@
 
 
 = render template: "layouts/rocket"
+
+- if params[:f]
+  :javascript
+    $(document).ready(function(){
+      filterByStatus("#{params[:f]}")
+    })
