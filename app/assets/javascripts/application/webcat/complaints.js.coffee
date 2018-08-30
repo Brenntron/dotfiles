@@ -362,6 +362,26 @@ window.lookup_prefix = () ->
 
   data = {url: [$("#url_1").val(),$("#url_2").val(),$("#url_3").val(),$("#url_4").val(),$("#url_5").val()]}
 
+  $select= $('#cat_new_url_1').selectize()
+  selectize = $select[0].selectize
+  selectize.clear()
+
+  $select= $('#cat_new_url_2').selectize()
+  selectize = $select[0].selectize
+  selectize.clear()
+
+  $select= $('#cat_new_url_3').selectize()
+  selectize = $select[0].selectize
+  selectize.clear()
+
+  $select= $('#cat_new_url_4').selectize()
+  selectize = $select[0].selectize
+  selectize.clear()
+
+  $select= $('#cat_new_url_5').selectize()
+  selectize = $select[0].selectize
+  selectize.clear()
+
 
   $.ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
