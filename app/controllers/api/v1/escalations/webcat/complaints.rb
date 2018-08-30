@@ -156,7 +156,51 @@ module API
             end
 
             params do
-              requires :url, type: String, desc: "Use URL to look up history"
+              requires :data, type: Hash, desc: "Retrieve categories based on URL"
+            end
+            get 'lookup_prefix' do
+              std_api_v2 do
+
+                prefix_ids = {}
+
+                # Retrieve an id for each url and preserve the order of assignment
+
+                position = 1
+                permitted_params['data']['url'].each do |param|
+                  if param != ''
+
+                    if Wbrs::Prefix.where(:urls => [param]).empty?
+                    else
+                      prefix_ids[position] = Wbrs::Prefix.where(:urls => [param]).first.prefix_id
+                    end
+                  else
+                    prefix_ids[position] = nil
+                  end
+                  position = position + 1
+                end
+
+
+                # Iterate through the prefix_ids hash and pass it to the API
+
+                responses = {}
+                response_json = {}
+
+                prefix_ids.each do |position, prefix_id|
+                  if prefix_id != nil
+                    responses[position]= (Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [prefix_id] }))
+                  end
+                end
+
+                responses.each do |position, response|
+                  response_json[position] = JSON.parse(response.body)
+                end
+
+                render json: response_json
+              end
+            end
+
+            params do
+              requires :url, type: String, desc: "Retrieve history based on URL"
             end
             get 'retrieve_history' do
               std_api_v2 do
@@ -165,11 +209,11 @@ module API
                 history_records = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
 
                 render json: history_records
-                end
               end
+            end
 
             params do
-              requires :url, type: String, desc: "Use URL to look up history"
+              requires :url, type: String, desc: "Remove categories based on URL"
             end
             post 'remove_cats_from_prefix' do
               std_api_v2 do

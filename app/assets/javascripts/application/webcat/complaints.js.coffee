@@ -357,6 +357,53 @@ window.enlarge_image = (id,image)->
     trigger: 'focus'
     content: '<img src="' + image + '">').popover 'show'
 
+window.lookup_prefix = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  data = {url: [$("#url_1").val(),$("#url_2").val(),$("#url_3").val(),$("#url_4").val(),$("#url_5").val()]}
+
+
+  $.ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
+    method: 'GET'
+    data: {data: data}
+    headers: headers
+    success: (response) ->
+      i = 1
+      while i < (6)
+        j = 0
+        try
+          while j < response.json[i].data.length
+            if i == 1
+              $select= $('#cat_new_url_1').selectize()
+              selectize = $select[0].selectize
+              selectize.addItem(response.json[i].data[j].descr)
+            if i == 2
+              $select= $('#cat_new_url_2').selectize()
+              selectize = $select[0].selectize
+              selectize.addItem(response.json[i].data[j].descr)
+            if i == 3
+              $select= $('#cat_new_url_3').selectize()
+              selectize = $select[0].selectize
+              selectize.addItem(response.json[i].data[j].descr)
+            if i == 4
+              $select= $('#cat_new_url_4').selectize()
+              selectize = $select[0].selectize
+              selectize.addItem(response.json[i].data[j].descr)
+            if i == 5
+              debugger
+              $select= $('#cat_new_url_5').selectize()
+              selectize = $select[0].selectize
+              selectize.addItem(response.json[i].data[j].descr)
+            j++
+        catch
+          i++
+          continue
+        i++
+
+
+  )
+
 window.retrieve_history = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
