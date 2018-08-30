@@ -200,7 +200,7 @@ class ComplaintEntry < ApplicationRecord
     rescue Exception => e
       Rails.logger.warn "Failed while getting importance."
       Rails.logger.warn e
-      Rails.logger.warn e.backtrace.join("\n")
+      Rails.logger.warn e&.backtrace&.join("\n")
     end
   end
 
