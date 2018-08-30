@@ -391,7 +391,6 @@ window.lookup_prefix = () ->
               selectize = $select[0].selectize
               selectize.addItem(response.json[i].data[j].descr)
             if i == 5
-              debugger
               $select= $('#cat_new_url_5').selectize()
               selectize = $select[0].selectize
               selectize.addItem(response.json[i].data[j].descr)
