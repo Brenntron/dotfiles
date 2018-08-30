@@ -253,6 +253,21 @@ module API
               complaint_entry_packet.to_json
             end
 
+            desc 'Get the history from Categorize URLs'
+            params do
+              requires :position, type: Integer, desc: "Parse URL's and retrieve history"
+              requires :url, type:  String, desc: "Parse URL's and retrieve history"
+            end
+            post 'categorize_urls_history' do
+              begin
+                prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
+                response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+
+                render response.to_json
+                end
+            end
+
+
 
             desc 'look up who is information from the domain given a complaint entry id'
             params do

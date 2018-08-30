@@ -229,19 +229,6 @@ module API
               end
             end
 
-            params do
-              requires :url, type: String, desc: "Retrieve history based on URL"
-            end
-            get 'retrieve_history' do
-              std_api_v2 do
-                # Replace google.com with params[:url]
-                prefix_id = Wbrs::Prefix.where(:urls => ['google.com']).first.prefix_id
-                history_records = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
-
-                render json: history_records
-              end
-            end
-
           end
         end
       end

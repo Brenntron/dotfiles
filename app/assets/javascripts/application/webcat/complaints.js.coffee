@@ -423,19 +423,73 @@ window.lookup_prefix = () ->
 
   )
 
-window.retrieve_history = () ->
+window.retrieve_history = (position) ->
+
+  switch(position)
+     when position = 1
+       url = $("#url_1").val()
+     when position = 2
+       url = $("#url_2").val()
+     when position = 3
+       url = $("#url_3").val()
+     when position = 4
+       url =  $("#url_4").val()
+     when position = 5
+       url = $("#url_5").val()
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
-  data = {url: $("#prefix").val()}
-
   $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/retrieve_history'
-    method: 'GET'
-    data: {data: data}
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
+    method: 'POST'
     headers: headers
+    data: {'position': position, url: url}
     success: (response) ->
-      $('#history').text(response)
-  )
+      json = JSON.parse(response)
+
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+        #parse this json properly
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<h5>Domain History</h5>' +
+          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+          '<tbody>'
+
+        for entry in json
+
+          entry_string = "" +
+            '<tr>' +
+            '<td>' + entry['action'] + '</td>' +
+            '<td>' + entry['confidence'] + '</td>' +
+            '<td>' + entry['description'] + '</td>' +
+            '<td>' + entry['time'] + '</td>' +
+            '<td>' + entry['user'] + '</td>' +
+            '<td>' + entry['category']['descr'] + '</td>' +
+            '</tr>'
+
+          history_dialog_content += entry_string
+        history_dialog_content += '</tbody></table>'
+        history_dialog_content += '<hr class="thin"/>'
+
+        if $("#history_dialog").length
+          history_dialog = this
+          $("#history_dialog").html(history_dialog_content)
+          $('#history_dialog').dialog('open')
+        else
+          history_dialog = '<div id="history_dialog" title="History Information"></div>'
+          $('body').append(history_dialog)
+          $("#history_dialog").html(history_dialog_content)
+          #$('#history_dialog').append(history_dialog_content)
+          $('#history_dialog').dialog
+            autoOpen: false
+            minWidth: 600
+            position: { my: "right top", at: "right top", of: window }
+          $('#history_dialog').dialog('open')
+
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
 
 window.drop_current_categories = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -738,16 +792,17 @@ window.history_dialog = (id) ->
         if $("#history_dialog").length
           history_dialog = this
           $("#history_dialog").html(history_dialog_content)
+          $('#history_dialog').dialog('open')
         else
           history_dialog = '<div id="history_dialog" title="History Information"></div>'
           $('body').append(history_dialog)
           $("#history_dialog").html(history_dialog_content)
           #$('#history_dialog').append(history_dialog_content)
           $('#history_dialog').dialog
-            autoOpen: true
+            autoOpen: false
             minWidth: 600
             position: { my: "right top", at: "right top", of: window }
-
+          $('#history_dialog').dialog('open')
 #        dialog_content = $(format_domain_info(json))
 #        if $("#complaint_button_dialog").length
 #          complaint_dialog = this
