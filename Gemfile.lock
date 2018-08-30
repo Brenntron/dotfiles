@@ -338,7 +338,6 @@ GEM
     paper_trail (6.0.2)
       activerecord (>= 4.0, < 5.2)
       request_store (~> 1.1)
-    phantomjs (2.1.1.0)
     poltergeist (1.11.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -563,7 +562,6 @@ DEPENDENCIES
   net-ssh (~> 4.1.0)
   paper_trail (~> 6.0.2)
   peake-bridge-client (>= 0.0.5.0)!
-  phantomjs
   poltergeist (~> 1.11.0)
   pry (~> 0.9.12.4)
   pry-remote (~> 0.1.8)
