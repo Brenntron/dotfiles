@@ -407,6 +407,10 @@ format = (complaint_entry_row) ->
   else
     customer_description = missing_data
 
+  screen_shot_error = ''
+  if complaint_entry.screen_shot_error
+    screen_shot_error = complaint_entry.screen_shot_error
+
   certainty = ''
   if complaint_entry.certainty
     certainty = complaint_entry.certainty
@@ -497,7 +501,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
@@ -549,7 +553,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
@@ -600,7 +604,7 @@ format = (complaint_entry_row) ->
 window.history_dialog = (id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/api/v1/escalations/webcat/complaint_entries/history'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
     method: 'POST'
     headers: headers
     data: {'id': id}

@@ -225,7 +225,7 @@ describe Repo::RuleCommitter do
 
   it 'clears cisco.com' do
 
-    auto = AutoResolve.create_from_payload(address_type: 'URI/DOMAIN', address: 'cisco.com')
+    auto = AutoResolve.create_from_payload('URI/DOMAIN', 'cisco.com')
 
     expect(auto.new?).to be_truthy
     expect(auto.domain?).to be_truthy
@@ -233,7 +233,7 @@ describe Repo::RuleCommitter do
 
   it 'clears http://www.cisco.com' do
 
-    auto = AutoResolve.create_from_payload(address_type: 'URI/DOMAIN', address: 'http://www.cisco.com')
+    auto = AutoResolve.create_from_payload('URI/DOMAIN', 'http://www.cisco.com')
 
     expect(auto.new?).to be_truthy
     expect(auto.uri?).to be_truthy
@@ -241,7 +241,7 @@ describe Repo::RuleCommitter do
 
   it 'clears 72.163.4.161' do
 
-    auto = AutoResolve.create_from_payload(address_type: 'IP', address: '72.163.4.161')
+    auto = AutoResolve.create_from_payload('IP', '72.163.4.161')
 
     expect(auto.new?).to be_truthy
     expect(auto.ip?).to be_truthy

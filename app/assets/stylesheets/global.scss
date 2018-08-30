@@ -3231,26 +3231,33 @@ fieldset.top-content {
   display: none;
 }
 
-.customer-facing-notice::before, .duplicate-email-notice::before {
+.customer-facing-notice::before, .duplicate-status-notice::before {
   content: '';
-  display: block;
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 20px 20px;
   width: 20px;
   height: 20px;
-  margin: 0 auto 6px auto;
 }
 
 .customer-facing-notice::before {
   background-image: url(image_path('icon_warning_orange.svg'));
+  display: block;
+  margin: 0 auto 6px auto;
 }
 
-.duplicate-email-notice::before {
+.duplicate-status-notice::before {
   background-image: url(image_path('icon_mark_duplicate_orange.svg'));
+  display: inline-block;
+  float: left;
+  margin-top: -3px;
+  margin-right: 4px;
 }
 
-
+.duplicate-status-notice {
+  color: $warning-accent-color;
+  font-weight: 700;
+}
 
 .email-header-information {
   background-color: $faint-neutral-color;

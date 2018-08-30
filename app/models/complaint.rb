@@ -311,7 +311,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
           new_complaint_entry.ip_address = key
-          new_complaint_entry.wbrs_score = entry['wbrs']["wbrs_score"]
+          new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
           new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
@@ -326,6 +326,7 @@ class Complaint < ApplicationRecord
 
 
           begin
+            screenshot_filename =  ""
             Timeout::timeout(max_wait_for_job) do
                 screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
             end
@@ -337,11 +338,14 @@ class Complaint < ApplicationRecord
             #couldnt complete in time
             Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
             ces.save!
-          rescue
+          rescue Exception => e
+            Rails.logger.error("#{e.message}")
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
             ces.save!
@@ -356,6 +360,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.user_id = user.id
           new_complaint_entry.uri = key
           new_complaint_entry.entry_type = "URI/DOMAIN"
+          new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
           new_complaint_entry.url_primary_category = entry["current_cat"]
           new_complaint_entry.subdomain = url_parts[:subdomain]

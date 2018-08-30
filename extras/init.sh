@@ -26,7 +26,7 @@ do
 		echo "$1ing: $process"
 		if [ $process == "delayed_job" ]
 		then
-			HOME=/var/log/analyst-console RAILS_ENV=${RAILS_ENV} GEM_HOME=${RAILS_ROOT}/vendor/bundle/ruby/2.4/gems ${PREFIX}/bin/bundle exec bin/$process $1
+			HOME=/var/log/analyst-console RAILS_ENV=${RAILS_ENV} GEM_HOME=${RAILS_ROOT}/vendor/bundle/ruby/2.4/gems ${PREFIX}/bin/bundle exec ${RAILS_ROOT}/bin/$process $1
 		else
 			HOME=/var/log/analyst-console RAILS_ENV=${RAILS_ENV} GEM_HOME=${RAILS_ROOT}/vendor/bundle/ruby/2.4/gems ${PREFIX}/bin/bundle exec ${RAILS_ROOT}/vendor/bundle/ruby/2.4/bin/rails runner script/$process $1
 		fi
