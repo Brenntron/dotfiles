@@ -85,6 +85,7 @@ module API
                   complaint_entry_packet[:tags] = {}
                   complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags.map{|tag| tag&.name }
 
+                  complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
 
                   if complaint_entry.complaint_entry_preload.present?
                     if complaint_entry.complaint_entry_preload.current_category_information.present?
