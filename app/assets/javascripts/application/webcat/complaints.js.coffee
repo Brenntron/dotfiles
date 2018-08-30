@@ -418,13 +418,14 @@ window.retrieve_history = () ->
       $('#history').text(response)
   )
 
-window.remove_cats_from_prefix = () ->
+window.drop_current_categories = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  data = {url: [$("#url_1").val(),$("#url_2").val(),$("#url_3").val(),$("#url_4").val(),$("#url_5").val()]}
 
-  data = {url: $("#prefix").val()}
+  console.log("Hope")
 
   $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/remove_cats_from_prefix'
+    url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
     data: {data: data}
     headers: headers

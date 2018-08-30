@@ -44,9 +44,9 @@
             %h5 Categorize URLs with Different Categories
             .toolbar
               %div
-                %button.toolbar-button.current-categories-button.esc-tooltipped{:type => 'button', title: 'Lookup Current Categories', onclick: 'lookup_prefix();'}
+                %button.toolbar-button.current-categories-button.esc-tooltipped{:type => 'button', title: 'Lookup Current Categories', onclick: 'lookup_prefix()'}
                   %span Lookup Current Categories
-                %button.toolbar-button.delete-categories-button.esc-tooltipped{title: 'Drop All Current Categories'}
+                %button.toolbar-button.delete-categories-button.esc-tooltipped{:type => 'button', title: 'Drop All Current Categories', onclick: 'drop_current_categories()'}
                   %span Drop All Current Categories
 
             .form-group

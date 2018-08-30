@@ -158,6 +158,7 @@ module API
             params do
               requires :data, type: Hash, desc: "Retrieve categories based on URL"
             end
+
             get 'lookup_prefix' do
               std_api_v2 do
 
@@ -191,11 +192,49 @@ module API
                   end
                 end
 
+                # Parse response as JSON and put it in a new hash
+
                 responses.each do |position, response|
                   response_json[position] = JSON.parse(response.body)
                 end
 
                 render json: response_json
+              end
+            end
+
+            params do
+              requires :data, type: Hash, desc: "Retrieve categories based on URL"
+            end
+
+            post 'drop_current_categories' do
+              std_api_v2 do
+
+                prefix_ids = []
+
+                urls = permitted_params['data']['url'].compact
+
+                urls.each do |url|
+                  if url == ''
+                    urls.delete('')
+                  end
+                end
+
+                urls.each do |param|
+                  if Wbrs::Prefix.where(:urls => [param]).empty?
+                  else
+                    prefix_ids.push(Wbrs::Prefix.where(:urls => [param]).first.prefix_id)
+                  end
+                end
+
+                # options = { 'prefix_ids' => [ urls ], 'user' => user }
+
+                prefix_ids.each do |prefix_id|
+                  # Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params( { 'prefix_ids' => [ prefix_id ], 'user' => current_user }))
+                  options = { 'prefix_id' => prefix_id, 'categories' => ['1'], 'user' => current_user, 'description' => 'anything' }
+                  response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/edit', body: Wbrs::Prefix.stringkey_params(options))
+                end
+
+                {:status => 'success'}.to_json
               end
             end
 
@@ -209,18 +248,6 @@ module API
                 history_records = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
 
                 render json: history_records
-              end
-            end
-
-            params do
-              requires :url, type: String, desc: "Remove categories based on URL"
-            end
-            post 'remove_cats_from_prefix' do
-              std_api_v2 do
-                # Replace google.com with params[:url]
-                prefix_id = Wbrs::Prefix.where(:urls => ['google.com']).first.prefix_id
-                options = { 'prefix_ids' => [ prefix_id ], 'user' => current_user }
-                Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
               end
             end
 
