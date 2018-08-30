@@ -60,8 +60,8 @@ class Wbrs::Prefix < Wbrs::Base
 
   # Get the audit history
   # @return [Array<Wbrs::HistoryRecord] the collection of audit history records.
-  def history_records
-    Wbrs::HistoryRecord.where(prefix_id: id)
+  def history_records(prefix_id:)
+    Wbrs::HistoryRecord.where(prefix_id: prefix_id)
   end
 
   # Creates a new prefix from a given URL and a list of categories.
@@ -89,11 +89,10 @@ class Wbrs::Prefix < Wbrs::Base
     response_body = JSON.parse(response.body)
     response_body['Updated']
   end
-
   # Disables the rules on this prefix.
   # @param [String] user: The user for this action
-  def disable(user:)
-    options = { 'prefix_ids' => [ id ], 'user' => user }
+  def disable(prefix_ids:,user:)
+    options = { 'prefix_ids' => [ prefix_ids ], 'user' => user }
     Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
   end
 end

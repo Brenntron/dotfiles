@@ -164,8 +164,6 @@ module API
 
                 prefix_ids = {}
 
-                # Retrieve an id for each url and preserve the order of assignment
-
                 position = 1
                 permitted_params['data']['url'].each do |param|
                   if param != ''
@@ -180,9 +178,6 @@ module API
                   position = position + 1
                 end
 
-
-                # Iterate through the prefix_ids hash and pass it to the API
-
                 responses = {}
                 response_json = {}
 
@@ -191,8 +186,6 @@ module API
                     responses[position]= (Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [prefix_id] }))
                   end
                 end
-
-                # Parse response as JSON and put it in a new hash
 
                 responses.each do |position, response|
                   response_json[position] = JSON.parse(response.body)
@@ -226,15 +219,13 @@ module API
                   end
                 end
 
-                # options = { 'prefix_ids' => [ urls ], 'user' => user }
+                # May be able to use less API calls by giving a hash of prefix_ids instead of looping through each one
 
                 prefix_ids.each do |prefix_id|
-                  # Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params( { 'prefix_ids' => [ prefix_id ], 'user' => current_user }))
-                  options = { 'prefix_id' => prefix_id, 'categories' => ['1'], 'user' => current_user, 'description' => 'anything' }
-                  response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/edit', body: Wbrs::Prefix.stringkey_params(options))
+                  response = prefix_object.disable(prefix_ids: prefix_id, user: current_user.email)
                 end
 
-                {:status => 'success'}.to_json
+                render json: response
               end
             end
 
