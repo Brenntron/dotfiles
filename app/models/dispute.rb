@@ -256,7 +256,8 @@ class Dispute < ApplicationRecord
 
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
     resolved_at = Time.now
-    dispute.status = DUPLICATE
+    dispute.resolution = Dispute::DUPLICATE
+    dispute.status = Dispute::RESOLVED
     dispute.related_id = authority_dispute.id
     dispute.related_at = Time.now
     dispute.save
