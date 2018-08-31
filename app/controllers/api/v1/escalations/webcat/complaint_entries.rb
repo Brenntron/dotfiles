@@ -82,7 +82,7 @@ module API
 
                   if !complaint_entry.suggested_disposition.nil?
                     first_category = complaint_entry.suggested_disposition.split(',')
-                    complaint_entry_packet[:suggested_category] = first_category.first + "<span data-toggle='popover' title='Suggested Categories' onclick='suggested_cat_popover()' data-content='" + complaint_entry.suggested_disposition + "'>" + " + "
+                    complaint_entry_packet[:suggested_category] = '<center><a href="#" class= "test" data-toggle="tooltip" title=" ' + complaint_entry.suggested_disposition + ' "> '  + first_category.first + '</a></center>'
                   else
                     complaint_entry_packet[:suggested_category] = ''
                   end

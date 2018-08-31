@@ -5766,6 +5766,11 @@ table.dataTable tbody tr.selected {
   outline: none !important;
 }
 
+.tooltip > .tooltip-inner {
+  white-space: nowrap;
+  display: block;
+}
+
 .selectize-input.dropdown-active::before {
   display: none;
 }

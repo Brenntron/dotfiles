@@ -977,11 +977,11 @@ window.triggerTooltips = () ->
     side: 'bottom'
   return
 
-window.suggested_cat_popover = () ->
-  $('[data-toggle="popover"]').popover()
-
 $ ->
   $(document).ready ->
+
+    $("body").tooltip({selector: '[data-toggle=tooltip]'})
+
     if window.location.pathname != '/escalations/webcat/complaints'
       $('#filter-complaints').hide()
       $('#fetch').hide()
