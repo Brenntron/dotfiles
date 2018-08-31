@@ -299,6 +299,7 @@ class Complaint < ApplicationRecord
 
         new_entries_ips.each do |key, entry|
 
+          prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
           new_payload_item[:status] = TI_NEW
@@ -314,7 +315,17 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry['wbrs']["wbrs_score"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
-          new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
+
+          if !prefix_response.nil?
+            if prefix_response.first.is_active == 1
+              new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
+            else
+              new_complaint_entry.url_primary_category = nil
+            end
+          else
+            new_complaint_entry.url_primary_category = nil
+          end
+
           new_complaint_entry.status = ComplaintEntry::NEW
           #lets query the top url API endpoint to determine if this is an important site or not
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
@@ -350,6 +361,8 @@ class Complaint < ApplicationRecord
         end
 
         new_entries_urls.each do |key, entry|
+
+          prefix_response = Wbrs::Prefix.where({:urls => [key]})
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
@@ -357,7 +370,17 @@ class Complaint < ApplicationRecord
           new_complaint_entry.uri = key
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
-          new_complaint_entry.url_primary_category = entry["current_cat"]
+
+          if !prefix_response.nil?
+            if prefix_response.first.is_active == 1
+              new_complaint_entry.url_primary_category = entry["current_cat"]
+            else
+              new_complaint_entry.url_primary_category = nil
+            end
+          else
+            new_complaint_entry.url_primary_category = nil
+          end
+
           new_complaint_entry.subdomain = url_parts[:subdomain]
           new_complaint_entry.domain = url_parts[:domain]
           new_complaint_entry.path = url_parts[:path]
