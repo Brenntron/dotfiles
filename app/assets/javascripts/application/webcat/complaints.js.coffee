@@ -979,9 +979,6 @@ window.triggerTooltips = () ->
 
 $ ->
   $(document).ready ->
-
-    $("body").tooltip({selector: '[data-toggle=tooltip]'})
-
     if window.location.pathname != '/escalations/webcat/complaints'
       $('#filter-complaints').hide()
       $('#fetch').hide()

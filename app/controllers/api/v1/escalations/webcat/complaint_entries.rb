@@ -83,7 +83,7 @@ module API
                   if !complaint_entry.suggested_disposition.nil?
                     first_category = complaint_entry.suggested_disposition.split(',')
                     if first_category.length > 1
-                      complaint_entry_packet[:suggested_category] = '<center><span class= "esc-tooltipped" data-toggle="tooltip" title=" ' + complaint_entry.suggested_disposition.gsub(',',', ') + ' "> '  + first_category.first + ' + </span></center>'
+                      complaint_entry_packet[:suggested_category] = '<span class= "esc-tooltipped" title=" ' + complaint_entry.suggested_disposition.gsub(',',', ') + ' "> '  + first_category.first + ' + </span>'
                     else
                       complaint_entry_packet[:suggested_category] = first_category.first
                     end
