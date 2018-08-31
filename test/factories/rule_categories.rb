@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :rule_category do
-    category 'APP_DETECT'
+    category        { 'APP-DETECT' }
   end
 end

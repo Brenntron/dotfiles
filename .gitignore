@@ -38,7 +38,7 @@ config/config.yml
 
 /net-snort-parser/
 
-coverage
+/coverage*
 
 
 .idea/*
