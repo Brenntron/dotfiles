@@ -250,15 +250,17 @@ class ComplaintEntry < ApplicationRecord
     end
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    max_wait_for_job = 10 #seconds
+    max_wait_for_job = 15 #seconds
     begin
       screenshot_filename =  ""
       Timeout::timeout(max_wait_for_job) do
-        screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+        screenshot_filename = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}", "tmp" )
       end
       ces = ComplaintEntryScreenshot.new
       ces.complaint_entry_id = new_complaint_entry.id
       ces.screenshot = open(screenshot_filename).read
+
+
       ces.save!
     rescue Timeout::Error => e
       #couldnt complete in time
