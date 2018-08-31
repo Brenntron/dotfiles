@@ -1,11 +1,11 @@
 FactoryBot.define do
   factory :user do
-    password "password"
-    password_confirmation "password"
-    current_sign_in_ip "127.0.0.1"
-    authentication_token "12345"
-    parent_id nil
-    class_level 3
+    password                            { "password" }
+    password_confirmation               { "password" }
+    current_sign_in_ip                  { "127.0.0.1" }
+    authentication_token                { "12345" }
+    parent_id                           {nil}
+    class_level                         { 3 }
     sequence :cvs_username do |nn|
       "user#{nn}"
     end
@@ -16,11 +16,11 @@ FactoryBot.define do
     end
 
     factory :current_user do
-      display_name ENV['authenticate_display_name']
-      cec_username ENV['authenticate_cec_username']
-      cvs_username ENV['authenticate_cvs_username']
-      kerberos_login ENV['remote_user']
-      email ENV['authenticate_email']
+      display_name                      { ENV['authenticate_display_name'] }
+      cec_username                      { ENV['authenticate_cec_username'] }
+      cvs_username                      { ENV['authenticate_cvs_username'] }
+      kerberos_login                    { ENV['remote_user'] }
+      email                             { ENV['authenticate_email'] }
     end
 
     factory :fake_user do
