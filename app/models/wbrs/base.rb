@@ -110,7 +110,7 @@ class Wbrs::Base
         raise Wbrs::WbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
       else
         body = JSON.parse(response.body)
-        # raise Wbrs::WbrsError, "HTTP response #{response.code} #{body['Error']}"
+        raise Wbrs::WbrsError, "HTTP response #{response.code} #{body['Error']}"
     end
   end
 
