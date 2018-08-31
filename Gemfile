@@ -67,7 +67,7 @@ gem 'ajax-datatables-rails', '~> 0.4.0'
 gem 'clipboard-rails', '1.7.1'
 
 gem 'capybara', '~> 2.11.0'
-gem 'poltergeist', '~> 1.11.0'
+gem 'poltergeist', '~> 1.11'
 
 gem 'inline_svg'
 
