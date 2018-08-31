@@ -169,8 +169,10 @@ module API
                   if param != ''
 
                     if Wbrs::Prefix.where(:urls => [param]).empty?
-                    else
+                    elsif Wbrs::Prefix.where(:urls => [param]).first.is_active == 1
                       prefix_ids[position] = Wbrs::Prefix.where(:urls => [param]).first.prefix_id
+                    elsif Wbrs::Prefix.where(:urls => [param]).first.is_active == 0
+                      prefix_ids[position] = nil
                     end
                   else
                     prefix_ids[position] = nil
@@ -203,6 +205,7 @@ module API
               std_api_v2 do
 
                 prefix_ids = []
+                response = []
 
                 urls = permitted_params['data']['url'].compact
 
@@ -219,10 +222,8 @@ module API
                   end
                 end
 
-                # May be able to use less API calls by giving a hash of prefix_ids instead of looping through each one
-
                 prefix_ids.each do |prefix_id|
-                  response = prefix_object.disable(prefix_ids: prefix_id, user: current_user.email)
+                  response = Wbrs::Prefix.disable(prefix_id, current_user.email)
                 end
 
                 render json: response
