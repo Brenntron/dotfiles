@@ -736,6 +736,7 @@ window.populate_webcat_index_table = (filter) ->
         else
           datatable = $('#complaints-index').DataTable()
           datatable.clear();
+
           datatable.rows.add(json.data);
           datatable.draw();
 
@@ -1006,4 +1007,7 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+
+
 
