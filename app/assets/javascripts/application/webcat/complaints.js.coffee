@@ -419,8 +419,6 @@ window.lookup_prefix = () ->
           i++
           continue
         i++
-
-
   )
 
 window.retrieve_history = (position) ->
@@ -494,8 +492,6 @@ window.retrieve_history = (position) ->
 window.drop_current_categories = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   data = {url: [$("#url_1").val(),$("#url_2").val(),$("#url_3").val(),$("#url_4").val(),$("#url_5").val()]}
-
-  console.log("Hope")
 
   $.ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
