@@ -216,6 +216,14 @@ module API
               render json: response
             end
 
+            post 'fetch_wbnp_data' do
+              std_api_v2 do
+
+                Complaint.get_latest_wbnp_complaints
+                {:status => "success"}.to_json
+
+              end
+            end
           end
         end
       end

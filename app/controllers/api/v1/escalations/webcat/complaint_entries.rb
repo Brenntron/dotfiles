@@ -75,16 +75,32 @@ module API
                   complaint_entry_packet[:domain] = complaint_entry.domain
                   complaint_entry_packet[:path] = complaint_entry.path
                   complaint_entry_packet[:ip_address] = complaint_entry.ip_address
-                  complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score
+                  if complaint_entry.wbrs_score.present?
+                    complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score.to_d.truncate(2).to_f
+                  else
+                    complaint_entry_packet[:wbrs_score] = ''
+                  end
                   complaint_entry_packet[:is_important] = complaint_entry.is_important
                   complaint_entry_packet[:was_dismissed] = complaint_entry.was_dismissed?
                   complaint_entry_packet[:viewable] = complaint_entry.viewable
-                  complaint_entry_packet[:suggested_category] = complaint_entry.suggested_disposition
+
+                  if !complaint_entry.suggested_disposition.nil?
+                    first_category = complaint_entry.suggested_disposition.split(',')
+                    if first_category.length > 1
+                      complaint_entry_packet[:suggested_category] = '<span class= "esc-tooltipped" title=" ' + complaint_entry.suggested_disposition.gsub(',',', ') + ' "> '  + first_category.first + ' + </span>'
+                    else
+                      complaint_entry_packet[:suggested_category] = first_category.first
+                    end
+                  else
+                    complaint_entry_packet[:suggested_category] = ''
+                  end
+
                   complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
                   complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
                   complaint_entry_packet[:tags] = {}
                   complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags.map{|tag| tag&.name }
 
+                  complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
 
                   if complaint_entry.complaint_entry_preload.present?
                     if complaint_entry.complaint_entry_preload.current_category_information.present?
@@ -148,9 +164,10 @@ module API
                                          permitted_params['resolution_comment'],
                                          current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
-
-                message = Bridge::ComplaintUpdateStatusEvent.new
-                message.post_complaint(entry.complaint)
+                if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                  message = Bridge::ComplaintUpdateStatusEvent.new
+                  message.post_complaint(entry.complaint)
+                end
 
               rescue Exception => e
                   return {error:e.message}.to_json
@@ -176,6 +193,10 @@ module API
                                     permitted_params['status'],
                                     permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
+
+                message = Bridge::ComplaintUpdateStatusEvent.new
+                message.post_complaint(entry.complaint)
+
               rescue Exception => e
                 return e.message
               end

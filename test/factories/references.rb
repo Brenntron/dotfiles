@@ -4,8 +4,8 @@ FactoryBot.define do
     nn
   end
   factory :reference do
-    reference_data 'some data'
-    reference_type_id '1'
+    reference_data                      { 'some data' }
+    reference_type_id                   { '1' }
 
     factory :cve_reference do
       transient do

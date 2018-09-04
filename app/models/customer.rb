@@ -11,6 +11,27 @@ class Customer < ApplicationRecord
     end
   end
 
+  def self.customer_from_ruleui(data)
+
+    wbnp_company = Company.find_or_create_by(:name => "WBNP")
+
+    ti_company_format = data["customer_name"].downcase.gsub(/[[:space:]]/, '')
+    email = "wbnp-#{ti_company_format}@talosintelligence.com"
+
+    customer = Customer.where(:email => email).first
+    if customer.blank?
+      customer = Customer.new
+      customer.company_id = wbnp_company.id
+      customer.name = data["customer_name"]
+      customer.email = email
+      customer.save
+    end
+    customer.reload
+
+    customer
+
+  end
+
   def self.process_and_get_customer(payload)
     customer_email = payload["payload"]["email"]
     customer_company = payload["payload"]["user_company"]

@@ -2,28 +2,27 @@ Feature: Webrep communications
   In order to communicate with customers
   I will provide a communications interface
 
-  #TODO: we need to update the user role on these tests
 
   @javascript
   Scenario: there should be a difference between read and unread emails
-    Given a user with role "admin" exists and is logged in
-    And the following disputes exist:
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute emails exist:
       |id  | dispute_id           | status |
       | 1  | 722                  | unread |
       | 2  | 722                  | read   |
-    And I goto "/escalations/webrep/disputes/722"
+    And I goto "/escalations/webrep/disputes/722#communication_tab"
     And row with email_id "1" should have class "email-unread"
     And row with email_id "2" should have class "email-read"
 
 
   @javascript
   Scenario: an unread email should change to read once clicked
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute emails exist:
@@ -40,8 +39,8 @@ Feature: Webrep communications
 
   @javascript
   Scenario: I should see the full contents of an email once clicked
-    Given a user with role "admin" exists and is logged in
-    And the following disputes exist:
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute emails exist:
@@ -63,9 +62,9 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can reply to an email
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute emails exist:
@@ -85,9 +84,9 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can create a new email
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute emails exist:
@@ -106,9 +105,9 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can create a new email using an email template
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute emails exist:
@@ -132,9 +131,9 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can create a new note
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And I goto "/escalations/webrep/disputes/722"
@@ -147,12 +146,12 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can edit their own note
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
     And the following users exist
       |id  |cec_username|
       |2   | snorty     |
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute comments exist:
@@ -171,12 +170,12 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user cannot delete a note authored by another user
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
     And the following users exist
       |id  |cec_username|
       |2   | snorty     |
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute comments exist:
@@ -193,12 +192,12 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can delete a note authored by themselves
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
     And the following users exist
       |id  |cec_username|
       |2   | snorty     |
 
-    And the following disputes exist:
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following dispute comments exist:
@@ -216,8 +215,8 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can create an email template
-    Given a user with role "admin" exists and is logged in
-    And the following disputes exist:
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And I goto "/escalations/webrep/disputes/722"
@@ -235,8 +234,8 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can edit an email template
-    Given a user with role "admin" exists and is logged in
-    And the following disputes exist:
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following email templates exist:
@@ -254,8 +253,8 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user can delete an email template
-    Given a user with role "admin" exists and is logged in
-    And the following disputes exist:
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
       | id     |
       | 722    |
     And the following email templates exist:

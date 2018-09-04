@@ -195,14 +195,13 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.self_importance(ip_url)
-    Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
-  rescue
-
-    Rails.logger.warn "Failed while getting importance."
-    Rails.logger.warn except
-    Rails.logger.warn except.backtrace.join("\n")
-
-    nil
+    begin
+      Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
+    rescue Exception => e
+      Rails.logger.warn "Failed while getting importance."
+      Rails.logger.warn e
+      Rails.logger.warn e&.backtrace&.join("\n")
+    end
   end
 
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
@@ -210,6 +209,11 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry = ComplaintEntry.new
       new_complaint_entry.complaint_id = complaint.id
       new_complaint_entry.status = status
+
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_score = wbrs_stuff["wbrs"]["score"]
+      new_complaint_entry.wbrs_score = wbrs_score
+
 
       if is_ip?(ip_url)
         new_complaint_entry.ip_address = ip_url
@@ -246,27 +250,35 @@ class ComplaintEntry < ApplicationRecord
     end
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    max_wait_for_job = 10 #seconds
+    max_wait_for_job = 15 #seconds
     begin
+      screenshot_data =  ""
       Timeout::timeout(max_wait_for_job) do
-        screenshot_filename = CapybaraSpider.capture("http://#{new_complaint_entry.hostlookup}")
+        screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
       end
       ces = ComplaintEntryScreenshot.new
       ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = open(screenshot_filename).read
+      ces.screenshot = Base64.decode64(screenshot_data)
       ces.save!
     rescue Timeout::Error => e
       #couldnt complete in time
       Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
       ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
       ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+        ces.screenshot = f.read
+      end
       ces.save!
-    rescue
+    rescue Exception => e
+      Rails.logger.error("#{e.message}")
       #do nothing, it was worth a try. kittens are sad now
       ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
       ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = open("app/assets/images/failed_screenshot.jpg").read
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+        ces.screenshot = f.read
+      end
       ces.save!
     end
   end
@@ -498,9 +510,13 @@ class ComplaintEntry < ApplicationRecord
   def set_current_category
     prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
     if prefix_results
-      categories = prefix_results.map{ |result| result.descr}
-      self.url_primary_category = categories.join(',')
-      self.category = categories.join(',')
+      if prefix_results.first.is_active == 1
+        categories = prefix_results.map{ |result| result.descr}
+        self.url_primary_category = categories.join(',')
+        self.category = categories.join(',')
+      else
+        categories = nil
+      end
     end
   rescue => except
 

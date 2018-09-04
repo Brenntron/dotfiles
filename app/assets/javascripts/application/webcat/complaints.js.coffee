@@ -506,6 +506,10 @@ format = (complaint_entry_row) ->
   else
     customer_description = missing_data
 
+  screen_shot_error = ''
+  if complaint_entry.screen_shot_error
+    screen_shot_error = complaint_entry.screen_shot_error
+
   certainty = ''
   if complaint_entry.certainty
     certainty = complaint_entry.certainty
@@ -596,7 +600,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
@@ -648,7 +652,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +
@@ -832,6 +836,7 @@ window.populate_webcat_index_table = (filter) ->
         else
           datatable = $('#complaints-index').DataTable()
           datatable.clear();
+
           datatable.rows.add(json.data);
           datatable.draw();
 
@@ -880,6 +885,23 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
 
+window.fetch_wbnp_data = () ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
+    data: {}
+    success: (response) ->
+      $('#loader-modal').hide()
+      std_msg_success('WBNP Complaints successfully retrieved from RuleUI.', [], reload: true)
+    error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove()
+      std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
+  )
 
 window.fetch_complaints = () ->
   std_msg_ajax(
@@ -1102,4 +1124,7 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+
+
 

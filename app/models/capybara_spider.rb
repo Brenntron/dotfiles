@@ -20,26 +20,34 @@ class CapybaraSpider < Capybara::Session
   end
 
   def self.tmpfilename
-    Dir::Tmpname.make_tmpname(['./tmp/webcapture_', '.png'], nil)
+    Dir::Tmpname.make_tmpname(['webcapture_', '.png'], nil)
+  end
+
+  def self.low_capture(url)
+    `phantomjs /extras/capture_site_image.js #{url}`.strip()
   end
 
   def self.capture(url)
-    session = CapybaraSpider.build_session
-    session.visit(url)
-    session.filename = tmpfilename
-    session.save_screenshot(session.filename, full: false)
+    begin
+      session = CapybaraSpider.build_session
+      session.visit(url)
+      session.filename = "#{Rails.root}/tmp/#{tmpfilename}"
+      session.save_screenshot(session.filename, full: false)
 
-    if block_given?
-      File.open(session.filename, 'r') do |file|
-        session.file = file
-        yield session
+      if block_given?
+        File.open(session.filename, 'r') do |file|
+          session.file = file
+          yield session
+        end
+
+        File.delete(session.filename)
+
+        nil
+      else
+        filename
       end
-
-      File.delete(session.filename)
-
-      nil
-    else
-      filename
+    rescue Exception => e
+      Rails.logger.error("there was a problem using Capybara. #{e.message}")
     end
   end
 
