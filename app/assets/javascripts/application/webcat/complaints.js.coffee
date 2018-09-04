@@ -360,28 +360,13 @@ window.enlarge_image = (id,image)->
 window.lookup_prefix = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  data = {url: [$("#url_1").val(),$("#url_2").val(),$("#url_3").val(),$("#url_4").val(),$("#url_5").val()]}
+  data = {url: []}
 
-  $select= $('#cat_new_url_1').selectize()
-  selectize = $select[0].selectize
-  selectize.clear()
-
-  $select= $('#cat_new_url_2').selectize()
-  selectize = $select[0].selectize
-  selectize.clear()
-
-  $select= $('#cat_new_url_3').selectize()
-  selectize = $select[0].selectize
-  selectize.clear()
-
-  $select= $('#cat_new_url_4').selectize()
-  selectize = $select[0].selectize
-  selectize.clear()
-
-  $select= $('#cat_new_url_5').selectize()
-  selectize = $select[0].selectize
-  selectize.clear()
-
+  for i in [1 .. 5]
+    $select= $('#cat_new_url_' + i).selectize()
+    selectize = $select[0].selectize
+    selectize.clear()
+    data['url'].push($("#url_" + i ).val())
 
   $.ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
@@ -390,10 +375,10 @@ window.lookup_prefix = () ->
     headers: headers
     success: (response) ->
       i = 1
-      while i < (6)
+      for [i .. 5]
         j = 0
         try
-          while j < response.json[i].data.length
+          for [j .. response.json[i].data.length]
             if i == 1
               $select= $('#cat_new_url_1').selectize()
               selectize = $select[0].selectize
@@ -445,8 +430,7 @@ window.retrieve_history = (position) ->
       json = JSON.parse(response)
 
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+        std_msg_error("<p>Something went wrong: #{json.error}","")
       else
         #parse this json properly
         history_dialog_content = '<div class="dialog-content-wrapper">' +
@@ -486,7 +470,7 @@ window.retrieve_history = (position) ->
           $('#history_dialog').dialog('open')
 
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      std_msg_error("<p>Something went wrong: #{response.responseText}","")
   , this)
 
 window.drop_current_categories = () ->
@@ -499,7 +483,6 @@ window.drop_current_categories = () ->
     data: {data: data}
     headers: headers
     success: (response) ->
-      console.log("It worked!")
 )
 
 format = (complaint_entry_row) ->

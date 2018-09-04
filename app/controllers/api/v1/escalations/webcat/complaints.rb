@@ -166,14 +166,9 @@ module API
 
                 position = 1
                 permitted_params['data']['url'].each do |param|
-                  if param != ''
-
-                    if Wbrs::Prefix.where(:urls => [param]).empty?
-                    elsif Wbrs::Prefix.where(:urls => [param]).first.is_active == 1
-                      prefix_ids[position] = Wbrs::Prefix.where(:urls => [param]).first.prefix_id
-                    elsif Wbrs::Prefix.where(:urls => [param]).first.is_active == 0
-                      prefix_ids[position] = nil
-                    end
+                  prefix_record = Wbrs::Prefix.where(:urls => [param])
+                  if !prefix_record.empty? && prefix_record.first.is_active == 1
+                    prefix_ids[position] = prefix_record.first.prefix_id
                   else
                     prefix_ids[position] = nil
                   end
@@ -216,8 +211,7 @@ module API
                 end
 
                 urls.each do |param|
-                  if Wbrs::Prefix.where(:urls => [param]).empty?
-                  else
+                  if !Wbrs::Prefix.where(:urls => [param]).empty?
                     prefix_ids.push(Wbrs::Prefix.where(:urls => [param]).first.prefix_id)
                   end
                 end
