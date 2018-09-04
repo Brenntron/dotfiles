@@ -42,7 +42,7 @@ describe Wbrs::RuleLink do
         }
     }.to_json
   end
-  let(:rule_links_error_json) {{'Error' => 'No search criteria provided.'}.to_json}
+  let(:rule_links_error_json) {'{"Error": "No search criteria provided"}'}
   let(:rule_links_response) { double('HTTPI::Response', code: 200, body: rule_links_json) }
   let(:rule_links_error) { double('HTTPI::Response', code: 400, body: rule_links_error_json) }
 

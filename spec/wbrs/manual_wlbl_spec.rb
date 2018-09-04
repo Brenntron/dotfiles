@@ -70,9 +70,9 @@ describe Wbrs::ManualWlbl do
         ]
     }.to_json
   end
-  let(:find_wlbl_error_json) {{'Error' => "WL/BL entry with ID '101' not found."}.to_json}
-  let(:where_wlbl_error_json) {{'Error' => 'No search criteria provided.'}.to_json}
-  let(:add_wlbl_error_json) {{'Error' => 'Invalid data format.'}.to_json}
+  let(:find_wlbl_error_json) {'{"Error": "WL/BL entry with ID \'101\' not found."}'}
+  let(:where_wlbl_error_json) {'{"Error": "No search criteria provided."}'}
+  let(:add_wlbl_error_json) {'{"Error": "Invalid data format."}'}
   let(:wlbl_types_response) { double('HTTPI::Response', code: 200, body: wlbl_types_json) }
   let(:find_wlbl_response) { double('HTTPI::Response', code: 200, body: find_wlbl_json) }
   let(:find_wlbl_error) { double('HTTPI::Response', code: 400, body: find_wlbl_error_json) }

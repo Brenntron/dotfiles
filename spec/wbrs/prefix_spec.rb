@@ -95,7 +95,7 @@ describe Wbrs::Prefix do
         }
     }.to_json
   end
-  let(:prefix_error_json) {{'Error' => 'No search criteria provided.'}.to_json}
+  let(:prefix_error_json) {'{"Error": "No search criteria provided"}'}
   let(:create_prefix_json) { {"Created": 111}.to_json }
   let(:create_prefix_error_json) {{'Error' => 'Prefix ID required.'}.to_json}
   let(:prefix_response) { double('HTTPI::Response', code: 200, body: prefix_json) }
@@ -339,7 +339,8 @@ describe 'A prefix' do
     expect {
       prefix.set_categories([],
                             user: 'tester',
-                            description: 'Testing /edit route.')
+                            description: 'Testing /edit route.',
+                            prefix_id: 101)
     }.to raise_error(Wbrs::WbrsError)
 
   end
