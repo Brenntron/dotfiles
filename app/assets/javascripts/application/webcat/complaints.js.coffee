@@ -369,11 +369,14 @@ window.lookup_prefix = () ->
     selectize.clear()
     urls.push($("#url_" + i ).val())
 
-  $.ajax(
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
-    method: 'GET'
-    data: { urls: urls }
+    method: 'POST'
     headers: headers
+    data: { 'urls': urls }
+
     success: (response) ->
       i = 1
       for [i .. 5]
@@ -451,12 +454,16 @@ window.retrieve_history = (position) ->
 
 window.drop_current_categories = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  data = {url: [$("#url_1").val(),$("#url_2").val(),$("#url_3").val(),$("#url_4").val(),$("#url_5").val()]}
 
-  $.ajax(
+  urls = []
+
+  for i in [1 .. 5]
+    urls.push($("#url_" + i ).val())
+
+  std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
-    data: {data: data}
+    data: { 'urls': urls }
     headers: headers
     success: (response) ->
 )

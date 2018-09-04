@@ -159,68 +159,61 @@ module API
               requires :urls, type: Array[String]
             end
 
-            get 'lookup_prefix' do
-              std_api_v2 do
+            post 'lookup_prefix' do
+              prefix_ids = {}
 
-                prefix_ids = {}
-
-                permitted_params['urls'].each_with_index do |param, position|
-                  prefix_record = Wbrs::Prefix.where(:urls => [param])
-                  if !prefix_record.empty? && prefix_record.first.is_active == 1
-                    prefix_ids[position + 1] = prefix_record.first.prefix_id
-                  else
-                    prefix_ids[position + 1 ] = nil
-                  end
+              permitted_params['urls'].each_with_index do |param, position|
+                prefix_record = Wbrs::Prefix.where(:urls => [param])
+                if !prefix_record.empty? && prefix_record.first.is_active == 1
+                  prefix_ids[position + 1] = prefix_record.first.prefix_id
+                else
+                  prefix_ids[position + 1 ] = nil
                 end
-
-                responses = {}
-                response_json = {}
-
-                prefix_ids.each do |position, prefix_id|
-                  if prefix_id != nil
-                    responses[position]= (Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [prefix_id] }))
-                  end
-                end
-
-                responses.each do |position, response|
-                  response_json[position] = JSON.parse(response.body)
-                end
-
-                render json: response_json
               end
+
+              responses = {}
+              response_json = {}
+
+              prefix_ids.each do |position, prefix_id|
+                if prefix_id != nil
+                  responses[position]= (Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [prefix_id] }))
+                end
+              end
+
+              responses.each do |position, response|
+                response_json[position] = JSON.parse(response.body)
+              end
+
+              render json: response_json
             end
 
             params do
-              # requires :data, type: Hash, desc: "Retrieve categories based on URL"
-              requires :urls, type: Array[String], desc: "Retrieve categories based on URL"
+              requires :urls, type: Array[String], desc: "Drops categories on URLS"
             end
 
             post 'drop_current_categories' do
-              std_api_v2 do
+              prefix_ids = []
+              response = []
 
-                prefix_ids = []
-                response = []
+              urls = permitted_params['urls'].compact
 
-                urls = permitted_params['data']['url'].compact
-
-                urls.each do |url|
-                  if url == ''
-                    urls.delete('')
-                  end
+              urls.each do |url|
+                if url == ''
+                  urls.delete('')
                 end
-
-                urls.each do |param|
-                  if !Wbrs::Prefix.where(:urls => [param]).empty?
-                    prefix_ids.push(Wbrs::Prefix.where(:urls => [param]).first.prefix_id)
-                  end
-                end
-
-                prefix_ids.each do |prefix_id|
-                  response = Wbrs::Prefix.disable(prefix_id, current_user.email)
-                end
-
-                render json: response
               end
+
+              urls.each do |param|
+                if !Wbrs::Prefix.where(:urls => [param]).empty?
+                  prefix_ids.push(Wbrs::Prefix.where(:urls => [param]).first.prefix_id)
+                end
+              end
+
+              prefix_ids.each do |prefix_id|
+                response = Wbrs::Prefix.disable(prefix_id, current_user.email)
+              end
+
+              render json: response
             end
 
           end
