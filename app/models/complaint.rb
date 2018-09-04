@@ -316,12 +316,8 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
 
-          if !prefix_response.nil?
-            if prefix_response.first.is_active == 1
-              new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
-            else
-              new_complaint_entry.url_primary_category = nil
-            end
+          if !prefix_response.nil? && prefix_response.first.is_active == 1
+            new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
           else
             new_complaint_entry.url_primary_category = nil
           end
@@ -371,12 +367,8 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
 
-          if !prefix_response.nil?
-            if prefix_response.first.is_active == 1
-              new_complaint_entry.url_primary_category = entry["current_cat"]
-            else
-              new_complaint_entry.url_primary_category = nil
-            end
+          if !prefix_response.nil? && prefix_response.first.is_active == 1
+            new_complaint_entry.url_primary_category = entry["current_cat"]
           else
             new_complaint_entry.url_primary_category = nil
           end
