@@ -393,20 +393,11 @@ window.lookup_prefix = () ->
 
 window.retrieve_history = (position) ->
 
-  switch(position)
-     when position = 1
-       url = $("#url_1").val()
-     when position = 2
-       url = $("#url_2").val()
-     when position = 3
-       url = $("#url_3").val()
-     when position = 4
-       url =  $("#url_4").val()
-     when position = 5
-       url = $("#url_5").val()
+  url = $("#url_" + position).val()
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
     method: 'POST'
     headers: headers
