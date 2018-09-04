@@ -780,6 +780,14 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
 
+window.fetch_wbnp_data = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
+    data: {}
+    success_msg: 'WBNP Complaints requested from RuleUI.  Please refresh your page shortly.'
+    error_prefix: 'Error fetching wbnp data complaints.'
+  )
 
 window.fetch_complaints = () ->
   std_msg_ajax(
