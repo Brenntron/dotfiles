@@ -785,6 +785,23 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
 
+window.fetch_wbnp_data = () ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
+    data: {}
+    success: (response) ->
+      $('#loader-modal').hide()
+      std_msg_success('WBNP Complaints successfully retrieved from RuleUI.', [], reload: true)
+    error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove()
+      std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
+  )
 
 window.fetch_complaints = () ->
   std_msg_ajax(

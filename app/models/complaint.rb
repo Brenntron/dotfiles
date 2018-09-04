@@ -30,6 +30,9 @@ class Complaint < ApplicationRecord
 
   TI_CHANNEL = 'talosintel'
   INT_CHANNEL = 'internal'
+  WBNP_CHANNEL = 'wbnp'
+
+  SOURCE_RULEUI = "RuleUI"
 
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
@@ -38,6 +41,7 @@ class Complaint < ApplicationRecord
   scope :open_comps, -> { where.not(status: COMPLETED) }
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :by_guest, -> { joins(customer: :company).where('companies.name = ?', 'Guest')}
   scope :by_cust, -> { joins(customer: :company).where('companies.name != ?', 'Guest')}
 
@@ -76,21 +80,38 @@ class Complaint < ApplicationRecord
     url = "http://" + pre_url
 
     uri_parts = {}
+    begin
+      uri_object = URI(url)
 
-    uri_object = URI(url)
 
-    domain_parts = uri_object.host.split(".")
+      domain_parts = uri_object.host.split(".")
 
-    if domain_parts.size > 2
-      uri_parts[:subdomain] = domain_parts.first
-      uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
-      uri_parts[:path] = uri_object.path
-    else
-      uri_parts[:subdomain] = ""
-      uri_parts[:domain] = uri_object.host
-      uri_parts[:path] = uri_object.path
+      if domain_parts.size > 2
+        uri_parts[:subdomain] = domain_parts.first
+        uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
+        uri_parts[:path] = uri_object.path
+      else
+        uri_parts[:subdomain] = ""
+        uri_parts[:domain] = uri_object.host
+        uri_parts[:path] = uri_object.path
+      end
+
+    rescue
+      shitty_uri_parts = url.split("/")
+      shitty_url = [shitty_uri_parts[0], shitty_uri_parts[1], shitty_uri_parts[2]].join("/")
+      leftover_garbage = shitty_uri_parts - [shitty_uri_parts[0], shitty_uri_parts[1], shitty_uri_parts[2]]
+      clean_uri_object = URI(shitty_url)
+      domain_parts = clean_uri_object.host.split(".")
+      if domain_parts.size > 2
+        uri_parts[:subdomain] = domain_parts.first
+        uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
+        uri_parts[:path] = leftover_garbage.join('/')
+      else
+        uri_parts[:subdomain] = ""
+        uri_parts[:domain] = uri_object.host
+        uri_parts[:path] = leftover_garbage.join('/')
+      end
     end
-
 
     uri_parts
   end
@@ -452,6 +473,94 @@ class Complaint < ApplicationRecord
       conn = ::Bridge::ComplaintFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
     end
+  end
+
+  def self.get_latest_wbnp_complaints
+    begin
+
+      bugzilla_proxy = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
+      bugzilla_proxy.bugzilla_login(Bugzilla::User.new(bugzilla_proxy),
+                                    Rails.configuration.bugzilla_username,
+                                    Rails.configuration.bugzilla_password)
+      bugzilla_session = bugzilla_proxy
+
+      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+
+      new_complaints = []
+
+      all_complaints.each do |rule_ui_complaint|
+        rule_ui_complaint_exists = ComplaintEntry.where(:uri => compile_parts_to_uri(rule_ui_complaint))
+        if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
+          new_complaints << rule_ui_complaint
+        end
+      end
+
+      new_complaints.each do |new_ui_complaint|
+        rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_session)
+      end
+
+    rescue
+      #no wbnp response
+    end
+  end
+
+  def self.compile_parts_to_uri(parts)
+    subdomain = ""
+    if parts["subdomain"].present?
+      subdomain = "#{parts["subdomain"]}."
+    end
+    uri = "#{parts["protocol"]}://#{subdomain}#{parts["domain"]}#{parts["path"]}"
+
+    uri
+  end
+
+  def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_session)
+    #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
+    # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
+    # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
+    # "who_updated"=>""}}"
+
+
+    uri = compile_parts_to_uri(rule_ui_complaint)
+    description = "WBNP Sourced Complaint"
+
+    user = User.where(cvs_username:"vrtincom").first
+    bug_factory = Bugzilla::Bug.new(bugzilla_session)
+
+    summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          IPs/URIs: #{uri}
+          Problem Summary: #{description}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'Categorization',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+
+    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+
+    cust = Customer.customer_from_ruleui(rule_ui_complaint)
+    new_complaint = Complaint.create(id: bug_stub_hash["id"],
+                                     description: description,
+                                     customer_id: cust ? cust.id : nil,
+                                     status: NEW,
+                                     channel: WBNP_CHANNEL,
+                                     ticket_source_type: 'Complaint',
+                                     ticket_source: Complaint::SOURCE_RULEUI,
+                                     ticket_source_key: rule_ui_complaint["complaint_id"])
+
+    ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
+
+
+    Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+
   end
 
   def self.create_action(bugzilla_session, ips_urls, description, customer, tags, status=NEW, categories = nil)

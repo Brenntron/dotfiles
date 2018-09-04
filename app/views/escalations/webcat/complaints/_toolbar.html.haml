@@ -32,7 +32,9 @@
     %label.toolbar-section-label Data
     %button.toolbar-button.sync-button#fetch.esc-tooltipped{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
       %span.toolbar-button-text Fetch Complaints
-
+    %button.toolbar-button.sync-button#fetch{ onclick: 'fetch_wbnp_data();'}
+      %span.toolbar-button-text Fetch WBNP Data
+        
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}
       Allow Self Review

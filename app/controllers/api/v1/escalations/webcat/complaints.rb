@@ -154,6 +154,15 @@ module API
                 raise "Error code #{response.code} fetching complaints." unless 400 > response.code
               end
             end
+
+            post 'fetch_wbnp_data' do
+              std_api_v2 do
+
+                Complaint.get_latest_wbnp_complaints
+                {:status => "success"}.to_json
+
+              end
+            end
           end
         end
       end

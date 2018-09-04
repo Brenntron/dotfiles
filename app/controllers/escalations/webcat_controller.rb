@@ -6,7 +6,7 @@ class Escalations::WebcatController < ApplicationController
     @ti_comp_guest = Complaint.from_ti.by_guest.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
     @ti_comp_cust = Complaint.from_ti.by_cust.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
     @int_comp_entries = Complaint.from_int.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
-    @wbnp = "-"
+    @wbnp = Complaint.from_wbnp.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }
 
     @active_comp = Complaint.active_count
     @completed_comp = Complaint.completed_count
