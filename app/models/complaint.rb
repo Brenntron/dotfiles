@@ -430,7 +430,7 @@ class Complaint < ApplicationRecord
   end
 
   def self.get_latest_wbnp_complaints
-    #begin
+    begin
 
       bugzilla_proxy = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
       bugzilla_proxy.bugzilla_login(Bugzilla::User.new(bugzilla_proxy),
@@ -449,13 +449,13 @@ class Complaint < ApplicationRecord
         end
       end
 
-      new_complaints.first(2).each do |new_ui_complaint|
+      new_complaints.each do |new_ui_complaint|
         rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_session)
       end
 
-    #rescue
+    rescue
       #no wbnp response
-    #end
+    end
   end
 
   def self.compile_parts_to_uri(parts)

@@ -45,7 +45,7 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
 
 
 
-  # Creates a new prefix from a given URL and a list of categories.
+  # Assigns a ticket and some other unnecessary workflow silliness
 
   # @param [Array<Integer>] complaint_ids: List of complaint ids
   # @param [String] user: username
