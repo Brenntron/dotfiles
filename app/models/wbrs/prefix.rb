@@ -60,8 +60,8 @@ class Wbrs::Prefix < Wbrs::Base
 
   # Get the audit history
   # @return [Array<Wbrs::HistoryRecord] the collection of audit history records.
-  def history_records(prefix_id:)
-    Wbrs::HistoryRecord.where(prefix_id: prefix_id)
+  def history_records
+    Wbrs::HistoryRecord.where(prefix_id: id)
   end
 
   # Creates a new prefix from a given URL and a list of categories.

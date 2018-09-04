@@ -379,26 +379,10 @@ window.lookup_prefix = () ->
         j = 0
         try
           for [j .. response.json[i].data.length]
-            if i == 1
-              $select= $('#cat_new_url_1').selectize()
-              selectize = $select[0].selectize
-              selectize.addItem(response.json[i].data[j].descr)
-            if i == 2
-              $select= $('#cat_new_url_2').selectize()
-              selectize = $select[0].selectize
-              selectize.addItem(response.json[i].data[j].descr)
-            if i == 3
-              $select= $('#cat_new_url_3').selectize()
-              selectize = $select[0].selectize
-              selectize.addItem(response.json[i].data[j].descr)
-            if i == 4
-              $select= $('#cat_new_url_4').selectize()
-              selectize = $select[0].selectize
-              selectize.addItem(response.json[i].data[j].descr)
-            if i == 5
-              $select= $('#cat_new_url_5').selectize()
-              selectize = $select[0].selectize
-              selectize.addItem(response.json[i].data[j].descr)
+            selector = '#cat_new_url_' + i.toString()
+            $select= $(selector).selectize()
+            selectize = $select[0].selectize
+            selectize.addItem(response.json[i].data[j].descr)
             j++
         catch
           i++

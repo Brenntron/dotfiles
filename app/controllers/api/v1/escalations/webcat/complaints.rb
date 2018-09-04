@@ -193,7 +193,8 @@ module API
             end
 
             params do
-              requires :data, type: Hash, desc: "Retrieve categories based on URL"
+              # requires :data, type: Hash, desc: "Retrieve categories based on URL"
+              requires :urls, type: Array[String], desc: "Retrieve categories based on URL"
             end
 
             post 'drop_current_categories' do
