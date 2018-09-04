@@ -358,20 +358,21 @@ window.enlarge_image = (id,image)->
     content: '<img src="' + image + '">').popover 'show'
 
 window.lookup_prefix = () ->
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  data = {url: []}
+  urls = []
 
   for i in [1 .. 5]
     $select= $('#cat_new_url_' + i).selectize()
     selectize = $select[0].selectize
     selectize.clear()
-    data['url'].push($("#url_" + i ).val())
+    urls.push($("#url_" + i ).val())
 
   $.ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
     method: 'GET'
-    data: {data: data}
+    data: { urls: urls }
     headers: headers
     success: (response) ->
       i = 1

@@ -156,7 +156,7 @@ module API
             end
 
             params do
-              requires :data, type: Hash, desc: "Retrieve categories based on URL"
+              requires :urls, type: Array[String]
             end
 
             get 'lookup_prefix' do
@@ -164,15 +164,13 @@ module API
 
                 prefix_ids = {}
 
-                position = 1
-                permitted_params['data']['url'].each do |param|
+                permitted_params['urls'].each_with_index do |param, position|
                   prefix_record = Wbrs::Prefix.where(:urls => [param])
                   if !prefix_record.empty? && prefix_record.first.is_active == 1
-                    prefix_ids[position] = prefix_record.first.prefix_id
+                    prefix_ids[position + 1] = prefix_record.first.prefix_id
                   else
-                    prefix_ids[position] = nil
+                    prefix_ids[position + 1 ] = nil
                   end
-                  position = position + 1
                 end
 
                 responses = {}
