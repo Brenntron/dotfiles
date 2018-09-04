@@ -23,8 +23,8 @@ class CapybaraSpider < Capybara::Session
     Dir::Tmpname.make_tmpname(['webcapture_', '.png'], nil)
   end
 
-  def self.low_capture(url, dirpath)
-    `phantomjs /extras/capture_site_image.js #{url} #{dirpath}/#{tmpfilename}`.strip()
+  def self.low_capture(url)
+    `phantomjs /extras/capture_site_image.js #{url}`.strip()
   end
 
   def self.capture(url)

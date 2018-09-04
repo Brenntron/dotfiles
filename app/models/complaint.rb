@@ -328,7 +328,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data =  ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}", "tmp")
+              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
@@ -389,7 +389,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data = ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}", "tmp")
+              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
