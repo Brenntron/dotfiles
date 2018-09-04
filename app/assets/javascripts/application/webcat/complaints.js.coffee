@@ -359,8 +359,6 @@ window.enlarge_image = (id,image)->
 
 window.lookup_prefix = () ->
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
   urls = []
 
   for i in [1 .. 5]
@@ -369,12 +367,9 @@ window.lookup_prefix = () ->
     selectize.clear()
     urls.push($("#url_" + i ).val())
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
     method: 'POST'
-    headers: headers
     data: { 'urls': urls }
 
     success: (response) ->
@@ -398,12 +393,9 @@ window.retrieve_history = (position) ->
 
   url = $("#url_" + position).val()
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
     method: 'POST'
-    headers: headers
     data: {'position': position, url: url}
     success: (response) ->
       json = JSON.parse(response)
@@ -453,7 +445,6 @@ window.retrieve_history = (position) ->
   , this)
 
 window.drop_current_categories = () ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   urls = []
 
@@ -464,7 +455,6 @@ window.drop_current_categories = () ->
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
     data: { 'urls': urls }
-    headers: headers
     success: (response) ->
 )
 
