@@ -30,6 +30,7 @@ class Complaint < ApplicationRecord
 
   TI_CHANNEL = 'talosintel'
   INT_CHANNEL = 'internal'
+  WBNP_CHANNEL = 'wbnp'
 
   SOURCE_RULEUI = "RuleUI"
 
@@ -437,13 +438,13 @@ class Complaint < ApplicationRecord
                                     Rails.configuration.bugzilla_password)
       bugzilla_session = bugzilla_proxy
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => ['wbnp'], :statuses => ['new']})["data"]
+      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       new_complaints = []
 
       all_complaints.each do |rule_ui_complaint|
         rule_ui_complaint_exists = ComplaintEntry.where(:uri => compile_parts_to_uri(rule_ui_complaint))
-        if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == 'wbnp'
+        if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
           new_complaints << rule_ui_complaint
         end
       end
@@ -504,7 +505,7 @@ class Complaint < ApplicationRecord
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
                                      status: NEW,
-                                     channel: "WBNP",
+                                     channel: WBNP_CHANNEL,
                                      ticket_source_type: 'Complaint',
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
