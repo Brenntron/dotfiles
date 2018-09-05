@@ -39,7 +39,7 @@ window.multiple_url_categorization = ()->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+    url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
     method: 'POST'
     headers: headers
     data: {urls: urls, cats: cats}
