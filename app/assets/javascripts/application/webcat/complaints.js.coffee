@@ -359,6 +359,16 @@ window.enlarge_image = (id,image)->
 
 window.lookup_prefix = () ->
 
+  event.preventDefault()
+
+  $('#loader-modal').show()
+  $('.modal-backdrop').show()
+
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+
   urls = []
 
   for i in [1 .. 5]
@@ -387,6 +397,8 @@ window.lookup_prefix = () ->
           i++
           continue
         i++
+      $('#loader-modal').hide()
+      $('.modal-backdrop').hide()
   )
 
 window.retrieve_history = (position) ->
