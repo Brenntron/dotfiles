@@ -131,21 +131,20 @@ module API
 
             desc 'categorize url without complaint'
             params do
-              requires :data, type: Hash, desc: "Hash of urls and categories to create prefixes on"
+              requires :urls, type: Array[String], desc: "URLS for categorization"
+              requires :cats, type: Array[String], desc: "Categories to apply"
             end
             post 'cat_new_url' do
               std_api_v2 do
-                params["data"].each do |item, prefix|
-                  if prefix["url"].present?
-                    Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
-                                                       categories_string: prefix["cats"].join(','),
-                                                       description: '',
-                                                       user: current_user.email,
-                                                       bugzilla_session: bugzilla_session)
-
-                  end
+                permitted_params['urls'].each do |prefix|
+                  Complaint.commit_without_complaint(ip_or_uri: prefix,
+                                                     categories_string: permitted_params["cats"].join(','),
+                                                     description: '',
+                                                     user: current_user.email,
+                                                     bugzilla_session: bugzilla_session)
                 end
               end
+              render json: 'Success'
             end
 
             post 'fetch' do
