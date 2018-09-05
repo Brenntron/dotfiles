@@ -12,7 +12,7 @@ FactoryBot.define do
     email { "#{cvs_username}@cisco.com" }
 
     trait :vrt_incoming_user do
-      display_name "Vrt Incoming"
+      display_name                      { "Vrt Incoming" }
     end
 
     factory :current_user do

@@ -1,9 +1,9 @@
 FactoryBot.define do
   factory :dispute_entry do
-    dispute_id 1
-    uri 'talosintelligence.com'
-    status 'NEW'
-    case_opened_at Time.now
+    dispute_id      { 1 }
+    uri             { 'talosintelligence.com' }
+    status          { 'NEW' }
+    case_opened_at  { Time.now }
   end
 
   trait :with_preloader do
