@@ -8,7 +8,7 @@ RSpec.describe "Talos Intelligence poll-from-bridge channel", type: :request do
     expect(response.code).to eq('400')
   end
 
-  let(:complaints_and_disputes_email) do
+  let(:dispute_email) do
     <<-HEREDOC
         ____________________________________________________________
         User-entered Information:
@@ -40,82 +40,97 @@ RSpec.describe "Talos Intelligence poll-from-bridge channel", type: :request do
         Hostname's IPs:
     HEREDOC
   end
-  let(:complaints_and_disputes_message) do
+  let(:complaint_message) do
     {
         envelope: {
             channel: "ticket-event",
             addressee: "analyst-console-escalations",
             sender: "talos-intelligence"
         },
-        message: [
-            {
-                complaint: {
-                    source_key: 49,
-                    source_type: "Complaint",
-                    payload: {
-                        name: "Marlin Pierce",
-                        email: "marlpier@cisco.com",
-                        domain: "cisco.com",
-                        problem: "New category",
-                        details: '',
-                        user_ip: "::1",
-                        ticket_time: "September 03, 2018 12:05",
-                        investigate_ips: {},
-                        investigate_urls: {
-                            "www.spanx.com": {
-                                WBRS_SCORE: '1.58',
-                                WBRS_Rule_Hits: "alx_cln, vsvd",
-                                Hostname_ips: '',
-                                current_cat: "Shopping",
-                                cat_sugg: [
-                                    "Lingerie and Swimsuits"
-                                ],
-                            }
-                        },
-                        user_company: "Cisco Systems, Inc.",
-                        submission_type: "w"
-                    }
-                }
-            },
-            {
-                dispute: {
-                    payload: {
-                        name: "Marlin Pierce",
-                        email: "marlpier@cisco.com",
-                        domain: "cisco.com",
-                        problem: "New category",
-                        details: '',
-                        user_ip: "::1",
-                        ticket_time: "September 03, 2018 12:04",
-                        investigate_ips: {},
-                        investigate_urls: {
-                            "www.spanx.com": {
-                                WBRS_SCORE: '1.58',
-                                WBRS_Rule_Hits: "alx_cln, vsvd",
-                                Hostname_ips: '',
-                                rep_sugg: "Good",
-                                category: "Shopping"
-
-                            }
-                        },
-                        email_subject: "New category",
-                        email_body: complaints_and_disputes_email,
-                        user_company: "Cisco Systems, Inc.",
-                        submission_type: "w"
+        message: {
+            complaint: {
+                source_key: 49,
+                source_type: "Complaint",
+                payload: {
+                    name: "Marlin Pierce",
+                    email: "marlpier@cisco.com",
+                    domain: "cisco.com",
+                    problem: "New category",
+                    details: '',
+                    user_ip: "::1",
+                    ticket_time: "September 03, 2018 12:05",
+                    investigate_ips: {},
+                    investigate_urls: {
+                        "www.spanx.com": {
+                            WBRS_SCORE: '1.58',
+                            WBRS_Rule_Hits: "alx_cln, vsvd",
+                            Hostname_ips: '',
+                            current_cat: "Shopping",
+                            cat_sugg: [
+                                "Lingerie and Swimsuits"
+                            ],
+                        }
                     },
-                    source_key: 47,
-                    source_type: "Dispute"
+                    user_company: "Cisco Systems, Inc.",
+                    submission_type: "w"
                 }
             }
-        ]
+        }
+    }
+  end
+  let(:dispute_message) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                payload: {
+                    name: "Marlin Pierce",
+                    email: "marlpier@cisco.com",
+                    domain: "cisco.com",
+                    problem: "New category",
+                    details: '',
+                    user_ip: "::1",
+                    ticket_time: "September 03, 2018 12:04",
+                    investigate_ips: {},
+                    investigate_urls: {
+                        "www.spanx.com": {
+                            WBRS_SCORE: '1.58',
+                            WBRS_Rule_Hits: "alx_cln, vsvd",
+                            Hostname_ips: '',
+                            rep_sugg: "Good",
+                            category: "Shopping"
+
+                        }
+                    },
+                    email_subject: "New category",
+                    email_body: dispute_email,
+                    user_company: "Cisco Systems, Inc.",
+                    submission_type: "w"
+                },
+                source_key: 47,
+                source_type: "Dispute"
+            }
+        }
     }
   end
 
-  it 'receives complaints and disputes' do
+  it 'receives a complaint message' do
 
     post '/escalations/peake_bridge/channels/ticket-event/messages', headers: { 'Content-Type': 'application/json' },
-         params: complaints_and_disputes_message.to_json
+         params: complaint_message.to_json
 
-    expect(response.code).to eq('400')
+    expect(response.code).to eq('200')
+  end
+
+  it 'receives a dispute message' do
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', headers: { 'Content-Type': 'application/json' },
+         params: dispute_message.to_json
+
+    expect(response.code).to eq('200')
   end
 end

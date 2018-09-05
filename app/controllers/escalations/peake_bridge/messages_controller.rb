@@ -117,10 +117,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
 
   def message_params
     #TODO: use stronger permitting here eventually
-    # params.require(:message).permit!
-    params.require(:message).tap do |message_params|
-      message_params.permit! if message_params.respond_to?(:permit!)
-    end
+    params.require(:message).permit!
   end
 
   def false_positive_params
