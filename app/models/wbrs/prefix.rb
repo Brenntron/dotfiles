@@ -82,8 +82,13 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [String] user: The user for this action
   # @param [String] description: A description
   # @return [Integer] id of updated prefix.
-  def set_categories(category_ids_array, user:, description: nil, prefix_id:)
-    options = { 'prefix_id' => prefix_id, 'categories' => category_ids_array, 'user' => user, 'description' => description }
+  def set_categories(category_ids_array, user:, description: nil, prefix_id: nil)
+    options = {
+        'prefix_id' => prefix_id || self.id,
+        'categories' => category_ids_array,
+        'user' => user,
+        'description' => description
+    }
     response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/edit', body: Wbrs::Prefix.stringkey_params(options))
 
     response_body = JSON.parse(response.body)

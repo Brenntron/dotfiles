@@ -327,8 +327,7 @@ describe 'A prefix' do
 
     edit_prefix_id = prefix.set_categories([category, 6],
                                            user: 'tester',
-                                           description: 'Testing /edit route.',
-                                           prefix_id: 101)
+                                           description: 'Testing /edit route.')
 
     expect(edit_prefix_id).to eql(101)
   end
