@@ -141,9 +141,9 @@ describe Wbrs::Prefix do
 
     prefixes = Wbrs::Prefix.where(category_ids: [5, 6], active: true).sort_by{ |prefix| prefix.id }
 
-    expect(prefixes.count).to eql(2)
+    expect(prefixes.count).to eql(3)
     expect(prefixes[0].id).to eql(101)
-    expect(prefixes[1].id).to eql(102)
+    expect(prefixes[2].id).to eql(102)
   end
 
   it 'should handle errors getting a prefixes collection given conditions' do
