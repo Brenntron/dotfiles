@@ -180,7 +180,9 @@ window.updatePending = (id,row_id) ->
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
-
+        td = $(temp_row).next('tr').find('td:first')
+        unless $(td).hasClass 'nested-complaint-data-wrapper'
+          $(td).addClass 'nested-complaint-data-wrapper'
         if json.was_dismissed
           temp_row.node().className += ' highlight-was-dismissed'
 
