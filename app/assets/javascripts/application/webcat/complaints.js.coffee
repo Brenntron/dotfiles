@@ -376,7 +376,7 @@ format = (complaint_entry_row) ->
     host = host + complaint_entry.domain
     url = host
     if complaint_entry.path
-      url = host + complaint_entry.path
+      url = host
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A+' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
   else if  complaint_entry.ip_address
