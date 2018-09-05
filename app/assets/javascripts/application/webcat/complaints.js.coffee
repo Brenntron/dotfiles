@@ -456,6 +456,9 @@ window.drop_current_categories = () ->
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
+      std_msg_success('Categories have been successfully dropped.', [], reload: false)
+    error: (response) ->
+      std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
 format = (complaint_entry_row) ->
