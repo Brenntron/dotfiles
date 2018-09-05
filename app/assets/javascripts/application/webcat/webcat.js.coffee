@@ -126,7 +126,6 @@ $ ->
       ]
       select: 'style': 'os'
       responsive: true)
-    populate_webcat_index_table()
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 
