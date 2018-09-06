@@ -57,7 +57,7 @@ class HurlArgs
 
   def set_defaults
     @env                    = nil
-    @project                = 'analyst-console'
+    @project                = 'analyst-console-escalations'
     @build_base             = '../releases'
     @get_source             = true
     @do_create_tar          = true
