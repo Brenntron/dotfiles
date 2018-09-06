@@ -333,8 +333,19 @@ Then(/^I do some debugging$/) do
   binding.pry
 end
 
+Then(/^I do some debugging with byebug$/) do
+  #insert debug lines here
+  # page.driver.debug  #you need @debug and @javascript for this to work
+  byebug
+end
+
 Then(/^open inspector$/) do
   page.driver.debug
 end
 
-
+Then(/^Expect date in element "(.*?)" to equal today's date$/) do |element|
+  within element do
+    t = Time.now
+    expect(page).to have_content(t.strftime("%Y-%m-%d"))
+  end
+end

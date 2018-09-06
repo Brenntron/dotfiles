@@ -11,7 +11,7 @@ Given(/^the following dispute_entries exist:$/) do |dispute_entries|
   FactoryBot.create(:customer) unless Customer.all.exists?
   FactoryBot.create(:user) unless User.all.exists?
   dispute_entries.hashes.each do |dispute_entry|
-    FactoryBot.create(:dispute, dispute_entry)
+    FactoryBot.create(:dispute_entry, dispute_entry)
   end
 end
 
