@@ -257,7 +257,7 @@ class Complaint < ApplicationRecord
 
     begin
       ActiveRecord::Base.transaction do
-        max_wait_for_job = 10 #seconds
+        max_wait_for_job = 15 #seconds
 
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
@@ -396,6 +396,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
 
+
           if prefix_response.first&.is_active == 1
             new_complaint_entry.url_primary_category = entry["current_cat"]
           else
@@ -435,6 +436,7 @@ class Complaint < ApplicationRecord
             #couldnt complete in time
             Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             open("app/assets/images/failed_screenshot.jpg") do |f|
               ces.screenshot = f.read
@@ -442,6 +444,7 @@ class Complaint < ApplicationRecord
             ces.save!
           rescue Exception => e
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             open("app/assets/images/failed_screenshot.jpg") do |f|
               ces.screenshot = f.read
