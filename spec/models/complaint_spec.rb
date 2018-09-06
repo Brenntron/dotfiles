@@ -28,11 +28,22 @@ describe Complaint do
         }
     })
   end
+  let(:rules_get_json) do
+    {
+        "data" => [],
+        "errors" => [],
+        "meta" => {
+            "limit" => 1000,
+            "rows_found" => 0
+        }
+    }.to_json
+  end
   let(:top_url_response_json) do
     {
         "www.spanx.com": true
     }.to_json
   end
+  let(:rules_get_response) { double('HTTPI::Response', code: 200, body: rules_get_json) }
   let(:top_url_response_response) { double('HTTPI::Response', code: 200, body: top_url_response_json) }
   let(:bug_factory) do
     double('Bugzilla::Bug', create: { "id" => 101 })
@@ -45,6 +56,10 @@ describe Complaint do
 
   it 'processes bridge payload' do
     allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/cat/rules/get', body: anything)
+                .and_return(rules_get_response)
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:post, '/v1/cat/urls/top', body: anything)
