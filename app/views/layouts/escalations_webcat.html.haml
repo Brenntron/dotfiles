@@ -93,18 +93,14 @@
 
         %form{method: 'get', 'accept-charset': 'UTF-8'}
           #categorize-same-form
-            %h5 Categorize URLs with Same Categories
+            %h5 Categorize Multiple URLs With Same Categories
             .form-group
               %label.content-label-sm Categories
               %select.form-control#multi_cat_url_cats.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;"}
             %hr.thin.condensed
             .form-group
-              %label.content-label-sm URLs
-              %input.form-control#multi_url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+              %label.content-label-sm URLs/IP Addresses
+              %textarea#categorize_urls{required: true}
             .form-group.text-center
               %button.primary{:type => "button", :onclick=>"multiple_url_categorization()"} Categorize URLs
 

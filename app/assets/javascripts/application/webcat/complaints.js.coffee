@@ -32,16 +32,17 @@ window.multiple_url_categorization = ()->
     backdrop: 'static',
     keyboard: false
   })
-  data = {}
-  for i in [1...6] by 1
-    data[i] = {url: $("#multi_url_#{i}").val(), cats: $("#multi_cat_url_cats").val()}
+
+  urls = $("#categorize_urls").val().split(/\n/)
+  cats = $("#multi_cat_url_cats").val()
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+    url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
     method: 'POST'
     headers: headers
-    data: {data: data}
+    data: {urls: urls, cats: cats}
     success: (response) ->
       $('#loader-modal').hide()
       std_msg_success('URLs categorized successfully.',"", reload: true)
@@ -1134,13 +1135,16 @@ $ ->
 
   $('#cat-urls-diff').click ->
     if $('#cat-urls-diff').prop('checked')
-      $('#categorize-diff-form').show()
       $('#categorize-same-form').hide()
+      $('#categorize-diff-form').show()
 
   $('#cat-urls-same').click ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+
+
 
 
 

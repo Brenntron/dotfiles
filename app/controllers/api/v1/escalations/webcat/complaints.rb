@@ -148,6 +148,24 @@ module API
               end
             end
 
+            desc 'categorize multiple urls without complaint'
+            params do
+              requires :urls, type: Array[String], desc: "URLS for categorization"
+              requires :cats, type: Array[String], desc: "Categories to apply"
+            end
+            post 'multi_cat_new_url' do
+              std_api_v2 do
+                permitted_params['urls'].each do |prefix|
+                  Complaint.commit_without_complaint(ip_or_uri: prefix,
+                                                     categories_string: permitted_params["cats"].join(','),
+                                                     description: '',
+                                                     user: current_user.email,
+                                                     bugzilla_session: bugzilla_session)
+                end
+              end
+              render json: 'Success'
+            end
+
             post 'fetch' do
               std_api_v2 do
                 response = Bridge::DirectRequest.poll('talos-intelligence')
