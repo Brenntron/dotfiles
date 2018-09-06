@@ -397,7 +397,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
 
 
-          if prefix_response.first&.is_active == 1
+          if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"]
           else
             new_complaint_entry.url_primary_category = nil
