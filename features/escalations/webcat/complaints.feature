@@ -77,4 +77,16 @@ Feature: Webcat complaints
     And I wait for "1" seconds
     Then I should see "Vrt Incoming"
 
-
+  @javascript
+  Scenario: a user attempts to view reports more than once
+    Given an admin user with role "webcat user" exists and is logged in
+    And I goto "/escalations/webcat/reports"
+    And I fill in "report_date_from" with "2018-08-01"
+    And I fill in "report_date_to" with "2018-08-02"
+    Then I click "Report" and switch to the new window
+    Then I should see "Webcat Report"
+    Then I goto "/escalations/webcat/reports"
+    And I fill in "report_date_from" with "2018-08-11"
+    And I fill in "report_date_to" with "2018-08-12"
+    Then I click "Report" and switch to the new window
+    Then I should see "Webcat Report"

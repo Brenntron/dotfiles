@@ -345,3 +345,6 @@ Then(/^I trigger-click "(.*?)"$/) do |target|
   find(target).trigger('click')
 end
 
+Then /I click "(.*?)" and switch to the new window/ do |target|
+  page.switch_to_window(page.window_opened_by{click_button(target)})
+end
