@@ -9,6 +9,6 @@ Feature: Disputes
     Then I goto "escalations/webrep/"
     When I trigger-click "#table-show-columns-button"
     And I trigger-click "#submitter-type-checkbox"
-    Then Element with class "sorting" should have content "Submitter Type"
-#    Then I should see "Submitter Type"
+    When I trigger-click "#table-show-columns-button"
+    Then I should see header with id "submitter-type"
     Then take a screenshot
