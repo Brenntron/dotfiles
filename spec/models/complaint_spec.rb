@@ -28,6 +28,15 @@ describe Complaint do
         }
     })
   end
+  let(:top_url_response_json) do
+    {
+        "www.spanx.com": true
+    }.to_json
+  end
+  let(:top_url_response_response) { double('HTTPI::Response', code: 200, body: top_url_response_json) }
+  let(:bug_factory) do
+    double('Bugzilla::Bug', create: { "id" => 101 })
+  end
 
   before(:example) do
     FactoryBot.create(:vrt_incoming_user)
@@ -35,6 +44,11 @@ describe Complaint do
   end
 
   it 'processes bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
 
     Complaint.process_bridge_payload(complaint_message_payload)
   end
