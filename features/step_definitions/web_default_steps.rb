@@ -337,4 +337,7 @@ Then(/^open inspector$/) do
   page.driver.debug
 end
 
+Then(/^I trigger-click "(.*?)"$/) do |target|
+  find(target).trigger('click')
+end
 
