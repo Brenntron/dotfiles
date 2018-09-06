@@ -3901,12 +3901,12 @@ button.tertiary {
   left: auto;
 }
 
-#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input {
+#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input, #categorize-urls-form-wrapper textarea {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus {
+#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus, #categorize-urls-form-wrapper textarea:focus {
   background-color: $faint-alt-highlight;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -5726,11 +5726,11 @@ table.dataTable tbody tr.selected {
   min-width: 350px;
 }
 
-#new-complaint-wrapper textarea, #new-complaint-wrapper input {
+#new-complaint-wrapper textarea, #new-complaint-wrapper input, #categorize-urls-form-wrapper textarea {
   width: 100%;
 }
 
-#new-complaint-wrapper textarea {
+#new-complaint-wrapper textarea, #categorize-urls-form-wrapper textarea {
   padding: 4px;
   color: $type-lighter-color;
   font-size: 9.5pt;
