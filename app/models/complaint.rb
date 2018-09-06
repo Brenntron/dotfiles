@@ -410,7 +410,7 @@ class Complaint < ApplicationRecord
           #lets query the top url API endpoint to determine if this is an important site or not
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
-          new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
+          new_complaint_entry.is_important = !!importance #making sure importance is a boolean
           new_complaint_entry.save
 
           new_payload_item = {}
