@@ -174,10 +174,72 @@ describe Dispute do
         }
     }.to_json
   end
+  let(:xbrs_domain_json) do
+    "---\n" +
+    {
+        "api" => {
+            "memory_footprint_kb" => 55012,
+            "system_top_genid" => 20573168,
+            "response_took" => 0.014037847518920898,
+            "response_repdb_time" => 1536348248,
+            "isolation_level" => "REPEATABLE-READ",
+            "request" => "http://prod-xbrs-writer1.vega.ironport.com:80/v1/domain/www.spanx.com?consumer=TEST",
+            "product_version" => "1.3.0 2018-05-16 09:38 PDT",
+            "response_local_time" => 1536348248,
+            "total_data_rows" => 0,
+            "response_action" => "domain.one",
+            "data_documents" => 1,
+            "request_local_time" => 1536348248.6497071,
+            "api_version" => "v1"
+        },
+        "resource" => {
+            "requested_subdomain" => nil,
+            "data_rows" => 0,
+            "requested_domain" => "www.spanx.com"
+        }
+    }.to_json +
+    "\n---\n" +
+    {
+        "rule_type" => "PREFIX",
+        "data" => [],
+        "legend" => [
+            "rule_id",
+            "mnemonic",
+            "row_id",
+            "ctime",
+            "genid",
+            "proto",
+            "userpass",
+            "subdomain",
+            "domain",
+            "port",
+            "path",
+            "query",
+            "fragment",
+            "attr",
+            "attr_truncated",
+            "path_truncated",
+            "query_truncated",
+            "unique_hash",
+            "mtime",
+            "operation"
+        ]
+    }.to_json
+  end
+  let(:umbrella_data) do
+    {
+        "www.spanx.com" => {
+            "status" => 0,
+            "security_categories" => [],
+            "content_categories" => ["8", "41"]
+        }
+    }
+  end
   let(:top_url_response_response) { double('HTTPI::Response', code: 200, body: top_url_response_json) }
   let(:blacklist_response) { double('HTTPI::Response', code: 200, body: blacklist_json) }
   let(:virustotal_response) { double('HTTPI::Response', code: 200, body: virustotal_json) }
   let(:manual_wlbl_response) { double('HTTPI::Response', code: 200, body: manual_wlbl_json) }
+  let(:xbrs_domain_response) { double('HTTPI::Response', code: 200, body: xbrs_domain_json) }
   let(:bug_factory) do
     double('Bugzilla::Bug', create: { "id" => 101 })
   end
@@ -205,6 +267,11 @@ describe Dispute do
         .to receive(:post_request)
                 .with(path: '/v1/rep/wlbl/get', body: anything)
                 .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Preloader::Base).to receive(:auto_resolve_new).and_return(double("AutoResolve", call_umbrella: umbrella_data))
 
     expect do
       Dispute.process_bridge_payload(dispute_message_payload)
