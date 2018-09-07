@@ -93,6 +93,7 @@ class Preloader::Base
       dispute_entry.reload
     end
 
+    # TODO: You know what, maybe this whole method should be in the DisputeEntryPreload class.
     data = DisputeEntryPreload.new do |d|
       d.dispute_entry_id = dispute_entry_id
       d.xbrs_history = xbrs_history

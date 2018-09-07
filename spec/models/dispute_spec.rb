@@ -272,6 +272,7 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Preloader::Base).to receive(:auto_resolve_new).and_return(double("AutoResolve", call_umbrella: umbrella_data))
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
 
     expect do
       Dispute.process_bridge_payload(dispute_message_payload)
