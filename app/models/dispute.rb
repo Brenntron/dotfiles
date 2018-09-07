@@ -343,7 +343,7 @@ class Dispute < ApplicationRecord
 
   def self.is_important?(key)
     top_url = Wbrs::TopUrl.check_urls([key]).first
-    return false if top_url.is_important != "invalid"
+    return false if 'invalid' == top_url.is_important
     top_url.is_important
   rescue => except
 
