@@ -1,4 +1,5 @@
 class Escalations::PeakeBridge::MessagesController < ApplicationController
+  skip_before_action :require_login
 
   def get_messages
     #if peake bridge ever asks for info from AC this is where you would return a response
@@ -55,7 +56,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
     Rails.logger.warn(message)
 
     render plain: message,
-           status: :internal_server_error
+           status: :bad_request
   end
 
   private

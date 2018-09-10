@@ -32,16 +32,17 @@ window.multiple_url_categorization = ()->
     backdrop: 'static',
     keyboard: false
   })
-  data = {}
-  for i in [1...6] by 1
-    data[i] = {url: $("#multi_url_#{i}").val(), cats: $("#multi_cat_url_cats").val()}
+
+  urls = $("#categorize_urls").val().split(/\n/)
+  cats = $("#multi_cat_url_cats").val()
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+    url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
     method: 'POST'
     headers: headers
-    data: {data: data}
+    data: {urls: urls, cats: cats}
     success: (response) ->
       $('#loader-modal').hide()
       std_msg_success('URLs categorized successfully.',"", reload: true)
@@ -180,7 +181,9 @@ window.updatePending = (id,row_id) ->
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
-
+        td = $(temp_row).next('tr').find('td:first')
+        unless $(td).hasClass 'nested-complaint-data-wrapper'
+          $(td).addClass 'nested-complaint-data-wrapper'
         if json.was_dismissed
           temp_row.node().className += ' highlight-was-dismissed'
 
@@ -357,7 +360,121 @@ window.enlarge_image = (id,image)->
     trigger: 'focus'
     content: '<img src="' + image + '">').popover 'show'
 
+window.lookup_prefix = () ->
 
+  event.preventDefault()
+
+  $('#loader-modal').show()
+  $('.modal-backdrop').show()
+
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+
+  urls = []
+
+  for i in [1 .. 5]
+    $select= $('#cat_new_url_' + i).selectize()
+    selectize = $select[0].selectize
+    selectize.clear()
+    urls.push($("#url_" + i ).val())
+
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
+    method: 'POST'
+    data: { 'urls': urls }
+
+    success: (response) ->
+      i = 1
+      for [i .. 5]
+        j = 0
+        try
+          for [j .. response.json[i].data.length]
+            selector = '#cat_new_url_' + i.toString()
+            $select= $(selector).selectize()
+            selectize = $select[0].selectize
+            selectize.addItem(response.json[i].data[j].descr)
+            j++
+        catch
+          i++
+          continue
+        i++
+      $('#loader-modal').hide()
+      $('.modal-backdrop').hide()
+  )
+
+window.retrieve_history = (position) ->
+
+  url = $("#url_" + position).val()
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
+    method: 'POST'
+    data: {'position': position, url: url}
+    success: (response) ->
+      json = JSON.parse(response)
+
+      if json.error
+        std_msg_error("<p>Something went wrong: #{json.error}","")
+      else
+        #parse this json properly
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<h5>Domain History</h5>' +
+          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+          '<tbody>'
+
+        for entry in json
+
+          entry_string = "" +
+            '<tr>' +
+            '<td>' + entry['action'] + '</td>' +
+            '<td>' + entry['confidence'] + '</td>' +
+            '<td>' + entry['description'] + '</td>' +
+            '<td>' + entry['time'] + '</td>' +
+            '<td>' + entry['user'] + '</td>' +
+            '<td>' + entry['category']['descr'] + '</td>' +
+            '</tr>'
+
+          history_dialog_content += entry_string
+        history_dialog_content += '</tbody></table>'
+        history_dialog_content += '<hr class="thin"/>'
+
+        if $("#history_dialog").length
+          history_dialog = this
+          $("#history_dialog").html(history_dialog_content)
+          $('#history_dialog').dialog('open')
+        else
+          history_dialog = '<div id="history_dialog" title="History Information"></div>'
+          $('body').append(history_dialog)
+          $("#history_dialog").html(history_dialog_content)
+          #$('#history_dialog').append(history_dialog_content)
+          $('#history_dialog').dialog
+            autoOpen: false
+            minWidth: 600
+            position: { my: "right top", at: "right top", of: window }
+          $('#history_dialog').dialog('open')
+
+    error: (response) ->
+      std_msg_error("<p>Something went wrong: #{response.responseText}","")
+  , this)
+
+window.drop_current_categories = () ->
+
+  urls = []
+
+  for i in [1 .. 5]
+    urls.push($("#url_" + i ).val())
+
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
+    method: 'POST'
+    data: { 'urls': urls }
+    success: (response) ->
+      std_msg_success('Categories have been successfully dropped.', [], reload: false)
+    error: (response) ->
+      std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
+)
 
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
@@ -376,7 +493,7 @@ format = (complaint_entry_row) ->
     host = host + complaint_entry.domain
     url = host
     if complaint_entry.path
-      url = host + complaint_entry.path
+      url = host
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A+' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
   else if  complaint_entry.ip_address
@@ -649,16 +766,17 @@ window.history_dialog = (id) ->
         if $("#history_dialog").length
           history_dialog = this
           $("#history_dialog").html(history_dialog_content)
+          $('#history_dialog').dialog('open')
         else
           history_dialog = '<div id="history_dialog" title="History Information"></div>'
           $('body').append(history_dialog)
           $("#history_dialog").html(history_dialog_content)
           #$('#history_dialog').append(history_dialog_content)
           $('#history_dialog').dialog
-            autoOpen: true
+            autoOpen: false
             minWidth: 600
             position: { my: "right top", at: "right top", of: window }
-
+          $('#history_dialog').dialog('open')
 #        dialog_content = $(format_domain_info(json))
 #        if $("#complaint_button_dialog").length
 #          complaint_dialog = this
@@ -1017,13 +1135,16 @@ $ ->
 
   $('#cat-urls-diff').click ->
     if $('#cat-urls-diff').prop('checked')
-      $('#categorize-diff-form').show()
       $('#categorize-same-form').hide()
+      $('#categorize-diff-form').show()
 
   $('#cat-urls-same').click ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+
+
 
 
 

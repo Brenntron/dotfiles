@@ -148,11 +148,90 @@ module API
               end
             end
 
+            desc 'categorize multiple urls without complaint'
+            params do
+              requires :urls, type: Array[String], desc: "URLS for categorization"
+              requires :cats, type: Array[String], desc: "Categories to apply"
+            end
+            post 'multi_cat_new_url' do
+              std_api_v2 do
+                permitted_params['urls'].each do |prefix|
+                  Complaint.commit_without_complaint(ip_or_uri: prefix,
+                                                     categories_string: permitted_params["cats"].join(','),
+                                                     description: '',
+                                                     user: current_user.email,
+                                                     bugzilla_session: bugzilla_session)
+                end
+              end
+              render json: 'Success'
+            end
+
             post 'fetch' do
               std_api_v2 do
                 response = Bridge::DirectRequest.poll('talos-intelligence')
                 raise "Error code #{response.code} fetching complaints." unless 400 > response.code
               end
+            end
+
+            params do
+              requires :urls, type: Array[String]
+            end
+
+            post 'lookup_prefix' do
+              prefix_ids = {}
+
+              permitted_params['urls'].each_with_index do |param, position|
+                prefix_record = Wbrs::Prefix.where(:urls => [param])
+                if !prefix_record.empty? && prefix_record.first.is_active == 1
+                  prefix_ids[position + 1] = prefix_record.first.prefix_id
+                else
+                  prefix_ids[position + 1 ] = nil
+                end
+              end
+
+              responses = {}
+              response_json = {}
+
+              prefix_ids.each do |position, prefix_id|
+                if prefix_id != nil
+                  responses[position]= (Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [prefix_id] }))
+                end
+              end
+
+              responses.each do |position, response|
+                response_json[position] = JSON.parse(response.body)
+              end
+
+              render json: response_json
+            end
+
+            params do
+              requires :urls, type: Array[String], desc: "Drops categories on URLS"
+            end
+
+            post 'drop_current_categories' do
+              prefix_ids = []
+              response = []
+
+              urls = permitted_params['urls'].compact
+
+              urls.each do |url|
+                if url == ''
+                  urls.delete('')
+                end
+              end
+
+              urls.each do |param|
+                if !Wbrs::Prefix.where(:urls => [param]).empty?
+                  prefix_ids.push(Wbrs::Prefix.where(:urls => [param]).first.prefix_id)
+                end
+              end
+
+              prefix_ids.each do |prefix_id|
+                response = Wbrs::Prefix.disable(prefix_id, current_user.email)
+              end
+
+              render json: response
             end
 
             post 'fetch_wbnp_data' do

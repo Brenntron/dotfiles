@@ -42,33 +42,50 @@
         #categorize-diff-form
           %form{method: 'get', 'accept-charset': 'UTF-8'}
             %h5 Categorize URLs with Different Categories
+            .toolbar
+              %div
+                %button.toolbar-button.current-categories-button.esc-tooltipped{:type => 'button', title: 'Lookup Current Categories', onclick: 'lookup_prefix()'}
+                  %span Lookup Current Categories
+                %button.toolbar-button.delete-categories-button.esc-tooltipped{:type => 'button', title: 'Drop All Current Categories', onclick: 'drop_current_categories()'}
+                  %span Drop All Current Categories
+
             .form-group
               %label.content-label-sm URL
-              %input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
+              %br
+              %input.inline-input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
+              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(1)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: '2'}
             %hr.thin.condensed
             .form-group
               %label.content-label-sm URL
-              %input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3'}/
+              %br
+              %input.inline-input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3'}/
+              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(2)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4"}
             %hr.thin.condensed
             .form-group
               %label.content-label-sm URL
-              %input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5'}/
+              %br
+              %input.inline-input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5'}/
+              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(3)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6"}
             %hr.thin.condensed
             .form-group
               %label.content-label-sm URL
-              %input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7'}/
+              %br
+              %input.inline-input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7'}/
+              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(4)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8"}
             %hr.thin.condensed
             .form-group
               %label.content-label-sm URL
-              %input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
+              %br
+              %input.inline-input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
+              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(5)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
             .form-group.text-center
@@ -76,18 +93,14 @@
 
         %form{method: 'get', 'accept-charset': 'UTF-8'}
           #categorize-same-form
-            %h5 Categorize URLs with Same Categories
+            %h5 Categorize Multiple URLs With Same Categories
             .form-group
               %label.content-label-sm Categories
               %select.form-control#multi_cat_url_cats.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;"}
             %hr.thin.condensed
             .form-group
-              %label.content-label-sm URLs
-              %input.form-control#multi_url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
-              %input.form-control#multi_url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL"}
+              %label.content-label-sm URLs/IP Addresses
+              %textarea#categorize_urls{required: true}
             .form-group.text-center
               %button.primary{:type => "button", :onclick=>"multiple_url_categorization()"} Categorize URLs
 

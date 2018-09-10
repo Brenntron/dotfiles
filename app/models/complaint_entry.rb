@@ -510,7 +510,7 @@ class ComplaintEntry < ApplicationRecord
   def set_current_category
     prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
     if prefix_results
-      if prefix_results.first.is_active == 1
+      if prefix_results.first&.is_active == 1
         categories = prefix_results.map{ |result| result.descr}
         self.url_primary_category = categories.join(',')
         self.category = categories.join(',')
