@@ -24,7 +24,6 @@ class Wbrs::HistoryRecord < Wbrs::Base
     response = post_request(path: '/v1/cat/rules/audit', body: params)
 
     response_body = JSON.parse(response.body)
-    result = response_body['data'].map {|datum| new_from_datum(datum)}
     response_body['data'].map {|datum| new_from_datum(datum)}
   end
 end
