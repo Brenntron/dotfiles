@@ -557,11 +557,8 @@ class ComplaintEntry < ApplicationRecord
      by_cat[hist.category_id] << hist
     end
 
-
-    # binding.pry
     if !by_cat.empty?
       data.each do |key, value|
-        binding.pry
         data[key][:confidence] = by_cat[key].last.confidence
         data[key][:name] = by_cat[key].last.category.descr
         data[key][:long_description] = by_cat[key].last.category.desc_long
