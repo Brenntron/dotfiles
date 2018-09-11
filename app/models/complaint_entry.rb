@@ -562,13 +562,9 @@ class ComplaintEntry < ApplicationRecord
         data[key][:confidence] = by_cat[key].last.confidence
         data[key][:name] = by_cat[key].last.category.descr
         data[key][:long_description] = by_cat[key].last.category.desc_long
+        # Certainty is dummy data
+        data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
       end
-    end
-
-    # Enter code to obtain certainty here, when it becomes available from the ruleapi guys
-    # in the meantime, dummy data
-    data.each do |key, value|
-      data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
     end
 
     data
