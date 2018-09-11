@@ -592,7 +592,7 @@ format = (complaint_entry_row) ->
 
         tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
         tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="nested-tooltipped certainty-flag" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
+        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="certainty-flag" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
         category_table = category_table + category_row
 
       return

@@ -121,13 +121,15 @@ module API
                                                                               :confidence => value['confidence'],
                                                                               :name => value['name'],
                                                                               :long_description => value['long_description']}
-                        complaint_entry_packet[:current_categories][key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}]
+                        complaint_entry_packet[:current_categories][key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => 'N/A'}]
                       end
 
 
                       # complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
                     else
-                      complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+                      no_preload_data_dummy = {}
+                      no_preload_data_dummy[77] = {:is_active => 1, :mnemonic => "N/A", :category_id => 1, :prefix_id => 12, :confidence => 1, :name => "N/A", :long_description => "Good ole fun juice"}
+                      complaint_entry_packet[:current_categories] = no_preload_data_dummy[77]
                     end
                   else
                     complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
