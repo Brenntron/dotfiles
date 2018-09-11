@@ -130,7 +130,7 @@ module API
                       complaint_entry_packet[:current_categories] = {}
                     end
                   else
-                    complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
+                    complaint_entry_packet[:current_categories] = {}
                   end
 
                   #fake it til they make it
