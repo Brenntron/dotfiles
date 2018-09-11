@@ -110,6 +110,7 @@ module API
 
 
                       parsed_current_cat_information.each_pair do |key,value|
+
                         complaint_entry_packet[:current_categories][key] = {}
                         complaint_entry_packet[:current_categories][key][:certainty] = {}
 
@@ -117,8 +118,8 @@ module API
                                                                               :mnemonic => value['mnemonic'],
                                                                               :category_id => value['category_id'],
                                                                               :prefix_id => value['prefix_id'],
-                                                                              :confidence => value['confidence'],
-                                                                              :name => value['name'],
+                                                                              :confidence => value['confidence'] || 'N/A',
+                                                                              :name => value['name'] || 'N/A',
                                                                               :long_description => value['long_description']}
                         complaint_entry_packet[:current_categories][key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => 'N/A'}]
                       end
