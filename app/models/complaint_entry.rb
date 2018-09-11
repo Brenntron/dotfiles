@@ -568,7 +568,7 @@ class ComplaintEntry < ApplicationRecord
     # Enter code to obtain certainty here, when it becomes available from the ruleapi guys
     # in the meantime, dummy data
     data.each do |key, value|
-      data[key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+      data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
     end
 
     data
