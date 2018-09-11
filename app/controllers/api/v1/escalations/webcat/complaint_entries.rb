@@ -103,8 +103,29 @@ module API
                   complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
 
                   if complaint_entry.complaint_entry_preload.present?
-                    if complaint_entry.complaint_entry_preload.current_category_information.present?
-                      complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
+
+                    if complaint_entry.complaint_entry_preload.current_category_information.present? &&
+                       complaint_entry.complaint_entry_preload.current_category_information != 'DATA ERROR'
+                      complaint_entry_packet[:current_categories] = {}
+                      parsed_current_cat_information = JSON.parse(complaint_entry.complaint_entry_preload.current_category_information)
+
+
+                      parsed_current_cat_information.each_pair do |key,value|
+                        complaint_entry_packet[:current_categories][key] = {}
+                        complaint_entry_packet[:current_categories][key][:certainty] = {}
+
+                        complaint_entry_packet[:current_categories][key] = {:is_active => value['is_active'],
+                                                                              :mnemonic => value['mnemonic'],
+                                                                              :category_id => value['category_id'],
+                                                                              :prefix_id => value['prefix_id'],
+                                                                              :confidence => value['confidence'],
+                                                                              :name => value['name'],
+                                                                              :long_description => value['long_description']}
+                        complaint_entry_packet[:current_categories][key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}]
+                      end
+
+
+                      # complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
                     else
                       complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
                     end
@@ -112,15 +133,14 @@ module API
                     complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
                   end
 
-
                   #fake it til they make it
-                  fake_ass_bullshit = {}
-                  fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
-                  fake_ass_bullshit[77][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
-                  fake_ass_bullshit[88] = {:is_active => 1, :mnemonic => "auct", :category_id => 88, :prefix_id => 12, :confidence => 2, :name => "Auctions", :long_description => "Buy stuff from cool people who yell."}
-                  fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
-
-                  complaint_entry_packet[:current_categories] = fake_ass_bullshit
+                  # fake_ass_bullshit = {}
+                  # fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
+                  # fake_ass_bullshit[77][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+                  # fake_ass_bullshit[88] = {:is_active => 1, :mnemonic => "auct", :category_id => 88, :prefix_id => 12, :confidence => 2, :name => "Auctions", :long_description => "Buy stuff from cool people who yell."}
+                  # fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+                  #
+                  # complaint_entry_packet[:current_categories] = fake_ass_bullshit
 
                   #each row has available to it: action, confidence, description, even_id, prefix_id, time, user, category.   "category" has its own hash
                   #which has available to it: mnem, descr, category_id, desc_long
