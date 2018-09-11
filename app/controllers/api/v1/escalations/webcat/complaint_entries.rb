@@ -103,7 +103,6 @@ module API
                   complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
 
                   if complaint_entry.complaint_entry_preload.present?
-
                     if complaint_entry.complaint_entry_preload.current_category_information.present? &&
                        complaint_entry.complaint_entry_preload.current_category_information != 'DATA ERROR'
                       complaint_entry_packet[:current_categories] = {}
@@ -127,9 +126,7 @@ module API
 
                       # complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
                     else
-                      no_preload_data_dummy = {}
-                      no_preload_data_dummy[77] = {:is_active => 1, :mnemonic => "N/A", :category_id => 1, :prefix_id => 12, :confidence => 1, :name => "N/A", :long_description => "Good ole fun juice"}
-                      complaint_entry_packet[:current_categories] = no_preload_data_dummy[77]
+                      complaint_entry_packet[:current_categories] = {}
                     end
                   else
                     complaint_entry_packet[:current_categories] = complaint_entry.current_category_data
