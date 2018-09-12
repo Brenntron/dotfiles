@@ -359,6 +359,7 @@ module API
               if params[:resolution].present?
                 resolution = params[:resolution]
               end
+
               if params[:comment].present?
                 if status == 'RESOLVED_CLOSED'
                   comment = status + ' : ' + resolution + ' - ' + params[:comment]
@@ -428,8 +429,9 @@ module API
               std_api_v2 do
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 status = dispute.status
+                comment = dispute.resolution_comment
 
-                {:status => status}.to_json
+                {:status => status, :comment => comment}.to_json
               end
             end
 

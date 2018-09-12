@@ -192,8 +192,10 @@ window.dispute_status_drop_down = (dispute_id) ->
     success: (response) ->
       response = JSON.parse(response)
       status = response.status
+      comment = response.comment
 
       $('.ticket-status-radio' + '#' + status).prop("checked", true);
+      $('.ticket-status-comment').text(comment)
   )
 
 window.dispute_resolution_drop_down = (dispute_id) ->
