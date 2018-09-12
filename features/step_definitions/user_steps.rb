@@ -30,6 +30,12 @@ Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   sign_in_user
 end
 
+Given(/^a user with role "(.*?)" exists with cvs_username, 'Cucumber', exists and is logged in$/) do |role|
+  @user = FactoryBot.create(:current_user, confirmed: true, cvs_username: 'Cucumber')
+  @user.roles << FactoryBot.create(:role, role: role)
+  sign_in_user
+end
+
 Given(/^a user with id "(.*?)" has a role "(.*?)" and is logged in$/) do |user_id, role|
   @user = User.find(user_id)
   @role = Role.find_by_role(role)
@@ -146,3 +152,15 @@ Then(/^current user should have kerberos login$/) do
   user.kerberos_login.should == user_attrs[:kerberos_login]
 end
 
+Then(/^I should see current user in element "(.*?)"$/) do |element|
+  user = User.first.cvs_username
+  within element do
+    expect(page).to have_content(user)
+  end
+end
+
+Then(/^I should see user, 'Cucumber', in element "(.*?)"$/) do |element|
+  within element do
+    expect(page).to have_content('Cucumber')
+  end
+end
