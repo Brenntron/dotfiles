@@ -5,12 +5,16 @@ $ ->
     clean_up_current_email_view()
     handle_current_email_row($(this))
 
+    data = {}
+    if $(this).hasClass('email-unread')
+      data = {'status': 'read'}
+
     email_id = $(this).attr('email_id')
 
     std_msg_ajax(
       method: 'PUT'
       url: "/escalations/api/v1/escalations/webrep/dispute_emails/#{email_id}"
-      data: {status: 'read'}
+      data: data
       success_reload: false
       success: (response) ->
         $('.email-header-information').removeClass('hidden')
@@ -53,9 +57,9 @@ $ ->
   handle_current_email_row = (row) ->
     dup_row = row.clone().addClass('duplicate-current-email-view').insertAfter(row)
     row.addClass('current-email-view')
-    row.removeClass('email-unread')
-    row.addClass('email-read')
-
+    if row.hasClass('email-unread')
+      row.removeClass('email-unread')
+      row.addClass('email-read')
 
   # Email reply creation and attachments
 
