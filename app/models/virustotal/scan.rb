@@ -9,7 +9,6 @@ class Virustotal::Scan < Virustotal::Base
 
 
   def self.scan_hashes(address:)
-    byebug
     response = call_virustotal_request(:get,
                                        "/vtapi/v2/url/report&resource=#{address}",
                                        body: '',
