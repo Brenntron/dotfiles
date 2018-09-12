@@ -71,20 +71,19 @@ class Virustotal::Base
     end
   end
 
-  def self.call_virustotal_request(method, path, body, raw = false)
+  def self.call_virustotal_request(method, path, body, raw = false, content_type: 'application/json')
     request = new_request(path)
 
-    request.headers = {"Content-Type" => "application/json" }
+    request.headers = {'Content-Type' => content_type }
     request.body = body.to_json
 
     response = request_error_handling(call_request(method, request))
     return response.body if raw == true
-    response_body = JSON.parse(response.body)
-    response_body
+    JSON.parse(response.body)
   end
 
-  def call_virustotal_request(method, path, body:)
-    Virustotal::Base.call_virustotal_request(method, path, body: body)
+  def call_virustotal_request(method, path, body:, content_type: 'application/json')
+    Virustotal::Base.call_virustotal_request(method, path, body: body, content_type: content_type)
   end
 
 end
