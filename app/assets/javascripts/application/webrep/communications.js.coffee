@@ -3,14 +3,15 @@ $ ->
   # Generic email show stuff
   $('.email-row').on 'click', ->
     clean_up_current_email_view()
-    handle_current_email_row($(this))
 
     data = {}
     if $(this).hasClass('email-unread')
       data = {'status': 'read'}
 
-    email_id = $(this).attr('email_id')
+    handle_current_email_row($(this))
 
+
+    email_id = $(this).attr('email_id')
     std_msg_ajax(
       method: 'PUT'
       url: "/escalations/api/v1/escalations/webrep/dispute_emails/#{email_id}"

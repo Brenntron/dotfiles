@@ -27,7 +27,9 @@ module API
               authorize!(:update, DisputeEmail)
               @dispute_email = DisputeEmail.find(permitted_params[:id])
               authorize!(:update, @dispute_email)
-              @dispute_email.update_attributes(status: permitted_params[:status])
+              if permitted_params[:status]
+                @dispute_email.update_attributes(status: permitted_params[:status])
+              end
               @case_email = DisputeEmail.generate_case_email_address(@dispute_email.dispute_id)
 
 
