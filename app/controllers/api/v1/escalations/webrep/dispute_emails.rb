@@ -69,7 +69,7 @@ module API
 
                   if params[:dispute_email_id].present?
                     replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
-                    replied_email.status = DisputeEmail::REPLIED
+                    replied_email.status = DisputeEmail::SENT
                     replied_email.save
                   end
 
