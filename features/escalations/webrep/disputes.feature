@@ -15,7 +15,7 @@ Feature: Disputes
     When I goto "escalations/webrep/disputes"
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
-    Then I should see user, 'Cucumber', in element "#owner_2"
+    Then I see "Cucumber" in element "#owner_2"
 
   @javascript
   Scenario: a user takes a dispute, returns a dispute, and takes the dispute again
@@ -29,10 +29,10 @@ Feature: Disputes
     When I goto "escalations/webrep/disputes"
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
-    Then I should see user, "Cucumber", in element "#owner_2"
+    Then I see "Cucumber" in element "#owner_2"
     When I click ".return-ticket-2"
     Then I see "NEW" in element "#status_2"
-    Then I should see user, "Unassigned", in element "#owner_2"
+    Then I see "Unassigned" in element "#owner_2"
     When I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
-    Then I should see user, "Cucumber", in element "#owner_2"
+    Then I see "Cucumber" in element "#owner_2"
