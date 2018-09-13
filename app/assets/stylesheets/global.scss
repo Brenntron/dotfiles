@@ -3158,6 +3158,7 @@ fieldset.top-content {
 .email-icon               {background-image: url(image_path('icon_message_white.svg'));}
 .email-read .email-icon   {background-image: url(image_path('icon_email_read.svg'));}
 .email-sent .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
+.email-replied .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
 .email-read.email-sent .email-icon  {background-image: url(image_path('icon_email_sent.svg'));}
 .note-icon                {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon         {background-image: url(image_path('icon_status2.svg'));}
