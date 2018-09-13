@@ -69,11 +69,14 @@ module API
 
                   DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
 
-                  if params[:dispute_email_id].present?
-                    replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
-                    replied_email.status = DisputeEmail::SENT
-                    replied_email.save
-                  end
+                  # This logic was here to mark an email that had been replied to as "Replied"
+                  # Per Melissa's orders, we aren't currently doing a "Replied" icon, and those "Read"
+                  # emails should stay "Read". If this changes, un-comment this
+                  # if params[:dispute_email_id].present?
+                  #   replied_email = DisputeEmail.where(:id => params[:dispute_email_id]).first
+                  #   replied_email.status = DisputeEmail::REPLIED
+                  #   replied_email.save
+                  # end
 
                   if params[:dispute_id].present?
                     dispute = Dispute.find(params[:dispute_id])
