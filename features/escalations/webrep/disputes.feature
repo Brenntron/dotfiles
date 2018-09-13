@@ -27,7 +27,6 @@ Feature: Disputes
       |id|user_id|
       |2 |3      |
     When I goto "escalations/webrep/disputes"
-    Then take a screenshot
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
     Then I see "Cucumber" in element "#owner_2"
@@ -44,3 +43,20 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/disputes"
     Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
+
+  @javascript
+  Scenario: a user adds a dispute as a related case using the tooltip button
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+    |id|
+    |1 |
+    And the following disputes exist:
+    |id|
+    |2 |
+    When I goto "escalations/webrep/disputes"
+    Given I check "cbox0000000001"
+    And I click ".mark-related-button"
+    And I fill in "dispute_id" with "2"
+    And I click "#set-related-dispute-submit-button_button_related_dispute"
+    And I wait for "5" seconds
+    Then check if dispute id, '1', has a related_id of '2'

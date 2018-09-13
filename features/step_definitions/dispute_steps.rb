@@ -26,5 +26,7 @@ Given(/^the following disputes exist and have entries:$/) do |disputes|
   end
 end
 
-
+Then(/^check if dispute id, '1', has a related_id of '2'$/) do
+  expect((Dispute.where(id: 1)).first.related_id).to eq(2)
+end
 
