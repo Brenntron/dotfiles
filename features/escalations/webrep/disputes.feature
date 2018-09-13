@@ -39,10 +39,8 @@ Feature: Disputes
 #    Then I see "Cucumber" in element "#owner_2"
 
   @javascript
-  Scenario: a user performs a bogus search which results in a no-match modal popping up
-    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
-    And the following disputes exist:
-      |id|
-      |1 |
+  Scenario: when the user encounters a situation in which no results exists (therefore none returned),
+            an error modal should display
+    Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/disputes"
-    Then take a screenshot
+    Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
