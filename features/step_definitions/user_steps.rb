@@ -164,3 +164,9 @@ Then(/^I should see user, 'Cucumber', in element "(.*?)"$/) do |element|
     expect(page).to have_content('Cucumber')
   end
 end
+
+Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |user, element|
+  within element do
+    expect(page).to have_content(user)
+  end
+end
