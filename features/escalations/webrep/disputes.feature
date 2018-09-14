@@ -5,13 +5,10 @@ Feature: Disputes
 
   @javascript
   Scenario: a user can see data in the Submitter Type column
-    Given a user with role "admin" exists and is logged in
-    And the following disputes exist:
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
       |id|submitter_type|
       |1 |CUSTOMER      |
-    And the following dispute_entries exist:
-      |id|dispute_id|
-      |1 |1         |
     Then I goto "escalations/webrep/"
     When I trigger-click "#table-show-columns-button"
     And I trigger-click "#submitter-type-checkbox"
