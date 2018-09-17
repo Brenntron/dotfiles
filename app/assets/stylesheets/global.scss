@@ -3158,6 +3158,7 @@ fieldset.top-content {
 .email-icon               {background-image: url(image_path('icon_message_white.svg'));}
 .email-read .email-icon   {background-image: url(image_path('icon_email_read.svg'));}
 .email-sent .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
+.email-replied .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
 .email-read.email-sent .email-icon  {background-image: url(image_path('icon_email_sent.svg'));}
 .note-icon                {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon         {background-image: url(image_path('icon_status2.svg'));}
@@ -4207,15 +4208,18 @@ input.file_attachment {
 }
 
 table > tbody > tr > td.dispute_rep_tools {
-  width: 90px;
+  // Uncomment these when inline wlbl and reptool buttons are added back in
+  //width: 90px;
   padding: 0 0 8px 0 !important;
   text-align: right;
 }
 
 .dispute_rep_tools_wrapper {
   position: absolute;
-  width: 90px;
-  margin-left: -90px;
+  // Uncomment these when inline wlbl and reptool buttons are added back in
+  //width: 90px;
+  //margin-left: -90px;
+  margin-left: -22px;
   margin-top: 7px;
 }
 
@@ -6206,6 +6210,37 @@ table#duplicates a {
   height: 26px;
   margin-left: 6px;
   background-size: 18px 18px;
+}
+
+.entry-dispute-name, .entry-reptool-class, .entry-reptool-expiration, .new_wbrs_score, .current-wbrs-score {
+  float: none !important;
+  font-size: 8pt !important;
+  padding-left: 0 !important;
+}
+
+.toolbar span.dropdown, .toolbar span.toggle-slider {
+  padding-left: 0;
+}
+
+.dropdown-button-margin-right {
+  margin-right: 3px;
+}
+
+.dropdown-button-margin-left {
+  margin-left: 3px;
+}
+
+#reptool_adjust_entries {
+  margin-left: 0;
+}
+
+.bfrp-table .dispute_rep_tools_wrapper {
+  min-width: 38px;
+  display: block;
+}
+
+.bfrp-table .dispute_rep_tools {
+  min-width: 38px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

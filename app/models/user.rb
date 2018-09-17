@@ -88,7 +88,7 @@ class User < ApplicationRecord
   end
 
   def team_manager
-    if children.empty?
+    if children.empty? && parent
       parent
     else
       self
@@ -96,7 +96,7 @@ class User < ApplicationRecord
   end
 
   def my_team
-    if children.empty?
+    if children.empty? && parent
       siblings + [parent, self]
     else
       descendants + [self]

@@ -141,7 +141,7 @@ describe Complaint do
       Complaint.process_bridge_payload(complaint_message_payload)
     end.to change { Complaint.count }.from(0).to(1)
   end
-
+  
   it 'check to ensure WBRS score is populated' do
     allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     # Note: get rules is called three times.
