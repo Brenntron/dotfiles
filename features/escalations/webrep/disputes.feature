@@ -12,5 +12,4 @@ Feature: Disputes
     Given a dispute exists and is related to disputes with ID, '1':
     And I go to "/escalations/webrep/disputes/1"
     Then I click "#related-tab-link"
-    Then take a screenshot
     Then I should see "0000000002"
