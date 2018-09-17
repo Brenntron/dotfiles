@@ -5,7 +5,7 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute and status is updated to assigned
-    Given a user with role "webrep user" exists with cvs_username, 'Cucumber', exists and is logged in
+    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
     |id|cvs_username|
     |3 |vrtincom    |
@@ -15,4 +15,4 @@ Feature: Disputes
     When I goto "escalations/webrep/disputes"
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
-    Then I should see user, 'Cucumber', in element "#owner_2"
+    Then I should see user, "Cucumber", in element "#owner_2"
