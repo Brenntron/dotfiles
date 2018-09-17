@@ -26,7 +26,7 @@
             %span.toolbar-button-text Collapse All Rows
         %div
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               -#For each checked checkbox populate this information
@@ -50,7 +50,7 @@
                     .row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
-                    .row
+                    .row.toggle-offset
                       .col-xs-6
                         %ul.wlbl-toggle-list
                           %li
@@ -142,7 +142,7 @@
           %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
   .row
     .col-xs-12
-      %table#disputes-research-table.table.table-sm
+      %table#disputes-research-table.table.table-sm.bfrp-table
         %tbody
           - @entries.each do |entry|
             %tr.research-table-row{'data-entry-id': "#{entry.id}"}
