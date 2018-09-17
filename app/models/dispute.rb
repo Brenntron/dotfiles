@@ -629,7 +629,7 @@ class Dispute < ApplicationRecord
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
-
+        new_dispute.reload
         new_dispute.check_entries_and_resolve(ALL_AUTO_RESOLVED)
 
 
