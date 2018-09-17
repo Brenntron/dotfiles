@@ -152,13 +152,6 @@ Then(/^current user should have kerberos login$/) do
   user.kerberos_login.should == user_attrs[:kerberos_login]
 end
 
-Then(/^I should see current user in element "(.*?)"$/) do |element|
-  user = User.first.cvs_username
-  within element do
-    expect(page).to have_content(user)
-  end
-end
-
 Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |username, element|
   within element do
     expect(page).to have_content(username)
