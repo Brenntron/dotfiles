@@ -89,3 +89,8 @@ Feature: Webcat complaints
     And I wait for "2" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
+  @javascript
+  Scenario: a user clicks the domain button
+    Given a user with role "admin" exists and is logged in
+    And a complaint entry with trait "new_entry" exists
+
