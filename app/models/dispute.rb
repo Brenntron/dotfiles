@@ -954,8 +954,6 @@ class Dispute < ApplicationRecord
         dispute.case_resolved_at = resolved_at
       end
 
-
-
       dispute.dispute_entries.each do |entry|
         if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
           entry.resolution = resolution
@@ -966,8 +964,6 @@ class Dispute < ApplicationRecord
         entry.status = status
         entry.save
       end
-
-
 
       dispute.save
       if comment.present?
