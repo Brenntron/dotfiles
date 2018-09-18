@@ -294,6 +294,9 @@ production:
     gssnegotiate: true
   ruletest:
     url: "https://ruletest.vrt.sourcefire.com"
+  sds:
+    host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/trusted-certificates.pem"
   snort_doc_max_fails: 10
   snort_org:
     host: "snort.org"
