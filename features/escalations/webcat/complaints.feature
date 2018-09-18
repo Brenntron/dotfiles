@@ -80,7 +80,9 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user selects the 'My Complaints' filter
     Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "assigned_entry" exists
     And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
+    Then take a screenshot
 
   @javascript
   Scenario: a user selects the 'My Open Complaints' filter
