@@ -82,40 +82,76 @@ Feature: Webcat complaints
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
     And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
-    Then take a screenshot
+    Then I wait for "3" seconds
+    Then I should see "ASSIGNED"
 
   @javascript
   Scenario: a user selects the 'My Open Complaints' filter
     Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "assigned_entry" exists
     And I goto "/escalations/webcat/complaints?f=MY%20OPEN%20COMPLAINTS"
+    Then I wait for "3" seconds
+    Then I should see "ASSIGNED"
 
   @javascript
   Scenario: a user selects the 'My Closed Complaints' filter
     Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "assigned_closed_entry" exists
     And I goto "/escalations/webcat/complaints?f=MY%20CLOSED%20COMPLAINTS"
+    Then I wait for "3" seconds
+    Then I should see "COMPLETED"
 
   @javascript
   Scenario: a user selects the 'Completed' filter
     Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "completed_entry" exists
     And I goto "/escalations/webcat/complaints?f=COMPLETED"
+    Then I wait for "3" seconds
+    Then I should see "COMPLETED"
 
   @javascript
   Scenario: a user selects the 'Active' filter
     Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "pending_entry" exists
     And I goto "/escalations/webcat/complaints?f=ACTIVE"
+    Then I wait for "3" seconds
+    Then I should see "PENDING"
 
   @javascript
   Scenario: a user selects the 'New' filter
     Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "new_entry" exists
     And I goto "/escalations/webcat/complaints?f=NEW"
+    Then I wait for "3" seconds
+    Then I should see "NEW"
 
   @javascript
   Scenario: a user selects the 'Review' filter
     Given a user with role "admin" exists and is logged in
+    And a new complaint entry with trait "pending_entry" exists
     And I goto "/escalations/webcat/complaints?f=REVIEW"
+    Then I wait for "3" seconds
+    Then I should see "PENDING"
 
   @javascript
   Scenario: a user selects the 'All' filter
     Given a user with role "admin" exists and is logged in
-    And I goto "/escalations/webcat/complaints?f=ALL
+    And a new complaint entry with trait "assigned_entry" exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I wait for "3" seconds
+    Then take a screenshot
+    Then I should see "ASSIGNED"
+
+  @javascript
+  Scenario: a user attempts to submit changes without categories and receives expected error alert
+    Given a user with role "admin" exists and is logged in
+    And a complaint entry with trait "new_entry" exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click ".expand-all"
+    And I wait for "2" seconds
+    And I click "#submit_changes_1"
+    And I wait for "2" seconds
+    Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
+
 

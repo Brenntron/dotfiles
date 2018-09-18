@@ -343,7 +343,7 @@ class Dispute < ApplicationRecord
 
   def self.is_important?(key)
     top_url = Wbrs::TopUrl.check_urls([key]).first
-    return false if top_url.is_important != "invalid"
+    return false if 'invalid' == top_url.is_important
     top_url.is_important
   rescue => except
 
@@ -629,7 +629,7 @@ class Dispute < ApplicationRecord
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
-
+        new_dispute.reload
         new_dispute.check_entries_and_resolve(ALL_AUTO_RESOLVED)
 
 
@@ -1069,7 +1069,8 @@ class Dispute < ApplicationRecord
             dispute_packet[:assigned_to] =
                 "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
           else
-            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+            dispute_packet[:assigned_to] =
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
           end
       end
 

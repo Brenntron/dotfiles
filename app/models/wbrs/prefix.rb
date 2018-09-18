@@ -6,6 +6,10 @@ class Wbrs::Prefix < Wbrs::Base
 
   alias_method(:id, :prefix_id)
 
+  def is_active?
+    0 < is_active
+  end
+
   def self.new_from_attributes(attributes)
     new(attributes)
   end

@@ -397,7 +397,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
 
 
-          if prefix_response.first&.is_active == 1
+          if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"]
           else
             new_complaint_entry.url_primary_category = nil
@@ -410,7 +410,7 @@ class Complaint < ApplicationRecord
           #lets query the top url API endpoint to determine if this is an important site or not
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
-          new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
+          new_complaint_entry.is_important = !!importance #making sure importance is a boolean
           new_complaint_entry.save
 
           new_payload_item = {}
