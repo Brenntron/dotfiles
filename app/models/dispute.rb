@@ -1069,7 +1069,8 @@ class Dispute < ApplicationRecord
             dispute_packet[:assigned_to] =
                 "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
           else
-            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+            dispute_packet[:assigned_to] =
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
           end
       end
 
