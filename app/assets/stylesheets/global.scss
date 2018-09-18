@@ -4208,18 +4208,15 @@ input.file_attachment {
 }
 
 table > tbody > tr > td.dispute_rep_tools {
-  // Uncomment these when inline wlbl and reptool buttons are added back in
-  //width: 90px;
+  width: 90px;
   padding: 0 0 8px 0 !important;
   text-align: right;
 }
 
 .dispute_rep_tools_wrapper {
   position: absolute;
-  // Uncomment these when inline wlbl and reptool buttons are added back in
-  //width: 90px;
-  //margin-left: -90px;
-  margin-left: -22px;
+  width: 90px;
+  margin-left: -90px;
   margin-top: 7px;
 }
 
