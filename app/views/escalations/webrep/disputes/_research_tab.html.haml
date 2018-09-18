@@ -206,7 +206,7 @@
                         = entry[:status]
 
                     %span.dropdown
-                      %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", onclick: "populate_entry_status_dropdown(#{entry.id});", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         - if entry[:status].nil?
                           NEW
                         - else

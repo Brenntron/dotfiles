@@ -978,6 +978,10 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def self.create_note(dispute_id, comment, current_user = nil)
+    DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute_id)
+  end
+
   # Searches in a variety of ways.
   # advanced -- search by supplied field.
   # named -- call a saved search.

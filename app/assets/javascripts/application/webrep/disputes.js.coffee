@@ -1577,6 +1577,18 @@ $ ->
         popup_response_error(response, 'Error retrieving WL/BL Data')
     )
 
+window.populate_entry_status_dropdown = (dispute_id) ->
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_id}"
+    method: 'GET'
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.entry-status-radio' + '#' + status).prop("checked", true);
+  )
 
 $ ->
   $(document).ready ->
