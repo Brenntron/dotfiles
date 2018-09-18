@@ -77,4 +77,43 @@ Feature: Webcat complaints
     And I wait for "1" seconds
     Then I should see "Vrt Incoming"
 
+  @javascript
+  Scenario: a user selects the 'My Complaints' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
+
+  @javascript
+  Scenario: a user selects the 'My Open Complaints' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=MY%20OPEN%20COMPLAINTS"
+
+  @javascript
+  Scenario: a user selects the 'My Closed Complaints' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=MY%20CLOSED%20COMPLAINTS"
+
+  @javascript
+  Scenario: a user selects the 'Completed' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=COMPLETED"
+
+  @javascript
+  Scenario: a user selects the 'Active' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=ACTIVE"
+
+  @javascript
+  Scenario: a user selects the 'New' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=NEW"
+
+  @javascript
+  Scenario: a user selects the 'Review' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=REVIEW"
+
+  @javascript
+  Scenario: a user selects the 'All' filter
+    Given a user with role "admin" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=ALL
 
