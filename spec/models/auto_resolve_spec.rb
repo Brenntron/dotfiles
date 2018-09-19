@@ -1,4 +1,4 @@
-describe Repo::RuleCommitter do
+describe AutoResolve do
   describe 'checking sources' do
     let(:auto_cisco) { AutoResolve.new(address_type: 'URI/DOMAIN', address: 'cisco.com', rule_hits: []) }
     let(:virus_total_clear_json) {

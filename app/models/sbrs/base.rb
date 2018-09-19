@@ -20,7 +20,7 @@ class Sbrs::Base
   end
 
   def self.sds_host
-    @sds_host ||= ENV['SDS_HOSTNAME']
+    @sds_host ||= Rails.configuration.sds.host
   end
 
   def self.port
@@ -35,9 +35,9 @@ class Sbrs::Base
     @gssnegotiate ||= false
   end
 
-  def self.sds_cert
-    @sds_cert ||= ENV['SDS_CERT'] || ""
-  end
+  # def self.sds_cert
+  #   @sds_cert ||= ENV['SDS_CERT'] || ""
+  # end
 
   def self.stringkey_params(conditions = {})
     conditions.inject({}) do |params, (key, value)|
@@ -61,6 +61,12 @@ class Sbrs::Base
   def self.request_sds(path:, body:, type: nil)
     # adapted from TI/sb_api, then heavily modified
     query_string = path
+    cert = File.open(Rails.configuration.sds.cert_file, 'r') do |file|
+      file.read
+    end
+    pkey = File.open(Rails.configuration.sds.pkey_file, 'r') do |file|
+      file.read
+    end
     if /\/score\// =~ query_string ? true : false
       if type == 'wbrs'
         uri_item = "#{body['url']}"
@@ -75,8 +81,9 @@ class Sbrs::Base
       request["X-Product-ID"] = "talosintelligence"
       req_options = {
           use_ssl: uri.scheme == "https",
-          cert: OpenSSL::X509::Certificate.new(sds_cert.gsub("\\n", "\n")),
-          key: OpenSSL::PKey::RSA.new(sds_cert.gsub("\\n", "\n")),
+          cert: OpenSSL::X509::Certificate.new(cert),
+          key: OpenSSL::PKey::RSA.new(pkey),
+          # ca_file: Rails.configuration.sds.cert_file,
           verify_mode: OpenSSL::SSL::VERIFY_NONE
       }
       begin
@@ -100,8 +107,9 @@ class Sbrs::Base
       request["X-Product-ID"] = "talosintelligence"
       req_options = {
           use_ssl: uri.scheme == "https",
-          cert: OpenSSL::X509::Certificate.new(sds_cert.gsub("\\n", "\n")),
-          key: OpenSSL::PKey::RSA.new(sds_cert.gsub("\\n", "\n")),
+          cert: OpenSSL::X509::Certificate.new(cert),
+          key: OpenSSL::PKey::RSA.new(pkey),
+          # ca_file: Rails.configuration.sds.cert_file,
           verify_mode: OpenSSL::SSL::VERIFY_NONE
       }
       begin

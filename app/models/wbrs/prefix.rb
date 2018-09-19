@@ -6,6 +6,10 @@ class Wbrs::Prefix < Wbrs::Base
 
   alias_method(:id, :prefix_id)
 
+  def is_active?
+    0 < is_active
+  end
+
   def self.new_from_attributes(attributes)
     new(attributes)
   end
@@ -94,11 +98,11 @@ class Wbrs::Prefix < Wbrs::Base
     response_body = JSON.parse(response.body)
     response_body['Updated']
   end
-
   # Disables the rules on this prefix.
   # @param [String] user: The user for this action
-  def disable(user:)
-    options = { 'prefix_ids' => [ id ], 'user' => user }
+
+  def self.disable(prefix_id, user)
+    options = { 'prefix_ids' => [ prefix_id ], 'user' => user }
     Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
   end
 end
