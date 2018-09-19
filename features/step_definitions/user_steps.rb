@@ -30,8 +30,8 @@ Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   sign_in_user
 end
 
-Given(/^a user with role "(.*?)" exists with cvs_username, "(.*?)", exists and is logged in$/) do  |role, cvs_username|
-  @user = FactoryBot.create(:current_user, confirmed: true, cvs_username: cvs_username)
+Given(/^a user with role "(.*?)" exists with cvs_username, "(.*?)", exists and is logged in$/) do |role, username|
+  @user = FactoryBot.create(:current_user, confirmed: true, cvs_username: username)
   @user.roles << FactoryBot.create(:role, role: role)
   sign_in_user
 end
@@ -150,4 +150,10 @@ Then(/^current user should have kerberos login$/) do
   User.where(cvs_username: user_attrs[:cvs_username]).count.should == 1
   user = User.where(cvs_username: user_attrs[:cvs_username]).first
   user.kerberos_login.should == user_attrs[:kerberos_login]
+end
+
+Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |username, element|
+  within element do
+    expect(page).to have_content(username)
+  end
 end

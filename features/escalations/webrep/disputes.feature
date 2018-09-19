@@ -43,3 +43,4 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/disputes"
     Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
+

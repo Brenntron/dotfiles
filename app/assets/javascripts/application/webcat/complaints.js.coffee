@@ -216,53 +216,54 @@ window.updateEntryColumns = (entry_id,row_id) ->
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
-    method: 'POST'
-    headers: headers
-    data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
-    success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        if categories.length == 0
-          std_msg_error("Must include at least one category.","", reload: false)
-        else
-          std_msg_error(response,"", reload: false)
-      else
-        table = $('#complaints-index').DataTable()
-        temp_row = table.row(row_id)
-        temp_row.data().status = json.status
-        temp_row.data().resolution = status
-        temp_row.data().internal_comment = comment
-        temp_row.data().resolution_comment = resolution_comment
-        temp_row.data().category = categories
-        temp_row.invalidate().draw()
-        temp_row.child().remove()
-        temp_row.child(format(temp_row)).show()
-        $('#input_cat_'+ temp_row.data().entry_id).selectize {
-          persist: false,
-          create: false,
-          maxItems: 5
-          valueField: 'value'
-          labelField: 'value'
-          searchField: 'text'
-          options: AC.WebCat.createSelectOptions()
-          items: selected_options(temp_row.data().category)
-        }
-        $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
-          persist: false,
-          create: false,
-          maxItems: 5
-          valueField: 'value'
-          labelField: 'value'
-          searchField: 'text'
-          options: AC.WebCat.createSelectOptions()
-          items: selected_options(temp_row.data().category)
-        }
-    error: (response) ->
-      $("#submit_changes_#{entry_id}").prop("disabled",false)
-      std_msg_error(response,"", reload: false)
-  , this)
+
+  if categories.length == 0 && status != 'INVALID'
+    std_msg_error("Must include at least one category.","", reload: false)
+    $("#submit_changes_#{entry_id}").prop("disabled",false)
+  else
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
+      method: 'POST'
+      headers: headers
+      data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
+      success: (response) ->
+        json = $.parseJSON(response)
+        if !json.error
+          table = $('#complaints-index').DataTable()
+          temp_row = table.row(row_id)
+          temp_row.data().status = json.status
+          temp_row.data().resolution = status
+          temp_row.data().internal_comment = comment
+          temp_row.data().resolution_comment = resolution_comment
+          temp_row.data().category = categories
+          temp_row.invalidate().draw()
+          temp_row.child().remove()
+          temp_row.child(format(temp_row)).show()
+          $('#input_cat_'+ temp_row.data().entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'value'
+            labelField: 'value'
+            searchField: 'text'
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(temp_row.data().category)
+          }
+          $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'value'
+            labelField: 'value'
+            searchField: 'text'
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(temp_row.data().category)
+          }
+
+      error: (response) ->
+        $("#submit_changes_#{entry_id}").prop("disabled",false)
+        std_msg_error(response,"", reload: false)
+    , this)
 
 
 window.take_selected = ()->
@@ -592,7 +593,7 @@ format = (complaint_entry_row) ->
 
         tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
         tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="nested-tooltipped certainty-flag" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
+        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="certainty-flag" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
         category_table = category_table + category_row
 
       return

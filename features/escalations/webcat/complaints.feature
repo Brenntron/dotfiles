@@ -77,4 +77,15 @@ Feature: Webcat complaints
     And I wait for "1" seconds
     Then I should see "Vrt Incoming"
 
+  @javascript
+  Scenario: a user attempts to submit changes without categories and receives expected error alert
+    Given a user with role "admin" exists and is logged in
+    And a complaint entry with trait "new_entry" exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click ".expand-all"
+    And I wait for "2" seconds
+    And I click "#submit_changes_1"
+    And I wait for "2" seconds
+    Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
