@@ -335,10 +335,33 @@ module API
             end
             patch 'entries/field_data' do
               std_api_v2 do
+                # binding.pry
                 authorize!(:update, Dispute)
                 DisputeEntry.update_from_field_data(permitted_params['field_data'])
                 DisputeEntry.send_status_updates(permitted_params['field_data'])
+
+                permitted_params['field_data'].each do |index, entry|
+                  if entry.length == 3
+                    comment = entry.last.new
+                    dispute_entry_id = index
+                    dispute_id = DisputeEntry.find(dispute_entry_id).dispute_id
+                    Dispute.create_note(current_user, comment, dispute_id)
+
+
+                  end
+                end
+
                 true
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+              requires :comment, type: String
+            end
+            post 'create_note' do
+              std_api_v2 do
+                Dispute.create_note(permitted_params['dispute_id'], permitted_params['comment'])
               end
             end
 
