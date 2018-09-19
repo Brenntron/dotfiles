@@ -29,10 +29,22 @@ end
 Then(/^check if dispute id, "(.*?)", has a related_id of "(.*?)"$/) do |dispute_id, related_id|
   expect((Dispute.where(id: 1)).first.related_id).to eq(2)
 end
+Given(/^the following disputes exist and have entries without preloads:$/) do |disputes|
+  FactoryBot.create(:customer) unless Customer.all.exists?
+  FactoryBot.create(:user) unless User.all.exists?
+  disputes.hashes.each do |dispute|
+    dispute = FactoryBot.create(:dispute, dispute)
+    entry = FactoryBot.create(:dispute_entry, dispute_id: dispute.id)
+  end
+end
 
 Given(/^a dispute exists and is related to disputes with ID, "(.*?)":$/) do |related_id|
   FactoryBot.create(:customer) unless Customer.all.exists?
   FactoryBot.create(:user) unless User.all.exists?
   FactoryBot.create(:dispute, related_id: related_id, resolution: Dispute::DUPLICATE)
 end
+Then(/^the Entry preload with id "(.*?)" should exist$/) do |id|
+  raise "Preload ID #{id} does not exist" unless DisputeEntryPreload.exists?(id)
+end
+
 
