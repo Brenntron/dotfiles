@@ -50,7 +50,7 @@ class Xbrs::Base
             'http'
         end
 
-    request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}?consumer=#{consumer_key}")
+    request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}?consumer=#{self.consumer_key}")
 
     case tls_mode
       when 'verify-peer'
@@ -111,7 +111,12 @@ class Xbrs::Base
         body = JSON.parse(response.body)
         raise Xbrs::XbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
       else
-        body = JSON.parse(response.body)
+        begin
+          body = JSON.parse(response.body)
+        rescue
+          body = response.body
+          raise Xbrs::XbrsError, "HTTP response #{response.code} #{body}"
+        end
         raise Xbrs::XbrsError, "HTTP response #{response.code} #{body['Error']}"
     end
   end

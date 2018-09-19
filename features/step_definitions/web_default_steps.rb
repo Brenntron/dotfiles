@@ -17,6 +17,7 @@ When(/^I click "(.*?)"$/) do |target|
       page.find("#{target}").click
     end
 end
+
 Then(/^I cannot click "(.*?)"$/) do |target|
   begin
     raise "Clicked on #{target} when should not have been able to" if click_on(target)
@@ -343,9 +344,18 @@ Then(/^open inspector$/) do
   page.driver.debug
 end
 
+
 Then(/^Expect date in element "(.*?)" to equal today's date$/) do |element|
   within element do
     t = Time.now
     expect(page).to have_content(t.strftime("%Y-%m-%d"))
   end
 end
+
+Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
+  within element do
+    expect(page).to have_content(content)
+  end
+end
+
+

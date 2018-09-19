@@ -817,6 +817,14 @@ thead th.sorting.center {
   margin-left: -36px;
 }
 
+.toolbar span {
+  font-size: 9pt;
+  float: right;
+  font-weight: 400;
+  padding-left: 8px;
+  line-height: 1em;
+}
+
 .toolbar-button-text {
   display: none;
 }
@@ -3150,6 +3158,7 @@ fieldset.top-content {
 .email-icon               {background-image: url(image_path('icon_message_white.svg'));}
 .email-read .email-icon   {background-image: url(image_path('icon_email_read.svg'));}
 .email-sent .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
+.email-replied .email-icon   {background-image: url(image_path('icon_email_sent.svg'));}
 .email-read.email-sent .email-icon  {background-image: url(image_path('icon_email_sent.svg'));}
 .note-icon                {background-image: url(image_path('icon_notepad.svg'));}
 .disp-status-icon         {background-image: url(image_path('icon_status2.svg'));}
@@ -3901,12 +3910,12 @@ button.tertiary {
   left: auto;
 }
 
-#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input {
+#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input, #categorize-urls-form-wrapper textarea {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus {
+#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus, #categorize-urls-form-wrapper textarea:focus {
   background-color: $faint-alt-highlight;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -4246,7 +4255,7 @@ table > tbody > tr > td.dispute_rep_tools {
   padding: 12px 15px;
 }
 
-.dispute-inline-buttons {
+.dispute-inline-buttons, .inline-button {
   width: 20px;
   height: 20px;
   background-color: darken($nav-toolbar-color, 10%);
@@ -5726,11 +5735,11 @@ table.dataTable tbody tr.selected {
   min-width: 350px;
 }
 
-#new-complaint-wrapper textarea, #new-complaint-wrapper input {
+#new-complaint-wrapper textarea, #new-complaint-wrapper input, #categorize-urls-form-wrapper textarea {
   width: 100%;
 }
 
-#new-complaint-wrapper textarea {
+#new-complaint-wrapper textarea, #categorize-urls-form-wrapper textarea {
   padding: 4px;
   color: $type-lighter-color;
   font-size: 9.5pt;
@@ -5784,6 +5793,15 @@ table.dataTable tbody tr.selected {
   border: none;
   border-radius: 2px;
   box-shadow: none;
+}
+
+.selectize-control.multi .selectize-input .item.category-to-delete {
+  background-color: $warning-accent-color !important;
+  padding-right: 30px;
+  background-image: url(image_path('icon_delete_white.svg'));
+  background-repeat: no-repeat;
+  background-position: center right 6px;
+  background-size: 16px 16px;
 }
 
 #new-complaint-wrapper .selectize-dropdown.multi.form-control.selectize {
@@ -6168,6 +6186,58 @@ table#duplicates a {
 #refresh-error-msg {
   background-image: url(image_path('icon_error.svg'));
   background-repeat: no-repeat;
+}
+
+.current-categories-button { background-image: url(image_path('icon_categorize.svg'));}
+.delete-categories-button {background-image: url(image_path('icon_delete.svg'));}
+.history-button {background-image: url(image_path('icon_history.svg'));}
+
+#categorize-diff-form .toolbar {
+  margin-top: 4px;
+}
+
+.inline-input {
+  display: inline-block;
+  float: left;
+  width: 426px;
+}
+
+.inline-button {
+  width: 26px;
+  height: 26px;
+  margin-left: 6px;
+  background-size: 18px 18px;
+}
+
+.entry-dispute-name, .entry-reptool-class, .entry-reptool-expiration, .new_wbrs_score, .current-wbrs-score {
+  float: none !important;
+  font-size: 8pt !important;
+  padding-left: 0 !important;
+}
+
+.toolbar span.dropdown, .toolbar span.toggle-slider {
+  padding-left: 0;
+}
+
+.dropdown-button-margin-right {
+  margin-right: 3px;
+}
+
+.dropdown-button-margin-left {
+  margin-left: 3px;
+}
+
+#reptool_adjust_entries {
+  margin-left: 0;
+}
+
+.bfrp-table .dispute_rep_tools_wrapper {
+  min-width: 38px;
+  display: block;
+}
+
+.bfrp-table .dispute_rep_tools {
+  min-width: 38px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

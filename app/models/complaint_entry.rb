@@ -510,7 +510,7 @@ class ComplaintEntry < ApplicationRecord
   def set_current_category
     prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
     if prefix_results
-      if prefix_results.first.is_active == 1
+      if prefix_results.first&.is_active == 1
         categories = prefix_results.map{ |result| result.descr}
         self.url_primary_category = categories.join(',')
         self.category = categories.join(',')
@@ -539,29 +539,32 @@ class ComplaintEntry < ApplicationRecord
     end
 
 
-    ###LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
+    ##LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
+    #
+    # if Wbrs::Prefix.where(:urls => [self.hostlookup]).present?
+    #   prefix_id_lookup = Wbrs::Prefix.where(:urls => [self.hostlookup]).first.prefix_id
+    # end
 
-    #audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
-    #by_cat = {}
-    #audit_history.each do |hist|
+    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+    by_cat = {}
 
-    #  if by_cat[hist.category_id].blank?
-    #    by_cat[hist.category_id] = []
-    #  end
+    audit_history.each do |hist|
 
-    #  by_cat[hist.category_id] << hist
-    #end
+     if by_cat[hist.category_id].blank?
+       by_cat[hist.category_id] = []
+     end
 
-    #data.each do |key, value|
-    #  data[key][:confidence] = by_cat[key].last.confidence
-    #  data[key][:name] = by_cat[key].last.category.descr
-    #  data[key][:long_description] = by_cat[key].last.category.desc_long
-    #end
+     by_cat[hist.category_id] << hist
+    end
 
-    ##Enter code to obtain certainty here, when it becomes available from the ruleapi guys
-    ##in the meantime, dummy data
-    data.each do |key, value|
-      data[key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
+    if !by_cat.empty?
+      data.each do |key, value|
+        data[key][:confidence] = by_cat[key].last.confidence
+        data[key][:name] = by_cat[key].last.category.descr
+        data[key][:long_description] = by_cat[key].last.category.desc_long
+        # Certainty is dummy data
+        data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
+      end
     end
 
     data
@@ -592,6 +595,14 @@ class ComplaintEntry < ApplicationRecord
       my_screenshot.screenshot = capture.read
       my_screenshot.save!
     end
+  end
+
+  def self.complaint_entry_preload
+    ComplaintEntryPreload.where(complaint_entry_id: self.id).last
+  end
+
+  def self.current_category_information
+    self.complaint_entry_preload.current_category_information
   end
 
 end
