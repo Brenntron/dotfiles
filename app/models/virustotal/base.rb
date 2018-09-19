@@ -83,7 +83,7 @@ class Virustotal::Base
   end
 
   def call_virustotal_request(method, path, body:, content_type: 'application/json')
-    Virustotal::Base.call_virustotal_request(method, path, body: body, content_type: content_type)
+    Virustotal::Base.call_virustotal_request(method, path, body, false, content_type: content_type)
   end
 
 end
