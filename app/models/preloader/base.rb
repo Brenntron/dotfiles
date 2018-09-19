@@ -3,6 +3,11 @@ require 'resolv'
 class Preloader::Base
   include ActiveModel::Model
   TRIES = 3
+
+  def self.auto_resolve_new
+    AutoResolve.new
+  end
+
   def self.fetch_all_api_data(host, dispute_entry_id) # pass an entire DisputeEntry into this
 
     is_ip_address = !!(host  =~ Resolv::IPv4::Regex)
@@ -28,6 +33,7 @@ class Preloader::Base
     end
     counter = 0
 
+    # TODO refactor to call Wbrs::ManualWlbl.where once instead of twice
     while counter < TRIES
       begin
         crosslisted_urls ||= Wbrs::ManualWlbl.where({:url => host}, true)
@@ -63,7 +69,7 @@ class Preloader::Base
 
     while counter < TRIES
       begin
-        @umbrella = AutoResolve.new.call_umbrella(address: host)
+        @umbrella = auto_resolve_new.call_umbrella(address: host)
         pretty_umbrella_status = "Unclassified" # Default or "0"
         case
           # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
@@ -87,6 +93,7 @@ class Preloader::Base
       dispute_entry.reload
     end
 
+    # TODO: You know what, maybe this whole method should be in the DisputeEntryPreload class.
     data = DisputeEntryPreload.new do |d|
       d.dispute_entry_id = dispute_entry_id
       d.xbrs_history = xbrs_history

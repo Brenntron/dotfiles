@@ -60,3 +60,4 @@ Feature: Disputes
     And I click "#set-related-dispute-submit-button_button_related_dispute"
     And I wait for "5" seconds
     Then check if dispute id, '1', has a related_id of '2'
+

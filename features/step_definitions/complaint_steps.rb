@@ -3,3 +3,6 @@ Given(/^the following complaints exist:$/) do |complaints|
     FactoryBot.create(:complaint, complaint)
   end
 end
+Given(/^a complaint with trait "(.*?)" exists$/) do| trait_name|
+  FactoryBot.create(:complaint,trait_name.to_sym)
+end

@@ -1,5 +1,5 @@
 class Wbrs::Category < Wbrs::Base
-  FIELD_NAMES = %w{category_id desc_long descr mnem}
+  FIELD_NAMES = %w{category_id desc_long descr mnem is_active}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
@@ -8,7 +8,7 @@ class Wbrs::Category < Wbrs::Base
 
   def self.new_from_datum(datum)
     datum['category_id'] = datum.delete('category') if datum['category'].present?
-    new(datum)
+    new(datum.slice(*FIELD_NAMES))
   end
 
   # Get all the categories.
