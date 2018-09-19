@@ -101,6 +101,11 @@ class Wbrs::Prefix < Wbrs::Base
   # Disables the rules on this prefix.
   # @param [String] user: The user for this action
 
+  def disable(user)
+    options = { 'prefix_ids' => [ self.id ], 'user' => user }
+    Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+  end
+
   def self.disable(prefix_id, user)
     options = { 'prefix_ids' => [ prefix_id ], 'user' => user }
     Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
