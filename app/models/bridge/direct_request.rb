@@ -19,7 +19,7 @@ class Bridge::DirectRequest < HTTPI::Request
       when 'verify-peer'
         request.ssl = true
         request.auth.ssl.verify_mode = :peer
-        request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
+        request.auth.ssl.ca_cert_file = peakebridge.ca_cert_file #this will be nil for Heroku apps
       when 'verify-none'
         request.ssl = true
         request.auth.ssl.verify_mode = :none
