@@ -139,7 +139,6 @@ Feature: Webcat complaints
     And a new complaint entry with trait "assigned_entry" exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I wait for "3" seconds
-    Then take a screenshot
     Then I should see "ASSIGNED"
 
   @javascript
