@@ -498,8 +498,7 @@ module API
                   resolution_comment = ''
                 end
 
-                {:resolution => resolution,
-                 :resolution_comment => resolution_comment}.to_json
+                {:resolution => resolution}.to_json
               end
             end
 

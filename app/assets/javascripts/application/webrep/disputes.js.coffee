@@ -1590,6 +1590,17 @@ window.populate_entry_status_dropdown = (dispute_id) ->
       $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true);
   )
 
+window.populate_resolution_dropdown = (dispute_id) ->
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_id}"
+    method: 'GET'
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true);
 $ ->
   $(document).ready ->
 
