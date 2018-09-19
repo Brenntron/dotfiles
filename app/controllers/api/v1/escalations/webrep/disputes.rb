@@ -344,10 +344,7 @@ module API
                   if entry.length == 3 && entry.last.field == 'resolution_comment' && !entry.last.new.empty?
                     comment = entry.last.new
                     dispute_entry_id = index
-                    dispute_id = DisputeEntry.find(dispute_entry_id).dispute_id
-                    Dispute.create_note(current_user, comment, dispute_id)
-
-
+                    Dispute.create_note(current_user, comment, dispute_entry_id)
                   end
                 end
 
