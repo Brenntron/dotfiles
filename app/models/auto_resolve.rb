@@ -97,6 +97,7 @@ class AutoResolve
     request
   end
 
+  # TODO refactor into umbrella class like virustotal for easier testing.
   def call_umbrella(address: self.address)
     request = umbrella_request(address)
     response = HTTPI.post(request)

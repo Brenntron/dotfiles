@@ -36,3 +36,4 @@ Feature: Disputes
     When I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
     Then I see "Cucumber" in element "#owner_2"
+

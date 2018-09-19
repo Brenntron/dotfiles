@@ -11,8 +11,12 @@ FactoryBot.define do
     end
     email { "#{cvs_username}@cisco.com" }
 
-    trait :vrt_incoming_user do
+    factory :vrt_incoming_user do
       display_name                      { "Vrt Incoming" }
+      cvs_username                      { "vrtincom" }
+      cec_username                      { "vrtincom" }
+      kerberos_login                    { "vrtincom" }
+      email                             { "vrt-incoming@sourcefire.com" }
     end
 
     factory :current_user do
