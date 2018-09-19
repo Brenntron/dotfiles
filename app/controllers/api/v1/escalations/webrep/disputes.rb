@@ -341,7 +341,7 @@ module API
                 DisputeEntry.send_status_updates(permitted_params['field_data'])
 
                 permitted_params['field_data'].each do |index, entry|
-                  if entry.length == 3
+                  if entry.length == 3 && entry.last.field == 'resolution_comment' && !entry.last.new.empty?
                     comment = entry.last.new
                     dispute_entry_id = index
                     dispute_id = DisputeEntry.find(dispute_entry_id).dispute_id

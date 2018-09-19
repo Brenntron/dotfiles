@@ -980,7 +980,6 @@ class Dispute < ApplicationRecord
 
   def self.create_note(current_user = nil, comment, dispute_id)
     DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute_id)
-    binding.pry
   end
 
   # Searches in a variety of ways.
