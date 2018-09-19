@@ -35,7 +35,9 @@
             <li class="ruledoc-menu"><%= link_to 'RULE DOCS', rule_docs_path %></li>
           <% end %>
           <li class="users-menu"><%= link_to 'USERS', escalations_users_path %></li>
-          <li class="doc-menu"><%= link_to 'Wiki', 'https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki', target: '_blank' %></li>
+          <li class="doc-menu">
+            <%= link_to 'DOC', 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank' %>
+          </li>
           <% if can?(:read, Admin) %>
             <li class="admin-menu"><%= link_to 'ADMIN', admin_root_path %></li>
           <% end %>

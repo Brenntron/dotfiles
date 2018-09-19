@@ -17,6 +17,7 @@ class ComplaintEntryPreload < ApplicationRecord
     end
     counter = 0
 
+    # TODO: historic info repeats the query above to get the prefix id.  Use previous results to short cut this check.
     while counter < TRIES
       begin
         historic_category_information ||= complaint_entry.historic_category_data

@@ -19,8 +19,8 @@ FactoryBot.define do
 
     trait :new_entry do
       status        { 'NEW' }
-      resolution    {''}
-      user          { FactoryBot.create(:user,:vrt_incoming_user) }
+      resolution    { '' }
+      user          { FactoryBot.create(:vrt_incoming_user) }
     end
     trait :pending_entry do
       status        { 'PENDING' }

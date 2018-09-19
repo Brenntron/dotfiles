@@ -56,7 +56,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
     Rails.logger.warn(message)
 
     render plain: message,
-           status: :internal_server_error
+           status: :bad_request
   end
 
   private
