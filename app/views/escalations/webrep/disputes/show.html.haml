@@ -139,7 +139,7 @@
       %label.content-label-sm
         Dispute Entries
       %div
-        = @entries.first.hostlookup
+        = @entries.first.hostlookup if @entries.present?
         -#- @entries.each do |entry|
         -#  = entry.hostlookup
       %span.dispute-entry-count

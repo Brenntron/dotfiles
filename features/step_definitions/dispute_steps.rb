@@ -26,5 +26,17 @@ Given(/^the following disputes exist and have entries:$/) do |disputes|
   end
 end
 
+Given(/^the following disputes exist and have entries without preloads:$/) do |disputes|
+  FactoryBot.create(:customer) unless Customer.all.exists?
+  FactoryBot.create(:user) unless User.all.exists?
+  disputes.hashes.each do |dispute|
+    dispute = FactoryBot.create(:dispute, dispute)
+    entry = FactoryBot.create(:dispute_entry, dispute_id: dispute.id)
+  end
+end
+
+Then(/^the Entry preload with id "(.*?)" should exist$/) do |id|
+  raise "Preload ID #{id} does not exist" unless DisputeEntryPreload.exists?(id)
+end
 
 
