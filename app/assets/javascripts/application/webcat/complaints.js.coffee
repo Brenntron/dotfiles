@@ -689,7 +689,7 @@ format = (complaint_entry_row) ->
       '</div><div class="col-xs-2">' +
       '<button class="secondary">Lookup</button><br/>' +
       '<button class="secondary" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
-      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="domain_button" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
