@@ -38,8 +38,14 @@ class ApplicationController < ActionController::Base
   rescue_from ::CanCan::AccessDenied do |exception|
     respond_to do |format|
       format.json { head :forbidden, content_type: 'text/html' }
-      format.html { redirect_to "/users"
-                    flash[:alert] = exception.message }
+      format.html do
+        if current_user
+          redirect_to escalations_users_path
+        else
+          redirect_to new_escalations_session_path
+        end
+        flash[:alert] = exception.message
+      end
       format.js   { head :forbidden, content_type: 'text/html' }
     end
   end

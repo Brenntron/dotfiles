@@ -761,7 +761,7 @@ window.history_dialog = (id) ->
             if change_key != "whodunnit"
               entry_string += "<p>" + change_key + ": " + change_entry[0] + " - " + change_entry[1] + "</p>"
             else
-              entry_string += "<p>User: " + change_entry + "</p>"
+              entry_string += "<p>User: " + change_entry + "</p>" +"</br>"
           history_dialog_content += entry_string
 
         if $("#history_dialog").length
