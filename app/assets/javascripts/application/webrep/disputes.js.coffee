@@ -1587,7 +1587,7 @@ window.populate_entry_status_dropdown = (dispute_id) ->
       response = JSON.parse(response)
       status = response.status
 
-      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true);
+      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
   )
 
 window.populate_resolution_dropdown = (dispute_id) ->
@@ -1600,7 +1600,10 @@ window.populate_resolution_dropdown = (dispute_id) ->
       response = JSON.parse(response)
       status = response.status
 
-      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true);
+      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
+  )
+
+
 $ ->
   $(document).ready ->
 
