@@ -93,4 +93,8 @@ Feature: Webcat complaints
   Scenario: a user clicks the domain button
     Given a user with role "admin" exists and is logged in
     And a complaint entry with trait "new_entry" exists
+    Then I click ".expand-all"
+    Then I wait for "2" seconds
+    Then take a screenshot
+
 
