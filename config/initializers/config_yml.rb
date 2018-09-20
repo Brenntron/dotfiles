@@ -76,6 +76,14 @@ Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
 raise "config.yml missing ruletest section" unless env_config['ruletest']
 Rails.configuration.ruletest_server     = env_config['ruletest']['url']
 
+sds_config = env_config['sds']
+Rails.configuration.sds                 = OpenStruct.new
+if sds_config
+  Rails.configuration.sds.host          = sds_config['host']
+  Rails.configuration.sds.cert_file     = sds_config['cert_file']
+  Rails.configuration.sds.pkey_file     = sds_config['pkey_file']
+end
+
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
 
 snort_org_config = env_config['snort_org']
