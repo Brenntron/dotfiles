@@ -336,7 +336,7 @@ module API
             patch 'entries/field_data' do
               std_api_v2 do
                 authorize!(:update, Dispute)
-                binding.pry
+
                 DisputeEntry.update_from_field_data(permitted_params['field_data'])
                 DisputeEntry.send_status_updates(permitted_params['field_data'])
 
