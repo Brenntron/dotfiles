@@ -5083,12 +5083,9 @@ td.data-table-emph {
 }
 
 button[disabled] {
-  background-color: lighten($content-label-color, 25%) !important;
+  background-color: lighten($content-label-color, 10%) !important;
   color: $faint-neutral-color;
-}
-
-button[disabled]:hover {
-  background-color: lighten($content-label-color, 25%) !important;
+  cursor: not-allowed;
 }
 
 button.dropdown-submit-button {
@@ -5914,6 +5911,34 @@ table.dataTable tbody tr.selected {
   text-transform: none;
   font-weight: 300;
   width: auto;
+}
+
+.nested-complaint-data-wrapper button.secondary:disabled {
+  color: $content-bg-color;
+}
+
+.selectize-control .selectize-input.disabled {
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.selectize-control.multi .selectize-input.disabled [data-value], .selectize-control.multi .selectize-input.disabled > div {
+  border: none;
+  cursor: not-allowed;
+}
+
+.selectize-control.multi .selectize-input.disabled [data-value] {
+  color: $content-bg-color;
+  cursor: not-allowed;
+}
+
+.selectize-control .selectize-input.disabled .item {
+  color: $content-bg-color;
+  border: none;
+  border-radius: 2px;
+  background-image: none;
+  background-color: #329fca !important;
+  cursor: not-allowed;
 }
 
 .case-id {
