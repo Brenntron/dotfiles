@@ -146,14 +146,10 @@ module API
                   #which has available to it: mnem, descr, category_id, desc_long
 
                   complaint_entry_packet[:entry_history] = {}
-                  if complaint_entry.complaint_entry_preload.present?
-                    if complaint_entry.complaint_entry_preload.historic_category_information.present?
-                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
-                    else
-                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
-                    end
+                  if complaint_entry.complaint_entry_preload.present? && complaint_entry.complaint_entry_preload.historic_category_information.present?
+                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
                   else
-                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                    complaint_entry_packet[:entry_history][:domain_history] = nil
                   end
 
                   complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
