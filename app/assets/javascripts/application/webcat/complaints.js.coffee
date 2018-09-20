@@ -55,9 +55,10 @@ window.multiple_url_categorization = ()->
 name_servers =(server_list)->
   i = 0
   text = ""
-  while i < server_list.length
-    text += server_list[i] + '<br>'
-    i++
+  if server_list
+    while i < server_list.length
+      text += server_list[i] + '<br>'
+      i++
   text
 
 format_domain_info = (info)->
