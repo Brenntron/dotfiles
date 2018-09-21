@@ -94,6 +94,5 @@ Feature: Webcat complaints
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "empty_domain" exists
     And I goto "/escalations/webcat/complaints/1"
-    Then take a screenshot
     Then I should see "1.1.1.1"
 
