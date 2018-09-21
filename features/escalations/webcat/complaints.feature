@@ -54,7 +54,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user can take a complaint
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "not_important" exists
     And I goto "/escalations/webcat"
     And I wait for "2" seconds
@@ -67,7 +67,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user can return a complaint
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And an assigned complaint entry with trait "not_important" exists
     And I goto "/escalations/webcat"
     And I wait for "1" seconds
@@ -79,7 +79,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
@@ -88,4 +88,12 @@ Feature: Webcat complaints
     And I click "#submit_changes_1"
     And I wait for "2" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
+
+  @javascript
+  Scenario: a user visits a complaint show page and sees its IP
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "empty_domain" exists
+    And I goto "/escalations/webcat/complaints/1"
+    Then take a screenshot
+    Then I should see "1.1.1.1"
 

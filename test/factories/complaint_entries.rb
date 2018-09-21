@@ -38,6 +38,9 @@ FactoryBot.define do
       user          { FactoryBot.create(:user)}
     end
 
+    trait :empty_domain do
+      domain        { nil }
+    end
   end
 end
 
