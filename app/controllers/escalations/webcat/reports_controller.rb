@@ -26,6 +26,7 @@ class Escalations::Webcat::ReportsController < Escalations::WebcatController
   end
 
   def complaint_entry
-
+    @report = WebcatReport::ComplaintEntryReport.new(date_from: params['report']['date_from'],
+                                                     date_to: params['report']['date_to'])
   end
 end
