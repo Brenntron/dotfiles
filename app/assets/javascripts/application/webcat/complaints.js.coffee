@@ -439,7 +439,6 @@ window.retrieve_history = (position) ->
 
           history_dialog_content += entry_string
         history_dialog_content += '</tbody></table>'
-        history_dialog_content += '<hr class="thin"/>'
 
         if $("#history_dialog").length
           history_dialog = this
@@ -750,7 +749,6 @@ window.history_dialog = (id) ->
 
           history_dialog_content += entry_string
         history_dialog_content += '</tbody></table>'
-        history_dialog_content += '<hr class="thin"/>'
         history_dialog_content += '<h5>Complaint Entry History</h5>'
         entry_string = ""
         for key, entry of json.entry_history.complaint_history

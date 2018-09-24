@@ -302,7 +302,7 @@ module API
             post 'categorize_urls_history' do
               begin
                 prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+                response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).reverse
 
                 render response.to_json
                 end
