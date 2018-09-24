@@ -24,4 +24,8 @@ class Escalations::Webcat::ReportsController < Escalations::WebcatController
     end
     send_data contents
   end
+
+  def complaint_entry
+
+  end
 end

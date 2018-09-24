@@ -46,6 +46,8 @@ Rails.application.routes.draw do
           get :index
           get :resolution
           get :export_resolution
+          get :complaint_entry
+          get :export_complaint_entry
         end
       end
     end
