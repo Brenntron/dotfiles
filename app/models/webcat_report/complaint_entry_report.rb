@@ -7,4 +7,9 @@ class WebcatReport::ComplaintEntryReport
     @date_to = Date.iso8601(date_to)
   end
 
+  def each_entry
+    ComplaintEntry.all.each do |entry|
+      yield entry
+    end
+  end
 end

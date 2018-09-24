@@ -1,3 +1,27 @@
 %h1 Webcat Complaint Entry Report
 
 
+.report-div
+  #webcat-resolution-report-div
+    %table#webcat-resolution-report-table
+      %caption Complaint Entries
+      %thead
+        %tr
+          %th Customer Name
+          %th URL
+          %th Engineer
+          %th Resolution
+          %th Final Category
+          %th Suggested Category
+          %th Created
+      %tbody
+        - @report.each_entry do |entry|
+          %tr
+            %td= entry.customer_name
+            %td= entry.uri
+            %td= entry.user_display_name
+            %td= entry.resolution
+            %td= entry.category
+            %td= entry.suggested_disposition
+            %td= entry.created_at
+
