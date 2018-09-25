@@ -11,7 +11,6 @@ class WebcatReport::ComplaintEntryReport
   def each_entry
     entries = ComplaintEntry.where(created_at: (@date_from..@date_to))
 
-    byebug
     if @customer_name.present?
       entries =
           entries.joins(complaint: {customer: :company})
