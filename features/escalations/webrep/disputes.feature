@@ -37,3 +37,22 @@ Feature: Disputes
     Then I see "ASSIGNED" in element "#status_2"
     Then I see "Cucumber" in element "#owner_2"
 
+  @javascript
+  Scenario: a user edits a dispute entry's status and saves their changes
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+    |id|
+    |1 |
+    When I goto "escalations/webrep/disputes/1/"
+    And I click "#research-tab-link"
+    And I click ".inline-edit-entry-button"
+    And I click "#entry_status_button_1"
+    And I click "#RE-OPENED"
+    And I click ".save-all-changes"
+    Then take a screenshot
+    Then I should see "RE-OPENED"
+
+
+#    Then I wait for "1" seconds
+#    Then take a screenshot
+
