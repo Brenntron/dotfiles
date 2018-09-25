@@ -241,7 +241,7 @@ Then(/^I should see button with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
 
-Then(/^I should see header with id "(.*?)"$/) do |element|
+Then(/^I should see table header with id "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//th[contains(@id, '#{element}')]")
 end
 
@@ -340,6 +340,13 @@ end
 
 Then(/^open inspector$/) do
   page.driver.debug
+end
+
+Then(/^Expect date in element "(.*?)" to equal today's date$/) do |element|
+  within element do
+    t = Time.now
+    expect(page).to have_content(t.strftime("%Y-%m-%d"))
+  end
 end
 
 Then(/^I trigger-click "(.*?)"$/) do |target|
