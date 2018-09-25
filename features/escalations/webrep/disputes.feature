@@ -8,13 +8,10 @@ Feature: Disputes
     Given a user with role "admin" exists and is logged in
     And the following disputes exist and have entries:
     |id|
-    |1 |
-    And the following disputes exist and have entries:
-    |id|
-    |2 |
+    | 1|
+    | 2|
     Then I go to "/escalations/webrep/disputes/1"
     Then I click link "Research"
-    Then take a screenshot
     Then Expect date in element "#last-submitted" to equal today's date
 
   @javascript
@@ -22,10 +19,10 @@ Feature: Disputes
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
     |id|cvs_username|
-    |3 |vrtincom    |
+    | 3|  vrtincom  |
     And the following disputes exist:
     |id|user_id|
-    |2 |3      |
+    | 2|   3   |
     When I goto "escalations/webrep/disputes"
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
