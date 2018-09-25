@@ -157,3 +157,4 @@ Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |username, element|
     expect(page).to have_content(username)
   end
 end
+

@@ -487,7 +487,7 @@ format = (complaint_entry_row) ->
   search_uri = ''
   if complaint_entry.uri
     uri = '<a href="http://' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
-    search_uri = '<a href="https://www.google.com/search?q=site%3A+' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
+    search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
   else if complaint_entry.domain
     if complaint_entry.subdomain
       host = complaint_entry.subdomain + '.'
@@ -496,12 +496,12 @@ format = (complaint_entry_row) ->
     if complaint_entry.path
       url = host
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
-    search_uri = '<a href="https://www.google.com/search?q=site%3A+' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
+    search_uri = '<a href="https://www.google.com/search?q=site%3A' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
   else if  complaint_entry.ip_address
     host = complaint_entry.ip_address
     url = host
     uri = '<a href="http://' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
-    search_uri = '<a href="https://www.google.com/search?q=site%3A+' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
+    search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
 
@@ -761,7 +761,7 @@ window.history_dialog = (id) ->
             if change_key != "whodunnit"
               entry_string += "<p>" + change_key + ": " + change_entry[0] + " - " + change_entry[1] + "</p>"
             else
-              entry_string += "<p>User: " + change_entry + "</p>"
+              entry_string += "<p>User: " + change_entry + "</p>" +"</br>"
           history_dialog_content += entry_string
 
         if $("#history_dialog").length
