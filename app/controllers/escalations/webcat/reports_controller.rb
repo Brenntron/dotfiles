@@ -26,7 +26,14 @@ class Escalations::Webcat::ReportsController < Escalations::WebcatController
   end
 
   def complaint_entry
-    @report = WebcatReport::ComplaintEntryReport.new(date_from: params['report']['date_from'],
-                                                     date_to: params['report']['date_to'])
+    @report = WebcatReport::ComplaintEntryReport.new(date_from: ce_rpt_params['date_from'],
+                                                     date_to: ce_rpt_params['date_to'],
+                                                     customer_name: ce_rpt_params['customer_name'])
+  end
+
+  private
+
+  def ce_rpt_params
+    params.require(:report).permit(:date_from, :date_to, :customer_name)
   end
 end
