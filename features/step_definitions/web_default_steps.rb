@@ -342,6 +342,13 @@ Then(/^open inspector$/) do
   page.driver.debug
 end
 
+Then(/^Expect date in element "(.*?)" to equal today's date$/) do |element|
+  within element do
+    t = Time.now
+    expect(page).to have_content(t.strftime("%Y-%m-%d"))
+  end
+end
+
 Then(/^I trigger-click "(.*?)"$/) do |target|
   find(target).trigger('click')
 end
