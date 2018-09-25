@@ -12,7 +12,7 @@ Feature: Disputes
     Then I goto "escalations/webrep/"
     When I trigger-click "#table-show-columns-button"
     And I trigger-click "#submitter-type-checkbox"
-    Then I should see header with id "submitter-type"
+    Then I should see table header with id "submitter-type"
     Then I should see "CUSTOMER"
 
   @javascript
