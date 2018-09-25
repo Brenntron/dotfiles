@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180822195617) do
+ActiveRecord::Schema.define(version: 20180831120000) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -180,6 +180,7 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.datetime "updated_at", null: false
     t.integer "complaint_entry_id"
     t.binary "screenshot", limit: 16777215
+    t.string "error_message", default: ""
     t.index ["complaint_entry_id"], name: "index_complaint_entry_screenshots_on_complaint_entry_id"
   end
 
@@ -326,6 +327,8 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.text "resolution_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "sbrs_score", limit: 24
+    t.float "wbrs_score", limit: 24
     t.integer "webrep_wlbl_key"
     t.integer "reptool_key"
     t.boolean "is_important"
@@ -334,8 +337,6 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.datetime "case_closed_at"
     t.datetime "case_accepted_at"
     t.datetime "case_resolved_at"
-    t.float "sbrs_score", limit: 24
-    t.float "wbrs_score", limit: 24
   end
 
   create_table "dispute_entry_preloads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -401,12 +402,12 @@ ActiveRecord::Schema.define(version: 20180822195617) do
     t.string "ticket_source_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "submission_type"
-    t.string "submitter_type"
     t.integer "customer_id"
     t.integer "user_id"
-    t.datetime "case_responded_at"
+    t.string "submission_type"
+    t.string "submitter_type"
     t.integer "related_id"
+    t.datetime "case_responded_at"
     t.datetime "related_at"
     t.text "resolution_comment"
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
