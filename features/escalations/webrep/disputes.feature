@@ -71,3 +71,9 @@ Feature: Disputes
     Then I see "ASSIGNED" in element "#status_2"
     Then I see "Cucumber" in element "#owner_2"
 
+  @javascript
+  Scenario: when the user encounters a situation in which no results exists (therefore none returned),
+            an error modal should display
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/disputes"
+    Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
