@@ -5,13 +5,14 @@
       .col-xs-5
         %label Sort:
         %select#history-sort-dropdown
-          %option#date="Date (default)"
+          %option#date-desc="Date, Desc"
+          %option#date-asc="Date, Asc"
           %option#author="Author"
           %option#kind="Kind"
       .col-xs-7
         %label Show:
         %select#history-display-dropdown
-          %option#all="Everything (default)"
+          %option#all="Everything"
           %option#email="Email"
           %option#note-history="Notes"
           %option#version="Status"

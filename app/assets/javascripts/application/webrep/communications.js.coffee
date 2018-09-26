@@ -5,9 +5,13 @@ $ ->
     list = $("#case-history tr").get();
 
     switch sort_on
-      when "date"
+      when "date-desc"
         sort_function = (a, b) ->
           return $(".case-history-datetime", b).data().dbDate.localeCompare($(".case-history-datetime", a).data().dbDate)
+      when "date-asc"
+        sort_function = (a, b) ->
+          return $(".case-history-datetime", a).data().dbDate.localeCompare($(".case-history-datetime", b).data().dbDate)
+
       when "author"
         sort_function = (a, b) ->
           return $(".case-history-author", a).text().localeCompare($(".case-history-author", b).text())
