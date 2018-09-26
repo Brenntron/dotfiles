@@ -1,5 +1,35 @@
 $ ->
 
+  $('#history-sort-dropdown').on 'change', ->
+    sort_on = this.options[this.selectedIndex].id
+    list = $("#case-history tr").get();
+
+    switch sort_on
+      when "date"
+        sort_function = (a, b) ->
+          return $(".case-history-datetime", b).data().dbDate.localeCompare($(".case-history-datetime", a).data().dbDate)
+      when "author"
+        sort_function = (a, b) ->
+          return $(".case-history-author", a).text().localeCompare($(".case-history-author", b).text())
+      when "kind"
+        sort_function = (a, b) ->
+          return $(".case-history-icon", a).data().historyKind.localeCompare($(".case-history-icon", b).data().historyKind)
+      else
+#        Do nothing
+
+    list.sort(sort_function);
+    i = 0
+    while i < list.length
+      list[i].parentNode.appendChild list[i]
+      i++
+
+
+  $('#history-display-dropdown').on 'change', ->
+    $("#case-history tr").show()
+    display_kind = this.options[this.selectedIndex].id
+    if display_kind != "all"
+      $("#case-history tr").not("." + display_kind + "-row").hide()
+
   # Generic email show stuff
   $('.email-row').on 'click', ->
     clean_up_current_email_view()

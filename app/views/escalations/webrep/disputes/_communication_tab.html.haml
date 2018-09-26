@@ -3,45 +3,52 @@
     %h1 Case History
     .row.table-toolbar
       .col-xs-6
-        Sort by [DROPDOWN]
+        Sort by:
+        %select#history-sort-dropdown
+          %option#date="Date (default)"
+          %option#author="Author"
+          %option#kind="Kind"
       .col-xs-6
-        Show [DROPDOWN]
+        History to Show:
+        %select#history-display-dropdown
+          %option#all="Everything (default)"
+          %option#email="Email"
+          %option#note-history="Note"
+          %option#version="Status"
     .row
       .col-xs-12
-        %table
+        %table#case-history
           -@dispute.dispute_emails.each do |email|
             %tr.email-row{class: "email-#{email.status}", email_id: "#{email.id}"}
               %td.alt-col.icon-col
-                %span.case-history-icon.email-icon
+                %span.case-history-icon.email-icon{:data => {:history_kind => "email"}}
               %td
                 %span.case-history-author
                   =email.from
                 %span.case-history-preview
                   =email.subject
-              %td.alt-col.case-history-datetime
+              %td.alt-col.case-history-datetime{:data => {:db_date => email.created_at}}
                 =email.created_at.strftime("%Y-%d-%m")
                 %br
                 =email.created_at.strftime("%H:%M:%S")
-
           -@dispute.dispute_comments.recent_first.each do |comment|
             %tr.note-history-row
               %td.alt-col.icon-col
-                %span.case-history-icon.note-icon
+                %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
               %td
                 %span.case-history-author
                   =comment.user.cec_username
                 %span.case-history-preview
                   =comment.comment.truncate(75, omission: '...')
-              %td.alt-col.case-history-datetime
+              %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
                 =comment.created_at.strftime("%Y-%d-%m")
                 %br
                 =comment.created_at.strftime("%H:%M:%S")
-
           -@versioned_items.each do |item|
             -item.versions.each do |version|
-              %tr
+              %tr.version-row
                 %td.alt-col.icon-col
-                  %span.case-history-icon.disp-status-icon
+                  %span.case-history-icon.disp-status-icon{:data => {:history_kind => "version"}}
                 %td
                   %span.case-history-author
                     =whodunnit_helper(version)
@@ -51,11 +58,10 @@
                       %span.emphasize #{changed_from}
                       to
                       %span.emphasize #{changed_to}.
-                %td.alt-col.case-history-datetime
+                %td.alt-col.case-history-datetime{:data => {:db_date => version.created_at}}
                   =version.created_at.strftime("%Y-%d-%m")
                   %br
                   =version.created_at.strftime("%H:%M:%S")
-
 
   .col-sm-6.border-section
     .row
@@ -246,3 +252,15 @@
 
   :javascript
     AC.Helpers.clipboard()
+    // Default sort of case history
+    $(document).ready(function(){
+      list = $("#case-history tr").get();
+      sort_function = function(a, b) {
+        return $(".case-history-datetime", b).data().dbDate.localeCompare($(".case-history-datetime", a).data().dbDate);
+      };
+      list.sort(sort_function);
+      for (var i = 0; i < list.length; i++) {
+          list[i].parentNode.appendChild(list[i]);
+      }
+    })
+
