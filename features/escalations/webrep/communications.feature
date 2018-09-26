@@ -276,8 +276,8 @@ Feature: Webrep communications
       | id     |
       | 722    |
     And the following dispute emails exist:
-      |id  | dispute_id           | status | subject          |to                        |  from                    | body                                                                                                                                                                                                              |
-      | 1  | 722                  | unread | subject number 1 | email@webrepdisputes.com |  bob@bob.com      |" Key Rules:Problem Summary: Hi Already have this mail server running a couple of domains of our company and we have 3 clients in a domains that cannot send email to emails of a company using sendbase service. |
+      |id| dispute_id | status | subject          |to                        | from        | body                                                                                                                                                                                                             |
+      | 1| 722        | unread | subject number 1 | email@webrepdisputes.com | bob@bob.com |" Key Rules:Problem Summary: Hi Already have this mail server running a couple of domains of our company and we have 3 clients in a domains that cannot send email to emails of a company using sendbase service. |
     Then I go to "/escalations/webrep/disputes/722"
     Then I click on row with email_id "1"
     Then I should see div element with class "customer-facing-notice"
