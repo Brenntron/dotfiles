@@ -38,7 +38,6 @@ Feature: Disputes
     When I goto "escalations/webrep/disputes"
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
-#    Then I see "Cucumber" in element "#owner_2"
     Then I should see user, "Cucumber", in element "#owner_2"
 
   @javascript
