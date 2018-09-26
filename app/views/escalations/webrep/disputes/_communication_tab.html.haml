@@ -2,18 +2,18 @@
   .col-sm-3
     %h1 Case History
     .row.table-toolbar
-      .col-xs-6
-        Sort by:
+      .col-xs-5
+        %label Sort:
         %select#history-sort-dropdown
           %option#date="Date (default)"
           %option#author="Author"
           %option#kind="Kind"
-      .col-xs-6
-        History to Show:
+      .col-xs-7
+        %label Show:
         %select#history-display-dropdown
           %option#all="Everything (default)"
           %option#email="Email"
-          %option#note-history="Note"
+          %option#note-history="Notes"
           %option#version="Status"
     .row
       .col-xs-12
