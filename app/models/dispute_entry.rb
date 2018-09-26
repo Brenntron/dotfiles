@@ -363,6 +363,7 @@ class DisputeEntry < ApplicationRecord
   def self.update_from_field_data(field_data)
     field_data.each do |entry_id, field_hash|
       entry = DisputeEntry.find(entry_id)
+
       entry.update_from_field_data(field_hash)
     end
   end
