@@ -32,9 +32,9 @@ end
 Given(/^the following disputes exist and have entries without preloads:$/) do |disputes|
   FactoryBot.create(:customer) unless Customer.all.exists?
   FactoryBot.create(:user) unless User.all.exists?
-  disputes.hashes.each do |dispute|
-    dispute = FactoryBot.create(:dispute, dispute)
-    entry = FactoryBot.create(:dispute_entry, dispute_id: dispute.id)
+  disputes.hashes.each do |dispute_attrs|
+    dispute = FactoryBot.create(:dispute, dispute_attrs)
+    FactoryBot.create(:dispute_entry, dispute_id: dispute.id)
   end
 end
 
