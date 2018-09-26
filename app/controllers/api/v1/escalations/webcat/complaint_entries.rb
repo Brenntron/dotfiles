@@ -317,6 +317,10 @@ module API
             post 'domain_whois' do
               whois = {}
               begin
+                if /\A[\d\.]*\z/ !~ params[:lookup]
+                  tld = params[:lookup].split('.').last
+                  Whois::Server.define(:tld, tld, "whois.iana.org")
+                end
                 record = Whois.whois(params[:lookup])
                 parser = Whois::Parser.new(record)
                 parser.record.content.each_line do |line|
