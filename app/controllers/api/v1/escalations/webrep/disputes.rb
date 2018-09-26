@@ -336,9 +336,29 @@ module API
             patch 'entries/field_data' do
               std_api_v2 do
                 authorize!(:update, Dispute)
+
                 DisputeEntry.update_from_field_data(permitted_params['field_data'])
                 DisputeEntry.send_status_updates(permitted_params['field_data'])
+
+                permitted_params['field_data'].each do |index, entry|
+                  if entry.length == 3 && entry.last.field == 'resolution_comment' && !entry.last.new.empty?
+                    comment = entry.last.new
+                    dispute_entry_id = index
+                    Dispute.create_note(current_user, comment, dispute_entry_id)
+                  end
+                end
+
                 true
+              end
+            end
+
+            params do
+              requires :dispute_id, type: Integer
+              requires :comment, type: String
+            end
+            post 'create_note' do
+              std_api_v2 do
+                Dispute.create_note(permitted_params['dispute_id'], permitted_params['comment'])
               end
             end
 
@@ -359,6 +379,7 @@ module API
               if params[:resolution].present?
                 resolution = params[:resolution]
               end
+
               if params[:comment].present?
                 if status == 'RESOLVED_CLOSED'
                   comment = status + ' : ' + resolution + ' - ' + params[:comment]
@@ -428,8 +449,9 @@ module API
               std_api_v2 do
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 status = dispute.status
+                comment = dispute.resolution_comment
 
-                {:status => status}.to_json
+                {:status => status, :comment => comment}.to_json
               end
             end
 
@@ -477,8 +499,7 @@ module API
                   resolution_comment = ''
                 end
 
-                {:resolution => resolution,
-                 :resolution_comment => resolution_comment}.to_json
+                {:resolution => resolution}.to_json
               end
             end
 
