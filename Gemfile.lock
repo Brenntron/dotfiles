@@ -169,6 +169,8 @@ GEM
     diff-lcs (1.3)
     diffy (3.2.1)
     docile (1.3.1)
+    domainatrix (0.0.11)
+      addressable
     dotenv (2.2.2)
     dotenv-rails (2.2.2)
       dotenv (= 2.2.2)
@@ -528,6 +530,7 @@ DEPENDENCIES
   delayed_job_active_record (~> 4.1.2)
   devise (~> 4.3.0)
   diffy (~> 3.2.0)
+  domainatrix
   dotenv-rails (~> 2.2.1)
   factory_bot (~> 4.10)
   factory_bot_rails (~> 4.10)
@@ -592,4 +595,4 @@ DEPENDENCIES
   xmlrpc
 
 BUNDLED WITH
-   1.16.1
+   1.16.3
