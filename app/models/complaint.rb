@@ -76,46 +76,16 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    pre_url = url.gsub("http://", "").gsub("https://", "")
-    url = "http://" + pre_url
+    url = Domainatrix.parse(url)
 
     uri_parts = {}
-    begin
-      uri_object = URI(url)
 
-
-      domain_parts = uri_object.host.split(".")
-
-      if domain_parts.size > 2
-        uri_parts[:subdomain] = domain_parts.first
-        uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
-        uri_parts[:path] = uri_object.path
-      else
-        uri_parts[:subdomain] = ""
-        uri_parts[:domain] = uri_object.host
-        uri_parts[:path] = uri_object.path
-      end
-
-    rescue
-      shitty_uri_parts = url.split("/")
-      shitty_url = [shitty_uri_parts[0], shitty_uri_parts[1], shitty_uri_parts[2]].join("/")
-      leftover_garbage = shitty_uri_parts - [shitty_uri_parts[0], shitty_uri_parts[1], shitty_uri_parts[2]]
-      clean_uri_object = URI(shitty_url)
-      domain_parts = clean_uri_object.host.split(".")
-      if domain_parts.size > 2
-        uri_parts[:subdomain] = domain_parts.first
-        uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
-        uri_parts[:path] = leftover_garbage.join('/')
-      else
-        uri_parts[:subdomain] = ""
-        uri_parts[:domain] = uri_object.host
-        uri_parts[:path] = leftover_garbage.join('/')
-      end
-    end
+    uri_parts[:subdomain] = url.subdomain
+    uri_parts[:domain] = ([url.domain] + [url.public_suffix]).join('.')
+    uri_parts[:path] = url.path
 
     uri_parts
   end
-
 
   def self.is_possible_company_duplicate(complaint, entry, entry_type)
     company_id = complaint.customer.company.id
