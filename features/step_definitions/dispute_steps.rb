@@ -26,3 +26,9 @@ Given(/^the following disputes exist and have entries:$/) do |disputes|
   end
 end
 
+Given(/^a dispute exists and is related to disputes with ID, "(.*?)":$/) do |related_id|
+  FactoryBot.create(:customer) unless Customer.all.exists?
+  FactoryBot.create(:user) unless User.all.exists?
+  FactoryBot.create(:dispute, related_id: related_id, resolution: Dispute::DUPLICATE)
+end
+
