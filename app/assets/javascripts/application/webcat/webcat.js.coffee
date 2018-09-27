@@ -43,11 +43,13 @@ $ ->
       columns: [
         {
           data: null
-          defaultContent: '<button class="expand-row-button-inline"></button>'
+
           width: '14px'
           orderable: false
           searchable: false
           sortable: false
+          'render':(data,type,full,meta)->
+            return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
         }
         {
           data: null

@@ -1,5 +1,14 @@
-window.removeSubdomain = (id,host) ->
-  id.value = host
+window.updateURI = (complaint_entry_id) ->
+  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
+    data: {complaint_entry_id: complaint_entry_id, uri: uri }
+    success_reload: true
+  )
+
+
 
 window.cat_new_url = ()->
   event.preventDefault()
@@ -645,8 +654,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Categories to commit</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
@@ -698,8 +706,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +

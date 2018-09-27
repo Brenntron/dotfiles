@@ -242,6 +242,30 @@ module API
 
               end
             end
+
+            params do
+              requires :uri, type: String
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'update_uri' do
+              std_api_v2 do
+
+                authorize!(:update, DisputeEntry)
+                complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+
+                parsed_uri = Complaint.parse_url(permitted_params[:uri])
+
+                complaint_entry.domain = parsed_uri[:domain]
+                complaint_entry.subdomain = parsed_uri[:subdomain]
+                complaint_entry.uri = complaint_entry.subdomain + complaint_entry.domain
+                ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
+
+                # Add code to refresh confidence, primary category, and WBRS score by replacing preload
+
+                complaint_entry.save
+              end
+            end
           end
         end
       end
