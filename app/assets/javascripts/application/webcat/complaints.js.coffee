@@ -5,10 +5,20 @@ window.updateURI = (complaint_entry_id) ->
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
-    success_reload: true
+    success: (response) ->
+
+      $("#simple-nested-table-#{complaint_entry_id} tbody > tr").remove()
+
+      if response.status != 'error'
+        $.each response, (key, entry) ->
+          $("#simple-nested-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
+
+        $("#entry-uri-#{complaint_entry_id}").text(uri)
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+      else
+        $("#entry-uri-#{complaint_entry_id}").text(uri)
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
   )
-
-
 
 window.cat_new_url = ()->
   event.preventDefault()
@@ -634,12 +644,12 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data">' + url + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + url + '</span>' +
       '<label class="content-label-sm">Site Search</label>' +
-      '<span class="nested-complaint-data">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="simple-nested-table-' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div>' +
@@ -685,13 +695,13 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data">' + uri + '</span>' +
-      '<label class="content-label-sm">Site Search</label>' +
-      '<span class="nested-complaint-data">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + url + '</span>' +
+      '<label class="content-label-sm" id="site-search">Site Search</label>' +
+      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="simple-nested-table-' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +

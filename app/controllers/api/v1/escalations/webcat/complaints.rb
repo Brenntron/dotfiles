@@ -261,9 +261,16 @@ module API
                 complaint_entry.uri = complaint_entry.subdomain + complaint_entry.domain
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
 
-                # Add code to refresh confidence, primary category, and WBRS score by replacing preload
-
                 complaint_entry.save
+
+                if complaint_entry&.complaint_entry_preload&.current_category_information == 'DATA ERROR'
+                  response = {:status => "error"}.to_json
+                else
+                  response = complaint_entry&.complaint_entry_preload&.current_category_information
+                end
+
+                JSON.parse(response)
+
               end
             end
           end
