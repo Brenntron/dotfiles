@@ -9,15 +9,17 @@ window.updateURI = (complaint_entry_id) ->
 
       $("#simple-nested-table-#{complaint_entry_id} tbody > tr").remove()
 
-      if response.status != 'error'
-        $.each response, (key, entry) ->
+      if response.json.status == 'success'
+        $.each response.json.data, (key, entry) ->
           $("#simple-nested-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
 
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
-      else
+      else if response.json.status == 'error'
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+      else if response.json.status == 'ip'
+        std_msg_error("Cannot edit IP entries.","")
   )
 
 window.cat_new_url = ()->

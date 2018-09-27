@@ -254,22 +254,25 @@ module API
                 authorize!(:update, DisputeEntry)
                 complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
 
-                parsed_uri = Complaint.parse_url(permitted_params[:uri])
+                if complaint_entry.entry_type == 'URI/DOMAIN' || complaint_entry.entry_type.nil?
+                  parsed_uri = Complaint.parse_url(permitted_params[:uri])
 
-                complaint_entry.domain = parsed_uri[:domain]
-                complaint_entry.subdomain = parsed_uri[:subdomain]
-                complaint_entry.uri = complaint_entry.subdomain + complaint_entry.domain
-                ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
+                  complaint_entry.domain = parsed_uri[:domain]
+                  complaint_entry.subdomain = parsed_uri[:subdomain]
+                  complaint_entry.uri = complaint_entry.subdomain + complaint_entry.domain
+                  ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
 
-                complaint_entry.save
+                  complaint_entry.save
 
-                if complaint_entry&.complaint_entry_preload&.current_category_information == 'DATA ERROR'
-                  response = {:status => "error"}.to_json
-                else
-                  response = complaint_entry&.complaint_entry_preload&.current_category_information
+                  if complaint_entry&.complaint_entry_preload&.current_category_information == 'DATA ERROR'
+                    render json: {:status=> 'error'}
+                  else
+                    response = (complaint_entry&.complaint_entry_preload&.current_category_information)
+                    render json: {:status=> 'success', :data => JSON.parse(response)}
+                  end
+                elsif complaint_entry.entry_type == 'IP'
+                  render json: {:status=> 'ip'}
                 end
-
-                JSON.parse(response)
 
               end
             end
