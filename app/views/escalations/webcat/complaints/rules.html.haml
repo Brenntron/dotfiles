@@ -1,10 +1,33 @@
 .content-wrapper
   - content_for(:webcat_page) do
-    Rules Management
+    Cluster Management
   - content_for(:webcat_icon) do
     icon-categories
-  .complaint-mgt-top-area
-    = render "escalations/webcat/shared/telemetry"
+
+  .complaint-mgt-top-area.cluster-mgt-top-area
+    .row.cluster-title
+      .col-xs-3.dashboard-left-data
+        %span.top-info-icon{class: "#{content_for :webcat_icon}"}
+        %h1= content_for :webcat_page
+      .col-xs-9.search-stg
+        = form_for(:search, method: "get") do |search_form|
+          .row
+            .col-xs-8.remove-pad-right
+              .row
+                .col-xs-9.search
+                  = search_form.text_field(:uri, class: 'search-box', placeholder: 'Regex', autofocus: 'true')
+                .col-xs-3.search-submit
+                  = search_form.submit 'Apply Filter', class: 'button_primary apply-filter-btn icon-filter-white', data: { disable_with: false }
+            .col-xs-4.no-padding
+              .row.search-options-row.btn-layout
+                .col-xs-6.no_pad
+                  = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
+                  %label{for: 'research-search-strict'} Include Pattern
+                .col-xs-6.no_pad
+                  = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
+                  %label{for: 'research-search-broad'} Exclude Pattern
+
+    -#= render "escalations/webcat/shared/telemetry"
   .row
     .col-xs-12.temp-spacer
       %p Here we have categorized rules and uncategorized rules essentially the clusters page

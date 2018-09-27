@@ -6275,3 +6275,116 @@ h2 {
   margin-bottom: 6px;
   color: #333;
 }
+
+// Vdeutou worked on cluster top bar.
+$border: 1px solid red;
+
+.complaint-mgt-top-area.cluster-mgt-top-area {
+  background-color: #3e5a72;
+  padding: 20px 0;
+
+  .apply-filter-btn {
+    //background-image: url(image_path('icon_reports_white.svg'));
+    background-repeat: no-repeat;
+    background-size: 26px;
+    padding-left: 40px !important;
+    background-position: 8px center;
+    margin-top: 20px !important;
+  }
+
+  .cluster-title {
+    h2 {
+      display: none;
+    }
+    h1 {
+      margin-bottom: 0;
+    }
+  }
+
+  .search-stg {
+    height: 50px;
+    margin: 0 auto;
+
+    form {
+      height: 100%;
+
+      .row {
+        height: 100%;
+      }
+
+      .search {
+        padding-right: 0;
+
+        input {
+          margin-top: 9px;
+          height: 30px;
+        }
+      }
+
+      .search-submit {
+        padding: 0;
+        input[type='submit'] {
+          height: 30px;
+          margin-top: 9px !important;
+          padding: 0 10px;
+          line-height: 30px;
+        }
+      }
+      .search-options-row {
+        max-width: 300px;
+        //margin: 12px auto;
+      }
+      .btn-layout {
+        margin-left: 0;
+      }
+      .remove-pad-right {
+        padding-right: 0;
+      }
+    }
+
+    .no-padding {
+      padding: 0;
+      margin-left: -30px;
+    }
+  }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (max-width: 1640px) {
+  .cluster-title {
+    .col-xs-3 {
+      width: auto;
+      h1 {
+        padding-right: 10px;
+      }
+    }
+    .col-xs-9 {
+      width: 50%;
+    }
+    .dashboard-left-data {
+      padding-right: 0;
+      padding-left: 0;
+    }
+
+    .search-stg {
+      padding-right: 0;
+      padding-left: 10px;
+    }
+  }
+}
+
+@media (max-width: 1300px) {
+  .cluster-title {
+    h1 {
+      display: none;
+    }
+    .dashboard-left-data {
+      margin-top: 10px;
+      padding-right: 10px;
+    }
+
+    .search-stg {
+      width: 70%;
+    }
+  }
+}

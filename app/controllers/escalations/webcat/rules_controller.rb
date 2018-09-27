@@ -3,4 +3,13 @@ class Escalations::Webcat::RulesController < Escalations::WebcatController
 
   def index
   end
+
+  def rules
+    puts params
+  end
+
+  private
+  def research_params
+    params.fetch(:search, {}).permit(:uri, :scope)
+  end
 end
