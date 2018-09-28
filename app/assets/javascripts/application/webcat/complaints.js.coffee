@@ -6,11 +6,11 @@ window.updateURI = (complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
-      $("#simple-nested-table-#{complaint_entry_id} tbody > tr").remove()
+      $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
       if response.json.status == 'success'
         $.each response.json.data, (key, entry) ->
-          $("#simple-nested-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
+          $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
         $("#domain-#{complaint_entry_id}").html('<button class="secondary" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
@@ -651,7 +651,7 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="simple-nested-table-' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div>' +
@@ -703,7 +703,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="simple-nested-table-' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
