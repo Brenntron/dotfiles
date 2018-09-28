@@ -7,37 +7,46 @@
   .complaint-mgt-top-area.cluster-mgt-top-area
     .row.cluster-title
       .col-xs-3.dashboard-left-data
-        %span.top-info-icon{class: "#{content_for :webcat_icon}"}
         %h1= content_for :webcat_page
+        %span.top-info-icon{class: "#{content_for :webcat_icon}"}
       .col-xs-9.search-stg
-        = form_for(:search, method: "get") do ||
-          .row
-            .col-xs-8
-              .row
-                .col-xs-9
-                  %input.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
-                .col-xs-3.no_pad
-                  %button.primary{class:'apply-filter-btn icon-filter-white'}Apply Filter
-            .col-xs-4
-              .row.search-options-row.btn-layout
-                .col-xs-6
-                  .radio
-                    %label
-                      %input{name: 'choice', type: 'radio', value: 'value'}
-                      Include Pattern
-                .col-xs-6
-                  .radio
-                    %label
-                      %input{name: 'choice', type: 'radio', value: 'value'}
-                      Exclude Pattern
+        .row
+          .col-xs-8
+            .row
+              .col-xs-9
+                %input.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
+              .col-xs-3.no_pad
+                %button.primary{class:'apply-filter-btn icon-filter-white'}Apply Filter
+          .col-xs-4
+            .row.search-options-row.btn-layout
+              .col-xs-6
+                .radio
+                  %label
+                    %input{name: 'choice', type: 'radio', value: 'value'}
+                    Include Pattern
+              .col-xs-6
+                .radio
+                  %label
+                    %input{name: 'choice', type: 'radio', value: 'value'}
+                    Exclude Pattern
   .row
     .col-xs-12.temp-spacer
-      %p Here we have categorized rules and uncategorized rules essentially the clusters page
-      %p Rulebuilder wont be on this page it will be on the complaints page.
+      .card.shadow-lg.p-3
+        %h1.card-subtitle Comment
+        .card-body
+          %input.text_field{autofocus: 'true'}
+          %button Submit Changes
 
-      %p We also want to add Rule history here
-
-      %p we can also add verifying rules here too
 
 
-      %p cluster management is essentailly the show multple without complaints (the data will just be URLS)
+
+      -#%p Here we have categorized rules and uncategorized rules essentially the clusters page
+      -#
+      -#%p Rulebuilder wont be on this page it will be on the complaints page.
+      -#
+      -#%p We also want to add Rule history here
+      -#
+      -#%p we can also add verifying rules here too
+      -#
+
+      -#%p cluster management is essentailly the show multple without complaints (the data will just be URLS)

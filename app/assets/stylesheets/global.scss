@@ -6276,7 +6276,7 @@ h2 {
   color: #333;
 }
 
-// Cluster top bar header custometics strart here.
+// Cluster top bar header Scss begin here.
 .complaint-mgt-top-area.cluster-mgt-top-area {
   background-color: $content-tab-color;
   padding: 20px 0;
@@ -6292,24 +6292,18 @@ h2 {
         margin: 0;
       }
     }
-  }
 
-  .apply-filter-btn {
-    background-repeat: no-repeat;
-    background-size: 26px;
-    padding-left: 40px !important;
-    background-position: 8px center;
-  }
-
-  .search-stg {
-    height: 50px;
-    margin: 0 auto;
-
-    form {
-      height: 100%;
+    .search-stg {
+      height: 50px;
+      margin: 0 auto;
 
       .row {
         height: 100%;
+
+        input {
+          margin-top: 10px;
+          height: 30px;
+        }
 
         button {
           padding-top: 5px;
@@ -6318,27 +6312,64 @@ h2 {
           height: 30px;
           vertical-align: center;
         }
-      }
+        .apply-filter-btn {
+          background-repeat: no-repeat;
+          background-size: 26px;
+          padding-left: 40px !important;
+          background-position: 8px center;
+        }
 
-      input {
-        margin-top: 10px;
-        height: 30px;
-      }
-      .search-options-row {
-        max-width: 300px;
-      }
+        .search-options-row {
+          max-width: 300px;
+        }
+        .btn-layout {
+          margin: 0;
 
-      .btn-layout {
-        margin: 0;
-
-        .col-xs-6 {
-          .radio {
-            margin: 0;
-            label {
-              line-height: 4.6;
+          .col-xs-6 {
+            .radio {
+              margin: 0;
+              label {
+                line-height: 4.6;
+              }
             }
           }
         }
+      }
+    }
+  }
+}
+// Cluster mgmt UI - Comment box / Category Submission
+.temp-spacer {
+  padding: 20px 15px;
+
+  .card {
+    width: 40%;
+    float: right;
+    padding: 0 5px 10px 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+
+    h1 {
+      font-size: 8px;
+    }
+
+    .card-body {
+      display: inline-flex;
+      width: 100%;
+
+      input {
+        width: 80%;
+      }
+
+      button {
+        width: 20%;
+        background-color: $primary-section-color;
+        font-size: 8px;
+        background-image: url(image_path('icon_submit_arrow.svg'));
+        background-repeat: no-repeat;
+        margin: 0 0 0 10px;
+        padding: 0;
+        color: white;
+        border: none;
       }
     }
   }
