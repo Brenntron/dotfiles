@@ -1614,6 +1614,7 @@ $ ->
 
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
       $(this).tooltipster
+        debug: false,
         theme: [
           'tooltipster-borderless'
           'tooltipster-borderless-customized'
