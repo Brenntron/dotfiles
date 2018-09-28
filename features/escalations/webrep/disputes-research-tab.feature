@@ -38,6 +38,7 @@ Feature: Disputes index, Research tab
     |2 |3      |
     When I goto "escalations/webrep/disputes/2"
     And I click "#research-tab-link"
+    When I wait for the ajax request to finish
     Then "#disputes-research-table" should be visible
     And the Entry preload with id "1" should exist
 
