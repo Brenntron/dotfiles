@@ -18,9 +18,6 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   def rules
   end
 
-  def reports
-  end
-
   def show_multiple
     ids = params["selected_ids"]&.split(',') || nil
     @complaints = Complaint.where(id:ids)
