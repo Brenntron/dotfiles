@@ -6279,7 +6279,6 @@ h2 {
 // Cluster top bar header Scss begin here.
 .complaint-mgt-top-area.cluster-mgt-top-area {
   background-color: $content-tab-color;
-  padding: 20px 0;
 
   .cluster-title {
     margin: 0;
@@ -6299,6 +6298,11 @@ h2 {
 
       .row {
         height: 100%;
+
+        .search-box {
+          background-image: none;
+          padding: 0 0 0 10px;
+        }
 
         input {
           margin-top: 10px;
@@ -6345,12 +6349,8 @@ h2 {
   .card {
     width: 40%;
     float: right;
-    padding: 0 5px 10px 5px;
+    padding: 10px 5px 20px 5px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-
-    h1 {
-      font-size: 8px;
-    }
 
     .card-body {
       display: inline-flex;
@@ -6358,6 +6358,7 @@ h2 {
 
       input {
         width: 80%;
+        border: 1px solid #eee;
       }
 
       button {
@@ -6367,7 +6368,7 @@ h2 {
         background-image: url(image_path('icon_submit_arrow.svg'));
         background-repeat: no-repeat;
         margin: 0 0 0 10px;
-        padding: 0;
+        padding: 0 0 0 25px;
         color: white;
         border: none;
       }
