@@ -10,24 +10,26 @@
         %span.top-info-icon{class: "#{content_for :webcat_icon}"}
         %h1= content_for :webcat_page
       .col-xs-9.search-stg
-        = form_for(:search, method: "get") do |search_form|
+        = form_for(:search, method: "get") do ||
           .row
-            .col-xs-8.remove-pad-right
+            .col-xs-8
               .row
-                .col-xs-9.search
-                  = search_form.text_field(:uri, class: 'search-box', placeholder: 'Regex', autofocus: 'true')
-                .col-xs-3.search-submit
-                  = search_form.submit 'Apply Filter', class: 'button_primary apply-filter-btn icon-filter-white', data: { disable_with: false }
-            .col-xs-4.no-padding
+                .col-xs-9
+                  %input.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
+                .col-xs-3.no_pad
+                  %button.primary{class:'apply-filter-btn icon-filter-white'}Apply Filter
+            .col-xs-4
               .row.search-options-row.btn-layout
-                .col-xs-6.no_pad
-                  = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-                  %label{for: 'research-search-strict'} Include Pattern
-                .col-xs-6.no_pad
-                  = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-                  %label{for: 'research-search-broad'} Exclude Pattern
-
-    -#= render "escalations/webcat/shared/telemetry"
+                .col-xs-6
+                  .radio
+                    %label
+                      %input{name: 'choice', type: 'radio', value: 'value'}
+                      Include Pattern
+                .col-xs-6
+                  .radio
+                    %label
+                      %input{name: 'choice', type: 'radio', value: 'value'}
+                      Exclude Pattern
   .row
     .col-xs-12.temp-spacer
       %p Here we have categorized rules and uncategorized rules essentially the clusters page
