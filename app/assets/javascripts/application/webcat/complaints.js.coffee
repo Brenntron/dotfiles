@@ -6,18 +6,18 @@ window.updateURI = (complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
-
       $("#simple-nested-table-#{complaint_entry_id} tbody > tr").remove()
 
       if response.json.status == 'success'
         $.each response.json.data, (key, entry) ->
           $("#simple-nested-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
-
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+        $("#domain-#{complaint_entry_id}").html('<button class="secondary" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
       else if response.json.status == 'error'
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+        $("#domain-#{complaint_entry_id}").html('<button class="secondary" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
       else if response.json.status == 'ip'
         std_msg_error("Cannot edit IP entries.","")
   )
@@ -708,8 +708,8 @@ format = (complaint_entry_row) ->
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary">Lookup</button><br/>' +
-      '<button class="secondary" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
-      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
+      '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +

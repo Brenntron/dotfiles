@@ -268,7 +268,7 @@ module API
                     render json: {:status=> 'error'}
                   else
                     response = (complaint_entry&.complaint_entry_preload&.current_category_information)
-                    render json: {:status=> 'success', :data => JSON.parse(response)}
+                    render json: {:status=> 'success', :data => JSON.parse(response), :domain => complaint_entry.domain}
                   end
                 elsif complaint_entry.entry_type == 'IP'
                   render json: {:status=> 'ip'}
