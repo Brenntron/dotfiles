@@ -24,4 +24,33 @@ class Escalations::Webcat::ReportsController < Escalations::WebcatController
     end
     send_data contents
   end
+
+  def complaint_entry
+    @ce_rpt_params = ce_rpt_params
+    @report = WebcatReport::ComplaintEntryReport.new(date_from: ce_rpt_params['date_from'],
+                                                     date_to: ce_rpt_params['date_to'],
+                                                     customer_name: ce_rpt_params['customer_name'])
+  end
+
+  def export_complaint_entry
+    @ce_rpt_params = ce_rpt_params
+    @report = WebcatReport::ComplaintEntryReport.new(date_from: ce_rpt_params['date_from'],
+                                                     date_to: ce_rpt_params['date_to'],
+                                                     customer_name: ce_rpt_params['customer_name'])
+
+    contents = CSV.generate do |csv|
+      csv << [ 'Customer Name', 'URL', 'Engineer', 'Resolution', 'Final Category', 'Suggested Category', 'Created' ]
+      @report.each_entry do |entry|
+        csv << [ entry.customer_name, entry.uri, entry.user_display_name, entry.resolution,
+                 entry.category, entry.suggested_disposition, entry.created_at ]
+      end
+    end
+    send_data contents
+  end
+
+  private
+
+  def ce_rpt_params
+    params.require(:report).permit(:date_from, :date_to, :customer_name)
+  end
 end
