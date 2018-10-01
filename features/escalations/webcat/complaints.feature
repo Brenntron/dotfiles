@@ -78,7 +78,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'My Complaints' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
@@ -87,7 +87,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'My Open Complaints' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=MY%20OPEN%20COMPLAINTS"
@@ -96,7 +96,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'My Closed Complaints' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "assigned_closed_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=MY%20CLOSED%20COMPLAINTS"
@@ -105,7 +105,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'Completed' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "completed_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=COMPLETED"
@@ -114,7 +114,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'Active' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "pending_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ACTIVE"
@@ -123,7 +123,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'New' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=NEW"
@@ -132,7 +132,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'Review' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "pending_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=REVIEW"
@@ -141,7 +141,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user selects the 'All' filter
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
@@ -164,7 +164,7 @@ Feature: Webcat complaints
     
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
