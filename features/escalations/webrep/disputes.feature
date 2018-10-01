@@ -68,7 +68,6 @@ Feature: Disputes
     Then I see "NEW" in element "#status_2"
     Then I see "Unassigned" in element "#owner_2"
     When I click ".take-dispute-2"
-
     Then I see "ASSIGNED" in element "#status_2"
     Then I see "Cucumber" in element "#owner_2"
 
@@ -109,4 +108,5 @@ Feature: Disputes
     And I click "#set-related-dispute-submit-button_button_related_dispute"
     And I wait for "5" seconds
     Then check if dispute id, "1", has a related_id of "2"
+
 
