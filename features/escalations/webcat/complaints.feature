@@ -166,6 +166,7 @@ Feature: Webcat complaints
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
     And I click ".expand-all"
@@ -178,6 +179,7 @@ Feature: Webcat complaints
   Scenario: a user clicks the domain button
     Given a user with role "admin" exists and is logged in
     And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
     And I click ".expand-all"
@@ -191,5 +193,6 @@ Feature: Webcat complaints
     And the following complaint entries exist:
     |id|domain|
     |1 |      |
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
     Then I should see "1.1.1.1"
