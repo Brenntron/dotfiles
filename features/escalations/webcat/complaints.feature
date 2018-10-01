@@ -6,7 +6,7 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: a user can manually create a new complaint
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And the following companies exist:
     |id| name  |
     | 1| Cisco |
