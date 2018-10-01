@@ -80,6 +80,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'My Complaints' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
@@ -88,6 +89,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'My Open Complaints' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=MY%20OPEN%20COMPLAINTS"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
@@ -96,6 +98,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'My Closed Complaints' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "assigned_closed_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=MY%20CLOSED%20COMPLAINTS"
     Then I wait for "3" seconds
     Then I should see "COMPLETED"
@@ -104,6 +107,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'Completed' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "completed_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=COMPLETED"
     Then I wait for "3" seconds
     Then I should see "COMPLETED"
@@ -112,6 +116,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'Active' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "pending_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ACTIVE"
     Then I wait for "3" seconds
     Then I should see "PENDING"
@@ -120,6 +125,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'New' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=NEW"
     Then I wait for "3" seconds
     Then I should see "NEW"
@@ -128,6 +134,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'Review' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "pending_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=REVIEW"
     Then I wait for "3" seconds
     Then I should see "PENDING"
@@ -136,6 +143,7 @@ Feature: Webcat complaints
   Scenario: a user selects the 'All' filter
     Given a user with role "admin" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
@@ -144,15 +152,15 @@ Feature: Webcat complaints
   Scenario: a user attempts to view reports more than once
     Given an admin user with role "webcat user" exists and is logged in
     And I goto "/escalations/webcat/reports"
-    And I fill in "report_date_from" with "2018-08-01"
-    And I fill in "report_date_to" with "2018-08-02"
-    Then I click "Report" and switch to the new window
-    Then I should see "Webcat Report"
+    And I fill in "complaint_entry_report_from" with "2018-08-01"
+    And I fill in "complaint_entry_report_to" with "2018-08-02"
+    Then I click "complaint_entry_report" and switch to the new window
+    Then I should see "Webcat Complaint Entry Report"
     Then I goto "/escalations/webcat/reports"
-    And I fill in "report_date_from" with "2018-08-11"
-    And I fill in "report_date_to" with "2018-08-12"
-    Then I click "Report" and switch to the new window
-    Then I should see "Webcat Report"
+    And I fill in "complaint_entry_report_from" with "2018-08-11"
+    And I fill in "complaint_entry_report_to" with "2018-08-12"
+    Then I click "complaint_entry_report" and switch to the new window
+    Then I should see "Webcat Complaint Entry Report"
     
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
