@@ -56,7 +56,7 @@
           Status
         %br
         -##bugzilla_popover_state
-        - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+        - if (@dispute.resolution != Dispute::DUPLICATE)
           %span.dropdown
             %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down(#{@dispute.id})"}
               - if @dispute.status.nil?
@@ -139,7 +139,7 @@
       %label.content-label-sm
         Dispute Entries
       %div
-        = @entries.first.hostlookup
+        = @entries.first.hostlookup if @entries.present?
         -#- @entries.each do |entry|
         -#  = entry.hostlookup
       %span.dispute-entry-count
