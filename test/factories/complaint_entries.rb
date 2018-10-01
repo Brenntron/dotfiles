@@ -32,6 +32,11 @@ FactoryBot.define do
       resolution    {''}
       user          {User.first}
     end
+    trait :assigned_closed_entry do
+      status        { 'COMPLETED' }
+      resolution    {''}
+      user          {User.first}
+    end
     trait :completed_entry do
       status        { 'COMPLETED' }
       resolution    { 'fixed' }
