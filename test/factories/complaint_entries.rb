@@ -42,7 +42,6 @@ FactoryBot.define do
       resolution    { 'fixed' }
       user          { FactoryBot.create(:user)}
     end
-
   end
 end
 
