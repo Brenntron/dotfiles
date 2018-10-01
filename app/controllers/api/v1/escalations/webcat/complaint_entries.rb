@@ -156,7 +156,6 @@ module API
                     complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
                   end
 
-
                   complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
