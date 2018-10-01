@@ -110,5 +110,4 @@ Feature: Webcat complaints
     |id|domain|
     |1 |      |
     And I goto "/escalations/webcat/complaints/1"
-    Then take a screenshot
     Then I should see "1.1.1.1"
