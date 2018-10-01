@@ -78,6 +78,20 @@ Feature: Webcat complaints
     Then I should see "Vrt Incoming"
 
   @javascript
+  Scenario: a user attempts to view reports more than once
+    Given an admin user with role "webcat user" exists and is logged in
+    And I goto "/escalations/webcat/reports"
+    And I fill in "report_date_from" with "2018-08-01"
+    And I fill in "report_date_to" with "2018-08-02"
+    Then I click "Report" and switch to the new window
+    Then I should see "Webcat Report"
+    Then I goto "/escalations/webcat/reports"
+    And I fill in "report_date_from" with "2018-08-11"
+    And I fill in "report_date_to" with "2018-08-12"
+    Then I click "Report" and switch to the new window
+    Then I should see "Webcat Report"
+    
+  @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
@@ -88,7 +102,7 @@ Feature: Webcat complaints
     And I click "#submit_changes_1"
     And I wait for "2" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
-
+    
   @javascript
   Scenario: a user visits a complaint show page and sees its IP
     Given a user with role "webcat user" exists and is logged in
@@ -98,4 +112,3 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints/1"
     Then take a screenshot
     Then I should see "1.1.1.1"
-

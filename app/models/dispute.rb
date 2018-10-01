@@ -60,6 +60,8 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
 
+  AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -472,7 +474,7 @@ class Dispute < ApplicationRecord
               new_payload_item[:resolution] = "FIXED"
               new_payload_item[:status] = TI_RESOLVED
             else
-              new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_payload_item[:resolution_message] = AUTORESOLVED_UNCHANGED_MESSAGE
               new_payload_item[:resolution] = "UNCHANGED"
               new_payload_item[:status] = TI_RESOLVED
             end
@@ -500,7 +502,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.case_closed_at = resolved_at
               new_dispute_entry.case_resolved_at = resolved_at
             else
-              new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
               new_dispute_entry.case_closed_at = resolved_at
@@ -581,7 +583,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.case_closed_at = resolved_at
               new_dispute_entry.case_resolved_at = resolved_at
             else
-              new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
               new_dispute_entry.case_closed_at = resolved_at
@@ -976,6 +978,14 @@ class Dispute < ApplicationRecord
       message.post_entries(dispute.dispute_entries)
 
     end
+  end
+
+  def self.create_note(current_user = nil, comment, dispute_entry_id)
+    dispute_entry = DisputeEntry.find(dispute_entry_id)
+    dispute_id = dispute_entry.dispute_id
+
+    formatted_comment = dispute_entry.hostlookup + ' : ' + dispute_entry.status + ' : ' + Time.now.strftime("%m/%d/%Y %H:%M").to_s + ' : '+ comment
+    DisputeComment.create(:user_id => current_user.id, :comment => formatted_comment, :dispute_id => dispute_id)
   end
 
   # Searches in a variety of ways.
