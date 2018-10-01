@@ -92,7 +92,10 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user visits a complaint show page and sees its IP
     Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "empty_domain" exists
+    And the following complaint entries exist:
+    |id|domain|
+    |1 |      |
     And I goto "/escalations/webcat/complaints/1"
+    Then take a screenshot
     Then I should see "1.1.1.1"
 
