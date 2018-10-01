@@ -292,11 +292,10 @@ $ ->
         method: 'POST'
         url: "/escalations/api/v1/escalations/webrep/dispute_comments"
         data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
+        success_msg: 'Note Created.'
         success_reload: true
-        success: (response) ->
-          std_msg_success('Note Created.', [], reload: true)
-        error: (response) ->
-          std_api_error(response, "Note could not created.", reload: false)
+        error_prefix: 'Note could not created.'
+        failure_reload: false
       )
     else
       std_msg_error("Note is blank. Delete note?",'')
