@@ -13,15 +13,14 @@ Feature: Webcat complaints
     And the following customers exist:
     | company_id | name         | email           |
     | 1          | Talos Person | talos@cisco.com |
-    And I goto "/escalations/webcat"
+    And I goto "/escalations/webcat/complaints"
     And I click "new-complaint"
     And I fill in "ips_urls" with "talosintelligence.com"
     And I fill in "description" with "This is my favorite website"
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
     And I fill in selectized with "urgent"
     And I click "Create"
-    And I click button "Create"
-    And I wait for "3" seconds
+    And I wait for "30" seconds
     And I should see "COMPLAINT CREATED"
 
   @javascript
