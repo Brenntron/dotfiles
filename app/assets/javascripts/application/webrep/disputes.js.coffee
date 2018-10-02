@@ -843,7 +843,6 @@ window.save_dispute_entries = () ->
       new_value = switch (this.dataset.field)
         when 'status' then $(this).find(".table-entry-input")[0].innerHTML
 
-#      when 'status' then $(this).find("input[name='entry-status']:checked").attr('id')
         else $(this).find('.table-entry-input')[0].value.trim()
 
       old_value = $(this).find('.entry-data')[0].innerText.trim()
@@ -933,7 +932,6 @@ window.set_duplicate_dispute = (form_tag) ->
 $(document).on "change", ".entry-status-radio[type='radio']", () ->
 
   nearest_selection = $(this).closest("input[name='entry-status']:checked").attr('id')
-#  $(this).closest(".status_drop_down").prev().html(nearest_selection)
   $(this).closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
 $ ->
