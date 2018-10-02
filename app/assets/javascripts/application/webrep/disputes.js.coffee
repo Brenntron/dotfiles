@@ -841,7 +841,11 @@ window.save_dispute_entries = () ->
     fielddata = $(this).find('.dual-edit-field').map(() ->
 
       new_value = switch (this.dataset.field)
-        when 'status' then $(this).find(".table-entry-input")[0].innerHTML
+        when 'status'
+          if $(this).find("input[name='entry-status']:checked").attr('id') != $(this).find(".table-entry-input")[0].innerHTML
+            $(this).find("input[name='entry-status']:checked").attr('id')
+          else
+            $(this).find(".table-entry-input")[0].innerHTML
 
         else $(this).find('.table-entry-input')[0].value.trim()
 

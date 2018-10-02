@@ -83,7 +83,7 @@ Feature: Disputes
     And I click "#entry_status_button_1"
     And I click "#RE-OPENED"
     And I trigger-click ".save-all-changes"
-    Then take a screenshot
+    Then I wait for "3" seconds
     Then I should see "RE-OPENED"
 
   @javascript
