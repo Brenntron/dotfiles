@@ -321,16 +321,18 @@ $ ->
     dispute_id = $('input[name="dispute_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
 
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/webrep/dispute_comments"
-      data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
-      success_reload: true
-      success: (response) ->
-        std_msg_success('Note Created.', [], reload: true)
-      error: (response) ->
-        std_api_error(response, "Note could not created.", reload: false)
-    )
+    if comment.trim().length > 0
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/webrep/dispute_comments"
+        data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
+        success_msg: 'Note Created.'
+        success_reload: true
+        error_prefix: 'Note could not created.'
+        failure_reload: false
+      )
+    else
+      std_msg_error("Note is blank. Delete note?",'')
 
 
   $('#newEmailDialog').dialog

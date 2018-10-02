@@ -47,8 +47,12 @@ module API
             end
 
             post "", root: "dispute_comment" do
-              authorize!(:create, DisputeComment)
-              DisputeComment.create(permitted_params)
+              std_api_v2 do
+                authorize!(:create, DisputeComment)
+
+                DisputeComment.create!(permitted_params)
+                {:status => "success"}.to_json
+              end
             end
 
             desc "delete a dispute comment"
