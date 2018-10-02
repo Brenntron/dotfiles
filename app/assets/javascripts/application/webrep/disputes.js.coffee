@@ -932,15 +932,9 @@ window.set_duplicate_dispute = (form_tag) ->
 
 $(document).on "change", ".entry-status-radio[type='radio']", () ->
 
-  debugger
-# Work on this line, it's almost done
-
-#  $(document).closest('.table-entry-input').find("input[name='entry-status']:checked")
-
-# Take this:
-  $(this).closest($('.table-entry-input').html($(document).find("input[name='entry-status']:checked").attr('id')))
-
-#  $(document).closest($('.table-entry-input')).html($(document).find("input[name='entry-status']:checked").attr('id'))
+  nearest_selection = $(this).closest("input[name='entry-status']:checked").attr('id')
+#  $(this).closest(".status_drop_down").prev().html(nearest_selection)
+  $(this).closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
 $ ->
 
