@@ -205,13 +205,13 @@
                       - else
                         = entry[:status]
 
-                    %span.dropdown
+                    %span.dropdown{ :class => "test#{entry.id}"}
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         - if entry[:status].nil?
                           NEW
                         - else
                           = entry[:status]
-                      .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
+                      .dropdown-menu.inline-dropdown-menu{class: "status_drop_down", id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
                         %ul
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RESEARCHING'}
