@@ -93,7 +93,11 @@ class DisputeEntry < ApplicationRecord
       when self.entry_type == "URI/DOMAIN"
         xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
       else
-        self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+        begin
+          self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+        rescue
+          xbrs = [{}, {'data' => []}]
+        end
       end
     end
     
@@ -137,7 +141,11 @@ class DisputeEntry < ApplicationRecord
           if dispute_entry_preload.present? && dispute_entry_preload.wlbl.present?
             RepApi::Blacklist.load_from_prefetch(dispute_entry_preload.wlbl).first
           else
-            RepApi::Blacklist.where(entries: [ hostlookup ]).first
+            begin
+              RepApi::Blacklist.where(entries: [ hostlookup ]).first
+            rescue
+              nil
+            end
           end
       @blacklist_loaded = true
     end
@@ -175,7 +183,11 @@ class DisputeEntry < ApplicationRecord
       if dispute_entry_preload.present? && dispute_entry_preload.virustotal.present?
         virustotal_data = Virustotal::GetVirustotal.load_from_prefetch(dispute_entry_preload.virustotal)
       else
-        virustotal_data = Virustotal::GetVirustotal.by_domain(hostlookup)
+        begin
+          virustotal_data = Virustotal::GetVirustotal.by_domain(hostlookup)
+        rescue
+          virustotal_data = {"scans" => []}
+        end
       end
       #scans = Virustotal::GetVirustotal.by_domain(hostlookup)["scans"]
       scans = virustotal_data["scans"]
@@ -363,6 +375,7 @@ class DisputeEntry < ApplicationRecord
   def self.update_from_field_data(field_data)
     field_data.each do |entry_id, field_hash|
       entry = DisputeEntry.find(entry_id)
+
       entry.update_from_field_data(field_hash)
     end
   end
@@ -385,7 +398,7 @@ class DisputeEntry < ApplicationRecord
   def self.research_results(research_params)
     if research_params.present?
       url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
-
+      domain_of_url = Dispute.parse_url(url)[:domain]
       entries = entries_of_url(url)
 
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
@@ -401,7 +414,23 @@ class DisputeEntry < ApplicationRecord
         unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
       end
 
-      entries = unique_entries
+      #entries = unique_entries
+
+      #get rid of weird entries
+
+      final_entries = []
+      rejected_entries = []
+      unique_entries.each do |r_entry|
+        entry_domain = Dispute.parse_url(r_entry.hostlookup)[:domain]
+        if entry_domain.include?(domain_of_url)
+          final_entries << r_entry
+        else
+          rejected_entries << r_entry
+        end
+      end
+
+      entries = final_entries
+
       # END WLBL LOGIC, WE SHOULD ONLY HAVE UNIQUE URIS NOW
 
       if research_params['scope'] == "strict"

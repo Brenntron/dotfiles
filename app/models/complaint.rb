@@ -5,6 +5,8 @@ class Complaint < ApplicationRecord
 
   has_paper_trail on: [:update], ignore: [:updated_at]
 
+  delegate :name, to: :customer, allow_nil: true, prefix: true
+
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
   RESOLUTION_UNCHANGED                  = 'UNCHANGED'
@@ -76,46 +78,16 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    pre_url = url.gsub("http://", "").gsub("https://", "")
-    url = "http://" + pre_url
+    url = Domainatrix.parse(url)
 
     uri_parts = {}
-    begin
-      uri_object = URI(url)
 
-
-      domain_parts = uri_object.host.split(".")
-
-      if domain_parts.size > 2
-        uri_parts[:subdomain] = domain_parts.first
-        uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
-        uri_parts[:path] = uri_object.path
-      else
-        uri_parts[:subdomain] = ""
-        uri_parts[:domain] = uri_object.host
-        uri_parts[:path] = uri_object.path
-      end
-
-    rescue
-      shitty_uri_parts = url.split("/")
-      shitty_url = [shitty_uri_parts[0], shitty_uri_parts[1], shitty_uri_parts[2]].join("/")
-      leftover_garbage = shitty_uri_parts - [shitty_uri_parts[0], shitty_uri_parts[1], shitty_uri_parts[2]]
-      clean_uri_object = URI(shitty_url)
-      domain_parts = clean_uri_object.host.split(".")
-      if domain_parts.size > 2
-        uri_parts[:subdomain] = domain_parts.first
-        uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
-        uri_parts[:path] = leftover_garbage.join('/')
-      else
-        uri_parts[:subdomain] = ""
-        uri_parts[:domain] = uri_object.host
-        uri_parts[:path] = leftover_garbage.join('/')
-      end
-    end
+    uri_parts[:subdomain] = url.subdomain
+    uri_parts[:domain] = ([url.domain] + [url.public_suffix]).join('.')
+    uri_parts[:path] = url.path
 
     uri_parts
   end
-
 
   def self.is_possible_company_duplicate(complaint, entry, entry_type)
     company_id = complaint.customer.company.id
@@ -257,7 +229,7 @@ class Complaint < ApplicationRecord
 
     begin
       ActiveRecord::Base.transaction do
-        max_wait_for_job = 10 #seconds
+        max_wait_for_job = 15 #seconds
 
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
@@ -337,7 +309,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
 
-          if !prefix_response.nil? && prefix_response.first.is_active == 1
+          if prefix_response.first&.is_active == 1
             new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
           else
             new_complaint_entry.url_primary_category = nil
@@ -396,7 +368,8 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
 
-          if !prefix_response.nil? && prefix_response.first.is_active == 1
+
+          if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"]
           else
             new_complaint_entry.url_primary_category = nil
@@ -409,7 +382,7 @@ class Complaint < ApplicationRecord
           #lets query the top url API endpoint to determine if this is an important site or not
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
-          new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
+          new_complaint_entry.is_important = !!importance #making sure importance is a boolean
           new_complaint_entry.save
 
           new_payload_item = {}
@@ -435,6 +408,7 @@ class Complaint < ApplicationRecord
             #couldnt complete in time
             Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             open("app/assets/images/failed_screenshot.jpg") do |f|
               ces.screenshot = f.read
@@ -442,6 +416,7 @@ class Complaint < ApplicationRecord
             ces.save!
           rescue Exception => e
             ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
             open("app/assets/images/failed_screenshot.jpg") do |f|
               ces.screenshot = f.read

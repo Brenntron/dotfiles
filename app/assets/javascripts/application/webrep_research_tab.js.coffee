@@ -35,6 +35,15 @@ $ ->
       alert ('Select at least one entry to edit.')
 
 
+  $('.dispute_check_box').on 'click', (e) ->
+    if $(this).not(":checked") && $('.cancel-changes').is(":visible")
+      if confirm "Cancel editing?"
+        $('.cancel-changes').click()
+      else
+        e.preventDefault()
+
+
+
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')
@@ -459,10 +468,6 @@ $ ->
     info: false
   })
 
-  $('#ruleHitEmailDialog').dialog
-    autoOpen: false
-    minWidth: 400
-    position: { my: "right bottom", at: "right bottom", of: window }
 
 #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
@@ -476,12 +481,12 @@ $ ->
         response = JSON.parse(response)
 
         $('#communication-tab-link').trigger 'click'
-        $('#ruleHitEmailDialog').dialog 'open'
+        $('#newEmailDialog').dialog 'open'
 
-        reciever_input = $('#ruleHitEmailDialog').find('.receiver-email')
-        cc_input = $('#ruleHitEmailDialog').find('.cc-email')
-        subject_input = $('#ruleHitEmailDialog').find('.communication-subject')
-        body_input = $('#ruleHitEmailDialog').find('.email-reply-body')
+        reciever_input = $('#newEmailDialog').find('.receiver-email')
+        cc_input = $('#newEmailDialog').find('.cc-email')
+        subject_input = $('#newEmailDialog').find('.communication-subject')
+        body_input = $('#newEmailDialog').find('.email-reply-body')
 
         $(reciever_input[0]).val(response.to)
         $(cc_input[0]).val(response.cc)
@@ -506,12 +511,12 @@ $ ->
       success: (response) ->
         response = JSON.parse(response)
 
-        $('#ruleHitEmailDialog').dialog 'open'
+        $('#newEmailDialog').dialog 'open'
 
-        reciever_input = $('#ruleHitEmailDialog').find('.receiver-email')
-        cc_input = $('#ruleHitEmailDialog').find('.cc-email')
-        subject_input = $('#ruleHitEmailDialog').find('.communication-subject')
-        body_input = $('#ruleHitEmailDialog').find('.email-reply-body')
+        reciever_input = $('#newEmailDialog').find('.receiver-email')
+        cc_input = $('#newEmailDialog').find('.cc-email')
+        subject_input = $('#newEmailDialog').find('.communication-subject')
+        body_input = $('#newEmailDialog').find('.email-reply-body')
 
         $(reciever_input[0]).val(response.to)
         $(cc_input[0]).val(response.cc)

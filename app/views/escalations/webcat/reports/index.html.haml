@@ -20,3 +20,14 @@
           = rpt_form.input :date_to, as: :string, input_html: {type: :date}
           = rpt_form.submit 'Report', data: { disable_with: false }
 
+
+      .report-listing-div
+        %h2 Complaint Entry Report
+
+        = simple_form_for :report, url: complaint_entry_escalations_webcat_reports_path, method: :get,
+                          html: { target: :_blank } do |rpt_form|
+          = rpt_form.input :date_from, as: :string, input_html: {type: :date, id: 'complaint_entry_report_from'}
+          = rpt_form.input :date_to, as: :string, id: 'complaint_entry_report_to', input_html: {type: :date, id: 'complaint_entry_report_to'}
+          = rpt_form.input :customer_name, required: false, input_html: { size: 60 }
+          = rpt_form.submit 'Report', data: { disable_with: false }, id: 'complaint_entry_report'
+

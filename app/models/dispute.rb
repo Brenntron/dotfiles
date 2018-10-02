@@ -60,6 +60,8 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
 
+  AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -343,7 +345,7 @@ class Dispute < ApplicationRecord
 
   def self.is_important?(key)
     top_url = Wbrs::TopUrl.check_urls([key]).first
-    return false if top_url.is_important != "invalid"
+    return false if 'invalid' == top_url.is_important
     top_url.is_important
   rescue => except
 
@@ -472,7 +474,7 @@ class Dispute < ApplicationRecord
               new_payload_item[:resolution] = "FIXED"
               new_payload_item[:status] = TI_RESOLVED
             else
-              new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_payload_item[:resolution_message] = AUTORESOLVED_UNCHANGED_MESSAGE
               new_payload_item[:resolution] = "UNCHANGED"
               new_payload_item[:status] = TI_RESOLVED
             end
@@ -500,7 +502,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.case_closed_at = resolved_at
               new_dispute_entry.case_resolved_at = resolved_at
             else
-              new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
               new_dispute_entry.case_closed_at = resolved_at
@@ -581,7 +583,7 @@ class Dispute < ApplicationRecord
               new_dispute_entry.case_closed_at = resolved_at
               new_dispute_entry.case_resolved_at = resolved_at
             else
-              new_dispute_entry.resolution_comment = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
               new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
               new_dispute_entry.status = DisputeEntry::RESOLVED
               new_dispute_entry.case_closed_at = resolved_at
@@ -629,7 +631,7 @@ class Dispute < ApplicationRecord
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
-
+        new_dispute.reload
         new_dispute.check_entries_and_resolve(ALL_AUTO_RESOLVED)
 
 
@@ -978,6 +980,14 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def self.create_note(current_user = nil, comment, dispute_entry_id)
+    dispute_entry = DisputeEntry.find(dispute_entry_id)
+    dispute_id = dispute_entry.dispute_id
+
+    formatted_comment = dispute_entry.hostlookup + ' : ' + dispute_entry.status + ' : ' + Time.now.strftime("%m/%d/%Y %H:%M").to_s + ' : '+ comment
+    DisputeComment.create(:user_id => current_user.id, :comment => formatted_comment, :dispute_id => dispute_id)
+  end
+
   # Searches in a variety of ways.
   # advanced -- search by supplied field.
   # named -- call a saved search.
@@ -1069,7 +1079,8 @@ class Dispute < ApplicationRecord
             dispute_packet[:assigned_to] =
                 "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
           else
-            dispute_packet[:assigned_to] = dispute.user.cvs_username + " <button class='take-ticket-button' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+            dispute_packet[:assigned_to] =
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
           end
       end
 
