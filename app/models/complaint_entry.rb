@@ -53,7 +53,7 @@ class ComplaintEntry < ApplicationRecord
       for_view[version.created_at] = set_with_usernames.merge(whodunnit)
     end
 
-    for_view.sort().reverse
+    for_view.sort_by {|key, val| key}.reverse
   end
 
   def location_url
