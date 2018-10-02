@@ -226,7 +226,7 @@
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ON_HOLD_#{entry.id}", id: "ON_HOLD"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} On Hold
                           %li.status-radio-wrapper
-                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", onclick: "populate_resolution_dropdown(#{entry.id});"}
+                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", id: "RESOLVED_CLOSED", onclick: "populate_resolution_dropdown(#{entry.id});"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}"} Resolved / Closed
                             .dropdown-menu.ticket-resolution-submenu
                               .col-xs-6.submenu-left-wrapper
