@@ -168,4 +168,11 @@ describe Complaint do
     Complaint.process_bridge_payload(complaint_message_payload)
     expect(ComplaintEntry.first.wbrs_score).to eq(1.58)
   end
+
+  it 'check parsing urls' do
+    parse = Complaint.parse_url('2e6b5fd9344d4f8565e7d015d861b240.europe-west3.gcp.cloud.es.io/test/go')
+    expect(parse[:subdomain]).to eq('2e6b5fd9344d4f8565e7d015d861b240.europe-west3.gcp.cloud')
+    expect(parse[:domain]).to eq('es.io')
+    expect(parse[:path]).to eq('/test/go')
+  end
 end
