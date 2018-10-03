@@ -363,7 +363,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
-          new_complaint_entry.uri = key
+          new_complaint_entry.uri = key.gsub('www.','')
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
