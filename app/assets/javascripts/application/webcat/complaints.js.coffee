@@ -754,12 +754,14 @@ window.history_dialog = (id) ->
         history_dialog_content += '</tbody></table>'
         history_dialog_content += '<h5>Complaint Entry History</h5>'
         entry_string = ""
-        for key, entry of json.entry_history.complaint_history
-
+        for entry in json.entry_history.complaint_history
+          debugger
           entry_string = "" +
-          '<p>Time: ' + key + '</p>'
-          for change_key, change_entry of entry
-            if change_key != "whodunnit"
+          '<p>Time: ' + entry[0] + '</p>'
+          for i in entry[1..entry.length]
+            debugger
+#          for change_key, change_entry of entry
+            if i != "whodunnit"
               entry_string += "<p>" + change_key + ": " + change_entry[0] + " - " + change_entry[1] + "</p>"
             else
               entry_string += "<p>User: " + change_entry + "</p>" +"</br>"
