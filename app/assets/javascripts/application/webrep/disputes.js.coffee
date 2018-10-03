@@ -192,8 +192,10 @@ window.dispute_status_drop_down = (dispute_id) ->
     success: (response) ->
       response = JSON.parse(response)
       status = response.status
+      comment = response.comment
 
-      $('.dispute-status-' + dispute_id + '#' + status).prop("checked", true);
+      $('.ticket-status-radio' + '#' + status).prop("checked", true);
+      $('.ticket-status-comment').text(comment)
   )
 
 window.dispute_resolution_drop_down = (dispute_id) ->
@@ -839,7 +841,7 @@ window.save_dispute_entries = () ->
     fielddata = $(this).find('.dual-edit-field').map(() ->
 
       new_value = switch (this.dataset.field)
-        when 'status' then $(this).find("input[name='entry-status']:checked").attr('id')
+        when 'status' then $(this).find(".table-entry-input")[0].innerHTML
         else $(this).find('.table-entry-input')[0].value.trim()
 
       old_value = $(this).find('.entry-data')[0].innerText.trim()
@@ -1575,6 +1577,32 @@ $ ->
         popup_response_error(response, 'Error retrieving WL/BL Data')
     )
 
+window.populate_entry_status_dropdown = (dispute_id) ->
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_id}"
+    method: 'GET'
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
+  )
+
+window.populate_resolution_dropdown = (dispute_id) ->
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_id}"
+    method: 'GET'
+    data: {}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      status = response.status
+
+      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
+  )
+
 
 $ ->
   $(document).ready ->
@@ -1586,6 +1614,7 @@ $ ->
 
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
       $(this).tooltipster
+        debug: false,
         theme: [
           'tooltipster-borderless'
           'tooltipster-borderless-customized'

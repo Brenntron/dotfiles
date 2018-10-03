@@ -302,7 +302,7 @@ module API
             post 'categorize_urls_history' do
               begin
                 prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+                response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
 
                 render response.to_json
                 end
@@ -317,6 +317,10 @@ module API
             post 'domain_whois' do
               whois = {}
               begin
+                if /\A[\d\.]*\z/ !~ params[:lookup]
+                  tld = params[:lookup].split('.').last
+                  Whois::Server.define(:tld, tld, "whois.iana.org")
+                end
                 record = Whois.whois(params[:lookup])
                 parser = Whois::Parser.new(record)
                 parser.record.content.each_line do |line|

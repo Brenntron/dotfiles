@@ -415,7 +415,7 @@
                                 %span.inline-col-breakup.entry-reptool-status
                                   = entry.blacklist.status
                                 %span.inline-col-breakup.entry-reptool-comment
-                                  = entry.blacklist.metadata['VRT']['comment']
+                                  = entry.blacklist.metadata&.fetch('VRT', {})['comment']
                             %td.left-bordered
                               %label Umbrella
                             %td.text-center
@@ -633,7 +633,7 @@
                                       %td= entry.classifications.first
                                       %td= entry.blacklist.status
                                       %td= entry.blacklist.expiration
-                                      %td= entry.blacklist.metadata['VRT']['comment']
+                                      %td= entry.blacklist.metadata&.fetch('VRT', {})['comment']
                                       %td= entry.blacklist.primary_source
                                       %td= entry.blacklist.first_seen
                                       %td= entry.blacklist.last_seen

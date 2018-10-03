@@ -43,9 +43,11 @@ Rails.application.routes.draw do
 
       resources :reports, only: [:index] do
         collection do
-          get :index, to: 'complaints#reports'
+          get :index
           get :resolution
           get :export_resolution
+          get :complaint_entry
+          get :export_complaint_entry
         end
       end
     end

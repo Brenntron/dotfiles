@@ -980,6 +980,14 @@ class Dispute < ApplicationRecord
     end
   end
 
+  def self.create_note(current_user = nil, comment, dispute_entry_id)
+    dispute_entry = DisputeEntry.find(dispute_entry_id)
+    dispute_id = dispute_entry.dispute_id
+
+    formatted_comment = dispute_entry.hostlookup + ' : ' + dispute_entry.status + ' : ' + Time.now.strftime("%m/%d/%Y %H:%M").to_s + ' : '+ comment
+    DisputeComment.create(:user_id => current_user.id, :comment => formatted_comment, :dispute_id => dispute_id)
+  end
+
   # Searches in a variety of ways.
   # advanced -- search by supplied field.
   # named -- call a saved search.

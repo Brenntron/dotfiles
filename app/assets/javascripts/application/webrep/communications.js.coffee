@@ -1,15 +1,50 @@
 $(window).load ->
 
-  newest_email = 0
+  most_recent_email = 0
 
   $('.email-row').each(() ->
-    if $(this).attr('email_id') > newest_email
-      newest_email = $(this).attr('email_id')
+    if $(this).attr('email_id') > most_recent_email
+      most_recent_email = $(this).attr('email_id')
   )
 
-  $(".email-row[email_id="+newest_email+"]").click()
+  $(".email-row[email_id="+most_recent_email+"]").click()
   
 $ ->
+
+  $('#history-sort-dropdown').on 'change', ->
+    sort_on = this.options[this.selectedIndex].id
+    list = $("#case-history tr").get();
+
+    switch sort_on
+      when "date-desc"
+        sort_function = (a, b) ->
+          return $(".case-history-datetime", b).data().dbDate.localeCompare($(".case-history-datetime", a).data().dbDate)
+      when "date-asc"
+        sort_function = (a, b) ->
+          return $(".case-history-datetime", a).data().dbDate.localeCompare($(".case-history-datetime", b).data().dbDate)
+
+      when "author"
+        sort_function = (a, b) ->
+          return $(".case-history-author", a).text().localeCompare($(".case-history-author", b).text())
+      when "kind"
+        sort_function = (a, b) ->
+          return $(".case-history-icon", a).data().historyKind.localeCompare($(".case-history-icon", b).data().historyKind)
+      else
+#        Do nothing
+
+    list.sort(sort_function);
+    i = 0
+    while i < list.length
+      list[i].parentNode.appendChild list[i]
+      i++
+
+
+  $('#history-display-dropdown').on 'change', ->
+    $("#case-history tr").show()
+    display_kind = this.options[this.selectedIndex].id
+    if display_kind != "all"
+      $("#case-history tr").not("." + display_kind + "-row").hide()
+
   # Generic email show stuff
   $('.email-row').on 'click', ->
     clean_up_current_email_view()
@@ -297,16 +332,18 @@ $ ->
     dispute_id = $('input[name="dispute_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
 
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/webrep/dispute_comments"
-      data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
-      success_reload: true
-      success: (response) ->
-        std_msg_success('Note Created.', [], reload: true)
-      error: (response) ->
-        std_api_error(response, "Note could not created.", reload: false)
-    )
+    if comment.trim().length > 0
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/webrep/dispute_comments"
+        data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
+        success_msg: 'Note Created.'
+        success_reload: true
+        error_prefix: 'Note could not created.'
+        failure_reload: false
+      )
+    else
+      std_msg_error("Note is blank. Delete note?",'')
 
 
   $('#newEmailDialog').dialog
