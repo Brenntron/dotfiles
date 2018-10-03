@@ -842,10 +842,10 @@ window.save_dispute_entries = () ->
 
       new_value = switch (this.dataset.field)
         when 'status'
-          if $(this).find("input[name='entry-status']:checked").attr('id') != $(this).find(".table-entry-input")[0].innerHTML
-            $(this).find("input[name='entry-status']:checked").attr('id')
-          else
+          if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
             $(this).find(".table-entry-input")[0].innerHTML
+          else
+            $(this).find("input[name='entry-status']:checked").attr('id')
 
         else $(this).find('.table-entry-input')[0].value.trim()
 
