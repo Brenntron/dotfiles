@@ -1,7 +1,14 @@
 $(window).load ->
 
-  $('.email-row td:last').click()
+  newest_email = 0
 
+  $('.email-row').each(() ->
+    if $(this).attr('email_id') > newest_email
+      newest_email = $(this).attr('email_id')
+  )
+
+  $(".email-row[email_id="+newest_email+"]").click()
+  
 $ ->
   # Generic email show stuff
   $('.email-row').on 'click', ->
