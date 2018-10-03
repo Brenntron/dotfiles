@@ -754,16 +754,20 @@ window.history_dialog = (id) ->
         history_dialog_content += '</tbody></table>'
         history_dialog_content += '<h5>Complaint Entry History</h5>'
         entry_string = ""
+
         for entry in json.entry_history.complaint_history
-          entry_string = "" +
-          '<p>Time: ' + entry[0] + '</p>'
-#          for change_key, change_entry in entry[1..entry.length]
+          entry_string = "" + '<p>Time: ' + entry[0] + '</p>'
+
+          i = 0
 
           for change_key, change_entry of entry
-            debugger
-            if change_key > 0
-              entry_string += "<p>Category: " + change_entry.cvs_username[0] + " - " + change_entry.cvs_username[1] + "</p>"
-              entry_string += "<p>User: " + change_entry + "</p>" +"</br>"
+            i = i + 1
+            if i > 1
+              for key, value of change_entry
+                if key != "whodunnit"
+                  entry_string += "<p>" + key + ": " + value[0] + " - " + value[1] + "</p>"
+                else
+                  entry_string += "<p>User: " + value + "</p>" +"</br>"
           history_dialog_content += entry_string
 
         if $("#history_dialog").length
