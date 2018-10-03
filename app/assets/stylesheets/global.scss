@@ -1743,6 +1743,9 @@ a.static-nav-item {
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
+.icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
+.icon-copycat-tool {background-image: url(image_path('icon_open_selected.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -6343,12 +6346,58 @@ h2 {
   }
 }
 // Cluster mgmt UI - Comment box / Category Submission
+$border: 1px solid red;
 .temp-spacer {
   padding: 20px 15px;
 
+  .default-padding {
+    padding: 0 0 15px 0;
+  }
+  .toolbal-header.vertical-separator {
+    border-right: 1px solid #dddddd;
+  }
+  .toolbal-header {
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: 0;
+    display: inline-block;
+    padding: 0 15px;
+
+    span {
+      color: #6dbcdb;
+      text-transform: none;
+    }
+  }
+  .content-label-sm {
+    width: 100%;
+    display: block;
+    text-align: left;
+  }
+
+  .btn-group {
+    .btn {
+      //border: $border;
+      margin: 0 5px;
+      padding: 0;
+      font-size: .6rem;
+      background-color: lightgray;
+    }
+
+    .btn:first-child {
+      margin-left: 0;
+    }
+
+    .opened-selected-btn {
+      background-repeat: no-repeat;
+      background-size: 15px;
+      padding: 5px 5px 5px 30px !important;
+      background-position: 8px center;
+    }
+  }
+
   .card {
-    width: 40%;
-    float: right;
+    width: 100%;
     padding: 5px 20px 20px 20px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
 
