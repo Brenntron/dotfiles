@@ -1,3 +1,14 @@
+$(window).load ->
+
+  most_recent_email = 0
+
+  $('.email-row').each(() ->
+    if $(this).attr('email_id') > most_recent_email
+      most_recent_email = $(this).attr('email_id')
+  )
+
+  $(".email-row[email_id="+most_recent_email+"]").click()
+  
 $ ->
 
   $('#history-sort-dropdown').on 'change', ->
