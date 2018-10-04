@@ -67,6 +67,8 @@ class Dispute < ApplicationRecord
   scope :closed_disputes, -> { where(status: RESOLVED) }
   scope :in_progress_disputes, -> { where(status: [ STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_CUSTOMER_PENDING, STATUS_ON_HOLD, STATUS_REOPENED, STATUS_CUSTOMER_UPDATE ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
+  scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
+  scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
   def case_id_str
     '%010i' % id
@@ -881,6 +883,10 @@ class Dispute < ApplicationRecord
         'My Team\'s Tickets'
       when 'open'
         'Open Tickets'
+      when 'open_email'
+        'Open Email Tickets'
+      when 'open_web'
+        'Open Web Tickets'
       when 'closed'
         'Closed Tickets'
       when 'all'
@@ -906,6 +912,10 @@ class Dispute < ApplicationRecord
         where(user_id: user.my_team)
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED])
+    when 'open_email'
+      sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED])
+    when 'open_web'
+      wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED])
       when 'closed'
         where(status: [CLOSED, STATUS_RESOLVED])
     when 'all'
