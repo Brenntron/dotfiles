@@ -770,6 +770,15 @@ class Dispute < ApplicationRecord
     relation = where(dispute_fields)
 
 
+    if params['submission_type_sbrs']
+      relation = relation.sbrs_disputes
+    end
+
+    if params['submission_type_wbrs']
+      relation = relation.wbrs_disputes
+    end
+
+
     if params['submitted_newer'].present?
       relation =
           relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
