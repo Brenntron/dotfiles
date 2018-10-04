@@ -899,7 +899,7 @@ class Dispute < ApplicationRecord
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where(status: [STATUS_ASSIGNED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_REOPENED, STATUS_NEW, STATUS_RESEARCHING, STATUS_ESCALATED], user_id: user.id)
+        where.not(status: STATUS_RESOLVED).where(user_id: user.id)
       when 'my_disputes'
         where(user_id: user.id)
       when 'team_disputes'
