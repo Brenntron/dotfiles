@@ -1738,6 +1738,8 @@ a.static-nav-item {
 .icon-team-bugs    {background-image: url(image_path('icon_teambugs.svg'));}
 .icon-pending-bugs {background-image: url(image_path('icon_pendingbugs.svg'));}
 .icon-open-bugs    {background-image: url(image_path('icon_openbugs.svg'));}
+.icon-email-tix {background-image: url(image_path('icon_open_email_tix.svg'));}
+.icon-web-tix {background-image: url(image_path('icon_open_web_tix.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
 .icon-all-bugs     {background-image: url(image_path('bugs_icon.svg'));}
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
@@ -1832,7 +1834,7 @@ a.static-nav-item {
   margin-top: -10px;
   border-top-right-radius: 4px;
   border-bottom-left-radius: 0;
-  min-height: 305px;
+  min-height: 388px;
   padding-top: 10px;
 }
 
@@ -1849,11 +1851,11 @@ a.static-nav-item {
 }
 
 #filter-bugs-list li, #filter-cases-list li {
-  width: 170px;
+  width: 200px;
 }
 
 #filter-dropdown {
-  min-width: 420px;
+  min-width: 450px;
 }
 
 .nav-tool-content-wrapper .form-control {
