@@ -6380,19 +6380,31 @@ h2 {
   .toolbar {
     height: 27px;
 
+    .div {
+
+      .toolbar-button {
+        padding-left: 20px;
+      }
+    }
+
     .toolbar-button {
       padding-left: 25px;
     }
 
-    .alignment {
-      margin-top: 4px;
+    .cat-btn {
+      margin: 4px 0 0 5px;
+      background-color: $content-tab-color;
+      color: white;
     }
 
-    button.toolbar-button:focus,
-    button.toolbar-button:active,
-    button.toolbar-button.active {
+
+    .cat-btn:focus,
+    .cat-btn:active,
+    .cat-btn.active {
+      background-color: $primary-section-color;
+    }
+    .cat-btn:hover {
       background-color: $sidebar-nav-base;
-      color: white;
     }
 
   }
