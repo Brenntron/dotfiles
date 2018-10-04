@@ -1,6 +1,6 @@
 -#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
 -#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
-= form_for NamedSearch.new, url: escalations_webrep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |named_form|
+= form_for :advanced_search, url: escalations_webrep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
   .form-group.search-item
     %label.content-label-sm Case IDs
     %input.form-control#caseid-input{name: 'case_id'}
@@ -28,6 +28,14 @@
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %input.form-control#resolution-input{name: 'resolution'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Submission Type
+    %input.form-control#submission-input{name: 'submission_type'}
+    = advanced_search_form.check_box(:submission_type, {}, 'sbrs')
+    Email Only
+    = advanced_search_form.check_box(:submission_type, {}, 'wbrs')
+    Web Only
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
@@ -107,6 +115,10 @@
           %label.search-criteria-label
             %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input' }
             Resolution
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submission-type-cb{type: 'checkbox', name: 'search-criteria', value: 'SubmissionType', for: 'submission-input'}
+            Submission Type
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitter-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type', for: 'submitter-input'}
