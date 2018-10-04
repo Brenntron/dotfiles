@@ -6318,6 +6318,7 @@ h2 {
           margin-top: 10px;
           height: 30px;
           vertical-align: center;
+          border-radius: 2px;
         }
         .apply-filter-btn {
           background-repeat: no-repeat;
@@ -6345,18 +6346,18 @@ h2 {
     }
   }
 }
-// Cluster mgmt UI - Comment box / Category Submission
-$border: 1px solid red;
+
+//Toolbar Layout UI ticket 194
 .temp-spacer {
   padding: 20px 15px;
 
   .default-padding {
     padding: 0 0 15px 0;
   }
-  .toolbal-header.vertical-separator {
+  .toolbar-header.vertical-separator {
     border-right: 1px solid #dddddd;
   }
-  .toolbal-header {
+  .toolbar-header {
     font-size: .8rem;
     text-transform: uppercase;
     font-weight: bold;
@@ -6365,8 +6366,9 @@ $border: 1px solid red;
     padding: 0 15px;
 
     span {
-      color: #6dbcdb;
+      color: $primary-section-color;
       text-transform: none;
+      padding-left: 10px;
     }
   }
   .content-label-sm {
@@ -6375,27 +6377,18 @@ $border: 1px solid red;
     text-align: left;
   }
 
-  .btn-group {
-    .btn {
-      //border: $border;
-      margin: 0 5px;
-      padding: 0;
-      font-size: .6rem;
-      background-color: lightgray;
-    }
+  .toolbar {
+    height: 35px;
 
-    .btn:first-child {
-      margin-left: 0;
-    }
+    .div {
 
-    .opened-selected-btn {
-      background-repeat: no-repeat;
-      background-size: 15px;
-      padding: 5px 5px 5px 30px !important;
-      background-position: 8px center;
+      .toolbar-button {
+        padding-left: 25px;
+      }
     }
   }
 
+  // Cluster mgmt UI - Comment box / Category Submission
   .card {
     width: 100%;
     padding: 5px 20px 20px 20px;
@@ -6424,6 +6417,7 @@ $border: 1px solid red;
         padding: 10px 5px 10px 30px;
         color: white;
         border: none;
+        border-radius: 2px;
       }
     }
   }
