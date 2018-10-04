@@ -1745,7 +1745,7 @@ a.static-nav-item {
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
 .icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
 .icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
-.icon-copycat-tool {background-image: url(image_path('icon_open_selected.svg'));}
+.icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -6354,10 +6354,10 @@ h2 {
   .default-padding {
     padding: 0 0 15px 0;
   }
-  .toolbar-header.vertical-separator {
+  .result-label.vertical-separator {
     border-right: 1px solid #dddddd;
   }
-  .toolbar-header {
+  .result-label {
     font-size: .8rem;
     text-transform: uppercase;
     font-weight: bold;
@@ -6378,14 +6378,23 @@ h2 {
   }
 
   .toolbar {
-    height: 35px;
+    height: 27px;
 
-    .div {
-
-      .toolbar-button {
-        padding-left: 25px;
-      }
+    .toolbar-button {
+      padding-left: 25px;
     }
+
+    .alignment {
+      margin-top: 4px;
+    }
+
+    button.toolbar-button:focus,
+    button.toolbar-button:active,
+    button.toolbar-button.active {
+      background-color: $sidebar-nav-base;
+      color: white;
+    }
+
   }
 
   // Cluster mgmt UI - Comment box / Category Submission
