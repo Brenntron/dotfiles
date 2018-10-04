@@ -147,7 +147,7 @@
               %button.primary.change_ticket_status_button
                 Submit
 
-    - if current_user.has_role?('manager')
+
       %span.dropdown
         %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
