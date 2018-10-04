@@ -20,6 +20,8 @@ module API
               optional :status, type: String
               optional :priority, type: String
               optional :resolution, type: String
+              optional :submission_type_sbrs, type: Boolean
+              optional :submission_type_wbrs, type: Boolean
               optional :submitter_type, type: String
               optional :submitted_older, type: Date
               optional :submitted_newer, type: Date

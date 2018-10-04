@@ -1,6 +1,6 @@
 -#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
 -#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
-= form_for :advanced_search, url: escalations_webrep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
+= form_for :advanced_search, html: {id: 'disputes-advanced-search-form'}, url: escalations_webrep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
   .form-group.search-item
     %label.content-label-sm Case IDs
     %input.form-control#caseid-input{name: 'case_id'}
@@ -32,9 +32,9 @@
   .form-group.search-item.hidden
     %label.content-label-sm Submission Type
     %input.form-control#submission-input{name: 'submission_type'}
-    = advanced_search_form.check_box(:submission_type, {}, 'sbrs')
+    = advanced_search_form.check_box(:submission_type, {id: 'submission-type-sbrs-cb'}, 'sbrs')
     Email Only
-    = advanced_search_form.check_box(:submission_type, {}, 'wbrs')
+    = advanced_search_form.check_box(:submission_type, {id: 'submission-type-wbrs-cb'}, 'wbrs')
     Web Only
     %button.remove-input
   .form-group.search-item.hidden
