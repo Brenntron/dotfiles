@@ -121,7 +121,11 @@ module API
                                                                               :confidence => value['confidence'] || 'N/A',
                                                                               :name => value['name'] || 'N/A',
                                                                               :long_description => value['long_description']}
-                        complaint_entry_packet[:current_categories][key][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => 'N/A'}]
+                        #TODO: replace this with working code when the API is finished and we can actually get certainty.
+                        complaint_entry_packet[:current_categories][key][:certainty] = [
+                            {:source => "Multicat Cisco/IronPort Rules", :source_category => "comp - Computers and Internet", :source_certainty => '1000', :source_confidence => '1.437'},
+                            {:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500', :source_confidence => '.8245'}
+                        ]
                       end
 
 
@@ -306,6 +310,54 @@ module API
 
                 render response.to_json
                 end
+            end
+
+
+            desc 'get the lookup info about a url(rule)'
+            params do
+              requires :id, type: Integer, desc: "the id of the complaint entry"
+            end
+            post 'lookup' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(permitted_params[:id])
+                complaint_entry_packet = {"prefix"=>complaint_entry.domain||complaint_entry.ip_address}
+                if complaint_entry.complaint_entry_preload.present?
+                  if complaint_entry.complaint_entry_preload.current_category_information.present? &&
+                      complaint_entry.complaint_entry_preload.current_category_information != 'DATA ERROR'
+                    complaint_entry_packet[:current_categories] = {}
+                    parsed_current_cat_information = JSON.parse(complaint_entry.complaint_entry_preload.current_category_information)
+
+
+                    parsed_current_cat_information.each_pair do |key,value|
+
+                      complaint_entry_packet[:current_categories][key] = {}
+                      complaint_entry_packet[:current_categories][key][:certainty] = {}
+
+                      complaint_entry_packet[:current_categories][key] = {:is_active => value['is_active'],
+                                                                          :mnemonic => value['mnemonic'],
+                                                                          :category_id => value['category_id'],
+                                                                          :prefix_id => value['prefix_id'],
+                                                                          :confidence => value['confidence'] || 'N/A',
+                                                                          :name => value['name'] || 'N/A',
+                                                                          :long_description => value['long_description']}
+                      #TODO: replace this with working code when the API is finished and we can actually get certainty.
+                      complaint_entry_packet[:current_categories][key][:certainty] = [
+                          {:source => "Multicat Cisco/IronPort Rules", :source_category => "comp - Computers and Internet", :source_certainty => '1000', :source_confidence => '1.437'},
+                          {:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500', :source_confidence => '.8245'}
+                                                                                      ]
+                    end
+
+
+                    # complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
+                  else
+                    complaint_entry_packet[:current_categories] = {}
+                  end
+                else
+                  complaint_entry_packet[:current_categories] = {}
+                end
+                # find the lookup info for the url
+                render complaint_entry_packet.to_json
+              end
             end
 
 
