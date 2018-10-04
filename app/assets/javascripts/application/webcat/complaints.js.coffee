@@ -759,7 +759,6 @@ window.history_dialog = (id) ->
           entry_string = "" + '<p>Time: ' + entry[0] + '</p>'
 
           i = 0
-
           for change_key, change_entry of entry
             i = i + 1
             if i > 1
@@ -768,6 +767,7 @@ window.history_dialog = (id) ->
                   entry_string += "<p>" + key + ": " + value[0] + " - " + value[1] + "</p>"
                 else
                   entry_string += "<p>User: " + value + "</p>" +"</br>"
+
           history_dialog_content += entry_string
 
         if $("#history_dialog").length
