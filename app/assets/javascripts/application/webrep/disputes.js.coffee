@@ -933,10 +933,11 @@ window.set_duplicate_dispute = (form_tag) ->
 
 
 
-$(document).on "change", ".entry-status-radio[type='radio']", () ->
+window.populate_status_selection = () ->
 
-  nearest_selection = $(this).closest("input[name='entry-status']:checked").attr('id')
-  $(this).closest(".inline-dropdown-menu").prev().html(nearest_selection)
+
+  nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
+  $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
 $ ->
 
