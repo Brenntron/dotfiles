@@ -99,6 +99,31 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def contains_search
   end
 
+  def export
+    @dispute = Dispute.find(params[:id])
+    contents = CSV.generate do |csv|
+      csv << [
+          'WBRS',
+          'WBRS Rule Hits',
+          'WBRS Rules',
+          'SBRS',
+          'SBRS Rule Hits',
+          'SBRS Rules',
+      ]
+      @dispute.dispute_entries.each do |entry|
+        csv << [
+            entry.wbrs_score,
+            entry.dispute_rule_hits.wbrs_rule_hits.count,
+            "\"#{entry.dispute_rule_hits.wbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
+            entry.sbrs_score,
+            entry.dispute_rule_hits.sbrs_rule_hits.count,
+            "\"#{dispute_rule_hits.sbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
+        ]
+      end
+    end
+    send_data contents
+  end
+
   def resolution_report
     @report = DisputeReport::ResolutionReport.new(date_from: params['report']['date_from'],
                                                   date_to: params['report']['date_to'],

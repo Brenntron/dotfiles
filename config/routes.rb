@@ -67,6 +67,9 @@ Rails.application.routes.draw do
           get :resolution_age_report
           get :export_resolution_age_report
         end
+        member do
+          get :export
+        end
       end
       resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.
       resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
