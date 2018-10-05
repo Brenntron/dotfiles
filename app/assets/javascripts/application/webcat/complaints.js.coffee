@@ -78,17 +78,20 @@ window.multiple_url_categorization = ()->
   )
 
 name_servers =(server_list)->
-  i = 0
-  text = ""
-  while i < server_list.length
-    text += server_list[i] + '<br>'
-    i++
-  text
+  if undefined == server_list
+    ''
+  else
+    i = 0
+    text = ""
+    while i < server_list.length
+      text += server_list[i] + '<br>'
+      i++
+    text
 
 format_domain_info = (info)->
   '<div class="dialog-content-wrapper">' +
     '<h5>Domain Name</h5>' +
-    '<p>' + info.domain_name + '</p>' +
+    '<p>' + info['domain'] + '</p>' +
     '<hr class="thin">' +
     '<h5>Registrant </h5>' +
     '<table class="nested-dialog-table">' +
@@ -97,13 +100,13 @@ format_domain_info = (info)->
            'Organization' +
         '</td>' +
         '<td>' +
-          info.registrant_organization +
+          info['organisation'] +
       '</tr><tr>' +
         '<td class="table-side-header">' +
           'Country' +
         '</td>' +
         '<td>' +
-          info.registrant_country +
+          info['registrant_country'] +
         '</td>' +
       '</tr><tr>' +
         '<td class="table-side-header">' +
@@ -116,7 +119,7 @@ format_domain_info = (info)->
     '</table>' +
     '<hr class="thin">' +
     '<h5>Name Servers</h5>'+
-    name_servers(info.name_server) +
+    name_servers(info['nserver']) +
     '<hr class="thin">' +
     '<h5> Dates</h5>'+
     '<table class="nested-dialog-table">' +
@@ -124,20 +127,20 @@ format_domain_info = (info)->
         '<td class="table-side-header">' +
           'Created' +
         '</td>' +
-        '<td>' + info.creation_date + '</td>'+
+        '<td>' + info['created'] + '</td>'+
       '</tr><tr>' +
         '<td class="table-side-header">' +
           'Last updated' +
         '</td>' +
         '<td>' +
-          info.updated_date +
+          info['changed'] +
         '</td>' +
       '</tr><tr>' +
         '<td class="table-side-header">' +
           'Expiry_date' +
         '</td>' +
         '<td>' +
-          info.registry_expiry_date +
+          info['registry_expiry_date'] +
         '</td>' +
       '</tr>' +
     '</table>' +
@@ -151,12 +154,12 @@ window.domain_whois = (IP_Domain) ->
     headers: headers
     data: {'lookup': IP_Domain}
     success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+      info = $.parseJSON(response)
+      if info.error
+        notice_html = "<p>Something went wrong: #{info.error}</p>"
+        alert(info.error)
       else
-        dialog_content = $(format_domain_info(json))
+        dialog_content = $(format_domain_info(info))
         if $("#complaint_button_dialog").length
           complaint_dialog = this
 
@@ -464,7 +467,6 @@ window.retrieve_history = (position) ->
 
           history_dialog_content += entry_string
         history_dialog_content += '</tbody></table>'
-        history_dialog_content += '<hr class="thin"/>'
 
         if $("#history_dialog").length
           history_dialog = this
@@ -773,7 +775,6 @@ window.history_dialog = (id) ->
 
           history_dialog_content += entry_string
         history_dialog_content += '</tbody></table>'
-        history_dialog_content += '<hr class="thin"/>'
         history_dialog_content += '<h5>Complaint Entry History</h5>'
         entry_string = ""
         for key, entry of json.entry_history.complaint_history

@@ -3344,6 +3344,17 @@ fieldset.top-content {
   margin-top: 14px;
 }
 
+.table-toolbar .col-xs-5 {
+  padding-right: 0 !important;
+}
+
+.table-toolbar select {
+  border-radius: 0 !important;;
+  border-color: $nav-toolbar-color;
+  background-color: $content-bg-color;
+  font-weight: 400 !important;
+}
+
 .communication-subject {
   color: $type-lighter-color;
   line-height: 1.3em;

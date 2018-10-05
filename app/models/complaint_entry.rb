@@ -9,6 +9,9 @@ class ComplaintEntry < ApplicationRecord
   has_one :complaint_entry_screenshot
   has_one :complaint_entry_preload
 
+  delegate :customer_name, to: :complaint, allow_nil: true, prefix: false
+  delegate :cvs_username, :display_name, to: :user, allow_nil: true, prefix: true
+
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
@@ -52,7 +55,8 @@ class ComplaintEntry < ApplicationRecord
       set_with_usernames = ComplaintEntry.manipulate_changeset(version.changeset)
       for_view[version.created_at] = set_with_usernames.merge(whodunnit)
     end
-    for_view
+
+    for_view.sort_by {|key, val| key}.reverse
   end
 
   def location_url
@@ -578,7 +582,7 @@ class ComplaintEntry < ApplicationRecord
       prefix_id = prefix_results.first.prefix_id
     end
     if prefix_id.present?
-      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
     else
       prefix_history = []
     end

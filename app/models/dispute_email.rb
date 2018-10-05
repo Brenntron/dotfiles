@@ -39,6 +39,42 @@ class DisputeEmail < ApplicationRecord
       return
     end
 
+    ##########################################
+
+    dispute = Dispute.where(:id => case_id).first
+    if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at >= 2.weeks.ago
+
+      dispute.status = Dispute::STATUS_REOPENED
+      dispute.save
+
+      dispute.dispute_entries.each do |entry|
+        entry.status = DisputeEntry::STATUS_REOPENED
+        entry.save
+      end
+
+
+    end
+
+    if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at < 2.weeks.ago
+
+      old_case_email_args = {}
+      old_case_email_args[:to] = message_payload["payload"]["from"]
+      old_case_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+      old_case_email_args[:subject] = old_case_gateway_subject
+      old_case_email_args[:body] = old_case_gateway_body
+
+      attachments_to_mail = []
+      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+      conn.post(old_case_email_args, attachments_to_mail)
+
+      conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+      conn.post()
+
+      return
+    end
+
+    ##########################################
+
     new_email = DisputeEmail.new
     new_email.dispute_id = case_id
     new_email.email_headers = message_payload["payload"]["headers"]
@@ -59,7 +95,7 @@ class DisputeEmail < ApplicationRecord
 
     #Update ticket status
     dispute = Dispute.find(case_id)
-    dispute.status = Dispute::STATUS_CUSTOMER_UPDATE
+    dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
     dispute.save
 
     conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
@@ -201,7 +237,16 @@ https://talosintelligence.com/reputation_center/support
     BADGATEWAY
   end
 
+  def self.old_case_gateway_subject
+    "Unable to process dispute submission"
+  end
 
+  def self.old_case_gateway_body
+    <<~BADGATEWAY
+Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, this case has expired and can no longer be reopened.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
+https://talosintelligence.com/reputation_center/support
+    BADGATEWAY
+  end
 
 
 end
