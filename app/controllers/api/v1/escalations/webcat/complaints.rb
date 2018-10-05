@@ -250,32 +250,10 @@ module API
 
             post 'update_uri' do
               std_api_v2 do
-
-                authorize!(:update, DisputeEntry)
-                complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
-
-                if complaint_entry.entry_type == 'URI/DOMAIN' || complaint_entry.entry_type.nil?
-                  parsed_uri = Complaint.parse_url(permitted_params[:uri])
-
-                  complaint_entry.domain = parsed_uri[:domain]
-                  complaint_entry.subdomain = parsed_uri[:subdomain]
-                  complaint_entry.uri = complaint_entry.subdomain + complaint_entry.domain
-                  ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
-
-                  complaint_entry.save
-
-                  if complaint_entry&.complaint_entry_preload&.current_category_information == 'DATA ERROR'
-                    render json: {:status=> 'error'}
-                  else
-                    response = (complaint_entry&.complaint_entry_preload&.current_category_information)
-                    render json: {:status=> 'success', :data => JSON.parse(response), :domain => complaint_entry.domain}
-                  end
-                elsif complaint_entry.entry_type == 'IP'
-                  render json: {:status=> 'ip'}
-                end
-
+                ComplaintEntry.update_uri(permitted_params[:complaint_entry_id], permitted_params[:uri])
               end
             end
+
           end
         end
       end
