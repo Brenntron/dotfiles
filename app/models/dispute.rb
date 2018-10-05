@@ -765,6 +765,10 @@ class Dispute < ApplicationRecord
     end
 
     dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
+    if dispute_fields['id'].present?
+      dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/)
+    end
+
     relation = where(dispute_fields)
 
 
