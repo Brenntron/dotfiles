@@ -214,7 +214,7 @@
                       .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
                         %ul
                           %li.status-radio-wrapper
-                            %input.entry-status-radio.dropdown-radio{type: 'radio', name: 'entry-status', class: "RESEARCHING_#{entry.id}", id: "RESEARCHING", onclick: 'populate_status_selection();'}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RESEARCHING_#{entry.id}", id: "RESEARCHING", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ESCALATED_#{entry.id}", id: "ESCALATED", onclick: 'populate_status_selection();'}
