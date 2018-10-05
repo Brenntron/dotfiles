@@ -28,6 +28,7 @@ Feature: Escalations
 
   @javascript
   Scenario: A summary must be provided to create a new research bug
+    Then pending
     Given a user with role "ips escalator" exists and is logged in
     And the following "escalation_bug" bugs with trait "open_bug" exist:
       | id  | bugzilla_id | user_id | summary                 | description       | committer_id |
@@ -41,6 +42,7 @@ Feature: Escalations
 
   @javascript
   Scenario: A description must be provided to create a new research bug
+    Then pending
     Given a user with commit permission exists and is logged in
     And the following "escalation_bug" bugs with trait "open_bug" exist:
       |   id   | bugzilla_id | user_id | summary                 | description       | committer_id |
