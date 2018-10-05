@@ -30,7 +30,24 @@
                     %input{name: 'choice', type: 'radio', value: 'value'}
                     Exclude Pattern
   .row
-    .col-xs-12.temp-spacer
+    .col-xs-6.temp-spacer
+      .row.default-padding
+        .result-label.vertical-separator
+          Current Cluster Entries:
+          %span 2,354
+        .result-label
+          Regex:
+          %span \d
+      .toolbar
+        .div
+          %label.toolbar-section-label View
+          %button{class: 'toolbar-button icon-opened-selected'}
+            %span.toolbar-button-text Open Selected
+          %button{class: 'toolbar-button icon-open-all'}
+            %span.toolbar-button-text Open All
+        %button.toolbar-button{class:'cat-btn icon-copycat'} CopyCat Tool
+
+    .col-xs-6.temp-spacer
       .card
         .label.content-label-sm Comment
         .card-body
