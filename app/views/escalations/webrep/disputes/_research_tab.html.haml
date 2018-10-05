@@ -445,7 +445,7 @@
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label XBRS History
                         %td.text-center
-                          - unless entry.hostlookup.nil?
+                          - if entry.hostlookup
                             = entry.find_xbrs[1]['data'].count
                         %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
@@ -455,7 +455,7 @@
                           - if entry.virustotals.count == 0
                             %span.missing-data N/A
                           - else
-                            = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+                            = entry.virustotals_negatives_count
                             \\
                             = entry.virustotals.count
 
