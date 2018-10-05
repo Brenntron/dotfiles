@@ -76,7 +76,8 @@ $ ->
     )
 
   populate_communication_details = (email, attachments, case_email) ->
-    $('input[type=text].reply-subject').val("Re: " + email.subject)
+    dispute_id = $('input[name="dispute_id"]').val()
+    $('input[type=text].reply-subject').val("Talosintelligence.com support request " + dispute_id)
     $('.communication-subject')[0].innerHTML = email.subject
     $('.author-username')[0].innerHTML = email.from
     $('.receiver-email')[0].innerHTML = (email.to || case_email)
