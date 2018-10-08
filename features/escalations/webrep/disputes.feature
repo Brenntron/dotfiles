@@ -108,6 +108,7 @@ Feature: Disputes
     And I click "#modified-older-cb"
     And I click "#add-search-criteria"
     Then I trigger-click ".export-button"
+    Then I should receive a file of type "application/vnd.ms-excel"
 
 
 
