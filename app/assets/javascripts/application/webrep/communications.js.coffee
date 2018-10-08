@@ -329,7 +329,7 @@ $ ->
     $('.new-case-note-textarea').empty()
 
   $('.new-case-note-save-button').on "click", ->
-    comment = $('.new-case-note-textarea').text()
+    comment = $('.new-case-note-textarea')[0].innerText
     dispute_id = $('input[name="dispute_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
 
