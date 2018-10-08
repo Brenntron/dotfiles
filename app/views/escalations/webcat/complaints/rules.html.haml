@@ -41,11 +41,13 @@
       .toolbar
         .div
           %label.toolbar-section-label View
-          %button{class: 'toolbar-button icon-opened-selected'}
+          %button.toolbar-button.icon-opened-selected.esc-tooltipped{onclick: 'open_selected()', type: 'button', title: 'Open Viewable'}
             %span.toolbar-button-text Open Selected
-          %button{class: 'toolbar-button icon-open-all'}
+          %button.toolbar-button.icon-open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All'}
             %span.toolbar-button-text Open All
-        %button.toolbar-button{class:'cat-btn icon-copycat'} CopyCat Tool
+        -#%button.toolbar-button{class:'cat-btn icon-copycat'} CopyCat Tool
+        %button.toolbar-button.cat-btn.icon-copycat.esc-tooltipped{onclick: 'copycat_tool()', type: 'button', title: 'CopyCat Tool'}
+          %span.toolbar-button-text CopyCat Tool
 
     .col-xs-6.temp-spacer
       .card
@@ -53,3 +55,22 @@
         .card-body
           %input.text_field
           %button Submit Changes
+
+  .row
+    .col-xs-12
+      %table.table.responsive#rules-index
+        %thead
+          %tr
+            %th
+            -# Expand / Collapse Button
+            %th
+              %input#disputes_check_box{type: 'checkbox'}
+            %th Cluster Entry
+            %th Volume
+            %th Age
+            %th Score
+            %th ID Number
+            %th Domain
+            %th Hostname(s)
+            %th Rules
+            %th Categories

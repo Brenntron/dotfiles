@@ -6350,6 +6350,7 @@ h2 {
 //Toolbar Layout UI ticket 194
 .temp-spacer {
   padding: 20px 15px;
+  min-height: auto;
 
   .default-padding {
     padding: 0 0 15px 0;
@@ -6443,3 +6444,5 @@ h2 {
     }
   }
 }
+
+//table layout start here
