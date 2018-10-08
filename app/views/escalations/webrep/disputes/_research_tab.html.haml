@@ -159,10 +159,9 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#sync-data-button
           %span.toolbar-button-text Refresh Data
-        #dispute_research_export_div
-          %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
-            %button.toolbar-button.export-button
-              %span.toolbar-button-text Export
+        %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
+          %button.toolbar-button.export-button
+            %span.toolbar-button-text Export
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
