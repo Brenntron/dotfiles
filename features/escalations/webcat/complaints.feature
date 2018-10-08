@@ -196,3 +196,15 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
     Then I should see "1.1.1.1"
+
+  @javascript
+  Scenario: lookup information is accessable via lookup button
+    Given a user with role "webcat user" exists and is logged in
+    And a new complaint entry with trait "new_entry" exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I resize the browser to "1440" X "768"
+    And I wait for "1" seconds
+    And I click button with class "expand_item_1"
+    Then I should not see "Lookup Information"
+    When I click "Lookup"
+    Then I should see "Lookup Information"

@@ -338,6 +338,10 @@ Then(/^I do some debugging$/) do
   binding.pry
 end
 
+And(/^I resize the browser to "(.*?)" X "(.*?)"$/) do |x,y|
+  Capybara.page.driver.browser.resize(x,y)
+end
+
 Then(/^open inspector$/) do
   page.driver.debug
 end

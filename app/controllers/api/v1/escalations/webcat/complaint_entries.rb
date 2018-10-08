@@ -356,7 +356,7 @@ module API
                   complaint_entry_packet[:current_categories] = {}
                 end
                 # find the lookup info for the url
-                render complaint_entry_packet.to_json
+                complaint_entry_packet.to_json
               end
             end
 
