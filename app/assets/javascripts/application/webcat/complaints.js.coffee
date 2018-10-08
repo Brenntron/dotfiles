@@ -8,22 +8,18 @@ window.updateURI = (complaint_entry_id) ->
     success: (response) ->
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
-      if response.status == 'success'
-        $.each response.data, (key, entry) ->
-          $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
-        $("#entry-uri-#{complaint_entry_id}").text(uri)
-        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
-
-
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
-      else if response.status == 'error'
-        $("#entry-uri-#{complaint_entry_id}").text(uri)
-        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
-
-
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
-      else if response.status == 'ip'
+      if 'ip' == response.status
         std_msg_error("Cannot edit IP entries.","")
+      else
+        if response.preload
+          $.each response.data, (key, entry) ->
+            $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
+
+        $("#entry-uri-#{complaint_entry_id}").text(uri)
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+
+
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
   )
 
 window.cat_new_url = ()->
