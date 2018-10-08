@@ -17,10 +17,10 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Please attach Screenshot if possible**
-
 **Browser:**
 [e.g. chrome, safari]
 
 **Additional context**
 Add any other context about the problem here.
+
+**Please attach Screenshot if possible**

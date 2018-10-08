@@ -765,6 +765,10 @@ class Dispute < ApplicationRecord
     end
 
     dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
+    if dispute_fields['id'].present?
+      dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/)
+    end
+
     relation = where(dispute_fields)
 
 
@@ -899,7 +903,7 @@ class Dispute < ApplicationRecord
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where(status: [STATUS_ASSIGNED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_REOPENED], user_id: user.id)
+        where.not(status: STATUS_RESOLVED).where(user_id: user.id)
       when 'my_disputes'
         where(user_id: user.id)
       when 'team_disputes'

@@ -113,15 +113,6 @@ Feature: Rules
     And  A rule gid "1" and sid "22211" has class "parsed"
     And  A rule gid "1" and sid "22211" has rev "4"
 
-  Scenario: Editing Rule: A rule can revert model test
-    Given the following "edited_rule" rules exist:
-      | id | gid |  sid  | rev |parsed|               rule_content               |
-      |  7 |  1  | 19500 |  3  |false | alert (msg: "the promised one has come") |
-    When code calls revert_rules_action for rule gid "1" sid "19500"
-    Then a rule record for rule gid "1" sid "19500" will exist
-    And  A rule gid "1" and sid "19500" has class "synched"
-    And  A rule gid "1" and sid "19500" has class "parsed"
-
   ### Scenarios Synching a rule from VC ###
    
   Scenario: Synch Rule: create a valid rule from synching model test
