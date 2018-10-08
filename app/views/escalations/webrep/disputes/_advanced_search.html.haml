@@ -33,14 +33,14 @@
     %label.content-label-sm Submission Type
     .radio-wrapper
       .ticket-radio-button-wrapper
-        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-wbrs-cb', class: 'form-control', checked: 'checked'}, 'wbrs')
-        %label.content-label-sm{for: 'submission-type-wbrs-cb'} Web Tickets (W)
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-w-cb', class: 'form-control', checked: 'checked'}, 'w')
+        %label.content-label-sm{for: 'submission-type-w-cb'} Web Tickets (W)
       .ticket-radio-button-wrapper
-        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-sbrs-cb', class: 'form-control', checked: 'checked'}, 'sbrs')
-        %label.content-label-sm{for: 'submission-type-sbrs-cb'} Email Tickets (E)
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-e-cb', class: 'form-control', checked: 'checked'}, 'e')
+        %label.content-label-sm{for: 'submission-type-e-cb'} Email Tickets (E)
       .ticket-radio-button-wrapper
-        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-sbrs-wbrs-cb', class: 'form-control', checked: 'checked'}, 'sbrs-wbrs')
-        %label.content-label-sm{for: 'submission-type-sbrs-wbrs-cb'} Email/Web Tickets (EW)
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-ew-cb', class: 'form-control', checked: 'checked'}, 'ew')
+        %label.content-label-sm{for: 'submission-type-ew-cb'} Email/Web Tickets (EW)
     %button.remove-input.remove-radio-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
