@@ -773,12 +773,14 @@ class Dispute < ApplicationRecord
           relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
     end
 
-    if params['submitted_older'].class == 'Date'
-      relation =
+    if params['submitted_older'].present?
+      if params['submitted_older'].kind_of?(Date)
+        relation =
           relation.where('case_opened_at < :submitted_older', submitted_older: (params['submitted_older'])+1)
-    elsif params['submitted_older'].class == 'String'
-      relation =
+      elsif params['submitted_older'].kind_of?(String)
+        relation =
           relation.where('case_opened_at < :submitted_older', submitted_older: Date.parse(params['submitted_older'])+1)
+      end
     end
 
     if params['age_newer'].present?
@@ -806,12 +808,12 @@ class Dispute < ApplicationRecord
     end
 
     if params['modified_older'].present?
-      if params['submitted_older'].class == 'Date'
+      if params['modified_older'].kind_of?(Date)
         relation =
-            relation.where('updated_at < :modified_older', modified_older: params['modified_older']+1)
-      elsif params['modified_older'].class == 'String'
+          relation.where('updated_at < :modified_older', modified_older: params['modified_older']+1)
+      elsif params['modified_older'].kind_of?(String)
         relation =
-            relation.where('updated_at < :modified_older', modified_older: Date.parse(params['modified_older'])+1)
+          relation.where('updated_at < :modified_older', modified_older: Date.parse(params['modified_older'])+1)
       end
     end
 
