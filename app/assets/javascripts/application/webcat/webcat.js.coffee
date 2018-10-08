@@ -81,7 +81,13 @@ $ ->
             tag_items
         }
         {
-          data: 'subdomain'
+          'render':(data,type,full,meta)->
+            subdomain = full.subdomain
+
+            if subdomain
+              '<p id="subdomain_' + full.entry_id + '">' + subdomain + '</p>'
+            else
+              '<p id="subdomain_' + full.entry_id + '">' + '</p>'
           width: '50px'
         }
         {
@@ -89,7 +95,7 @@ $ ->
             domain = full.domain
             ip_address = full.ip_address
             if domain
-              '<p id="domain_'+full.entry_id+'">' + domain + '</p>'
+              '<p id="domain_' + full.entry_id + '">' + domain + '</p>'
             else
               '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 

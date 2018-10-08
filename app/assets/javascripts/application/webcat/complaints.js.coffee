@@ -28,11 +28,12 @@ window.updateURI = (complaint_entry_id) ->
           $.each response.data, (key, entry) ->
             $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
 
-        $("#domain_#{complaint_entry_id}").text(uri)
+        $("#domain_#{complaint_entry_id}").text(response.domain)
+        $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
 
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</domain>')
 
 
 

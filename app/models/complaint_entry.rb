@@ -622,10 +622,10 @@ class ComplaintEntry < ApplicationRecord
 
       save!
 
-      return {status: 'success', preload: false} if complaint_entry_preload&.current_category_information == 'DATA ERROR'
+      return {status: 'success', preload: false, domain: domain, subdomain: subdomain} if complaint_entry_preload&.current_category_information == 'DATA ERROR'
 
       response = (complaint_entry_preload&.current_category_information)
-      return {status: 'success', preload: true, data: JSON.parse(response), domain: domain}
+      return {status: 'success', preload: true, data: JSON.parse(response), domain: domain, subdomain: subdomain}
     end
   end
 end
