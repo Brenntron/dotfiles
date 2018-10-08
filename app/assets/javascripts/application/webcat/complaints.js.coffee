@@ -33,7 +33,9 @@ window.updateURI = (complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}'>#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
 
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</domain>')
+
+        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
 
 
 
