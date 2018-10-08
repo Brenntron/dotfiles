@@ -29,14 +29,19 @@
     %label.content-label-sm Resolution
     %input.form-control#resolution-input{name: 'resolution'}
     %button.remove-input
-  .form-group.search-item.hidden
+  .form-group.search-item.hidden#submission-type
     %label.content-label-sm Submission Type
-    %input.form-control#submission-input{name: 'submission_type'}
-    = advanced_search_form.check_box(:submission_type, {id: 'submission-type-sbrs-cb'}, 'sbrs')
-    Email Only
-    = advanced_search_form.check_box(:submission_type, {id: 'submission-type-wbrs-cb'}, 'wbrs')
-    Web Only
-    %button.remove-input
+    .radio-wrapper
+      .ticket-radio-button-wrapper
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-wbrs-cb', class: 'form-control', checked: 'checked'}, 'wbrs')
+        %label.content-label-sm{for: 'submission-type-wbrs-cb'} Web Tickets (W)
+      .ticket-radio-button-wrapper
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-sbrs-cb', class: 'form-control', checked: 'checked'}, 'sbrs')
+        %label.content-label-sm{for: 'submission-type-sbrs-cb'} Email Tickets (E)
+      .ticket-radio-button-wrapper
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-sbrs-wbrs-cb', class: 'form-control', checked: 'checked'}, 'sbrs-wbrs')
+        %label.content-label-sm{for: 'submission-type-sbrs-wbrs-cb'} Email/Web Tickets (EW)
+    %button.remove-input.remove-radio-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
     %input.form-control#submitter-input{name: 'submitter'}
@@ -117,7 +122,7 @@
             Resolution
         %li
           %label.search-criteria-label
-            %input.search-checkbox#submission-type-cb{type: 'checkbox', name: 'search-criteria', value: 'SubmissionType', for: 'submission-input'}
+            %input.search-checkbox#submission-type-cb{type: 'checkbox', name: 'search-criteria', value: 'SubmissionType', for: 'submission-type'}
             Submission Type
         %li
           %label.search-criteria-label

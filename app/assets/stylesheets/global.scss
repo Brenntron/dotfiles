@@ -3934,7 +3934,11 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-
+#advanced-search-dropdown .form-group input[type='checkbox'] {
+  border: none;
+  outline: none;
+  width: auto;
+}
 
 #search-criteria-options {
   color: $type-base-color;
@@ -3999,6 +4003,10 @@ button.tertiary {
   float: right;
   margin-top: 3px;
   margin-right: -26px;
+}
+
+.remove-input.remove-radio-input {
+  margin-top: -28px;
 }
 
 #login-div a:hover {
@@ -6278,7 +6286,26 @@ table#duplicates a {
   min-width: 38px;
 }
 
-/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+.ticket-radio-button-wrapper {
+  display: inline-block;
+}
+
+.ticket-radio-button-wrapper input, .ticket-radio-button-wrapper label {
+  display: inline-block;
+}
+
+.ticket-radio-button-wrapper input {
+  margin-right: 6px;
+  height: 20px;
+  float: left;
+  margin-top: 2px;
+}
+
+.ticket-radio-button-wrapper label {
+  margin-right: 15px;
+}
+
+  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
   font-size: 14pt;
