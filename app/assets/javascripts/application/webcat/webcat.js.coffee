@@ -89,7 +89,7 @@ $ ->
             domain = full.domain
             ip_address = full.ip_address
             if domain
-              '<p>' + domain + '</p>'
+              '<p id="domain_'+full.entry_id+'">' + domain + '</p>'
             else
               '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 

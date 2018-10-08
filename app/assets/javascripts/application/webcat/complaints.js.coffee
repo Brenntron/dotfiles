@@ -28,6 +28,7 @@ window.updateURI = (complaint_entry_id) ->
           $.each response.data, (key, entry) ->
             $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
 
+        $("#domain_#{complaint_entry_id}").text(uri)
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
 
