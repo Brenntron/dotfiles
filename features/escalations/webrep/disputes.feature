@@ -108,7 +108,6 @@ Feature: Disputes
     And I click "#modified-older-cb"
     And I click "#add-search-criteria"
     Then I trigger-click ".export-button"
-    Then take a screenshot
 
 
 
