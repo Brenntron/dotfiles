@@ -62,10 +62,7 @@
         %thead
           %tr
             %th
-            -# Expand / Collapse Button
-            %th
-              %input#disputes_check_box{type: 'checkbox'}
-            %th Cluster Entry
+              %input#disputes_check_box{type: 'checkbox', class: 'right-space'} Cluster Entry
             %th Volume
             %th Age
             %th Score
@@ -74,3 +71,17 @@
             %th Hostname(s)
             %th Rules
             %th Categories
+
+        %tbody
+          %tr
+            %th{:scope => "row", class: 'other-stg'} 13.68.93.109
+            %td 84883009
+            %td 45 MIN
+            %td 8488309
+            %td N / A
+            %td N / A
+            %td N / A
+            %td N / A
+            %td
+              %input.category-search
+              %button

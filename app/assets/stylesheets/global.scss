@@ -6446,3 +6446,33 @@ h2 {
 }
 
 //table layout start here
+.table {
+
+  .right-space {
+    margin-right: 10px;
+  }
+
+  .other-stg {
+    padding-left: 30px;
+    border-bottom: 1px solid $faint-neutral-color;
+  }
+
+  .category-search {
+    width: 88%;
+    border: 1px solid #eee;
+    float: left;
+  }
+
+  button {
+    width: 10%;
+    height: 20px;
+    float: right;
+    border-radius: 2px;
+    background-color: $primary-section-color;
+    background-image: url(image_path('icon_submit_arrow.svg'));
+    background-repeat: no-repeat;
+    background-size: 15px;
+    background-position-x: center;
+    background-position-y: center;
+  }
+}
