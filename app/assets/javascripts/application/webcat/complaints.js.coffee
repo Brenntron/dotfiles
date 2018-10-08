@@ -667,7 +667,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + url + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
       '<label class="content-label-sm">Site Search</label>' +
       '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '</div></div>' +
@@ -718,7 +718,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + url + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
       '<label class="content-label-sm" id="site-search">Site Search</label>' +
       '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
