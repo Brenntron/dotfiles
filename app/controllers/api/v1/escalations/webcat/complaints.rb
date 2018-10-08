@@ -250,7 +250,9 @@ module API
 
             post 'update_uri' do
               std_api_v2 do
-                ComplaintEntry.update_uri(permitted_params[:complaint_entry_id], permitted_params[:uri])
+                authorize!(:update, DisputeEntry)
+                complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+                complaint_entry.update_uri(permitted_params[:uri])
               end
             end
 

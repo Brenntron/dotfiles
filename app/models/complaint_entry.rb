@@ -609,26 +609,24 @@ class ComplaintEntry < ApplicationRecord
     self.complaint_entry_preload.current_category_information
   end
 
-  def self.update_uri(complaint_entry_id, uri)
-    complaint_entry = ComplaintEntry.find(complaint_entry_id)
-
-    if complaint_entry.entry_type == 'URI/DOMAIN' || complaint_entry.entry_type.nil?
+  def update_uri(uri)
+    if entry_type == 'URI/DOMAIN' || entry_type.nil?
       parsed_uri = Complaint.parse_url(uri)
 
-      complaint_entry.domain = parsed_uri[:domain]
-      complaint_entry.subdomain = parsed_uri[:subdomain]
-      complaint_entry.uri = complaint_entry.subdomain + complaint_entry.domain
-      ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
+      self.domain = parsed_uri[:domain]
+      self.subdomain = parsed_uri[:subdomain]
+      self.uri = subdomain + domain
+      ComplaintEntryPreload.generate_preload_from_complaint_entry(self)
 
-      complaint_entry.save
+      save
 
-      if complaint_entry&.complaint_entry_preload&.current_category_information == 'DATA ERROR'
+      if complaint_entry_preload&.current_category_information == 'DATA ERROR'
         return {:status=> 'error'}
       else
-        response = (complaint_entry&.complaint_entry_preload&.current_category_information)
-        return {:status=> 'success', :data => JSON.parse(response), :domain => complaint_entry.domain}
+        response = (complaint_entry_preload&.current_category_information)
+        return {:status=> 'success', :data => JSON.parse(response), :domain => domain}
       end
-    elsif complaint_entry.entry_type == 'IP'
+    elsif self.entry_type == 'IP'
       return {:status=> 'ip'}
     end
   end
