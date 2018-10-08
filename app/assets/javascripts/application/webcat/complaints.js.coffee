@@ -1,4 +1,14 @@
 window.updateURI = (complaint_entry_id) ->
+  event.preventDefault()
+
+  $('#loader-modal').show()
+  $('.modal-backdrop').show()
+
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+  
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -6,6 +16,9 @@ window.updateURI = (complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove()
+
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
       if 'ip' == response.status
@@ -18,8 +31,12 @@ window.updateURI = (complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").text(uri)
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
 
-
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.json.domain+'\')">Domain</domain>')
+
+
+
+
+
   )
 
 window.cat_new_url = ()->
@@ -43,7 +60,7 @@ window.cat_new_url = ()->
       std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
     error: (response) ->
       $('#loader-modal').hide()
-      $('.modal-backdrop').remove();
+      $('.modal-backdrop').remove()
       std_msg_error(response,"", reload: false)
   )
 
