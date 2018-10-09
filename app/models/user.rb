@@ -175,18 +175,6 @@ class User < ApplicationRecord
     metrics_timeframe ? metrics_timeframe : DEFAULT_METRICS_TIMEFRAME
   end
 
-  def login_from_test
-    self.confirmed = 'true'
-    self.updated_at = Time.now
-    ensure_authentication_token # make sure the user has a token generated
-    Rails.logger.info("login_user user #{id} updated : #{cvs_username} #{updated_at.inspect} -- #{display_name}")
-
-    raise Exception.new("Error signing in user #{display_name}. Please contact the administrator.") unless save!
-    Rails.logger.info("login_user user #{id} saved : #{cvs_username} -- #{display_name}")
-
-    LoginSession.new(self)
-  end
-
   private
 
   def add_role
