@@ -209,7 +209,7 @@
                         = entry[:status]
 
                     %span.dropdown
-                      %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", onclick: "populate_entry_status_dropdown(#{entry.id});", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         - if entry[:status].nil?
                           NEW
                         - else
@@ -217,19 +217,19 @@
                       .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
                         %ul
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RESEARCHING_#{entry.id}", id: "RESEARCHING"}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RESEARCHING_#{entry.id}", id: "RESEARCHING", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ESCALATED_#{entry.id}", id: "ESCALATED"}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ESCALATED_#{entry.id}", id: "ESCALATED", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} Escalated
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "CUSTOMER_PENDING_#{entry.id}", id: "CUSTOMER_PENDING"}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "CUSTOMER_PENDING_#{entry.id}", id: "CUSTOMER_PENDING", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}"} Customer Pending
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ON_HOLD_#{entry.id}", id: "ON_HOLD"}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ON_HOLD_#{entry.id}", id: "ON_HOLD", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} On Hold
                           %li.status-radio-wrapper
-                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", onclick: "populate_resolution_dropdown(#{entry.id});"}
+                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", id: "RESOLVED_CLOSED", onclick: 'populate_resolved_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}"} Resolved / Closed
                             .dropdown-menu.ticket-resolution-submenu
                               .col-xs-6.submenu-left-wrapper
@@ -261,7 +261,7 @@
                                   %textarea{name: 'resolution-comment'}
 
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RE-OPENED_#{entry.id}", id: "RE-OPENED"}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RE-OPENED_#{entry.id}", id: "RE-OPENED", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_REOPENED}"} Re-Opened
                   %td
                     - if entry.resolution.nil?

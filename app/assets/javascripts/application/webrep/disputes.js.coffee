@@ -841,7 +841,12 @@ window.save_dispute_entries = () ->
     fielddata = $(this).find('.dual-edit-field').map(() ->
 
       new_value = switch (this.dataset.field)
-        when 'status' then $(this).find(".table-entry-input")[0].innerHTML
+        when 'status'
+          if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
+            $(this).find(".table-entry-input")[0].innerHTML
+          else
+            $(this).find("input[name='entry-status']:checked").attr('id')
+
         else $(this).find('.table-entry-input')[0].value.trim()
 
       old_value = $(this).find('.entry-data')[0].innerText.trim()
@@ -927,6 +932,16 @@ window.set_duplicate_dispute = (form_tag) ->
   )
 
 
+
+window.populate_status_selection = () ->
+  nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
+  $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
+
+window.populate_resolved_status_selection = () ->
+  $('.ticket-resolution-submenu').show()
+
+  nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
+  $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
 $ ->
 
