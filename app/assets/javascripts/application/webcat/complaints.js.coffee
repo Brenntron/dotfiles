@@ -850,8 +850,7 @@ window.lookup_dialog  = (id) ->
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+        std_msg_error("<p>Something went wrong: #{json.error}","")
       else
         #parse this json properly
         lookup_dialog_content = '<div class="dialog-content-wrapper">' +

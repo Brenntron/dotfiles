@@ -123,8 +123,7 @@ module API
                                                                               :long_description => value['long_description']}
                         #TODO: replace this with working code when the API is finished and we can actually get certainty.
                         complaint_entry_packet[:current_categories][key][:certainty] = [
-                            {:source => "Multicat Cisco/IronPort Rules", :source_category => "comp - Computers and Internet", :source_certainty => '1000', :source_confidence => '1.437'},
-                            {:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500', :source_confidence => '.8245'}
+                            {:source => "Missing Source data", :source_category => "Missing Category", :source_certainty => "N/A", :source_confidence => 'N.A'}
                         ]
                       end
 
@@ -342,8 +341,7 @@ module API
                                                                           :long_description => value['long_description']}
                       #TODO: replace this with working code when the API is finished and we can actually get certainty.
                       complaint_entry_packet[:current_categories][key][:certainty] = [
-                          {:source => "Multicat Cisco/IronPort Rules", :source_category => "comp - Computers and Internet", :source_certainty => '1000', :source_confidence => '1.437'},
-                          {:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500', :source_confidence => '.8245'}
+                          {:source => "Missing Source data", :source_category => "Missing Category", :source_certainty => "N/A", :source_confidence => 'N.A'}
                                                                                       ]
                     end
 
