@@ -754,7 +754,9 @@ class Dispute < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
 
-    dispute_fields = params.to_h.slice(*%w{status org_domain priority resolution submitter_type case_id case_owner_username})
+    dispute_fields =
+        params.to_h.slice(*%w{status org_domain priority resolution submission_types submitter_type
+                              case_id case_owner_username})
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
     if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
@@ -774,13 +776,6 @@ class Dispute < ApplicationRecord
     relation = where(dispute_fields)
 
 
-    if params['submission_type_sbrs']
-      relation = relation.sbrs_disputes
-    end
-
-    if params['submission_type_wbrs']
-      relation = relation.wbrs_disputes
-    end
 
 
     if params['submitted_newer'].present?

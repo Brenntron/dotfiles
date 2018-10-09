@@ -116,6 +116,13 @@ window.populate_webrep_index_table = (data = {}) ->
 
 window.advanced_webrep_index_table = () ->
   form = $('#disputes-advanced-search-form')
+  submission_types = []
+  if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
+    submission_types.push('w')
+  if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
+    submission_types.push('e')
+  if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
+    submission_types.push('ew')
   data = {
     search_type: 'advanced'
     search_name: form.find('input[name="search_name"]').val()
@@ -134,8 +141,7 @@ window.advanced_webrep_index_table = () ->
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
     resolution: form.find('input[id="resolution-input"]').val()
-    submission_type_sbrs: form.find('input[value=sbrs]').is(':checked')
-    submission_type_wbrs: form.find('input[value=wbrs]').is(':checked')
+    submission_types: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
