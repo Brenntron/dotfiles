@@ -934,7 +934,11 @@ window.set_duplicate_dispute = (form_tag) ->
 
 
 window.populate_status_selection = () ->
+  nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
+  $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
+window.populate_resolved_status_selection = () ->
+  $('.ticket-resolution-submenu').show()
 
   nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
   $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
