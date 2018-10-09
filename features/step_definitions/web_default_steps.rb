@@ -362,3 +362,7 @@ end
 Then /I click "(.*?)" and switch to the new window/ do |target|
   page.switch_to_window(page.window_opened_by{click_button(target)})
 end
+
+Then (/^I should receive a file of type "(.*?)"/) do |type|
+  result = page.response_headers['Content-Type'].should == type
+end

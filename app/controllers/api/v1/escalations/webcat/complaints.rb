@@ -242,6 +242,20 @@ module API
 
               end
             end
+
+            params do
+              requires :uri, type: String
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'update_uri' do
+              std_api_v2 do
+                authorize!(:update, DisputeEntry)
+                complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+                complaint_entry.update_uri(permitted_params[:uri])
+              end
+            end
+
           end
         end
       end

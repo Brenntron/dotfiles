@@ -1,3 +1,14 @@
+$(window).load ->
+
+  most_recent_email = 0
+
+  $('.email-row').each(() ->
+    if $(this).attr('email_id') > most_recent_email
+      most_recent_email = $(this).attr('email_id')
+  )
+
+  $(".email-row[email_id="+most_recent_email+"]").click()
+  
 $ ->
 
   $('#history-sort-dropdown').on 'change', ->
@@ -65,7 +76,8 @@ $ ->
     )
 
   populate_communication_details = (email, attachments, case_email) ->
-    $('input[type=text].reply-subject').val("Re: " + email.subject)
+    dispute_id = $('input[name="dispute_id"]').val()
+    $('input[type=text].reply-subject').val("Talosintelligence.com support request " + dispute_id)
     $('.communication-subject')[0].innerHTML = email.subject
     $('.author-username')[0].innerHTML = email.from
     $('.receiver-email')[0].innerHTML = (email.to || case_email)
@@ -317,7 +329,7 @@ $ ->
     $('.new-case-note-textarea').empty()
 
   $('.new-case-note-save-button').on "click", ->
-    comment = $('.new-case-note-textarea').text()
+    comment = $('.new-case-note-textarea')[0].innerText
     dispute_id = $('input[name="dispute_id"]').val()
     user_id = $('input[name="current_user_id"]').val()
 

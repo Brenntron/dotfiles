@@ -10,10 +10,10 @@ Feature: User Accounts
             and redirected to the bugs page
     Given current user exists
     And I visit the root url
-    And I should see "Please sign in using your Talos credentials"
+    And I should see "Please sign in using your Cisco credentials"
     When the user signs in
-    Then I should not see "Please sign in using your Talos credentials"
-    And I should see "/users/" in the current url
+    Then I should not see "Please sign in using your Cisco credentials"
+    And I should see "/escalations/users" in the current url
 
   @javascript
   Scenario: A user logging in not in the database should be added to the database
@@ -482,76 +482,11 @@ Feature: User Accounts
     Then I click "Next"
     And  I should see "[TELUS] broken bug12"
 
-  @javascript
-  Scenario: Bugs in closed tab should be paginated
-    Given a manager exists and is logged in
-    And the following users exist
-      | id | email                | cvs_username | display_name        | parent_id |
-      | 3  | hclinton@email.com   | h_clinton    | Hillary Clinton     | 1         |
-
-
-    And the following bugs exist:
-      | id      | bugzilla_id | state     | user_id | summary              | product | component   | version | description       |
-      |222222   | 222222      | OPEN      | 3       | [BP][NSS] fixed bug  | Research| Snort Rules | 2.6.0   | test description3 |
-      |333333   | 333333      | PENDING   | 3       | [TELUS] broken bug   | Research| Snort Rules | 2.6.0   | test description4 |
-      |4        | 4           | FIXED     | 3       | [TELUS] broken bug2  | Research| Snort Rules | 2.6.0   | test description  |
-      |5        | 5           | FIXED     | 3       | [TELUS] broken bug3  | Research| Snort Rules | 2.6.0   | test description  |
-      |6        | 6           | FIXED     | 3       | [TELUS] broken bug4  | Research| Snort Rules | 2.6.0   | test description  |
-      |7        | 7           | FIXED     | 3       | [TELUS] broken bug5  | Research| Snort Rules | 2.6.0   | test description  |
-      |8        | 8           | FIXED     | 3       | [TELUS] broken bug6  | Research| Snort Rules | 2.6.0   | test description  |
-      |9        | 9           | FIXED     | 3       | [TELUS] broken bug7  | Research| Snort Rules | 2.6.0   | test description  |
-      |10       | 10          | FIXED     | 3       | [TELUS] broken bug8  | Research| Snort Rules | 2.6.0   | test description  |
-      |11       | 11          | FIXED     | 3       | [TELUS] broken bug9  | Research| Snort Rules | 2.6.0   | test description  |
-      |12       | 12          | FIXED     | 3       | [TELUS] broken bug10 | Research| Snort Rules | 2.6.0   | test description  |
-      |13       | 13          | FIXED     | 3       | [TELUS] broken bug11 | Research| Snort Rules | 2.6.0   | test description  |
-      |14       | 14          | FIXED     | 3       | [TELUS] broken bug12 | Research| Snort Rules | 2.6.0   | test description  |
-      |15       | 15          | FIXED     | 3       | [TELUS] broken bug13 | Research| Snort Rules | 2.6.0   | test description  |
-      |16       | 16          | FIXED     | 3       | [TELUS] broken bug14 | Research| Snort Rules | 2.6.0   | test description  |
-      |17       | 17          | FIXED     | 3       | [TELUS] broken bug15 | Research| Snort Rules | 2.6.0   | test description  |
-      |18       | 18          | FIXED     | 3       | [TELUS] broken bug16 | Research| Snort Rules | 2.6.0   | test description  |
-      |19       | 19          | FIXED     | 3       | [TELUS] broken bug17 | Research| Snort Rules | 2.6.0   | test description  |
-      |20       | 20          | FIXED     | 3       | [TELUS] broken bug18 | Research| Snort Rules | 2.6.0   | test description  |
-      |21       | 21          | FIXED     | 3       | [TELUS] broken bug19 | Research| Snort Rules | 2.6.0   | test description  |
-      |22       | 22          | FIXED     | 3       | [TELUS] broken bug20 | Research| Snort Rules | 2.6.0   | test description  |
-      |23       | 23          | FIXED     | 3       | [TELUS] broken bug21 | Research| Snort Rules | 2.6.0   | test description  |
-      |24       | 24          | FIXED     | 3       | [TELUS] broken bug22 | Research| Snort Rules | 2.6.0   | test description  |
-      |25       | 25          | FIXED     | 3       | [TELUS] broken bug23 | Research| Snort Rules | 2.6.0   | test description  |
-      |26       | 26          | FIXED     | 3       | [TELUS] broken bug24 | Research| Snort Rules | 2.6.0   | test description  |
-      |27       | 27          | FIXED     | 3       | [TELUS] broken bug25 | Research| Snort Rules | 2.6.0   | test description  |
-      |28       | 28          | FIXED     | 3       | [TELUS] broken bug26 | Research| Snort Rules | 2.6.0   | test description  |
-      |29       | 29          | FIXED     | 3       | [TELUS] broken bug27 | Research| Snort Rules | 2.6.0   | test description  |
-      |30       | 30          | FIXED     | 3       | [TELUS] broken bug28 | Research| Snort Rules | 2.6.0   | test description  |
-      |31       | 31          | FIXED     | 3       | [TELUS] broken bug29 | Research| Snort Rules | 2.6.0   | test description  |
-      |32       | 32          | FIXED     | 3       | [TELUS] broken bug30 | Research| Snort Rules | 2.6.0   | test description  |
-      |33       | 33          | FIXED     | 3       | [TELUS] broken bug31 | Research| Snort Rules | 2.6.0   | test description  |
-      |34       | 34          | FIXED     | 3       | [TELUS] broken bug32 | Research| Snort Rules | 2.6.0   | test description  |
-      |35       | 35          | FIXED     | 3       | [TELUS] broken bug33 | Research| Snort Rules | 2.6.0   | test description  |
-      |36       | 36          | FIXED     | 3       | [TELUS] broken bug34 | Research| Snort Rules | 2.6.0   | test description  |
-      |37       | 37          | FIXED     | 3       | [TELUS] broken bug35 | Research| Snort Rules | 2.6.0   | test description  |
-      |38       | 38          | FIXED     | 3       | [TELUS] broken bug36 | Research| Snort Rules | 2.6.0   | test description  |
-      |39       | 39          | FIXED     | 3       | [TELUS] broken bug37 | Research| Snort Rules | 2.6.0   | test description  |
-      |40       | 40          | FIXED     | 3       | [TELUS] broken bug38 | Research| Snort Rules | 2.6.0   | test description  |
-      |41       | 41          | FIXED     | 3       | [TELUS] broken bug39 | Research| Snort Rules | 2.6.0   | test description  |
-      |42       | 42          | FIXED     | 3       | [TELUS] broken bug40 | Research| Snort Rules | 2.6.0   | test description  |
-      |43       | 43          | FIXED     | 3       | [TELUS] broken bug41 | Research| Snort Rules | 2.6.0   | test description  |
-      |44       | 44          | FIXED     | 3       | [TELUS] broken bug42 | Research| Snort Rules | 2.6.0   | test description  |
-      |45       | 45          | FIXED     | 3       | [TELUS] broken bug43 | Research| Snort Rules | 2.6.0   | test description  |
-
-    Then I wait for "3" seconds
-    And  I goto "/users/3"
-    And  I should see "[BP][NSS] fixed bug"
-    And  I should not see "[TELUS] broken bug2"
-    Then I click "closed (42)"
-    And  I should see "[TELUS] broken bug2"
-    And  I should not see "[BP][NSS] fixed bug"
-    Then I click "Next"
-    And  I should see "[TELUS] broken bug32"
-
   ### Scenarios User search
 
   @javascript
   Scenario: A user can search using email
-    Given a user with role "analyst" exists and is logged in
+    Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email              |
@@ -570,7 +505,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using a users display name
-    Given a user with role "analyst" exists and is logged in
+    Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | display_name        |
@@ -588,7 +523,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using CVS user name
-    Given a user with role "analyst" exists and is logged in
+    Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | cvs_username |
@@ -606,7 +541,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using CEC username
-    Given a user with role "analyst" exists and is logged in
+    Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | cec_username |
@@ -624,7 +559,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using Kerberos Login
-    Given a user with role "analyst" exists and is logged in
+    Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
       | email            | kerberos_login |
@@ -644,131 +579,6 @@ Feature: User Accounts
   ### Scenarios User Role access ###
 
   @javascript
-  Scenario: An analyst should be able to do everything
-            related to a bug except for commit a rule
-    Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
-    Given I wait for "3" seconds
-    And I goto "/bugs/333333"
-    When I click ".rules-tab"
-    Then I should see content "edit" within ".top-bar"
-    And I should see content "create" within ".top-bar"
-    And I should see content "remove" within ".top-bar"
-    And I should not see content "commit" within ".top-bar"
-    When I click ".attachments-tab"
-    Then I should see button with class "create_attachment"
-    When I click ".notes-tab"
-    Then I should see content "edit" within "#notes_form"
-    And I should see content "publish" within "#notes_form"
-
-  @javascript
-  Scenario: A committer should be able to do everything related to a bug
-    Given a user with role "committer" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
-    Given I wait for "3" seconds
-    And I goto "/bugs/333333"
-    When I click ".rules-tab"
-    Then I should see content "edit" within ".top-bar"
-    And I should see content "create" within ".top-bar"
-    And I should see content "remove" within ".top-bar"
-    And I should see content "commit" within ".top-bar"
-    When I click ".attachments-tab"
-    Then I should see button with class "create_attachment"
-    When I click ".notes-tab"
-    Then I should see content "edit" within "#notes_form"
-    And I should see content "publish" within "#notes_form"
-
-  @javascript
-  Scenario: A user with only a manager role should only be able to manage users
-    Given a user with role "manager" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
-    Given I wait for "3" seconds
-    And I goto "/bugs/333333"
-    When I click ".rules-tab"
-    Then I should not see content "edit" within ".top-bar"
-    And I should not see content "create" within ".top-bar"
-    And I should not see content "remove" within ".top-bar"
-    And I should not see content "commit" within ".top-bar"
-    When I click ".attachments-tab"
-    Then I should not see button with class "create_attachment"
-    When I click ".notes-tab"
-    Then I should not see content "edit" within "#notes_form"
-    And I should not see content "publish" within "#notes_form"
-    When I goto "/users/1"
-    Then I should see "manage"
-
-  @javascript @allow-rescue
-  Scenario: A build coordinator should be able to view everything related to a bug but not alter it
-            A build coordinator cannot create new bugs
-    Given a user with role "build coordinator" exists and is logged in
-    And the following bugs exist:
-      | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
-      |333333   | 333333      | OPEN   | 1       | [TELUS] broken bug  | Research| Snort Rules | 2.6.0   | test description4 |
-    Given I wait for "3" seconds
-    And  I goto "/bugs/new"
-    Then I should see "You are not authorized to new research bug."
-    And I goto "/bugs/333333"
-    When I click ".rules-tab"
-    Then I should not see content "edit" within ".top-bar"
-    And I should not see content "create" within ".top-bar"
-    And I should not see content "remove" within ".top-bar"
-    And I should not see content "commit" within ".top-bar"
-    When I click ".attachments-tab"
-    Then I should not see button with class "create_attachment"
-    When I click ".notes-tab"
-    Then I should not see content "edit" within "#notes_form"
-    And I should not see content "publish" within "#notes_form"
-
-  @javascript
-  Scenario: An analyst should see a list of their bugs first time in bugs index
-    Given a user with role "analyst" exists and is logged in
-    And the following bugs exist:
-      | bugzilla_id | state | user_id | summary                                     | product  | component   | version | description       |
-      | 111111      | OPEN  | 1       | [[TELUS][VULN][BP] [SID] 22078 test summary | Research | Snort Rules | 2.6.0   | test description  |
-      | 222222      | OPEN  | 2       | No Tags in this one                         | Research | Snort Rules | 2.6.0   | test description2 |
-      | 222222      | FIXED | 2       | [BP][NSS] fixed bug                         | Research | Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And  I goto "/bugs?q=my-bugs"
-    And  I should see "[[TELUS][VULN][BP] [SID] 22078 test summary"
-    And  I should not see "[BP][NSS] fixed bug"
-
-  @javascript
-  Scenario: A committer should see a list of pending bugs first time in bugs index
-    Given a user with role "committer" exists and is logged in
-    And the following bugs exist:
-      | bugzilla_id | state   | user_id | summary                                                 | product  | component   | version | description       |
-      | 111111      | OPEN    | 2       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
-      | 222222      | OPEN    | 2       | No Tags in this one                                     | Research | Snort Rules | 2.6.0   | test description2 |
-      | 222222      | FIXED   | 2       | [BP][NSS] fixed bug                                     | Research | Snort Rules | 2.6.0   | test description3 |
-      | 333333      | PENDING | 2       | Pending bug I should see                                | Research | Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And  I goto "/bugs"
-    And  I should see "Pending bug I should see"
-    And  I should not see "[BP][NSS] fixed bug"
-
-  @javascript
-  Scenario: A build coordinator should see a list of fixed bugs first time in bugs index
-    Given a user with role "build coordinator" exists and is logged in
-    And the following bugs exist:
-      | bugzilla_id | state   | user_id | summary                                                 | product  | component   | version | description       |
-      | 111111      | OPEN    | 2       | [[TELUS][VULN][BP] [SID] 22078 test summary             | Research | Snort Rules | 2.6.0   | test description  |
-      | 222222      | OPEN    | 2       | No Tags in this one                                     | Research | Snort Rules | 2.6.0   | test description2 |
-      | 222222      | FIXED   | 2       | [BP][NSS] fixed bug                                     | Research | Snort Rules | 2.6.0   | test description3 |
-      | 333333      | PENDING | 2       | Pending bug I should see                                | Research | Snort Rules | 2.6.0   | test description3 |
-    Then I wait for "3" seconds
-    And  I goto "/bugs"
-    And  I should see "[BP][NSS] fixed bug"
-    And  I should not see "Pending bug I should see"
-    And  I should not see "[[TELUS][VULN][BP] [SID] 22078 test summary"
-
-
-  @javascript
   Scenario: An Admin user should be able to get to the admin section
     Given a user with role "admin" exists and is logged in
     And I wait for "3" seconds
@@ -782,5 +592,5 @@ Feature: User Accounts
     And I wait for "3" seconds
     And I go to "/admin"
     Then I should not see "Admin Page"
-    And I should see "You are not authorized to manage module"
+    And I should see "You are not authorized"
 
