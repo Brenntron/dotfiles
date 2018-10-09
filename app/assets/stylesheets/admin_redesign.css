@@ -13,8 +13,6 @@
  *= require font_import_opensans
  *= require font_import_firamono
  *= require global
- *= require admin-snort-doc
- *= require rule-docs
  *= require webcat_telemetry
  *= require webcat_complaints
  *= require tooltipster.bundle.min
