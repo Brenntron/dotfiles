@@ -26,16 +26,6 @@
         .col-sm-4
           %h3= @rule.snort_on_off
 
-      -if RuleDoc.where(rule_id:@rule.rule_doc&.rule_id).count > 1
-        .doc_error THIS RULE HAS A DUPLICATE RULE DOC
-        %a{href: rule_docs_path} FIX IT!
-      -else
-        -if @rule.rule_doc.nil?
-          View doc(no doc exists)
-        -else
-          %a{href: edit_rule_doc_path(@rule.rule_doc&.id)} View doc
-
-
       %fieldset
         .row
           .col-xs-4

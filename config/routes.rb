@@ -17,7 +17,6 @@ Rails.application.routes.draw do
         patch :remove_tag
         patch :remove_whiteboard
       end
-      # resources :references
     end
 
     namespace :webcat do
@@ -136,30 +135,9 @@ Rails.application.routes.draw do
         get :related
       end
     end
-    resources :reference_types, only: [:index, :edit, :update]
     resources :scheduled_tasks, only: [:index, :show, :create, :destroy] do
       collection do
         post :run_job
-      end
-    end
-
-    namespace :snort_doc do
-      root 'root#index'
-      get 'doc_output', to: 'rule_docs#doc_output'
-      get :rule_docs, to: 'rule_docs#index'
-      get :upload_docs, to: 'rule_docs#upload'
-      post :upload_docs, to: 'rule_docs#send_yaml'
-      namespace :cves do
-        get :nvd
-        post :download
-        get :missing
-        post :update
-      end
-    end
-
-    resources :rules_sync, only: [:index] do
-      collection do
-        get :diagnostics
       end
     end
   end
@@ -209,11 +187,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :rule_docs
-  namespace :templates do
-    resources :rules, only: [:show]
-  end
-
   resources :research_bugs, controller: 'bugs'
   resources :bugs, only: [:index, :new, :create, :show, :update] do
     member do
@@ -223,7 +196,6 @@ Rails.application.routes.draw do
       patch :remove_tag
       patch :remove_whiteboard
     end
-    resources :references, only: [:create]
     get :bug_metrics, defaults: { format: :json }
   end
 
@@ -242,7 +214,6 @@ Rails.application.routes.draw do
         post 'fp-event/messages', to: 'messages#messages_from_bridge'
         post 'fp-create/messages', to: 'messages#fp_create'
         post 'ticket-event/messages', to: 'messages#messages_from_bridge'
-        post 'rule-file-notify/messages', to: 'messages#rule_file_notify'
       end
       resources :messages, only: [:create]
     end

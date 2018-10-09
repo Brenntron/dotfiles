@@ -9,27 +9,6 @@ RSpec.describe "Widget management", :type => :request do
     expect(response.code).to eq('500')
   end
 
-  it 'receives rule_file_notify' do
-    allow(Thread).to receive(:new)
-
-    post '/bridge/channels/rule-file-notify/messages', params: {
-        envelope: {
-            channel: "rule-file-notify",
-            addressee: "analyst-console",
-            sender: "svn"
-        },
-        message: {
-            filenames: [
-                'trunk/snort-rules/app-detect.rules',
-                'trunk/snort-rules/browser-chrome.rules',
-                'trunk/snort-rules/file-office.rules'
-            ]
-        }
-    }
-
-    expect(response.code).to eq('202')
-  end
-
   it 'receives fp_create' do
     allow(Thread).to receive(:new)
 
