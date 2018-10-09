@@ -755,7 +755,7 @@ class Dispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
 
     dispute_fields =
-        params.to_h.slice(*%w{status org_domain priority resolution submission_types submitter_type
+        params.to_h.slice(*%w{status org_domain priority resolution submission_type submitter_type
                               case_id case_owner_username})
     dispute_fields['id'] = dispute_fields.delete('case_id')
 

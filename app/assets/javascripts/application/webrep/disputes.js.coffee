@@ -141,7 +141,7 @@ window.advanced_webrep_index_table = () ->
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
     resolution: form.find('input[id="resolution-input"]').val()
-    submission_types: submission_types
+    submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
