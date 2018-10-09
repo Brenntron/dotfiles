@@ -115,31 +115,40 @@ window.populate_webrep_index_table = (data = {}) ->
   , this)
 
 window.advanced_webrep_index_table = () ->
+  form = $('#disputes-advanced-search-form')
+  submission_types = []
+  if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
+    submission_types.push('w')
+  if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
+    submission_types.push('e')
+  if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
+    submission_types.push('ew')
   data = {
+    search_type: 'advanced'
+    search_name: form.find('input[name="search_name"]').val()
     customer: {
-      name: $('#new_named_search').find('input[id="name-input"]').val()
-      email: $('#new_named_search').find('input[id="email-input"]').val()
-      company_name: $('#new_named_search').find('input[id="company-input"]').val()
+      name: form.find('input[id="name-input"]').val()
+      email: form.find('input[id="email-input"]').val()
+      company_name: form.find('input[id="company-input"]').val()
     }
     dispute_entries: {
-      ip_or_uri: $('#new_named_search').find('input[id="dispute-input"]').val()
-      suggested_disposition: $('#new_named_search').find('input[id="disposition-input"]').val()
+      ip_or_uri: form.find('input[id="dispute-input"]').val()
+      suggested_disposition: form.find('input[id="disposition-input"]').val()
     }
-    search_type: 'advanced'
-    search_name: $('#new_named_search').find('input[name="search_name"]').val()
-    case_id: $('#new_named_search').find('input[id="caseid-input"]').val()
-    org_domain: $('#new_named_search').find('input[id="domain-input"]').val()
-    case_owner_username: $('#new_named_search').find('input[id="owner-input"]').val()
-    status: $('#new_named_search').find('input[id="status-input"]').val()
-    priority: $('#new_named_search').find('input[id="priority-input"]').val()
-    resolution: $('#new_named_search').find('input[id="resolution-input"]').val()
-    submitter_type: $('#new_named_search').find('input[id="submitter-input"]').val()
-    submitted_older: $('#new_named_search').find('input[id="submitted-older-input"]').val()
-    submitted_newer: $('#new_named_search').find('input[id="submitted-newer-input"]').val()
-    age_older: $('#new_named_search').find('input[id="age-older-input"]').val()
-    age_newer: $('#new_named_search').find('input[id="age-newer-input"]').val()
-    modified_older: $('#new_named_search').find('input[id="modified-older-input"]').val()
-    modified_newer: $('#new_named_search').find('input[id="modified-newer-input"]').val()
+    case_id: form.find('input[id="caseid-input"]').val()
+    org_domain: form.find('input[id="domain-input"]').val()
+    case_owner_username: form.find('input[id="owner-input"]').val()
+    status: form.find('input[id="status-input"]').val()
+    priority: form.find('input[id="priority-input"]').val()
+    resolution: form.find('input[id="resolution-input"]').val()
+    submission_type: submission_types
+    submitter_type: form.find('input[id="submitter-input"]').val()
+    submitted_older: form.find('input[id="submitted-older-input"]').val()
+    submitted_newer: form.find('input[id="submitted-newer-input"]').val()
+    age_older: form.find('input[id="age-older-input"]').val()
+    age_newer: form.find('input[id="age-newer-input"]').val()
+    modified_older: form.find('input[id="modified-older-input"]').val()
+    modified_newer: form.find('input[id="modified-newer-input"]').val()
   }
   window.current_search_data = data
   window.populate_webrep_index_table(data)
