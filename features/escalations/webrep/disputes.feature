@@ -101,7 +101,7 @@ Feature: Disputes
     And the following disputes exist and have entries:
     |id|
     |1 |
-    When I goto "/escalations/webrep/tickets?f=open"
+    When I goto "escalations/webrep/tickets?f=open"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#submitted-older-cb"
