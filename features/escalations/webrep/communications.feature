@@ -13,10 +13,10 @@ Feature: Webrep communications
       |id  | dispute_id           | status |
       | 1  | 722                  | unread |
       | 2  | 722                  | read   |
+      | 3  | 722                  | unread |
     And I goto "/escalations/webrep/disputes/722#communication_tab"
     And row with email_id "1" should have class "email-unread"
     And row with email_id "2" should have class "email-read"
-
 
   @javascript
   Scenario: an unread email should change to read once clicked
@@ -45,8 +45,9 @@ Feature: Webrep communications
       | 722    |
     And the following dispute emails exist:
       |id  | dispute_id           | status | subject          |to                        |  from                    | body                                                                                                                                                                                                              |
-      | 1  | 722                  | unread | subject number 1 | email@webrepdisputes.com |  customer@gmail.com      |" Key Rules:Problem Summary: Hi Already have this mail server running a couple of domains of our company and we have 3 clients in a domains that cannot send email to emails of a company using sendbase service. |
-      | 2  | 722                  | read   | another thing    | email@webrepdisputes.com |  customer@gmail.com      |    "This should only be seen second email"                                                                                                                                                                                                            |
+      | 1  | 722                  | unread | subject number 1 | email@webrepdisputes.com |  customer@gmail.com      | "Key Rules:Problem Summary: Hi Already have this mail server running a couple of domains of our company and we have 3 clients in a domains that cannot send email to emails of a company using sendbase service. |
+      | 2  | 722                  | read   | another thing    | email@webrepdisputes.com |  customer@gmail.com      | "This should only be seen second email"                                                                                                                                                                                                            |
+      | 3  | 722                  | read   | hack             | email@webrepdisputes.com |  customer@gmail.com      | "This is here to trick autoload most recent email."                                                                                                                                                                                                           |
     And I goto "/escalations/webrep/disputes/722"
     And I should not see "Hi Already have this mail server running"
     And I should not see "This should only be seen second email"
@@ -277,7 +278,8 @@ Feature: Webrep communications
       | 722    |
     And the following dispute emails exist:
       |id| dispute_id | status | subject          |to                        | from        | body                                                                                                                                                                                                             |
-      | 1| 722        | unread | subject number 1 | email@webrepdisputes.com | bob@bob.com |" Key Rules:Problem Summary: Hi Already have this mail server running a couple of domains of our company and we have 3 clients in a domains that cannot send email to emails of a company using sendbase service. |
+      | 1| 722        | unread | subject number 1 | email@webrepdisputes.com | bob@bob.com |" Key Rules:Problem Summary: Hi Already have this mail server running a couple of domains of our company and we have 3 clients in a domains that cannot send email to emails of a company using sendbase service. "|
+      | 2| 722        | unread | subject number 1 | email@webrepdisputes.com | bob@bob.com |" This is here to trick autoload most recent email feature from breaking our tests. "|
     Then I go to "/escalations/webrep/disputes/722"
     Then I click on row with email_id "1"
     Then I should see div element with class "customer-facing-notice"

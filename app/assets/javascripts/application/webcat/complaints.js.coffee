@@ -1,5 +1,47 @@
-window.removeSubdomain = (id,host) ->
-  id.value = host
+window.updateURI = (complaint_entry_id) ->
+  event.preventDefault()
+
+  $('#loader-modal').show()
+  $('.modal-backdrop').show()
+
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+  
+  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
+    data: {complaint_entry_id: complaint_entry_id, uri: uri }
+    success: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove()
+
+      $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
+
+      if 'ip' == response.status
+        std_msg_error("Cannot edit IP entries.","")
+      else
+        if response.preload
+          $.each response.data, (key, entry) ->
+            $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
+
+        $("#domain_#{complaint_entry_id}").text(response.domain)
+        $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
+        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}'>#{uri}</a>")
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+
+
+        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
+
+
+
+
+
+  )
 
 window.cat_new_url = ()->
   event.preventDefault()
@@ -22,7 +64,7 @@ window.cat_new_url = ()->
       std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
     error: (response) ->
       $('#loader-modal').hide()
-      $('.modal-backdrop').remove();
+      $('.modal-backdrop').remove()
       std_msg_error(response,"", reload: false)
   )
 
@@ -628,12 +670,12 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data">' + url + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
       '<label class="content-label-sm">Site Search</label>' +
-      '<span class="nested-complaint-data">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div>' +
@@ -648,8 +690,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Categories to commit</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
@@ -680,19 +721,19 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data">' + uri + '</span>' +
-      '<label class="content-label-sm">Site Search</label>' +
-      '<span class="nested-complaint-data">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
+      '<label class="content-label-sm" id="site-search">Site Search</label>' +
+      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="\' + complaint_entry.entry_id + \'"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
-      '<button class="secondary" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
-      '<button class="secondary" id="domain_button" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
+      '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
+      '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -701,8 +742,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +

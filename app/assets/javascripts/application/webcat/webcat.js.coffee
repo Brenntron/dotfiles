@@ -42,9 +42,14 @@ $ ->
       ]
       columns: [
         {
+          data: null
+
+          width: '14px'
+          orderable: false
+          searchable: false
+          sortable: false
           'render':(data,type,full,meta)->
-            id = full.entry_id
-            '<button class="expand-row-button-inline expand_item_' + id + '"></button>'
+            return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
         }
         {
           data: null
@@ -76,7 +81,13 @@ $ ->
             tag_items
         }
         {
-          data: 'subdomain'
+          'render':(data,type,full,meta)->
+            subdomain = full.subdomain
+
+            if subdomain
+              '<p id="subdomain_' + full.entry_id + '">' + subdomain + '</p>'
+            else
+              '<p id="subdomain_' + full.entry_id + '">' + '</p>'
           width: '50px'
         }
         {
@@ -84,7 +95,7 @@ $ ->
             domain = full.domain
             ip_address = full.ip_address
             if domain
-              '<p>' + domain + '</p>'
+              '<p id="domain_' + full.entry_id + '">' + domain + '</p>'
             else
               '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 

@@ -72,11 +72,25 @@ Feature: Disputes
     Then I see "Cucumber" in element "#owner_2"
 
   @javascript
-  Scenario: when the user encounters a situation in which no results exists (therefore none returned),
-            an error modal should display
+  Scenario: a user edits a dispute entry's status and saves their changes
     Given a user with role "webrep user" exists and is logged in
-    When I goto "escalations/webrep/disputes"
-    Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
+    And the following disputes exist and have entries:
+    |id|
+    |1 |
+    When I goto "escalations/webrep/disputes/1/"
+    And I click "#research-tab-link"
+    And I click ".inline-edit-entry-button"
+    And I click "#entry_status_button_1"
+    And I click "#RE-OPENED"
+    And I trigger-click ".save-all-changes"
+    Then I wait for "3" seconds
+    Then I should see "RE-OPENED"
+
+  @javascript
+  Scenario: when the user encounters a situation in which no results exists (therefore none returned), an error modal should display
+  Given a user with role "webrep user" exists and is logged in
+  When I goto "escalations/webrep/disputes"
+  Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
 
   @javascript
   Scenario: a user adds a dispute as a related case using the tooltip button
@@ -95,3 +109,18 @@ Feature: Disputes
     And I wait for "5" seconds
     Then check if dispute id, "1", has a related_id of "2"
 
+  @javascript
+  Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+    |id|
+    |1 |
+    When I goto "escalations/webrep/tickets?f=open"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#submitted-older-cb"
+    And I click "#modified-older-cb"
+    And I click "#add-search-criteria"
+    Then I trigger-click ".export-button"
+    Then I wait for "3" seconds
+    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
