@@ -159,6 +159,9 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#sync-data-button
           %span.toolbar-button-text Refresh Data
+        %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
+          %button.toolbar-button.export-button
+            %span.toolbar-button-text Export
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
@@ -422,7 +425,7 @@
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
-                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size
+                          = entry.dispute_rule_hits.wbrs_rule_hits.count
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
@@ -441,7 +444,7 @@
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label XBRS History
                         %td.text-center
-                          - unless entry.hostlookup.nil?
+                          - if entry.hostlookup
                             = entry.find_xbrs[1]['data'].count
                         %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
@@ -451,7 +454,7 @@
                           - if entry.virustotals.count == 0
                             %span.missing-data N/A
                           - else
-                            = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+                            = entry.virustotals_negatives_count
                             \\
                             = entry.virustotals.count
 
@@ -511,6 +514,7 @@
                               = sbrs_hit.name
                               - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
                                 = ","
+                          -#= entry.dispute_rule_hits.sbrs_rule_hits.map {|rule_hit| rule_trigger(rule_hit)}.join(', ').html_safe
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}

@@ -216,6 +216,10 @@ class DisputeEntry < ApplicationRecord
     @virustotals
   end
 
+  def virustotals_negatives_count
+    virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+  end
+
   def xbrs_data
     find_xbrs[1]
   end
