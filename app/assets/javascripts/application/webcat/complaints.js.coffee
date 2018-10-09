@@ -614,7 +614,7 @@ format = (complaint_entry_row) ->
     tooltip_table = ''
     tooltip_all = ''
     tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
-    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Category</th><th>Source</th></tr></thead><tbody>'
+    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead><tbody>'
     tooltip_table_end = '</tbody></table>'
     tooltip_table_guts = ''
     tooltip_wrapper_end = '</span></div>'
@@ -629,15 +629,16 @@ format = (complaint_entry_row) ->
         top_certainty = this.certainty[0].source_certainty
         certainties = this.certainty
         $(certainties).each ->
+          source_confidence = this.source_confidence
           source_certainty = this.source_certainty
           source_category = this.source_category
           source_name = this.source
-          certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_category + '</td><td>' + source_name + '</td></tr>'
+          certainty_row = '<tr><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
           tooltip_table_guts = tooltip_table_guts + certainty_row
 
         tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
         tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="certainty-flag" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
+        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
         category_table = category_table + category_row
 
       return
@@ -674,7 +675,7 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div>' +
@@ -726,11 +727,11 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="\' + complaint_entry.entry_id + \'"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
@@ -841,6 +842,65 @@ window.history_dialog = (id) ->
   , this)
 
 
+parse_lookup_dialog_content = (json) ->
+  lookup_dialog_content = '<div class="dialog-content-wrapper">' +
+    '<h5> Lookup info for ' + json["prefix"] + '</h5>' +
+    '<table class="lookup-table">' +
+    '<tbody>'
+  categories = json["current_categories"]
+  $.each categories, (key, value) ->
+    category = this
+    active =  $(this).attr("is_active")
+    if active == 1
+      confidence = this.confidence
+      mnemonic = this.mnemonic
+      name = this.name
+      cat_id = this.category_id
+      top_certainty = this.certainty[0].source_certainty
+      certainties = this.certainty
+      category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
+      lookup_dialog_content = lookup_dialog_content + category_row
+      lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
+        '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
+        '<tbody>'
+      $(certainties).each ->
+        source_confidence = this.source_confidence
+        source_certainty = this.source_certainty
+        source_category = this.source_category
+        source_name = this.source
+        lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
+      lookup_dialog_content += '</tbody></table></tr>'
+  lookup_dialog_content += '</tbody></table>'
+
+
+window.lookup_dialog  = (id) ->
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaint_entries/lookup'
+    method: 'POST'
+    data: {'id': id}
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        std_msg_error("<p>Something went wrong: #{json.error}","")
+      else
+        #parse this json properly
+        lookup_dialog_content = parse_lookup_dialog_content(json)
+        if $("#lookup_dialog").length
+          lookup_dialog = this
+          $("#lookup_dialog").html(lookup_dialog_content)
+          $('#lookup_dialog').dialog('open')
+        else
+          lookup_dialog = '<div id="lookup_dialog" title="Lookup Information"></div>'
+          $('body').append(lookup_dialog)
+          $("#lookup_dialog").html(lookup_dialog_content)
+          $('#lookup_dialog').dialog
+            autoOpen: false
+            minWidth: 400
+            position: { my: "center top", at: "center top", of: window }
+          $('#lookup_dialog').dialog('open')
+    error: (response) ->
+      std_msg_error("<p>Something went wrong: #{response.responseText}","")
+  , this)
 
 
 window.click_table_buttons = (complaint_table, button)->
@@ -1154,7 +1214,7 @@ window.load_screenshot = (img_tag, complaint_entry_id) ->
       this.img_tag.src = src
   )
 
-window.triggerTooltips = () ->
+window.triggerTooltips = (item) ->
   $('.nested-tooltipped').tooltipster
     theme: [
       'tooltipster-borderless'
