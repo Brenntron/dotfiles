@@ -25,7 +25,7 @@ class Ability
     if role_names.include?('admin')
       can :read, :all
       can [:acknowledge_bug], Bug
-      can :manage, [Admin, User, Role, Task, SnortDocPublisher]
+      can :manage, [Admin, User, Role, Task]
     end
 
 
