@@ -778,8 +778,13 @@ class Dispute < ApplicationRecord
     end
 
     if params['submitted_older'].present?
-      relation =
-          relation.where('case_opened_at < :submitted_older', submitted_older: params['submitted_older']+1)
+      if params['submitted_older'].kind_of?(Date)
+        relation =
+          relation.where('case_opened_at < :submitted_older', submitted_older: (params['submitted_older'])+1)
+      elsif params['submitted_older'].kind_of?(String)
+        relation =
+          relation.where('case_opened_at < :submitted_older', submitted_older: Date.parse(params['submitted_older'])+1)
+      end
     end
 
     if params['age_newer'].present?
@@ -807,8 +812,13 @@ class Dispute < ApplicationRecord
     end
 
     if params['modified_older'].present?
-      relation =
+      if params['modified_older'].kind_of?(Date)
+        relation =
           relation.where('updated_at < :modified_older', modified_older: params['modified_older']+1)
+      elsif params['modified_older'].kind_of?(String)
+        relation =
+          relation.where('updated_at < :modified_older', modified_older: Date.parse(params['modified_older'])+1)
+      end
     end
 
 
