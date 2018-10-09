@@ -6399,8 +6399,6 @@ h2 {
     }
 
 
-    .cat-btn:focus,
-    .cat-btn:active,
     .cat-btn.active {
       background-color: $primary-section-color;
     }
@@ -6453,8 +6451,33 @@ h2 {
   }
 
   .other-stg {
-    padding-left: 30px;
     border-bottom: 1px solid $faint-neutral-color;
+
+    ul {
+      float: right;
+      margin: 0;
+      padding: 0;
+
+      li {
+        display: inline-block;
+        margin: 0;
+        height: 22.5px;
+        width: 24px;
+        border-right: 1px solid #dddddd;
+        button {
+          width: 20px;
+          height: 20px;
+          float: left;
+        }
+      }
+
+      li:last-child {
+        border: none;
+        button {
+          //float: right;
+        }
+      }
+    }
   }
 
   .category-search {
@@ -6463,11 +6486,41 @@ h2 {
     float: left;
   }
 
+  .data-btn {
+    background-color: $primary-section-color;
+    background-image: url(image_path('icon_open_viewable.svg'));
+    background-repeat: no-repeat;
+    //background-size: 15px;
+    background-position-x: center;
+    background-position-y: center;
+  }
+
+  .help-btn {
+    background-image: url(image_path('icon_whois.svg'));
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    background-color: #dddddd;
+
+  }
+
+  .google-btn {
+    background-image: url(image_path('icon_google_grey.svg'));
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    background-color: #dddddd;
+  }
+
   button {
     width: 10%;
     height: 20px;
     float: right;
     border-radius: 2px;
+    border: none;
+  }
+
+  .category-btn {
     background-color: $primary-section-color;
     background-image: url(image_path('icon_submit_arrow.svg'));
     background-repeat: no-repeat;
