@@ -842,6 +842,37 @@ window.history_dialog = (id) ->
   , this)
 
 
+parse_lookup_dialog_content = (json) ->
+  lookup_dialog_content = '<div class="dialog-content-wrapper">' +
+    '<h5> Lookup info for ' + json["prefix"] + '</h5>' +
+    '<table class="lookup-table">' +
+    '<tbody>'
+  categories = json["current_categories"]
+  $.each categories, (key, value) ->
+    category = this
+    active =  $(this).attr("is_active")
+    if active == 1
+      confidence = this.confidence
+      mnemonic = this.mnemonic
+      name = this.name
+      cat_id = this.category_id
+      top_certainty = this.certainty[0].source_certainty
+      certainties = this.certainty
+      category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
+      lookup_dialog_content = lookup_dialog_content + category_row
+      lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
+        '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
+        '<tbody>'
+      $(certainties).each ->
+        source_confidence = this.source_confidence
+        source_certainty = this.source_certainty
+        source_category = this.source_category
+        source_name = this.source
+        lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
+      lookup_dialog_content += '</tbody></table></tr>'
+  lookup_dialog_content += '</tbody></table>'
+
+
 window.lookup_dialog  = (id) ->
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/lookup'
@@ -853,34 +884,7 @@ window.lookup_dialog  = (id) ->
         std_msg_error("<p>Something went wrong: #{json.error}","")
       else
         #parse this json properly
-        lookup_dialog_content = '<div class="dialog-content-wrapper">' +
-          '<h5> Lookup info for ' + json["prefix"] + '</h5>' +
-          '<table class="lookup-table">' +
-          '<tbody>'
-        categories = json["current_categories"]
-        $.each categories, (key, value) ->
-          category = this
-          active =  $(this).attr("is_active")
-          if active == 1
-            confidence = this.confidence
-            mnemonic = this.mnemonic
-            name = this.name
-            cat_id = this.category_id
-            top_certainty = this.certainty[0].source_certainty
-            certainties = this.certainty
-            category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
-            lookup_dialog_content = lookup_dialog_content + category_row
-            lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
-            '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
-              '<tbody>'
-            $(certainties).each ->
-              source_confidence = this.source_confidence
-              source_certainty = this.source_certainty
-              source_category = this.source_category
-              source_name = this.source
-              lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
-            lookup_dialog_content += '</tbody></table></tr>'
-        lookup_dialog_content += '</tbody></table>'
+        lookup_dialog_content = parse_lookup_dialog_content(json)
         if $("#lookup_dialog").length
           lookup_dialog = this
           $("#lookup_dialog").html(lookup_dialog_content)
