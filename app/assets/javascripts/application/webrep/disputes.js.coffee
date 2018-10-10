@@ -1612,6 +1612,9 @@ $ ->
   $('#submit-advanced-search').click ->
     $('#advanced-search-dropdown').toggle()
 
+  $(document).click ->
+    $("#advanced-search-dropdown").hide()
+
   $(document).ready ->
 
     setInterval ->
