@@ -47,11 +47,6 @@ window.fetch_cluster_data = (id) ->
 
 
 
-
-
-
-
-
 $ ->
   $(document).ready ->
 
