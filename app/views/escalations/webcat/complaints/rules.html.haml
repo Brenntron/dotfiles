@@ -1,18 +1,55 @@
 .content-wrapper
   - content_for(:webcat_page) do
-    Rules Management
+    Cluster Management
   - content_for(:webcat_icon) do
     icon-categories
-  .complaint-mgt-top-area
-    = render "escalations/webcat/shared/telemetry"
+
+  .complaint-mgt-top-area.cluster-mgt-top-area
+    .row.cluster-title
+      .col-xs-3.dashboard-left-data
+        %h1= content_for :webcat_page
+        %span.top-info-icon{class: "#{content_for :webcat_icon}"}
+      .col-xs-9.search-stg
+        .row
+          .col-xs-8
+            .row
+              .col-xs-9
+                %input.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
+              .col-xs-3.no_pad
+                %button.primary{class:'apply-filter-btn icon-filter-white'}Apply Filter
+          .col-xs-4
+            .row.search-options-row.btn-layout
+              .col-xs-6
+                .radio
+                  %label
+                    %input{name: 'choice', type: 'radio', value: 'value'}
+                    Include Pattern
+              .col-xs-6
+                .radio
+                  %label
+                    %input{name: 'choice', type: 'radio', value: 'value'}
+                    Exclude Pattern
   .row
-    .col-xs-12.temp-spacer
-      %p Here we have categorized rules and uncategorized rules essentially the clusters page
-      %p Rulebuilder wont be on this page it will be on the complaints page.
+    .col-xs-6.temp-spacer
+      .row.default-padding
+        .result-label.vertical-separator
+          Current Cluster Entries:
+          %span 2,354
+        .result-label
+          Regex:
+          %span \d
+      .toolbar
+        .div
+          %label.toolbar-section-label View
+          %button{class: 'toolbar-button icon-opened-selected'}
+            %span.toolbar-button-text Open Selected
+          %button{class: 'toolbar-button icon-open-all'}
+            %span.toolbar-button-text Open All
+        %button.toolbar-button{class:'cat-btn icon-copycat'} CopyCat Tool
 
-      %p We also want to add Rule history here
-
-      %p we can also add verifying rules here too
-
-
-      %p cluster management is essentailly the show multple without complaints (the data will just be URLS)
+    .col-xs-6.temp-spacer
+      .card
+        .label.content-label-sm Comment
+        .card-body
+          %input.text_field
+          %button Submit Changes

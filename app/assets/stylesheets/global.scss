@@ -1745,6 +1745,9 @@ a.static-nav-item {
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
+.icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
+.icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -6319,4 +6322,169 @@ h2 {
   margin-top: 24px;
   margin-bottom: 6px;
   color: #333;
+}
+
+// Cluster top bar header Scss begin here.
+.complaint-mgt-top-area.cluster-mgt-top-area {
+  background-color: $content-tab-color;
+
+  .cluster-title {
+    margin: 0;
+
+    .dashboard-left-data {
+      padding: 0 0;
+      margin-top: 6px;
+
+      h1 {
+        margin: 0;
+      }
+    }
+
+    .search-stg {
+      height: 50px;
+      margin: 0 auto;
+
+      .row {
+        height: 100%;
+
+        .search-box {
+          background-image: none;
+          padding: 0 0 0 10px;
+        }
+
+        input {
+          margin-top: 10px;
+          height: 30px;
+        }
+
+        button {
+          padding-top: 5px;
+          padding-bottom: 5px;
+          margin-top: 10px;
+          height: 30px;
+          vertical-align: center;
+          border-radius: 2px;
+        }
+        .apply-filter-btn {
+          background-repeat: no-repeat;
+          background-size: 26px;
+          padding-left: 40px !important;
+          background-position: 8px center;
+        }
+
+        .search-options-row {
+          max-width: 300px;
+        }
+        .btn-layout {
+          margin: 0;
+
+          .col-xs-6 {
+            .radio {
+              margin: 0;
+              label {
+                line-height: 4.6;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//Toolbar Layout UI ticket 194
+.temp-spacer {
+  padding: 20px 15px;
+
+  .default-padding {
+    padding: 0 0 15px 0;
+  }
+  .result-label.vertical-separator {
+    border-right: 1px solid #dddddd;
+  }
+  .result-label {
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: 0;
+    display: inline-block;
+    padding: 0 15px;
+
+    span {
+      color: $primary-section-color;
+      text-transform: none;
+      padding-left: 10px;
+    }
+  }
+  .content-label-sm {
+    width: 100%;
+    display: block;
+    text-align: left;
+  }
+
+  .toolbar {
+    height: 27px;
+
+    .div {
+
+      .toolbar-button {
+        padding-left: 20px;
+      }
+    }
+
+    .toolbar-button {
+      padding-left: 25px;
+    }
+
+    .cat-btn {
+      margin: 4px 0 0 5px;
+      background-color: $content-tab-color;
+      color: white;
+    }
+
+
+    .cat-btn:focus,
+    .cat-btn:active,
+    .cat-btn.active {
+      background-color: $primary-section-color;
+    }
+    .cat-btn:hover {
+      background-color: $sidebar-nav-base;
+    }
+
+  }
+
+  // Cluster mgmt UI - Comment box / Category Submission
+  .card {
+    width: 100%;
+    padding: 5px 20px 20px 20px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+
+    .card-body {
+      display: inline-flex;
+      width: 100%;
+      margin: 5px 0 0 0;
+
+      input {
+        width: 80%;
+        border: 1px solid #eee;
+      }
+
+      button {
+        width: 20%;
+        background-color: $primary-section-color;
+        font-size: 8px;
+        background-image: url(image_path('icon_submit_arrow.svg'));
+        background-repeat: no-repeat;
+        background-size: 15px;
+        background-position-x: 10px;
+        background-position-y: center;
+        margin: 0 0 0 10px;
+        padding: 10px 5px 10px 30px;
+        color: white;
+        border: none;
+        border-radius: 2px;
+      }
+    }
+  }
 }
