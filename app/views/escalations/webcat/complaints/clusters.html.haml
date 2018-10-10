@@ -58,43 +58,48 @@
 
   .row
     .col-xs-12
-      %table.table.responsive#rules-index
+      %table.table.responsive#clusters-index
         %thead
           %tr
             %th
-              %input#disputes_check_box{type: 'checkbox', class: 'right-space'} Cluster Entry
-            %th Volume
+              -#  Expandable button area
+              %input#disputes_check_box{type: 'checkbox', class: 'right-space'}
+            %th Cluster Domain
+            %th APAC Vol
+            %th EMRG Vol
+            %th EURP Vol
+            %th JAPN Vol
+            %th NA Vol
+            %th Global Volume
             %th Age
-            %th Score
-            %th ID Number
-            %th Domain
-            %th Hostname(s)
-            %th Rules
+            %th WBRS Score
+            -#%th Hostname(s)
+            -#%th Rules
             %th Categories
 
-        %tbody
-          - (1..50).each do |index|
-            - [{ip: "13.68.93.108", volume: 84883009, since: '45 MIN', average: 3.5, comment: 'N / A'}].each do |item|
-              %tr
-                %th{:scope => "row", class: 'other-stg'}
-                  #{item[:ip]}
-                  %ul
-                    %li
-                      %button.data-btn.right-separator
-                    %li
-                      %button.data-btn.left-separator
-
-                %td #{item[:volume]}
-                %td #{item[:since]}
-                %td #{item[:average]}
-                %td #{item[:comment]}
-                %td
-                  %button.help-btn
-                  #{item[:comment]}
-                  - if index % 4 == 0
-                    %button.google-btn.right-space
-                %td #{item[:comment]}
-                %td #{item[:comment]}
-                %td
-                  %input.category-search
-                  %button.category-btn
+        -#%tbody
+        -#  - (1..50).each do |index|
+        -#    - [{ip: "13.68.93.108", volume: 84883009, since: '45 MIN', average: 3.5, comment: 'N / A'}].each do |item|
+        -#      %tr
+        -#        %th{:scope => "row", class: 'other-stg'}
+        -#          #{item[:ip]}
+        -#          %ul
+        -#            %li
+        -#              %button.data-btn.right-separator
+        -#            %li
+        -#              %button.data-btn.left-separator
+        -#
+        -#        %td #{item[:volume]}
+        -#        %td #{item[:since]}
+        -#        %td #{item[:average]}
+        -#        %td #{item[:comment]}
+        -#        %td
+        -#          %button.help-btn
+        -#          #{item[:comment]}
+        -#          - if index % 4 == 0
+        -#            %button.google-btn.right-space
+        -#        %td #{item[:comment]}
+        -#        %td #{item[:comment]}
+        -#        %td
+        -#          %input.category-search
+        -#          %button.category-btn
