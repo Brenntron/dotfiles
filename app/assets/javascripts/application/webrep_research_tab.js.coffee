@@ -35,6 +35,15 @@ $ ->
       alert ('Select at least one entry to edit.')
 
 
+  $('.dispute_check_box').on 'click', (e) ->
+    if $(this).not(":checked") && $('.cancel-changes').is(":visible")
+      if confirm "Cancel editing?"
+        $('.cancel-changes').click()
+      else
+        e.preventDefault()
+
+
+
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')

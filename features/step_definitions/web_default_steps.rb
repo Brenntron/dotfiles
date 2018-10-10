@@ -241,6 +241,10 @@ Then(/^I should see button with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
 
+Then(/^I should see table header with id "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//th[contains(@id, '#{element}')]")
+end
+
 Then(/^I should not see button with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
@@ -334,8 +338,23 @@ Then(/^I do some debugging$/) do
   binding.pry
 end
 
+And(/^I resize the browser to "(.*?)" X "(.*?)"$/) do |x,y|
+  Capybara.page.driver.browser.resize(x,y)
+end
+
 Then(/^open inspector$/) do
   page.driver.debug
+end
+
+Then(/^Expect date in element "(.*?)" to equal today's date$/) do |element|
+  within element do
+    t = Time.now
+    expect(page).to have_content(t.strftime("%Y-%m-%d"))
+  end
+end
+
+Then(/^I trigger-click "(.*?)"$/) do |target|
+  find(target).trigger('click')
 end
 
 Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
@@ -344,3 +363,10 @@ Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
   end
 end
 
+Then /I click "(.*?)" and switch to the new window/ do |target|
+  page.switch_to_window(page.window_opened_by{click_button(target)})
+end
+
+Then (/^I should receive a file of type "(.*?)"/) do |type|
+  result = page.response_headers['Content-Type'].should == type
+end

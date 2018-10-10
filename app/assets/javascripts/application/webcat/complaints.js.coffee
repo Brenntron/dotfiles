@@ -1,5 +1,47 @@
-window.removeSubdomain = (id,host) ->
-  id.value = host
+window.updateURI = (complaint_entry_id) ->
+  event.preventDefault()
+
+  $('#loader-modal').show()
+  $('.modal-backdrop').show()
+
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+  
+  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
+    data: {complaint_entry_id: complaint_entry_id, uri: uri }
+    success: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove()
+
+      $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
+
+      if 'ip' == response.status
+        std_msg_error("Cannot edit IP entries.","")
+      else
+        if response.preload
+          $.each response.data, (key, entry) ->
+            $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
+
+        $("#domain_#{complaint_entry_id}").text(response.domain)
+        $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
+        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}'>#{uri}</a>")
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+
+
+        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
+
+
+
+
+
+  )
 
 window.cat_new_url = ()->
   event.preventDefault()
@@ -22,7 +64,7 @@ window.cat_new_url = ()->
       std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
     error: (response) ->
       $('#loader-modal').hide()
-      $('.modal-backdrop').remove();
+      $('.modal-backdrop').remove()
       std_msg_error(response,"", reload: false)
   )
 
@@ -53,17 +95,20 @@ window.multiple_url_categorization = ()->
   )
 
 name_servers =(server_list)->
-  i = 0
-  text = ""
-  while i < server_list.length
-    text += server_list[i] + '<br>'
-    i++
-  text
+  if undefined == server_list
+    ''
+  else
+    i = 0
+    text = ""
+    while i < server_list.length
+      text += server_list[i] + '<br>'
+      i++
+    text
 
 format_domain_info = (info)->
   '<div class="dialog-content-wrapper">' +
     '<h5>Domain Name</h5>' +
-    '<p>' + info.domain_name + '</p>' +
+    '<p>' + info['domain'] + '</p>' +
     '<hr class="thin">' +
     '<h5>Registrant </h5>' +
     '<table class="nested-dialog-table">' +
@@ -72,13 +117,13 @@ format_domain_info = (info)->
            'Organization' +
         '</td>' +
         '<td>' +
-          info.registrant_organization +
+          info['organisation'] +
       '</tr><tr>' +
         '<td class="table-side-header">' +
           'Country' +
         '</td>' +
         '<td>' +
-          info.registrant_country +
+          info['registrant_country'] +
         '</td>' +
       '</tr><tr>' +
         '<td class="table-side-header">' +
@@ -91,7 +136,7 @@ format_domain_info = (info)->
     '</table>' +
     '<hr class="thin">' +
     '<h5>Name Servers</h5>'+
-    name_servers(info.name_server) +
+    name_servers(info['nserver']) +
     '<hr class="thin">' +
     '<h5> Dates</h5>'+
     '<table class="nested-dialog-table">' +
@@ -99,20 +144,20 @@ format_domain_info = (info)->
         '<td class="table-side-header">' +
           'Created' +
         '</td>' +
-        '<td>' + info.creation_date + '</td>'+
+        '<td>' + info['created'] + '</td>'+
       '</tr><tr>' +
         '<td class="table-side-header">' +
           'Last updated' +
         '</td>' +
         '<td>' +
-          info.updated_date +
+          info['changed'] +
         '</td>' +
       '</tr><tr>' +
         '<td class="table-side-header">' +
           'Expiry_date' +
         '</td>' +
         '<td>' +
-          info.registry_expiry_date +
+          info['registry_expiry_date'] +
         '</td>' +
       '</tr>' +
     '</table>' +
@@ -126,12 +171,12 @@ window.domain_whois = (IP_Domain) ->
     headers: headers
     data: {'lookup': IP_Domain}
     success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+      info = $.parseJSON(response)
+      if info.error
+        notice_html = "<p>Something went wrong: #{info.error}</p>"
+        alert(info.error)
       else
-        dialog_content = $(format_domain_info(json))
+        dialog_content = $(format_domain_info(info))
         if $("#complaint_button_dialog").length
           complaint_dialog = this
 
@@ -439,7 +484,6 @@ window.retrieve_history = (position) ->
 
           history_dialog_content += entry_string
         history_dialog_content += '</tbody></table>'
-        history_dialog_content += '<hr class="thin"/>'
 
         if $("#history_dialog").length
           history_dialog = this
@@ -570,7 +614,7 @@ format = (complaint_entry_row) ->
     tooltip_table = ''
     tooltip_all = ''
     tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
-    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Category</th><th>Source</th></tr></thead><tbody>'
+    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead><tbody>'
     tooltip_table_end = '</tbody></table>'
     tooltip_table_guts = ''
     tooltip_wrapper_end = '</span></div>'
@@ -585,15 +629,16 @@ format = (complaint_entry_row) ->
         top_certainty = this.certainty[0].source_certainty
         certainties = this.certainty
         $(certainties).each ->
+          source_confidence = this.source_confidence
           source_certainty = this.source_certainty
           source_category = this.source_category
           source_name = this.source
-          certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_category + '</td><td>' + source_name + '</td></tr>'
+          certainty_row = '<tr><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
           tooltip_table_guts = tooltip_table_guts + certainty_row
 
         tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
         tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + '</td><td>' + name + '</td><td><span class="certainty-flag" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
+        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
         category_table = category_table + category_row
 
       return
@@ -625,12 +670,12 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data">' + url + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
       '<label class="content-label-sm">Site Search</label>' +
-      '<span class="nested-complaint-data">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div>' +
@@ -645,8 +690,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Categories to commit</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
@@ -677,19 +721,19 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data">' + uri + '</span>' +
-      '<label class="content-label-sm">Site Search</label>' +
-      '<span class="nested-complaint-data">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
+      '<label class="content-label-sm" id="site-search">Site Search</label>' +
+      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table"><thead><tr><th>Conf</th><th colspan="2">Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="\' + complaint_entry.entry_id + \'"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '<tbody>' + category_table +
       '</tbody></table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary">Lookup</button><br/>' +
-      '<button class="secondary" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
-      '<button class="secondary" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
+      '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
+      '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -698,8 +742,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="removeSubdomain(complaint_prefix_' + complaint_entry.entry_id +
-      ',\'' + complaint_entry.domain + '\')"' + entry_status + '>Remove Subdomain</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
@@ -750,18 +793,22 @@ window.history_dialog = (id) ->
 
           history_dialog_content += entry_string
         history_dialog_content += '</tbody></table>'
-        history_dialog_content += '<hr class="thin"/>'
         history_dialog_content += '<h5>Complaint Entry History</h5>'
         entry_string = ""
-        for key, entry of json.entry_history.complaint_history
 
-          entry_string = "" +
-          '<p>Time: ' + key + '</p>'
+        for entry in json.entry_history.complaint_history
+          entry_string = "" + '<p>Time: ' + entry[0] + '</p>'
+
+          i = 0
           for change_key, change_entry of entry
-            if change_key != "whodunnit"
-              entry_string += "<p>" + change_key + ": " + change_entry[0] + " - " + change_entry[1] + "</p>"
-            else
-              entry_string += "<p>User: " + change_entry + "</p>" +"</br>"
+            i = i + 1
+            if i > 1
+              for key, value of change_entry
+                if key != "whodunnit"
+                  entry_string += "<p>" + key + ": " + value[0] + " - " + value[1] + "</p>"
+                else
+                  entry_string += "<p>User: " + value + "</p>" +"</br>"
+
           history_dialog_content += entry_string
 
         if $("#history_dialog").length
@@ -795,6 +842,65 @@ window.history_dialog = (id) ->
   , this)
 
 
+parse_lookup_dialog_content = (json) ->
+  lookup_dialog_content = '<div class="dialog-content-wrapper">' +
+    '<h5> Lookup info for ' + json["prefix"] + '</h5>' +
+    '<table class="lookup-table">' +
+    '<tbody>'
+  categories = json["current_categories"]
+  $.each categories, (key, value) ->
+    category = this
+    active =  $(this).attr("is_active")
+    if active == 1
+      confidence = this.confidence
+      mnemonic = this.mnemonic
+      name = this.name
+      cat_id = this.category_id
+      top_certainty = this.certainty[0].source_certainty
+      certainties = this.certainty
+      category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
+      lookup_dialog_content = lookup_dialog_content + category_row
+      lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
+        '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
+        '<tbody>'
+      $(certainties).each ->
+        source_confidence = this.source_confidence
+        source_certainty = this.source_certainty
+        source_category = this.source_category
+        source_name = this.source
+        lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
+      lookup_dialog_content += '</tbody></table></tr>'
+  lookup_dialog_content += '</tbody></table>'
+
+
+window.lookup_dialog  = (id) ->
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaint_entries/lookup'
+    method: 'POST'
+    data: {'id': id}
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        std_msg_error("<p>Something went wrong: #{json.error}","")
+      else
+        #parse this json properly
+        lookup_dialog_content = parse_lookup_dialog_content(json)
+        if $("#lookup_dialog").length
+          lookup_dialog = this
+          $("#lookup_dialog").html(lookup_dialog_content)
+          $('#lookup_dialog').dialog('open')
+        else
+          lookup_dialog = '<div id="lookup_dialog" title="Lookup Information"></div>'
+          $('body').append(lookup_dialog)
+          $("#lookup_dialog").html(lookup_dialog_content)
+          $('#lookup_dialog').dialog
+            autoOpen: false
+            minWidth: 400
+            position: { my: "center top", at: "center top", of: window }
+          $('#lookup_dialog').dialog('open')
+    error: (response) ->
+      std_msg_error("<p>Something went wrong: #{response.responseText}","")
+  , this)
 
 
 window.click_table_buttons = (complaint_table, button)->
@@ -1108,7 +1214,7 @@ window.load_screenshot = (img_tag, complaint_entry_id) ->
       this.img_tag.src = src
   )
 
-window.triggerTooltips = () ->
+window.triggerTooltips = (item) ->
   $('.nested-tooltipped').tooltipster
     theme: [
       'tooltipster-borderless'

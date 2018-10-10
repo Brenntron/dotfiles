@@ -67,6 +67,8 @@ class Dispute < ApplicationRecord
   scope :closed_disputes, -> { where(status: RESOLVED) }
   scope :in_progress_disputes, -> { where(status: [ STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_CUSTOMER_PENDING, STATUS_ON_HOLD, STATUS_REOPENED, STATUS_CUSTOMER_UPDATE ]) }
   scope :my_team, ->(user) { where(user_id: user.my_team) }
+  scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
+  scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
   def case_id_str
     '%010i' % id
@@ -752,7 +754,9 @@ class Dispute < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
 
-    dispute_fields = params.to_h.slice(*%w{status org_domain priority resolution submitter_type case_id case_owner_username})
+    dispute_fields =
+        params.to_h.slice(*%w{status org_domain priority resolution submission_type submitter_type
+                              case_id case_owner_username})
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
     if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
@@ -765,7 +769,13 @@ class Dispute < ApplicationRecord
     end
 
     dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
+    if dispute_fields['id'].present?
+      dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/)
+    end
+
     relation = where(dispute_fields)
+
+
 
 
     if params['submitted_newer'].present?
@@ -774,8 +784,13 @@ class Dispute < ApplicationRecord
     end
 
     if params['submitted_older'].present?
-      relation =
-          relation.where('case_opened_at < :submitted_older', submitted_older: params['submitted_older']+1)
+      if params['submitted_older'].kind_of?(Date)
+        relation =
+          relation.where('case_opened_at < :submitted_older', submitted_older: (params['submitted_older'])+1)
+      elsif params['submitted_older'].kind_of?(String)
+        relation =
+          relation.where('case_opened_at < :submitted_older', submitted_older: Date.parse(params['submitted_older'])+1)
+      end
     end
 
     if params['age_newer'].present?
@@ -803,8 +818,13 @@ class Dispute < ApplicationRecord
     end
 
     if params['modified_older'].present?
-      relation =
+      if params['modified_older'].kind_of?(Date)
+        relation =
           relation.where('updated_at < :modified_older', modified_older: params['modified_older']+1)
+      elsif params['modified_older'].kind_of?(String)
+        relation =
+          relation.where('updated_at < :modified_older', modified_older: Date.parse(params['modified_older'])+1)
+      end
     end
 
 
@@ -881,6 +901,10 @@ class Dispute < ApplicationRecord
         'My Team\'s Tickets'
       when 'open'
         'Open Tickets'
+      when 'open_email'
+        'Open Email Tickets'
+      when 'open_web'
+        'Open Web Tickets'
       when 'closed'
         'Closed Tickets'
       when 'all'
@@ -899,13 +923,17 @@ class Dispute < ApplicationRecord
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where(status: [STATUS_ASSIGNED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_REOPENED], user_id: user.id)
+        where.not(status: STATUS_RESOLVED).where(user_id: user.id)
       when 'my_disputes'
         where(user_id: user.id)
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED])
+    when 'open_email'
+      sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED])
+    when 'open_web'
+      wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED])
       when 'closed'
         where(status: [CLOSED, STATUS_RESOLVED])
     when 'all'
@@ -978,6 +1006,14 @@ class Dispute < ApplicationRecord
       message.post_entries(dispute.dispute_entries)
 
     end
+  end
+
+  def self.create_note(current_user = nil, comment, dispute_entry_id)
+    dispute_entry = DisputeEntry.find(dispute_entry_id)
+    dispute_id = dispute_entry.dispute_id
+
+    formatted_comment = dispute_entry.hostlookup + ' : ' + dispute_entry.status + ' : ' + Time.now.strftime("%m/%d/%Y %H:%M").to_s + ' : '+ comment
+    DisputeComment.create(:user_id => current_user.id, :comment => formatted_comment, :dispute_id => dispute_id)
   end
 
   # Searches in a variety of ways.
