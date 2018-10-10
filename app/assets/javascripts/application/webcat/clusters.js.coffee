@@ -46,5 +46,18 @@ window.fetch_cluster_data = (id) ->
   )
 
 
+
+
+
+
+
+
 $ ->
   $(document).ready ->
+
+
+
+
+window.copycat_dialog = () ->
+  $('#copycat_dialog').dialog()
+  return
