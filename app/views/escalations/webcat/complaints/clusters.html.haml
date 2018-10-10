@@ -56,17 +56,15 @@
           %button Submit Changes
 
     #copycat_dialog{title: 'CopyCat Tool'}
-      Here is content.
-  -#.ui-dialog-titlebar.ui-helper-clearfix.cat-dialog-header
-  -#  %label
-  -#  %span#ui-id-1.ui-dialog-title CopyCat Tool
-  -#  %button.ui-dialog-titlebar-close-simple{:type => "button", 'onclick': "$('button.cat-btn').trigger('click');"}
-  -##copycat_dialog
-  -#  .dialog-content-wrapper
-  -#    %input.text-field{placeholder: 'Add Categories'}
-  -#  .cat-dialog-btn-align
-  -#    %button.cat-paste-btn Paste Categories
-  -#    %button.cat-clear-btn Clear Categories
+      .dialog-content-wrapper
+        %input.text-field{placeholder: 'Add Categories'}
+        .cat-dialog-btn-align
+          %button.cat-paste-btn Paste Categories
+          %button.cat-clear-btn Clear Categories
+
+
+
+
 
 
 -#:javascript

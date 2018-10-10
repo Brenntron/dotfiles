@@ -59,5 +59,7 @@ $ ->
 
 
 window.copycat_dialog = () ->
-  $('#copycat_dialog').dialog()
+  $('#copycat_dialog').dialog({
+    dialogClass: "copycat_tool_dialog"
+  })
   return

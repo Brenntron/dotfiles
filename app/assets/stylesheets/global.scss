@@ -6504,28 +6504,18 @@ h2 {
   }
 }
 
-.ui-cat-tool {
-  position: absolute;
-  height: auto;
-  width: 20%;
-  padding: 0 0 20px 0;
-  left: 30%;
-  top: 30%;
-  display: none;
 
-  .cat-dialog-header {
-    background-color: $content-tab-color;
 
-    label {
-      background-image: url(image_path('icon_copycat.svg'));
-      background-repeat: no-repeat;
-      padding: inherit;
-      border: none;
-      float: left;
-    }
-  }
+.copycat_tool_dialog .ui-dialog-titlebar {
+  background-color: $content-tab-color;
+  background-image: url(image_path('icon_copycat.svg'));
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-size: 24px 24px;
+  padding-left: 40px;
+  border: none;
+}
 
-  //.cat-dialog-body {
 
   .dialog-content-wrapper {
 
@@ -6571,4 +6561,3 @@ h2 {
       border: none;
     }
   }
-}
