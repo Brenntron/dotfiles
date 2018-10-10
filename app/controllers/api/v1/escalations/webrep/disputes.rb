@@ -572,6 +572,19 @@ module API
 
             end
 
+            desc 'Autopopulate fields on Advanced Search'
+            get 'autopopulate_advanced_search' do
+              case_owners = User.where.not(cvs_username: nil).order(cvs_username: :asc)
+              statuses = ['Researching','Escalated','Customer Pending','On Hold','Resolved / Closed', 'Re-Opened']
+              submitter_types = ['Customer', 'Non-Customer']
+              contacts = Customer.all.order(name: :asc)
+              companies = Company.all.order(name: :asc)
+              resolutions = ['Fixed - FP', 'Fixed - FN', 'Unchanged', 'Invalid / Junk Email', 'Test / Training', 'Other']
+
+
+              render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
+                            contacts: contacts, companies: companies, resolutions: resolutions }
+            end
 
           end
         end
