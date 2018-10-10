@@ -159,6 +159,9 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#sync-data-button
           %span.toolbar-button-text Refresh Data
+        %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
+          %button.toolbar-button.export-button
+            %span.toolbar-button-text Export
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
@@ -214,19 +217,19 @@
                       .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
                         %ul
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RESEARCHING'}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RESEARCHING_#{entry.id}", id: "RESEARCHING", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ESCALATED'}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ESCALATED_#{entry.id}", id: "ESCALATED", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} Escalated
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'CUSTOMER_PENDING'}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "CUSTOMER_PENDING_#{entry.id}", id: "CUSTOMER_PENDING", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}"} Customer Pending
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'ON_HOLD'}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ON_HOLD_#{entry.id}", id: "ON_HOLD", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} On Hold
                           %li.status-radio-wrapper
-                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'RESOLVED_CLOSED'}
+                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", id: "RESOLVED_CLOSED", onclick: 'populate_resolved_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}"} Resolved / Closed
                             .dropdown-menu.ticket-resolution-submenu
                               .col-xs-6.submenu-left-wrapper
@@ -258,7 +261,7 @@
                                   %textarea{name: 'resolution-comment'}
 
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', id: 'RE-OPENED'}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RE-OPENED_#{entry.id}", id: "RE-OPENED", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_REOPENED}"} Re-Opened
                   %td
                     - if entry.resolution.nil?
@@ -422,7 +425,7 @@
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
-                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.size
+                          = entry.dispute_rule_hits.wbrs_rule_hits.count
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
@@ -441,7 +444,7 @@
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %label XBRS History
                         %td.text-center
-                          - unless entry.hostlookup.nil?
+                          - if entry.hostlookup
                             = entry.find_xbrs[1]['data'].count
                         %td.input-col
                           %span.research-table-input-wrapper.virus-total-input-wrapper
@@ -451,7 +454,7 @@
                           - if entry.virustotals.count == 0
                             %span.missing-data N/A
                           - else
-                            = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+                            = entry.virustotals_negatives_count
                             \\
                             = entry.virustotals.count
 
@@ -511,6 +514,7 @@
                               = sbrs_hit.name
                               - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
                                 = ","
+                          -#= entry.dispute_rule_hits.sbrs_rule_hits.map {|rule_hit| rule_trigger(rule_hit)}.join(', ').html_safe
                         %td.input-col
                           %span.research-table-input-wrapper.crosslisted-input-wrapper
                             %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -530,7 +534,7 @@
                             %span.inline-col-breakup.entry-reptool-status
                               = entry.blacklist.status
                             %span.inline-col-breakup.entry-reptool-comment
-                              = entry.blacklist.metadata['VRT']['comment']
+                              = entry.blacklist.metadata&.fetch('VRT', {})['comment']
                         %td.left-bordered
                           %label Umbrella
                         %td.text-center
@@ -538,7 +542,7 @@
 
                         %td.left-bordered
                           %label Last Submitted
-                        %td
+                        %td#last-submitted
                           = entry.last_submitted
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                   %td.expanded-row{colspan: '8'}
@@ -733,7 +737,7 @@
                                     %td= entry.classifications.first
                                     %td= entry.blacklist.status
                                     %td= entry.blacklist.expiration
-                                    %td= entry.blacklist.metadata['VRT']['comment']
+                                    %td= entry.blacklist.metadata&.fetch('VRT', {})['comment']
                                     %td= entry.blacklist.primary_source
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen

@@ -1738,6 +1738,8 @@ a.static-nav-item {
 .icon-team-bugs    {background-image: url(image_path('icon_teambugs.svg'));}
 .icon-pending-bugs {background-image: url(image_path('icon_pendingbugs.svg'));}
 .icon-open-bugs    {background-image: url(image_path('icon_openbugs.svg'));}
+.icon-email-tix {background-image: url(image_path('icon_open_email_tix.svg'));}
+.icon-web-tix {background-image: url(image_path('icon_open_web_tix.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
 .icon-all-bugs     {background-image: url(image_path('bugs_icon.svg'));}
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
@@ -1835,7 +1837,7 @@ a.static-nav-item {
   margin-top: -10px;
   border-top-right-radius: 4px;
   border-bottom-left-radius: 0;
-  min-height: 305px;
+  min-height: 388px;
   padding-top: 10px;
 }
 
@@ -1852,11 +1854,11 @@ a.static-nav-item {
 }
 
 #filter-bugs-list li, #filter-cases-list li {
-  width: 170px;
+  width: 200px;
 }
 
 #filter-dropdown {
-  min-width: 420px;
+  min-width: 450px;
 }
 
 .nav-tool-content-wrapper .form-control {
@@ -3347,6 +3349,17 @@ fieldset.top-content {
   margin-top: 14px;
 }
 
+.table-toolbar .col-xs-5 {
+  padding-right: 0 !important;
+}
+
+.table-toolbar select {
+  border-radius: 0 !important;;
+  border-color: $nav-toolbar-color;
+  background-color: $content-bg-color;
+  font-weight: 400 !important;
+}
+
 .communication-subject {
   color: $type-lighter-color;
   line-height: 1.3em;
@@ -3924,7 +3937,11 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-
+#advanced-search-dropdown .form-group input[type='checkbox'] {
+  border: none;
+  outline: none;
+  width: auto;
+}
 
 #search-criteria-options {
   color: $type-base-color;
@@ -3989,6 +4006,10 @@ button.tertiary {
   float: right;
   margin-top: 3px;
   margin-right: -26px;
+}
+
+.remove-input.remove-radio-input {
+  margin-top: -28px;
 }
 
 #login-div a:hover {
@@ -6266,6 +6287,30 @@ table#duplicates a {
 
 .bfrp-table .dispute_rep_tools {
   min-width: 38px;
+}
+
+.ticket-radio-button-wrapper {
+  display: inline-block;
+}
+
+.ticket-radio-button-wrapper input, .ticket-radio-button-wrapper label {
+  display: inline-block;
+}
+
+.ticket-radio-button-wrapper input {
+  margin-right: 6px;
+  height: 20px;
+  float: left;
+  margin-top: 2px;
+}
+
+.ticket-radio-button-wrapper label {
+  margin-right: 15px;
+}
+
+#dispute_research_export_form {
+  display: inline-block;
+  height: 26px;
 }
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */

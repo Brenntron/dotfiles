@@ -2,6 +2,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
   skip_before_action :require_login
 
   def get_messages
+    Rails.logger.info("GET get_messages")
     #if peake bridge ever asks for info from AC this is where you would return a response
     return_message = {
 
@@ -16,8 +17,10 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
 
     case envelope_params["sender"]
       when "snort-org"
+        Rails.logger.info("POST snort-org message, on channel #{envelope_params[:channel].inspect}")
         fp_create(false_positive_params)
       when "talos-intelligence"
+        Rails.logger.info("POST talos-intelligence message, on channel #{envelope_params[:channel].inspect}")
         obj_type_key = message_params.keys.first
         obj_type = obj_type_key.to_s.camelize
         message_params[obj_type_key][:bugzilla_session] = bugzilla_session

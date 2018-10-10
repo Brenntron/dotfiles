@@ -15,10 +15,7 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   def update
   end
 
-  def rules
-  end
-
-  def reports
+  def clusters
   end
 
   def show_multiple

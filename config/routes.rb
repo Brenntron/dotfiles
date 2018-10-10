@@ -39,13 +39,15 @@ Rails.application.routes.draw do
       resources :customers, only: :index
 
       get 'show_multiple', to: 'complaints#show_multiple'
-      get 'rules', to: 'complaints#rules'
+      get 'clusters', to: 'complaints#clusters'
 
       resources :reports, only: [:index] do
         collection do
-          get :index, to: 'complaints#reports'
+          get :index
           get :resolution
           get :export_resolution
+          get :complaint_entry
+          get :export_complaint_entry
         end
       end
     end
@@ -64,6 +66,9 @@ Rails.application.routes.draw do
           get :export_per_customer_report
           get :resolution_age_report
           get :export_resolution_age_report
+        end
+        member do
+          get :export
         end
       end
       resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.

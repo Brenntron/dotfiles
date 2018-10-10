@@ -1,0 +1,33 @@
+%h1 Webcat Complaint Entry Report
+
+#export-webcat-complaint-entry-div
+  %form#export-webcat-complaint-entry-form{action: export_complaint_entry_escalations_webcat_reports_path(format: :csv), method: 'get'}
+    %input{type: 'hidden', name: 'report[date_from]', value: @ce_rpt_params['date_from']}
+    %input{type: 'hidden', name: 'report[date_to]', value: @ce_rpt_params['date_to']}
+    %input{type: 'hidden', name: 'report[customer_name]', value: @ce_rpt_params['customer_name']}
+    %button Export
+
+.report-div
+  #webcat-complaint-entry-report-div
+    %table#webcat-complaint-entry-report-table
+      %caption Complaint Entries
+      %thead
+        %tr
+          %th Customer Name
+          %th URL
+          %th Engineer
+          %th Resolution
+          %th Final Category
+          %th Suggested Category
+          %th Created
+      %tbody
+        - @report.each_entry do |entry|
+          %tr
+            %td= entry.customer_name
+            %td= entry.uri
+            %td= entry.user_display_name
+            %td= entry.resolution
+            %td= entry.category
+            %td= entry.suggested_disposition
+            %td= entry.created_at
+

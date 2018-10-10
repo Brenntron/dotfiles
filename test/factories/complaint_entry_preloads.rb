@@ -1,0 +1,7 @@
+FactoryBot.define do
+  factory :complaint_entry_preload do
+    complaint_entry_id { 1 }
+    current_category_information {"{\"3\":{\"is_active\":1,\"mnemonic\":\"comp\",\"category_id\":3,\"prefix_id\":49,\"certainty\":[{\"source\":\"iwf\",\"source_category\":\"busi - Business and Industry\",\"source_certainty\":\"1000\"},{\"source\":\"other_multi_eka\",\"source_category\":\"ngo - Non-government Organization\",\"source_certainty\":\"1000\"}]},\"6\":{\"is_active\":1,\"mnemonic\":\"adlt\",\"category_id\":6,\"prefix_id\":49,\"certainty\":[{\"source\":\"iwf\",\"source_category\":\"busi - Business and Industry\",\"source_certainty\":\"1000\"},{\"source\":\"other_multi_eka\",\"source_category\":\"ngo - Non-government Organization\",\"source_certainty\":\"1000\"}]}}"}
+    historic_category_information {"[{\"action\":\"insert\",\"confidence\":1,\"description\":\"\",\"event_id\":5603938,\"prefix_id\":3669989,\"time\":\"Wed, 26 Sep 2018 20:17:25 GMT\",\"user\":\"ancheng3@cisco.com\",\"category\":{\"category_id\":77,\"desc_long\":\"Alcohol as a pleasurable activity, beer and wine making, cocktail recipes, liquor sellers, wineries, vineyards, breweries, alcohol distributors. Alcohol addiction is classified as Health and Nutrition. Bars and restaurants are classified as Dining and Drinking.\",\"descr\":\"Alcohol\",\"mnem\":\"alc\",\"is_active\":1}}]"}
+  end
+end
