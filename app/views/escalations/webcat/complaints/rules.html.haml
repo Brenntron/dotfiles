@@ -45,7 +45,8 @@
             %span.toolbar-button-text Open Selected
           %button{class: 'toolbar-button icon-open-all'}
             %span.toolbar-button-text Open All
-        %button.toolbar-button{class:'cat-btn icon-copycat'} CopyCat Tool
+        %button.toolbar-button.cat-btn.icon-copycat{'onclick': "$('#copycatId').toggle(); this.classList.toggle('active');"}
+          %span.toolbar-button-text CopyCat Tool
 
     .col-xs-6.temp-spacer
       .card
@@ -53,3 +54,65 @@
         .card-body
           %input.text_field
           %button Submit Changes
+
+#copycatId.ui-dialog.ui-cat-tool
+  .ui-dialog-titlebar.ui-helper-clearfix.cat-dialog-header
+    %label
+    %span#ui-id-1.ui-dialog-title CopyCat Tool
+    %button.ui-dialog-titlebar-close-simple{:type => "button", 'onclick': "$('button.cat-btn').trigger('click');"}
+  #copycat_dialog
+    .dialog-content-wrapper
+      %input.text-field{placeholder: 'Add Categories'}
+    .cat-dialog-btn-align
+      %button.cat-paste-btn Paste Categories
+      %button.cat-clear-btn Clear Categories
+
+
+:javascript
+  //Make the DIV element draggagle:
+  dragElement(document.getElementById("copycatId"));
+
+  function dragElement(elmnt) {
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    if (document.getElementById(elmnt.id + "ui-id-1")) {
+      /* if present, the header is where you move the DIV from:*/
+      document.getElementById(elmnt.id + "ui-id-1").onmousedown = dragMouseDown;
+    }
+    else {
+      /* otherwise, move the DIV from anywhere inside the DIV:*/
+      elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+      /* stop moving when mouse button is released:*/
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
+
+
+

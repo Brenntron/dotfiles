@@ -4031,6 +4031,18 @@ button.tertiary {
   margin-right: 3px;
 }
 
+.ui-dialog .ui-dialog-titlebar-close-simple {
+  background-color: transparent;
+  background-image: url(image_path('icon_delete_simple.svg'));
+  border: none;
+  margin-right: 3px;
+  position: absolute;
+  right: .3em;
+  width: 20px;
+  padding: 1px;
+  height: 20px;
+}
+
 #newEmailDialog .sender-receiver-info {
   margin-top: 0;
 }
@@ -6063,6 +6075,10 @@ table.dataTable tbody tr.selected {
   padding: 15px;
 }
 
+#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper {
+  padding: 15px;
+}
+
 .history-table {
   font-size: 8pt;
 }
@@ -6398,7 +6414,6 @@ h2 {
     }
 
 
-    .cat-btn:focus,
     .cat-btn:active,
     .cat-btn.active {
       background-color: $primary-section-color;
@@ -6440,6 +6455,75 @@ h2 {
         border: none;
         border-radius: 2px;
       }
+    }
+  }
+}
+
+.ui-cat-tool {
+  position: absolute;
+  height: auto;
+  width: 20%;
+  padding: 0 0 20px 0;
+  left: 30%;
+  top: 30%;
+  display: none;
+
+  .cat-dialog-header {
+    background-color: $content-tab-color;
+
+    label {
+      background-image: url(image_path('icon_copycat.svg'));
+      background-repeat: no-repeat;
+      padding: inherit;
+      border: none;
+      float: left;
+    }
+  }
+
+  //.cat-dialog-body {
+
+  .dialog-content-wrapper {
+
+    input {
+      width: 100%;
+      height: 30px;
+      padding: 0 10px;
+      border: 1px solid #e0e0e0;
+    }
+  }
+
+  .cat-dialog-btn-align {
+    display: flex;
+    justify-content: space-evenly;
+
+    .cat-paste-btn {
+      background-color: $primary-section-color;
+      background-image: url(image_path('icon_paste.svg'));
+      background-repeat: no-repeat;
+      background-size: 15px;
+      background-position-x: 10px;
+      background-position-y: center;
+      color: white;
+      font-size: 10px;
+      padding: 10px 10px 10px 40px;
+      margin: 0 0 0 15px;
+      border-radius: 2px;
+      border: none;
+    }
+
+    .cat-clear-btn {
+      background-color: $nav-toolbar-color;
+      background-image: url(image_path('icon_clear.svg'));
+      background-repeat: no-repeat;
+      background-size: 15px;
+      background-position-x: 10px;
+      background-position-y: center;
+      font-size: 10px;
+      color: white;
+      padding: 10px 10px 10px 40px;
+      margin: 0 15px 0 0;
+      border-radius: 2px;
+      border: none;
     }
   }
 }
