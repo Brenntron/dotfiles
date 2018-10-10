@@ -143,7 +143,6 @@ window.advanced_webrep_index_table = () ->
   }
   window.current_search_data = data
   window.populate_webrep_index_table(data)
-  $('#advanced-search-dropdown').toggle()
 
 window.standard_webrep_index_table = (search_name) ->
   data = {
@@ -1608,6 +1607,9 @@ window.populate_resolution_dropdown = (dispute_id) ->
 $ ->
 
   $('#advanced-search-button').click ->
+    $('#advanced-search-dropdown').show()
+
+  $('#submit-advanced-search').click ->
     $('#advanced-search-dropdown').toggle()
 
   $(document).ready ->
