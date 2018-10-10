@@ -11,65 +11,65 @@
           .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Entry Details
           %ul
             %li.toggle-vis{'data-column':'2'}
-              %input{type: 'checkbox', checked: true} Priority
+              %input{type: 'checkbox', checked: true, id: 'priority-checkbox'} Priority
             %li.toggle-vis{'data-column':'3'}
-              %input{type: 'checkbox', checked: true} Case ID
+              %input{type: 'checkbox', checked: true, id: 'case-id-checkbox'} Case ID
             %li.toggle-vis{'data-column':'4'}
-              %input{type: 'checkbox', checked: true} Status
+              %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
             %li.toggle-vis{'data-column':'5'}
-              %input{type: 'checkbox'} Resolution
+              %input{type: 'checkbox', id: 'resolution-checkbox'} Resolution
             %li.toggle-vis{'data-column':'6'}
-              %input{type: 'checkbox', checked: true} Ticket Type
+              %input{type: 'checkbox', checked: true, id: 'ticket-type-checkbox'} Ticket Type
             %li.toggle-vis{'data-column':'7'}
-              %input{type: 'checkbox', checked: true} Dispute
+              %input{type: 'checkbox', checked: true, id: 'dispute-checkbox'} Dispute
             %li.toggle-vis{'data-column':'8'}
-              %input{type: 'checkbox', checked: true} Owner
+              %input{type: 'checkbox', checked: true, id: 'owner-checkbox'} Owner
             %li.toggle-vis{'data-column':'9'}
-              %input{type: 'checkbox', checked: true} Time Submitted
+              %input{type: 'checkbox', checked: true, id: 'time-submitted-checkbox'} Time Submitted
 
           %ul
             %li.toggle-vis{'data-column':'10'}
-              %input{type: 'checkbox', checked: true} Age
+              %input{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
             %li.toggle-vis{'data-column':'11'}
-              %input{type: 'checkbox'} Case Origin
+              %input{type: 'checkbox', id: 'case-origin-checkbox'} Case Origin
             %li.toggle-vis{'data-column':'12'}
-              %input{type: 'checkbox'} Submitter Type
+              %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
             %li.toggle-vis{'data-column':'13'}
-              %input{type: 'checkbox'} Submitter Org
+              %input{type: 'checkbox', id: 'submitter-org-checkbox'} Submitter Org
             %li.toggle-vis{'data-column':'14'}
-              %input{type: 'checkbox'} Submitter Domain
+              %input{type: 'checkbox', id: 'submitter-domain-checkbox'} Submitter Domain
             %li.toggle-vis{'data-column':'15'}
-              %input{type: 'checkbox'} Contact Name
+              %input{type: 'checkbox', id: 'contact-name-checkbox'} Contact Name
             %li.toggle-vis{'data-column':'16'}
-              %input{type: 'checkbox'} Contact Email
+              %input{type: 'checkbox', id: 'contact-email-checkbox'} Contact Email
 
         .dropdown-menu-content-block
           .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
           %ul
             %li.toggle-vis-nested{'data-column': 'entry-col-content'}
-              %input{type: 'checkbox', checked: true} Dispute Entry
+              %input{type: 'checkbox', checked: true, id: 'dispute-entry-checkbox'} Dispute Entry
             %li.toggle-vis-nested{'data-column': 'entry-col-status'}
-              %input{type: 'checkbox', checked: true} Entry Status
+              %input{type: 'checkbox', checked: true, id: 'entry-status-checkbox'} Entry Status
             %li.toggle-vis-nested{'data-column': 'entry-col-res'}
-              %input{type: 'checkbox', checked: true} Entry Resolution
+              %input{type: 'checkbox', checked: true, id: 'entry-resolution-checkbox'} Entry Resolution
             %li.toggle-vis-nested{'data-column': 'entry-col-disp'}
-              %input{type: 'checkbox', checked: true} Suggested Disposition
+              %input{type: 'checkbox', checked: true, id: 'suggested-disposition-checkbox'} Suggested Disposition
             %li.toggle-vis-nested{'data-column': 'entry-col-cat'}
-              %input{type: 'checkbox', checked: true} Category
+              %input{type: 'checkbox', checked: true, id: 'category-checkbox'} Category
             %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-score'}
-              %input{type: 'checkbox', checked: true} WBRS Score
+              %input{type: 'checkbox', checked: true, id: 'wbrs-score-checkbox'} WBRS Score
             %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-hits'}
-              %input{type: 'checkbox', checked: true} WBRS Total Rule Hits
+              %input{type: 'checkbox', checked: true, id: 'wbrs-total-rule-hits-checkbox'} WBRS Total Rule Hits
             %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-rules'}
-              %input{type: 'checkbox'} WBRS Rules
+              %input{type: 'checkbox', id: 'wbrs-rules-checkbox'} WBRS Rules
 
           %ul
             %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-score'}
-              %input{type: 'checkbox', checked: true} SBRS Score
+              %input{type: 'checkbox', checked: true, id: 'sbrs-score-checkbox'} SBRS Score
             %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-hits'}
-              %input{type: 'checkbox', checked: true} SBRS Total Rule Hits
+              %input{type: 'checkbox', checked: true, id: 'sbrs-total-rule-hits-checkbox'} SBRS Total Rule Hits
             %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-rules'}
-              %input{type: 'checkbox'} SBRS Rules
+              %input{type: 'checkbox', id: 'sbrs-rules-checkbox'} SBRS Rules
 
     %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped{title: 'Expand All Rows'}
       %span.toolbar-button-text Expand All Rows
@@ -147,7 +147,7 @@
               %button.primary.change_ticket_status_button
                 Submit
 
-    - if current_user.has_role?('manager')
+
       %span.dropdown
         %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text

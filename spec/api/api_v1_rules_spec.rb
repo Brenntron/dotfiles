@@ -6,34 +6,6 @@ describe API::V1::Rules do
     @std_params = { headers: @std_headers }
   end
 
-  describe "GET gids/:gid/sids/:sid", type: :api do
-    it "gets a rule from database" do
-      rule = FactoryBot.create(:synched_rule)
-
-      get "/api/v1/rules/gids/#{rule.gid}/sids/#{rule.sid}", @std_params
-
-      expect(response).to be_success
-
-      data = JSON.parse(response.body)
-      rule_attrs = data["rule"]
-      expect(rule_attrs["sid"]).to eql(rule.sid)
-      expect(rule_attrs["gid"]).to eql(rule.gid)
-    end
-
-    it "gets a rule from repo" do
-      rule = FactoryBot.attributes_for(:synched_rule, gid: 1, sid: 19500)
-
-      get "/api/v1/rules/gids/#{rule[:gid]}/sids/#{rule[:sid]}", @std_params
-
-      expect(response).to be_success
-
-      data = JSON.parse(response.body)
-      rule_attrs = data["rule"]
-      expect(rule_attrs["sid"]).to eql(rule[:sid])
-      expect(rule_attrs["gid"]).to eql(rule[:gid])
-    end
-  end
-
   describe "PUT gids/:gid/sids/:sid", type: :api do
     before (:context) do
       analyst_role = Role.where(role: 'analyst').first || FactoryBot.create(:analyst_role)
