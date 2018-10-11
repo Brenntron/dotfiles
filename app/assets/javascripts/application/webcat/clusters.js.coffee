@@ -6,7 +6,6 @@ window.populate_clusters_index_table = (filter) ->
 
   #body.index-action may need to change depending on how it's all coded up
   if $('#clusters-index').length
-    alert 'Fuck?'
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
@@ -15,9 +14,9 @@ window.populate_clusters_index_table = (filter) ->
 #      data: data
 #      data_json: JSON.stringify(data)
       success: (response) ->
-        debugger
-        console.log response
+#        debugger
         json = $.parseJSON(response)
+        console.log json.data
 
         if json.data.length == 0
           std_msg_error("No clusters available.","")

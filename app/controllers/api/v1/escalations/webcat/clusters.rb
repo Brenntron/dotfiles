@@ -28,7 +28,6 @@ module API
 
                 clusters.each do |cluster|
                   cluster_packet = {}
-
                   cluster_packet[:cluster_id] = cluster[:cluster_id]
                   cluster_packet[:domain] = cluster[:domain]
                   cluster_packet[:global_volume] = cluster[:glob_volume]
