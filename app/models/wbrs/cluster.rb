@@ -152,7 +152,10 @@ class Wbrs::Cluster < Wbrs::Base
   # @param [Integer] cluster_id: The cluster(domain) to be categorized
   # @param [Array<Integer>] category_ids: List of up to 5 categories to apply to the cluster_id
   # @param [String] comment: comment to add to category rule
-  def self.process(conditions = {})
+  def self.process(conditions = {}, test =  nil)
+    if test.present?
+      return {}
+    end
     params = stringkey_params(conditions)
 
     response = post_request(path: '/v1/clusters/process', body: params)
