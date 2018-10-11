@@ -14,7 +14,7 @@ class Wbrs::Cluster < Wbrs::Base
     if test.present?
       return [
           {
-              "cluster_id": 3,
+              "cluster_id": 1337,
               "domain": "204.79.197.109",
               "ctime": "Fri, 21 Sep 2018 12:53:40 GMT",
               "mtime": "Fri, 21 Sep 2018 12:53:40 GMT",
@@ -25,7 +25,7 @@ class Wbrs::Cluster < Wbrs::Base
               "glob_volume": 7637758,
           },
           {
-              "cluster_id": 3,
+              "cluster_id": 7331,
               "domain": "google.com",
               "ctime": "Fri, 21 Sep 2018 12:53:40 GMT",
               "mtime": "Fri, 21 Sep 2018 12:53:40 GMT",
@@ -36,7 +36,7 @@ class Wbrs::Cluster < Wbrs::Base
               "glob_volume": 7637758,
           },
           {
-              "cluster_id": 3,
+              "cluster_id": 2345,
               "domain": "yahoo.com",
               "ctime": "Fri, 21 Sep 2018 12:53:40 GMT",
               "mtime": "Fri, 21 Sep 2018 12:53:40 GMT",
@@ -47,7 +47,7 @@ class Wbrs::Cluster < Wbrs::Base
               "glob_volume": 7637758,
           },
           {
-              "cluster_id": 3,
+              "cluster_id": 8187,
               "domain": "www.microsoft.com",
               "ctime": "Fri, 21 Sep 2018 12:53:40 GMT",
               "mtime": "Fri, 21 Sep 2018 12:53:40 GMT",
@@ -58,7 +58,7 @@ class Wbrs::Cluster < Wbrs::Base
               "glob_volume": 7637758,
           },
           {
-              "cluster_id": 3,
+              "cluster_id": 12313,
               "domain": "fuckthisshit.com",
               "ctime": "Fri, 21 Sep 2018 12:53:40 GMT",
               "mtime": "Fri, 21 Sep 2018 12:53:40 GMT",
@@ -69,7 +69,7 @@ class Wbrs::Cluster < Wbrs::Base
               "glob_volume": 7637758,
           },
           {
-              "cluster_id": 3,
+              "cluster_id": 242,
               "domain": "gtfo.com",
               "ctime": "Fri, 21 Sep 2018 12:53:40 GMT",
               "mtime": "Fri, 21 Sep 2018 12:53:40 GMT",
