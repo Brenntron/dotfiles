@@ -61,9 +61,10 @@
       %table.table.responsive#clusters-index
         %thead
           %tr
-            -#%th
-            -#  -#  Expandable button area
-            -#  %input#disputes_check_box{type: 'checkbox', class: 'right-space'}
+            %th
+              -#  Expandable button area
+            %th
+              %input#clusters_check_box{type: 'checkbox'}
             %th Cluster ID
             %th Cluster Domain
             -#%th APAC Vol
@@ -72,7 +73,9 @@
             -#%th JAPN Vol
             -#%th NA Vol
             %th Global Volume
-            -#%th Age
+            %th Ctime
+            %th Now
+            %th Age
             -#%th WBRS Score
             -#%th Hostname(s)
             -#%th Rules

@@ -54,19 +54,50 @@ window.fetch_cluster_data = (id) ->
 
 $ ->
   $(document).ready ->
+
+
     clusters_table = $('#clusters-index').DataTable(
-      columns: [
+      columnDefs: [
         {
-          data: 'cluster_id'
-          width: '50px'
+          targets: [
+            0
+            1
+          ]
+          orderable: false
+          searchable: false
         }
         {
-          data: 'global_volume'
-          width: '40px'
+          targets: [ 0 ]
+          className: 'expandable-row-column'
+        }
+      ]
+      columns: [
+        {
+          data: null
+          defaultContent: '<button class="expand-row-button-inline"></button>'
+        }
+        {
+          data: 'cluster_id'
+          render: (data) ->
+            '<input type="checkbox" name="cbox" class="cluster_check_box" id="cbox' + data + '" value="' + data + '" />'
+        }
+        {
+          data: 'cluster_id'
         }
         {
           data: 'domain'
-          width: '150px'
+        }
+        {
+          data: 'global_volume'
+        }
+        {
+          data: 'ctime'
+        }
+        {
+          data: 'now'
+        }
+        {
+          data: 'age'
         }
       ]
     )

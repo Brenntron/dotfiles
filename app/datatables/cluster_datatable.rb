@@ -11,6 +11,7 @@ class ClusterDatatable < AjaxDatatablesRails::Base
       # cluster_entries_count: {source: "Cluster.entry_count", cond: :eq, searchable: false, orderable: true},
       # customer_name: {source: "Complaint.customer_name", cond: :eq, searchable: true, orderable: true},
       global_volume: {source: "Cluster.global_volume", cond: :eq, searchable: true, orderable: true},
+      age:  {source: "Cluster.ctime", cond: :eq, searchable: true, orderable: true},
     }
   end
 
@@ -18,7 +19,7 @@ class ClusterDatatable < AjaxDatatablesRails::Base
     records.map do |record|
       {
           id:         record.cluster_id,
-          # age:        record.age,
+          age:        record.ctime,
           domain:     record.domain,
           # entry_count: record.entries.count,
           global_volume:     record.global_volume,
