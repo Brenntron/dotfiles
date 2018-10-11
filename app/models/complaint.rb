@@ -234,9 +234,8 @@ class Complaint < ApplicationRecord
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
         #TODO: this should be put in a params method
-        message_payload["payload"] = message_payload["payload"].permit!.to_h
-        new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
-        new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+        new_entries_ips = message_payload["payload"]["investigate_ips"]
+        new_entries_urls = message_payload["payload"]["investigate_urls"]
 
         return_payload = {}
 
@@ -246,11 +245,11 @@ class Complaint < ApplicationRecord
 
         summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-        full_description = %Q{
+        full_description = <<~HEREDOC
           IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
           URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
           Problem Summary: #{message_payload["payload"]["problem"]}
-        }
+        HEREDOC
 
         bug_attrs = {
             'product' => 'Escalations Console',
@@ -278,7 +277,7 @@ class Complaint < ApplicationRecord
 
         new_complaint.submitter_type = new_complaint.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-        new_complaint.save
+        new_complaint.save!
 
         response = is_possible_customer_duplicate?(new_complaint, new_entries_ips, new_entries_urls)
 
@@ -440,7 +439,6 @@ class Complaint < ApplicationRecord
         #}
       end
     rescue Exception => e
-      logger.debug("Failed.")
       Rails.logger.error "Complaint failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")

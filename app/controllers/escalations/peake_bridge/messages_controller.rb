@@ -18,14 +18,18 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
     case envelope_params["sender"]
       when "talos-intelligence"
         Rails.logger.info("POST talos-intelligence message, on channel #{envelope_params[:channel].inspect}")
-        obj_type_key = message_params.keys.first
+        obj_type_key, message_payload = message_params.to_h.first
         obj_type = obj_type_key.to_s.camelize
-        message_params[obj_type_key][:bugzilla_session] = bugzilla_session
-        message_params[obj_type_key][:current_user] = current_user
-        #return_message = obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
 
-        Thread.new { obj_type.constantize.process_bridge_payload(message_params[obj_type_key]) }
-        #obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
+        if message_payload.respond_to?(:permit!)
+          message_payload = message_payload.permit!.to_h
+        end
+        message_payload[:bugzilla_session] = bugzilla_session
+        message_payload[:current_user] = current_user
+        #return_message = obj_type.constantize.process_bridge_payload(message_payload)
+
+        Thread.new { obj_type.constantize.process_bridge_payload(message_payload) }
+        #obj_type.constantize.process_bridge_payload(message_payload)
 
         #return_message = {
         #    "envelope":
@@ -34,7 +38,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         #            "addressee": "talos-intelligence",
         #            "sender": "analyst-console"
         #        },
-        #    "message": {"source_key":message_params[obj_type_key]["source_key"],"ac_status":"CREATE_PENDING", "ticket_entries": "", "case_email": case_email}
+        #    "message": {"source_key":message_payload["source_key"],"ac_status":"CREATE_PENDING", "ticket_entries": "", "case_email": case_email}
         #}
 
         render json: {}, status: :ok
