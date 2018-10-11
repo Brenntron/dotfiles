@@ -11,11 +11,10 @@ window.populate_clusters_index_table = (filter) ->
     url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
     method: 'GET'
     headers: headers
-    data: data
-    data_json: JSON.stringify(data)
     success: (response) ->
 
       json = $.parseJSON(response)
+
 
       if json.data.length == 0
         std_msg_error("No clusters available.","")
@@ -27,7 +26,6 @@ window.populate_clusters_index_table = (filter) ->
 
         datatable = $('#clusters-index').DataTable()
         datatable.clear();
-
         datatable.rows.add(json.data);
         datatable.draw();
 
@@ -54,3 +52,20 @@ window.fetch_cluster_data = (id) ->
 
 $ ->
   $(document).ready ->
+    clusters_table = $('#clusters-index').DataTable(
+      columns: [
+        {
+          data: 'cluster_id'
+          width: '50px'
+        }
+        {
+          data: 'global_volume'
+          width: '40px'
+        }
+        {
+          data: 'domain'
+          width: '150px'
+        }
+      ]
+    )
+    window.populate_clusters_index_table()
