@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Peake-Bridge messages miscellanious channels", type: :request do
+RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
   let(:vrt_incoming) { FactoryBot.create(:vrt_incoming_user) }
   let(:guest_company) { FactoryBot.create(:guest_company) }
 
