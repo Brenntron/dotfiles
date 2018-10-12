@@ -91,6 +91,10 @@ $ ->
           data: 'global_volume'
         }
         {
+          data: null
+          defaultContent: 'N/A'
+        }
+        {
           data: 'ctime'
         }
         {
