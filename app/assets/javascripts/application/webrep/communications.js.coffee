@@ -365,7 +365,7 @@ $ ->
 
   window.check_email_attachment_size = (e) ->
     if e.files[0].size > 20971520
-      alert 'Max file size for attachments is 20MB'
+      std_msg_error("Max attachment size is 20MB", "")
       e.value = ''
     return
 
