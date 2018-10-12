@@ -1,19 +1,25 @@
 .content-wrapper
   .dashboard-header-area.my-dashboard-header-area
     .row
-      .col-xs-2.dashboard-left-data
-        %h1 My Dashboard
-        %span.my-dashboard-icon
-
       .col-xs-6
-        %h5= current_user.display_name
-        %p.dashboard-details
-          = current_user.cvs_username
+        .dashboard-wrapper
+          .dashboard-title
+            %h1 My Dashboard
+            %span.my-dashboard-icon
 
-      .col-xs-4
-        %label September 2 - 8, 2018
-        %button.toolbar-button.button-stg.icon-calendar Change Time Span
-        %button.arrow-left.down View Last Week's Tickets
+          .user-info
+            %h5= current_user.display_name
+            %p.dashboard-details
+              = current_user.cvs_username
+
+      .col-xs-6.text-right
+        .dashboard-time-wrapper
+          .dashboard-time
+            %label September 2 - 8, 2018
+            %button.toolbar-button.button-stg.icon-calendar Change Time Span
+          .dashboard-time-ticket
+            .button-wrapper
+              %button.arrow-left.left-align View Last Week's Tickets
 
 
 
