@@ -6368,7 +6368,7 @@ h2 {
       button {
         background-color: $content-tab-color;
         border: none;
-        font-size: 10px;
+        font-size: 12px;
         margin-left: 15px;
         padding: 5px 5px 5px 25px;
       }
@@ -6380,7 +6380,7 @@ h2 {
 
     .dashboard-time-ticket {
       .button-wrapper {
-        width: 355px;
+        width: 382px;
         text-align: left;
         float: right;
         background-color: $content-tab-color;
@@ -6407,116 +6407,4 @@ h2 {
       }
     }
   }
-}
-.dashboard-submenu {
-  height: 50px;
-  background-color: $base-color;
-  margin-right: -15px;
-  margin-left: -15px;
-  color: #fff;
-  padding: 0 10px;
-
-  label {
-    position: relative;
-    color: black;
-    top: 20px;
-    float: left;
-    margin-right: 10px;
-  }
-
-
-
-  ul {
-    margin: 0;
-    padding: 0;
-    height: inherit;
-    width: 100%;
-    display: block;
-    border-right: 2px solid white;
-
-    li {
-      height: inherit;
-      display: inline-block;
-      line-height: 50px;
-      cursor: pointer;
-      margin-right: 20px;
-
-      a {
-        display: block;
-        height: 100%;
-        padding: 0 0 0 20px;
-        font-size: 10px;
-        text-decoration: none;
-      }
-
-      .user-icon-stg {
-        background-repeat: no-repeat;
-        background-size: 15px;
-        background-position-y: 17px;
-        vertical-align: center;
-      }
-    }
-  }
-
-  .dashboard-submenu-area {
-    //border: 1px solid red;
-    width: 100%;
-    display: flex;
-
-    .dashboard-menu-list {
-      display: flex;
-      //border: 1px solid red;
-    }
-
-    .dashboard-submission-area {
-      display: flex;
-
-      .label-stg {
-        padding: 3px 15px 0 30px;
-        top: 0;
-        font-weight: bolder;
-        color: gray;
-        font-size: 20px;
-      }
-
-      label {
-        font-size: 20px;
-        color: gray;
-        top: 0;
-        padding-top: 15px;
-      }
-
-      .valid-label {
-        font-weight: bold;
-        padding-top: 3px;
-        padding-left: 30px;
-        text-transform: uppercase;
-      }
-
-      .invalid-label {
-        text-transform: uppercase;
-      }
-    }
-
-    .dashboard-export-report {
-      display: flex;
-      float: right;
-      border: 1px solid red;
-
-
-
-      button {
-        padding-left: 30px;
-        background-color: gray;
-        //float: right;
-      }
-    }
-  }
-}
-.vertical-separator {
-  padding-right: 20px;
-  border-right: 1px solid gray;
-  height: 50%;
-  top: 50%;
-  transform: translateY(50%);
 }
