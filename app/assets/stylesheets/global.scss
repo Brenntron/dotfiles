@@ -6455,13 +6455,6 @@ h2 {
         color: white;
         background-color: $primary-section-color;
       }
-
-      //.user-icon-stg {
-      //  background-repeat: no-repeat;
-      //  background-size: 15px;
-      //  background-position-y: 17px;
-      //  vertical-align: center;
-      //}
     }
   }
 
@@ -6473,14 +6466,12 @@ h2 {
   }
 
   .dashboard-submenu-area {
-    //border: 1px solid red;
     width: 100%;
     display: flex;
     position: relative;
 
     .dashboard-menu-list {
       display: flex;
-      //border: 1px solid red;
     }
 
     .dashboard-submission-area {
@@ -6496,7 +6487,6 @@ h2 {
       .invalid-stg {
         padding-left: 20px;
         background-position-y: 8px;
-        //vertical-align: center;
       }
 
       .right-vertical-separator {
