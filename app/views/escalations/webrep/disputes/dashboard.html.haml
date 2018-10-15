@@ -19,7 +19,7 @@
             %button.toolbar-button.icon-calendar Change Time Span
           .dashboard-time-ticket
             .button-wrapper
-              %button.arrow-left.left-align View Last Week's Tickets
+              %button.arrow-left View Last Week's Tickets
 
   .dashboard-submenu
     .dashboard-submenu-area
@@ -49,30 +49,28 @@
 
 
 
+  -#.col-xs-4
+  -#  %table.tickets-totals-table
+  -#    %tr
+  -#      %td.ticket-total= Dispute.assigned_disputes.where(user: current_user).count
+  -#      %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::ASSIGNED}).count
+  -#      %td
+  -#        %span.ticket-type-label Open
+  -#        Tickets / Total Entries per Ticket
+  -#    %tr
+  -#      %td.ticket-total= Dispute.in_progress_disputes.where(user: current_user).count
+  -#      %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: [ Dispute::STATUS_RESEARCHING, Dispute::STATUS_ESCALATED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_ON_HOLD, Dispute::STATUS_REOPENED ]}).count
+  -#      %td
+  -#        %span.ticket-type-label In Progress
+  -#        Tickets / Total Entries per Ticket
+  -#    %tr
+  -#      %td.ticket-total= Dispute.closed_disputes.where(user: current_user).count
+  -#      %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::RESOLVED}).count
+  -#      %td
+  -#        %span.ticket-type-label Closed
+  -#        Tickets / Total Entries per Ticket
 
-
-      -#.col-xs-4
-      -#  %table.tickets-totals-table
-      -#    %tr
-      -#      %td.ticket-total= Dispute.assigned_disputes.where(user: current_user).count
-      -#      %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::ASSIGNED}).count
-      -#      %td
-      -#        %span.ticket-type-label Open
-      -#        Tickets / Total Entries per Ticket
-      -#    %tr
-      -#      %td.ticket-total= Dispute.in_progress_disputes.where(user: current_user).count
-      -#      %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: [ Dispute::STATUS_RESEARCHING, Dispute::STATUS_ESCALATED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_ON_HOLD, Dispute::STATUS_REOPENED ]}).count
-      -#      %td
-      -#        %span.ticket-type-label In Progress
-      -#        Tickets / Total Entries per Ticket
-      -#    %tr
-      -#      %td.ticket-total= Dispute.closed_disputes.where(user: current_user).count
-      -#      %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::RESOLVED}).count
-      -#      %td
-      -#        %span.ticket-type-label Closed
-      -#        Tickets / Total Entries per Ticket
-
-      -#.col-xs-5
+  -#.col-xs-5
 
   -#
   -#.row

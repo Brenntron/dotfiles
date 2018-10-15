@@ -3,7 +3,11 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
 <style type="text/css">
+<<<<<<< HEAD
 	.st0{fill:#ffffff;}
+=======
+	.st0{fill:#FFFFFF;}
+>>>>>>> 5_dashboard_reporting_feature
 </style>
 <g>
 	<path class="st0" d="M16.9,2h-4.4C12.2,2,12,2.2,12,2.4v1.2c0,0.1,0.1,0.3,0.2,0.4c0.1,0.1,0.2,0.2,0.4,0.2h1.9l-8.2,8.2

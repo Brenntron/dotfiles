@@ -647,7 +647,6 @@ th.alt-col {
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
-
 .delete-search {
   display: inline-block;
   float: right;
@@ -1748,10 +1747,13 @@ a.static-nav-item {
 .icon-all-tickets-grey  {background-image: url(image_path('icon_ticket_grey.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
-.icon-calendar {background-image: url(image_path('icon_calendar.svg')); background-size: 25px;}
 .icon-team-grey {background-image: url(image_path('icon_team_grey.svg'));}
 .icon-custom-user-grey {background-image: url(image_path('icon_custom_user_grey.svg'));}
 .icon-invalid-grey {background-image: url(image_path('icon_invalid_grey.svg'));}
+.icon-calendar {background-image: url(image_path('icon_calendar.svg')); background-size: 30px;}
+.icon-user-white {background-image: url(image_path('icon_user_white.svg'));}
+.icon-customer-grey {background-image: url(image_path('icon_custom_user_grey.svg'));}
+.icon-all-tickets-grey {background-image: url(image_path('icon_ticket_grey.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -5328,6 +5330,7 @@ table.dispute_tool_current tr:last-of-type td {
 
 .my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
 .team-icon {  background-image: url(image_path('icon_team.svg'));}
+.team-icon-grey {background-image: url(image_path('icon_team_grey.svg'));}
 
 .tickets-totals-table td {
   border-bottom: none;
@@ -6366,19 +6369,19 @@ h2 {
       button {
         background-color: $content-tab-color;
         border: none;
-        font-size: 10px;
+        font-size: 12px;
         margin-left: 15px;
         padding: 5px 5px 5px 25px;
       }
 
       .toolbar-button {
-        padding-left: 30px;
+        padding-left: 35px;
       }
     }
 
     .dashboard-time-ticket {
       .button-wrapper {
-        width: 355px;
+        width: 382px;
         text-align: left;
         float: right;
         background-color: $content-tab-color;
