@@ -297,6 +297,5 @@ Feature: Webrep communications
     Given I upload "test.png" from_button "attachment"
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
-    And I wait for "15" seconds
-    Then take a screenshot
+    And I wait for "10" seconds
     And I should see "EMAIL SENT"
