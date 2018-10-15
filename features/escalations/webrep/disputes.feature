@@ -127,18 +127,20 @@ Feature: Disputes
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
   @javascript
-  Scenario: a user should see an auto-populate field for 'Customer Name' through advanced search
+  Scenario: a users uses advanced search with 'Contact Name' as a search criteria
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
     |id|
     |1 |
-    When I goto "escalations/webrep/tickets?f=open"
+    When I goto "escalations/webrep/tickets?f=all"
+    Then take a screenshot
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
     And I click "#add-search-criteria"
-    Then I fill in "contact-name" with "Bob Jones"
+    Then I fill in "caseid-input" with "1"
+
     Then I click "#submit-advanced-search"
     Then I wait for "3" seconds
-    Then take a screenshot
+#    Then take a screenshot
 

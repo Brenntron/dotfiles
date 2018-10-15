@@ -152,7 +152,7 @@ if [ "SKIP" != "$PRECOMPILE" ]; then
     umask 000 $RELTMP/cache/assets/sprockets/v3.0
     chmod 777 $RELTMP/cache/assets/sprockets/v3.0/*
     umask 000 $RELTMP/cache/assets/sprockets/v3.0/*
-    chmod 777 $RELTMP/cache/assets/sprockets/v3.0/*/*
+    #chmod 777 $RELTMP/cache/assets/sprockets/v3.0/*/*
 fi
 
 if [ "SKIP" != "$SVN_WORKING" ]; then
@@ -189,6 +189,9 @@ if [ "" != "$VERSION" ]; then
     echo "* tar output"
     echo VERSION=$VERSION
     echo $VERSION > public/version.html
+    if [ -d "public/escalations" ]; then
+        echo $VERSION > public/escalations/version.html
+    fi
     rm -rf tmp
     #mkdir tmp
     rm -rf log
