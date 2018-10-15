@@ -1755,6 +1755,7 @@ a.static-nav-item {
 .icon-customer-grey {background-image: url(image_path('icon_custom_user_grey.svg'));}
 .icon-all-tickets-grey {background-image: url(image_path('icon_ticket_grey.svg'));}
 
+
 .saved-search {
   text-transform: none !important;
   font-weight: 400;
@@ -5276,8 +5277,14 @@ table.dispute_tool_current tr:last-of-type td {
 }
 
 .dispute-W {background-image: url(image_path('icon_type_web.svg'));}
+.dispute-W-grey {background-image: url(image_path('icon_type_web_grey.svg'));}
+
 .dispute-E {background-image: url(image_path('icon_type_email.svg'));}
+.dispute-E-grey {background-image: url(image_path('icon_type_email_grey.svg'));}
+
 .dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
+.dispute-EW-grey {background-image: url(image_path('icon_type_email_web_grey.svg'));}
+
 
 .my-dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $bug-section-color;
@@ -6532,4 +6539,46 @@ h2 {
   height: 50%;
   top: 50%;
   transform: translateY(50%);
+}
+
+
+.btn-margin-left {
+  margin-left: 15px;
+}
+
+
+.toolbar-content-layout {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+
+  button {
+  }
+
+  .right-vertical-separator {
+    padding-right: 20px;
+    border-right: 1px solid gray;
+  }
+
+  label {
+    background-repeat: no-repeat;
+    padding-left: 25px;
+  }
+
+  .content-layout-list {
+    height: 100%;
+    padding-left: 20px;
+
+    label {
+
+      input {
+        margin-left: 10px;
+      }
+    }
+
+    .checkbox-stg {
+      padding-left: 10px;
+    }
+  }
 }
