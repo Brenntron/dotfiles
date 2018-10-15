@@ -121,6 +121,24 @@ Feature: Disputes
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
     And I click "#add-search-criteria"
+    Then I click "#submit-advanced-search"
     Then I trigger-click ".export-button"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+  @javascript
+  Scenario: a user should see an auto-populate field for 'Customer Name' through advanced search
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+    |id|
+    |1 |
+    When I goto "escalations/webrep/tickets?f=open"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#name-cb"
+    And I click "#add-search-criteria"
+    Then I fill in "contact-name" with "Bob Jones"
+    Then I click "#submit-advanced-search"
+    Then I wait for "3" seconds
+    Then take a screenshot
+
