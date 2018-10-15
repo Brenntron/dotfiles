@@ -24,23 +24,23 @@
   .dashboard-submenu
     .dashboard-submenu-area
       .dashboard-menu-list
-        %label View:
+        %label.bold View:
         %ul
           %li
-            %a.ticket-owner-button.user-icon-stg{:href => ""} My Tickets
+            %a.white-user.ticket-owner-button.user-icon-stg.bold{:href => ""} My Tickets
           %li
-            %a.icon-team-grey.user-icon-stg{:href => ""} My Team Tickets
+            %a.group-user-white.icon-team-grey.user-icon-stg.bold{:href => ""} My Team Tickets
           %li
-            %a.icon-all-tickets-grey.user-icon-stg{:href => ""} All Tickets
+            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{:href => ""} All Tickets
 
           %li.dropdown
-            %a.icon-custom-user-grey.user-icon-stg{:href => ""} Select Custom Users
+            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{:href => ""} Select Custom Users
 
       .dashboard-submission-area
         %label.right-vertical-separator.bold.font-lg 30
         %label.font-lg 99
-        %label.uppercase.right-vertical-separator valid total tickets / entries submission
-        %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg 12 invalid tickets
+        %label.uppercase.right-vertical-separator.bold valid total tickets / entries submission
+        %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 invalid tickets
 
       .dashboard-export-report.left-vertical-separator
         %button.toolbar-button.export-button-white Export Report
