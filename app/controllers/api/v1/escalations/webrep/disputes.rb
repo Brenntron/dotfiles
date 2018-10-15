@@ -58,6 +58,7 @@ module API
                   response_data['search_id'] = named_search&.id
                 end
               end
+              binding.pry
               response_data.to_json
 
             end
