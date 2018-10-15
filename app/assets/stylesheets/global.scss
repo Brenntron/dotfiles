@@ -646,6 +646,8 @@ th.alt-col {
 .expand-all {background-image: url(image_path('icon_expand_all.svg'));}
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
+.export-button-white    {background-image: url(image_path('icon_export_white.svg'));}
+
 .delete-search {
   display: inline-block;
   float: right;
@@ -1745,6 +1747,12 @@ a.static-nav-item {
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-calendar {background-image: url(image_path('icon_calendar.svg')); background-size: 30px;}
+.icon-user-white {background-image: url(image_path('icon_user_white.svg'));}
+.icon-customer-grey {background-image: url(image_path('icon_custom_user_grey.svg'));}
+.icon-all-tickets-grey {background-image: url(image_path('icon_ticket_grey.svg'));}
+
+
 
 .saved-search {
   text-transform: none !important;
@@ -5321,6 +5329,7 @@ table.dispute_tool_current tr:last-of-type td {
 
 .my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
 .team-icon {  background-image: url(image_path('icon_team.svg'));}
+.team-icon-grey {background-image: url(image_path('icon_team_grey.svg'));}
 
 .tickets-totals-table td {
   border-bottom: none;
@@ -6319,4 +6328,83 @@ h2 {
   margin-top: 24px;
   margin-bottom: 6px;
   color: #333;
+}
+
+.dashboard-header-area.my-dashboard-header-area {
+  background-color: $content-tab-color;
+
+  .dashboard-wrapper {
+    display: flex;
+
+    .dashboard-title {
+      padding-right: 20px;
+      border-right: 1px solid #e0e0e0;
+
+      h1 {
+        margin: 0;
+      }
+    }
+
+    .user-info {
+      padding-left: 20px;
+    }
+  }
+
+  .dashboard-time-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .dashboard-time {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+
+      label {
+        font-size: 20px;
+        padding-right: 20px;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      button {
+        background-color: $content-tab-color;
+        border: none;
+        font-size: 12px;
+        margin-left: 15px;
+        padding: 5px 5px 5px 25px;
+      }
+
+      .toolbar-button {
+        padding-left: 35px;
+      }
+    }
+
+    .dashboard-time-ticket {
+      .button-wrapper {
+        width: 382px;
+        text-align: left;
+        float: right;
+        background-color: $content-tab-color;
+
+        button {
+          background-color: $content-tab-color;
+          border: none;
+        }
+
+        .arrow-left::before {
+          content: '';
+          width: 0;
+          height: 0;
+          border-bottom: 5px solid transparent;
+          border-top: 5px solid transparent;
+          border-right: 5px solid white;
+          font-size: 0;
+          line-height: 0;
+          margin-top: 1px;
+          margin-left: -7px;
+          margin-right: 10px;
+          float: left;
+        }
+      }
+    }
+  }
 }
