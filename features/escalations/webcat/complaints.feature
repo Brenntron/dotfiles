@@ -209,3 +209,14 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     When I click "Lookup"
     Then I should see "Lookup Information"
+
+  @javascript
+  Scenario: a user sees a description in the 'Customer Description' field after selecting a complaint entry row
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+    |id|
+    |1 |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I click ".expand-all"
+    Then I should see "Description for testing"
