@@ -102,7 +102,6 @@ Feature: Webrep communications
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
     And I wait for "2" seconds
-    Then take a screenshot
     And I should see "EMAIL SENT"
 
 
