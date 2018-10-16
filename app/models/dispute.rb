@@ -837,7 +837,6 @@ class Dispute < ApplicationRecord
         company_name = customer_params.delete('company_name')
         relation = relation.joins(customer: :company)
       else
-        binding.pry
         relation = relation.joins(:customer)
       end
 
