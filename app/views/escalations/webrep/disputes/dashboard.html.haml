@@ -21,6 +21,30 @@
             .button-wrapper
               %button.arrow-left View Last Week's Tickets
 
+  .dashboard-submenu
+    .dashboard-submenu-area
+      .dashboard-menu-list
+        %label.bold View:
+        %ul
+          %li
+            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{:href => ""} My Tickets
+          %li
+            %a.group-user-white.icon-team-grey.user-icon-stg.bold{:href => ""} My Team Tickets
+          %li
+            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{:href => ""} All Tickets
+
+          %li.dropdown
+            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{:href => ""} Select Custom Users
+
+      .dashboard-submission-area
+        %label.right-vertical-separator.bold.font-lg 30
+        %label.font-lg 99
+        %label.uppercase.right-vertical-separator.bold valid total tickets / entries submission
+        %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 invalid tickets
+
+      .dashboard-export-report.left-vertical-separator
+        %button.toolbar-button.export-button-white Export Report
+
 
 
 
