@@ -121,7 +121,6 @@ Feature: Disputes
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
     And I click "#add-search-criteria"
-    Then I click "#submit-advanced-search"
     Then I trigger-click ".export-button"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

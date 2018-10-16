@@ -10,10 +10,6 @@ Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
 
-Given(/^I fill in "(.*?)" with a demo customer's name$/) do |field_label|
-  fill_in field_label, :with => Customer.first.name
-end
-
 When(/^I click "(.*?)"$/) do |target|
     begin
       click_on(target)
