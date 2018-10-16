@@ -45,6 +45,31 @@
       .dashboard-export-report.left-vertical-separator
         %button.toolbar-button.export-button-white Export Report
 
+  .toolbar-content-layout
+    -#%button.toolbar-button.icon-queue.btn-pad-left legend
+
+    .content-layout-list
+      %label.icon-custom-star
+        Show Customer Tickets
+        %input{:type => "checkbox", :checked => "checked"}/
+
+      %label.right-vertical-separator
+        Show Guest Tickets
+        %input{:type => "checkbox", :checked => "checked"}/
+
+      %label.dispute-E-grey.btn-margin-left
+        Show Email Tickets
+        %input{:type => "checkbox", :checked => "checked"}/
+
+      %label.dispute-W-grey.btn-margin-left
+        Show Web Tickets
+        %input{:type => "checkbox", :checked => "checked"}/
+
+      %label.dispute-EW-grey.btn-margin-left
+        Show Email/Web Tickets
+        %input{:type => "checkbox", :checked => "checked"}/
+
+
 
 
 
