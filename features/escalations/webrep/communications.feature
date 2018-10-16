@@ -82,6 +82,7 @@ Feature: Webrep communications
     And I should see "EMAIL SENT"
 
 
+
   @javascript
   Scenario: a user can create a new email
     Given a user with role "webrep user" exists and is logged in
@@ -97,9 +98,11 @@ Feature: Webrep communications
     Then I click "Compose New Email"
     And I wait for "2" seconds
     And I fill in "receiver" with "customer@gmail.com"
+    And I fill in "subject" with "Demo"
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
     And I wait for "2" seconds
+    Then take a screenshot
     And I should see "EMAIL SENT"
 
 
@@ -297,5 +300,6 @@ Feature: Webrep communications
     Given I upload "test.png" from_button "attachment"
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
-    And I wait for "10" seconds
+    And I wait for "8" seconds
+    Then take a screenshot
     And I should see "EMAIL SENT"
