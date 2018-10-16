@@ -1752,7 +1752,6 @@ a.static-nav-item {
 .icon-invalid-grey {background-image: url(image_path('icon_invalid_grey.svg'));}
 .icon-calendar {background-image: url(image_path('icon_calendar.svg')); background-size: 30px;}
 .icon-user-white {background-image: url(image_path('icon_user_white.svg'));}
-.icon-all-tickets-grey {background-image: url(image_path('icon_ticket_grey.svg'));}
 .icon-custom-user-white {background-image: url(image_path('icon_custom_user_white.svg'));}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 
@@ -6457,7 +6456,7 @@ h2 {
         display: block;
         height: 100%;
         padding: 0 15px 0 40px;
-        font-size: 10px;
+        font-size: 11px;
         text-decoration: none;
         color: $type-lighter-color;
       }
@@ -6598,7 +6597,8 @@ h2 {
     padding-left: 20px;
 
     label {
-      font-size: 12px;
+      font-size: 11px;
+      color: $type-lighter-color;
       
       input {
         margin-left: 10px;
@@ -6609,8 +6609,4 @@ h2 {
       padding-left: 10px;
     }
   }
-}
-.icon-dispute-stg {
-  background-size: 20px;
-  background-position-y: -1.4px;
 }
