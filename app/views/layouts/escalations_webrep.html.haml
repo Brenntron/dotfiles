@@ -6,7 +6,7 @@
     %a#dashboard.nav-page-button{href: '/escalations/webrep/dashboard', class: ("active" if current_page?('/escalations/webrep/dashboard'))}
       %span.nav-toolbar-icon-large.icon-dashboard
 
-    %a#queue.nav-page-button{href: '/escalations/webrep/tickets?f=open', class: ("active" if current_page?('/escalations/webrep/tickets'))}
+    %a#queue.nav-page-button{href: escalations_webrep_disputes_path(params: {f: 'open'}), class: ("active" if current_page?('/escalations/webrep/tickets'))}
       %span.nav-toolbar-icon-large.icon-queue
 
     %a#research.nav-page-button{href: '/escalations/webrep/research', class: ("active" if current_page?('/escalations/webrep/research'))}

@@ -86,18 +86,18 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def tickets
   end
   
-  def advanced_search
-    @dispute = Dispute.new
-  end
-
-  def named_search
-  end
-
-  def standard_search
-  end
-
-  def contains_search
-  end
+  # def advanced_search
+  #   @dispute = Dispute.new
+  # end
+  #
+  # def named_search
+  # end
+  #
+  # def standard_search
+  # end
+  #
+  # def contains_search
+  # end
 
   def export
     @dispute = Dispute.find(params[:id])
