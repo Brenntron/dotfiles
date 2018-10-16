@@ -13,6 +13,7 @@ module API
             params do
               required :from, type: String
               required :to, type: String
+              required :scope, type: String
             end
 
             get "open_tickets_report" do
