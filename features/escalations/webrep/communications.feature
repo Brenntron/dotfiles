@@ -288,10 +288,13 @@ Feature: Webrep communications
   @javascript
   Scenario: a user attaches a file to an email and sends it
     Given a user with role "webrep user" exists and is logged in
+    And the following bugs exist:
+    |id   |bugzilla_id|
+    |5370 |5370       |
     And the following disputes exist and have entries:
-      | id     |
-      | 722    |
-    And I goto "/escalations/webrep/disputes/722"
+    |id     |
+    |5370    |
+    And I goto "/escalations/webrep/disputes/5370"
     Then I click "Compose New Email"
     And I wait for "2" seconds
     And I fill in "receiver" with "customer@gmail.com"
@@ -300,6 +303,5 @@ Feature: Webrep communications
     Given I upload "test.png" from_button "attachment"
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
-    And I wait for "8" seconds
-    Then take a screenshot
+    And I wait for "30" seconds
     And I should see "EMAIL SENT"
