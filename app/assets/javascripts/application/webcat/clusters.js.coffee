@@ -85,7 +85,15 @@ $ ->
           data: 'cluster_id'
         }
         {
-          data: 'domain'
+          data: 'domain',
+          render: (data) ->
+            regexp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/i;
+            if (data.match(regexp))
+              data
+            else
+              if (data.startsWith('http') is false)
+                data = 'http://' + data
+              data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn" data-toggle="tooltip" data-placement="top" title="Open ' + data + ' in a new tab"></button>'
         }
         {
           data: 'global_volume'
