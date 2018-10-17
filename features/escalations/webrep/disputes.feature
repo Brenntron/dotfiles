@@ -143,3 +143,40 @@ Feature: Disputes
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
 
+
+  @javascript
+  Scenario: a users uses advanced search with 'Contact Email' as a search criteria
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id| submission_type|
+      |1 | w              |
+    When I goto "escalations/webrep/tickets?f=all"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#email-cb"
+    And I click "#add-search-criteria"
+    Then I fill in "email-input" with "bob@bob.com"
+    Then I click "#submit-advanced-search"
+    And I trigger-click "#advanced-search-button"
+    Then I wait for "5" seconds
+    Then I should see "talosintelligence.com"
+    Then I should see "0000000001"
+
+  @javascript
+  Scenario: a users uses advanced search with 'Company' as a search criteria
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id| submission_type|
+      |1 | w              |
+    When I goto "escalations/webrep/tickets?f=all"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#company-cb"
+    And I click "#add-search-criteria"
+    Then I fill in "company-input" with "Bobs Burgers"
+    Then I click "#submit-advanced-search"
+    And I trigger-click "#advanced-search-button"
+    Then I wait for "5" seconds
+    Then I should see "talosintelligence.com"
+    Then I should see "0000000001"
+
