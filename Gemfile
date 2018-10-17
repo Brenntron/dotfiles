@@ -77,6 +77,8 @@ gem 'rubyXL', '3.3.29'
 
 gem 'domainatrix'
 
+gem 'dotiw'
+
 group :development do
   gem 'thin', '~> 1.7.0'
   gem 'puma'

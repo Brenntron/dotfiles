@@ -1,3 +1,5 @@
+include ActionView::Helpers::DateHelper
+
 class Dispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
 
@@ -1216,5 +1218,24 @@ class Dispute < ApplicationRecord
     end
 
   end
+
+
+  #####FOR REPORTING#######
+
+  def self.open_tickets_report(users, from, to)
+
+    status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
+
+    report_data = []
+    user_ids = users.pluck(:id)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+
+    results.each do |result|
+      report_data << {:case_id => result.id, :status => result.status, :dispute => result.dispute_entries.first.hostlookup, :age => distance_of_time_in_words(Time.now, result.created_at)}
+    end
+
+    report_data
+  end
+
 end
 
