@@ -6533,7 +6533,7 @@ h2 {
 
   .data-btn {
     background-color: $primary-section-color;
-    background-image: url(image_path('icon_open_viewable.svg'));
+    background-image: url(image_path('icon_open_viewable_white.svg'));
     background-repeat: no-repeat;
     background-size: 75%;
     background-position-x: center;
@@ -6576,25 +6576,4 @@ h2 {
 }
 .right-margin {
   margin-right: 4px;
-}
-
-#whois_dialog {
-  display: none;
-  width: 200px;
-}
-
-.whois_tool_dialog {
-  min-width: 600px;
-  min-height: 400px;
-}
-
-.whois_tool_dialog .ui-dialog-titlebar {
-  background-color: $content-tab-color;
-  background-image: url(image_path('icon_whois.svg'));
-  background-repeat: no-repeat;
-  background-position: 8px center;
-  background-size: 24px 24px;
-  padding-left: 40px;
-  border: none;
-  width: 100%;
 }
