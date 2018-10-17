@@ -14,92 +14,94 @@ class DisputeEmail < ApplicationRecord
 
   def self.process_bridge_payload(message_payload)
 
-    xmlrpc = message_payload[:bugzilla_session]
-    user = message_payload[:current_user] 
-    envelope = JSON.parse(message_payload["payload"]["envelope"])
-    #check envelope for case validity
-    case_id = find_case_number_in_email(message_payload["payload"])
+    ActiveRecord::Base.transaction do
+      xmlrpc = message_payload[:bugzilla_session]
+      user = message_payload[:current_user]
+      envelope = JSON.parse(message_payload["payload"]["envelope"])
+      #check envelope for case validity
+      case_id = find_case_number_in_email(message_payload["payload"])
 
-    if case_id.blank?
-      #create email to instruct user to use TI form and send to bridge
-      return_message = {}
+      if case_id.blank?
+        #create email to instruct user to use TI form and send to bridge
+        return_message = {}
 
-      bad_email_args = {}
-      bad_email_args[:to] = message_payload["payload"]["from"]
-      bad_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
-      bad_email_args[:subject] = bad_gateway_subject
-      bad_email_args[:body] = bad_gateway_body
+        bad_email_args = {}
+        bad_email_args[:to] = message_payload["payload"]["from"]
+        bad_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+        bad_email_args[:subject] = bad_gateway_subject
+        bad_email_args[:body] = bad_gateway_body
 
-      attachments_to_mail = []
-      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-      conn.post(bad_email_args, attachments_to_mail)
+        attachments_to_mail = []
+        conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+        conn.post(bad_email_args, attachments_to_mail)
+
+        conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn.post()
+        return
+      end
+
+      ##########################################
+
+      dispute = Dispute.where(:id => case_id).first
+      if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at >= 2.weeks.ago
+
+        dispute.status = Dispute::STATUS_REOPENED
+        dispute.save!
+
+        dispute.dispute_entries.each do |entry|
+          entry.status = DisputeEntry::STATUS_REOPENED
+          entry.save!
+        end
+
+
+      end
+
+      if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at < 2.weeks.ago
+
+        old_case_email_args = {}
+        old_case_email_args[:to] = message_payload["payload"]["from"]
+        old_case_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+        old_case_email_args[:subject] = old_case_gateway_subject
+        old_case_email_args[:body] = old_case_gateway_body
+
+        attachments_to_mail = []
+        conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+        conn.post(old_case_email_args, attachments_to_mail)
+
+        conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn.post()
+
+        return
+      end
+
+      ##########################################
+
+      new_email = DisputeEmail.new
+      new_email.dispute_id = case_id
+      new_email.email_headers = message_payload["payload"]["headers"]
+      #Need to clean from value, can show up in form of:
+      #\"Chris LaClair (claclair)\" <claclair@cisco.com>   which as an absolute value, is not a valid email address
+      new_email.from = envelope["from"]
+      new_email.to = envelope["to"].join(",")
+      new_email.subject = message_payload["payload"]["subject"]
+      new_email.body = message_payload["payload"]["text"]
+      new_email.status = UNREAD
+      new_email.save!
+
+      if message_payload["attachments"].present?
+        message_payload["attachments"].each do |email_attachment|
+          DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, email_attachment, user, new_email)
+        end
+      end
+
+      #Update ticket status
+      dispute = Dispute.find(case_id)
+      dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
+      dispute.save!
 
       conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post()
-      return
     end
-
-    ##########################################
-
-    dispute = Dispute.where(:id => case_id).first
-    if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at >= 2.weeks.ago
-
-      dispute.status = Dispute::STATUS_REOPENED
-      dispute.save
-
-      dispute.dispute_entries.each do |entry|
-        entry.status = DisputeEntry::STATUS_REOPENED
-        entry.save
-      end
-
-
-    end
-
-    if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at < 2.weeks.ago
-
-      old_case_email_args = {}
-      old_case_email_args[:to] = message_payload["payload"]["from"]
-      old_case_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
-      old_case_email_args[:subject] = old_case_gateway_subject
-      old_case_email_args[:body] = old_case_gateway_body
-
-      attachments_to_mail = []
-      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-      conn.post(old_case_email_args, attachments_to_mail)
-
-      conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
-      conn.post()
-
-      return
-    end
-
-    ##########################################
-
-    new_email = DisputeEmail.new
-    new_email.dispute_id = case_id
-    new_email.email_headers = message_payload["payload"]["headers"]
-    #Need to clean from value, can show up in form of:
-    #\"Chris LaClair (claclair)\" <claclair@cisco.com>   which as an absolute value, is not a valid email address
-    new_email.from = envelope["from"]
-    new_email.to = envelope["to"].join(",")
-    new_email.subject = message_payload["payload"]["subject"]
-    new_email.body = message_payload["payload"]["text"]
-    new_email.status = UNREAD
-    new_email.save
-
-    if message_payload["attachments"].present?
-      message_payload["attachments"].each do |email_attachment|
-        DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, email_attachment, user, new_email)
-      end
-    end
-
-    #Update ticket status
-    dispute = Dispute.find(case_id)
-    dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
-    dispute.save
-
-    conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
-    conn.post()
   end
 
   ## FORMAT FOR AN EXTERNAL FACING CASE NUMBER IS:  ref-[dispute#id]-anco   example: ref-325302-anco wher 325302 is the ID of a record in disputes table
