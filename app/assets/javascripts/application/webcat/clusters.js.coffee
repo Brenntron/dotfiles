@@ -51,9 +51,19 @@ window.fetch_cluster_data = (id) ->
       #$('.modal-backdrop').remove()
   )
 
-
 $ ->
   $(document).ready ->
+    window.copycat_dialog = (value) ->
+      $('#whois_dialog').dialog({
+        dialogClass: "whois_tool_dialog"
+      })
+      $('input.whois-input-holder')[0].value = value
+      return
+    window.clearInputField = (fieldname) ->
+      $('input.' + fieldname)[0].value = ''
+    window.pasteDomain = (fieldname) =>
+      value = $('input.whois-input-holder')[0].value
+      $('input.' + fieldname)[0].value = value
 
 
     clusters_table = $('#clusters-index').DataTable(
@@ -93,7 +103,9 @@ $ ->
             else
               if (data.startsWith('http') is false)
                 data = 'http://' + data
-              data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn" data-toggle="tooltip" data-placement="top" title="Open ' + data + ' in a new tab"></button>'
+              data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn esc-tooltipped tooltipstered", title="Open ' + data + ' in a new tab"></button>' +
+              '<button type="button" class="google-btn right-margin esc-tooltipped tooltipstered" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
+              '<button type="button" class="help-btn right-margin esc-tooltipped tooltipstered" title="Whois data" onclick="copycat_dialog(\'' + data + '\')"></button>'
         }
         {
           data: 'global_volume'
