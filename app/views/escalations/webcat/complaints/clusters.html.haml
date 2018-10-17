@@ -71,14 +71,8 @@
             %th Ctime
             %th Now
             %th
-  #whois_dialog{title: 'Who is'}
-    .dialog-content-wrapper
-      %input.text-field.whois-input{placeholder: 'Add Domain'}
-      %input.text-field.hidden.whois-input-holder
+  #whois_dialog{title: 'Domain Lookup Information'}
 
-    .whois-tool-footer
-      %button.toolbar-button.domain-paste-btn{onclick: 'pasteDomain("whois-input")'} Paste Domain
-      %button.toolbar-button.domain-clear-btn{onclick: 'clearInputField("whois-input")'} Clear Domain
 :javascript
   window.populate_clusters_index_table()
   // window.fetch_cluster_data(3)
