@@ -9,24 +9,19 @@ module API
             before do
               PaperTrail.whodunnit = current_user.id if current_user.present?
             end
-            desc 'get all disputes'
+            desc 'Open Tickets Report Table'
             params do
               required :from, type: String
               required :to, type: String
-              required :scope, type: String
+              required :users, type: Array[Integer], desc: "array of user ids to apply to the report"
             end
 
             get "open_tickets_report" do
               authorize!(:index, Dispute)
 
-              disputes = Dispute.robust_search(permitted_params['search_type'],
-                                               search_name: permitted_params['search_name'],
-                                               params: permitted_params,
-                                               user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
-              title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
-              json_packet = Dispute.to_data_packet(disputes, user: current_user)
+              report_data = Dispute.open_tickets_report(params[:users], params[:from], params[:to])
 
-              response_data = {status: "success", title: title, data: json_packet}
+              response_data = {status: "success", data: report_data}
               if 'advanced' == permitted_params['search_type']
                 if permitted_params['search_name'].present?
                   search_name = permitted_params['search_name']
@@ -35,6 +30,9 @@ module API
                   response_data['search_id'] = named_search&.id
                 end
               end
+
+              response_data = {:status => "success", :data => []}
+
               response_data.to_json
 
             end
