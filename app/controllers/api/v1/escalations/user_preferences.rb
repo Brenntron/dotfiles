@@ -4,25 +4,54 @@ module API
       class UserPreferences < Grape::API
         include API::V1::Defaults
 
-
-        resource :user_preferences do
+        resource "escalations/user_preferences" do
 
           desc "Return all preferences of current user"
           get "", root: :user_preferences do
-            current_user.user_preferences.to_json
+            user_preference = UserPreference.where(user_id: current_user.id).first
+
+            if user_preference.present?
+              user_preference.value
+            end
           end
 
-          desc "Create a preference"
+          desc "Update a preference (remove/add)"
           params do
-            requires :name, type: String, desc: "The name of the preference."
-            requires :value, type: String, desc: "Value to set in the preference."
+            requires :data, type: Hash, desc: "Hash containing a preference key/value pair"
           end
           post "", root: "user_preferences" do
-            UserPreference.create(
-                :name => permitted_params[:name],
-                :value => permitted_params[:value],
-                :user_id => current_user.id,
-                )
+            columns = params.data
+
+            user_preference = UserPreference.where(user_id: current_user.id).first
+
+            name = 0
+            state = 1
+
+            if user_preference.present?
+              json = JSON.parse(user_preference.value)
+
+              columns.each do |column|
+                json[column[name]] = column[state]
+              end
+
+              user_preference.value = json.to_json
+              user_preference.save
+            else
+              UserPreference.create(value: "{\"priority\":true,\"case-id\":true,\"status\":true,\"ticket-type\":true,\"dispute\":true,\"owner\":true,\"time-submitted\":true,\"age\":true}", user_id: current_user.id)
+
+              user_preference = UserPreference.where(user_id: current_user.id).first
+
+              json = JSON.parse(user_preference.value)
+
+              columns.each do |column|
+                json[column[name]] = column[state]
+              end
+
+              user_preference.value = json.to_json
+              user_preference.save
+            end
+
+            user_preference.value
           end
 
           desc "Return a specific preference"
