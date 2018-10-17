@@ -125,9 +125,9 @@ $ ->
             else
               if (data.startsWith('http') is false)
                 data = 'http://' + data
-                '<button type="button" class="help-btn right-margin esc-tooltipped tooltipstered" title="Whois Domain Lookup Information" onclick="copycat_dialog(\'' + data + '\')"></button>' +
-                '<button type="button" class="google-btn right-margin esc-tooltipped tooltipstered" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
-                data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped tooltipstered", title="Open ' + data + ' in a new tab"></button>'
+                '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="copycat_dialog(\'' + data + '\')"></button>' +
+                '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
+                data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>'
         }
         {
           data: 'global_volume'
