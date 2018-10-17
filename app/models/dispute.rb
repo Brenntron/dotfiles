@@ -1237,5 +1237,20 @@ class Dispute < ApplicationRecord
     report_data
   end
 
+  def self.closed_tickets_report(users, from, to)
+
+    status_array = [STATUS_RESOLVED]
+
+    report_data = []
+    user_ids = users.pluck(:id)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+
+    results.each do |result|
+      report_data << {:case_id => result.id, :resolution => result.resolution, :dispute => result.dispute_entries.first.hostlookup, :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at)}
+    end
+
+    report_data
+  end
+
 end
 
