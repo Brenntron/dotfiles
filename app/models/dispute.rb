@@ -363,24 +363,23 @@ class Dispute < ApplicationRecord
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
-    verdicts_to_blacklist = []
-    user = User.where(cvs_username:"vrtincom").first
-    guest = Company.where(:name => "Guest").first
-    opened_at = Time.now
-    resolved_at = Time.now
-    customer = Customer.process_and_get_customer(message_payload)
-
     begin
       ActiveRecord::Base.transaction do
+        verdicts_to_blacklist = []
+        user = User.where(cvs_username:"vrtincom").first
+        guest = Company.where(:name => "Guest").first
+        opened_at = Time.now
+        resolved_at = Time.now
+        customer = Customer.process_and_get_customer(message_payload)
+
 
         logger.debug "Starting ticket create"
 
         #user = User.where(cvs_username:"vrtincom").first
 
         #TODO: this should be put in a params method
-        message_payload["payload"] = message_payload["payload"].permit!.to_h
-        new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
-        new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+        new_entries_ips = message_payload["payload"]["investigate_ips"]
+        new_entries_urls = message_payload["payload"]["investigate_urls"]
 
         return_payload = {}
 
@@ -390,11 +389,11 @@ class Dispute < ApplicationRecord
 
         summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-        full_description = %Q{
+        full_description = <<~HEREDOC
           IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
           URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
           Problem Summary: #{message_payload["payload"]["problem"]}
-        }
+        HEREDOC
 
         bug_attrs = {
             'product' => 'Escalations Console',
@@ -438,7 +437,7 @@ class Dispute < ApplicationRecord
         end
         logger.debug "Saving Dispute"
 
-        new_dispute.save
+        new_dispute.save!
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
@@ -513,7 +512,7 @@ class Dispute < ApplicationRecord
           else
             new_dispute_entry.status = DisputeEntry::NEW
           end
-          new_dispute_entry.save
+          new_dispute_entry.save!
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
             all_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",")
@@ -522,7 +521,7 @@ class Dispute < ApplicationRecord
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "SBRS"
-              new_rule_hit.save
+              new_rule_hit.save!
             end
           end
           if entry[:wbrs]["WBRS_Rule_Hits"].present?
@@ -532,7 +531,7 @@ class Dispute < ApplicationRecord
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "WBRS"
-              new_rule_hit.save
+              new_rule_hit.save!
             end
           end
 
@@ -595,7 +594,7 @@ class Dispute < ApplicationRecord
             new_dispute_entry.status = DisputeEntry::NEW
           end
 
-          new_dispute_entry.save
+          new_dispute_entry.save!
 
 
           new_payload_item = {}
@@ -624,7 +623,7 @@ class Dispute < ApplicationRecord
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "WBRS"
-              new_rule_hit.save
+              new_rule_hit.save!
             end
           end
 
@@ -648,7 +647,7 @@ class Dispute < ApplicationRecord
         first_email.subject = message_payload["payload"]["email_subject"]
         first_email.body = message_payload["payload"]["email_body"]
         first_email.status = DisputeEmail::UNREAD
-        first_email.save
+        first_email.save!
 
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)

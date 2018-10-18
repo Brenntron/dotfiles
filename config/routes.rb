@@ -21,7 +21,7 @@ Rails.application.routes.draw do
     end
 
     namespace :webcat do
-      root 'complaints#index'
+      root 'root#index'
       resources :complaints, only: [:index, :show, :update] do
         collection do
           get :show_multiple
@@ -53,7 +53,7 @@ Rails.application.routes.draw do
     end
 
     namespace :webrep do
-      root 'disputes#index'
+      root 'root#index'
       resources :disputes, only: [:index, :show] do
         collection do
           get :advanced_search
@@ -107,8 +107,6 @@ Rails.application.routes.draw do
       resources :channels, only: [] do
         collection do
           get 'poll-from-bridge/messages', to: 'messages#get_messages'
-          post 'fp-event/messages', to: 'messages#messages_from_bridge'
-          post 'fp-create/messages', to: 'messages#fp_create'
           post 'ticket-event/messages', to: 'messages#messages_from_bridge'
         end
         resources :messages, only: [:create]
@@ -231,20 +229,6 @@ Rails.application.routes.draw do
   resources :notes, only: [:create] do
     collection do
       put :publish_to_bugzilla
-    end
-  end
-
-
-  namespace :bridge do
-    resources :channels, only: [] do
-      collection do
-        get 'poll-from-bridge/messages', to: 'messages#get_messages'
-        post 'fp-event/messages', to: 'messages#messages_from_bridge'
-        post 'fp-create/messages', to: 'messages#fp_create'
-        post 'ticket-event/messages', to: 'messages#messages_from_bridge'
-        post 'rule-file-notify/messages', to: 'messages#rule_file_notify'
-      end
-      resources :messages, only: [:create]
     end
   end
 
