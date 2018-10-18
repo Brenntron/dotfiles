@@ -1320,8 +1320,8 @@ fieldset.tight {
 /*** Overriding selectize plugin styles to work with our forms ***/
 .selectize-input {
   border: none;
-  padding: 2px 0 0 0 !important;
-  margin: -4px 0  !important;
+  padding: 1px 0 0 0 !important;
+  margin: -4px 0 -4px -2px !important;
   min-height: 0 !important;
   box-shadow: none !important;
 }
@@ -5783,6 +5783,15 @@ table.dataTable tbody tr.selected {
   height: 32px;
 }
 
+.category-column .form-control.selectize {
+  height: 30px !important;
+  margin: -4px 0 !important;
+}
+
+.category-column .form-control.selectize .selectize-input input {
+  font-size: 8.5pt;
+}
+
 .selectize-dropdown.multi.form-control.selectize {
   min-height: 32px !important;
   height: auto !important;
@@ -5842,6 +5851,7 @@ table.dataTable tbody tr.selected {
 
 .selectize-dropdown-content {
   min-height: 28px !important;
+  font-size: 8.5pt;
 }
 
 #advanced-search-wrapper .selectize-input.dropdown-active::before {
@@ -6585,4 +6595,8 @@ h2 {
 
 .category-column fieldset {
   margin: 0;
+}
+
+.domain-column {
+  min-width: 300px;
 }

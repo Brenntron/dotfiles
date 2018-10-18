@@ -101,6 +101,10 @@ $ ->
         className: 'expandable-row-column'
       }
       {
+        targets: [3]
+        className: 'domain-column'
+      }
+      {
         targets: [6]
         className: 'category-column'
       }
@@ -117,11 +121,15 @@ $ ->
       }
       {
         data: 'cluster_id'
+        orderable: false
+        searchable: false
+        sortable: false
         render: (data) ->
           '<input type="checkbox" name="cbox" class="cluster_check_box" id="cbox' + data + '" value="' + data + '" />'
       }
       {
         data: 'cluster_id'
+        width: '100px'
       }
       {
         data: 'domain',
