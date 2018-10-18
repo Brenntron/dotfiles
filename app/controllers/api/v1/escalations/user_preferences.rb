@@ -37,7 +37,7 @@ module API
               user_preference.value = json.to_json
               user_preference.save
             else
-              UserPreference.create(value: "{\"priority\":true,\"case-id\":true,\"status\":true,\"ticket-type\":true,\"dispute\":true,\"owner\":true,\"time-submitted\":true,\"age\":true}", user_id: current_user.id)
+              UserPreference.create(user_id: current_user.id)
 
               user_preference = UserPreference.where(user_id: current_user.id).first
 

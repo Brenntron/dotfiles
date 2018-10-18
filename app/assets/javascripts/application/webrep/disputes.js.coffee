@@ -1327,10 +1327,9 @@ $ ->
     checkbox_trigger = $(this).attr('data-column')
     checkbox = $(this).find('input')
     $(this).on 'click', ->
-      console.log 'clicked'
+      $(checkbox).prop 'checked', !checkbox.prop('checked')
       $('.dispute-entry-table td, .dispute-entry-table th').each ->
         if $(this).hasClass(checkbox_trigger)
-          console.log 'match'
           $(checkbox).prop 'checked', !checkbox.prop('checked')
           $(this).toggle()
         return
@@ -1357,70 +1356,11 @@ $ ->
       $.each response, (column, state) ->
         if state == true
           $("##{column}-checkbox").prop('checked', true)
-          switch column
-            when 'priority'
-              window.dispute_table.column("2").visible true
-            when 'case-id'
-              window.dispute_table.column("3").visible true
-            when 'status'
-              window.dispute_table.column("4").visible true
-            when 'resolution'
-              window.dispute_table.column("5").visible true
-            when 'ticket-type'
-              window.dispute_table.column("6").visible true
-            when 'dispute'
-              window.dispute_table.column("7").visible true
-            when 'owner'
-              window.dispute_table.column("8").visible true
-            when 'time-submitted'
-              window.dispute_table.column("9").visible true
-            when 'age'
-              window.dispute_table.column("10").visible true
-            when 'case-origin'
-              window.dispute_table.column("11").visible true
-            when 'submitter-type'
-              window.dispute_table.column("12").visible true
-            when 'submitter-org'
-              window.dispute_table.column("13").visible true
-            when 'submitter-domain'
-              window.dispute_table.column("14").visible true
-            when 'contact-name'
-              window.dispute_table.column("15").visible true
-            when 'contact-email'
-              window.dispute_table.column("16").visible true
+          window.dispute_table.column("##{column}").visible true
         else
           $("##{column}-checkbox").prop('checked', false)
-          switch column
-            when 'priority'
-              window.dispute_table.column("2").visible false
-            when 'case-id'
-              window.dispute_table.column("3").visible false
-            when 'status'
-              window.dispute_table.column("4").visible false
-            when 'resolution'
-              window.dispute_table.column("5").visible false
-            when 'ticket-type'
-              window.dispute_table.column("6").visible false
-            when 'dispute'
-              window.dispute_table.column("7").visible false
-            when 'owner'
-              window.dispute_table.column("8").visible false
-            when 'time-submitted'
-             window.dispute_table.column("9").visible false
-            when 'age'
-              window.dispute_table.column("10").visible false
-            when 'case-origin'
-              window.dispute_table.column("11").visible false
-            when 'submitter-type'
-              window.dispute_table.column("12").visible false
-            when 'submitter-org'
-              window.dispute_table.column("13").visible false
-            when 'submitter-domain'
-              window.dispute_table.column("14").visible false
-            when 'contact-name'
-              window.dispute_table.column("15").visible false
-            when 'contact-email'
-             window.dispute_table.column("16").visible false
+          window.dispute_table.column("##{column}").visible false
+
   )
   $(document).ready ->
 
@@ -1449,6 +1389,29 @@ $ ->
         dataType: 'json'
         success: (response) ->
       )
+
+    $('.toggle-vis-nested').on "click", ->
+      data = {}
+      data['dispute-entry'] = $("#dispute-entry-checkbox").is(':checked')
+      data['entry-status'] = $("#entry-status-checkbox").is(':checked')
+      data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
+      data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
+      data['category'] = $("#category-checkbox").is(':checked')
+      data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
+      data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
+      data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')
+      data['sbrs-score'] = $("#sbrs-score-checkbox").is(':checked')
+      data['sbrs-total-rule-hits'] = $("#sbrs-total-rule-hits-checkbox").is(':checked')
+      data['sbrs-rules'] = $("#sbrs-rules-checkbox").is(':checked')
+
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences"
+        method: 'POST'
+        data: {data}
+        dataType: 'json'
+        success: (response) ->
+      )
+
 
     if window.location.pathname != '/escalations/webrep/tickets'
       $('#filter-cases').hide()
