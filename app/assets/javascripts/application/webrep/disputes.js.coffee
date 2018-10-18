@@ -1348,7 +1348,7 @@ $ ->
 
 $ ->
   std_msg_ajax(
-    url: "/escalations/api/v1/escalations/user_preferences"
+    url: "/escalations/api/v1/escalations/user_preferences/dispute_columns"
     method: 'GET'
     success: (response) ->
       response = JSON.parse(response)
@@ -1383,7 +1383,7 @@ $ ->
       data['contact-email'] = $("#contact-email-checkbox").is(':checked')
 
       std_msg_ajax(
-        url: "/escalations/api/v1/escalations/user_preferences"
+        url: "/escalations/api/v1/escalations/user_preferences/dispute_columns"
         method: 'POST'
         data: {data}
         dataType: 'json'
@@ -1405,7 +1405,7 @@ $ ->
       data['sbrs-rules'] = $("#sbrs-rules-checkbox").is(':checked')
 
       std_msg_ajax(
-        url: "/escalations/api/v1/escalations/user_preferences"
+        url: "/escalations/api/v1/escalations/user_preferences/dispute_columns"
         method: 'POST'
         data: {data}
         dataType: 'json'
