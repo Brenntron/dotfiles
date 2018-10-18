@@ -141,6 +141,7 @@ Feature: Disputes
     And I trigger-click "#contact-name-checkbox"
     And I trigger-click "#contact-email-checkbox"
     When I goto "escalations/webrep/tickets?f=open"
+    Then I wait for "5" seconds
     Then I should not see "CASE ID"
     Then I should not see "STATUS"
     Then I should see "SUBMITTER TYPE"
