@@ -1703,7 +1703,6 @@ $ ->
     $("#advanced-search-dropdown").hide()
 
   $(document).ready ->
-
     setInterval ->
       if window.current_search_data
         window.populate_webrep_index_table(window.current_search_data)
