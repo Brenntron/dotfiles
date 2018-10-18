@@ -123,4 +123,27 @@ Feature: Disputes
     And I click "#add-search-criteria"
     Then I trigger-click ".export-button"
     Then I wait for "3" seconds
-    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"'
+
+  @javascript
+  Scenario: a user adds and selects columns from the Column drop-down
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id|
+      |1 |
+    When I goto "escalations/webrep/tickets?f=open"
+    And I click "#table-show-columns-button"
+    And I trigger-click "#case-id-checkbox"
+    And I trigger-click "#status-checkbox"
+    And I trigger-click "#submitter-type-checkbox"
+    And I trigger-click "#submitter-org-checkbox"
+    And I trigger-click "#submitter-domain-checkbox"
+    And I trigger-click "#contact-name-checkbox"
+    And I trigger-click "#contact-email-checkbox"
+    Then I should not see "CASE ID"
+    Then I should not see "STATUS"
+    Then I should see "SUBMITTER TYPE"
+    Then I should see "SUBMITTER ORG"
+    Then I should see "SUBMITTER DOMAIN"
+    Then I should see "CONTACT NAME"
+    Then I should see "CONTACT EMAIL"
