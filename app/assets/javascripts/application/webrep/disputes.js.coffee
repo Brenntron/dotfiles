@@ -952,6 +952,10 @@ window.populate_resolved_status_selection = () ->
   nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
   $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
+window.webrep_reset_search = () ->
+  debugger
+  console.log("Test")
+  document.location.reload()
 $ ->
 
   $('.change_ticket_status_button').click ->
