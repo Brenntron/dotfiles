@@ -45,6 +45,24 @@ module API
 
             end
 
+            desc 'Ticket Entries Closed By Day Graph'
+
+            params do
+              requires :from, type: String
+              requires :to, type: String
+              requires :user_id, type: Integer, desc: ""
+            end
+
+            get "ticket_entries_closed_by_day_report" do
+              authorize!(:index, Dispute)
+
+              report_data = Dispute.ticket_entries_closed_by_day_report(params[:user_id], params[:from], params[:to])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+
+            end
 
           end
         end
