@@ -14,16 +14,12 @@ window.populate_clusters_index_table = (filter) ->
     success: (response) ->
 
       json = $.parseJSON(response)
-
-
       if json.data.length == 0
         std_msg_error("No clusters available.","")
-
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-
         datatable = $('#clusters-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -84,7 +80,8 @@ window.categorize_cluster = (cluster_id, comment, category_ids) ->
   , this)
 
 $ ->
-  
+
+#  Populate the cluster management table (temp data currently)
   clusters_table = $('#clusters-index').DataTable(
     columnDefs: [
       {
@@ -160,4 +157,14 @@ $ ->
   )
   window.populate_clusters_index_table()
 
+  #  Nested cluster entries within the parent cluster row
+  #  Format established below
+  format = (cluster_entry_row) ->
+    cluster_entry = cluster_entry_row.data()
+    missing_data = '<span class="missing-data">No Data</span>'
 
+    cluster_entry_html = ''
+    cluster_entry_html =
+      '<table><tr><td>' +
+      'Testing setup' +
+      '</td></tr></table>'

@@ -1,6 +1,3 @@
-$('#myModal').on 'shown.bs.modal', ->
-  $('#myInput').trigger 'focus'
-
 window.display_tooltip = (id)->
   $('#cat_tooltip_' + id).tooltip('toggle')
 
