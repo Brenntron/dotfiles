@@ -37,7 +37,7 @@ module API
               user_preference.value = json.to_json
               user_preference.save
             else
-              UserPreference.create(user_id: current_user.id)
+              UserPreference.create(user_id: current_user.id, value: {})
 
               user_preference = UserPreference.where(user_id: current_user.id).first
 
@@ -50,6 +50,8 @@ module API
               user_preference.value = json.to_json
               user_preference.save
             end
+
+
 
             user_preference.value
           end
