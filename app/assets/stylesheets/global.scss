@@ -6533,9 +6533,9 @@ h2 {
 
   .data-btn {
     background-color: $primary-section-color;
-    background-image: url(image_path('icon_open_viewable.svg'));
+    background-image: url(image_path('icon_open_viewable_white.svg'));
     background-repeat: no-repeat;
-    //background-size: 15px;
+    background-size: 75%;
     background-position-x: center;
     background-position-y: center;
   }
@@ -6575,60 +6575,5 @@ h2 {
   }
 }
 .right-margin {
-  margin-right: 10px;
-}
-
-#whois_dialog {
-  display: none;
-  width: 200px;
-}
-
-.whois_tool_dialog {
-  min-width: 400px;
-}
-
-.whois_tool_dialog .ui-dialog-titlebar {
-  background-color: $content-tab-color;
-  background-image: url(image_path('icon_whois.svg'));
-  background-repeat: no-repeat;
-  background-position: 8px center;
-  background-size: 24px 24px;
-  padding-left: 40px;
-  border: none;
-  width: 100%;
-}
-
-.ui-dialog .ui-dialog-content {
-  width: 100% !important;
-}
-
-.dialog-content-wrapper {
-  padding: 0 10px;
-
-  input {
-    width: 100%;
-    height: 30px;
-    padding: 0 10px;
-    margin-top: 10px;
-    border: 1px solid #e0e0e0;
-  }
-}
-.whois-tool-footer {
-  display: flex;
-  justify-content: space-evenly;
-  margin-top: 20px;
-
-  .domain-paste-btn {
-    background-color: $primary-section-color;
-    color: white;
-    font-size: 10px;
-    padding: 10px 10px 10px 30px;
-
-  }
-
-  .domain-clear-btn {
-    background-color: $nav-toolbar-color;
-    font-size: 10px;
-    padding: 10px 10px 10px 30px;
-  }
+  margin-right: 4px;
 }
