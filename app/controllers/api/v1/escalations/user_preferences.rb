@@ -13,14 +13,12 @@ module API
           post "", root: :user_preferences do
             name = params['name']
 
-            case name
-            when 'WebRepColumns'
-              user_preference = UserPreference.where(user_id: current_user.id, name: 'WebRepColumns').first
+            user_preference = UserPreference.where(user_id: current_user.id, name: name).first
 
-              if user_preference.present?
-                user_preference.value
-              end
+            if user_preference.present?
+              user_preference.value
             end
+
           end
 
           desc "Update a preference for current user"
@@ -30,45 +28,27 @@ module API
           end
           post "update", root: :user_preferences do
             name = params['name']
+            columns = params.data
 
-            case name
-            when 'WebRepColumns'
-              columns = params.data
+            user_preference = UserPreference.create_with(value: {}, name: name).find_or_create_by(user_id: current_user.id, name: name)
 
-              user_preference = UserPreference.where(user_id: current_user.id, name: 'WebRepColumns').first
+            name = 0
+            state = 1
 
-              name = 0
-              state = 1
+            if user_preference.present?
+              json = JSON.parse(user_preference.value)
 
-              if user_preference.present?
-                json = JSON.parse(user_preference.value)
-
-                columns.each do |column|
-                  json[column[name]] = column[state]
-                end
-
-                user_preference.value = json.to_json
-                user_preference.save
-              else
-                UserPreference.create(user_id: current_user.id, name: 'WebRepColumns', value: {})
-
-                user_preference = UserPreference.where(user_id: current_user.id, name: 'WebRepColumns').first
-
-                json = JSON.parse(user_preference.value)
-
-                columns.each do |column|
-                  json[column[name]] = column[state]
-                end
-
-                user_preference.value = json.to_json
-                user_preference.save
+              columns.each do |column|
+                json[column[name]] = column[state]
               end
 
-              user_preference.value
+              user_preference.value = json.to_json
+              user_preference.save
+            end
+
             end
           end
         end
       end
-    end
   end
 end
