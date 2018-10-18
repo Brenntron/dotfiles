@@ -132,7 +132,7 @@ Feature: Disputes
       |id|
       |1 |
     When I goto "escalations/webrep/tickets?f=open"
-    And I click "#table-show-columns-button"
+    And I trigger-click "#table-show-columns-button"
     And I trigger-click "#case-id-checkbox"
     And I trigger-click "#status-checkbox"
     And I trigger-click "#submitter-type-checkbox"

@@ -15,9 +15,7 @@ module API
 
             user_preference = UserPreference.where(user_id: current_user.id, name: name).first
 
-            if user_preference.present?
-              user_preference.value
-            end
+            user_preference.value
 
           end
 
@@ -35,16 +33,14 @@ module API
             name = 0
             state = 1
 
-            if user_preference.present?
-              json = JSON.parse(user_preference.value)
+            json = JSON.parse(user_preference.value)
 
-              columns.each do |column|
-                json[column[name]] = column[state]
-              end
-
-              user_preference.value = json.to_json
-              user_preference.save
+            columns.each do |column|
+              json[column[name]] = column[state]
             end
+
+            user_preference.value = json.to_json
+            user_preference.save
 
             end
           end
