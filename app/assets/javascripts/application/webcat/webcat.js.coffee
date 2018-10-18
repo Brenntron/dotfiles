@@ -31,10 +31,12 @@ $ ->
           orderable: false
           searchable: false
         }
-          targets: [ 1 ]
+        {
+          targets: [1]
           className: 'important-flag-col'
           orderable: false
           searchable: false
+        }
         {
           targets: [ 2 ]
           className: 'entry-id-col'
@@ -43,7 +45,6 @@ $ ->
       columns: [
         {
           data: null
-
           width: '14px'
           orderable: false
           searchable: false
@@ -126,7 +127,6 @@ $ ->
         {
           data: 'company_name'
         }
-
         {
           data: 'assigned_to'
           className: 'alt-col'
@@ -134,6 +134,7 @@ $ ->
       ]
       select: 'style': 'os'
       responsive: true)
+
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 

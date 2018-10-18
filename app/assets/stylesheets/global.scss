@@ -1323,6 +1323,7 @@ fieldset.tight {
   padding: 2px 0 0 0 !important;
   margin: -4px 0  !important;
   min-height: 0 !important;
+  box-shadow: none !important;
 }
 
 .selectize-input.focus {
@@ -5774,7 +5775,7 @@ table.dataTable tbody tr.selected {
   margin-bottom: 0;
 }
 
-.nav-tool-content-wrapper .form-control.selectize, #categorize-urls-form-wrapper .form-control.selectize {
+.nav-tool-content-wrapper .form-control.selectize, #categorize-urls-form-wrapper .form-control.selectize, .category-column .form-control.selectize {
   background-color: transparent;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -5995,7 +5996,7 @@ table.dataTable tbody tr.selected {
   font-size: 8pt;
 }
 
-.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item {
+.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;
   font-size: 8pt;
@@ -6576,4 +6577,12 @@ h2 {
 }
 .right-margin {
   margin-right: 4px;
+}
+
+.category-column {
+  min-width: 250px;
+}
+
+.category-column fieldset {
+  margin: 0;
 }

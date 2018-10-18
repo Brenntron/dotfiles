@@ -29,6 +29,16 @@ window.populate_clusters_index_table = (filter) ->
         datatable.rows.add(json.data);
         datatable.draw();
 
+        $('.cluster_categories').selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          valueField: 'value',
+          labelField: 'value',
+          searchField: ['text'],
+          options: AC.WebCat.createSelectOptions()
+        }
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
       #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
@@ -75,63 +85,71 @@ window.categorize_cluster = (cluster_id, comment, category_ids) ->
 
 $ ->
   
-    clusters_table = $('#clusters-index').DataTable(
-      columnDefs: [
-        {
-          targets: [
-            0
-            1
-          ]
-          orderable: false
-          searchable: false
-        }
-        {
-          targets: [ 0 ]
-          className: 'expandable-row-column'
-        }
-      ]
-      columns: [
-        {
-          data: null
-          defaultContent: '<button class="expand-row-button-inline"></button>'
-        }
-        {
-          data: 'cluster_id'
-          render: (data) ->
-            '<input type="checkbox" name="cbox" class="cluster_check_box" id="cbox' + data + '" value="' + data + '" />'
-        }
-        {
-          data: 'cluster_id'
-        }
-        {
-          data: 'domain',
-          render: (data) ->
-            regexp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/i;
-            if (data.match(regexp))
-              data
-            else
-              if (data.startsWith('http') is false)
-                data = 'http://' + data
-                '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data + '\')"></button>' +
-                '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
-                data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>'
-        }
-        {
-          data: 'global_volume'
-        }
-        {
-          data: null
-          defaultContent: 'N/A'
-        }
-        {
-          data: 'ctime'
-        }
-        {
-          data: 'now'
-        }
-        {
-          data: 'age'
-        }
-      ]
-    )
-    window.populate_clusters_index_table()
+  clusters_table = $('#clusters-index').DataTable(
+    columnDefs: [
+      {
+        targets: [
+          0
+          1
+          6
+        ]
+        orderable: false
+        searchable: false
+      }
+      {
+        targets: [ 0 ]
+        className: 'expandable-row-column'
+      }
+      {
+        targets: [6]
+        className: 'category-column'
+      }
+    ]
+    columns: [
+      {
+        data: null
+        width: '14px'
+        orderable: false
+        searchable: false
+        sortable: false
+        'render':(data,type,full,meta)->
+          return '<button class="expand-row-button-inline expand-row-button-' + data.cluster_id + '"></button>'
+      }
+      {
+        data: 'cluster_id'
+        render: (data) ->
+          '<input type="checkbox" name="cbox" class="cluster_check_box" id="cbox' + data + '" value="' + data + '" />'
+      }
+      {
+        data: 'cluster_id'
+      }
+      {
+        data: 'domain',
+        render: (data) ->
+          regexp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/i;
+          if (data.match(regexp))
+            data
+          else
+            if (data.startsWith('http') is false)
+              data = 'http://' + data
+              '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data + '\')"></button>' +
+              '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
+              data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>'
+      }
+      {
+        data: 'global_volume'
+      }
+      {
+        data: null
+        defaultContent: 'N/A'
+      }
+      {
+        data: 'cluster_id'
+        render: (data) ->
+          '<select id="' + data + '_categories"' + 'class="form-control selectize cluster_categories" multiple="multiple" placeholder="Enter up to 5 categories" value="" name="">'
+      }
+    ]
+  )
+  window.populate_clusters_index_table()
+
+
