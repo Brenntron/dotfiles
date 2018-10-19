@@ -1283,5 +1283,21 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.ticket_time_to_close_report(user, from, to)
+
+    status_array = [STATUS_RESOLVED]
+
+    report_data = []
+
+    main_results = Dispute.where(:user_id => user.id).where("case_resolved_at between '#{from}' and '#{to}'").where(:status => status_array)
+
+    main_results.each do |result|
+      report_data << ((result.case_resolved_at - result.created_at) / 3600 )
+    end
+
+    report_data
+
+  end
+
 end
 
