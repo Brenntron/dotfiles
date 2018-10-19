@@ -95,7 +95,7 @@ class AutoResolve
   end
 
   def call_umbrella(address: self.address)
-    response = Umbrella::Scan.scan(address: address)
+    response = Umbrella::Scan.scan_result(address: address)
     case
       when 300 <= response.code
         Rails.logger.error("Umbrella http response #{response.code}")
@@ -120,6 +120,9 @@ class AutoResolve
         return STATUS_NONMALICIOUS
       end
     end
+  rescue
+    append_comment('Umbrella: error; ')
+    return nil
   end
 
   def mark_malicious

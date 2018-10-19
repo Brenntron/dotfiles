@@ -9,7 +9,7 @@ class Umbrella::Scan
     request
   end
 
-  def self.scan(address:)
+  def self.scan_result(address:)
     request = new_request(address)
     HTTPI.post(request)
   end

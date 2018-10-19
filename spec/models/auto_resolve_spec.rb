@@ -85,16 +85,39 @@ describe AutoResolve do
 
 
     # 1.  Complaints has at least one hit, VT and Umbrella convict, produces NEW ticket.
-    # 2.  Complaints has at least one hit, VT and Umbrella acquit, produces NEW ticket.
-    # 3.  Complaints has no hits, VT convicts, Umbrella acquits, produces malicious status.
-    it 'produces resolves as malicious when Complaints has no hits, VT convicts, Umbrella acquits' do
+    it 'produces new ticket when complaints hits and VT and Umbrella convict' do
       allow(Rails.configuration.complaints).to receive(:check).and_return(true)
       allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
       allow(Rails.configuration.umbrella).to receive(:check).and_return(true)
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
-      expect(Umbrella::Scan).to receive(:scan).with(address: target_address).and_return(umbrella_clear_response)
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      # auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd})
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd})
+
+      expect(auto_resolve.resolved?).to be_falsey
+    end
+
+    # 2.  Complaints has at least one hit, VT and Umbrella acquit, produces NEW ticket.
+    it 'produces new ticket when complaints hits and VT and Umbrella aquit' do
+      allow(Rails.configuration.complaints).to receive(:check).and_return(true)
+      allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
+      allow(Rails.configuration.umbrella).to receive(:check).and_return(true)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_clear_response)
+
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd})
+
+      expect(auto_resolve.resolved?).to be_falsey
+    end
+
+    # 3.  Complaints has no hits, VT convicts, Umbrella acquits, produces malicious status.
+    it 'resolves as malicious when Complaints has no hits, VT convicts, Umbrella acquits' do
+      allow(Rails.configuration.complaints).to receive(:check).and_return(true)
+      allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
+      allow(Rails.configuration.umbrella).to receive(:check).and_return(true)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_clear_response)
+
       auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
 
       expect(auto_resolve.resolved?).to be_truthy
@@ -102,14 +125,13 @@ describe AutoResolve do
     end
 
     # 4.  Complaints has no hits, VT acquits, Umbrella convicts, produces malicious status.
-    it 'produces resolves as malicious when Complaints has no hits, VT acquits, Umbrella convicts' do
+    it 'resolves as malicious when Complaints has no hits, VT acquits, Umbrella convicts' do
       allow(Rails.configuration.complaints).to receive(:check).and_return(true)
       allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
       allow(Rails.configuration.umbrella).to receive(:check).and_return(true)
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
-      expect(Umbrella::Scan).to receive(:scan).with(address: target_address).and_return(umbrella_conviction_response)
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      # auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd})
       auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
 
       expect(auto_resolve.resolved?).to be_truthy
@@ -117,14 +139,13 @@ describe AutoResolve do
     end
 
     # 5.  Complaints has no hits, VT acquits, Umbrella acquits, produces non-malicious status.
-    it 'produces resolves as non-malicious when Complaints has no hits, VT acquits, Umbrella acquits' do
+    it 'resolves as non-malicious when Complaints has no hits, VT acquits, Umbrella acquits' do
       allow(Rails.configuration.complaints).to receive(:check).and_return(true)
       allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
       allow(Rails.configuration.umbrella).to receive(:check).and_return(true)
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
-      expect(Umbrella::Scan).to receive(:scan).with(address: target_address).and_return(umbrella_clear_response)
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_clear_response)
 
-      # auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd})
       auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
 
       expect(auto_resolve.resolved?).to be_truthy
@@ -132,13 +153,37 @@ describe AutoResolve do
     end
 
     # 6.  Complaints has no hits, VT acquits, Umbrella check disabled produces NEW ticket.
+    it 'produces new ticket when Complaints has no hits, VT acquits, Umbrella check disabled' do
+      allow(Rails.configuration.complaints).to receive(:check).and_return(true)
+      allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
+      allow(Rails.configuration.umbrella).to receive(:check).and_return(false)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
+      allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
+
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+
+      expect(auto_resolve.resolved?).to be_falsey
+    end
+
     # 7.  Complaints has no hits, VT acquits, Umbrella check fails to connect produces NEW ticket.
+    it 'produces new ticket when Complaints has no hits, VT acquits, Umbrella check disabled' do
+      allow(Rails.configuration.complaints).to receive(:check).and_return(true)
+      allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
+      allow(Rails.configuration.umbrella).to receive(:check).and_return(true)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
+
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+
+      expect(auto_resolve.resolved?).to be_falsey
+    end
+
     # 8.  Complaints has no hits, VT check disabled, Umbrella convicts, produces malicious status.
     # 9.  Complaints has no hits, VT check fails to connect, Umbrella convicts, produces malicious status.
     # 10. Complaints has no hits, VT check disabled, Umbrella acquits, produces NEW ticket.
     # 11. Complaints has no hits, VT check fails to connect, Umbrella acquits, produces NEW ticket.
     # 12. Complaints has no hits, VT check disabled, Umbrella check disabled produces NEW ticket.
-    it 'produces new ticket when complaints hit and VT and Umbrella convict' do
+    it 'produces new ticket when Complaints has no hits and VT and Umbrella convict' do
       allow(Rails.configuration.complaints).to receive(:check).and_return(true)
       allow(Rails.configuration.virus_total).to receive(:check).and_return(false)
       allow(Rails.configuration.umbrella).to receive(:check).and_return(false)
@@ -153,16 +198,6 @@ describe AutoResolve do
     # 14. Complaints has no hits, VT check fails to connect, Umbrella check disabled produces NEW ticket.
     # 15. Complaints has no hits, VT check fails to connect, Umbrella check fails to connect produces NEW ticket.
 
-
-    it 'checks complaints' do
-      allow(Rails.configuration.complaints).to receive(:check).and_return(true)
-      allow(Rails.configuration.virus_total).to receive(:check).and_return(false)
-      allow(Rails.configuration.umbrella).to receive(:check).and_return(false)
-      expect(auto_cisco).to receive(:check_complaints)
-
-      auto_cisco.create_from_payload('IP', target_address, rule_hits: [])
-
-    end
 
     it 'skips complaints' do
       allow(Rails.configuration.complaints).to receive(:check).and_return(false)
