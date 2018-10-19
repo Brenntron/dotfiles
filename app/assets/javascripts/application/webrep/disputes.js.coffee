@@ -953,7 +953,7 @@ window.populate_resolved_status_selection = () ->
   $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
 window.webrep_reset_search = () ->
-  document.location.reload()
+  $(document).find("#caseid-input").text("")
 
 $ ->
 
