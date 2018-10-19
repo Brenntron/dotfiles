@@ -469,19 +469,21 @@ class Dispute < ApplicationRecord
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry["rep_sugg"]
 
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_payload_item[:resolution] = "FIXED"
-              new_payload_item[:status] = TI_RESOLVED
-            else
-              new_payload_item[:resolution_message] = AUTORESOLVED_UNCHANGED_MESSAGE
-              new_payload_item[:resolution] = "UNCHANGED"
-              new_payload_item[:status] = TI_RESOLVED
-            end
-          else
+          case
+          when !false_negative_claim
             new_payload_item[:status] = TI_NEW
             new_payload_item[:resolution_message] = ""
+          when !auto_resolve_verdict.resolved?
+            new_payload_item[:status] = TI_NEW
+            new_payload_item[:resolution_message] = ""
+          when auto_resolve_verdict.malicious?
+            new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+            new_payload_item[:resolution] = "FIXED"
+            new_payload_item[:status] = TI_RESOLVED
+          else
+            new_payload_item[:resolution_message] = AUTORESOLVED_UNCHANGED_MESSAGE
+            new_payload_item[:resolution] = "UNCHANGED"
+            new_payload_item[:status] = TI_RESOLVED
           end
           new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
           return_payload[key] = new_payload_item
@@ -495,22 +497,24 @@ class Dispute < ApplicationRecord
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.case_opened_at = opened_at
 
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            else
-              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            end
-          else
+          case
+          when !false_negative_claim
             new_dispute_entry.status = DisputeEntry::NEW
+          when !auto_resolve_verdict.resolved?
+            new_dispute_entry.status = DisputeEntry::NEW
+          when auto_resolve_verdict.malicious?
+            new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+            new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+            new_dispute_entry.status = DisputeEntry::RESOLVED
+            new_dispute_entry.case_closed_at = resolved_at
+            new_dispute_entry.case_resolved_at = resolved_at
+            verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+          else
+            new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
+            new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+            new_dispute_entry.status = DisputeEntry::RESOLVED
+            new_dispute_entry.case_closed_at = resolved_at
+            new_dispute_entry.case_resolved_at = resolved_at
           end
           new_dispute_entry.save!
 
@@ -535,7 +539,6 @@ class Dispute < ApplicationRecord
             end
           end
 
-          verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
           logger.debug "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
@@ -576,22 +579,23 @@ class Dispute < ApplicationRecord
           new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.case_opened_at = opened_at
 
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            else
-              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            end
-          else
+          case
+          when !false_negative_claim
             new_dispute_entry.status = DisputeEntry::NEW
+          when !auto_resolve_verdict.resolved?
+            new_dispute_entry.status = DisputeEntry::NEW
+          when auto_resolve_verdict.malicious?
+            new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+            new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+            new_dispute_entry.status = DisputeEntry::RESOLVED
+            new_dispute_entry.case_closed_at = resolved_at
+            new_dispute_entry.case_resolved_at = resolved_at
+          else
+            new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
+            new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+            new_dispute_entry.status = DisputeEntry::RESOLVED
+            new_dispute_entry.case_closed_at = resolved_at
+            new_dispute_entry.case_resolved_at = resolved_at
           end
 
           new_dispute_entry.save!
@@ -599,19 +603,22 @@ class Dispute < ApplicationRecord
 
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry["rep_sugg"]
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_payload_item[:resolution] = "FIXED"
-              new_payload_item[:status] = TI_RESOLVED
-            else
-              new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_payload_item[:resolution] = "UNCHANGED"
-              new_payload_item[:status] = TI_RESOLVED
-            end
-          else
+          case
+          when !false_negative_claim
             new_payload_item[:status] = TI_NEW
             new_payload_item[:resolution_message] = ""
+          when !auto_resolve_verdict.resolved?
+            new_payload_item[:status] = TI_NEW
+            new_payload_item[:resolution_message] = ""
+          when auto_resolve_verdict.malicious?
+            new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+            new_payload_item[:resolution] = "FIXED"
+            new_payload_item[:status] = TI_RESOLVED
+            verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+          else
+            new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
+            new_payload_item[:resolution] = "UNCHANGED"
+            new_payload_item[:status] = TI_RESOLVED
           end
           new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
           return_payload[key] = new_payload_item
@@ -627,7 +634,6 @@ class Dispute < ApplicationRecord
             end
           end
 
-          verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
           logger.debug "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
