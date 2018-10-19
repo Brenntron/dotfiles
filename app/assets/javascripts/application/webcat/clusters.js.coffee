@@ -122,7 +122,7 @@ $ ->
         searchable: false
         sortable: false
         render: (data) ->
-          '<input type="checkbox" name="cbox" class="cluster_check_box" id="cbox' + data + '" value="' + data + '" />'
+          '<span></span>'
       }
       {
         data: 'cluster_id'
@@ -168,3 +168,14 @@ $ ->
       '<table><tr><td>' +
       'Testing setup' +
       '</td></tr></table>'
+
+    cluster_entry_html
+
+# Select rows in Clusters Table
+$ ->
+  $('#clusters_check_box').click ->
+    if $('#clusters_check_box').prop('checked')
+      $('#clusters-index').DataTable().rows().select()
+    else
+      $('#clusters-index').DataTable().rows().deselect()
+  return
