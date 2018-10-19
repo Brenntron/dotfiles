@@ -149,7 +149,6 @@ class AutoResolve
   # Checks the remote systems.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_sources(rule_hits:)
-    # byebug
     wbrs_hits =
         if Rails.configuration.complaints.check
           check_complaints(rule_hits: rule_hits)

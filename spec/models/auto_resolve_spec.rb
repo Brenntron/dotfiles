@@ -288,7 +288,31 @@ describe AutoResolve do
     end
 
     # 14. Complaints has no hits, VT check fails to connect, Umbrella check disabled produces NEW ticket.
+    it 'produces new ticket when Complaints has no hits, VT check fails to connect, Umbrella check disabled' do
+      allow(Rails.configuration.complaints).to receive(:check).and_return(true)
+      allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
+      allow(Rails.configuration.umbrella).to receive(:check).and_return(false)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
+      allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
+
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+
+      expect(auto_resolve.resolved?).to be_falsey
+    end
+
     # 15. Complaints has no hits, VT check fails to connect, Umbrella check fails to connect produces NEW ticket.
+    it 'produces new ticket when Complaints has no hits, VT check fails to connect, Umbrella check fails to connect' do
+      allow(Rails.configuration.complaints).to receive(:check).and_return(true)
+      allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
+      allow(Rails.configuration.umbrella).to receive(:check).and_return(false)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
+      allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
+
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+
+      expect(auto_resolve.resolved?).to be_falsey
+    end
+
 
   end
 end
