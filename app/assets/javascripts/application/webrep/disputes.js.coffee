@@ -1647,6 +1647,9 @@ $ ->
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
+
+
+
 $ ->
   $('input[name="dates"]').datepicker
     showWeek: true
@@ -1666,6 +1669,5 @@ $ ->
     $('input[name="dates"]').datepicker 'show'
   return
 
-#    $('input[name="dates"]').datepicker()
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
