@@ -6374,6 +6374,17 @@ h2 {
         border-right: 1px solid #e0e0e0;
       }
 
+      .no-right-border {
+        border-right: none;
+      }
+      input {
+        color: red;
+        width: 0;
+        overflow: hidden;
+        border: none;
+        background: transparent;
+      }
+
       button {
         background-color: $content-tab-color;
         border: none;

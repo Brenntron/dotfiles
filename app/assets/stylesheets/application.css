@@ -17,6 +17,7 @@
  *= require selectize.default
  *= require bootstrap-multiselect
  *= require bootstrap-table.min
+ *= require daterangepicker
  *= require_tree .
  *= require_self
  *= stub dataTables/extras/dataTables.responsive
