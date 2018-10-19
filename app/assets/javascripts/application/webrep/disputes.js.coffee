@@ -953,7 +953,26 @@ window.populate_resolved_status_selection = () ->
   $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
 window.webrep_reset_search = () ->
-  $(document).find("#caseid-input").text("")
+
+  document.getElementById("caseid-input").value=""
+  document.getElementById("dispute-input").value=""
+  document.getElementById("owner-input").value=""
+  document.getElementById("status-input").value=""
+  document.getElementById("priority-input").value=""
+  document.getElementById("disposition-input").value=""
+  document.getElementById("resolution-input").value=""
+  document.getElementById("submission-type-input").value=""
+  document.getElementById("name-input").value=""
+  document.getElementById("caseid-input").value=""
+  document.getElementById("email-input").value=""
+  document.getElementById("company-input").value=""
+  document.getElementById("domain-input").value=""
+  document.getElementById("submitted-newer-input").value=""
+  document.getElementById("submitted-older-input").value=""
+  document.getElementById("age-newer-input").value=""
+  document.getElementById("age-older-input").value=""
+  document.getElementById("modified-newer-input").value=""
+  document.getElementById("modified-older-input").value=""
 
 $ ->
 
