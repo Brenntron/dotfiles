@@ -363,9 +363,9 @@ class Dispute < ApplicationRecord
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
+    verdicts_to_blacklist = []
     begin
       ActiveRecord::Base.transaction do
-        verdicts_to_blacklist = []
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
         opened_at = Time.now
@@ -390,8 +390,8 @@ class Dispute < ApplicationRecord
         summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
         full_description = <<~HEREDOC
-          IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
-          URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
+          IPs: #{new_entries_ips.keys}
+          URIs: #{new_entries_urls.keys}
           Problem Summary: #{message_payload["payload"]["problem"]}
         HEREDOC
 
