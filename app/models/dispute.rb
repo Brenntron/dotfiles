@@ -474,26 +474,12 @@ class Dispute < ApplicationRecord
           auto_resolve_verdict = AutoResolve.create_from_payload(new_dispute_entry.entry_type, key, total_hits)
 
           #this is for return back to TI to populate its ticket show pages
-          new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["rep_sugg"]
-
           case
           when !false_negative_claim
-            new_payload_item[:status] = TI_NEW
-            new_payload_item[:resolution_message] = ""
           when !auto_resolve_verdict.resolved?
-            new_payload_item[:status] = TI_NEW
-            new_payload_item[:resolution_message] = ""
           when auto_resolve_verdict.malicious?
-            new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-            new_payload_item[:resolution] = "FIXED"
-            new_payload_item[:status] = TI_RESOLVED
-          else
-            new_payload_item[:resolution_message] = AUTORESOLVED_UNCHANGED_MESSAGE
-            new_payload_item[:resolution] = "UNCHANGED"
-            new_payload_item[:status] = TI_RESOLVED
+            verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
           end
-          new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
 
           case
           when !false_negative_claim
@@ -504,10 +490,8 @@ class Dispute < ApplicationRecord
           new_dispute_entry.save!
 
 
-          payload_item = new_dispute_entry.xnew_payload_item
-          payload_item[:sugg_type] = entry["rep_sugg"]
-          payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
-          return_payload[key] = new_payload_item
+          #this is for return back to TI to populate its ticket show pages
+          return_payload[key] = new_dispute_entry.new_payload_item
 
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
@@ -582,32 +566,15 @@ class Dispute < ApplicationRecord
           new_dispute_entry.save!
 
 
-          new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["rep_sugg"]
           case
           when !false_negative_claim
-            new_payload_item[:status] = TI_NEW
-            new_payload_item[:resolution_message] = ""
           when !auto_resolve_verdict.resolved?
-            new_payload_item[:status] = TI_NEW
-            new_payload_item[:resolution_message] = ""
           when auto_resolve_verdict.malicious?
-            new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-            new_payload_item[:resolution] = "FIXED"
-            new_payload_item[:status] = TI_RESOLVED
             verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-          else
-            new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-            new_payload_item[:resolution] = "UNCHANGED"
-            new_payload_item[:status] = TI_RESOLVED
           end
-          new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
 
 
-          payload_item = new_dispute_entry.xnew_payload_item
-          payload_item[:sugg_type] = entry["rep_sugg"]
-          payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
-          return_payload[key] = new_payload_item
+          return_payload[key] = new_dispute_entry.new_payload_item
 
           if entry["WBRS_Rule_Hits"].present?
             all_hits = entry["WBRS_Rule_Hits"].split(",")

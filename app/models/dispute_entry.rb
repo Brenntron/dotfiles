@@ -265,8 +265,7 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
-  def xnew_payload_item
-    # byebug
+  def new_payload_item
     case
     when NEW == status
       {
