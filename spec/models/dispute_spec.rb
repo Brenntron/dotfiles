@@ -1,5 +1,6 @@
 describe Dispute do
   let(:target_address) {'www.spanx.com'}
+  # let(:target_address) {'192.230.66.19'}
   let(:dispute_email) do
     <<~HEREDOC
         ____________________________________________________________
@@ -45,7 +46,7 @@ describe Dispute do
                 'ticket_time' => "September 03, 2018 12:04",
                 'investigate_ips' => {},
                 'investigate_urls' => {
-                    'www.spanx.com' => {
+                    target_address => {
                         'WBRS_SCORE' => '1.58',
                         'WBRS_Rule_Hits' => "alx_cln, vsvd",
                         'Hostname_ips' => '',
@@ -76,7 +77,7 @@ describe Dispute do
                 'ticket_time' => "September 03, 2018 12:04",
                 'investigate_ips' => {},
                 'investigate_urls' => {
-                    'www.spanx.com' => {
+                    target_address => {
                         'WBRS_SCORE' => '1.58',
                         'WBRS_Rule_Hits' => "alx_cln, vsvd",
                         'Hostname_ips' => '',
