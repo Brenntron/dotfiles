@@ -15,7 +15,7 @@ module API
 
             user_preference = UserPreference.where(user_id: current_user.id, name: name).first
 
-            user_preference.value
+            user_preference&.value
 
           end
 

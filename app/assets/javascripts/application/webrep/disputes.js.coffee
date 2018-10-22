@@ -1350,20 +1350,21 @@ $ ->
 
   $(document).ready ->
 
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/user_preferences/"
-      data: {name: 'WebRepColumns'}
-      success: (response) ->
-        response = JSON.parse(response)
+    if window.location.pathname == '/escalations/webrep/tickets'
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'WebRepColumns'}
+        success: (response) ->
+          response = JSON.parse(response)
 
-        $.each response, (column, state) ->
-          if state == true
-            $("##{column}-checkbox").prop('checked', true)
-            window.dispute_table.column("##{column}").visible true
-          else
-            $("##{column}-checkbox").prop('checked', false)
-            window.dispute_table.column("##{column}").visible false
+          $.each response, (column, state) ->
+            if state == true
+              $("##{column}-checkbox").prop('checked', true)
+              window.dispute_table.column("##{column}").visible true
+            else
+              $("##{column}-checkbox").prop('checked', false)
+              window.dispute_table.column("##{column}").visible false
 
     )
 
