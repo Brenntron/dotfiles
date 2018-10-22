@@ -5,11 +5,15 @@ FactoryBot.define do
     domain          { 'testing.com' }
     path            { '/downloads' }
     wbrs_score      { 2 }
-    url_primary_category {'Arts'}
+    url_primary_category {''}
     sbrs_score      { 10 }
     ip_address      { '1.1.1.1' }
     category        { 'bogus_category' }
 
+    trait :high_telemetry do
+      status               { 'PENDING' }
+      url_primary_category {'Arts'}
+    end
     trait :important do
       is_important  { true }
     end

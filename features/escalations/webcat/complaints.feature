@@ -28,58 +28,54 @@ Feature: Webcat complaints
   @javascript
   Scenario: A user must review a high telemetry site
     Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "important" exists
+    And a complaint entry with trait "high_telemetry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I wait for "7" seconds
     And I should see "Arts"
     Then I should not see "Update"
     And I click ".expand-all"
+    Then I should see "Commit"
+    Then I should see "Decline"
+    Then I should see "Submit"
+
+  @javascript
+  Scenario: A user does not need to review a low telemetry site
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "not_important" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I should not see "Update"
+    And I click ".expand-all"
     And I choose "fixed1"
     And I should see "Update"
     And I should not see "commit"
     When I click "#submit_changes_1"
-    Then I wait for "25" seconds
-    Then I should see "Commit"
-
-  @javascript
-  Scenario: A user does not need to review a low telemetry site
-    Given a user with role "admin" exists and is logged in
-    And a complaint entry with trait "not_important" exists
-    And I goto "/escalations/webcat"
-    And I should see "bogus_category"
-    Then I should not see "Update"
-    When I click button with class "expand-row-button-inline"
-    And I choose "fixed1"
-    And I should see "Update"
-    And I should not see "commit"
-    When I click "Update"
     Then I should not see "commit"
 
   @javascript
   Scenario: a user can take a complaint
     Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "not_important" exists
-    And I goto "/escalations/webcat"
-    And I wait for "2" seconds
-    And I should see "Vrt Incoming"
-    And I click a table row
-    And I click button "Take selected"
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I click ".sorting_1"
+    And I click ".take-ticket-toolbar-button"
+    Then I wait for "3" seconds
     Then I should see "ASSIGNED"
-    Then take a photo
-    And I should not see "Vrt Incoming"
 
   @javascript
   Scenario: a user can return a complaint
     Given a user with role "webcat user" exists and is logged in
-    And an assigned complaint entry with trait "not_important" exists
-    And I goto "/escalations/webcat"
-    And I wait for "1" seconds
-    And I should not see "Vrt Incoming"
-    And I click a table row
-    And I click button "Return selected"
-    And I wait for "1" seconds
-    Then I should see "Vrt Incoming"
+    And an assigned complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I click ".sorting_1"
+    And I click ".return-ticket-toolbar-button"
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I should see "NEW"
 
   @javascript
   Scenario: a user selects the 'My Complaints' filter
@@ -173,22 +169,22 @@ Feature: Webcat complaints
     And a complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     And I click ".expand-all"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     And I click "#submit_changes_1"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
   @javascript
   Scenario: a user clicks the domain button
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     And I click ".expand-all"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     Then I click "#domain-1"
     Then I should see "Domain Information"
 
