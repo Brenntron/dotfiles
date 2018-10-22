@@ -1,6 +1,6 @@
 describe Dispute do
-  # let(:target_address) {'www.spanx.com'}
-  let(:target_address) {'184.168.221.74'}
+  let(:target_url_address) {'www.spanx.com'}
+  let(:target_ip_address) {'184.168.221.74'}
   let(:dispute_email) do
     <<~HEREDOC
         ____________________________________________________________
@@ -39,13 +39,13 @@ describe Dispute do
             payload: {
                 'name' => "Marlin Pierce",
                 'email' => "marlpier@cisco.com",
-                'domain' => target_address,
+                'domain' => target_ip_address,
                 'problem' => "New category",
                 'details' => '',
                 'user_ip' => "::1",
                 'ticket_time' => "September 03, 2018 12:04",
                 'investigate_ips' => {
-                    target_address => {
+                    target_ip_address => {
                         "wbrs" => {
                             'WBRS_SCORE' => '1.58',
                             'WBRS_Rule_Hits' => "alx_cln, vsvd",
@@ -78,13 +78,13 @@ describe Dispute do
             payload: {
                 'name' => "Marlin Pierce",
                 'email' => "marlpier@cisco.com",
-                'domain' => target_address,
+                'domain' => target_ip_address,
                 'problem' => "New category",
                 'details' => '',
                 'user_ip' => "::1",
                 'ticket_time' => "September 03, 2018 12:04",
                 'investigate_ips' => {
-                    target_address => {
+                    target_ip_address => {
                         "wbrs" => {
                             'WBRS_SCORE' => '1.58',
                             'WBRS_Rule_Hits' => "alx_cln, vsvd",
@@ -117,14 +117,14 @@ describe Dispute do
             payload: {
                 'name' => "Marlin Pierce",
                 'email' => "marlpier@cisco.com",
-                'domain' => target_address,
+                'domain' => target_url_address,
                 'problem' => "New category",
                 'details' => '',
                 'user_ip' => "::1",
                 'ticket_time' => "September 03, 2018 12:04",
                 'investigate_ips' => {},
                 'investigate_urls' => {
-                    target_address => {
+                    target_url_address => {
                         'WBRS_SCORE' => '1.58',
                         'WBRS_Rule_Hits' => "alx_cln, vsvd",
                         'Hostname_ips' => '',
@@ -148,14 +148,14 @@ describe Dispute do
             payload: {
                 'name' => "Marlin Pierce",
                 'email' => "marlpier@cisco.com",
-                'domain' => target_address,
+                'domain' => target_url_address,
                 'problem' => "New category",
                 'details' => '',
                 'user_ip' => "::1",
                 'ticket_time' => "September 03, 2018 12:04",
                 'investigate_ips' => {},
                 'investigate_urls' => {
-                    target_address => {
+                    target_url_address => {
                         'WBRS_SCORE' => '1.58',
                         'WBRS_Rule_Hits' => "alx_cln, vsvd",
                         'Hostname_ips' => '',
@@ -175,19 +175,21 @@ describe Dispute do
   end
   let(:top_url_response_json) do
     {
-        target_address => true
+        target_url_address => true,
+        target_ip_address => true,
     }.to_json
   end
   let(:blacklist_json) do
     {
-        target_address => 'NOT_FOUND'
+        target_url_address => 'NOT_FOUND',
+        target_ip_address => 'NOT_FOUND',
     }.to_json
   end
   let(:virustotal_json) do
     {
         "scan_id": "263a0bca315778e09734a8ac9539f557905e909847d901946c5df1a13e631b17-1536170044",
-        "resource": target_address,
-        "url": "http://#{target_address}/",
+        "resource": target_url_address,
+        "url": "http://#{target_url_address}/",
         "response_code": 1,
         "scan_date": "2018-09-05 17:54:04",
         "permalink": "https://www.virustotal.com/url/263a0bca315778e09734a8ac9539f557905e909847d901946c5df1a13e631b17/analysis/1536170044/", "verbose_msg": "Scan finished, scan information embedded in this object",
@@ -208,8 +210,8 @@ describe Dispute do
             "Virusdie External Site Scan": {"detected": false, "result": "clean site"},
             "Quttera": {"detected": false, "result": "clean site"},
             "AegisLab WebGuard": {"detected": false, "result": "clean site"},
-            "MalwareDomainList": {"detected": false, "result": "clean site", "detail": "http://www.malwaredomainlist.com/mdl.php?search=#{target_address}"},
-            "ZeusTracker": {"detected": false, "result": "clean site", "detail": "https://zeustracker.abuse.ch/monitor.php?host=#{target_address}"},
+            "MalwareDomainList": {"detected": false, "result": "clean site", "detail": "http://www.malwaredomainlist.com/mdl.php?search=#{target_url_address}"},
+            "ZeusTracker": {"detected": false, "result": "clean site", "detail": "https://zeustracker.abuse.ch/monitor.php?host=#{target_url_address}"},
             "zvelo": {"detected": false, "result": "clean site"},
             "Google Safebrowsing": {"detected": false, "result": "clean site"},
             "Kaspersky": {"detected": false, "result": "clean site"},
@@ -233,7 +235,7 @@ describe Dispute do
             "AlienVault": {"detected": false, "result": "clean site"},
             "Emsisoft": {"detected": false, "result": "clean site"},
             "Rising": {"detected": false, "result": "clean site"},
-            "Malc0de Database": {"detected": false, "result": "clean site", "detail": "http://malc0de.com/database/index.php?search=#{target_address}"},
+            "Malc0de Database": {"detected": false, "result": "clean site", "detail": "http://malc0de.com/database/index.php?search=#{target_url_address}"},
             "malwares.com URL checker": {"detected": false, "result": "clean site"},
             "Phishtank": {"detected": false, "result": "clean site"},
             "Malwared": {"detected": false, "result": "clean site"},
@@ -247,7 +249,7 @@ describe Dispute do
             "Malekal": {"detected": false, "result": "clean site"},
             "ESET": {"detected": false, "result": "clean site"},
             "Sophos": {"detected": false, "result": "unrated site"},
-            "Yandex Safebrowsing": {"detected": false, "result": "clean site", "detail": "http://yandex.com/infected?l10n=en&url=http://#{target_address}/"},
+            "Yandex Safebrowsing": {"detected": false, "result": "clean site", "detail": "http://yandex.com/infected?l10n=en&url=http://#{target_url_address}/"},
             "Spam404": {"detected": false, "result": "clean site"},
             "Nucleon": {"detected": false, "result": "clean site"},
             "Sucuri SiteCheck": {"detected": false, "result": "clean site"},
@@ -267,7 +269,7 @@ describe Dispute do
   end
   let(:umbrella_clear_json) {
     {
-        target_address => {
+        target_url_address => {
             "status" => 1,
             "security_categories" => [],
             "content_categories" => ["25","32"]
@@ -303,7 +305,7 @@ describe Dispute do
             "response_took" => 0.014037847518920898,
             "response_repdb_time" => 1536348248,
             "isolation_level" => "REPEATABLE-READ",
-            "request" => "http://prod-xbrs-writer1.vega.ironport.com:80/v1/domain/#{target_address}?consumer=TEST",
+            "request" => "http://prod-xbrs-writer1.vega.ironport.com:80/v1/domain/#{target_url_address}?consumer=TEST",
             "product_version" => "1.3.0 2018-05-16 09:38 PDT",
             "response_local_time" => 1536348248,
             "total_data_rows" => 0,
@@ -315,7 +317,7 @@ describe Dispute do
         "resource" => {
             "requested_subdomain" => nil,
             "data_rows" => 0,
-            "requested_domain" => target_address
+            "requested_domain" => target_url_address
         }
     }.to_json +
     "\n---\n" +
@@ -348,7 +350,7 @@ describe Dispute do
   end
   let(:umbrella_data) do
     {
-        target_address => {
+        target_url_address => {
             "status" => 0,
             "security_categories" => [],
             "content_categories" => ["8", "41"]
@@ -385,11 +387,11 @@ describe Dispute do
                 .and_return(blacklist_response)
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
                 .and_return(virustotal_response)
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_ip_address)
                 .and_return(umbrella_clear_response)
     allow(Wbrs::Base)
         .to receive(:post_request)
@@ -427,16 +429,16 @@ describe Dispute do
     # TODO remove redundant API call
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
                 .and_return(virustotal_response)
     # TODO remove redundant API call
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_ip_address)
                 .and_return(umbrella_clear_response)
     allow(AutoResolve)
         .to receive(:create_from_payload)
-                .with('IP', target_address, anything)
+                .with('IP', target_ip_address, anything)
                 .and_return(auto_resolve_new)
     allow(Wbrs::Base)
         .to receive(:post_request)
@@ -474,16 +476,16 @@ describe Dispute do
     # TODO remove redundant API call
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
                 .and_return(virustotal_response)
     # TODO remove redundant API call
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_ip_address)
                 .and_return(umbrella_clear_response)
     allow(AutoResolve)
         .to receive(:create_from_payload)
-                .with('IP', target_address, anything)
+                .with('IP', target_ip_address, anything)
                 .and_return(auto_convict)
     allow(Wbrs::Base)
         .to receive(:post_request)
@@ -521,16 +523,16 @@ describe Dispute do
     # TODO remove redundant API call
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
                 .and_return(virustotal_response)
     # TODO remove redundant API call
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_ip_address)
                 .and_return(umbrella_clear_response)
     allow(AutoResolve)
         .to receive(:create_from_payload)
-                .with('IP', target_address, anything)
+                .with('IP', target_ip_address, anything)
                 .and_return(auto_acquit)
     allow(Wbrs::Base)
         .to receive(:post_request)
@@ -566,11 +568,11 @@ describe Dispute do
                 .and_return(blacklist_response)
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
                 .and_return(virustotal_response)
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_url_address)
                 .and_return(umbrella_clear_response)
     allow(Wbrs::Base)
         .to receive(:post_request)
@@ -608,16 +610,16 @@ describe Dispute do
     # TODO remove redundant API call
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
                 .and_return(virustotal_response)
     # TODO remove redundant API call
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_url_address)
                 .and_return(umbrella_clear_response)
     allow(AutoResolve)
         .to receive(:create_from_payload)
-                .with('URI/DOMAIN', target_address, anything)
+                .with('URI/DOMAIN', target_url_address, anything)
                 .and_return(auto_resolve_new)
     allow(Wbrs::Base)
         .to receive(:post_request)
@@ -655,16 +657,16 @@ describe Dispute do
     # TODO remove redundant API call
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
                 .and_return(virustotal_response)
     # TODO remove redundant API call
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_url_address)
                 .and_return(umbrella_clear_response)
     allow(AutoResolve)
         .to receive(:create_from_payload)
-                .with('URI/DOMAIN', target_address, anything)
+                .with('URI/DOMAIN', target_url_address, anything)
                 .and_return(auto_convict)
     allow(Wbrs::Base)
         .to receive(:post_request)
@@ -702,16 +704,16 @@ describe Dispute do
     # TODO remove redundant API call
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
                 .and_return(virustotal_response)
     # TODO remove redundant API call
     allow(Umbrella::Scan)
         .to receive(:scan_result)
-                .with(address: target_address)
+                .with(address: target_url_address)
                 .and_return(umbrella_clear_response)
     allow(AutoResolve)
         .to receive(:create_from_payload)
-                .with('URI/DOMAIN', target_address, anything)
+                .with('URI/DOMAIN', target_url_address, anything)
                 .and_return(auto_acquit)
     allow(Wbrs::Base)
         .to receive(:post_request)
