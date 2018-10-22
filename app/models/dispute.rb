@@ -464,7 +464,14 @@ class Dispute < ApplicationRecord
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
-          auto_resolve_verdict = AutoResolve.create_from_payload("IP", key, total_hits)
+          new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: key)
+          new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
+          new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
+          new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
+          new_dispute_entry.case_opened_at = opened_at
+
+
+          auto_resolve_verdict = AutoResolve.create_from_payload(new_dispute_entry.entry_type, key, total_hits)
 
           #this is for return back to TI to populate its ticket show pages
           new_payload_item = {}
@@ -488,15 +495,6 @@ class Dispute < ApplicationRecord
           end
           new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
           return_payload[key] = new_payload_item
-
-          new_dispute_entry = DisputeEntry.new
-          new_dispute_entry.dispute_id = new_dispute.id
-          new_dispute_entry.ip_address = key
-          new_dispute_entry.entry_type = "IP"
-          new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
-          new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
-          new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-          new_dispute_entry.case_opened_at = opened_at
 
           case
           when !false_negative_claim
