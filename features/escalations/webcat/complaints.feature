@@ -184,7 +184,7 @@ Feature: Webcat complaints
     And I wait for "2" seconds
     And I click ".expand-all"
     And I wait for "2" seconds
-    Then I click "#domain_button"
+    Then I click "#domain-1"
     Then I should see "Domain Information"
 
   @javascript
