@@ -79,9 +79,5 @@
 
   .copycat-tool-footer
     %button.toolbar-button.cat-paste-btn.icon-paste Paste Categories
-    %button.toolbar-button.cat-clear-btn.icon-clear Clear Categories
-
-
-:javascript
-  window.populate_clusters_index_table()
-  // window.fetch_cluster_data(3)
+    %button.toolbar-button.cat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
+    

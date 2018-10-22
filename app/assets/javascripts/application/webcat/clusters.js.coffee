@@ -175,13 +175,16 @@ $ ->
 $ ->
   $(document).ready ->
 
-
-
-
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
     dialogClass: "copycat_tool_dialog"
   })
+
+# delete copycat input content
+window.copycat_clear = () ->
+  console.log('clearing copy cat input')
+  $('#copycat_dialog input')[0].value = ''
+
 
 # Select rows in Clusters Table
 $ ->
