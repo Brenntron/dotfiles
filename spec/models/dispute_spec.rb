@@ -323,9 +323,16 @@ describe Dispute do
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
 
+    dispute = nil
     expect do
-      Dispute.process_bridge_payload(fn_url_dispute_message_payload)
+      dispute = Dispute.process_bridge_payload(fn_url_dispute_message_payload)
     end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry.resolution).to be_nil
   end
 
   it 'processes fp auto-resolve as new bridge payload' do
