@@ -499,8 +499,6 @@ class Dispute < ApplicationRecord
           case
           when !false_negative_claim
             new_dispute_entry.status = DisputeEntry::NEW
-          when !auto_resolve_verdict.resolved?
-            new_dispute_entry.status = DisputeEntry::NEW
           else
             new_dispute_entry.assign_from_auto_resolve(auto_resolve_verdict, resolved_at: resolved_at)
           end
@@ -570,8 +568,6 @@ class Dispute < ApplicationRecord
 
           case
           when !false_negative_claim
-            new_dispute_entry.status = DisputeEntry::NEW
-          when !auto_resolve_verdict.resolved?
             new_dispute_entry.status = DisputeEntry::NEW
           else
             new_dispute_entry.assign_from_auto_resolve(auto_resolve_verdict, resolved_at: resolved_at)
