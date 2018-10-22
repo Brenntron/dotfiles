@@ -1320,9 +1320,10 @@ fieldset.tight {
 /*** Overriding selectize plugin styles to work with our forms ***/
 .selectize-input {
   border: none;
-  padding: 2px 0 0 0 !important;
-  margin: -4px 0  !important;
+  padding: 1px 0 0 0 !important;
+  margin: -4px 0 -4px -2px !important;
   min-height: 0 !important;
+  box-shadow: none !important;
 }
 
 .selectize-input.focus {
@@ -5788,12 +5789,21 @@ table.dataTable tbody tr.selected {
   margin-bottom: 0;
 }
 
-.nav-tool-content-wrapper .form-control.selectize, #categorize-urls-form-wrapper .form-control.selectize {
+.nav-tool-content-wrapper .form-control.selectize, #categorize-urls-form-wrapper .form-control.selectize, .category-column .form-control.selectize {
   background-color: transparent;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
   padding: 1px;
   height: 32px;
+}
+
+.category-column .form-control.selectize {
+  height: 30px !important;
+  margin: -4px 0 !important;
+}
+
+.category-column .form-control.selectize .selectize-input input {
+  font-size: 8.5pt;
 }
 
 .selectize-dropdown.multi.form-control.selectize {
@@ -5855,6 +5865,7 @@ table.dataTable tbody tr.selected {
 
 .selectize-dropdown-content {
   min-height: 28px !important;
+  font-size: 8.5pt;
 }
 
 #advanced-search-wrapper .selectize-input.dropdown-active::before {
@@ -6009,7 +6020,7 @@ table.dataTable tbody tr.selected {
   font-size: 8pt;
 }
 
-.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item {
+.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;
   font-size: 8pt;
@@ -6413,6 +6424,7 @@ h2 {
 //Toolbar Layout UI ticket 194
 .temp-spacer {
   padding: 20px 15px;
+  min-height: auto;
 
   .default-padding {
     padding: 0 0 15px 0;
@@ -6505,6 +6517,7 @@ h2 {
     }
   }
 }
+
 // copycat tool dialog start here
 #copycat_dialog {
   display: none;
@@ -6554,4 +6567,106 @@ h2 {
     font-size: 10px;
     padding: 10px 10px 10px 30px;
   }
+}
+
+//table layout start here
+.table {
+
+  .right-space {
+    margin-right: 10px;
+  }
+
+  .other-stg {
+    border-bottom: 1px solid $faint-neutral-color;
+
+    ul {
+      float: right;
+      margin: 0;
+      padding: 0;
+
+      li {
+        display: inline-block;
+        margin: 0;
+        height: 22.5px;
+        width: 24px;
+        border-right: 1px solid #dddddd;
+        button {
+          width: 20px;
+          height: 20px;
+          float: left;
+        }
+      }
+
+      li:last-child {
+        border: none;
+        button {
+          //float: right;
+        }
+      }
+    }
+  }
+
+  .category-search {
+    width: 88%;
+    border: 1px solid #eee;
+    float: left;
+  }
+
+  .data-btn {
+    background-color: $primary-section-color;
+    background-image: url(image_path('icon_open_viewable_white.svg'));
+    background-repeat: no-repeat;
+    background-size: 75%;
+    background-position-x: center;
+    background-position-y: center;
+  }
+
+  .help-btn {
+    background-image: url(image_path('icon_whois.svg'));
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    background-color: #dddddd;
+
+  }
+
+  .google-btn {
+    background-image: url(image_path('icon_google_grey.svg'));
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    background-color: #dddddd;
+  }
+
+  button {
+    width: 20px;
+    height: 20px;
+    float: right;
+    border-radius: 2px;
+    border: none;
+  }
+
+  .category-btn {
+    background-color: $primary-section-color;
+    background-image: url(image_path('icon_submit_arrow.svg'));
+    background-repeat: no-repeat;
+    background-size: 15px;
+    background-position-x: center;
+    background-position-y: center;
+  }
+}
+.right-margin {
+  margin-right: 4px;
+}
+
+.category-column {
+  min-width: 250px;
+}
+
+.category-column fieldset {
+  margin: 0;
+}
+
+.domain-column {
+  min-width: 300px;
 }

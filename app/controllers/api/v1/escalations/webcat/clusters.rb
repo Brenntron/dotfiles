@@ -11,6 +11,25 @@ module API
               PaperTrail.whodunnit = current_user.id if current_user.present?
             end
 
+            desc 'process cluster'
+            params do
+              requires :category_ids, type: Array, desc: 'List of category ids'
+              requires :cluster_id, type: Integer, desc: 'ID of cluster to categorize'
+              optional :comment, type: String, desc: 'comment to associate with rule'
+            end
+
+            post "process_cluster" do
+
+
+              conditions = {}
+              conditions[:cluster_id] = params[:cluster_id]
+              conditions[:category_ids] = params[:category_ids]
+              conditions[:comment] = params[:comment] unless params[:comment].blank?
+
+              Wbrs::Cluster.process(conditions, true)
+            end
+
+
             desc 'get all clusters'
             params do
             end
@@ -28,11 +47,15 @@ module API
 
                 clusters.each do |cluster|
                   cluster_packet = {}
-
                   cluster_packet[:cluster_id] = cluster[:cluster_id]
                   cluster_packet[:domain] = cluster[:domain]
                   cluster_packet[:global_volume] = cluster[:glob_volume]
-
+                  ctime = Time.gm(cluster[:ctime]).to_i
+                  now = Time.now.utc.to_i
+                  age = (now + ctime)
+                  cluster_packet[:ctime] = Time.gm(cluster[:ctime]).to_i
+                  cluster_packet[:now] = Time.now.utc.to_i
+                  cluster_packet[:age] = distance_of_time_in_words(age)
                   json_packet << cluster_packet
                 end
               end
@@ -51,6 +74,10 @@ module API
             #    "url": "http://www.facebook.com/plugins/like.php",
             #    "wbrs_score": 3.8
             #}
+            desc ""
+            params do
+
+            end
             get ":id" do
               cluster_id = params[:id]
 
@@ -58,16 +85,8 @@ module API
               {:status => "success", :data => cluster_info}.to_json
             end
 
-            post "process" do
-              cluster_id = params[:id]
 
-              conditions = {}
-              conditions[:cluster_id] = cluster_id
-              conditions[:category_ids] = params[:category_ids]
-              conditions[:comment] = params[:comment] unless params[:comment].blank?
 
-              Wbrs::Cluster.process(conditions)
-            end
 
           end
         end

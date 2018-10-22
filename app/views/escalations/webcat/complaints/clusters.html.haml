@@ -41,9 +41,9 @@
       .toolbar
         .div
           %label.toolbar-section-label View
-          %button{class: 'toolbar-button icon-opened-selected'}
+          %button.toolbar-button.icon-opened-selected.esc-tooltipped{onclick: 'open_selected()', type: 'button', title: 'Open Viewable'}
             %span.toolbar-button-text Open Selected
-          %button{class: 'toolbar-button icon-open-all'}
+          %button.toolbar-button.icon-open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All'}
             %span.toolbar-button-text Open All
         %button.toolbar-button.cat-btn.icon-copycat{'onclick': 'copycat_dialog()'}
           %span.toolbar-button-text CopyCat Tool
@@ -55,6 +55,24 @@
           %input.text_field
           %button Submit Changes
 
+  .row
+    .col-xs-12
+      %table.table.responsive#clusters-index
+        %thead
+          %tr
+            %th
+              -#  Expandable button area
+            %th
+              %input#clusters_check_box{type: 'checkbox'}
+            %th Cluster ID
+            %th Cluster Domain
+            %th Global Volume
+            %th WBRS Score
+            %th Categories
+
+
+  #whois_dialog{title: 'Domain Lookup Information'}
+
 #copycat_dialog{title: 'CopyCat Tool'}
   .dialog-content-wrapper
     %input.text-field{placeholder: 'Add Categories'}
@@ -64,3 +82,6 @@
     %button.toolbar-button.cat-clear-btn.icon-clear Clear Categories
 
 
+:javascript
+  window.populate_clusters_index_table()
+  // window.fetch_cluster_data(3)
