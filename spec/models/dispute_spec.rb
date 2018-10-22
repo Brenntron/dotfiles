@@ -282,6 +282,7 @@ describe Dispute do
   let(:umbrella_clear_response) { double('HTTPI::Response', code: 200, body: umbrella_clear_json) }
   let(:manual_wlbl_response) { double('HTTPI::Response', code: 200, body: manual_wlbl_json) }
   let(:xbrs_domain_response) { double('HTTPI::Response', code: 200, body: xbrs_domain_json) }
+  let(:auto_resolve_new) { double('AutoResolve', resolved?: false, malicious?: nil) }
   let(:auto_convict) { double('AutoResolve', resolved?: true, malicious?: true) }
   let(:auto_acquit) { double('AutoResolve', resolved?: true, malicious?: false) }
   let(:bug_factory) do
@@ -324,6 +325,53 @@ describe Dispute do
     expect do
       Dispute.process_bridge_payload(fn_url_dispute_message_payload)
     end.to change { Dispute.count }.from(0).to(1)
+  end
+
+  it 'processes fp auto-resolve as new bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    # TODO remove redundant API call
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    # TODO remove redundant API call
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
+                .and_return(virustotal_response)
+    # TODO remove redundant API call
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_address)
+                .and_return(umbrella_clear_response)
+    allow(AutoResolve)
+        .to receive(:create_from_payload)
+                .with('URI/DOMAIN', target_address, anything)
+                .and_return(auto_resolve_new)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fp_url_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry.resolution).to be_nil
   end
 
   it 'processes fp auto-convicted bridge payload' do
