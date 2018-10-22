@@ -471,21 +471,17 @@ class Dispute < ApplicationRecord
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
 
 
-          auto_resolve_verdict = AutoResolve.create_from_payload(new_dispute_entry.entry_type, key, total_hits)
-
-          #this is for return back to TI to populate its ticket show pages
-          case
-          when !false_negative_claim
-          when !auto_resolve_verdict.resolved?
-          when auto_resolve_verdict.malicious?
-            verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-          end
-
           case
           when !false_negative_claim
             new_dispute_entry.status = DisputeEntry::NEW
           else
-            new_dispute_entry.assign_from_auto_resolve(auto_resolve_verdict, resolved_at: resolved_at)
+            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                              total_hits: total_hits,
+                                                                              resolved_at: resolved_at)
+
+            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+            end
           end
           new_dispute_entry.save!
 
@@ -553,25 +549,20 @@ class Dispute < ApplicationRecord
 
 
 
-          auto_resolve_verdict = AutoResolve.create_from_payload(new_dispute_entry.entry_type, key, total_hits)
-
-
           case
           when !false_negative_claim
             new_dispute_entry.status = DisputeEntry::NEW
           else
-            new_dispute_entry.assign_from_auto_resolve(auto_resolve_verdict, resolved_at: resolved_at)
+            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                              total_hits: total_hits,
+                                                                              resolved_at: resolved_at)
+
+            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+            end
           end
 
           new_dispute_entry.save!
-
-
-          case
-          when !false_negative_claim
-          when !auto_resolve_verdict.resolved?
-          when auto_resolve_verdict.malicious?
-            verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-          end
 
 
           return_payload[key] = new_dispute_entry.new_payload_item
