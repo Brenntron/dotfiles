@@ -1226,12 +1226,37 @@ class Dispute < ApplicationRecord
 
     status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
 
-    report_data = []
+
+
+    report_data = {}
+    report_data[:table_data] = []
     user_ids = users.pluck(:id)
     results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
 
+    report_data[:ticket_count] = results.size
+    report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
+
+    report_data[:customer_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
+    report_data[:guest_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
+    report_data[:email_count] = results.select {|result| result.submission_type.downcase == 'e'}.size
+    report_data[:web_count] = results.select {|result| result.submission_type.downcase == 'w'}.size
+    report_data[:email_web_count] = results.select {|result| result.submission_type.downcase == 'ew'}.size
+
     results.each do |result|
-      report_data << {:case_id => result.id, :status => result.status, :dispute => result.dispute_entries.first.hostlookup, :age => distance_of_time_in_words(Time.now, result.created_at)}
+      entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
+      last_comment_time = result.dispute_comments.last.created_at.to_s
+      ticket_user = result.user.cvs_username
+      report_data[:table_data] << {:case_id => result.id,
+                      :status => result.status,
+                      :dispute => result.dispute_entries.first.hostlookup,
+                      :age => distance_of_time_in_words(Time.now, result.created_at),
+                      :is_customer => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
+                      :submission_type => result.submission_type,
+                      :last_comment_time => last_comment_time,
+                      :entry_count => entry_count,
+                      :user => ticket_user
+
+      }
     end
 
     report_data
