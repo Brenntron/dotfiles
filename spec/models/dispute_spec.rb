@@ -1,6 +1,7 @@
 describe Dispute do
+  let(:target_address) {'www.spanx.com'}
   let(:dispute_email) do
-    <<-HEREDOC
+    <<~HEREDOC
         ____________________________________________________________
         User-entered Information:
         ____________________________________________________________
@@ -31,13 +32,13 @@ describe Dispute do
         Hostname's IPs:
     HEREDOC
   end
-  let(:dispute_message_payload) do
+  let(:fn_dispute_message_payload) do
     ActionController::Parameters.new(
         {
             payload: {
                 'name' => "Marlin Pierce",
                 'email' => "marlpier@cisco.com",
-                'domain' => "cisco.com",
+                'domain' => target_address,
                 'problem' => "New category",
                 'details' => '',
                 'user_ip' => "::1",
@@ -64,19 +65,19 @@ describe Dispute do
   end
   let(:top_url_response_json) do
     {
-        "www.spanx.com": true
+        target_address => true
     }.to_json
   end
   let(:blacklist_json) do
     {
-        'www.spanx.com' => 'NOT_FOUND'
+        target_address => 'NOT_FOUND'
     }.to_json
   end
   let(:virustotal_json) do
     {
         "scan_id": "263a0bca315778e09734a8ac9539f557905e909847d901946c5df1a13e631b17-1536170044",
-        "resource": "spanx.com",
-        "url": "http://spanx.com/",
+        "resource": target_address,
+        "url": "http://#{target_address}/",
         "response_code": 1,
         "scan_date": "2018-09-05 17:54:04",
         "permalink": "https://www.virustotal.com/url/263a0bca315778e09734a8ac9539f557905e909847d901946c5df1a13e631b17/analysis/1536170044/", "verbose_msg": "Scan finished, scan information embedded in this object",
@@ -97,8 +98,8 @@ describe Dispute do
             "Virusdie External Site Scan": {"detected": false, "result": "clean site"},
             "Quttera": {"detected": false, "result": "clean site"},
             "AegisLab WebGuard": {"detected": false, "result": "clean site"},
-            "MalwareDomainList": {"detected": false, "result": "clean site", "detail": "http://www.malwaredomainlist.com/mdl.php?search=spanx.com"},
-            "ZeusTracker": {"detected": false, "result": "clean site", "detail": "https://zeustracker.abuse.ch/monitor.php?host=spanx.com"},
+            "MalwareDomainList": {"detected": false, "result": "clean site", "detail": "http://www.malwaredomainlist.com/mdl.php?search=#{target_address}"},
+            "ZeusTracker": {"detected": false, "result": "clean site", "detail": "https://zeustracker.abuse.ch/monitor.php?host=#{target_address}"},
             "zvelo": {"detected": false, "result": "clean site"},
             "Google Safebrowsing": {"detected": false, "result": "clean site"},
             "Kaspersky": {"detected": false, "result": "clean site"},
@@ -122,7 +123,7 @@ describe Dispute do
             "AlienVault": {"detected": false, "result": "clean site"},
             "Emsisoft": {"detected": false, "result": "clean site"},
             "Rising": {"detected": false, "result": "clean site"},
-            "Malc0de Database": {"detected": false, "result": "clean site", "detail": "http://malc0de.com/database/index.php?search=spanx.com"},
+            "Malc0de Database": {"detected": false, "result": "clean site", "detail": "http://malc0de.com/database/index.php?search=#{target_address}"},
             "malwares.com URL checker": {"detected": false, "result": "clean site"},
             "Phishtank": {"detected": false, "result": "clean site"},
             "Malwared": {"detected": false, "result": "clean site"},
@@ -136,7 +137,7 @@ describe Dispute do
             "Malekal": {"detected": false, "result": "clean site"},
             "ESET": {"detected": false, "result": "clean site"},
             "Sophos": {"detected": false, "result": "unrated site"},
-            "Yandex Safebrowsing": {"detected": false, "result": "clean site", "detail": "http://yandex.com/infected?l10n=en&url=http://spanx.com/"},
+            "Yandex Safebrowsing": {"detected": false, "result": "clean site", "detail": "http://yandex.com/infected?l10n=en&url=http://#{target_address}/"},
             "Spam404": {"detected": false, "result": "clean site"},
             "Nucleon": {"detected": false, "result": "clean site"},
             "Sucuri SiteCheck": {"detected": false, "result": "clean site"},
@@ -154,6 +155,15 @@ describe Dispute do
         }
     }.to_json
   end
+  let(:umbrella_clear_json) {
+    {
+        target_address => {
+            "status" => 1,
+            "security_categories" => [],
+            "content_categories" => ["25","32"]
+        }
+    }.to_json
+  }
   let(:manual_wlbl_json) do
     {
         "data" => [
@@ -183,7 +193,7 @@ describe Dispute do
             "response_took" => 0.014037847518920898,
             "response_repdb_time" => 1536348248,
             "isolation_level" => "REPEATABLE-READ",
-            "request" => "http://prod-xbrs-writer1.vega.ironport.com:80/v1/domain/www.spanx.com?consumer=TEST",
+            "request" => "http://prod-xbrs-writer1.vega.ironport.com:80/v1/domain/#{target_address}?consumer=TEST",
             "product_version" => "1.3.0 2018-05-16 09:38 PDT",
             "response_local_time" => 1536348248,
             "total_data_rows" => 0,
@@ -195,7 +205,7 @@ describe Dispute do
         "resource" => {
             "requested_subdomain" => nil,
             "data_rows" => 0,
-            "requested_domain" => "www.spanx.com"
+            "requested_domain" => target_address
         }
     }.to_json +
     "\n---\n" +
@@ -228,7 +238,7 @@ describe Dispute do
   end
   let(:umbrella_data) do
     {
-        "www.spanx.com" => {
+        target_address => {
             "status" => 0,
             "security_categories" => [],
             "content_categories" => ["8", "41"]
@@ -238,6 +248,7 @@ describe Dispute do
   let(:top_url_response_response) { double('HTTPI::Response', code: 200, body: top_url_response_json) }
   let(:blacklist_response) { double('HTTPI::Response', code: 200, body: blacklist_json) }
   let(:virustotal_response) { double('HTTPI::Response', code: 200, body: virustotal_json) }
+  let(:umbrella_clear_response) { double('HTTPI::Response', code: 200, body: umbrella_clear_json) }
   let(:manual_wlbl_response) { double('HTTPI::Response', code: 200, body: manual_wlbl_json) }
   let(:xbrs_domain_response) { double('HTTPI::Response', code: 200, body: xbrs_domain_json) }
   let(:bug_factory) do
@@ -261,8 +272,12 @@ describe Dispute do
                 .and_return(blacklist_response)
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, '/vtapi/v2/url/report?resource=www.spanx.com')
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_address}")
                 .and_return(virustotal_response)
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_address)
+                .and_return(umbrella_clear_response)
     allow(Wbrs::Base)
         .to receive(:post_request)
                 .with(path: '/v1/rep/wlbl/get', body: anything)
@@ -271,11 +286,11 @@ describe Dispute do
         .to receive(:call_request)
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
-    allow(Preloader::Base).to receive(:auto_resolve_new).and_return(double("AutoResolve", call_umbrella: umbrella_data))
+    # allow(Preloader::Base).to receive(:auto_resolve_new).and_return(double("AutoResolve", call_umbrella: umbrella_data))
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
 
     expect do
-      Dispute.process_bridge_payload(dispute_message_payload)
+      Dispute.process_bridge_payload(fn_dispute_message_payload)
     end.to change { Dispute.count }.from(0).to(1)
   end
 end
