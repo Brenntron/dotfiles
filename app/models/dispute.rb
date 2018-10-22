@@ -465,10 +465,10 @@ class Dispute < ApplicationRecord
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
           new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: key)
+          new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-          new_dispute_entry.case_opened_at = opened_at
 
 
           auto_resolve_verdict = AutoResolve.create_from_payload(new_dispute_entry.entry_type, key, total_hits)
@@ -562,21 +562,24 @@ class Dispute < ApplicationRecord
 
           total_hits = wbrs_hits
 
-          auto_resolve_verdict = AutoResolve.create_from_payload("URI/DOMAIN", key, total_hits)
-
-          url_parts = Dispute.parse_url(key)
-          new_dispute_entry = DisputeEntry.new
-          new_dispute_entry.dispute_id = new_dispute.id
-          new_dispute_entry.uri = key
+          new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'URI/DOMAIN', uri: key)
+          new_dispute_entry.case_opened_at = opened_at
+          # new_dispute_entry.uri = key
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+          new_dispute_entry.is_important = is_important?(key)
+
+          url_parts = Dispute.parse_url(key)
           new_dispute_entry.subdomain = url_parts[:subdomain]
           new_dispute_entry.domain = url_parts[:domain]
           new_dispute_entry.path = url_parts[:path]
           new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
-          new_dispute_entry.entry_type = "URI/DOMAIN"
-          new_dispute_entry.is_important = is_important?(key)
-          new_dispute_entry.case_opened_at = opened_at
+          # new_dispute_entry.entry_type = "URI/DOMAIN"
+
+
+
+          auto_resolve_verdict = AutoResolve.create_from_payload(new_dispute_entry.entry_type, key, total_hits)
+
 
           case
           when !false_negative_claim
