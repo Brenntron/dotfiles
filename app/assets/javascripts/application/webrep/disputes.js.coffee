@@ -1657,24 +1657,14 @@ $ ->
   return
 
 
-#$ ->
-#  $('input[name="dates"]').datepicker
-#    showWeek: true
-#    firstDay: 1
-#    dateFormat: 'MM-dd-yy'
-#    onSelect: (value) ->
-#      vals = value.split('-')
-#      console.log(vals)
-#      dateRange = vals[0] + ' ' + vals[1] + ' - ' + vals[1] + ', ' + vals[2]
-#      console.log('range value should be', dateRange)
-#      $('.dashboard-time label')[0].innerHTML = dateRange
-#  return
-#
-#$ ->
-#  $('button.icon-calendar').click ->
-#    console.log('You clicked me. I am going to click the input now.')
-#    $('input[name="dates"]').datepicker 'show'
-#  return
+$ ->
+  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
+    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
+    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
+    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
+    $('.dashboard-time label')[0].innerHTML = val
+    return
+  return
 
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made

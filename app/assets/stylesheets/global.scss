@@ -6399,10 +6399,10 @@ h2 {
     }
 
     .dashboard-time-ticket {
+
       .button-wrapper {
-        width: 382px;
-        text-align: left;
-        float: right;
+        width: 370px;
+        text-align: right;
         background-color: $content-tab-color;
 
         button {
@@ -6589,9 +6589,6 @@ h2 {
   display: flex;
   justify-content: center;
   margin-top: 15px;
-
-  button {
-  }
 
   .right-vertical-separator {
     padding-right: 20px;
