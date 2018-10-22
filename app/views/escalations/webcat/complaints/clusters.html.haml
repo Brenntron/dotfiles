@@ -71,13 +71,13 @@
             %th Categories
 
 
-  #whois_dialog{title: 'Domain Lookup Information'}
-
 #copycat_dialog{title: 'CopyCat Tool'}
   .dialog-content-wrapper
     %input.text-field{placeholder: 'Add Categories'}
 
   .copycat-tool-footer
-    %button.toolbar-button.cat-paste-btn.icon-paste Paste Categories
+    %button.toolbar-button.cat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
     %button.toolbar-button.cat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
-    
+
+
+#whois_dialog{title: 'Domain Lookup Information'}

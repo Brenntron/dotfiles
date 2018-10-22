@@ -185,6 +185,18 @@ window.copycat_clear = () ->
   console.log('clearing copy cat input')
   $('#copycat_dialog input')[0].value = ''
 
+# paste checkbox category input into copycat input
+window.copycat_paste = () ->
+  console.log('pasting all selected rows')
+  selectedRows = []
+  if $('#clusters_check_box').prop('checked')
+    console.log('Row is selected')
+    $('#clusters-index').DataTable().rows().select()
+    selectedRows = $('#clusters-index').DataTable().rows()
+    console.log(selectedRows)
+  else
+    console.log('row not selected')
+
 
 # Select rows in Clusters Table
 $ ->
