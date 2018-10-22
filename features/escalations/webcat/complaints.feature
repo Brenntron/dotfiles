@@ -29,17 +29,17 @@ Feature: Webcat complaints
   Scenario: A user must review a high telemetry site
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "important" exists
+    And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I wait for "7" seconds
-    And I should see "testing"
+    And I should see "Arts"
     Then I should not see "Update"
     And I click ".expand-all"
     And I choose "fixed1"
     And I should see "Update"
     And I should not see "commit"
-    When I click "Update"
+    When I click "#submit_changes_1"
     Then I wait for "25" seconds
-    Then take a screenshot
     Then I should see "Commit"
 
   @javascript

@@ -5,7 +5,7 @@ FactoryBot.define do
     domain          { 'testing.com' }
     path            { '/downloads' }
     wbrs_score      { 2 }
-    url_primary_category {'test'}
+    url_primary_category {'Arts'}
     sbrs_score      { 10 }
     ip_address      { '1.1.1.1' }
     category        { 'bogus_category' }
