@@ -494,7 +494,6 @@ class Dispute < ApplicationRecord
             new_payload_item[:status] = TI_RESOLVED
           end
           new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
-          return_payload[key] = new_payload_item
 
           case
           when !false_negative_claim
@@ -503,6 +502,13 @@ class Dispute < ApplicationRecord
             new_dispute_entry.assign_from_auto_resolve(auto_resolve_verdict, resolved_at: resolved_at)
           end
           new_dispute_entry.save!
+
+
+          payload_item = new_dispute_entry.xnew_payload_item
+          payload_item[:sugg_type] = entry["rep_sugg"]
+          payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
+          return_payload[key] = new_payload_item
+
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
             all_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",")
@@ -596,6 +602,11 @@ class Dispute < ApplicationRecord
             new_payload_item[:status] = TI_RESOLVED
           end
           new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
+
+
+          payload_item = new_dispute_entry.xnew_payload_item
+          payload_item[:sugg_type] = entry["rep_sugg"]
+          payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
           return_payload[key] = new_payload_item
 
           if entry["WBRS_Rule_Hits"].present?

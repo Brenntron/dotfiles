@@ -246,7 +246,7 @@ class DisputeEntry < ApplicationRecord
 
   def assign_from_auto_resolve(auto_resolve_verdict, resolved_at:)
 
-    self.status = DisputeEntry::NEW
+    self.status = NEW
 
     return unless auto_resolve_verdict.resolved?
 
@@ -265,8 +265,37 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def xnew_payload_item
+    # byebug
+    case
+    when NEW == status
+      {
+          status: Dispute::TI_NEW,
+          resolution_message: '',
+      }
+    when STATUS_RESOLVED_FIXED_FN == resolution
+      {
+          resolution_message: 'Talos has lowered our reputation score for the URL/Domain/Host to block access.',
+          resolution: 'FIXED',
+          status: Dispute::TI_RESOLVED,
+      }
+    else
+      message =
+          if 'IP' == entry_type
+            Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
+          else
+            'The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information.'
+          end
+      {
+          resolution_message: message,
+          resolution: 'UNCHANGED',
+          status: Dispute::TI_RESOLVED,
+      }
+    end
+  end
+
   def referenced_tickets
-    is_ip_address = !!(hostlookup  =~ Resolv::IPv4::Regex)
+    is_ip_address = !!(hostlookup =~ Resolv::IPv4::Regex)
     if is_ip_address
       references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address}).where.not(:dispute_entries => {:dispute_id => self.dispute_id})
     else
