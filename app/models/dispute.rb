@@ -509,11 +509,7 @@ class Dispute < ApplicationRecord
             new_dispute_entry.case_resolved_at = resolved_at
             verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
           else
-            new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
-            new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
-            new_dispute_entry.status = DisputeEntry::RESOLVED
-            new_dispute_entry.case_closed_at = resolved_at
-            new_dispute_entry.case_resolved_at = resolved_at
+            new_dispute_entry.assign_from_auto_resolve(auto_resolve_verdict, resolved_at: resolved_at)
           end
           new_dispute_entry.save!
 
@@ -564,7 +560,6 @@ class Dispute < ApplicationRecord
 
           new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'URI/DOMAIN', uri: key)
           new_dispute_entry.case_opened_at = opened_at
-          # new_dispute_entry.uri = key
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.is_important = is_important?(key)
@@ -574,7 +569,6 @@ class Dispute < ApplicationRecord
           new_dispute_entry.domain = url_parts[:domain]
           new_dispute_entry.path = url_parts[:path]
           new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
-          # new_dispute_entry.entry_type = "URI/DOMAIN"
 
 
 
@@ -593,11 +587,7 @@ class Dispute < ApplicationRecord
             new_dispute_entry.case_closed_at = resolved_at
             new_dispute_entry.case_resolved_at = resolved_at
           else
-            new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
-            new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
-            new_dispute_entry.status = DisputeEntry::RESOLVED
-            new_dispute_entry.case_closed_at = resolved_at
-            new_dispute_entry.case_resolved_at = resolved_at
+            new_dispute_entry.assign_from_auto_resolve(auto_resolve_verdict, resolved_at: resolved_at)
           end
 
           new_dispute_entry.save!

@@ -244,6 +244,16 @@ class DisputeEntry < ApplicationRecord
     pretty_umbrella_status
   end
 
+  def assign_from_auto_resolve(auto_resolve_verdict, resolved_at:)
+
+    self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
+    self.resolution = STATUS_RESOLVED_UNCHANGED
+    self.status = RESOLVED
+    self.case_closed_at = resolved_at
+    self.case_resolved_at = resolved_at
+
+  end
+
   def referenced_tickets
     is_ip_address = !!(hostlookup  =~ Resolv::IPv4::Regex)
     if is_ip_address
