@@ -13,8 +13,10 @@ Feature: Webcat complaints
     And the following customers exist:
     | company_id | name         | email           |
     | 1          | Talos Person | talos@cisco.com |
-    And I goto "/escalations/webcat/complaints"
-    And I click "new-complaint"
+    And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#new-complaint"
     And I fill in "ips_urls" with "talosintelligence.com"
     And I fill in "description" with "This is my favorite website"
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
@@ -25,17 +27,20 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: A user must review a high telemetry site
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "important" exists
-    And I goto "/escalations/webcat"
-    And I should see "bogus_category"
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I wait for "7" seconds
+    And I should see "testing"
     Then I should not see "Update"
-    When I click button with class "expand-row-button-inline"
+    And I click ".expand-all"
     And I choose "fixed1"
     And I should see "Update"
     And I should not see "commit"
     When I click "Update"
-    Then I should see "commit"
+    Then I wait for "25" seconds
+    Then take a screenshot
+    Then I should see "Commit"
 
   @javascript
   Scenario: A user does not need to review a low telemetry site
