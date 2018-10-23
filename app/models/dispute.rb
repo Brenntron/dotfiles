@@ -365,9 +365,9 @@ class Dispute < ApplicationRecord
   def self.process_bridge_payload(message_payload)
     new_dispute = nil
     verdicts_to_blacklist = []
+    user = User.where(cvs_username:"vrtincom").first
     begin
       ActiveRecord::Base.transaction do
-        user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
         opened_at = Time.now
         resolved_at = Time.now
@@ -648,7 +648,7 @@ class Dispute < ApplicationRecord
 
         args = {}
         args[:dispute_id] = dispute_entry.dispute_id
-        args[:user_id] = dispute_entry.user_id
+        args[:user_id] = user&.id
         args[:comment] = "Dispute Entry #{dispute_entry.hostlookup} was eligible for auto-resolution, but failed to connect to RepTool. Sending this to the analysts' queue"
 
         DisputeComment.create(args)
