@@ -28,7 +28,7 @@ module API
             name = params['name']
             columns = params.data
 
-            user_preference = UserPreference.create_with(value: {}, name: name).find_or_create_by(user_id: current_user.id, name: name)
+            user_preference = UserPreference.create_with(value: {}).find_or_create_by(user_id: current_user.id, name: name)
 
             name = 0
             state = 1
