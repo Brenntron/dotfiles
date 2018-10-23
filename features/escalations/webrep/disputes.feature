@@ -131,7 +131,7 @@ Feature: Disputes
     And the following disputes exist and have entries:
       |id|
       |1 |
-    When I goto "escalations/webrep/tickets?f=open"
+    When I goto "escalations/webrep/disputes?f=open"
     And I trigger-click "#table-show-columns-button"
     And I trigger-click "#case-id-checkbox"
     And I trigger-click "#status-checkbox"
