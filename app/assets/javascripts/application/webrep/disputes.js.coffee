@@ -952,6 +952,12 @@ window.populate_resolved_status_selection = () ->
   nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
   $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
 
+window.webrep_reset_search = () ->
+  inputs = document.getElementsByClassName('form-control')
+
+  for i in inputs
+    i.value = ""
+
 $ ->
 
   $('.change_ticket_status_button').click ->
@@ -996,7 +1002,6 @@ $ ->
         window.location.reload()
 
     )
-
 
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
