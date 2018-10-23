@@ -1347,7 +1347,7 @@ $ ->
 
   $(document).ready ->
 
-    if window.location.pathname == '/escalations/webrep/tickets'
+    if window.location.pathname == '/escalations/webrep/disputes'
       std_msg_ajax(
         method: 'POST'
         url: "/escalations/api/v1/escalations/user_preferences/"
