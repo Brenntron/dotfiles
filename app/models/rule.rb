@@ -126,25 +126,6 @@ class Rule < ApplicationRecord
     end
   end
 
-  def has_doc?
-    rule_doc && rule_doc.summary.present?
-  end
-
-  def doc_complete?
-    case
-      when !requires_doc?
-        true
-      when !has_doc?
-        false
-      else
-        true
-    end
-  end
-
-  def doc_updated?
-    DOC_STATUS_UPDATED == self.doc_status
-  end
-
   def doc_template_name
     case
       when RuleCategory.policy_categories.include?(rule_category)
@@ -374,49 +355,6 @@ class Rule < ApplicationRecord
     end
   end
 
-  def associate_references(rule_content)
-    references_ary = []
-    rule_content.split(';').each { |option| references_ary << option.strip.gsub('reference:', '') if option.match(/reference\W*:/) }
-
-    self.references.delete_all
-    references_ary.each do |ref_str|
-      ref_pair = ref_str.split(',')
-      unless ref_pair[1].nil? || ref_pair[1].empty?
-        ref_type = ReferenceType.find_or_create_by(name: ref_pair[0].strip)
-        new_reference = Reference.find_or_create_by(reference_type: ref_type, reference_data: ref_pair[1].strip)
-        self.references << new_reference
-      end
-    end
-  end
-
-  def update_references(rule_content)
-    current_references = []
-    references.each { |r| current_references << ReferenceType.where(id: r.reference_type_id).first.name + ',' + r.reference_data }
-    references = []
-    rule_content.split(';').each { |r| references << r.strip.gsub('reference:', '') if r.match(/reference\W*:/) }
-    references.each do |r|
-      # skip this reference if it already exists
-      if current_references.include? r
-        current_references.delete(r)
-        # otherwise create it
-      else
-        ref_type = r.split(',')[0]
-        ref_data = r.split(',')[1]
-        unless ref_data.strip.empty?
-          new_reference = Reference.find_or_create_by(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data)
-          self.references << new_reference unless self.references.include?(new_reference)
-        end
-      end
-    end
-    # delete the reference if it is no longer part of the record
-    current_references.each do |r|
-      ref_type = r.split(',')[0]
-      ref_data = r.split(',')[1]
-      ref = Reference.where(reference_type: ReferenceType.where(name: ref_type).first, reference_data: ref_data)
-      self.references.destroy(ref)
-    end
-  end
-
   # Extracts components from VisruleParser and sets field of rule.
   #
   # Does not save the rule.
@@ -580,7 +518,6 @@ class Rule < ApplicationRecord
   def load_rule_content(rule_content, should_clear_svn_result: true)
     assign_from_rule_file(rule_content)
     save!
-    associate_references(rule_content)
     clear_svn_result if should_clear_svn_result
     self
   end
@@ -871,7 +808,6 @@ class Rule < ApplicationRecord
     rule_params = build_rule_params(rule_data)
     rule_content_local = RuleSyntax::Assemposer.new(rule_params).rule_content
     Rule.save_rule_content(rule_content_local)
-    associate_references(rule_content_local)
   end
 
   def sort_state_ordinal
@@ -979,9 +915,6 @@ class Rule < ApplicationRecord
       css_classes << 'stale-edit' if stale_edit?
       css_classes << 'parsed' if parsed?
       css_classes << 'incomplete-unparsed' unless parsed?
-      if parsed?
-        css_classes << 'incomplete-missing-doc' if !doc_complete?
-      end
 
       css_classes << 'deleted-rule' if deleted?
 
@@ -1046,7 +979,6 @@ class Rule < ApplicationRecord
     rule_content = RuleSyntax::Assemposer.new(rule_params).rule_content
     parser = RuleSyntax::RuleParser.new(rule_content)
     rule.assign_from_user_edit(rule_content, parser: parser)
-    rule.associate_references(rule_content)
 
     rule
   end
@@ -1090,8 +1022,6 @@ class Rule < ApplicationRecord
         bug.rules << rule if bug
       end
 
-      rule.associate_references(rule_content)
-
       if rule_doc.present?
         rule_doc = RuleDoc.prepare_rule_doc_hash(rule_doc, rule)
       end
@@ -1108,7 +1038,6 @@ class Rule < ApplicationRecord
         bug = Bug.where(id: bug_id).first
         bug.rules << rule if bug
       end
-      rule.associate_references(rule.rule_content)
 
       if rule_doc.present?
         rule_doc = RuleDoc.prepare_rule_doc_hash(rule_doc, rule)
@@ -1131,7 +1060,6 @@ class Rule < ApplicationRecord
   # @return [Rule]
   def self.update_action(rule, rule_content, rule_doc = nil)
     Rule.save_rule_content(rule_content, rule.id).tap do |rule|
-      rule.update_references(rule_content)
 
       if rule_doc.present?
         rule_doc = RuleDoc.prepare_rule_doc_hash(rule_doc, rule)

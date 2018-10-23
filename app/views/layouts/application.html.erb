@@ -31,9 +31,6 @@
           <% if can?(:index, EscalationBug) %>
             <li class="escalations-menu"><%= link_to 'ESCALATIONS', escalations_root_path %></li>
           <% end %>
-          <% if can?(:read, RuleDoc) %>
-            <li class="ruledoc-menu"><%= link_to 'RULE DOCS', rule_docs_path %></li>
-          <% end %>
           <li class="users-menu"><%= link_to 'USERS', escalations_users_path %></li>
           <li class="doc-menu">
             <%= link_to 'DOC', 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank' %>
