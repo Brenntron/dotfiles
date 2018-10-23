@@ -6572,14 +6572,37 @@ h2 {
   margin-left: 15px;
 }
 
+.top-space {
+  margin-top: 20px;
+}
 
 .toolbar-content-layout {
   position: relative;
   display: flex;
   justify-content: center;
   margin-top: 15px;
+}
 
-  button {
+.col-xs-6 {
+  .content-layout-list {
+    height: 100%;
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-between;
+
+    label {
+      font-size: 10px;
+      color: $type-lighter-color;
+      padding-left: 15px;
+    }
+
+    .no-left-pad{
+      padding-left: 0;
+    }
+
+    .checkbox-stg {
+      padding-left: 10px;
+    }
   }
 
   .right-vertical-separator {
@@ -6589,24 +6612,24 @@ h2 {
 
   label {
     background-repeat: no-repeat;
-    padding-left: 25px;
+    background-size: 12px;
+    background-position-y: 2px;
   }
+}
 
-  .content-layout-list {
-    height: 100%;
-    padding-left: 20px;
+.user-tickets-title {
+  display: block;
+  padding-top: 20px;
+
+  .num-frame {
+    display: inline-flex;
+    float: right;
 
     label {
-      font-size: 11px;
-      color: $type-lighter-color;
-      
-      input {
-        margin-left: 10px;
-      }
+      font-size: 20px;
     }
-
-    .checkbox-stg {
-      padding-left: 10px;
-    }
+  }
+  .left-space {
+    padding-left: 20px;
   }
 }

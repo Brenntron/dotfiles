@@ -45,29 +45,44 @@
       .dashboard-export-report.left-vertical-separator
         %button.toolbar-button.export-button-white Export Report
 
-  .toolbar-content-layout
-    -#%button.toolbar-button.icon-queue.btn-pad-left legend
+  .row.top-space
+    .col-xs-6
+      %h1 My Tickets
+      .content-layout-list
+        %label.icon-custom-star
+          Show Customer Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-    .content-layout-list
-      %label.icon-custom-star
-        Show Customer Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.no-left-pad.right-vertical-separator
+          Show Guest Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.right-vertical-separator
-        Show Guest Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.dispute-E-grey
+          Show Email Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.dispute-E-grey.btn-margin-left
-        Show Email Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.dispute-W-grey.btn-margin-left
+          Show Web Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.dispute-W-grey.btn-margin-left
-        Show Web Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.dispute-EW-grey.btn-margin-left
+          Show Email/Web Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.dispute-EW-grey.btn-margin-left
-        Show Email/Web Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+      .user-tickets-title
+        %label My Open Tickets
+        .num-frame
+          %label.right-vertical-separator 3
+          %label.left-space 23
+
+    .col-xs-6
+      %h2 Dashboard Graph will goes here
+      %h2 Dashboard Graph will goes here
+      %h2 Dashboard Graph will goes here
+      %h2 Dashboard Graph will goes here
+      %h2 Dashboard Graph will goes here
+
+
 
 
 
