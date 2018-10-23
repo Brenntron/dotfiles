@@ -1,6 +1,7 @@
 class Escalations::WebcatController < ApplicationController
-  before_action :require_login
   before_action :dashboard_metrics
+
+  private   #because in ruby, private is protected not private
 
   def dashboard_metrics
     @ti_comp_guest = Complaint.from_ti.by_guest.open_comps.map{ |c| c.complaint_entries.size }.inject(0){ |sum,item| sum + item }

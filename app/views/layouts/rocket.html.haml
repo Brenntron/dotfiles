@@ -58,7 +58,7 @@
                   %a= inline_svg 'icon_amp.svg'
               - if can?(:index, Dispute)
                 %li{class: 'rep-link'}
-                  %a{href: escalations_webrep_tickets_path}
+                  %a{href: escalations_webrep_disputes_path}
                     =inline_svg 'icon_rep.svg'
               - if can?(:index, Complaint)
                 %li{class: 'cat-link'}
@@ -126,7 +126,7 @@
                     %a AMP
                 - if can?(:index, Dispute)
                   %li{class: 'rep-link'}
-                    %a{href: escalations_webrep_tickets_path} Reputation
+                    %a{href: escalations_webrep_disputes_path} Reputation
                 - if can?(:index, Complaint)
                   %li{class: 'cat-link'}
                     %a{href: escalations_webcat_complaints_path} Categorization

@@ -575,8 +575,17 @@ module API
 
             desc 'Autopopulate fields on Advanced Search'
             get 'autopopulate_advanced_search' do
+
+
+              STATUS_RESEARCHING = "RESEARCHING"
+              STATUS_ESCALATED = "ESCALATED"
+              STATUS_CUSTOMER_PENDING = "CUSTOMER_PENDING"
+              STATUS_ON_HOLD = "ON_HOLD"
+              STATUS_RESOLVED = "RESOLVED_CLOSED"
+              STATUS_REOPENED = "RE-OPENED"
+
               case_owners = User.where.not(cvs_username: nil).order(cvs_username: :asc)
-              statuses = ['Researching','Escalated','Customer Pending','On Hold','Resolved / Closed', 'Re-Opened']
+              statuses = [STATUS_RESEARCHING,STATUS_ESCALATED,STATUS_CUSTOMER_PENDING,STATUS_ON_HOLD,STATUS_RESOLVED,STATUS_REOPENED]
               submitter_types = ['Customer', 'Non-Customer']
               contacts = Customer.all.order(name: :asc)
               companies = Company.all.order(name: :asc)

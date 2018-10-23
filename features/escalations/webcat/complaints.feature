@@ -13,8 +13,10 @@ Feature: Webcat complaints
     And the following customers exist:
     | company_id | name         | email           |
     | 1          | Talos Person | talos@cisco.com |
-    And I goto "/escalations/webcat/complaints"
-    And I click "new-complaint"
+    And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#new-complaint"
     And I fill in "ips_urls" with "talosintelligence.com"
     And I fill in "description" with "This is my favorite website"
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
@@ -25,56 +27,55 @@ Feature: Webcat complaints
 
   @javascript
   Scenario: A user must review a high telemetry site
-    Given a user with role "admin" exists and is logged in
-    And a complaint entry with trait "important" exists
-    And I goto "/escalations/webcat"
-    And I should see "bogus_category"
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "high_telemetry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I wait for "7" seconds
+    And I should see "Arts"
     Then I should not see "Update"
-    When I click button with class "expand-row-button-inline"
-    And I choose "fixed1"
-    And I should see "Update"
-    And I should not see "commit"
-    When I click "Update"
-    Then I should see "commit"
+    And I click ".expand-all"
+    Then I should see "Commit"
+    Then I should see "Decline"
+    Then I should see "Submit"
 
   @javascript
   Scenario: A user does not need to review a low telemetry site
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "not_important" exists
-    And I goto "/escalations/webcat"
-    And I should see "bogus_category"
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
     Then I should not see "Update"
-    When I click button with class "expand-row-button-inline"
+    And I click ".expand-all"
     And I choose "fixed1"
     And I should see "Update"
     And I should not see "commit"
-    When I click "Update"
+    When I click "#submit_changes_1"
     Then I should not see "commit"
 
   @javascript
   Scenario: a user can take a complaint
     Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "not_important" exists
-    And I goto "/escalations/webcat"
-    And I wait for "2" seconds
-    And I should see "Vrt Incoming"
-    And I click a table row
-    And I click button "Take selected"
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I click ".sorting_1"
+    And I click ".take-ticket-toolbar-button"
+    Then I wait for "3" seconds
     Then I should see "ASSIGNED"
-    Then take a photo
-    And I should not see "Vrt Incoming"
 
   @javascript
   Scenario: a user can return a complaint
     Given a user with role "webcat user" exists and is logged in
-    And an assigned complaint entry with trait "not_important" exists
-    And I goto "/escalations/webcat"
-    And I wait for "1" seconds
-    And I should not see "Vrt Incoming"
-    And I click a table row
-    And I click button "Return selected"
-    And I wait for "1" seconds
-    Then I should see "Vrt Incoming"
+    And an assigned complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I click ".sorting_1"
+    And I click ".return-ticket-toolbar-button"
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I should see "NEW"
 
   @javascript
   Scenario: a user selects the 'My Complaints' filter
@@ -168,23 +169,23 @@ Feature: Webcat complaints
     And a complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     And I click ".expand-all"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     And I click "#submit_changes_1"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
   @javascript
   Scenario: a user clicks the domain button
-    Given a user with role "admin" exists and is logged in
+    Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "2" seconds
+    And I wait for "5" seconds
     And I click ".expand-all"
-    And I wait for "2" seconds
-    Then I click "#domain_button"
+    And I wait for "5" seconds
+    Then I click "#domain-1"
     Then I should see "Domain Information"
 
   @javascript
@@ -209,3 +210,14 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     When I click "Lookup"
     Then I should see "Lookup Information"
+
+  @javascript
+  Scenario: a user sees a description in the 'Customer Description' field after selecting a complaint entry row
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+    |id|
+    |1 |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I click ".expand-all"
+    Then I should see "Description for testing"

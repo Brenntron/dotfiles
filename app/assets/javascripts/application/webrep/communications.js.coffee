@@ -223,8 +223,7 @@ $ ->
     if $('form')[0].checkValidity() == true
       e.preventDefault()
       if dispute_id
-        $.ajax(
-          headers: headers
+        std_msg_ajax(
           method: 'POST'
           url: '/escalations/api/v1/escalations/webrep/dispute_emails'
           data: form_data
@@ -239,8 +238,7 @@ $ ->
             std_api_error(response, "Email was not sent", response, reload: false)
         )
       else
-        $.ajax(
-          headers: headers
+        std_msg_ajax(
           method: 'POST'
           url: '/escalations/api/v1/escalations/webrep/dispute_emails/ad_hoc'
           data: form_data
