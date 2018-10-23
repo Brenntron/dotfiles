@@ -131,7 +131,7 @@ Feature: Disputes
     And the following disputes exist and have entries:
     |id| submission_type|
     |1 | w              |
-    When I goto "escalations/webrep/tickets?f=all"
+    When I goto "escalations/webrep/disputes?f=all"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
@@ -150,7 +150,7 @@ Feature: Disputes
     And the following disputes exist and have entries:
       |id| submission_type|
       |1 | w              |
-    When I goto "escalations/webrep/tickets?f=all"
+    When I goto "escalations/webrep/disputes?f=all"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#email-cb"
@@ -168,7 +168,7 @@ Feature: Disputes
     And the following disputes exist and have entries:
       |id| submission_type|
       |1 | w              |
-    When I goto "escalations/webrep/tickets?f=all"
+    When I goto "escalations/webrep/disputes?f=all"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#company-cb"
