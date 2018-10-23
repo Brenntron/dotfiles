@@ -1298,11 +1298,16 @@ class Dispute < ApplicationRecord
   def self.ticket_entries_closed_by_day_report(user, from, to)
 
     swap_day = from
-    report_data = []
+    report_data = {}
 
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten
+
+    report_data[:all_results] = 0
+    report_data[:email_results] = 0
+    report_data[:web_results] = 0
+    report_data[:email_web_results] = 0
 
     while Date.parse(swap_day.to_s) != (Date.parse(to.to_s) + 1.day)
 
@@ -1313,7 +1318,16 @@ class Dispute < ApplicationRecord
 
         day_results.each do |day_result|
           if day_result.status == DisputeEntry::STATUS_RESOLVED
-            report_day_count += 1
+            report_data[:all_results] += 1
+
+            case day_result.dispute.submission_type.downcase
+              when 'e'
+                report_data[:email_results] += 1
+              when 'w'
+                report_data[:web_results] += 1
+              when 'ew'
+                report_data[:email_web_results] += 1
+            end
           end
         end
       end
