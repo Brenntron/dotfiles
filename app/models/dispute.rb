@@ -1266,12 +1266,30 @@ class Dispute < ApplicationRecord
 
     status_array = [STATUS_RESOLVED]
 
-    report_data = []
+    report_data = {}
+    report_data[:table_data] = []
     user_ids = users.pluck(:id)
     results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
 
+    report_data[:ticket_count] = results.size
+    report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
+
+    report_data[:customer_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
+    report_data[:guest_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
+    report_data[:email_count] = results.select {|result| result.submission_type.downcase == 'e'}.size
+    report_data[:web_count] = results.select {|result| result.submission_type.downcase == 'w'}.size
+    report_data[:email_web_count] = results.select {|result| result.submission_type.downcase == 'ew'}.size
+
+
+
     results.each do |result|
-      report_data << {:case_id => result.id, :resolution => result.resolution, :dispute => result.dispute_entries.first.hostlookup, :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at)}
+      report_data << {:case_id => result.id,
+                      :resolution => result.resolution,
+                      :dispute => result.dispute_entries.first.hostlookup,
+                      :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
+                      :is_customer => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
+                      :submission_type => result.submission_type
+      }
     end
 
     report_data
