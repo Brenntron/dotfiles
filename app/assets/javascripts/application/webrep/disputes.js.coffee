@@ -1415,7 +1415,7 @@ $ ->
       )
 
 
-    if window.location.pathname != '/escalations/webrep/tickets'
+    if window.location.pathname != '/escalations/webrep/disputes'
       $('#filter-cases').hide()
       $('#import-webrep').hide()
       $('#web-rep-search').hide()
