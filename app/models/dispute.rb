@@ -1356,9 +1356,9 @@ class Dispute < ApplicationRecord
 
   end
 
-  def self.closed_ticket_entries_by_resolution_report(user, from, to, submission_types, submitter_types)
+  def self.closed_ticket_entries_by_resolution_report(user, from, to, submission_types)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where(:submitter_type => submitter_types)
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
     total_count = all_entries.size
