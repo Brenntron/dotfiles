@@ -95,27 +95,6 @@ module RulesHelper
     end
   end
 
-  def doc_image_file(rule)
-    case
-      when !rule.doc_complete?
-        'icon_missing_document.svg'
-      # when !rule.doc_updated?
-      #   'icon_document.svg'
-      else
-        'icon_edit_document.svg'
-    end
-  end
-
-  def doc_status(rule)
-    if rule
-      if can?(:update, RuleDoc) && rule.rule_doc&.id
-        link_to content_tag(:img, '', src: image_path(doc_image_file(rule)), class: 'icon-docs'), "/rule_docs/#{rule.rule_doc&.id}/edit"
-      else
-        content_tag(:img, '', src: image_path(doc_image_file(rule)), class: 'icon-docs')
-      end
-    end
-  end
-
   def diff_lines(left, right)
     content_tag(:p, class: "code wrapped_code") do
       content_tag(:p) do

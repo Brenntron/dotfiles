@@ -116,7 +116,6 @@ eos
       allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
       allow(File).to receive(:directory?).and_return(true)
       allow(Rule).to receive(:find_from_parser).and_return(@rule)
-      allow(@rule).to receive(:associate_references)
 
       Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
 
@@ -132,7 +131,6 @@ eos
       allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
       allow(File).to receive(:directory?).and_return(true)
       allow(Rule).to receive(:find_from_parser).and_return(@rule)
-      allow(@rule).to receive(:associate_references)
 
       Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
 
@@ -149,7 +147,6 @@ eos
       allow(Repo::RuleContentCommitter).to receive(:svn_diff_output).with(@filename).and_return(@svn_diff_output)
       allow(File).to receive(:directory?).and_return(true)
       allow(Rule).to receive(:find_from_parser).and_return(@rule)
-      allow(@rule).to receive(:associate_references)
 
       Repo::RuleContentCommitter.repo_notify_relative_filenames(@filenames)
 

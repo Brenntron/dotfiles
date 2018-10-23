@@ -25,7 +25,7 @@ class Ability
     if role_names.include?('admin')
       can :read, :all
       can [:acknowledge_bug], Bug
-      can :manage, [Admin, User, Role, ReferenceType, Task, SnortDocPublisher]
+      can :manage, [Admin, User, Role, Task]
     end
 
 
@@ -93,14 +93,14 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can :read, [ResearchBug, Rule, RuleDoc]
+      can :read, [ResearchBug, Rule]
     end
 
     if role_names.include?('committer')
       can [:manage, :acknowledge_bug, :import, :toggle_liberty], ResearchBug do |bug|
         bug.check_permission(current_user)
       end
-      can :manage, [EscalationLink, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
+      can :manage, [EscalationLink, Attachment, Note, Rule]
       can :publish, Rule
       can :publish_to_bugzilla, Note
     end
@@ -109,7 +109,7 @@ class Ability
       can [:manage, :acknowledge_bug, :import], ResearchBug do |bug|
         bug.check_permission(current_user)
       end
-      can :manage, [Attachment, Note, RuleDoc, Exploit, Reference]
+      can :manage, [Attachment, Note]
       can [:read, :create, :update, :destroy], Rule #CRUD but no publish/commit
       # TODO When implementing escalation bugs re-enable
       # can [:manage, :acknowledge_bug, :import], EscalationBug
@@ -121,8 +121,8 @@ class Ability
     end
 
     if role_names.include?('build coordinator')
-      cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note, Exploit, Reference]
-      can :read, [ResearchBug, Attachment, Note, Rule, RuleDoc, Exploit, Reference]
+      cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note]
+      can :read, [ResearchBug, Attachment, Note, Rule]
     end
   end
 end
