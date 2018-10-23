@@ -56,10 +56,10 @@ Rails.application.routes.draw do
       root 'root#index'
       resources :disputes, only: [:index, :show] do
         collection do
-          get :advanced_search
-          get :named_search
-          get :standard_search
-          get :contains_search
+          # get :advanced_search
+          # get :named_search
+          # get :standard_search
+          # get :contains_search
           get :resolution_report
           get :export_per_resolution_report
           get :export_per_engineer_report
@@ -75,7 +75,6 @@ Rails.application.routes.draw do
       resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
       resources :email_templates        # TODO This route has no controller so determine if it should be removed.
 
-      get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
     end
