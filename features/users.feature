@@ -9,7 +9,8 @@ Feature: User Accounts
   Scenario: A user with proper credentials should get logged in
             and redirected to the bugs page
     Given current user exists
-    And I visit the root url
+    When I visit the root url
+    Then I should see "/escalations/sessions/new" in the current url
     And I should see "Please sign in using your Cisco credentials"
     When the user signs in
     Then I should not see "Please sign in using your Cisco credentials"
