@@ -575,22 +575,14 @@ module API
 
             desc 'Autopopulate fields on Advanced Search'
             get 'autopopulate_advanced_search' do
-
-
-              STATUS_RESEARCHING = "RESEARCHING"
-              STATUS_ESCALATED = "ESCALATED"
-              STATUS_CUSTOMER_PENDING = "CUSTOMER_PENDING"
-              STATUS_ON_HOLD = "ON_HOLD"
-              STATUS_RESOLVED = "RESOLVED_CLOSED"
-              STATUS_REOPENED = "RE-OPENED"
-
               case_owners = User.where.not(cvs_username: nil).order(cvs_username: :asc)
-              statuses = [STATUS_RESEARCHING,STATUS_ESCALATED,STATUS_CUSTOMER_PENDING,STATUS_ON_HOLD,STATUS_RESOLVED,STATUS_REOPENED]
+              statuses = [Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING,
+                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED]
               submitter_types = ['Customer', 'Non-Customer']
               contacts = Customer.all.order(name: :asc)
               companies = Company.all.order(name: :asc)
-              resolutions = ['Fixed - FP', 'Fixed - FN', 'Unchanged', 'Invalid / Junk Email', 'Test / Training', 'Other']
-
+              resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
+                             Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
 
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions }
