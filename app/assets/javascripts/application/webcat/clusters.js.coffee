@@ -121,8 +121,8 @@ $ ->
         orderable: false
         searchable: false
         sortable: false
-        render: (data) ->
-          '<span></span>'
+        render: (data, type, full, meta) ->
+          '<input type="checkbox" name="id[]" onclick="toggleRow(this)">'
       }
       {
         data: 'cluster_id'
@@ -177,32 +177,52 @@ $ ->
 
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
-    dialogClass: "copycat_tool_dialog"
-  })
+    dialogClass: "copycat_tool_dialog",
+    close: (event, ui) =>
+      $('button.icon-copycat').removeClass('active')
+  });
 
 # delete copycat input content
 window.copycat_clear = () ->
-  console.log('clearing copy cat input')
   $('#copycat_dialog input')[0].value = ''
+
+window.onlyUnique = (value, index, self) ->
+  self.indexOf(value) == index
 
 # paste checkbox category input into copycat input
 window.copycat_paste = () ->
-  console.log('pasting all selected rows')
-  selectedRows = []
-  if $('#clusters_check_box').prop('checked')
-    console.log('Row is selected')
-    $('#clusters-index').DataTable().rows().select()
-    selectedRows = $('#clusters-index').DataTable().rows()
-    console.log(selectedRows)
-  else
-    console.log('row not selected')
+  selectedRows = $('#clusters-index tr[role="row"].selected')
+  i = 0
+  values = []
+  while i < selectedRows.length
+    $(selectedRows[i]).find('.category-column select :selected').each ->
+      values.push($(this).text())
+    i++
+  values = values.filter(onlyUnique).join(',')
+  $('#copycat_dialog input')[0].value = values
 
+
+
+window.toggleRow = (el) ->
+  $(el).closest('tr').toggleClass('selected')
 
 # Select rows in Clusters Table
 $ ->
   $('#clusters_check_box').click ->
     if $('#clusters_check_box').prop('checked')
       $('#clusters-index').DataTable().rows().select()
+      rows = $('table#clusters-index input[type="checkbox"]');
+      i = 1
+      while i < rows.length
+        $(rows[i])[0].checked = true
+        console.log(rows[i].value)
+        i++
     else
       $('#clusters-index').DataTable().rows().deselect()
+      rows = $('table#clusters-index input[type="checkbox"]')
+      i = 1
+      while i < rows.length
+        $(rows[i])[0].checked = false
+        i++
   return
+
