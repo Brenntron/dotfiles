@@ -69,23 +69,12 @@ window.cat_new_url = ()->
   )
 
 window.webcat_reset_search = ()->
-  document.getElementById("complaintid-input").value=""
-  document.getElementById("complaint-input").value=""
-  document.getElementById("category-input").value=""
-  document.getElementById("status-input").value=""
+  inputs = document.getElementsByClassName('form-control')
+  for i in inputs
+    i.value = ""
   tags_select = $('#tags-input').selectize()
   tags_control = tags_select[0].selectize
   tags_control.clear()
-  document.getElementById("resolution-input").value=""
-  document.getElementById("channel-input").value=""
-  document.getElementById("name-input").value=""
-  document.getElementById("email-input").value=""
-  document.getElementById("company-input").value=""
-  document.getElementById("desc-input").value=""
-  document.getElementById("submitted-newer-input").value=""
-  document.getElementById("submitted-older-input").value=""
-  document.getElementById("modified-newer-input").value=""
-  document.getElementById("modified-older-input").value=""
 
 window.multiple_url_categorization = ()->
   event.preventDefault()
