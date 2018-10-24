@@ -26,7 +26,7 @@ Feature: Disputes index, Research tab
     When I goto "escalations/webrep/disputes/2"
     And I click "#research-tab-link"
     Then "#disputes-research-table" should be visible
-@now
+
   @javascript
   Scenario: Dispute entries with no preloaded data attempt to fire the preloader
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in

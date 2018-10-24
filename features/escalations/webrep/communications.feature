@@ -285,7 +285,7 @@ Feature: Webrep communications
     Then I go to "/escalations/webrep/disputes/722"
     Then I click on row with email_id "1"
     Then I should see div element with class "customer-facing-notice"
-@now
+
   @javascript
   Scenario: a user attaches a file to an email and sends it
     Given a user with role "webrep user" exists and is logged in

@@ -33,7 +33,7 @@ Feature: User Accounts
 
 
   ### Scenarios User management ###
-@now
+
   @javascript
   Scenario: A regular user should see a not found flash message
     Given a user with role "analyst" exists and is logged in
@@ -247,7 +247,7 @@ Feature: User Accounts
     And  I should see "rainbow_b"
     Then I goto "/users/1/relationships"
     And  I should see "d_drumph"
-@now
+
   @javascript
   Scenario: A manager can add and remove team members on the relationships page.
     Given a manager exists and is logged in

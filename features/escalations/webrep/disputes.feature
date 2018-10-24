@@ -24,7 +24,7 @@ Feature: Disputes
     Then I go to "/escalations/webrep/disputes/1"
     Then I click link "Research"
     Then Expect date in element "#last-submitted" to equal today's date
-@now
+
   @javascript
   Scenario: a user can see data in the Submitter Type column
     Given a user with role "webrep user" exists and is logged in
