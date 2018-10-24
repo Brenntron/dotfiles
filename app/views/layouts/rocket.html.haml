@@ -9,6 +9,8 @@
 
   %body{class: "rocket-layout #{controller_path.gsub('/', '--')}-controller #{action_name}-action"}
 
+    = render '/layouts/shared/bugzilla_auth'
+
     = render '/shared/alert_modal'
     = render '/shared/loader_modal'
  
