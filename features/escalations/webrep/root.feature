@@ -1,6 +1,6 @@
 Feature: Webrep Root
   Features in the Webrep Root Controller
-
+@now
   @javascript
   Scenario: The webrep root redirects to webrep/tickets
     Given a user with role "webrep user" exists and is logged in

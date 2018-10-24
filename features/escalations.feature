@@ -2,7 +2,7 @@ Feature: Escalations
   In order to import, create or edit escalation bugs
   as a user
   I will provides ways to interact with escalation bugs
-
+@now
   @javascript
   Scenario: the appropriate canned response is added when manually resolving the bug
 
@@ -59,7 +59,7 @@ Feature: Escalations
     When I click "OK"
     Then I wait for "1" seconds
     Then I should see "must provide a description for the new research bug."
-
+@now
   @javascript
   Scenario: Cannot create a research bug when one bug blocks another
     Given a user with commit permission exists and is logged in

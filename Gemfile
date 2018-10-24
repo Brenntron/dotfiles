@@ -34,7 +34,7 @@ gem 'curb', '~> 0.9.3' #Libcurl bindings for Ruby
 
 gem 'net-ssh', '~> 4.1.0'
 gem 'daemons', '~> 1.2.4'
-gem 'activemessaging', '0.13.1.2'  # , path: './vendor/gems/activemessaging'
+gem 'activemessaging', '0.13.1.2'   , path: './vendor/gems/activemessaging'
 gem 'stomp', '~> 1.4.3'
 gem 'dalli', '~> 2.6.4'
 gem 'pry', '~> 0.9.12.4'
@@ -81,7 +81,7 @@ group :development do
   gem 'thin', '~> 1.7.0'
   gem 'puma'
   gem 'awesome_print', '1.2.0'
-  gem 'guard','2.14.0'
+  gem 'guard','2.14.2'
   gem 'guard-livereload', '2.5.2', require: false
   gem 'web-console', '~> 3.4.0'
 end
