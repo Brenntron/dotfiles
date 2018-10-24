@@ -184,7 +184,7 @@ window.copycat_dialog = () ->
 
 # delete copycat input content
 window.copycat_clear = () ->
-  $('#copycat_dialog input')[0].value = ''
+  $('#copycat_dialog .dialog-content-wrapper')[0].innerHTML = '<input type="text" id="mk-select" placeholder="Add Categories">'
 
 window.onlyUnique = (value, index, self) ->
   self.indexOf(value) == index
@@ -200,6 +200,8 @@ window.copycat_paste = () ->
     i++
   values = values.filter(onlyUnique).join(',')
   $('#copycat_dialog input')[0].value = values
+
+  $('#mk-select').selectize()
 
 
 
