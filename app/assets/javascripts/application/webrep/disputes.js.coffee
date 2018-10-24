@@ -1715,5 +1715,313 @@ $ ->
     )
 
 
+    new Chart(document.getElementById('bar-chart2'),
+      type: 'bar'
+      data:
+        labels: [
+          'September 1'
+          'September 2'
+          'September 3'
+          'September 4'
+          'September 5'
+        ]
+        datasets: [
+          {
+            label: 'E'
+            backgroundColor: 'blue'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'W'
+            backgroundColor: 'orange'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'EW'
+            backgroundColor: 'red'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+        ]
+      options:
+        legend: display: true
+        title:
+          display: true
+          text: 'TICKET ENTRIES CLOSED BY DAY'
+        scales:
+          yAxes: [
+            {
+              ticks: {
+                min: 0
+                stepSize: 10
+              }
+            }
+          ]
+    )
+
+    new Chart(document.getElementById('bar-chart3'),
+      type: 'bar'
+      data:
+        labels: [
+          'September 1'
+          'September 2'
+          'September 3'
+          'September 4'
+          'September 5'
+        ]
+        datasets: [
+          {
+            label: 'E'
+            backgroundColor: 'blue'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'W'
+            backgroundColor: 'orange'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'EW'
+            backgroundColor: 'red'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+        ]
+      options:
+        legend: display: true
+        title:
+          display: true
+          text: 'TICKET ENTRIES CLOSED BY DAY'
+        scales:
+          yAxes: [
+            {
+              ticks: {
+                min: 0
+                stepSize: 10
+              }
+            }
+          ]
+    )
+
+
+    new Chart(document.getElementById('bar-chart4'),
+      type: 'bar'
+      data:
+        labels: [
+          'September 1'
+          'September 2'
+          'September 3'
+          'September 4'
+          'September 5'
+        ]
+        datasets: [
+          {
+            label: 'E'
+            backgroundColor: 'blue'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'W'
+            backgroundColor: 'orange'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'EW'
+            backgroundColor: 'red'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+        ]
+      options:
+        legend: display: true
+        title:
+          display: true
+          text: 'TICKET ENTRIES CLOSED BY DAY'
+        scales:
+          yAxes: [
+            {
+              ticks: {
+                min: 0
+                stepSize: 10
+              }
+            }
+          ]
+    )
+
+    new Chart(document.getElementById('bar-chart5'),
+      type: 'bar'
+      data:
+        labels: [
+          'September 1'
+          'September 2'
+          'September 3'
+          'September 4'
+          'September 5'
+        ]
+        datasets: [
+          {
+            label: 'E'
+            backgroundColor: 'blue'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'W'
+            backgroundColor: 'orange'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'EW'
+            backgroundColor: 'red'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+        ]
+      options:
+        legend: display: true
+        title:
+          display: true
+          text: 'TICKET ENTRIES CLOSED BY DAY'
+        scales:
+          yAxes: [
+            {
+              ticks: {
+                min: 0
+                stepSize: 10
+              }
+            }
+          ]
+    )
+
+    new Chart(document.getElementById('bar-chart6'),
+      type: 'bar'
+      data:
+        labels: [
+          'September 1'
+          'September 2'
+          'September 3'
+          'September 4'
+          'September 5'
+        ]
+        datasets: [
+          {
+            label: 'E'
+            backgroundColor: 'blue'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'W'
+            backgroundColor: 'orange'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+          {
+            label: 'EW'
+            backgroundColor: 'red'
+            data: [
+              11
+              11
+              23
+              17
+              14
+            ]
+          }
+        ]
+      options:
+        legend: display: true
+        title:
+          display: true
+          text: 'TICKET ENTRIES CLOSED BY DAY'
+        scales:
+          yAxes: [
+            {
+              ticks: {
+                min: 0
+                stepSize: 10
+              }
+            }
+          ]
+    )
+
+
+
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
