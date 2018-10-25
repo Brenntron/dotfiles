@@ -4,7 +4,7 @@ module ApplicationHelper
   end
 
   def bugzilla_api_key
-    'the_bugzilla_api_key'
+    current_user&.bugzilla_api_key
   end
 
   def bootstrap_class_for(flash_type)

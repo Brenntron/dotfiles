@@ -22,6 +22,11 @@
           </span>
         </h2>
         <p class="text-muted"><em><strong><%=@user.roles.map(&:role).join(', ')%></strong></em></p>
+        <% if can?(:manage_bugzilla_api, @user) %>
+        <div>
+          <%= link_to 'Bugzilla API Key', edit_escalations_user_bugzilla_api_key_path(@user) %>
+        </div>
+        <% end %>
       </div>
       <% if current_user.has_role?('admin') %>
           <div class="col-xs-12 col-sm-8">
