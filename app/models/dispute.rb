@@ -1311,6 +1311,12 @@ class Dispute < ApplicationRecord
 
     while Date.parse(swap_day.to_s) != (Date.parse(to.to_s) + 1.day)
 
+      report_data[swap_day.to_s] = {}
+      report_data[swap_day.to_s][:all_results] = 0
+      report_data[swap_day.to_s][:email_results] = 0
+      report_data[swap_day.to_s][:web_results] = 0
+      report_data[swap_day.to_s][:email_web_results] = 0
+
       report_day_count = 0
       day_results = all_entries.select {|result| Date.parse(result.case_resolved_at.to_s) == Date.parse(swap_day.to_s)}
 
@@ -1318,21 +1324,20 @@ class Dispute < ApplicationRecord
 
         day_results.each do |day_result|
           if day_result.status == DisputeEntry::STATUS_RESOLVED
-            report_data[:all_results] += 1
+            report_data[swap_day.to_s][:all_results] += 1
 
             case day_result.dispute.submission_type.downcase
               when 'e'
-                report_data[:email_results] += 1
+                report_data[swap_day.to_s][:email_results] += 1
               when 'w'
-                report_data[:web_results] += 1
+                report_data[swap_day.to_s][:web_results] += 1
               when 'ew'
-                report_data[:email_web_results] += 1
+                report_data[swap_day.to_s][:email_web_results] += 1
             end
           end
         end
       end
 
-      report_data << report_day_count
       swap_day = swap_day + 1.day
     end
 
