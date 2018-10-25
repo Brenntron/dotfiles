@@ -55,6 +55,14 @@ module API
             xmlrpc
           end
 
+          def bugzilla_rest_session
+            byebug
+            # BugzillaRest::Session.new_from_ajax(request.headers, env: env, current_user: current_user)
+            token = headers['X-Bugzilla-Restapi-Token']
+            token = env['rack.session']['bugzilla_rest_api_token'] unless token.present?
+            BugzillaRest::Session.new(api_key: current_user.bugzilla_api_key, token: token)
+          end
+
           # Standard (our standard) handling of an exception
           # @param [Exception, #read] exception is the exception to report
           # @param [Fixnum] status is the HTTP status code

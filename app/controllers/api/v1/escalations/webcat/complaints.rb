@@ -68,11 +68,13 @@ module API
             end
 
             post "" do
-              Complaint.create_action(bugzilla_session,
-                                      permitted_params[:ips_urls],
-                                      permitted_params[:description],
-                                      permitted_params[:customer],
-                                      permitted_params[:tags])
+              byebug
+              bz_session = bugzilla_rest_session
+              # Complaint.create_action(bugzilla_session,
+              #                         permitted_params[:ips_urls],
+              #                         permitted_params[:description],
+              #                         permitted_params[:customer],
+              #                         permitted_params[:tags])
               {:status => 'success'}.to_json
             end
 
