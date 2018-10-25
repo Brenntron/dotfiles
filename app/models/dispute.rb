@@ -1373,5 +1373,36 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.tickets_submitted_by_submitter_per_day(from, to)
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("created_at between '#{from}' and '#{to}'")
+
+    report_data = {}
+
+    swap_day = from
+
+    while Date.parse(swap_day.to_s) != (Date.parse(to.to_s) + 1.day)
+
+       report_data[swap_day.to_s] = {}
+       report_data[swap_day.to_s][:customer_count] = 0
+       report_data[swap_day.to_s][:guest_count] = 0
+
+       day_results = main_results.select {|result| Date.parse(result.created_at.to_s) == Date.parse(swap_day.to_s)}
+
+       day_results.each do |result|
+         if result.submitter_type == SUBMITTER_TYPE_CUSTOMER
+           report_data[swap_day.to_s][:customer_count] += 1
+         end
+         if result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER
+           report_data[swap_day.to_s][:guest_count] += 1
+         end
+       end
+
+       swap_day = swap_day + 1.day
+    end
+
+    report_data
+
+  end
+
 end
 
