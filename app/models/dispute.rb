@@ -639,13 +639,16 @@ class Dispute < ApplicationRecord
         logger.debug "Creating email"
         #build first official email of the new case
 
+        email_body = message_payload["payload"]["email_body"].to_s # I don't know how this comes in so we have to make sure it's a string...
+        email_body = email_body[0..64000].gsub(/\s\w+\s*$/, '... ... THIS MESSAGE WAS LONGER THAN 64,000 CHARACTERS AND HAS BEEN TRUNCATED.') # ...Or else this wouldn't work.
+
         first_email = DisputeEmail.new
         first_email.dispute_id = new_dispute.id
         first_email.email_headers = nil
         first_email.from = message_payload["payload"]["email"]
         first_email.to = nil
         first_email.subject = message_payload["payload"]["email_subject"]
-        first_email.body = message_payload["payload"]["email_body"]
+        first_email.body = email_body
         first_email.status = DisputeEmail::UNREAD
         first_email.save!
 
