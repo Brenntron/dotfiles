@@ -199,9 +199,11 @@ window.copycat_paste = () ->
       values.push($(this).text())
     i++
   values = values.filter(onlyUnique).join(',')
-  $('#copycat_dialog input')[0].value = values
-
-  $('#mk-select').selectize()
+  if values.length == 0
+    $('button#error-trigger').trigger 'click'
+  else
+    $('#copycat_dialog input')[0].value = values
+    $('#mk-select').selectize()
 
 
 

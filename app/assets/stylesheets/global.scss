@@ -6671,5 +6671,25 @@ h2 {
 
 .selectize-input {
   border: 1px solid #dddddd;
-  padding: 0 10px !important;
+  padding: 0 5px !important;
+}
+#errorModal .modal-header {
+  background-color: $content-tab-color;
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-size: 24px 24px;
+  padding-left: 40px;
+  border: none;
+
+  .modal-title {
+    color: red;
+  }
+}
+
+.modal-header .close {
+  background-color: transparent;
+  background-image: url(image_path('icon_delete_white.svg'));
+  top: 16px;
+  background-size: 20px;
 }
