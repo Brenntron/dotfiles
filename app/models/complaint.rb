@@ -536,16 +536,14 @@ class Complaint < ApplicationRecord
 
   end
 
-  def self.create_action(bugzilla_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
-    user = User.where(cvs_username:"vrtincom").first
-    bug_factory = Bugzilla::Bug.new(bugzilla_session)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-    full_description = %Q{
+    full_description = <<~HEREDOC
           IPs/URIs: #{ips_urls}
           Problem Summary: #{description}
-    }
+    HEREDOC
 
     bug_attrs = {
         'product' => 'Escalations Console',
@@ -557,14 +555,16 @@ class Complaint < ApplicationRecord
         'classification' => 'unclassified',
     }
 
-    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+    bug_id = bugzilla_rest_session.create_bug(bug_attrs)
+
 
     cust = find_customer(customer) if customer
-    new_complaint = Complaint.create(id: bug_stub_hash["id"],
+    new_complaint = Complaint.create(id: bug_id,
                                      description: description,
-                                     customer_id: cust ? cust.id : nil,
+                                     customer_id: cust&.id,
                                      status: status,
                                      channel: INT_CHANNEL)
+
 
     handle_tags(new_complaint, tags) if tags
 
