@@ -1699,10 +1699,10 @@ $ ->
           }
         ]
       options:
-        legend: display: true
-        title:
-          display: true
-          text: 'TICKET ENTRIES CLOSED BY DAY'
+        legend: display: false
+#        title:
+#          display: true
+#          text: 'TICKET ENTRIES CLOSED BY DAY'
         scales:
           yAxes: [
             {
@@ -1714,312 +1714,111 @@ $ ->
           ]
     )
 
-
-    new Chart(document.getElementById('bar-chart2'),
-      type: 'bar'
+    ctx = document.getElementById('myChart')
+    myChart = new Chart(ctx,
+      type: 'line'
       data:
         labels: [
-          'September 1'
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
+          'Red'
+          'Blue'
+          'Yellow'
+          'Green'
+          'Purple'
+          'Orange'
         ]
         datasets: [
           {
-            label: 'E'
-            backgroundColor: 'blue'
+            label: '# of Votes'
             data: [
-              11
-              11
-              23
-              17
-              14
+              12
+              19
+              3
+              5
+              2
+              3
             ]
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)'
+              'rgba(54, 162, 235, 0.2)'
+              'rgba(255, 206, 86, 0.2)'
+              'rgba(75, 192, 192, 0.2)'
+              'rgba(153, 102, 255, 0.2)'
+              'rgba(255, 159, 64, 0.2)'
+            ]
+            borderColor: [
+              'rgba(255,99,132,1)'
+              'rgba(54, 162, 235, 1)'
+              'rgba(255, 206, 86, 1)'
+              'rgba(75, 192, 192, 1)'
+              'rgba(153, 102, 255, 1)'
+              'rgba(255, 159, 64, 1)'
+            ]
+            borderWidth: 1
           }
           {
-            label: 'W'
-            backgroundColor: 'orange'
+            label: '# of Players'
             data: [
-              11
-              11
-              23
-              17
-              14
+              1
+              20
+              1
+              2
+              5
+              8
             ]
-          }
-          {
-            label: 'EW'
-            backgroundColor: 'red'
-            data: [
-              11
-              11
-              23
-              17
-              14
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)'
+              'rgba(54, 162, 235, 0.2)'
+              'rgba(255, 206, 86, 0.2)'
+              'rgba(75, 192, 192, 0.2)'
+              'rgba(153, 102, 255, 0.2)'
+              'rgba(255, 159, 64, 0.2)'
             ]
+            borderColor: [
+              'rgba(255,99,132,1)'
+              'rgba(54, 162, 235, 1)'
+              'rgba(255, 206, 86, 1)'
+              'rgba(75, 192, 192, 1)'
+              'rgba(153, 102, 255, 1)'
+              'rgba(255, 159, 64, 1)'
+            ]
+            borderWidth: 1
           }
         ]
-      options:
-        legend: display: true
-        title:
-          display: true
-          text: 'TICKET ENTRIES CLOSED BY DAY'
-        scales:
-          yAxes: [
-            {
-              ticks: {
-                min: 0
-                stepSize: 10
-              }
-            }
-          ]
-    )
+      options: scales: yAxes: [ { ticks: beginAtZero: true } ])
 
-    new Chart(document.getElementById('bar-chart3'),
-      type: 'bar'
-      data:
-        labels: [
-          'September 1'
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
+    oilCanvas = document.getElementById('oilChart')
+    Chart.defaults.global.defaultFontFamily = 'Lato'
+    Chart.defaults.global.defaultFontSize = 18
+    oilData =
+      labels: [
+        'all users'
+        'admin'
+        'cyber team'
+        'devOps'
+        'branch'
+      ]
+      datasets: [ {
+        data: [
+          133.3
+          86.2
+          52.2
+          51.2
+          50.2
         ]
-        datasets: [
-          {
-            label: 'E'
-            backgroundColor: 'blue'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'W'
-            backgroundColor: 'orange'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'EW'
-            backgroundColor: 'red'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
+        backgroundColor: [
+          '#FF6384'
+          'orange'
+          '#84FF63'
+          '#8463FF'
+          '#6384FF'
         ]
-      options:
-        legend: display: true
-        title:
-          display: true
-          text: 'TICKET ENTRIES CLOSED BY DAY'
-        scales:
-          yAxes: [
-            {
-              ticks: {
-                min: 0
-                stepSize: 10
-              }
-            }
-          ]
-    )
+      } ]
+    pieChart = new Chart(oilCanvas,
+      type: 'pie'
+      data: oilData)
 
-
-    new Chart(document.getElementById('bar-chart4'),
-      type: 'bar'
-      data:
-        labels: [
-          'September 1'
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
-        ]
-        datasets: [
-          {
-            label: 'E'
-            backgroundColor: 'blue'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'W'
-            backgroundColor: 'orange'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'EW'
-            backgroundColor: 'red'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-        ]
-      options:
-        legend: display: true
-        title:
-          display: true
-          text: 'TICKET ENTRIES CLOSED BY DAY'
-        scales:
-          yAxes: [
-            {
-              ticks: {
-                min: 0
-                stepSize: 10
-              }
-            }
-          ]
-    )
-
-    new Chart(document.getElementById('bar-chart5'),
-      type: 'bar'
-      data:
-        labels: [
-          'September 1'
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
-        ]
-        datasets: [
-          {
-            label: 'E'
-            backgroundColor: 'blue'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'W'
-            backgroundColor: 'orange'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'EW'
-            backgroundColor: 'red'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-        ]
-      options:
-        legend: display: true
-        title:
-          display: true
-          text: 'TICKET ENTRIES CLOSED BY DAY'
-        scales:
-          yAxes: [
-            {
-              ticks: {
-                min: 0
-                stepSize: 10
-              }
-            }
-          ]
-    )
-
-    new Chart(document.getElementById('bar-chart6'),
-      type: 'bar'
-      data:
-        labels: [
-          'September 1'
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
-        ]
-        datasets: [
-          {
-            label: 'E'
-            backgroundColor: 'blue'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'W'
-            backgroundColor: 'orange'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-          {
-            label: 'EW'
-            backgroundColor: 'red'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
-          }
-        ]
-      options:
-        legend: display: true
-        title:
-          display: true
-          text: 'TICKET ENTRIES CLOSED BY DAY'
-        scales:
-          yAxes: [
-            {
-              ticks: {
-                min: 0
-                stepSize: 10
-              }
-            }
-          ]
-    )
+# ---
+# generated by js2coffee 2.2.0
 
 
 

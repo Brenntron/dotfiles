@@ -78,14 +78,53 @@
             %label.left-space.left-vertical-separator 23
 
     .col-xs-6
-      .col-xs-6
-        %canvas#bar-chart{:height => "50px", :width => "50px"}
-        %canvas#bar-chart2{:height => "50px", :width => "50px"}
-        %canvas#bar-chart3{:height => "50px", :width => "50px"}
+      .col-xs-6.left-graph-section
+        .graph-top-header
+          %h5.uppercase ticket entries closed by day
+        %label.content-label-sm Time Breakdown
 
-      .col-xs-6
-        %canvas#bar-chart4{:height => "50px", :width => "50px", "margin" => "50px"}
-        %canvas#bar-chart5{:height => "50px", :width => "50px"}
+        .graph-config
+          .occurrence
+            %select.form-control
+              %option{:selected => "selected", :value => ""} By Day
+              %option{:value => ""} Weekly
+              %option{:value => ""} Monthly
+              %option{:value => ""} Yearly
+
+          -#.dropdown
+            -#%button#dropdown-menu.arrow-down.dropdown-toggle{"data-toggle" => "dropdown"}
+            -#  Dropdown button
+            -#.dropdown-menu{"aria-labelledby" => "dropdownMenuButton"}
+            -#  %a By Day
+            -#  %a Weekly
+            -#  %a Monthly
+            -#  %a Yearly
+
+          .graph-menu
+            .radio
+              %label
+                %input{type: 'radio', value: 'value', :checked => "checked"}
+                Total Ticket Entries
+
+            .radio
+              %label
+                %input{type: 'radio', value: 'value', :checked => "checked"}
+                Entries By Ticket Type
+
+        %canvas#bar-chart{:height => "50px", :width => "50px"}
+
+        .graph-top-header
+          %h5.uppercase ticket entries closed by day
+        %canvas#myChart{:height => "50px", :width => "50px"}
+
+
+
+
+      .col-xs-6.start-point
+        %canvas#oilChart{:height => "50px", :width => "50px"}
+
+
+
 
 
 
