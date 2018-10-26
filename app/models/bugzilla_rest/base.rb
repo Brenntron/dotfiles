@@ -1,6 +1,9 @@
 class BugzillaRest::Base
+  include ActiveModel::Model
 
-  def initialize(api_key:, token:)
+  attr_reader :api_key, :token
+
+  def initialize(api_key: nil, token: nil)
     @api_key = api_key
     @token = token
   end

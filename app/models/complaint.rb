@@ -225,7 +225,7 @@ class Complaint < ApplicationRecord
 
 
 
-  def self.process_bridge_payload(message_payload)
+  def self.process_bridge_payload(message_payload, bugzilla_rest_session: nil)
 
     begin
       ActiveRecord::Base.transaction do
@@ -240,8 +240,6 @@ class Complaint < ApplicationRecord
         return_payload = {}
 
         #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
-
-        bug_factory = Bugzilla::Bug.new(message_payload[:bugzilla_session])
 
         summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -261,12 +259,12 @@ class Complaint < ApplicationRecord
             'classification' => 'unclassified',
         }
 
-        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+        bug_id_object = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
 
 
         new_complaint = Complaint.new
         new_complaint.submission_type = message_payload["payload"]["submission_type"]
-        new_complaint.id = bug_stub_hash["id"]
+        new_complaint.id = bug_id_object.id
         new_complaint.description = message_payload["payload"]["problem"]
         new_complaint.ticket_source_key = message_payload["source_key"]
         new_complaint.ticket_source = "talos-intelligence"

@@ -3,10 +3,71 @@ require "rails_helper"
 RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
   let(:vrt_incoming) { FactoryBot.create(:vrt_incoming_user) }
   let(:guest_company) { FactoryBot.create(:guest_company) }
+  let(:complaint_payload) do
+    {
+        investigate_ips: {
+            '72.52.134.84' => {
+                "wbrs" => {
+                    "WBRS_SCORE"=>"-3.55",
+                    "WBRS_Rule_Hits"=>"dotq",
+                    "Hostname_ips"=>"",
+                    "current_cat"=>"Not in our list",
+                    "cat_sugg"=>["Business and Industry"]
+                },
+                "sbrs" => {
+                    "SBRS_SCORE"=>"No score",
+                    "SBRS_Rule_Hits"=>"",
+                    "Hostname"=>"server-52-84-141-37.yto50.r.cloudfront.net",
+                    "current_cat"=>"Not in our list",
+                    "cat_sugg"=>["Business and Industry"]
+                }
+            },
+            '72.52.134.51' => {
+                "wbrs" => {
+                    "WBRS_SCORE"=>"-3.55",
+                    "WBRS_Rule_Hits"=>"dotq",
+                    "Hostname_ips"=>"",
+                    "current_cat"=>"Search Engines and Portals",
+                    "cat_sugg"=>["Search Engines and Portals", "Adult"]
+                },
+                "sbrs"=>{"SBRS_SCORE"=>"No score",
+                         "SBRS_Rule_Hits"=>"",
+                         "Hostname"=>"redirect-v225.secureserver.net",
+                         "current_cat"=>"Search Engines and Portals",
+                         "cat_sugg"=>["Search Engines and Portals", "Adult"]
+                }
+            }
+        },
+        investigate_urls: {
+            'host.gerenciahospitalaria.org' => {
+                "WBRS_SCORE"=>"1.55",
+                "WBRS_Rule_Hits"=>"alx_cln, suwl",
+                "Hostname_ips"=>"",
+                "current_cat"=>"Science and Technology",
+                "cat_sugg"=>["Science and Technology", "Business and Industry"]
+            },
+            'thepretenders.com' => {
+                "WBRS_SCORE"=>"noscore",
+                "WBRS_Rule_Hits"=>"",
+                "Hostname_ips"=>"",
+                "current_cat"=>"Entertainment",
+                "cat_sugg"=>["Entertainment", "Adult"]
+            }
+        },
+        problem: 'What do I need to do to improve the reputation',
+        submission_type: 'ew',
+        name: 'Ricardo Pedraza',
+        email: 'webmaster@cmim.org',
+        user_company: 'Guest'
+    }
+  end
 
   it 'receives complaint payload messages' do
     vrt_incoming
     guest_company
+    allow(Wbrs::TopUrl).to receive(:check_urls).and_return([ Wbrs::TopUrl.new(is_important: false) ])
+    allow(ComplaintEntryPreload).to receive(:generate_preload_from_complaint_entry)
+    allow(Wbrs::Prefix).to receive(:where).and_return([])
 
     post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: {
         envelope: {
@@ -18,62 +79,7 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
             complaint: {
                 source_type: 'Complaint',
                 source_key: 1001,
-                payload: {
-                    investigate_ips: {
-                        '72.52.134.84' => {
-                            "wbrs" => {
-                                "WBRS_SCORE"=>"-3.55",
-                                "WBRS_Rule_Hits"=>"dotq",
-                                "Hostname_ips"=>"",
-                                "current_cat"=>"Not in our list",
-                                "cat_sugg"=>["Business and Industry"]
-                            },
-                            "sbrs" => {
-                                "SBRS_SCORE"=>"No score",
-                                "SBRS_Rule_Hits"=>"",
-                                "Hostname"=>"server-52-84-141-37.yto50.r.cloudfront.net",
-                                "current_cat"=>"Not in our list",
-                                "cat_sugg"=>["Business and Industry"]
-                            }
-                        },
-                        '72.52.134.51' => {
-                            "wbrs" => {
-                                "WBRS_SCORE"=>"-3.55",
-                                "WBRS_Rule_Hits"=>"dotq",
-                                "Hostname_ips"=>"",
-                                "current_cat"=>"Search Engines and Portals",
-                                "cat_sugg"=>["Search Engines and Portals", "Adult"]
-                            },
-                            "sbrs"=>{"SBRS_SCORE"=>"No score",
-                                     "SBRS_Rule_Hits"=>"",
-                                     "Hostname"=>"redirect-v225.secureserver.net",
-                                     "current_cat"=>"Search Engines and Portals",
-                                     "cat_sugg"=>["Search Engines and Portals", "Adult"]
-                            }
-                        }
-                    },
-                    investigate_urls: {
-                        'host.gerenciahospitalaria.org' => {
-                            "WBRS_SCORE"=>"1.55",
-                            "WBRS_Rule_Hits"=>"alx_cln, suwl",
-                            "Hostname_ips"=>"",
-                            "current_cat"=>"Science and Technology",
-                            "cat_sugg"=>["Science and Technology", "Business and Industry"]
-                        },
-                        'thepretenders.com' => {
-                            "WBRS_SCORE"=>"noscore",
-                            "WBRS_Rule_Hits"=>"",
-                            "Hostname_ips"=>"",
-                            "current_cat"=>"Entertainment",
-                            "cat_sugg"=>["Entertainment", "Adult"]
-                        }
-                    },
-                    problem: 'What do I need to do to improve the reputation',
-                    submission_type: 'ew',
-                    name: 'Ricardo Pedraza',
-                    email: 'webmaster@cmim.org',
-                    user_company: 'Guest'
-                }
+                payload: complaint_payload
             }
         }
     }

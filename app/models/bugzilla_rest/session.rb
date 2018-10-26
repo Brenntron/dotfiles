@@ -1,3 +1,7 @@
+
+# I don't know why, but rspec breaks unless I have the BugId class referenced below.
+BugzillaRest::BugId
+
 class BugzillaRest::Session < BugzillaRest::Base
 
   # @return [Integer] the id of the created bug
@@ -12,6 +16,6 @@ class BugzillaRest::Session < BugzillaRest::Base
     response_body = post('/rest/bug', bugzilla_bug_options.to_json)
     response_hash = JSON.parse(response_body)
 
-    response_hash['id']
+    BugzillaRest::BugId.new(response_hash['id'], api_key: @api_key, token: @token)
   end
 end

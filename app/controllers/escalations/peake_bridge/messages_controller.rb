@@ -26,10 +26,11 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         end
         message_payload[:bugzilla_session] = bugzilla_session
         message_payload[:current_user] = current_user
-        #return_message = obj_type.constantize.process_bridge_payload(message_payload)
 
-        Thread.new { obj_type.constantize.process_bridge_payload(message_payload) }
-        #obj_type.constantize.process_bridge_payload(message_payload)
+        Thread.new do
+          obj_type.constantize.process_bridge_payload(message_payload,
+                                                      bugzilla_rest_session: bugzilla_rest_session)
+        end
 
         #return_message = {
         #    "envelope":
@@ -82,6 +83,10 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
       Rails.logger.error(except.message)
     end
     @bugzilla_session
+  end
+
+  def bugzilla_rest_session
+    BugzillaRest::Session.new(api_key: Rails.configuration.bugzilla_api_key)
   end
 
   def log_exception(except)
