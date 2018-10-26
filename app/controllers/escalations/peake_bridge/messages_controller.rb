@@ -27,7 +27,12 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         message_payload[:bugzilla_session] = bugzilla_session
         message_payload[:current_user] = current_user
 
-        Thread.new do
+        if self.class.threaded?
+          Thread.new do
+            obj_type.constantize.process_bridge_payload(message_payload,
+                                                        bugzilla_rest_session: bugzilla_rest_session)
+          end
+        else
           obj_type.constantize.process_bridge_payload(message_payload,
                                                       bugzilla_rest_session: bugzilla_rest_session)
         end
@@ -68,6 +73,11 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
 
   private
 
+
+  # defined so tests can stub to return false.
+  def self.threaded?
+    true
+  end
 
   # @return [Bugzilla::XMLRPC] Authenticated bugzilla session
   def bugzilla_session
