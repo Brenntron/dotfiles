@@ -77,52 +77,55 @@
             %label.label-stg 3
             %label.left-space.left-vertical-separator 23
 
-    .col-xs-6
-      .col-xs-6.left-graph-section
+    .col-xs-6.graph-section
+      .col-xs-6.left-graph-frame
         .graph-top-header
-          %h5.uppercase ticket entries closed by day
-        %label.content-label-sm Time Breakdown
+          %h5.uppercase.header-stg ticket entries closed by day
 
-        .graph-config
-          .occurrence
+        .graph1
+          %label.content-label-sm Time Breakdown
+          .graph-config
             %select.form-control
               %option{:selected => "selected", :value => ""} By Day
               %option{:value => ""} Weekly
               %option{:value => ""} Monthly
               %option{:value => ""} Yearly
 
-          -#.dropdown
-            -#%button#dropdown-menu.arrow-down.dropdown-toggle{"data-toggle" => "dropdown"}
-            -#  Dropdown button
-            -#.dropdown-menu{"aria-labelledby" => "dropdownMenuButton"}
-            -#  %a By Day
-            -#  %a Weekly
-            -#  %a Monthly
-            -#  %a Yearly
-
-          .graph-menu
-            .radio
+            .graph-menu
               %label
-                %input{type: 'radio', value: 'value', :checked => "checked"}
-                Total Ticket Entries
+                %input{:type => "checkbox", :checked => "checked"}/
+                %label.total-legend
+                Total Tickets Entries
 
-            .radio
               %label
-                %input{type: 'radio', value: 'value', :checked => "checked"}
-                Entries By Ticket Type
+                %input{:type => "checkbox", :checked => "checked"}/
+                %label.dispute-E.legend-option
+                %label.dispute-W.legend-option
+                %label.dispute-EW.legend-option
+                Entries By Ticket Types
+          %canvas#canvas
 
-        %canvas#bar-chart{:height => "50px", :width => "50px"}
 
+        .graph-top-header.top-space.bottom-space
+          %h5.uppercase.header-stg Times to Close Tickets
+
+        .left-graph2
+          %canvas#line-chart
+
+
+
+        -#.graph2
+        -#  %canvas#line-chart
+        -#
+        -#
+        -#
+        -#.graph3
+
+      .col-xs-6.right-graph-frame
         .graph-top-header
-          %h5.uppercase ticket entries closed by day
-        %canvas#myChart{:height => "50px", :width => "50px"}
+          %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg closed email entries by resolution
 
-
-
-
-      .col-xs-6.start-point
-        %canvas#oilChart{:height => "50px", :width => "50px"}
-
+        %canvas#pie-chart
 
 
 

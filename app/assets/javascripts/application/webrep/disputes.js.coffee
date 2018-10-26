@@ -1652,175 +1652,182 @@ $ ->
 
 $ ->
   $(document).ready ->
-# Bar chart
-    new Chart(document.getElementById('bar-chart'),
-      type: 'bar'
+
+    Data =
+      labels: [
+        'September 2',
+        'September 3',
+        'September 4',
+        'September 5',
+        'September 6',
+        'September 7',
+        'September 8'
+      ]
+      datasets: [
+        {
+          label: 'E'
+          backgroundColor: '#6dbcdb'
+          data: [
+            20
+            24
+            30
+            28
+          ]
+        }
+        {
+          label: 'W'
+          backgroundColor: '#E47433'
+          data: [
+            15
+            20
+            18
+            20
+          ]
+        }
+        {
+          label: 'EW'
+          backgroundColor: '#8CC63F'
+          data: [
+            8
+            7
+            15
+            12
+          ]
+        }
+        {
+          label: 'Total Ticket Entries'
+          backgroundColor: '#BA55D3'
+          data: [
+            0
+            0
+            0
+            9
+          ]
+        }
+      ]
+    chartOptions =
+      responsive: true
+      legend: false
+      title:
+        display: true
+        position: 'bottom'
+        text: 'Dates'
+      scales:
+        yAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 10
+            }
+          }
+        ]
+        xAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              autoSkip: false
+            }
+          }
+        ]
+
+    window.onload = ->
+      ctx = document.getElementById('canvas').getContext('2d')
+      window.myBar = new Chart(ctx,
+        type: 'bar'
+        data: Data
+        options: chartOptions)
+      return
+
+
+
+    new Chart(document.getElementById('pie-chart'),
+      type: 'pie'
       data:
         labels: [
-          'September 1'
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
+          'Africa'
+          'Asia'
+          'Europe'
+          'Latin America'
+          'North America'
+        ]
+        datasets: [ {
+          label: 'Population (millions)'
+          backgroundColor: [
+            '#3e95cd'
+            '#8e5ea2'
+            '#3cba9f'
+            '#e8c3b9'
+            '#c45850'
+          ]
+          data: [
+            2478
+            5267
+            734
+            784
+            433
+          ]
+        } ]
+      options: title:
+        display: false
+        text: 'CLOSED EMAIL ENTRIES BY RESOLUTION')
+
+
+
+    new Chart(document.getElementById('line-chart'),
+      type: 'line'
+      data:
+        labels: [
+          5
+          10
+          20
+          29
         ]
         datasets: [
           {
-            label: 'E'
-            backgroundColor: 'blue'
             data: [
-              11
-              11
-              23
-              17
-              14
+              5
+              10
+              20
+              29
             ]
+            label: 'Africa'
+            borderColor: '#3e95cd'
+            fill: false
           }
           {
-            label: 'W'
-            backgroundColor: 'orange'
             data: [
-              11
-              11
-              23
-              17
-              14
+              5
+              10
+              20
+              29
             ]
-          }
-          {
-            label: 'EW'
-            backgroundColor: 'red'
-            data: [
-              11
-              11
-              23
-              17
-              14
-            ]
+            label: 'Asia'
+            borderColor: '#8e5ea2'
+            fill: false
           }
         ]
       options:
-        legend: display: false
-#        title:
-#          display: true
-#          text: 'TICKET ENTRIES CLOSED BY DAY'
+        legend: false
         scales:
           yAxes: [
             {
+              gridLines: display: false
               ticks: {
                 min: 0
                 stepSize: 10
               }
             }
           ]
-    )
-
-    ctx = document.getElementById('myChart')
-    myChart = new Chart(ctx,
-      type: 'line'
-      data:
-        labels: [
-          'Red'
-          'Blue'
-          'Yellow'
-          'Green'
-          'Purple'
-          'Orange'
-        ]
-        datasets: [
-          {
-            label: '# of Votes'
-            data: [
-              12
-              19
-              3
-              5
-              2
-              3
-            ]
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)'
-              'rgba(54, 162, 235, 0.2)'
-              'rgba(255, 206, 86, 0.2)'
-              'rgba(75, 192, 192, 0.2)'
-              'rgba(153, 102, 255, 0.2)'
-              'rgba(255, 159, 64, 0.2)'
-            ]
-            borderColor: [
-              'rgba(255,99,132,1)'
-              'rgba(54, 162, 235, 1)'
-              'rgba(255, 206, 86, 1)'
-              'rgba(75, 192, 192, 1)'
-              'rgba(153, 102, 255, 1)'
-              'rgba(255, 159, 64, 1)'
-            ]
-            borderWidth: 1
-          }
-          {
-            label: '# of Players'
-            data: [
-              1
-              20
-              1
-              2
-              5
-              8
-            ]
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)'
-              'rgba(54, 162, 235, 0.2)'
-              'rgba(255, 206, 86, 0.2)'
-              'rgba(75, 192, 192, 0.2)'
-              'rgba(153, 102, 255, 0.2)'
-              'rgba(255, 159, 64, 0.2)'
-            ]
-            borderColor: [
-              'rgba(255,99,132,1)'
-              'rgba(54, 162, 235, 1)'
-              'rgba(255, 206, 86, 1)'
-              'rgba(75, 192, 192, 1)'
-              'rgba(153, 102, 255, 1)'
-              'rgba(255, 159, 64, 1)'
-            ]
-            borderWidth: 1
-          }
-        ]
-      options: scales: yAxes: [ { ticks: beginAtZero: true } ])
-
-    oilCanvas = document.getElementById('oilChart')
-    Chart.defaults.global.defaultFontFamily = 'Lato'
-    Chart.defaults.global.defaultFontSize = 18
-    oilData =
-      labels: [
-        'all users'
-        'admin'
-        'cyber team'
-        'devOps'
-        'branch'
-      ]
-      datasets: [ {
-        data: [
-          133.3
-          86.2
-          52.2
-          51.2
-          50.2
-        ]
-        backgroundColor: [
-          '#FF6384'
-          'orange'
-          '#84FF63'
-          '#8463FF'
-          '#6384FF'
-        ]
-      } ]
-    pieChart = new Chart(oilCanvas,
-      type: 'pie'
-      data: oilData)
-
-# ---
-# generated by js2coffee 2.2.0
-
-
-
-#    If user changes buttons from initial status, enable the submit button
-#   TODO add this check in later that only allows user to submit if there have been changes made
+          xAxes: [
+            {
+              gridLines: display: false
+              scaleLabel: {
+                display: true,
+                labelString: 'Tikets'
+              }
+              ticks: {
+                display: true
+              }
+            }
+          ])

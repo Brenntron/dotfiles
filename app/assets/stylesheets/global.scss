@@ -6576,6 +6576,10 @@ h2 {
   margin-top: 20px;
 }
 
+.bottom-space {
+  margin-bottom: 20px;
+}
+
 .toolbar-content-layout {
   position: relative;
   display: flex;
@@ -6659,83 +6663,104 @@ h2 {
   }
 }
 
-.col-xs-6 .left-graph-section {
-  //border: 1px solid blue;
-  display: block;
-  padding: 35px 0 0 0;
-  margin: 0;
 
-  .graph-top-header {
-    width: 100%;
-    display: flex;
-    justify-content: center;
+$border: 1px solid red;
+
+.graph-top-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .header-stg {
+    color: $type-lighter-color;
   }
-
-  label {
-    width: 100%;
-  }
-
-  .graph-config {
-    display: inline-flex;
-    width: 100%;
-    height: 40px;
-    justify-content: space-between;
-    //border: 1px solid royalblue;
-
-    .occurrence {
-      width: 30%;
-
-      .form-control {
-        background-color: transparent;
-      }
-    }
-
-    //.dropdown-menu {
-    //  //display: block;
-    //  border: 1px solid red;
-    //  text-align: center;
-    //
-    //  a {
-    //    display: block;
-    //    width: 100%;
-    //    color: $type-lighter-color;
-    //    padding: 10px 0 0 0;
-    //    cursor: pointer;
-    //  }
-    //
-    //  a:first-child {
-    //    padding-top: 0;
-    //  }
-    //}
-
-    .graph-menu {
-
-      .radio {
-        margin: 0;
-      }
-    }
-
-    //.arrow-down::after {
-    //  content: '';
-    //  width: 0;
-    //  height: 0;
-    //  color: red;
-    //  rotation: 100deg;
-    //  border-bottom: 5px solid transparent;
-    //  border-top: 5px solid transparent;
-    //  border-right: 5px solid red;
-    //  font-size: 0;
-    //  line-height: 0;
-    //  margin-top: 1px;
-    //  margin-left: 10px;
-    //  transform: rotateZ(270deg);
-    //  //margin-right: 10px;
-    //  float: right;
-    //}
-  }
-
-
 }
-.start-point {
-  padding-top: 100px;
+
+.graph-section {
+  border: $border;
+  height: 75vh;
+
+  .left-graph-frame {
+    display: block;
+    height: 100%;
+    padding: 35px 0 0 0;
+    margin: 0;
+
+    .graph1 {
+      //border: 1px solid green;
+      //height: 32%;
+
+      .graph-config {
+        display: inline-flex;
+        width: 100%;
+        height: 40px;
+        justify-content: space-between;
+
+        .form-control {
+          height: 18px;
+          width: 25%;
+          padding: 0;
+          outline-offset: 2px;
+          font-size: 10px;
+          font-weight: bold;
+          background-color: lightgray;
+        }
+
+        .graph-menu {
+          height: 100%;
+          width: 48%;
+          border: 1px solid #dddddd;
+          padding: 0 5px;
+
+          label {
+            height: 50%;
+            width: 100%;
+            font-size: 9px;
+            font-weight: bold;
+            color: $content-label-color;
+
+            .total-legend {
+              background-color: skyblue;
+              width: 40px;
+              height: 10px;
+              position: relative;
+              top: 2px;
+              border-radius: 2px;
+            }
+
+            .legend-option {
+              width: 14px;
+              position: relative;
+              top: 1.5px;
+              background-position-y: -1px;
+              border-radius: 2px;
+            }
+          }
+        }
+      }
+
+      .graph2 {
+        border: 1px solid #5FB766;
+        height: 32%;
+      }
+
+      .graph3 {
+        border: 1px solid deeppink;
+        height: 32.8%;
+      }
+    }
+  }
+
+  .right-graph-frame {
+    border: $border;
+    display: block;
+    height: 100%;
+    padding: 35px 0 0 0;
+    margin: 0;
+
+    .graph-header-icon-stg {
+      background-repeat: no-repeat;
+      background-size: 15px;
+    }
+  }
 }
