@@ -1745,32 +1745,51 @@ $ ->
       type: 'pie'
       data:
         labels: [
-          'Africa'
-          'Asia'
-          'Europe'
-          'Latin America'
-          'North America'
+          'Fixed'
+          'Unchanged'
+          'Fixed FP'
         ]
         datasets: [ {
-          label: 'Population (millions)'
+          label: 'close-email-entries'
           backgroundColor: [
-            '#3e95cd'
-            '#8e5ea2'
-            '#3cba9f'
-            '#e8c3b9'
-            '#c45850'
+            '#3e5a72'
+            '#6dbcdb'
+            '#666'
           ]
           data: [
             2478
             5267
-            734
-            784
-            433
+            1202
           ]
         } ]
-      options: title:
-        display: false
-        text: 'CLOSED EMAIL ENTRIES BY RESOLUTION')
+      options:
+        legend: false)
+
+
+
+    new Chart(document.getElementById('pie-chart2'),
+      type: 'pie'
+      data:
+        labels: [
+          'Fixed'
+          'Unchanged'
+          'Fixed FP'
+        ]
+        datasets: [ {
+          label: 'close-email-entries'
+          backgroundColor: [
+            '#3e5a72'
+            '#6dbcdb'
+            '#666'
+          ]
+          data: [
+            2478
+            5267
+            1202
+          ]
+        } ]
+      options:
+        legend: false)
 
 
 
@@ -1831,3 +1850,66 @@ $ ->
               }
             }
           ])
+
+
+    # Bar chart
+    new Chart(document.getElementById('bar-chart'),
+      type: 'bar'
+      data:
+        labels: [
+          'September 2',
+          'September 3',
+          'September 4',
+          'September 5',
+          'September 6',
+          'September 7',
+          'September 8'
+        ]
+        datasets: [
+          {
+          label: 'Customer'
+          backgroundColor: '#6dbcdb'
+          data: [
+            20
+            24
+            30
+            28
+          ]
+          }
+          {
+            label: 'Guest'
+            backgroundColor: '#3e5a72'
+            data: [
+              15
+              20
+              18
+              20
+            ]
+          }]
+      options:
+        legend:
+          display: false
+
+        scales:
+          yAxes: [
+            {
+              gridLines: display: false
+              ticks: {
+                min: 0
+                stepSize: 10
+              }
+            }
+          ]
+          xAxes: [
+            {
+              gridLines: display: false
+              ticks: {
+                autoSkip: false
+              }
+            }
+          ]
+      )
+
+
+
+

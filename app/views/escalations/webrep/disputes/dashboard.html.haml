@@ -109,24 +109,88 @@
         .graph-top-header.top-space.bottom-space
           %h5.uppercase.header-stg Times to Close Tickets
 
-        .left-graph2
-          %canvas#line-chart
+        %canvas#line-chart
+
+
+        %label.content-label-sm Time Breakdown
+        .graph-config
+          %select.form-control
+            %option{:selected => "selected", :value => ""} By Day
+            %option{:value => ""} Weekly
+            %option{:value => ""} Monthly
+            %option{:value => ""} Yearly
+        .graph-top-header
+          %h5.uppercase.header-stg ticket submitted by submitter per day
+        %canvas#bar-chart
 
 
 
-        -#.graph2
-        -#  %canvas#line-chart
-        -#
-        -#
-        -#
-        -#.graph3
+
+
 
       .col-xs-6.right-graph-frame
         .graph-top-header
-          %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg closed email entries by resolution
+          %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
 
         %canvas#pie-chart
 
+        .right-graph-table-layout
+          %table.table
+            %thead
+              %tr
+                %th{:scope => "col"} RESOLUTION
+                %th{:scope => "col"} %
+                %th{:scope => "col"} COUNT
+            %tbody
+              %tr
+                %td Unchanged
+                %td 18.75%
+                %td 3
+              %tr
+                %td Fixed FN
+                %td 37.50%
+                %td 6
+              %tr
+                %td Fixed FP
+                %td 43.75%
+                %td 7
+
+              %tr
+                %td Other
+                %td 00.00%
+                %td 0
+
+
+        .graph-top-header.top-space.top-space-ex
+          %h5.uppercase.dispute-W-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
+
+        %canvas#pie-chart2
+
+        .right-graph-table-layout
+          %table.table
+            %thead
+              %tr
+                %th{:scope => "col"} RESOLUTION
+                %th{:scope => "col"} %
+                %th{:scope => "col"} COUNT
+            %tbody
+              %tr
+                %td Unchanged
+                %td 18.75%
+                %td 3
+              %tr
+                %td Fixed FN
+                %td 37.50%
+                %td 6
+              %tr
+                %td Fixed FP
+                %td 43.75%
+                %td 7
+
+              %tr
+                %td Other
+                %td 00.00%
+                %td 0
 
 
 
