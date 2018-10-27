@@ -1881,9 +1881,9 @@ $ ->
             backgroundColor: '#3e5a72'
             data: [
               15
-              20
+              8
               18
-              20
+              16
             ]
           }]
       options:

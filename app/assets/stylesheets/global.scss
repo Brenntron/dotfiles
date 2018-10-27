@@ -6668,8 +6668,6 @@ h2 {
 }
 
 
-$border: 1px solid red;
-
 .graph-top-header {
   width: 100%;
   display: flex;
@@ -6677,12 +6675,12 @@ $border: 1px solid red;
 
   .header-stg {
     color: $type-lighter-color;
+    font-weight: bold;
   }
 }
 
 .graph-section {
-  //border: $border;
-  //height: 75vh;
+  border-left: 1px solid #dddddd;
 
   .left-graph-frame {
     display: block;
@@ -6738,7 +6736,59 @@ $border: 1px solid red;
         }
       }
     }
+  }
 
+  .graph-bar2-legend {
+    height: 100%;
+    width: 35%;
+    padding: 0 10px;
+    border: 1px solid #dddddd;
+    float: right;
+
+    .legend-top-space {
+      margin-top: 4px;
+    }
+
+    .legend-radio {
+      display: block;
+      text-align: right;
+
+      .customer-legend {
+        display: block;
+      }
+
+      .guest-legend {
+        display: block;
+      }
+
+      .customer-legend-color {
+        height: 8px;
+        width: 8px;
+        border-radius: 100%;
+        background-color: $primary-section-color;
+      }
+
+      .guest-legend-color {
+        height: 8px;
+        width: 8px;
+        border-radius: 100%;
+        background-color: $content-tab-color;
+      }
+
+      label {
+        padding-right: 15px;
+        color: $content-label-color;
+        font-weight: bold;
+        font-size: 11px;
+      }
+      input {
+        font-size: 8px;
+      }
+      .input-color {
+        color: red;
+      }
+    }
+    //margin-top: 20px;
   }
 
   .right-graph-frame {
