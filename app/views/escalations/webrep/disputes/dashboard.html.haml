@@ -93,12 +93,12 @@
 
           .graph-menu
             %label
-              %input{:type => "checkbox", :checked => "checked"}/
+              %input.all-ticket{:type => "checkbox", :checked => "checked"}/
               %label.total-legend
               Total Tickets Entries
 
             %label
-              %input{:type => "checkbox", :checked => "checked"}/
+              %input.group-ticket{:type => "checkbox", :checked => "checked"}/
               %label.dispute-E.legend-option
               %label.dispute-W.legend-option
               %label.dispute-EW.legend-option
@@ -106,13 +106,15 @@
         %canvas#canvas
 
 
-        .graph-top-header.top-space.bottom-space
+        .graph-top-header.top-space-ex.bottom-space
           %h5.uppercase.header-stg Times to Close Tickets
-
+        .average-label
+          %label Average Time To Close
+          %label.label-stg 45m 12s
         %canvas#line-chart
 
 
-        %label.content-label-sm.top-space.top-space-ex Time Breakdown
+        %label.content-label-sm.top-space-ex Time Breakdown
         .graph-config
           %select.form-control
             %option{:selected => "selected", :value => ""} By Day
@@ -121,18 +123,15 @@
             %option{:value => ""} Yearly
         .graph-top-header
           %h5.uppercase.header-stg ticket submitted by submitter per day
-
         .graph-bar2-legend
           .legend-radio
             .customer-legend
               %label Customer
               %label.customer-legend-color
-
           .legend-radio
             .guest-legend
               %label Guest
               %label.guest-legend-color
-
         %canvas#bar-chart
 
 

@@ -6678,14 +6678,30 @@ h2 {
     font-weight: bold;
   }
 }
+.average-label {
+  float: right;
 
+  label {
+    font-size: 10px;
+    color: $type-lighter-color;
+    font-weight: bold;
+  }
+
+  .label-stg {
+    font-weight: bold;
+    color: $type-base-color;
+    display: block;
+    font-size: 15px;
+  }
+}
 .graph-section {
   border-left: 1px solid #dddddd;
 
   .left-graph-frame {
     display: block;
     height: 100%;
-    padding: 35px 0 0 0;
+    padding: 35px 15px 0 0;
+    border-right: 1px solid #dddddd;
     margin: 0;
 
     .graph-config {
@@ -6781,14 +6797,7 @@ h2 {
         font-weight: bold;
         font-size: 11px;
       }
-      input {
-        font-size: 8px;
-      }
-      .input-color {
-        color: red;
-      }
     }
-    //margin-top: 20px;
   }
 
   .right-graph-frame {

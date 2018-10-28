@@ -1648,12 +1648,11 @@ $ ->
       $(this).tooltipster 'show'
     return
 
-
-
-$ ->
-  $(document).ready ->
-
-    Data =
+window.makeBar = (id, data) ->
+  ctx = document.getElementById(id).getContext('2d')
+  window.myBar = new Chart(ctx,
+    type: 'bar'
+    data:
       labels: [
         'September 2',
         'September 3',
@@ -1663,49 +1662,8 @@ $ ->
         'September 7',
         'September 8'
       ]
-      datasets: [
-        {
-          label: 'E'
-          backgroundColor: '#6dbcdb'
-          data: [
-            20
-            24
-            30
-            28
-          ]
-        }
-        {
-          label: 'W'
-          backgroundColor: '#E47433'
-          data: [
-            15
-            20
-            18
-            20
-          ]
-        }
-        {
-          label: 'EW'
-          backgroundColor: '#8CC63F'
-          data: [
-            8
-            7
-            15
-            12
-          ]
-        }
-        {
-          label: 'Total Ticket Entries'
-          backgroundColor: '#BA55D3'
-          data: [
-            0
-            0
-            0
-            9
-          ]
-        }
-      ]
-    chartOptions =
+      datasets: data
+    options:
       responsive: true
       legend: false
       title:
@@ -1715,7 +1673,8 @@ $ ->
       scales:
         yAxes: [
           {
-            gridLines: display: false
+            gridLines:
+              display: false
             ticks: {
               min: 0
               stepSize: 10
@@ -1730,14 +1689,88 @@ $ ->
             }
           }
         ]
+  )
+  return
 
-    window.onload = ->
-      ctx = document.getElementById('canvas').getContext('2d')
-      window.myBar = new Chart(ctx,
-        type: 'bar'
-        data: Data
-        options: chartOptions)
-      return
+$ ->
+
+  $(document).ready ->
+    barDataSets = [
+      {
+        label: 'Total Ticket Entries'
+        backgroundColor: '#6dbcdb'
+        data: [
+          20
+          24
+          30
+          28
+          0
+          0
+          0
+        ]
+      }
+      {
+        label: 'W'
+        backgroundColor: '#E47433'
+        data: [
+          15
+          20
+          18
+          20
+          0
+          0
+          0
+        ]
+      }
+      {
+        label: 'EW'
+        backgroundColor: '#8CC63F'
+        data: [
+          8
+          7
+          15
+          12
+          0
+          0
+          0
+        ]
+      }
+      {
+        label: 'E'
+        backgroundColor: '#BA55D3'
+        data: [
+          0
+          0
+          0
+          9
+          0
+          0
+          0
+        ]
+      }
+    ]
+    barDataSet = barDataSets
+    makeBar('canvas', barDataSet)
+
+    $('.graph-menu input.all-ticket').click ->
+      if $(this)[0].checked
+        barDataSet = window.myBar.data.datasets
+        window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
+        window.myBar.update()
+      else
+        barDataSet = window.myBar.data.datasets
+        window.myBar.data.datasets = barDataSet.filter (x) -> x.label != 'Total Ticket Entries'
+        window.myBar.update()
+
+    $('.graph-menu input.group-ticket').click ->
+      if $(this)[0].checked
+        barDataSet = window.myBar.data.datasets
+        window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label != 'Total Ticket Entries'
+        window.myBar.update()
+      else
+        barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+        window.myBar.data.datasets = barDataSet
+        window.myBar.update()
 
 
 
@@ -1757,13 +1790,24 @@ $ ->
             '#666'
           ]
           data: [
-            2478
+            3478
             5267
             1202
           ]
         } ]
       options:
-        legend: false)
+        legend: false
+        pieceLabel:
+          render: (args) ->
+            return args.percentage + '%'
+          position: 'outside'
+          segment: false
+          precision: 2
+          showZero: true
+          fontStyle: 'bolder'
+          overlap: false
+          showActualPercentages: true
+    )
 
 
 
@@ -1783,13 +1827,26 @@ $ ->
             '#666'
           ]
           data: [
-            2478
+            3478
             5267
             1202
           ]
         } ]
       options:
-        legend: false)
+        legend: false
+        pieceLabel:
+          render: (args) ->
+            return args.percentage + '%'
+          position: 'outside'
+          label: 'Unchanched'
+          segment: false
+          precision: 2
+          showZero: true
+          fontStyle: 'bolder'
+          overlap: false
+          showActualPercentages: true
+
+    )
 
 
 
@@ -1797,56 +1854,91 @@ $ ->
       type: 'line'
       data:
         labels: [
+          0
+          1
+          3
+          4
           5
+          6
+          7
+          8
+          9
           10
-          20
-          29
+          11
         ]
         datasets: [
           {
             data: [
-              5
-              10
-              20
-              29
+              1
+              1.3
+              1.2
+              1.5
+              1.7
+              1.4
+              1.8
+              0.9
+              1
+              1.1
+              1.2
+              1.5
+              1.6
             ]
-            label: 'Africa'
-            borderColor: '#3e95cd'
-            fill: false
+            label: 'close'
+            backgroundColor: '#6dbcdb'
+            fill: true
+            lineTension: 0
           }
           {
             data: [
-              5
-              10
-              20
-              29
+              1.4
+              1.4
+              1.4
+              1.4
+              1.4
+              1.4
+              1.4
+              1.4
+              1.4
+              1.4
+              1.4
             ]
-            label: 'Asia'
-            borderColor: '#8e5ea2'
-            fill: false
+            label: 'ticket'
+            backgroundColor: 'rgba(135, 206, 250, .1)'
+            fill: true
+            lineTension: 0
           }
         ]
       options:
         legend: false
+        elements:
+          point:
+            radius: 0
         scales:
           yAxes: [
             {
-              gridLines: display: false
+              gridLines:
+                display: false
               ticks: {
                 min: 0
-                stepSize: 10
+                stepSize: .5
+                callback: (value, index, values) ->
+                  if value > 1
+                    return value + ' hr'
+                  else
+                    return value + ' hr'
               }
             }
           ]
           xAxes: [
             {
-              gridLines: display: false
+              gridLines:
+                display: false
               scaleLabel: {
                 display: true,
                 labelString: 'Tikets'
               }
               ticks: {
-                display: true
+                display: false
               }
             }
           ])
