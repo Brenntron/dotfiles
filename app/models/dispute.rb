@@ -1432,5 +1432,35 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.average_time_to_close_tickets_by_ticket_owner(users, from, to)
+
+    raw_data = {}
+    report_data = {}
+
+    user_ids = users.pluck(:id)
+
+    users.each do |user|
+      raw_data[user.cvs_username] = []
+    end
+
+    main_results = Dispute.where(:user_id => user_ids).where("case_resolved_at between '#{from}' and '#{to}'")
+
+    main_results.each do |result|
+      raw_data[result.user.cvs_username] << ((result.case_resolved_at - result.created_at) / 3600 )
+    end
+
+    raw_data.each do |k, v|
+      avg = v.inject{ |sum, el| sum + el }.to_f / v.size
+
+      if !avg.nan?
+        report_data[k] = avg
+      else
+        report_data[k] = 0
+      end
+    end
+
+    report_data
+  end
+
 end
 
