@@ -6372,7 +6372,7 @@ h2 {
         font-size: 20px;
         padding-right: 20px;
         padding-top: 5px;
-        margin-right: 5px;
+        margin-right: 10px;
         border-right: 1px solid #e0e0e0;
       }
 
@@ -6389,9 +6389,9 @@ h2 {
 
       button {
         border-radius: 2px;
-        background-color: $sidebar-nav-base;
+        background-color: #54708c;
         margin-left: 15px;
-        padding: 8px 20px 8px 25px;
+        padding: 8px 20px;
       }
 
       .toolbar-button {
@@ -6405,8 +6405,8 @@ h2 {
         text-align: right;
 
         button {
-          background-color: $sidebar-nav-base;
-          padding: 5px 20px;
+          background-color: #54708c;
+          padding: 8px 20px;
           border-radius: 2px;
           border: none;
         }
