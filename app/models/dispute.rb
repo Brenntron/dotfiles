@@ -1409,5 +1409,28 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.ticket_entries_closed_by_ticket_owner(users, from, to)
+
+    user_ids = users.pluck(:id)
+
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:user_id => user_ids)
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten
+
+    report_data = {}
+
+    users.each do |user|
+      report_data[user.cvs_username] = 0
+    end
+
+    all_entries.each do |entry|
+      if entry.status == DisputeEntry::STATUS_RESOLVED && entry.dispute.user.present?
+        report_data[entry.dispute.user.cvs_username] += 1
+      end
+    end
+
+    report_data
+
+  end
+
 end
 
