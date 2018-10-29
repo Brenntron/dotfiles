@@ -36,8 +36,8 @@ module API
 
             get "closed_tickets_report" do
               authorize!(:index, Dispute)
-
-              report_data = Dispute.closed_tickets_report(params[:users], params[:from], params[:to])
+              users = User.where(:id => params[:users])
+              report_data = Dispute.closed_tickets_report(users, params[:from], params[:to])
 
               response_data = {:status => "success", :data => report_data}
 
@@ -97,6 +97,37 @@ module API
               response_data.to_json
             end
 
+            params do
+              requires :from, type: String
+              requires :to, type: String
+              requires :users, type: Array[Integer], desc: ""
+            end
+
+            get 'ticket_entries_closed_by_ticket_owner_report' do
+              authorize!(:index, Dispute)
+              users = User.where(:id => params[:users])
+              report_data = Dispute.ticket_entries_closed_by_ticket_owner(users, params[:from], params[:to])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
+            params do
+              requires :from, type: String
+              requires :to, type: String
+              requires :users, type: Array[Integer], desc: ""
+            end
+
+            get 'average_time_to_close_tickets_by_ticket_owner_report' do
+              authorize!(:index, Dispute)
+              users = User.where(:id => params[:users])
+              report_data = Dispute.average_time_to_close_tickets_by_ticket_owner(users, params[:from], params[:to])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
 
           end
         end
