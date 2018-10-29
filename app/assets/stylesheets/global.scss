@@ -6658,3 +6658,36 @@ h2 {
     padding-left: 10px;
   }
 }
+
+//vanney dommy table start here
+
+.my-table {
+  margin-top: 20px;
+
+  thead {
+    background-color: $type-faint-accent;
+  }
+
+  .td-stg{
+    font-weight: bold;
+  }
+}
+
+.status_e,
+.status_w,
+.status_ew {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  color: white;
+  background: green;
+}
+
+.status_w {
+  background: orange;
+}
+
+.status_ew {
+  background: purple;
+}
