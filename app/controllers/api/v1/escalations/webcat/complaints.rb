@@ -68,12 +68,14 @@ module API
             end
 
             post "" do
-              Complaint.create_action(bugzilla_rest_session,
-                                      permitted_params[:ips_urls],
-                                      permitted_params[:description],
-                                      permitted_params[:customer],
-                                      permitted_params[:tags])
-              {:status => 'success'}.to_json
+              std_api_v2 do
+                Complaint.create_action(bugzilla_rest_session,
+                                        permitted_params[:ips_urls],
+                                        permitted_params[:description],
+                                        permitted_params[:customer],
+                                        permitted_params[:tags])
+                {:status => 'success'}.to_json
+              end
             end
 
             desc 'test a url'

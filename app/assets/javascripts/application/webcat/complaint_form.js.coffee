@@ -113,6 +113,7 @@ $ ->
         $('#loader-modal').hide()
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
+        debugger
         $('#loader-modal').hide()
         $('.modal-backdrop').remove();
         std_api_error(response, "Complaint was not created.", reload: false)

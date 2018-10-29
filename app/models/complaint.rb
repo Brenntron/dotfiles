@@ -553,7 +553,9 @@ class Complaint < ApplicationRecord
         'classification' => 'unclassified',
     }
 
+    byebug
     bug_id = bugzilla_rest_session.create_bug(bug_attrs)
+    raise 'raspberry' if true
 
 
     cust = find_customer(customer) if customer
@@ -569,6 +571,8 @@ class Complaint < ApplicationRecord
     ips_urls.split(' ').each do |ip_url|
       ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories)
     end
+
+    bug_id
   end
 
   def self.find_customer(customer)

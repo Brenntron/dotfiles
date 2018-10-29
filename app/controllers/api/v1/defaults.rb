@@ -85,6 +85,12 @@ module API
             std_exception(exception, status: 404)
           rescue Grape::Exceptions::ValidationErrors => exception
             std_exception(exception, status: 406)
+          rescue BugzillaRest::AuthenticationError => exception
+            Rails.logger.error("exception: #{exception.message}")
+            # error!(message: exception.message, status: 401, success: false,
+            #        system: 'bugzilla', prompt: 'Please sign in using your CEC credentials.')
+            error!(message: exception.message, status: 401, success: false,
+                   system: exception.system, prompt: exception.prompt, fields: exception.fields)
           rescue => exception
             std_exception(exception)
           end

@@ -12,6 +12,24 @@ class BugzillaRest::Base
     @host ||= Rails.configuration.bugzilla_host
   end
 
+  def bugzilla_rest_error_msg(body)
+    response_hash = JSON.parse(body)
+    response_hash['exception']['message']
+  rescue
+    nil
+  end
+
+  def handle_errors(response)
+    code = response.code
+    msg = bugzilla_rest_error_msg(response.body)
+    case
+    when 401 == code
+      raise AuthenticationError.new("Bugzilla REST Authentication Error.  #{msg}", code: code)
+    when 300 >= code
+      raise BaseError("Error using Bugzilla REST.  #{msg}", code: code)
+    end
+  end
+
   def post(path, body)
 
     # request = HTTPI::Request.new("https://fmd-bugzil-01tst.vrt.sourcefire.com/rest/bug")
@@ -41,9 +59,11 @@ class BugzillaRest::Base
 
     request.body = body
 
+    byebug
     response = HTTPI.post(request)
 
-    raise response.body unless 300 > response.code
+    # raise response.body unless 300 > response.code
+    handle_errors(response)
 
     response.body
   end
