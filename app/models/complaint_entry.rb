@@ -590,6 +590,33 @@ class ComplaintEntry < ApplicationRecord
     prefix_history
   end
 
+  def history_category_data_with_preload_save
+
+    prefix_id = nil
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+
+    complaint_entry_preload = ComplaintEntryPreload.where(complaint_entry_id: self.id).first
+
+    if prefix_results.present?
+      prefix_id = prefix_results.first.prefix_id
+    end
+
+    if prefix_id.present?
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+      if complaint_entry_preload.present?
+        complaint_entry_preload.historic_category_information = prefix_history
+        complaint_entry_preload.save
+      else
+        ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: prefix_history)
+      end
+    else
+      prefix_history = []
+      ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: 'DATA ERROR')
+    end
+
+    prefix_history
+  end
+
   def capture_screenshot
     CapybaraSpider.capture(self.location_url) do |capture|
       if complaint_entry_screenshot
