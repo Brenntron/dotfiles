@@ -14,7 +14,7 @@ class BugzillaRest::Base
 
   def bugzilla_rest_error_msg(body)
     response_hash = JSON.parse(body)
-    response_hash['exception']['message']
+    response_hash['message']
   rescue
     nil
   end

@@ -20,7 +20,11 @@ window.std_api_error =(response, prefix = "Error", options = {}) ->
 # Use std_msg_ajax confirmation message support
 # @param [Hash] ajax_data data and options for this AJAX call.
 window.std_api_ajax =(ajax_data) ->
-  ajax_data.headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  ajax_data.headers = {
+    'Token': $('input[name="token"]').val(),
+    'Xmlrpc-Token': $('input[name="xml_token"]').val(),
+    'X-Bugzilla-Restapi-Token': $('input[name="bugzilla_rest_token"]').val(),
+  }
   ajax_data.dataType = 'json'
 
   if ajax_data.contentType == undefined

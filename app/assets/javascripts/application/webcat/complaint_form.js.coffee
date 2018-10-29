@@ -100,10 +100,9 @@ $ ->
     customer = this.customers.value
     tags = $('.selectize').val() || []
 
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
-      headers: headers
       data:
         ips_urls: ips_urls,
         description: desc,

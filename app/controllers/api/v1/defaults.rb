@@ -69,7 +69,7 @@ module API
             exception.backtrace[0..4].each_with_index do |traceline, index|
               Rails.logger.error("backtrace[#{index}] #{traceline}")
             end
-            error!(message: exception.message, status: status, success: false)
+            error!({message: exception.message, status: status, success: false}, status)
           end
 
           # Transition to implement V2 API handling from the V1 API
@@ -87,10 +87,9 @@ module API
             std_exception(exception, status: 406)
           rescue BugzillaRest::AuthenticationError => exception
             Rails.logger.error("exception: #{exception.message}")
-            # error!(message: exception.message, status: 401, success: false,
-            #        system: 'bugzilla', prompt: 'Please sign in using your CEC credentials.')
-            error!(message: exception.message, status: 401, success: false,
-                   system: exception.system, prompt: exception.prompt, fields: exception.fields)
+            error!({message: exception.message, status: 401, success: false,
+                    system: exception.system, prompt: exception.prompt, fields: exception.fields},
+                   401)
           rescue => exception
             std_exception(exception)
           end
