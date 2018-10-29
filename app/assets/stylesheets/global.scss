@@ -6371,6 +6371,8 @@ h2 {
       label {
         font-size: 20px;
         padding-right: 20px;
+        padding-top: 5px;
+        margin-right: 5px;
         border-right: 1px solid #e0e0e0;
       }
 
@@ -6386,11 +6388,11 @@ h2 {
       }
 
       button {
-        background-color: $content-tab-color;
-        border: none;
+        border-radius: 2px;
+        background-color: $sidebar-nav-base;
         font-size: 12px;
         margin-left: 15px;
-        padding: 5px 5px 5px 25px;
+        padding: 8px 20px 8px 25px;
       }
 
       .toolbar-button {
@@ -6401,12 +6403,12 @@ h2 {
     .dashboard-time-ticket {
 
       .button-wrapper {
-        width: 370px;
         text-align: right;
-        background-color: $content-tab-color;
 
         button {
-          background-color: $content-tab-color;
+          background-color: $sidebar-nav-base;
+          padding: 5px 20px;
+          border-radius: 2px;
           border: none;
         }
 
