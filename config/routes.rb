@@ -70,6 +70,9 @@ Rails.application.routes.draw do
           get :export
         end
       end
+
+      resource :bugzilla_rest_login
+
       resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.
       resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
       resources :email_templates        # TODO This route has no controller so determine if it should be removed.

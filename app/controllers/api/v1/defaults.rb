@@ -88,7 +88,8 @@ module API
           rescue BugzillaRest::AuthenticationError => exception
             Rails.logger.error("exception: #{exception.message}")
             error!({message: exception.message, status: 401, success: false,
-                    system: exception.system, prompt: exception.prompt, fields: exception.fields},
+                    url: exception.url, system: exception.system, prompt: exception.prompt,
+                    fields: exception.fields},
                    401)
           rescue => exception
             std_exception(exception)

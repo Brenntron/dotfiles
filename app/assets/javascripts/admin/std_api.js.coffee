@@ -1,21 +1,30 @@
 
+window.std_api_login =() ->
+  username = $('form#modal-login-form').find('input[name=username]').val()
+  password = $('form#modal-login-form').find('input[name=password]').val()
+  url = $('form#modal-login-form').find('input[name=url]').val()
+
+
+
 window.check_auth_prompt =(response) ->
   (response.responseJSON != undefined) && (response.responseJSON.prompt != undefined)
 
 
-window.std_api_login =(responseJSON) ->
+window.std_api_unauthenticated =(responseJSON) ->
   msg_div = $('#login-modal').find('#message-text')[0]
   $(msg_div).html('Unable to authenticate to ' + responseJSON['system'])
 
   prompt_div = $('#login-modal').find('#prompt-text')[0]
   $(prompt_div).html(responseJSON['prompt'])
 
+  $('form#modal-login-form').find('input[name=url]').val(responseJSON['url'])
+
   $('#login-modal').modal('show')
 
 
 window.std_api_error =(response, prefix = "Error", options = {}) ->
   if check_auth_prompt(response)
-    std_api_login(response.responseJSON)
+    std_api_unauthenticated(response.responseJSON)
   else
     if response.responseJSON == undefined
       response_lines = response.responseText.split("\n")

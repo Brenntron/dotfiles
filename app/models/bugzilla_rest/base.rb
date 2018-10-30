@@ -24,9 +24,9 @@ class BugzillaRest::Base
     msg = bugzilla_rest_error_msg(response.body)
     case
     when 401 == code
-      raise AuthenticationError.new("Bugzilla REST Authentication Error.  #{msg}", code: code)
+      raise BugzillaRest::AuthenticationError.new("Bugzilla REST Authentication Error.  #{msg}", code: code)
     when 300 >= code
-      raise BaseError("Error using Bugzilla REST.  #{msg}", code: code)
+      raise BugzillaRest::BaseError("Error using Bugzilla REST.  #{msg}", code: code)
     end
   end
 
