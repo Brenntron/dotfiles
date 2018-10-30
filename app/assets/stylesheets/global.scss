@@ -6675,12 +6675,14 @@ h2 {
   min-width: 300px;
 }
 #copycat_dialog {
+  overflow: visible;
+
   .selectize-input {
     border: 1px solid #dddddd !important;
     padding: 0 5px !important;
   }
 
   .selectize-dropdown {
-    position: relative;
+    margin: 4px 0 0 -2px;
   }
 }

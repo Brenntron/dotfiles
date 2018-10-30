@@ -179,6 +179,7 @@ $ ->
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
     dialogClass: "copycat_tool_dialog",
+    position: { my: "left+475 top+160", at: "left top", of: window },
     close: (event, ui) =>
       $('button.icon-copycat').removeClass('active')
     open: (event, ui) =>
