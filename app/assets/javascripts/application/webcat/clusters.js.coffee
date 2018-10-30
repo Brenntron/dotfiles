@@ -1,11 +1,8 @@
 window.populate_clusters_index_table = (filter) ->
-#  alert 'Fuck'
   filter_param = ""
   if filter
     filter_param = "?regex=" + filter
 
-  #body.index-action may need to change depending on how it's all coded up
-#  if $('#clusters-index').length
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
@@ -37,9 +34,6 @@ window.populate_clusters_index_table = (filter) ->
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-      #$("#create_research_submit_wait").addClass('hidden').hide()
-      #$("#create_research_submit").show()
   , this)
 
 window.fetch_cluster_data = (id) ->
@@ -48,13 +42,10 @@ window.fetch_cluster_data = (id) ->
     url: "/escalations/api/v1/escalations/webcat/clusters/" + id
     data: {}
     success: (response) ->
-      #$('#loader-modal').hide()
       json = $.parseJSON(response)
       json.data
       console.log (json.data)
     error: (response) ->
-      #$('#loader-modal').hide()
-      #$('.modal-backdrop').remove()
   )
 
 window.categorize_cluster = (cluster_id, comment, category_ids) ->
@@ -68,15 +59,11 @@ window.categorize_cluster = (cluster_id, comment, category_ids) ->
 
       json = $.parseJSON(response)
       if json.error
-        #notice_html = "<p>Something went wrong: #{json.error}</p>"
-        #alert(json.error)
+
       else
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-      #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-      #$("#create_research_submit_wait").addClass('hidden').hide()
-      #$("#create_research_submit").show()
   , this)
 
 $ ->
@@ -121,8 +108,8 @@ $ ->
         orderable: false
         searchable: false
         sortable: false
-        render: (data) ->
-          '<span></span>'
+        render: (data, type, full, meta) ->
+          '<input type="checkbox" name="id[]" onclick="toggleRow(this)">'
       }
       {
         data: 'cluster_id'
@@ -171,11 +158,80 @@ $ ->
 
     cluster_entry_html
 
+
+$ ->
+  $(document).ready ->
+
+window.copycat_dialog = () ->
+  $('#copycat_dialog').dialog({
+    dialogClass: "copycat_tool_dialog",
+    position: { my: "left+475 top+160", at: "left top", of: window },
+    close: (event, ui) =>
+      $('button.icon-copycat').removeClass('active')
+    open: (event, ui) =>
+      $('#copycat_dialog #copycat-categories').selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'value',
+        labelField: 'value',
+        searchField: ['text'],
+        options: AC.WebCat.createSelectOptions()
+      }
+  });
+
+# delete copycat input content
+window.copycat_clear = () ->
+  inputSelectCtrl = $('#copycat_dialog #copycat-categories')[0].selectize
+  inputSelectCtrl.clear()
+
+window.onlyUnique = (value, index, self) ->
+  self.indexOf(value) == index
+
+# paste checkbox category input into copycat input
+window.copycat_paste = () ->
+  inputSelectCtrl = $('#copycat_dialog #copycat-categories')[0].selectize
+  selectedValues = inputSelectCtrl.items
+  if (selectedValues.length == 0)
+    std_msg_error('CopyCat Error', ['No categories selected.'])
+  else
+    selectedRows = $('#clusters-index tr[role="row"].selected')
+    i = 0
+    values = []
+
+  if (selectedRows.length == 0)
+    std_msg_error('CopyCat Error', ['Select at least one row to paste categories to.'])
+  else
+    selectedRows = $('#clusters-index tr[role="row"].selected')
+    i = 0
+    values = []
+    while i < selectedRows.length
+      rowSelectize = $(selectedRows[i]).find('.category-column .selectize')[0].selectize
+      rowSelectize.setValue(selectedValues, true)
+      i++
+
+
+
+window.toggleRow = (el) ->
+  $(el).closest('tr').toggleClass('selected')
+
 # Select rows in Clusters Table
 $ ->
   $('#clusters_check_box').click ->
     if $('#clusters_check_box').prop('checked')
       $('#clusters-index').DataTable().rows().select()
+      rows = $('table#clusters-index input[type="checkbox"]');
+      i = 1
+      while i < rows.length
+        $(rows[i])[0].checked = true
+        console.log(rows[i].value)
+        i++
     else
       $('#clusters-index').DataTable().rows().deselect()
+      rows = $('table#clusters-index input[type="checkbox"]')
+      i = 1
+      while i < rows.length
+        $(rows[i])[0].checked = false
+        i++
   return
+
