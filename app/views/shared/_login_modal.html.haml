@@ -1,0 +1,10 @@
+.modal.fade#login-modal
+  .modal-dialog{role: 'document'}
+    .modal-content
+      #api-msg.message-div
+        %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
+        #message-text= 'Unable to authenticate.'
+        #prompt-text= 'Please log in.'
+        .confirmation-buttons
+          %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Confirm'} Login
+          %button.panel-button.secondary.cancel.wide{'data-dismiss': 'modal', 'aria-label': 'Cancel'} Skip

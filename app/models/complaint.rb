@@ -553,7 +553,6 @@ class Complaint < ApplicationRecord
         'classification' => 'unclassified',
     }
 
-    byebug
     bug_id = bugzilla_rest_session.create_bug(bug_attrs)
     raise 'raspberry' if true
 

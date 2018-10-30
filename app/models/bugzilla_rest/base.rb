@@ -59,7 +59,6 @@ class BugzillaRest::Base
 
     request.body = body
 
-    byebug
     response = HTTPI.post(request)
 
     # raise response.body unless 300 > response.code
