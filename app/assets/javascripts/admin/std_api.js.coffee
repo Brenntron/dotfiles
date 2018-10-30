@@ -3,6 +3,12 @@ window.std_api_login =() ->
   username = $('form#modal-login-form').find('input[name=username]').val()
   password = $('form#modal-login-form').find('input[name=password]').val()
   url = $('form#modal-login-form').find('input[name=url]').val()
+  std_msg_ajax(
+    method: 'POST'
+    url: url
+    data: { username: username, password: password }
+    error_prefix: 'Error logging in.'
+  )
 
 
 

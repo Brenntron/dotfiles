@@ -12,5 +12,5 @@
           %lable Password
           %input{type: 'password', name: 'password'}
           .confirmation-buttons
-            %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Login', onclick: 'std_api_login();'} Login
+            %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Login', onclick: 'std_api_login(); return false;'} Login
             %button.panel-button.secondary.cancel.wide{'data-dismiss': 'modal', 'aria-label': 'Skip'} Skip

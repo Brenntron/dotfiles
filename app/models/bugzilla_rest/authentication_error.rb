@@ -3,7 +3,7 @@ class BugzillaRest::AuthenticationError < BugzillaRest::BaseError
 
   def initialize(msg = 'Bugzilla REST Authentication Error.', code:)
     super
-    @url = '/escalations/webrep/bugzilla_rest_login'
+    @url = '/escalations/api/v1/escalations/bugzilla_rest_login'
     @system = 'bugzilla'
     @prompt = 'Please sign in using your CEC credentials.'
     @fields = %w{username *password}
