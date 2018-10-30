@@ -73,26 +73,12 @@
 
 #copycat_dialog{title: 'CopyCat Tool'}
   .dialog-content-wrapper
-    %input#mk-select.text-field.form-control.selectize.cluster_categories{placeholder: 'Add Categories'}
+    %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Enter up to 5 categories", :value=>"", :name=>""}
 
   .copycat-tool-footer
     %button.toolbar-button.cat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
     %button.toolbar-button.cat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
 
--#/ Button trigger modal hidden
--#%button#error-trigger.btn.btn-primary.hidden{"data-target" => "#errorModal", "data-toggle" => "modal", :type => "button"}
--#  Launch default error modal
--#/ Modal
--#
--##errorModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "errorModalLabel", :role => "dialog", :tabindex => "-1"}
--#  .modal-dialog{:role => "document"}
--#    .modal-content
--#      .modal-header
--#        %h5#errorModalLabel.modal-title Error Message
--#        %button.close{"data-dismiss" => "modal", :type => "button"}
--#      .modal-body
--#        No rows and categories selected
--#      .modal-footer
--#        %button.btn.btn-secondary{"data-dismiss" => "modal", :type => "button"} Close
+
 
 #whois_dialog{title: 'Domain Lookup Information'}

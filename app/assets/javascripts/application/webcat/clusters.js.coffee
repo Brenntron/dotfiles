@@ -24,6 +24,7 @@ window.populate_clusters_index_table = (filter) ->
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+#        console.log(AC.WebCat.createSelectOptions())
 
         $('.cluster_categories').selectize {
           persist: false,
@@ -180,30 +181,40 @@ window.copycat_dialog = () ->
     dialogClass: "copycat_tool_dialog",
     close: (event, ui) =>
       $('button.icon-copycat').removeClass('active')
+    open: (event, ui) =>
+      $('#copycat_dialog #copycat-categories').selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'value',
+        labelField: 'value',
+        searchField: ['text'],
+        options: AC.WebCat.createSelectOptions()
+      }
   });
 
 # delete copycat input content
 window.copycat_clear = () ->
-  $('#copycat_dialog .dialog-content-wrapper')[0].innerHTML = '<input type="text" id="mk-select" placeholder="Add Categories">'
+  inputSelectCtrl = $('#copycat_dialog #copycat-categories')[0].selectize
+  inputSelectCtrl.clear()
 
 window.onlyUnique = (value, index, self) ->
   self.indexOf(value) == index
 
 # paste checkbox category input into copycat input
 window.copycat_paste = () ->
-  selectedRows = $('#clusters-index tr[role="row"].selected')
-  i = 0
-  values = []
-  while i < selectedRows.length
-    $(selectedRows[i]).find('.category-column select :selected').each ->
-      values.push($(this).text())
-    i++
-  values = values.filter(onlyUnique).join(',')
-  if values.length == 0
-    $('button#error-trigger').trigger 'click'
+  inputSelectCtrl = $('#copycat_dialog #copycat-categories')[0].selectize
+  selectedValues = inputSelectCtrl.items
+  if (selectedValues.length == 0)
+    std_msg_error('CopyCat Error', ['No values selected.'])
   else
-    $('#copycat_dialog input')[0].value = values
-    $('#mk-select').selectize()
+    selectedRows = $('#clusters-index tr[role="row"].selected')
+    i = 0
+    values = []
+    while i < selectedRows.length
+      rowSelectize = $(selectedRows[i]).find('.category-column .selectize')[0].selectize
+      rowSelectize.setValue(selectedValues, true)
+      i++
 
 
 
