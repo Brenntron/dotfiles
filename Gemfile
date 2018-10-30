@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '5.1.0'
 gem 'haml', '~> 5.0.1'
+gem 'activerecord-session_store', '~> 1.1'
 
 gem 'grape', '~> 0.19.0'
 
