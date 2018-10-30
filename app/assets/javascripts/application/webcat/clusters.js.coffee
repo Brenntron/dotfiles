@@ -206,7 +206,14 @@ window.copycat_paste = () ->
   inputSelectCtrl = $('#copycat_dialog #copycat-categories')[0].selectize
   selectedValues = inputSelectCtrl.items
   if (selectedValues.length == 0)
-    std_msg_error('CopyCat Error', ['No values selected.'])
+    std_msg_error('CopyCat Error', ['No Categories Selected.'])
+  else
+    selectedRows = $('#clusters-index tr[role="row"].selected')
+    i = 0
+    values = []
+
+  if (selectedRows.length == 0)
+    std_msg_error('CopyCat Error', ['No Row Selected to Past selected Categories'])
   else
     selectedRows = $('#clusters-index tr[role="row"].selected')
     i = 0

@@ -45,7 +45,7 @@
             %span.toolbar-button-text Open Selected
           %button.toolbar-button.icon-open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All'}
             %span.toolbar-button-text Open All
-        %button.toolbar-button.cat-btn.icon-copycat{'onclick': 'copycat_dialog()'}
+        %button.toolbar-button.cat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
           %span.toolbar-button-text CopyCat Tool
 
     .col-xs-6.temp-spacer
@@ -73,7 +73,7 @@
 
 #copycat_dialog{title: 'CopyCat Tool'}
   .dialog-content-wrapper
-    %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Enter up to 5 categories", :value=>"", :name=>""}
+    %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
 
   .copycat-tool-footer
     %button.toolbar-button.cat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
