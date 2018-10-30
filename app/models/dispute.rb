@@ -1283,7 +1283,7 @@ class Dispute < ApplicationRecord
 
 
     results.each do |result|
-      report_data << {:case_id => result.id,
+      report_data[:table_data] << {:case_id => result.id,
                       :resolution => result.resolution,
                       :dispute => result.dispute_entries.first.hostlookup,
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
@@ -1460,6 +1460,69 @@ class Dispute < ApplicationRecord
     end
 
     report_data
+  end
+
+  def self.ticket_entry_resolution_by_ticket_owner(users, from, to)
+
+    user_ids = users.pluck(:id)
+
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
+    #total_count = all_entries.size
+
+    results = {}
+    results[:chart_data] = {}
+    results[:table_data] = []
+
+
+    users.each do |user|
+      results[:chart_data][user.cvs_username] = {}
+      results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
+      results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FN] = 0
+      results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_UNCHANGED] = 0
+      results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_OTHER] = 0
+    end
+
+    results[:chart_data][:total] = {}
+    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
+    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FN] = 0
+    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_UNCHANGED] = 0
+    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_OTHER] = 0
+
+    all_entries.each do |entry|
+      case entry.resolution
+        when DisputeEntry::STATUS_RESOLVED_FIXED_FP
+          results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP] += 1
+          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FP] += 1
+        when DisputeEntry::STATUS_RESOLVED_FIXED_FN
+          results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FN] += 1
+          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FN] += 1
+        when DisputeEntry::STATUS_RESOLVED_UNCHANGED
+          results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_UNCHANGED] += 1
+          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_UNCHANGED] += 1
+        when DisputeEntry::STATUS_RESOLVED_OTHER
+          results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_OTHER] += 1
+          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_OTHER] += 1
+      end
+    end
+
+    users.each do |user|
+      results[:table_data] << {:owner => user.cvs_username,
+                                DisputeEntry::STATUS_RESOLVED_UNCHANGED => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_UNCHANGED],
+                                DisputeEntry::STATUS_RESOLVED_FIXED_FN => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FN],
+                                DisputeEntry::STATUS_RESOLVED_FIXED_FP => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP],
+                                DisputeEntry::STATUS_RESOLVED_OTHER => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_OTHER]}
+    end
+
+    results[:table_data] << {:owner => "TOTAL",
+                             DisputeEntry::STATUS_RESOLVED_UNCHANGED => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_UNCHANGED],
+                             DisputeEntry::STATUS_RESOLVED_FIXED_FN => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FN],
+                             DisputeEntry::STATUS_RESOLVED_FIXED_FP => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FP],
+                             DisputeEntry::STATUS_RESOLVED_OTHER => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_OTHER]}
+
+    results
+
   end
 
 end

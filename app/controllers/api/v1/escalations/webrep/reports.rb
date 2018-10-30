@@ -129,6 +129,22 @@ module API
               response_data.to_json
             end
 
+            params do
+              requires :from, type: String
+              requires :to, type: String
+              requires :users, type: Array[Integer], desc: ""
+            end
+
+            get 'ticket_entry_resolution_by_ticket_owner' do
+              authorize!(:index, Dispute)
+              users = User.where(:id => params[:users])
+              report_data = Dispute.ticket_entry_resolution_by_ticket_owner(users, params[:from], params[:to])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
           end
         end
       end
