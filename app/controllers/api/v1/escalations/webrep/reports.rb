@@ -50,13 +50,13 @@ module API
             params do
               requires :from, type: String
               requires :to, type: String
-              requires :user_id, type: Integer, desc: ""
+              requires :users, type: Array[Integer], desc: "array of user ids to apply to the report"
             end
 
             get "ticket_entries_closed_by_day_report" do
               authorize!(:index, Dispute)
-
-              report_data = Dispute.ticket_entries_closed_by_day_report(params[:user_id], params[:from], params[:to])
+              users = User.where(:id => params[:users])
+              report_data = Dispute.ticket_entries_closed_by_day_report(users, params[:from], params[:to])
 
               response_data = {:status => "success", :data => report_data}
 
