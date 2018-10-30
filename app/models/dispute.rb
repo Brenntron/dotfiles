@@ -1295,12 +1295,13 @@ class Dispute < ApplicationRecord
     report_data
   end
 
-  def self.ticket_entries_closed_by_day_report(user, from, to)
+  def self.ticket_entries_closed_by_day_report(users, from, to)
 
     swap_day = from
     report_data = {}
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+    user_ids = users.pluck(:id)
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten
 
