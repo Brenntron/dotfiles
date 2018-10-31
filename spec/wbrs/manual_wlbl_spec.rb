@@ -169,6 +169,7 @@ describe Wbrs::ManualWlbl do
     response = Wbrs::ManualWlbl.add_from_params(dispute_entry, wlbl_params)
 
     warnings = JSON.parse(response)['Warnings']
+    
     expect(warnings).to be_a_kind_of(Array)
     expect(warnings.count).to eql(2)
     expect(warnings[0]).to be_a_kind_of(String)
