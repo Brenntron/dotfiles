@@ -2002,6 +2002,173 @@ $ ->
           ]
       )
 
+    new Chart(document.getElementById('bar-chart-horizontal'),
+      type: 'horizontalBar'
+      data:
+        labels: [
+          'mtaylor'
+          'chrclair'
+          'nherbert'
+          'nverbeck'
+          'abreeeman'
+        ]
+        datasets: [ {
+          backgroundColor: [
+            '#6dbcdb'
+            '#6dbcdb'
+            '#6dbcdb'
+            '#6dbcdb'
+            '#6dbcdb'
+          ]
+          data: [
+            8
+            15
+            11
+            10
+            13.5
+          ]
+        } ]
+      options:
+        legend: display: false
+        scales:
+          yAxes: [
+            {
+              gridLines: display: false
+              ticks: {
+                min: 0
+                stepSize: 10
+              }
+            }
+          ]
+          xAxes: [
+            {
+              gridLines: display: false
+              ticks: {
+                min: 0
+                stepSize: 5
+                max: 20
+              }
+              scaleLabel: {
+                display: true,
+                labelString: 'Tickets'
+              }
+            }
+          ]
+        )
+
+    new Chart(document.getElementById('bar-chart2-horizontal'),
+      type: 'horizontalBar'
+      data:
+        labels: [
+          'mtaylor'
+          'chrclair'
+          'nherbert'
+          'nverbeck'
+          'abreeeman'
+        ]
+        datasets: [ {
+          backgroundColor: [
+            '#6dbcdb'
+            '#6dbcdb'
+            '#6dbcdb'
+            '#6dbcdb'
+            '#6dbcdb'
+          ]
+          data: [
+            .8
+            .7
+            1.7
+            1.6
+            2
+          ]
+        } ]
+      options:
+        legend: display: false
+        scales:
+          yAxes: [
+            {
+              gridLines: display: false
+              ticks: {
+                min: 0
+                stepSize: 1
+              }
+            }
+          ]
+          xAxes: [
+            {
+              gridLines: display: false
+              ticks: {
+                min: 0
+                stepSize: 1
+                max: 4
+              }
+              scaleLabel: {
+                display: true,
+                labelString: 'hours'
+              }
+            }
+          ]
+    )
+
+    new Chart(document.getElementById('bar-chart-grouped'),
+      type: 'bar'
+      data:
+        labels: [
+          'mtaylor'
+          'chrclair'
+          'nherbert'
+          'nverbeck'
+          'abreeman'
+        ]
+        datasets: [
+          {
+            label: 'Fixed FP'
+            backgroundColor: '#6dbcdb'
+            data: [
+              7
+              10
+              3.7
+              2
+            ]
+          }
+          {
+            label: 'Fixed FN'
+            backgroundColor: '#2c3e50'
+            data: [
+              7
+              10
+              3.7
+              2
+            ]
+          }
+          {
+            label: 'Unchanged'
+            backgroundColor: '#999'
+            data: [
+              7
+              10
+              3.7
+              2
+            ]
+          }
+          {
+            label: 'Other'
+            backgroundColor: '#E47433'
+            data: [
+              7
+              10
+              3.7
+              2
+            ]
+          }
+        ]
+      options:
+        title:
+          display: false
+
+        legend: display: false
+    )
+
 
 
 

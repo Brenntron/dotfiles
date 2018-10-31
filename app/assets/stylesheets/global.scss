@@ -6801,7 +6801,6 @@ h2 {
   }
 
   .right-graph-frame {
-    //border: $border;
     display: block;
     height: 100%;
     text-align: center;
@@ -6830,4 +6829,9 @@ h2 {
       }
     }
   }
+}
+
+.multi-graph-section {
+  border: 1px solid red;
+  display: none;
 }
