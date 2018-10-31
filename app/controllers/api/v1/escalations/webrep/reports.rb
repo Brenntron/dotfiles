@@ -145,6 +145,23 @@ module API
               response_data.to_json
             end
 
+            params do
+              requires :from, type: String
+              requires :to, type: String
+              requires :users, type: Array[Integer], desc: ""
+            end
+
+            get 'rulehits_for_false_positive_resolutions' do
+              authorize!(:index, Dispute)
+              users = User.where(:id => params[:users])
+              report_data = Dispute.rulehits_for_false_positive_resolutions(users, params[:from], params[:to])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
+
           end
         end
       end

@@ -1526,5 +1526,33 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.rulehits_for_false_positive_resolutions(users, from , to)
+
+    user_ids = users.pluck(:id)
+
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
+
+    fp_entries = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}
+
+    rulehits_found = fp_entries.map { |entry| entry.dispute_rule_hits.pluck(:name)}.flatten.uniq
+
+    rulehit_types = {}
+
+    rulehits_found.each do |rh|
+      rulehit_types[rh] = 0
+    end
+
+    fp_entries.each do |entry|
+      entry.dispute_rule_hits.each do |rh|
+        rulehit_types[rh.name] += 1
+      end
+    end
+
+    rulehit_types
+
+  end
+
 end
 
