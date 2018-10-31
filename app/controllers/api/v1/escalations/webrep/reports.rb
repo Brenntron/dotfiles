@@ -83,14 +83,14 @@ module API
             params do
               requires :from, type: String
               requires :to, type: String
-              requires :user_id, type: Integer, desc: ""
+              requires :users, type: Array[Integer], desc: ""
               requires :submission_types, type: Array[String]
             end
 
             get 'closed_ticket_entries_by_resolution_report' do
               authorize!(:index, Dispute)
-
-              report_data = Dispute.closed_ticket_entries_by_resolution_report(params[:user_id], params[:from], params[:to], params[:submission_types])
+              users = User.where(:id => params[:users])
+              report_data = Dispute.closed_ticket_entries_by_resolution_report(users, params[:from], params[:to], params[:submission_types])
 
               response_data = {:status => "success", :data => report_data}
 
