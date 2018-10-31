@@ -56,9 +56,6 @@
           %input.text_field
           %button Submit Changes
 
-
-    .dockedbox.clearfix.esc-tooltipped{title: 'Open comment box'} Drop your comment
-    %div.clearfix
   .row
     .col-xs-12
       %table.table.responsive#clusters-index
@@ -74,6 +71,8 @@
             %th WBRS Score
             %th Categories
 
+  .dockedbox.clearfix.esc-tooltipped{title: 'Open comment box'} Drop your comment
+  %div.clearfix
 
 #copycat_dialog{title: 'CopyCat Tool'}
   .dialog-content-wrapper
@@ -82,7 +81,5 @@
   .copycat-tool-footer
     %button.toolbar-button.cat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
     %button.toolbar-button.cat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
-
-
 
 #whois_dialog{title: 'Domain Lookup Information'}
