@@ -1629,6 +1629,16 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
 
 $ ->
+
+  $('#advanced-search-button').click ->
+    $('#advanced-search-dropdown').show()
+
+  $('#submit-advanced-search').click ->
+    $('#advanced-search-dropdown').toggle()
+
+  $(document).click ->
+    $("#advanced-search-dropdown").hide()
+
   $(document).ready ->
 
     setInterval ->
