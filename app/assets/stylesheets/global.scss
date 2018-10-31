@@ -1751,6 +1751,7 @@ a.static-nav-item {
 .icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
 .icon-paste {background-image: url(image_path('icon_paste.svg'));}
 .icon-clear {background-image: url(image_path('icon_clear.svg'));}
+.icon-submit{background-image: url("icon_submit_arrow.svg")}
 
 .saved-search {
   text-transform: none !important;
@@ -6505,17 +6506,9 @@ h2 {
       button {
         width: 20%;
         background-color: $primary-section-color;
-        font-size: 8px;
-        background-image: url(image_path('icon_submit_arrow.svg'));
-        background-repeat: no-repeat;
-        background-size: 15px;
-        background-position-x: 10px;
-        background-position-y: center;
         margin: 0 0 0 10px;
-        padding: 10px 5px 10px 30px;
+        padding: 10px 5px 10px 25px;
         color: white;
-        border: none;
-        border-radius: 2px;
       }
     }
   }
