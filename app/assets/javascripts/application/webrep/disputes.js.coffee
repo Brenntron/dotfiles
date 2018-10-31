@@ -1648,77 +1648,158 @@ $ ->
       $(this).tooltipster 'show'
     return
 
-$ ->
-  $(document).ready ->
-    data = [
-      {
-        case_id: '12345'
-        dispute: 'paragon.downloads.com'
-        time_to_close: '2018-08-08 13:59:10'
-        empty: '',
-        status: 'E'
-      }
-      {
-        case_id: '12345'
-        dispute: 'paragon.downloads.com'
-        time_to_close: '2018-08-08 13:59:10'
-        empty: '',
-        status: 'EW'
-      }
-      {
-        case_id: '12345'
-        dispute: 'paragon.downloads.com'
-        time_to_close: '2018-08-08 13:59:10'
-        empty: '',
-        status: 'W'
-      }
-    ]
-    closeTicketTable = $('#close-ticket-table').DataTable(
-      order: [ [
-        0
-        'desc'
-      ] ]
-      dom: '<"datatable-top-tools"lf>t<ip>'
-      columnDefs: [
-        {
-          targets: [
-            0
-          ]
-          orderable: false
-          searchable: false
-        }
-        {
-          targets: [ 0 ]
-          className: 'expandable-row-column'
-        }
-      ]
-      columns: [
-        {
-          data: null
-          defaultContent: '<button class="expand-row-button-inline"></button>'
-        }
-        { data: 'case_id' }
-        { data: 'empty' }
-        {
-          data: 'status'
-          render: (data) ->
-            if data == 'E'
-              '<label class="status_e">' + data + '</label>'
-            else if data == 'W'
-              '<label class="status_w">' + data + '</label>'
-            else if data == 'EW'
-              '<label class="status_ew">' + data + '</label>'
-            else
-              ''
-        }
-        { data: 'dispute' }
-        { data: 'empty' }
-        { data: 'time_to_close' }
-      ]
-    )
-    closeTicketTable.clear();
-    closeTicketTable.rows.add(data);
-    closeTicketTable.draw();
+#$ ->
+#  $(document).ready ->
+#    data = [
+#      {
+#        case_id: '12345'
+#        dispute: 'paragon.downloads.com'
+#        time_to_close: '2018-08-08 13:59:10'
+#        empty: '',
+#        status: 'E'
+#      }
+#      {
+#        case_id: '12345'
+#        dispute: 'paragon.downloads.com'
+#        time_to_close: '2018-08-08 13:59:10'
+#        empty: '',
+#        status: 'EW'
+#      }
+#      {
+#        case_id: '12345'
+#        dispute: 'paragon.downloads.com'
+#        time_to_close: '2018-08-08 13:59:10'
+#        empty: '',
+#        status: 'W'
+#      }
+#    ]
+#    closeTicketTable = $('#close-ticket-table').DataTable(
+#      order: [ [
+#        0
+#        'desc'
+#      ] ]
+#      dom: '<"datatable-top-tools"lf>t<ip>'
+#      columnDefs: [
+#        {
+#          targets: [
+#            0
+#          ]
+#          orderable: false
+#          searchable: false
+#        }
+#        {
+#          targets: [ 0 ]
+#          className: 'expandable-row-column'
+#        }
+#      ]
+#      columns: [
+#        {
+#          data: null
+#          defaultContent: '<button class="expand-row-button-inline"></button>'
+#        }
+#        { data: 'case_id' }
+#        { data: 'empty' }
+#        {
+#          data: 'status'
+#          render: (data) ->
+#            if data == 'E'
+#              '<label class="status_e">' + data + '</label>'
+#            else if data == 'W'
+#              '<label class="status_w">' + data + '</label>'
+#            else if data == 'EW'
+#              '<label class="status_ew">' + data + '</label>'
+#            else
+#              ''
+#        }
+#        { data: 'dispute' }
+#        { data: 'empty' }
+#        { data: 'time_to_close' }
+#      ]
+#    )
+#    closeTicketTable.clear();
+#    closeTicketTable.rows.add(data);
+#    closeTicketTable.draw();
 
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
+
+
+
+# Create Dashboard Initial Table (My Open Tickets)
+$ ->
+
+  window.open_dashboard_dispute_table = $('#table-user-complaints-open').DataTable(
+    dom: '<t<p>>'
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 4 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          4
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      { data: 'submitter_type'}
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      {
+        data: null
+        render: ->
+          '<span>2018-08-08 13:59:10</span>'
+      }
+    ])
+
+  window.populate_myopen_tix_table = () ->
+  data = {
+    test
+  }
+  window.populate_webrep_dashboard_opentix_table
+
+  
+
+window.populate_webrep_dashboard_opentix_table = (data = {}) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes'
+    method: 'GET'
+    headers: headers
+    data: data
+    data_json: JSON.stringify(data)
+    success: (response) ->
+      console.log(response)
+      json = $.parseJSON(response)
+
+      if json.data.length == 0
+        std_msg_error("No tickets matching filter or search.","")
+
+      else
+        datatable = $('#table-user-complaints-open').DataTable()
+        datatable.clear();
+        datatable.rows.add(json.data);
+        datatable.draw();
+    error: (response) ->
+     console.log(response)
+  , this)
+
+

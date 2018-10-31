@@ -79,29 +79,20 @@
             %label.total-table-ticket-count 3
             %label.total-table-entry-count 23
 
-        %table.table.my-table
+        %table.table.responsive#table-user-complaints-open
           %thead
             %tr
-              %th{:scope => "col"} CASE ID
-              %th{:scope => "col"} STATUS
-              %th{:scope => "col"} DISPUTE
-              %th{:scope => "col"} LAST COMMENT
-          %tbody
-            %tr
-              %th{:scope => "row"} 01402523
-              %td.td-stg ASSIGNED
-              %td paramon-dawnload.com
-              %td 2018-08-08 13:59:10
-            %tr
-              %th{:scope => "row"} 01402523
-              %td.td-stg IN PROGRESS
-              %td http://b2bmdvan.net
-              %td 2018-08-08 13:59:10
-            %tr
-              %th{:scope => "row"} 01402523
-              %td.td-stg CUSTOMER PENDING
-              %td http://ethermine.org
-              %td 2018-08-08 13:59:10
+              %th
+                -#    priority
+              %th Case ID
+              %th
+                -#  Submitter type
+              %th Status
+              %th
+                -#  Ticket type
+              %th Dispute Preview
+              %th Last Comment Date
+
 
       .tickets-section-wrapper.closed-tickets-wrapper
         .closed-tickets-header

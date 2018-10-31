@@ -6592,8 +6592,9 @@ h2 {
 
   label {
     background-repeat: no-repeat;
-    background-size: 12px;
-    background-position-y: 2px;
+    background-size: 14px;
+    background-position-y: center;
+    padding-left: 18px;
   }
 }
 
@@ -6643,19 +6644,7 @@ h2 {
 }
 
 
-//vanney dommy table start here
 
-.my-table {
-  margin-top: 20px;
-
-  thead {
-    background-color: $type-faint-accent;
-  }
-
-  .td-stg{
-    font-weight: bold;
-  }
-}
 
 .status_e,
 .status_w,
@@ -6679,8 +6668,6 @@ h2 {
 
 .tickets-section-wrapper {
   margin-top: 20px;
-
-
 }
 
 h3.larger-lighter {
@@ -6708,3 +6695,6 @@ h3.larger-lighter {
   background-image: url(image_path('icon_fixedbugs_grey.svg'));
 }
 
+.dashboard-header {
+  margin-top: 40px;
+}
