@@ -69,3 +69,9 @@ window.categorize_cluster = (cluster_id, comment, category_ids) ->
 
 $ ->
   $(document).ready ->
+    $('.card.dockable .comment-dock').on 'click', ->
+      $('.card.dockable').addClass 'dockit'
+      $('.dockedbox').toggle()
+    $('.dockedbox').on 'click', ->
+      $('.card.dockable').removeClass 'dockit'
+      $('.dockedbox').toggle()

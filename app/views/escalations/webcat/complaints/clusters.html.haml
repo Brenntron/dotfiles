@@ -48,8 +48,13 @@
         %button.toolbar-button{class:'cat-btn icon-copycat'} CopyCat Tool
 
     .col-xs-6.temp-spacer
-      .card
-        .label.content-label-sm Comment
+      .card.dockable
+        .comment-dock.esc-tooltipped{title: ' Dock comment box'} -
+        .content-label-sm Comment
         .card-body
           %input.text_field
           %button Submit Changes
+
+
+  .dockedbox.clearfix.esc-tooltipped{title: 'Open comment box'} Drop your comment
+  %div.clearfix
