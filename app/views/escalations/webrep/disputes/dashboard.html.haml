@@ -45,75 +45,87 @@
       .dashboard-export-report.left-vertical-separator
         %button.toolbar-button.export-button-white Export Report
 
-  .row.top-space
+  .row
     .col-xs-6
-      %h1 My Tickets
+
+      %h1.dashboard-header My Tickets
       .content-layout-list
-        %label.icon-custom-star
+        %label.content-label-sm.icon-custom-star
           Show Customer Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.no-left-pad.right-vertical-separator
+        %label.content-label-sm.no-left-pad.right-vertical-separator
           Show Guest Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.dispute-E-grey
+        %label.content-label-sm.dispute-E-grey
           Show Email Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.dispute-W-grey
+        %label.content-label-sm.dispute-W-grey
           Show Web Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.dispute-EW-grey.btn-margin-left
+        %label.content-label-sm.dispute-EW-grey.btn-margin-left
           Show Email/Web Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-      .user-tickets-top
-        .user-tickets-header
-          %h6 My Open Tickets
+      .tickets-section-wrapper.open-tickets-wrapper
 
-          .num-frame
-            %label.label-stg 3
-            %label.left-space.left-vertical-separator 23
+        .open-tickets-header
+          %h3.larger-lighter My Open Tickets
 
-      %table.table.my-table
-        %thead
-          %tr
-            %th{:scope => "col"} CASE ID
-            %th{:scope => "col"} STATUS
-            %th{:scope => "col"} DISPUTE
-            %th{:scope => "col"} LAST COMMENT
-        %tbody
-          %tr
-            %th{:scope => "row"} 01402523
-            %td.td-stg ASSIGNED
-            %td paramon-dawnload.com
-            %td 2018-08-08 13:59:10
-          %tr
-            %th{:scope => "row"} 01402523
-            %td.td-stg IN PROGRESS
-            %td http://b2bmdvan.net
-            %td 2018-08-08 13:59:10
-          %tr
-            %th{:scope => "row"} 01402523
-            %td.td-stg CUSTOMER PENDING
-            %td http://ethermine.org
-            %td 2018-08-08 13:59:10
+          .ticket-count-wrapper
+            %label.total-table-ticket-count 3
+            %label.total-table-entry-count 23
+
+        %table.table.my-table
+          %thead
+            %tr
+              %th{:scope => "col"} CASE ID
+              %th{:scope => "col"} STATUS
+              %th{:scope => "col"} DISPUTE
+              %th{:scope => "col"} LAST COMMENT
+          %tbody
+            %tr
+              %th{:scope => "row"} 01402523
+              %td.td-stg ASSIGNED
+              %td paramon-dawnload.com
+              %td 2018-08-08 13:59:10
+            %tr
+              %th{:scope => "row"} 01402523
+              %td.td-stg IN PROGRESS
+              %td http://b2bmdvan.net
+              %td 2018-08-08 13:59:10
+            %tr
+              %th{:scope => "row"} 01402523
+              %td.td-stg CUSTOMER PENDING
+              %td http://ethermine.org
+              %td 2018-08-08 13:59:10
+
+      .tickets-section-wrapper.closed-tickets-wrapper
+        .closed-tickets-header
+          %h3.larger-lighter My Closed Tickets
+
+          .ticket-count-wrapper
+            %label.total-table-ticket-count 3
+            %label.total-table-entry-count 23
 
 
-      .user-tickets-top
-        .user-tickets-header
-          %h6 My Closed Tickets
 
-      %table.table.responsive#close-ticket-table
-        %thead
-          %tr
-            %th
-              -# Expend / Collapse Button
-            %th#case-id CASE ID
-            %th
-            %th
-            %th#dispute DISPUTE
-            %th
-            %th#time-to-close TIME TO CLOSE
+
+-#.user-tickets-top
+-#  .user-tickets-header
+-#    %h6 My Closed Tickets
+-#
+-#%table.table.responsive#close-ticket-table
+-#  %thead
+-#    %tr
+-#      %th
+-#        -# Expend / Collapse Button
+-#      %th#case-id CASE ID
+-#      %th
+-#      %th
+-#      %th#dispute DISPUTE
+-#      %th
+-#      %th#time-to-close TIME TO CLOSE

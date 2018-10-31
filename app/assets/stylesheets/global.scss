@@ -6583,32 +6583,12 @@ h2 {
   margin-top: 15px;
 }
 
-.col-xs-6 {
-  .content-layout-list {
-    height: 100%;
-    width: 100%;
-    display: inline-flex;
-    justify-content: space-between;
 
-    label {
-      font-size: 10px;
-      color: $type-lighter-color;
-      padding-left: 15px;
-    }
-
-    .no-left-pad{
-      padding-left: 0;
-    }
-
-    .checkbox-stg {
-      padding-left: 10px;
-    }
-  }
-
-  .right-vertical-separator {
-    padding-right: 20px;
-    border-right: 1px solid gray;
-  }
+.content-layout-list {
+  height: 100%;
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
 
   label {
     background-repeat: no-repeat;
@@ -6617,47 +6597,51 @@ h2 {
   }
 }
 
-.left-vertical-separator {
-  margin-left: 10px;
-  border-left: 1px solid #dddddd;
+.no-left-pad{
+  padding-left: 0;
 }
-.user-tickets-top {
-  display: block;
-  height: 40px;
-  margin-top: 5px;
-  padding-top: 10px;
 
-  .user-tickets-header {
-    display: inline-flex;
-    justify-content: space-between;
-    width: 100%;
-    height: 100%;
-    line-height: 30px;
-
-    .num-frame {
-      display: inline-flex;
-      float: right;
-      height: 100%;
-
-      label {
-        font-size: 20px;
-      }
-
-      .label-stg {
-        border-radius: 100%;
-        text-align: center;
-        background-color: skyblue;
-        width: 30px;
-        font-weight: bold;
-        height: 100%;
-        line-height: 30px;
-      }
-    }
-  }
-  .left-space {
-    padding-left: 10px;
-  }
+.checkbox-stg {
+  padding-left: 10px;
 }
+
+
+.right-vertical-separator {
+  padding-right: 20px;
+  border-right: 1px solid gray;
+}
+
+
+.ticket-count-wrapper {
+  display: inline-flex;
+  float: right;
+  height: 100%;
+}
+.left-space {
+  padding-left: 10px;
+}
+
+.total-table-ticket-count, .total-table-entry-count {
+  height: 30px;
+  width: 30px;
+  font-size: 14pt;
+  line-height: 1.5em;
+  text-align: center;
+}
+
+.total-table-ticket-count {
+  font-weight: 600;
+  background-color: $faint-accent-color;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.total-table-entry-count {
+  font-weight: 300;
+  padding-left: 8px;
+  border-left: 1px solid $faint-neutral-color;
+}
+
 
 //vanney dommy table start here
 
@@ -6691,3 +6675,36 @@ h2 {
 .status_ew {
   background: purple;
 }
+
+
+.tickets-section-wrapper {
+  margin-top: 20px;
+
+
+}
+
+h3.larger-lighter {
+  color: $type-lighter-color;
+  font-size: 12pt;
+  font-weight: 300;
+}
+
+.open-tickets-header h3, .closed-tickets-header h3 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  padding-left: 34px;
+  background-position: left center;
+  height: 30px;
+  line-height: 1.95em;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.open-tickets-header h3 {
+  background-image: url(image_path('icon_myopenbugs_grey.svg'));
+}
+
+.closed-tickets-header h3 {
+  background-image: url(image_path('icon_fixedbugs_grey.svg'));
+}
+
