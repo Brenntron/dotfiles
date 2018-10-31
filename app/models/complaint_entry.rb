@@ -604,14 +604,18 @@ class ComplaintEntry < ApplicationRecord
     if prefix_id.present?
       prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
       if complaint_entry_preload.present?
-        complaint_entry_preload.historic_category_information = prefix_history
+        complaint_entry_preload.historic_category_information ||= prefix_history.to_json
         complaint_entry_preload.save
       else
-        ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: prefix_history)
+        ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: prefix_history.to_json)
       end
     else
       prefix_history = []
-      ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: 'DATA ERROR')
+      if complaint_entry_preload.present?
+        complaint_entry_preload.historic_category_information ||= 'DATA ERROR'
+      else
+        ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: 'DATA ERROR')
+      end
     end
 
     prefix_history
