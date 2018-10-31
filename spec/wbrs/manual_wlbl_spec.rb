@@ -79,6 +79,11 @@ describe Wbrs::ManualWlbl do
         "usr": 'ancheng3'
     }
   end
+  let(:error_wlbl_params) do
+    {
+        "usr": 'ancheng3'
+    }
+  end
 
   before do
     FactoryBot.create(:customer)
@@ -172,12 +177,12 @@ describe Wbrs::ManualWlbl do
     expect(DisputeEntry.find(2).webrep_wlbl_key).to eq(209054)
   end
 
-  it 'should handle errors adding a WL/BL on the backend' #do
-  #   expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_error)
-  #
-  #   expect {
-  #     Wbrs::ManualWlbl.add_from_params
-  #   }.to raise_error(Wbrs::WbrsError)
-  # end
+  it 'should handle errors adding a WL/BL on the backend' do
+    expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_error)
+
+    expect {
+      Wbrs::ManualWlbl.add_from_params(dispute_entry, error_wlbl_params)
+    }.to raise_error(Wbrs::WbrsError)
+  end
 
 end
