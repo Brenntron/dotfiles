@@ -67,7 +67,6 @@ window.categorize_cluster = (cluster_id, comment, category_ids) ->
   , this)
 
 $ ->
-  $(document).ready ->
 #  Populate the cluster management table (temp data currently)
   clusters_table = $('#clusters-index').DataTable(
     columnDefs: [
