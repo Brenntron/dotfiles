@@ -26,11 +26,11 @@
       .dashboard-menu-list
         %label.bold View:
         %ul
-          %li.active
-            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{:href => "/escalations/webrep/dashboard"} My Tickets
-            %span.arrow-down
           %li
-            %a.group-user-white.icon-team-grey.user-icon-stg.bold{:href => "/escalations/webrep/myteamtickets"} My Team Tickets
+            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{:href => "/escalations/webrep/dashboard"} My Tickets
+          %li.active
+            %a.group-user-white.icon-team-grey.user-icon-stg.bold{:href => "/escalations/webrep/teamtickets"} My Team Tickets
+            %span.arrow-down
           %li
             %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{:href => ""} All Tickets
 
@@ -79,12 +79,88 @@
             %label.left-space.left-vertical-separator 23
 
     .col-xs-6.graph-section
+      -#multi-user graph start here.
       .col-xs-6.left-graph-frame
-        .graph-top-header
-          %h5.uppercase.header-stg ticket entries closed by day
+        .graph-top-header.top-space-ex.bottom-space
+          %h5.uppercase.header-stg ticket entries closed by ticket owner
+        %canvas#bar-chart-horizontal
 
+        .graph-top-header.top-space-ex.bottom-space
+          %h5.uppercase.header-stg average time to close tickets by ticket owner
+        %canvas#bar-chart2-horizontal
 
-        %label.content-label-sm Time Breakdown
+        .graph-top-header.top-space-ex.bottom-space
+          %h5.uppercase.header-stg ticket resolution by ticket owner
+        .graph-bar2-legend
+          .custom-legend
+            %label Unchanged
+            %label.lightgray-legend-color
+          .custom-legend
+            %label Fixed FN
+            %label.navyblue-legend-color
+          .custom-legend
+            %label Fixed FP
+            %label.skyblue-legend-color
+          .custom-legend
+            %label Other
+            %label.orange-legend-color
+        %canvas#bar-chart-grouped.bottom-space
+        .right-graph-table-layout
+          %table.table
+            %thead
+              %tr
+                %th{:scope => "col"} OWNER
+                %th{:scope => "col"} UNCHANGED
+                %th{:scope => "col"} FIXED FN
+                %th{:scope => "col"} FIXED FP
+                %th{:scope => "col"} OTHER
+            %tbody
+              %tr.text-center
+                %td.text-left mtaylor
+                %td 4
+                %td 10
+                %td 8
+                %td 0
+              %tr.text-center
+                %td.text-left chrclair
+                %td 5
+                %td 13
+                %td 7
+                %td 1
+              %tr.text-center
+                %td.text-left nherbert
+                %td 11
+                %td 11
+                %td 6
+                %td 0
+
+              %tr.text-center
+                %td.text-left nverbeck
+                %td 13
+                %td 10
+                %td 7
+                %td 4
+
+              %tr.text-center
+                %td.text-left abreeman
+                %td 9
+                %td 5
+                %td 9
+                %td 1
+            %tfoot
+              %tr
+                %th Total
+                %th.text-center 42
+                %th.text-center 49
+                %th.text-center 37
+                %th.text-center 6
+
+        .graph-top-header.top-space.bottom-space
+          %h5.uppercase.header-stg rule hits for false positive resolutions
+        %canvas#bar-chart3-horizontal
+
+      .col-xs-6
+        %label.content-label-sm.top-space-ex Time Breakdown
         .graph-config
           %select.form-control
             %option{:selected => "selected", :value => "day"} By Day
@@ -92,38 +168,34 @@
             %option{:value => "monthly"} Monthly
             %option{:value => "yearly"} Yearly
 
-          .graph-menu
-            %label
-              %input.all-ticket{:type => "checkbox", :checked => "checked"}/
-              %label.total-legend
-              Total Tickets Entries
+        .graph-top-header
+          %h5.uppercase.header-stg ticket entries closed by day
 
-            %label
-              %input.group-ticket{:type => "checkbox", :checked => "checked"}/
-              %label.dispute-E.legend-option
-              %label.dispute-W.legend-option
-              %label.dispute-EW.legend-option
-              Entries By Ticket Types
-        %canvas#canvas
+        .graph-menu.float-right
+          %label
+            %input.all-ticket{:type => "checkbox", :checked => "checked"}/
+            %label.total-legend
+            Total Tickets Entries
 
+          %label
+            %input.group-ticket{:type => "checkbox"}/
+            %label.dispute-E.legend-option
+            %label.dispute-W.legend-option
+            %label.dispute-EW.legend-option
+            Entries By Ticket Types
+        %canvas#bar-chart2-grouped
 
-        .graph-top-header.top-space-ex.bottom-space
-          %h5.uppercase.header-stg Times to Close Tickets
-        .average-label
-          %label Average Time To Close
-          %label.label-stg 45m 12s
-        %canvas#line-chart
-
-
-        %label.content-label-sm.top-space-ex Time Breakdown
+        %label.content-label-sm.top-space Time Breakdown
         .graph-config
           %select.form-control
-            %option{:selected => "selected", :value => ""} By Day
-            %option{:value => ""} Weekly
-            %option{:value => ""} Monthly
-            %option{:value => ""} Yearly
+            %option{:selected => "selected", :value => "day"} By Day
+            %option{:value => "weekly"} Weekly
+            %option{:value => "monthly"} Monthly
+            %option{:value => "yearly"} Yearly
+
         .graph-top-header
           %h5.uppercase.header-stg ticket submitted by submitter per day
+
         .graph-bar2-legend
           .custom-legend
             %label Customer
@@ -131,14 +203,12 @@
           .custom-legend
             %label Guest
             %label.navyblue-legend-color
-        %canvas#bar-chart
+        %canvas#bar-chart3-grouped
 
-
-      .col-xs-6.right-graph-frame
-        .graph-top-header
+        .graph-top-header.top-space-ex
           %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
 
-        %canvas#pie-chart
+        %canvas#team-pie-chart
 
         .right-graph-table-layout.left-space
           %table.table
@@ -166,11 +236,10 @@
                 %td 00.00%
                 %td 0
 
+        .graph-top-header.top-space-ex
+          %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
 
-        .graph-top-header.top-space.top-space-ex
-          %h5.uppercase.dispute-W-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
-
-        %canvas#pie-chart2
+        %canvas#team-pie2-chart
 
         .right-graph-table-layout.left-space
           %table.table

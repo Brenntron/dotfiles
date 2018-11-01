@@ -6442,7 +6442,7 @@ h2 {
     padding: 0;
     height: inherit;
     width: 100%;
-    display: block;
+    display: flex;
     border-right: 2px solid white;
 
     li {
@@ -6450,34 +6450,74 @@ h2 {
       display: inline-block;
       line-height: 50px;
       cursor: pointer;
-      margin-right: 20px;
+      padding: 0 10px;
+      position: relative;
+      border-left: .5px solid $faint-neutral-color;
+      border-right: .5px solid $faint-neutral-color;
+
+      .arrow-down {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: $primary-section-color;
+        transform: rotate(45deg);
+        bottom: -5px;
+        left: calc(50% - 5px);
+      }
 
       a {
         display: block;
         height: 100%;
-        padding: 0 15px 0 40px;
+        width: 100%;
+        padding-left: 40px;
         font-size: 11px;
         text-decoration: none;
         color: $type-lighter-color;
       }
 
-      a:hover {
+      //a:hover,
+      //a.active {
+      //  color: white;
+      //  background-color: $primary-section-color;
+      //}
+      //.white-user:hover,
+      //.white-user.active{
+      //  background-image: url(image_path('icon_user_white.svg'));;
+      //}
+      //.group-user-white:hover,
+      //.group-user-white.active {
+      //  background-image: url(image_path('icon_team.svg'));
+      //}
+      //.all-tickets-white:hover,
+      //.all-tickets-white.active{
+      //  background-image: url(image_path('icon_ticket.svg'));
+      //}
+      //.custom-user-white:hover,
+      //.custom-user-white.active{
+      //  background-image: url(image_path('icon_custom_user_white.svg'));
+      //}
+
+    }
+
+    li.active,
+    li:hover {
+      background-color: $primary-section-color;
+      a {
         color: white;
-        background-color: $primary-section-color;
-      }
-      .white-user:hover {
-        background-image: url(image_path('icon_user_white.svg'));;
-      }
-      .group-user-white:hover {
-        background-image: url(image_path('icon_team.svg'));
-      }
-      .all-tickets-white:hover {
-        background-image: url(image_path('icon_ticket.svg'));
-      }
-      .custom-user-white:hover {
-        background-image: url(image_path('icon_custom_user_white.svg'));
       }
 
+      .white-user {
+        background-image: url(image_path('icon_user_white.svg'));;
+      }
+      .group-user-white {
+        background-image: url(image_path('icon_team.svg'));
+      }
+      .all-tickets-white{
+        background-image: url(image_path('icon_ticket.svg'));
+      }
+      .custom-user-white{
+        background-image: url(image_path('icon_custom_user_white.svg'));
+      }
     }
   }
   .user-icon-stg-1 {
@@ -6662,11 +6702,11 @@ h2 {
       }
     }
   }
-  .left-space {
-    padding-left: 10px;
-  }
 }
 
+.left-space {
+  padding-left: 10px;
+}
 
 .graph-top-header {
   width: 100%;
@@ -6703,101 +6743,58 @@ h2 {
     padding: 35px 15px 0 0;
     border-right: 1px solid #dddddd;
     margin: 0;
-
-    .graph-config {
-      display: inline-flex;
-      width: 100%;
-      height: 40px;
-      justify-content: space-between;
-
-      .form-control {
-        height: 18px;
-        width: 25%;
-        padding: 0;
-        outline-offset: 2px;
-        font-size: 10px;
-        font-weight: bold;
-        background-color: lightgray;
-      }
-
-      .graph-menu {
-        height: 100%;
-        width: 48%;
-        border: 1px solid #dddddd;
-        padding: 0 5px;
-
-        label {
-          height: 50%;
-          width: 100%;
-          font-size: 9px;
-          font-weight: bold;
-          color: $content-label-color;
-
-          .total-legend {
-            background-color: skyblue;
-            width: 40px;
-            height: 10px;
-            position: relative;
-            top: 2px;
-            border-radius: 2px;
-          }
-
-          .legend-option {
-            width: 14px;
-            position: relative;
-            top: 1.5px;
-            background-position-y: -1px;
-            border-radius: 2px;
-          }
-        }
-      }
     }
   }
 
   .graph-bar2-legend {
     height: 100%;
-    width: 35%;
+    width: 30%;
     padding: 0 10px;
-    border: 1px solid #dddddd;
+    border: 1px solid $faint-neutral-color;
     float: right;
 
     .legend-top-space {
       margin-top: 4px;
     }
 
-    .legend-radio {
+    .custom-legend {
       display: block;
+      padding: 4px 0;
       text-align: right;
-
-      .customer-legend {
-        display: block;
-      }
-
-      .guest-legend {
-        display: block;
-      }
-
-      .customer-legend-color {
-        height: 8px;
-        width: 8px;
-        border-radius: 100%;
-        background-color: $primary-section-color;
-      }
-
-      .guest-legend-color {
-        height: 8px;
-        width: 8px;
-        border-radius: 100%;
-        background-color: $content-tab-color;
-      }
-
-      label {
-        padding-right: 15px;
-        color: $content-label-color;
-        font-weight: bold;
-        font-size: 11px;
-      }
     }
+
+    .skyblue-legend-color {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $primary-section-color;
+    }
+
+    .navyblue-legend-color {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $content-tab-color;
+    }
+
+    .lightgray-legend-color {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $content-label-color;
+    }
+
+    .orange-legend-color {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $warning-accent-color;
+    }
+
+    label {
+      font-size: 11px;
+    }
+
   }
 
   .right-graph-frame {
@@ -6806,32 +6803,65 @@ h2 {
     text-align: center;
     padding: 35px 0 0 0;
     margin: 0;
+  }
 
-    .graph-header-icon-stg {
-      background-repeat: no-repeat;
-      background-size: 14px;
-      padding-left: 20px;
-      background-position-y: 3px;
-    }
+.graph-header-icon-stg {
+  background-repeat: no-repeat;
+  background-size: 14px;
+  padding-left: 20px;
+  background-position-y: 3px;
+}
+.right-graph-table-layout {
+  display: flex;
+  width: 100%;
+  margin-top: 20px;
+  justify-content: center;
+}
 
-    .right-graph-table-layout {
-      display: flex;
-      width: 100%;
-      padding: 0 40px;
-      margin-top: 20px;
-      justify-content: center;
+.graph-config {
+  display: inline-flex;
+  width: 100%;
+  height: 40px;
+  justify-content: space-between;
 
-      th {
-        text-align: center;
-      }
-      td {
-        text-align: center;
-      }
-    }
+  .form-control {
+    height: 18px;
+    width: 25%;
+    padding: 0;
+    outline-offset: 2px;
+    font-size: 10px;
+    font-weight: bold;
+    background-color: lightgray;
   }
 }
 
-.multi-graph-section {
-  border: 1px solid red;
-  display: none;
+.graph-menu {
+  height: 100%;
+  width: 50%;
+  border: 1px solid #dddddd;
+  padding: 0 5px;
+
+  label {
+    height: 50%;
+    width: 100%;
+    font-size: 9px;
+    font-weight: bold;
+    color: $content-label-color;
+
+    .total-legend {
+      background-color: skyblue;
+      width: 40px;
+      height: 10px;
+      position: relative;
+      top: 2px;
+      border-radius: 2px;
+    }
+
+    .legend-option {
+      width: 14px;
+      position: relative;
+      top: 1.5px;
+      background-position-y: -1px;
+    }
+  }
 }
