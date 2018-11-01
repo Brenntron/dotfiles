@@ -5264,6 +5264,7 @@ table.dispute_tool_current tr:last-of-type td {
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
+  display: block;
 }
 
 .top-case-info .dispute-submission-type {
@@ -6644,28 +6645,6 @@ h2 {
 }
 
 
-
-
-.status_e,
-.status_w,
-.status_ew {
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-  text-align: center;
-  color: white;
-  background: green;
-}
-
-.status_w {
-  background: orange;
-}
-
-.status_ew {
-  background: purple;
-}
-
-
 .tickets-section-wrapper {
   margin-top: 20px;
 }
@@ -6697,4 +6676,20 @@ h3.larger-lighter {
 
 .dashboard-header {
   margin-top: 40px;
+}
+
+.submitter-type-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.submitter-customer {
+  background-image: url(image_path('icon_customer_star.svg'));
+}
+
+.dashboard-tickets-table {
+  margin-top: 10px !important;
 }

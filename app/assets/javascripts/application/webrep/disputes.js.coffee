@@ -1730,13 +1730,14 @@ $ ->
 
   window.open_dashboard_dispute_table = $('#table-user-complaints-open').DataTable(
     dom: '<t<p>>'
+    data: tempSingleUserOpenTixDataset
     columnDefs: [
       {
         targets: [ 1 ]
         className: 'id-col'
       }
       {
-        targets: [ 4 ]
+        targets: [ 3 ]
         className: 'state-col'
       }
       {
@@ -1755,7 +1756,11 @@ $ ->
           '<span class="bug-priority p-' + data + '"></span>'
       }
       { data: 'case_number' }
-      { data: 'submitter_type'}
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
       { data: 'status' }
       {
         data: 'submission_type'
@@ -1763,21 +1768,51 @@ $ ->
           '<span class="dispute-submission-type dispute-' + data  + '"></span>'
       }
       { data: 'd_entry_preview' }
-      {
-        data: null
-        render: ->
-          '<span>2018-08-08 13:59:10</span>'
-      }
-    ])
+      { data: 'last_comment' }
+    ]
+  )
 
-  window.populate_myopen_tix_table = () ->
-  data = {
-    test
+tempSingleUserOpenTixDataset = [
+  {
+    'priority': ['P1'],
+    'case_number': ['0000375515'],
+    'submitter_type': ['customer'],
+    'status': ['Researching'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['0000375513'],
+    'submitter_type': ['guest'],
+    'status': ['Assigned'],
+    'submission_type': ['E'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
+  },
+  {
+    'priority': ['P4'],
+    'case_number': ['0000375502'],
+    'submitter_type': ['guest'],
+    'status': ['Customer_Pending'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['000012345'],
+    'submitter_type': ['customer'],
+    'status': ['Researching'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
   }
-  window.populate_webrep_dashboard_opentix_table
+]
 
-  
 
+# This is not actually set up to work yet.
 window.populate_webrep_dashboard_opentix_table = (data = {}) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -1788,6 +1823,7 @@ window.populate_webrep_dashboard_opentix_table = (data = {}) ->
     data_json: JSON.stringify(data)
     success: (response) ->
       console.log(response)
+      console.log(data)
       json = $.parseJSON(response)
 
       if json.data.length == 0
