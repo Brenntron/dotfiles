@@ -76,14 +76,14 @@
           %h3.larger-lighter My Open Tickets
 
           .ticket-count-wrapper
-            %label.total-table-ticket-count 3
+            %label.total-table-ticket-count 4
             %label.total-table-entry-count 23
 
         %table.table.responsive.dashboard-tickets-table#table-user-complaints-open
           %thead
             %tr
               %th
-                -#    priority
+                -#  priority
               %th Case ID
               %th
                 -#  Submitter type
@@ -93,30 +93,81 @@
               %th Dispute Preview
               %th Last Comment Date
 
+        .ticket-entries-totals-wrapper
+          %label.totals-label
+            Total Ticket Entries
+          .ticket-entry-total-block
+            %label.content-label-sm.submitter-customer
+              Customer
+            %span.ticket-entry-total
+              32
+          .ticket-entry-total-block.guest-block-total
+            %label.content-label-sm
+              Guest
+            %span.ticket-entry-total
+              12
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-E-grey
+              Email Entries
+            %span.ticket-entry-total
+              25
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-W-grey
+              Web Entries
+            %span.ticket-entry-total
+              22
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-EW-grey
+              Email/Web Entries
+            %span.ticket-entry-total
+              3
+
 
       .tickets-section-wrapper.closed-tickets-wrapper
         .closed-tickets-header
           %h3.larger-lighter My Closed Tickets
 
           .ticket-count-wrapper
-            %label.total-table-ticket-count 3
-            %label.total-table-entry-count 23
+            %label.total-table-ticket-count 7
+            %label.total-table-entry-count 46
 
-
-
-
--#.user-tickets-top
--#  .user-tickets-header
--#    %h6 My Closed Tickets
--#
--#%table.table.responsive#close-ticket-table
--#  %thead
--#    %tr
--#      %th
--#        -# Expend / Collapse Button
--#      %th#case-id CASE ID
--#      %th
--#      %th
--#      %th#dispute DISPUTE
--#      %th
--#      %th#time-to-close TIME TO CLOSE
+        %table.table.responsive.dashboard-tickets-table#table-user-complaints-closed
+          %thead
+            %tr
+              %th
+                -#    priority
+              %th Case ID
+              %th
+                -#  Submitter type
+              %th
+                -#  Ticket type
+              %th Dispute Preview
+              %th Time to Close
+        .ticket-entries-totals-wrapper
+          %label.totals-label
+            Total Ticket Entries
+          .ticket-entry-total-block
+            %label.content-label-sm.submitter-customer
+              Customer
+            %span.ticket-entry-total
+              32
+          .ticket-entry-total-block.guest-block-total
+            %label.content-label-sm
+              Guest
+            %span.ticket-entry-total
+              12
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-E-grey
+              Email Entries
+            %span.ticket-entry-total
+              25
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-W-grey
+              Web Entries
+            %span.ticket-entry-total
+              22
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-EW-grey
+              Email/Web Entries
+            %span.ticket-entry-total
+              3

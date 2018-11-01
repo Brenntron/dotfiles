@@ -6649,6 +6649,10 @@ h2 {
   margin-top: 20px;
 }
 
+.closed-tickets-wrapper {
+  margin-top: 50px;
+}
+
 h3.larger-lighter {
   color: $type-lighter-color;
   font-size: 12pt;
@@ -6692,4 +6696,51 @@ h3.larger-lighter {
 
 .dashboard-tickets-table {
   margin-top: 10px !important;
+}
+
+td.text-center span {
+  margin: auto;
+}
+
+.totals-label {
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  font-size: 8pt;
+  font-weight: 600;
+}
+
+.ticket-entries-totals-wrapper {
+  margin-top: 12px;
+}
+
+.totals-label, .ticket-entry-total-block {
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.ticket-entries-totals-wrapper .content-label-sm {
+  color: $type-lighter-color;
+  font-weight: 500;
+  font-size: 8pt;
+  margin-bottom: 0;
+}
+
+.ticket-entry-total {
+  font-weight: 700;
+  font-size: 8.5pt;
+}
+
+.ticket-entry-total-block {
+  .submitter-customer, .dispute-E-grey, .dispute-W-grey, .dispute-EW-grey {
+    padding-left: 20px;
+    background-size: 14px 14px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    line-height: 1.5em;
+  }
+}
+
+.guest-block-total {
+  border-right: 1px solid $content-label-color;
+  padding-right: 12px;
 }

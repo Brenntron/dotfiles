@@ -1729,7 +1729,7 @@ $ ->
 $ ->
 
   window.open_dashboard_dispute_table = $('#table-user-complaints-open').DataTable(
-    dom: '<t<p>>'
+    dom: '<t>'
     data: tempSingleUserOpenTixDataset
     columnDefs: [
       {
@@ -1772,6 +1772,45 @@ $ ->
     ]
   )
 
+  window.open_dashboard_dispute_table = $('#table-user-complaints-closed').DataTable(
+    dom: '<t>'
+    data: tempSingleUserClosedTixDataset
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [
+          0
+          2
+          3
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'time_to_close' }
+    ]
+  )
+
 tempSingleUserOpenTixDataset = [
   {
     'priority': ['P1'],
@@ -1811,6 +1850,65 @@ tempSingleUserOpenTixDataset = [
   }
 ]
 
+
+tempSingleUserClosedTixDataset = [
+  {
+    'priority': ['P1'],
+    'case_number': ['0000375515'],
+    'submitter_type': ['customer'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
+    'time_to_close': ['35m']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['0000375513'],
+    'submitter_type': ['guest'],
+    'submission_type': ['E'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
+    'time_to_close': ['1h 25m']
+  },
+  {
+    'priority': ['P4'],
+    'case_number': ['0000375502'],
+    'submitter_type': ['guest'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
+    'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
+  },
+  {
+    'priority': ['P1'],
+    'case_number': ['0000375515'],
+    'submitter_type': ['customer'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
+    'time_to_close': ['35m']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['0000375513'],
+    'submitter_type': ['guest'],
+    'submission_type': ['E'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
+    'time_to_close': ['1h 25m']
+  },
+  {
+    'priority': ['P4'],
+    'case_number': ['0000375502'],
+    'submitter_type': ['guest'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
+    'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['000012345'],
+    'submitter_type': ['customer'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
+    'time_to_close': ['42m']
+  }
+]
 
 # This is not actually set up to work yet.
 window.populate_webrep_dashboard_opentix_table = (data = {}) ->
