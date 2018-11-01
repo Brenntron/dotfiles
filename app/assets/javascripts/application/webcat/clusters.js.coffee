@@ -82,7 +82,7 @@ window.categorize_cluster = (cluster_id, comment, category_ids) ->
 $ ->
 
 #  Populate the cluster management table (temp data currently)
-  clusters_table = $('#clusters-index').DataTable(
+  window.clusters_table = $('#clusters-index').DataTable(
     columnDefs: [
       {
         targets: [
@@ -139,7 +139,8 @@ $ ->
               data = 'http://' + data
               '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data + '\')"></button>' +
               '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
-              data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>'
+              data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>' +
+              ' <span class="label right-margin label-default">3</span>' # TODO: Put real data here
       }
       {
         data: 'global_volume'
@@ -178,4 +179,70 @@ $ ->
       $('#clusters-index').DataTable().rows().select()
     else
       $('#clusters-index').DataTable().rows().deselect()
-  return
+
+
+  $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
+    tr = $(this).closest('tr')
+    row = window.clusters_table.row(tr)
+    if row.child.isShown()
+# This row is already open - close it
+      row.child.hide()
+      tr.removeClass 'shown'
+    else
+# Open this row
+      row.child(window.format(row.data())).show()
+      tr.addClass 'shown'
+      td = $(tr).next('tr').find('td:first')
+      $(td).addClass 'dispute-entry-table-wrapper'
+      # Check to see which columns should be displayed
+      $('.toggle-vis-nested').each ->
+        checkbox_trigger = $(this).attr('data-column')
+        checkbox = $(this).find('input')
+        if $(checkbox).prop('checked')
+          $('.dispute-entry-table td, .dispute-entry-table th').each ->
+            if $(this).hasClass(checkbox_trigger)
+              $(this).show()
+            return
+        else if $(checkbox).prop('checked') == false
+          $('.dispute-entry-table td, .dispute-entry-table th').each ->
+            if $(this).hasClass(checkbox_trigger)
+              $(this).hide()
+            return
+        return
+    return
+#  Expand cluster rows
+
+  window.format = (cluster) ->
+    table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' + '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' + '<th class="clusterpath-col-path">Cluster Paths</th>' + '<th class="clusterpath-col-volume">Volume</th>' + '<th class="clusterpath-col-wbrs">WBRS Score</th>' + '<th class="clusterpath-col-rules">Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+    missing_data = '<span class="missing-data">Missing Data</span>'
+    entry_rows = []
+    entry = [
+      {
+        "id": 1,
+        "path": "255.255.255.0",
+        "volume": 8.488308,
+        "rules": "Test"
+      },
+      {
+        "id": 2,
+        "path": "192.168.0.1",
+      }
+    ]
+    $(entry).each ->
+
+      entry_row = '<tr class="index-entry-row">' +
+        '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
+        '<td class="clusterpath-col-path">' + this.path + '</td>' +
+        '<td class="clusterpath-col-volume">' + this.volume + '</td>' +
+        '<td class="clusterpath-col-wbrs">' + this.wbrs + '</td>' +
+        '<td class="clusterpath-col-rules">' + this.rules + '</td>' +
+        '</tr>'
+      entry_rows.push entry_row
+      return
+    # `d` is the original data object for the row
+    table_head + entry_rows.join('') + '</tbody></table>'
+
+  window.select_or_deselect_cluster = (cluster_id)->
+    $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
+
+
