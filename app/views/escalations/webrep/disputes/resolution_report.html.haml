@@ -6,7 +6,7 @@
       %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
       %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
       %input{type: 'hidden', name: 'period', value: params['report']['period']}
-      %button Export
+      %button{class: 'per-resolution-export'} Export
 
   .report-div
     #per-resolution-report-div
@@ -45,7 +45,7 @@
       %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
       %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
       %input{type: 'hidden', name: 'period', value: params['report']['period']}
-      %button Export
+      %button{class: 'per-engineer-export'} Export
 
   .report-div
     #per-engineer-report-div
@@ -85,7 +85,7 @@
       %input{type: 'hidden', name: 'date_from', value: params['report']['date_from']}
       %input{type: 'hidden', name: 'date_to', value: params['report']['date_to']}
       %input{type: 'hidden', name: 'period', value: params['report']['period']}
-      %button Export
+      %button{class: 'per-customer-export'}
 
   .report-div
     #per-customer-report-div
