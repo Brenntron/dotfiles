@@ -76,7 +76,6 @@ class Wbrs::Base
   end
 
   def self.call_request(method, request)
-    raise 'raspberry'
     case method
       when :post
         if gssnegotiate?

@@ -554,7 +554,6 @@ class Complaint < ApplicationRecord
     }
 
     bug_id = bugzilla_rest_session.create_bug(bug_attrs)
-    raise 'raspberry' if true
 
 
     cust = find_customer(customer) if customer
